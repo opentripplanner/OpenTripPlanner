@@ -51,10 +51,10 @@ public class TemporaryVerticesContainerBuilder {
 
   private final Graph graph;
   private final VertexLinker vertexLinker;
-  private final Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
+  private final List<DisposableEdgeCollection> tempEdges = new ArrayList<>();
   private GenericLocation from = GenericLocation.UNKNOWN;
   private GenericLocation to = GenericLocation.UNKNOWN;
-  private List<GenericLocation> visitViaLocations = List.of();
+  private List<VisitViaLocation> visitViaLocationsWithCoordinates = List.of();
   private Set<Vertex> fromVertices = Set.of();
   private Set<Vertex> toVertices = Set.of();
   private Map<VisitViaLocation, Set<Vertex>> visitViaLocationVertices = Map.of();
@@ -122,10 +122,10 @@ public class TemporaryVerticesContainerBuilder {
       .stream()
       .filter(location -> location.coordinateLocation() != null)
       .toList();
-    this.visitViaLocations = visitViaLocationsWithCoordinates
-      .stream()
-      .map(VisitViaLocation::coordinateLocation)
-      .toList();
+    if (visitViaLocationsWithCoordinates.isEmpty()) {
+      return this;
+    }
+    this.visitViaLocationsWithCoordinates = visitViaLocationsWithCoordinates;
     this.visitViaLocationVertices = visitViaLocationsWithCoordinates
       .stream()
       .collect(
@@ -146,7 +146,7 @@ public class TemporaryVerticesContainerBuilder {
     return visitViaLocationVertices;
   }
 
-  public Set<DisposableEdgeCollection> tempEdges() {
+  public List<DisposableEdgeCollection> tempEdges() {
     return tempEdges;
   }
 
@@ -157,21 +157,42 @@ public class TemporaryVerticesContainerBuilder {
   }
 
   private void addAdjustedEdges() {
+    addAdjustedEdgesBetween(fromVertices, toVertices);
+    if (visitViaLocationsWithCoordinates.isEmpty()) {
+      return;
+    }
+    addAdjustedEdgesBetween(
+      fromVertices,
+      visitViaLocationVertices.get(visitViaLocationsWithCoordinates.getFirst())
+    );
+    addAdjustedEdgesBetween(
+      visitViaLocationVertices.get(visitViaLocationsWithCoordinates.getLast()),
+      toVertices
+    );
+    var i = 1;
+    while (i < visitViaLocationsWithCoordinates.size()) {
+      Set<Vertex> fromViaVertices = visitViaLocationVertices.get(
+        visitViaLocationsWithCoordinates.get(i - 1)
+      );
+      Set<Vertex> toViaVertices = visitViaLocationVertices.get(
+        visitViaLocationsWithCoordinates.get(i)
+      );
+      addAdjustedEdgesBetween(fromViaVertices, toViaVertices);
+      i++;
+    }
+  }
+
+  private void addAdjustedEdgesBetween(Set<Vertex> fromVertices, Set<Vertex> toVertices) {
     for (Vertex fromVertex : fromVertices) {
       for (Vertex toVertex : toVertices) {
-        tempEdges.add(SameEdgeAdjuster.adjust(fromVertex, toVertex, graph));
+        addEdges(SameEdgeAdjuster.adjust(fromVertex, toVertex, graph));
       }
     }
-    var viaVertices = visitViaLocationVertices.values().stream().flatMap(Set::stream).toList();
-    for (Vertex fromVertex : fromVertices) {
-      for (Vertex viaVertex : viaVertices) {
-        tempEdges.add(SameEdgeAdjuster.adjust(fromVertex, viaVertex, graph));
-      }
-    }
-    for (Vertex toVertex : toVertices) {
-      for (Vertex viaVertex : viaVertices) {
-        tempEdges.add(SameEdgeAdjuster.adjust(viaVertex, toVertex, graph));
-      }
+  }
+
+  private void addEdges(DisposableEdgeCollection collection) {
+    if (!collection.isEmpty()) {
+      tempEdges.add(collection);
     }
   }
 
@@ -225,7 +246,7 @@ public class TemporaryVerticesContainerBuilder {
     // Check if coordinate is provided and connect it to graph
     if (location.getCoordinate() != null) {
       results.add(
-        createVertexFromCoordinate(location.getCoordinate(), location.label, modes, type, tempEdges)
+        createVertexFromCoordinate(location.getCoordinate(), location.label, modes, type)
       );
     }
 
@@ -247,8 +268,7 @@ public class TemporaryVerticesContainerBuilder {
     Coordinate coordinate,
     @Nullable String label,
     List<TraverseMode> modes,
-    LocationType type,
-    Set<DisposableEdgeCollection> tempEdges
+    LocationType type
   ) {
     LOG.debug("Creating {} vertex for {}", type.description(), coordinate);
 
@@ -258,7 +278,7 @@ public class TemporaryVerticesContainerBuilder {
 
     var temporaryStreetLocation = new TemporaryStreetLocation(coordinate, name);
 
-    tempEdges.add(
+    addEdges(
       vertexLinker.linkVertexForRequest(
         temporaryStreetLocation,
         new TraverseModeSet(modes),
@@ -297,7 +317,7 @@ public class TemporaryVerticesContainerBuilder {
     }
 
     // check that vertices where found if visit via locations with coordinates were specified
-    if (!visitViaLocations.isEmpty()) {
+    if (!visitViaLocationsWithCoordinates.isEmpty()) {
       var errors = visitViaLocationVertices
         .entrySet()
         .stream()

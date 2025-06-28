@@ -1,5 +1,6 @@
 package org.opentripplanner.street.search;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
@@ -17,7 +18,7 @@ import org.opentripplanner.street.search.request.FromToViaVertexRequest;
  */
 public class TemporaryVerticesContainer implements AutoCloseable {
 
-  private final Set<DisposableEdgeCollection> tempEdges;
+  private final List<DisposableEdgeCollection> tempEdges;
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
   private final Map<VisitViaLocation, Set<Vertex>> visitViaLocationVertices;

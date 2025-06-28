@@ -34,6 +34,13 @@ public class DisposableEdgeCollection {
   }
 
   /**
+   * This collection is empty and there is no need to dispose edges.
+   */
+  public boolean isEmpty() {
+    return edges.isEmpty();
+  }
+
+  /**
    * Removes all the edges in this collection from the graph.
    */
   public void disposeEdges() {
