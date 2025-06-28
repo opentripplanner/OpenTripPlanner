@@ -7,6 +7,9 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.util.Map;
 
+/**
+ * Support class for building data fetching environments for testing data fetchers.
+ */
 class DataFetchingSupport {
 
   static DataFetchingEnvironment dataFetchingEnvironment(Object source) {

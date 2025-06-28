@@ -2,22 +2,24 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.truth.StreamSubject;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
+import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -26,12 +28,7 @@ class LegImplTest implements PlanTestConstants {
   private static final TimetableRepositoryForTest MODEL = TimetableRepositoryForTest.of();
   private static final AreaStop AREA_STOP = MODEL.areaStop("a1").build();
   private static final RegularStop REGULAR_STOP = MODEL.stop("r1").build();
-  private static final GroupStop GROUP_STOP = MODEL.groupStop(
-    "g1",
-    REGULAR_STOP,
-    REGULAR_STOP,
-    REGULAR_STOP
-  );
+  private static final GroupStop GROUP_STOP = MODEL.groupStop("g1", REGULAR_STOP);
   private static final StopPattern STOP_PATTERN = TimetableRepositoryForTest.stopPattern(
     REGULAR_STOP,
     REGULAR_STOP,
@@ -65,6 +62,10 @@ class LegImplTest implements PlanTestConstants {
     .withTripPattern(PATTERN)
     .build();
   private static final LegImpl SUBJECT = new LegImpl();
+  private static final Map<String, Object> INCLUDE_STOP_ONLY = Map.of(
+    "include",
+    List.of(GraphQLTypes.GraphQLStopType.STOP)
+  );
 
   @Test
   void intermediateStops() throws Exception {
@@ -75,37 +76,26 @@ class LegImplTest implements PlanTestConstants {
 
   @Test
   void intermediateStopsWithInclude() throws Exception {
-    var env = DataFetchingSupport.dataFetchingEnvironment(
-      LEG,
-      Map.of("include", List.of(GraphQLTypes.GraphQLStopType.STOP))
-    );
-    var stops = StreamSupport.stream(
-      SUBJECT.intermediatePlaces().get(env).spliterator(),
-      false
-    ).map(s -> s.place.stop);
+    var env = DataFetchingSupport.dataFetchingEnvironment(LEG, INCLUDE_STOP_ONLY);
+    var stops = toStops(SUBJECT.intermediatePlaces().get(env));
     assertThat(stops).containsExactly(REGULAR_STOP);
   }
 
   @Test
   void intermediatePlaces() throws Exception {
     var env = DataFetchingSupport.dataFetchingEnvironment(LEG);
-    var stops = StreamSupport.stream(
-      SUBJECT.intermediatePlaces().get(env).spliterator(),
-      false
-    ).map(s -> s.place.stop);
+    var stops = toStops(SUBJECT.intermediatePlaces().get(env));
     assertThat(stops).containsExactly(REGULAR_STOP, AREA_STOP, GROUP_STOP);
   }
 
   @Test
   void intermediatePlacesWithInclude() throws Exception {
-    var env = DataFetchingSupport.dataFetchingEnvironment(
-      LEG,
-      Map.of("include", List.of(GraphQLTypes.GraphQLStopType.STOP))
-    );
-    var stops = StreamSupport.stream(
-      SUBJECT.intermediatePlaces().get(env).spliterator(),
-      false
-    ).map(s -> s.place.stop);
+    var env = DataFetchingSupport.dataFetchingEnvironment(LEG, INCLUDE_STOP_ONLY);
+    var stops = toStops(SUBJECT.intermediatePlaces().get(env));
     assertThat(stops).containsExactly(REGULAR_STOP);
+  }
+
+  private static Stream<StopLocation> toStops(Iterable<StopArrival> stopArrivals) {
+    return StreamSupport.stream(stopArrivals.spliterator(), false).map(s -> s.place.stop);
   }
 }

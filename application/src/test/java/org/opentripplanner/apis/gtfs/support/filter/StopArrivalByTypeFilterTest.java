@@ -36,10 +36,13 @@ class StopArrivalByTypeFilterTest {
 
   private static List<Arguments> filterCases() {
     return List.of(
+      Arguments.of(List.of(GROUP, REGULAR, AREA), null, List.of(GROUP, REGULAR, AREA)),
+      Arguments.of(List.of(REGULAR), null, List.of(REGULAR)),
       Arguments.of(List.of(REGULAR), Set.of(STOP), List.of(REGULAR)),
       Arguments.of(List.of(REGULAR, AREA), Set.of(STOP), List.of(REGULAR)),
       Arguments.of(List.of(AREA, AREA), Set.of(STOP), List.of()),
       Arguments.of(List.of(GROUP), Set.of(STOP), List.of()),
+      Arguments.of(List.of(GROUP, GROUP, GROUP, AREA), Set.of(STOP), List.of()),
       Arguments.of(List.of(GROUP), Set.of(LOCATION_GROUP), List.of(GROUP)),
       Arguments.of(List.of(GROUP, AREA), Set.of(LOCATION_GROUP), List.of(GROUP)),
       Arguments.of(List.of(GROUP, REGULAR, AREA), Set.of(LOCATION_GROUP), List.of(GROUP)),
