@@ -31,6 +31,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -501,7 +502,8 @@ class GraphQLIntegrationTest {
       2000,
       2000,
       Locale.ENGLISH,
-      context
+      context,
+      Collections.emptyList()
     );
     var actualJson = responseBody(response);
     assertEquals(200, response.getStatus());

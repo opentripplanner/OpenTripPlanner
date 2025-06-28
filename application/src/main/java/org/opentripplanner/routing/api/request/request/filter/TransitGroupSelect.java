@@ -93,8 +93,8 @@ public class TransitGroupSelect {
   @Override
   public String toString() {
     return isEmpty()
-      ? "TransitGroupSelect{ EMPTY }"
-      : ToStringBuilder.of(TransitGroupSelect.class)
+      ? "EMPTY"
+      : ToStringBuilder.ofEmbeddedType()
         .addCol("modes", modes)
         .addCol("subModeRegexp", subModeRegexp)
         .addCol("agencyIds", agencyIds)

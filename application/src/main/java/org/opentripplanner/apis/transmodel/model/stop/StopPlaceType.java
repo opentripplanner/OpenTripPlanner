@@ -108,7 +108,8 @@ public class StopPlaceType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment -> (((MonoOrMultiModalStation) environment.getSource()).getLat())
+          .dataFetcher(environment ->
+            (((MonoOrMultiModalStation) environment.getSource()).getLat())
           )
           .build()
       )
@@ -116,7 +117,8 @@ public class StopPlaceType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("longitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment -> (((MonoOrMultiModalStation) environment.getSource()).getLon())
+          .dataFetcher(environment ->
+            (((MonoOrMultiModalStation) environment.getSource()).getLon())
           )
           .build()
       )

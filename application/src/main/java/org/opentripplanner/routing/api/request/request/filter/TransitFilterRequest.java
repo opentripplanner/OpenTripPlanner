@@ -111,7 +111,10 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(TransitFilterRequest.class)
+    if (select.length == 0 && not.length == 0) {
+      return "ALL";
+    }
+    return ToStringBuilder.ofEmbeddedType()
       .addCol("select", Arrays.asList(select))
       .addCol("not", Arrays.asList(not))
       .toString();

@@ -106,7 +106,7 @@ public class JourneyRequest implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(JourneyRequest.class)
+    return ToStringBuilder.ofEmbeddedType()
       .addObj("transit", transit, DEFAULT.transit)
       .addObj("access", access, DEFAULT.access)
       .addObj("egress", egress, DEFAULT.egress)

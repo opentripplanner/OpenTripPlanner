@@ -98,7 +98,8 @@ public class BikeRentalStationType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).getLatitude()
+          .dataFetcher(environment ->
+            ((VehicleRentalStation) environment.getSource()).getLatitude()
           )
           .build()
       )
