@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -13,6 +14,8 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StopArrival;
+import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -66,6 +69,7 @@ class LegImplTest implements PlanTestConstants {
     "include",
     List.of(GraphQLTypes.GraphQLStopType.STOP)
   );
+  private static final StreetLeg WALK_LEG = StreetLeg.of().withMode(TraverseMode.WALK).build();
 
   @Test
   void intermediateStops() throws Exception {
@@ -93,6 +97,18 @@ class LegImplTest implements PlanTestConstants {
     var env = DataFetchingSupport.dataFetchingEnvironment(LEG, INCLUDE_STOP_ONLY);
     var stops = toStops(SUBJECT.intermediatePlaces().get(env));
     assertThat(stops).containsExactly(REGULAR_STOP);
+  }
+
+  @Test
+  void walkLeg() throws Exception {
+    var env = DataFetchingSupport.dataFetchingEnvironment(WALK_LEG);
+    assertNull(SUBJECT.intermediatePlaces().get(env));
+  }
+
+  @Test
+  void walkLegWithInclude() throws Exception {
+    var env = DataFetchingSupport.dataFetchingEnvironment(WALK_LEG, INCLUDE_STOP_ONLY);
+    assertNull(SUBJECT.intermediatePlaces().get(env));
   }
 
   private static Stream<StopLocation> toStops(Iterable<StopArrival> stopArrivals) {
