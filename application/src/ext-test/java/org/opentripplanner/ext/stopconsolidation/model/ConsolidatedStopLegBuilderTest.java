@@ -32,7 +32,6 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
   private static final ScheduledTransitLeg SCHEDULED_TRANSIT_LEG =
     new ScheduledTransitLegBuilder<>()
       .withZoneId(ZoneIds.BERLIN)
-      .withServiceDate(LocalDate.of(2025, 1, 15))
       .withTripPattern(PATTERN)
       .withBoardStopIndexInPattern(0)
       .withDistanceMeters(1000)
