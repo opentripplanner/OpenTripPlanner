@@ -1080,8 +1080,6 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> gtfsId();
 
-    public DataFetcher<Boolean> hasFutureServices();
-
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
     public DataFetcher<Double> lat();
