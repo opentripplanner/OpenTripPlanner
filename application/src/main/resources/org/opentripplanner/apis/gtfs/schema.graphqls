@@ -771,16 +771,16 @@ type Leg {
   originates and the Place where the leg ends. For non-transit legs, null.
   Returns Place type, which has fields for e.g. departure and arrival times.
     
-  The `include` parameter allows filtering of the returned places by stop type. If not, it returns
-  all types. An empty list is not permitted.
+  The `include` parameter allows filtering of the returned places by stop type. If not provided, the
+  field returns all types. An empty list is not permitted.
   """
   intermediatePlaces(include: [StopType!]): [Place]
   """
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
     
-  The `include` parameter allows filtering of the returned places by stop type. If not, it returns
-  all types. An empty list is not permitted.
+  The `include` parameter allows filtering of the returned places by stop type. If not provided, the
+  field returns all types. An empty list is not permitted.
   """
   intermediateStops(include: [StopType!]): [Stop]
   "The leg's geometry."
