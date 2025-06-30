@@ -307,24 +307,37 @@ public class RoutingWorker {
   }
 
   private TemporaryVerticesContainer createTemporaryVerticesContainer() {
+    var fromModes = request.journey().transit().enabled()
+      ? EnumSet.of(request.journey().access().mode())
+      : EnumSet.noneOf(StreetMode.class);
+    var toModes = request.journey().transit().enabled()
+      ? EnumSet.of(request.journey().egress().mode())
+      : EnumSet.noneOf(StreetMode.class);
+    var viaModes = request.journey().transit().enabled()
+      ? EnumSet.of(
+        request.journey().access().mode(),
+        request.journey().egress().mode(),
+        request.journey().transfer().mode()
+      )
+      : EnumSet.noneOf(StreetMode.class);
+    var directMode = resolveDirectMode();
+    if (directMode != StreetMode.NOT_SET) {
+      fromModes.add(directMode);
+      toModes.add(directMode);
+      viaModes.add(directMode);
+    }
     return TemporaryVerticesContainer.of(serverContext.graph())
-      .withFrom(
-        request.from(),
-        EnumSet.of(request.journey().access().mode(), request.journey().direct().mode())
-      )
-      .withTo(
-        request.to(),
-        EnumSet.of(request.journey().egress().mode(), request.journey().direct().mode())
-      )
-      .withVia(
-        request.getVisitViaLocations(),
-        EnumSet.of(
-          request.journey().access().mode(),
-          request.journey().egress().mode(),
-          request.journey().direct().mode(),
-          request.journey().transfer().mode()
-        )
-      )
+      .withFrom(request.from(), fromModes)
+      .withTo(request.to(), toModes)
+      .withVia(request.getVisitViaLocations(), viaModes)
       .build();
+  }
+
+  private StreetMode resolveDirectMode() {
+    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
+      request.journey().direct().mode(),
+      request.pageCursor() != null
+    );
+    return emptyDirectModeHandler.resolveDirectMode();
   }
 }
