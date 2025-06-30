@@ -149,7 +149,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       if (intermediateStops == null) {
         return null;
       }
-      var args = new GraphQLTypes.GraphQLLegIntermediatePlacesArgs(env.getArguments());
+      var args = new GraphQLTypes.GraphQLLegIntermediateStopsArgs(env.getArguments());
       var filter = new StopArrivalByTypeFilter(args.getGraphQLInclude());
       return filter
         .filter(intermediateStops)
