@@ -46,6 +46,18 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     return toVertices;
   }
 
+  Map<VisitViaLocation, Set<Vertex>> visitViaLocationVertices() {
+    return visitViaLocationVertices;
+  }
+
+  Set<TransitStopVertex> fromStopVertices() {
+    return fromStopVertices;
+  }
+
+  Set<TransitStopVertex> toStopVertices() {
+    return toStopVertices;
+  }
+
   /**
    * Creates a {@link FromToViaVertexRequest} that contains vertices from this container.
    */

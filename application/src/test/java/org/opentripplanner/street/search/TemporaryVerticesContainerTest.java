@@ -1,12 +1,15 @@
 package org.opentripplanner.street.search;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,8 +18,13 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.via.VisitViaLocation;
+import org.opentripplanner.routing.api.response.InputField;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -25,59 +33,227 @@ import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.TemporaryEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class TemporaryVerticesContainerTest {
 
   private final GeometryFactory gf = GeometryUtils.getGeometryFactory();
   // Given:
-  // - a graph with 3 intersections/vertexes
+  // - a graph with 4 intersections/vertexes and a stop
   private final Graph g = new Graph(new Deduplicator());
 
   private final StreetVertex a = StreetModelForTest.intersectionVertex("A", 1.0, 1.0);
   private final StreetVertex b = StreetModelForTest.intersectionVertex("B", 1.0, 0.0);
   private final StreetVertex c = StreetModelForTest.intersectionVertex("C", 0.0, 1.0);
-  private final List<Vertex> permanentVertexes = Arrays.asList(a, b, c);
+  private final StreetVertex d = StreetModelForTest.intersectionVertex("D", 0.0, 2.0);
+  private final FeedScopedId stopId = new FeedScopedId("test", "1");
+  private final TransitStopVertex s = TransitStopVertex.of()
+    .withStop(RegularStop.of(stopId, () -> 1).withCoordinate(WgsCoordinate.GREENWICH).build())
+    .build();
+  private final List<Vertex> permanentVertexes = Arrays.asList(a, b, c, d, s);
   // - And travel *origin* is 0,4 degrees on the road from B to A
   private final GenericLocation from = GenericLocation.fromCoordinate(1.0, 0.4);
   // - and *destination* is slightly off 0.7 degrees on road from C to A
   private final GenericLocation to = GenericLocation.fromCoordinate(0.701, 1.001);
-  private TemporaryVerticesContainer subject;
+  private final List<VisitViaLocation> viaLocations = List.of(
+    new VisitViaLocation("Via1", null, List.of(), List.of(new WgsCoordinate(0.0, 1.5))),
+    new VisitViaLocation("Via2", null, List.of(FeedScopedId.parse("F:1")), List.of()),
+    new VisitViaLocation(
+      "Via3",
+      null,
+      List.of(FeedScopedId.parse("F:2")),
+      List.of(new WgsCoordinate(0.1, 1.9))
+    )
+  );
 
   // - and some roads
   @BeforeEach
   public void setup() {
     permanentVertexes.forEach(g::addVertex);
-    createStreetEdge(a, b, "a -> b");
-    createStreetEdge(b, a, "b -> a");
+    createStreetEdge(a, b, "a -> b WALK");
+    createStreetEdge(a, b, "a -> b CAR", StreetTraversalPermission.CAR);
+    createStreetEdge(b, a, "b -> a WALK");
+    createStreetEdge(b, a, "b -> a CAR", StreetTraversalPermission.CAR);
     createStreetEdge(a, c, "a -> c");
+    createStreetEdge(c, d, "c -> d");
+    createStreetEdge(d, c, "c -> d");
+    createStreetEdge(a, d, "a -> d");
     g.index();
+    g.calculateConvexHull();
+  }
+
+  @Test
+  public void createFromToViaVertexRequest() {
+    var fromWithStops = new GenericLocation("From with stops", stopId, 1.0, 0.4);
+    var subject = TemporaryVerticesContainer.of(g)
+      .withFrom(fromWithStops, StreetMode.WALK)
+      .withTo(to, StreetMode.WALK)
+      .withVia(viaLocations, EnumSet.of(StreetMode.WALK))
+      .build();
+    var request = subject.createFromToViaVertexRequest();
+    assertThat(request.from()).isNotEmpty();
+    assertEquals(subject.fromVertices(), request.from());
+    assertThat(request.to()).isNotEmpty();
+    assertEquals(subject.toVertices(), request.to());
+    assertThat(request.fromStops()).isNotEmpty();
+    assertEquals(subject.fromStopVertices(), request.fromStops());
+    assertThat(request.toStops()).isEmpty();
+    assertEquals(subject.toStopVertices(), request.toStops());
+    var firstViaVertices = request.findVertices(viaLocations.get(0));
+    assertThat(firstViaVertices).isNotEmpty();
+    assertEquals(subject.visitViaLocationVertices().get(viaLocations.get(0)), firstViaVertices);
+    var thirdViaVertices = request.findVertices(viaLocations.get(2));
+    assertThat(thirdViaVertices).isNotEmpty();
+    assertEquals(subject.visitViaLocationVertices().get(viaLocations.get(2)), thirdViaVertices);
   }
 
   @Test
   public void temporaryChangesRemovedOnClose() {
     // When - the container is created
-    subject = TemporaryVerticesContainer.of(g)
+    var subject = TemporaryVerticesContainer.of(g)
       .withFrom(from, StreetMode.WALK)
       .withTo(to, StreetMode.WALK)
       .build();
 
     // Then:
-    originAndDestinationInsertedCorrect();
+    originAndDestinationInsertedCorrect(subject, false);
+    cleanUpAndValidate(subject);
+  }
 
-    // And When:
-    subject.close();
+  @Test
+  public void multipleModes() {
+    try (
+      var subject = TemporaryVerticesContainer.of(g)
+        .withFrom(from, EnumSet.of(StreetMode.WALK, StreetMode.CAR_TO_PARK))
+        .withTo(to, StreetMode.WALK)
+        .build()
+    ) {
+      // When - the container is created
 
-    // Then - permanent vertexes
-    for (Vertex v : permanentVertexes) {
-      // - does not reference the any temporary nodes anymore
-      for (Edge e : v.getIncoming()) {
-        assertVertexEdgeIsNotReferencingTemporaryElements(v, e, e.getFromVertex());
-      }
-      for (Edge e : v.getOutgoing()) {
-        assertVertexEdgeIsNotReferencingTemporaryElements(v, e, e.getToVertex());
-      }
+      // Then:
+      assertThat(subject.fromVertices()).hasSize(1);
+      var fromOutgoing = subject.fromVertices().iterator().next().getOutgoing();
+      assertThat(fromOutgoing).hasSize(4);
+      assertTrue(outgoingEdgeIsTraversableWith(fromOutgoing, TraverseMode.WALK));
+      assertTrue(outgoingEdgeIsTraversableWith(fromOutgoing, TraverseMode.CAR));
+    }
+  }
+
+  @Test
+  public void temporaryChangesRemovedOnCloseWithVia() {
+    // When - the container is created
+    var subject = TemporaryVerticesContainer.of(g)
+      .withFrom(from, StreetMode.WALK)
+      .withTo(to, StreetMode.WALK)
+      .withVia(viaLocations, EnumSet.of(StreetMode.WALK))
+      .build();
+
+    // Then:
+    locationsInsertedCorrect(subject);
+    cleanUpAndValidate(subject);
+  }
+
+  @Test
+  public void locationNotFoundException() {
+    // Stops not found
+    try (
+      var container = TemporaryVerticesContainer.of(g)
+        .withFrom(
+          new GenericLocation("Stop not found", new FeedScopedId("F", "stop1"), null, null),
+          StreetMode.WALK
+        )
+        .build()
+    ) {
+      assertNull(container);
+    } catch (RoutingValidationException e) {
+      assertThat(e.getRoutingErrors()).hasSize(1);
+      var fromError = e.getRoutingErrors().getFirst();
+      assertEquals(InputField.FROM_PLACE, fromError.inputField);
+      assertEquals(RoutingErrorCode.LOCATION_NOT_FOUND, fromError.code);
+    }
+
+    try (
+      var container = TemporaryVerticesContainer.of(g)
+        .withFrom(from, StreetMode.WALK)
+        .withTo(
+          new GenericLocation("Stop not found", new FeedScopedId("F", "stop1"), null, null),
+          StreetMode.WALK
+        )
+        .build()
+    ) {
+      assertNull(container);
+    } catch (RoutingValidationException e) {
+      assertThat(e.getRoutingErrors()).hasSize(1);
+      var fromError = e.getRoutingErrors().getFirst();
+      assertEquals(InputField.TO_PLACE, fromError.inputField);
+      assertEquals(RoutingErrorCode.LOCATION_NOT_FOUND, fromError.code);
+    }
+
+    // Coordinate not found (but in bounds)
+    try (
+      var container = TemporaryVerticesContainer.of(g)
+        .withFrom(from, StreetMode.WALK)
+        .withTo(to, StreetMode.WALK)
+        .withVia(
+          List.of(new VisitViaLocation("Via1", null, List.of(), List.of(new WgsCoordinate(10, 0)))),
+          EnumSet.of(StreetMode.WALK)
+        )
+        .build()
+    ) {
+      assertNull(container);
+    } catch (RoutingValidationException e) {
+      assertThat(e.getRoutingErrors()).hasSize(1);
+      var fromError = e.getRoutingErrors().getFirst();
+      assertEquals(InputField.INTERMEDIATE_PLACE, fromError.inputField);
+      assertEquals(RoutingErrorCode.LOCATION_NOT_FOUND, fromError.code);
+    }
+  }
+
+  @Test
+  public void locationOutsideBoundsException() {
+    try (
+      var container = TemporaryVerticesContainer.of(g)
+        .withFrom(GenericLocation.fromCoordinate(0, 0.02), StreetMode.WALK)
+        .withTo(GenericLocation.fromCoordinate(0, 0.01), StreetMode.WALK)
+        .withVia(
+          List.of(new VisitViaLocation("Via1", null, List.of(), List.of(new WgsCoordinate(78, 0)))),
+          EnumSet.of(StreetMode.WALK)
+        )
+        .build()
+    ) {
+      assertNull(container);
+    } catch (RoutingValidationException e) {
+      assertThat(e.getRoutingErrors()).hasSize(3);
+      var fromError = e.getRoutingErrors().get(0);
+      assertEquals(InputField.FROM_PLACE, fromError.inputField);
+      assertEquals(RoutingErrorCode.OUTSIDE_BOUNDS, fromError.code);
+      var toError = e.getRoutingErrors().get(1);
+      assertEquals(InputField.TO_PLACE, toError.inputField);
+      assertEquals(RoutingErrorCode.OUTSIDE_BOUNDS, toError.code);
+      var viaError = e.getRoutingErrors().get(2);
+      assertEquals(InputField.INTERMEDIATE_PLACE, viaError.inputField);
+      assertEquals(RoutingErrorCode.OUTSIDE_BOUNDS, viaError.code);
+    }
+  }
+
+  @Test
+  public void walkingBetterThanTransitException() {
+    try (
+      var container = TemporaryVerticesContainer.of(g)
+        .withFrom(from, StreetMode.WALK)
+        .withTo(from, StreetMode.WALK)
+        .build()
+    ) {
+      assertNull(container);
+    } catch (RoutingValidationException e) {
+      assertThat(e.getRoutingErrors()).hasSize(1);
+      var fromError = e.getRoutingErrors().getFirst();
+      assertNull(fromError.inputField);
+      assertEquals(RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, fromError.code);
     }
   }
 
@@ -101,10 +277,17 @@ public class TemporaryVerticesContainerTest {
     return list;
   }
 
-  private void originAndDestinationInsertedCorrect() {
+  private void originAndDestinationInsertedCorrect(
+    TemporaryVerticesContainer subject,
+    boolean hasViaLocations
+  ) {
     // Then - the origin and destination is
-    assertEquals("Origin", subject.fromVertices().iterator().next().getDefaultName());
-    assertEquals("Destination", subject.toVertices().iterator().next().getDefaultName());
+    var originVertices = subject.fromVertices();
+    assertThat(originVertices).hasSize(1);
+    assertEquals("Origin", originVertices.iterator().next().getDefaultName());
+    var destinationVertices = subject.toVertices();
+    assertThat(destinationVertices).hasSize(1);
+    assertEquals("Destination", destinationVertices.iterator().next().getDefaultName());
 
     // And - from the origin
     Collection<String> vertexesReachableFromOrigin = findAllReachableVertexes(
@@ -118,7 +301,13 @@ public class TemporaryVerticesContainerTest {
     assertTrue(vertexesReachableFromOrigin.contains("A"), msg);
     assertTrue(vertexesReachableFromOrigin.contains("B"), msg);
     assertTrue(vertexesReachableFromOrigin.contains("C"), msg);
+    assertTrue(vertexesReachableFromOrigin.contains("D"), msg);
     assertTrue(vertexesReachableFromOrigin.contains("Destination"), msg);
+
+    if (hasViaLocations) {
+      assertTrue(vertexesReachableFromOrigin.contains("Via1"), msg);
+      assertTrue(vertexesReachableFromOrigin.contains("Via3"), msg);
+    }
 
     // And - from the destination we can backtrack
     Collection<String> vertexesReachableFromDestination = findAllReachableVertexes(
@@ -137,7 +326,114 @@ public class TemporaryVerticesContainerTest {
     assertFalse(vertexesReachableFromDestination.contains("C"), msg);
   }
 
+  private void locationsInsertedCorrect(TemporaryVerticesContainer subject) {
+    originAndDestinationInsertedCorrect(subject, true);
+    // Then - only via locations with coordinates are included
+    var viaVertices = subject.visitViaLocationVertices();
+    assertThat(viaVertices).hasSize(2);
+    var firstViaVertices = viaVertices.get(viaLocations.get(0));
+    assertThat(firstViaVertices).hasSize(1);
+    assertEquals("Via1", firstViaVertices.iterator().next().getDefaultName());
+    var thirdViaVertices = viaVertices.get(viaLocations.get(2));
+    assertThat(thirdViaVertices).hasSize(1);
+    assertEquals("Via3", thirdViaVertices.iterator().next().getDefaultName());
+
+    // And - from the first via location
+    Collection<String> vertexesReachableFromFirstViaForward = findAllReachableVertexes(
+      firstViaVertices.iterator().next(),
+      true,
+      new ArrayList<>()
+    );
+    Collection<String> vertexesReachableFromFirstViaBackward = findAllReachableVertexes(
+      firstViaVertices.iterator().next(),
+      false,
+      new ArrayList<>()
+    );
+    String firstForwardMsg =
+      "Forward reachable vertexes from the first via location: " +
+      vertexesReachableFromFirstViaForward;
+    String firstBackwardMsg =
+      "Backward reachable vertexes from the first via location: " +
+      vertexesReachableFromFirstViaBackward;
+
+    assertTrue(vertexesReachableFromFirstViaForward.contains("C"), firstForwardMsg);
+    assertTrue(vertexesReachableFromFirstViaForward.contains("D"), firstForwardMsg);
+    assertTrue(vertexesReachableFromFirstViaForward.contains("Via1"), firstForwardMsg);
+
+    assertTrue(vertexesReachableFromFirstViaBackward.contains("A"), firstBackwardMsg);
+    assertTrue(vertexesReachableFromFirstViaBackward.contains("B"), firstBackwardMsg);
+    assertTrue(vertexesReachableFromFirstViaBackward.contains("C"), firstBackwardMsg);
+    assertTrue(vertexesReachableFromFirstViaBackward.contains("D"), firstBackwardMsg);
+    assertTrue(vertexesReachableFromFirstViaBackward.contains("Origin"), firstBackwardMsg);
+    assertTrue(vertexesReachableFromFirstViaBackward.contains("Via1"), firstBackwardMsg);
+    assertTrue(vertexesReachableFromFirstViaBackward.contains("Via3"), firstBackwardMsg);
+
+    // And - from the third via location
+    Collection<String> vertexesReachableFromThirdViaForward = findAllReachableVertexes(
+      thirdViaVertices.iterator().next(),
+      true,
+      new ArrayList<>()
+    );
+    Collection<String> vertexesReachableFromThirdViaBackward = findAllReachableVertexes(
+      thirdViaVertices.iterator().next(),
+      false,
+      new ArrayList<>()
+    );
+    String thirdForwardMsg =
+      "Forward reachable vertexes from the third via location: " +
+      vertexesReachableFromThirdViaForward;
+    String thirdBackwardMsg =
+      "Backward reachable vertexes from the third via location: " +
+      vertexesReachableFromThirdViaBackward;
+
+    assertTrue(vertexesReachableFromFirstViaForward.contains("C"), thirdForwardMsg);
+    assertTrue(vertexesReachableFromFirstViaForward.contains("D"), thirdForwardMsg);
+    assertTrue(vertexesReachableFromFirstViaForward.contains("Via1"), thirdForwardMsg);
+
+    assertTrue(vertexesReachableFromFirstViaBackward.contains("A"), thirdBackwardMsg);
+    assertTrue(vertexesReachableFromFirstViaBackward.contains("B"), thirdBackwardMsg);
+    assertTrue(vertexesReachableFromFirstViaBackward.contains("Origin"), thirdBackwardMsg);
+    assertTrue(vertexesReachableFromFirstViaBackward.contains("Via3"), thirdBackwardMsg);
+  }
+
+  private void cleanUpAndValidate(TemporaryVerticesContainer subject) {
+    // And When:
+    subject.close();
+
+    // Then - permanent vertexes
+    for (Vertex v : permanentVertexes) {
+      // - does not reference the any temporary nodes anymore
+      for (Edge e : v.getIncoming()) {
+        assertVertexEdgeIsNotReferencingTemporaryElements(v, e, e.getFromVertex());
+      }
+      for (Edge e : v.getOutgoing()) {
+        assertVertexEdgeIsNotReferencingTemporaryElements(v, e, e.getToVertex());
+      }
+    }
+  }
+
+  private boolean outgoingEdgeIsTraversableWith(Collection<Edge> edges, TraverseMode mode) {
+    return edges
+      .stream()
+      .anyMatch(outgoing ->
+        outgoing
+          .getToVertex()
+          .getOutgoingStreetEdges()
+          .stream()
+          .anyMatch(edge -> edge.canTraverse(mode))
+      );
+  }
+
   private void createStreetEdge(StreetVertex v0, StreetVertex v1, String name) {
+    createStreetEdge(v0, v1, name, StreetTraversalPermission.PEDESTRIAN);
+  }
+
+  private void createStreetEdge(
+    StreetVertex v0,
+    StreetVertex v1,
+    String name,
+    StreetTraversalPermission permission
+  ) {
     LineString geom = gf.createLineString(
       new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() }
     );
@@ -148,7 +444,7 @@ public class TemporaryVerticesContainerTest {
       .withGeometry(geom)
       .withName(name)
       .withMeterLength(dist)
-      .withPermission(StreetTraversalPermission.ALL)
+      .withPermission(permission)
       .withBack(false)
       .buildAndConnect();
   }
