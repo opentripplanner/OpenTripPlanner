@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.core;
+package org.opentripplanner.street.search;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -26,7 +26,6 @@ import org.opentripplanner.street.model.edge.TemporaryEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TemporaryVerticesContainerTest {
