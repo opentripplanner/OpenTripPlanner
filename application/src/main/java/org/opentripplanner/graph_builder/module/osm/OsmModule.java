@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -20,7 +19,6 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
-import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
@@ -112,9 +110,14 @@ public class OsmModule implements GraphBuilderModule {
   public void buildGraph() {
     // the OsmDatabase contains very large collections and should _not_ be stored as an instance
     // variable of this class, because this prevents it from being garbage collected at the end of
-    // the build method.
+    // this method.
     var osmdb = new OsmDatabase(issueStore);
-    var vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags(), params.includeOsmSubwayEntrances());
+    var vertexGenerator = new VertexGenerator(
+      osmdb,
+      graph,
+      params.boardingAreaRefTags(),
+      params.includeOsmSubwayEntrances()
+    );
     for (var provider : providers) {
       LOG.info("Gathering OSM from provider: {}", provider);
       LOG.info(
@@ -227,7 +230,11 @@ public class OsmModule implements GraphBuilderModule {
     return OsmAreaGroup.groupAreas(areasLevels);
   }
 
-  private void buildWalkableAreas(OsmDatabase osmdb, VertexGenerator vertexGenerator, boolean skipVisibility) {
+  private void buildWalkableAreas(
+    OsmDatabase osmdb,
+    VertexGenerator vertexGenerator,
+    boolean skipVisibility
+  ) {
     if (skipVisibility) {
       LOG.info(
         "Skipping visibility graph construction for walkable areas and using just area rings for edges."
