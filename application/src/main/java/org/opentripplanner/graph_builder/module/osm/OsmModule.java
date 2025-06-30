@@ -110,6 +110,9 @@ public class OsmModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
+    // the OsmDatabase contains very large collections and should _not_ be stored as an instance
+    // variable of this class, because this prevents it from being garbage collected at the end of
+    // the build method.
     var osmdb = new OsmDatabase(issueStore);
     var vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags(), params.includeOsmSubwayEntrances());
     for (var provider : providers) {
