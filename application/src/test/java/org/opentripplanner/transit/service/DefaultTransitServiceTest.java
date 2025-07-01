@@ -145,11 +145,11 @@ class DefaultTransitServiceTest {
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     var firstDate = LocalDate.of(2024, 8, 8);
     var secondDate = LocalDate.of(2024, 8, 9);
-    var today = LocalDate.now();
+    var thirdDate = LocalDate.of(2025, 7, 2);
 
     calendarServiceData.putServiceDatesForServiceId(
       CALENDAR_ID,
-      List.of(firstDate, secondDate, today, SERVICE_DATE)
+      List.of(firstDate, secondDate, thirdDate, SERVICE_DATE)
     );
     calendarServiceData.putServiceDatesForServiceId(
       CALENDAR_ID_TWO,
@@ -310,8 +310,9 @@ class DefaultTransitServiceTest {
 
   @Test
   void hasTripsForStop() {
-    assertTrue(service.hasScheduledServicesAfter(LocalDate.now(), STOP_ONE));
-    assertFalse(service.hasScheduledServicesAfter(LocalDate.now(), STOP_A));
-    assertFalse(service.hasScheduledServicesAfter(LocalDate.now(), STOP_C));
+    assertTrue(service.hasScheduledServicesAfter(LocalDate.of(2025, 7, 1), STOP_ONE));
+    assertTrue(service.hasScheduledServicesAfter(LocalDate.of(2025, 7, 2), STOP_ONE));
+    assertFalse(service.hasScheduledServicesAfter(LocalDate.of(2025, 7, 3), STOP_ONE));
+    assertFalse(service.hasScheduledServicesAfter(LocalDate.of(2025, 7, 1), STOP_C));
   }
 }
