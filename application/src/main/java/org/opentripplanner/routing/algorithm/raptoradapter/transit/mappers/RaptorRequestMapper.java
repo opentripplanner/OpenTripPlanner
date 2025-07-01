@@ -216,19 +216,19 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private boolean hasPassThroughOnly() {
     return (
       request.isViaSearch() &&
-      request.getViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation)
+      request.listViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation)
     );
   }
 
   private boolean hasViaLocationsOnly() {
     return (
       request.isViaSearch() &&
-      request.getViaLocations().stream().noneMatch(ViaLocation::isPassThroughLocation)
+      request.listViaLocations().stream().noneMatch(ViaLocation::isPassThroughLocation)
     );
   }
 
   private boolean hasViaLocationsAndPassThroughLocations() {
-    var c = request.getViaLocations();
+    var c = request.listViaLocations();
     return (
       request.isViaSearch() &&
       c.stream().anyMatch(ViaLocation::isPassThroughLocation) &&
@@ -237,7 +237,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   }
 
   private List<RaptorViaLocation> mapViaLocations() {
-    return request.getViaLocations().stream().map(this::mapViaLocation).toList();
+    return request.listViaLocations().stream().map(this::mapViaLocation).toList();
   }
 
   private RaptorViaLocation mapViaLocation(ViaLocation input) {

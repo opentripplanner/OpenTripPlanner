@@ -338,10 +338,10 @@ class RaptorRequestMapperTest {
   ) {
     return switch (feature) {
       case VIA_VISIT -> req.withViaLocations(
-        ListUtils.combine(req.buildRequest().getViaLocations(), List.of(VISIT_VIA_LOCATION))
+        ListUtils.combine(req.buildRequest().listViaLocations(), List.of(VISIT_VIA_LOCATION))
       );
       case VIA_PASS_THROUGH -> req.withViaLocations(
-        ListUtils.combine(req.buildRequest().getViaLocations(), List.of(PASS_THROUGH_VIA_LOCATION))
+        ListUtils.combine(req.buildRequest().listViaLocations(), List.of(PASS_THROUGH_VIA_LOCATION))
       );
       case TRANSIT_GROUP_PRIORITY -> req.withPreferences(p ->
         p.withTransit(t -> t.withRelaxTransitGroupPriority(RELAX_TRANSIT_GROUP_PRIORITY))

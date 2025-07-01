@@ -329,7 +329,7 @@ public class RoutingWorker {
     return TemporaryVerticesContainer.of(serverContext.graph())
       .withFrom(request.from(), fromModes)
       .withTo(request.to(), toModes)
-      .withVia(request.getVisitViaLocations(), viaModes)
+      .withVia(request.listVisitViaLocations(), viaModes)
       .build();
   }
 

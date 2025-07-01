@@ -114,7 +114,7 @@ class RouteRequestTest {
 
   @Test
   void via() {
-    assertEquals(VIA, subject.getViaLocations());
+    assertEquals(VIA, subject.listViaLocations());
   }
 
   @Test

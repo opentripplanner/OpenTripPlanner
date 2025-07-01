@@ -293,14 +293,14 @@ public class RouteRequest implements Serializable {
     return !via.isEmpty();
   }
 
-  public List<ViaLocation> getViaLocations() {
+  public List<ViaLocation> listViaLocations() {
     return via;
   }
 
   /**
    * Return the via locations that are of type {@link VisitViaLocation}.
    */
-  public List<VisitViaLocation> getVisitViaLocations() {
+  public List<VisitViaLocation> listVisitViaLocations() {
     return via
       .stream()
       .filter(VisitViaLocation.class::isInstance)
