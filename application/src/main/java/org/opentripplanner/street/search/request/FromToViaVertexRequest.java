@@ -7,6 +7,12 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
+/**
+ * Holds vertices (mainly temporary) that are meant to be used within the scope of a single route
+ * request that can contain access/egress/direct/transfer routing. The temporary vertices will be
+ * disposed by {@link org.opentripplanner.street.search.TemporaryVerticesContainer} after the search
+ * is over.
+ */
 public class FromToViaVertexRequest {
 
   private final Set<Vertex> from;
@@ -29,32 +35,40 @@ public class FromToViaVertexRequest {
     this.visitViaLocationVertices = visitViaLocationVertices;
   }
 
+  /**
+   * Vertices that are used for from (origin). This includes both street and stop vertices.
+   */
   public Set<Vertex> from() {
     return from;
   }
 
   /**
-   * Get the stop vertices that correspond to the from location. If the from location only contains
-   * coordinates, this will return an empty set. If the from location is a station id this will
-   * return the child stops of that station.
+   * If from location (origin) has a stop id defined, this will include vertices related to it. If
+   * the stop is a station, the child stops will be included.
    */
   public Set<TransitStopVertex> fromStops() {
     return fromStops;
   }
 
+  /**
+   * Vertices that are used for to (destination). This includes both street and stop vertices.
+   */
   public Set<Vertex> to() {
     return to;
   }
 
   /**
-   * Get the stop vertices that corresponds to the to location. If the to location only contains
-   * coordinates, this will return an empty set. If the to location is a station id this will
-   * return the child stops of that station.
+   * If to location (destination) has a stop id defined, this will include vertices related to it.
+   * If the stop is a station, the child stops will be included.
    */
   public Set<TransitStopVertex> toStops() {
     return toStops;
   }
 
+  /**
+   * Vertices that are used for a visit via location. Only the visit via locations that have a
+   * coordinate specified will have vertices available. Stop vertices are not included.
+   */
   public Set<Vertex> findVertices(VisitViaLocation visitViaLocation) {
     return visitViaLocationVertices.getOrDefault(visitViaLocation, Set.of());
   }
