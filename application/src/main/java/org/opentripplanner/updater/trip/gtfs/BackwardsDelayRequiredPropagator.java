@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs;
 
 import java.util.Objects;
-import java.util.OptionalInt;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 
@@ -9,7 +8,7 @@ import org.opentripplanner.transit.model.timetable.StopRealTimeState;
  * This class fills in missing times before the first updated time directly from the scheduled
  * time, propagating negative delay only when necessary to keep the trip times non-decreasing.
  */
-class BackwardsDelayRequiredPropagator implements BackwardsDelayPropagator {
+class BackwardsDelayRequiredPropagator extends BackwardsDelayPropagator {
 
   /**
    * If true, updated stops are set NO_DATA and not exposed in APIs.
@@ -21,13 +20,7 @@ class BackwardsDelayRequiredPropagator implements BackwardsDelayPropagator {
   }
 
   @Override
-  public OptionalInt propagateBackwards(RealTimeTripTimesBuilder builder) {
-    if (builder.getArrivalDelay(0) == null) {
-      // nothing to propagate
-      return OptionalInt.empty();
-    }
-
-    var firstUpdatedIndex = 0;
+  protected void fillInMissingTimes(RealTimeTripTimesBuilder builder, int firstUpdatedIndex) {
     while (
       builder.getArrivalDelay(firstUpdatedIndex) == null &&
       builder.getDepartureDelay(firstUpdatedIndex) == null
@@ -51,6 +44,5 @@ class BackwardsDelayRequiredPropagator implements BackwardsDelayPropagator {
       builder.withDepartureTime(i, time = Math.min(time, builder.getScheduledDepartureTime(i)));
       builder.withArrivalTime(i, time = Math.min(time, builder.getScheduledArrivalTime(i)));
     }
-    return OptionalInt.of(firstUpdatedIndex);
   }
 }
