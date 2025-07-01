@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
+import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -228,7 +229,7 @@ class TripTimesUpdater {
 
     // Interpolate missing times from SKIPPED stops since they don't necessarily have times
     // associated. Note: Currently for GTFS-RT updates ONLY not for SIRI updates.
-    if (builder.interpolateMissingTimes()) {
+    if (interpolateMissingTimes(builder)) {
       LOG.debug("Interpolated delays for cancelled stops on trip {}.", tripId);
     }
 
@@ -271,5 +272,85 @@ class TripTimesUpdater {
     } catch (DataValidationException e) {
       return DataValidationExceptionMapper.toResult(e);
     }
+  }
+
+  /**
+   * Note: This method only applies for GTFS, not SIRI!
+   * This method interpolates the times for SKIPPED stops in between regular stops since GTFS-RT
+   * does not require arrival and departure times for these stops. This method ensures the internal
+   * time representations in OTP for SKIPPED stops are between the regular stop times immediately
+   * before and after the cancellation in GTFS-RT. This is to meet the OTP requirement that stop
+   * times should be increasing and to support the trip search flag `includeRealtimeCancellations`.
+   * Terminal stop cancellations can be handled by backward and forward propagations, and are
+   * outside the scope of this method.
+   *
+   * TODO: this interpolation logic is problematic, need to discard and rewrite later
+   *
+   * @return true if there is interpolated times, false if there is no interpolation.
+   */
+  public static boolean interpolateMissingTimes(RealTimeTripTimesBuilder builder) {
+    boolean hasInterpolatedTimes = builder.copyMissingTimesFromScheduledTimetable();
+    final int numStops = builder.numberOfStops();
+    boolean startInterpolate = false;
+    boolean hasPrevTimes = false;
+    int prevDeparture = 0;
+    int prevScheduledDeparture = 0;
+    int prevStopIndex = -1;
+
+    // Loop through all stops
+    for (int s = 0; s < numStops; s++) {
+      final boolean isCancelledStop =
+        builder.getStopRealTimeState(s) == StopRealTimeState.CANCELLED;
+      final int scheduledArrival = builder.getScheduledArrivalTime(s);
+      final int scheduledDeparture = builder.getScheduledDepartureTime(s);
+      final int arrival = builder.getArrivalTime(s);
+      final int departure = builder.getDepartureTime(s);
+
+      if (!isCancelledStop && !startInterpolate) {
+        // Regular stop, could be used for interpolation for future cancellation, keep track.
+        prevDeparture = departure;
+        prevScheduledDeparture = scheduledDeparture;
+        prevStopIndex = s;
+        hasPrevTimes = true;
+      } else if (isCancelledStop && !startInterpolate && hasPrevTimes) {
+        // First cancelled stop, keep track.
+        startInterpolate = true;
+      } else if (!isCancelledStop && startInterpolate && hasPrevTimes) {
+        // First regular stop after cancelled stops, interpolate.
+        // Calculate necessary info for interpolation.
+        int numCancelledStops = s - prevStopIndex - 1;
+        int scheduledTravelTime = scheduledArrival - prevScheduledDeparture;
+        int realTimeTravelTime = arrival - prevDeparture;
+        double travelTimeRatio = (double) realTimeTravelTime / scheduledTravelTime;
+
+        // Fill out interpolated time for cancelled stops, using the calculated ratio.
+        for (int cancelledIndex = prevStopIndex + 1; cancelledIndex < s; cancelledIndex++) {
+          final int scheduledArrivalCancelled = builder.getScheduledArrivalTime(cancelledIndex);
+          final int scheduledDepartureCancelled = builder.getScheduledDepartureTime(cancelledIndex);
+
+          // Interpolate
+          int scheduledArrivalDiff = scheduledArrivalCancelled - prevScheduledDeparture;
+          double interpolatedArrival = prevDeparture + travelTimeRatio * scheduledArrivalDiff;
+          int scheduledDepartureDiff = scheduledDepartureCancelled - prevScheduledDeparture;
+          double interpolatedDeparture = prevDeparture + travelTimeRatio * scheduledDepartureDiff;
+
+          // Set Interpolated Times
+          builder.withArrivalTime(cancelledIndex, (int) interpolatedArrival);
+          builder.withDepartureTime(cancelledIndex, (int) interpolatedDeparture);
+        }
+
+        // Set tracking variables
+        prevDeparture = departure;
+        prevScheduledDeparture = scheduledDeparture;
+        prevStopIndex = s;
+        startInterpolate = false;
+        hasPrevTimes = true;
+
+        // Set return variable
+        hasInterpolatedTimes = true;
+      }
+    }
+
+    return hasInterpolatedTimes;
   }
 }
