@@ -310,8 +310,8 @@ class DefaultTransitServiceTest {
 
   @Test
   void hasTripsForStop() {
-    assertTrue(service.isStopInService(STOP_ONE));
-    assertFalse(service.isStopInService(STOP_A));
-    assertFalse(service.isStopInService(STOP_C));
+    assertTrue(service.hasScheduledServicesAfter(LocalDate.now(), STOP_ONE));
+    assertFalse(service.hasScheduledServicesAfter(LocalDate.now(), STOP_A));
+    assertFalse(service.hasScheduledServicesAfter(LocalDate.now(), STOP_C));
   }
 }

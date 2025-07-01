@@ -50,8 +50,7 @@ class TimetableRepositoryIndex {
   private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
   private final Multimap<StopLocation, TripPattern> patternsForStop = ArrayListMultimap.create();
 
-  private final Map<StopLocation, LocalDate> endOfServiceDateForStop = new HashMap<>();
-  private final Map<FeedScopedId, LocalDate> endOfServiceDateForService = new HashMap<>();
+  private Map<StopLocation, LocalDate> endOfServiceDateForStop = new HashMap<>();
   private final Map<LocalDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
   private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay =
     new HashMap<>();
@@ -104,8 +103,7 @@ class TimetableRepositoryIndex {
       );
     }
 
-    initalizeServiceCodesForDate(timetableRepository);
-    initializeTheEndOfServiceDateForStop();
+    initializeServiceData(timetableRepository);
 
     if (OTPFeature.FlexRouting.isOn()) {
       flexIndex = new FlexIndex(timetableRepository);
@@ -154,16 +152,17 @@ class TimetableRepositoryIndex {
   }
 
   /**
-   * Checks if the last scheduled service date for the stop is today or in the future.
+   * Checks if the last scheduled service date for the stop is on or after the given date.
+   * This does not include real-time updates, so it only checks the scheduled service dates.
    *
+   * @param date the date to check against
    * @param stop the stop to check
-   * @return true if the stop is in service today or later, false otherwise
+   * @return true if the stop has scheduled services after the given date, false otherwise
    */
-  boolean isStopInService(StopLocation stop) {
+  boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop) {
     LocalDate endOfServiceDate = endOfServiceDateForStop.get(stop);
     return (
-      endOfServiceDate != null &&
-      (endOfServiceDate.isAfter(LocalDate.now()) || endOfServiceDate.isEqual(LocalDate.now()))
+      endOfServiceDate != null && (endOfServiceDate.isAfter(date) || endOfServiceDate.isEqual(date))
     );
   }
 
@@ -213,7 +212,7 @@ class TimetableRepositoryIndex {
     return flexIndex;
   }
 
-  private void initalizeServiceCodesForDate(TimetableRepository timetableRepository) {
+  private void initializeServiceData(TimetableRepository timetableRepository) {
     CalendarService calendarService = timetableRepository.getCalendarService();
 
     if (calendarService == null) {
@@ -232,6 +231,7 @@ class TimetableRepositoryIndex {
     // Reconstruct set of all dates where service is defined, keeping track of which services
     // run on which days.
     Multimap<LocalDate, FeedScopedId> serviceIdsForServiceDate = HashMultimap.create();
+    Map<FeedScopedId, LocalDate> endOfServiceDateForService = new HashMap<>();
 
     for (FeedScopedId serviceId : calendarService.getServiceIds()) {
       Set<LocalDate> serviceDatesForService = calendarService.getServiceDatesForServiceId(
@@ -256,25 +256,31 @@ class TimetableRepositoryIndex {
       }
       serviceCodesRunningForDate.put(serviceDate, serviceCodesRunning);
     }
+
+    initializeTheEndOfServiceDateForStop(endOfServiceDateForService);
   }
 
-  private void initializeTheEndOfServiceDateForStop() {
+  private void initializeTheEndOfServiceDateForStop(
+    Map<FeedScopedId, LocalDate> endOfServiceDateForService
+  ) {
+    Map<StopLocation, LocalDate> endOfServiceDates = new HashMap<>();
     for (StopLocation stop : patternsForStop.keySet()) {
       for (TripPattern pattern : patternsForStop.get(stop)) {
         pattern
           .scheduledTripsAsStream()
           .forEach(trip -> {
             LocalDate tripEndDate = endOfServiceDateForService.get(trip.getServiceId());
-            LocalDate endOfServiceDate = endOfServiceDateForStop.get(stop);
+            LocalDate endOfServiceDate = endOfServiceDates.get(stop);
             if (
               tripEndDate != null &&
               (endOfServiceDate == null || tripEndDate.isAfter(endOfServiceDate))
             ) {
-              endOfServiceDateForStop.put(stop, tripEndDate);
+              endOfServiceDates.put(stop, tripEndDate);
             }
           });
       }
     }
+    endOfServiceDateForStop = Map.copyOf(endOfServiceDates);
   }
 
   Collection<GroupOfRoutes> getAllGroupOfRoutes() {

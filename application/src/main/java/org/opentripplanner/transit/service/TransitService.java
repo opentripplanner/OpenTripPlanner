@@ -420,12 +420,8 @@ public interface TransitService {
   Collection<StopLocation> findStopLocations(FindStopLocationsRequest request);
 
   /**
-   * Returns boolean indicating if there are trips scheduled for a stop in the future.
+   * Returns boolean indicating if there are scheduled services on or after the given date.
+   * This does not include real-time updates, so it only checks the scheduled service dates.
    */
-  boolean isStopInService(StopLocation stop);
-
-  /**
-   * Returns boolean indicating if there are trips scheduled for any child stop of the station in the future.
-   */
-  boolean isStationInService(Station station);
+  boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop);
 }
