@@ -1,10 +1,19 @@
 package org.opentripplanner.updater.trip.gtfs;
 
+import java.util.Objects;
+import java.util.OptionalInt;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 
+/**
+ * This class fills in missing times before the first updated time directly from the scheduled
+ * time, propagating negative delay only when necessary to keep the trip times non-decreasing.
+ */
 class BackwardsDelayRequiredPropagator implements BackwardsDelayPropagator {
 
+  /**
+   * If true, updated stops are set NO_DATA and not exposed in APIs.
+   */
   private final boolean setNoData;
 
   BackwardsDelayRequiredPropagator(boolean setNoData) {
@@ -12,36 +21,36 @@ class BackwardsDelayRequiredPropagator implements BackwardsDelayPropagator {
   }
 
   @Override
-  public boolean adjustTimes(RealTimeTripTimesBuilder builder, int firstUpdatedIndex) {
-    if (builder.getArrivalTime(firstUpdatedIndex) > builder.getDepartureTime(firstUpdatedIndex)) {
-      // The given trip update has arrival time after departure time for the first updated stop.
-      // This method doesn't try to fix issues in the given data, only for the missing part
-      return false;
+  public OptionalInt propagateBackwards(RealTimeTripTimesBuilder builder) {
+    if (builder.getArrivalDelay(0) == null) {
+      // nothing to propagate
+      return OptionalInt.empty();
     }
-    int nextStopArrivalTime = builder.getArrivalTime(firstUpdatedIndex);
-    int delay = builder.getArrivalDelay(firstUpdatedIndex);
-    boolean hasAdjustedTimes = false;
-    boolean adjustTimes = true;
+
+    var firstUpdatedIndex = 0;
+    while (
+      builder.getArrivalDelay(firstUpdatedIndex) == null &&
+      builder.getDepartureDelay(firstUpdatedIndex) == null
+    ) {
+      ++firstUpdatedIndex;
+    }
+    var time = builder.getArrivalTime(firstUpdatedIndex);
+    if (time == null) {
+      builder.withArrivalTime(
+        firstUpdatedIndex,
+        time = Math.min(
+          Objects.requireNonNull(builder.getDepartureTime(firstUpdatedIndex)),
+          builder.getScheduledArrivalTime(firstUpdatedIndex)
+        )
+      );
+    }
     for (int i = firstUpdatedIndex - 1; i >= 0; i--) {
       if (setNoData && builder.stopRealTimeStates()[i] != StopRealTimeState.CANCELLED) {
         builder.withNoData(i);
       }
-      if (adjustTimes) {
-        if (builder.getDepartureTime(i) < nextStopArrivalTime) {
-          adjustTimes = false;
-          continue;
-        } else {
-          hasAdjustedTimes = true;
-          builder.withDepartureDelay(i, delay);
-        }
-        if (builder.getArrivalTime(i) < builder.getDepartureTime(i)) {
-          adjustTimes = false;
-        } else {
-          builder.withArrivalDelay(i, delay);
-          nextStopArrivalTime = builder.getArrivalTime(i);
-        }
-      }
+      builder.withDepartureTime(i, time = Math.min(time, builder.getScheduledDepartureTime(i)));
+      builder.withArrivalTime(i, time = Math.min(time, builder.getScheduledArrivalTime(i)));
     }
-    return hasAdjustedTimes;
+    return OptionalInt.of(firstUpdatedIndex);
   }
 }

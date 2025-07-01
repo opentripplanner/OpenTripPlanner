@@ -233,21 +233,12 @@ class TripTimesUpdater {
       LOG.debug("Interpolated delays for cancelled stops on trip {}.", tripId);
     }
 
-    // Backwards propagation for past stops that are no longer present in GTFS-RT, that is, up until
-    // the first SCHEDULED stop sequence included in the GTFS-RT feed.
-    if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
-      if (
-        BackwardsDelayPropagator.getBackwardsDelayPropagator(
-          backwardsDelayPropagationType
-        ).adjustTimes(builder, firstUpdatedIndex)
-      ) {
-        LOG.debug(
-          "Propagated delay from stop index {} backwards on trip {}.",
-          firstUpdatedIndex,
-          tripId
-        );
-      }
-    }
+    var backwardPropagationIndex = BackwardsDelayPropagator.getBackwardsDelayPropagator(
+      backwardsDelayPropagationType
+    ).propagateBackwards(builder);
+    backwardPropagationIndex.ifPresent(index ->
+      LOG.debug("Propagated delay from stop index {} backwards on trip {}.", index, tripId)
+    );
 
     if (tripUpdate.hasVehicle()) {
       var vehicleDescriptor = tripUpdate.getVehicle();

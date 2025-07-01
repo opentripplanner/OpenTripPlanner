@@ -1,16 +1,15 @@
 package org.opentripplanner.updater.trip.gtfs;
 
+import java.util.OptionalInt;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
-import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 
 public interface BackwardsDelayPropagator {
-  boolean adjustTimes(RealTimeTripTimesBuilder realTimeTripTimesBuilder, int firstUpdatedIndex);
-
   /**
-   * Adjusts arrival time for the stop at the firstUpdatedIndex if no update was given for it and
-   * arrival/departure times for the stops before that stop. Returns {@code true} if times have been
-   * adjusted.
+   * Fill in missing times before the first given time in the real-time update.
+   * @return The first stop position with given time if propagation is done.
    */
+  OptionalInt propagateBackwards(RealTimeTripTimesBuilder builder);
+
   static BackwardsDelayPropagator getBackwardsDelayPropagator(
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
