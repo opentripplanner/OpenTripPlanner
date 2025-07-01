@@ -2,7 +2,8 @@ package org.opentripplanner.updater.trip.gtfs;
 
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 
-class BackwardsDelayAlwaysPropagator implements BackwardsDelayPropagator{
+class BackwardsDelayAlwaysPropagator implements BackwardsDelayPropagator {
+
   @Override
   public boolean adjustTimes(RealTimeTripTimesBuilder builder, int firstUpdatedIndex) {
     boolean hasAdjustedTimes = false;

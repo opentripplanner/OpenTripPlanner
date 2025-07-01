@@ -16,7 +16,9 @@ public interface BackwardsDelayPropagator {
   ) {
     return switch (backwardsDelayPropagationType) {
       case ALWAYS -> new BackwardsDelayAlwaysPropagator();
-      case REQUIRED, REQUIRED_NO_DATA -> new BackwardsDelayRequiredPropagator(backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED_NO_DATA);
+      case REQUIRED, REQUIRED_NO_DATA -> new BackwardsDelayRequiredPropagator(
+        backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
     };
   }
 }

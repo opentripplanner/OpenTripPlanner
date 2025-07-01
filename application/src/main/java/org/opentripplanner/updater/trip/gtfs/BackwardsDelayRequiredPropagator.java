@@ -4,6 +4,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 
 class BackwardsDelayRequiredPropagator implements BackwardsDelayPropagator {
+
   private final boolean setNoData;
 
   BackwardsDelayRequiredPropagator(boolean setNoData) {
@@ -12,9 +13,7 @@ class BackwardsDelayRequiredPropagator implements BackwardsDelayPropagator {
 
   @Override
   public boolean adjustTimes(RealTimeTripTimesBuilder builder, int firstUpdatedIndex) {
-    if (
-      builder.getArrivalTime(firstUpdatedIndex) > builder.getDepartureTime(firstUpdatedIndex)
-    ) {
+    if (builder.getArrivalTime(firstUpdatedIndex) > builder.getDepartureTime(firstUpdatedIndex)) {
       // The given trip update has arrival time after departure time for the first updated stop.
       // This method doesn't try to fix issues in the given data, only for the missing part
       return false;
