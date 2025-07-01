@@ -81,7 +81,7 @@ class LegImplTest implements PlanTestConstants {
   @Test
   void intermediateStopsWithInclude() throws Exception {
     var env = DataFetchingSupport.dataFetchingEnvironment(LEG, INCLUDE_STOP_ONLY);
-    var stops = toStops(SUBJECT.intermediatePlaces().get(env));
+    var stops = SUBJECT.intermediateStops().get(env);
     assertThat(stops).containsExactly(REGULAR_STOP);
   }
 
