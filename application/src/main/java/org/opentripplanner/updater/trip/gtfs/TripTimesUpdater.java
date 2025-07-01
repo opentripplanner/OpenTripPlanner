@@ -262,6 +262,8 @@ class TripTimesUpdater {
       return Result.success(new TripTimesPatch(result, skippedStopIndices));
     } catch (DataValidationException e) {
       return DataValidationExceptionMapper.toResult(e);
+    } catch (IllegalStateException e) {
+      
     }
   }
 

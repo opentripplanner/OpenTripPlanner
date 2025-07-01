@@ -165,7 +165,7 @@ class RealTimeTripTimesTest {
   @Test
   public void testIncompleteTimes() {
     assertThrows(
-      IllegalStateException.class,
+      DataValidationException.class,
       createInitialTripTimes().createRealTimeWithoutScheduledTimes()::build
     );
   }

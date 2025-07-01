@@ -1,9 +1,14 @@
 package org.opentripplanner.transit.model.timetable;
 
+import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.MISSING_ARRIVAL_TIME;
+import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.MISSING_DEPARTURE_TIME;
+import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
+
 import java.util.Arrays;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 
 public class RealTimeTripTimesBuilder {
 
@@ -69,8 +74,8 @@ public class RealTimeTripTimesBuilder {
     var result = new int[arrivalTimes.length];
     for (int i = 0; i < arrivalTimes.length; i++) {
       if (arrivalTimes[i] == null) {
-        throw new IllegalStateException(
-          "The arrival time is not provided at stop %d for trip %s".formatted(i, getTrip().getId())
+        throw new DataValidationException(
+          new TimetableValidationError(MISSING_ARRIVAL_TIME, i, getTrip())
         );
       }
       result[i] = arrivalTimes[i];
@@ -121,11 +126,8 @@ public class RealTimeTripTimesBuilder {
     var result = new int[departureTimes.length];
     for (int i = 0; i < departureTimes.length; i++) {
       if (departureTimes[i] == null) {
-        throw new IllegalStateException(
-          "The departure time is not provided at stop %d for trip %s".formatted(
-              i,
-              getTrip().getId()
-            )
+        throw new DataValidationException(
+          new TimetableValidationError(MISSING_DEPARTURE_TIME, i, getTrip())
         );
       }
       result[i] = departureTimes[i];
