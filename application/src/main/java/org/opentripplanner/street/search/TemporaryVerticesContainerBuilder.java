@@ -151,8 +151,13 @@ public class TemporaryVerticesContainerBuilder {
   }
 
   public TemporaryVerticesContainer build() {
-    checkIfVerticesFound();
-    addAdjustedEdges();
+    try {
+      checkIfVerticesFound();
+      addAdjustedEdges();
+    } catch (Exception e) {
+      this.tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
+      throw e;
+    }
     return new TemporaryVerticesContainer(this);
   }
 

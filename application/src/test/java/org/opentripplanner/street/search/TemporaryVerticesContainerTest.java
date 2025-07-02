@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class TemporaryVerticesContainerTest {
 
   // - and some roads
   @BeforeEach
-  public void setup() {
+  void setup() {
     permanentVertexes.forEach(g::addVertex);
     createStreetEdge(a, b, "a -> b WALK");
     createStreetEdge(a, b, "a -> b CAR", StreetTraversalPermission.CAR);
@@ -87,7 +88,7 @@ public class TemporaryVerticesContainerTest {
   }
 
   @Test
-  public void createFromToViaVertexRequest() {
+  void createFromToViaVertexRequest() {
     var fromWithStops = new GenericLocation("From with stops", stopId, 1.0, 0.4);
     var subject = TemporaryVerticesContainer.of(g)
       .withFrom(fromWithStops, StreetMode.WALK)
@@ -112,7 +113,7 @@ public class TemporaryVerticesContainerTest {
   }
 
   @Test
-  public void temporaryChangesRemovedOnClose() {
+  void temporaryChangesRemovedOnClose() {
     // When - the container is created
     var subject = TemporaryVerticesContainer.of(g)
       .withFrom(from, StreetMode.WALK)
@@ -125,7 +126,7 @@ public class TemporaryVerticesContainerTest {
   }
 
   @Test
-  public void multipleModes() {
+  void multipleModes() {
     try (
       var subject = TemporaryVerticesContainer.of(g)
         .withFrom(from, EnumSet.of(StreetMode.WALK, StreetMode.CAR_TO_PARK))
@@ -144,7 +145,7 @@ public class TemporaryVerticesContainerTest {
   }
 
   @Test
-  public void temporaryChangesRemovedOnCloseWithVia() {
+  void temporaryChangesRemovedOnCloseWithVia() {
     // When - the container is created
     var subject = TemporaryVerticesContainer.of(g)
       .withFrom(from, StreetMode.WALK)
@@ -158,44 +159,41 @@ public class TemporaryVerticesContainerTest {
   }
 
   @Test
-  public void locationNotFoundException() {
+  void locationNotFoundException() {
     // Stops not found
-    try (
-      var container = TemporaryVerticesContainer.of(g)
+    var fromException = assertThrows(RoutingValidationException.class, () ->
+      TemporaryVerticesContainer.of(g)
         .withFrom(
           new GenericLocation("Stop not found", new FeedScopedId("F", "stop1"), null, null),
           StreetMode.WALK
         )
         .build()
-    ) {
-      assertNull(container);
-    } catch (RoutingValidationException e) {
-      assertThat(e.getRoutingErrors()).hasSize(1);
-      var fromError = e.getRoutingErrors().getFirst();
-      assertEquals(InputField.FROM_PLACE, fromError.inputField);
-      assertEquals(RoutingErrorCode.LOCATION_NOT_FOUND, fromError.code);
-    }
+        .close()
+    );
+    assertThat(fromException.getRoutingErrors()).hasSize(1);
+    var fromError = fromException.getRoutingErrors().getFirst();
+    assertEquals(InputField.FROM_PLACE, fromError.inputField);
+    assertEquals(RoutingErrorCode.LOCATION_NOT_FOUND, fromError.code);
 
-    try (
-      var container = TemporaryVerticesContainer.of(g)
+    var toException = assertThrows(RoutingValidationException.class, () ->
+      TemporaryVerticesContainer.of(g)
         .withFrom(from, StreetMode.WALK)
         .withTo(
           new GenericLocation("Stop not found", new FeedScopedId("F", "stop1"), null, null),
           StreetMode.WALK
         )
         .build()
-    ) {
-      assertNull(container);
-    } catch (RoutingValidationException e) {
-      assertThat(e.getRoutingErrors()).hasSize(1);
-      var fromError = e.getRoutingErrors().getFirst();
-      assertEquals(InputField.TO_PLACE, fromError.inputField);
-      assertEquals(RoutingErrorCode.LOCATION_NOT_FOUND, fromError.code);
-    }
+        .close()
+    );
+
+    assertThat(toException.getRoutingErrors()).hasSize(1);
+    var toError = toException.getRoutingErrors().getFirst();
+    assertEquals(InputField.TO_PLACE, toError.inputField);
+    assertEquals(RoutingErrorCode.LOCATION_NOT_FOUND, toError.code);
 
     // Coordinate not found (but in bounds)
-    try (
-      var container = TemporaryVerticesContainer.of(g)
+    var viaException = assertThrows(RoutingValidationException.class, () ->
+      TemporaryVerticesContainer.of(g)
         .withFrom(from, StreetMode.WALK)
         .withTo(to, StreetMode.WALK)
         .withVia(
@@ -203,20 +201,18 @@ public class TemporaryVerticesContainerTest {
           EnumSet.of(StreetMode.WALK)
         )
         .build()
-    ) {
-      assertNull(container);
-    } catch (RoutingValidationException e) {
-      assertThat(e.getRoutingErrors()).hasSize(1);
-      var fromError = e.getRoutingErrors().getFirst();
-      assertEquals(InputField.INTERMEDIATE_PLACE, fromError.inputField);
-      assertEquals(RoutingErrorCode.LOCATION_NOT_FOUND, fromError.code);
-    }
+        .close()
+    );
+    assertThat(viaException.getRoutingErrors()).hasSize(1);
+    var viaError = viaException.getRoutingErrors().getFirst();
+    assertEquals(InputField.INTERMEDIATE_PLACE, viaError.inputField);
+    assertEquals(RoutingErrorCode.LOCATION_NOT_FOUND, viaError.code);
   }
 
   @Test
-  public void locationOutsideBoundsException() {
-    try (
-      var container = TemporaryVerticesContainer.of(g)
+  void locationOutsideBoundsException() {
+    var exception = assertThrows(RoutingValidationException.class, () ->
+      TemporaryVerticesContainer.of(g)
         .withFrom(GenericLocation.fromCoordinate(0, 0.02), StreetMode.WALK)
         .withTo(GenericLocation.fromCoordinate(0, 0.01), StreetMode.WALK)
         .withVia(
@@ -224,37 +220,49 @@ public class TemporaryVerticesContainerTest {
           EnumSet.of(StreetMode.WALK)
         )
         .build()
-    ) {
-      assertNull(container);
-    } catch (RoutingValidationException e) {
-      assertThat(e.getRoutingErrors()).hasSize(3);
-      var fromError = e.getRoutingErrors().get(0);
-      assertEquals(InputField.FROM_PLACE, fromError.inputField);
-      assertEquals(RoutingErrorCode.OUTSIDE_BOUNDS, fromError.code);
-      var toError = e.getRoutingErrors().get(1);
-      assertEquals(InputField.TO_PLACE, toError.inputField);
-      assertEquals(RoutingErrorCode.OUTSIDE_BOUNDS, toError.code);
-      var viaError = e.getRoutingErrors().get(2);
-      assertEquals(InputField.INTERMEDIATE_PLACE, viaError.inputField);
-      assertEquals(RoutingErrorCode.OUTSIDE_BOUNDS, viaError.code);
-    }
+        .close()
+    );
+
+    assertThat(exception.getRoutingErrors()).hasSize(3);
+    var fromError = exception.getRoutingErrors().get(0);
+    assertEquals(InputField.FROM_PLACE, fromError.inputField);
+    assertEquals(RoutingErrorCode.OUTSIDE_BOUNDS, fromError.code);
+    var toError = exception.getRoutingErrors().get(1);
+    assertEquals(InputField.TO_PLACE, toError.inputField);
+    assertEquals(RoutingErrorCode.OUTSIDE_BOUNDS, toError.code);
+    var viaError = exception.getRoutingErrors().get(2);
+    assertEquals(InputField.INTERMEDIATE_PLACE, viaError.inputField);
+    assertEquals(RoutingErrorCode.OUTSIDE_BOUNDS, viaError.code);
   }
 
   @Test
-  public void walkingBetterThanTransitException() {
-    try (
-      var container = TemporaryVerticesContainer.of(g)
+  void walkingBetterThanTransitException() {
+    var exception = assertThrows(RoutingValidationException.class, () ->
+      TemporaryVerticesContainer.of(g)
         .withFrom(from, StreetMode.WALK)
         .withTo(from, StreetMode.WALK)
         .build()
-    ) {
-      assertNull(container);
-    } catch (RoutingValidationException e) {
-      assertThat(e.getRoutingErrors()).hasSize(1);
-      var fromError = e.getRoutingErrors().getFirst();
-      assertNull(fromError.inputField);
-      assertEquals(RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, fromError.code);
-    }
+        .close()
+    );
+
+    assertThat(exception.getRoutingErrors()).hasSize(1);
+    var fromError = exception.getRoutingErrors().getFirst();
+    assertNull(fromError.inputField);
+    assertEquals(RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, fromError.code);
+  }
+
+  @Test
+  void cleanUpWhenExceptionThrown() {
+    assertThrows(RoutingValidationException.class, () ->
+      TemporaryVerticesContainer.of(g)
+        .withFrom(from, StreetMode.WALK)
+        .withTo(from, StreetMode.WALK)
+        .withVia(viaLocations, EnumSet.of(StreetMode.WALK))
+        .build()
+        .close()
+    );
+
+    validateCleanup();
   }
 
   private static <T extends Collection<String>> T findAllReachableVertexes(
@@ -400,6 +408,11 @@ public class TemporaryVerticesContainerTest {
     // And When:
     subject.close();
 
+    // Then - validate temporary elements are removed
+    validateCleanup();
+  }
+
+  private void validateCleanup() {
     // Then - permanent vertexes
     for (Vertex v : permanentVertexes) {
       // - does not reference the any temporary nodes anymore
@@ -410,6 +423,7 @@ public class TemporaryVerticesContainerTest {
         assertVertexEdgeIsNotReferencingTemporaryElements(v, e, e.getToVertex());
       }
     }
+    assertTrue(g.getEdges().stream().noneMatch(e -> e instanceof TemporaryEdge));
   }
 
   private boolean outgoingEdgeIsTraversableWith(Collection<Edge> edges, TraverseMode mode) {
