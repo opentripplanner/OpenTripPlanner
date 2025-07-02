@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs;
 
+import java.util.Objects;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 
@@ -23,6 +24,7 @@ public class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolat
     Integer delay = null;
     Integer time = null;
     StopRealTimeState propagatedState = StopRealTimeState.DEFAULT;
+    Integer firstCanceledStop = null;
     boolean updated = false;
     for (var i = 0; i < builder.numberOfStops(); ++i) {
       boolean noTimeGiven =
@@ -30,6 +32,13 @@ public class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolat
       if (noTimeGiven) {
         if (builder.getStopRealTimeState(i) == StopRealTimeState.DEFAULT) {
           builder.withStopRealTimeState(i, propagatedState);
+        }
+
+        if (builder.getStopRealTimeState(i) == StopRealTimeState.CANCELLED) {
+          if (firstCanceledStop == null) {
+            firstCanceledStop = i;
+          }
+          continue;
         }
       }
 
@@ -75,6 +84,38 @@ public class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolat
       time = builder.getDepartureTime(i);
       delay = builder.getDepartureDelay(i);
 
+      // interpolate time for canceled stops before this stop
+      if (firstCanceledStop != null && firstCanceledStop > 0) {
+        Integer prevDeparture = builder.getDepartureTime(firstCanceledStop - 1);
+        if (prevDeparture != null) {
+          int arrival = Objects.requireNonNull(builder.getArrivalTime(i));
+          int prevScheduledDeparture = builder.getScheduledDepartureTime(firstCanceledStop - 1);
+          int scheduledTravelTime = builder.getScheduledArrivalTime(i) - prevScheduledDeparture;
+          int realTimeTravelTime = arrival - prevDeparture;
+          double travelTimeRatio = (double) realTimeTravelTime / scheduledTravelTime;
+
+          // Fill out interpolated time for cancelled stops, using the calculated ratio.
+          for (int cancelledIndex = firstCanceledStop; cancelledIndex < i; cancelledIndex++) {
+            final int scheduledArrivalCancelled = builder.getScheduledArrivalTime(cancelledIndex);
+            final int scheduledDepartureCancelled = builder.getScheduledDepartureTime(
+              cancelledIndex
+            );
+
+            // Interpolate
+            int scheduledArrivalDiff = scheduledArrivalCancelled - prevScheduledDeparture;
+            double interpolatedArrival = prevDeparture + travelTimeRatio * scheduledArrivalDiff;
+            int scheduledDepartureDiff = scheduledDepartureCancelled - prevScheduledDeparture;
+            double interpolatedDeparture = prevDeparture + travelTimeRatio * scheduledDepartureDiff;
+
+            // Set Interpolated Times
+            builder.withArrivalTime(cancelledIndex, (int) interpolatedArrival);
+            builder.withDepartureTime(cancelledIndex, (int) interpolatedDeparture);
+            updated = true;
+          }
+        }
+      }
+      firstCanceledStop = null;
+
       var state = builder.getStopRealTimeState(i);
       // NO_DATA should be propagated per the spec, SKIPPED should not
       // GTFS does not support INACCURATE_PREDICTIONS, but I think it should be propagated as well
@@ -82,6 +123,15 @@ public class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolat
         propagatedState = state;
       } else {
         propagatedState = StopRealTimeState.DEFAULT;
+      }
+    }
+
+    if (delay != null && firstCanceledStop != null) {
+      // there are skipped stops without estimated times at the end of the journey, propagate delay
+      for (int i = firstCanceledStop; i < builder.numberOfStops(); ++i) {
+        builder.withArrivalDelay(i, delay);
+        builder.withDepartureDelay(i, delay);
+        updated = true;
       }
     }
 

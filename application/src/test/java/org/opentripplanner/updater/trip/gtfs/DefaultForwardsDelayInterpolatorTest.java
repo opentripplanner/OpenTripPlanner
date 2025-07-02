@@ -3,6 +3,7 @@ package org.opentripplanner.updater.trip.gtfs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -173,6 +174,47 @@ class DefaultForwardsDelayInterpolatorTest {
     for (var i = 7; i < STOP_COUNT; ++i) {
       assertEquals(StopRealTimeState.INACCURATE_PREDICTIONS, builder.getStopRealTimeState(i));
     }
+    builder.build();
+  }
+
+  @Test
+  void canceledStops() {
+    // Stops 4 to 10 takes 1800 seconds scheduled, 900 seconds actual
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withCanceled(0)
+      .withCanceled(1)
+      .withCanceled(2)
+      .withCanceled(5)
+      .withCanceled(6)
+      .withCanceled(7)
+      .withCanceled(8)
+      .withCanceled(9)
+      .withCanceled(18)
+      .withCanceled(19)
+      .withArrivalTime(3, 3000)
+      .withArrivalTime(10, 4200);
+    assertTrue(new DefaultForwardsDelayInterpolator().interpolateDelay(builder));
+    // 0 to 2 should not be touched at all, it is the job for the backward interpolator
+    assertNull(builder.getDepartureTime(0));
+    assertNull(builder.getDepartureTime(1));
+    assertNull(builder.getDepartureTime(2));
+    assertEquals(3000, builder.getDepartureTime(3));
+    // for non-canceled stops, the delay is propagated as-is
+    assertEquals(3300, builder.getDepartureTime(4));
+    // for the skipped stops, the travel time is apportioned
+    assertEquals(3450, builder.getDepartureTime(5));
+    assertEquals(3600, builder.getDepartureTime(6));
+    assertEquals(3750, builder.getDepartureTime(7));
+    assertEquals(3900, builder.getDepartureTime(8));
+    assertEquals(4050, builder.getDepartureTime(9));
+    assertEquals(4200, builder.getDepartureTime(10));
+    for (int i = 11; i < STOP_COUNT; ++i) {
+      assertEquals(builder.getDepartureDelay(10), builder.getDepartureDelay(i));
+    }
+    assertEquals(
+      OptionalInt.of(3),
+      new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
+    );
     builder.build();
   }
 }
