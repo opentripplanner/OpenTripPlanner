@@ -813,4 +813,9 @@ public class DefaultTransitService implements TransitEditorService {
       }
     }
   }
+
+  @Override
+  public boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop) {
+    return timetableRepositoryIndex.hasScheduledServicesAfter(date, stop);
+  }
 }

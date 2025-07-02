@@ -39,13 +39,15 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
       .findStopTimesInPattern(stop, serviceDate, ArrivalDeparture.BOTH, true)
       .stream()
       .anyMatch(stopTime -> stopTime.times.size() > 0);
+    var inService = transitService.hasScheduledServicesAfter(LocalDate.now(), stop);
 
     Collection<KeyValue> sharedKeyValues = getBaseKeyValues(stop, i18NStringMapper, transitService);
     return ListUtils.combine(
       sharedKeyValues,
       List.of(
         new KeyValue("closedByServiceAlert", noServiceAlert),
-        new KeyValue("servicesRunningOnServiceDate", stopTimesExist)
+        new KeyValue("servicesRunningOnServiceDate", stopTimesExist),
+        new KeyValue("servicesRunningInFuture", inService)
       )
     );
   }
