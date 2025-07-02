@@ -99,7 +99,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     public void messageArrived(String topic, MqttMessage message) {
       virtualThreadExecutor.submit(() ->
         serviceDelivery(message.getPayload()).ifPresent(serviceDeliveryConsumer::apply));
-      LOG.info("Message arrived to topic: {}", topic);
       primed = true;
     }
 
