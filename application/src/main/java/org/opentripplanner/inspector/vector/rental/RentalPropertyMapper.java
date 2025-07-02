@@ -1,5 +1,6 @@
 package org.opentripplanner.inspector.vector.rental;
 
+import static org.opentripplanner.inspector.vector.KeyValue.kEnum;
 import static org.opentripplanner.inspector.vector.KeyValue.kv;
 
 import java.util.Collection;
@@ -25,6 +26,7 @@ class RentalPropertyMapper extends PropertyMapper<VehicleRentalPlace> {
 
     if (input instanceof VehicleRentalVehicle vehicle) {
       var props = List.of(
+        kv("formFactor", vehicle.vehicleType.formFactor),
         kv("isReserved", vehicle.isReserved),
         kv("isDisabled", vehicle.isDisabled)
       );
