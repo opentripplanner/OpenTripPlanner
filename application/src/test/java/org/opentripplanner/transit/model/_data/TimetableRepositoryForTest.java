@@ -209,6 +209,14 @@ public class TimetableRepositoryForTest {
     return stopTime;
   }
 
+  public StopTime stopTime(Trip trip, int seq, int arrival, int departure) {
+    var stopTime = stopTime(trip, seq);
+    stopTime.setArrivalTime(arrival);
+    stopTime.setDepartureTime(departure);
+    stopTime.setStopHeadsign(I18NString.of("Stop headsign at stop %s".formatted(seq)));
+    return stopTime;
+  }
+
   public Place place(String name, Consumer<RegularStopBuilder> stopBuilder) {
     var stop = stop(name);
     stopBuilder.accept(stop);

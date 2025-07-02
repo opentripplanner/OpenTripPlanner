@@ -8,7 +8,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
  * kept the same delay all the way from the starting stop to the first updated stop.
  */
 
-class BackwardsDelayAlwaysPropagator extends BackwardsDelayPropagatorBase {
+class BackwardsDelayAlwaysInterpolator extends BackwardsDelayInterpolatorBase {
 
   @Override
   protected void fillInMissingTimes(RealTimeTripTimesBuilder builder, int firstUpdatedIndex) {

@@ -12,7 +12,7 @@ import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
-class BackwardsDelayAlwaysPropagatorTest {
+class BackwardsDelayAlwaysInterpolatorTest {
 
   static final Trip TRIP = TimetableRepositoryForTest.trip("TRIP_ID").build();
   public static final int STOP_COUNT = 5;
@@ -28,7 +28,7 @@ class BackwardsDelayAlwaysPropagatorTest {
       .withArrivalDelay(0, -3);
     assertEquals(
       OptionalInt.empty(),
-      new BackwardsDelayAlwaysPropagator().propagateBackwards(builder)
+      new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
     );
     // nothing after the first given update should be touched, so it should be left null
     assertNull(builder.getDepartureDelay(0));
@@ -44,7 +44,7 @@ class BackwardsDelayAlwaysPropagatorTest {
       .withArrivalDelay(firstUpdateIndex, delay);
     assertEquals(
       OptionalInt.of(firstUpdateIndex),
-      new BackwardsDelayAlwaysPropagator().propagateBackwards(builder)
+      new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
     );
     // everything before the first given update should be filled in
     for (var i = 0; i < firstUpdateIndex; ++i) {
@@ -68,7 +68,7 @@ class BackwardsDelayAlwaysPropagatorTest {
       .withDepartureDelay(firstUpdateIndex, delay);
     assertEquals(
       OptionalInt.of(firstUpdateIndex),
-      new BackwardsDelayAlwaysPropagator().propagateBackwards(builder)
+      new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
     );
     // everything before the first given update should be filled in
     for (var i = 0; i < firstUpdateIndex; ++i) {
@@ -88,7 +88,7 @@ class BackwardsDelayAlwaysPropagatorTest {
   void noUpdatesAtAll() {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes();
     Assertions.assertThrows(IllegalArgumentException.class, () ->
-      new BackwardsDelayAlwaysPropagator().propagateBackwards(builder)
+      new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
     );
   }
 }

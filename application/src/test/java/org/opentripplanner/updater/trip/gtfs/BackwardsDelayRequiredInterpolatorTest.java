@@ -13,7 +13,7 @@ import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
-class BackwardsDelayRequiredPropagatorTest {
+class BackwardsDelayRequiredInterpolatorTest {
 
   static final Trip TRIP = TimetableRepositoryForTest.trip("TRIP_ID").build();
   public static final int STOP_COUNT = 5;
@@ -29,7 +29,7 @@ class BackwardsDelayRequiredPropagatorTest {
       .withArrivalDelay(0, -3);
     assertEquals(
       OptionalInt.empty(),
-      new BackwardsDelayRequiredPropagator(false).propagateBackwards(builder)
+      new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)
     );
     // nothing after the first given update should be touched, so it should be left null
     assertNull(builder.getDepartureDelay(0));
@@ -45,7 +45,7 @@ class BackwardsDelayRequiredPropagatorTest {
       .withArrivalDelay(firstUpdateIndex, delay);
     assertEquals(
       OptionalInt.of(firstUpdateIndex),
-      new BackwardsDelayRequiredPropagator(false).propagateBackwards(builder)
+      new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)
     );
     // everything before the first given update should be given the scheduled time
     for (var i = 0; i < firstUpdateIndex; ++i) {
@@ -71,7 +71,7 @@ class BackwardsDelayRequiredPropagatorTest {
       .withArrivalDelay(firstUpdateIndex, delay);
     assertEquals(
       OptionalInt.of(firstUpdateIndex),
-      new BackwardsDelayRequiredPropagator(true).propagateBackwards(builder)
+      new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
     );
     // everything before the first given update should be given the scheduled time
     for (var i = 0; i < firstUpdateIndex; ++i) {
@@ -97,7 +97,7 @@ class BackwardsDelayRequiredPropagatorTest {
       .withCanceled(canceledIndex);
     assertEquals(
       OptionalInt.of(firstUpdateIndex),
-      new BackwardsDelayRequiredPropagator(true).propagateBackwards(builder)
+      new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
     );
     // everything before the first given update should be given the scheduled time and set NO_DATA
     // unless the stop has been canceled
@@ -120,7 +120,7 @@ class BackwardsDelayRequiredPropagatorTest {
       .withArrivalTime(2, 150);
     assertEquals(
       OptionalInt.of(2),
-      new BackwardsDelayRequiredPropagator(true).propagateBackwards(builder)
+      new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
     );
     assertEquals(0, builder.getArrivalTime(0));
     assertEquals(0, builder.getDepartureTime(0));
@@ -143,7 +143,7 @@ class BackwardsDelayRequiredPropagatorTest {
       .withDepartureDelay(firstUpdateIndex, delay);
     assertEquals(
       OptionalInt.of(firstUpdateIndex),
-      new BackwardsDelayRequiredPropagator(true).propagateBackwards(builder)
+      new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
     );
     // everything before the first given update should be given the scheduled time
     for (var i = 0; i < firstUpdateIndex; ++i) {
@@ -167,7 +167,7 @@ class BackwardsDelayRequiredPropagatorTest {
   void noUpdatesAtAll() {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes();
     Assertions.assertThrows(IllegalArgumentException.class, () ->
-      new BackwardsDelayRequiredPropagator(false).propagateBackwards(builder)
+      new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)
     );
   }
 }

@@ -8,14 +8,14 @@ import org.opentripplanner.transit.model.timetable.StopRealTimeState;
  * This class fills in missing times before the first updated time directly from the scheduled
  * time, propagating negative delay only when necessary to keep the trip times non-decreasing.
  */
-class BackwardsDelayRequiredPropagator extends BackwardsDelayPropagatorBase {
+class BackwardsDelayRequiredInterpolator extends BackwardsDelayInterpolatorBase {
 
   /**
    * If true, updated stops are set NO_DATA and not exposed in APIs.
    */
   private final boolean setNoData;
 
-  BackwardsDelayRequiredPropagator(boolean setNoData) {
+  BackwardsDelayRequiredInterpolator(boolean setNoData) {
     this.setNoData = setNoData;
   }
 

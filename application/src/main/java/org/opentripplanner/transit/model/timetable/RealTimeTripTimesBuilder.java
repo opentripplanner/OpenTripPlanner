@@ -200,7 +200,7 @@ public class RealTimeTripTimesBuilder {
     return withStopRealTimeState(stop, StopRealTimeState.INACCURATE_PREDICTIONS);
   }
 
-  private RealTimeTripTimesBuilder withStopRealTimeState(int stop, StopRealTimeState state) {
+  public RealTimeTripTimesBuilder withStopRealTimeState(int stop, StopRealTimeState state) {
     this.stopRealTimeStates[stop] = state;
     return this;
   }
@@ -267,8 +267,9 @@ public class RealTimeTripTimesBuilder {
   }
 
   /**
-   * A transitional method to emulate the past behavior of copying ScheduledTripTimes to
-   * RealTimeTripTimes. To be removed after the interpolation logic is refactored out.
+   * Fill in all the missing real times from the scheduled timetable.
+   * <p>
+   * This does not check for data consistency between the scheduled and real times.
    */
   public boolean copyMissingTimesFromScheduledTimetable() {
     var hasCopiedTimes = false;

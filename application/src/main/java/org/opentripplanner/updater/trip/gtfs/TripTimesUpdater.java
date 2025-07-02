@@ -22,7 +22,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
-import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -106,8 +105,6 @@ class TripTimesUpdater {
     GtfsRealtime.TripUpdate.StopTimeUpdate update = updates.next();
 
     int numStops = tripTimes.getNumStops();
-    Integer delay = null;
-    Integer firstUpdatedIndex = null;
 
     final long today = ServiceDateUtils.asStartOfService(
       updateServiceDate,
@@ -134,40 +131,24 @@ class TripTimesUpdater {
           scheduleRelationship ==
           GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED
         ) {
-          // Set status to cancelled and delays to previously recorded delays or to 0 otherwise.
-          // Note: This will discard the times from TripUpdates even if they are present.
+          // Set status to cancelled
           skippedStopIndices.add(i);
           builder.withCanceled(i);
-          int delayOrZero = delay != null ? delay : 0;
-          builder.withArrivalDelay(i, delayOrZero);
-          builder.withDepartureDelay(i, delayOrZero);
         } else if (
           scheduleRelationship ==
           GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.NO_DATA
         ) {
           // Set status to NO_DATA and delays to 0.
           // Note: GTFS-RT requires NO_DATA stops to have no arrival departure times.
-          builder.withArrivalDelay(i, 0);
-          builder.withDepartureDelay(i, 0);
-          delay = 0;
           builder.withNoData(i);
         } else {
           // Else the status is SCHEDULED, update times as needed.
           if (update.hasArrival()) {
-            if (firstUpdatedIndex == null) {
-              firstUpdatedIndex = i;
-            }
             GtfsRealtime.TripUpdate.StopTimeEvent arrival = update.getArrival();
-            if (arrival.hasDelay()) {
-              delay = arrival.getDelay();
-              if (arrival.hasTime()) {
-                builder.withArrivalTime(i, (int) (arrival.getTime() - today));
-              } else {
-                builder.withArrivalDelay(i, delay);
-              }
-            } else if (arrival.hasTime()) {
+            if (arrival.hasTime()) {
               builder.withArrivalTime(i, (int) (arrival.getTime() - today));
-              delay = builder.getArrivalDelay(i);
+            } else if (arrival.hasDelay()) {
+              builder.withArrivalDelay(i, arrival.getDelay());
             } else {
               LOG.debug(
                 "Arrival time at index {} of trip {} has neither a delay nor a time.",
@@ -176,25 +157,14 @@ class TripTimesUpdater {
               );
               return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME, i));
             }
-          } else if (delay != null) {
-            builder.withArrivalDelay(i, delay);
           }
 
           if (update.hasDeparture()) {
-            if (firstUpdatedIndex == null) {
-              firstUpdatedIndex = i;
-            }
             GtfsRealtime.TripUpdate.StopTimeEvent departure = update.getDeparture();
-            if (departure.hasDelay()) {
-              delay = departure.getDelay();
-              if (departure.hasTime()) {
-                builder.withDepartureTime(i, (int) (departure.getTime() - today));
-              } else {
-                builder.withDepartureDelay(i, delay);
-              }
-            } else if (departure.hasTime()) {
+            if (departure.hasTime()) {
               builder.withDepartureTime(i, (int) (departure.getTime() - today));
-              delay = builder.getDepartureDelay(i);
+            } else if (departure.hasDelay()) {
+              builder.withDepartureDelay(i, departure.getDelay());
             } else {
               LOG.debug(
                 "Departure time at index {} of trip {} has neither a delay nor a time.",
@@ -203,8 +173,6 @@ class TripTimesUpdater {
               );
               return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME, i));
             }
-          } else if (delay != null) {
-            builder.withDepartureDelay(i, delay);
           }
         }
 
@@ -213,10 +181,6 @@ class TripTimesUpdater {
         } else {
           update = null;
         }
-      } else if (delay != null) {
-        // If not match and has previously set delays, propagate delays.
-        builder.withArrivalDelay(i, delay);
-        builder.withDepartureDelay(i, delay);
       }
     }
     if (update != null) {
@@ -229,11 +193,11 @@ class TripTimesUpdater {
 
     // Interpolate missing times from SKIPPED stops since they don't necessarily have times
     // associated. Note: Currently for GTFS-RT updates ONLY not for SIRI updates.
-    if (interpolateMissingTimes(builder)) {
-      LOG.debug("Interpolated delays for cancelled stops on trip {}.", tripId);
+    if (ForwardsDelayInterpolator.getInstance().interpolateDelay(builder)) {
+      LOG.debug("Interpolated delays for for missing stops on trip {}.", tripId);
     }
 
-    var backwardPropagationIndex = BackwardsDelayPropagator.getBackwardsDelayPropagator(
+    var backwardPropagationIndex = BackwardsDelayInterpolator.getInstance(
       backwardsDelayPropagationType
     ).propagateBackwards(builder);
     backwardPropagationIndex.ifPresent(index ->
@@ -262,88 +226,6 @@ class TripTimesUpdater {
       return Result.success(new TripTimesPatch(result, skippedStopIndices));
     } catch (DataValidationException e) {
       return DataValidationExceptionMapper.toResult(e);
-    } catch (IllegalStateException e) {
-      
     }
-  }
-
-  /**
-   * Note: This method only applies for GTFS, not SIRI!
-   * This method interpolates the times for SKIPPED stops in between regular stops since GTFS-RT
-   * does not require arrival and departure times for these stops. This method ensures the internal
-   * time representations in OTP for SKIPPED stops are between the regular stop times immediately
-   * before and after the cancellation in GTFS-RT. This is to meet the OTP requirement that stop
-   * times should be increasing and to support the trip search flag `includeRealtimeCancellations`.
-   * Terminal stop cancellations can be handled by backward and forward propagations, and are
-   * outside the scope of this method.
-   *
-   * TODO: this interpolation logic is problematic, need to discard and rewrite later
-   *
-   * @return true if there is interpolated times, false if there is no interpolation.
-   */
-  public static boolean interpolateMissingTimes(RealTimeTripTimesBuilder builder) {
-    boolean hasInterpolatedTimes = builder.copyMissingTimesFromScheduledTimetable();
-    final int numStops = builder.numberOfStops();
-    boolean startInterpolate = false;
-    boolean hasPrevTimes = false;
-    int prevDeparture = 0;
-    int prevScheduledDeparture = 0;
-    int prevStopIndex = -1;
-
-    // Loop through all stops
-    for (int s = 0; s < numStops; s++) {
-      final boolean isCancelledStop =
-        builder.getStopRealTimeState(s) == StopRealTimeState.CANCELLED;
-      final int scheduledArrival = builder.getScheduledArrivalTime(s);
-      final int scheduledDeparture = builder.getScheduledDepartureTime(s);
-      final int arrival = builder.getArrivalTime(s);
-      final int departure = builder.getDepartureTime(s);
-
-      if (!isCancelledStop && !startInterpolate) {
-        // Regular stop, could be used for interpolation for future cancellation, keep track.
-        prevDeparture = departure;
-        prevScheduledDeparture = scheduledDeparture;
-        prevStopIndex = s;
-        hasPrevTimes = true;
-      } else if (isCancelledStop && !startInterpolate && hasPrevTimes) {
-        // First cancelled stop, keep track.
-        startInterpolate = true;
-      } else if (!isCancelledStop && startInterpolate && hasPrevTimes) {
-        // First regular stop after cancelled stops, interpolate.
-        // Calculate necessary info for interpolation.
-        int numCancelledStops = s - prevStopIndex - 1;
-        int scheduledTravelTime = scheduledArrival - prevScheduledDeparture;
-        int realTimeTravelTime = arrival - prevDeparture;
-        double travelTimeRatio = (double) realTimeTravelTime / scheduledTravelTime;
-
-        // Fill out interpolated time for cancelled stops, using the calculated ratio.
-        for (int cancelledIndex = prevStopIndex + 1; cancelledIndex < s; cancelledIndex++) {
-          final int scheduledArrivalCancelled = builder.getScheduledArrivalTime(cancelledIndex);
-          final int scheduledDepartureCancelled = builder.getScheduledDepartureTime(cancelledIndex);
-
-          // Interpolate
-          int scheduledArrivalDiff = scheduledArrivalCancelled - prevScheduledDeparture;
-          double interpolatedArrival = prevDeparture + travelTimeRatio * scheduledArrivalDiff;
-          int scheduledDepartureDiff = scheduledDepartureCancelled - prevScheduledDeparture;
-          double interpolatedDeparture = prevDeparture + travelTimeRatio * scheduledDepartureDiff;
-
-          // Set Interpolated Times
-          builder.withArrivalTime(cancelledIndex, (int) interpolatedArrival);
-          builder.withDepartureTime(cancelledIndex, (int) interpolatedDeparture);
-        }
-
-        // Set tracking variables
-        prevDeparture = departure;
-        prevScheduledDeparture = scheduledDeparture;
-        prevStopIndex = s;
-        startInterpolate = false;
-        hasPrevTimes = true;
-
-        // Set return variable
-        hasInterpolatedTimes = true;
-      }
-    }
-
-    return hasInterpolatedTimes;
   }
 }
