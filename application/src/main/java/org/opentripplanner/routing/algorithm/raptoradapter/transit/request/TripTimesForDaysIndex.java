@@ -61,12 +61,14 @@ final class TripTimesForDaysIndex {
     int tripIndexIndex = 0;
     int i = 0;
     int j = 0;
-    int u = a[i];
+    int u = safeValueAt(a, i);
     int v = safeValueNextDayAt(list, day, j);
 
     do {
       if (u <= v) {
-        tripIndexIndex = setIndexValue(tripIndexIndex, day, i);
+        if (i < a.length) {
+          tripIndexIndex = setIndexValue(tripIndexIndex, day, i);
+        }
         ++i;
         if (i < a.length) {
           u = a[i];
@@ -86,7 +88,7 @@ final class TripTimesForDaysIndex {
             a = list.get(day);
           }
           j = 0;
-          u = a[i];
+          u = safeValueAt(a, i);
           v = safeValueNextDayAt(list, day, j);
         }
       }
@@ -139,6 +141,9 @@ final class TripTimesForDaysIndex {
 
   @Override
   public String toString() {
+    if (tripIndex.length == 0) {
+      return "";
+    }
     var buf = new StringBuilder();
     for (int i = 0; i < tripIndex.length; i += 2) {
       buf.append(tripIndex[i]).append(':').append(tripIndex[i + 1]).append(' ');
