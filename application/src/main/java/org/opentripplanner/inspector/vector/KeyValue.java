@@ -12,7 +12,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * The underlying format (and library) supports only a limited number of Java types and silently
  * drops those that aren't supported: https://github.com/CI-CMG/mapbox-vector-tile/blob/master/src/main/java/edu/colorado/cires/cmg/mvt/encoding/MvtValue.java#L18-L40
  * <p>
- * For this reason this class also has static initializer that automatically converts common
+ * For this reason this class also has a static initializer that automatically converts common
  * OTP classes into vector tile-compatible strings.
  */
 public record KeyValue(String key, Object value) {

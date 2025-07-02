@@ -1,6 +1,5 @@
 package org.opentripplanner.inspector.vector.rental;
 
-import static org.opentripplanner.inspector.vector.KeyValue.kEnum;
 import static org.opentripplanner.inspector.vector.KeyValue.kv;
 
 import java.util.Collection;
