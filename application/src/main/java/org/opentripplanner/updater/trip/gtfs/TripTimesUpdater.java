@@ -11,10 +11,8 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_N
 import com.google.transit.realtime.GtfsRealtime;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.gtfs.mapping.PickDropMapper;
