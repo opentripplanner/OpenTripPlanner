@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.apis.gtfs.datafetchers.DataFetchingSupport.dataFetchingEnvironment;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -69,50 +70,39 @@ class LegImplTest implements PlanTestConstants {
     "include",
     List.of(GraphQLTypes.GraphQLStopType.STOP)
   );
-  private static final Map<String, Object> FILTER = Map.of(
-    "include",
-    Map.of("stopTypes", List.of(GraphQLTypes.GraphQLStopType.STOP))
-  );
   private static final StreetLeg WALK_LEG = StreetLeg.of().withMode(TraverseMode.WALK).build();
 
   @Test
   void intermediateStops() throws Exception {
-    var env = DataFetchingSupport.dataFetchingEnvironment(LEG);
+    var env = dataFetchingEnvironment(LEG);
     var stops = SUBJECT.intermediateStops().get(env);
     assertThat(stops).containsExactly(REGULAR_STOP, AREA_STOP, GROUP_STOP);
   }
 
   @Test
   void intermediateStopsWithInclude() throws Exception {
-    var env = DataFetchingSupport.dataFetchingEnvironment(LEG, INCLUDE_STOP_ONLY);
+    var env = dataFetchingEnvironment(LEG, INCLUDE_STOP_ONLY);
     var stops = SUBJECT.intermediateStops().get(env);
     assertThat(stops).containsExactly(REGULAR_STOP);
   }
 
   @Test
   void intermediatePlaces() throws Exception {
-    var env = DataFetchingSupport.dataFetchingEnvironment(LEG);
+    var env = dataFetchingEnvironment(LEG);
     var stops = toStops(SUBJECT.intermediatePlaces().get(env));
     assertThat(stops).containsExactly(REGULAR_STOP, AREA_STOP, GROUP_STOP);
   }
 
   @Test
-  void intermediatePlacesWithInclude() throws Exception {
-    var env = DataFetchingSupport.dataFetchingEnvironment(LEG, FILTER);
-    var stops = toStops(SUBJECT.intermediatePlaces().get(env));
-    assertThat(stops).containsExactly(REGULAR_STOP);
-  }
-
-  @Test
   void walkLeg() throws Exception {
-    var env = DataFetchingSupport.dataFetchingEnvironment(WALK_LEG);
+    var env = dataFetchingEnvironment(WALK_LEG);
     assertNull(SUBJECT.intermediatePlaces().get(env));
   }
 
   @Test
   void walkLegWithInclude() throws Exception {
-    var env = DataFetchingSupport.dataFetchingEnvironment(WALK_LEG, FILTER);
-    assertNull(SUBJECT.intermediatePlaces().get(env));
+    var env = dataFetchingEnvironment(WALK_LEG, INCLUDE_STOP_ONLY);
+    assertNull(SUBJECT.intermediateStops().get(env));
   }
 
   private static Stream<StopLocation> toStops(Iterable<StopArrival> stopArrivals) {
