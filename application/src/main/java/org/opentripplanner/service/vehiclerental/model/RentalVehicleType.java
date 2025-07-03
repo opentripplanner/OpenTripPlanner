@@ -15,7 +15,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * @see <a href="https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS
  * Specification</a>
  * <p>
- * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public final class RentalVehicleType implements Serializable, Comparable<RentalVehicleType> {
 

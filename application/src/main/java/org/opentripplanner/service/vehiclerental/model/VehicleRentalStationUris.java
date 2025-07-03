@@ -11,7 +11,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * station_information.json specification</a>
  * for more details.
  * <p>
- * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public final class VehicleRentalStationUris {
 

@@ -16,18 +16,16 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.collection.SetUtils;
-import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Implements the {@link VehicleRentalPlace} class which contains Javadoc.
  * <p>
- * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public final class VehicleRentalStation implements VehicleRentalPlace {
 
   public static final VehicleRentalStation DEFAULT = new VehicleRentalStation();
 
-  // GBFS  Static information
+  // GBFS Static information
   public FeedScopedId id;
   public I18NString name;
   public String shortName;

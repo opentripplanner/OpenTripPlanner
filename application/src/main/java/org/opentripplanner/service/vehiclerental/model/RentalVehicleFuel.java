@@ -12,7 +12,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * See the <a href="https://github.com/MobilityData/gbfs/blob/v3.0/gbfs.md#vehicle_statusjson">GBFS
  * vehicle_status specification</a> for more details.
  * <p>
- * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public final class RentalVehicleFuel {
 
