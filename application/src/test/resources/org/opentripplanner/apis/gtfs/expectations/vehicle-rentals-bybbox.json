@@ -11,14 +11,14 @@
             {
               "vehicleType": {
                 "formFactor": "BICYCLE",
-                "propulsionType": "ELECTRIC"
+                "propulsionType": "HUMAN"
               },
               "count": 5
             },
             {
               "vehicleType": {
                 "formFactor": "BICYCLE",
-                "propulsionType": "HUMAN"
+                "propulsionType": "ELECTRIC"
               },
               "count": 5
             }
@@ -31,16 +31,16 @@
             {
               "vehicleType": {
                 "formFactor": "BICYCLE",
-                "propulsionType": "ELECTRIC"
+                "propulsionType": "HUMAN"
               },
-              "count": 3
+              "count": 7
             },
             {
               "vehicleType": {
                 "formFactor": "BICYCLE",
-                "propulsionType": "HUMAN"
+                "propulsionType": "ELECTRIC"
               },
-              "count": 7
+              "count": 3
             }
           ],
           "total": 10
