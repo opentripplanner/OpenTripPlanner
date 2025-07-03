@@ -446,6 +446,63 @@ public class TripTimesUpdaterTest {
   }
 
   @Test
+  public void testUpdateWithNoBackwardPropagationWhenItIsNotRequired() {
+    TripDescriptor.Builder tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(0);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(15);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      timetable,
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      BackwardsDelayPropagationType.NONE
+    );
+
+    assertTrue(result.isSuccess());
+
+    result.ifSuccess(p -> {
+      var updatedTripTimes = p.getTripTimes();
+      assertNotNull(updatedTripTimes);
+      assertEquals(15, updatedTripTimes.getArrivalDelay(0));
+      assertFalse(updatedTripTimes.isNoDataStop(0));
+    });
+  }
+
+  @Test
+  public void testUpdateWithNoBackwardPropagationWhenItIsRequired() {
+    TripDescriptor.Builder tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(15);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      timetable,
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      BackwardsDelayPropagationType.NONE
+    );
+
+    assertTrue(result.isFailure());
+
+    result.ifFailure(p -> {
+      assertEquals(UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME, p.errorType());
+    });
+  }
+
+  @Test
   public void testUpdateWithRequiredNoDataDelayPropagationWhenItsNotRequired() {
     TripDescriptor.Builder tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
