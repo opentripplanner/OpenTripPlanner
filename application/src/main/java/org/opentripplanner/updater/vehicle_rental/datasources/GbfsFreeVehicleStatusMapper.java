@@ -80,7 +80,7 @@ public class GbfsFreeVehicleStatusMapper {
       if (
         vehicle.getVehicleTypeId() != null &&
         vehicleTypes.get(vehicle.getVehicleTypeId()) != null &&
-        vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType !=
+        vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType() !=
         RentalVehicleType.PropulsionType.HUMAN &&
         rangeMeters == null
       ) {
@@ -113,10 +113,10 @@ public class GbfsFreeVehicleStatusMapper {
     var typeId = vehicle.getVehicleTypeId();
     if (typeId != null) {
       var type = vehicleTypes.get(typeId);
-      if (type != null && type.name != null) {
-        return type.name;
+      if (type != null && type.name() != null) {
+        return type.name();
       }
     }
-    return RentalVehicleType.getDefaultType(system.systemId).name;
+    return RentalVehicleType.getDefaultType(system.systemId).name();
   }
 }

@@ -220,12 +220,12 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
 
   @Override
   public boolean isCarStation() {
-    return vehicleType.formFactor.equals(RentalFormFactor.CAR);
+    return vehicleType.formFactor().equals(RentalFormFactor.CAR);
   }
 
   @Override
   public Set<RentalFormFactor> getAvailablePickupFormFactors(boolean includeRealtimeAvailability) {
-    return Set.of(vehicleType.formFactor);
+    return Set.of(vehicleType.formFactor());
   }
 
   @Override

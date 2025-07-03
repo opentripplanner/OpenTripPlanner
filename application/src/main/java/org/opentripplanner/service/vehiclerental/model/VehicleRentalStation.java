@@ -355,7 +355,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     return Stream.concat(
       vehicleTypesAvailable.keySet().stream(),
       vehicleSpacesAvailable.keySet().stream()
-    ).anyMatch(rentalVehicleType -> rentalVehicleType.formFactor.equals(RentalFormFactor.CAR));
+    ).anyMatch(rentalVehicleType -> rentalVehicleType.formFactor().equals(RentalFormFactor.CAR));
   }
 
   @Override
@@ -364,7 +364,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       .entrySet()
       .stream()
       .filter(e -> !includeRealtimeAvailability || e.getValue() > 0)
-      .map(e -> e.getKey().formFactor)
+      .map(e -> e.getKey().formFactor())
       .collect(Collectors.toSet());
   }
 
@@ -374,7 +374,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       .entrySet()
       .stream()
       .filter(e -> !includeRealtimeAvailability || overloadingAllowed || e.getValue() > 0)
-      .map(e -> e.getKey().formFactor)
+      .map(e -> e.getKey().formFactor())
       .collect(Collectors.toSet());
   }
 

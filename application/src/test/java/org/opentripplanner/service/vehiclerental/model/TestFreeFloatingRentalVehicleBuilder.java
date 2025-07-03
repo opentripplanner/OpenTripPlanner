@@ -103,7 +103,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
 
   public VehicleRentalVehicle build() {
     var vehicle = new VehicleRentalVehicle();
-    var stationName = "free-floating-" + vehicleType.formFactor.name().toLowerCase();
+    var stationName = "free-floating-" + vehicleType.formFactor().name().toLowerCase();
     vehicle.id = new FeedScopedId(this.network, stationName);
     vehicle.name = new NonLocalizedString(stationName);
     vehicle.latitude = latitude;

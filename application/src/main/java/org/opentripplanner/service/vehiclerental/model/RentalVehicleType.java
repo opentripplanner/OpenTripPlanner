@@ -24,11 +24,11 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
 
   public static final RentalVehicleType DEFAULT = new RentalVehicleType();
 
-  public final FeedScopedId id;
-  public final String name;
-  public final RentalFormFactor formFactor;
-  public final PropulsionType propulsionType;
-  public final Double maxRangeMeters;
+  private final FeedScopedId id;
+  private final String name;
+  private final RentalFormFactor formFactor;
+  private final PropulsionType propulsionType;
+  private final Double maxRangeMeters;
 
   private RentalVehicleType() {
     this.id = new FeedScopedId("DEFAULT", "DEFAULT");

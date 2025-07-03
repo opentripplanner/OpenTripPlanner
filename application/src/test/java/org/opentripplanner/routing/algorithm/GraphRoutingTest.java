@@ -397,7 +397,7 @@ public abstract class GraphRoutingTest {
       );
       VehicleRentalEdge.createVehicleRentalEdge(
         vertex,
-        RentalVehicleType.getDefaultType(network).formFactor
+        RentalVehicleType.getDefaultType(network).formFactor()
       );
       return vertex;
     }

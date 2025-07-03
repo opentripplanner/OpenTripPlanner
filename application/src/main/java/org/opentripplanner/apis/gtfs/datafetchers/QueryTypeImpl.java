@@ -573,8 +573,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         return vehicleRentalStationService
           .getVehicleRentalVehicles()
           .stream()
-          .filter(v -> v.vehicleType != null)
-          .filter(v -> requiredFormFactors.contains(v.vehicleType.formFactor))
+          .filter(v -> v.vehicleType() != null)
+          .filter(v -> requiredFormFactors.contains(v.vehicleType().formFactor()))
           .toList();
       }
 

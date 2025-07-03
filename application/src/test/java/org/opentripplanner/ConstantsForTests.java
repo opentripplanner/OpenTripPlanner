@@ -366,7 +366,7 @@ public class ConstantsForTests {
 
         VehicleRentalPlaceVertex stationVertex = new VehicleRentalPlaceVertex(station);
         graph.addVertex(stationVertex);
-        VehicleRentalEdge.createVehicleRentalEdge(stationVertex, vehicleType.formFactor);
+        VehicleRentalEdge.createVehicleRentalEdge(stationVertex, vehicleType.formFactor());
 
         linker.linkVertexPermanently(
           stationVertex,
