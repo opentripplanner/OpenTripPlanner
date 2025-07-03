@@ -91,7 +91,7 @@ class TripTimesUpdater {
       LOG.trace("tripId {} found in timetable.", tripId);
     }
 
-    RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
+    RealTimeTripTimesBuilder builder = tripTimes.createRealTimeWithoutScheduledTimes();
     List<Integer> skippedStopIndices = new ArrayList<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
@@ -191,8 +191,8 @@ class TripTimesUpdater {
       return Result.failure(new UpdateError(feedScopedTripId, INVALID_STOP_SEQUENCE));
     }
 
-    // Interpolate missing times from SKIPPED stops since they don't necessarily have times
-    // associated. Note: Currently for GTFS-RT updates ONLY not for SIRI updates.
+    // Interpolate missing times for stops which don't have times associated. Note: Currently for
+    // GTFS-RT updates ONLY not for SIRI updates.
     if (ForwardsDelayInterpolator.getInstance().interpolateDelay(builder)) {
       LOG.debug("Interpolated delays for for missing stops on trip {}.", tripId);
     }

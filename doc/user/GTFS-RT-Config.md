@@ -91,9 +91,13 @@ The information is downloaded in a single HTTP request and polled regularly.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
 **Path:** /updaters/[5]   
-**Enum values:** `required-no-data` | `required` | `always`
+**Enum values:** `none` | `required-no-data` | `required` | `always`
 
 How backwards propagation should be handled.
+
+  NONE:
+  Do not propagate delays backwards. Reject real-time updates if the times are not specified
+  from the beginning of the trip.
 
   REQUIRED_NO_DATA:
   Default value. Only propagates delays backwards when it is required to ensure that the times
@@ -104,7 +108,7 @@ How backwards propagation should be handled.
   Only propagates delays backwards when it is required to ensure that the times are increasing.
   The updated times are exposed through APIs.
 
-  ALWAYS
+  ALWAYS:
   Propagates delays backwards on stops with no estimates regardless if it's required or not.
   The updated times are exposed through APIs.
 
@@ -177,9 +181,13 @@ This system powers the realtime updates in Helsinki and more information can be 
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
 **Path:** /updaters/[6]   
-**Enum values:** `required-no-data` | `required` | `always`
+**Enum values:** `none` | `required-no-data` | `required` | `always`
 
 How backwards propagation should be handled.
+
+  NONE:
+  Do not propagate delays backwards. Reject real-time updates if the times are not specified
+  from the beginning of the trip.
 
   REQUIRED_NO_DATA:
   Default value. Only propagates delays backwards when it is required to ensure that the times
