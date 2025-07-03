@@ -137,8 +137,14 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<Iterable<StopArrival>> intermediatePlaces() {
     return env -> {
       var args = new GraphQLTypes.GraphQLLegIntermediatePlacesArgs(env.getArguments());
-      var filter = new StopArrivalByTypeFilter(args.getGraphQLInclude());
-      return filter.filter(getSource(env).listIntermediateStops());
+      var intermediateStops = getSource(env).listIntermediateStops();
+      if (args.getGraphQLInclude() != null) {
+        var types = args.getGraphQLInclude().getGraphQLStopTypes();
+        var filter = new StopArrivalByTypeFilter(types);
+        return filter.filter(intermediateStops);
+      } else {
+        return intermediateStops;
+      }
     };
   }
 

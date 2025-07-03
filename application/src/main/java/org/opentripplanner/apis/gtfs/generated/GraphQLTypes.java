@@ -1328,6 +1328,32 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLIntermediatePlaceFilterInput {
+
+    private List<GraphQLStopType> stopTypes;
+
+    public GraphQLIntermediatePlaceFilterInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("stopTypes") != null) {
+          this.stopTypes = ((List<Object>) args.get("stopTypes")).stream()
+            .map(item ->
+              item instanceof GraphQLStopType ? item : GraphQLStopType.valueOf((String) item)
+            )
+            .map(GraphQLStopType.class::cast)
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLStopType> getGraphQLStopTypes() {
+      return this.stopTypes;
+    }
+
+    public void setGraphQLStopTypes(List<GraphQLStopType> stopTypes) {
+      this.stopTypes = stopTypes;
+    }
+  }
+
   /**
    * Enable this to attach a system notice to itineraries instead of removing them. This is very
    * convenient when tuning the itinerary-filter-chain.
@@ -1341,26 +1367,21 @@ public class GraphQLTypes {
 
   public static class GraphQLLegIntermediatePlacesArgs {
 
-    private List<GraphQLStopType> include;
+    private GraphQLIntermediatePlaceFilterInput include;
 
     public GraphQLLegIntermediatePlacesArgs(Map<String, Object> args) {
       if (args != null) {
-        if (args.get("include") != null) {
-          this.include = ((List<Object>) args.get("include")).stream()
-            .map(item ->
-              item instanceof GraphQLStopType ? item : GraphQLStopType.valueOf((String) item)
-            )
-            .map(GraphQLStopType.class::cast)
-            .collect(Collectors.toList());
-        }
+        this.include = new GraphQLIntermediatePlaceFilterInput(
+          (Map<String, Object>) args.get("include")
+        );
       }
     }
 
-    public List<GraphQLStopType> getGraphQLInclude() {
+    public GraphQLIntermediatePlaceFilterInput getGraphQLInclude() {
       return this.include;
     }
 
-    public void setGraphQLInclude(List<GraphQLStopType> include) {
+    public void setGraphQLInclude(GraphQLIntermediatePlaceFilterInput include) {
       this.include = include;
     }
   }

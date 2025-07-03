@@ -771,10 +771,10 @@ type Leg {
   originates and the Place where the leg ends. For non-transit legs, null.
   Returns Place type, which has fields for e.g. departure and arrival times.
     
-  The `include` parameter allows filtering of the returned places by stop type. If not provided, the
-  field returns all types. An empty list is not permitted.
+  The `include` parameter allows filtering of the returned places. If not provided, the
+  field returns all types.
   """
-  intermediatePlaces(include: [StopType!]): [Place]
+  intermediatePlaces(include: IntermediatePlaceFilterInput): [Place]
   """
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
@@ -4225,6 +4225,16 @@ input InputUnpreferred {
   Deprecated: Use `unpreferredCost` instead.
   """
   useUnpreferredRoutesPenalty: Int @deprecated(reason : "Use unpreferredCost instead")
+}
+
+"Filter for including only certain intermediate places."
+input IntermediatePlaceFilterInput {
+  """
+  Filter the intermediate places by stop type.
+  
+  An empty list is not permitted.
+  """
+  stopTypes: [StopType!]!
 }
 
 "Filters an entity by a date range."

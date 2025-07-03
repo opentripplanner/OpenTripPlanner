@@ -69,6 +69,10 @@ class LegImplTest implements PlanTestConstants {
     "include",
     List.of(GraphQLTypes.GraphQLStopType.STOP)
   );
+  private static final Map<String, Object> FILTER = Map.of(
+    "include",
+    Map.of("stopTypes", List.of(GraphQLTypes.GraphQLStopType.STOP))
+  );
   private static final StreetLeg WALK_LEG = StreetLeg.of().withMode(TraverseMode.WALK).build();
 
   @Test
@@ -94,7 +98,7 @@ class LegImplTest implements PlanTestConstants {
 
   @Test
   void intermediatePlacesWithInclude() throws Exception {
-    var env = DataFetchingSupport.dataFetchingEnvironment(LEG, INCLUDE_STOP_ONLY);
+    var env = DataFetchingSupport.dataFetchingEnvironment(LEG, FILTER);
     var stops = toStops(SUBJECT.intermediatePlaces().get(env));
     assertThat(stops).containsExactly(REGULAR_STOP);
   }
@@ -107,7 +111,7 @@ class LegImplTest implements PlanTestConstants {
 
   @Test
   void walkLegWithInclude() throws Exception {
-    var env = DataFetchingSupport.dataFetchingEnvironment(WALK_LEG, INCLUDE_STOP_ONLY);
+    var env = DataFetchingSupport.dataFetchingEnvironment(WALK_LEG, FILTER);
     assertNull(SUBJECT.intermediatePlaces().get(env));
   }
 
