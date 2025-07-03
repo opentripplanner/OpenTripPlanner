@@ -720,6 +720,11 @@ public class GtfsRealTimeTripUpdateAdapter {
     if (tripHeadsign != null) {
       tripBuilder.withHeadsign(new NonLocalizedString(tripHeadsign));
     }
+    
+    var tripShortName = getTripShortName(tripUpdate);
+    if (tripShortName != null) {
+      tripBuilder.withShortName(tripShortName);
+    }
 
     return addTripToGraphAndBuffer(
       tripBuilder.build(),
@@ -739,6 +744,17 @@ public class GtfsRealTimeTripUpdateAdapter {
       var tripProperties = tripUpdate.getTripProperties();
       if (tripProperties.hasTripHeadsign()) {
         return tripProperties.getTripHeadsign();
+      }
+    }
+    return null;
+  }
+
+  @Nullable
+  private static String getTripShortName(TripUpdate tripUpdate) {
+    if (tripUpdate.hasTripProperties()) {
+      var tripProperties = tripUpdate.getTripProperties();
+      if (tripProperties.hasTripShortName()) {
+        return tripProperties.getTripShortName();
       }
     }
     return null;

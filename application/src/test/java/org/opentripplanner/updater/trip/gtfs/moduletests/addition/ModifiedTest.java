@@ -39,7 +39,8 @@ public class ModifiedTest implements RealtimeTestConstants {
       SERVICE_DATE,
       REPLACEMENT,
       TIME_ZONE,
-      "New Headsign"
+      "New Headsign",
+      "SW1234" // we can't change trip short name at real-time yet
     );
     builder
       .addStopTime(STOP_A_ID, 30)
