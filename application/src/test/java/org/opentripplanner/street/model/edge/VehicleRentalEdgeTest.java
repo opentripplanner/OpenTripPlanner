@@ -205,13 +205,15 @@ class VehicleRentalEdgeTest {
       .withLatitude(1)
       .withLongitude(1)
       .withId(new FeedScopedId(NETWORK, "123"))
-      .withVehicleType(RentalVehicleType.of()
-        .withId(new FeedScopedId(NETWORK, "scooter"))
-        .withName("scooter")
-        .withFormFactor(RentalFormFactor.SCOOTER)
-        .withPropulsionType(RentalVehicleType.PropulsionType.ELECTRIC)
-        .withMaxRangeMeters(100000d)
-        .build())
+      .withVehicleType(
+        RentalVehicleType.of()
+          .withId(new FeedScopedId(NETWORK, "scooter"))
+          .withName("scooter")
+          .withFormFactor(RentalFormFactor.SCOOTER)
+          .withPropulsionType(RentalVehicleType.PropulsionType.ELECTRIC)
+          .withMaxRangeMeters(100000d)
+          .build()
+      )
       .build();
 
     @Test

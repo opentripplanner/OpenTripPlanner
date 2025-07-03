@@ -32,7 +32,9 @@ public class RentalVehicleType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("vehicleType")
           .type(new GraphQLNonNull(vehicleTypeType))
-          .dataFetcher(environment -> ((VehicleRentalVehicle) environment.getSource()).vehicleType())
+          .dataFetcher(environment ->
+            ((VehicleRentalVehicle) environment.getSource()).vehicleType()
+          )
           .build()
       )
       .field(
