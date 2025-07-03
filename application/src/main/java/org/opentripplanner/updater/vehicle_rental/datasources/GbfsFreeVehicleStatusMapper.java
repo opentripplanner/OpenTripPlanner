@@ -47,14 +47,14 @@ public class GbfsFreeVehicleStatusMapper {
       vehicle.getLat() != null
     ) {
       VehicleRentalVehicle rentalVehicle = new VehicleRentalVehicle();
-      rentalVehicle.id = new FeedScopedId(system.systemId, vehicle.getBikeId());
+      rentalVehicle.id = new FeedScopedId(system.systemId(), vehicle.getBikeId());
       rentalVehicle.system = system;
       rentalVehicle.name = new NonLocalizedString(getName(vehicle));
       rentalVehicle.longitude = vehicle.getLon();
       rentalVehicle.latitude = vehicle.getLat();
       rentalVehicle.vehicleType = vehicleTypes.getOrDefault(
         vehicle.getVehicleTypeId(),
-        RentalVehicleType.getDefaultType(system.systemId)
+        RentalVehicleType.getDefaultType(system.systemId())
       );
       rentalVehicle.isReserved = vehicle.getIsReserved() != null ? vehicle.getIsReserved() : false;
       rentalVehicle.isDisabled = vehicle.getIsDisabled() != null ? vehicle.getIsDisabled() : false;
@@ -117,6 +117,6 @@ public class GbfsFreeVehicleStatusMapper {
         return type.name();
       }
     }
-    return RentalVehicleType.getDefaultType(system.systemId).name();
+    return RentalVehicleType.getDefaultType(system.systemId()).name();
   }
 }

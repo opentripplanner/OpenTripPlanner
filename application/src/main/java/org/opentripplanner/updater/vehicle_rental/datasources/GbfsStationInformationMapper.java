@@ -46,7 +46,7 @@ public class GbfsStationInformationMapper {
       LOG.info(
         String.format(
           "GBFS station for %s system has issues with required fields: \n%s",
-          system.systemId,
+          system.systemId(),
           station
         )
       );
@@ -54,7 +54,7 @@ public class GbfsStationInformationMapper {
     }
 
     var builder = VehicleRentalStation.of()
-      .withId(new FeedScopedId(system.systemId, station.getStationId()))
+      .withId(new FeedScopedId(system.systemId(), station.getStationId()))
       .withSystem(system)
       .withLongitude(station.getLon())
       .withLatitude(station.getLat())

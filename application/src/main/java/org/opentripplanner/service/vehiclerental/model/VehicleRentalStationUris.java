@@ -24,7 +24,7 @@ public final class VehicleRentalStationUris {
    * May be {@code null} if a rental URI does not exist.
    */
   @Nullable
-  public final String android;
+  private final String android;
 
   /**
    * A URI that can be used on iOS to launch the rental app for this station.
@@ -32,7 +32,7 @@ public final class VehicleRentalStationUris {
    * May be {@code null} if a rental URI does not exist.
    */
   @Nullable
-  public final String ios;
+  private final String ios;
 
   /**
    * At URL that can be used by a web browser to show more information about renting a vehicle at
@@ -41,7 +41,7 @@ public final class VehicleRentalStationUris {
    * May be {@code null} if a rental URL does not exist.
    */
   @Nullable
-  public final String web;
+  private final String web;
 
   private VehicleRentalStationUris() {
     this.android = null;

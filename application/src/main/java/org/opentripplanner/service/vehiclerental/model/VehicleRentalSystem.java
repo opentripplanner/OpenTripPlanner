@@ -8,30 +8,29 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * Based on https://github.com/NABSA/gbfs/blob/master/gbfs.md#system_informationjson
  * <p>
- * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public final class VehicleRentalSystem {
 
   public static final VehicleRentalSystem DEFAULT = new VehicleRentalSystem();
 
-  public final String systemId;
-  public final String language;
-  public final String name;
-  public final String shortName;
-  public final String operator;
-  public final String url;
-  public final String purchaseUrl;
-  public final String startDate;
-  public final String phoneNumber;
-  public final String email;
-  public final String feedContactEmail;
-  public final String licenseUrl;
+  private final String systemId;
+  private final String language;
+  private final String name;
+  private final String shortName;
+  private final String operator;
+  private final String url;
+  private final String purchaseUrl;
+  private final String startDate;
+  private final String phoneNumber;
+  private final String email;
+  private final String feedContactEmail;
+  private final String licenseUrl;
 
   // this is intentionally a string, not a zone id as the validator doesn't check the correctness
   // https://github.com/MobilityData/gbfs-validator/issues/76
-  public final String timezone;
-  public final VehicleRentalSystemAppInformation androidApp;
-  public final VehicleRentalSystemAppInformation iosApp;
+  private final String timezone;
+  private final VehicleRentalSystemAppInformation androidApp;
+  private final VehicleRentalSystemAppInformation iosApp;
 
   private VehicleRentalSystem() {
     this.systemId = null;

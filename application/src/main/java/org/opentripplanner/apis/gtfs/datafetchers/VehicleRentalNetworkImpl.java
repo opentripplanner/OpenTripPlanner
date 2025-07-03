@@ -9,7 +9,7 @@ public class VehicleRentalNetworkImpl implements GraphQLDataFetchers.GraphQLVehi
 
   @Override
   public DataFetcher<String> networkId() {
-    return environment -> getSource(environment).systemId;
+    return environment -> getSource(environment).systemId();
   }
 
   @Override
