@@ -134,7 +134,14 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithSkippedStop() {
-    var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE, "A loop", "SW1234");
+    var builder = new TripUpdateBuilder(
+      ADDED_TRIP_ID,
+      SERVICE_DATE,
+      ADDED,
+      TIME_ZONE,
+      "A loop",
+      "SW1234"
+    );
     builder
       .addStopTime(STOP_A_ID, 30, DropOffPickupType.PHONE_AGENCY)
       .addSkippedStop(STOP_B_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)

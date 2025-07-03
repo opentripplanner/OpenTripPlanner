@@ -81,9 +81,21 @@ final class AddedStopTime {
       );
   }
 
+  OptionalLong scheduledArrivalTime() {
+    return stopTimeUpdate.hasArrival()
+      ? getScheduledTime(stopTimeUpdate.getArrival())
+      : OptionalLong.empty();
+  }
+
   OptionalLong arrivalTime() {
     return stopTimeUpdate.hasArrival()
       ? getTime(stopTimeUpdate.getArrival())
+      : OptionalLong.empty();
+  }
+
+  OptionalLong scheduledDepartureTime() {
+    return stopTimeUpdate.hasDeparture()
+      ? getScheduledTime(stopTimeUpdate.getDeparture())
       : OptionalLong.empty();
   }
 
@@ -97,6 +109,16 @@ final class AddedStopTime {
     return stopTimeEvent.hasTime()
       ? OptionalLong.of(stopTimeEvent.getTime())
       : OptionalLong.empty();
+  }
+
+  /**
+   * Get the scheduled time of a StopTimeEvent.
+   * If it is not specified, calculate it from time - delay.
+   */
+  private OptionalLong getScheduledTime(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
+    return stopTimeEvent.hasScheduledTime()
+      ? OptionalLong.of(stopTimeEvent.getScheduledTime())
+      : getTime(stopTimeEvent).stream().map(time -> time - getDelay(stopTimeEvent)).findFirst();
   }
 
   int arrivalDelay() {

@@ -48,7 +48,10 @@ public class TripUpdateBuilder {
   ) {
     this(tripId, serviceDate, scheduleRelationship, zoneId);
     tripUpdateBuilder.setTripProperties(
-      GtfsRealtime.TripUpdate.TripProperties.newBuilder().setTripHeadsign(tripHeadsign).setTripShortName(tripShortName).build()
+      GtfsRealtime.TripUpdate.TripProperties.newBuilder()
+        .setTripHeadsign(tripHeadsign)
+        .setTripShortName(tripShortName)
+        .build()
     );
   }
 
