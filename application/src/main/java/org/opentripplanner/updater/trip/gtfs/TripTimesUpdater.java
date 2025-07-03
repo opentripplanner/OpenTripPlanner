@@ -12,8 +12,13 @@ import com.google.transit.realtime.GtfsRealtime;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.gtfs.mapping.PickDropMapper;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimesPatch;
@@ -55,6 +60,7 @@ class TripTimesUpdater {
     GtfsRealtime.TripUpdate tripUpdate,
     ZoneId timeZone,
     LocalDate updateServiceDate,
+    ForwardsDelayPropagationType forwardsDelayPropagationType,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
     Result<TripTimesPatch, UpdateError> invalidInput = Result.failure(
@@ -76,7 +82,7 @@ class TripTimesUpdater {
     GtfsRealtime.TripDescriptor tripDescriptor = tripUpdate.getTrip();
     if (!tripDescriptor.hasTripId()) {
       LOG.debug("TripDescriptor object has no TripId field");
-      Result.failure(UpdateError.noTripId(TRIP_NOT_FOUND));
+      return Result.failure(UpdateError.noTripId(TRIP_NOT_FOUND));
     }
 
     String tripId = tripDescriptor.getTripId();
@@ -91,8 +97,18 @@ class TripTimesUpdater {
       LOG.trace("tripId {} found in timetable.", tripId);
     }
 
-    RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
-    List<Integer> skippedStopIndices = new ArrayList<>();
+    RealTimeTripTimesBuilder builder = tripTimes.createRealTimeWithoutScheduledTimes();
+    if (tripUpdate.hasTripProperties()) {
+      var tripProperties = tripUpdate.getTripProperties();
+      if (tripProperties.hasTripHeadsign()) {
+        builder.withTripHeadsign(I18NString.of(tripProperties.getTripHeadsign()));
+      }
+      // TODO: add support for changing trip short name
+    }
+
+    Map<Integer, PickDrop> updatedPickups = new HashMap<>();
+    Map<Integer, PickDrop> updatedDropoffs = new HashMap<>();
+    Map<Integer, String> replacedStopIndices = new HashMap<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
     Iterator<GtfsRealtime.TripUpdate.StopTimeUpdate> updates = tripUpdate
@@ -105,8 +121,6 @@ class TripTimesUpdater {
     GtfsRealtime.TripUpdate.StopTimeUpdate update = updates.next();
 
     int numStops = tripTimes.getNumStops();
-    Integer delay = null;
-    Integer firstUpdatedIndex = null;
 
     final long today = ServiceDateUtils.asStartOfService(
       updateServiceDate,
@@ -124,6 +138,28 @@ class TripTimesUpdater {
       }
 
       if (match) {
+        if (update.hasStopTimeProperties()) {
+          var stopTimeProperties = update.getStopTimeProperties();
+          if (stopTimeProperties.hasAssignedStopId()) {
+            replacedStopIndices.put(i, stopTimeProperties.getAssignedStopId());
+          }
+          if (stopTimeProperties.hasPickupType()) {
+            updatedPickups.put(
+              i,
+              PickDropMapper.map(stopTimeProperties.getPickupType().getNumber())
+            );
+          }
+          if (stopTimeProperties.hasDropOffType()) {
+            updatedDropoffs.put(
+              i,
+              PickDropMapper.map(stopTimeProperties.getDropOffType().getNumber())
+            );
+          }
+          if (stopTimeProperties.hasStopHeadsign()) {
+            builder.withStopHeadsign(i, I18NString.of(stopTimeProperties.getStopHeadsign()));
+          }
+        }
+
         GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship =
           update.hasScheduleRelationship()
             ? update.getScheduleRelationship()
@@ -133,40 +169,25 @@ class TripTimesUpdater {
           scheduleRelationship ==
           GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED
         ) {
-          // Set status to cancelled and delays to previously recorded delays or to 0 otherwise.
-          // Note: This will discard the times from TripUpdates even if they are present.
-          skippedStopIndices.add(i);
+          // Set status to cancelled
+          updatedPickups.put(i, PickDrop.CANCELLED);
+          updatedDropoffs.put(i, PickDrop.CANCELLED);
           builder.withCanceled(i);
-          int delayOrZero = delay != null ? delay : 0;
-          builder.withArrivalDelay(i, delayOrZero);
-          builder.withDepartureDelay(i, delayOrZero);
         } else if (
           scheduleRelationship ==
           GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.NO_DATA
         ) {
           // Set status to NO_DATA and delays to 0.
           // Note: GTFS-RT requires NO_DATA stops to have no arrival departure times.
-          builder.withArrivalDelay(i, 0);
-          builder.withDepartureDelay(i, 0);
-          delay = 0;
           builder.withNoData(i);
         } else {
           // Else the status is SCHEDULED, update times as needed.
           if (update.hasArrival()) {
-            if (firstUpdatedIndex == null) {
-              firstUpdatedIndex = i;
-            }
             GtfsRealtime.TripUpdate.StopTimeEvent arrival = update.getArrival();
-            if (arrival.hasDelay()) {
-              delay = arrival.getDelay();
-              if (arrival.hasTime()) {
-                builder.withArrivalTime(i, (int) (arrival.getTime() - today));
-              } else {
-                builder.withArrivalDelay(i, delay);
-              }
-            } else if (arrival.hasTime()) {
+            if (arrival.hasTime()) {
               builder.withArrivalTime(i, (int) (arrival.getTime() - today));
-              delay = builder.getArrivalDelay(i);
+            } else if (arrival.hasDelay()) {
+              builder.withArrivalDelay(i, arrival.getDelay());
             } else {
               LOG.debug(
                 "Arrival time at index {} of trip {} has neither a delay nor a time.",
@@ -175,25 +196,14 @@ class TripTimesUpdater {
               );
               return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME, i));
             }
-          } else if (delay != null) {
-            builder.withArrivalDelay(i, delay);
           }
 
           if (update.hasDeparture()) {
-            if (firstUpdatedIndex == null) {
-              firstUpdatedIndex = i;
-            }
             GtfsRealtime.TripUpdate.StopTimeEvent departure = update.getDeparture();
-            if (departure.hasDelay()) {
-              delay = departure.getDelay();
-              if (departure.hasTime()) {
-                builder.withDepartureTime(i, (int) (departure.getTime() - today));
-              } else {
-                builder.withDepartureDelay(i, delay);
-              }
-            } else if (departure.hasTime()) {
+            if (departure.hasTime()) {
               builder.withDepartureTime(i, (int) (departure.getTime() - today));
-              delay = builder.getDepartureDelay(i);
+            } else if (departure.hasDelay()) {
+              builder.withDepartureDelay(i, departure.getDelay());
             } else {
               LOG.debug(
                 "Departure time at index {} of trip {} has neither a delay nor a time.",
@@ -202,8 +212,6 @@ class TripTimesUpdater {
               );
               return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME, i));
             }
-          } else if (delay != null) {
-            builder.withDepartureDelay(i, delay);
           }
         }
 
@@ -212,10 +220,6 @@ class TripTimesUpdater {
         } else {
           update = null;
         }
-      } else if (delay != null) {
-        // If not match and has previously set delays, propagate delays.
-        builder.withArrivalDelay(i, delay);
-        builder.withDepartureDelay(i, delay);
       }
     }
     if (update != null) {
@@ -226,27 +230,20 @@ class TripTimesUpdater {
       return Result.failure(new UpdateError(feedScopedTripId, INVALID_STOP_SEQUENCE));
     }
 
-    // Interpolate missing times from SKIPPED stops since they don't necessarily have times
-    // associated. Note: Currently for GTFS-RT updates ONLY not for SIRI updates.
-    if (builder.interpolateMissingTimes()) {
-      LOG.debug("Interpolated delays for cancelled stops on trip {}.", tripId);
+    // Interpolate missing times for stops which don't have times associated. Note: Currently for
+    // GTFS-RT updates ONLY not for SIRI updates.
+    if (
+      ForwardsDelayInterpolator.getInstance(forwardsDelayPropagationType).interpolateDelay(builder)
+    ) {
+      LOG.debug("Interpolated delays for for missing stops on trip {}.", tripId);
     }
 
-    // Backwards propagation for past stops that are no longer present in GTFS-RT, that is, up until
-    // the first SCHEDULED stop sequence included in the GTFS-RT feed.
-    if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
-      if (
-        BackwardsDelayPropagator.getBackwardsDelayPropagator(
-          backwardsDelayPropagationType
-        ).adjustTimes(builder, firstUpdatedIndex)
-      ) {
-        LOG.debug(
-          "Propagated delay from stop index {} backwards on trip {}.",
-          firstUpdatedIndex,
-          tripId
-        );
-      }
-    }
+    var backwardPropagationIndex = BackwardsDelayInterpolator.getInstance(
+      backwardsDelayPropagationType
+    ).propagateBackwards(builder);
+    backwardPropagationIndex.ifPresent(index ->
+      LOG.debug("Propagated delay from stop index {} backwards on trip {}.", index, tripId)
+    );
 
     if (tripUpdate.hasVehicle()) {
       var vehicleDescriptor = tripUpdate.getVehicle();
@@ -267,7 +264,9 @@ class TripTimesUpdater {
         "A valid TripUpdate object was applied to trip {} using the Timetable class update method.",
         tripId
       );
-      return Result.success(new TripTimesPatch(result, skippedStopIndices));
+      return Result.success(
+        new TripTimesPatch(result, updatedPickups, updatedDropoffs, replacedStopIndices)
+      );
     } catch (DataValidationException e) {
       return DataValidationExceptionMapper.toResult(e);
     }

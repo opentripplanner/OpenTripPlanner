@@ -63,14 +63,14 @@
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>33.1</geotools.version>
         <google.dagger.version>2.56.2</google.dagger.version>
-        <jackson.version>2.19.0</jackson.version>
+        <jackson.version>2.19.1</jackson.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
         <jersey.version>3.1.10</jersey.version>
         <junit.version>5.13.1</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.18</logback.version>
-        <lucene.version>10.1.0</lucene.version>
+        <lucene.version>10.2.2</lucene.version>
         <micrometer.version>1.14.7</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
@@ -267,7 +267,7 @@
                   but we need the Maven project version as well, so we perform substitution. -->
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>9.0.1</version>
+                <version>9.0.2</version>
                 <executions>
                     <execution>
                         <goals>
@@ -295,7 +295,7 @@
                 <artifactId>prettier-maven-plugin</artifactId>
                 <configuration>
                     <skip>${plugin.prettier.skip}</skip>
-                    <prettierJavaVersion>2.6.7</prettierJavaVersion>
+                    <prettierJavaVersion>2.6.8</prettierJavaVersion>
                     <inputGlobs>
                         <inputGlob>src/main/java/**/*.java</inputGlob>
                         <inputGlob>src/test/java/**/*.java</inputGlob>
@@ -313,7 +313,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.5</version>
+                <version>3.4.6</version>
                 <configuration>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>

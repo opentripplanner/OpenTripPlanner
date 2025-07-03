@@ -267,11 +267,12 @@ public class LegacyTimetableSnapshotIntegrationTest {
       tripUpdate,
       timeZone,
       serviceDate,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     if (result.isSuccess()) {
       return resolver.update(
-        new RealTimeTripUpdate(pattern, result.successValue().getTripTimes(), serviceDate)
+        new RealTimeTripUpdate(pattern, result.successValue().tripTimes(), serviceDate)
       );
     }
     throw new RuntimeException("createUpdatedTripTimes returned an error: " + result);

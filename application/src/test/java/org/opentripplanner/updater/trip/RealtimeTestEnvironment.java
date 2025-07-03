@@ -25,6 +25,7 @@ import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableHandler;
@@ -179,6 +180,7 @@ public final class RealtimeTestEnvironment {
   ) {
     UpdateResult updateResult = gtfsAdapter.applyTripUpdates(
       null,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
       incrementality,
       updates,

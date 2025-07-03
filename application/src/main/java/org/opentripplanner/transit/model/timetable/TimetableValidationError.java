@@ -25,5 +25,7 @@ public record TimetableValidationError(ErrorCode code, int stopIndex, Trip trip)
   public enum ErrorCode {
     NEGATIVE_DWELL_TIME,
     NEGATIVE_HOP_TIME,
+    MISSING_ARRIVAL_TIME,
+    MISSING_DEPARTURE_TIME,
   }
 }

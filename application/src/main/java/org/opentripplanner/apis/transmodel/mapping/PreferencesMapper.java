@@ -21,7 +21,8 @@ class PreferencesMapper {
     DataFetcherDecorator callWith,
     RoutingPreferencesBuilder preferences
   ) {
-    preferences.withStreet(street -> mapStreetPreferences(street, environment, preferences.street())
+    preferences.withStreet(street ->
+      mapStreetPreferences(street, environment, preferences.street())
     );
     preferences.withWalk(walk -> mapWalkPreferences(walk, callWith));
     preferences.withBike(bike -> mapBikePreferences(bike, callWith));

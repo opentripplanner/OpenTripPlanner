@@ -140,6 +140,7 @@ public class GtfsRealTimeTripUpdateAdapter {
    */
   public UpdateResult applyTripUpdates(
     @Nullable GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    ForwardsDelayPropagationType forwardsDelayPropagationType,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     UpdateIncrementality updateIncrementality,
     List<TripUpdate> updates,
@@ -230,6 +231,7 @@ public class GtfsRealTimeTripUpdateAdapter {
             tripUpdate,
             tripId,
             serviceDate,
+            forwardsDelayPropagationType,
             backwardsDelayPropagationType
           );
           case NEW, ADDED -> validateAndHandleAddedTrip(
@@ -353,6 +355,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     TripUpdate tripUpdate,
     FeedScopedId tripId,
     LocalDate serviceDate,
+    ForwardsDelayPropagationType forwardsDelayPropagationType,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
     final TripPattern pattern = getPatternForTripId(tripId);
@@ -387,6 +390,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       tripUpdate,
       timeZone,
       serviceDate,
+      forwardsDelayPropagationType,
       backwardsDelayPropagationType
     );
 
@@ -397,15 +401,38 @@ public class GtfsRealTimeTripUpdateAdapter {
 
     var tripTimesPatch = result.successValue();
 
-    List<Integer> skippedStopIndices = tripTimesPatch.getSkippedStopIndices();
+    var updatedPickup = tripTimesPatch.updatedPickup();
+    var updatedDropoff = tripTimesPatch.updatedDropoff();
+    var replacedStopIndices = tripTimesPatch.replacedStopIndices();
 
-    var updatedTripTimes = tripTimesPatch.getTripTimes();
+    var updatedTripTimes = tripTimesPatch.tripTimes();
 
-    // If there are skipped stops, we need to change the pattern from the scheduled one
-    if (skippedStopIndices.size() > 0) {
+    Map<Integer, StopLocation> newStops = new HashMap<>();
+    for (var entry : replacedStopIndices.entrySet()) {
+      var stop = transitEditorService.getRegularStop(
+        new FeedScopedId(tripId.getFeedId(), entry.getValue())
+      );
+      if (stop != null) {
+        newStops.put(entry.getKey(), stop);
+      } else {
+        debug(
+          tripId,
+          serviceDate,
+          "Graph doesn't contain assigned stop id '{}' at position '{}' for trip '{}' , skipping stop assignment.",
+          entry.getValue(),
+          entry.getKey(),
+          tripId
+        );
+      }
+    }
+
+    // If there are stops with different pickup / drop off, or replaced stops, we need to change the pattern from the scheduled one
+    if (!updatedPickup.isEmpty() || !updatedDropoff.isEmpty() || !newStops.isEmpty()) {
       StopPattern newStopPattern = pattern
         .copyPlannedStopPattern()
-        .cancelStops(skippedStopIndices)
+        .updatePickup(updatedPickup)
+        .updateDropoff(updatedDropoff)
+        .replaceStops(newStops)
         .build();
 
       final Trip trip = transitEditorService.getTrip(tripId);

@@ -73,6 +73,11 @@ message FeedHeader {
   // January 1st 1970 00:00:00 UTC).
   optional uint64 timestamp = 3;
 
+  // String that matches the feed_info.feed_version from the GTFS feed that the real
+  // time data is based on. Consumers can use this to identify which GTFS feed is
+  // currently active or when a new one is available to download.
+  optional string feed_version = 4;
+
   // The extensions namespace allows 3rd-party developers to extend the
   // GTFS Realtime specification in order to add and evaluate new features and
   // modifications to the spec.
@@ -190,9 +195,11 @@ message TripUpdate {
     // To specify a completely certain prediction, set its uncertainty to 0.
     optional int32 uncertainty = 3;
 
-    // Scheduled time for a new or replacement trip.
+    // Scheduled time for a NEW, REPLACEMENT, or DUPLICATED trip.
     // In Unix time (i.e., number of seconds since January 1st 1970 00:00:00
     // UTC).
+    // Optional if TripUpdate.schedule_relationship is NEW, REPLACEMENT or DUPLICATED, forbidden otherwise.
+    // NOTE: This field is still experimental, and subject to change. It may be formally adopted in the future.
     optional int64 scheduled_time = 4;
 
     // The extensions namespace allows 3rd-party developers to extend the
@@ -400,13 +407,12 @@ message TripUpdate {
     // populated and will be ignored by consumers.
     // NOTE: This field is still experimental, and subject to change. It may be formally adopted in the future.
     optional string start_time = 3;
-    // Specifies the shape of the vehicle travel path when the trip shape differs from the shape specified in
-    // (CSV) GTFS or to specify it in real-time when it's not provided by (CSV) GTFS, such as a vehicle that takes differing
-    // paths based on rider demand. See definition of trips.shape_id in (CSV) GTFS. If a shape is neither defined in (CSV) GTFS
-    // nor in real-time, the shape is considered unknown. This field can refer to a shape defined in the (CSV) GTFS in shapes.txt
-    // or a Shape in the (protobuf) real-time feed. The order of stops (stop sequences) for this trip must remain the same as
-    // (CSV) GTFS. Stops that are a part of the original trip but will no longer be made, such as when a detour occurs, should
-    // be marked as schedule_relationship=SKIPPED.
+    // Specifies the identifier of the shape of the vehicle travel path when the trip shape differs from the shape specified in (CSV) GTFS
+    // or to specify it in real-time when it's not provided by (CSV) GTFS, such as a vehicle that takes differing paths based on rider demand. See definition of trips.shape_id in (CSV) GTFS.
+    // If a shape is neither defined in (CSV) GTFS nor in real-time, the shape is considered unknown. This field can refer to a shape defined in the (CSV) GTFS in shapes.txt or a `Shape` in the same (protobuf) real-time feed. 
+    // The order of stops (stop sequences) for this trip must remain the same as (CSV) GTFS. 
+    // If it refers to a `Shape` entity in the same real-time feed, the value of this field should be the one of the `shape_id` inside the entity, and _not_ the `id` of `FeedEntity`.
+    // Stops that are a part of the original trip but will no longer be made, such as when a detour occurs, should be marked as schedule_relationship=SKIPPED or more details can be provided via a `TripModifications` message.
     // NOTE: This field is still experimental, and subject to change. It may be formally adopted in the future. 
     optional string shape_id = 4;
 
@@ -845,6 +851,7 @@ message TripDescriptor {
     CANCELED = 3;
 
     // A trip that replaces an existing trip in the schedule.
+    // NOTE: This field is still experimental, and subject to change. It may be formally adopted in the future.
     REPLACEMENT = 5;
 
     // An extra trip that was added in addition to a running schedule, for example, to replace a broken vehicle or to
@@ -853,7 +860,9 @@ message TripDescriptor {
     // date and/or time. Duplicating a trip is allowed if the service related to the original trip in (CSV) GTFS
     // (in calendar.txt or calendar_dates.txt) is operating within the next 30 days. The trip to be duplicated is
     // identified via TripUpdate.TripDescriptor.trip_id. This enumeration does not modify the existing trip referenced by
-    // TripUpdate.TripDescriptor.trip_id - if a producer wants to replace the original trip, a value of `REPLACEMENT` should be used instead.
+    // TripUpdate.TripDescriptor.trip_id - if a producer wants to cancel the original trip, it must publish a separate
+    // TripUpdate with the value of CANCELED or DELETED. If a producer wants to replace the original trip, a value of 
+    // `REPLACEMENT` should be used instead.
     //
     // Trips defined in GTFS frequencies.txt with exact_times that is
     // empty or equal to 0 cannot be duplicated. The VehiclePosition.TripDescriptor.trip_id for the new trip must contain
@@ -1040,7 +1049,7 @@ message TranslatedImage {
     // String containing an URL linking to an image
     // The image linked must be less than 2MB. 
     // If an image changes in a significant enough way that an update is required on the consumer side, the producer must update the URL to a new one.
-    // The URL should be a fully qualified URL that includes http:// or https://, and any special characters in the URL must be correctly escaped. See the following http://www.w3.org/Addressing/URL/4_URI_Recommentations.html for a description of how to create fully qualified URL values.
+    // The URL should be a fully qualified URL that includes http:// or https://, and any special characters in the URL must be correctly escaped. See the following http://www.w3.org/Addressing/URL/4_URI_Recommentations.html for a description of how to create fully qualified URL values.
     required string url = 1;
 
     // IANA media type as to specify the type of image to be displayed. 
@@ -1086,7 +1095,7 @@ message Shape {
   // NOTE: This field is still experimental, and subject to change. It may be formally adopted in the future.
   optional string shape_id = 1;
 
-  // Encoded polyline representation of the shape. This polyline must contain at least two points.
+  // Encoded polyline representation of the shape. This polyline must contain at least two points and represent the full shape of the trip where it's used. 
   // For more information about encoded polylines, see https://developers.google.com/maps/documentation/utilities/polylinealgorithm
   // This field is required as per reference.md, but needs to be specified here optional because "Required is Forever"
   // See https://developers.google.com/protocol-buffers/docs/proto#specifying_field_rules
@@ -1176,8 +1185,9 @@ message TripModifications {
   message SelectedTrips {
     // A list of trips affected with this replacement that all have the same new `shape_id`. A `TripUpdate` with `schedule_relationship=REPLACEMENT` must not already exist for the trip.
     repeated string trip_ids = 1;
-    // The ID of the new shape for the modified trips in this SelectedTrips.
-    // May refer to a new shape added using a GTFS-RT Shape message, or to an existing shape defined in the GTFS-Static feed’s shapes.txt.
+    // The ID of the new shape for the modified trips in this SelectedTrips. 
+    // May refer to a new shape added using a `Shape` message in the same GTFS-RT feed, or to an existing shape defined in the GTFS-Static feed’s shapes.txt. 
+    // If it refers to a `Shape` entity in the real-time feed, the value of this field should be the one of the `shape_id` inside the entity, and _not_ the `id` of `FeedEntity`.
     optional string shape_id = 2;
 
     // The extensions namespace allows 3rd-party developers to extend the
@@ -1235,7 +1245,8 @@ message ReplacementStop {
   // This value MUST be monotonically increasing and may only be a negative number if the first stop of the original trip is the reference stop.
   optional int32 travel_time_to_stop = 1;
 
-  // The replacement stop ID which will now be visited by the trip. May refer to a new stop added using a GTFS-RT Stop message, or to an existing stop defined in the GTFS-Static feed’s stops.txt. The stop MUST have location_type=0 (routable stops).
+  // The replacement stop ID which will now be visited by the trip. May refer to a new stop added using a GTFS-RT `Stop` message in the same GTFS-RT feed, or to an existing stop defined in the (CSV) GTFS feed’s `stops.txt`.
+  // If it refers to a `Shape` entity in the real-time feed, the value of this field should be the one of the `stop_id` inside the entity, and _not_ the `id` of `FeedEntity`. The replacement stop MUST have `location_type=0` (routable stops).
   optional string stop_id = 2;
 
   // The extensions namespace allows 3rd-party developers to extend the

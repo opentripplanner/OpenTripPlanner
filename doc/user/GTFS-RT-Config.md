@@ -79,6 +79,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 | type = "stop-time-updater"                                            |      `enum`     | The type of the updater.                                                   | *Required* |                      |  1.5  |
 | [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |      `enum`     | How backwards propagation should be handled.                               | *Optional* | `"required-no-data"` |  2.2  |
 | feedId                                                                |     `string`    | Which feed the updates apply to.                                           | *Required* |                      |  1.5  |
+| [forwardsDelayPropagationType](#u__5__forwardsDelayPropagationType)   |      `enum`     | How forwards propagation should be handled.                                | *Optional* | `"default"`          |  2.8  |
 | frequency                                                             |    `duration`   | How often the data should be downloaded.                                   | *Optional* | `"PT1M"`             |  1.5  |
 | fuzzyTripMatching                                                     |    `boolean`    | If the trips should be matched fuzzily.                                    | *Optional* | `false`              |  1.5  |
 | [url](#u__5__url)                                                     |     `string`    | The URL of the GTFS-RT resource.                                           | *Required* |                      |  1.5  |
@@ -91,9 +92,13 @@ The information is downloaded in a single HTTP request and polled regularly.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
 **Path:** /updaters/[5]   
-**Enum values:** `required-no-data` | `required` | `always`
+**Enum values:** `none` | `required-no-data` | `required` | `always`
 
 How backwards propagation should be handled.
+
+  NONE:
+  Do not propagate delays backwards. Reject real-time updates if the times are not specified
+  from the beginning of the trip.
 
   REQUIRED_NO_DATA:
   Default value. Only propagates delays backwards when it is required to ensure that the times
@@ -104,9 +109,37 @@ How backwards propagation should be handled.
   Only propagates delays backwards when it is required to ensure that the times are increasing.
   The updated times are exposed through APIs.
 
-  ALWAYS
+  ALWAYS:
   Propagates delays backwards on stops with no estimates regardless if it's required or not.
   The updated times are exposed through APIs.
+
+
+<h4 id="u__5__forwardsDelayPropagationType">forwardsDelayPropagationType</h4>
+
+**Since version:** `2.8` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
+**Path:** /updaters/[5]   
+**Enum values:** `none` | `default`
+
+How forwards propagation should be handled.
+
+  NONE:
+  Do not propagate delays forwards. Reject real-time updates if not all arrival / departure times
+  are specified until the end of the trip.
+
+  Note that this will also reject all updates containing NO_DATA, or all updates containing
+  SKIPPED stops without a time provided. Only use this value when you can guarantee that the
+  real-time feed contains all departure and arrival times for all future stops, including
+  SKIPPED stops.
+
+  DEFAULT:
+  Default value. Propagate delays forwards for stops without arrival / departure times given.
+
+  For NO_DATA stops, the scheduled time is used unless a previous delay fouls the scheduled time
+  at the stop, in such case the minimum amount of delay is propagated to make the times
+  non-decreasing.
+
+  For SKIPPED stops without time given, interpolate the estimated time using the ratio between
+  scheduled and real times from the previous to the next stop.
 
 
 <h4 id="u__5__url">url</h4>
@@ -165,6 +198,7 @@ This system powers the realtime updates in Helsinki and more information can be 
 | type = "mqtt-gtfs-rt-updater"                                         |   `enum`  | The type of the updater.                     | *Required* |                      |  1.5  |
 | [backwardsDelayPropagationType](#u__6__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled. | *Optional* | `"required-no-data"` |  2.2  |
 | feedId                                                                |  `string` | The feed id to apply the updates to.         | *Required* |                      |  2.0  |
+| [forwardsDelayPropagationType](#u__6__forwardsDelayPropagationType)   |   `enum`  | How forwards propagation should be handled.  | *Optional* | `"default"`          |  2.8  |
 | fuzzyTripMatching                                                     | `boolean` | Whether to match trips fuzzily.              | *Optional* | `false`              |  2.0  |
 | qos                                                                   | `integer` | QOS level.                                   | *Optional* | `0`                  |  2.0  |
 | topic                                                                 |  `string` | The topic to subscribe to.                   | *Required* |                      |  2.0  |
@@ -177,9 +211,13 @@ This system powers the realtime updates in Helsinki and more information can be 
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
 **Path:** /updaters/[6]   
-**Enum values:** `required-no-data` | `required` | `always`
+**Enum values:** `none` | `required-no-data` | `required` | `always`
 
 How backwards propagation should be handled.
+
+  NONE:
+  Do not propagate delays backwards. Reject real-time updates if the times are not specified
+  from the beginning of the trip.
 
   REQUIRED_NO_DATA:
   Default value. Only propagates delays backwards when it is required to ensure that the times
@@ -193,6 +231,34 @@ How backwards propagation should be handled.
   ALWAYS:
   Propagates delays backwards on stops with no estimates regardless if it's required or not.
   The updated times are exposed through APIs.
+
+
+<h4 id="u__6__forwardsDelayPropagationType">forwardsDelayPropagationType</h4>
+
+**Since version:** `2.8` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
+**Path:** /updaters/[6]   
+**Enum values:** `none` | `default`
+
+How forwards propagation should be handled.
+
+  NONE:
+  Do not propagate delays forwards. Reject real-time updates if not all arrival / departure times
+  are specified until the end of the trip.
+
+  Note that this will also reject all updates containing NO_DATA, or all updates containing
+  SKIPPED stops without a time provided. Only use this value when you can guarantee that the
+  real-time feed contains all departure and arrival times for all future stops, including
+  SKIPPED stops.
+
+  DEFAULT:
+  Default value. Propagate delays forwards for stops without arrival / departure times given.
+
+  For NO_DATA stops, the scheduled time is used unless a previous delay fouls the scheduled time
+  at the stop, in such case the minimum amount of delay is propagated to make the times
+  non-decreasing.
+
+  For SKIPPED stops without time given, interpolate the estimated time using the ratio between
+  scheduled and real times from the previous to the next stop.
 
 
 
