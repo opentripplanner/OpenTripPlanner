@@ -14,7 +14,7 @@ public class VehicleRentalNetworkImpl implements GraphQLDataFetchers.GraphQLVehi
 
   @Override
   public DataFetcher<String> url() {
-    return environment -> getSource(environment).url;
+    return environment -> getSource(environment).url();
   }
 
   private VehicleRentalSystem getSource(DataFetchingEnvironment environment) {

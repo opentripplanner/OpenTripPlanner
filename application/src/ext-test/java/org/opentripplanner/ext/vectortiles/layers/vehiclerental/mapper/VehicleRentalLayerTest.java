@@ -17,7 +17,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public  {
+public class VehicleRentalLayerTest {
 
   public static final String NAME = "a rental";
 

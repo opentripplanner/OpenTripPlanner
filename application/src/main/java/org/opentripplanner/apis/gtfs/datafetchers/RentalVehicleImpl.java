@@ -73,7 +73,7 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
 
   @Override
   public DataFetcher<RentalVehicleType> vehicleType() {
-    return environment -> getSource(environment).vehicleType;
+    return environment -> getSource(environment).vehicleType();
   }
 
   @Override
