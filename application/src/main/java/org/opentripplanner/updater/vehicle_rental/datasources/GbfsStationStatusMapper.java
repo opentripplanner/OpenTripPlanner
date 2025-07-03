@@ -28,9 +28,7 @@ public class GbfsStationStatusMapper {
 
   VehicleRentalStation mapStationStatus(VehicleRentalStation station) {
     if (!statusLookup.containsKey(station.getStationId())) {
-      return station.copyOf()
-        .withRealTimeData(false)
-        .build();
+      return station.copyOf().withRealTimeData(false).build();
     }
     GBFSStation status = statusLookup.get(station.getStationId());
 
@@ -38,7 +36,8 @@ public class GbfsStationStatusMapper {
       ? status.getNumBikesAvailable()
       : 0;
 
-    Map<RentalVehicleType, Integer> vehicleTypesAvailable = status.getVehicleTypesAvailable() != null
+    Map<RentalVehicleType, Integer> vehicleTypesAvailable = status.getVehicleTypesAvailable() !=
+      null
       ? status
         .getVehicleTypesAvailable()
         .stream()
@@ -46,15 +45,14 @@ public class GbfsStationStatusMapper {
         .collect(Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> e.getCount()))
       : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), vehiclesAvailable);
 
-    int vehiclesDisabled = status.getNumBikesDisabled() != null
-      ? status.getNumBikesDisabled()
-      : 0;
+    int vehiclesDisabled = status.getNumBikesDisabled() != null ? status.getNumBikesDisabled() : 0;
 
     int spacesAvailable = status.getNumDocksAvailable() != null
       ? status.getNumDocksAvailable()
       : Integer.MAX_VALUE;
 
-    Map<RentalVehicleType, Integer> vehicleSpacesAvailable = status.getVehicleDocksAvailable() != null
+    Map<RentalVehicleType, Integer> vehicleSpacesAvailable = status.getVehicleDocksAvailable() !=
+      null
       ? status
         .getVehicleDocksAvailable()
         .stream()
@@ -67,9 +65,7 @@ public class GbfsStationStatusMapper {
         .collect(Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count))
       : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), spacesAvailable);
 
-    int spacesDisabled = status.getNumDocksDisabled() != null
-      ? status.getNumDocksDisabled()
-      : 0;
+    int spacesDisabled = status.getNumDocksDisabled() != null ? status.getNumDocksDisabled() : 0;
 
     boolean isInstalled = status.getIsInstalled() != null ? status.getIsInstalled() : true;
     boolean isRenting = status.getIsRenting() != null ? status.getIsRenting() : true;
@@ -79,7 +75,8 @@ public class GbfsStationStatusMapper {
       ? Instant.ofEpochSecond(status.getLastReported().longValue())
       : null;
 
-    return station.copyOf()
+    return station
+      .copyOf()
       .withVehiclesAvailable(vehiclesAvailable)
       .withVehicleTypesAvailable(vehicleTypesAvailable)
       .withVehiclesDisabled(vehiclesDisabled)

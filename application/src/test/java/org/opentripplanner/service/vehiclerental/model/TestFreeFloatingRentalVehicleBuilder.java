@@ -110,17 +110,21 @@ public class TestFreeFloatingRentalVehicleBuilder {
       .withLongitude(longitude)
       .withVehicleType(vehicleType)
       .withSystem(system)
-      .withFuel(RentalVehicleFuel.of()
-        .withPercent(currentFuelPercent)
-        .withRange(Distance.ofMetersBoxed(currentRangeMeters, ignore -> {}).orElse(null))
-        .build())
+      .withFuel(
+        RentalVehicleFuel.of()
+          .withPercent(currentFuelPercent)
+          .withRange(Distance.ofMetersBoxed(currentRangeMeters, ignore -> {}).orElse(null))
+          .build()
+      )
       .withAvailableUntil(DEFAULT_AVAILABLE_UNTIL)
       .build();
   }
 
   private TestFreeFloatingRentalVehicleBuilder buildVehicleType(RentalFormFactor rentalFormFactor) {
     this.vehicleType = RentalVehicleType.of()
-      .withId(new FeedScopedId(TestFreeFloatingRentalVehicleBuilder.NETWORK_1, rentalFormFactor.name()))
+      .withId(
+        new FeedScopedId(TestFreeFloatingRentalVehicleBuilder.NETWORK_1, rentalFormFactor.name())
+      )
       .withName(rentalFormFactor.name())
       .withFormFactor(rentalFormFactor)
       .withPropulsionType(RentalVehicleType.PropulsionType.ELECTRIC)

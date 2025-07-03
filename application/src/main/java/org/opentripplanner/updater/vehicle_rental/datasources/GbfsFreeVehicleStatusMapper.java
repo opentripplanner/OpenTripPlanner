@@ -60,7 +60,7 @@ public class GbfsFreeVehicleStatusMapper {
           )
         );
       }).orElse(null);
-      
+
       // if the propulsion type has an engine current_range_meters is required
       if (
         vehicle.getVehicleTypeId() != null &&
@@ -78,19 +78,20 @@ public class GbfsFreeVehicleStatusMapper {
         .withName(new NonLocalizedString(getName(vehicle)))
         .withLongitude(vehicle.getLon())
         .withLatitude(vehicle.getLat())
-        .withVehicleType(vehicleTypes.getOrDefault(
-          vehicle.getVehicleTypeId(),
-          RentalVehicleType.getDefaultType(system.systemId())
-        ))
+        .withVehicleType(
+          vehicleTypes.getOrDefault(
+            vehicle.getVehicleTypeId(),
+            RentalVehicleType.getDefaultType(system.systemId())
+          )
+        )
         .withIsReserved(vehicle.getIsReserved() != null ? vehicle.getIsReserved() : false)
         .withIsDisabled(vehicle.getIsDisabled() != null ? vehicle.getIsDisabled() : false)
-        .withLastReported(vehicle.getLastReported() != null
-          ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
-          : null)
-        .withFuel(RentalVehicleFuel.of()
-          .withPercent(fuelRatio)
-          .withRange(rangeMeters)
-          .build())
+        .withLastReported(
+          vehicle.getLastReported() != null
+            ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
+            : null
+        )
+        .withFuel(RentalVehicleFuel.of().withPercent(fuelRatio).withRange(rangeMeters).build())
         .withPricingPlanId(vehicle.getPricingPlanId());
 
       String availableUntil = vehicle.getAvailableUntil();
@@ -103,11 +104,13 @@ public class GbfsFreeVehicleStatusMapper {
         String androidUri = rentalUris.getAndroid();
         String iosUri = rentalUris.getIos();
         String webUri = rentalUris.getWeb();
-        builder.withRentalUris(VehicleRentalStationUris.of()
-          .withAndroid(androidUri)
-          .withIos(iosUri)
-          .withWeb(webUri)
-          .build());
+        builder.withRentalUris(
+          VehicleRentalStationUris.of()
+            .withAndroid(androidUri)
+            .withIos(iosUri)
+            .withWeb(webUri)
+            .build()
+        );
       }
 
       return builder.build();
