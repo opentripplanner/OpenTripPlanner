@@ -12,8 +12,13 @@ import com.google.transit.realtime.GtfsRealtime;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.gtfs.mapping.PickDropMapper;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimesPatch;
@@ -93,7 +98,17 @@ class TripTimesUpdater {
     }
 
     RealTimeTripTimesBuilder builder = tripTimes.createRealTimeWithoutScheduledTimes();
-    List<Integer> skippedStopIndices = new ArrayList<>();
+    if (tripUpdate.hasTripProperties()) {
+      var tripProperties = tripUpdate.getTripProperties();
+      if (tripProperties.hasTripHeadsign()) {
+        builder.withTripHeadsign(I18NString.of(tripProperties.getTripHeadsign()));
+      }
+      // TODO: add support for changing trip short name
+    }
+
+    Map<Integer, PickDrop> updatedPickups = new HashMap<>();
+    Map<Integer, PickDrop> updatedDropoffs = new HashMap<>();
+    Map<Integer, String> replacedStopIndices = new HashMap<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
     Iterator<GtfsRealtime.TripUpdate.StopTimeUpdate> updates = tripUpdate
@@ -123,6 +138,28 @@ class TripTimesUpdater {
       }
 
       if (match) {
+        if (update.hasStopTimeProperties()) {
+          var stopTimeProperties = update.getStopTimeProperties();
+          if (stopTimeProperties.hasAssignedStopId()) {
+            replacedStopIndices.put(i, stopTimeProperties.getAssignedStopId());
+          }
+          if (stopTimeProperties.hasPickupType()) {
+            updatedPickups.put(
+              i,
+              PickDropMapper.map(stopTimeProperties.getPickupType().getNumber())
+            );
+          }
+          if (stopTimeProperties.hasDropOffType()) {
+            updatedDropoffs.put(
+              i,
+              PickDropMapper.map(stopTimeProperties.getDropOffType().getNumber())
+            );
+          }
+          if (stopTimeProperties.hasStopHeadsign()) {
+            builder.withStopHeadsign(i, I18NString.of(stopTimeProperties.getStopHeadsign()));
+          }
+        }
+
         GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship =
           update.hasScheduleRelationship()
             ? update.getScheduleRelationship()
@@ -133,7 +170,8 @@ class TripTimesUpdater {
           GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED
         ) {
           // Set status to cancelled
-          skippedStopIndices.add(i);
+          updatedPickups.put(i, PickDrop.CANCELLED);
+          updatedDropoffs.put(i, PickDrop.CANCELLED);
           builder.withCanceled(i);
         } else if (
           scheduleRelationship ==
@@ -226,7 +264,9 @@ class TripTimesUpdater {
         "A valid TripUpdate object was applied to trip {} using the Timetable class update method.",
         tripId
       );
-      return Result.success(new TripTimesPatch(result, skippedStopIndices));
+      return Result.success(
+        new TripTimesPatch(result, updatedPickups, updatedDropoffs, replacedStopIndices)
+      );
     } catch (DataValidationException e) {
       return DataValidationExceptionMapper.toResult(e);
     }

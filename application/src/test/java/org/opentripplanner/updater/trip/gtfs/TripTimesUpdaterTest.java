@@ -3,6 +3,7 @@ package org.opentripplanner.updater.trip.gtfs;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
@@ -28,6 +29,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimesPatch;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -190,7 +193,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isSuccess());
     var p = result.successValue();
 
-    var updatedTripTimes = p.getTripTimes();
+    var updatedTripTimes = p.tripTimes();
     assertNotNull(updatedTripTimes);
     timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
     assertEquals(20 * 60 + 120, timetable.getTripTimes(tripId).getArrivalTime(2));
@@ -217,7 +220,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isSuccess());
 
     p = result.successValue();
-    updatedTripTimes = p.getTripTimes();
+    updatedTripTimes = p.tripTimes();
     assertNotNull(updatedTripTimes);
     timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
 
@@ -246,7 +249,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isSuccess());
 
     p = result.successValue();
-    updatedTripTimes = p.getTripTimes();
+    updatedTripTimes = p.tripTimes();
     assertNotNull(updatedTripTimes);
     timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
 
@@ -273,7 +276,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isSuccess());
 
     p = result.successValue();
-    updatedTripTimes = p.getTripTimes();
+    updatedTripTimes = p.tripTimes();
     assertNotNull(updatedTripTimes);
     timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
 
@@ -299,7 +302,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isSuccess());
 
     p = result.successValue();
-    updatedTripTimes = p.getTripTimes();
+    updatedTripTimes = p.tripTimes();
     assertNotNull(updatedTripTimes);
     timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
   }
@@ -399,7 +402,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isSuccess());
 
     result.ifSuccess(p -> {
-      var tripTimes = p.getTripTimes();
+      var tripTimes = p.tripTimes();
       assertEquals(15, tripTimes.getArrivalDelay(0));
       assertEquals(20, tripTimes.getDepartureDelay(0));
       assertEquals(25, tripTimes.getArrivalDelay(1));
@@ -437,7 +440,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isSuccess());
 
     result.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(RealTimeState.UPDATED, updatedTripTimes.getRealTimeState());
       assertTrue(updatedTripTimes.isNoDataStop(0));
@@ -445,9 +448,65 @@ public class TripTimesUpdaterTest {
       assertTrue(updatedTripTimes.isCancelledStop(1));
       assertFalse(updatedTripTimes.isCancelledStop(2));
       assertTrue(updatedTripTimes.isNoDataStop(2));
-      var skippedStops = p.getSkippedStopIndices();
-      assertEquals(1, skippedStops.size());
-      assertEquals(1, skippedStops.get(0));
+      var updatedPickup = p.updatedPickup();
+      var updatedDropoff = p.updatedDropoff();
+      assertIterableEquals(Map.of(1, PickDrop.CANCELLED).entrySet(), updatedPickup.entrySet());
+      assertIterableEquals(Map.of(1, PickDrop.CANCELLED).entrySet(), updatedDropoff.entrySet());
+    });
+  }
+
+  @Test
+  public void testUpdateWithTripAndStopProperties() {
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
+
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    tripUpdateBuilder.getTripPropertiesBuilder().setTripHeadsign("new trip headsign");
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(1);
+    stopTimeUpdateBuilder.getArrivalBuilder().setDelay(0);
+    stopTimeUpdateBuilder.getDepartureBuilder().setDelay(0);
+    stopTimeUpdateBuilder.getStopTimePropertiesBuilder().setStopHeadsign("new stop headsign");
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(1);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(2);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.getArrivalBuilder().setDelay(0);
+    stopTimeUpdateBuilder.getDepartureBuilder().setDelay(0);
+    stopTimeUpdateBuilder
+      .getStopTimePropertiesBuilder()
+      .setPickupType(StopTimeUpdate.StopTimeProperties.DropOffPickupType.NONE)
+      .setDropOffType(StopTimeUpdate.StopTimeProperties.DropOffPickupType.COORDINATE_WITH_DRIVER);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      timetable,
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+
+    assertTrue(result.isSuccess());
+
+    result.ifSuccess(p -> {
+      var updatedTripTimes = p.tripTimes();
+      assertNotNull(updatedTripTimes);
+      assertEquals(RealTimeState.UPDATED, updatedTripTimes.getRealTimeState());
+      assertFalse(updatedTripTimes.isCancelledStop(0));
+      assertTrue(updatedTripTimes.isCancelledStop(1));
+      assertFalse(updatedTripTimes.isCancelledStop(2));
+      assertEquals(I18NString.of("new stop headsign"), updatedTripTimes.getHeadsign(0));
+      assertEquals(I18NString.of("new trip headsign"), updatedTripTimes.getHeadsign(1));
+      assertEquals(I18NString.of("new trip headsign"), updatedTripTimes.getHeadsign(2));
+      var updatedPickup = p.updatedPickup();
+      var updatedDropoff = p.updatedDropoff();
+      assertEquals(Map.of(1, PickDrop.CANCELLED, 2, PickDrop.NONE), updatedPickup);
+      assertEquals(
+        Map.of(1, PickDrop.CANCELLED, 2, PickDrop.COORDINATE_WITH_DRIVER),
+        updatedDropoff
+      );
     });
   }
 
@@ -482,7 +541,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isSuccess());
 
     result.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(10, updatedTripTimes.getArrivalDelay(0));
       assertEquals(10, updatedTripTimes.getDepartureDelay(0));
@@ -522,7 +581,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isSuccess());
 
     result.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(15, updatedTripTimes.getArrivalDelay(0));
       assertEquals(15, updatedTripTimes.getDepartureDelay(0));
@@ -557,7 +616,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isSuccess());
 
     result.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(15, updatedTripTimes.getArrivalDelay(0));
       assertFalse(updatedTripTimes.isNoDataStop(0));
@@ -615,7 +674,7 @@ public class TripTimesUpdaterTest {
     assertTrue(patch.isSuccess());
 
     patch.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(0, updatedTripTimes.getArrivalDelay(0));
       assertEquals(0, updatedTripTimes.getDepartureDelay(0));
@@ -656,7 +715,7 @@ public class TripTimesUpdaterTest {
     assertTrue(patch.isSuccess());
 
     patch.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(0, updatedTripTimes.getArrivalDelay(0));
       assertEquals(0, updatedTripTimes.getDepartureDelay(0));
@@ -705,7 +764,7 @@ public class TripTimesUpdaterTest {
     // therefore the processing should succeed even if only one of them is given
     assertTrue(result.isSuccess());
     result.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(15, updatedTripTimes.getArrivalDelay(2));
       assertEquals(15, updatedTripTimes.getDepartureDelay(2));
@@ -736,7 +795,7 @@ public class TripTimesUpdaterTest {
     assertTrue(result.isSuccess());
 
     result.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(0, updatedTripTimes.getArrivalDelay(0));
       assertEquals(0, updatedTripTimes.getDepartureDelay(0));
@@ -787,7 +846,7 @@ public class TripTimesUpdaterTest {
     assertTrue(patch.isSuccess());
 
     patch.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(0, updatedTripTimes.getArrivalDelay(0));
       assertEquals(0, updatedTripTimes.getDepartureDelay(0));
@@ -834,7 +893,7 @@ public class TripTimesUpdaterTest {
     assertTrue(patch.isSuccess());
 
     patch.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(1000, updatedTripTimes.getArrivalDelay(0));
       assertEquals(1000, updatedTripTimes.getDepartureDelay(0));
@@ -916,7 +975,7 @@ public class TripTimesUpdaterTest {
     assertTrue(patch.isSuccess());
 
     patch.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(-700, updatedTripTimes.getArrivalDelay(1));
       assertEquals(-700, updatedTripTimes.getDepartureDelay(1));
@@ -962,7 +1021,7 @@ public class TripTimesUpdaterTest {
     assertTrue(patch.isSuccess());
 
     patch.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(0, updatedTripTimes.getArrivalDelay(0));
       assertEquals(0, updatedTripTimes.getDepartureDelay(0));
@@ -1016,7 +1075,7 @@ public class TripTimesUpdaterTest {
     assertTrue(patch.isSuccess());
 
     patch.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(600, updatedTripTimes.getArrivalDelay(0));
       assertEquals(600, updatedTripTimes.getDepartureDelay(0));
@@ -1081,7 +1140,7 @@ public class TripTimesUpdaterTest {
     assertTrue(patch.isSuccess());
 
     patch.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
+      var updatedTripTimes = p.tripTimes();
       assertNotNull(updatedTripTimes);
       assertEquals(600, updatedTripTimes.getArrivalDelay(0));
       assertEquals(600, updatedTripTimes.getDepartureDelay(0));
