@@ -334,6 +334,82 @@ public class TripTimesUpdaterTest {
   }
 
   @Test
+  public void testUpdateWithNoForwardPropagationWhenItIsRequired() {
+    TripDescriptor.Builder tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(1);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(15);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      timetable,
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      ForwardsDelayPropagationType.NONE,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+
+    assertTrue(result.isFailure());
+
+    result.ifFailure(p -> assertEquals(INVALID_ARRIVAL_TIME, p.errorType()));
+  }
+
+  @Test
+  public void testUpdateWithNoForwardPropagationWithCompleteData() {
+    TripDescriptor.Builder tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(1);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(15);
+    stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+    stopTimeEventBuilder.setDelay(20);
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(1);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(25);
+    stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+    stopTimeEventBuilder.setDelay(30);
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(2);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(35);
+    stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+    stopTimeEventBuilder.setDelay(40);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      timetable,
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      ForwardsDelayPropagationType.NONE,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+
+    assertTrue(result.isSuccess());
+
+    result.ifSuccess(p -> {
+      var tripTimes = p.getTripTimes();
+      assertEquals(15, tripTimes.getArrivalDelay(0));
+      assertEquals(20, tripTimes.getDepartureDelay(0));
+      assertEquals(25, tripTimes.getArrivalDelay(1));
+      assertEquals(30, tripTimes.getDepartureDelay(1));
+      assertEquals(35, tripTimes.getArrivalDelay(2));
+      assertEquals(40, tripTimes.getDepartureDelay(2));
+    });
+  }
+
+  @Test
   public void testUpdateWithNoData() {
     var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
 
@@ -463,7 +539,7 @@ public class TripTimesUpdaterTest {
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
-    stopTimeUpdateBuilder.setStopSequence(0);
+    stopTimeUpdateBuilder.setStopSequence(1);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
     StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(15);
