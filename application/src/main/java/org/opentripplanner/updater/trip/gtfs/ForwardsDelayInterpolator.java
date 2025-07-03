@@ -9,7 +9,12 @@ public interface ForwardsDelayInterpolator {
    */
   boolean interpolateDelay(RealTimeTripTimesBuilder builder);
 
-  static ForwardsDelayInterpolator getInstance() {
-    return new DefaultForwardsDelayInterpolator();
+  static ForwardsDelayInterpolator getInstance(
+    ForwardsDelayPropagationType forwardsDelayPropagationType
+  ) {
+    return switch (forwardsDelayPropagationType) {
+      case NONE -> builder -> false;
+      case DEFAULT -> new DefaultForwardsDelayInterpolator();
+    };
   }
 }

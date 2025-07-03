@@ -86,6 +86,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     assertTrue(result.isFailure());
@@ -115,6 +116,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     assertTrue(result.isFailure());
@@ -145,6 +147,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     assertTrue(result.isFailure());
@@ -180,6 +183,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -206,6 +210,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -234,6 +239,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -260,6 +266,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -285,6 +292,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -319,6 +327,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     assertTrue(result.isFailure());
@@ -345,6 +354,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -389,6 +399,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.ALWAYS
     );
 
@@ -428,6 +439,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.ALWAYS
     );
 
@@ -462,6 +474,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.NONE
     );
 
@@ -492,6 +505,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.NONE
     );
 
@@ -518,6 +532,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -558,6 +573,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -603,6 +619,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     // the spec does not require you to supply both arrival and departure on a StopTimeUpdate
@@ -636,6 +653,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED
     );
 
@@ -686,6 +704,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -732,6 +751,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -777,6 +797,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -812,6 +833,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -857,6 +879,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -910,6 +933,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -974,6 +998,7 @@ public class TripTimesUpdaterTest {
       tripUpdate,
       TIME_ZONE,
       SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
 
@@ -1035,6 +1060,7 @@ public class TripTimesUpdaterTest {
         tripUpdate,
         TIME_ZONE,
         SERVICE_DATE,
+        ForwardsDelayPropagationType.DEFAULT,
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
       );
 

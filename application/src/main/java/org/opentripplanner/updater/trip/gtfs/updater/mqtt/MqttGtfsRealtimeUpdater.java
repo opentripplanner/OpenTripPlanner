@@ -21,6 +21,7 @@ import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.updater.TripUpdateGraphWriterRunnable;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
@@ -53,6 +54,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   private final String topic;
   private final String feedId;
   private final int qos;
+  private final ForwardsDelayPropagationType forwardsDelayPropagationType;
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
   private final String clientId = "OpenTripPlanner-" + MqttClient.generateClientId();
   private final String configRef;
@@ -71,13 +73,14 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   ) {
     this.configRef = parameters.configRef();
     this.url = parameters.url();
-    this.topic = parameters.getTopic();
+    this.topic = parameters.topic();
     this.feedId = parameters.feedId();
-    this.qos = parameters.getQos();
-    this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
+    this.qos = parameters.qos();
+    this.forwardsDelayPropagationType = parameters.forwardsDelayPropagationType();
+    this.backwardsDelayPropagationType = parameters.backwardsDelayPropagationType();
     this.adapter = adapter;
     // Set properties of realtime data snapshot source
-    this.fuzzyTripMatching = parameters.getFuzzyTripMatching();
+    this.fuzzyTripMatching = parameters.fuzzyTripMatching();
     this.recordMetrics = TripUpdateMetrics.streaming(parameters);
     LOG.info("Creating streaming GTFS-RT TripUpdate updater subscribing to MQTT broker at {}", url);
   }
@@ -176,6 +179,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
           new TripUpdateGraphWriterRunnable(
             adapter,
             fuzzyTripMatching,
+            forwardsDelayPropagationType,
             backwardsDelayPropagationType,
             updateIncrementality,
             updates,

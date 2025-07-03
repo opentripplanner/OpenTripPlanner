@@ -55,6 +55,7 @@ class TripTimesUpdater {
     GtfsRealtime.TripUpdate tripUpdate,
     ZoneId timeZone,
     LocalDate updateServiceDate,
+    ForwardsDelayPropagationType forwardsDelayPropagationType,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
     Result<TripTimesPatch, UpdateError> invalidInput = Result.failure(
@@ -193,7 +194,9 @@ class TripTimesUpdater {
 
     // Interpolate missing times for stops which don't have times associated. Note: Currently for
     // GTFS-RT updates ONLY not for SIRI updates.
-    if (ForwardsDelayInterpolator.getInstance().interpolateDelay(builder)) {
+    if (
+      ForwardsDelayInterpolator.getInstance(forwardsDelayPropagationType).interpolateDelay(builder)
+    ) {
       LOG.debug("Interpolated delays for for missing stops on trip {}.", tripId);
     }
 

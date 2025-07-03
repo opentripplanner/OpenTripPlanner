@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
-import static org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
@@ -52,6 +51,8 @@ import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
+import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
@@ -244,7 +245,8 @@ public abstract class GtfsTest {
       }
       tripUpdateAdapter.applyTripUpdates(
         null,
-        REQUIRED_NO_DATA,
+        ForwardsDelayPropagationType.DEFAULT,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA,
         UpdateIncrementality.DIFFERENTIAL,
         updates,
         FEED_ID
