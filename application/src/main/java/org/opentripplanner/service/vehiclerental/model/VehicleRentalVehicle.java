@@ -146,47 +146,27 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
   }
 
   @Override
-  public FeedScopedId getId() {
-    return id;
+  public String stationId() {
+    return this.id().getId();
   }
 
   @Override
-  public String getStationId() {
-    return getId().getId();
+  public String network() {
+    return this.id().getFeedId();
   }
 
   @Override
-  public String getNetwork() {
-    return getId().getFeedId();
-  }
-
-  @Override
-  public I18NString getName() {
-    return name;
-  }
-
-  @Override
-  public double getLongitude() {
-    return longitude;
-  }
-
-  @Override
-  public double getLatitude() {
-    return latitude;
-  }
-
-  @Override
-  public int getVehiclesAvailable() {
+  public int vehiclesAvailable() {
     return 1;
   }
 
   @Override
-  public int getSpacesAvailable() {
+  public int spacesAvailable() {
     return 0;
   }
 
   @Override
-  public Integer getCapacity() {
+  public Integer capacity() {
     return 0;
   }
 
@@ -224,12 +204,12 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
   }
 
   @Override
-  public Set<RentalFormFactor> getAvailablePickupFormFactors(boolean includeRealtimeAvailability) {
+  public Set<RentalFormFactor> availablePickupFormFactors(boolean includeRealtimeAvailability) {
     return Set.of(vehicleType.formFactor());
   }
 
   @Override
-  public Set<RentalFormFactor> getAvailableDropoffFormFactors(boolean includeRealtimeAvailability) {
+  public Set<RentalFormFactor> availableDropoffFormFactors(boolean includeRealtimeAvailability) {
     return Set.of();
   }
 
@@ -244,12 +224,7 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
   }
 
   @Override
-  public VehicleRentalStationUris getRentalUris() {
-    return rentalUris;
-  }
-
-  @Override
-  public VehicleRentalSystem getVehicleRentalSystem() {
+  public VehicleRentalSystem vehicleRentalSystem() {
     return system;
   }
 

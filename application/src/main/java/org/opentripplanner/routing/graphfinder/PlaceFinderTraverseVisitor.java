@@ -259,18 +259,16 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     if (!includeVehicleRentals) {
       return;
     }
-    if (
-      !filterByVehicleRental.isEmpty() && !filterByVehicleRental.contains(station.getStationId())
-    ) {
+    if (!filterByVehicleRental.isEmpty() && !filterByVehicleRental.contains(station.stationId())) {
       return;
     }
-    if (seenVehicleRentalPlaces.contains(station.getId())) {
+    if (seenVehicleRentalPlaces.contains(station.id())) {
       return;
     }
-    if (!filterByNetwork.isEmpty() && !filterByNetwork.contains(station.getNetwork())) {
+    if (!filterByNetwork.isEmpty() && !filterByNetwork.contains(station.network())) {
       return;
     }
-    seenVehicleRentalPlaces.add(station.getId());
+    seenVehicleRentalPlaces.add(station.id());
     placesFound.add(new PlaceAtDistance(station, distance));
   }
 }

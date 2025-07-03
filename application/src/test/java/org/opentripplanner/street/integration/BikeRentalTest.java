@@ -246,11 +246,11 @@ public class BikeRentalTest extends GraphRoutingTest {
   public void testFloatingBike() {
     VehicleRentalPlace station = B1.getStation();
     VehicleRentalVehicle vehicle = VehicleRentalVehicle.of()
-      .withLatitude(station.getLatitude())
-      .withLongitude(station.getLongitude())
-      .withId(station.getId())
-      .withName(station.getName())
-      .withVehicleType(RentalVehicleType.getDefaultType(station.getId().getFeedId()))
+      .withLatitude(station.latitude())
+      .withLongitude(station.longitude())
+      .withId(station.id())
+      .withName(station.name())
+      .withVehicleType(RentalVehicleType.getDefaultType(station.id().getFeedId()))
       .build();
     B1.setStation(vehicle);
 

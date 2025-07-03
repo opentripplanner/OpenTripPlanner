@@ -151,7 +151,6 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     return new Builder(this);
   }
 
-  // New accessor methods following foo() convention
   @Nullable
   public FeedScopedId id() {
     return id;
@@ -280,50 +279,14 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     return realTimeData;
   }
 
-  // Legacy interface methods - these delegate to the new accessors
   @Override
-  public FeedScopedId getId() {
-    return id;
+  public String stationId() {
+    return this.id().getId();
   }
 
   @Override
-  public String getStationId() {
-    return getId().getId();
-  }
-
-  @Override
-  public String getNetwork() {
-    return getId().getFeedId();
-  }
-
-  @Override
-  public I18NString getName() {
-    return name;
-  }
-
-  @Override
-  public double getLongitude() {
-    return longitude;
-  }
-
-  @Override
-  public double getLatitude() {
-    return latitude;
-  }
-
-  @Override
-  public int getVehiclesAvailable() {
-    return vehiclesAvailable;
-  }
-
-  @Override
-  public int getSpacesAvailable() {
-    return spacesAvailable;
-  }
-
-  @Override
-  public Integer getCapacity() {
-    return capacity;
+  public String network() {
+    return this.id().getFeedId();
   }
 
   @Override
@@ -358,7 +321,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   @Override
-  public Set<RentalFormFactor> getAvailablePickupFormFactors(boolean includeRealtimeAvailability) {
+  public Set<RentalFormFactor> availablePickupFormFactors(boolean includeRealtimeAvailability) {
     return vehicleTypesAvailable
       .entrySet()
       .stream()
@@ -368,7 +331,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   @Override
-  public Set<RentalFormFactor> getAvailableDropoffFormFactors(boolean includeRealtimeAvailability) {
+  public Set<RentalFormFactor> availableDropoffFormFactors(boolean includeRealtimeAvailability) {
     return vehicleSpacesAvailable
       .entrySet()
       .stream()
@@ -393,12 +356,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   @Override
-  public VehicleRentalStationUris getRentalUris() {
-    return rentalUris;
-  }
-
-  @Override
-  public VehicleRentalSystem getVehicleRentalSystem() {
+  public VehicleRentalSystem vehicleRentalSystem() {
     return system;
   }
 
@@ -414,10 +372,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   public Set<RentalFormFactor> formFactors() {
-    return SetUtils.combine(
-      getAvailableDropoffFormFactors(false),
-      getAvailablePickupFormFactors(false)
-    );
+    return SetUtils.combine(availableDropoffFormFactors(false), availablePickupFormFactors(false));
   }
 
   /**

@@ -23,9 +23,7 @@ public class RentalVehicleType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
-          .dataFetcher(environment ->
-            ((VehicleRentalVehicle) environment.getSource()).getStationId()
-          )
+          .dataFetcher(environment -> ((VehicleRentalVehicle) environment.getSource()).stationId())
           .build()
       )
       .field(
@@ -41,25 +39,21 @@ public class RentalVehicleType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("network")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
-          .dataFetcher(environment -> ((VehicleRentalVehicle) environment.getSource()).getNetwork())
+          .dataFetcher(environment -> ((VehicleRentalVehicle) environment.getSource()).network())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("longitude")
           .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-          .dataFetcher(environment ->
-            ((VehicleRentalVehicle) environment.getSource()).getLongitude()
-          )
+          .dataFetcher(environment -> ((VehicleRentalVehicle) environment.getSource()).longitude())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-          .dataFetcher(environment ->
-            ((VehicleRentalVehicle) environment.getSource()).getLatitude()
-          )
+          .dataFetcher(environment -> ((VehicleRentalVehicle) environment.getSource()).latitude())
           .build()
       )
       .field(

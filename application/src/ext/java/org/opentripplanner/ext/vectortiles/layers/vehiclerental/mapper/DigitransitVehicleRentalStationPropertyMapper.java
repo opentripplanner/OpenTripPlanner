@@ -30,8 +30,8 @@ public class DigitransitVehicleRentalStationPropertyMapper
 
   protected static List<KeyValue> getFeedScopedIdAndNetwork(VehicleRentalPlace vehicleRentalPlace) {
     return List.of(
-      new KeyValue("id", vehicleRentalPlace.getId().toString()),
-      new KeyValue("network", vehicleRentalPlace.getNetwork())
+      new KeyValue("id", vehicleRentalPlace.id().toString()),
+      new KeyValue("network", vehicleRentalPlace.network())
     );
   }
 
@@ -40,7 +40,7 @@ public class DigitransitVehicleRentalStationPropertyMapper
     I18NStringMapper i18NStringMapper
   ) {
     return List.of(
-      new KeyValue("name", i18NStringMapper.mapToApi(vehicleRentalStation.getName())),
+      new KeyValue("name", i18NStringMapper.mapToApi(vehicleRentalStation.name())),
       // a station can potentially have multiple form factors that's why this is plural
       new KeyValue(
         "formFactors",

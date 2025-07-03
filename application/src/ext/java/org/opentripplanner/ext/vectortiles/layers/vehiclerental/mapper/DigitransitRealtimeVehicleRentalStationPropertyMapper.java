@@ -28,8 +28,8 @@ public class DigitransitRealtimeVehicleRentalStationPropertyMapper
     items.addAll(getNameAndFormFactors(station, i18NStringMapper));
     items.addAll(
       List.of(
-        new KeyValue("vehiclesAvailable", station.getVehiclesAvailable()),
-        new KeyValue("spacesAvailable", station.getSpacesAvailable()),
+        new KeyValue("vehiclesAvailable", station.vehiclesAvailable()),
+        new KeyValue("spacesAvailable", station.spacesAvailable()),
         new KeyValue("operative", station.isAllowPickup() && station.isAllowDropoff())
       )
     );

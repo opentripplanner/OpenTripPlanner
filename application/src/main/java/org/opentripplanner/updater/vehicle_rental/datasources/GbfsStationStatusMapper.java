@@ -27,10 +27,10 @@ public class GbfsStationStatusMapper {
   }
 
   VehicleRentalStation mapStationStatus(VehicleRentalStation station) {
-    if (!statusLookup.containsKey(station.getStationId())) {
+    if (!statusLookup.containsKey(station.stationId())) {
       return station.copyOf().withRealTimeData(false).build();
     }
-    GBFSStation status = statusLookup.get(station.getStationId());
+    GBFSStation status = statusLookup.get(station.stationId());
 
     int vehiclesAvailable = status.getNumBikesAvailable() != null
       ? status.getNumBikesAvailable()
@@ -43,7 +43,7 @@ public class GbfsStationStatusMapper {
         .stream()
         .filter(e -> containsVehicleType(e, status))
         .collect(Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> e.getCount()))
-      : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), vehiclesAvailable);
+      : Map.of(RentalVehicleType.getDefaultType(station.network()), vehiclesAvailable);
 
     int vehiclesDisabled = status.getNumBikesDisabled() != null ? status.getNumBikesDisabled() : 0;
 
@@ -63,7 +63,7 @@ public class GbfsStationStatusMapper {
             .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount()))
         )
         .collect(Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count))
-      : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), spacesAvailable);
+      : Map.of(RentalVehicleType.getDefaultType(station.network()), spacesAvailable);
 
     int spacesDisabled = status.getNumDocksDisabled() != null ? status.getNumDocksDisabled() : 0;
 

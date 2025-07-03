@@ -15,18 +15,18 @@ public class VehicleRentalPlaceVertex extends Vertex {
   private VehicleRentalPlace station;
 
   public VehicleRentalPlaceVertex(VehicleRentalPlace station) {
-    super(station.getLongitude(), station.getLatitude());
+    super(station.longitude(), station.latitude());
     this.station = station;
   }
 
   @Override
   public I18NString getName() {
-    return station.getName();
+    return station.name();
   }
 
   @Override
   public VertexLabel getLabel() {
-    return VertexLabel.string("vehicle rental station " + station.getId());
+    return VertexLabel.string("vehicle rental station " + station.id());
   }
 
   public VehicleRentalPlace getStation() {

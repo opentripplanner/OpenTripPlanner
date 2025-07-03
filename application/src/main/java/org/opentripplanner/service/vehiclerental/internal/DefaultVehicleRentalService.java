@@ -68,7 +68,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
 
   @Override
   public void addVehicleRentalStation(VehicleRentalPlace vehicleRentalStation) {
-    rentalPlaces.put(vehicleRentalStation.getId(), vehicleRentalStation);
+    rentalPlaces.put(vehicleRentalStation.id(), vehicleRentalStation);
   }
 
   @Override
@@ -109,7 +109,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
     );
 
     return getVehicleRentalStationsAsStream()
-      .filter(b -> envelope.contains(new Coordinate(b.getLongitude(), b.getLatitude())))
+      .filter(b -> envelope.contains(new Coordinate(b.longitude(), b.latitude())))
       .toList();
   }
 
@@ -125,7 +125,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
   public List<VehicleRentalPlace> getVehicleRentalPlacesForEnvelope(Envelope envelope) {
     Stream<VehicleRentalPlace> vehicleRentalPlaceStream = getVehicleRentalPlaces()
       .stream()
-      .filter(vr -> envelope.contains(new Coordinate(vr.getLongitude(), vr.getLatitude())));
+      .filter(vr -> envelope.contains(new Coordinate(vr.longitude(), vr.latitude())));
 
     return vehicleRentalPlaceStream.toList();
   }

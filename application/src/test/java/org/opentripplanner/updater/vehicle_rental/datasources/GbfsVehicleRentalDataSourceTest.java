@@ -48,9 +48,7 @@ class GbfsVehicleRentalDataSourceTest {
     assertTrue(
       stations
         .stream()
-        .anyMatch(vehicleRentalStation ->
-          vehicleRentalStation.getName().toString().equals("TORVGATA")
-        )
+        .anyMatch(vehicleRentalStation -> vehicleRentalStation.name().toString().equals("TORVGATA"))
     );
     assertTrue(
       stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.isAllowDropoff())
@@ -65,7 +63,7 @@ class GbfsVehicleRentalDataSourceTest {
       stations
         .stream()
         .allMatch(vehicleRentalStation ->
-          vehicleRentalStation.getNetwork().equals("lillestrombysykkel")
+          vehicleRentalStation.network().equals("lillestrombysykkel")
         )
     );
     assertTrue(
@@ -185,7 +183,7 @@ class GbfsVehicleRentalDataSourceTest {
       stations
         .stream()
         .anyMatch(vehicleRentalStation ->
-          vehicleRentalStation.getName().toString().equals("Viiskulma")
+          vehicleRentalStation.name().toString().equals("Viiskulma")
         )
     );
     assertTrue(
@@ -201,9 +199,7 @@ class GbfsVehicleRentalDataSourceTest {
       stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isCarStation())
     );
     assertTrue(
-      stations
-        .stream()
-        .allMatch(vehicleRentalStation -> vehicleRentalStation.getNetwork() == network)
+      stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.network() == network)
     );
     assertTrue(
       stations

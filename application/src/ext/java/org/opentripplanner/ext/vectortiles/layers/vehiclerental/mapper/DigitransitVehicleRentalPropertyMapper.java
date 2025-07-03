@@ -19,11 +19,11 @@ public class DigitransitVehicleRentalPropertyMapper extends PropertyMapper<Vehic
   @Override
   protected Collection<KeyValue> map(VehicleRentalPlace place) {
     return List.of(
-      new KeyValue("id", place.getStationId()),
+      new KeyValue("id", place.stationId()),
       // to the response somehow.
-      new KeyValue("name", i18NStringMapper.mapToApi(place.getName())),
+      new KeyValue("name", i18NStringMapper.mapToApi(place.name())),
       // this is plural since once upon a time OSM-added rental stations could have multiple stations
-      new KeyValue("networks", place.getNetwork())
+      new KeyValue("networks", place.network())
     );
   }
 }
