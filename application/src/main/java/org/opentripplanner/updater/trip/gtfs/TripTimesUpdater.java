@@ -76,7 +76,7 @@ class TripTimesUpdater {
     GtfsRealtime.TripDescriptor tripDescriptor = tripUpdate.getTrip();
     if (!tripDescriptor.hasTripId()) {
       LOG.debug("TripDescriptor object has no TripId field");
-      Result.failure(UpdateError.noTripId(TRIP_NOT_FOUND));
+      return Result.failure(UpdateError.noTripId(TRIP_NOT_FOUND));
     }
 
     String tripId = tripDescriptor.getTripId();
