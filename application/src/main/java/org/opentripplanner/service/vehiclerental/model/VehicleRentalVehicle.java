@@ -20,21 +20,21 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
 
   public static final VehicleRentalVehicle DEFAULT = new VehicleRentalVehicle();
 
-  public FeedScopedId id;
-  public I18NString name;
-  public double longitude;
-  public double latitude;
+  private final FeedScopedId id;
+  private final I18NString name;
+  private final double longitude;
+  private final double latitude;
 
-  public VehicleRentalSystem system;
-  public RentalVehicleType vehicleType;
-  public VehicleRentalStationUris rentalUris;
-  public boolean isReserved = false;
-  public boolean isDisabled = false;
-  public Instant lastReported;
-  public VehicleRentalStation station;
-  public String pricingPlanId;
-  public RentalVehicleFuel fuel;
-  public OffsetDateTime availableUntil;
+  private final VehicleRentalSystem system;
+  private final RentalVehicleType vehicleType;
+  private final VehicleRentalStationUris rentalUris;
+  private final boolean isReserved;
+  private final boolean isDisabled;
+  private final Instant lastReported;
+  private final VehicleRentalStation station;
+  private final String pricingPlanId;
+  private final RentalVehicleFuel fuel;
+  private final OffsetDateTime availableUntil;
 
   public VehicleRentalVehicle() {
     this.id = null;
