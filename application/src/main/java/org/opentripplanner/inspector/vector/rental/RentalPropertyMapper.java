@@ -32,8 +32,8 @@ class RentalPropertyMapper extends PropertyMapper<VehicleRentalPlace> {
       return ListUtils.combine(base, props);
     } else if (input instanceof VehicleRentalStation station) {
       var props = List.of(
-        kv("isRenting", station.isRenting),
-        kv("isReturning", station.isReturning)
+        kv("isRenting", station.isRenting()),
+        kv("isReturning", station.isReturning())
       );
       return ListUtils.combine(base, props);
     }

@@ -86,7 +86,10 @@ public class GbfsFreeVehicleStatusMapper {
       ) {
         return null;
       }
-      rentalVehicle.fuel = new RentalVehicleFuel(fuelRatio, rangeMeters);
+      rentalVehicle.fuel = RentalVehicleFuel.of()
+        .withPercent(fuelRatio)
+        .withRange(rangeMeters)
+        .build();
       String availableUntil = vehicle.getAvailableUntil();
       if (StringUtils.hasValue(availableUntil)) {
         rentalVehicle.availableUntil = OffsetDateTime.parse(availableUntil);

@@ -110,10 +110,10 @@ public class TestFreeFloatingRentalVehicleBuilder {
     vehicle.longitude = longitude;
     vehicle.vehicleType = vehicleType;
     vehicle.system = system;
-    vehicle.fuel = new RentalVehicleFuel(
-      currentFuelPercent,
-      Distance.ofMetersBoxed(currentRangeMeters, ignore -> {}).orElse(null)
-    );
+    vehicle.fuel = RentalVehicleFuel.of()
+      .withPercent(currentFuelPercent)
+      .withRange(Distance.ofMetersBoxed(currentRangeMeters, ignore -> {}).orElse(null))
+      .build();
     vehicle.availableUntil = DEFAULT_AVAILABLE_UNTIL;
     return vehicle;
   }
