@@ -26,42 +26,42 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   public static final VehicleRentalStation DEFAULT = new VehicleRentalStation();
 
   // GBFS Static information
-  public FeedScopedId id;
-  public I18NString name;
-  public String shortName;
-  public double longitude;
-  public double latitude;
-  public String address;
-  public String crossStreet;
-  public String regionId;
-  public String postCode;
-  public Set<String> rentalMethods;
-  public boolean isVirtualStation = false;
-  public Geometry stationArea;
-  public Integer capacity;
-  public Map<RentalVehicleType, Integer> vehicleTypeAreaCapacity;
-  public Map<RentalVehicleType, Integer> vehicleTypeDockCapacity;
-  public boolean isValetStation = false;
-  public VehicleRentalSystem system;
-  public VehicleRentalStationUris rentalUris;
+  private final FeedScopedId id;
+  private final I18NString name;
+  private final String shortName;
+  private final double longitude;
+  private final double latitude;
+  private final String address;
+  private final String crossStreet;
+  private final String regionId;
+  private final String postCode;
+  private final Set<String> rentalMethods;
+  private boolean isVirtualStation = false;
+  private final Geometry stationArea;
+  private final Integer capacity;
+  private final Map<RentalVehicleType, Integer> vehicleTypeAreaCapacity;
+  private final Map<RentalVehicleType, Integer> vehicleTypeDockCapacity;
+  private boolean isValetStation = false;
+  private final VehicleRentalSystem system;
+  private final VehicleRentalStationUris rentalUris;
 
   // GBFS Dynamic information
-  public int vehiclesAvailable = 0;
-  public int vehiclesDisabled = 0;
-  public Map<RentalVehicleType, Integer> vehicleTypesAvailable = Map.of();
-  public int spacesAvailable = 0;
-  public int spacesDisabled = 0;
-  public Map<RentalVehicleType, Integer> vehicleSpacesAvailable = Map.of();
+  private final int vehiclesAvailable;
+  private final int vehiclesDisabled;
+  private final Map<RentalVehicleType, Integer> vehicleTypesAvailable;
+  private final int spacesAvailable;
+  private final int spacesDisabled;
+  private final Map<RentalVehicleType, Integer> vehicleSpacesAvailable;
 
-  public boolean isInstalled = true;
-  public boolean isRenting = true;
-  public boolean isReturning = true;
-  public Instant lastReported;
+  private final boolean isInstalled;
+  private final boolean isRenting;
+  private final boolean isReturning;
+  private final Instant lastReported;
 
   // OTP internal data
-  public boolean overloadingAllowed = false;
-  public boolean isArrivingInRentalVehicleAtDestinationAllowed = false;
-  public boolean realTimeData = true;
+  private final boolean overloadingAllowed;
+  private final boolean isArrivingInRentalVehicleAtDestinationAllowed;
+  private final boolean realTimeData;
 
   public VehicleRentalStation() {
     this.id = null;
