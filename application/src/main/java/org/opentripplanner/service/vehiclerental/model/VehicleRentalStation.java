@@ -3,6 +3,7 @@ package org.opentripplanner.service.vehiclerental.model;
 import static java.util.Locale.ROOT;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -447,6 +448,8 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       .entrySet()
       .stream()
       .map(vtc -> new RentalVehicleTypeCount(vtc.getKey(), vtc.getValue()))
+      // we sort to have reproducible results in tests
+      .sorted(Comparator.comparing(count -> count.vehicleType().id().toString()))
       .toList();
   }
 
