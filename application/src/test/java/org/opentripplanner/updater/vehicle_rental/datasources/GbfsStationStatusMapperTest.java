@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
+import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleDocksAvailable;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleTypesAvailable;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -16,11 +17,14 @@ import org.opentripplanner.street.model.RentalFormFactor;
 
 class GbfsStationStatusMapperTest {
 
-  public static final RentalVehicleType TYPE_CAR = RentalVehicleType.of()
+  private static final RentalVehicleType TYPE_CAR = RentalVehicleType.of()
     .withFormFactor(RentalFormFactor.CAR)
     .withId(id("tc"))
     .build();
-  public static final String ID = "s1";
+  private static final String ID = "s1";
+  private static final VehicleRentalStation STATION = VehicleRentalStation.of()
+    .withId(id(ID))
+    .build();
 
   @Test
   void availableSpacesFromVehicles() {
@@ -39,12 +43,60 @@ class GbfsStationStatusMapperTest {
       Map.of(TYPE_CAR.id().getId(), TYPE_CAR)
     );
 
-    var station = VehicleRentalStation.of().withId(id(ID)).build();
-
-    var mapped = mapper.mapStationStatus(station);
+    var mapped = mapper.mapStationStatus(STATION);
 
     assertEquals(
       new RentalVehicleEntityCounts(3, List.of(new RentalVehicleTypeCount(TYPE_CAR, 3))),
+      mapped.getVehicleSpaceCounts()
+    );
+  }
+
+  @Test
+  void availableSpacesFromTypes() {
+    var gbfsStation = new GBFSStation();
+    gbfsStation.setStationId(ID);
+    gbfsStation.setNumDocksAvailable(99);
+    gbfsStation.setNumBikesAvailable(4);
+    var t = new GBFSVehicleTypesAvailable();
+    t.setCount(1);
+    t.setVehicleTypeId(TYPE_CAR.id().getId());
+
+    var a = new GBFSVehicleDocksAvailable();
+    a.setCount(88);
+    a.setVehicleTypeIds(List.of(TYPE_CAR.id().getId()));
+
+    gbfsStation.setVehicleTypesAvailable(List.of(t));
+    gbfsStation.setVehicleDocksAvailable(List.of(a));
+
+    var mapper = new GbfsStationStatusMapper(
+      Map.of(ID, gbfsStation),
+      Map.of(TYPE_CAR.id().getId(), TYPE_CAR)
+    );
+
+    var mapped = mapper.mapStationStatus(STATION);
+
+    assertEquals(
+      new RentalVehicleEntityCounts(99, List.of(new RentalVehicleTypeCount(TYPE_CAR, 88))),
+      mapped.getVehicleSpaceCounts()
+    );
+  }
+
+  @Test
+  void noTypes() {
+    var gbfsStation = new GBFSStation();
+    gbfsStation.setStationId(ID);
+    gbfsStation.setNumDocksAvailable(1);
+    gbfsStation.setNumBikesAvailable(4);
+
+    var mapper = new GbfsStationStatusMapper(
+      Map.of(ID, gbfsStation),
+      Map.of(TYPE_CAR.id().getId(), TYPE_CAR)
+    );
+
+    var mapped = mapper.mapStationStatus(STATION);
+    var bikeType = RentalVehicleType.getDefaultType("F");
+    assertEquals(
+      new RentalVehicleEntityCounts(1, List.of(new RentalVehicleTypeCount(bikeType, 1))),
       mapped.getVehicleSpaceCounts()
     );
   }
