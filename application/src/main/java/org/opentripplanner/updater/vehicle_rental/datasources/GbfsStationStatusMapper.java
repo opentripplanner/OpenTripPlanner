@@ -103,7 +103,7 @@ public class GbfsStationStatusMapper {
       // we assume that for each available vehicle there are places to return
       return typesAvailable
         .stream()
-        .map(a -> new VehicleTypeCount(vehicleTypes.get(a.getVehicleTypeId()), a.getCount()))
+        .map(a -> new VehicleTypeCount(vehicleTypes.get(a.getVehicleTypeId()), spacesAvailable))
         .collect(TYPE_MAP_COLLECTOR);
     } else {
       return docksAvailable
