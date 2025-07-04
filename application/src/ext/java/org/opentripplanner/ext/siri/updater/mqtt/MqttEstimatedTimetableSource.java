@@ -3,8 +3,6 @@ package org.opentripplanner.ext.siri.updater.mqtt;
 import jakarta.xml.bind.JAXBException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
@@ -31,7 +29,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   private Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer;
   private volatile boolean primed;
-  private final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
   private MqttClient client;
 
@@ -97,8 +94,9 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
     @Override
     public void messageArrived(String topic, MqttMessage message) {
-      virtualThreadExecutor.submit(() ->
-        serviceDelivery(message.getPayload()).ifPresent(serviceDeliveryConsumer::apply));
+      serviceDelivery(message.getPayload()).ifPresent(serviceDelivery -> {
+        serviceDeliveryConsumer.apply(serviceDelivery);
+      });
       primed = true;
     }
 
