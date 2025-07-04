@@ -3,7 +3,7 @@ package org.opentripplanner.updater.trip.gtfs;
 import java.util.OptionalInt;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 
-abstract class BackwardsDelayInterpolatorBase implements BackwardsDelayInterpolator {
+abstract class AbstractBackwardsDelayInterpolator implements BackwardsDelayInterpolator {
 
   /**
    * Propagate backwards from the first stop with real-time information
