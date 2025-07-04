@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -37,5 +38,10 @@ public class TransmodelMappingUtilTest {
       .copy()
       .withId(new FeedScopedId(feedScope, Integer.toString(id)))
       .build();
+  }
+
+  @AfterEach
+  public void cleanUp() {
+    TransitIdMapper.clearFixedFeedId();
   }
 }
