@@ -13,7 +13,6 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
-import org.opentripplanner.street.search.request.FromToViaVertexRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
 import org.opentripplanner.street.search.state.State;
@@ -44,14 +43,6 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
 
   public StreetSearchBuilder setStreetRequest(StreetRequest streetRequest) {
     this.streetRequest = streetRequest;
-    return this;
-  }
-
-  public StreetSearchBuilder setFromToViaVertexRequest(
-    FromToViaVertexRequest fromToViaVertexRequest
-  ) {
-    setFrom(fromToViaVertexRequest.from());
-    setTo(fromToViaVertexRequest.to());
     return this;
   }
 

@@ -1,5 +1,6 @@
 package org.opentripplanner.street.search.request;
 
+import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -17,7 +19,19 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 class FromToViaVertexRequestTest {
 
+  private static final GenericLocation FROM = new GenericLocation(
+    "from",
+    null,
+    WgsCoordinate.GREENWICH.latitude(),
+    WgsCoordinate.GREENWICH.longitude()
+  );
   private static final Set<Vertex> FROM_VERTICES = Set.of(createVertex("from"));
+  private static final GenericLocation TO = new GenericLocation(
+    "to",
+    null,
+    WgsCoordinate.GREENWICH.latitude(),
+    WgsCoordinate.GREENWICH.longitude()
+  );
   private static final Set<Vertex> TO_VERTICES = Set.of(createVertex("to"));
   private static final Set<TransitStopVertex> FROM_STOPS = Set.of(
     createStopVertexForTest("from-stop")
@@ -32,26 +46,18 @@ class FromToViaVertexRequestTest {
   private static final Set<Vertex> VIA_VERTICES = Set.of(createVertex("via"));
   private static final FromToViaVertexRequest FROM_TO_VIA_VERTEX_REQUEST =
     new FromToViaVertexRequest(
-      FROM_VERTICES,
-      TO_VERTICES,
       FROM_STOPS,
       TO_STOPS,
-      Map.of(VISIT_VIA_LOCATION, VIA_VERTICES)
+      Map.ofEntries(
+        entry(FROM, FROM_VERTICES),
+        entry(TO, TO_VERTICES),
+        entry(VISIT_VIA_LOCATION.coordinateLocation(), VIA_VERTICES)
+      )
     );
-
-  @Test
-  void from() {
-    assertEquals(FROM_VERTICES, FROM_TO_VIA_VERTEX_REQUEST.from());
-  }
 
   @Test
   void fromStops() {
     assertEquals(FROM_STOPS, FROM_TO_VIA_VERTEX_REQUEST.fromStops());
-  }
-
-  @Test
-  void to() {
-    assertEquals(TO_VERTICES, FROM_TO_VIA_VERTEX_REQUEST.to());
   }
 
   @Test
@@ -61,19 +67,22 @@ class FromToViaVertexRequestTest {
 
   @Test
   void findVertices() {
-    assertEquals(VIA_VERTICES, FROM_TO_VIA_VERTEX_REQUEST.findVertices(VISIT_VIA_LOCATION));
+    assertEquals(FROM_VERTICES, FROM_TO_VIA_VERTEX_REQUEST.findVertices(FROM));
+    assertEquals(TO_VERTICES, FROM_TO_VIA_VERTEX_REQUEST.findVertices(TO));
+    assertEquals(
+      VIA_VERTICES,
+      FROM_TO_VIA_VERTEX_REQUEST.findVertices(VISIT_VIA_LOCATION.coordinateLocation())
+    );
   }
 
   @Test
   void testToString() {
     assertEquals(
-      "FromToViaVertexRequest{from: [{from lat,lng=1.0,1.0}], " +
-      "fromStops: [{test:from-stop lat,lng=51.48,0.0}], " +
-      "to: [{to lat,lng=1.0,1.0}], " +
+      "FromToViaVertexRequest{fromStops: [{test:from-stop lat,lng=51.48,0.0}], " +
       "toStops: [{test:to-stop lat,lng=51.48,0.0}], " +
-      "visitViaLocationVertices: {VisitViaLocation" +
-      "{label: Via coordinate, minimumWaitTime: 10m, coordinates: [(51.48, 0.0)]}=[{via lat,lng=1.0,1.0}]" +
-      "}}",
+      "verticesByLocation: [to (51.48, 0.0)=[{to lat,lng=1.0,1.0}], " +
+      "Via coordinate (51.48, 0.0)=[{via lat,lng=1.0,1.0}], " +
+      "from (51.48, 0.0)=[{from lat,lng=1.0,1.0}]]}",
       FROM_TO_VIA_VERTEX_REQUEST.toString()
     );
   }

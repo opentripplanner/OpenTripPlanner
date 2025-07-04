@@ -574,7 +574,8 @@ public class TestHalfEdges {
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
         .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(walking)
-        .setFromToViaVertexRequest(container.createFromToViaVertexRequest())
+        .setFrom(container.fromVertices())
+        .setTo(container.toVertices())
         .getShortestPathTree();
       GraphPath<State, Edge, Vertex> path = spt.getPath(container.toVertices().iterator().next());
       for (State s : path.states) {

@@ -56,8 +56,8 @@ public class AccessEgressRouter {
       .collect(Collectors.toSet());
 
     var originVertices = accessOrEgress.isAccess()
-      ? fromToViaVertexRequest.from()
-      : fromToViaVertexRequest.to();
+      ? fromToViaVertexRequest.findVertices(request.from())
+      : fromToViaVertexRequest.findVertices(request.to());
     var streetAccessEgress = new StreetNearbyStopFinder(
       durationLimit,
       maxStopCount,

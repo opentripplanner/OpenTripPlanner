@@ -257,7 +257,9 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         viaStops.add(stopIndex);
       }
       for (var coordinate : input.coordinates()) {
-        var vertices = fromToViaVertexRequest.findVertices((VisitViaLocation) input);
+        var vertices = fromToViaVertexRequest.findVertices(
+          ((VisitViaLocation) input).coordinateLocation()
+        );
         if (vertices.isEmpty()) {
           LOG.warn(
             "Found no vertices for the visit via location {} which indicates a problem.",

@@ -3,7 +3,7 @@ package org.opentripplanner.street.search;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.routing.api.request.via.VisitViaLocation;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -18,18 +18,18 @@ import org.opentripplanner.street.search.request.FromToViaVertexRequest;
 public class TemporaryVerticesContainer implements AutoCloseable {
 
   private final List<DisposableEdgeCollection> tempEdges;
-  private final Set<Vertex> fromVertices;
-  private final Set<Vertex> toVertices;
-  private final Map<VisitViaLocation, Set<Vertex>> visitViaLocationVertices;
+  private final GenericLocation from;
+  private final GenericLocation to;
+  private final Map<GenericLocation, Set<Vertex>> verticesByLocation;
   private final Set<TransitStopVertex> fromStopVertices;
   private final Set<TransitStopVertex> toStopVertices;
 
   public TemporaryVerticesContainer(TemporaryVerticesContainerBuilder builder) {
     this.tempEdges = builder.tempEdges();
-    this.fromVertices = builder.fromVertices();
+    this.from = builder.from();
+    this.to = builder.to();
     this.fromStopVertices = builder.fromStopVertices();
-    this.toVertices = builder.toVertices();
-    this.visitViaLocationVertices = builder.visitViaLocationVertices();
+    this.verticesByLocation = builder.verticesByLocation();
     this.toStopVertices = builder.toStopVertices();
   }
 
@@ -41,22 +41,23 @@ public class TemporaryVerticesContainer implements AutoCloseable {
    * Vertices that are used for from (origin). This includes both street and stop vertices.
    */
   public Set<Vertex> fromVertices() {
-    return fromVertices;
+    return verticesByLocation.getOrDefault(from, Set.of());
   }
 
   /**
    * Vertices that are used for to (destination). This includes both street and stop vertices.
    */
   public Set<Vertex> toVertices() {
-    return toVertices;
+    return verticesByLocation.getOrDefault(to, Set.of());
   }
 
   /**
-   * Vertices that are used for visit via locations that have a coordinate. Stop vertices are not
-   * included.
+   * Vertices that are used for either origin, destination or for via locations. Only the visit via
+   * locations that have a coordinate specified will have vertices available. Stop vertices are not
+   * included via locations.
    */
-  Map<VisitViaLocation, Set<Vertex>> visitViaLocationVertices() {
-    return visitViaLocationVertices;
+  Map<GenericLocation, Set<Vertex>> verticesByLocation() {
+    return verticesByLocation;
   }
 
   /**
@@ -79,13 +80,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
    * Creates a {@link FromToViaVertexRequest} that contains vertices from this container.
    */
   public FromToViaVertexRequest createFromToViaVertexRequest() {
-    return new FromToViaVertexRequest(
-      fromVertices,
-      toVertices,
-      fromStopVertices,
-      toStopVertices,
-      visitViaLocationVertices
-    );
+    return new FromToViaVertexRequest(fromStopVertices, toStopVertices, verticesByLocation);
   }
 
   /**

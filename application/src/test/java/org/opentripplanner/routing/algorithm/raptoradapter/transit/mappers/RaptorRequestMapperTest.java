@@ -277,10 +277,8 @@ class RaptorRequestMapperTest {
       new FromToViaVertexRequest(
         Set.of(),
         Set.of(),
-        Set.of(),
-        Set.of(),
         Map.of(
-          VISIT_VIA_LOCATION_COORDINATE,
+          VISIT_VIA_LOCATION_COORDINATE.coordinateLocation(),
           Set.of(new LabelledIntersectionVertex("viapoint", 1, 1, false, false))
         )
       )

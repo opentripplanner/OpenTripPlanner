@@ -104,7 +104,8 @@ public class StreetGraphFinder implements GraphFinder {
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunctions.LeastWalk())
         .setRequest(request)
-        .setFromToViaVertexRequest(temporaryVerticesContainer.createFromToViaVertexRequest())
+        .setFrom(temporaryVerticesContainer.fromVertices())
+        .setTo(temporaryVerticesContainer.toVertices())
         .getShortestPathTree();
     }
   }

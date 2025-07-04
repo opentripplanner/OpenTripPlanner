@@ -125,8 +125,8 @@ public class GraphPathFinder {
   ) {
     return graphPathFinderEntryPoint(
       request,
-      fromToViaVertexRequest.from(),
-      fromToViaVertexRequest.to()
+      fromToViaVertexRequest.findVertices(request.from()),
+      fromToViaVertexRequest.findVertices(request.to())
     );
   }
 

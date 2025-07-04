@@ -96,20 +96,28 @@ public class TemporaryVerticesContainerTest {
       .withVia(viaLocations, EnumSet.of(StreetMode.WALK))
       .build();
     var request = subject.createFromToViaVertexRequest();
-    assertThat(request.from()).isNotEmpty();
-    assertEquals(subject.fromVertices(), request.from());
-    assertThat(request.to()).isNotEmpty();
-    assertEquals(subject.toVertices(), request.to());
+    var fromVertices = request.findVertices(fromWithStops);
+    assertThat(fromVertices).isNotEmpty();
+    assertEquals(subject.fromVertices(), fromVertices);
+    var toVertices = request.findVertices(to);
+    assertThat(toVertices).isNotEmpty();
+    assertEquals(subject.toVertices(), toVertices);
     assertThat(request.fromStops()).isNotEmpty();
     assertEquals(subject.fromStopVertices(), request.fromStops());
     assertThat(request.toStops()).isEmpty();
     assertEquals(subject.toStopVertices(), request.toStops());
-    var firstViaVertices = request.findVertices(viaLocations.get(0));
+    var firstViaVertices = request.findVertices(viaLocations.get(0).coordinateLocation());
     assertThat(firstViaVertices).isNotEmpty();
-    assertEquals(subject.visitViaLocationVertices().get(viaLocations.get(0)), firstViaVertices);
-    var thirdViaVertices = request.findVertices(viaLocations.get(2));
+    assertEquals(
+      subject.verticesByLocation().get(viaLocations.get(0).coordinateLocation()),
+      firstViaVertices
+    );
+    var thirdViaVertices = request.findVertices(viaLocations.get(2).coordinateLocation());
     assertThat(thirdViaVertices).isNotEmpty();
-    assertEquals(subject.visitViaLocationVertices().get(viaLocations.get(2)), thirdViaVertices);
+    assertEquals(
+      subject.verticesByLocation().get(viaLocations.get(2).coordinateLocation()),
+      thirdViaVertices
+    );
   }
 
   @Test
@@ -337,12 +345,12 @@ public class TemporaryVerticesContainerTest {
   private void locationsInsertedCorrect(TemporaryVerticesContainer subject) {
     originAndDestinationInsertedCorrect(subject, true);
     // Then - only via locations with coordinates are included
-    var viaVertices = subject.visitViaLocationVertices();
-    assertThat(viaVertices).hasSize(2);
-    var firstViaVertices = viaVertices.get(viaLocations.get(0));
+    var verticesByLocation = subject.verticesByLocation();
+    assertThat(verticesByLocation).hasSize(4);
+    var firstViaVertices = verticesByLocation.get(viaLocations.get(0).coordinateLocation());
     assertThat(firstViaVertices).hasSize(1);
     assertEquals("Via1", firstViaVertices.iterator().next().getDefaultName());
-    var thirdViaVertices = viaVertices.get(viaLocations.get(2));
+    var thirdViaVertices = verticesByLocation.get(viaLocations.get(2).coordinateLocation());
     assertThat(thirdViaVertices).hasSize(1);
     assertEquals("Via3", thirdViaVertices.iterator().next().getDefaultName());
 

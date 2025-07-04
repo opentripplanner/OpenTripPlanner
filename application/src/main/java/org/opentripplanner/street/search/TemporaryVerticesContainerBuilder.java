@@ -2,10 +2,13 @@ package org.opentripplanner.street.search;
 
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -54,10 +57,10 @@ public class TemporaryVerticesContainerBuilder {
   private final List<DisposableEdgeCollection> tempEdges = new ArrayList<>();
   private GenericLocation from = GenericLocation.UNKNOWN;
   private GenericLocation to = GenericLocation.UNKNOWN;
-  private List<VisitViaLocation> visitViaLocationsWithCoordinates = List.of();
+  private List<GenericLocation> visitViaLocationsWithCoordinates = List.of();
   private Set<Vertex> fromVertices = Set.of();
   private Set<Vertex> toVertices = Set.of();
-  private Map<VisitViaLocation, Set<Vertex>> visitViaLocationVertices = Map.of();
+  private Map<GenericLocation, Set<Vertex>> visitViaLocationVertices = Map.of();
   private Set<TransitStopVertex> fromStopVertices = Set.of();
   private Set<TransitStopVertex> toStopVertices = Set.of();
 
@@ -82,8 +85,8 @@ public class TemporaryVerticesContainerBuilder {
     return this;
   }
 
-  public Set<Vertex> fromVertices() {
-    return fromVertices;
+  public GenericLocation from() {
+    return from;
   }
 
   public Set<TransitStopVertex> fromStopVertices() {
@@ -106,8 +109,8 @@ public class TemporaryVerticesContainerBuilder {
     return this;
   }
 
-  public Set<Vertex> toVertices() {
-    return toVertices;
+  public GenericLocation to() {
+    return to;
   }
 
   public Set<TransitStopVertex> toStopVertices() {
@@ -120,7 +123,8 @@ public class TemporaryVerticesContainerBuilder {
   ) {
     var visitViaLocationsWithCoordinates = visitViaLocations
       .stream()
-      .filter(location -> location.coordinateLocation() != null)
+      .map(VisitViaLocation::coordinateLocation)
+      .filter(Objects::nonNull)
       .toList();
     if (visitViaLocationsWithCoordinates.isEmpty()) {
       return this;
@@ -131,19 +135,18 @@ public class TemporaryVerticesContainerBuilder {
       .collect(
         Collectors.toMap(
           location -> location,
-          location ->
-            getStreetVerticesForLocation(
-              location.coordinateLocation(),
-              modes,
-              LocationType.VISIT_VIA_LOCATION
-            )
+          location -> getStreetVerticesForLocation(location, modes, LocationType.VISIT_VIA_LOCATION)
         )
       );
     return this;
   }
 
-  public Map<VisitViaLocation, Set<Vertex>> visitViaLocationVertices() {
-    return visitViaLocationVertices;
+  public Map<GenericLocation, Set<Vertex>> verticesByLocation() {
+    var verticesByLocation = new HashMap<GenericLocation, Set<Vertex>>();
+    verticesByLocation.put(from, fromVertices);
+    verticesByLocation.put(to, toVertices);
+    verticesByLocation.putAll(visitViaLocationVertices);
+    return Collections.unmodifiableMap(verticesByLocation);
   }
 
   public List<DisposableEdgeCollection> tempEdges() {
@@ -329,7 +332,7 @@ public class TemporaryVerticesContainerBuilder {
         .filter(entry -> isDisconnected(entry.getValue(), LocationType.VISIT_VIA_LOCATION))
         .map(entry ->
           new RoutingError(
-            getRoutingErrorCodeForDisconnected(entry.getKey().coordinateLocation()),
+            getRoutingErrorCodeForDisconnected(entry.getKey()),
             InputField.INTERMEDIATE_PLACE
           )
         )
