@@ -39,11 +39,11 @@ class StopTimesHelperTest {
       transitService.getTrip(new FeedScopedId(feedId, "5.1"))
     );
     var tt = originalPattern.getScheduledTimetable();
-    var newTripTimes = tt.getTripTimes().getFirst().copyScheduledTimes();
+    var newTripTimes = tt.getTripTimes().getFirst().createRealTimeFromScheduledTimes();
     newTripTimes.cancelTrip();
     pattern = originalPattern
       .copy()
-      .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes))
+      .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes.build()))
       .build();
     // replace the original pattern by the updated pattern in the transit model
     timetableRepository.addTripPattern(pattern.getId(), pattern);

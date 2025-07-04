@@ -28,6 +28,6 @@ class AllowAllModesFilterTest {
 
   @Test
   void testToString() {
-    assertEquals(subject.getClass().getSimpleName() + "{}", subject.toString());
+    assertEquals("AllowAllModesFilter", subject.toString());
   }
 }

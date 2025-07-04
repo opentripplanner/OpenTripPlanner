@@ -169,7 +169,8 @@ public class TimetabledPassingTimeType {
           .name("bookingArrangements")
           .description("Booking arrangements for this passing time.")
           .type(bookingArrangementType)
-          .dataFetcher(environment -> environment.<TripTimeOnDate>getSource().getPickupBookingInfo()
+          .dataFetcher(environment ->
+            environment.<TripTimeOnDate>getSource().getPickupBookingInfo()
           )
           .build()
       )

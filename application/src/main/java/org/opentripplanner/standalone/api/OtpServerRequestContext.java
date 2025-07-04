@@ -4,6 +4,7 @@ import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -127,6 +128,8 @@ public interface OtpServerRequestContext {
   ViaCoordinateTransferFactory viaTransferResolver();
 
   TriasApiParameters triasApiParameters();
+
+  GtfsApiParameters gtfsApiParameters();
 
   /* Sandbox modules */
 

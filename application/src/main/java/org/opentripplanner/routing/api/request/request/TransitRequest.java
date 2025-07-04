@@ -186,7 +186,7 @@ public class TransitRequest implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(TransitRequest.class)
+    return ToStringBuilder.ofEmbeddedType()
       .addCol("filters", filters, DEFAULT.filters)
       .addCol("preferredAgencies", preferredAgencies)
       .addCol("unpreferredAgencies", unpreferredAgencies)

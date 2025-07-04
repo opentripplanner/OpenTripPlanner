@@ -61,8 +61,7 @@ class ScheduledTransitLegReferenceTest {
       trip,
       TEST_MODEL.stopTimesEvery5Minutes(5, trip, "11:00"),
       new Deduplicator()
-    );
-    tripTimes.setServiceCode(SERVICE_CODE);
+    ).withServiceCode(SERVICE_CODE);
     TripPattern tripPattern = TimetableRepositoryForTest.tripPattern(
       "1",
       TimetableRepositoryForTest.route(id("1")).build()

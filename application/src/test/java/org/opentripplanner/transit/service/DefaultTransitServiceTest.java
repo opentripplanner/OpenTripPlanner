@@ -2,6 +2,7 @@ package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
@@ -32,6 +33,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -46,7 +48,10 @@ class DefaultTransitServiceTest {
     .withParentStation(STATION)
     .build();
   private static final RegularStop STOP_B = TEST_MODEL.stop("B").withParentStation(STATION).build();
-
+  private static final RegularStop STOP_C = TEST_MODEL.stop("C").withVehicleType(BUS).build();
+  private static final RegularStop STOP_ONE = TEST_MODEL.stop("Stop_1")
+    .withVehicleType(TRAM)
+    .build();
   private static final FeedScopedId SERVICE_ID = new FeedScopedId("FEED", "SERVICE");
   private static final int SERVICE_CODE = 0;
   private static final TripPattern FERRY_PATTERN = TEST_MODEL.pattern(FERRY).build();
@@ -81,70 +86,99 @@ class DefaultTransitServiceTest {
     .build();
 
   private static final int DELAY = 120;
-  private static final RealTimeTripTimes REALTIME_TRIP_TIMES =
-    SCHEDULED_TRIP_TIMES.copyScheduledTimes();
-  private static final RealTimeTripTimes ADDED_TRIP_TIMES = RealTimeTripTimes.of(
-    ScheduledTripTimes.of()
-      .withTrip(ADDED_TRIP)
-      .withArrivalTimes(new int[] { 10, 11 })
-      .withDepartureTimes(new int[] { 10, 11 })
-      .withServiceCode(SERVICE_CODE)
-      .build()
-  );
+  private static final RealTimeTripTimes REALTIME_TRIP_TIMES = getRealTimeTripTimes();
+  private static final ScheduledTripTimes ADDED_TRIP_TIMES = ScheduledTripTimes.of()
+    .withTrip(ADDED_TRIP)
+    .withArrivalTimes(new int[] { 10, 11 })
+    .withDepartureTimes(new int[] { 10, 11 })
+    .withServiceCode(SERVICE_CODE)
+    .build();
 
-  static {
-    for (var i = 0; i < REALTIME_TRIP_TIMES.getNumStops(); ++i) {
-      REALTIME_TRIP_TIMES.updateArrivalDelay(i, DefaultTransitServiceTest.DELAY);
-      REALTIME_TRIP_TIMES.updateDepartureDelay(i, DefaultTransitServiceTest.DELAY);
-    }
-  }
+  static FeedScopedId CALENDAR_ID_TWO = TimetableRepositoryForTest.id("CAL_2");
+  static Trip TRIP_TODAY = TimetableRepositoryForTest.trip("12345")
+    .withHeadsign(I18NString.of("Trip Headsign"))
+    .withServiceId(CALENDAR_ID_TWO)
+    .build();
+  private static final ScheduledTripTimes SCHEDULED_TRIP_TIMES_TODAY = ScheduledTripTimes.of()
+    .withTrip(TRIP_TODAY)
+    .withArrivalTimes(new int[] { 0, 1 })
+    .withDepartureTimes(new int[] { 0, 1 })
+    .withServiceCode(SERVICE_CODE)
+    .build();
+  private static final TripPattern BUS_PATTERN_TODAY = TEST_MODEL.pattern(BUS)
+    .withStopPattern(REAL_TIME_STOP_PATTERN)
+    .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(SCHEDULED_TRIP_TIMES_TODAY))
+    .build();
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
   private static final LocalDate NO_SERVICE_DATE = LocalDate.of(2024, 1, 2);
+
+  private static RealTimeTripTimes getRealTimeTripTimes() {
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes();
+    for (var i = 0; i < SCHEDULED_TRIP_TIMES.getNumStops(); ++i) {
+      builder.withArrivalDelay(i, DefaultTransitServiceTest.DELAY);
+      builder.withDepartureDelay(i, DefaultTransitServiceTest.DELAY);
+    }
+    return builder.build();
+  }
 
   @BeforeAll
   static void setup() {
     var siteRepository = TEST_MODEL.siteRepositoryBuilder()
       .withRegularStop(STOP_A)
       .withRegularStop(STOP_B)
+      .withRegularStop(STOP_C)
+      .withRegularStop(STOP_ONE)
       .withStation(STATION)
       .build();
 
     var deduplicator = new Deduplicator();
-    var transitModel = new TimetableRepository(siteRepository, deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     var canceledStopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, TRIP, "11:30");
-    var canceledTripTimes = TripTimesFactory.tripTimes(TRIP, canceledStopTimes, deduplicator);
-    canceledTripTimes.cancelTrip();
-    transitModel.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
+    var canceledTripTimes = TripTimesFactory.tripTimes(TRIP, canceledStopTimes, deduplicator)
+      .createRealTimeFromScheduledTimes()
+      .cancelTrip()
+      .build();
+    timetableRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
 
     // Crate a calendar (needed for testing cancelled trips)
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     var firstDate = LocalDate.of(2024, 8, 8);
     var secondDate = LocalDate.of(2024, 8, 9);
+    var thirdDate = LocalDate.of(2025, 7, 2);
+
     calendarServiceData.putServiceDatesForServiceId(
       CALENDAR_ID,
-      List.of(firstDate, secondDate, SERVICE_DATE)
+      List.of(firstDate, secondDate, thirdDate, SERVICE_DATE)
     );
-    transitModel.getServiceCodes().put(CALENDAR_ID, 0);
-    transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
+    calendarServiceData.putServiceDatesForServiceId(
+      CALENDAR_ID_TWO,
+      List.of(firstDate, secondDate)
+    );
 
-    transitModel.index();
-    var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
-    var calendar = new CalendarServiceData();
-    calendar.putServiceDatesForServiceId(SERVICE_ID, List.of(SERVICE_DATE));
     var serviceCodes = timetableRepository.getServiceCodes();
     serviceCodes.put(SERVICE_ID, SERVICE_CODE);
-    timetableRepository.updateCalendarServiceData(true, calendar, DataImportIssueStore.NOOP);
+    serviceCodes.put(CALENDAR_ID, SERVICE_CODE);
+    serviceCodes.put(CALENDAR_ID_TWO, 1);
+
     timetableRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
+    timetableRepository.addTripPattern(BUS_PATTERN.getId(), BUS_PATTERN);
+    timetableRepository.addTripPattern(BUS_PATTERN_TODAY.getId(), BUS_PATTERN_TODAY);
+
+    timetableRepository.updateCalendarServiceData(
+      true,
+      calendarServiceData,
+      DataImportIssueStore.NOOP
+    );
+
     timetableRepository.index();
 
     TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-    RealTimeTripTimes tripTimes = RealTimeTripTimes.of(
-      ScheduledTripTimes.of()
-        .withTrip(TimetableRepositoryForTest.trip("123").build())
-        .withDepartureTimes(new int[] { 0, 1 })
-        .build()
-    );
+    TripTimes tripTimes = ScheduledTripTimes.of()
+      .withTrip(TimetableRepositoryForTest.trip("123").build())
+      .withDepartureTimes(new int[] { 0, 1 })
+      .withServiceCode(SERVICE_CODE)
+      .build();
     timetableSnapshot.update(new RealTimeTripUpdate(REAL_TIME_PATTERN, tripTimes, firstDate));
     timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, firstDate));
     timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, secondDate));
@@ -272,5 +306,13 @@ class DefaultTransitServiceTest {
   @Test
   void getRealtimeTripTimesForAddedTripOnNoServiceDay() {
     assertEquals(Optional.empty(), service.getTripTimeOnDates(ADDED_TRIP, NO_SERVICE_DATE));
+  }
+
+  @Test
+  void hasTripsForStop() {
+    assertTrue(service.hasScheduledServicesAfter(LocalDate.of(2025, 7, 1), STOP_ONE));
+    assertTrue(service.hasScheduledServicesAfter(LocalDate.of(2025, 7, 2), STOP_ONE));
+    assertFalse(service.hasScheduledServicesAfter(LocalDate.of(2025, 7, 3), STOP_ONE));
+    assertFalse(service.hasScheduledServicesAfter(LocalDate.of(2025, 7, 1), STOP_C));
   }
 }

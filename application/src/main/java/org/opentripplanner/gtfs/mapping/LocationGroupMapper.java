@@ -46,7 +46,7 @@ class LocationGroupMapper {
   }
 
   private GroupStop doMap(LocationGroup element) {
-    var id = idFactory.createId(element.getId());
+    var id = idFactory.createId(element.getId(), "location group");
     // the GTFS spec allows name-less location groups: https://gtfs.org/documentation/schedule/reference/#location_groupstxt
     var name = NonLocalizedString.ofNullableOrElse(element.getName(), FALLBACK_NAME);
     var groupStopBuilder = siteRepositoryBuilder.groupStop(id).withName(name);

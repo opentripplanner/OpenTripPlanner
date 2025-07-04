@@ -4,7 +4,6 @@ import java.io.Serializable;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This filter will exclude everything.
@@ -31,6 +30,6 @@ public final class ExcludeAllTransitFilter implements Serializable, TransitFilte
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(ExcludeAllTransitFilter.class).toString();
+    return ExcludeAllTransitFilter.class.getSimpleName();
   }
 }

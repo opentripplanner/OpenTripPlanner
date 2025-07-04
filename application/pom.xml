@@ -172,7 +172,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.17.0</version>
+            <version>5.18.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -295,7 +295,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>7.0.0</version>
+            <version>7.0.4</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
@@ -365,17 +365,17 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.55.3</version>
+            <version>1.55.4</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.17.11</version>
+            <version>7.17.12</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.16.1</version>
+            <version>1.16.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -444,7 +444,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
                 <executions>
                     <execution>
                         <id>build-helper-generate-sources</id>

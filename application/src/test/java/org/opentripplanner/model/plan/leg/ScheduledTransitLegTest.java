@@ -51,8 +51,14 @@ class ScheduledTransitLegTest {
   private static final int GENERALIZED_COST = 980;
   private static final double DISTANCE = 900.0;
   private static final ZoneId ZONE_ID = ZoneIds.BERLIN;
-  private static final RealTimeTripTimes REAL_TIME_TRIP_TIMES = RealTimeTripTimes.of(TRIP_TIMES);
   private static final Duration DELAY = Duration.ofMinutes(4);
+  private static final RealTimeTripTimes REAL_TIME_TRIP_TIMES =
+    TRIP_TIMES.createRealTimeFromScheduledTimes()
+      .withDepartureTime(
+        BOARD_STOP_INDEX_IN_PATTERN,
+        TRIP_TIMES.getScheduledDepartureTime(BOARD_STOP_INDEX_IN_PATTERN) + (int) DELAY.toSeconds()
+      )
+      .build();
 
   private static final Set<TransitAlert> ALERTS = Set.of(
     TransitAlert.of(id("alert")).withDescriptionText(I18NString.of("alert")).build()
@@ -62,13 +68,6 @@ class ScheduledTransitLegTest {
   private static final List<FareProduct> FARE_PRODUCTS = List.of(
     FareProduct.of(id("fp"), "fare product", Money.euros(10.00f)).build()
   );
-
-  static {
-    REAL_TIME_TRIP_TIMES.updateDepartureTime(
-      BOARD_STOP_INDEX_IN_PATTERN,
-      TRIP_TIMES.getScheduledDepartureTime(BOARD_STOP_INDEX_IN_PATTERN) + (int) DELAY.toSeconds()
-    );
-  }
 
   private final ScheduledTransitLeg subject = new ScheduledTransitLegBuilder()
     .withTripTimes(REAL_TIME_TRIP_TIMES)
@@ -85,13 +84,6 @@ class ScheduledTransitLegTest {
     .withEmissionPerPerson(EMISSION)
     .withFareProducts(FARE_PRODUCTS)
     .build();
-
-  static {
-    REAL_TIME_TRIP_TIMES.updateDepartureTime(
-      BOARD_STOP_INDEX_IN_PATTERN,
-      TRIP_TIMES.getScheduledDepartureTime(BOARD_STOP_INDEX_IN_PATTERN) + (int) DELAY.toSeconds()
-    );
-  }
 
   @Test
   void testMinimalSetOfFieldsSet() {

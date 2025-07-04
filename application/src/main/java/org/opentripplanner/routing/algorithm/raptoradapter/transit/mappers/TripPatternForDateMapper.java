@@ -101,4 +101,21 @@ public class TripPatternForDateMapper {
       serviceDate
     );
   }
+
+  /**
+   * Calls {@link TripPatternForDateMapper#map(Timetable, LocalDate)} and validates that the result
+   * is valid. Since it would cause exceptions with flex trips during start up this method should
+   * be used during real-time updates as flex trip cannot have real-time (as of now).
+   *
+   * @throws IllegalArgumentException
+   */
+  @Nullable
+  public TripPatternForDate mapAndValidate(Timetable timetable, LocalDate serviceDate)
+    throws IllegalArgumentException {
+    var result = map(timetable, serviceDate);
+    if (result != null) {
+      result.assertValidRunningPeriod();
+    }
+    return result;
+  }
 }

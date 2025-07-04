@@ -56,6 +56,7 @@ public class PlaceFinderTraverseVisitorTest {
   static TimetableRepository a = new TimetableRepository();
 
   static {
+    a.addTransitMode(TransitMode.BUS);
     TripPatternBuilder t = tripPattern("trip", r);
     var st1 = new StopTime();
     st1.setStop(STOP1);
