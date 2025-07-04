@@ -3,7 +3,9 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleTypesAvailable;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -14,6 +16,11 @@ import org.slf4j.LoggerFactory;
 public class GbfsStationStatusMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsStationStatusMapper.class);
+  private static final Collector<
+    VehicleTypeCount,
+    ?,
+    Map<RentalVehicleType, Integer>
+  > TYPE_MAP_COLLECTOR = Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count);
 
   private final Map<String, GBFSStation> statusLookup;
   private final Map<String, RentalVehicleType> vehicleTypes;
@@ -51,25 +58,13 @@ public class GbfsStationStatusMapper {
       ? status.getNumDocksAvailable()
       : Integer.MAX_VALUE;
 
-    Map<RentalVehicleType, Integer> vehicleSpacesAvailable = status.getVehicleDocksAvailable() !=
-      null
-      ? status
-        .getVehicleDocksAvailable()
-        .stream()
-        .flatMap(available ->
-          available
-            .getVehicleTypeIds()
-            .stream()
-            .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount()))
-        )
-        .collect(Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count))
-      : Map.of(RentalVehicleType.getDefaultType(station.network()), spacesAvailable);
+    var vehicleSpacesAvailable = vehicleSpaces(station, status, spacesAvailable);
 
     int spacesDisabled = status.getNumDocksDisabled() != null ? status.getNumDocksDisabled() : 0;
 
-    boolean isInstalled = status.getIsInstalled() != null ? status.getIsInstalled() : true;
-    boolean isRenting = status.getIsRenting() != null ? status.getIsRenting() : true;
-    boolean isReturning = status.getIsReturning() != null ? status.getIsReturning() : true;
+    boolean isInstalled = toBoolean(status.getIsInstalled());
+    boolean isRenting = toBoolean(status.getIsRenting());
+    boolean isReturning = toBoolean(status.getIsReturning());
 
     Instant lastReported = status.getLastReported() != null
       ? Instant.ofEpochSecond(status.getLastReported().longValue())
@@ -88,6 +83,43 @@ public class GbfsStationStatusMapper {
       .withIsReturning(isReturning)
       .withLastReported(lastReported)
       .build();
+  }
+
+  /**
+   * Extract the available parking places from a variety of potentially incomplete information.
+   */
+  private Map<RentalVehicleType, Integer> vehicleSpaces(
+    VehicleRentalStation station,
+    GBFSStation status,
+    int spacesAvailable
+  ) {
+    var typesAvailable = status.getVehicleTypesAvailable();
+    var docksAvailable = status.getVehicleDocksAvailable();
+    if (docksAvailable == null && typesAvailable == null) {
+      // no per-type information available at all, assume it's bicycle
+      return Map.of(RentalVehicleType.getDefaultType(station.network()), spacesAvailable);
+    } else if (typesAvailable != null && docksAvailable == null) {
+      // we have available vehicles, but no per-type information on spaces, so
+      // we assume that for each available vehicle there are places to return
+      return typesAvailable
+        .stream()
+        .map(a -> new VehicleTypeCount(vehicleTypes.get(a.getVehicleTypeId()), a.getCount()))
+        .collect(TYPE_MAP_COLLECTOR);
+    } else {
+      return docksAvailable
+        .stream()
+        .flatMap(available ->
+          available
+            .getVehicleTypeIds()
+            .stream()
+            .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount()))
+        )
+        .collect(TYPE_MAP_COLLECTOR);
+    }
+  }
+
+  private static boolean toBoolean(@Nullable Boolean status) {
+    return Boolean.TRUE.equals(status);
   }
 
   private boolean containsVehicleType(
