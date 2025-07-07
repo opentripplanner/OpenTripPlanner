@@ -126,10 +126,6 @@ class TimetableRepositoryIndex {
     return routeForId.get(id);
   }
 
-  void addRoutes(Route route) {
-    routeForId.put(route.getId(), route);
-  }
-
   /** Dynamically generate the set of Routes passing though a Stop on demand. */
   Set<Route> getRoutesForStop(StopLocation stop) {
     Set<Route> routes = new HashSet<>();
