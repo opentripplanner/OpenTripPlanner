@@ -24,7 +24,8 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
 
   private static final Route ROUTE_1 = routeInNetwork("r1");
   private static final Route ROUTE_2 = routeInNetwork("r2");
-  private static final Route ROUTE_3 = TimetableRepositoryForTest.route("r3").build();
+  private static final Route ROUTE_3 = routeInNetwork("r3");
+  private static final Route ROUTE_4 = TimetableRepositoryForTest.route("r4").build();
   private static final FeedScopedId LEG_GROUP = id("leg-group-a");
 
   private static final GtfsFaresV2Service SERVICE = new GtfsFaresV2Service(
@@ -70,12 +71,17 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     );
   }
 
+  /**
+   * Tests that a transfer product is correctly applied to three consecutive legs of the same network:
+   * Transfers are one dollar but unlimited, so you need to either product a or b plus a single
+   * transfer for the last two legs.
+   */
   @Test
   void threeLegs() {
     var i1 = newItinerary(A, 0)
       .bus(ROUTE_1, 1, 0, 20, B)
       .bus(ROUTE_2, 2, 21, 40, C)
-      .bus(ROUTE_2, 3, 41, 45, D)
+      .bus(ROUTE_3, 3, 41, 45, D)
       .build();
 
     var result = SERVICE.calculateFares(i1);
@@ -106,7 +112,7 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     var i1 = newItinerary(A, 0)
       .bus(ROUTE_1, 1, 0, 20, B)
       .bus(ROUTE_2, 2, 21, 40, C)
-      .bus(ROUTE_3, 3, 41, 45, D)
+      .bus(ROUTE_4, 3, 41, 45, D)
       .build();
 
     var result = SERVICE.calculateFares(i1);
