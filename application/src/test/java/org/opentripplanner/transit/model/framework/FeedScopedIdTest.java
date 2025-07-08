@@ -2,7 +2,9 @@ package org.opentripplanner.transit.model.framework;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,5 +43,21 @@ class FeedScopedIdTest {
     Assertions.assertThrows(IllegalArgumentException.class, () -> {
       FeedScopedId.parseList(input);
     });
+  }
+
+  @Test
+  void parseList() {
+    var ids = FeedScopedId.parse(List.of("trimet:123", "trimet:456"));
+    assertEquals(
+      List.of(new FeedScopedId("trimet", "123"), new FeedScopedId("trimet", "456")),
+      ids
+    );
+  }
+
+  @Test
+  void throwWhenParsingNull() {
+    var input = new ArrayList<String>();
+    input.add(null);
+    assertThrows(IllegalArgumentException.class, () -> FeedScopedId.parse(input));
   }
 }

@@ -15,15 +15,12 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateSuccess;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A class which abstracts away locking, updating, committing and purging of the timetable snapshot.
  */
 public final class TimetableSnapshotManager {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotManager.class);
   private final RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater;
 
   /**
@@ -98,10 +95,7 @@ public final class TimetableSnapshotManager {
    */
   void commitTimetableSnapshot(final boolean force) {
     if (force || buffer.isDirty()) {
-      LOG.debug("Committing {}", buffer);
       snapshot.publish(buffer.commit(realtimeRaptorTransitDataUpdater, force));
-    } else {
-      LOG.debug("Buffer was unchanged, keeping old snapshot.");
     }
   }
 
@@ -162,8 +156,6 @@ public final class TimetableSnapshotManager {
     if (lastPurgeDate != null && lastPurgeDate.compareTo(previously) >= 0) {
       return false;
     }
-
-    LOG.debug("Purging expired realtime data");
 
     lastPurgeDate = previously;
 

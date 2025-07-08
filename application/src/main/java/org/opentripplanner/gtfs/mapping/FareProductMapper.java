@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Currency;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.RiderCategory;
@@ -30,7 +31,11 @@ class FareProductMapper {
     if (rhs.getDurationUnit() != NOT_SET) {
       duration = toDuration(rhs.getDurationUnit(), rhs.getDurationAmount());
     }
-    var fp = FareProduct.of(idFactory.createId(rhs.getFareProductId()), rhs.getName(), price)
+    var fp = FareProduct.of(
+      idFactory.createId(rhs.getFareProductId(), "fare product"),
+      rhs.getName(),
+      price
+    )
       .withValidity(duration)
       .withCategory(toInternalModel(rhs.getRiderCategory()))
       .withMedium(toInternalModel(rhs.getFareMedium()))
@@ -45,16 +50,19 @@ class FareProductMapper {
     return allFareProducts.stream().map(this::map).toList();
   }
 
-  public Collection<FareProduct> getByFareProductId(FeedScopedId fareProductId) {
+  public Collection<FareProduct> findFareProducts(FeedScopedId fareProductId) {
     return mappedFareProducts.stream().filter(p -> p.id().equals(fareProductId)).toList();
   }
 
-  private RiderCategory toInternalModel(org.onebusaway.gtfs.model.RiderCategory riderCategory) {
+  @Nullable
+  private RiderCategory toInternalModel(
+    @Nullable org.onebusaway.gtfs.model.RiderCategory riderCategory
+  ) {
     if (riderCategory == null) {
       return null;
     } else {
       return new RiderCategory(
-        idFactory.createId(riderCategory.getId()),
+        idFactory.createId(riderCategory.getId(), "rider category"),
         riderCategory.getName(),
         riderCategory.getEligibilityUrl()
       );
@@ -76,11 +84,12 @@ class FareProductMapper {
     };
   }
 
-  private FareMedium toInternalModel(org.onebusaway.gtfs.model.FareMedium c) {
+  @Nullable
+  private FareMedium toInternalModel(@Nullable org.onebusaway.gtfs.model.FareMedium c) {
     if (c == null) {
       return null;
     } else {
-      return new FareMedium(idFactory.createId(c.getId()), c.getName());
+      return new FareMedium(idFactory.createId(c.getId(), "fare medium"), c.getName());
     }
   }
 }

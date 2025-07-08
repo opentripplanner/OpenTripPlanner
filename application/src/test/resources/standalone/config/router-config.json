@@ -204,6 +204,9 @@
   "transmodelApi": {
     "hideFeedId": true
   },
+  "gtfsApi": {
+    "tracingTags": ["example-header-name", "example-query-parameter-name"]
+  },
   "vectorTiles": {
     "basePath": "/otp_ct/vectorTiles",
     "layers": [

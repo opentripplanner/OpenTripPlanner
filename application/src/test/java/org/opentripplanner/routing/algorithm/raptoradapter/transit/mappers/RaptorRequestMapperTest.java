@@ -20,11 +20,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
@@ -37,13 +39,13 @@ import org.opentripplanner.utils.collection.ListUtils;
 
 class RaptorRequestMapperTest {
 
+  private static final GenericLocation TO = GenericLocation.fromCoordinate(60.0, 10.0);
+  private static final GenericLocation FROM = GenericLocation.fromCoordinate(62.0, 12.0);
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final StopLocation STOP_A = TEST_MODEL.stop("Stop:A").build();
-  public static final PassThroughViaLocation PASS_THROUGH_VIA_LOCATION = new PassThroughViaLocation(
-    "Via A",
-    List.of(STOP_A.getId())
-  );
-  public static final VisitViaLocation VISIT_VIA_LOCATION = new VisitViaLocation(
+  private static final PassThroughViaLocation PASS_THROUGH_VIA_LOCATION =
+    new PassThroughViaLocation("Via A", List.of(STOP_A.getId()));
+  private static final VisitViaLocation VISIT_VIA_LOCATION = new VisitViaLocation(
     "Via A",
     null,
     List.of(STOP_A.getId()),
@@ -54,7 +56,7 @@ class RaptorRequestMapperTest {
   private static final List<RaptorAccessEgress> ACCESS = List.of(TestAccessEgress.walk(12, 45));
   private static final List<RaptorAccessEgress> EGRESS = List.of(TestAccessEgress.walk(144, 54));
   private static final WgsCoordinate VIA_COORDINATE = WgsCoordinate.GREENWICH;
-  public static final ViaCoordinateTransfer VIA_TRANSFER = new ViaCoordinateTransfer(
+  private static final ViaCoordinateTransfer VIA_TRANSFER = new ViaCoordinateTransfer(
     VIA_COORDINATE,
     VIA_FROM_STOP_INDEX,
     VIA_TO_STOP_INDEX,
@@ -72,7 +74,7 @@ class RaptorRequestMapperTest {
   private static final CostLinearFunction RELAX_TRANSIT_GROUP_PRIORITY = CostLinearFunction.of(
     "30m + 1.2t"
   );
-  public static final double RELAX_GENERALIZED_COST_AT_DESTINATION = 2.0;
+  private static final double RELAX_GENERALIZED_COST_AT_DESTINATION = 2.0;
 
   static List<Arguments> testCasesRelaxedCost() {
     return List.of(
@@ -96,14 +98,14 @@ class RaptorRequestMapperTest {
 
   @Test
   void testViaLocation() {
-    var req = new RouteRequest();
+    var req = requestBuilder();
     var minWaitTime = Duration.ofMinutes(13);
 
-    req.setViaLocations(
+    req.withViaLocations(
       List.of(new VisitViaLocation("Via A", minWaitTime, List.of(STOP_A.getId()), List.of()))
     );
 
-    var result = map(req);
+    var result = map(req.buildRequest());
 
     assertTrue(result.searchParams().isVisitViaSearch());
     assertEquals(
@@ -114,11 +116,11 @@ class RaptorRequestMapperTest {
 
   @Test
   void testPassThroughPoints() {
-    var req = new RouteRequest();
+    var req = requestBuilder();
 
-    req.setViaLocations(List.of(new PassThroughViaLocation("Via A", List.of(STOP_A.getId()))));
+    req.withViaLocations(List.of(new PassThroughViaLocation("Via A", List.of(STOP_A.getId()))));
 
-    var result = map(req);
+    var result = map(req.buildRequest());
 
     assertTrue(result.searchParams().isPassThroughSearch());
     assertEquals(
@@ -129,16 +131,16 @@ class RaptorRequestMapperTest {
 
   @Test
   void testViaCoordinate() {
-    var req = new RouteRequest();
+    var req = requestBuilder();
     Duration minimumWaitTime = Duration.ofMinutes(10);
 
-    req.setViaLocations(
+    req.withViaLocations(
       List.of(
         new VisitViaLocation("Via coordinate", minimumWaitTime, List.of(), List.of(VIA_COORDINATE))
       )
     );
 
-    var result = map(req);
+    var result = map(req.buildRequest());
 
     assertFalse(result.searchParams().viaLocations().isEmpty());
     assertEquals(
@@ -149,14 +151,14 @@ class RaptorRequestMapperTest {
 
   @Test
   void testTransitGroupPriority() {
-    var req = new RouteRequest();
+    var req = requestBuilder();
 
     // Set relax transit-group-priority
     req.withPreferences(p ->
       p.withTransit(t -> t.withRelaxTransitGroupPriority(CostLinearFunction.of("30m + 1.2t")))
     );
 
-    var result = map(req);
+    var result = map(req.buildRequest());
 
     assertTrue(result.multiCriteria().transitPriorityCalculator().isPresent());
   }
@@ -239,20 +241,20 @@ class RaptorRequestMapperTest {
     List<RequestFeature> expectedFeatures,
     @Nullable String errorMessage
   ) {
-    var req = new RouteRequest();
+    var builder = requestBuilder();
 
     for (RequestFeature it : requestedFeatures) {
-      req = setFeaturesOnRequest(req, it);
+      builder = setFeaturesOnRequest(builder, it);
     }
 
     if (errorMessage == null) {
-      var result = map(req);
+      var result = map(builder.buildRequest());
 
       for (var feature : RequestFeature.values()) {
         assertFeatureSet(feature, result, expectedFeatures.contains(feature));
       }
     } else {
-      var r = req;
+      var r = builder.buildRequest();
       var ex = Assertions.assertThrows(IllegalArgumentException.class, () -> map(r));
       assertEquals(errorMessage, ex.getMessage());
     }
@@ -312,13 +314,20 @@ class RaptorRequestMapperTest {
     }
   }
 
-  private static RouteRequest setFeaturesOnRequest(RouteRequest req, RequestFeature feature) {
+  private static RouteRequestBuilder requestBuilder() {
+    return RouteRequest.of().withFrom(FROM).withTo(TO);
+  }
+
+  private static RouteRequestBuilder setFeaturesOnRequest(
+    RouteRequestBuilder req,
+    RequestFeature feature
+  ) {
     return switch (feature) {
-      case VIA_VISIT -> req.setViaLocations(
-        ListUtils.combine(req.getViaLocations(), List.of(VISIT_VIA_LOCATION))
+      case VIA_VISIT -> req.withViaLocations(
+        ListUtils.combine(req.buildRequest().getViaLocations(), List.of(VISIT_VIA_LOCATION))
       );
-      case VIA_PASS_THROUGH -> req.setViaLocations(
-        ListUtils.combine(req.getViaLocations(), List.of(PASS_THROUGH_VIA_LOCATION))
+      case VIA_PASS_THROUGH -> req.withViaLocations(
+        ListUtils.combine(req.buildRequest().getViaLocations(), List.of(PASS_THROUGH_VIA_LOCATION))
       );
       case TRANSIT_GROUP_PRIORITY -> req.withPreferences(p ->
         p.withTransit(t -> t.withRelaxTransitGroupPriority(RELAX_TRANSIT_GROUP_PRIORITY))

@@ -342,7 +342,8 @@ public class StyleBuilder {
   }
 
   private void validate() {
-    Stream.of(TYPE).forEach(p -> Objects.requireNonNull(props.get(p), "%s must be set".formatted(p))
+    Stream.of(TYPE).forEach(p ->
+      Objects.requireNonNull(props.get(p), "%s must be set".formatted(p))
     );
   }
 

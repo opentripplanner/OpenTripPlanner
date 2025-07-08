@@ -185,7 +185,7 @@ public class ConstantsForTests {
         timetableRepository,
         DataImportIssueStore.NOOP,
         Duration.ofMinutes(30),
-        List.of(new RouteRequest())
+        List.of(RouteRequest.defaultValue())
       ).buildGraph();
 
       graph.index();

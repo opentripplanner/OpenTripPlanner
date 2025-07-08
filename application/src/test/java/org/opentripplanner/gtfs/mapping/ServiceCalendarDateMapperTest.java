@@ -55,11 +55,12 @@ public class ServiceCalendarDateMapperTest {
   @Test
   public void testMapWithNulls() {
     ServiceCalendarDate input = new ServiceCalendarDate();
+    input.setServiceId(AGENCY_AND_ID);
     org.opentripplanner.model.calendar.ServiceCalendarDate result = subject.map(input);
 
     assertNull(result.getDate());
     assertEquals(0, result.getExceptionType());
-    assertNull(result.getServiceId());
+    assertEquals("A:1", result.getServiceId().toString());
   }
 
   /** Mapping the same object twice, should return the the same instance. */

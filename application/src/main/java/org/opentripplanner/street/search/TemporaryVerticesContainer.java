@@ -133,6 +133,10 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
+    if (!location.isSpecified()) {
+      return null;
+    }
+
     // Differentiate between driving and non-driving, as driving is not available from transit stops
     TraverseMode mode = getTraverseModeForLinker(streetMode, endVertex);
 

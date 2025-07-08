@@ -22,12 +22,22 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
  */
 public interface TripTimes extends Serializable, Comparable<TripTimes> {
   /**
-   * Copy scheduled times, but not the actual times.
+   * Create a RealTimeTripTimesBuilder using the information, but not the times, from this
+   * TripTimes.
    */
-  RealTimeTripTimes copyScheduledTimes();
+  RealTimeTripTimesBuilder createRealTimeWithoutScheduledTimes();
+
+  /**
+   * Create a RealTimeTripTimesBuilder using the information from this TripTimes, with the actual
+   * times pre-filled from scheduled times.
+   */
+  RealTimeTripTimesBuilder createRealTimeFromScheduledTimes();
 
   /** The code for the service on which this trip runs. For departure search optimizations. */
   int getServiceCode();
+
+  /** Make a copy of the TripTimes with the new service code, for use while adding trips to Timetable */
+  TripTimes withServiceCode(int serviceCode);
 
   /**
    * The time in seconds after midnight at which the vehicle should arrive at the given stop
@@ -132,6 +142,7 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   /**
    * @return the whole trip's headsign. Individual stops can have different headsigns.
    */
+  @Nullable
   I18NString getTripHeadsign();
 
   /**

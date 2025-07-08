@@ -180,29 +180,30 @@ public class TriangleInequalityTest {
     assertNotNull(start);
     assertNotNull(end);
 
-    RouteRequest prototypeOptions = new RouteRequest();
-
-    // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
-    prototypeOptions.withPreferences(preferences ->
-      preferences
-        .withWalk(walk -> walk.withStairsReluctance(1.0).withSpeed(1.0).withReluctance(1.0))
-        .withStreet(street -> street.withTurnReluctance(1.0))
-        .withCar(car -> car.withReluctance(1.0))
-        .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
-        .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
-    );
-
-    if (modes != null) {
-      prototypeOptions.journey().setModes(modes);
-    }
-    if (!filters.isEmpty()) {
-      prototypeOptions.journey().transit().setFilters(filters);
-    }
+    var request = RouteRequest.of()
+      // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
+      .withPreferences(preferences ->
+        preferences
+          .withWalk(walk -> walk.withStairsReluctance(1.0).withSpeed(1.0).withReluctance(1.0))
+          .withStreet(street -> street.withTurnReluctance(1.0))
+          .withCar(car -> car.withReluctance(1.0))
+          .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
+          .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
+      )
+      .withJourney(jb -> {
+        if (modes != null) {
+          jb.setModes(modes);
+        }
+        if (!filters.isEmpty()) {
+          jb.withTransit(b -> b.setFilters(filters));
+        }
+      })
+      .buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-      .setRequest(prototypeOptions)
+      .setRequest(request)
       .setFrom(start)
       .setTo(end)
       .setIntersectionTraversalCalculator(calculator)
@@ -224,7 +225,7 @@ public class TriangleInequalityTest {
       }
 
       GraphPath<State, Edge, Vertex> startIntermediatePath = getPath(
-        prototypeOptions,
+        request,
         null,
         start,
         intermediate
@@ -235,7 +236,7 @@ public class TriangleInequalityTest {
 
       Edge back = startIntermediatePath.states.getLast().getBackEdge();
       GraphPath<State, Edge, Vertex> intermediateEndPath = getPath(
-        prototypeOptions,
+        request,
         back,
         intermediate,
         end

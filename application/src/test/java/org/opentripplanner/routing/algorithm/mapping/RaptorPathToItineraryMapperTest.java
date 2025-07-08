@@ -304,7 +304,7 @@ public class RaptorPathToItineraryMapperTest {
       new DefaultTransitService(timetableRepository),
       getRaptorTransitData(),
       dateTime.atZone(ZoneIds.CET),
-      new RouteRequest()
+      RouteRequest.defaultValue()
     );
   }
 

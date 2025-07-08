@@ -31,7 +31,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
-import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
+import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -40,8 +40,14 @@ import org.opentripplanner.transit.service.TimetableRepository;
  */
 public class FlexIntegrationTest {
 
-  public static final GenericLocation OUTSIDE_FLEX_ZONE = new GenericLocation(33.7552, -84.4631);
-  public static final GenericLocation INSIDE_FLEX_ZONE = new GenericLocation(33.8694, -84.6233);
+  public static final GenericLocation OUTSIDE_FLEX_ZONE = GenericLocation.fromCoordinate(
+    33.7552,
+    -84.4631
+  );
+  public static final GenericLocation INSIDE_FLEX_ZONE = GenericLocation.fromCoordinate(
+    33.8694,
+    -84.6233
+  );
   static Instant dateTime = ZonedDateTime.parse(
     "2021-12-02T12:00:00-05:00[America/New_York]"
   ).toInstant();
@@ -111,7 +117,7 @@ public class FlexIntegrationTest {
   @Test
   void shouldReturnARouteWithTwoTransfers() {
     var from = GenericLocation.fromStopId("ALEX DR@ALEX WAY", "MARTA", "97266");
-    var to = new GenericLocation(33.86701256815635, -84.61787939071655);
+    var to = GenericLocation.fromCoordinate(33.86701256815635, -84.61787939071655);
 
     var itin = getItinerary(from, to, 3);
 
@@ -142,9 +148,9 @@ public class FlexIntegrationTest {
   @Test
   void flexDirect() {
     // near flex zone
-    var from = new GenericLocation(33.85281, -84.60271);
+    var from = GenericLocation.fromCoordinate(33.85281, -84.60271);
     // in the middle of flex zone
-    var to = new GenericLocation(33.86701256815635, -84.61787939071655);
+    var to = GenericLocation.fromCoordinate(33.86701256815635, -84.61787939071655);
 
     List<Itinerary> itineraries = getItineraries(from, to, true);
 
@@ -201,7 +207,7 @@ public class FlexIntegrationTest {
     new AreaStopsToVerticesMapper(graph, timetableRepository).buildGraph();
 
     // generate direct transfers
-    var req = new RouteRequest();
+    var req = RouteRequest.defaultValue();
 
     // we don't have a complete coverage of the entire area so use straight lines for transfers
     new DirectTransferGenerator(
@@ -226,33 +232,33 @@ public class FlexIntegrationTest {
     GenericLocation to,
     boolean onlyDirect
   ) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(dateTime);
-    request.setFrom(from);
-    request.setTo(to);
-    request.setNumItineraries(10);
-    request.setSearchWindow(Duration.ofHours(2));
-    request.withPreferences(p ->
-      p.withStreet(s ->
-        s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
+    RouteRequest request = RouteRequest.of()
+      .withDateTime(dateTime)
+      .withFrom(from)
+      .withTo(to)
+      .withNumItineraries(10)
+      .withSearchWindow(Duration.ofHours(2))
+      .withPreferences(p ->
+        p.withStreet(s ->
+          s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
+        )
       )
-    );
+      .withJourney(journeyBuilder -> {
+        var modes = JourneyRequest.DEFAULT.modes().copyOf();
 
-    var modes = request.journey().modes().copyOf();
+        if (onlyDirect) {
+          modes
+            .withDirectMode(FLEXIBLE)
+            .withAccessMode(StreetMode.WALK)
+            .withEgressMode(StreetMode.WALK);
+          journeyBuilder.withTransit(b -> b.disable());
+        } else {
+          modes.withEgressMode(FLEXIBLE);
+        }
 
-    if (onlyDirect) {
-      modes
-        .withDirectMode(FLEXIBLE)
-        .withAccessMode(StreetMode.WALK)
-        .withEgressMode(StreetMode.WALK);
-      request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
-      request.journey().transit().disable();
-    } else {
-      modes.withEgressMode(FLEXIBLE);
-      request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
-    }
-
-    request.journey().setModes(modes.build());
+        journeyBuilder.setModes(modes.build());
+      })
+      .buildRequest();
 
     var result = service.route(request);
     var itineraries = result.getTripPlan().itineraries;

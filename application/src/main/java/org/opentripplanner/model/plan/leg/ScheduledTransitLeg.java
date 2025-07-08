@@ -94,16 +94,9 @@ public class ScheduledTransitLeg implements TransitLeg {
       "alightStopPosInPattern"
     );
 
-    // TODO - Add requireNonNull for start-time. Some tests fails when this is done, these tests
-    //        should be fixed.
-    this.startTime = builder.startTime();
-    // TODO - Add requireNonNull for end-tTime. Some tests fails when this is done, these tests
-    //        should be fixed.
-    this.endTime = builder.endTime();
-
-    // TODO - Add requireNonNull for service-date. Some tests fails when this is done, these tests
-    //        should be fixed.
-    this.serviceDate = builder.serviceDate();
+    this.startTime = Objects.requireNonNull(builder.startTime());
+    this.endTime = Objects.requireNonNull(builder.endTime());
+    this.serviceDate = Objects.requireNonNull(builder.serviceDate());
     this.zoneId = Objects.requireNonNull(builder.zoneId());
 
     this.tripOnServiceDate = builder.tripOnServiceDate();

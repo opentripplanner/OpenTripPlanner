@@ -46,6 +46,7 @@ import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping._support.mapping.ItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
@@ -99,7 +100,7 @@ public abstract class SnapshotTestBase {
     return ConstantsForTests.getInstance().getCachedPortlandGraph();
   }
 
-  protected RouteRequest createTestRequest(
+  protected RouteRequestBuilder createTestRequest(
     int year,
     int month,
     int day,
@@ -109,18 +110,19 @@ public abstract class SnapshotTestBase {
   ) {
     OtpServerRequestContext serverContext = serverContext();
 
-    RouteRequest request = serverContext.defaultRouteRequest();
-    request.setDateTime(
-      LocalDateTime.of(year, month, day, hour, minute, second)
-        .atZone(ZoneId.of(serverContext.transitService().getTimeZone().getId()))
-        .toInstant()
-    );
+    var builder = serverContext
+      .defaultRouteRequest()
+      .copyOf()
+      .withDateTime(
+        LocalDateTime.of(year, month, day, hour, minute, second)
+          .atZone(ZoneId.of(serverContext.transitService().getTimeZone().getId()))
+          .toInstant()
+      )
+      .withPreferences(pref -> pref.withTransfer(tx -> tx.withMaxTransfers(6)))
+      .withNumItineraries(6)
+      .withSearchWindow(Duration.ofHours(5));
 
-    request.withPreferences(pref -> pref.withTransfer(tx -> tx.withMaxTransfers(6)));
-    request.setNumItineraries(6);
-    request.setSearchWindow(Duration.ofHours(5));
-
-    return request;
+    return builder;
   }
 
   protected void printItineraries(
@@ -180,18 +182,19 @@ public abstract class SnapshotTestBase {
   }
 
   protected void expectArriveByToMatchDepartAtAndSnapshot(RouteRequest request) {
-    RouteRequest departAt = request.clone();
-    List<Itinerary> departByItineraries = retrieveItineraries(departAt);
+    List<Itinerary> departByItineraries = retrieveItineraries(request);
 
     logDebugInformationOnFailure(request, () -> assertFalse(departByItineraries.isEmpty()));
 
-    logDebugInformationOnFailure(departAt, () ->
+    logDebugInformationOnFailure(request, () ->
       expectItinerariesToMatchSnapshot(departByItineraries)
     );
 
-    RouteRequest arriveBy = request.clone();
-    arriveBy.setArriveBy(true);
-    arriveBy.setDateTime(departByItineraries.get(0).legs().getLast().endTime().toInstant());
+    RouteRequest arriveBy = request
+      .copyOf()
+      .withArriveBy(true)
+      .withDateTime(departByItineraries.get(0).legs().getLast().endTime().toInstant())
+      .buildRequest();
 
     List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy);
 

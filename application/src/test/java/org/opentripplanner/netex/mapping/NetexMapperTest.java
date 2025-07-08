@@ -20,7 +20,8 @@ class NetexMapperTest {
   private static final String QUAY_ID = "quay-1";
   private static final String SSP_ID = "ssp-1";
   private static final String FEED_ID = "sta";
-  private static final RegularStop STOP = RegularStop.of(new FeedScopedId(FEED_ID, QUAY_ID), () -> 1
+  private static final RegularStop STOP = RegularStop.of(new FeedScopedId(FEED_ID, QUAY_ID), () ->
+    1
   ).build();
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
 

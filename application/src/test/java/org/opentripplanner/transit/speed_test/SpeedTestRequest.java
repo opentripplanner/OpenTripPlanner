@@ -43,53 +43,51 @@ public class SpeedTestRequest {
   }
 
   RouteRequest toRouteRequest() {
-    var request = config.request.clone();
+    var builder = config.request.copyOf();
 
     var input = testCase.definition();
 
     if (input.departureTimeSet()) {
-      request.setDateTime(time(input.departureTime()));
-      request.setArriveBy(false);
+      builder.withDateTime(time(input.departureTime())).withArriveBy(false);
     } else if (input.arrivalTimeSet()) {
-      request.setDateTime(time(input.arrivalTime()));
-      request.setArriveBy(true);
+      builder.withDateTime(time(input.arrivalTime())).withArriveBy(true);
     }
 
     if (input.window() != null) {
-      request.setSearchWindow(input.window());
+      builder.withSearchWindow(input.window());
     }
 
-    request.setFrom(input.fromPlace());
-    request.setTo(input.toPlace());
+    builder.withFrom(input.fromPlace()).withTo(input.toPlace());
 
     // Filter the results inside the SpeedTest, not in the itineraries filter,
     // when ignoring street results. This will use the default which is 50.
     if (!config.ignoreStreetResults) {
-      request.setNumItineraries(opts.numOfItineraries());
+      builder.withNumItineraries(opts.numOfItineraries());
     }
-    request.journey().setModes(input.modes().getRequestModes());
+    builder.withJourney(journeyBuilder -> {
+      journeyBuilder.setModes(input.modes().getRequestModes());
 
-    var tModes = input.modes().getTransitModes().stream().map(MainAndSubMode::new).toList();
-    if (tModes.isEmpty()) {
-      request.journey().transit().disable();
-    } else {
-      var builder = TransitFilterRequest.of()
-        .addSelect(SelectRequest.of().withTransportModes(tModes).build());
-      request.journey().transit().setFilters(List.of(builder.build()));
-    }
+      var tModes = input.modes().getTransitModes().stream().map(MainAndSubMode::new).toList();
+      if (tModes.isEmpty()) {
+        journeyBuilder.withTransit(b -> b.disable());
+      } else {
+        var fb = TransitFilterRequest.of()
+          .addSelect(SelectRequest.of().withTransportModes(tModes).build());
+        journeyBuilder.withTransit(b -> b.setFilters(List.of(fb.build())));
+      }
 
-    if (profile.raptorProfile().is(MIN_TRAVEL_DURATION)) {
-      request.setSearchWindow(Duration.ZERO);
-    }
+      if (profile.raptorProfile().is(MIN_TRAVEL_DURATION)) {
+        builder.withSearchWindow(Duration.ZERO);
+      }
 
-    request
-      .journey()
-      .transit()
-      .raptorDebugging()
-      .withStops(opts.debugStops())
-      .withPath(opts.debugPath());
+      journeyBuilder.withTransit(transitBuilder ->
+        transitBuilder.withRaptorDebugging(d ->
+          d.withStops(opts.debugStops()).withPath(opts.debugPath())
+        )
+      );
+    });
 
-    request.withPreferences(pref -> {
+    builder.withPreferences(pref -> {
       if (input.departureTimeSet() && input.arrivalTimeSet()) {
         pref.withTransit(transit ->
           transit.withRaptor(r -> r.withTimeLimit(time(input.arrivalTime())))
@@ -113,7 +111,7 @@ public class SpeedTestRequest {
       );
     });
 
-    return request;
+    return builder.buildRequest();
   }
 
   private Instant time(int time) {

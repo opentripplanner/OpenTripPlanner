@@ -221,7 +221,7 @@ public class TripQuery {
             "the search, not implemented for the transit yet."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(routing.request.wheelchair())
+          .defaultValue(routing.request.journey().wheelchair())
           .build()
       )
       .argument(

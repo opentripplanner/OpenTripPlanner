@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.AfterAll;
@@ -12,11 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.error.RoutingValidationException;
 
 @ExtendWith(SnapshotExtension.class)
@@ -60,14 +58,14 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL")
   @Test
   public void directBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request.journey().setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
-
-    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
-
-    request.setFrom(p1);
-    request.setTo(p2);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
+      .withJourney(jb -> {
+        jb.setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
+        jb.withTransit(b -> b.disable());
+      })
+      .withFrom(p1)
+      .withTo(p2)
+      .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -84,14 +82,12 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with departAt")
   @Test
   public void directBikeRentalArrivingAtDestinationWithDepartAt() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request.journey().setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
-    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
-
-    allowArrivalWithRentalVehicle(request);
-    request.setFrom(p1);
-    request.setTo(p2);
+    var builder = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
+      jb.setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
+      jb.withTransit(b -> b.disable());
+    });
+    allowArrivalWithRentalVehicle(builder);
+    var request = builder.withFrom(p1).withTo(p2).buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -99,15 +95,12 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with arriveBy")
   @Test
   public void directBikeRentalArrivingAtDestinationWithArriveBy() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request.journey().setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
-    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
-
-    allowArrivalWithRentalVehicle(request);
-    request.setFrom(p1);
-    request.setTo(p2);
-    request.setArriveBy(true);
+    var builder = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
+      jb.setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
+      jb.withTransit(b -> b.disable());
+    });
+    allowArrivalWithRentalVehicle(builder);
+    var request = builder.withFrom(p1).withTo(p2).withArriveBy(true).buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -115,21 +108,20 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Access BIKE_RENTAL")
   @Test
   public void accessBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
-
-    request
-      .journey()
-      .setModes(
-        RequestModes.of()
-          .withAccessMode(StreetMode.BIKE_RENTAL)
-          .withEgressMode(StreetMode.WALK)
-          .withDirectMode(StreetMode.NOT_SET)
-          .withTransferMode(StreetMode.WALK)
-          .build()
-      );
-    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
-    request.setFrom(p1);
-    request.setTo(p3);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0)
+      .withJourney(jb ->
+        jb.setModes(
+          RequestModes.of()
+            .withAccessMode(StreetMode.BIKE_RENTAL)
+            .withEgressMode(StreetMode.WALK)
+            .withDirectMode(StreetMode.NOT_SET)
+            .withTransferMode(StreetMode.WALK)
+            .build()
+        )
+      )
+      .withFrom(p1)
+      .withTo(p3)
+      .buildRequest();
 
     try {
       expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -141,27 +133,26 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Egress BIKE_RENTAL")
   @Test
   public void egressBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request
-      .journey()
-      .setModes(
-        RequestModes.of()
-          .withAccessMode(StreetMode.WALK)
-          .withEgressMode(StreetMode.BIKE_RENTAL)
-          .withTransferMode(StreetMode.WALK)
-          .withDirectMode(StreetMode.NOT_SET)
-          .build()
-      );
-    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
-    request.setFrom(p3);
-    request.setTo(p1);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
+      .withJourney(jb ->
+        jb.setModes(
+          RequestModes.of()
+            .withAccessMode(StreetMode.WALK)
+            .withEgressMode(StreetMode.BIKE_RENTAL)
+            .withTransferMode(StreetMode.WALK)
+            .withDirectMode(StreetMode.NOT_SET)
+            .build()
+        )
+      )
+      .withFrom(p3)
+      .withTo(p1)
+      .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
 
-  private void allowArrivalWithRentalVehicle(RouteRequest request) {
-    request.withPreferences(preferences ->
+  private void allowArrivalWithRentalVehicle(RouteRequestBuilder builder) {
+    builder.withPreferences(preferences ->
       preferences.withBike(bike ->
         bike.withRental(rental -> rental.withAllowArrivingInRentedVehicleAtDestination(true))
       )

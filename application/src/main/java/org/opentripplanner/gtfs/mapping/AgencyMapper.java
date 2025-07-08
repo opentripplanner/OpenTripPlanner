@@ -27,7 +27,7 @@ class AgencyMapper {
   }
 
   private Agency doMap(org.onebusaway.gtfs.model.Agency rhs) {
-    return Agency.of(idFactory.createId(rhs.getId()))
+    return Agency.of(idFactory.createId(rhs.getId(), "agency"))
       .withName(rhs.getName())
       .withTimezone(rhs.getTimezone())
       .withUrl(rhs.getUrl())

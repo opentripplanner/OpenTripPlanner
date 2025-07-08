@@ -310,12 +310,9 @@ public class TurnRestrictionModuleTest {
     var module = new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
     module.buildGraph();
 
-    var request = new RouteRequest();
-    var dateTime = Instant.now();
-    request.setDateTime(dateTime);
-    request.journey().direct().setMode(StreetMode.CAR);
-
     var streetRequest = new StreetRequest(StreetMode.CAR);
+
+    var request = RouteRequest.of().withJourney(j -> j.withDirect(streetRequest)).buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .setRequest(request)

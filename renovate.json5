@@ -29,7 +29,7 @@
       "matchFiles": ["client/package.json"],
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "Debug UI dependencies (non-major)",
-      "schedule": ["after 6pm on the 3rd and 17th day of the month"],
+      "schedule": ["after 6pm on the 17th day of the month"],
       "reviewers": ["testower"]
     },
     {

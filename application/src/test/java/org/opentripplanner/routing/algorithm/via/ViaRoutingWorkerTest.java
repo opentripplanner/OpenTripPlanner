@@ -144,7 +144,7 @@ public class ViaRoutingWorkerTest {
       )
     );
 
-    var viaJourneys = List.of(new JourneyRequest(), new JourneyRequest());
+    var viaJourneys = List.of(JourneyRequest.of().build(), JourneyRequest.of().build());
 
     return RouteViaRequest.of(viaLocations, viaJourneys)
       .withDateTime(dateTime)
@@ -185,6 +185,6 @@ public class ViaRoutingWorkerTest {
   }
 
   private static GenericLocation location(Place p) {
-    return new GenericLocation(p.coordinate.latitude(), p.coordinate.longitude());
+    return GenericLocation.fromCoordinate(p.coordinate.latitude(), p.coordinate.longitude());
   }
 }

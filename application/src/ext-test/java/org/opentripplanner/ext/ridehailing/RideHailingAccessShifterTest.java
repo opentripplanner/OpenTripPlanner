@@ -29,8 +29,8 @@ import org.opentripplanner.street.search.state.TestStateBuilder;
 class RideHailingAccessShifterTest {
 
   private static final Instant TIME = OffsetDateTime.parse("2023-03-23T17:00:00+01:00").toInstant();
-  private static final GenericLocation FROM = new GenericLocation(0d, 0d);
-  private static final GenericLocation TO = new GenericLocation(1d, 1d);
+  private static final GenericLocation FROM = GenericLocation.fromCoordinate(0d, 0d);
+  private static final GenericLocation TO = GenericLocation.fromCoordinate(1d, 1d);
   private static final State DRIVING_STATE = TestStateBuilder.ofDriving()
     .streetEdge()
     .streetEdge()
@@ -59,11 +59,14 @@ class RideHailingAccessShifterTest {
   @ParameterizedTest
   @MethodSource("testCases")
   void testArrivalDelay(Instant searchTime, Duration expectedArrival) {
-    var req = new RouteRequest();
-    req.setTo(FROM);
-    req.setFrom(TO);
-    req.setDateTime(searchTime);
-    req.journey().setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build());
+    var req = RouteRequest.of()
+      .withTo(FROM)
+      .withFrom(TO)
+      .withDateTime(searchTime)
+      .withJourney(jb ->
+        jb.setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
+      )
+      .buildRequest();
 
     var result = arrivalDelay(req, List.of(service), TIME);
 
@@ -126,11 +129,13 @@ class RideHailingAccessShifterTest {
   }
 
   private static RouteRequest routeRequest(Instant time) {
-    var req = new RouteRequest();
-    req.setDateTime(time);
-    req.setFrom(FROM);
-    req.setFrom(TO);
-    req.journey().setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build());
-    return req;
+    return RouteRequest.of()
+      .withDateTime(time)
+      .withFrom(FROM)
+      .withTo(TO)
+      .withJourney(jb ->
+        jb.setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
+      )
+      .buildRequest();
   }
 }

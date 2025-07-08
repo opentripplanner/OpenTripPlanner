@@ -98,10 +98,10 @@ public class RequestModes {
   @Override
   public String toString() {
     return ToStringBuilder.of(RequestModes.class)
-      .addEnum("accessMode", accessMode)
-      .addEnum("egressMode", egressMode)
-      .addEnum("directMode", directMode)
-      .addEnum("transferMode", transferMode)
+      .addEnum("access", accessMode)
+      .addEnum("egress", egressMode)
+      .addEnum("direct", directMode)
+      .addEnum("transfer", transferMode)
       .toString();
   }
 }

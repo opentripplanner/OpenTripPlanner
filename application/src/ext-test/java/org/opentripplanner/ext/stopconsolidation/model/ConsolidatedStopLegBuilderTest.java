@@ -5,6 +5,7 @@ import static org.opentripplanner.ext.fares.impl.FareModelForTest.FARE_PRODUCT_U
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 
 class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
 
+  private static final ZonedDateTime TIME = ZonedDateTime.parse("2025-06-25T08:33:36+02:00");
   private static final Set<TransitAlert> ALERTS = Set.of(
     TransitAlert.of(id("alert")).withDescriptionText(I18NString.of("alert")).build()
   );
@@ -30,11 +32,13 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
   private static final ScheduledTransitLeg SCHEDULED_TRANSIT_LEG =
     new ScheduledTransitLegBuilder<>()
       .withZoneId(ZoneIds.BERLIN)
-      .withServiceDate(LocalDate.of(2025, 1, 15))
       .withTripPattern(PATTERN)
       .withBoardStopIndexInPattern(0)
       .withDistanceMeters(1000)
       .withAlightStopIndexInPattern(1)
+      .withStartTime(TIME)
+      .withEndTime(TIME)
+      .withServiceDate(TIME.toLocalDate())
       .build();
   private static final List<FareProductUse> FARES = List.of(FARE_PRODUCT_USE);
 

@@ -58,10 +58,12 @@ class FlexibleTransitLegTest implements PlanTestConstants {
     var expectedType = RuntimeException.class;
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withStartTime(null).build());
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withEndTime(null).build());
-    assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withFlexTripEdge(null).build()
+    assertThrows(expectedType, () ->
+      new FlexibleTransitLegBuilder().withFlexTripEdge(null).build()
     );
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withAlerts(null).build());
-    assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withFareProducts(null).build()
+    assertThrows(expectedType, () ->
+      new FlexibleTransitLegBuilder().withFareProducts(null).build()
     );
   }
 

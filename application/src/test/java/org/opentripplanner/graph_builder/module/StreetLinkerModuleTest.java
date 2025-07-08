@@ -261,7 +261,7 @@ class StreetLinkerModuleTest {
         })
         .toList();
       StopPattern stopPattern = new StopPattern(stopTimes);
-      RealTimeTripTimes tripTimes = TripTimesFactory.tripTimes(
+      var tripTimes = TripTimesFactory.tripTimes(
         trip,
         stopTimes,
         timetableRepository.getDeduplicator()

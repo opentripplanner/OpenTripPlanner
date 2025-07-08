@@ -39,8 +39,7 @@ public class TripPatternForDateMapperTest {
       trip,
       TEST_MODEL.stopTimesEvery5Minutes(5, trip, "11:00"),
       new Deduplicator()
-    );
-    tripTimes.setServiceCode(SERVICE_CODE);
+    ).withServiceCode(SERVICE_CODE);
     timetable = Timetable.of().withTripPattern(pattern).addTripTimes(tripTimes).build();
   }
 

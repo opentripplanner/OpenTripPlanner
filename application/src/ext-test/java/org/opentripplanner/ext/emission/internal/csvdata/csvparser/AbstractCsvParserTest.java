@@ -231,7 +231,8 @@ class AbstractCsvParserTest {
 
   @Test
   void testToString() {
-    assertThrows(UnsupportedOperationException.class, () -> new TestCsvParser(VALID_DATA).toString()
+    assertThrows(UnsupportedOperationException.class, () ->
+      new TestCsvParser(VALID_DATA).toString()
     );
   }
 

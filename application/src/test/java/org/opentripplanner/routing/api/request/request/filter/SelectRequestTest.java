@@ -27,23 +27,23 @@ class SelectRequestTest {
 
   @Test
   void testModesToString() {
-    assertEquals("SelectRequest{transportModes: []}", modesSelect().toString());
-    assertEquals("SelectRequest{transportModes: [BUS]}", modesSelect(TC_BUS).toString());
+    assertEquals("(transportModes: EMPTY)", modesSelect().toString());
+    assertEquals("(transportModes: [BUS])", modesSelect(TC_BUS).toString());
     assertEquals(
-      "SelectRequest{transportModes: [BUS::LOCAL, FERRY]}",
+      "(transportModes: [BUS::LOCAL, FERRY])",
       modesSelect(TC_FERRY, TC_LOCAL_BUS).toString()
     );
     assertEquals(
-      "SelectRequest{transportModes: ALL-MAIN-MODES}",
+      "(transportModes: ALL)",
       SelectRequest.of().withTransportModes(MainAndSubMode.all()).build().toString()
     );
-    assertEquals("SelectRequest{transportModes: NOT [FERRY]}", notModesSelect(TC_FERRY).toString());
+    assertEquals("(transportModes: NOT [FERRY])", notModesSelect(TC_FERRY).toString());
     assertEquals(
-      "SelectRequest{transportModes: NOT [BUS, FERRY, TRAM]}",
+      "(transportModes: NOT [BUS, FERRY, TRAM])",
       notModesSelect(TC_BUS, TC_TRAM, TC_FERRY).toString()
     );
     assertEquals(
-      "SelectRequest{transportModes: [AIRPLANE, CABLE_CAR, CARPOOL, COACH, FUNICULAR, GONDOLA, MONORAIL, SUBWAY, TAXI, TROLLEYBUS]}",
+      "(transportModes: [AIRPLANE, CABLE_CAR, CARPOOL, COACH, FUNICULAR, GONDOLA, MONORAIL, SUBWAY, TAXI, TROLLEYBUS])",
       notModesSelect(TC_BUS, TC_FERRY, TC_TRAM, TC_RAIL).toString()
     );
     var list = new ArrayList<>(
@@ -51,7 +51,7 @@ class SelectRequestTest {
     );
     list.add(TC_LOCAL_BUS);
     assertEquals(
-      "SelectRequest{transportModes: [AIRPLANE, BUS::LOCAL, CABLE_CAR, CARPOOL, COACH, FERRY, FUNICULAR, GONDOLA, MONORAIL, RAIL, SUBWAY, TAXI, TROLLEYBUS]}",
+      "(transportModes: [AIRPLANE, BUS::LOCAL, CABLE_CAR, CARPOOL, COACH, FERRY, FUNICULAR, GONDOLA, MONORAIL, RAIL, SUBWAY, TAXI, TROLLEYBUS])",
       SelectRequest.of().withTransportModes(list).build().toString()
     );
   }

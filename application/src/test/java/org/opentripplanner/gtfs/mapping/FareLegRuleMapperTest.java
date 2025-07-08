@@ -120,13 +120,4 @@ class FareLegRuleMapperTest {
     assert (otpRule.fareProducts().contains(internalCashProduct));
     assert (otpRule.fareProducts().contains(internalCreditProduct));
   }
-
-  @Test
-  void noProducts() {
-    var productMapper = new FareProductMapper(ID_FACTORY);
-    var ruleMapper = new FareLegRuleMapper(ID_FACTORY, productMapper, DataImportIssueStore.NOOP);
-    var obaRule = new FareLegRule();
-    var mappedRules = List.copyOf(ruleMapper.map(List.of(obaRule)));
-    assertEquals(0, mappedRules.size());
-  }
 }

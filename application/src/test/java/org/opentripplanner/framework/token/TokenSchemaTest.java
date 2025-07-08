@@ -138,7 +138,8 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
 
   @Test
   public void decodeUndefinedToken() {
-    var ex = Assertions.assertThrows(IllegalArgumentException.class, () -> INT_SCHEMA.decode("foo")
+    var ex = Assertions.assertThrows(IllegalArgumentException.class, () ->
+      INT_SCHEMA.decode("foo")
     );
     assertEquals("Token is not valid. Unable to parse token: 'foo'.", ex.getMessage());
   }

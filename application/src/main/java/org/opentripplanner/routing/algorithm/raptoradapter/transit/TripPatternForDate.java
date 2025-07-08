@@ -94,7 +94,6 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
         serviceDate,
         last.getArrivalTime(last.getNumStops() - 1)
       ).toLocalDate();
-      assertValidRunningPeriod(startOfRunningPeriod, endOfRunningPeriod, first, last);
     }
   }
 
@@ -224,23 +223,22 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     return new TripPatternForDate(tripPattern, filteredTripTimes, filteredFrequencies, serviceDate);
   }
 
-  private static void assertValidRunningPeriod(
-    LocalDate startOfRunningPeriod,
-    LocalDate endOfRunningPeriod,
-    TripTimes first,
-    TripTimes last
-  ) {
-    if (first.getTrip().getRoute().getFlexibleLineType() != null) {
-      // do not validate running period for flexible trips
-      return;
-    }
+  /**
+   * Asserts that the running period is valid and throws an {@link IllegalArgumentException} if it
+   * is not.
+   * This validation is only needed for real-time updates and should not be applied to flex trips
+   * where it would fail.
+   */
+  public void assertValidRunningPeriod() throws IllegalArgumentException {
     if (startOfRunningPeriod.isAfter(endOfRunningPeriod)) {
+      var firstTrip = tripTimes[0].getTrip();
+      var lastTrip = tripTimes[tripTimes.length - 1].getTrip();
       LOG.warn(
         "Could not construct as start of the running period {} in trip {} is after the end {} in trip {}",
         startOfRunningPeriod,
-        first.getTrip().getId(),
+        firstTrip.getId(),
         endOfRunningPeriod,
-        last.getTrip().getId()
+        lastTrip.getId()
       );
       throw new IllegalArgumentException(
         "Start of the running period is after end of the running period"
