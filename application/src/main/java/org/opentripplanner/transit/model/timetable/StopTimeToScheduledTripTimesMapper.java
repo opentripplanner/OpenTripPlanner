@@ -27,7 +27,7 @@ class StopTimeToScheduledTripTimesMapper {
    * The non-interpolated stoptimes should already be marked at timepoints by a previous filtering
    * step.
    */
-  public static ScheduledTripTimes map(
+  public static TripTimes map(
     Trip trip,
     Collection<StopTime> stopTimes,
     DeduplicatorService deduplicator
@@ -35,7 +35,7 @@ class StopTimeToScheduledTripTimesMapper {
     return new StopTimeToScheduledTripTimesMapper(trip, deduplicator).doMap(stopTimes);
   }
 
-  private ScheduledTripTimes doMap(Collection<StopTime> stopTimes) {
+  private TripTimes doMap(Collection<StopTime> stopTimes) {
     final int nStops = stopTimes.size();
     final int[] departures = new int[nStops];
     final int[] arrivals = new int[nStops];
@@ -65,7 +65,13 @@ class StopTimeToScheduledTripTimesMapper {
       .withPickupBookingInfos(pickupBookingInfos)
       .withTimepoints(timepoints);
 
-    return builder.build();
+    var isFlex = stopTimes.stream().anyMatch(st -> st.hasFlexStop() || st.hasFlexWindow());
+    if (isFlex) {
+      return builder.buildScheduledDeviated();
+    }
+    {
+      return builder.build();
+    }
   }
 
   /**

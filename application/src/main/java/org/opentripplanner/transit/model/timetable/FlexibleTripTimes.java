@@ -1,15 +1,11 @@
 package org.opentripplanner.transit.model.timetable;
 
-import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
-
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalInt;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.error.OtpError;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -18,17 +14,21 @@ import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
-import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
- * Regular/planed/scheduled read-only version of {@link TripTimes}. The set of static
- * trip-times are build during graph-build and can not be changed using real-time updates.
+ * A version of {@link TripTimes} which contains both regular, fixed calls and flexible ones,
+ * <p>
+ * This means one of more of the following elements are part of the trip:
  *
- * @see RealTimeTripTimes for real-time version
+ * - time windows (rather than a fixed arrival/departure time)
+ * - a zone servicing an area (rather than a fixed stop)
+ * - a group stop servicing collection of stops
+ *
+ * Because of these facts validation is not as strict as for a regular {@link ScheduledTripTimes}.
  */
-public final class ScheduledTripTimes implements TripTimes {
+public final class FlexibleTripTimes implements TripTimes {
 
   /**
    * When time-shifting from one time-zone to another negative times may occur.
@@ -73,7 +73,7 @@ public final class ScheduledTripTimes implements TripTimes {
 
   private final int[] gtfsSequenceOfStopIndex;
 
-  ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
+  FlexibleTripTimes(ScheduledTripTimesBuilder builder) {
     this.timeShift = builder.timeShift();
     this.serviceCode = builder.serviceCode();
     this.arrivalTimes = Objects.requireNonNull(builder.arrivalTimes());
@@ -127,17 +127,19 @@ public final class ScheduledTripTimes implements TripTimes {
 
   @Override
   public RealTimeTripTimesBuilder createRealTimeWithoutScheduledTimes() {
-    return new RealTimeTripTimesBuilder(this);
+    throw uoe();
   }
 
   @Override
   public RealTimeTripTimesBuilder createRealTimeFromScheduledTimes() {
-    return RealTimeTripTimesBuilder.fromScheduledTimes(this);
+    throw uoe();
   }
 
   @Override
-  public ScheduledTripTimes adjustTimesToGraphTimeZone(Duration shiftDelta) {
-    return copyOfNoDuplication().plusTimeShift((int) shiftDelta.toSeconds()).build();
+  public FlexibleTripTimes adjustTimesToGraphTimeZone(Duration shiftDelta) {
+    return copyOfNoDuplication()
+      .plusTimeShift((int) shiftDelta.toSeconds())
+      .buildScheduledDeviated();
   }
 
   @Override
@@ -146,8 +148,8 @@ public final class ScheduledTripTimes implements TripTimes {
   }
 
   @Override
-  public ScheduledTripTimes withServiceCode(int serviceCode) {
-    return this.copyOfNoDuplication().withServiceCode(serviceCode).build();
+  public FlexibleTripTimes withServiceCode(int serviceCode) {
+    return this.copyOfNoDuplication().withServiceCode(serviceCode).buildScheduledDeviated();
   }
 
   @Override
@@ -325,7 +327,7 @@ public final class ScheduledTripTimes implements TripTimes {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    ScheduledTripTimes that = (ScheduledTripTimes) o;
+    FlexibleTripTimes that = (FlexibleTripTimes) o;
     return (
       timeShift == that.timeShift &&
       serviceCode == that.serviceCode &&
@@ -358,63 +360,12 @@ public final class ScheduledTripTimes implements TripTimes {
     );
   }
 
-  /* package local - only visible to timetable classes */
-
-  int[] copyArrivalTimes() {
-    return IntUtils.shiftArray(timeShift, arrivalTimes);
-  }
-
-  int[] copyDepartureTimes() {
-    return IntUtils.shiftArray(timeShift, departureTimes);
-  }
-
-  I18NString[] copyHeadsigns(Supplier<I18NString[]> defaultValue) {
-    return headsigns == null ? defaultValue.get() : Arrays.copyOf(headsigns, headsigns.length);
-  }
-
   /* private methods */
 
   private void validate() {
     // Validate first departure time and last arrival time
     validateTimeInRange("departureTime", departureTimes, 0);
     validateTimeInRange("arrivalTime", arrivalTimes, arrivalTimes.length - 1);
-    validateNonIncreasingTimes();
-  }
-
-  /**
-   * When creating scheduled trip times we could potentially imply negative running or dwell times.
-   * We really don't want those being used in routing. This method checks that all times are
-   * increasing. The first stop arrival time and the last stops departure time is NOT checked -
-   * these should be ignored by raptor.
-   */
-  private void validateNonIncreasingTimes() {
-    final int lastStop = arrivalTimes.length - 1;
-
-    // This check is currently used since Flex trips may have only one stop. This class should
-    // not be used to represent FLEX, so remove this check and create new data classes for FLEX
-    // trips.
-    if (lastStop < 1) {
-      return;
-    }
-    int prevDep = getDepartureTime(0);
-
-    for (int i = 1; true; ++i) {
-      final int arr = getArrivalTime(i);
-      final int dep = getDepartureTime(i);
-
-      if (prevDep > arr) {
-        throw new DataValidationException(new TimetableValidationError(NEGATIVE_HOP_TIME, i, trip));
-      }
-      if (i == lastStop) {
-        return;
-      }
-      if (dep < arr) {
-        throw new DataValidationException(
-          new TimetableValidationError(NEGATIVE_DWELL_TIME, i, trip)
-        );
-      }
-      prevDep = dep;
-    }
   }
 
   private int timeShifted(int time) {
@@ -438,5 +389,11 @@ public final class ScheduledTripTimes implements TripTimes {
         )
       );
     }
+  }
+
+  private static UnsupportedOperationException uoe() {
+    return new UnsupportedOperationException(
+      "Real-time operations are not supported for flex trips."
+    );
   }
 }
