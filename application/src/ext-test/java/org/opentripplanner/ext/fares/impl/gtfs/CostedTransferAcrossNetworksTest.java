@@ -105,25 +105,25 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
 
     var result = service.calculateFares(itin);
 
-    var firstLeg = itin.legs().getFirst();
-    var secondLeg = itin.legs().get(1);
-    var thirdleg = itin.legs().get(2);
-    var lastLeg = itin.legs().getLast();
+    var first = itin.legs().getFirst();
+    var second = itin.legs().get(1);
+    var third = itin.legs().get(2);
+    var last = itin.legs().getLast();
 
-    assertThat(result.offersForLeg(firstLeg)).containsExactly(
-      FareOffer.of(firstLeg.startTime(), FARE_PRODUCT_A)
+    assertThat(result.offersForLeg(first)).containsExactly(
+      FareOffer.of(first.startTime(), FARE_PRODUCT_A)
     );
-    assertThat(result.offersForLeg(secondLeg)).containsExactly(
-      FareOffer.of(firstLeg.startTime(), FARE_PRODUCT_A)
+    assertThat(result.offersForLeg(second)).containsExactly(
+      FareOffer.of(first.startTime(), FARE_PRODUCT_A)
     );
-    assertThat(result.offersForLeg(thirdleg)).containsExactly(
-      FareOffer.of(secondLeg.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
-      FareOffer.of(thirdleg.startTime(), FARE_PRODUCT_B)
+    assertThat(result.offersForLeg(third)).containsExactly(
+      FareOffer.of(second.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(third.startTime(), FARE_PRODUCT_B)
     );
-    assertThat(result.offersForLeg(lastLeg)).containsExactly(
-      FareOffer.of(secondLeg.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
-      FareOffer.of(lastLeg.startTime(), FARE_PRODUCT_A),
-      FareOffer.of(thirdleg.startTime(), FARE_PRODUCT_B)
+    assertThat(result.offersForLeg(last)).containsExactly(
+      FareOffer.of(second.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(last.startTime(), FARE_PRODUCT_A),
+      FareOffer.of(third.startTime(), FARE_PRODUCT_B)
     );
     assertThat(result.itineraryProducts()).isEmpty();
   }
@@ -169,21 +169,21 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
 
     var result = service.calculateFares(itin);
 
-    var firstLeg = itin.legs().getFirst();
-    var secondLeg = itin.legs().get(1);
-    var lastLeg = itin.legs().getLast();
+    var first = itin.legs().getFirst();
+    var second = itin.legs().get(1);
+    var last = itin.legs().getLast();
 
-    assertThat(result.offersForLeg(firstLeg)).containsExactly(
-      FareOffer.of(firstLeg.startTime(), FARE_PRODUCT_A)
+    assertThat(result.offersForLeg(first)).containsExactly(
+      FareOffer.of(first.startTime(), FARE_PRODUCT_A)
     );
-    assertThat(result.offersForLeg(secondLeg)).containsExactly(
-      FareOffer.of(firstLeg.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
-      FareOffer.of(secondLeg.startTime(), FARE_PRODUCT_B)
+    assertThat(result.offersForLeg(second)).containsExactly(
+      FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(second.startTime(), FARE_PRODUCT_B)
     );
-    assertThat(result.offersForLeg(lastLeg)).containsExactly(
-      FareOffer.of(firstLeg.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
-      FareOffer.of(secondLeg.startTime(), FARE_PRODUCT_B),
-      FareOffer.of(lastLeg.startTime(), FARE_PRODUCT_A)
+    assertThat(result.offersForLeg(last)).containsExactly(
+      FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(second.startTime(), FARE_PRODUCT_B),
+      FareOffer.of(last.startTime(), FARE_PRODUCT_A)
     );
     assertThat(result.itineraryProducts()).isEmpty();
   }
