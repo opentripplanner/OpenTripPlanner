@@ -187,6 +187,11 @@ public class ScheduledTripTimesBuilder {
     return new ScheduledTripTimes(this);
   }
 
+  public FlexibleTripTimes buildScheduledDeviated() {
+    normalizeTimes();
+    return new FlexibleTripTimes(this);
+  }
+
   /**
    * Times are always shifted to zero based on the first departure time. This is essential for
    * frequencies and deduplication.

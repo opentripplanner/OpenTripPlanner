@@ -259,6 +259,13 @@ public final class StopTime implements Comparable<StopTime> {
     );
   }
 
+  /**
+   * Does this stop time uses a non-fixed stop?
+   */
+  public boolean hasFlexStop() {
+    return !(stop instanceof RegularStop);
+  }
+
   private static int getAvailableTime(int... times) {
     for (var time : times) {
       if (time != MISSING_VALUE) {

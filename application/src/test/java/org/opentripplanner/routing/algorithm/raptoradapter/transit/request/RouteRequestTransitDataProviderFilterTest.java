@@ -974,7 +974,7 @@ class RouteRequestTransitDataProviderFilterTest {
     );
   }
 
-  private ScheduledTripTimes createTestTripTimes(
+  private TripTimes createTestTripTimes(
     FeedScopedId tripId,
     Route route,
     BikeAccess bikeAccess,

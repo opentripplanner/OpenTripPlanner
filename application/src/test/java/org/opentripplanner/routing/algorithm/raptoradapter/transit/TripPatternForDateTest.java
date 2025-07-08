@@ -27,11 +27,21 @@ class TripPatternForDateTest {
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final RegularStop STOP = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
   private static final Route ROUTE = TimetableRepositoryForTest.route("1").build();
-  private static final ScheduledTripTimes tripTimes = TripTimesFactory.tripTimes(
-    TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build(),
-    List.of(new StopTime()),
-    new Deduplicator()
-  );
+  private static final ScheduledTripTimes tripTimes =
+    (ScheduledTripTimes) TripTimesFactory.tripTimes(
+      TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build(),
+      List.of(stopTime()),
+      new Deduplicator()
+    );
+
+  private static StopTime stopTime() {
+    var stop = TimetableRepositoryForTest.of().stop("a").build();
+    var st = new StopTime();
+    st.setStop(stop);
+    st.setArrivalTime(0);
+    st.setArrivalTime(1);
+    return st;
+  }
 
   static Stream<Arguments> testCases() {
     return Stream.of(

@@ -140,11 +140,6 @@ class ExtraCallTripBuilder {
       aimedStopTimes,
       transitService.getDeduplicator()
     ).withServiceCode(transitService.getServiceCode(trip.getServiceId()));
-    // validate the scheduled trip times
-    // they are in general superseded by real-time trip times
-    // but in case of trip cancellation, OTP will fall back to scheduled trip times
-    // therefore they must be valid
-    tripTimes.validateNonIncreasingTimes();
     TripPattern pattern = TripPattern.of(generateTripPatternId.apply(trip))
       .withRoute(trip.getRoute())
       .withMode(trip.getMode())

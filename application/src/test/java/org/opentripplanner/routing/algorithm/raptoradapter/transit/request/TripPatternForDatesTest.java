@@ -84,9 +84,8 @@ class TripPatternForDatesTest {
       .build()
       .getRoutingTripPattern();
 
-    Trip trip = TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build();
-    final ScheduledTripTimes tripTimes = TripTimesFactory.tripTimes(
-      trip,
+    var tripTimes = (ScheduledTripTimes) TripTimesFactory.tripTimes(
+      TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build(),
       List.of(stopTime1, stopTime2),
       new Deduplicator()
     );

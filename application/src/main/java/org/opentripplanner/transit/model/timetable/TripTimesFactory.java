@@ -18,7 +18,7 @@ public class TripTimesFactory {
    * non-interpolated stoptimes should already be marked at timepoints by a previous filtering
    * step.
    */
-  public static ScheduledTripTimes tripTimes(
+  public static TripTimes tripTimes(
     Trip trip,
     List<StopTime> stopTimes,
     DeduplicatorService deduplicator

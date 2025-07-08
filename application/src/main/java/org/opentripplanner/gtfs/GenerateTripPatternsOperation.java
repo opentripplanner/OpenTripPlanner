@@ -137,7 +137,7 @@ public class GenerateTripPatternsOperation {
     var staticTripWithFewerThan2Stops =
       !FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 2;
     // flex trips are allowed to have a single stop because that can be an area or a group of stops
-    var flexTripWithZeroStops = FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 1;
+    var flexTripWithZeroStops = FlexTrip.containsFlexStops(stopTimes) && stopTimes.isEmpty();
     if (staticTripWithFewerThan2Stops || flexTripWithZeroStops) {
       issueStore.add(new TripDegenerate(trip));
       return;
@@ -149,14 +149,14 @@ public class GenerateTripPatternsOperation {
     TripPatternBuilder tripPatternBuilder = findOrCreateTripPattern(stopPattern, trip);
 
     // Create a TripTimes object for this list of stoptimes, which form one trip.
-    ScheduledTripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
 
     // If this trip is referenced by one or more lines in frequencies.txt, wrap it in a FrequencyEntry.
     List<Frequency> frequencies = frequenciesForTrip.get(trip);
     if (!frequencies.isEmpty()) {
       for (Frequency freq : frequencies) {
         tripPatternBuilder.withScheduledTimeTableBuilder(builder ->
-          builder.addFrequencyEntry(new FrequencyEntry(freq, tripTimes))
+          builder.addFrequencyEntry(new FrequencyEntry(freq, (ScheduledTripTimes) tripTimes))
         );
         freqCount++;
       }
