@@ -1,20 +1,17 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import com.google.common.collect.Multimaps;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.impl._support.FareTestConstants;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareOffer;
-import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
@@ -39,7 +36,13 @@ class FreeTransferAcrossNetworksTest implements PlanTestConstants, FareTestConst
         .withNetworkId(NETWORK_B.getId())
         .build()
     ),
-    List.of(new FareTransferRule(id("transfer"), LEG_GROUP_A, LEG_GROUP_B, -1, null, List.of())),
+    List.of(
+      FareTransferRule.of()
+        .withId(id("transfer"))
+        .withFromLegGroup(LEG_GROUP_A)
+        .withToLegGroup(LEG_GROUP_B)
+        .build()
+    ),
     Multimaps.forMap(Map.of())
   );
 

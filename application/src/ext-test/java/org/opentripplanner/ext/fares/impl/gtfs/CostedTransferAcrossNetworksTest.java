@@ -39,13 +39,30 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
     ),
     List.of(
       // transferring from A to A is free
-      new FareTransferRule(id("t1"), LEG_GROUP_A, LEG_GROUP_A, -1, null, List.of()),
+      FareTransferRule.of()
+        .withId(id("t1"))
+        .withFromLegGroup(LEG_GROUP_A)
+        .withToLegGroup(LEG_GROUP_A)
+        .build(),
       // transferring from B to B is also free
-      new FareTransferRule(id("t2"), LEG_GROUP_B, LEG_GROUP_B, -1, null, List.of()),
+      FareTransferRule.of()
+        .withId(id("t2"))
+        .withFromLegGroup(LEG_GROUP_B)
+        .withToLegGroup(LEG_GROUP_B)
+        .build(),
       // transferring from A to B costs one EUR
-      new FareTransferRule(id("t3"), LEG_GROUP_A, LEG_GROUP_B, -1, null, List.of(TRANSFER_1)),
+      FareTransferRule.of()
+        .withId(id("t3"))
+        .withFromLegGroup(LEG_GROUP_A)
+        .withToLegGroup(LEG_GROUP_B)
+        .withFareProducts(List.of(TRANSFER_1))
+        .build(),
       // transferring from B to A is free
-      new FareTransferRule(id("t4"), LEG_GROUP_B, LEG_GROUP_A, -1, null, List.of())
+      FareTransferRule.of()
+        .withId(id("t4"))
+        .withFromLegGroup(LEG_GROUP_B)
+        .withToLegGroup(LEG_GROUP_A)
+        .build()
     ),
     Multimaps.forMap(Map.of())
   );

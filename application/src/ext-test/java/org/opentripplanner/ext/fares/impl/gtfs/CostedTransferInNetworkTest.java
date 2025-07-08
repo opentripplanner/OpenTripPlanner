@@ -39,14 +39,13 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
         .build()
     ),
     List.of(
-      new FareTransferRule(
-        id("transfer"),
-        LEG_GROUP,
-        LEG_GROUP,
-        UNLIMITED_TRANSFERS,
-        null,
-        List.of(TRANSFER_1)
-      )
+      FareTransferRule.of()
+        .withId(id("transfer"))
+        .withFromLegGroup(LEG_GROUP)
+        .withToLegGroup(LEG_GROUP)
+        .withTransferCount(UNLIMITED_TRANSFERS)
+        .withFareProducts(List.of(TRANSFER_1))
+        .build()
     ),
     Multimaps.forMap(Map.of())
   );

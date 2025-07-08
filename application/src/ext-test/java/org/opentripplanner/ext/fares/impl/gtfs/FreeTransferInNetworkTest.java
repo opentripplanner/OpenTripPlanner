@@ -42,7 +42,13 @@ class FreeTransferInNetworkTest implements PlanTestConstants {
         .withNetworkId(NETWORK.getId())
         .build()
     ),
-    List.of(new FareTransferRule(id("transfer"), LEG_GROUP, LEG_GROUP, -1, null, List.of())),
+    List.of(
+      FareTransferRule.of()
+        .withId(id("transfer"))
+        .withFromLegGroup(LEG_GROUP)
+        .withToLegGroup(LEG_GROUP)
+        .build()
+    ),
     Multimaps.forMap(Map.of())
   );
 
