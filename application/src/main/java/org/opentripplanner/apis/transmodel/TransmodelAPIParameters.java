@@ -1,7 +1,6 @@
 package org.opentripplanner.apis.transmodel;
 
 import java.util.Collection;
-import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 
 /**
  * Transmodel API parameters. These parameters configure the behaviour of some aspects of the
@@ -16,7 +15,7 @@ public interface TransmodelAPIParameters {
   /**
    * Which HTTP headers should be used as tags for performance metering in the Actuator API
    *
-   * @see MicrometerGraphQLInstrumentation
+   * @see org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation
    */
   Collection<String> tracingHeaderTags();
 

@@ -18,8 +18,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -50,11 +50,11 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
 
   private static final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("sid1");
   private static final String START_TIME = "07:30:00";
-  private static final RealTimeTripTimes TRIP_TIMES = TripTimesFactory.tripTimes(
+  private static final TripTimes TRIP_TIMES = TripTimesFactory.tripTimes(
     TRIP,
     TEST_MODEL.stopTimesEvery5Minutes(5, TRIP, START_TIME),
     new Deduplicator()
-  );
+  ).withServiceCode(SERVICE_CODE);
   private static final TripPattern TRIP_PATTERN = TimetableRepositoryForTest.tripPattern(
     "tp1",
     ROUTE
@@ -65,7 +65,6 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
 
   @BeforeAll
   static void setup() {
-    TRIP_TIMES.setServiceCode(SERVICE_CODE);
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     calendarServiceData.putServiceDatesForServiceId(SERVICE_ID, List.of(SERVICE_DATE));
     TIMETABLE_REPOSITORY.addTripPattern(TRIP_PATTERN.getId(), TRIP_PATTERN);

@@ -250,11 +250,13 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   @Override
+  @Deprecated
   public DataFetcher<Object> cluster() {
     return environment -> null;
   }
 
   @Override
+  @Deprecated
   public DataFetcher<Iterable<Object>> clusters() {
     return environment -> Collections.EMPTY_LIST;
   }

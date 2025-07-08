@@ -17,6 +17,7 @@ import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
@@ -83,7 +84,7 @@ class TripPatternForDatesTest {
       .build()
       .getRoutingTripPattern();
 
-    final TripTimes tripTimes = TripTimesFactory.tripTimes(
+    final ScheduledTripTimes tripTimes = TripTimesFactory.tripTimes(
       TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build(),
       List.of(stopTime1, stopTime2),
       new Deduplicator()

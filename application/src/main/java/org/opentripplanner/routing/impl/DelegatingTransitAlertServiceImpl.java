@@ -157,7 +157,8 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   public Collection<TransitAlert> getRouteTypeAndAgencyAlerts(int routeType, FeedScopedId agency) {
     return transitAlertServices
       .stream()
-      .map(transitAlertService -> transitAlertService.getRouteTypeAndAgencyAlerts(routeType, agency)
+      .map(transitAlertService ->
+        transitAlertService.getRouteTypeAndAgencyAlerts(routeType, agency)
       )
       .flatMap(Collection::stream)
       .collect(Collectors.toList());

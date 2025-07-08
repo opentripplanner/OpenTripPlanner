@@ -624,7 +624,8 @@ public class VertexLinker {
       if (appliedCount < totalCount) {
         visibilityVertices = visibilityVertices
           .stream()
-          .sorted((v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
+          .sorted((v1, v2) ->
+            Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
           )
           .limit(appliedCount)
           .collect(Collectors.toSet());
@@ -644,7 +645,8 @@ public class VertexLinker {
           .visibilityVertices()
           .stream()
           .filter(v -> distSquared(v, newVertex) >= DUPLICATE_NODE_EPSILON_DEGREES_SQUARED)
-          .sorted((v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
+          .sorted((v1, v2) ->
+            Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
           )
           .findFirst();
         if (!nearest.isPresent()) {

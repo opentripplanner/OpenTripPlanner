@@ -30,6 +30,8 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -70,7 +72,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -105,8 +106,8 @@ import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -254,8 +255,13 @@ class GraphQLIntegrationTest {
     timetableRepository.index();
 
     TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-    tripTimes2.cancelTrip();
-    timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
+    timetableSnapshot.update(
+      new RealTimeTripUpdate(
+        pattern,
+        tripTimes2.createRealTimeFromScheduledTimes().cancelTrip().build(),
+        secondDate
+      )
+    );
 
     var routes = Arrays.stream(TransitMode.values())
       .sorted(Comparator.comparing(Enum::name))
@@ -280,8 +286,7 @@ class GraphQLIntegrationTest {
         t,
         TEST_MODEL.stopTimesEvery5Minutes(4, t, "00:00"),
         new Deduplicator()
-      );
-      realTimeTripTimes.setServiceCode(SERVICE_CODE);
+      ).withServiceCode(SERVICE_CODE);
       timetableSnapshot.update(
         new RealTimeTripUpdate(
           TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
@@ -326,9 +331,12 @@ class GraphQLIntegrationTest {
       public Set<Route> findRoutes(StopLocation stop) {
         return Set.of(ROUTE);
       }
-    };
 
-    routes.forEach(transitService::addRoutes);
+      @Override
+      public Collection<Route> listRoutes() {
+        return routes;
+      }
+    };
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)
@@ -466,12 +474,15 @@ class GraphQLIntegrationTest {
       .copyOf()
       .transformTransitLegs(tl -> {
         if (tl instanceof ScheduledTransitLeg stl) {
-          var rtt = (RealTimeTripTimes) stl.tripTimes();
+          TripTimes scheduledTimes = stl.tripTimes();
+          var builder = scheduledTimes.createRealTimeFromScheduledTimes();
 
-          for (var i = 0; i < rtt.getNumStops(); i++) {
-            rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);
-            rtt.updateDepartureTime(i, rtt.getDepartureTime(i) + TEN_MINUTES);
+          for (var i = 0; i < scheduledTimes.getNumStops(); i++) {
+            builder.withArrivalTime(i, scheduledTimes.getArrivalTime(i) + TEN_MINUTES);
+            builder.withDepartureTime(i, scheduledTimes.getDepartureTime(i) + TEN_MINUTES);
           }
+
+          return stl.copyOf().withTripTimes(builder.build()).build();
         }
         return tl;
       })
@@ -491,7 +502,8 @@ class GraphQLIntegrationTest {
       2000,
       2000,
       Locale.ENGLISH,
-      context
+      context,
+      Collections.emptyList()
     );
     var actualJson = responseBody(response);
     assertEquals(200, response.getStatus());

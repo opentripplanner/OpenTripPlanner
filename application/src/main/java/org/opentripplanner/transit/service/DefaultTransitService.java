@@ -76,11 +76,6 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  * A new instance of this class should be created for each request.
  * This ensures that the same TimetableSnapshot is used for the
  * duration of the request (which may involve several method calls).
- * <p>
- * There is an important exception: real-time updaters may want to query the state of unpublished
- * timetable data from a previous real-time update. In such a case the unpublished
- * TimetableSnapshot buffer is injected into the constructor, and the service is long-lived rather
- * than request scoped.
  */
 public class DefaultTransitService implements TransitEditorService {
 
@@ -243,15 +238,6 @@ public class DefaultTransitService implements TransitEditorService {
   public Collection<Route> findRoutes(FindRoutesRequest request) {
     Matcher<Route> matcher = RouteMatcherFactory.of(request, this.getFlexIndex()::contains);
     return listRoutes().stream().filter(matcher::match).toList();
-  }
-
-  /**
-   * Add a route to the transit model.
-   * Used only in unit tests.
-   */
-  @Override
-  public void addRoutes(Route route) {
-    this.timetableRepositoryIndex.addRoutes(route);
   }
 
   @Override
@@ -797,5 +783,10 @@ public class DefaultTransitService implements TransitEditorService {
         return t1.getTrip().getId().compareTo(t2.getTrip().getId());
       }
     }
+  }
+
+  @Override
+  public boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop) {
+    return timetableRepositoryIndex.hasScheduledServicesAfter(date, stop);
   }
 }
