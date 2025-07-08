@@ -15,7 +15,6 @@ import org.opentripplanner.ext.fares.impl._support.FareTestConstants;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareOffer;
-import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -23,8 +22,8 @@ import org.opentripplanner.transit.model.network.Route;
 
 class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstants {
 
-  private static final Route ROUTE_1 = route("r1");
-  private static final Route ROUTE_2 = route("r2");
+  private static final Route ROUTE_1 = routeInNetwork("r1");
+  private static final Route ROUTE_2 = routeInNetwork("r2");
   private static final Route ROUTE_3 = TimetableRepositoryForTest.route("r3").build();
   private static final FeedScopedId LEG_GROUP = id("leg-group-a");
 
@@ -128,7 +127,7 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     assertEquals(Set.of(), result.offersForLeg(i1.legs().getLast()));
   }
 
-  private static Route route(String id) {
+  private static Route routeInNetwork(String id) {
     return TimetableRepositoryForTest.route(id).withGroupOfRoutes(List.of(NETWORK_A)).build();
   }
 }

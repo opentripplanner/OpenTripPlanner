@@ -43,10 +43,10 @@ class AreasTest implements PlanTestConstants {
     Money.euros(5)
   ).build();
 
-  private static final Place INNER_ZONE_STOP = Place.forStop(
+  private static final Place INNER_ZONE_PLACE = Place.forStop(
     MODEL.stop("inner city stop").withCoordinate(1, 1).build()
   );
-  private static final Place OUTER_ZONE_STOP = Place.forStop(
+  private static final Place OUTER_ZONE_PLACE = Place.forStop(
     MODEL.stop("outer city stop").withCoordinate(2, 2).build()
   );
   private static final FeedScopedId INNER_ZONE = id("inner-zone");
@@ -70,15 +70,15 @@ class AreasTest implements PlanTestConstants {
     ),
     List.of(),
     Multimaps.forMap(
-      Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
+      Map.of(INNER_ZONE_PLACE.stop.getId(), INNER_ZONE, OUTER_ZONE_PLACE.stop.getId(), OUTER_ZONE)
     )
   );
 
   @Test
   void twoAreaIds() {
     Itinerary i1 = newItinerary(A, 0)
-      .walk(20, INNER_ZONE_STOP)
-      .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
+      .walk(20, INNER_ZONE_PLACE)
+      .faresV2Rail(ID, 0, 50, OUTER_ZONE_PLACE, null)
       .build();
 
     var result = SERVICE.calculateFares(i1);
@@ -97,7 +97,7 @@ class AreasTest implements PlanTestConstants {
   void onlyToAreaId() {
     Itinerary i1 = newItinerary(A, 0)
       .walk(20, B)
-      .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
+      .faresV2Rail(ID, 0, 50, OUTER_ZONE_PLACE, null)
       .build();
 
     var result = SERVICE.calculateFares(i1);
@@ -110,7 +110,7 @@ class AreasTest implements PlanTestConstants {
   @Test
   void onlyFromAreaId() {
     Itinerary i1 = newItinerary(A, 0)
-      .walk(20, OUTER_ZONE_STOP)
+      .walk(20, OUTER_ZONE_PLACE)
       .faresV2Rail(ID, 0, 50, B, null)
       .build();
 

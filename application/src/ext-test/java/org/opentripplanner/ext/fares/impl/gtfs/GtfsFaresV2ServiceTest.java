@@ -25,12 +25,12 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   private static final FeedScopedId expressNetwork = id("express");
   private static final FeedScopedId localNetwork = id("local");
 
-  private static final FareProduct SINGLE = FareProduct.of(
+  private static final FareProduct ALL_NETWORKS_SINGLE = FareProduct.of(
     new FeedScopedId(FEED_ID, "single"),
     "Single one-way ticket",
     Money.euros(1)
   ).build();
-  private static final FareProduct DAY_PASS = FareProduct.of(
+  private static final FareProduct ALL_NETWORKS_DAY_PASS = FareProduct.of(
     new FeedScopedId(FEED_ID, "day_pass"),
     "Day Pass",
     Money.euros(5)
@@ -44,14 +44,14 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   )
     .withValidity(Duration.ofDays(30))
     .build();
-  private static final FareProduct EXPRESS_PASS = FareProduct.of(
+  private static final FareProduct EXPRESS_DAY_PASS = FareProduct.of(
     new FeedScopedId(FEED_ID, "express_pass"),
     "Express Pass",
     Money.euros(50)
   )
     .withValidity(Duration.ofDays(1))
     .build();
-  private static final FareProduct LOCAL_PASS = FareProduct.of(
+  private static final FareProduct LOCAL_DAY_PASS = FareProduct.of(
     new FeedScopedId(FEED_ID, "local_pass"),
     "Local Pass",
     Money.euros(20)
@@ -61,13 +61,13 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   private static final GtfsFaresV2Service SERVICE = new GtfsFaresV2Service(
     List.of(
-      FareLegRule.of(id("1"), SINGLE).withLegGroupId(LEG_GROUP1).build(),
-      FareLegRule.of(id("4"), DAY_PASS).withLegGroupId(LEG_GROUP1).build(),
-      FareLegRule.of(id("5"), EXPRESS_PASS)
+      FareLegRule.of(id("1"), ALL_NETWORKS_SINGLE).withLegGroupId(LEG_GROUP1).build(),
+      FareLegRule.of(id("4"), ALL_NETWORKS_DAY_PASS).withLegGroupId(LEG_GROUP1).build(),
+      FareLegRule.of(id("5"), EXPRESS_DAY_PASS)
         .withLegGroupId(LEG_GROUP1)
         .withNetworkId(expressNetwork)
         .build(),
-      FareLegRule.of(id("5"), LOCAL_PASS)
+      FareLegRule.of(id("5"), LOCAL_DAY_PASS)
         .withLegGroupId(LEG_GROUP1)
         .withNetworkId(localNetwork)
         .build(),
@@ -86,7 +86,10 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     var result = SERVICE.calculateFares(i1);
     var startTime = i1.listScheduledTransitLegs().getFirst().startTime();
     assertEquals(
-      Set.of(FareOffer.of(startTime, DAY_PASS), FareOffer.of(startTime, SINGLE)),
+      Set.of(
+        FareOffer.of(startTime, ALL_NETWORKS_DAY_PASS),
+        FareOffer.of(startTime, ALL_NETWORKS_SINGLE)
+      ),
       result.offersForLeg(i1.legs().get(1))
     );
   }
@@ -98,7 +101,10 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     var result = SERVICE.calculateFares(i1);
     var startTime = i1.listScheduledTransitLegs().getFirst().startTime();
     assertEquals(
-      Set.of(FareOffer.of(startTime, DAY_PASS), FareOffer.of(startTime, SINGLE)),
+      Set.of(
+        FareOffer.of(startTime, ALL_NETWORKS_DAY_PASS),
+        FareOffer.of(startTime, ALL_NETWORKS_SINGLE)
+      ),
       result.offersForLeg(i1.legs().get(1))
     );
   }
@@ -110,7 +116,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     var result = SERVICE.calculateFares(i1);
     var startTime = i1.listScheduledTransitLegs().getFirst().startTime();
     assertEquals(
-      Set.of(FareOffer.of(startTime, EXPRESS_PASS)),
+      Set.of(FareOffer.of(startTime, EXPRESS_DAY_PASS)),
       result.offersForLeg(i1.legs().get(1))
     );
   }
@@ -131,10 +137,10 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
     var localLeg = i1.legs().get(1);
     var localLegProducts = result.offersForLeg(localLeg);
-    assertEquals(Set.of(FareOffer.of(localLeg.startTime(), LOCAL_PASS)), localLegProducts);
+    assertEquals(Set.of(FareOffer.of(localLeg.startTime(), LOCAL_DAY_PASS)), localLegProducts);
 
     var expressLeg = i1.legs().get(2);
     var expressProducts = result.offersForLeg(expressLeg);
-    assertEquals(Set.of(FareOffer.of(expressLeg.startTime(), EXPRESS_PASS)), expressProducts);
+    assertEquals(Set.of(FareOffer.of(expressLeg.startTime(), EXPRESS_DAY_PASS)), expressProducts);
   }
 }
