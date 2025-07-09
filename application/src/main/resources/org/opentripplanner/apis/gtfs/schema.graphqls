@@ -4054,8 +4054,6 @@ input BicycleRentalPreferencesInput {
   come with an extra cost.
   """
   destinationBicyclePolicy: DestinationBicyclePolicyInput
-  "An assumed duration of the rental trip, to make sure the vehicle is available during this time."
-  rentalDuration: Duration
 }
 
 "Costs related to walking a bicycle."
@@ -4654,8 +4652,6 @@ input ScooterRentalPreferencesInput {
   come with an extra cost.
   """
   destinationScooterPolicy: DestinationScooterPolicyInput
-  "An assumed duration of the rental trip, to make sure the vehicle is available during this time."
-  rentalDuration: Duration
 }
 
 input TimetablePreferencesInput {
