@@ -4,6 +4,7 @@ package org.opentripplanner.model;
 import static org.opentripplanner.model.PickDrop.NONE;
 
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -283,6 +284,7 @@ public final class StopTime implements Comparable<StopTime> {
    * Does this stop time uses a non-fixed stop?
    */
   public boolean hasFlexStop() {
+    Objects.requireNonNull(stop);
     return !(stop instanceof RegularStop);
   }
 
