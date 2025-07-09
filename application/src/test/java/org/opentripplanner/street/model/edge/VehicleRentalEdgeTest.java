@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
+import static org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType.ELECTRIC;
+import static org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType.HUMAN;
 import static org.opentripplanner.street.model.RentalFormFactor.BICYCLE;
 import static org.opentripplanner.street.model.RentalFormFactor.CAR;
 import static org.opentripplanner.street.model.RentalFormFactor.MOPED;
@@ -38,7 +40,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testBicycleMopedRental() {
-    initEdgeAndRequest(BIKE_RENTAL, MOPED, 3, 3);
+    initEdgeAndRequest(BIKE_RENTAL, MOPED, ELECTRIC, 3, 3, false, true, true, false);
 
     var s1 = rent();
 
@@ -47,7 +49,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testScooterBicycleRental() {
-    initEdgeAndRequest(SCOOTER_RENTAL, BICYCLE, 3, 3);
+    initEdgeAndRequest(SCOOTER_RENTAL, BICYCLE, HUMAN, 3, 3, false, true, true, false);
 
     var s1 = rent();
 
@@ -56,7 +58,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testRentingWithAvailableBikes() {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 3, 3);
+    initBicycleEdgeAndRequest(3, 3);
 
     var s1 = rent();
 
@@ -65,7 +67,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testRentingWithNoAvailableVehicles() {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 0, 3);
+    initBicycleEdgeAndRequest(0, 3);
 
     var s1 = rent();
 
@@ -74,7 +76,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testRentingWithNoAvailableVehiclesAndNoRealtimeUsage() {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 0, 3, false, true, false, false);
+    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, HUMAN, 0, 3, false, true, false, false);
 
     var s1 = rent();
 
@@ -83,7 +85,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testReturningWithAvailableSpaces() {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 3, 3);
+    initBicycleEdgeAndRequest(3, 3);
 
     var s1 = rentAndDropOff();
 
@@ -92,7 +94,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testReturningWithNoAvailableSpaces() {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 3, 0);
+    initBicycleEdgeAndRequest(3, 0);
 
     var s1 = rentAndDropOff();
 
@@ -101,7 +103,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testReturningWithNoAvailableSpacesAndOverloading() {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 3, 0, true, true, true, false);
+    initBicycleEdgeAndRequest(3, 0, true, true, true, false);
 
     var s1 = rentAndDropOff();
 
@@ -110,7 +112,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testReturningWithNoAvailableSpacesAndNoRealtimeUsage() {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 3, 0, false, true, false, false);
+    initBicycleEdgeAndRequest(3, 0, false, true, false, false);
 
     var s1 = rentAndDropOff();
 
@@ -119,7 +121,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testRentingFromClosedStation() {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 3, 0, true, false, true, false);
+    initBicycleEdgeAndRequest(3, 0, true, false, true, false);
 
     var s1 = rent();
 
@@ -128,13 +130,13 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testReturningToClosedStation() {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 3, 3, true, true, true, false);
+    initBicycleEdgeAndRequest(3, 3, true, true, true, false);
 
     var s1 = rent();
 
     assertFalse(State.isEmpty(s1));
 
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 3, 3, true, false, true, false);
+    initBicycleEdgeAndRequest(3, 3, true, false, true, false);
 
     var s2 = dropOff(s1[0]);
 
@@ -143,7 +145,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testReturningAndReturningToClosedStationWithNoRealtimeUsage() {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 3, 3, false, true, false, false);
+    initBicycleEdgeAndRequest(3, 3, false, true, false, false);
 
     var s1 = rentAndDropOff();
 
@@ -179,7 +181,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testBannedBicycleNetworkStation() {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, 3, 3, false, true, true, true);
+    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, HUMAN, 3, 3, false, true, true, true);
 
     var s1 = rent();
 
@@ -213,13 +215,8 @@ class VehicleRentalEdgeTest {
     assertTrue(State.isEmpty(s1));
   }
 
-  private void initEdgeAndRequest(
-    StreetMode mode,
-    RentalFormFactor formFactor,
-    int vehicles,
-    int spaces
-  ) {
-    initEdgeAndRequest(mode, formFactor, vehicles, spaces, false, true, true, false);
+  private void initBicycleEdgeAndRequest(int vehicles, int spaces) {
+    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, HUMAN, vehicles, spaces, false, true, true, false);
   }
 
   @Nested
@@ -240,8 +237,8 @@ class VehicleRentalEdgeTest {
       RENTAL_PLACE.vehicleType = new RentalVehicleType(
         new FeedScopedId(NETWORK, "scooter"),
         "scooter",
-        RentalFormFactor.SCOOTER,
-        RentalVehicleType.PropulsionType.ELECTRIC,
+        SCOOTER,
+        ELECTRIC,
         100000d
       );
     }
@@ -282,9 +279,31 @@ class VehicleRentalEdgeTest {
     }
   }
 
+  private void initBicycleEdgeAndRequest(
+    int vehicles,
+    int spaces,
+    boolean overloadingAllowed,
+    boolean stationOn,
+    boolean useRealtime,
+    boolean banNetwork
+  ) {
+    initEdgeAndRequest(
+      BIKE_RENTAL,
+      BICYCLE,
+      HUMAN,
+      vehicles,
+      spaces,
+      overloadingAllowed,
+      stationOn,
+      useRealtime,
+      banNetwork
+    );
+  }
+
   private void initEdgeAndRequest(
     StreetMode mode,
     RentalFormFactor formFactor,
+    RentalVehicleType.PropulsionType propulsionType,
     int vehicles,
     int spaces,
     boolean overloadingAllowed,
@@ -293,7 +312,7 @@ class VehicleRentalEdgeTest {
     boolean banNetwork
   ) {
     var station = TestVehicleRentalStationBuilder.of()
-      .withVehicleType(formFactor, RentalVehicleType.PropulsionType.HUMAN, vehicles, spaces)
+      .withVehicleType(formFactor, propulsionType, vehicles, spaces)
       .withOverloadingAllowed(overloadingAllowed)
       .withStationOn(stationOn)
       .build();
