@@ -107,7 +107,7 @@ class FareLookupService implements Serializable {
             return Stream.of();
           } else {
             var possibleTransfers = findPossibleTransfers(head, tail, r, fromRules, toRules);
-            return SetUtils.union(possibleTransfers).stream();
+            return SetUtils.intersection(possibleTransfers).stream();
           }
         })
         .collect(Collectors.toSet());

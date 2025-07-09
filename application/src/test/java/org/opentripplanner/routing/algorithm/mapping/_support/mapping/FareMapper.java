@@ -68,7 +68,7 @@ class FareMapper {
   }
 
   private List<ApiFareProduct> instancesToApiFareProducts(Collection<FareOffer> product) {
-    return toApiFareProducts(product.stream().map(u -> u.fareProduct()).toList());
+    return toApiFareProducts(product.stream().map(FareOffer::fareProduct).toList());
   }
 
   private List<ApiFareProduct> toApiFareProducts(Collection<FareProduct> product) {

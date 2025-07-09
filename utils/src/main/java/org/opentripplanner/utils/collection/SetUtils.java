@@ -20,7 +20,7 @@ public class SetUtils {
   /**
    * Return the set of values that are present in _all_ input sets.
    */
-  public static <T> Set<T> union(Collection<Set<T>> colls) {
+  public static <T> Set<T> intersection(Collection<Set<T>> colls) {
     var list = List.copyOf(colls);
     if (list.isEmpty()) {
       return Set.of();

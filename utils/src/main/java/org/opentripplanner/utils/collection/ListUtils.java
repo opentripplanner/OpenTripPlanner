@@ -97,7 +97,13 @@ public class ListUtils {
    * [A,B,C,D] becomes [[A,B],[B,C],[C,D]].
    */
   public static <T> List<Pair<T>> partitionIntoOverlappingPairs(List<T> input) {
-    var output = new ArrayList<Pair<T>>(input.size());
+    if (input.size() < 2) {
+      return List.of();
+    }
+    if (input.size() == 2) {
+      return List.of(new Pair<>(input.getFirst(), input.getLast()));
+    }
+    var output = new ArrayList<Pair<T>>(input.size() - 1);
     for (int i = 0; i < input.size() - 1; i++) {
       T first = input.get(i);
       T second = input.get(i + 1);

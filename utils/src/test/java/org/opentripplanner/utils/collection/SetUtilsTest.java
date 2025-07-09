@@ -16,14 +16,14 @@ class SetUtilsTest {
   }
 
   @Test
-  void union() {
+  void intersection() {
     var input = new ArrayList<Set<Integer>>();
     input.add(Set.of(1, 2, 3));
     input.add(Set.of(2, 3));
     input.add(Set.of(2, 3));
     input.add(Set.of(4, 3, 2));
 
-    var union = SetUtils.union(input);
-    assertEquals(Set.of(2, 3), union);
+    var res = SetUtils.intersection(input);
+    assertEquals(Set.of(2, 3), res);
   }
 }
