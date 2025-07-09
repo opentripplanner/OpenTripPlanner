@@ -72,7 +72,7 @@ public class TimetableSnapshotTest {
 
     TripTimes updatedTriptimes = TripTimesFactory.tripTimes(
       trip,
-      List.of(STOP_TIME),
+      List.of(STOP_TIME, STOP_TIME),
       new Deduplicator()
     );
     RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(
@@ -161,7 +161,7 @@ public class TimetableSnapshotTest {
     );
     TripTimes updatedTriptimes = TripTimesFactory.tripTimes(
       trip,
-      List.of(STOP_TIME),
+      List.of(STOP_TIME, STOP_TIME),
       new Deduplicator()
     );
     RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(

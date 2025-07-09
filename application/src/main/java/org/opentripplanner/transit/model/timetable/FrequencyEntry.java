@@ -131,7 +131,7 @@ public class FrequencyEntry implements Serializable {
       endTime,
       headway,
       exactTimes,
-      tripTimes.withServiceCode(serviceCode)
+      (ScheduledTripTimes) tripTimes.withServiceCode(serviceCode)
     );
   }
 

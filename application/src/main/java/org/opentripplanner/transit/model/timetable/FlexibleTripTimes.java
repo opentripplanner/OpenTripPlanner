@@ -73,7 +73,7 @@ public final class FlexibleTripTimes implements TripTimes {
 
   private final int[] gtfsSequenceOfStopIndex;
 
-  FlexibleTripTimes(ScheduledTripTimesBuilder builder) {
+  FlexibleTripTimes(AbstractTripTimesBuilder builder) {
     this.timeShift = builder.timeShift();
     this.serviceCode = builder.serviceCode();
     this.arrivalTimes = Objects.requireNonNull(builder.arrivalTimes());
@@ -93,16 +93,16 @@ public final class FlexibleTripTimes implements TripTimes {
    * simple fields like {@code timeShift} and {@code serviceCode} or even the prefered way in an
    * unittest.
    */
-  public static ScheduledTripTimesBuilder of() {
-    return new ScheduledTripTimesBuilder(null);
+  public static FlexibleTripTimesBuilder of() {
+    return new FlexibleTripTimesBuilder(null);
   }
 
-  public static ScheduledTripTimesBuilder of(DeduplicatorService deduplicator) {
-    return new ScheduledTripTimesBuilder(deduplicator);
+  public static FlexibleTripTimesBuilder of(DeduplicatorService deduplicator) {
+    return new FlexibleTripTimesBuilder(deduplicator);
   }
 
-  public ScheduledTripTimesBuilder copyOf(Deduplicator deduplicator) {
-    return new ScheduledTripTimesBuilder(
+  public FlexibleTripTimesBuilder copyOf(Deduplicator deduplicator) {
+    return new FlexibleTripTimesBuilder(
       timeShift,
       serviceCode,
       arrivalTimes,
@@ -121,7 +121,7 @@ public final class FlexibleTripTimes implements TripTimes {
   /**
    * @see #copyOf(Deduplicator) copyOf(null)
    */
-  public ScheduledTripTimesBuilder copyOfNoDuplication() {
+  public FlexibleTripTimesBuilder copyOfNoDuplication() {
     return copyOf(null);
   }
 
@@ -137,9 +137,7 @@ public final class FlexibleTripTimes implements TripTimes {
 
   @Override
   public FlexibleTripTimes adjustTimesToGraphTimeZone(Duration shiftDelta) {
-    return copyOfNoDuplication()
-      .plusTimeShift((int) shiftDelta.toSeconds())
-      .buildScheduledDeviated();
+    return copyOfNoDuplication().plusTimeShift((int) shiftDelta.toSeconds()).build();
   }
 
   @Override
@@ -149,7 +147,7 @@ public final class FlexibleTripTimes implements TripTimes {
 
   @Override
   public FlexibleTripTimes withServiceCode(int serviceCode) {
-    return this.copyOfNoDuplication().withServiceCode(serviceCode).buildScheduledDeviated();
+    return this.copyOfNoDuplication().withServiceCode(serviceCode).build();
   }
 
   @Override
@@ -316,7 +314,7 @@ public final class FlexibleTripTimes implements TripTimes {
    * Returns a time-shifted copy of this TripTimes in which the vehicle passes the given stop index
    * at the given time.
    */
-  public ScheduledTripTimes timeShift(final int stop, final int time, final boolean depart) {
+  public FlexibleTripTimes timeShift(final int stop, final int time, final boolean depart) {
     // Adjust 0-based times to match desired stoptime.
     final int shift = time - (depart ? getDepartureTime(stop) : getArrivalTime(stop));
 

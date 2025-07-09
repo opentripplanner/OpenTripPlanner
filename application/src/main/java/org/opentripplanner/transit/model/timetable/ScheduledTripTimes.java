@@ -136,7 +136,7 @@ public final class ScheduledTripTimes implements TripTimes {
   }
 
   @Override
-  public ScheduledTripTimes adjustTimesToGraphTimeZone(Duration shiftDelta) {
+  public TripTimes adjustTimesToGraphTimeZone(Duration shiftDelta) {
     return copyOfNoDuplication().plusTimeShift((int) shiftDelta.toSeconds()).build();
   }
 
@@ -146,7 +146,7 @@ public final class ScheduledTripTimes implements TripTimes {
   }
 
   @Override
-  public ScheduledTripTimes withServiceCode(int serviceCode) {
+  public TripTimes withServiceCode(int serviceCode) {
     return this.copyOfNoDuplication().withServiceCode(serviceCode).build();
   }
 
@@ -375,6 +375,9 @@ public final class ScheduledTripTimes implements TripTimes {
   /* private methods */
 
   private void validate() {
+    // Validate at least two times
+    IntUtils.requireInRange(arrivalTimes.length, 1, Integer.MAX_VALUE, "arrivalTimes.length");
+    IntUtils.requireInRange(departureTimes.length, 1, Integer.MAX_VALUE, "arrivalTimes.length");
     // Validate first departure time and last arrival time
     validateTimeInRange("departureTime", departureTimes, 0);
     validateTimeInRange("arrivalTime", arrivalTimes, arrivalTimes.length - 1);
@@ -390,12 +393,6 @@ public final class ScheduledTripTimes implements TripTimes {
   private void validateNonIncreasingTimes() {
     final int lastStop = arrivalTimes.length - 1;
 
-    // This check is currently used since Flex trips may have only one stop. This class should
-    // not be used to represent FLEX, so remove this check and create new data classes for FLEX
-    // trips.
-    if (lastStop < 1) {
-      return;
-    }
     int prevDep = getDepartureTime(0);
 
     for (int i = 1; true; ++i) {

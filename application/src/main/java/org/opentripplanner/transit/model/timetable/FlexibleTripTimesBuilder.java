@@ -8,14 +8,14 @@ import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.time.TimeUtils;
 
-public class ScheduledTripTimesBuilder
-  extends AbstractTripTimesBuilder<ScheduledTripTimes, ScheduledTripTimesBuilder> {
+public class FlexibleTripTimesBuilder
+  extends AbstractTripTimesBuilder<FlexibleTripTimes, FlexibleTripTimesBuilder> {
 
-  ScheduledTripTimesBuilder(@Nullable DeduplicatorService deduplicator) {
+  FlexibleTripTimesBuilder(@Nullable DeduplicatorService deduplicator) {
     this(0, NOT_SET, null, null, null, null, null, null, null, null, null, deduplicator);
   }
 
-  ScheduledTripTimesBuilder(
+  FlexibleTripTimesBuilder(
     int timeShift,
     int serviceCode,
     int[] arrivalTimes,
@@ -46,8 +46,8 @@ public class ScheduledTripTimesBuilder
   }
 
   @Override
-  public ScheduledTripTimes build() {
+  public FlexibleTripTimes build() {
     normalizeTimes();
-    return new ScheduledTripTimes(this);
+    return new FlexibleTripTimes(this);
   }
 }

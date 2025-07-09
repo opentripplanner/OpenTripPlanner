@@ -931,7 +931,7 @@ class RouteRequestTransitDataProviderFilterTest {
 
     TripTimes tripTimes = TripTimesFactory.tripTimes(
       TimetableRepositoryForTest.trip("1").withRoute(route).build(),
-      List.of(stopTime),
+      List.of(stopTime, stopTime),
       new Deduplicator()
     );
 
@@ -1000,7 +1000,7 @@ class RouteRequestTransitDataProviderFilterTest {
     stopTime.setDepartureTime(60);
     stopTime.setStopSequence(0);
 
-    return TripTimesFactory.tripTimes(trip, List.of(stopTime), new Deduplicator());
+    return TripTimesFactory.tripTimes(trip, List.of(stopTime, stopTime), new Deduplicator());
   }
 
   private TripTimes createTestTripTimesWithSubmode(String submode) {

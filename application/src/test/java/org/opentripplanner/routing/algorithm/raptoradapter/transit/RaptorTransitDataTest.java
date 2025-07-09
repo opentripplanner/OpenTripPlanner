@@ -38,7 +38,7 @@ class RaptorTransitDataTest {
       .getRoutingTripPattern();
     TRIP_TIMES = TripTimesFactory.tripTimes(
       TimetableRepositoryForTest.trip("1").withRoute(route).build(),
-      List.of(stopTime),
+      List.of(stopTime, stopTime),
       new Deduplicator()
     );
   }

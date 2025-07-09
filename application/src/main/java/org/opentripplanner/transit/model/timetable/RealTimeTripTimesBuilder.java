@@ -212,11 +212,6 @@ public class RealTimeTripTimesBuilder {
     return tripHeadsign;
   }
 
-  public RealTimeTripTimesBuilder withTripHeadsign(I18NString headsign) {
-    tripHeadsign = headsign;
-    return this;
-  }
-
   public @Nullable I18NString[] stopHeadsigns() {
     var result = scheduledTripTimes.copyHeadsigns(() ->
       new I18NString[scheduledTripTimes.getNumStops()]
@@ -258,10 +253,12 @@ public class RealTimeTripTimesBuilder {
   }
 
   public RealTimeTripTimesBuilder withServiceCode(int serviceCode) {
-    this.scheduledTripTimes = scheduledTripTimes
-      .copyOfNoDuplication()
-      .withServiceCode(serviceCode)
-      .build();
+    var tripTimes = scheduledTripTimes.copyOfNoDuplication().withServiceCode(serviceCode).build();
+    if (tripTimes instanceof ScheduledTripTimes tt) {
+      this.scheduledTripTimes = tt;
+    } else {
+      throw new UnsupportedOperationException("Cannot apply real-time updates to flex trips.");
+    }
     return this;
   }
 
