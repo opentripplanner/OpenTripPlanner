@@ -30,18 +30,9 @@ class TripPatternForDateTest {
   private static final ScheduledTripTimes tripTimes =
     (ScheduledTripTimes) TripTimesFactory.tripTimes(
       TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build(),
-      List.of(stopTime()),
+      List.of(TEST_MODEL.stopTime("A")),
       new Deduplicator()
     );
-
-  private static StopTime stopTime() {
-    var stop = TimetableRepositoryForTest.of().stop("a").build();
-    var st = new StopTime();
-    st.setStop(stop);
-    st.setArrivalTime(0);
-    st.setArrivalTime(1);
-    return st;
-  }
 
   static Stream<Arguments> testCases() {
     return Stream.of(
