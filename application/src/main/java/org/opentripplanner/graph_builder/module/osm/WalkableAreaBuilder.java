@@ -61,9 +61,6 @@ class WalkableAreaBuilder {
 
   private final VertexGenerator vertexBuilder;
 
-  private final HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate =
-    new HashMap<>();
-
   private final boolean platformEntriesLinking;
 
   private final List<OsmVertex> platformLinkingPoints;

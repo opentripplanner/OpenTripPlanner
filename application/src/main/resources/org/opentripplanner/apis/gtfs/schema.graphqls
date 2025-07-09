@@ -794,14 +794,16 @@ type Leg {
   """
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
-  Returns Place type, which has fields for e.g. departure and arrival times
   """
   intermediatePlaces: [Place]
   """
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
+    
+  The `include` parameter allows filtering of the returned places by stop type. If not provided, the
+  field returns all types. An empty list is not permitted.
   """
-  intermediateStops: [Stop]
+  intermediateStops(include: [StopType!]): [Stop]
   "The leg's geometry."
   legGeometry: Geometry
   "The mode (e.g. `WALK`) used when traversing this leg."
@@ -3777,6 +3779,15 @@ enum StopAlertType {
   STOP_ON_TRIPS
   "Alerts affecting the trips that go through this stop"
   TRIPS
+}
+
+enum StopType {
+  "An area or zone represented by a polygon. Introduced by the GTFS-Flex spec process."
+  LOCATION
+  "A group of stops. Introduced by the GTFS-Flex spec process."
+  LOCATION_GROUP
+  "A fixed stop represented by a coordinate."
+  STOP
 }
 
 """

@@ -1367,6 +1367,32 @@ public class GraphQLTypes {
     OFF,
   }
 
+  public static class GraphQLLegIntermediateStopsArgs {
+
+    private List<GraphQLStopType> include;
+
+    public GraphQLLegIntermediateStopsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("include") != null) {
+          this.include = ((List<Object>) args.get("include")).stream()
+            .map(item ->
+              item instanceof GraphQLStopType ? item : GraphQLStopType.valueOf((String) item)
+            )
+            .map(GraphQLStopType.class::cast)
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLStopType> getGraphQLInclude() {
+      return this.include;
+    }
+
+    public void setGraphQLInclude(List<GraphQLStopType> include) {
+      this.include = include;
+    }
+  }
+
   public static class GraphQLLegNextLegsArgs {
 
     private List<GraphQLTransitMode> destinationModesWithParentStation;
@@ -5029,6 +5055,12 @@ public class GraphQLTypes {
     STOP_ON_ROUTES,
     STOP_ON_TRIPS,
     TRIPS,
+  }
+
+  public enum GraphQLStopType {
+    LOCATION,
+    LOCATION_GROUP,
+    STOP,
   }
 
   public static class GraphQLStoptimeHeadsignArgs {
