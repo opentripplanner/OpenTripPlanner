@@ -10,7 +10,7 @@ import org.opentripplanner.utils.lang.Sandbox;
 /**
  * An interface for expressing the fares offered to a passenger. They can be straightforward,
  * like a single ticket, but also more complicated like tickets that are only valid when purchased
- *  together with another one.
+ * together with another one.
  */
 @Sandbox
 public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.DependentFareOffer {

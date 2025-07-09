@@ -48,7 +48,7 @@ public final class FareTransferRule {
   }
 
   /**
-   * Returns true if there is no limited on the number of transfers.
+   * Returns true if there is no limit on the number of transfers.
    */
   public boolean unlimitedTransfers() {
     return transferCount == UNLIMITED_TRANSFERS;
