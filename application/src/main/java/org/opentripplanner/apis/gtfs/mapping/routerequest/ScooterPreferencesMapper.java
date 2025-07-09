@@ -57,10 +57,6 @@ public class ScooterPreferencesMapper {
         preferences.withArrivingInRentalVehicleAtDestinationCost(cost.toSeconds());
       }
     }
-    var rentalDuration = args.getGraphQLRentalDuration();
-    if (rentalDuration != null) {
-      preferences.withRentalDuration(rentalDuration);
-    }
   }
 
   private static void setScooterOptimization(
