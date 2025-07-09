@@ -30,7 +30,7 @@ class TripPatternForDateTest {
   private static final ScheduledTripTimes tripTimes =
     (ScheduledTripTimes) TripTimesFactory.tripTimes(
       TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build(),
-      List.of(TEST_MODEL.stopTime("A")),
+      List.of(TEST_MODEL.stopTime("A"), TEST_MODEL.stopTime("B")),
       new Deduplicator()
     );
 
