@@ -33,15 +33,28 @@ To enable this you need to add the feature `ActuatorAPI`.
 
 ### Endpoints
 
-#### /health
+#### /otp/actuators/health
 
 The health endpoints returns an 200 OK status code once the graph is loaded and all updaters are
 ready. Otherwise, a 404 NOT FOUND is returned.
 
-#### /prometheus
+#### /otp/actuators/prometheus
 
 Prometheus metrics are returned using Micrometer. The default JVM and jersey metrics are enabled.
 
 Also, GraphQL timing metrics are exported under `graphql.timer.query` and `graphql.timer.resolver`,
 if the GraphQL endpoints are enabled.
 
+### Tracing tags
+
+To enable tracing tags, configure them for the
+[Transmodel API](../RouterConfiguration.md#transmodelApi_tracingHeaderTags) or
+[GTFS API](../RouterConfiguration.md#gtfsApi_tracingTags).
+If configured correctly, the tracing tags appear in the Prometheus metrics, for example:
+```
+...
+graphql_timer_resolver_seconds_count{example-header-or-query-parameter-name="value",operationName="__UNKNOWN__",parent="QueryType"} 9
+graphql_timer_resolver_seconds_sum{example-header-or-query-parameter-name="value",operationName="__UNKNOWN__",parent="QueryType"} 10.621173848
+graphql_timer_resolver_seconds_max{example-header-or-query-parameter-name="value",operationName="__UNKNOWN__",parent="QueryType"} 1.997706365
+...
+```

@@ -44,6 +44,10 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix station alert NullPointerExceptions in GTFS GraphQL API [#6691](https://github.com/opentripplanner/OpenTripPlanner/pull/6691)
 - Fix initialization bug in DebugRaptor request DTO [#6694](https://github.com/opentripplanner/OpenTripPlanner/pull/6694)
 - Fix error for overlapping service days [#6666](https://github.com/opentripplanner/OpenTripPlanner/pull/6666)
+- Move validation of TripPatternForDate into RealTimeRaptorTransitDataUpdater [#6685](https://github.com/opentripplanner/OpenTripPlanner/pull/6685)
+- Add tracing tags for headers and query parameters to GTFS API [#6712](https://github.com/opentripplanner/OpenTripPlanner/pull/6712)
+- Reduce graph build memory by gc-ing OsmDatabase early [#6724](https://github.com/opentripplanner/OpenTripPlanner/pull/6724)
+- Allow filtering of intermediate stops in GraphQL API [#6725](https://github.com/opentripplanner/OpenTripPlanner/pull/6725)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)

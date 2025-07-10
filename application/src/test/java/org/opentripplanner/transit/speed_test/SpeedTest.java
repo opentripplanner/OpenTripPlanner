@@ -125,6 +125,7 @@ public class SpeedTest {
       config.transitRoutingParams,
       new DefaultTransitService(timetableRepository),
       null,
+      null,
       VectorTileConfig.DEFAULT,
       TestServerContext.createVehicleParkingService(),
       TestServerContext.createVehicleRentalService(),

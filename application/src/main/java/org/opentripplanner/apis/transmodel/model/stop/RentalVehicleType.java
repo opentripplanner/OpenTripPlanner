@@ -55,7 +55,8 @@ public class RentalVehicleType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-          .dataFetcher(environment -> ((VehicleRentalVehicle) environment.getSource()).getLatitude()
+          .dataFetcher(environment ->
+            ((VehicleRentalVehicle) environment.getSource()).getLatitude()
           )
           .build()
       )

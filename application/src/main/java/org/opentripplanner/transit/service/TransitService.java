@@ -317,8 +317,6 @@ public interface TransitService {
 
   Collection<TripOnServiceDate> listTripsOnServiceDate();
 
-  Set<TransitMode> listTransitModes();
-
   Collection<PathTransfer> findPathTransfers(StopLocation stop);
 
   RaptorTransitData getRaptorTransitData();
@@ -418,4 +416,10 @@ public interface TransitService {
    * Returns a list of {@link StopLocation}s that match the filtering defined in the request.
    */
   Collection<StopLocation> findStopLocations(FindStopLocationsRequest request);
+
+  /**
+   * Returns boolean indicating if there are scheduled services on or after the given date.
+   * This does not include real-time updates, so it only checks the scheduled service dates.
+   */
+  boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop);
 }

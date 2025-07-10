@@ -75,7 +75,6 @@ public class GraphBuilderModules {
           osmConfiguredDataSource.dataSource(),
           osmConfiguredDataSource.config().osmTagMapper(),
           osmConfiguredDataSource.config().timeZone(),
-          osmConfiguredDataSource.config().includeOsmSubwayEntrances(),
           config.osmCacheDataInMem,
           issueStore
         )

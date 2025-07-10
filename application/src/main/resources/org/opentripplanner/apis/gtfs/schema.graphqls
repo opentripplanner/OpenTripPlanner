@@ -376,17 +376,17 @@ type CarPark implements Node & PlaceInterface {
 "Cluster is a list of stops grouped by name and proximity"
 type Cluster implements Node {
   "ID of the cluster"
-  gtfsId: String!
+  gtfsId: String! @deprecated(reason : "Not implemented")
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
-  id: ID!
+  id: ID! @deprecated(reason : "Not implemented")
   "Latitude of the center of this cluster (i.e. average latitude of stops in this cluster)"
-  lat: Float!
+  lat: Float! @deprecated(reason : "Not implemented")
   "Longitude of the center of this cluster (i.e. average longitude of stops in this cluster)"
-  lon: Float!
+  lon: Float! @deprecated(reason : "Not implemented")
   "Name of the cluster"
-  name: String!
+  name: String! @deprecated(reason : "Not implemented")
   "List of stops in the cluster"
-  stops: [Stop!]
+  stops: [Stop!] @deprecated(reason : "Not implemented")
 }
 
 "Contact information for booking an on-demand or flexible service."
@@ -765,18 +765,20 @@ type Leg {
   """
   interlineWithPreviousLeg: Boolean
   "Whether the destination of this leg (field `to`) is one of the intermediate places specified in the query."
-  intermediatePlace: Boolean
+  intermediatePlace: Boolean @deprecated(reason : "Not implemented")
   """
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
-  Returns Place type, which has fields for e.g. departure and arrival times
   """
   intermediatePlaces: [Place]
   """
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
+    
+  The `include` parameter allows filtering of the returned places by stop type. If not provided, the
+  field returns all types. An empty list is not permitted.
   """
-  intermediateStops: [Stop]
+  intermediateStops(include: [StopType!]): [Stop]
   "The leg's geometry."
   legGeometry: Geometry
   "The mode (e.g. `WALK`) used when traversing this leg."
@@ -1282,9 +1284,9 @@ type QueryType {
     ids: [String]
   ): [CarPark] @deprecated(reason : "carParks is deprecated. Use vehicleParkings instead.")
   "Get a single cluster based on its ID, i.e. value of field `gtfsId`"
-  cluster(id: String!): Cluster
+  cluster(id: String!): Cluster @deprecated(reason : "Not implemented")
   "Get all clusters"
-  clusters: [Cluster]
+  clusters: [Cluster] @deprecated(reason : "Not implemented")
   "Get a single departure row based on its ID (ID format is `FeedId:StopId:PatternId`)"
   departureRow(id: String!): DepartureRow
   "Get all available feeds"
@@ -1463,7 +1465,7 @@ type QueryType {
     "When true, real-time updates are ignored during this search. Default value: false"
     ignoreRealtimeUpdates: Boolean,
     "An ordered list of intermediate locations to be visited."
-    intermediatePlaces: [InputCoordinates] @deprecated(reason : "Not implemented in OTP2."),
+    intermediatePlaces: [InputCoordinates] @deprecated(reason : "Not implemented"),
     """
     How easily bad itineraries are filtered from results. Value 0 (default)
     disables filtering. Itineraries are filtered if they are worse than another
@@ -1582,7 +1584,7 @@ type QueryType {
     travel time of the trip (and therefore arguments `time` and `from` must be
     used correctly to get meaningful itineraries).
     """
-    startTransitTripId: String @deprecated(reason : "Not implemented in OTP2"),
+    startTransitTripId: String @deprecated(reason : "Not implemented"),
     "Time of departure or arrival in format hh:mm:ss. Default value: current time"
     time: String,
     """
@@ -2128,7 +2130,7 @@ type Stop implements Node & PlaceInterface {
     types: [StopAlertType]
   ): [Alert]
   "The cluster which this stop is part of"
-  cluster: Cluster
+  cluster: Cluster @deprecated(reason : "Not implemented")
   "Stop code which is visible at the stop"
   code: String
   "Description of the stop, usually a street name"
@@ -3745,6 +3747,15 @@ enum StopAlertType {
   TRIPS
 }
 
+enum StopType {
+  "An area or zone represented by a polygon. Introduced by the GTFS-Flex spec process."
+  LOCATION
+  "A group of stops. Introduced by the GTFS-Flex spec process."
+  LOCATION_GROUP
+  "A fixed stop represented by a coordinate."
+  STOP
+}
+
 """
 Transit modes include modes that are used within organized transportation networks
 run by public transportation authorities, taxi companies etc.
@@ -4102,14 +4113,14 @@ input InputBanned {
   banned for boarding and disembarking vehicles — it is possible to get an
   itinerary where a vehicle stops at one of these stops
   """
-  stops: String @deprecated(reason : "Not implemented in OTP2.")
+  stops: String @deprecated(reason : "Not implemented")
   """
   A comma-separated list of banned stop ids. Only itineraries where these stops
   are not travelled through are returned, e.g. if a bus route stops at one of
   these stops, that route will not be used in the itinerary, even if the stop is
   not used for boarding or disembarking the vehicle.
   """
-  stopsHard: String @deprecated(reason : "Not implemented in OTP2.")
+  stopsHard: String @deprecated(reason : "Not implemented")
   "A comma-separated list of banned trip ids"
   trips: String
 }

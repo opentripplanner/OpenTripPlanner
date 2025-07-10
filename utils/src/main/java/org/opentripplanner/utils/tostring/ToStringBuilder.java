@@ -48,9 +48,14 @@ public class ToStringBuilder {
   private final OtpNumberFormat numFormat = new OtpNumberFormat();
 
   boolean first = true;
+  private final char sufix;
 
-  private ToStringBuilder(String name) {
-    sb.append(name).append("{");
+  private ToStringBuilder(String name, char open, char close) {
+    this.sufix = close;
+    if (name != null) {
+      sb.append(name);
+    }
+    sb.append(open);
   }
 
   /**
@@ -58,7 +63,7 @@ public class ToStringBuilder {
    * field names) when building the to string.
    */
   public static ToStringBuilder of(Class<?> clazz) {
-    return new ToStringBuilder(clazz.getSimpleName());
+    return of(clazz.getSimpleName());
   }
 
   /**
@@ -66,16 +71,19 @@ public class ToStringBuilder {
    * but this can be used if the type is unknown or irrelevant.
    */
   public static ToStringBuilder of(String name) {
-    return new ToStringBuilder(name);
+    return new ToStringBuilder(name, '{', '}');
   }
 
   /**
-   * Create a ToStringBuilder for a regular POJO type without including the type in the name. Some
-   * classes are always embedded in other classes and the type is given, for these cases this
+   * Create a ToStringBuilder for a ValueObject/POJO type without including the type in the name.
+   * Some classes are always embedded in other classes and the type is given, for these cases this
    * builder make the toString a bit easier to read.
+   * <p>
+   * Using this builder enforce "name : value", if you only want to print the value use
+   * {@link ValueObjectToStringBuilder}.
    */
-  public static ToStringBuilder of() {
-    return new ToStringBuilder("");
+  public static ToStringBuilder ofEmbeddedType() {
+    return new ToStringBuilder(null, '(', ')');
   }
 
   /* General purpose formatters */
@@ -345,7 +353,7 @@ public class ToStringBuilder {
 
   @Override
   public String toString() {
-    return sb.append("}").toString();
+    return sb.append(sufix).toString();
   }
 
   /** private methods */

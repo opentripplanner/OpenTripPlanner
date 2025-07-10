@@ -315,7 +315,8 @@ public class EstimatedCallType {
           .name("bookingArrangements")
           .description("Booking arrangements for this EstimatedCall.")
           .type(bookingArrangementType)
-          .dataFetcher(environment -> environment.<TripTimeOnDate>getSource().getPickupBookingInfo()
+          .dataFetcher(environment ->
+            environment.<TripTimeOnDate>getSource().getPickupBookingInfo()
           )
           .build()
       )

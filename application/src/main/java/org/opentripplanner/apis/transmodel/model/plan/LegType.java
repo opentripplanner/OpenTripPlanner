@@ -340,7 +340,8 @@ public class LegType {
             "For ride legs, all estimated calls for the service journey. For non-ride legs, empty list."
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
-          .dataFetcher(env -> TripTimeOnDateHelper.getAllTripTimeOnDatesForLegsTrip(env.getSource())
+          .dataFetcher(env ->
+            TripTimeOnDateHelper.getAllTripTimeOnDatesForLegsTrip(env.getSource())
           )
           .build()
       )

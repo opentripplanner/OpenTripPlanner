@@ -78,16 +78,16 @@ public class TripRequestMapper {
 
         if (GqlUtil.hasArgument(environment, "filters")) {
           transitBuilder.setFilters(
-            FilterMapper.mapFilterNewWay(environment.getArgument("filters"))
+            TransitFilterNewWayMapper.mapFilter(environment.getArgument("filters"))
           );
         } else {
-          FilterMapper.mapFilterOldWay(environment, callWith, requestBuilder);
+          TransitFilterOldWayMapper.mapFilter(environment, callWith, transitBuilder);
         }
       });
 
       if (GqlUtil.hasArgument(environment, "modes")) {
         journeyBuilder.setModes(
-          RequestModesMapper.mapRequestModes(environment.getArgument("modes"))
+          RequestStreetModesMapper.mapRequestStreetModes(environment.getArgument("modes"))
         );
       }
     });
