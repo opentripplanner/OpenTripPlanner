@@ -215,10 +215,6 @@ class VehicleRentalEdgeTest {
     assertTrue(State.isEmpty(s1));
   }
 
-  private void initBicycleEdgeAndRequest(int vehicles, int spaces) {
-    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, HUMAN, vehicles, spaces, false, true, true, false);
-  }
-
   @Nested
   class StartedReverseSearchInNoGeofencingZone {
 
@@ -277,6 +273,10 @@ class VehicleRentalEdgeTest {
         new GeofencingZone(new FeedScopedId(NETWORK, "zone"), null, true, false)
       );
     }
+  }
+
+  private void initBicycleEdgeAndRequest(int vehicles, int spaces) {
+    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, HUMAN, vehicles, spaces, false, true, true, false);
   }
 
   private void initBicycleEdgeAndRequest(
