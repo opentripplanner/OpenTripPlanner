@@ -250,11 +250,11 @@ public class TimetableRepositoryForTest {
     return builder.build();
   }
 
-  public static StopPattern stopPattern(RegularStop... stops) {
+  public static StopPattern stopPattern(StopLocation... stops) {
     return stopPattern(Arrays.asList(stops));
   }
 
-  public static StopPattern stopPattern(List<RegularStop> stops) {
+  public static StopPattern stopPattern(List<StopLocation> stops) {
     var builder = StopPattern.create(stops.size());
     for (int i = 0; i < stops.size(); i++) {
       builder.stops.with(i, stops.get(i));

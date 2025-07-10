@@ -7,6 +7,7 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
@@ -72,5 +73,5 @@ public record TripInput(String id, Route route, List<StopCall> stops, @Nullable 
     }
   }
 
-  record StopCall(RegularStop stop, int arrivalTime, int departureTime) {}
+  record StopCall(StopLocation stop, int arrivalTime, int departureTime) {}
 }
