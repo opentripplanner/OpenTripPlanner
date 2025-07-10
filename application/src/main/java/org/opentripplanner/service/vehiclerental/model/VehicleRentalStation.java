@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -98,57 +97,47 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     this.realTimeData = true;
   }
 
-  private VehicleRentalStation(Builder builder) {
-    this.id = builder.id;
-    this.name = builder.name;
-    this.shortName = builder.shortName;
-    this.longitude = builder.longitude;
-    this.latitude = builder.latitude;
-    this.address = builder.address;
-    this.crossStreet = builder.crossStreet;
-    this.regionId = builder.regionId;
-    this.postCode = builder.postCode;
-    this.rentalMethods = builder.rentalMethods != null
-      ? Set.copyOf(builder.rentalMethods)
-      : Set.of();
-    this.isVirtualStation = builder.isVirtualStation;
-    this.stationArea = builder.stationArea;
-    this.capacity = builder.capacity;
-    this.vehicleTypeAreaCapacity = builder.vehicleTypeAreaCapacity != null
-      ? Map.copyOf(builder.vehicleTypeAreaCapacity)
-      : Map.of();
-    this.vehicleTypeDockCapacity = builder.vehicleTypeDockCapacity != null
-      ? Map.copyOf(builder.vehicleTypeDockCapacity)
-      : Map.of();
-    this.isValetStation = builder.isValetStation;
-    this.system = builder.system;
-    this.rentalUris = builder.rentalUris;
-    this.vehiclesAvailable = builder.vehiclesAvailable;
-    this.vehiclesDisabled = builder.vehiclesDisabled;
-    this.vehicleTypesAvailable = builder.vehicleTypesAvailable != null
-      ? Map.copyOf(builder.vehicleTypesAvailable)
-      : Map.of();
-    this.spacesAvailable = builder.spacesAvailable;
-    this.spacesDisabled = builder.spacesDisabled;
-    this.vehicleSpacesAvailable = builder.vehicleSpacesAvailable != null
-      ? Map.copyOf(builder.vehicleSpacesAvailable)
-      : Map.of();
-    this.isInstalled = builder.isInstalled;
-    this.isRenting = builder.isRenting;
-    this.isReturning = builder.isReturning;
-    this.lastReported = builder.lastReported;
-    this.overloadingAllowed = builder.overloadingAllowed;
+  VehicleRentalStation(VehicleRentalStationBuilder builder) {
+    this.id = builder.id();
+    this.name = builder.name();
+    this.shortName = builder.shortName();
+    this.longitude = builder.longitude();
+    this.latitude = builder.latitude();
+    this.address = builder.address();
+    this.crossStreet = builder.crossStreet();
+    this.regionId = builder.regionId();
+    this.postCode = builder.postCode();
+    this.rentalMethods = Set.copyOf(builder.rentalMethods());
+    this.isVirtualStation = builder.isVirtualStation();
+    this.stationArea = builder.stationArea();
+    this.capacity = builder.capacity();
+    this.vehicleTypeAreaCapacity = Map.copyOf(builder.vehicleTypeAreaCapacity());
+    this.vehicleTypeDockCapacity = Map.copyOf(builder.vehicleTypeDockCapacity());
+    this.isValetStation = builder.isValetStation();
+    this.system = builder.system();
+    this.rentalUris = builder.rentalUris();
+    this.vehiclesAvailable = builder.vehiclesAvailable();
+    this.vehiclesDisabled = builder.vehiclesDisabled();
+    this.vehicleTypesAvailable = Map.copyOf(builder.vehicleTypesAvailable());
+    this.spacesAvailable = builder.spacesAvailable();
+    this.spacesDisabled = builder.spacesDisabled();
+    this.vehicleSpacesAvailable = Map.copyOf(builder.vehicleSpacesAvailable());
+    this.isInstalled = builder.isInstalled();
+    this.isRenting = builder.isRenting();
+    this.isReturning = builder.isReturning();
+    this.lastReported = builder.lastReported();
+    this.overloadingAllowed = builder.isOverloadingAllowed();
     this.isArrivingInRentalVehicleAtDestinationAllowed =
-      builder.isArrivingInRentalVehicleAtDestinationAllowed;
-    this.realTimeData = builder.realTimeData;
+      builder.isArrivingInRentalVehicleAtDestinationAllowed();
+    this.realTimeData = builder.isRealTimeData();
   }
 
-  public static Builder of() {
+  public static VehicleRentalStationBuilder of() {
     return DEFAULT.copyOf();
   }
 
-  public Builder copyOf() {
-    return new Builder(this);
+  public VehicleRentalStationBuilder copyOf() {
+    return new VehicleRentalStationBuilder(this);
   }
 
   @Nullable
@@ -484,257 +473,5 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       isArrivingInRentalVehicleAtDestinationAllowed,
       realTimeData
     );
-  }
-
-  public static class Builder {
-
-    private final VehicleRentalStation original;
-    private FeedScopedId id;
-    private I18NString name;
-    private String shortName;
-    private double longitude;
-    private double latitude;
-    private String address;
-    private String crossStreet;
-    private String regionId;
-    private String postCode;
-    private Set<String> rentalMethods;
-    private boolean isVirtualStation;
-    private Geometry stationArea;
-    private Integer capacity;
-    private Map<RentalVehicleType, Integer> vehicleTypeAreaCapacity;
-    private Map<RentalVehicleType, Integer> vehicleTypeDockCapacity;
-    private boolean isValetStation;
-    private VehicleRentalSystem system;
-    private VehicleRentalStationUris rentalUris;
-    private int vehiclesAvailable;
-    private int vehiclesDisabled;
-    private Map<RentalVehicleType, Integer> vehicleTypesAvailable;
-    private int spacesAvailable;
-    private int spacesDisabled;
-    private Map<RentalVehicleType, Integer> vehicleSpacesAvailable;
-    private boolean isInstalled;
-    private boolean isRenting;
-    private boolean isReturning;
-    private Instant lastReported;
-    private boolean overloadingAllowed;
-    private boolean isArrivingInRentalVehicleAtDestinationAllowed;
-    private boolean realTimeData;
-
-    private Builder(VehicleRentalStation original) {
-      this.original = original;
-      this.id = original.id;
-      this.name = original.name;
-      this.shortName = original.shortName;
-      this.longitude = original.longitude;
-      this.latitude = original.latitude;
-      this.address = original.address;
-      this.crossStreet = original.crossStreet;
-      this.regionId = original.regionId;
-      this.postCode = original.postCode;
-      this.rentalMethods = original.rentalMethods;
-      this.isVirtualStation = original.isVirtualStation;
-      this.stationArea = original.stationArea;
-      this.capacity = original.capacity;
-      this.vehicleTypeAreaCapacity = original.vehicleTypeAreaCapacity;
-      this.vehicleTypeDockCapacity = original.vehicleTypeDockCapacity;
-      this.isValetStation = original.isValetStation;
-      this.system = original.system;
-      this.rentalUris = original.rentalUris;
-      this.vehiclesAvailable = original.vehiclesAvailable;
-      this.vehiclesDisabled = original.vehiclesDisabled;
-      this.vehicleTypesAvailable = original.vehicleTypesAvailable;
-      this.spacesAvailable = original.spacesAvailable;
-      this.spacesDisabled = original.spacesDisabled;
-      this.vehicleSpacesAvailable = original.vehicleSpacesAvailable;
-      this.isInstalled = original.isInstalled;
-      this.isRenting = original.isRenting;
-      this.isReturning = original.isReturning;
-      this.lastReported = original.lastReported;
-      this.overloadingAllowed = original.overloadingAllowed;
-      this.isArrivingInRentalVehicleAtDestinationAllowed =
-        original.isArrivingInRentalVehicleAtDestinationAllowed;
-      this.realTimeData = original.realTimeData;
-    }
-
-    public VehicleRentalStation original() {
-      return original;
-    }
-
-    public Builder withId(@Nullable FeedScopedId id) {
-      this.id = id;
-      return this;
-    }
-
-    public Builder withName(@Nullable I18NString name) {
-      this.name = name;
-      return this;
-    }
-
-    public Builder withShortName(@Nullable String shortName) {
-      this.shortName = shortName;
-      return this;
-    }
-
-    public Builder withLongitude(double longitude) {
-      this.longitude = longitude;
-      return this;
-    }
-
-    public Builder withLatitude(double latitude) {
-      this.latitude = latitude;
-      return this;
-    }
-
-    public Builder withAddress(@Nullable String address) {
-      this.address = address;
-      return this;
-    }
-
-    public Builder withCrossStreet(@Nullable String crossStreet) {
-      this.crossStreet = crossStreet;
-      return this;
-    }
-
-    public Builder withRegionId(@Nullable String regionId) {
-      this.regionId = regionId;
-      return this;
-    }
-
-    public Builder withPostCode(@Nullable String postCode) {
-      this.postCode = postCode;
-      return this;
-    }
-
-    public Builder withRentalMethods(@Nullable Set<String> rentalMethods) {
-      this.rentalMethods = rentalMethods;
-      return this;
-    }
-
-    public Builder withIsVirtualStation(boolean isVirtualStation) {
-      this.isVirtualStation = isVirtualStation;
-      return this;
-    }
-
-    public Builder withStationArea(@Nullable Geometry stationArea) {
-      this.stationArea = stationArea;
-      return this;
-    }
-
-    public Builder withCapacity(@Nullable Integer capacity) {
-      this.capacity = capacity;
-      return this;
-    }
-
-    public Builder withVehicleTypeAreaCapacity(
-      @Nullable Map<RentalVehicleType, Integer> vehicleTypeAreaCapacity
-    ) {
-      this.vehicleTypeAreaCapacity = vehicleTypeAreaCapacity;
-      return this;
-    }
-
-    public Builder withVehicleTypeDockCapacity(
-      @Nullable Map<RentalVehicleType, Integer> vehicleTypeDockCapacity
-    ) {
-      this.vehicleTypeDockCapacity = vehicleTypeDockCapacity;
-      return this;
-    }
-
-    public Builder withIsValetStation(boolean isValetStation) {
-      this.isValetStation = isValetStation;
-      return this;
-    }
-
-    public Builder withSystem(@Nullable VehicleRentalSystem system) {
-      this.system = system;
-      return this;
-    }
-
-    public Builder withRentalUris(@Nullable VehicleRentalStationUris rentalUris) {
-      this.rentalUris = rentalUris;
-      return this;
-    }
-
-    public Builder withVehiclesAvailable(int vehiclesAvailable) {
-      this.vehiclesAvailable = vehiclesAvailable;
-      return this;
-    }
-
-    public Builder withVehiclesDisabled(int vehiclesDisabled) {
-      this.vehiclesDisabled = vehiclesDisabled;
-      return this;
-    }
-
-    public Builder withVehicleTypesAvailable(
-      @Nullable Map<RentalVehicleType, Integer> vehicleTypesAvailable
-    ) {
-      this.vehicleTypesAvailable = vehicleTypesAvailable;
-      return this;
-    }
-
-    public Builder withSpacesAvailable(int spacesAvailable) {
-      this.spacesAvailable = spacesAvailable;
-      return this;
-    }
-
-    public Builder withSpacesDisabled(int spacesDisabled) {
-      this.spacesDisabled = spacesDisabled;
-      return this;
-    }
-
-    public Builder withVehicleSpacesAvailable(
-      @Nullable Map<RentalVehicleType, Integer> vehicleSpacesAvailable
-    ) {
-      this.vehicleSpacesAvailable = vehicleSpacesAvailable;
-      return this;
-    }
-
-    public Builder withIsInstalled(boolean isInstalled) {
-      this.isInstalled = isInstalled;
-      return this;
-    }
-
-    public Builder withIsRenting(boolean isRenting) {
-      this.isRenting = isRenting;
-      return this;
-    }
-
-    public Builder withIsReturning(boolean isReturning) {
-      this.isReturning = isReturning;
-      return this;
-    }
-
-    public Builder withLastReported(@Nullable Instant lastReported) {
-      this.lastReported = lastReported;
-      return this;
-    }
-
-    public Builder withOverloadingAllowed(boolean overloadingAllowed) {
-      this.overloadingAllowed = overloadingAllowed;
-      return this;
-    }
-
-    public Builder withIsArrivingInRentalVehicleAtDestinationAllowed(
-      boolean isArrivingInRentalVehicleAtDestinationAllowed
-    ) {
-      this.isArrivingInRentalVehicleAtDestinationAllowed =
-        isArrivingInRentalVehicleAtDestinationAllowed;
-      return this;
-    }
-
-    public Builder withRealTimeData(boolean realTimeData) {
-      this.realTimeData = realTimeData;
-      return this;
-    }
-
-    public Builder apply(Consumer<Builder> body) {
-      body.accept(this);
-      return this;
-    }
-
-    public VehicleRentalStation build() {
-      var value = new VehicleRentalStation(this);
-      return original.equals(value) ? original : value;
-    }
   }
 }
