@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module.geometry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -45,7 +46,7 @@ public class GeometryProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(GeometryProcessor.class);
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-  private final OtpTransitServiceBuilder transitService;
+  private final OtpTransitServiceBuilder builder;
   // this is a thread-safe implementation
   private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey =
     new ConcurrentHashMap<>();
@@ -57,13 +58,11 @@ public class GeometryProcessor {
   private final DataImportIssueStore issueStore;
 
   public GeometryProcessor(
-    // TODO OTP2 - Operate on the builder, not the transit service and move the execution of
-    //           - this to where the builder is in context.
-    OtpTransitServiceBuilder transitService,
+    OtpTransitServiceBuilder builder,
     double maxStopToShapeSnapDistance,
     DataImportIssueStore issueStore
   ) {
-    this.transitService = transitService;
+    this.builder = builder;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance > 0
       ? maxStopToShapeSnapDistance
       : 150;
@@ -88,7 +87,7 @@ public class GeometryProcessor {
     }
 
     return Arrays.asList(
-      createGeometry(trip.getShapeId(), transitService.getStopTimesSortedByTrip().get(trip))
+      createGeometry(trip.getShapeId(), builder.getStopTimesSortedByTrip().get(trip))
     );
   }
 
@@ -465,12 +464,17 @@ public class GeometryProcessor {
    * they are unnecessary, and 2) they define 0-length line segments which cause JTS location
    * indexed line to return a segment location of NaN, which we do not want.
    */
-  private List<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
-    List<ShapePoint> points = new ArrayList<>(transitService.getShapePoints().get(shapeId));
-    Collections.sort(points);
+  private Collection<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
+    var points = builder.getShapePoints().get(shapeId);
     ArrayList<ShapePoint> filtered = new ArrayList<>(points.size());
     ShapePoint last = null;
+    int currentSeq = Integer.MIN_VALUE;
     for (ShapePoint sp : points) {
+      if (sp.sequence() < currentSeq) {
+        // this should never happen, because the GTFS import should make sure they are already in order
+        // therefore this just a safety check to detect a programmer error
+        throw new IllegalStateException("Shape %s is not sorted in order of sequence. This indicates a bug in OTP.".formatted(shapeId) );
+      }
       if (last == null || last.sequence() != sp.sequence()) {
         if (last != null && last.lat() == sp.lat() && last.lon() == sp.lon()) {
           LOG.trace("pair of identical shape points (skipping): {} {}", last, sp);
@@ -479,6 +483,7 @@ public class GeometryProcessor {
         }
       }
       last = sp;
+      currentSeq = sp.sequence();
     }
     if (filtered.size() != points.size()) {
       filtered.trimToSize();
@@ -495,7 +500,7 @@ public class GeometryProcessor {
       return geometry;
     }
 
-    List<ShapePoint> points = getUniqueShapePointsForShapeId(shapeId);
+    var points = getUniqueShapePointsForShapeId(shapeId);
     if (points.size() < 2) {
       return null;
     }
