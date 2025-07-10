@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
+import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -131,6 +132,8 @@ public interface OtpServerRequestContext {
 
   GtfsApiParameters gtfsApiParameters();
 
+  TransmodelAPIParameters transmodelAPIParameters();
+
   /* Sandbox modules */
 
   @Nullable
@@ -156,7 +159,10 @@ public interface OtpServerRequestContext {
   SorlandsbanenNorwayService sorlandsbanenService();
 
   @Nullable
-  GraphQLSchema schema();
+  GraphQLSchema gtfsSchema();
+
+  @Nullable
+  GraphQLSchema transmodelSchema();
 
   FareService fareService();
 }
