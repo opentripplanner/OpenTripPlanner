@@ -102,12 +102,12 @@ public class VehicleRentalStationImpl implements GraphQLDataFetchers.GraphQLVehi
 
   @Override
   public DataFetcher<RentalVehicleEntityCounts> availableVehicles() {
-    return environment -> getSource(environment).getVehicleTypeCounts();
+    return environment -> getSource(environment).vehicleTypeCounts();
   }
 
   @Override
   public DataFetcher<RentalVehicleEntityCounts> availableSpaces() {
-    return environment -> getSource(environment).getVehicleSpaceCounts();
+    return environment -> getSource(environment).vehicleSpaceCounts();
   }
 
   @Override

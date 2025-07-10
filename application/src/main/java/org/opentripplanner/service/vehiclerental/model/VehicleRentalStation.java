@@ -378,7 +378,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   /**
    * @return Counts of available vehicles by type as well as the total number of available vehicles.
    */
-  public RentalVehicleEntityCounts getVehicleTypeCounts() {
+  public RentalVehicleEntityCounts vehicleTypeCounts() {
     return new RentalVehicleEntityCounts(
       vehiclesAvailable,
       vehicleRentalTypeMapToList(vehicleTypesAvailable)
@@ -389,7 +389,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
    * @return Counts of available vehicle spaces by type as well as the total number of available
    * vehicle spaces.
    */
-  public RentalVehicleEntityCounts getVehicleSpaceCounts() {
+  public RentalVehicleEntityCounts vehicleSpaceCounts() {
     return new RentalVehicleEntityCounts(
       spacesAvailable,
       vehicleRentalTypeMapToList(vehicleSpacesAvailable)
