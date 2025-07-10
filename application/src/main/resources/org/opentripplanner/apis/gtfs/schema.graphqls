@@ -505,7 +505,7 @@ For example, when taking the train into a city, you might get a discounted "tran
 switching to the bus for the second leg.
 """
 type DependentFareProduct implements FareProduct {
-  "The fare product is _not_ valid without purchasing at least _one of"
+  "The fare product is _not_ valid without purchasing at least _one_ of"
   dependencies(filter: DependentFareProductFilter = ALL): [FareProduct!]!
   id: String!
   """
