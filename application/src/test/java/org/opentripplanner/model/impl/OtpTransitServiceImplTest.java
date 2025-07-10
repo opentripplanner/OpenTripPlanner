@@ -190,8 +190,8 @@ public class OtpTransitServiceImplTest {
   }
 
   private static String toString(ShapePoint sp) {
-    int lat = (int) sp.getLat();
-    int lon = (int) sp.getLon();
-    return "#" + sp.getSequence() + " (" + lat + "," + lon + ")";
+    int lat = (int) sp.lat();
+    int lon = (int) sp.lon();
+    return "#" + sp.sequence() + " (" + lat + "," + lon + ")";
   }
 }

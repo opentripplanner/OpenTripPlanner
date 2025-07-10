@@ -135,7 +135,7 @@ public class GtfsModule implements GraphBuilderModule {
       for (GtfsBundle gtfsBundle : gtfsBundles) {
         GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
 
-        final String feedId = gtfsBundle.getFeedId();
+        var feedId = gtfsBundle.getFeedId();
         verifyUniqueFeedId(gtfsBundle, feedIdsEncountered, feedId);
 
         feedIdsEncountered.put(feedId, gtfsBundle);
@@ -310,7 +310,9 @@ public class GtfsModule implements GraphBuilderModule {
   }
 
   private GtfsMutableRelationalDao loadBundle(GtfsBundle gtfsBundle) throws IOException {
-    StoreImpl store = new StoreImpl(new GtfsRelationalDaoImpl());
+    var dao = new GtfsRelationalDaoImpl();
+    dao.setPackShapePoints(true);
+    StoreImpl store = new StoreImpl(dao);
     store.open();
     LOG.info("reading {}", gtfsBundle.feedInfo());
 

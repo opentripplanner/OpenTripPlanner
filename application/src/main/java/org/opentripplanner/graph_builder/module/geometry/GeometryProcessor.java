@@ -471,8 +471,8 @@ public class GeometryProcessor {
     ArrayList<ShapePoint> filtered = new ArrayList<>(points.size());
     ShapePoint last = null;
     for (ShapePoint sp : points) {
-      if (last == null || last.getSequence() != sp.getSequence()) {
-        if (last != null && last.getLat() == sp.getLat() && last.getLon() == sp.getLon()) {
+      if (last == null || last.sequence() != sp.sequence()) {
+        if (last != null && last.lat() == sp.lat() && last.lon() == sp.lon()) {
           LOG.trace("pair of identical shape points (skipping): {} {}", last, sp);
         } else {
           filtered.add(sp);
@@ -506,8 +506,8 @@ public class GeometryProcessor {
 
     int i = 0;
     for (ShapePoint point : points) {
-      coordinates[i] = new Coordinate(point.getLon(), point.getLat());
-      distances[i] = point.getDistTraveled();
+      coordinates[i] = new Coordinate(point.lon(), point.lat());
+      distances[i] = point.distTraveled();
       if (!point.isDistTraveledSet()) hasAllDistances = false;
       i++;
     }

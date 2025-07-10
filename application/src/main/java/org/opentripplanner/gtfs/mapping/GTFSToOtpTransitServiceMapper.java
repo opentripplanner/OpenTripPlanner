@@ -19,6 +19,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
@@ -26,6 +28,8 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
  * for other import modules.
  */
 public class GTFSToOtpTransitServiceMapper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GTFSToOtpTransitServiceMapper.class);
 
   private final AgencyMapper agencyMapper;
 
@@ -170,9 +174,18 @@ public class GTFSToOtpTransitServiceMapper {
     builder.getFeedInfos().addAll(feedInfoMapper.map(data.getAllFeedInfos()));
     builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
     builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
-    for (ShapePoint shapePoint : shapePointMapper.map(data.getAllShapePoints())) {
-      builder.getShapePoints().put(shapePoint.getShapeId(), shapePoint);
-    }
+    shapePointMapper
+      .map(data.getAllShapePoints())
+      .forEach((shapeId, compactShape) ->
+        builder.getShapePoints().putAll(shapeId, compactShape.shapePoints())
+      );
+    // shape points is a large collection, so after mapping it can be cleared
+    data.getAllShapePoints().clear();
+
+    LOG.debug(
+      "Mapped {} shapes into OTP model. Clearing GTFS shape storage from memory.",
+      builder.getShapePoints().keySet().size()
+    );
 
     mapGtfsStopsToOtpTypes(data.getAllStops());
 

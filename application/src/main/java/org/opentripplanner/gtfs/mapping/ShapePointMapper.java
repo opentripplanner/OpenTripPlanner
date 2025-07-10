@@ -1,46 +1,105 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.utils.collection.MapUtils;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /** Responsible for mapping GTFS ShapePoint into the OTP model. */
 class ShapePointMapper {
 
   private final IdFactory idFactory;
-  private final Map<org.onebusaway.gtfs.model.ShapePoint, ShapePoint> mappedShapePoints =
-    new HashMap<>();
 
   ShapePointMapper(IdFactory idFactory) {
     this.idFactory = idFactory;
   }
 
-  Collection<ShapePoint> map(Collection<org.onebusaway.gtfs.model.ShapePoint> allShapePoints) {
-    return MapUtils.mapToList(allShapePoints, this::map);
-  }
-
-  /** Map from GTFS to OTP model, {@code null} safe. */
-  ShapePoint map(org.onebusaway.gtfs.model.ShapePoint orginal) {
-    return orginal == null ? null : mappedShapePoints.computeIfAbsent(orginal, this::doMap);
-  }
-
-  private ShapePoint doMap(org.onebusaway.gtfs.model.ShapePoint rhs) {
-    ShapePoint lhs = new ShapePoint();
-
-    lhs.setShapeId(idFactory.createId(rhs.getShapeId(), "shape point"));
-    lhs.setSequence(rhs.getSequence());
-    lhs.setLat(rhs.getLat());
-    lhs.setLon(rhs.getLon());
-    lhs.setDistTraveled(rhs.getDistTraveled());
-
-    // Skip mapping of proxy
-    // private transient StopTimeProxy proxy;
-    if (rhs.getProxy() != null) {
-      throw new IllegalStateException("Did not expect proxy to be set! Data: " + rhs);
+  Map<FeedScopedId, CompactShapeBuilder> map(
+    Collection<org.onebusaway.gtfs.model.ShapePoint> allShapePoints
+  ) {
+    var ret = new HashMap<FeedScopedId, CompactShapeBuilder>();
+    for (var shapePoint : allShapePoints) {
+      var shapeId = idFactory.createId(shapePoint.getShapeId(), "shape point");
+      var shapeBuilder = ret.getOrDefault(shapeId, new CompactShapeBuilder(50));
+      shapeBuilder.addPoint(shapePoint);
+      ret.put(shapeId, shapeBuilder);
     }
 
-    return lhs;
+    return ret;
+  }
+}
+
+class CompactShapeBuilder {
+
+  public static final int INCREASE = 50;
+  private double[] lats;
+  private double[] lons;
+  // we only initialize this if we need it
+  private double[] distTraveleds;
+
+  public CompactShapeBuilder(int size) {
+    this.lats = new double[size];
+    this.lons = new double[size];
+    // distTraveleds is created on demand if required
+  }
+
+  public void addPoint(org.onebusaway.gtfs.model.ShapePoint shapePoint) {
+    int index = shapePoint.getSequence();
+    ensureLatLonCapacity(index);
+    lats[index] = shapePoint.getLat();
+    lons[index] = shapePoint.getLon();
+    if (shapePoint.isDistTraveledSet()) {
+      ensureDistTraveledCapacity(index);
+      distTraveleds[index] = shapePoint.getDistTraveled();
+    }
+  }
+
+  public Iterable<ShapePoint> shapePoints() {
+    return () ->
+      new Iterator<>() {
+        private int index = 0;
+
+        @Override
+        public boolean hasNext() {
+          return index < lats.length;
+        }
+
+        @Override
+        public ShapePoint next() {
+          var lat = lats[index];
+          var lon = lons[index];
+          Double distTraveled = null;
+          if (distTraveleds != null) {
+            distTraveled = distTraveleds[index];
+          }
+          var ret = new ShapePoint(index, lat, lon, distTraveled);
+          index++;
+          return ret;
+        }
+      };
+  }
+
+  private void ensureLatLonCapacity(int index) {
+    if (lats.length < index + 1) {
+      int newLength = increaseCapacity(lats);
+      this.lats = Arrays.copyOf(lats, newLength);
+      this.lons = Arrays.copyOf(lons, newLength);
+    }
+  }
+
+  private void ensureDistTraveledCapacity(int index) {
+    if (this.distTraveleds == null) {
+      this.distTraveleds = new double[INCREASE];
+    } else if (distTraveleds.length < index + 1) {
+      int newLength = increaseCapacity(distTraveleds);
+      this.distTraveleds = Arrays.copyOf(distTraveleds, newLength);
+    }
+  }
+
+  private static int increaseCapacity(double[] array) {
+    return Math.max(INCREASE, array.length + INCREASE);
   }
 }
