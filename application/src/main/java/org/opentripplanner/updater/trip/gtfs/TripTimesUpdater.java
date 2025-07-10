@@ -112,11 +112,12 @@ class TripTimesUpdater {
     Iterator<GtfsRealtime.TripUpdate.StopTimeUpdate> updates = tripUpdate
       .getStopTimeUpdateList()
       .iterator();
+    GtfsRealtime.TripUpdate.StopTimeUpdate update = null;
     if (!updates.hasNext()) {
-      LOG.warn("Won't apply zero-length trip update to trip {}.", tripId);
-      return Result.failure(new UpdateError(feedScopedTripId, TOO_FEW_STOPS));
+      LOG.warn("Zero-length trip update to trip {}.", tripId);
+    } else {
+      update = updates.next();
     }
-    GtfsRealtime.TripUpdate.StopTimeUpdate update = updates.next();
 
     int numStops = tripTimes.getNumStops();
 
