@@ -33,16 +33,19 @@ class ShapePointMapper {
 }
 
 class CompactShapeBuilder {
-
-  public static final int INCREASE = 50;
+  private static final double NO_VALUE = -9999;
+  private static final int INCREASE = 50;
   private double[] lats;
   private double[] lons;
   // we only initialize this if we need it
   private double[] distTraveleds;
+  private int maxSequence = (int) NO_VALUE;
 
-  public CompactShapeBuilder(int size) {
-    this.lats = new double[size];
-    this.lons = new double[size];
+  public CompactShapeBuilder(int initialCapacity) {
+    this.lats = new double[initialCapacity];
+    this.lons = new double[initialCapacity];
+    Arrays.fill(this.lats, NO_VALUE);
+    Arrays.fill(this.lons, NO_VALUE);
     // distTraveleds is created on demand if required
   }
 
@@ -55,6 +58,9 @@ class CompactShapeBuilder {
       ensureDistTraveledCapacity(index);
       distTraveleds[index] = shapePoint.getDistTraveled();
     }
+    if(index > maxSequence) {
+      maxSequence = index;
+    }
   }
 
   public Iterable<ShapePoint> shapePoints() {
@@ -64,16 +70,23 @@ class CompactShapeBuilder {
 
         @Override
         public boolean hasNext() {
-          return index < lats.length;
+          return index < maxSequence;
         }
 
         @Override
         public ShapePoint next() {
           var lat = lats[index];
+          while (lat == NO_VALUE) {
+            index++;
+            lat = lats[index];
+          }
           var lon = lons[index];
           Double distTraveled = null;
           if (distTraveleds != null) {
             distTraveled = distTraveleds[index];
+            if(distTraveled == NO_VALUE) {
+              distTraveled = null;
+            }
           }
           var ret = new ShapePoint(index, lat, lon, distTraveled);
           index++;
@@ -93,6 +106,7 @@ class CompactShapeBuilder {
   private void ensureDistTraveledCapacity(int index) {
     if (this.distTraveleds == null) {
       this.distTraveleds = new double[INCREASE];
+      Arrays.fill(distTraveleds, NO_VALUE);
     } else if (distTraveleds.length < index + 1) {
       int newLength = increaseCapacity(distTraveleds);
       this.distTraveleds = Arrays.copyOf(distTraveleds, newLength);

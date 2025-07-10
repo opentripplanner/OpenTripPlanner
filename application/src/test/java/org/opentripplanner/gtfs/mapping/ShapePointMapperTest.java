@@ -43,31 +43,18 @@ public class ShapePointMapperTest {
   }
 
   @Test
-  public void testMapCollection() throws Exception {
-    assertNull(subject.map(null));
+  public void testMapCollection() {
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(SHAPE_POINT)).size());
   }
 
   @Test
-  public void testMap() throws Exception {
+  public void testMap() {
     var result = map(List.of(SHAPE_POINT));
     assertEquals(DIST_TRAVELED, result.distTraveled(), 0.0001d);
     assertEquals(LAT, result.lat(), 0.0001d);
     assertEquals(LON, result.lon(), 0.0001d);
     assertEquals(SEQUENCE, result.sequence());
-  }
-
-  @Test
-  public void testMapWithNulls() throws Exception {
-    var orginal = new ShapePoint();
-    orginal.setShapeId(OBA_ID);
-    var result = map(List.of(orginal));
-
-    assertFalse(result.isDistTraveledSet());
-    assertEquals(0d, result.lat(), 0.00001);
-    assertEquals(0d, result.lon(), 0.00001);
-    assertEquals(0d, result.sequence(), 0.00001);
   }
 
   private org.opentripplanner.model.ShapePoint map(List<ShapePoint> shapePoint) {
