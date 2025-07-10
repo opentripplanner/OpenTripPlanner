@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.model;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -9,7 +10,7 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-public final class FareTransferRule {
+public final class FareTransferRule implements Serializable {
 
   public static final int UNLIMITED_TRANSFERS = -1;
   private final FeedScopedId id;
