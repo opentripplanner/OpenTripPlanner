@@ -23,7 +23,7 @@ class ShapePointMapper {
     var ret = new HashMap<FeedScopedId, CompactShapeBuilder>();
     for (var shapePoint : allShapePoints) {
       var shapeId = idFactory.createId(shapePoint.getShapeId(), "shape point");
-      var shapeBuilder = ret.getOrDefault(shapeId, new CompactShapeBuilder(50));
+      var shapeBuilder = ret.getOrDefault(shapeId, new CompactShapeBuilder());
       shapeBuilder.addPoint(shapePoint);
       ret.put(shapeId, shapeBuilder);
     }
@@ -33,6 +33,7 @@ class ShapePointMapper {
 }
 
 class CompactShapeBuilder {
+
   private static final double NO_VALUE = -9999;
   private static final int INCREASE = 50;
   private double[] lats;
@@ -41,9 +42,9 @@ class CompactShapeBuilder {
   private double[] distTraveleds;
   private int maxSequence = (int) NO_VALUE;
 
-  public CompactShapeBuilder(int initialCapacity) {
-    this.lats = new double[initialCapacity];
-    this.lons = new double[initialCapacity];
+  public CompactShapeBuilder() {
+    this.lats = new double[INCREASE];
+    this.lons = new double[INCREASE];
     Arrays.fill(this.lats, NO_VALUE);
     Arrays.fill(this.lons, NO_VALUE);
     // distTraveleds is created on demand if required
@@ -58,7 +59,7 @@ class CompactShapeBuilder {
       ensureDistTraveledCapacity(index);
       distTraveleds[index] = shapePoint.getDistTraveled();
     }
-    if(index > maxSequence) {
+    if (index > maxSequence) {
       maxSequence = index;
     }
   }
@@ -84,7 +85,7 @@ class CompactShapeBuilder {
           Double distTraveled = null;
           if (distTraveleds != null) {
             distTraveled = distTraveleds[index];
-            if(distTraveled == NO_VALUE) {
+            if (distTraveled == NO_VALUE) {
               distTraveled = null;
             }
           }
@@ -97,9 +98,14 @@ class CompactShapeBuilder {
 
   private void ensureLatLonCapacity(int index) {
     if (lats.length < index + 1) {
+      int oldLength = lats.length;
       int newLength = increaseCapacity(lats);
-      this.lats = Arrays.copyOf(lats, newLength);
-      this.lons = Arrays.copyOf(lons, newLength);
+      lats = Arrays.copyOf(lats, newLength);
+      lons = Arrays.copyOf(lons, newLength);
+      for (var i = oldLength; i < newLength; i++) {
+        lats[i] = NO_VALUE;
+        lons[i] = NO_VALUE;
+      }
     }
   }
 

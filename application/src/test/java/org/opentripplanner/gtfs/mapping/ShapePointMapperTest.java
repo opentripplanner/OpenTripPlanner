@@ -57,6 +57,12 @@ public class ShapePointMapperTest {
     assertEquals(SEQUENCE, result.sequence());
   }
 
+  @Test
+  void string() {
+    var result = map(List.of(SHAPE_POINT)).toString();
+    assertEquals("3 (60.0, 45.0)", result);
+  }
+
   private org.opentripplanner.model.ShapePoint map(List<ShapePoint> shapePoint) {
     final Map<FeedScopedId, CompactShapeBuilder> map = subject.map(shapePoint);
     return ImmutableList.copyOf(map.get(SHAPE_ID).shapePoints()).getFirst();

@@ -3,7 +3,9 @@ package org.opentripplanner.model;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 public final class ShapePoint implements Comparable<ShapePoint> {
 
@@ -65,13 +67,25 @@ public final class ShapePoint implements Comparable<ShapePoint> {
     );
   }
 
+  public boolean sameCoordinates(ShapePoint that) {
+    return (Double.compare(this.lat, that.lat) == 0 && Double.compare(this.lon, that.lon) == 0);
+  }
+
   @Override
   public String toString() {
-    return ("ShapePoint{" + " #" + sequence() + " (" + lat() + "," + lon() + ")}");
+    var s = ValueObjectToStringBuilder.of().addNum(sequence).addCoordinate(lat, lon);
+    if(distTraveled != MISSING_VALUE) {
+      s.addText(" dist=").addNum(distTraveled);
+    }
+    return s.toString();
   }
 
   @Override
   public int compareTo(ShapePoint o) {
     return this.sequence() - o.sequence();
+  }
+
+  public Coordinate coordinate() {
+    return new Coordinate(lon, lat);
   }
 }

@@ -471,12 +471,16 @@ public class GeometryProcessor {
     int currentSeq = Integer.MIN_VALUE;
     for (ShapePoint sp : points) {
       if (sp.sequence() < currentSeq) {
-        // this should never happen, because the GTFS import should make sure they are already in order
-        // therefore this just a safety check to detect a programmer error
-        throw new IllegalStateException("Shape %s is not sorted in order of sequence. This indicates a bug in OTP.".formatted(shapeId) );
+        // this should never happen, because the GTFS import should make sure they are already in order.
+        // therefore this just a safety check to detect a programmer error.
+        throw new IllegalStateException(
+          "Shape %s is not sorted in order of sequence. This indicates a bug in OTP.".formatted(
+              shapeId
+            )
+        );
       }
       if (last == null || last.sequence() != sp.sequence()) {
-        if (last != null && last.lat() == sp.lat() && last.lon() == sp.lon()) {
+        if (last != null && last.sameCoordinates(sp)) {
           LOG.trace("pair of identical shape points (skipping): {} {}", last, sp);
         } else {
           filtered.add(sp);
@@ -511,7 +515,7 @@ public class GeometryProcessor {
 
     int i = 0;
     for (ShapePoint point : points) {
-      coordinates[i] = new Coordinate(point.lon(), point.lat());
+      coordinates[i] = point.coordinate();
       distances[i] = point.distTraveled();
       if (!point.isDistTraveledSet()) hasAllDistances = false;
       i++;
