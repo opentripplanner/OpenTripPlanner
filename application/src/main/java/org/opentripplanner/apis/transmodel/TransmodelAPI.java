@@ -21,11 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.apis.support.TracingUtils;
 import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
-import org.opentripplanner.apis.transmodel.mapping.FixedFeedIdGenerator;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
-import org.opentripplanner.ext.trias.id.HideFeedIdResolver;
-import org.opentripplanner.ext.trias.id.IdResolver;
-import org.opentripplanner.ext.trias.id.UseFeedIdResolver;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
@@ -51,7 +47,6 @@ public class TransmodelAPI {
   private final GraphQLSchema schema;
   private final Collection<String> tracingHeaderTags;
   private final int maxNumberOfResultFields;
-  private final IdResolver idResolver;
 
   private final OtpServerRequestContext serverContext;
   private final TransmodelGraph index;
@@ -64,14 +59,6 @@ public class TransmodelAPI {
 
     tracingHeaderTags = serverContext.transmodelAPIParameters().tracingHeaderTags();
     maxNumberOfResultFields = serverContext.transmodelAPIParameters().maxNumberOfResultFields();
-
-    if (serverContext.transmodelAPIParameters().hideFeedId()) {
-      String fixedFeedId = FixedFeedIdGenerator.generateFixedFeedId(
-        serverContext.transitService().listAgencies());
-      idResolver = new HideFeedIdResolver(fixedFeedId);
-    } else {
-      idResolver = new UseFeedIdResolver();
-    }
   }
 
   /**

@@ -14,6 +14,7 @@ import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
+import org.opentripplanner.ext.trias.id.IdResolver;
 
 public class ViaTripQuery {
 
@@ -22,7 +23,8 @@ public class ViaTripQuery {
     GraphQLOutputType viaTripType,
     GraphQLInputObjectType viaLocationInputType,
     GraphQLInputObjectType viaSegmentInputType,
-    GraphQLScalarType dateTimeScalar
+    GraphQLScalarType dateTimeScalar,
+    IdResolver idResolver
   ) {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("viaTrip")
@@ -157,7 +159,7 @@ public class ViaTripQuery {
           .defaultValueProgrammatic("no")
           .build()
       )
-      .dataFetcher(environment -> new TransmodelGraphQLPlanner().planVia(environment))
+      .dataFetcher(environment -> new TransmodelGraphQLPlanner(idResolver).planVia(environment))
       .build();
   }
 }

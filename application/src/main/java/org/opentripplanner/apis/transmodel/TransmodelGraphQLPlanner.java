@@ -8,13 +8,13 @@ import java.util.Map;
 import org.opentripplanner.apis.transmodel.mapping.TripRequestMapper;
 import org.opentripplanner.apis.transmodel.mapping.ViaRequestMapper;
 import org.opentripplanner.apis.transmodel.model.PlanResponse;
+import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,13 +22,20 @@ public class TransmodelGraphQLPlanner {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransmodelGraphQLPlanner.class);
 
+  private final TripRequestMapper tripRequestMapper;
+  private final ViaRequestMapper viaRequestMapper;
+
+  public TransmodelGraphQLPlanner(IdResolver idResolver) {
+    this.tripRequestMapper = new TripRequestMapper(idResolver);
+    this.viaRequestMapper = new ViaRequestMapper(idResolver);
+  }
+
   public DataFetcherResult<PlanResponse> plan(DataFetchingEnvironment environment) {
     PlanResponse response = new PlanResponse();
     TransmodelRequestContext ctx = environment.getContext();
-    OtpServerRequestContext serverContext = ctx.getServerContext();
     RouteRequest request = null;
     try {
-      request = TripRequestMapper.createRequest(environment);
+      request = tripRequestMapper.createRequest(environment);
       RoutingResponse res = ctx.getRoutingService().route(request);
 
       response.plan = res.getTripPlan();
@@ -53,7 +60,7 @@ public class TransmodelGraphQLPlanner {
     TransmodelRequestContext ctx = environment.getContext();
     RouteViaRequest request = null;
     try {
-      request = ViaRequestMapper.createRouteViaRequest(environment);
+      request = viaRequestMapper.createRouteViaRequest(environment);
       response = ctx.getRoutingService().route(request);
     } catch (RoutingValidationException e) {
       response = new ViaRoutingResponse(Map.of(), List.of(), e.getRoutingErrors());

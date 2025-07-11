@@ -8,7 +8,6 @@ import jakarta.inject.Singleton;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
-import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
@@ -61,8 +60,7 @@ public class ConstructApplicationModule {
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
     @Nullable LuceneIndex luceneIndex,
-    FareService fareService,
-    TransmodelAPIParameters transmodelAPIParameters
+    FareService fareService
   ) {
     var defaultRequest = launcherRequestDecorator.intercept(routerConfig.routingRequestDefaults());
 
@@ -71,6 +69,7 @@ public class ConstructApplicationModule {
     var gtfsApiConfig = routerConfig.gtfsApiParameters();
     var vectorTileConfig = routerConfig.vectorTileConfig();
     var flexParameters = routerConfig.flexParameters();
+    var transmodelAPIParameters = routerConfig.transmodelApi();
 
     return new DefaultServerRequestContext(
       debugUiConfig,

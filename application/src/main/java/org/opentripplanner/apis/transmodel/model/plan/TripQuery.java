@@ -20,6 +20,7 @@ import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PassThroughPointInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PenaltyForStreetModeType;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
+import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
@@ -42,7 +43,8 @@ public class TripQuery {
     GraphQLOutputType tripType,
     GraphQLInputObjectType durationPerStreetModeType,
     GraphQLInputObjectType penaltyForStreetMode,
-    GraphQLScalarType dateTimeScalar
+    GraphQLScalarType dateTimeScalar,
+    IdResolver idResolver
   ) {
     RoutingPreferences preferences = routing.request.preferences();
 
@@ -584,7 +586,7 @@ public class TripQuery {
           )
           .build()
       )
-      .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))
+      .dataFetcher(environment -> new TransmodelGraphQLPlanner(idResolver).plan(environment))
       .build();
   }
 

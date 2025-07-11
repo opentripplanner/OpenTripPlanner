@@ -12,14 +12,23 @@ import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
 public class TripRequestMapper {
 
+  private final TripViaLocationMapper tripViaLocationMapper;
+  private final GenericLocationMapper genericLocationMapper;
+
+  public TripRequestMapper(IdResolver idResolver) {
+    this.tripViaLocationMapper = new TripViaLocationMapper(idResolver);
+    this.genericLocationMapper = new GenericLocationMapper(idResolver);
+  }
+
   /**
    * Create a RouteRequest from the input fields of the trip query arguments.
    */
-  public static RouteRequest createRequest(DataFetchingEnvironment environment) {
+  public RouteRequest createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
     var serverContext = context.getServerContext();
     var requestBuilder = serverContext.defaultRouteRequest().copyOf();
@@ -27,16 +36,16 @@ public class TripRequestMapper {
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
     callWith.argument("from", (Map<String, Object> v) ->
-      requestBuilder.withFrom(GenericLocationMapper.toGenericLocation(v))
+      requestBuilder.withFrom(genericLocationMapper.toGenericLocation(v))
     );
     callWith.argument("to", (Map<String, Object> v) ->
-      requestBuilder.withTo(GenericLocationMapper.toGenericLocation(v))
+      requestBuilder.withTo(genericLocationMapper.toGenericLocation(v))
     );
     callWith.argument("passThroughPoints", (List<Map<String, Object>> v) -> {
-      requestBuilder.withViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
+      requestBuilder.withViaLocations(tripViaLocationMapper.toLegacyPassThroughLocations(v));
     });
     callWith.argument(TripQuery.TRIP_VIA_PARAMETER, (List<Map<String, Object>> v) -> {
-      requestBuilder.withViaLocations(TripViaLocationMapper.mapToViaLocations(v));
+      requestBuilder.withViaLocations(tripViaLocationMapper.mapToViaLocations(v));
     });
 
     callWith.argument("dateTime", millisSinceEpoch ->

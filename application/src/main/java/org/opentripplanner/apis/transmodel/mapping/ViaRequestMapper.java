@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
@@ -18,10 +19,18 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
  */
 public class ViaRequestMapper {
 
+  private final ViaLocationDeprecatedMapper viaLocationDeprecatedMapper;
+  private final GenericLocationMapper genericLocationMapper;
+
+  public ViaRequestMapper(IdResolver idResolver) {
+    viaLocationDeprecatedMapper = new ViaLocationDeprecatedMapper(idResolver);
+    genericLocationMapper = new GenericLocationMapper(idResolver);
+  }
+
   /**
    * Create a RouteViaRequest from the input fields of the viaTrip query arguments.
    */
-  public static RouteViaRequest createRouteViaRequest(DataFetchingEnvironment environment) {
+  public RouteViaRequest createRouteViaRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
     OtpServerRequestContext serverContext = context.getServerContext();
     RouteRequest request = serverContext.defaultRouteRequest();
@@ -29,7 +38,7 @@ public class ViaRequestMapper {
     List<Map<String, Object>> viaInput = environment.getArgument("via");
     List<ViaLocationDeprecated> vias = viaInput
       .stream()
-      .map(ViaLocationDeprecatedMapper::mapViaLocation)
+      .map(viaLocationDeprecatedMapper::mapViaLocation)
       .toList();
 
     List<JourneyRequest> requests;
@@ -50,8 +59,8 @@ public class ViaRequestMapper {
         )
       )
       .withSearchWindow(environment.getArgumentOrDefault("searchWindow", request.searchWindow()))
-      .withFrom(GenericLocationMapper.toGenericLocation(environment.getArgument("from")))
-      .withTo(GenericLocationMapper.toGenericLocation(environment.getArgument("to")))
+      .withFrom(genericLocationMapper.toGenericLocation(environment.getArgument("from")))
+      .withTo(genericLocationMapper.toGenericLocation(environment.getArgument("to")))
       .withNumItineraries(
         environment.getArgumentOrDefault("numTripPatterns", request.numItineraries())
       )

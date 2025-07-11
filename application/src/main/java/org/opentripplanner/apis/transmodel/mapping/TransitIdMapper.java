@@ -45,19 +45,7 @@ public class TransitIdMapper {
     return ids.stream().filter(StringUtils::hasValue).map(TransitIdMapper::mapIDToDomain).toList();
   }
 
-  /**
-   * Maps ids to feed-scoped ids.
-   * Return null if the collection of ids is null.
-   * If the collection of ids contains null or blank elements, they are ignored.
-   */
-  public static List<FeedScopedId> mapIDsToDomain(@Nullable Collection<String> ids) {
-    if (ids == null) {
-      return null;
-    }
-    return ids.stream().filter(StringUtils::hasValue).map(TransitIdMapper::mapIDToDomain).toList();
-  }
-
-  public static FeedScopedId mapIDToDomain(String id) {
+  private static FeedScopedId mapIDToDomain(String id) {
     if (id == null || id.isBlank()) {
       return null;
     }
