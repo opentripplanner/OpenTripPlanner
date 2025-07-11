@@ -74,7 +74,7 @@ public final class ShapePoint implements Comparable<ShapePoint> {
   @Override
   public String toString() {
     var s = ValueObjectToStringBuilder.of().addNum(sequence).addCoordinate(lat, lon);
-    if(distTraveled != MISSING_VALUE) {
+    if (distTraveled != MISSING_VALUE) {
       s.addText(" dist=").addNum(distTraveled);
     }
     return s.toString();

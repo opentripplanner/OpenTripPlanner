@@ -83,7 +83,7 @@ class CompactShapeBuilder {
           }
           var lon = lons[index];
           Double distTraveled = null;
-          if (distTraveleds != null) {
+          if (distTraveleds != null && index - 1 < distTraveleds.length) {
             distTraveled = distTraveleds[index];
             if (distTraveled == NO_VALUE) {
               distTraveled = null;
@@ -97,9 +97,9 @@ class CompactShapeBuilder {
   }
 
   private void ensureLatLonCapacity(int index) {
-    if (lats.length < index + 1) {
+    if (lats.length - 1 < index) {
       int oldLength = lats.length;
-      int newLength = increaseCapacity(lats);
+      int newLength = increaseCapacity(index);
       lats = Arrays.copyOf(lats, newLength);
       lons = Arrays.copyOf(lons, newLength);
       for (var i = oldLength; i < newLength; i++) {
@@ -111,15 +111,19 @@ class CompactShapeBuilder {
 
   private void ensureDistTraveledCapacity(int index) {
     if (this.distTraveleds == null) {
-      this.distTraveleds = new double[INCREASE];
+      this.distTraveleds = new double[Math.max(INCREASE, index + 1)];
       Arrays.fill(distTraveleds, NO_VALUE);
-    } else if (distTraveleds.length < index + 1) {
-      int newLength = increaseCapacity(distTraveleds);
+    } else if (distTraveleds.length - 1 < index) {
+      int oldLength = distTraveleds.length;
+      int newLength = increaseCapacity(index);
       this.distTraveleds = Arrays.copyOf(distTraveleds, newLength);
+      for (var i = oldLength; i < newLength; i++) {
+        distTraveleds[i] = NO_VALUE;
+      }
     }
   }
 
-  private static int increaseCapacity(double[] array) {
-    return Math.max(INCREASE, array.length + INCREASE);
+  private static int increaseCapacity(int index) {
+    return index + INCREASE;
   }
 }
