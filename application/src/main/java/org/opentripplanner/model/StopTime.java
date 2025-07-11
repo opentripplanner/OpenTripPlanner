@@ -46,9 +46,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   private double shapeDistTraveled = MISSING_VALUE;
 
-  /** This is a Conveyal extension to the GTFS spec to support Seattle on/off peak fares. */
-  private String farePeriodId;
-
   private int flexWindowStart = MISSING_VALUE;
 
   private int flexWindowEnd = MISSING_VALUE;

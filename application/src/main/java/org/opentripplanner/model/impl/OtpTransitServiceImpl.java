@@ -1,12 +1,12 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.impl;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -54,7 +54,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Collection<FeedScopedId> serviceIds;
 
-  private final Map<FeedScopedId, List<ShapePoint>> shapePointsByShapeId;
+  private final Map<FeedScopedId, Iterable<ShapePoint>> shapePointsByShapeId;
 
   private final Map<FeedScopedId, Entrance> entrancesById;
 
@@ -84,7 +84,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
     this.operators = immutableList(builder.getOperatorsById().values());
     this.pathways = immutableList(builder.getPathways());
     this.serviceIds = immutableList(builder.findAllServiceIds());
-    this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());
+    this.shapePointsByShapeId = Map.copyOf(builder.getShapePoints());
     this.entrancesById = builder.getEntrances().asImmutableMap();
     this.pathwayNodesById = builder.getPathwayNodes().asImmutableMap();
     this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
@@ -139,11 +139,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   @Override
   public List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId) {
-    final List<ShapePoint> points = shapePointsByShapeId.get(shapeId);
-    if (points == null) {
+    var compactShape = shapePointsByShapeId.get(shapeId);
+    if (compactShape == null) {
       return List.of();
     }
-    return immutableList(points);
+    return ImmutableList.copyOf(compactShape);
   }
 
   @Override
@@ -212,18 +212,5 @@ class OtpTransitServiceImpl implements OtpTransitService {
       list = new ArrayList<>(c);
     }
     return Collections.unmodifiableList(list);
-  }
-
-  private Map<FeedScopedId, List<ShapePoint>> mapShapePoints(
-    Multimap<FeedScopedId, ShapePoint> shapePoints
-  ) {
-    Map<FeedScopedId, List<ShapePoint>> map = new HashMap<>();
-    for (Map.Entry<FeedScopedId, Collection<ShapePoint>> entry : shapePoints.asMap().entrySet()) {
-      map.put(entry.getKey(), new ArrayList<>(entry.getValue()));
-    }
-    for (List<ShapePoint> list : map.values()) {
-      Collections.sort(list);
-    }
-    return map;
   }
 }

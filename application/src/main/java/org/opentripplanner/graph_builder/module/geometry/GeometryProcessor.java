@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -466,7 +467,7 @@ public class GeometryProcessor {
    */
   private Collection<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
     var points = builder.getShapePoints().get(shapeId);
-    ArrayList<ShapePoint> filtered = new ArrayList<>(points.size());
+    ArrayList<ShapePoint> filtered = new ArrayList<>();
     ShapePoint last = null;
     int currentSeq = Integer.MIN_VALUE;
     for (ShapePoint sp : points) {
@@ -489,12 +490,8 @@ public class GeometryProcessor {
       last = sp;
       currentSeq = sp.sequence();
     }
-    if (filtered.size() != points.size()) {
-      filtered.trimToSize();
-      return filtered;
-    } else {
-      return points;
-    }
+    filtered.trimToSize();
+    return filtered;
   }
 
   private LineString getLineStringForShapeId(FeedScopedId shapeId) {

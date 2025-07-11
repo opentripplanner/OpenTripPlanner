@@ -145,10 +145,9 @@ public class GtfsModule implements GraphBuilderModule {
           feedId,
           issueStore,
           gtfsBundle.parameters().discardMinTransferTimes(),
-          gtfsDao,
           gtfsBundle.parameters().stationTransferPreference()
         );
-        mapper.mapStopTripAndRouteDataIntoBuilder();
+        mapper.mapStopTripAndRouteDataIntoBuilder(gtfsDao);
 
         OtpTransitServiceBuilder builder = mapper.getBuilder();
         var fareRulesData = mapper.fareRulesData();
@@ -168,7 +167,7 @@ public class GtfsModule implements GraphBuilderModule {
         );
 
         // We need to run this after the cleaning of the data, as stop indices might have changed
-        mapper.mapAndAddTransfersToBuilder();
+        mapper.mapAndAddTransfersToBuilder(gtfsDao);
 
         GeometryProcessor geometryProcessor = new GeometryProcessor(
           builder,

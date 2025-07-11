@@ -60,7 +60,7 @@ public class ShapePointMapperTest {
   @Test
   void string() {
     var result = map(List.of(SHAPE_POINT)).toString();
-    assertEquals("3 (60.0, 45.0)", result);
+    assertEquals("3 (60.0, 45.0) dist=2.0", result);
   }
 
   private org.opentripplanner.model.ShapePoint map(List<ShapePoint> shapePoint) {

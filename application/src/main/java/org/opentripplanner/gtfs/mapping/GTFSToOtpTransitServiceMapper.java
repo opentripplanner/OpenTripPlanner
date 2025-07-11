@@ -9,11 +9,11 @@ import static org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP;
 import java.util.Collection;
 import java.util.function.Function;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.services.GtfsDao;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -81,8 +81,6 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final DataImportIssueStore issueStore;
 
-  private final GtfsRelationalDao data;
-
   private final OtpTransitServiceBuilder builder;
 
   private final FareRulesData fareRulesBuilder = new FareRulesData();
@@ -95,7 +93,6 @@ public class GTFSToOtpTransitServiceMapper {
     String feedId,
     DataImportIssueStore issueStore,
     boolean discardMinTransferTimes,
-    GtfsRelationalDao data,
     StopTransferPriority stationTransferPreference
   ) {
     var idFactory = new IdFactory(feedId);
@@ -105,7 +102,6 @@ public class GTFSToOtpTransitServiceMapper {
     Function<FeedScopedId, Station> stationLookup = id -> builder.getStations().get(id);
     Function<FeedScopedId, RegularStop> stopLookup = id -> builder.getStops().get(id);
 
-    this.data = data;
     this.discardMinTransferTimes = discardMinTransferTimes;
     serviceCalendarMapper = new ServiceCalendarMapper(idFactory);
     serviceCalendarDateMapper = new ServiceCalendarDateMapper(idFactory);
@@ -165,7 +161,7 @@ public class GTFSToOtpTransitServiceMapper {
     return fareRulesBuilder;
   }
 
-  public void mapStopTripAndRouteDataIntoBuilder() {
+  public void mapStopTripAndRouteDataIntoBuilder(GtfsRelationalDao data) {
     translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
 
     builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
@@ -174,15 +170,12 @@ public class GTFSToOtpTransitServiceMapper {
     builder.getFeedInfos().addAll(feedInfoMapper.map(data.getAllFeedInfos()));
     builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
     builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
-    shapePointMapper
-      .map(data.getAllShapePoints())
-      .forEach((shapeId, compactShape) ->
-        builder.getShapePoints().putAll(shapeId, compactShape.shapePoints())
-      );
+    var shapes = shapePointMapper.map(data.getAllShapePoints());
+    builder.getShapePoints().putAll(shapes);
     // shape points is a large collection, so after mapping it can be cleared
     data.getAllShapePoints().clear();
 
-    LOG.debug(
+    LOG.info(
       "Mapped {} shapes into OTP model. Clearing GTFS shape storage from memory.",
       builder.getShapePoints().keySet().size()
     );
@@ -242,7 +235,7 @@ public class GTFSToOtpTransitServiceMapper {
   /**
    * Note! Trip-pattens must be added BEFORE mapping transfers
    */
-  public void mapAndAddTransfersToBuilder() {
+  public void mapAndAddTransfersToBuilder(GtfsDao data) {
     TransferMapper transferMapper = new TransferMapper(
       routeMapper,
       stationMapper,
