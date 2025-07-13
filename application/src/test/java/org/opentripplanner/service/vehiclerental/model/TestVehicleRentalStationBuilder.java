@@ -74,7 +74,7 @@ public class TestVehicleRentalStationBuilder {
   }
 
   public TestVehicleRentalStationBuilder withVehicleTypeBicycle(int numAvailable, int numSpaces) {
-    return buildVehicleType(
+    return withVehicleType(
       RentalFormFactor.BICYCLE,
       RentalVehicleType.PropulsionType.HUMAN,
       numAvailable,
@@ -86,7 +86,7 @@ public class TestVehicleRentalStationBuilder {
     int numAvailable,
     int numSpaces
   ) {
-    return buildVehicleType(
+    return withVehicleType(
       RentalFormFactor.BICYCLE,
       RentalVehicleType.PropulsionType.ELECTRIC,
       numAvailable,
@@ -95,7 +95,7 @@ public class TestVehicleRentalStationBuilder {
   }
 
   public TestVehicleRentalStationBuilder withVehicleTypeCar(int numAvailable, int numSpaces) {
-    return buildVehicleType(
+    return withVehicleType(
       RentalFormFactor.CAR,
       RentalVehicleType.PropulsionType.ELECTRIC,
       numAvailable,
@@ -103,7 +103,7 @@ public class TestVehicleRentalStationBuilder {
     );
   }
 
-  private TestVehicleRentalStationBuilder buildVehicleType(
+  public TestVehicleRentalStationBuilder withVehicleType(
     RentalFormFactor rentalFormFactor,
     RentalVehicleType.PropulsionType propulsionType,
     int numAvailable,
