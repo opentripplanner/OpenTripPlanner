@@ -4,6 +4,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import org.opentripplanner.model.ShapePoint;
 
+/**
+ * A builder that stores shape points in a memory-efficient way and allows you to iterate over them
+ * for further processing.
+ * <p>
+ * It is package-private but implements Iterable, so you should use that as the return type of the
+ * mapping process.
+ */
 class CompactShapeBuilder implements Iterable<ShapePoint> {
 
   private static final double NO_VALUE = -9999;
@@ -36,41 +43,43 @@ class CompactShapeBuilder implements Iterable<ShapePoint> {
     }
   }
 
+  /**
+   * Return an Iterable that iterates over the shape points.
+   */
   public Iterable<ShapePoint> shapePoints() {
-    return () ->
-      new Iterator<>() {
-        private int index = 0;
-
-        @Override
-        public boolean hasNext() {
-          return index <= maxSequence;
-        }
-
-        @Override
-        public ShapePoint next() {
-          var lat = lats[index];
-          while (lat == NO_VALUE) {
-            index++;
-            lat = lats[index];
-          }
-          var lon = lons[index];
-          Double distTraveled = null;
-          if (distTraveleds != null && index - 1 < distTraveleds.length) {
-            distTraveled = distTraveleds[index];
-            if (distTraveled == NO_VALUE) {
-              distTraveled = null;
-            }
-          }
-          var ret = new ShapePoint(index, lat, lon, distTraveled);
-          index++;
-          return ret;
-        }
-      };
+    return this;
   }
 
   @Override
   public Iterator<ShapePoint> iterator() {
-    return shapePoints().iterator();
+    return new Iterator<>() {
+      private int index = 0;
+
+      @Override
+      public boolean hasNext() {
+        return index <= maxSequence;
+      }
+
+      @Override
+      public ShapePoint next() {
+        var lat = lats[index];
+        while (lat == NO_VALUE) {
+          index++;
+          lat = lats[index];
+        }
+        var lon = lons[index];
+        Double distTraveled = null;
+        if (distTraveleds != null && index - 1 < distTraveleds.length) {
+          distTraveled = distTraveleds[index];
+          if (distTraveled == NO_VALUE) {
+            distTraveled = null;
+          }
+        }
+        var ret = new ShapePoint(index, lat, lon, distTraveled);
+        index++;
+        return ret;
+      }
+    };
   }
 
   private void ensureLatLonCapacity(int index) {

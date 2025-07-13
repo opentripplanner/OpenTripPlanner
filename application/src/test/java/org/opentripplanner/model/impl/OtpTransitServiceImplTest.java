@@ -2,12 +2,13 @@ package org.opentripplanner.model.impl;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +21,6 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Pathway;
@@ -31,7 +31,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public class OtpTransitServiceImplTest {
 
-  private static final FeedScopedId STATION_ID = TimetableRepositoryForTest.id("station");
+  private static final FeedScopedId STATION_ID = id("station");
 
   // The subject is used as read only; hence static is ok
   private static OtpTransitService subject;
@@ -132,7 +132,7 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetStopForId() {
-    RegularStop stop = subject.siteRepository().getRegularStop(TimetableRepositoryForTest.id("P"));
+    RegularStop stop = subject.siteRepository().getRegularStop(id("P"));
     assertEquals("RegularStop{F:P P}", stop.toString());
   }
 
@@ -146,9 +146,8 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetShapePointsForShapeId() {
-    List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(
-      TimetableRepositoryForTest.id("5")
-    );
+    var id = id("5");
+    var shapePoints = ImmutableList.copyOf(subject.getShapePointsForShapeId(id));
     assertEquals(
       "[#1 (41,-72), #2 (41,-72), #3 (40,-72), #4 (41,-73), #5 (41,-74)]",
       shapePoints.stream().map(OtpTransitServiceImplTest::toString).toList().toString()
@@ -179,10 +178,6 @@ public class OtpTransitServiceImplTest {
 
   private static String removeFeedScope(String text) {
     return text.replace("agency:", "").replace(FEED_ID + ":", "");
-  }
-
-  private static <T> List<T> sort(Collection<? extends T> c) {
-    return c.stream().sorted(comparing(T::toString)).collect(toList());
   }
 
   private static <T> T first(Collection<? extends T> c) {

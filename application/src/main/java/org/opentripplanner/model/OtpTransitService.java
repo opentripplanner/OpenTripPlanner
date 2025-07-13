@@ -52,7 +52,7 @@ public interface OtpTransitService {
    */
   Collection<FeedScopedId> getAllServiceIds();
 
-  List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);
+  Iterable<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);
 
   Collection<Entrance> getAllEntrances();
 
