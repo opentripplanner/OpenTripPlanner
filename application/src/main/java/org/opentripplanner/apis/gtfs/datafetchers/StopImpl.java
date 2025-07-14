@@ -489,7 +489,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       station -> null
     );
   }
-  
+
   @Nullable
   private Collection<Route> getRoutes(DataFetchingEnvironment environment) {
     return getValue(
