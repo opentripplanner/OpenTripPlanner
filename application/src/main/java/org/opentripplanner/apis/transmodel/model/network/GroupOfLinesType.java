@@ -5,15 +5,17 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
+import java.util.Optional;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.ext.trias.id.IdResolver;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 
 public class GroupOfLinesType {
 
   private static final String NAME = "GroupOfLines";
 
-  public static GraphQLObjectType create() {
+  public static GraphQLObjectType create(IdResolver idResolver) {
     return GraphQLObjectType.newObject()
       .name(NAME)
       .description(
@@ -23,7 +25,12 @@ public class GroupOfLinesType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
-          .dataFetcher(env -> TransitIdMapper.mapEntityIDToApi(env.getSource()))
+          .dataFetcher(env ->
+            Optional.ofNullable((AbstractTransitEntity<?, ?>) env.getSource())
+              .map(AbstractTransitEntity::getId)
+              .map(idResolver::toString)
+              .orElse(null)
+          )
           .build()
       )
       .field(

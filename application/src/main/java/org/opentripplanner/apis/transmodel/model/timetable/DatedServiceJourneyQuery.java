@@ -1,7 +1,5 @@
 package org.opentripplanner.apis.transmodel.model.timetable;
 
-import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDsToDomainNullSafe;
-
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
@@ -42,7 +40,10 @@ public class DatedServiceJourneyQuery {
       .build();
   }
 
-  public static GraphQLFieldDefinition createQuery(GraphQLOutputType datedServiceJourneyType) {
+  public static GraphQLFieldDefinition createQuery(
+    GraphQLOutputType datedServiceJourneyType,
+    IdResolver idResolver
+  ) {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("datedServiceJourneys")
       .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(datedServiceJourneyType))))
@@ -93,19 +94,19 @@ public class DatedServiceJourneyQuery {
         // are pushing this check into the domain request.
         var authorities = FilterValues.ofEmptyIsEverything(
           "authorities",
-          mapIDsToDomainNullSafe(environment.getArgument("authorities"))
+          idResolver.parseListNullSafe(environment.getArgument("authorities"))
         );
         var lines = FilterValues.ofEmptyIsEverything(
           "lines",
-          mapIDsToDomainNullSafe(environment.getArgument("lines"))
+          idResolver.parseListNullSafe(environment.getArgument("lines"))
         );
         var serviceJourneys = FilterValues.ofEmptyIsEverything(
           "serviceJourneys",
-          mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"))
+          idResolver.parseListNullSafe(environment.getArgument("serviceJourneys"))
         );
         var replacementFor = FilterValues.ofEmptyIsEverything(
           "replacementFor",
-          mapIDsToDomainNullSafe(environment.getArgument("replacementFor"))
+          idResolver.parseListNullSafe(environment.getArgument("replacementFor"))
         );
         var privateCodes = FilterValues.ofEmptyIsEverything(
           "privateCodes",

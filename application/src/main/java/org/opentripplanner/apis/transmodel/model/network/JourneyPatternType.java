@@ -19,6 +19,7 @@ import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -35,11 +36,12 @@ public class JourneyPatternType {
     GraphQLOutputType lineType,
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType stopToStopGeometryType,
-    GraphQLNamedOutputType ptSituationElementType
+    GraphQLNamedOutputType ptSituationElementType,
+    IdResolver idResolver
   ) {
     return GraphQLObjectType.newObject()
       .name("JourneyPattern")
-      .field(GqlUtil.newTransitIdField())
+      .field(GqlUtil.newTransitIdField(idResolver))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("line")

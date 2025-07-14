@@ -1,7 +1,5 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
-import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDsToDomainNullSafe;
-
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
@@ -19,10 +17,16 @@ public class TripRequestMapper {
 
   private final TripViaLocationMapper tripViaLocationMapper;
   private final GenericLocationMapper genericLocationMapper;
+  private final TransitFilterNewWayMapper transitFilterNewWayMapper;
+  private final TransitFilterOldWayMapper transitFilterOldWayMapper;
+  private final IdResolver idResolver;
 
   public TripRequestMapper(IdResolver idResolver) {
     this.tripViaLocationMapper = new TripViaLocationMapper(idResolver);
     this.genericLocationMapper = new GenericLocationMapper(idResolver);
+    this.transitFilterNewWayMapper = new TransitFilterNewWayMapper(idResolver);
+    this.transitFilterOldWayMapper = new TransitFilterOldWayMapper(idResolver);
+    this.idResolver = idResolver;
   }
 
   /**
@@ -69,28 +73,28 @@ public class TripRequestMapper {
 
       journeyBuilder.withTransit(transitBuilder -> {
         callWith.argument("preferred.authorities", (Collection<String> authorities) ->
-          transitBuilder.withPreferredAgencies(mapIDsToDomainNullSafe(authorities))
+          transitBuilder.withPreferredAgencies(idResolver.parseListNullSafe(authorities))
         );
         callWith.argument("unpreferred.authorities", (Collection<String> authorities) ->
-          transitBuilder.withUnpreferredAgencies(mapIDsToDomainNullSafe(authorities))
+          transitBuilder.withUnpreferredAgencies(idResolver.parseListNullSafe(authorities))
         );
 
         callWith.argument("preferred.lines", (List<String> lines) ->
-          transitBuilder.withPreferredRoutes(mapIDsToDomainNullSafe(lines))
+          transitBuilder.withPreferredRoutes(idResolver.parseListNullSafe(lines))
         );
         callWith.argument("unpreferred.lines", (List<String> lines) ->
-          transitBuilder.withUnpreferredRoutes(mapIDsToDomainNullSafe(lines))
+          transitBuilder.withUnpreferredRoutes(idResolver.parseListNullSafe(lines))
         );
         callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) ->
-          transitBuilder.withBannedTrips(mapIDsToDomainNullSafe(serviceJourneys))
+          transitBuilder.withBannedTrips(idResolver.parseListNullSafe(serviceJourneys))
         );
 
         if (GqlUtil.hasArgument(environment, "filters")) {
           transitBuilder.setFilters(
-            TransitFilterNewWayMapper.mapFilter(environment.getArgument("filters"))
+            transitFilterNewWayMapper.mapFilter(environment.getArgument("filters"))
           );
         } else {
-          TransitFilterOldWayMapper.mapFilter(environment, callWith, transitBuilder);
+          transitFilterOldWayMapper.mapFilter(environment, callWith, transitBuilder);
         }
       });
 

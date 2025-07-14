@@ -32,7 +32,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -198,29 +197,35 @@ public class TransmodelGraphQLSchemaFactory {
     GraphQLOutputType serverInfoType = ServerInfoType.create();
     GraphQLOutputType authorityType = AuthorityType.create(
       LineType.REF,
-      PtSituationElementType.REF
+      PtSituationElementType.REF,
+      idResolver
     );
-    GraphQLOutputType operatorType = OperatorType.create(LineType.REF, ServiceJourneyType.REF);
-    GraphQLOutputType brandingType = BrandingType.create();
-    GraphQLOutputType noticeType = NoticeType.create();
+    GraphQLOutputType operatorType = OperatorType.create(
+      LineType.REF,
+      ServiceJourneyType.REF,
+      idResolver
+    );
+    GraphQLOutputType brandingType = BrandingType.create(idResolver);
+    GraphQLOutputType noticeType = NoticeType.create(idResolver);
     GraphQLOutputType rentalVehicleTypeType = RentalVehicleTypeType.create();
 
     // Stop
-    GraphQLOutputType tariffZoneType = TariffZoneType.createTZ();
+    GraphQLOutputType tariffZoneType = TariffZoneType.createTZ(idResolver);
     GraphQLInterfaceType placeInterface = PlaceInterfaceType.create();
     GraphQLOutputType bikeRentalStationType = BikeRentalStationType.create(placeInterface);
     GraphQLOutputType rentalVehicleType = RentalVehicleType.create(
       rentalVehicleTypeType,
       placeInterface
     );
-    GraphQLOutputType bikeParkType = BikeParkType.createB(placeInterface);
+    GraphQLOutputType bikeParkType = BikeParkType.createB(placeInterface, idResolver);
     GraphQLOutputType stopPlaceType = StopPlaceType.create(
       placeInterface,
       QuayType.REF,
       tariffZoneType,
       EstimatedCallType.REF,
       PtSituationElementType.REF,
-      dateTimeScalar
+      dateTimeScalar,
+      idResolver
     );
     GraphQLOutputType quayType = QuayType.create(
       placeInterface,
@@ -230,7 +235,8 @@ public class TransmodelGraphQLSchemaFactory {
       EstimatedCallType.REF,
       PtSituationElementType.REF,
       tariffZoneType,
-      dateTimeScalar
+      dateTimeScalar,
+      idResolver
     );
 
     GraphQLOutputType stopToStopGeometryType = StopToStopGeometryType.create(
@@ -238,12 +244,16 @@ public class TransmodelGraphQLSchemaFactory {
       quayType
     );
 
-    GraphQLNamedOutputType quayAtDistance = QuayAtDistanceType.createQD(quayType, relay);
+    GraphQLNamedOutputType quayAtDistance = QuayAtDistanceType.createQD(
+      quayType,
+      relay,
+      idResolver
+    );
     GraphQLNamedOutputType placeAtDistanceType = PlaceAtDistanceType.create(relay, placeInterface);
 
     // Network
     GraphQLObjectType presentationType = PresentationType.create();
-    GraphQLOutputType groupOfLinesType = GroupOfLinesType.create();
+    GraphQLOutputType groupOfLinesType = GroupOfLinesType.create(idResolver);
     GraphQLOutputType destinationDisplayType = DestinationDisplayType.create();
     GraphQLOutputType lineType = LineType.create(
       bookingArrangementType,
@@ -256,7 +266,8 @@ public class TransmodelGraphQLSchemaFactory {
       ServiceJourneyType.REF,
       PtSituationElementType.REF,
       brandingType,
-      groupOfLinesType
+      groupOfLinesType,
+      idResolver
     );
     GraphQLOutputType interchangeType = InterchangeType.create(lineType, ServiceJourneyType.REF);
 
@@ -289,7 +300,8 @@ public class TransmodelGraphQLSchemaFactory {
       lineType,
       ServiceJourneyType.REF,
       stopToStopGeometryType,
-      ptSituationElementType
+      ptSituationElementType,
+      idResolver
     );
     GraphQLOutputType estimatedCallType = EstimatedCallType.create(
       bookingArrangementType,
@@ -312,14 +324,16 @@ public class TransmodelGraphQLSchemaFactory {
       ptSituationElementType,
       journeyPatternType,
       estimatedCallType,
-      TimetabledPassingTimeType.REF
+      TimetabledPassingTimeType.REF,
+      idResolver
     );
 
     GraphQLOutputType datedServiceJourneyType = DatedServiceJourneyType.create(
       serviceJourneyType,
       journeyPatternType,
       estimatedCallType,
-      quayType
+      quayType,
+      idResolver
     );
 
     GraphQLOutputType timetabledPassingTime = TimetabledPassingTimeType.create(
@@ -878,8 +892,12 @@ public class TransmodelGraphQLSchemaFactory {
             @SuppressWarnings("rawtypes")
             Map filterByIds = environment.getArgument("filterByIds");
             if (filterByIds != null) {
-              filterByStops = toIdList(((List<String>) filterByIds.get("quays")));
-              filterByRoutes = toIdList(((List<String>) filterByIds.get("lines")));
+              filterByStops = idResolver.parseListNullSafe(
+                ((List<String>) filterByIds.get("quays"))
+              );
+              filterByRoutes = idResolver.parseListNullSafe(
+                ((List<String>) filterByIds.get("lines"))
+              );
               filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null
                 ? (List<String>) filterByIds.get("bikeRentalStations")
                 : List.of();
@@ -1097,7 +1115,7 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .dataFetcher(environment -> {
             if (environment.containsArgument("ids")) {
-              var ids = toIdList(environment.getArgument("ids"));
+              var ids = idResolver.parseListNullSafe(environment.getArgument("ids"));
 
               // flexibleLines gets special treatment because it has a default value.
               if (
@@ -1496,18 +1514,16 @@ public class TransmodelGraphQLSchemaFactory {
           .build()
       )
       .field(DatedServiceJourneyQuery.createGetById(datedServiceJourneyType, idResolver))
-      .field(DatedServiceJourneyQuery.createQuery(datedServiceJourneyType))
+      .field(DatedServiceJourneyQuery.createQuery(datedServiceJourneyType, idResolver))
       .build();
 
-    var schema = GraphQLSchema.newSchema()
+    return GraphQLSchema.newSchema()
       .query(queryType)
       .additionalType(placeInterface)
       .additionalType(timetabledPassingTime)
       .additionalType(Relay.pageInfoType)
       .additionalDirective(TransmodelDirectives.TIMING_DATA)
       .build();
-
-    return schema;
   }
 
   private Stream<FeedScopedId> resolveIds(DataFetchingEnvironment env) {
@@ -1516,21 +1532,10 @@ public class TransmodelGraphQLSchemaFactory {
       .flatMap(ids -> ids.stream().filter(StringUtils::hasValue).map(idResolver::parse));
   }
 
-  private List<FeedScopedId> toIdList(@Nullable List<String> ids) {
-    if (ids == null) {
-      return Collections.emptyList();
-    }
-    return ids
-      .stream()
-      .map(idResolver::parseNullSafe)
-      .filter(Objects::nonNull)
-      .collect(Collectors.toList());
-  }
-
   private @Nullable List<FeedScopedId> toNullableIdList(@Nullable List<String> ids) {
     if (ids == null) {
       return null;
     }
-    return toIdList(ids);
+    return idResolver.parseListNullSafe(ids);
   }
 }

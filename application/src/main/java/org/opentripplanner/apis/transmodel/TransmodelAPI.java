@@ -20,12 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.apis.support.TracingUtils;
-import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
-import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
-import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,24 +67,6 @@ public class TransmodelAPI {
       @PathParam("ignoreRouterId") String ignore
     ) {
       super(serverContext);
-    }
-  }
-
-  /**
-   * This method should be called BEFORE the Web-Container is started and load new instances of this
-   * class. This is a hack, and it would be better if the configuration was done more explicit and
-   * enforced, not relaying on a "static" setup method to be called.
-   */
-  public static void setUp(
-    TransmodelAPIParameters config,
-    TimetableRepository timetableRepository,
-    RouteRequest defaultRouteRequest,
-    ApiDocumentationProfile documentationProfile,
-    TransitRoutingConfig transitRoutingConfig
-  ) {
-    if (config.hideFeedId()) {
-      // ToDo: use idResolver instead of TransitIdMapper everywhere, then this can be deleted
-      TransitIdMapper.setupFixedFeedId(timetableRepository.getAgencies());
     }
   }
 

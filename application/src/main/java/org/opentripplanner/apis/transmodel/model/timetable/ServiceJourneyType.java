@@ -20,6 +20,7 @@ import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -41,12 +42,13 @@ public class ServiceJourneyType {
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType journeyPatternType,
     GraphQLOutputType estimatedCallType,
-    GraphQLOutputType timetabledPassingTimeType
+    GraphQLOutputType timetabledPassingTimeType,
+    IdResolver idResolver
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
       .description("A planned vehicle journey with passengers.")
-      .field(GqlUtil.newTransitIdField())
+      .field(GqlUtil.newTransitIdField(idResolver))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("line")

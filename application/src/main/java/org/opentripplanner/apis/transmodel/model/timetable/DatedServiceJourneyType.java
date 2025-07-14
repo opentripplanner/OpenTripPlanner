@@ -17,6 +17,7 @@ import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -34,12 +35,13 @@ public class DatedServiceJourneyType {
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType journeyPatternType,
     GraphQLType estimatedCallType,
-    GraphQLType quayType
+    GraphQLType quayType,
+    IdResolver idResolver
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
       .description("A planned journey on a specific day")
-      .field(GqlUtil.newTransitIdField())
+      .field(GqlUtil.newTransitIdField(idResolver))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("operatingDay")

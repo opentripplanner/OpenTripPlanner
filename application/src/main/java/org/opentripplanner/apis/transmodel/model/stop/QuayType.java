@@ -24,6 +24,7 @@ import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -46,7 +47,8 @@ public class QuayType {
     GraphQLOutputType estimatedCallType,
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType tariffZoneType,
-    GraphQLScalarType dateTimeScalar
+    GraphQLScalarType dateTimeScalar,
+    IdResolver idResolver
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -54,7 +56,7 @@ public class QuayType {
         "A place such as platform, stance, or quayside where passengers have access to PT vehicles."
       )
       .withInterface(placeInterface)
-      .field(GqlUtil.newTransitIdField())
+      .field(GqlUtil.newTransitIdField(idResolver))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
@@ -284,7 +286,7 @@ public class QuayType {
             Duration timeRange = Duration.ofSeconds(timeRangeInput);
             StopLocation stop = environment.getSource();
 
-            JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
+            JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idResolver);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
             Long startTimeInput = environment.getArgument("startTime");

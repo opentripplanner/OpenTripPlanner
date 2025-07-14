@@ -21,10 +21,12 @@ public class ViaRequestMapper {
 
   private final ViaLocationDeprecatedMapper viaLocationDeprecatedMapper;
   private final GenericLocationMapper genericLocationMapper;
+  private final ViaSegmentMapper viaSegmentMapper;
 
   public ViaRequestMapper(IdResolver idResolver) {
     viaLocationDeprecatedMapper = new ViaLocationDeprecatedMapper(idResolver);
     genericLocationMapper = new GenericLocationMapper(idResolver);
+    viaSegmentMapper = new ViaSegmentMapper(idResolver);
   }
 
   /**
@@ -46,7 +48,7 @@ public class ViaRequestMapper {
       List<Map<String, Object>> segments = environment.getArgument("segments");
       requests = segments
         .stream()
-        .map(viaRequest -> ViaSegmentMapper.mapViaSegment(request, viaRequest))
+        .map(viaRequest -> viaSegmentMapper.mapViaSegment(request, viaRequest))
         .toList();
     } else {
       requests = Collections.nCopies(vias.size() + 1, request.journey());

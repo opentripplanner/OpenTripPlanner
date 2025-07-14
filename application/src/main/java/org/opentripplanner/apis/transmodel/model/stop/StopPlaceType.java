@@ -27,12 +27,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -58,7 +58,8 @@ public class StopPlaceType {
     GraphQLOutputType tariffZoneType,
     GraphQLOutputType estimatedCallType,
     GraphQLOutputType ptSituationElementType,
-    GraphQLScalarType dateTimeScalar
+    GraphQLScalarType dateTimeScalar,
+    IdResolver idResolver
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -71,7 +72,7 @@ public class StopPlaceType {
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(env ->
-            TransitIdMapper.mapIDToApi(((MonoOrMultiModalStation) env.getSource()).getId())
+            idResolver.toString(((MonoOrMultiModalStation) env.getSource()).getId())
           )
           .build()
       )
@@ -347,7 +348,7 @@ public class StopPlaceType {
             Duration timeRange = Duration.ofSeconds(timeRangeInput);
 
             MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
-            JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
+            JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idResolver);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
             Instant startTime = environment.containsArgument("startTime")

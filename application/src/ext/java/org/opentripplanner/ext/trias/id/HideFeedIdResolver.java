@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.trias.id;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -20,11 +19,6 @@ public class HideFeedIdResolver implements IdResolver {
   @Override
   public FeedScopedId parse(String id) {
     return new FeedScopedId(feedId, id);
-  }
-
-  @Override
-  public FeedScopedId parseNullSafe(@Nullable String id) {
-    return FeedScopedId.ofNullable(feedId, id);
   }
 
   @Override

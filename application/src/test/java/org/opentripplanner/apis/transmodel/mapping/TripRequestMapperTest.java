@@ -319,8 +319,6 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   @Test
   void testViaLocations() {
-    TransitIdMapper.clearFixedFeedId();
-
     final List<String> PTP1 = Stream.of(stop1, stop2, stop3).map(STOP_TO_ID).toList();
     final List<String> PTP2 = Stream.of(stop3, stop2).map(STOP_TO_ID).toList();
     final Map<String, Object> arguments = arguments(

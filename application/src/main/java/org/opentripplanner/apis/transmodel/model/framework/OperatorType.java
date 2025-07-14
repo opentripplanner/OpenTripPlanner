@@ -9,17 +9,19 @@ import graphql.schema.GraphQLOutputType;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.ext.trias.id.IdResolver;
 
 public class OperatorType {
 
   public static GraphQLObjectType create(
     GraphQLOutputType lineType,
-    GraphQLOutputType serviceJourneyType
+    GraphQLOutputType serviceJourneyType,
+    IdResolver idResolver
   ) {
     return GraphQLObjectType.newObject()
       .name("Operator")
       .description("Organisation providing public transport services.")
-      .field(GqlUtil.newTransitIdField())
+      .field(GqlUtil.newTransitIdField(idResolver))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("name")

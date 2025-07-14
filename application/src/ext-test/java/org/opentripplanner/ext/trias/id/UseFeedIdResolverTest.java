@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.trias.id;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
@@ -18,27 +17,8 @@ class UseFeedIdResolverTest {
   }
 
   @Test
-  void shouldResolveToNull_whenNull() {
-    FeedScopedId feedScopedId = RESOLVER.parseNullSafe(null);
-    assertNull(feedScopedId);
-  }
-
-  @Test
-  void shouldResolveToNull_whenEmpty() {
-    FeedScopedId feedScopedId = RESOLVER.parseNullSafe("");
-    assertNull(feedScopedId);
-  }
-
-  @Test
-  void shouldResolveToNull_whenBlank() {
-    // this test comes from the TransitIdMapperTest, see also todo in FeedScopeId
-    FeedScopedId feedScopedId = RESOLVER.parseNullSafe(" ");
-    assertNull(feedScopedId);
-  }
-
-  @Test
   void shouldThrowInvalidArgumentException_whenIdIsInvalid() {
-    assertThrows(IllegalArgumentException.class, () -> RESOLVER.parseNullSafe("invalid"));
+    assertThrows(IllegalArgumentException.class, () -> RESOLVER.parse("invalid"));
   }
 
   @Test

@@ -11,20 +11,22 @@ import graphql.schema.GraphQLOutputType;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.transit.model.organization.Agency;
 
 public class AuthorityType {
 
   public static GraphQLObjectType create(
     GraphQLOutputType lineType,
-    GraphQLOutputType ptSituationElementType
+    GraphQLOutputType ptSituationElementType,
+    IdResolver idResolver
   ) {
     return GraphQLObjectType.newObject()
       .name("Authority")
       .description(
         "Authority involved in public transportation. An organisation under which the responsibility of organising the transport service in a certain area is placed."
       )
-      .field(GqlUtil.newTransitIdField())
+      .field(GqlUtil.newTransitIdField(idResolver))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
