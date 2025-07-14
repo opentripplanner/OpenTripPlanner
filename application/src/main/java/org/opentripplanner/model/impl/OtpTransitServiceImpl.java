@@ -1,7 +1,6 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.impl;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -54,8 +52,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Collection<FeedScopedId> serviceIds;
 
-  private final Map<FeedScopedId, Iterable<ShapePoint>> shapePointsByShapeId;
-
   private final Map<FeedScopedId, Entrance> entrancesById;
 
   private final Map<FeedScopedId, PathwayNode> pathwayNodesById;
@@ -84,7 +80,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
     this.operators = immutableList(builder.getOperatorsById().values());
     this.pathways = immutableList(builder.getPathways());
     this.serviceIds = immutableList(builder.findAllServiceIds());
-    this.shapePointsByShapeId = Map.copyOf(builder.getShapePoints());
     this.entrancesById = builder.getEntrances().asImmutableMap();
     this.pathwayNodesById = builder.getPathwayNodes().asImmutableMap();
     this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
@@ -135,15 +130,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
   @Override
   public Collection<FeedScopedId> getAllServiceIds() {
     return serviceIds;
-  }
-
-  @Override
-  public List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId) {
-    var compactShape = shapePointsByShapeId.get(shapeId);
-    if (compactShape == null) {
-      return List.of();
-    }
-    return ImmutableList.copyOf(compactShape);
   }
 
   @Override

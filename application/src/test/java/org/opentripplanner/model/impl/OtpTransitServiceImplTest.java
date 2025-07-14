@@ -8,7 +8,6 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
-import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +18,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -145,16 +143,6 @@ public class OtpTransitServiceImplTest {
   }
 
   @Test
-  public void testGetShapePointsForShapeId() {
-    var id = id("5");
-    var shapePoints = ImmutableList.copyOf(subject.getShapePointsForShapeId(id));
-    assertEquals(
-      "[#1 (41,-72), #2 (41,-72), #3 (40,-72), #4 (41,-73), #5 (41,-74)]",
-      shapePoints.stream().map(OtpTransitServiceImplTest::toString).toList().toString()
-    );
-  }
-
-  @Test
   public void testGetStopTimesForTrip() {
     List<StopTime> stopTimes = subject.getStopTimesForTrip(first(subject.getAllTrips()));
     assertEquals(
@@ -182,11 +170,5 @@ public class OtpTransitServiceImplTest {
 
   private static <T> T first(Collection<? extends T> c) {
     return c.stream().min(comparing(T::toString)).orElseThrow();
-  }
-
-  private static String toString(ShapePoint sp) {
-    int lat = (int) sp.lat();
-    int lon = (int) sp.lon();
-    return "#" + sp.sequence() + " (" + lat + "," + lon + ")";
   }
 }

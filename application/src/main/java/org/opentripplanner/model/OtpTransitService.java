@@ -52,8 +52,6 @@ public interface OtpTransitService {
    */
   Collection<FeedScopedId> getAllServiceIds();
 
-  Iterable<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);
-
   Collection<Entrance> getAllEntrances();
 
   Collection<PathwayNode> getAllPathwayNodes();

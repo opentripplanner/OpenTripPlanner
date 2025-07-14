@@ -8,6 +8,9 @@ import org.opentripplanner.model.ShapePoint;
  * A builder that stores shape points in a memory-efficient way and allows you to iterate over them
  * for further processing.
  * <p>
+ * It is a compromise between efficient memory consumption and efficient use of CPU by not compressing
+ * or encoding the shape but storing the raw coordinate values.
+ * <p>
  * It is package-private but implements Iterable, so you should use that as the return type of the
  * mapping process.
  */
@@ -41,13 +44,6 @@ class CompactShapeBuilder implements Iterable<ShapePoint> {
     if (maxSequence < index) {
       maxSequence = index;
     }
-  }
-
-  /**
-   * Return an Iterable that iterates over the shape points.
-   */
-  public Iterable<ShapePoint> shapePoints() {
-    return this;
   }
 
   @Override

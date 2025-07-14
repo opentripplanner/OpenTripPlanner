@@ -2,7 +2,7 @@ package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.tngtech.archunit.thirdparty.com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.ShapePoint;
@@ -18,7 +18,7 @@ class CompactShapeBuilderTest {
     builder.addPoint(shapePoint(3, 3, 3));
     builder.addPoint(shapePoint(4, 4, 4));
 
-    var points = ImmutableList.copyOf(builder.shapePoints());
+    var points = ImmutableList.copyOf(builder);
 
     assertEquals("[1 (1.0, 2.0), 2 (2.0, 2.0), 3 (3.0, 3.0), 4 (4.0, 4.0)]", points.toString());
   }
@@ -35,7 +35,7 @@ class CompactShapeBuilderTest {
     builder.addPoint(p2);
     builder.addPoint(p3);
 
-    var points = ImmutableList.copyOf(builder.shapePoints());
+    var points = ImmutableList.copyOf(builder);
 
     assertEquals("[1 (1.0, 2.0), 2 (3.0, 4.0), 10 (3.0, 4.0)]", points.toString());
   }
@@ -49,7 +49,7 @@ class CompactShapeBuilderTest {
     builder.addPoint(shapePoint(10, 3, 3));
     builder.addPoint(shapePoint(51, 4, 4));
 
-    var points = ImmutableList.copyOf(builder.shapePoints());
+    var points = ImmutableList.copyOf(builder);
 
     assertEquals("[1 (1.0, 1.0), 2 (2.0, 2.0), 10 (3.0, 3.0), 51 (4.0, 4.0)]", points.toString());
   }
@@ -63,7 +63,7 @@ class CompactShapeBuilderTest {
     builder.addPoint(shapePoint(10, 3, 3, 2d));
     builder.addPoint(shapePoint(51, 4, 4));
 
-    var points = ImmutableList.copyOf(builder.shapePoints());
+    var points = ImmutableList.copyOf(builder);
 
     assertEquals(
       "[1 (1.0, 1.0) dist=0.0, 2 (2.0, 2.0) dist=1.0, 10 (3.0, 3.0) dist=2.0, 51 (4.0, 4.0)]",
@@ -82,7 +82,7 @@ class CompactShapeBuilderTest {
     builder.addPoint(shapePoint(102, 5, 5, 10d));
     builder.addPoint(shapePoint(150, 6, 6));
 
-    var points = ImmutableList.copyOf(builder.shapePoints());
+    var points = ImmutableList.copyOf(builder);
 
     assertEquals(
       "[1 (1.0, 1.0) dist=1.0, 2 (2.0, 2.0) dist=2.0, 10 (3.0, 3.0) dist=4.0, 51 (4.0, 4.0), 102 (5.0, 5.0) dist=10.0, 150 (6.0, 6.0)]",
@@ -100,7 +100,7 @@ class CompactShapeBuilderTest {
     builder.addPoint(shapePoint(50, 4, 4, 5d));
     builder.addPoint(shapePoint(51, 5, 5, 6d));
 
-    var points = ImmutableList.copyOf(builder.shapePoints());
+    var points = ImmutableList.copyOf(builder);
 
     assertEquals(
       "[0 (1.0, 1.0) dist=1.0, 9 (2.0, 2.0) dist=2.0, 10 (3.0, 3.0) dist=4.0, 50 (4.0, 4.0) dist=5.0, 51 (5.0, 5.0) dist=6.0]",
