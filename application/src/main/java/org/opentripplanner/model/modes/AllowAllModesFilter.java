@@ -22,6 +22,6 @@ class AllowAllModesFilter implements AllowTransitModeFilter {
 
   @Override
   public String toString() {
-    return "AllowAllModesFilter{}";
+    return AllowAllModesFilter.class.getSimpleName();
   }
 }

@@ -3,8 +3,8 @@ package org.opentripplanner.standalone.api;
 import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
-import java.util.Locale;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -12,6 +12,7 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.trias.parameters.TriasApiParameters;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -72,11 +73,6 @@ public interface OtpServerRequestContext {
   @HttpRequestScoped
   RouteRequest defaultRouteRequest();
 
-  /**
-   * Return the default routing request locale(without cloning the request).
-   */
-  Locale defaultLocale();
-
   RaptorConfig<TripSchedule> raptorConfig();
 
   Graph graph();
@@ -122,7 +118,7 @@ public interface OtpServerRequestContext {
   TraverseVisitor<State, Edge> traverseVisitor();
 
   default GraphFinder graphFinder() {
-    return GraphFinder.getInstance(graph(), transitService());
+    return GraphFinder.getInstance(graph(), transitService()::findRegularStopsByBoundingBox);
   }
 
   FlexParameters flexParameters();
@@ -130,6 +126,10 @@ public interface OtpServerRequestContext {
   VectorTileConfig vectorTileConfig();
 
   ViaCoordinateTransferFactory viaTransferResolver();
+
+  TriasApiParameters triasApiParameters();
+
+  GtfsApiParameters gtfsApiParameters();
 
   /* Sandbox modules */
 

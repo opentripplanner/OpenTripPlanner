@@ -1,7 +1,8 @@
 # Naming Conventions
 
 In general, we use American English. We use the GTFS terminology inside OTP as the transit
-domain-specific language. In cases where GTFS does not provide an alternative, we use NeTEx.
+domain-specific language. In cases where GTFS does not provide an alternative, we use NeTEx. More
+information about the used terminology is in [the Dictionary](/doc/dev/Dictionary.md).
 We follow the [Google Java Style Guide - Naming](https://google.github.io/styleguide/javaguide.html#s5-naming) conventions.
 The code formatting part of that style guide is not relevant, as OTP code is auto-formatted using Prettier.
 If in doubt, check the Oxford Dictionary (American).

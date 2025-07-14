@@ -22,7 +22,6 @@ import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.TripPatternCache;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdater;
 import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdater;
@@ -52,7 +51,6 @@ public class UpdaterConfigurator {
   private final VehicleRentalRepository vehicleRentalRepository;
   private final VehicleParkingRepository parkingRepository;
   private final TimetableSnapshotManager snapshotManager;
-  private final TripPatternCache tripPatternCache;
 
   private UpdaterConfigurator(
     Graph graph,
@@ -61,7 +59,6 @@ public class UpdaterConfigurator {
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     TimetableSnapshotManager snapshotManager,
-    TripPatternCache tripPatternCache,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
@@ -71,7 +68,6 @@ public class UpdaterConfigurator {
     this.updatersParameters = updatersParameters;
     this.parkingRepository = parkingRepository;
     this.snapshotManager = snapshotManager;
-    this.tripPatternCache = tripPatternCache;
   }
 
   public static void configure(
@@ -81,7 +77,6 @@ public class UpdaterConfigurator {
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     TimetableSnapshotManager snapshotManager,
-    TripPatternCache tripPatternCache,
     UpdatersParameters updatersParameters
   ) {
     new UpdaterConfigurator(
@@ -91,7 +86,6 @@ public class UpdaterConfigurator {
       parkingRepository,
       timetableRepository,
       snapshotManager,
-      tripPatternCache,
       updatersParameters
     ).configure();
   }
@@ -232,19 +226,12 @@ public class UpdaterConfigurator {
   }
 
   private SiriRealTimeTripUpdateAdapter provideSiriAdapter() {
-    return new SiriRealTimeTripUpdateAdapter(
-      timetableRepository,
-      snapshotManager,
-      tripPatternCache
-    );
+    return new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
   }
 
   private GtfsRealTimeTripUpdateAdapter provideGtfsAdapter() {
-    return new GtfsRealTimeTripUpdateAdapter(
-      timetableRepository,
-      snapshotManager,
-      tripPatternCache,
-      () -> LocalDate.now(timetableRepository.getTimeZone())
+    return new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
+      LocalDate.now(timetableRepository.getTimeZone())
     );
   }
 

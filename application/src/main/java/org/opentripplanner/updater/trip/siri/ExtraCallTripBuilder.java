@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitEditorService;
@@ -135,18 +135,16 @@ class ExtraCallTripBuilder {
     // TODO: We always create a new TripPattern to be able to modify its scheduled timetable
     StopPattern stopPattern = new StopPattern(aimedStopTimes);
 
-    RealTimeTripTimes tripTimes = TripTimesFactory.tripTimes(
+    var tripTimes = TripTimesFactory.tripTimes(
       trip,
       aimedStopTimes,
       transitService.getDeduplicator()
-    );
+    ).withServiceCode(transitService.getServiceCode(trip.getServiceId()));
     // validate the scheduled trip times
     // they are in general superseded by real-time trip times
     // but in case of trip cancellation, OTP will fall back to scheduled trip times
     // therefore they must be valid
     tripTimes.validateNonIncreasingTimes();
-    tripTimes.setServiceCode(transitService.getServiceCode(trip.getServiceId()));
-
     TripPattern pattern = TripPattern.of(generateTripPatternId.apply(trip))
       .withRoute(trip.getRoute())
       .withMode(trip.getMode())
@@ -156,13 +154,13 @@ class ExtraCallTripBuilder {
       .withCreatedByRealtimeUpdater(true)
       .build();
 
-    RealTimeTripTimes updatedTripTimes = tripTimes.copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
 
     // Loop through calls again and apply updates
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
       TimetableHelper.applyUpdates(
         departureDate,
-        updatedTripTimes,
+        builder,
         stopSequence,
         stopSequence == (calls.size() - 1),
         isJourneyPredictionInaccurate,
@@ -172,20 +170,18 @@ class ExtraCallTripBuilder {
     }
 
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
-      updatedTripTimes.cancelTrip();
+      builder.cancelTrip();
     } else {
-      updatedTripTimes.setRealTimeState(RealTimeState.MODIFIED);
+      builder.withRealTimeState(RealTimeState.MODIFIED);
     }
 
     /* Validate */
     try {
-      updatedTripTimes.validateNonIncreasingTimes();
+      return Result.success(
+        new TripUpdate(stopPattern, builder.build(), serviceDate, null, pattern, false, dataSource)
+      );
     } catch (DataValidationException e) {
       return DataValidationExceptionMapper.toResult(e, dataSource);
     }
-
-    return Result.success(
-      new TripUpdate(stopPattern, updatedTripTimes, serviceDate, null, pattern, false, dataSource)
-    );
   }
 }

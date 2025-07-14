@@ -11,6 +11,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class TimetableBuilder {
@@ -96,7 +97,7 @@ public class TimetableBuilder {
         it.endTime,
         it.headway,
         it.exactTimes,
-        update.apply(it.tripTimes)
+        (ScheduledTripTimes) update.apply(it.tripTimes)
       )
     );
     return this;

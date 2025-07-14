@@ -1,16 +1,51 @@
 package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
+import java.util.Objects;
 import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-// TODO VIA: Javadoc
-public class JourneyRequest implements Cloneable, Serializable {
+public class JourneyRequest implements Serializable {
 
-  private TransitRequest transit = new TransitRequest();
-  private StreetRequest access = new StreetRequest();
-  private StreetRequest egress = new StreetRequest();
-  private StreetRequest transfer = new StreetRequest();
-  private StreetRequest direct = new StreetRequest();
+  public static final JourneyRequest DEFAULT = new JourneyRequest(
+    TransitRequest.DEFAULT,
+    StreetRequest.DEFAULT,
+    StreetRequest.DEFAULT,
+    StreetRequest.DEFAULT,
+    StreetRequest.DEFAULT,
+    false
+  );
+
+  private final TransitRequest transit;
+  private final StreetRequest access;
+  private final StreetRequest egress;
+  private final StreetRequest transfer;
+  private final StreetRequest direct;
+  private final boolean wheelchair;
+
+  JourneyRequest(
+    TransitRequest transit,
+    StreetRequest access,
+    StreetRequest egress,
+    StreetRequest transfer,
+    StreetRequest direct,
+    boolean wheelchair
+  ) {
+    this.transit = transit;
+    this.access = access;
+    this.egress = egress;
+    this.transfer = transfer;
+    this.direct = direct;
+    this.wheelchair = wheelchair;
+  }
+
+  public static JourneyRequestBuilder of() {
+    return DEFAULT.copyOf();
+  }
+
+  public JourneyRequestBuilder copyOf() {
+    return new JourneyRequestBuilder(this);
+  }
 
   public TransitRequest transit() {
     return transit;
@@ -32,35 +67,52 @@ public class JourneyRequest implements Cloneable, Serializable {
     return direct;
   }
 
-  public void setModes(RequestModes modes) {
-    transfer().setMode(modes.transferMode);
-    access().setMode(modes.accessMode);
-    egress().setMode(modes.egressMode);
-    direct().setMode(modes.directMode);
+  /**
+   * Whether the trip must be wheelchair-accessible
+   */
+  public boolean wheelchair() {
+    return wheelchair;
   }
 
   public RequestModes modes() {
     return RequestModes.of()
       .withAccessMode(access.mode())
-      .withTransferMode(transfer.mode())
       .withEgressMode(egress.mode())
+      .withTransferMode(transfer.mode())
       .withDirectMode(direct.mode())
       .build();
   }
 
-  public JourneyRequest clone() {
-    try {
-      var clone = (JourneyRequest) super.clone();
-      clone.transit = this.transit.clone();
-      clone.access = this.access.clone();
-      clone.egress = this.egress.clone();
-      clone.transfer = this.transfer.clone();
-      clone.direct = this.direct.clone();
-
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
+    JourneyRequest that = (JourneyRequest) o;
+    return (
+      wheelchair == that.wheelchair &&
+      Objects.equals(transit, that.transit) &&
+      Objects.equals(access, that.access) &&
+      Objects.equals(egress, that.egress) &&
+      Objects.equals(transfer, that.transfer) &&
+      Objects.equals(direct, that.direct)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(transit, access, egress, transfer, direct, wheelchair);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.ofEmbeddedType()
+      .addObj("transit", transit, DEFAULT.transit)
+      .addObj("access", access, DEFAULT.access)
+      .addObj("egress", egress, DEFAULT.egress)
+      .addObj("transfer", transfer, DEFAULT.transfer)
+      .addObj("direct", direct, DEFAULT.direct)
+      .addBoolIfTrue("wheelchair", wheelchair)
+      .toString();
   }
 }

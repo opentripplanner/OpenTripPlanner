@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -97,7 +98,7 @@ public class BikeRentalTest extends GraphRoutingTest {
       B,
       C,
       false,
-      new RouteRequest(),
+      RouteRequest.defaultValue(),
       StreetMode.BIKE
     );
 
@@ -111,7 +112,7 @@ public class BikeRentalTest extends GraphRoutingTest {
       B,
       C,
       false,
-      new RouteRequest(),
+      RouteRequest.defaultValue(),
       StreetMode.BIKE
     );
 
@@ -432,7 +433,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     Set<String> bannedNetworks,
     Set<String> allowedNetworks
   ) {
-    Consumer<RouteRequest> setter = options -> {
+    Consumer<RouteRequestBuilder> setter = options -> {
       options.withPreferences(preferences ->
         preferences.withBike(bike ->
           bike.withRental(rental -> {
@@ -462,7 +463,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     Set<String> bannedNetworks,
     Set<String> allowedNetworks
   ) {
-    Consumer<RouteRequest> setter = options -> {
+    Consumer<RouteRequestBuilder> setter = options -> {
       options.withPreferences(preferences ->
         preferences.withBike(bike ->
           bike.withRental(rental -> {
@@ -604,15 +605,13 @@ public class BikeRentalTest extends GraphRoutingTest {
     Vertex fromVertex,
     Vertex toVertex,
     boolean arriveBy,
-    Consumer<RouteRequest> optionsSetter
+    Consumer<RouteRequestBuilder> optionsSetter
   ) {
-    var request = new RouteRequest();
+    var builder = RouteRequest.of().withArriveBy(arriveBy);
 
-    request.setArriveBy(arriveBy);
+    optionsSetter.accept(builder);
 
-    optionsSetter.accept(request);
-
-    request.withPreferences(preferences ->
+    builder.withPreferences(preferences ->
       preferences.withBike(bike ->
         bike.withRental(rental ->
           rental.withPickupTime(42).withPickupCost(62).withDropOffCost(33).withDropOffTime(15)
@@ -624,7 +623,7 @@ public class BikeRentalTest extends GraphRoutingTest {
       fromVertex,
       toVertex,
       arriveBy,
-      request,
+      builder.buildDefault(),
       StreetMode.BIKE_RENTAL
     );
   }

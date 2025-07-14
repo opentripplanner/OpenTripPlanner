@@ -93,8 +93,8 @@ To enable this functionality, you need to enable the "Emission" feature in the
 
 ```
 
-Include the `emissions` object in the
-`build-config.json` file. The `emissions` object should contain parameters called
+Include the `emission` object in the
+`build-config.json` file. The `emission` object should contain parameters called
 `carAvgCo2PerKm` and `carAvgOccupancy`. The `carAvgCo2PerKm` provides the average emissions value for a car in g/km and
 the `carAvgOccupancy` provides the average number of passengers in a car.
 

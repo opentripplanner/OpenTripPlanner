@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -35,6 +36,7 @@ class RoutingResultTest implements PlanTestConstants {
   void empty() {
     var subject = RoutingResult.empty();
     assertTrue(subject.itineraries().isEmpty());
+    assertFalse(subject.removeWalkAllTheWayResults());
     assertTrue(subject.errors().isEmpty());
   }
 
@@ -43,6 +45,16 @@ class RoutingResultTest implements PlanTestConstants {
     var subject = RoutingResult.ok(List.of(I1));
     assertEquals(I1, subject.itineraries().getFirst());
     assertTrue(subject.errors().isEmpty());
+    assertFalse(subject.removeWalkAllTheWayResults());
+    assertContains(subject, List.of(I1), Set.of());
+  }
+
+  @Test
+  void okAndRemoveWalkAllTheWay() {
+    var subject = RoutingResult.ok(List.of(I1), true);
+    assertEquals(I1, subject.itineraries().getFirst());
+    assertTrue(subject.errors().isEmpty());
+    assertTrue(subject.removeWalkAllTheWayResults());
     assertContains(subject, List.of(I1), Set.of());
   }
 
@@ -51,6 +63,7 @@ class RoutingResultTest implements PlanTestConstants {
     var subject = RoutingResult.failed(List.of(E1));
     assertTrue(subject.itineraries().isEmpty());
     assertEquals(E1, subject.errors().stream().findFirst().orElseThrow());
+    assertFalse(subject.removeWalkAllTheWayResults());
     assertContains(subject, List.of(), Set.of(E1));
   }
 
@@ -71,6 +84,16 @@ class RoutingResultTest implements PlanTestConstants {
     // Merrging in the same error twice have no effect, also the order is not important
     subject.merge(RoutingResult.failed(Set.of(E2)));
     assertContains(subject, List.of(I1, I2), Set.of(E2, E1));
+
+    // Merge in removeWalkAllTheWayResults
+    //  Assert flag not set yet
+    assertFalse(subject.removeWalkAllTheWayResults());
+    // Set removeWalkAllTheWayResults, one of these will overide all previous added results
+    subject.merge(RoutingResult.ok(List.of(), true));
+    assertTrue(subject.removeWalkAllTheWayResults());
+    // Adding another result is not changing the removeWalkAllTheWayResults flag
+    subject.merge(RoutingResult.ok(List.of(), false));
+    assertTrue(subject.removeWalkAllTheWayResults());
   }
 
   @Test
@@ -82,16 +105,6 @@ class RoutingResultTest implements PlanTestConstants {
 
     subject.transform(l -> List.of(I2));
     assertContains(subject, List.of(I2), Set.of());
-  }
-
-  void addErrors() {
-    var subject = RoutingResult.empty();
-
-    subject.addErrors(List.of(E1));
-    assertContains(subject, List.of(), Set.of(E1));
-
-    subject.addErrors(Set.of(E2));
-    assertContains(subject, List.of(), Set.of(E1, E2));
   }
 
   private void assertContains(

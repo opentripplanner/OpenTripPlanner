@@ -338,7 +338,6 @@ public class GtfsModule implements GraphBuilderModule {
       if (entityClass == Agency.class) {
         for (Agency agency : reader.getAgencies()) {
           String agencyId = agency.getId();
-          LOG.info("This Agency has the ID {}", agencyId);
           // Somehow, when the agency's id field is missing, OBA replaces it with the agency's name.
           // TODO Figure out how and why this is happening.
           if (agencyId == null || agencyIdsSeen.contains(gtfsFeedId + agencyId)) {

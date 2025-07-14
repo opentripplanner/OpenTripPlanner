@@ -51,6 +51,50 @@
                 "dropoffType": "SCHEDULED"
               }
             ],
+            "stoptimesForDate": [
+              {
+                "stop": {
+                  "gtfsId": "F:Stop_0",
+                  "name": "Stop_0"
+                },
+                "headsign": "Stop headsign at stop 10",
+                "scheduledArrival": 39600,
+                "scheduledDeparture": 39600,
+                "stopPosition": 10,
+                "stopPositionInPattern": 0,
+                "realtimeState": "SCHEDULED",
+                "pickupType": "SCHEDULED",
+                "dropoffType": "SCHEDULED"
+              },
+              {
+                "stop": {
+                  "gtfsId": "F:Stop_1",
+                  "name": "Stop_1"
+                },
+                "headsign": "Stop headsign at stop 20",
+                "scheduledArrival": 39900,
+                "scheduledDeparture": 39900,
+                "stopPosition": 20,
+                "stopPositionInPattern": 1,
+                "realtimeState": "SCHEDULED",
+                "pickupType": "SCHEDULED",
+                "dropoffType": "SCHEDULED"
+              },
+              {
+                "stop": {
+                  "gtfsId": "F:Stop_2",
+                  "name": "Stop_2"
+                },
+                "headsign": "Stop headsign at stop 30",
+                "scheduledArrival": 40200,
+                "scheduledDeparture": 40200,
+                "stopPosition": 30,
+                "stopPositionInPattern": 2,
+                "realtimeState": "SCHEDULED",
+                "pickupType": "SCHEDULED",
+                "dropoffType": "SCHEDULED"
+              }
+            ],
             "occupancy": {
               "occupancyStatus": "NO_DATA_AVAILABLE"
             }
@@ -101,6 +145,50 @@
                 "dropoffType": "SCHEDULED"
               }
             ],
+            "stoptimesForDate": [
+              {
+                "stop": {
+                  "gtfsId": "F:Stop_0",
+                  "name": "Stop_0"
+                },
+                "headsign": "Stop headsign at stop 10",
+                "scheduledArrival": 41400,
+                "scheduledDeparture": 41400,
+                "stopPosition": 10,
+                "stopPositionInPattern": 0,
+                "realtimeState": "SCHEDULED",
+                "pickupType": "SCHEDULED",
+                "dropoffType": "SCHEDULED"
+              },
+              {
+                "stop": {
+                  "gtfsId": "F:Stop_1",
+                  "name": "Stop_1"
+                },
+                "headsign": "Stop headsign at stop 20",
+                "scheduledArrival": 41700,
+                "scheduledDeparture": 41700,
+                "stopPosition": 20,
+                "stopPositionInPattern": 1,
+                "realtimeState": "SCHEDULED",
+                "pickupType": "SCHEDULED",
+                "dropoffType": "SCHEDULED"
+              },
+              {
+                "stop": {
+                  "gtfsId": "F:Stop_2",
+                  "name": "Stop_2"
+                },
+                "headsign": "Stop headsign at stop 30",
+                "scheduledArrival": 42000,
+                "scheduledDeparture": 42000,
+                "stopPosition": 30,
+                "stopPositionInPattern": 2,
+                "realtimeState": "SCHEDULED",
+                "pickupType": "SCHEDULED",
+                "dropoffType": "SCHEDULED"
+              }
+            ],
             "occupancy": {
               "occupancyStatus": "NO_DATA_AVAILABLE"
             }
@@ -108,6 +196,50 @@
           {
             "gtfsId": "F:321Canceled",
             "stoptimes": [
+              {
+                "stop": {
+                  "gtfsId": "F:Stop_0",
+                  "name": "Stop_0"
+                },
+                "headsign": "Stop headsign at stop 10",
+                "scheduledArrival": 41400,
+                "scheduledDeparture": 41400,
+                "stopPosition": 10,
+                "stopPositionInPattern": 0,
+                "realtimeState": "SCHEDULED",
+                "pickupType": "SCHEDULED",
+                "dropoffType": "SCHEDULED"
+              },
+              {
+                "stop": {
+                  "gtfsId": "F:Stop_1",
+                  "name": "Stop_1"
+                },
+                "headsign": "Stop headsign at stop 20",
+                "scheduledArrival": 41700,
+                "scheduledDeparture": 41700,
+                "stopPosition": 20,
+                "stopPositionInPattern": 1,
+                "realtimeState": "SCHEDULED",
+                "pickupType": "SCHEDULED",
+                "dropoffType": "SCHEDULED"
+              },
+              {
+                "stop": {
+                  "gtfsId": "F:Stop_2",
+                  "name": "Stop_2"
+                },
+                "headsign": "Stop headsign at stop 30",
+                "scheduledArrival": 42000,
+                "scheduledDeparture": 42000,
+                "stopPosition": 30,
+                "stopPositionInPattern": 2,
+                "realtimeState": "SCHEDULED",
+                "pickupType": "SCHEDULED",
+                "dropoffType": "SCHEDULED"
+              }
+            ],
+            "stoptimesForDate": [
               {
                 "stop": {
                   "gtfsId": "F:Stop_0",

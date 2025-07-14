@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Trias version="1.1" xmlns="http://www.vdv.de/trias" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <ServiceRequest>
+        <siri:RequestTimestamp>2025-01-27T13:34:00</siri:RequestTimestamp>
+        <siri:RequestorRef>OpenTripPlanner Explorer</siri:RequestorRef>
+        <RequestPayload>
+            <StopEventRequest>
+                <Location>
+                    <LocationRef>
+                        <StopPointRef>{{ stop_point_ref }}</StopPointRef>
+                    </LocationRef>
+                    {% if dep_arr_time %}<DepArrTime>{{ dep_arr_time }}</DepArrTime>{% endif %}
+                </Location>
+                <Params>
+                    {% if num_results %}<NumberOfResults>{{ num_results }}</NumberOfResults>{% endif %}
+                    {% if stop_event_type %}<StopEventType>{{ stop_event_type }}</StopEventType>{% endif %}
+                    {% if include_previous_calls %}<IncludePreviousCalls>{{ include_previous_calls }}</IncludePreviousCalls>{% endif %}
+                    {% if include_onward_calls %}<IncludeOnwardCalls>{{ include_onward_calls }}</IncludeOnwardCalls>{% endif %}
+                    {% if include_realtime_data %}<IncludeRealtimeData>{{ include_realtime_data }}</IncludeRealtimeData>{% endif %}
+                </Params>
+            </StopEventRequest>
+        </RequestPayload>
+    </ServiceRequest>
+</Trias>

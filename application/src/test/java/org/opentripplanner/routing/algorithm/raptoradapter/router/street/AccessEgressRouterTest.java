@@ -206,7 +206,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
   /* Helper methods */
 
   private GenericLocation location(WgsCoordinate coordinate) {
-    return new GenericLocation(coordinate.latitude(), coordinate.longitude());
+    return GenericLocation.fromCoordinate(coordinate.latitude(), coordinate.longitude());
   }
 
   private GenericLocation location(FeedScopedId id) {
@@ -218,10 +218,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
   }
 
   private RouteRequest requestFromTo(GenericLocation from, GenericLocation to) {
-    var routeRequest = new RouteRequest();
-    routeRequest.setFrom(from);
-    routeRequest.setTo(to);
-    return routeRequest;
+    return RouteRequest.of().withFrom(from).withTo(to).buildRequest();
   }
 
   private String nearbyStopDescription(NearbyStop nearbyStop) {
@@ -267,7 +264,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       return AccessEgressRouter.findAccessEgresses(
         request,
         verticesContainer,
-        new StreetRequest(),
+        StreetRequest.DEFAULT,
         null,
         accessEgress,
         durationLimit,

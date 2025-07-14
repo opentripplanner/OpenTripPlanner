@@ -4,7 +4,7 @@ import { Leg } from '../static/query/tripQueryTypes';
 const getColorForMode = function (mode: Mode) {
   if (mode === Mode.Foot) return '#191616';
   if (mode === Mode.Bicycle) return '#5076D9';
-  if (mode === Mode.Scooter) return '#253664';
+  if (mode === Mode.Scooter) return '#14b7ca';
   if (mode === Mode.Car) return '#7e7e7e';
   if (mode === Mode.Rail) return '#86BF8B';
   if (mode === Mode.Coach) return '#25642A';

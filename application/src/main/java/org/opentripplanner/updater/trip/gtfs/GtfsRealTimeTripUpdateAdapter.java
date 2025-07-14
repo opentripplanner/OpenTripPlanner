@@ -53,9 +53,10 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -66,7 +67,6 @@ import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.TripPatternCache;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -87,7 +87,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
 
   /** A synchronized cache of trip patterns added to the graph due to GTFS-realtime messages. */
-  private final TripPatternCache tripPatternCache;
+  private final TripPatternCache tripPatternCache = new TripPatternCache();
 
   private final ZoneId timeZone;
 
@@ -111,7 +111,6 @@ public class GtfsRealTimeTripUpdateAdapter {
   public GtfsRealTimeTripUpdateAdapter(
     TimetableRepository timetableRepository,
     TimetableSnapshotManager snapshotManager,
-    TripPatternCache tripPatternCache,
     Supplier<LocalDate> localDateNow
   ) {
     this.snapshotManager = snapshotManager;
@@ -123,7 +122,6 @@ public class GtfsRealTimeTripUpdateAdapter {
     );
     this.deduplicator = timetableRepository.getDeduplicator();
     this.serviceCodes = timetableRepository.getServiceCodes();
-    this.tripPatternCache = tripPatternCache;
   }
 
   /**
@@ -397,11 +395,8 @@ public class GtfsRealTimeTripUpdateAdapter {
 
     var updatedTripTimes = tripTimesPatch.getTripTimes();
 
-    // Make sure that updated trip times have the correct real time state
-    updatedTripTimes.setRealTimeState(RealTimeState.UPDATED);
-
     // If there are skipped stops, we need to change the pattern from the scheduled one
-    if (!skippedStopIndices.isEmpty()) {
+    if (skippedStopIndices.size() > 0) {
       StopPattern newStopPattern = pattern
         .copyPlannedStopPattern()
         .cancelStops(skippedStopIndices)
@@ -409,7 +404,11 @@ public class GtfsRealTimeTripUpdateAdapter {
 
       final Trip trip = transitEditorService.getTrip(tripId);
       // Get cached trip pattern or create one if it doesn't exist yet
-      final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(newStopPattern, trip);
+      final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
+        newStopPattern,
+        trip,
+        pattern
+      );
 
       cancelScheduledTrip(tripId, serviceDate, CancelationType.DELETE);
       return snapshotManager.updateBuffer(
@@ -845,38 +844,40 @@ public class GtfsRealTimeTripUpdateAdapter {
     // Create StopPattern
     final StopPattern stopPattern = new StopPattern(stopTimes);
 
+    final TripPattern originalTripPattern = transitEditorService.findPattern(trip);
     // Get cached trip pattern or create one if it doesn't exist yet
-    final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip);
+    final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
+      stopPattern,
+      trip,
+      originalTripPattern
+    );
 
     // Create new trip times
-    final RealTimeTripTimes newTripTimes = TripTimesFactory.tripTimes(
+    final RealTimeTripTimesBuilder builder = TripTimesFactory.tripTimes(
       trip,
       stopTimes,
       deduplicator
-    );
+    ).createRealTimeFromScheduledTimes();
 
     // Update all times to mark trip times as realtime
     // TODO: should we incorporate the delay field if present?
-    for (int stopIndex = 0; stopIndex < newTripTimes.getNumStops(); stopIndex++) {
-      newTripTimes.updateArrivalTime(stopIndex, newTripTimes.getScheduledArrivalTime(stopIndex));
-      newTripTimes.updateDepartureTime(
-        stopIndex,
-        newTripTimes.getScheduledDepartureTime(stopIndex)
-      );
+    for (int stopIndex = 0; stopIndex < stopTimes.size(); stopIndex++) {
+      builder.withArrivalTime(stopIndex, builder.getScheduledArrivalTime(stopIndex));
+      builder.withDepartureTime(stopIndex, builder.getScheduledDepartureTime(stopIndex));
     }
 
     // Set service code of new trip times
     final int serviceCode = serviceCodes.get(trip.getServiceId());
-    newTripTimes.setServiceCode(serviceCode);
+    builder.withServiceCode(serviceCode);
 
     // Make sure that updated trip times have the correct real time state
-    newTripTimes.setRealTimeState(realTimeState);
+    builder.withRealTimeState(realTimeState);
 
     if (vehicleDescriptor != null) {
       if (vehicleDescriptor.hasWheelchairAccessible()) {
         GtfsRealtimeMapper.mapWheelchairAccessible(
           vehicleDescriptor.getWheelchairAccessible()
-        ).ifPresent(newTripTimes::updateWheelchairAccessibility);
+        ).ifPresent(builder::withWheelchairAccessibility);
       }
     }
 
@@ -903,7 +904,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     return snapshotManager.updateBuffer(
       new RealTimeTripUpdate(
         pattern,
-        newTripTimes,
+        builder.build(),
         serviceDate,
         tripOnServiceDate,
         realTimeState == RealTimeState.ADDED,
@@ -937,12 +938,7 @@ public class GtfsRealTimeTripUpdateAdapter {
           "Could not cancel scheduled trip because it's not in the timetable"
         );
       } else {
-        final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
-        switch (cancelationType) {
-          case CANCEL -> newTripTimes.cancelTrip();
-          case DELETE -> newTripTimes.deleteTrip();
-        }
-        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, newTripTimes, serviceDate));
+        cancelTrip(serviceDate, cancelationType, pattern, tripTimes);
         success = true;
       }
     }
@@ -977,16 +973,25 @@ public class GtfsRealTimeTripUpdateAdapter {
       if (tripTimes == null) {
         debug(tripId, serviceDate, "Could not cancel previously added trip on {}", serviceDate);
       } else {
-        final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
-        switch (cancelationType) {
-          case CANCEL -> newTripTimes.cancelTrip();
-          case DELETE -> newTripTimes.deleteTrip();
-        }
-        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, newTripTimes, serviceDate));
+        cancelTrip(serviceDate, cancelationType, pattern, tripTimes);
         cancelledAddedTrip = true;
       }
     }
     return cancelledAddedTrip;
+  }
+
+  private void cancelTrip(
+    LocalDate serviceDate,
+    CancelationType cancelationType,
+    TripPattern pattern,
+    TripTimes tripTimes
+  ) {
+    final RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
+    switch (cancelationType) {
+      case CANCEL -> builder.cancelTrip();
+      case DELETE -> builder.deleteTrip();
+    }
+    snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, builder.build(), serviceDate));
   }
 
   /**

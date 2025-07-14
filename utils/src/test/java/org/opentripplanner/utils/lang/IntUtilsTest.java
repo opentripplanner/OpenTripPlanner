@@ -90,7 +90,8 @@ class IntUtilsTest {
     assertEquals(7, requireNotNegative(7, "ok"));
     assertEquals(0, requireNotNegative(0, "ok"));
 
-    var ex = assertThrows(IllegalArgumentException.class, () -> requireNotNegative(-1, "too-small")
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      requireNotNegative(-1, "too-small")
     );
     assertEquals("Negative value not expected for 'too-small': -1", ex.getMessage());
 

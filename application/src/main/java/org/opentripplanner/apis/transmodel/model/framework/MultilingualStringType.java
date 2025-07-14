@@ -25,7 +25,8 @@ public class MultilingualStringType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("language")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((Map.Entry<String, String>) environment.getSource()).getKey()
+          .dataFetcher(environment ->
+            ((Map.Entry<String, String>) environment.getSource()).getKey()
           )
           .build()
       )

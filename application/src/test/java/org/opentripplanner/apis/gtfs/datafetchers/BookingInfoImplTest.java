@@ -1,12 +1,9 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
-import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.apis.gtfs.datafetchers.DataFetchingSupport.dataFetchingEnvironment;
 
-import graphql.execution.ExecutionId;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -46,14 +43,5 @@ class BookingInfoImplTest {
     var env = dataFetchingEnvironment(WITH_NOTICE_DURATIONS);
     assertEquals(TEN_MINUTES, SUBJECT.minimumBookingNotice().get(env));
     assertEquals(TEN_MINUTES, SUBJECT.maximumBookingNotice().get(env));
-  }
-
-  private DataFetchingEnvironment dataFetchingEnvironment(BookingInfo bookingInfo) {
-    var executionContext = newExecutionContextBuilder()
-      .executionId(ExecutionId.from(this.getClass().getName()))
-      .build();
-    return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
-      .source(bookingInfo)
-      .build();
   }
 }

@@ -25,23 +25,24 @@ public class SchemaFactoryTest {
 
   @Test
   void createSchema() {
-    var schema = SchemaFactory.createSchemaWithDefaultInjection(new RouteRequest());
+    var schema = SchemaFactory.createSchemaWithDefaultInjection(RouteRequest.defaultValue());
     assertNotNull(schema);
   }
 
   @Test
   void testDefaultValueInjection() {
-    var routeRequest = new RouteRequest();
     double walkSpeed = 15;
-    routeRequest.withPreferences(preferences ->
-      preferences.withWalk(walk -> walk.withSpeed(walkSpeed))
-    );
     var maxTransfers = 2;
-    routeRequest.withPreferences(preferences ->
-      preferences.withTransfer(transfer -> transfer.withMaxTransfers(maxTransfers + 1))
-    );
     var numItineraries = 63;
-    routeRequest.setNumItineraries(numItineraries);
+
+    var routeRequest = RouteRequest.of()
+      .withPreferences(preferences -> {
+        preferences.withWalk(walk -> walk.withSpeed(walkSpeed));
+        preferences.withTransfer(transfer -> transfer.withMaxTransfers(maxTransfers + 1));
+      })
+      .withNumItineraries(numItineraries)
+      .buildDefault();
+
     var schema = SchemaFactory.createSchemaWithDefaultInjection(routeRequest);
     assertNotNull(schema);
 
@@ -71,12 +72,12 @@ public class SchemaFactoryTest {
   @ParameterizedTest(name = "\"{0}\" must be a an async fetcher")
   void asyncDataFetchers(String fieldName) {
     OTPFeature.AsyncGraphQLFetchers.testOn(() -> {
-      var schema = SchemaFactory.createSchemaWithDefaultInjection(new RouteRequest());
+      var schema = SchemaFactory.createSchemaWithDefaultInjection(RouteRequest.defaultValue());
       var fetcher = getQueryType(fieldName, schema);
       assertSame(fetcher.getClass(), AsyncDataFetcher.class);
     });
     OTPFeature.AsyncGraphQLFetchers.testOff(() -> {
-      var schema = SchemaFactory.createSchemaWithDefaultInjection(new RouteRequest());
+      var schema = SchemaFactory.createSchemaWithDefaultInjection(RouteRequest.defaultValue());
       var fetcher = getQueryType(fieldName, schema);
       assertNotSame(fetcher.getClass(), AsyncDataFetcher.class);
     });

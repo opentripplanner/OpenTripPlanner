@@ -70,7 +70,7 @@ public class PatternAtStop {
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   ) {
-    return transitService.findTripTimeOnDate(
+    return transitService.findTripTimesOnDate(
       stop,
       pattern,
       startTime,

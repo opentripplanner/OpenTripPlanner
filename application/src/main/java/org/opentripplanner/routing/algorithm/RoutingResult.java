@@ -18,22 +18,32 @@ class RoutingResult {
 
   private final List<Itinerary> itineraries = new ArrayList<>();
   private final Set<RoutingError> errors = new HashSet<>();
+  private boolean removeWalkAllTheWayResults = false;
 
-  RoutingResult(Collection<Itinerary> itineraries, Collection<RoutingError> errors) {
+  RoutingResult(
+    Collection<Itinerary> itineraries,
+    Collection<RoutingError> errors,
+    boolean removeWalkAllTheWayResults
+  ) {
     addItineraries(itineraries);
     addErrors(errors);
+    this.removeWalkAllTheWayResults = removeWalkAllTheWayResults;
   }
 
   static RoutingResult empty() {
-    return new RoutingResult(List.of(), List.of());
+    return new RoutingResult(List.of(), List.of(), false);
+  }
+
+  static RoutingResult ok(List<Itinerary> itineraries, boolean removeWalkAllTheWayResults) {
+    return new RoutingResult(itineraries, List.of(), removeWalkAllTheWayResults);
   }
 
   static RoutingResult ok(List<Itinerary> itineraries) {
-    return new RoutingResult(itineraries, List.of());
+    return ok(itineraries, false);
   }
 
   static RoutingResult failed(Collection<RoutingError> errors) {
-    return new RoutingResult(List.of(), errors);
+    return new RoutingResult(List.of(), errors, false);
   }
 
   List<Itinerary> itineraries() {
@@ -44,10 +54,17 @@ class RoutingResult {
     return Set.copyOf(errors);
   }
 
+  public boolean removeWalkAllTheWayResults() {
+    return removeWalkAllTheWayResults;
+  }
+
   void merge(RoutingResult... others) {
     for (RoutingResult it : others) {
       addItineraries(it.itineraries);
       addErrors(it.errors);
+      if (it.removeWalkAllTheWayResults) {
+        this.removeWalkAllTheWayResults = true;
+      }
     }
   }
 

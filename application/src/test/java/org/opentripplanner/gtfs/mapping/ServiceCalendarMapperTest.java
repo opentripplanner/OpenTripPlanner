@@ -87,6 +87,7 @@ public class ServiceCalendarMapperTest {
   @Test
   public void testMapWithNulls() {
     ServiceCalendar input = new ServiceCalendar();
+    input.setServiceId(AGENCY_AND_ID);
     org.opentripplanner.model.calendar.ServiceCalendar result = subject.map(input);
 
     assertEquals(0, result.getMonday());

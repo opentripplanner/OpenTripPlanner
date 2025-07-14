@@ -45,7 +45,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     this(
       request.journey().transfer().mode() == StreetMode.BIKE,
       request.journey().transfer().mode() == StreetMode.CAR,
-      request.wheelchair(),
+      request.journey().wheelchair(),
       request.preferences().wheelchair(),
       request.preferences().transit().includePlannedCancellations(),
       request.preferences().transit().includeRealtimeCancellations(),

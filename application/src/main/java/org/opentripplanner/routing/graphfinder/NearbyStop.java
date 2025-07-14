@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.graphfinder;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -129,6 +130,13 @@ public class NearbyStop implements Comparable<NearbyStop> {
       return (int) (this.state.getWeight()) - (int) (that.state.getWeight());
     }
     return (int) (this.distance) - (int) (that.distance);
+  }
+
+  /**
+   * Duration it took to reach the stop.
+   */
+  public Duration duration() {
+    return Duration.ofSeconds(state.getElapsedTimeSeconds());
   }
 
   @Override

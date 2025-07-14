@@ -25,6 +25,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class TestTripSchedule implements TripSchedule {
 
   private static final int DEFAULT_DEPARTURE_DELAY = 10;
+  private static final LocalDate DATE = LocalDate.of(2025, 6, 25);
   private final DefaultTripPattern pattern;
   private final int[] arrivalTimes;
   private final int[] departureTimes;
@@ -113,7 +114,7 @@ public class TestTripSchedule implements TripSchedule {
 
   @Override
   public LocalDate getServiceDate() {
-    return null;
+    return DATE;
   }
 
   @Override

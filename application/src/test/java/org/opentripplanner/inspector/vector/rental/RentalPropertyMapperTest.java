@@ -41,6 +41,7 @@ class RentalPropertyMapperTest {
         kv("network", "Network-1"),
         kv("vehiclesAvailable", 1),
         kv("spacesAvailable", 0),
+        kv("formFactor", "BICYCLE"),
         kv("isReserved", false),
         kv("isDisabled", false)
       ),

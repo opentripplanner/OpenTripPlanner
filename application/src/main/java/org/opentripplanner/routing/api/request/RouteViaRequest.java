@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 
 /**
@@ -51,7 +52,7 @@ public class RouteViaRequest implements Serializable {
     this.dateTime = Instant.now();
     this.searchWindow = null;
     this.wheelchair = false;
-    this.preferences = new RoutingPreferences();
+    this.preferences = RoutingPreferences.DEFAULT;
     this.locale = null;
     this.numItineraries = null;
 
@@ -85,19 +86,20 @@ public class RouteViaRequest implements Serializable {
     return new Builder(this);
   }
 
-  public RouteRequest routeRequest() {
-    var request = new RouteRequest();
+  public RouteRequestBuilder routeRequestFirstSegment() {
+    // TODO: This should use the configured default, not the code default. This will lead to errors
+    //       where a deployment would expect the same perferences in the via is in a normal routing
+    //       request.
+    var request = RouteRequest.of();
 
-    request.setTo(to);
-    request.setFrom(from);
-    request.setSearchWindow(searchWindow);
-    request.setDateTime(dateTime);
-    request.setWheelchair(wheelchair);
-    request.setPreferences(preferences);
+    request.withFrom(from);
+    request.withSearchWindow(searchWindow);
+    request.withDateTime(dateTime);
+    request.withPreferences(preferences);
     if (numItineraries != null) {
-      request.setNumItineraries(numItineraries);
+      request.withNumItineraries(numItineraries);
     }
-
+    request.withJourney(j -> j.withWheelchair(wheelchair));
     return request;
   }
 
@@ -228,7 +230,7 @@ public class RouteViaRequest implements Serializable {
       return this;
     }
 
-    public Builder withPreferences(Consumer<RoutingPreferences.Builder> prefs) {
+    public Builder withPreferences(Consumer<RoutingPreferencesBuilder> prefs) {
       preferences = preferences.copyOf().apply(prefs).build();
       return this;
     }

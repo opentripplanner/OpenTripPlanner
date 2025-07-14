@@ -44,7 +44,7 @@ public class TestTransferPoint implements TransferPoint {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of()
+    return ToStringBuilder.ofEmbeddedType()
       .addNum("stop", stop)
       .addObj("trip", schedule.pattern().debugInfo())
       .toString();

@@ -4,7 +4,9 @@ import static org.opentripplanner.utils.lang.StringUtils.assertHasValue;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.utils.lang.StringUtils;
 
@@ -42,7 +44,8 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    * @return an id object
    * @throws IllegalArgumentException if the id cannot be parsed
    */
-  public static FeedScopedId parse(String value) throws IllegalArgumentException {
+  @Nullable
+  public static FeedScopedId parse(@Nullable String value) throws IllegalArgumentException {
     if (value == null || value.isEmpty()) {
       return null;
     }
@@ -52,6 +55,20 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     } else {
       return new FeedScopedId(value.substring(0, index), value.substring(index + 1));
     }
+  }
+
+  /**
+   * Given collection of strings in the form "feedId:entityId", parses into a list of {@link FeedScopedId}.
+   *
+   * @throws IllegalArgumentException if there is a null or invalid value in the collection
+   */
+  public static List<FeedScopedId> parse(Collection<String> value) throws IllegalArgumentException {
+    value.forEach(id -> {
+      if (id == null) {
+        throw new IllegalArgumentException("Collection of FeedScopedId must not contain null.");
+      }
+    });
+    return value.stream().map(FeedScopedId::parse).toList();
   }
 
   /**
@@ -70,7 +87,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
       .toList();
   }
 
-  public static boolean isValidString(String value) throws IllegalArgumentException {
+  public static boolean isValidString(@Nullable String value) throws IllegalArgumentException {
     return value != null && value.indexOf(ID_SEPARATOR) > -1;
   }
 

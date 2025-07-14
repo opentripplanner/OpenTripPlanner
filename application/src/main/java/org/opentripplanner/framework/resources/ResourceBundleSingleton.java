@@ -15,14 +15,15 @@ public enum ResourceBundleSingleton {
   static final ResourceBundle.Control noFallbackControl = Control.getNoFallbackControl(
     Control.FORMAT_PROPERTIES
   );
-  private final Set<String> internalKeys = Set.of(
+  private static final Set<String> INTERNAL_KEYS = Set.of(
     "corner",
     "unnamedStreet",
     "origin",
     "destination",
     "partOf",
     "price.free",
-    "price.startMain"
+    "price.startMain",
+    "locationGroup"
   );
 
   //in singleton because resurce bundles are cached based on calling class
@@ -36,7 +37,7 @@ public enum ResourceBundleSingleton {
     }
     try {
       ResourceBundle resourceBundle;
-      if (internalKeys.contains(key)) {
+      if (INTERNAL_KEYS.contains(key)) {
         resourceBundle = ResourceBundle.getBundle("internals", locale, noFallbackControl);
       } else {
         resourceBundle = ResourceBundle.getBundle("WayProperties", locale, noFallbackControl);

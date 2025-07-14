@@ -47,7 +47,7 @@ class RouteRequestConfigTest {
     var subject = RouteRequestConfig.mapRouteRequest(nodeAdapter);
 
     var accessibility = subject.preferences().wheelchair();
-    assertTrue(subject.wheelchair());
+    assertTrue(subject.journey().wheelchair());
 
     assertFalse(accessibility.trip().onlyConsiderAccessible());
     assertEquals(1, accessibility.trip().unknownCost());

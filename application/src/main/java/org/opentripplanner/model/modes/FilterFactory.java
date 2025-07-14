@@ -38,7 +38,7 @@ class FilterFactory {
    * </ul>
    */
   static AllowTransitModeFilter create(Collection<MainAndSubMode> allowedModes) {
-    var filters = allowedModes.stream().map(FilterFactory::of).toList();
+    var filters = allowedModes.stream().distinct().map(FilterFactory::of).toList();
 
     if (filters.isEmpty()) {
       throw new IllegalArgumentException("Can not match an empty set of modes!");

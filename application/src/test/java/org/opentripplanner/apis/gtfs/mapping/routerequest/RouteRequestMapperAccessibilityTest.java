@@ -2,8 +2,6 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.createArgsCopy;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.executionContext;
 
 import java.util.Locale;
 import java.util.Map;
@@ -11,9 +9,11 @@ import org.junit.jupiter.api.Test;
 
 class RouteRequestMapperAccessibilityTest {
 
+  private final _RouteRequestTestContext testCtx = _RouteRequestTestContext.of(Locale.ENGLISH);
+
   @Test
   void testWheelchairPreferences() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     var wheelchairEnabled = true;
     args.put(
       "preferences",
@@ -24,8 +24,8 @@ class RouteRequestMapperAccessibilityTest {
         )
       )
     );
-    var env = executionContext(args, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
-    assertEquals(wheelchairEnabled, routeRequest.wheelchair());
+    var env = testCtx.executionContext(args);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
+    assertEquals(wheelchairEnabled, routeRequest.journey().wheelchair());
   }
 }
