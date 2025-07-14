@@ -38,8 +38,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   private List<String> headsignVias;
 
-  private String routeShortName;
-
   private PickDrop pickupType = PickDrop.SCHEDULED;
 
   private PickDrop dropOffType = PickDrop.SCHEDULED;
@@ -150,14 +148,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   public void setStopHeadsign(I18NString headSign) {
     this.stopHeadsign = headSign;
-  }
-
-  public String getRouteShortName() {
-    return routeShortName;
-  }
-
-  public void setRouteShortName(String routeShortName) {
-    this.routeShortName = routeShortName;
   }
 
   public PickDrop getPickupType() {
