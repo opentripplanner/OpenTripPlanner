@@ -18,7 +18,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Pathway;
@@ -107,20 +106,6 @@ public class OtpTransitServiceImplTest {
   }
 
   @Test
-  public void testGetAllStopTimes() {
-    List<StopTime> stopTimes = new ArrayList<>();
-    for (Trip trip : subject.getAllTrips()) {
-      stopTimes.addAll(subject.getStopTimesForTrip(trip));
-    }
-
-    assertEquals(88, stopTimes.size());
-    assertEquals(
-      "StopTime(seq=1 stop=F:A trip=F:1.1 times=00:00:00-00:00:00)",
-      first(stopTimes).toString()
-    );
-  }
-
-  @Test
   public void testListTrips() {
     Collection<Trip> trips = subject.getAllTrips();
 
@@ -140,15 +125,6 @@ public class OtpTransitServiceImplTest {
       subject.siteRepository().getStationById(STATION_ID).getChildStops()
     );
     assertEquals("[RegularStop{F:A A}]", stops.toString());
-  }
-
-  @Test
-  public void testGetStopTimesForTrip() {
-    List<StopTime> stopTimes = subject.getStopTimesForTrip(first(subject.getAllTrips()));
-    assertEquals(
-      "[RegularStop{F:A A}, RegularStop{F:B B}, RegularStop{F:C C}]",
-      stopTimes.stream().map(StopTime::getStop).toList().toString()
-    );
   }
 
   @Test

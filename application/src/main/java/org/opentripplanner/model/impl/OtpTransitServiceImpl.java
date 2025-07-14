@@ -11,7 +11,6 @@ import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -58,8 +57,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Map<FeedScopedId, BoardingArea> boardingAreasById;
 
-  private final Map<Trip, List<StopTime>> stopTimesByTrip;
-
   private final Collection<ConstrainedTransfer> transfers;
 
   private final Collection<TripPattern> tripPatterns;
@@ -83,7 +80,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
     this.entrancesById = builder.getEntrances().asImmutableMap();
     this.pathwayNodesById = builder.getPathwayNodes().asImmutableMap();
     this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
-    this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
     this.transfers = immutableList(builder.getTransfers());
     this.tripPatterns = immutableList(builder.getTripPatterns().values());
     this.trips = immutableList(builder.getTripsById().values());
@@ -145,11 +141,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
   @Override
   public Collection<BoardingArea> getAllBoardingAreas() {
     return immutableList(boardingAreasById.values());
-  }
-
-  @Override
-  public List<StopTime> getStopTimesForTrip(Trip trip) {
-    return immutableList(stopTimesByTrip.get(trip));
   }
 
   @Override
