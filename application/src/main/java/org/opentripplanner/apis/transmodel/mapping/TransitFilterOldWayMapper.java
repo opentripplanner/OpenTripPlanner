@@ -20,7 +20,6 @@ class TransitFilterOldWayMapper {
 
   private final IdResolver idResolver;
 
-  /** This is a utility class, only static methods */
   TransitFilterOldWayMapper(IdResolver idResolver) {
     this.idResolver = idResolver;
   }
