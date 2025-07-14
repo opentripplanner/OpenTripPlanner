@@ -58,17 +58,17 @@
   max-width: 50px;
 }
 
-.search-bar input.input-small {
+.search-bar .input-small {
   max-width: 100px;
 }
 
-.search-bar input.input-medium {
+.search-bar .input-medium {
   max-width: 130px;
 }
 
 .search-bar-route-button-wrapper {
   height: 5rem;
-  padding-top: 25px;
+  padding-top: 37px;
 }
 
 .search-bar-route-button-wrapper a.btn img {
