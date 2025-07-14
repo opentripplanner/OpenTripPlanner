@@ -64,7 +64,7 @@ public class ShapePointMapperTest {
   }
 
   private org.opentripplanner.model.ShapePoint map(List<ShapePoint> shapePoint) {
-    final Map<FeedScopedId, CompactShapeBuilder> map = subject.map(shapePoint);
+    final Map<FeedScopedId, CompactShape> map = subject.map(shapePoint);
     return ImmutableList.copyOf(map.get(SHAPE_ID)).getFirst();
   }
 }

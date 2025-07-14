@@ -5,8 +5,8 @@ import java.util.Iterator;
 import org.opentripplanner.model.ShapePoint;
 
 /**
- * A builder that stores shape points in a memory-efficient way and allows you to iterate over them
- * for further processing.
+ * A representation that stores GTFS shape points in a memory-efficient way and allows you to
+ * iterate over them for further processing.
  * <p>
  * It is a compromise between efficient memory consumption and efficient use of CPU by not compressing
  * or encoding the shape but storing the raw coordinate values.
@@ -14,7 +14,7 @@ import org.opentripplanner.model.ShapePoint;
  * It is package-private but implements Iterable, so you should use that as the return type of the
  * mapping process.
  */
-class CompactShapeBuilder implements Iterable<ShapePoint> {
+class CompactShape implements Iterable<ShapePoint> {
 
   private static final double NO_VALUE = -9999;
   private static final int INCREASE = 50;
@@ -24,7 +24,7 @@ class CompactShapeBuilder implements Iterable<ShapePoint> {
   private double[] distTraveleds;
   private int maxSequence = (int) NO_VALUE;
 
-  public CompactShapeBuilder() {
+  public CompactShape() {
     this.lats = new double[INCREASE];
     this.lons = new double[INCREASE];
     Arrays.fill(this.lats, NO_VALUE);

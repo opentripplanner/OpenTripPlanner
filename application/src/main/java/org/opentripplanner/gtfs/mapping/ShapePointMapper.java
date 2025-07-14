@@ -14,13 +14,13 @@ class ShapePointMapper {
     this.idFactory = idFactory;
   }
 
-  Map<FeedScopedId, CompactShapeBuilder> map(
+  Map<FeedScopedId, CompactShape> map(
     Collection<org.onebusaway.gtfs.model.ShapePoint> allShapePoints
   ) {
-    var ret = new HashMap<FeedScopedId, CompactShapeBuilder>();
+    var ret = new HashMap<FeedScopedId, CompactShape>();
     for (var shapePoint : allShapePoints) {
       var shapeId = idFactory.createId(shapePoint.getShapeId(), "shape point");
-      var shapeBuilder = ret.getOrDefault(shapeId, new CompactShapeBuilder());
+      var shapeBuilder = ret.getOrDefault(shapeId, new CompactShape());
       shapeBuilder.addPoint(shapePoint);
       ret.put(shapeId, shapeBuilder);
     }

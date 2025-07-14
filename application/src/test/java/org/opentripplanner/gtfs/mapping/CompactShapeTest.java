@@ -7,11 +7,11 @@ import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.ShapePoint;
 
-class CompactShapeBuilderTest {
+class CompactShapeTest {
 
   @Test
   void simple() {
-    var builder = new CompactShapeBuilder();
+    var builder = new CompactShape();
 
     builder.addPoint(shapePoint(1, 1, 2));
     builder.addPoint(shapePoint(2, 2, 2));
@@ -25,7 +25,7 @@ class CompactShapeBuilderTest {
 
   @Test
   void hole() {
-    var builder = new CompactShapeBuilder();
+    var builder = new CompactShape();
 
     var p1 = shapePoint(1, 1.0, 2.0);
     var p2 = shapePoint(2, 3.0, 4.0);
@@ -42,7 +42,7 @@ class CompactShapeBuilderTest {
 
   @Test
   void extendLatLon() {
-    var builder = new CompactShapeBuilder();
+    var builder = new CompactShape();
 
     builder.addPoint(shapePoint(1, 1, 1));
     builder.addPoint(shapePoint(2, 2, 2));
@@ -56,7 +56,7 @@ class CompactShapeBuilderTest {
 
   @Test
   void shapeDist() {
-    var builder = new CompactShapeBuilder();
+    var builder = new CompactShape();
 
     builder.addPoint(shapePoint(1, 1, 1, 0d));
     builder.addPoint(shapePoint(2, 2, 2, 1d));
@@ -73,7 +73,7 @@ class CompactShapeBuilderTest {
 
   @Test
   void holeInDistTraveled() {
-    var builder = new CompactShapeBuilder();
+    var builder = new CompactShape();
 
     builder.addPoint(shapePoint(1, 1, 1, 1d));
     builder.addPoint(shapePoint(2, 2, 2, 2d));
@@ -92,7 +92,7 @@ class CompactShapeBuilderTest {
 
   @Test
   void zero() {
-    var builder = new CompactShapeBuilder();
+    var builder = new CompactShape();
 
     builder.addPoint(shapePoint(0, 1, 1, 1d));
     builder.addPoint(shapePoint(9, 2, 2, 2d));
