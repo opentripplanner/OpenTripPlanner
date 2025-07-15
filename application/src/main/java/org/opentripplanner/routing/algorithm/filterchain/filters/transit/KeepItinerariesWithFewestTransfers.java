@@ -29,7 +29,7 @@ public class KeepItinerariesWithFewestTransfers implements ItineraryListFilter {
       .stream()
       .min(numberOfTransfersComparator())
       .filter(it ->
-        filterKeys.containsAll(it.getSystemNotices().stream().map(SystemNotice::tag).toList())
+        filterKeys.containsAll(it.systemNotices().stream().map(SystemNotice::tag).toList())
       )
       .ifPresent(it -> it.removeDeletionFlags(filterKeys));
 

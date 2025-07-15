@@ -7,7 +7,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.model.plan.ElevationProfile;
+import org.opentripplanner.model.plan.leg.ElevationProfile;
 
 public class ElevationProfileStepType {
 

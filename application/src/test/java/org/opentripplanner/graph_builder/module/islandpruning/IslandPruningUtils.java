@@ -35,7 +35,7 @@ class IslandPruningUtils {
       osmModule.buildGraph();
 
       timetableRepository.index();
-      graph.index(timetableRepository.getSiteRepository());
+      graph.index();
 
       // Prune floating islands and set noThru where necessary
       PruneIslands pruneIslands = new PruneIslands(

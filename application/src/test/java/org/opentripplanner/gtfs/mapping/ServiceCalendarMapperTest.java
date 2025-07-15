@@ -39,7 +39,7 @@ public class ServiceCalendarMapperTest {
   private static final ServiceDate END_DATE = new ServiceDate(2018, 1, 2);
 
   private static final ServiceCalendar CALENDAR = new ServiceCalendar();
-  private final ServiceCalendarMapper subject = new ServiceCalendarMapper();
+  private final ServiceCalendarMapper subject = new ServiceCalendarMapper(new IdFactory("A"));
 
   static {
     CALENDAR.setId(ID);
@@ -87,6 +87,7 @@ public class ServiceCalendarMapperTest {
   @Test
   public void testMapWithNulls() {
     ServiceCalendar input = new ServiceCalendar();
+    input.setServiceId(AGENCY_AND_ID);
     org.opentripplanner.model.calendar.ServiceCalendar result = subject.map(input);
 
     assertEquals(0, result.getMonday());

@@ -24,7 +24,7 @@ public class ViaLocationInputType {
     """
     A visit-via-location is a physical visit to one of the stop locations or coordinates listed. An
     on-board visit does not count, the traveler must alight or board at the given stop for it to to
-    be accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point
+    be accepted. To visit a coordinate, the traveler must walk (bike or drive) to the closest point
     in the street network from a stop and back to another stop to join the transit network.
     """;
   private static final String DOC_PASS_THROUGH_VIA_LOCATION =
@@ -50,7 +50,7 @@ public class ViaLocationInputType {
     "Board or alight at a stop location or visit a coordinate.";
   public static final String FIELD_PASS_THROUGH = "passThrough";
   public static final String DOC_FIELD_PASS_THROUGH =
-    "Board, alight or pass-through(on-board) at the stop location.";
+    "Board, alight or pass-through (on-board) at the stop location.";
 
   private static final String DOC_LABEL =
     "The label/name of the location. This is pass-through " +

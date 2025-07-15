@@ -13,6 +13,7 @@ import org.opentripplanner.utils.collection.MapUtils;
 /** Responsible for mapping GTFS TripMapper into the OTP model. */
 class TripMapper {
 
+  private final IdFactory idFactory;
   private final RouteMapper routeMapper;
   private final DirectionMapper directionMapper;
   private final TranslationHelper translationHelper;
@@ -21,10 +22,12 @@ class TripMapper {
   private final Map<Trip, TimePenalty> flexSafeTimePenalties = new HashMap<>();
 
   TripMapper(
+    IdFactory idFactory,
     RouteMapper routeMapper,
     DirectionMapper directionMapper,
     TranslationHelper translationHelper
   ) {
+    this.idFactory = idFactory;
     this.routeMapper = routeMapper;
     this.directionMapper = directionMapper;
     this.translationHelper = translationHelper;
@@ -50,10 +53,10 @@ class TripMapper {
   }
 
   private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
-    var lhs = Trip.of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
+    var lhs = Trip.of(idFactory.createId(rhs.getId(), "trip"));
 
     lhs.withRoute(routeMapper.map(rhs.getRoute()));
-    lhs.withServiceId(AgencyAndIdMapper.mapAgencyAndId(rhs.getServiceId()));
+    lhs.withServiceId(idFactory.createId(rhs.getServiceId(), "trip's service"));
     lhs.withShortName(rhs.getTripShortName());
     I18NString tripHeadsign = null;
     if (rhs.getTripHeadsign() != null) {
@@ -67,7 +70,7 @@ class TripMapper {
     lhs.withHeadsign(tripHeadsign);
     lhs.withDirection(directionMapper.map(rhs.getDirectionId(), lhs.getId()));
     lhs.withGtfsBlockId(rhs.getBlockId());
-    lhs.withShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
+    lhs.withShapeId(idFactory.createNullableId(rhs.getShapeId()));
     lhs.withWheelchairBoarding(WheelchairAccessibilityMapper.map(rhs.getWheelchairAccessible()));
     lhs.withBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
     lhs.withCarsAllowed(CarAccessMapper.mapForTrip(rhs));

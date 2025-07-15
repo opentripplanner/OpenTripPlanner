@@ -5,7 +5,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.model.plan.LegRealTimeEstimate;
+import org.opentripplanner.model.plan.leg.LegRealTimeEstimate;
 
 public class RealTimeEstimateImpl implements GraphQLDataFetchers.GraphQLRealTimeEstimate {
 

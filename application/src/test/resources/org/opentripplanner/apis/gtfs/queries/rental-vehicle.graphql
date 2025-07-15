@@ -23,5 +23,6 @@
       percent
       range
     }
+    availableUntil
   }
 }

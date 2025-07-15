@@ -1,14 +1,15 @@
 package org.opentripplanner.transit.api.model;
 
 import java.util.Collection;
+import javax.annotation.Nullable;
 
 /**
  * {@link RequiredFilterValues} is a subclass of {@link FilterValues} that requires at least one
  * value to be included.
  */
-public class RequiredFilterValues<E> extends FilterValues<E> {
+class RequiredFilterValues<E> extends FilterValues<E> {
 
-  RequiredFilterValues(String name, Collection<E> values) {
+  RequiredFilterValues(String name, @Nullable Collection<E> values) {
     super(name, values);
     if (values == null || values.isEmpty()) {
       throw new IllegalArgumentException("Filter %s values must not be empty.".formatted(name));

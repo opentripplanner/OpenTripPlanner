@@ -67,6 +67,7 @@ class AreaStopsToVerticesMapperTest {
 
     graph.addVertex(fromVertex);
     assertTrue(fromVertex.areaStops().isEmpty());
+    graph.index();
 
     var mapper = new AreaStopsToVerticesMapper(graph, TRANSIT_MODEL);
 

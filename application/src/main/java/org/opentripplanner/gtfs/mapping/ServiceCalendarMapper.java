@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,8 +9,13 @@ import org.opentripplanner.utils.collection.MapUtils;
 /** Responsible for mapping GTFS ServiceCalendar into the OTP model. */
 class ServiceCalendarMapper {
 
+  private final IdFactory idFactory;
   private final Map<org.onebusaway.gtfs.model.ServiceCalendar, ServiceCalendar> mappedCalendars =
     new HashMap<>();
+
+  ServiceCalendarMapper(IdFactory idFactory) {
+    this.idFactory = idFactory;
+  }
 
   Collection<ServiceCalendar> map(
     Collection<org.onebusaway.gtfs.model.ServiceCalendar> allServiceCalendars
@@ -28,7 +31,7 @@ class ServiceCalendarMapper {
   private ServiceCalendar doMap(org.onebusaway.gtfs.model.ServiceCalendar rhs) {
     ServiceCalendar lhs = new ServiceCalendar();
 
-    lhs.setServiceId(mapAgencyAndId(rhs.getServiceId()));
+    lhs.setServiceId(idFactory.createId(rhs.getServiceId(), "service calendar"));
     lhs.setMonday(rhs.getMonday());
     lhs.setTuesday(rhs.getTuesday());
     lhs.setWednesday(rhs.getWednesday());

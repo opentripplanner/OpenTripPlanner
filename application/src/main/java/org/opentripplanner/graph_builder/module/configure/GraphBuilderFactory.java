@@ -7,8 +7,9 @@ import java.time.ZoneId;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
-import org.opentripplanner.ext.emissions.EmissionsModule;
+import org.opentripplanner.ext.emission.EmissionRepository;
+import org.opentripplanner.ext.emission.configure.EmissionGraphBuilderModule;
+import org.opentripplanner.ext.emission.internal.graphbuilder.EmissionGraphBuilder;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
@@ -23,12 +24,14 @@ import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidat
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.graph_builder.module.TripPatternNamer;
+import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.graph_builder.module.geometry.CalculateWorldEnvelopeModule;
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.configure.OsmInfoGraphBuildServiceModule;
@@ -39,28 +42,38 @@ import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 @Singleton
-@Component(modules = { GraphBuilderModules.class, OsmInfoGraphBuildServiceModule.class })
+@Component(
+  modules = {
+    GraphBuilderModules.class,
+    OsmInfoGraphBuildServiceModule.class,
+    EmissionGraphBuilderModule.class,
+  }
+)
 public interface GraphBuilderFactory {
-  //DataImportIssueStore issueStore();
-  GraphBuilder graphBuilder();
-  OsmModule osmModule();
-  GtfsModule gtfsModule();
-  EmissionsModule emissionsModule();
-  NetexModule netexModule();
-  TimeZoneAdjusterModule timeZoneAdjusterModule();
-  TripPatternNamer tripPatternNamer();
-  OsmBoardingLocationsModule osmBoardingLocationsModule();
-  StreetLinkerModule streetLinkerModule();
-  PruneIslands pruneIslands();
-  List<ElevationModule> elevationModules();
   AreaStopsToVerticesMapper areaStopsToVerticesMapper();
+  CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
+  DataImportIssueReporter dataImportIssueReporter();
   DirectTransferGenerator directTransferGenerator();
   DirectTransferAnalyzer directTransferAnalyzer();
   GraphCoherencyCheckerModule graphCoherencyCheckerModule();
+  GraphBuilder graphBuilder();
+  GtfsModule gtfsModule();
+  List<ElevationModule> elevationModules();
+  NetexModule netexModule();
+  OsmBoardingLocationsModule osmBoardingLocationsModule();
+  OsmModule osmModule();
+  PruneIslands pruneIslands();
+  StreetLinkerModule streetLinkerModule();
+  TimeZoneAdjusterModule timeZoneAdjusterModule();
+  TripPatternNamer tripPatternNamer();
+
+  @Nullable
   EdgeUpdaterModule dataOverlayFactory();
-  DataImportIssueReporter dataImportIssueReporter();
-  CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
-  StreetLimitationParameters streetLimitationParameters();
+
+  TurnRestrictionModule turnRestrictionModule();
+
+  @Nullable
+  EmissionGraphBuilder emissionGraphBuilder();
 
   @Nullable
   RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator();
@@ -68,8 +81,7 @@ public interface GraphBuilderFactory {
   @Nullable
   StopConsolidationModule stopConsolidationModule();
 
-  @Nullable
-  StopConsolidationRepository stopConsolidationRepository();
+  FareServiceFactory fareServiceFactory();
 
   @Component.Builder
   interface Builder {
@@ -97,6 +109,9 @@ public interface GraphBuilderFactory {
     Builder vehicleParkingRepository(VehicleParkingRepository parkingRepository);
 
     @BindsInstance
+    Builder fareServiceFactory(FareServiceFactory fareServiceFactory);
+
+    @BindsInstance
     Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);
 
     @BindsInstance
@@ -108,6 +123,6 @@ public interface GraphBuilderFactory {
     GraphBuilderFactory build();
 
     @BindsInstance
-    Builder emissionsDataModel(@Nullable EmissionsDataModel emissionsDataModel);
+    Builder emissionRepository(@Nullable EmissionRepository emissionRepository);
   }
 }

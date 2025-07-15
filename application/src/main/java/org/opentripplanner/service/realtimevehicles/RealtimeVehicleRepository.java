@@ -1,27 +1,20 @@
 package org.opentripplanner.service.realtimevehicles;
 
+import com.google.common.collect.Multimap;
 import java.util.List;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 public interface RealtimeVehicleRepository {
   /**
-   * For the given pattern set all realtime vehicles.
+   * Stores all realtime vehicles for a given {@code feedId} and associates each with a pattern.
+   * If the pattern is a realtime-added one, then the original (scheduled) one is used as the key
+   * for the map storing the information.
    * <p>
-   * The list is expected to be exhaustive: all existing vehicles will be overridden.
-   * <p>
-   * This means that if there are two updaters providing vehicles for the same pattern they
-   * overwrite each other.
+   * Before storing the new vehicles, it removes the previous updates for the given {@code feedId}.
    */
-  void setRealtimeVehicles(TripPattern pattern, List<RealtimeVehicle> updates);
+  void setRealtimeVehiclesForFeed(String feedId, Multimap<TripPattern, RealtimeVehicle> updates);
 
-  /**
-   * Remove all vehicles for a given pattern.
-   * <p>
-   * This is useful to clear old vehicles for which there are no more updates and we assume that
-   * they have stopped their trip.
-   */
-  void clearRealtimeVehicles(TripPattern pattern);
   /**
    * Get the vehicles for a certain trip.
    */

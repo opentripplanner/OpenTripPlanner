@@ -173,6 +173,7 @@ public class TripTimesUpdaterTest {
         .toEpochSecond()
     );
     var tripUpdate = tripUpdateBuilder.build();
+    var timetable = TripTimesUpdaterTest.timetable;
     assertEquals(20 * 60, timetable.getTripTimes(tripId).getArrivalTime(2));
     var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
@@ -183,13 +184,12 @@ public class TripTimesUpdaterTest {
     );
 
     assertTrue(result.isSuccess());
+    var p = result.successValue();
 
-    result.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
-      assertNotNull(updatedTripTimes);
-      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
-      assertEquals(20 * 60 + 120, timetable.getTripTimes(tripId).getArrivalTime(2));
-    });
+    var updatedTripTimes = p.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
+    assertEquals(20 * 60 + 120, timetable.getTripTimes(tripId).getArrivalTime(2));
 
     // update trip arrival time incorrectly
     tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
@@ -211,11 +211,10 @@ public class TripTimesUpdaterTest {
 
     assertTrue(result.isSuccess());
 
-    result.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
-      assertNotNull(updatedTripTimes);
-      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
-    });
+    p = result.successValue();
+    updatedTripTimes = p.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
 
     // update trip arrival time only
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -240,11 +239,10 @@ public class TripTimesUpdaterTest {
 
     assertTrue(result.isSuccess());
 
-    result.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
-      assertNotNull(updatedTripTimes);
-      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
-    });
+    p = result.successValue();
+    updatedTripTimes = p.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
 
     // update trip departure time only
     tripDescriptorBuilder = tripDescriptorBuilder();
@@ -267,11 +265,10 @@ public class TripTimesUpdaterTest {
 
     assertTrue(result.isSuccess());
 
-    result.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
-      assertNotNull(updatedTripTimes);
-      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
-    });
+    p = result.successValue();
+    updatedTripTimes = p.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
 
     // update trip using stop id
     tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
@@ -293,11 +290,10 @@ public class TripTimesUpdaterTest {
 
     assertTrue(result.isSuccess());
 
-    result.ifSuccess(p -> {
-      var updatedTripTimes = p.getTripTimes();
-      assertNotNull(updatedTripTimes);
-      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
-    });
+    p = result.successValue();
+    updatedTripTimes = p.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
   }
 
   @Test

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><trias:Trias xmlns:trias="http://www.vdv.de/trias" xmlns:siri="http://www.siri.org.uk/siri" xmlns:ojp="http://www.vdv.de/ojp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="http://www.vdv.de/trias https://raw.githubusercontent.com/VDVde/TRIAS/refs/tags/v1.2/Trias.xsd">
+    <trias:ServiceDelivery>
+        <siri:ResponseTimestamp>2025-02-17T14:24:02+01:00</siri:ResponseTimestamp>
+        <siri:ProducerRef>OpenTripPlanner</siri:ProducerRef>
+        <trias:Language>en</trias:Language>
+        <siri:ErrorCondition>An error occurred</siri:ErrorCondition>
+    </trias:ServiceDelivery>
+</trias:Trias>

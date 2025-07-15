@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
@@ -27,11 +27,11 @@ public class TripTimeOnDateHelper {
     }
     ScheduledTransitLeg transitLeg = leg.asScheduledTransitLeg();
     return new TripTimeOnDate(
-      transitLeg.getTripTimes(),
-      transitLeg.getBoardStopPosInPattern(),
-      transitLeg.getTripPattern(),
-      transitLeg.getServiceDate(),
-      transitLeg.getServiceDateMidnight()
+      transitLeg.tripTimes(),
+      transitLeg.boardStopPosInPattern(),
+      transitLeg.tripPattern(),
+      transitLeg.serviceDate(),
+      transitLeg.serviceDateMidnight()
     );
     /* TODO OTP2 This method is only used for EstimatedCalls for from place. We have to decide
                      if EstimatedCalls are applicable to flex trips, and if that is the case, add
@@ -55,11 +55,11 @@ public class TripTimeOnDateHelper {
     }
     ScheduledTransitLeg transitLeg = leg.asScheduledTransitLeg();
     return new TripTimeOnDate(
-      transitLeg.getTripTimes(),
-      transitLeg.getAlightStopPosInPattern(),
-      transitLeg.getTripPattern(),
-      transitLeg.getServiceDate(),
-      transitLeg.getServiceDateMidnight()
+      transitLeg.tripTimes(),
+      transitLeg.alightStopPosInPattern(),
+      transitLeg.tripPattern(),
+      transitLeg.serviceDate(),
+      transitLeg.serviceDateMidnight()
     );
     /* TODO OTP2 This method is only used for EstimatedCalls for to place. We have to decide
                      if EstimatedCalls are applicable to flex trips, and if that is the case, add
@@ -82,12 +82,13 @@ public class TripTimeOnDateHelper {
       return List.of();
     }
     ScheduledTransitLeg transitLeg = leg.asScheduledTransitLeg();
-    TripTimes tripTimes = transitLeg.getTripTimes();
-    TripPattern tripPattern = transitLeg.getTripPattern();
-    Instant serviceDateMidnight = transitLeg.getServiceDateMidnight();
-    LocalDate serviceDate = transitLeg.getServiceDate();
+    TripTimes tripTimes = transitLeg.tripTimes();
+    TripPattern tripPattern = transitLeg.tripPattern();
+    Instant serviceDateMidnight = transitLeg.serviceDateMidnight();
+    LocalDate serviceDate = transitLeg.serviceDate();
     return IntStream.range(0, tripPattern.numberOfStops())
-      .mapToObj(i -> new TripTimeOnDate(tripTimes, i, tripPattern, serviceDate, serviceDateMidnight)
+      .mapToObj(i ->
+        new TripTimeOnDate(tripTimes, i, tripPattern, serviceDate, serviceDateMidnight)
       )
       .collect(Collectors.toList());
   }
@@ -100,12 +101,13 @@ public class TripTimeOnDateHelper {
       return List.of();
     }
     ScheduledTransitLeg transitLeg = leg.asScheduledTransitLeg();
-    TripTimes tripTimes = transitLeg.getTripTimes();
-    TripPattern tripPattern = transitLeg.getTripPattern();
-    Instant serviceDateMidnight = transitLeg.getServiceDateMidnight();
-    LocalDate serviceDate = transitLeg.getServiceDate();
-    return IntStream.range(leg.getBoardStopPosInPattern() + 1, leg.getAlightStopPosInPattern())
-      .mapToObj(i -> new TripTimeOnDate(tripTimes, i, tripPattern, serviceDate, serviceDateMidnight)
+    TripTimes tripTimes = transitLeg.tripTimes();
+    TripPattern tripPattern = transitLeg.tripPattern();
+    Instant serviceDateMidnight = transitLeg.serviceDateMidnight();
+    LocalDate serviceDate = transitLeg.serviceDate();
+    return IntStream.range(leg.boardStopPosInPattern() + 1, leg.alightStopPosInPattern())
+      .mapToObj(i ->
+        new TripTimeOnDate(tripTimes, i, tripPattern, serviceDate, serviceDateMidnight)
       )
       .collect(Collectors.toList());
   }

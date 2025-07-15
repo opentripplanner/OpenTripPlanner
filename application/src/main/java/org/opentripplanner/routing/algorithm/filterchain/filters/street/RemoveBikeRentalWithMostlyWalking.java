@@ -33,10 +33,10 @@ public class RemoveBikeRentalWithMostlyWalking implements RemoveItineraryFlagger
       }
 
       double bikeRentalDistance = itinerary
-        .getLegs()
+        .legs()
         .stream()
-        .filter(l -> l.getRentedVehicle() != null && l.getRentedVehicle())
-        .mapToDouble(Leg::getDistanceMeters)
+        .filter(l -> l.rentedVehicle() != null && l.rentedVehicle())
+        .mapToDouble(Leg::distanceMeters)
         .sum();
 
       double totalDistance = itinerary.distanceMeters();

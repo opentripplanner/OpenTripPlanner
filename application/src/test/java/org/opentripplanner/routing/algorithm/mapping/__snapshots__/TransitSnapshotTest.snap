@@ -280,7 +280,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4026,
+      "generalizedCost" : 4025,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -1261,7 +1261,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 2315,
+      "generalizedCost" : 2314,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -1804,7 +1804,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4026,
+      "generalizedCost" : 4025,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -3593,7 +3593,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 2895,
+      "generalizedCost" : 2894,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -4074,7 +4074,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 3705,
+      "generalizedCost" : 3704,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -4678,7 +4678,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 2925,
+      "generalizedCost" : 2924,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -5159,7 +5159,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 3705,
+      "generalizedCost" : 3704,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,

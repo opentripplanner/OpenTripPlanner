@@ -133,10 +133,6 @@ public class OsmWay extends OsmEntity {
     return (isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS));
   }
 
-  public Optional<Duration> getDuration(Consumer<String> errorHandler) {
-    return getTagValueAsDuration("duration", errorHandler);
-  }
-
   public boolean isForwardEscalator() {
     return isEscalator() && "forward".equals(this.getTag("conveying"));
   }

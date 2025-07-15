@@ -11,7 +11,7 @@ those paths (the post-processing).
 ## Supported Input Data
 
 - OTP supports [GTFS Transfers.txt](https://gtfs.org/reference/static#transferstxt) and the Google
-  extention
+  extension
   with [Trip to Trip transfers](https://developers.google.com/transit/gtfs/reference/gtfs-extensions#TripToTripTransfers)
   .
 - OTP

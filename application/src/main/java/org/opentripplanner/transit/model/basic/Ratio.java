@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.utils.lang.DoubleUtils;
 
 /**
- * Represents a ratio within the range [0, 1].
+ * Represents a ratio within the range [0.0, 1.0].
  * The class ensures that the ratio value, represented as a double,
  * falls withing the specified range.
  */
@@ -32,7 +32,7 @@ public class Ratio {
     if (ratio >= 0d && ratio <= 1d) {
       return Optional.of(new Ratio(ratio));
     } else {
-      validationErrorHandler.accept("Ratio must be in range [0,1], but was: " + ratio);
+      validationErrorHandler.accept("Ratio must be in range [0.0, 1.0], but was: " + ratio);
       return Optional.empty();
     }
   }

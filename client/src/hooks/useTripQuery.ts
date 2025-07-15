@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { request } from 'graphql-request';
-import { Location, QueryType, TripQueryVariables } from '../gql/graphql.ts';
+import { Location, TripQuery, TripQueryVariables } from '../gql/graphql.ts';
 import { getApiUrl } from '../util/getApiUrl.ts';
 import { query } from '../static/query/tripQuery.tsx';
 
@@ -10,10 +10,10 @@ import { query } from '../static/query/tripQuery.tsx';
 
 type TripQueryHook = (
   variables?: TripQueryVariables,
-) => [QueryType | null, boolean, (pageCursor?: string) => Promise<void>];
+) => [TripQuery | null, boolean, (pageCursor?: string) => Promise<void>];
 
 export const useTripQuery: TripQueryHook = (variables) => {
-  const [data, setData] = useState<QueryType | null>(null);
+  const [data, setData] = useState<TripQuery | null>(null);
   const [loading, setLoading] = useState(false);
   const callback = useCallback(
     async (pageCursor?: string) => {
@@ -24,9 +24,9 @@ export const useTripQuery: TripQueryHook = (variables) => {
           setLoading(true);
           try {
             if (pageCursor) {
-              setData((await request(getApiUrl(), query, { ...variables, pageCursor })) as QueryType);
+              setData((await request(getApiUrl(), query, { ...variables, pageCursor })) as TripQuery);
             } else {
-              setData((await request(getApiUrl(), query, variables)) as QueryType);
+              setData((await request(getApiUrl(), query, variables)) as TripQuery);
             }
           } catch (e) {
             console.error('Error at useTripQuery', e);

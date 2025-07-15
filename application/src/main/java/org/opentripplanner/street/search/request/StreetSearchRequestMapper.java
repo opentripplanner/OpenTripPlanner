@@ -5,20 +5,21 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 
 public class StreetSearchRequestMapper {
 
-  public static StreetSearchRequestBuilder map(RouteRequest opt) {
+  public static StreetSearchRequestBuilder map(RouteRequest request) {
+    var time = request.dateTime() == null ? RouteRequest.normalizeNow() : request.dateTime();
     return StreetSearchRequest.of()
-      .withStartTime(opt.dateTime())
-      .withPreferences(opt.preferences())
-      .withWheelchair(opt.wheelchair())
-      .withFrom(opt.from())
-      .withTo(opt.to());
+      .withStartTime(time)
+      .withPreferences(request.preferences())
+      .withWheelchair(request.journey().wheelchair())
+      .withFrom(request.from())
+      .withTo(request.to());
   }
 
-  public static StreetSearchRequestBuilder mapToTransferRequest(RouteRequest opt) {
+  public static StreetSearchRequestBuilder mapToTransferRequest(RouteRequest request) {
     return StreetSearchRequest.of()
       .withStartTime(Instant.ofEpochSecond(0))
-      .withPreferences(opt.preferences())
-      .withWheelchair(opt.wheelchair())
-      .withMode(opt.journey().transfer().mode());
+      .withPreferences(request.preferences())
+      .withWheelchair(request.journey().wheelchair())
+      .withMode(request.journey().transfer().mode());
   }
 }

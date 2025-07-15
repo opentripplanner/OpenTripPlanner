@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.realtimeresolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
@@ -17,7 +18,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -63,23 +64,26 @@ class RealtimeResolverTest {
       .build();
     transitService.getTransitAlertService().setAlerts(List.of(alert));
 
-    var itineraries = List.of(itinerary);
-    RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    var itinerariesWithRealtime = RealtimeResolver.populateLegsWithRealtime(
+      List.of(itinerary),
+      transitService
+    );
 
-    assertEquals(1, itineraries.size());
+    assertFalse(itinerariesWithRealtime.isEmpty());
 
-    var legs = itinerary.getLegs();
+    var legs = itinerariesWithRealtime.getFirst().legs();
     var leg1ArrivalDelay = legs
       .get(0)
       .asScheduledTransitLeg()
-      .getTripPattern()
+      .tripPattern()
       .getScheduledTimetable()
       .getTripTimes()
       .getFirst()
       .getArrivalDelay(1);
     assertEquals(123, leg1ArrivalDelay);
-    assertEquals(0, legs.get(0).getTransitAlerts().size());
-    assertEquals(1, legs.get(1).getTransitAlerts().size());
+    assertEquals(0, legs.get(0).listTransitAlerts().size());
+    assertEquals(1, legs.get(1).listTransitAlerts().size());
+    assertEquals(1, itinerariesWithRealtime.size());
   }
 
   @Test
@@ -95,11 +99,11 @@ class RealtimeResolverTest {
     var transitService = new DefaultTransitService(model);
 
     var itineraries = List.of(itinerary);
-    RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
 
     assertEquals(1, itineraries.size());
 
-    var legs = itinerary.getLegs();
+    var legs = itinerary.legs();
     assertEquals(2, legs.size());
     assertTrue(legs.get(0).isWalkingLeg());
     assertTrue(legs.get(1).isTransitLeg());
@@ -117,11 +121,11 @@ class RealtimeResolverTest {
     var transitService = makeTransitService(patterns, serviceDate);
 
     var itineraries = List.of(staySeatedItinerary);
-    RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
 
     assertEquals(1, itineraries.size());
 
-    var constrained = itineraries.get(0).getLegs().get(1).getTransferFromPrevLeg();
+    var constrained = itineraries.get(0).legs().get(1).transferFromPrevLeg();
     assertNotNull(constrained);
     assertTrue(constrained.getTransferConstraint().isStaySeated());
   }
@@ -139,21 +143,21 @@ class RealtimeResolverTest {
   }
 
   private static TripTimes delay(TripTimes tt, int seconds) {
-    var delayed = tt.copyScheduledTimes();
-    IntStream.range(0, delayed.getNumStops()).forEach(i -> {
-      delayed.updateArrivalDelay(i, seconds);
-      delayed.updateDepartureDelay(i, seconds);
+    var builder = tt.createRealTimeFromScheduledTimes();
+    IntStream.range(0, tt.getNumStops()).forEach(i -> {
+      builder.withArrivalDelay(i, seconds);
+      builder.withDepartureDelay(i, seconds);
     });
-    return delayed;
+    return builder.build();
   }
 
   private static List<TripPattern> itineraryPatterns(Itinerary itinerary) {
     return itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(Leg::isScheduledTransitLeg)
       .map(Leg::asScheduledTransitLeg)
-      .map(ScheduledTransitLeg::getTripPattern)
+      .map(ScheduledTransitLeg::tripPattern)
       .collect(Collectors.toList());
   }
 

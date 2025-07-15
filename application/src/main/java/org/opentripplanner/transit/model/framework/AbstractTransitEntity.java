@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * All OTP Transit entities should extend this class. The purpose of the class is to enforce a
@@ -72,14 +73,14 @@ public abstract class AbstractTransitEntity<
     return buf.toString();
   }
 
-  protected static <T> List<T> listOfNullSafe(List<T> list) {
+  protected static <T> List<T> listOfNullSafe(@Nullable List<T> list) {
     if (list == null || list.isEmpty()) {
       return List.of();
     }
     return List.copyOf(list);
   }
 
-  protected static <T> Set<T> setOfNullSafe(Collection<T> input) {
+  protected static <T> Set<T> setOfNullSafe(@Nullable Collection<T> input) {
     if (input == null || input.isEmpty()) {
       return Set.of();
     }

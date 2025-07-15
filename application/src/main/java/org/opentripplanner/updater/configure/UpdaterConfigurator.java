@@ -27,7 +27,7 @@ import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdater;
 import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.siri.updater.google.SiriETGooglePubsubUpdater;
-import org.opentripplanner.updater.vehicle_parking.AvailabilityDatasourceFactory;
+import org.opentripplanner.updater.vehicle_parking.AvailabilityDataSourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingAvailabilityUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
@@ -208,7 +208,7 @@ public class UpdaterConfigurator {
           );
         }
         case AVAILABILITY_ONLY -> {
-          var source = AvailabilityDatasourceFactory.create(configItem);
+          var source = AvailabilityDataSourceFactory.create(configItem);
           updaters.add(
             new VehicleParkingAvailabilityUpdater(configItem, source, parkingRepository)
           );

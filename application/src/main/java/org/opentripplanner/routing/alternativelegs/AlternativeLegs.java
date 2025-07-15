@@ -19,9 +19,9 @@ import java.util.stream.Stream;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegConstructionSupport;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
+import org.opentripplanner.model.plan.leg.LegConstructionSupport;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -79,8 +79,8 @@ public class AlternativeLegs {
     boolean exactOriginStop,
     boolean exactDestinationStop
   ) {
-    StopLocation fromStop = leg.getFrom().stop;
-    StopLocation toStop = leg.getTo().stop;
+    StopLocation fromStop = leg.from().stop;
+    StopLocation toStop = leg.to().stop;
 
     Station fromStation = fromStop.getParentStation();
     Station toStation = toStop.getParentStation();
@@ -94,7 +94,7 @@ public class AlternativeLegs {
       : toStation.getChildStops();
 
     Comparator<ScheduledTransitLeg> legComparator = Comparator.comparing(
-      ScheduledTransitLeg::getStartTime
+      ScheduledTransitLeg::startTime
     );
 
     if (direction == NavigationDirection.PREVIOUS) {
@@ -110,9 +110,7 @@ public class AlternativeLegs {
       .filter(tripPatternPredicate)
       .distinct()
       .flatMap(tripPattern -> withBoardingAlightingPositions(origins, destinations, tripPattern))
-      .flatMap(t ->
-        generateLegs(transitService, t, leg.getStartTime(), leg.getServiceDate(), direction)
-      )
+      .flatMap(t -> generateLegs(transitService, t, leg.startTime(), leg.serviceDate(), direction))
       .filter(Predicate.not(leg::isPartiallySameTransitLeg))
       .sorted(legComparator)
       .limit(numberLegs)

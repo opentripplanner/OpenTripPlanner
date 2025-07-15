@@ -18,6 +18,20 @@
         pickupType
         dropoffType
       }
+      stoptimesForDate(serviceDate: "20240809") {
+        stop {
+          gtfsId
+          name
+        }
+        headsign
+        scheduledArrival
+        scheduledDeparture
+        stopPosition
+        stopPositionInPattern
+        realtimeState
+        pickupType
+        dropoffType
+      }
       occupancy {
         occupancyStatus
       }
@@ -36,6 +50,7 @@
       speed
       heading
       lastUpdated
+      lastUpdate
       trip {
         gtfsId
       }

@@ -20,7 +20,8 @@
         // need code changes, don't want to upgrade
         "io.github.origin-energy:java-snapshot-testing-junit5",
         "commons-cli:commons-cli",
-        "org.processing:core"
+        "org.processing:core",
+        "edu.ucar:netcdf4"
       ],
       "enabled": false
     },
@@ -28,7 +29,7 @@
       "matchFiles": ["client/package.json"],
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "Debug UI dependencies (non-major)",
-      "schedule": ["after 6pm on the 3rd and 17th day of the month"],
+      "schedule": ["after 6pm on the 17th day of the month"],
       "reviewers": ["testower"]
     },
     {
@@ -102,7 +103,7 @@
       "schedule": "on the 7th through 8th day of the month"
     },
     {
-      "groupName": "Update GTFS API code generation in a single PR",
+      "groupName": "GTFS API code generation",
       "matchFiles": ["application/src/main/java/org/opentripplanner/apis/gtfs/generated/package.json"],
       "reviewers": ["optionsome", "leonardehrenfried"],
       "schedule": "on the 11th through 12th day of the month"
@@ -133,7 +134,8 @@
       "groupName": "logging dependencies",
       "matchPackageNames": [
         "org.slf4j:{/,}**",
-        "ch.qos.logback:{/,}**"
+        "ch.qos.logback:{/,}**",
+        "net.logstash.logback:logstash-logback-encoder"
       ],
       "automerge": true,
       "schedule": "on the 4th day of the month"
@@ -141,13 +143,14 @@
     {
       "groupName": "highly trusted dependencies (patch)",
       "matchUpdateTypes": ["patch"],
-      "schedule": ["on the 27th day of the month"],
+      "schedule": ["on the 13th and 27th day of the month"],
       "matchPackageNames": [
         "org.onebusaway:onebusaway-gtfs",
         "org.glassfish.jersey.{/,}**",
         "com.google.guava:guava",
         "com.google.cloud:libraries-bom",
         "com.google.protobuf:protobuf-java",
+        "com.google.dagger:{/,}**",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx",
         "com.fasterxml.jackson.core:{/,}**",
@@ -160,13 +163,20 @@
       "description": "give some projects time to publish a changelog before opening the PR",
       "matchPackageNames": [
         "com.google.dagger:{/,}**",
-        "com.fasterxml.jackson:{/,}**",
-        "com.fasterxml.jackson.datatype::{/,}**",
         "org.apache.httpcomponents.client5:httpclient5"
       ],
       "matchUpdateTypes": ["major", "minor"],
       "minimumReleaseAge": "1 week",
       "schedule": "on the 13th through 14th day of the month"
+    },
+    {
+      "groupName": "Jackson non-patch",
+      "matchPackageNames": [
+        "com.fasterxml.jackson:{/,}**",
+        "com.fasterxml.jackson.datatype::{/,}**",
+      ],
+      "matchUpdateTypes": ["major", "minor"],
+      "minimumReleaseAge": "1 week"
     },
     {
       "description": "Geotools takes a while to publish a changelog and since it pulls in JTS it can change the serialization of the graph",
@@ -183,7 +193,7 @@
       ],
       "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 14th day of the month",
-      "reviewers": ["habrahamsson-skanetrafiken"]
+      "reviewers": ["habrahamsson-skanetrafiken", "svedbod"]
     }
   ],
   "timezone": "Europe/Berlin"

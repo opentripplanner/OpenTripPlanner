@@ -42,10 +42,9 @@ public class TransmodelGraphQLPlanner {
       response.messages.addAll(e.getRoutingErrors());
     }
 
-    Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
     return DataFetcherResult.<PlanResponse>newResult()
       .data(response)
-      .localContext(Map.of("locale", locale))
+      .localContext(Map.of("locale", request.preferences().locale()))
       .build();
   }
 
@@ -60,7 +59,8 @@ public class TransmodelGraphQLPlanner {
       response = new ViaRoutingResponse(Map.of(), List.of(), e.getRoutingErrors());
     }
 
-    Locale defaultLocale = ctx.getServerContext().defaultLocale();
+    Locale defaultLocale = ctx.getServerContext().defaultRouteRequest().preferences().locale();
+    // This is strange, the `request` can not be null here ?
     Locale locale = request == null ? defaultLocale : request.locale();
     return DataFetcherResult.<ViaRoutingResponse>newResult()
       .data(response)

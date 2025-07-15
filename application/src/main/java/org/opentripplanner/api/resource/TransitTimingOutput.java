@@ -1,7 +1,7 @@
 package org.opentripplanner.api.resource;
 
 /**
- * Holds information to be included in the REST Response for debugging and profiling purposes of a
+ * Holds information to be included in the response for debugging and profiling purposes of a
  * single transit routing search.
  */
 public class TransitTimingOutput {

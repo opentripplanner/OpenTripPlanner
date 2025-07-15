@@ -219,7 +219,8 @@ class StreetLinkerModuleTest {
         new DefaultVehicleParkingRepository(),
         timetableRepository,
         DataImportIssueStore.NOOP,
-        false
+        false,
+        0
       );
 
       assertFalse(stopVertex.isConnectedToGraph());
@@ -260,7 +261,7 @@ class StreetLinkerModuleTest {
         })
         .toList();
       StopPattern stopPattern = new StopPattern(stopTimes);
-      RealTimeTripTimes tripTimes = TripTimesFactory.tripTimes(
+      var tripTimes = TripTimesFactory.tripTimes(
         trip,
         stopTimes,
         timetableRepository.getDeduplicator()

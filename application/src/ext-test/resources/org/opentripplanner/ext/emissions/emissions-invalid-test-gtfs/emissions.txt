@@ -1,4 +1,0 @@
-route_id,avg_co2_per_vehicle_per_km,avg_passenger_count
-1001,1,0
-1001,-1,1
-1001,1,-1

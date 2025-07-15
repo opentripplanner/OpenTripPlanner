@@ -44,7 +44,6 @@ import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
 import org.opentripplanner.osm.model.OsmTag;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.street.model.RepeatingTimePeriod;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.search.TraverseMode;
@@ -949,26 +948,6 @@ public class OsmDatabase {
       return;
     }
     tag.modes = modes.clone();
-
-    // set the time periods for this restriction, if applicable
-    if (
-      relation.hasTag("day_on") &&
-      relation.hasTag("day_off") &&
-      relation.hasTag("hour_on") &&
-      relation.hasTag("hour_off")
-    ) {
-      try {
-        tag.time = RepeatingTimePeriod.parseFromOsmTurnRestriction(
-          relation.getTag("day_on"),
-          relation.getTag("day_off"),
-          relation.getTag("hour_on"),
-          relation.getTag("hour_off"),
-          relation.getOsmProvider()::getZoneId
-        );
-      } catch (NumberFormatException e) {
-        LOG.info("Unparseable turn restriction: {}", relation.getId());
-      }
-    }
 
     turnRestrictionsByFromWay.put(from, tag);
     turnRestrictionsByToWay.put(to, tag);

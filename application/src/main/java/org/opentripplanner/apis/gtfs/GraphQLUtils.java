@@ -102,4 +102,12 @@ public class GraphQLUtils {
       return value;
     }
   }
+
+  /**
+   * Takes the class name of a generated Java GraphQL object and returns the schema-defined name of
+   * the type.
+   */
+  public static String typeName(Object type) {
+    return type.getClass().getSimpleName().replaceAll("^GraphQL", "");
+  }
 }

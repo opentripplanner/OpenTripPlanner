@@ -3,8 +3,6 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.createArgsCopy;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.executionContext;
 
 import java.util.Locale;
 import java.util.Map;
@@ -15,9 +13,11 @@ import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
 class RouteRequestMapperScooterTest {
 
+  private final _RouteRequestTestContext testCtx = _RouteRequestTestContext.of(Locale.ENGLISH);
+
   @Test
   void testBasicScooterPreferences() {
-    var scooterArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var scooterArgs = testCtx.basicRequest();
     var reluctance = 7.5;
     var speed = 15d;
     scooterArgs.put(
@@ -31,8 +31,8 @@ class RouteRequestMapperScooterTest {
         )
       )
     );
-    var env = executionContext(scooterArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(scooterArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var scooterPreferences = routeRequest.preferences().scooter();
     assertEquals(reluctance, scooterPreferences.reluctance());
     assertEquals(speed, scooterPreferences.speed());
@@ -40,7 +40,7 @@ class RouteRequestMapperScooterTest {
 
   @Test
   void testScooterTrianglePreferences() {
-    var scooterArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var scooterArgs = testCtx.basicRequest();
     var scooterSafety = 0.3;
     var scooterFlatness = 0.5;
     var scooterTime = 0.2;
@@ -72,8 +72,8 @@ class RouteRequestMapperScooterTest {
         )
       )
     );
-    var env = executionContext(scooterArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(scooterArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var scooterPreferences = routeRequest.preferences().scooter();
     assertEquals(VehicleRoutingOptimizeType.TRIANGLE, scooterPreferences.optimizeType());
     var scooterTrianglePreferences = scooterPreferences.optimizeTriangle();
@@ -84,7 +84,7 @@ class RouteRequestMapperScooterTest {
 
   @Test
   void testScooterOptimizationPreferences() {
-    var scooterArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var scooterArgs = testCtx.basicRequest();
     scooterArgs.put(
       "preferences",
       Map.ofEntries(
@@ -99,15 +99,15 @@ class RouteRequestMapperScooterTest {
         )
       )
     );
-    var env = executionContext(scooterArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(scooterArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var scooterPreferences = routeRequest.preferences().scooter();
     assertEquals(VehicleRoutingOptimizeType.SAFEST_STREETS, scooterPreferences.optimizeType());
   }
 
   @Test
   void testScooterRentalPreferences() {
-    var scooterArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var scooterArgs = testCtx.basicRequest();
     var allowed = Set.of("foo", "bar");
     var banned = Set.of("not");
     var allowKeeping = true;
@@ -141,8 +141,8 @@ class RouteRequestMapperScooterTest {
         )
       )
     );
-    var env = executionContext(scooterArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(scooterArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var scooterRentalPreferences = routeRequest.preferences().scooter().rental();
     assertEquals(allowed, scooterRentalPreferences.allowedNetworks());
     assertEquals(banned, scooterRentalPreferences.bannedNetworks());
@@ -155,7 +155,7 @@ class RouteRequestMapperScooterTest {
 
   @Test
   void testEmptyScooterRentalPreferences() {
-    var scooterArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var scooterArgs = testCtx.basicRequest();
     var empty = Set.of();
     scooterArgs.put(
       "preferences",
@@ -173,12 +173,12 @@ class RouteRequestMapperScooterTest {
         )
       )
     );
-    var allowedEnv = executionContext(scooterArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var allowedEnv = testCtx.executionContext(scooterArgs);
     assertThrows(IllegalArgumentException.class, () ->
-      RouteRequestMapper.toRouteRequest(allowedEnv, RouteRequestMapperTest.CONTEXT)
+      RouteRequestMapper.toRouteRequest(allowedEnv, testCtx.context())
     );
 
-    scooterArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    scooterArgs = testCtx.basicRequest();
     scooterArgs.put(
       "preferences",
       Map.ofEntries(
@@ -195,8 +195,8 @@ class RouteRequestMapperScooterTest {
         )
       )
     );
-    var bannedEnv = executionContext(scooterArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(bannedEnv, RouteRequestMapperTest.CONTEXT);
+    var bannedEnv = testCtx.executionContext(scooterArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(bannedEnv, testCtx.context());
     var scooterRentalPreferences = routeRequest.preferences().scooter().rental();
     assertEquals(empty, scooterRentalPreferences.bannedNetworks());
   }

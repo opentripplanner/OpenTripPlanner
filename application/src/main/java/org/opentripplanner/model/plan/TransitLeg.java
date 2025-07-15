@@ -6,7 +6,7 @@ public interface TransitLeg extends Leg, AlertsAware<TransitLeg>, FareProductAwa
   /**
    * The mode (e.g., <code>BUS</code>) used when traversing this leg.
    */
-  TransitMode getMode();
+  TransitMode mode();
 
   @Override
   default boolean isTransitLeg() {
@@ -15,6 +15,6 @@ public interface TransitLeg extends Leg, AlertsAware<TransitLeg>, FareProductAwa
 
   @Override
   default boolean hasSameMode(Leg other) {
-    return other instanceof TransitLeg trLeg && getMode().equals(trLeg.getMode());
+    return other instanceof TransitLeg trLeg && mode().equals(trLeg.mode());
   }
 }

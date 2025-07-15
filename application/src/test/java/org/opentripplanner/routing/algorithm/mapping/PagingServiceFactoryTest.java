@@ -56,7 +56,7 @@ class PagingServiceFactoryTest {
       TRANSIT_START_TIME,
       TransitTuningParameters.FOR_TEST,
       new RaptorTuningParameters() {},
-      new RouteRequest(),
+      RouteRequest.defaultValue(),
       SEARCH_PARAMS_ALL,
       null,
       List.of()

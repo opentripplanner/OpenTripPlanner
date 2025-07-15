@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.request.ViaLocationDeprecated;
 import org.opentripplanner.routing.api.response.InputField;
@@ -23,29 +24,26 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 public class ViaRoutingWorker {
 
   private final RouteViaRequest viaRequest;
-  private final RouteRequest request;
   private final Function<RouteRequest, RoutingResponse> routingWorker;
   // TODO: This constant already exists in RoutingRequestToFilterChainMapper, so when POC is done use only constant
   private static final int MAX_NUMBER_OF_ITINERARIES = 200;
 
+  private RouteRequestBuilder currentSegmentRequest;
+
   public ViaRoutingWorker(
-    RouteViaRequest request,
+    RouteViaRequest viaRequest,
     Function<RouteRequest, RoutingResponse> routingWorker
   ) {
     // The request is cloned here and put in a field, as getRoutingResponse loops over all the
     // segments, modifying the request based on the result from each segment.
-    this.request = request.routeRequest().clone();
-    this.viaRequest = request;
+    this.currentSegmentRequest = viaRequest.routeRequestFirstSegment();
+    this.viaRequest = viaRequest;
     this.routingWorker = routingWorker;
   }
 
   public ViaRoutingResponse route() {
     //Loop over Via, for each cycle change from/to and JourneyRequest.
-    var result = viaRequest
-      .viaSegment()
-      .stream()
-      .map(v -> getRoutingResponse(viaRequest, v))
-      .toList();
+    var result = viaRequest.viaSegment().stream().map(v -> routeSegment(v)).toList();
 
     return combineRoutingResponse(result);
   }
@@ -54,35 +52,34 @@ public class ViaRoutingWorker {
    * Set to point and search trips. Return result with itineraries and prepare request for next
    * search.
    */
-  private RoutingResponse getRoutingResponse(
-    RouteViaRequest request,
-    RouteViaRequest.ViaSegment v
-  ) {
+  private RoutingResponse routeSegment(RouteViaRequest.ViaSegment v) {
     // If viaLocation is null then we are at last search
     if (v.viaLocation() != null) {
-      this.request.setTo(v.viaLocation().point());
+      this.currentSegmentRequest.withTo(v.viaLocation().point());
     } else {
-      this.request.setTo(request.routeRequest().to());
+      this.currentSegmentRequest.withTo(viaRequest.to());
     }
 
-    this.request.setJourney(v.journeyRequest());
+    this.currentSegmentRequest.withJourney(v.journeyRequest());
 
-    var response = this.routingWorker.apply(this.request);
+    var response = this.routingWorker.apply(this.currentSegmentRequest.buildRequest());
 
     if (v.viaLocation() == null) {
       return response;
     }
 
+    // Prepare next search
     var firstArrival = firstArrival(response).orElseThrow(this::createRoutingException);
     var lastArrival = lastArrival(response).orElseThrow(this::createRoutingException);
     var maxSlack = v.viaLocation().maxSlack();
-    // Prepare next search
     var searchWindow = Duration.between(firstArrival, lastArrival).plus(maxSlack);
 
-    this.request.setNumItineraries(MAX_NUMBER_OF_ITINERARIES);
-    this.request.setSearchWindow(searchWindow);
-    this.request.setDateTime(firstArrival.plus(v.viaLocation().minSlack()).toInstant());
-    this.request.setFrom(v.viaLocation().point());
+    this.currentSegmentRequest.withFrom(v.viaLocation().point());
+    this.currentSegmentRequest.withDateTime(
+        firstArrival.plus(v.viaLocation().minSlack()).toInstant()
+      );
+    this.currentSegmentRequest.withSearchWindow(searchWindow);
+    this.currentSegmentRequest.withNumItineraries(MAX_NUMBER_OF_ITINERARIES);
 
     return response;
   }

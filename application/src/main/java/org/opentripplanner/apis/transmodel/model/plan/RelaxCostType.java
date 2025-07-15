@@ -23,7 +23,7 @@ public class RelaxCostType {
     .description(
       """
       A relax-cost is used to increase the limit when comparing one cost to another cost.
-      This is used to include more results into the result. A `ratio=2.0` means a path(itinerary)
+      This is used to include more results into the result. A `ratio=2.0` means a path (itinerary)
       with twice as high cost as another one, is accepted. A `constant=$300` means a "fixed"
       constant is added to the limit. A `{ratio=1.0, constant=0}` is said to be the NORMAL relaxed
       cost - the limit is the same as the cost used to calculate the limit. The NORMAL is usually

@@ -51,9 +51,9 @@ class InterlineProcessorTest implements PlanTestConstants {
           List.of(LocalDate.of(2023, Month.JANUARY, 1))
         ),
         "[ConstrainedTransfer{from: TripTP{F:trip-2, stopPos 2}, to: TripTP{F:trip-3, stopPos 0}, " +
-        "constraint: {staySeated}}, ConstrainedTransfer{from: TripTP{F:trip-1, stopPos 2}, " +
-        "to: TripTP{F:trip-2, stopPos 0}, constraint: {staySeated}}, " +
-        "ConstrainedTransfer{from: TripTP{F:trip-3, stopPos 2}, to: TripTP{F:trip-4, stopPos 0}, constraint: {staySeated}}]"
+        "constraint: (staySeated)}, ConstrainedTransfer{from: TripTP{F:trip-1, stopPos 2}, " +
+        "to: TripTP{F:trip-2, stopPos 0}, constraint: (staySeated)}, " +
+        "ConstrainedTransfer{from: TripTP{F:trip-3, stopPos 2}, to: TripTP{F:trip-4, stopPos 0}, constraint: (staySeated)}]"
       ),
       Arguments.of(
         List.of(
@@ -69,9 +69,9 @@ class InterlineProcessorTest implements PlanTestConstants {
           List.of(LocalDate.of(2023, Month.JANUARY, 1))
         ),
         "[ConstrainedTransfer{from: TripTP{F:trip-2, stopPos 2}, to: TripTP{F:trip-3, stopPos 0}, " +
-        "constraint: {staySeated}}, ConstrainedTransfer{from: TripTP{F:trip-1, stopPos 2}, " +
-        "to: TripTP{F:trip-2, stopPos 0}, constraint: {staySeated}}, " +
-        "ConstrainedTransfer{from: TripTP{F:trip-2, stopPos 2}, to: TripTP{F:trip-4, stopPos 0}, constraint: {staySeated}}]"
+        "constraint: (staySeated)}, ConstrainedTransfer{from: TripTP{F:trip-1, stopPos 2}, " +
+        "to: TripTP{F:trip-2, stopPos 0}, constraint: (staySeated)}, " +
+        "ConstrainedTransfer{from: TripTP{F:trip-2, stopPos 2}, to: TripTP{F:trip-4, stopPos 0}, constraint: (staySeated)}]"
       ),
       // No common days between services
       Arguments.of(
@@ -87,7 +87,7 @@ class InterlineProcessorTest implements PlanTestConstants {
           List.of(LocalDate.of(2023, Month.JANUARY, 3)),
           List.of(LocalDate.of(2023, Month.JANUARY, 1))
         ),
-        "[ConstrainedTransfer{from: TripTP{F:trip-1, stopPos 2}, to: TripTP{F:trip-2, stopPos 0}, constraint: {staySeated}}]"
+        "[ConstrainedTransfer{from: TripTP{F:trip-1, stopPos 2}, to: TripTP{F:trip-2, stopPos 0}, constraint: (staySeated)}]"
       )
     );
   }

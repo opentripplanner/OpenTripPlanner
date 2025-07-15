@@ -9,7 +9,8 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 public class StationMapperTest {
 
-  private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+  private static final String FEED_ID = "A";
+  private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId(FEED_ID, "1");
 
   private static final double LAT = 60.0d;
 
@@ -31,6 +32,7 @@ public class StationMapperTest {
   public void testTransferPriority() {
     var recommendedPriority = StopTransferPriority.RECOMMENDED;
     StationMapper recommendedTransferMapper = new StationMapper(
+      new IdFactory(FEED_ID),
       new TranslationHelper(),
       recommendedPriority
     );

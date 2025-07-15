@@ -20,6 +20,13 @@
           minimumWaitTime: "1h"
         }
       }
+      {
+        visit: {
+          label: "via3"
+          coordinate: { latitude: 45.932, longitude: -122.345 }
+          minimumWaitTime: "1h"
+        }
+      }
     ]
     modes: {
       directOnly: false
@@ -84,8 +91,13 @@
           includePlannedCancellations: false
           includeRealTimeCancellations: true
         }
+        filters: [
+          { include: [{ routes: ["A:r1"] }] }
+          { exclude: [{ agencies: ["A:a1"] }] }
+        ]
       }
     }
+
     locale: "en"
   ) {
     searchDateTime

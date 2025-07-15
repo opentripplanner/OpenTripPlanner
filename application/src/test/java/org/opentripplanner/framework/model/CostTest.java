@@ -23,12 +23,11 @@ class CostTest {
 
   @Test
   void testCostOfSeconds() {
-    var a = Cost.costOfSeconds(11);
-    var b = Cost.costOfSeconds(11.499);
-    var c = Cost.costOfSeconds(10.5);
-
-    assertEquals(a, b);
-    assertEquals(a, c);
+    var c11 = Cost.costOfSeconds(11);
+    assertNotEquals(c11, Cost.costOfSeconds(10.99499));
+    assertEquals(c11, Cost.costOfSeconds(10.99500));
+    assertEquals(c11, Cost.costOfSeconds(11.00499));
+    assertNotEquals(c11, Cost.costOfSeconds(11.00500));
   }
 
   @Test
@@ -38,9 +37,11 @@ class CostTest {
 
   @Test
   void testFromDuration() {
-    assertEquals(Cost.costOfSeconds(11), Cost.fromDuration(Duration.ofSeconds(11)));
-    assertEquals(Cost.costOfSeconds(11), Cost.fromDuration(Duration.ofMillis(11499)));
-    assertEquals(Cost.costOfSeconds(11), Cost.fromDuration(Duration.ofMillis(10500)));
+    Cost c11 = Cost.costOfSeconds(11);
+    assertNotEquals(c11, Cost.fromDuration(Duration.ofMillis(10994)));
+    assertEquals(c11, Cost.fromDuration(Duration.ofMillis(10995)));
+    assertEquals(c11, Cost.fromDuration(Duration.ofMillis(11004)));
+    assertNotEquals(c11, Cost.fromDuration(Duration.ofMillis(11005)));
   }
 
   @Test
@@ -84,8 +85,31 @@ class CostTest {
   @Test
   void testMultiply() {
     assertEquals("$30", subject.multiply(3).toString());
-    assertEquals("$13", subject.multiply(1.25).toString());
-    assertEquals("$13", subject.multiply(1.34).toString());
+    assertEquals("$12.50", subject.multiply(1.25).toString());
+    assertEquals("$13.40", subject.multiply(1.34).toString());
+  }
+
+  @Test
+  void testLessThanAndGreaterThenFunctions() {
+    Cost same = Cost.costOfCentiSeconds(subject.toCentiSeconds());
+    Cost smaller = Cost.costOfCentiSeconds(subject.toCentiSeconds() - 1);
+    Cost bigger = Cost.costOfCentiSeconds(subject.toCentiSeconds() + 1);
+
+    assertTrue(subject.greaterThan(smaller));
+    assertFalse(subject.greaterThan(same));
+    assertFalse(subject.greaterThan(bigger));
+
+    assertTrue(subject.greaterOrEq(smaller));
+    assertTrue(subject.greaterOrEq(same));
+    assertFalse(subject.greaterOrEq(bigger));
+
+    assertFalse(subject.lessThan(smaller));
+    assertFalse(subject.lessThan(same));
+    assertTrue(subject.lessThan(bigger));
+
+    assertFalse(subject.lessOrEq(smaller));
+    assertTrue(subject.lessOrEq(same));
+    assertTrue(subject.lessOrEq(bigger));
   }
 
   @Test

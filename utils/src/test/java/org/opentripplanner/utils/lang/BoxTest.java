@@ -26,6 +26,13 @@ class BoxTest {
   }
 
   @Test
+  void modifyValue() {
+    Box<String> box = Box.of("A");
+    box.modify(v -> v + "B");
+    assertEquals("AB", box.get());
+  }
+
+  @Test
   void testIsEmpty() {
     assertTrue(Box.<String>empty().isEmpty());
     assertFalse(Box.of("A").isEmpty());

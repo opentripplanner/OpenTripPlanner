@@ -13,10 +13,11 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
@@ -36,15 +37,24 @@ public class SplitEdgeTurnRestrictionsTest {
     .atZone(ZoneIds.BERLIN)
     .toInstant();
   // Deufringen
-  static final GenericLocation hardtheimerWeg = new GenericLocation(48.67765, 8.87212);
-  static final GenericLocation steinhaldenWeg = new GenericLocation(48.67815, 8.87305);
-  static final GenericLocation k1022 = new GenericLocation(48.67846, 8.87021);
+  static final GenericLocation hardtheimerWeg = GenericLocation.fromCoordinate(48.67765, 8.87212);
+  static final GenericLocation steinhaldenWeg = GenericLocation.fromCoordinate(48.67815, 8.87305);
+  static final GenericLocation k1022 = GenericLocation.fromCoordinate(48.67846, 8.87021);
   // Böblingen
-  static final GenericLocation paulGerhardtWegEast = new GenericLocation(48.68363, 9.00728);
-  static final GenericLocation paulGerhardtWegWest = new GenericLocation(48.68297, 9.00520);
-  static final GenericLocation parkStrasse = new GenericLocation(48.68358, 9.00826);
-  static final GenericLocation herrenbergerStrasse = new GenericLocation(48.68497, 9.00909);
-  static final GenericLocation steinbeissWeg = new GenericLocation(48.68172, 9.00599);
+  static final GenericLocation paulGerhardtWegEast = GenericLocation.fromCoordinate(
+    48.68363,
+    9.00728
+  );
+  static final GenericLocation paulGerhardtWegWest = GenericLocation.fromCoordinate(
+    48.68297,
+    9.00520
+  );
+  static final GenericLocation parkStrasse = GenericLocation.fromCoordinate(48.68358, 9.00826);
+  static final GenericLocation herrenbergerStrasse = GenericLocation.fromCoordinate(
+    48.68497,
+    9.00909
+  );
+  static final GenericLocation steinbeissWeg = GenericLocation.fromCoordinate(48.68172, 9.00599);
   private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(
     SplitEdgeTurnRestrictionsTest.class
   );
@@ -64,7 +74,7 @@ public class SplitEdgeTurnRestrictionsTest {
     var noRightTurnPermitted = computeCarPolyline(graph, hardtheimerWeg, steinhaldenWeg);
     assertThatPolylinesAreEqual(
       noRightTurnPermitted,
-      "ijbhHuycu@g@Uq@[e@|BENGVYxA]xAYz@Yp@Yj@^n@JDN_@?Wa@i@Xq@X{@\\yAXyACGAIB]j@_DPaA@e@MDCB"
+      "ijbhHuycu@g@Uq@[e@|BMf@YxA]xAYz@Yp@Yj@^n@JDN_@?Wa@i@Xq@X{@\\yAXyACGAIB]j@_DPaA@e@MDCB"
     );
 
     // when to drive in reverse direction it's fine to go this way
@@ -73,7 +83,7 @@ public class SplitEdgeTurnRestrictionsTest {
 
     // make sure that going straight on a straight-only turn direction also works
     var straightAhead = computeCarPolyline(graph, hardtheimerWeg, k1022);
-    assertThatPolylinesAreEqual(straightAhead, "ijbhHuycu@g@Uq@[e@|BENGVYxA]xAXn@Hd@");
+    assertThatPolylinesAreEqual(straightAhead, "ijbhHuycu@g@Uq@[e@|BMf@YxA]xAXn@Hd@");
 
     var straightAheadBack = computeCarPolyline(graph, k1022, hardtheimerWeg);
     assertThatPolylinesAreEqual(straightAheadBack, "kobhHwmcu@Ie@Yo@\\yAXyAFWDOd@}Bp@Zf@T");
@@ -147,12 +157,13 @@ public class SplitEdgeTurnRestrictionsTest {
   }
 
   private static String computeCarPolyline(Graph graph, GenericLocation from, GenericLocation to) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(dateTime);
-    request.setFrom(from);
-    request.setTo(to);
+    RouteRequest request = RouteRequest.of()
+      .withDateTime(dateTime)
+      .withFrom(from)
+      .withTo(to)
+      .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
+      .buildRequest();
 
-    request.journey().direct().setMode(StreetMode.CAR);
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
       from,
@@ -175,7 +186,7 @@ public class SplitEdgeTurnRestrictionsTest {
     // make sure that we only get CAR legs
     itineraries.forEach(i ->
       i
-        .getLegs()
+        .legs()
         .forEach(l -> {
           if (l instanceof StreetLeg stLeg) {
             assertEquals(TraverseMode.CAR, stLeg.getMode());
@@ -184,7 +195,7 @@ public class SplitEdgeTurnRestrictionsTest {
           }
         })
     );
-    Geometry geometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
+    Geometry geometry = itineraries.get(0).legs().get(0).legGeometry();
     return EncodedPolyline.encode(geometry).points();
   }
 }

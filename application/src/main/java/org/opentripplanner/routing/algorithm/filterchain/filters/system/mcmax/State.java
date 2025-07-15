@@ -104,7 +104,7 @@ class State {
   }
 
   /**
-   * Search through all groups and return all items witch comes from groups with only one item.
+   * Search through all groups and return all items which comes from groups with only one item.
    */
   @Nullable
   private static Item findItemInFirstSingleItemGroup(List<Group> groups) {

@@ -2,7 +2,13 @@
   "data": {
     "stations": [
       {
-        "gtfsId": "F:STATION",
+        "gtfsId": "F:Omega",
+        "lat": 60.0,
+        "lon": 10.0,
+        "name": "Omega",
+        "vehicleMode": null,
+        "allRoutes": null,
+        "routesWithinRange": null,
         "alerts": []
       }
     ]

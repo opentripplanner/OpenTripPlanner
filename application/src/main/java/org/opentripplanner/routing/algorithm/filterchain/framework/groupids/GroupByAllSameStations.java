@@ -21,13 +21,13 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
 
   public GroupByAllSameStations(Itinerary itinerary) {
     keySet = itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(Leg::isTransitLeg)
       .map(leg ->
         new FeedScopedIdPair(
-          leg.getFrom().stop.getStationOrStopId(),
-          leg.getTo().stop.getStationOrStopId()
+          leg.from().stop.getStationOrStopId(),
+          leg.to().stop.getStationOrStopId()
         )
       )
       .collect(Collectors.toList());

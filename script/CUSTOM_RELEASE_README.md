@@ -1,7 +1,7 @@
 # README - OTP Custom/Fork Release Scripts
 
-**Note! This describes how you can set up and release OTP in your own GitHub fork, not how OTP in the
-main repo is released.**
+**Note! This describes how you can set up and release OTP in your own GitHub fork, not how OTP in
+the main repo is released.**
 
 
 ## Introduction
@@ -24,22 +24,23 @@ The release is made in the `release branch` in the forked git repository. The re
 based on the `base revision` - a branch, tag or commit, for example `otp/dev-2.x`. 
 
 1. The release script will start by _resetting_ the `release branch` to the given `base revision`.
-  **Nothing is kept from previous releases.**
+   **Nothing is kept from previous releases.**
 2. Then all pending PRs tagged with your `TEST` label is meged in. The name of the label is 
-  configured in the `custom-release-env.json` file.
-3. Then all your extention branches are meged in. These are normally branchech with your deployment
-  config and GitHub workflow files. The name of these branches is configured in the 
-  `custom-release-env.json` file.
-4. The `custom-release-extention` script is run, if it exist. For example you may delete 
-  workflow scripts comming from the upstream `base revision`. 
+   configured in the `custom-release-env.json` file.
+3. Then all your extension branches are meged in. These are normally branchech with your deployment
+   config and GitHub workflow files. The name of these branches is configured in the 
+   `custom-release-env.json` file.
+4. The `custom-release-extension` script is run, if it exist. For example you may delete 
+   workflow scripts comming from the upstream `base revision`. 
 5. The old release is then merged with an _empty merge_, this is done to create a continuous line
-  of releases in the release branch for easy viewing and navigation of the git history. Nothing
-  from the previous release is copied into the new release. We call this an _empty merge_.
-6. Then the script update the _otp-serialization-version-id_ and OTP _version_. Each release is 
-  given a unique version number specific to your fork, like `v2.7.0-MY_ORG-1`. The release script
-  uses both the git history and the GitHub GraphQL API (PRs labeled `bump serialization id`) to 
-  resolve the versions numbers. 
-7. The script finally push the release.
+   of releases in the release branch for easy viewing and navigation of the git history. Nothing
+   from the previous release is copied into the new release. We call this an _empty merge_.
+6. Then the script update the _otp-serialization-version-id_ and the OTP _version_ in the pom.xml 
+   file. Each release is given a unique version number specific to your fork, like 
+   `v2.7.0-MY_ORG-1`. The release script uses both the git history and the GitHub GraphQL API 
+   (PRs labeled `bump serialization id`) to resolve the serialization version number. 
+7. Finally the release is tagged and pushed to the remote Git repository. The repository is 
+   configured in the `custom-release-env.json` file.
 
 Do not worry about deleting more recent versions, the release script will preserve the history so
 nothing is lost.
@@ -80,12 +81,12 @@ new release (v3).
 When you make a new releae all open PRs tagged with your custom `TEST` label is automatically
 merged in. This is ilustrated with the _feature-branch-in-progress_ above. 
 
-## Extention branches
+## Extension branches
 
 You should create one or more branches in the local git repository where you keep your 
 deployment-specific config. Put the following in this(these) branch(es):
 
-The branch(es) must include(requiered):
+The branch(es) must include(required):
 
 - The `script/custom-release-env.json`, containing the release configuration. The branch containing
   this file must be merged into the `release brach` before the first release. If you make changes
@@ -105,12 +106,12 @@ The branch may include(optional):
 
 The config branches are merged into the release - so the best way to avoid merge conflict is to
 use a "old" commit from the **base branch/repo** as the base for your config. Do not use a commit 
-witch only exist in the release branch, this will lead to conficts with the pom.xml version number.
+which only exist in the release branch, this will lead to conficts with the pom.xml version number.
 
 
 ## Setup
 
-Create a configuration extention branch (`main_config`) in your local fork based on a commit in the
+Create a configuration extension branch (`main_config`) in your local fork based on a commit in the
 upstream repo, for example `HEAD` of `opentripplanner/OpenTripPlanner/dev-2.x`. 
 
 Add the `script/custom-release-env.json` file to your branch. The content of the file should be:
@@ -207,6 +208,22 @@ to turn _on_ new features in over test environment. When the new feature is test
 enable it by changing the config.
 
 
+## How To Make The First Release
+
+The release script looks for the _last release_ to resolve the next version. It uses the version
+in the Maven _pom.xml_, strips of `-SNAPSHOT` and appends `<organization name>` and a sequence number
+(`N`). The release fails if there are no tags matching `vX.Y.Z-<organization name>-N`. There are two
+ways to resolve this:
+
+- The simplest way to fix this, is to tag the _last release_ with an extra tag. Let say the new OTP 
+  version is `X.Y.Z-SNAPSHOT`. Then tag the last released version (or any commit in the release 
+  branch) with `vX.Y.Z-<organization name>-0`, for example `v2.8.0-entur-0`. The script will now 
+  use this as the _last version_ and set the new version number to `v2.8.0-entur-1`. You can delete
+  the tag `v2.8.0-entur-0` after the release is done.
+- Another way to do it, is to make the first release manually. Make sure to tag the release with 
+  `vX.Y.Z-<organization name>-1`. 
+
+
 ## How To Make A Release
 
 Find the base branch/commit to use, for example `otp/dev-2.x`. If you use a specific branch/commit, 
@@ -231,7 +248,7 @@ you rerun the script.
 > generated you mark the conflict as resolved.
 
 If a conflic happens in the CI/CD pipline it is recomended to fix the branch causing the conflict.
-The conflict can normally be fixed by rebasing or merging the extention branches or PRs. If not,
+The conflict can normally be fixed by rebasing or merging the extension branches or PRs. If not,
 you will have to make the release on a local mashine resolving conflicts by hand.
 
 

@@ -110,7 +110,7 @@ public class HeuristicsAdapter implements Heuristics {
   @Override
   public String toString() {
     return ToStringBuilder.of(Heuristics.class)
-      .addServiceTime("originDepartureTime(last iteration)", originDepartureTime)
+      .addServiceTime("originDepartureTime (last iteration)", originDepartureTime)
       .addObj("aggregatedResults", aggregatedResults)
       .addCol(
         "egress stops reached",

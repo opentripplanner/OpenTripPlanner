@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
@@ -71,8 +70,8 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
 
     var nearbyStops = finder.findNearbyStops(
       isolatedStop,
-      new RouteRequest(),
-      new StreetRequest(),
+      RouteRequest.defaultValue(),
+      StreetRequest.DEFAULT,
       false
     );
 
@@ -88,7 +87,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null);
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(stopA, new RouteRequest(), new StreetRequest(), false)
+      finder.findNearbyStops(stopA, RouteRequest.defaultValue(), StreetRequest.DEFAULT, false)
     );
 
     assertThat(sortedNearbyStops).hasSize(4);
@@ -105,7 +104,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null);
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(stopA, new RouteRequest(), new StreetRequest(), false)
+      finder.findNearbyStops(stopA, RouteRequest.defaultValue(), StreetRequest.DEFAULT, false)
     );
 
     assertThat(sortedNearbyStops).hasSize(2);
@@ -119,12 +118,13 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     // one extra stop.
     var durationLimit = Duration.ofSeconds(101);
     var maxStopCount = 0;
-    var routeRequest = new RouteRequest()
-      .withPreferences(b -> b.withWalk(walkPreferences -> walkPreferences.withSpeed(1.0)));
+    var routeRequest = RouteRequest.of()
+      .withPreferences(b -> b.withWalk(w -> w.withSpeed(1.0)))
+      .buildDefault();
 
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null);
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(stopA, routeRequest, new StreetRequest(), false)
+      finder.findNearbyStops(stopA, routeRequest, StreetRequest.DEFAULT, false)
     );
 
     assertThat(sortedNearbyStops).hasSize(2);
@@ -140,7 +140,12 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null, ignore);
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(Set.of(stopA), new RouteRequest(), new StreetRequest(), false)
+      finder.findNearbyStops(
+        Set.of(stopA),
+        RouteRequest.defaultValue(),
+        StreetRequest.DEFAULT,
+        false
+      )
     );
 
     assertThat(sortedNearbyStops).hasSize(2);
@@ -156,7 +161,12 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null, ignore);
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(Set.of(stopA), new RouteRequest(), new StreetRequest(), false)
+      finder.findNearbyStops(
+        Set.of(stopA),
+        RouteRequest.defaultValue(),
+        StreetRequest.DEFAULT,
+        false
+      )
     );
 
     assertThat(sortedNearbyStops).hasSize(1);

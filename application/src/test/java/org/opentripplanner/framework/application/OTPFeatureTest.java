@@ -12,7 +12,7 @@ import org.opentripplanner.standalone.config.OtpConfigLoader;
 
 public class OTPFeatureTest {
 
-  private final OTPFeature subject = OTPFeature.APIBikeRental;
+  private final OTPFeature subject = OTPFeature.GtfsGraphQlApi;
 
   @Test
   public void on() {
@@ -54,7 +54,7 @@ public class OTPFeatureTest {
       """
       {
         otpFeatures : {
-          APIBikeRental : false,
+          GtfsGraphQlApi: false,
           MinimumTransferTimeIsDefinitive : true
         }
       }
@@ -66,7 +66,7 @@ public class OTPFeatureTest {
     OTPFeature.enableFeatures(config.otpFeatures);
 
     // Then
-    assertTrue(OTPFeature.APIBikeRental.isOff());
+    assertTrue(OTPFeature.GtfsGraphQlApi.isOff());
     assertTrue(OTPFeature.MinimumTransferTimeIsDefinitive.isOn());
   }
 

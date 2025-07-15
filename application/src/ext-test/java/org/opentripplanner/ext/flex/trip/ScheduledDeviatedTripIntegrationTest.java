@@ -6,24 +6,17 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.fares.DecorateWithFare;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.flex.FlexIntegrationTestData;
-import org.opentripplanner.ext.flex.FlexParameters;
-import org.opentripplanner.ext.flex.FlexRouter;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
@@ -31,18 +24,11 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.street.model.vertex.StreetLocation;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
-import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -92,41 +78,6 @@ class ScheduledDeviatedTripIntegrationTest {
     assertEquals(-84.63430143459385, flexZone.getLon(), delta);
   }
 
-  @Test
-  void calculateDirectFare() {
-    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-    var trip = getFlexTrip();
-
-    var from = getNearbyStop(trip, "from-stop");
-    var to = getNearbyStop(trip, "to-stop");
-
-    var router = new FlexRouter(
-      graph,
-      new DefaultTransitService(timetableRepository),
-      FlexParameters.defaultValues(),
-      OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
-      null,
-      1,
-      1,
-      List.of(from),
-      List.of(to)
-    );
-
-    var filter = new DecorateWithFare(graph.getFareService());
-
-    var itineraries = router
-      .createFlexOnlyItineraries(false)
-      .stream()
-      .peek(filter::decorate)
-      .toList();
-
-    var itinerary = itineraries.getFirst();
-
-    assertFalse(itinerary.getFares().getLegProducts().isEmpty());
-
-    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
-  }
-
   /**
    * Trips which consist of flex and fixed-schedule stops should work in transit mode.
    * <p>
@@ -137,7 +88,11 @@ class ScheduledDeviatedTripIntegrationTest {
   void flexTripInTransitMode() {
     var feedId = timetableRepository.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(graph, timetableRepository);
+    var serverContext = TestServerContext.createServerContext(
+      graph,
+      timetableRepository,
+      new DefaultFareService()
+    );
 
     // from zone 3 to zone 2
     var from = GenericLocation.fromStopId("Transfer Point for Route 30", feedId, "cujv");
@@ -152,16 +107,16 @@ class ScheduledDeviatedTripIntegrationTest {
     assertEquals(2, itineraries.size());
 
     var itin = itineraries.get(0);
-    var leg = itin.getLegs().get(0);
+    var leg = itin.legs().get(0);
 
-    assertEquals("cujv", leg.getFrom().stop.getId().getId());
-    assertEquals("yz85", leg.getTo().stop.getId().getId());
+    assertEquals("cujv", leg.from().stop.getId().getId());
+    assertEquals("yz85", leg.to().stop.getId().getId());
 
-    var intermediateStops = leg.getIntermediateStops();
+    var intermediateStops = leg.listIntermediateStops();
     assertEquals(1, intermediateStops.size());
     assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
 
-    EncodedPolyline legGeometry = EncodedPolyline.encode(leg.getLegGeometry());
+    EncodedPolyline legGeometry = EncodedPolyline.encode(leg.legGeometry());
     assertThatPolylinesAreEqual(
       legGeometry.points(),
       "kfsmEjojcOa@eBRKfBfHR|ALjBBhVArMG|OCrEGx@OhAKj@a@tAe@hA]l@MPgAnAgw@nr@cDxCm@t@c@t@c@x@_@~@]pAyAdIoAhG}@lE{AzHWhAtt@t~Aj@tAb@~AXdBHn@FlBC`CKnA_@nC{CjOa@dCOlAEz@E|BRtUCbCQ~CWjD??qBvXBl@kBvWOzAc@dDOx@sHv]aIG?q@@c@ZaB\\mA"
@@ -202,12 +157,13 @@ class ScheduledDeviatedTripIntegrationTest {
     OtpServerRequestContext serverContext
   ) {
     var zoneId = ZoneIds.NEW_YORK;
-    RouteRequest request = new RouteRequest();
-    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
     var dateTime = LocalDateTime.of(2021, Month.DECEMBER, 16, 12, 0).atZone(zoneId);
-    request.setDateTime(dateTime.toInstant());
-    request.setFrom(from);
-    request.setTo(to);
+
+    RouteRequest request = RouteRequest.of()
+      .withDateTime(dateTime.toInstant())
+      .withFrom(from)
+      .withTo(to)
+      .buildRequest();
 
     var transitStartOfTime = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     var additionalSearchDays = AdditionalSearchDays.defaults(dateTime);
@@ -221,27 +177,6 @@ class ScheduledDeviatedTripIntegrationTest {
     );
 
     return result.getItineraries();
-  }
-
-  private static NearbyStop getNearbyStop(FlexTrip<?, ?> trip, String id) {
-    // getStops() returns a set of stops and the order doesn't correspond to the stop times
-    // of the trip
-    var stopLocation = trip
-      .getStops()
-      .stream()
-      .filter(s -> s instanceof AreaStop)
-      .findFirst()
-      .orElseThrow();
-
-    return new NearbyStop(
-      stopLocation,
-      0,
-      List.of(),
-      new State(
-        new StreetLocation(id, new Coordinate(0, 0), I18NString.of(id)),
-        StreetSearchRequest.of().build()
-      )
-    );
   }
 
   private static FlexTrip<?, ?> getFlexTrip() {

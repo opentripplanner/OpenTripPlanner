@@ -15,15 +15,18 @@ class PathwayNodeMapper {
 
   static final String DEFAULT_NAME = "Pathway node";
 
+  private final IdFactory idFactory;
   private final Map<org.onebusaway.gtfs.model.Stop, PathwayNode> mappedNodes = new HashMap<>();
 
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;
 
   PathwayNodeMapper(
+    IdFactory idFactory,
     TranslationHelper translationHelper,
     Function<FeedScopedId, Station> stationLookUp
   ) {
+    this.idFactory = idFactory;
     this.translationHelper = translationHelper;
     this.stationLookUp = stationLookUp;
   }
@@ -47,7 +50,7 @@ class PathwayNodeMapper {
       );
     }
 
-    StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
+    StopMappingWrapper base = new StopMappingWrapper(idFactory, gtfsStop);
     var builder = PathwayNode.of(base.getId())
       .withCode(base.getCode())
       .withCoordinate(base.getCoordinate())

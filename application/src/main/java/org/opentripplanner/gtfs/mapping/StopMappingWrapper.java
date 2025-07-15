@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -14,14 +12,16 @@ import org.opentripplanner.transit.model.site.StopLevel;
  */
 class StopMappingWrapper {
 
-  final Stop stop;
+  private final IdFactory idFactory;
+  private final Stop stop;
 
-  public StopMappingWrapper(Stop stop) {
+  public StopMappingWrapper(IdFactory idFactory, Stop stop) {
+    this.idFactory = idFactory;
     this.stop = stop;
   }
 
   public FeedScopedId getId() {
-    return mapAgencyAndId(stop.getId());
+    return idFactory.createNullableId(stop.getId());
   }
 
   public String getName() {

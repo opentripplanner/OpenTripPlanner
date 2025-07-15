@@ -9,6 +9,7 @@ import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
@@ -28,7 +29,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
  *
  * @author abyrd
  */
-public class UnroutableTest {
+class UnroutableTest {
 
   private Graph graph;
 
@@ -57,15 +58,16 @@ public class UnroutableTest {
    */
   @Test
   public void testOnBoardRouting() {
-    RouteRequest options = new RouteRequest();
-    options.journey().direct().setMode(StreetMode.BIKE);
+    var request = RouteRequest.of()
+      .withJourney(j -> j.withDirect(new StreetRequest(StreetMode.BIKE)))
+      .buildDefault();
 
     Vertex from = graph.getVertex(VertexLabel.osm(2003617278));
     Vertex to = graph.getVertex(VertexLabel.osm(40446276));
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(options)
-      .setStreetRequest(options.journey().direct())
+      .setRequest(request)
+      .setStreetRequest(request.journey().direct())
       .setFrom(from)
       .setTo(to)
       .getShortestPathTree();

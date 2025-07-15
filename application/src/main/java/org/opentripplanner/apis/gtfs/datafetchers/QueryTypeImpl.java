@@ -250,11 +250,13 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   @Override
+  @Deprecated
   public DataFetcher<Object> cluster() {
     return environment -> null;
   }
 
   @Override
+  @Deprecated
   public DataFetcher<Iterable<Object>> clusters() {
     return environment -> Collections.EMPTY_LIST;
   }
@@ -974,7 +976,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     RoutingResponse res = context.routingService().route(request);
     return DataFetcherResult.<RoutingResponse>newResult()
       .data(res)
-      .localContext(Map.of("locale", request.locale()))
+      .localContext(Map.of("locale", request.preferences().locale()))
       .build();
   }
 

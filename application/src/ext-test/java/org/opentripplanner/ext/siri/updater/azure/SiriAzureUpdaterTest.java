@@ -10,7 +10,6 @@ import com.azure.core.util.ExpandableStringEnum;
 import com.azure.messaging.servicebus.ServiceBusErrorSource;
 import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusFailureReason;
-import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,7 +32,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
-import uk.org.siri.siri20.ServiceDelivery;
+import uk.org.siri.siri21.ServiceDelivery;
 
 class SiriAzureUpdaterTest {
 

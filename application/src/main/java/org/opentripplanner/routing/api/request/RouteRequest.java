@@ -5,15 +5,11 @@ import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
@@ -27,8 +23,6 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.utils.collection.ListSection;
-import org.opentripplanner.utils.lang.ObjectUtils;
-import org.opentripplanner.utils.time.DateUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,67 +31,115 @@ import org.slf4j.LoggerFactory;
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
  * itineraries.
  * <p>
- * All defaults should be specified here in the RouteRequest, NOT as annotations on query parameters
+ * All defaults should be specified here in the RouteRequest, NOT as default values of parameters
  * in web services that create RouteRequests. This establishes a priority chain for default values:
  * RouteRequest field initializers, then JSON router config, then query parameters.
  */
-public class RouteRequest implements Cloneable, Serializable {
+public class RouteRequest implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(RouteRequest.class);
 
+  private static final int DEFAULT_NUM_ITINERARIES = 50;
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
 
-  /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
+  private static final RouteRequest DEFAULT = new RouteRequest();
 
-  private GenericLocation from;
-
-  private GenericLocation to;
-
-  private List<ViaLocation> via = Collections.emptyList();
-
-  private Instant dateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+  private final GenericLocation from;
+  private final GenericLocation to;
+  private final List<ViaLocation> via;
+  private final Instant dateTime;
+  private final boolean arriveBy;
+  private final boolean timetableView;
 
   @Nullable
-  private Duration maxSearchWindow;
+  private final Duration searchWindow;
 
-  private Duration searchWindow;
+  @Nullable
+  private final Duration maxSearchWindow;
 
-  private PageCursor pageCursor;
+  @Nullable
+  private final Instant bookingTime;
 
-  private boolean timetableView = true;
+  @Nullable
+  private final PageCursor pageCursor;
 
-  private boolean arriveBy = false;
-
-  private int numItineraries = 50;
-
-  private Locale locale = new Locale("en", "US");
-
-  private RoutingPreferences preferences = new RoutingPreferences();
-
-  private JourneyRequest journey = new JourneyRequest();
-
-  private boolean wheelchair = false;
-
-  private Instant bookingTime;
+  private final JourneyRequest journey;
+  private final RoutingPreferences preferences;
+  private final int numItineraries;
+  private final boolean defaultRequest;
 
   /* CONSTRUCTORS */
 
-  /** Constructor for options; modes defaults to walk and transit */
-  public RouteRequest() {
+  private RouteRequest() {
     // So that they are never null.
-    from = new GenericLocation(null, null);
-    to = new GenericLocation(null, null);
+    this.from = null;
+    this.to = null;
+    this.via = Collections.emptyList();
+    this.dateTime = null;
+    this.arriveBy = false;
+    this.timetableView = true;
+    this.searchWindow = null;
+    this.maxSearchWindow = null;
+    this.bookingTime = null;
+    this.pageCursor = null;
+    this.journey = JourneyRequest.DEFAULT;
+    this.preferences = RoutingPreferences.DEFAULT;
+    this.numItineraries = DEFAULT_NUM_ITINERARIES;
+    this.defaultRequest = true;
+  }
+
+  RouteRequest(RouteRequestBuilder builder) {
+    this.from = builder.from;
+    this.to = builder.to;
+    this.via = builder.via;
+
+    this.dateTime = (!builder.defaultRequest && builder.dateTime == null)
+      ? normalizeNow()
+      : normalizeDateTime(builder.dateTime);
+
+    this.arriveBy = builder.arriveBy;
+    this.timetableView = builder.timetableView;
+    this.searchWindow = builder.searchWindow;
+    this.maxSearchWindow = builder.maxSearchWindow;
+    this.bookingTime = builder.bookingTime;
+    this.pageCursor = builder.pageCursor;
+    this.journey = builder.journey;
+    this.preferences = builder.preferences;
+    this.numItineraries = builder.numItineraries;
+    this.defaultRequest = builder.defaultRequest;
+
+    validate();
+  }
+
+  public static RouteRequestBuilder of() {
+    return DEFAULT.copyOf();
+  }
+
+  public static RouteRequest defaultValue() {
+    return DEFAULT;
+  }
+
+  /**
+   * The given {@code dateTime} will be set to a whole number of seconds. We don't do sub-second
+   * accuracy, and if we set the millisecond part to a non-zero value, rounding will not be
+   * guaranteed to be the same for departAt and arriveBy queries.
+   *
+   * If the given {@code dateTime} is {@code null}, then {@code null} is returned
+   */
+  @Nullable
+  public static Instant normalizeDateTime(@Nullable Instant dateTime) {
+    return dateTime == null ? null : dateTime.truncatedTo(ChronoUnit.SECONDS);
+  }
+
+  public static Instant normalizeNow() {
+    return normalizeDateTime(Instant.now());
+  }
+
+  public RouteRequestBuilder copyOf() {
+    return new RouteRequestBuilder(this);
   }
 
   /* ACCESSOR/SETTER METHODS */
-
-  public void setJourney(JourneyRequest journey) {
-    this.journey = journey;
-  }
-
-  public void setArriveBy(boolean arriveBy) {
-    this.arriveBy = arriveBy;
-  }
 
   public JourneyRequest journey() {
     return journey;
@@ -105,11 +147,6 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public RoutingPreferences preferences() {
     return preferences;
-  }
-
-  public RouteRequest withPreferences(Consumer<RoutingPreferences.Builder> body) {
-    this.preferences = preferences.copyOf().apply(body).build();
-    return this;
   }
 
   /**
@@ -121,26 +158,6 @@ public class RouteRequest implements Cloneable, Serializable {
     return bookingTime;
   }
 
-  public RouteRequest setBookingTime(Instant bookingTime) {
-    this.bookingTime = bookingTime;
-    return this;
-  }
-
-  void setPreferences(RoutingPreferences preferences) {
-    this.preferences = preferences;
-  }
-
-  /**
-   * Whether the trip must be wheelchair-accessible
-   */
-  public boolean wheelchair() {
-    return wheelchair;
-  }
-
-  public void setWheelchair(boolean wheelchair) {
-    this.wheelchair = wheelchair;
-  }
-
   /**
    * The epoch date/time in seconds that the trip should depart (or arrive, for requests where
    * arriveBy is true)
@@ -148,30 +165,18 @@ public class RouteRequest implements Cloneable, Serializable {
    * The search time for the current request. If the client have moved to the next page then this is
    * the adjusted search time - the dateTime passed in is ignored and replaced with by a time from
    * the pageToken.
+   *
+   * This method returns {@code null} for default requests.
    */
+  @Nullable
   public Instant dateTime() {
     return dateTime;
   }
 
   /**
-   * The dateTime will be set to a whole number of seconds. We don't do sub-second accuracy,
-   * and if we set the millisecond part to a non-zero value, rounding will not be guaranteed
-   * to be the same for departAt and arriveBy queries.
-   * @param dateTime Either a departAt time or an arriveBy time, one second's accuracy
-   */
-  public void setDateTime(Instant dateTime) {
-    this.dateTime = dateTime.truncatedTo(ChronoUnit.SECONDS);
-  }
-
-  public void setDateTime(String date, String time, ZoneId tz) {
-    ZonedDateTime dateObject = DateUtils.toZonedDateTime(date, time, tz);
-    setDateTime(dateObject == null ? Instant.now() : dateObject.toInstant());
-  }
-
-  /**
    * Is the trip originally planned withing the previous/next 15h?
    */
-  public boolean isTripPlannedForNow() {
+  public static boolean isAPIGtfsTripPlannedForNow(Instant dateTime) {
     return Duration.between(dateTime, Instant.now()).abs().toSeconds() < NOW_THRESHOLD_SEC;
   }
 
@@ -188,24 +193,31 @@ public class RouteRequest implements Cloneable, Serializable {
    * the cursor[if exist], not the date-time.
    * <p>
    * The direct mode is also unset when there is a page cursor because for anything other than the
-   * initial page we don't want to see direct results.
-   * <p>
-   * See also {@link org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty},
-   * it uses a direct search to prune transit.
+   * initial page we don't want to see direct results. If the direct mode was given in the first request,
+   * the generalized cost of the direct mode itinerary from the initial request is stored in the page cursor
+   * for use with {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
+   * to filter away unwanted transit results.
    */
-  public void applyPageCursor() {
-    if (pageCursor != null) {
-      // We switch to "depart-after" search when paging next(lat==null). It does not make
-      // sense anymore to keep the latest-arrival-time when going to the "next page".
-      if (pageCursor.latestArrivalTime() == null) {
-        arriveBy = false;
-      }
-      this.dateTime = arriveBy
-        ? pageCursor.latestArrivalTime()
-        : pageCursor.earliestDepartureTime();
-      journey.setModes(journey.modes().copyOf().withDirectMode(StreetMode.NOT_SET).build());
-      LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
+  public RouteRequest withPageCursor() {
+    if (pageCursor == null) {
+      return this;
     }
+    boolean arriveBy = this.arriveBy;
+
+    // We switch to "depart-after" search when paging next(lat==null). It does not make
+    // sense anymore to keep the latest-arrival-time when going to the "next page".
+    if (pageCursor.latestArrivalTime() == null) {
+      arriveBy = false;
+    }
+
+    var request = copyOf()
+      .withArriveBy(arriveBy)
+      .withDateTime(arriveBy ? pageCursor.latestArrivalTime() : pageCursor.earliestDepartureTime())
+      .withJourney(jb -> jb.withoutDirect())
+      .buildRequest();
+
+    LOG.debug("Request dateTime={} set from pageCursor.", request.dateTime());
+    return request;
   }
 
   /**
@@ -245,48 +257,24 @@ public class RouteRequest implements Cloneable, Serializable {
     }
   }
 
-  /* INSTANCE METHODS */
-
   /**
-   * This method is used to clone the default message, and insert a current time. A typical use-case
-   * is to copy the default request(from router-config), and then set all user specified parameters
-   * before performing a routing search.
+   * The origin/start location.
+   *
+   * Returns {@code null} for default requests.
    */
-  public RouteRequest copyWithDateTimeNow() {
-    RouteRequest copy = clone();
-    copy.setDateTime(Instant.now());
-    return copy;
-  }
-
-  @Override
-  public RouteRequest clone() {
-    try {
-      RouteRequest clone = (RouteRequest) super.clone();
-      clone.journey = journey.clone();
-
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
-    }
-  }
-
-  /** The start location */
+  @Nullable
   public GenericLocation from() {
     return from;
   }
 
-  public void setFrom(GenericLocation from) {
-    this.from = from;
-  }
-
-  /** The end location */
+  /**
+   * The destination/end location.
+   *
+   * Returns {@code null} for default requests.
+   */
+  @Nullable
   public GenericLocation to() {
     return to;
-  }
-
-  public void setTo(GenericLocation to) {
-    this.to = to;
   }
 
   /**
@@ -306,11 +294,6 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public List<ViaLocation> getViaLocations() {
     return via;
-  }
-
-  public RouteRequest setViaLocations(final List<ViaLocation> via) {
-    this.via = via;
-    return this;
   }
 
   /**
@@ -336,18 +319,6 @@ public class RouteRequest implements Cloneable, Serializable {
     return searchWindow;
   }
 
-  public void setSearchWindow(@Nullable Duration searchWindow) {
-    if (searchWindow != null) {
-      if (hasMaxSearchWindow() && searchWindow.toSeconds() > maxSearchWindow.toSeconds()) {
-        throw new IllegalArgumentException("The search window cannot exceed " + maxSearchWindow);
-      }
-      if (searchWindow.isNegative()) {
-        throw new IllegalArgumentException("The search window must be a positive duration");
-      }
-    }
-    this.searchWindow = searchWindow;
-  }
-
   private boolean hasMaxSearchWindow() {
     return maxSearchWindow != null;
   }
@@ -358,26 +329,6 @@ public class RouteRequest implements Cloneable, Serializable {
    */
   public Duration maxSearchWindow() {
     return maxSearchWindow;
-  }
-
-  /**
-   * Initialize the maxSearchWindow from the transit config. This is necessary because the
-   * default route request is configured before the {@link TransitRoutingConfig}.
-   */
-  public void initMaxSearchWindow(Duration maxSearchWindow) {
-    this.maxSearchWindow = ObjectUtils.requireNotInitialized(
-      "maxSearchWindow",
-      this.maxSearchWindow,
-      Objects.requireNonNull(maxSearchWindow)
-    );
-  }
-
-  public Locale locale() {
-    return locale;
-  }
-
-  public void setLocale(Locale locale) {
-    this.locale = locale;
   }
 
   /**
@@ -392,10 +343,6 @@ public class RouteRequest implements Cloneable, Serializable {
    */
   public PageCursor pageCursor() {
     return pageCursor;
-  }
-
-  public void setPageCursorFromEncoded(String pageCursor) {
-    this.pageCursor = PageCursor.decode(pageCursor);
   }
 
   /**
@@ -431,10 +378,6 @@ public class RouteRequest implements Cloneable, Serializable {
     return timetableView;
   }
 
-  public void setTimetableView(boolean timetableView) {
-    this.timetableView = timetableView;
-  }
-
   /**
    * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
    */
@@ -456,18 +399,133 @@ public class RouteRequest implements Cloneable, Serializable {
     return numItineraries;
   }
 
-  public void setNumItineraries(int numItineraries) {
-    this.numItineraries = numItineraries;
+  boolean isDefaultRequest() {
+    return defaultRequest;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    var other = (RouteRequest) o;
+
+    // The 'defaultRequest' field does not need to be part of equals and hashCode
+    // because it is not possible to create the same object where only this field
+    // is diffrent.
+
+    return (
+      arriveBy == other.arriveBy &&
+      timetableView == other.timetableView &&
+      numItineraries == other.numItineraries &&
+      Objects.equals(from, other.from) &&
+      Objects.equals(to, other.to) &&
+      Objects.equals(via, other.via) &&
+      Objects.equals(dateTime, other.dateTime) &&
+      Objects.equals(searchWindow, other.searchWindow) &&
+      Objects.equals(maxSearchWindow, other.maxSearchWindow) &&
+      Objects.equals(bookingTime, other.bookingTime) &&
+      Objects.equals(pageCursor, other.pageCursor) &&
+      Objects.equals(journey, other.journey) &&
+      Objects.equals(preferences, other.preferences)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      from,
+      to,
+      via,
+      dateTime,
+      arriveBy,
+      timetableView,
+      searchWindow,
+      maxSearchWindow,
+      bookingTime,
+      pageCursor,
+      journey,
+      preferences,
+      numItineraries
+    );
   }
 
   public String toString() {
     return ToStringBuilder.of(RouteRequest.class)
       .addObj("from", from)
       .addObj("to", to)
+      .addCol("via", via)
       .addDateTime("dateTime", dateTime)
       .addBoolIfTrue("arriveBy", arriveBy)
-      .addObj("modes", journey.modes())
-      .addCol("filters", journey.transit().filters())
+      .addBoolIfTrue("timetableView: false", !timetableView)
+      .addDuration("searchWindow", searchWindow)
+      .addDuration("maxSearchWindow", maxSearchWindow)
+      .addDateTime("bookingTime", bookingTime)
+      .addNum("numItineraries", numItineraries, DEFAULT_NUM_ITINERARIES)
+      .addObj("preferences", preferences, RoutingPreferences.DEFAULT)
+      .addObj("journey", journey, JourneyRequest.DEFAULT)
       .toString();
+  }
+
+  private void validate() {
+    validateTimeNotSetIfDefaultRequest();
+
+    // TODO: Use the same strateg for all validation of the RouteRequest, currently
+    //       both RoutingError and IllegalArgumentException is used.
+    List<RoutingError> routingErrors = new ArrayList<>(2);
+    routingErrors.addAll(validateFromAndToLocation());
+
+    validateSearchWindow();
+
+    if (!routingErrors.isEmpty()) {
+      throw new RoutingValidationException(routingErrors);
+    }
+  }
+
+  private void validateTimeNotSetIfDefaultRequest() {
+    if (defaultRequest && dateTime != null) {
+      throw new IllegalStateException();
+    }
+  }
+
+  /**
+   * Validate that the routing request contains both a from location(origin) and a to
+   * location(destination). Origin and destination can be specified either by a reference to a stop
+   * place or by geographical coordinates. From/to locations are required in a one-to-one
+   * search, but not in a many-to-one or one-to-many(legacy, not supported any more).
+   *
+   * @throws RoutingValidationException if either origin or destination is missing.
+   */
+  public List<RoutingError> validateFromAndToLocation() {
+    if (defaultRequest) {
+      if (from != null || to != null) {
+        throw new IllegalStateException("from=" + from + ", to=" + to);
+      }
+      return List.of();
+    }
+
+    List<RoutingError> routingErrors = new ArrayList<>(2);
+
+    if (from == null || !from.isSpecified()) {
+      routingErrors.add(
+        new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
+      );
+    }
+
+    if (to == null || !to.isSpecified()) {
+      routingErrors.add(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE));
+    }
+    return routingErrors;
+  }
+
+  private void validateSearchWindow() {
+    if (searchWindow != null) {
+      if (hasMaxSearchWindow() && searchWindow.toSeconds() > maxSearchWindow.toSeconds()) {
+        throw new IllegalArgumentException("The search window cannot exceed " + maxSearchWindow);
+      }
+      if (searchWindow.isNegative()) {
+        throw new IllegalArgumentException("The search window must be a positive duration");
+      }
+    }
   }
 }

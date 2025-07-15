@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -16,6 +17,7 @@ import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,6 +164,20 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /**
+   * If applying turn restrictions to a graph has generated multiple instances of a vertex,
+   * one of them is the parent, and the others are subsidiary vertices. Calling getParent()
+   * on any of these will always return the same parent, which is used for example for
+   * Edge.isReverseOf(Edge), so that it does not have to operate on geographical coordinates
+   * and trust them for equality.
+   *
+   * @return The representative parent Vertex of a group of vertices that are same for
+   *         most purposes.
+   */
+  public Vertex getParent() {
+    return this;
+  }
+
+  /**
    * Return the position of the vertex as a WgsCoordinate.
    */
   public WgsCoordinate toWgsCoordinate() {
@@ -240,6 +256,13 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
 
   public void removeRentalRestriction(RentalRestrictionExtension ext) {
     rentalRestrictions = rentalRestrictions.remove(ext);
+  }
+
+  /**
+   * Returns the (flex) area stops that this vertex is inside.
+   */
+  public Set<AreaStop> areaStops() {
+    return Set.of();
   }
 
   /**

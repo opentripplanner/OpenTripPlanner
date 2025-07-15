@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,16 +16,19 @@ import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.opentripplanner.utils.collection.MapUtils;
 
 /** Responsible for mapping GTFS Location into the OTP model. */
-public class LocationMapper {
+class LocationMapper {
 
+  private final IdFactory idFactory;
   private final Map<Location, AreaStop> mappedLocations = new HashMap<>();
   private final SiteRepositoryBuilder siteRepositoryBuilder;
   private final DataImportIssueStore issueStore;
 
   public LocationMapper(
+    IdFactory idFactory,
     SiteRepositoryBuilder siteRepositoryBuilder,
     DataImportIssueStore issueStore
   ) {
+    this.idFactory = idFactory;
     this.siteRepositoryBuilder = siteRepositoryBuilder;
     this.issueStore = issueStore;
   }
@@ -44,7 +45,7 @@ public class LocationMapper {
   private AreaStop doMap(Location gtfsLocation) {
     var name = NonLocalizedString.ofNullable(gtfsLocation.getName());
     try {
-      var id = mapAgencyAndId(gtfsLocation.getId());
+      var id = idFactory.createId(gtfsLocation.getId(), "location");
       Geometry geometry = GeometryUtils.convertGeoJsonToJtsGeometry(gtfsLocation.getGeometry());
       var isValidOp = new IsValidOp(geometry);
       if (!isValidOp.isValid()) {

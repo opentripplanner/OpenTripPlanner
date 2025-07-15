@@ -126,18 +126,28 @@ public final class ScheduledTripTimes implements TripTimes {
   }
 
   @Override
-  public RealTimeTripTimes copyScheduledTimes() {
-    return RealTimeTripTimes.of(this);
+  public RealTimeTripTimesBuilder createRealTimeWithoutScheduledTimes() {
+    return new RealTimeTripTimesBuilder(this);
   }
 
   @Override
-  public TripTimes adjustTimesToGraphTimeZone(Duration shiftDelta) {
+  public RealTimeTripTimesBuilder createRealTimeFromScheduledTimes() {
+    return RealTimeTripTimesBuilder.fromScheduledTimes(this);
+  }
+
+  @Override
+  public ScheduledTripTimes adjustTimesToGraphTimeZone(Duration shiftDelta) {
     return copyOfNoDuplication().plusTimeShift((int) shiftDelta.toSeconds()).build();
   }
 
   @Override
   public int getServiceCode() {
     return serviceCode;
+  }
+
+  @Override
+  public ScheduledTripTimes withServiceCode(int serviceCode) {
+    return this.copyOfNoDuplication().withServiceCode(serviceCode).build();
   }
 
   @Override
@@ -300,14 +310,52 @@ public final class ScheduledTripTimes implements TripTimes {
     return OptionalInt.empty();
   }
 
+  /**
+   * Returns a time-shifted copy of this TripTimes in which the vehicle passes the given stop index
+   * at the given time.
+   */
+  public ScheduledTripTimes timeShift(final int stop, final int time, final boolean depart) {
+    // Adjust 0-based times to match desired stoptime.
+    final int shift = time - (depart ? getDepartureTime(stop) : getArrivalTime(stop));
+
+    return copyOfNoDuplication().plusTimeShift(shift).build();
+  }
+
   @Override
   public boolean equals(Object o) {
-    throw new UnsupportedOperationException("Not implemented, implement if needed!");
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ScheduledTripTimes that = (ScheduledTripTimes) o;
+    return (
+      timeShift == that.timeShift &&
+      serviceCode == that.serviceCode &&
+      Objects.deepEquals(arrivalTimes, that.arrivalTimes) &&
+      Objects.deepEquals(departureTimes, that.departureTimes) &&
+      Objects.equals(timepoints, that.timepoints) &&
+      Objects.equals(trip, that.trip) &&
+      Objects.equals(dropOffBookingInfos, that.dropOffBookingInfos) &&
+      Objects.equals(pickupBookingInfos, that.pickupBookingInfos) &&
+      Objects.deepEquals(headsigns, that.headsigns) &&
+      Objects.deepEquals(headsignVias, that.headsignVias) &&
+      Objects.deepEquals(gtfsSequenceOfStopIndex, that.gtfsSequenceOfStopIndex)
+    );
   }
 
   @Override
   public int hashCode() {
-    throw new UnsupportedOperationException("Not implemented, implement if needed!");
+    return Objects.hash(
+      timeShift,
+      serviceCode,
+      Arrays.hashCode(arrivalTimes),
+      Arrays.hashCode(departureTimes),
+      timepoints,
+      trip,
+      dropOffBookingInfos,
+      pickupBookingInfos,
+      Arrays.hashCode(headsigns),
+      Arrays.deepHashCode(headsignVias),
+      Arrays.hashCode(gtfsSequenceOfStopIndex)
+    );
   }
 
   /* package local - only visible to timetable classes */
@@ -339,8 +387,10 @@ public final class ScheduledTripTimes implements TripTimes {
    * We really don't want those being used in routing. This method checks that all times are
    * increasing. The first stop arrival time and the last stops departure time is NOT checked -
    * these should be ignored by raptor.
+   *
+   * TODO: This should be make private as the constructor should ensure the data consistency
    */
-  private void validateNonIncreasingTimes() {
+  public void validateNonIncreasingTimes() {
     final int lastStop = arrivalTimes.length - 1;
 
     // This check is currently used since Flex trips may have only one stop. This class should

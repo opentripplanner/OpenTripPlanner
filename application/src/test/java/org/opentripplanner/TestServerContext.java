@@ -7,12 +7,14 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.emissions.DefaultEmissionsService;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
-import org.opentripplanner.ext.emissions.EmissionsService;
+import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
+import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
+import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.service.DefaultViaCoordinateTransferFactory;
@@ -48,15 +50,17 @@ public class TestServerContext {
   /** Create a context for unit testing using default RoutingRequest.*/
   public static OtpServerRequestContext createServerContext(
     Graph graph,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    FareService fareService
   ) {
-    return createServerContext(graph, timetableRepository, null, null);
+    return createServerContext(graph, timetableRepository, fareService, null, null);
   }
 
   /** Create a context for unit testing */
   public static OtpServerRequestContext createServerContext(
     Graph graph,
     TimetableRepository timetableRepository,
+    FareService fareService,
     @Nullable TimetableSnapshotManager snapshotManager,
     @Nullable RouteRequest request
   ) {
@@ -90,6 +94,7 @@ public class TestServerContext {
 
     return new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
+      fareService,
       routerConfig.flexParameters(),
       graph,
       Metrics.globalRegistry,
@@ -100,12 +105,14 @@ public class TestServerContext {
       createStreetLimitationParametersService(),
       routerConfig.transitTuningConfig(),
       transitService,
+      routerConfig.triasApiParameters(),
+      routerConfig.gtfsApiParameters(),
       routerConfig.vectorTileConfig(),
       createVehicleParkingService(),
       createVehicleRentalService(),
       createViaTransferResolver(graph, transitService),
       createWorldEnvelopeService(),
-      createEmissionsService(),
+      createEmissionsItineraryDecorator(),
       null,
       null,
       null,
@@ -137,8 +144,10 @@ public class TestServerContext {
     return new DefaultVehicleParkingService(new DefaultVehicleParkingRepository());
   }
 
-  public static EmissionsService createEmissionsService() {
-    return new DefaultEmissionsService(new EmissionsDataModel());
+  public static ItineraryDecorator createEmissionsItineraryDecorator() {
+    return new EmissionItineraryDecorator(
+      new DefaultEmissionService(new DefaultEmissionRepository())
+    );
   }
 
   public static StreetLimitationParametersService createStreetLimitationParametersService() {

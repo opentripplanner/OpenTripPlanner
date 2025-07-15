@@ -22,7 +22,7 @@ is called `bikesAllowed`.
 Taking a rented, shared-mobility bike for part or the entirety of the route.
 
 _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
-See [Configuring GBFS](UpdaterConfig.md#gbfs-vehicle-rental-systems) on how to add one.
+See [Configuring GBFS](GBFS-Config.md) on how to add one.
 
 
 <h4 id="BIKE_TO_PARK">BIKE_TO_PARK</h4>
@@ -57,7 +57,7 @@ Walk to a car rental point, drive to a car rental drop-off point and walk the re
 This can include car rental at fixed locations or free-floating services.
 
 _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
-See [Configuring GBFS](UpdaterConfig.md#gbfs-vehicle-rental-systems) on how to add one.
+See [Configuring GBFS](GBFS-Config.md) on how to add one.
 
 
 <h4 id="CAR_TO_PARK">CAR_TO_PARK</h4>
@@ -77,7 +77,7 @@ Walking to a scooter rental point, riding a scooter to a scooter rental drop-off
 This can include scooter rental at fixed locations or free-floating services.
 
 _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
-See [Configuring GBFS](UpdaterConfig.md#gbfs-vehicle-rental-systems) on how to add one.
+See [Configuring GBFS](GBFS-Config.md) on how to add one.
 
 
 <h4 id="WALK">WALK</h4>

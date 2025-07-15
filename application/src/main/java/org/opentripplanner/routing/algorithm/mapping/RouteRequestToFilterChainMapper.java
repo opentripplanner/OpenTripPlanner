@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.emissions.DecorateWithEmission;
 import org.opentripplanner.ext.fares.DecorateWithFare;
 import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
@@ -46,6 +45,13 @@ public class RouteRequestToFilterChainMapper {
       builder = builder.withPagingDeduplicationFilter(request.pageCursor().itineraryPageCut());
     }
 
+    // The page cursor has generalizedCostMaxLimit information only when paging is used and
+    // when the RemoveTransitIfStreetOnlyIsBetter filter is enabled.
+    // The generalizedCostMaxLimit is the best street only cost found in the first search.
+    if (request.pageCursor() != null && request.pageCursor().containsGeneralizedCostMaxLimit()) {
+      builder = builder.withGeneralizedCostMaxLimit(request.pageCursor().generalizedCostMaxLimit());
+    }
+
     ItineraryFilterPreferences params = request.preferences().itineraryFilter();
     // Group by similar legs filter
     if (params.groupSimilarityKeepOne() >= 0.5) {
@@ -77,7 +83,7 @@ public class RouteRequestToFilterChainMapper {
       )
       .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip())
       .withAccessibilityScore(
-        params.useAccessibilityScore() && request.wheelchair(),
+        params.useAccessibilityScore() && request.journey().wheelchair(),
         request.preferences().wheelchair().maxSlope()
       )
       .withMinBikeParkingDistance(minBikeParkingDistance(request))
@@ -99,19 +105,19 @@ public class RouteRequestToFilterChainMapper {
       builder.withTransitGroupPriority();
     }
 
-    var fareService = context.graph().getFareService();
+    var fareService = context.fareService();
     if (fareService != null) {
       builder.withFareDecorator(new DecorateWithFare(fareService));
     }
 
     if (!context.rideHailingServices().isEmpty()) {
       builder.withRideHailingDecoratingFilter(
-        new DecorateWithRideHailing(context.rideHailingServices(), request.wheelchair())
+        new DecorateWithRideHailing(context.rideHailingServices(), request.journey().wheelchair())
       );
     }
 
-    if (OTPFeature.Co2Emissions.isOn() && context.emissionsService() != null) {
-      builder.withEmissions(new DecorateWithEmission(context.emissionsService()));
+    if (OTPFeature.Emission.isOn()) {
+      builder.withEmissions(context.emissionItineraryDecorator());
     }
 
     if (

@@ -40,13 +40,13 @@ import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.RiderCategory;
-import org.opentripplanner.model.plan.Emissions;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegCallTime;
-import org.opentripplanner.model.plan.LegRealTimeEstimate;
-import org.opentripplanner.model.plan.StopArrival;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.leg.LegCallTime;
+import org.opentripplanner.model.plan.leg.LegRealTimeEstimate;
+import org.opentripplanner.model.plan.leg.StopArrival;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -390,7 +390,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLEmissions {
-    public DataFetcher<org.opentripplanner.framework.model.Grams> co2();
+    public DataFetcher<org.opentripplanner.framework.model.Gram> co2();
   }
 
   /** Station entrance or exit, originating from OSM or GTFS data. */
@@ -481,7 +481,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> elevationLost();
 
-    public DataFetcher<Emissions> emissionsPerPerson();
+    public DataFetcher<Emission> emissionsPerPerson();
 
     public DataFetcher<java.time.OffsetDateTime> end();
 
@@ -914,6 +914,8 @@ public class GraphQLDataFetchers {
   /** Rental vehicle represents a vehicle that belongs to a rental network. */
   public interface GraphQLRentalVehicle {
     public DataFetcher<Boolean> allowPickupNow();
+
+    public DataFetcher<java.time.OffsetDateTime> availableUntil();
 
     public DataFetcher<RentalVehicleFuel> fuel();
 
@@ -1392,6 +1394,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> label();
 
+    public DataFetcher<java.time.OffsetDateTime> lastUpdate();
+
     public DataFetcher<Long> lastUpdated();
 
     public DataFetcher<Double> lat();
@@ -1556,7 +1560,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Double> distance();
 
     public DataFetcher<
-      Iterable<org.opentripplanner.model.plan.ElevationProfile.Step>
+      Iterable<org.opentripplanner.model.plan.leg.ElevationProfile.Step>
     > elevationProfile();
 
     public DataFetcher<String> exit();

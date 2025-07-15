@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
-import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
 import static org.opentripplanner.street.search.TraverseMode.SCOOTER;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.street.search.state.VehicleRentalState.HAVE_RENTED;
@@ -224,7 +223,7 @@ class StreetEdgeGeofencingTest {
       // we want to pick up a vehicle
       final State rentalState = states[1];
       assertEquals(RENTING_FLOATING, rentalState.getVehicleRentalState());
-      assertEquals(BICYCLE, rentalState.currentMode());
+      assertEquals(SCOOTER, rentalState.currentMode());
 
       // but also keep on walking in case we don't find an edge where to leave the vehicle
       var walkingState = states[0];
@@ -257,7 +256,7 @@ class StreetEdgeGeofencingTest {
       // then the speculative renting case for unknown rental network
       final State speculativeRenting = states[2];
       assertEquals(RENTING_FLOATING, speculativeRenting.getVehicleRentalState());
-      assertEquals(BICYCLE, speculativeRenting.currentMode());
+      assertEquals(SCOOTER, speculativeRenting.currentMode());
       // null means that the vehicle has been rented speculatively and the rest of the backwards search
       // needs to check if we really find a vehicle to pick up
       assertNull(speculativeRenting.getVehicleRentalNetwork());
@@ -269,7 +268,7 @@ class StreetEdgeGeofencingTest {
       // then the speculative renting cases for specific rental networks
       final State tierState = states[1];
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
-      assertEquals(BICYCLE, tierState.currentMode());
+      assertEquals(SCOOTER, tierState.currentMode());
       assertEquals(NETWORK_TIER, tierState.getVehicleRentalNetwork());
       assertEquals(Set.of(), tierState.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
     }
@@ -286,7 +285,7 @@ class StreetEdgeGeofencingTest {
 
       final State unknownNetworkState = states[3];
       assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
-      assertEquals(BICYCLE, unknownNetworkState.currentMode());
+      assertEquals(SCOOTER, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
 
       final State tierState = Arrays.stream(states)
@@ -294,14 +293,14 @@ class StreetEdgeGeofencingTest {
         .findFirst()
         .get();
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
-      assertEquals(BICYCLE, tierState.currentMode());
+      assertEquals(SCOOTER, tierState.currentMode());
 
       final State birdState = Arrays.stream(states)
         .filter(s -> NETWORK_BIRD.equals(s.getVehicleRentalNetwork()))
         .findFirst()
         .get();
       assertEquals(RENTING_FLOATING, birdState.getVehicleRentalState());
-      assertEquals(BICYCLE, birdState.currentMode());
+      assertEquals(SCOOTER, birdState.currentMode());
     }
 
     @Test
@@ -316,7 +315,7 @@ class StreetEdgeGeofencingTest {
 
       final State unknownNetworkState = states[3];
       assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
-      assertEquals(BICYCLE, unknownNetworkState.currentMode());
+      assertEquals(SCOOTER, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
 
       final State tierState = Arrays.stream(states)
@@ -324,14 +323,14 @@ class StreetEdgeGeofencingTest {
         .findFirst()
         .get();
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
-      assertEquals(BICYCLE, tierState.currentMode());
+      assertEquals(SCOOTER, tierState.currentMode());
 
       final State birdState = Arrays.stream(states)
         .filter(s -> NETWORK_BIRD.equals(s.getVehicleRentalNetwork()))
         .findFirst()
         .get();
       assertEquals(RENTING_FLOATING, birdState.getVehicleRentalState());
-      assertEquals(BICYCLE, birdState.currentMode());
+      assertEquals(SCOOTER, birdState.currentMode());
     }
 
     @Test
@@ -346,12 +345,12 @@ class StreetEdgeGeofencingTest {
 
       final State unknownNetworkState = states[2];
       assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
-      assertEquals(BICYCLE, unknownNetworkState.currentMode());
+      assertEquals(SCOOTER, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
 
       final State tierState = states[1];
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
-      assertEquals(BICYCLE, tierState.currentMode());
+      assertEquals(SCOOTER, tierState.currentMode());
       assertEquals(NETWORK_TIER, tierState.getVehicleRentalNetwork());
     }
 
@@ -380,12 +379,12 @@ class StreetEdgeGeofencingTest {
 
       final State unknownNetworkState = states[2];
       assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
-      assertEquals(BICYCLE, unknownNetworkState.currentMode());
+      assertEquals(SCOOTER, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
 
       final State tierState = states[1];
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
-      assertEquals(BICYCLE, tierState.currentMode());
+      assertEquals(SCOOTER, tierState.currentMode());
       assertEquals(NETWORK_TIER, tierState.getVehicleRentalNetwork());
     }
 
@@ -416,7 +415,7 @@ class StreetEdgeGeofencingTest {
     private static StreetSearchRequest defaultArriveByRequest() {
       return StreetSearchRequest.of()
         .withPreferences(p ->
-          p.withBike(b -> b.withRental(r -> r.withAllowedNetworks(Set.of(NETWORK_TIER))))
+          p.withScooter(b -> b.withRental(r -> r.withAllowedNetworks(Set.of(NETWORK_TIER))))
         )
         .withMode(StreetMode.SCOOTER_RENTAL)
         .withArriveBy(true)
@@ -429,7 +428,7 @@ class StreetEdgeGeofencingTest {
     ) {
       return StreetSearchRequest.of()
         .withPreferences(p ->
-          p.withBike(b ->
+          p.withScooter(b ->
             b.withRental(r ->
               r.withAllowedNetworks(allowedNetworks).withBannedNetworks(bannedNetworks)
             )

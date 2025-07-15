@@ -10,17 +10,19 @@ import static org.opentripplanner.apis.transmodel.mapping.preferences.TransitPre
 import static org.opentripplanner.apis.transmodel.mapping.preferences.WalkPreferencesMapper.mapWalkPreferences;
 
 import graphql.schema.DataFetchingEnvironment;
+import java.util.Locale;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 
 class PreferencesMapper {
 
   static void mapPreferences(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
-    RoutingPreferences.Builder preferences
+    RoutingPreferencesBuilder preferences
   ) {
-    preferences.withStreet(street -> mapStreetPreferences(street, environment, preferences.street())
+    preferences.withStreet(street ->
+      mapStreetPreferences(street, environment, preferences.street())
     );
     preferences.withWalk(walk -> mapWalkPreferences(walk, callWith));
     preferences.withBike(bike -> mapBikePreferences(bike, callWith));
@@ -31,5 +33,6 @@ class PreferencesMapper {
     preferences.withItineraryFilter(itineraryFilter ->
       mapItineraryFilterPreferences(itineraryFilter, environment, callWith)
     );
+    callWith.argument("locale", (String v) -> preferences.withLocale(Locale.forLanguageTag(v)));
   }
 }

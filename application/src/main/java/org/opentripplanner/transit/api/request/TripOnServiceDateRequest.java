@@ -2,7 +2,6 @@ package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
 import org.opentripplanner.transit.api.model.FilterValues;
-import org.opentripplanner.transit.api.model.RequiredFilterValues;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -24,7 +23,7 @@ public class TripOnServiceDateRequest {
   private final FilterValues<TripAlteration> alterations;
 
   TripOnServiceDateRequest(
-    RequiredFilterValues<LocalDate> serviceDates,
+    FilterValues<LocalDate> serviceDates,
     FilterValues<FeedScopedId> agencies,
     FilterValues<FeedScopedId> routes,
     FilterValues<FeedScopedId> serviceJourneys,
@@ -41,7 +40,7 @@ public class TripOnServiceDateRequest {
     this.alterations = alterations;
   }
 
-  public static TripOnServiceDateRequestBuilder of(RequiredFilterValues<LocalDate> serviceDates) {
+  public static TripOnServiceDateRequestBuilder of(FilterValues<LocalDate> serviceDates) {
     return new TripOnServiceDateRequestBuilder(serviceDates);
   }
 

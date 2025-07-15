@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -135,28 +136,31 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     Set<String> requiredTags,
     boolean arriveBy
   ) {
-    var request = new RouteRequest();
-    request.withPreferences(preferences ->
-      preferences
-        .withBike(b ->
-          b.withParking(parking -> {
-            parking.withRequiredVehicleParkingTags(requiredTags);
-            parking.withBannedVehicleParkingTags(bannedTags);
-            parking.withCost(120);
-            parking.withTime(60);
-          })
-        )
-        .withCar(c ->
-          c.withParking(parking -> {
-            parking.withRequiredVehicleParkingTags(requiredTags);
-            parking.withBannedVehicleParkingTags(bannedTags);
-            parking.withCost(240);
-            parking.withTime(180);
-          })
-        )
-    );
-    request.setWheelchair(requireWheelChairAccessible);
-    request.setArriveBy(arriveBy);
+    var request = RouteRequest.of()
+      .withFrom(GenericLocation.fromCoordinate(fromVertex.getLat(), fromVertex.getLon()))
+      .withTo(GenericLocation.fromCoordinate(toVertex.getLat(), toVertex.getLon()))
+      .withPreferences(preferences ->
+        preferences
+          .withBike(b ->
+            b.withParking(parking -> {
+              parking.withRequiredVehicleParkingTags(requiredTags);
+              parking.withBannedVehicleParkingTags(bannedTags);
+              parking.withCost(120);
+              parking.withTime(60);
+            })
+          )
+          .withCar(c ->
+            c.withParking(parking -> {
+              parking.withRequiredVehicleParkingTags(requiredTags);
+              parking.withBannedVehicleParkingTags(bannedTags);
+              parking.withCost(240);
+              parking.withTime(180);
+            })
+          )
+      )
+      .withJourney(j -> j.withWheelchair(requireWheelChairAccessible))
+      .withArriveBy(arriveBy)
+      .buildRequest();
 
     var tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())

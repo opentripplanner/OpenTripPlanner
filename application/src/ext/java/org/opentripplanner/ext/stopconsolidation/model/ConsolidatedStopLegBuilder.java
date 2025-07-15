@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.stopconsolidation.model;
 
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class ConsolidatedStopLegBuilder
@@ -17,8 +17,8 @@ public class ConsolidatedStopLegBuilder
 
   ConsolidatedStopLegBuilder(ConsolidatedStopLeg consolidatedStopLeg) {
     super(consolidatedStopLeg);
-    this.from = consolidatedStopLeg.getFrom();
-    this.to = consolidatedStopLeg.getTo();
+    this.from = consolidatedStopLeg.from();
+    this.to = consolidatedStopLeg.to();
   }
 
   public ConsolidatedStopLegBuilder withFrom(StopLocation stop) {

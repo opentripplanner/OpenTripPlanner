@@ -82,13 +82,17 @@ public class ToStringBuilderTest {
       "ToStringBuilderTest{a: true, b: false}",
       subject().addBool("a", true).addBool("b", false).toString()
     );
+    assertEquals("ToStringBuilderTest{}", subject().addBool("x", false, false).toString());
+    assertEquals("ToStringBuilderTest{x: false}", subject().addBool("x", false, true).toString());
+    assertEquals("ToStringBuilderTest{x: true}", subject().addBool("x", true, false).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addBool("x", true, true).toString());
   }
 
   @Test
   public void addStr() {
-    assertEquals("{a: 'text'}", ToStringBuilder.of().addStr("a", "text").toString());
-    assertEquals("{}", ToStringBuilder.of().addStr("a", null).toString());
-    assertEquals("{}", ToStringBuilder.of().addStr("a", "text", "text").toString());
+    assertEquals("(a: 'text')", ToStringBuilder.ofEmbeddedType().addStr("a", "text").toString());
+    assertEquals("()", ToStringBuilder.ofEmbeddedType().addStr("a", null).toString());
+    assertEquals("()", ToStringBuilder.ofEmbeddedType().addStr("a", "text", "text").toString());
   }
 
   @Test
@@ -266,6 +270,7 @@ public class ToStringBuilderTest {
       subject().addDateTime("t", time).toString()
     );
     assertEquals("ToStringBuilderTest{}", subject().addDateTime("t", null).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addDateTime("t", time, time).toString());
   }
 
   @Test

@@ -1,0 +1,111 @@
+{
+  "url": "/otp/trias/v1",
+  "api_key": "",
+  "templates": [
+    {
+      "name": "StopEvent (stop point)",
+      "template": "stop-event-stop-point.xml",
+      "variables": [
+        {
+          "name": "stop_point_ref",
+          "label": "Stop point reference",
+          "type": "string",
+          "default": "de:08111:6020:1:2",
+          "required": true
+        },
+        {
+          "name": "dep_arr_time",
+          "label": "Departure/arrival time",
+          "type": "datetime"
+        },
+        {
+          "name": "num_results",
+          "label": "Number of results",
+          "type": "integer",
+          "default": "1"
+        },
+        {
+          "name": "stop_event_type",
+          "label": "Stop event type reference",
+          "type": "enumeration",
+          "options": ["departure", "arrival"],
+          "default": "departure"
+        },
+        {
+          "name": "include_previous_calls",
+          "label": "IncludePreviousCalls",
+          "type": "boolean",
+          "default": false
+        },
+        {
+          "name": "include_onward_calls",
+          "label": "IncludeOnwardCalls",
+          "type": "boolean",
+          "default": false
+        },
+        {
+          "name": "include_realtime_data",
+          "label": "IncludeRealtimeData",
+          "type": "boolean",
+          "default": true
+        }
+      ]
+    },
+    {
+      "name": "StopEvent (coordinates)",
+      "template": "stop-event-coordinates.xml",
+      "variables": [
+        {
+          "name": "latitude",
+          "label": "Latitude",
+          "type": "string",
+          "default": "48.771149",
+          "required": true
+        },
+        {
+          "name": "longitude",
+          "label": "Longitude",
+          "type": "string",
+          "default": "9.177449",
+          "required": true
+        },
+        {
+          "name": "dep_arr_time",
+          "label": "Departure/arrival time",
+          "type": "datetime"
+        },
+        {
+          "name": "num_results",
+          "label": "Number of results",
+          "type": "integer",
+          "default": "1"
+        },
+        {
+          "name": "stop_event_type",
+          "label": "Stop event type reference",
+          "type": "enumeration",
+          "options": ["departure", "arrival"],
+          "default": "departure"
+        },
+        {
+          "name": "include_previous_calls",
+          "label": "IncludePreviousCalls",
+          "type": "boolean",
+          "default": false
+        },
+        {
+          "name": "include_onward_calls",
+          "label": "IncludeOnwardCalls",
+          "type": "boolean",
+          "default": false
+        },
+        {
+          "name": "include_realtime_data",
+          "label": "IncludeRealtimeData",
+          "type": "boolean",
+          "default": true
+        }
+      ]
+    }
+  ]
+}

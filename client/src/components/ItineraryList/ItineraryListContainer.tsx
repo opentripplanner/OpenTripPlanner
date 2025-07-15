@@ -1,4 +1,4 @@
-import { QueryType } from '../../gql/graphql.ts';
+import { TripQuery } from '../../gql/graphql.ts';
 import { Accordion } from 'react-bootstrap';
 import { useContainerWidth } from './useContainerWidth.ts';
 import { ItineraryHeaderContent } from './ItineraryHeaderContent.tsx';
@@ -15,7 +15,7 @@ export function ItineraryListContainer({
   pageResults,
   loading,
 }: {
-  tripQueryResult: QueryType | null;
+  tripQueryResult: TripQuery | null;
   selectedTripPatternIndex: number;
   setSelectedTripPatternIndex: (selectedTripPatterIndex: number) => void;
   pageResults: (cursor: string) => void;

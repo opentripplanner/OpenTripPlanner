@@ -28,6 +28,7 @@ import org.opentripplanner.transit.api.request.FindRoutesRequest;
 import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
+import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -142,6 +143,7 @@ public interface TransitService {
 
   Operator getOperator(FeedScopedId id);
 
+  @Nullable
   RegularStop getRegularStop(FeedScopedId id);
 
   Collection<StopLocation> listStopLocations();
@@ -259,7 +261,7 @@ public interface TransitService {
    *                             trip or the stop at the given stop location has been cancelled.
    *                             Deleted trips are never returned no matter the value of this parameter.
    */
-  List<TripTimeOnDate> findTripTimeOnDate(
+  List<TripTimeOnDate> findTripTimesOnDate(
     StopLocation stop,
     TripPattern pattern,
     Instant startTime,
@@ -268,6 +270,17 @@ public interface TransitService {
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations
   );
+
+  /**
+   * Fetch upcoming vehicle departures from a stop for a specific pattern, passing the stop for the
+   * previous, current and next service date. It uses a priority queue to keep track of the next
+   * departures. The queue is shared between all dates, as services from the previous service date
+   * can visit the stop later than the current service date's services.
+   * <p>
+   * This method is similar to {@link TransitService#findTripTimesOnDate(StopLocation, TripPattern, Instant, Duration, int, ArrivalDeparture, boolean)}
+   * in that it uses a filter request which allows you to include and exclude routes, agencies and modes.
+   */
+  List<TripTimeOnDate> findTripTimesOnDate(TripTimeOnDateRequest request);
 
   Collection<GroupOfRoutes> listGroupsOfRoutes();
 
@@ -303,8 +316,6 @@ public interface TransitService {
   TripOnServiceDate getTripOnServiceDate(FeedScopedId id);
 
   Collection<TripOnServiceDate> listTripsOnServiceDate();
-
-  Set<TransitMode> listTransitModes();
 
   Collection<PathTransfer> findPathTransfers(StopLocation stop);
 
@@ -405,4 +416,10 @@ public interface TransitService {
    * Returns a list of {@link StopLocation}s that match the filtering defined in the request.
    */
   Collection<StopLocation> findStopLocations(FindStopLocationsRequest request);
+
+  /**
+   * Returns boolean indicating if there are scheduled services on or after the given date.
+   * This does not include real-time updates, so it only checks the scheduled service dates.
+   */
+  boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop);
 }

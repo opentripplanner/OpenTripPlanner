@@ -172,13 +172,15 @@ public class CarPickupTest extends GraphRoutingTest {
     Vertex toVertex,
     boolean arriveBy
   ) {
-    var options = new RouteRequest();
-    options.setArriveBy(arriveBy);
+    var request = RouteRequest.of()
+      //.setFrom(GenericLocation.fromCoordinate(fromVertex.getLat(), fromVertex.getLon()))
+      //.setTo(GenericLocation.fromCoordinate(toVertex.getLat(), toVertex.getLon()))
+      .withArriveBy(arriveBy)
+      .buildDefault();
 
     var tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(options)
-      .setRequest(options)
+      .setRequest(request)
       .setStreetRequest(new StreetRequest(StreetMode.CAR_PICKUP))
       .setFrom(fromVertex)
       .setTo(toVertex)

@@ -29,7 +29,7 @@ import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * A debug logger which can be plugged into Raptor to do debug logging to standard error. This is
- * used by the REST API, SpeedTest and in module tests.
+ * used by the SpeedTest and in module tests.
  * <p>
  * See the Raptor design doc for a general description of the logging functionality.
  */

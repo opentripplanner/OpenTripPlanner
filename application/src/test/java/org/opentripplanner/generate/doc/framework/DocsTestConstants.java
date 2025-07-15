@@ -11,7 +11,9 @@ public interface DocsTestConstants {
   Logger LOG = LoggerFactory.getLogger(DocsTestConstants.class);
   File DOC_ROOT = new File("../doc");
   File TEMPLATE_PATH = new File(DOC_ROOT, "templates");
+  File SANDBOX_TEMPLATE_PATH = new File(TEMPLATE_PATH, "sandbox");
   File USER_DOC_PATH = new File(DOC_ROOT, "user");
+  File SANDBOX_USER_DOC_PATH = new File(USER_DOC_PATH, "sandbox");
 
   /**
    * This method return {@code true} if both the /doc/user and /doc/templates directories are available. If not, a warning is

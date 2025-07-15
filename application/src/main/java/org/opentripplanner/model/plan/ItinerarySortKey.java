@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import java.time.Instant;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 /**
@@ -16,9 +17,9 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 public interface ItinerarySortKey {
   Instant startTimeAsInstant();
   Instant endTimeAsInstant();
-  int getGeneralizedCostIncludingPenalty();
-  int getNumberOfTransfers();
-  boolean isOnStreetAllTheWay();
+  Cost generalizedCostIncludingPenalty();
+  int numberOfTransfers();
+  boolean isStreetOnly();
 
   default String keyAsString() {
     return ValueObjectToStringBuilder.of()
@@ -27,11 +28,11 @@ public interface ItinerarySortKey {
       .addText(", ")
       .addTime(endTimeAsInstant())
       .addText(", ")
-      .addCost(getGeneralizedCostIncludingPenalty())
+      .addObj(generalizedCostIncludingPenalty())
       .addText(", Tx")
-      .addNum(getNumberOfTransfers())
+      .addNum(numberOfTransfers())
       .addText(", ")
-      .addBool(isOnStreetAllTheWay(), "onStreet", "transit")
+      .addBool(isStreetOnly(), "onStreet", "transit")
       .addText("]")
       .toString();
   }

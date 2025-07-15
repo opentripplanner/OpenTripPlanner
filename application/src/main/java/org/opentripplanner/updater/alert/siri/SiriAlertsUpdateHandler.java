@@ -23,14 +23,14 @@ import org.opentripplanner.updater.alert.siri.mapping.AffectsMapper;
 import org.opentripplanner.updater.alert.siri.mapping.SiriSeverityMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.DefaultedTextStructure;
-import uk.org.siri.siri20.HalfOpenTimestampOutputRangeStructure;
-import uk.org.siri.siri20.InfoLinkStructure;
-import uk.org.siri.siri20.NaturalLanguageStringStructure;
-import uk.org.siri.siri20.PtSituationElement;
-import uk.org.siri.siri20.ServiceDelivery;
-import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
-import uk.org.siri.siri20.WorkflowStatusEnumeration;
+import uk.org.siri.siri21.DefaultedTextStructure;
+import uk.org.siri.siri21.HalfOpenTimestampOutputRangeStructure;
+import uk.org.siri.siri21.InfoLinkStructure;
+import uk.org.siri.siri21.NaturalLanguageStringStructure;
+import uk.org.siri.siri21.PtSituationElement;
+import uk.org.siri.siri21.ServiceDelivery;
+import uk.org.siri.siri21.SituationExchangeDeliveryStructure;
+import uk.org.siri.siri21.WorkflowStatusEnumeration;
 
 /**
  * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange (SX) feeds.
@@ -198,7 +198,9 @@ public class SiriAlertsUpdateHandler {
       alert.addEntity(new EntitySelector.Unknown("Alert had no entities that could be handled"));
     }
 
-    alert.withType(situation.getReportType());
+    if (situation.getReportType() != null) {
+      alert.withType(situation.getReportType().value());
+    }
 
     alert.withSeverity(SiriSeverityMapper.getAlertSeverityForSiriSeverity(situation.getSeverity()));
 

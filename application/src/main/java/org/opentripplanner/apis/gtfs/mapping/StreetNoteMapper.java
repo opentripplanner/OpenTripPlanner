@@ -9,9 +9,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class StreetNoteMapper {
 
-  /**
-   * Similar to {@link org.opentripplanner.apis.support.mapping.StreetNoteMapper ::mapToApi}.
-   */
   public static TransitAlert mapStreetNoteToAlert(StreetNote note) {
     // TODO: The ID is used only in the mapping, we should instead have two mappers for the fields
     TransitAlertBuilder alert = TransitAlert.of(

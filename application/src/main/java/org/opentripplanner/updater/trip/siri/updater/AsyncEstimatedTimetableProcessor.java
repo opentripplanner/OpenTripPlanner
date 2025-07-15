@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
-import uk.org.siri.siri20.ServiceDelivery;
+import uk.org.siri.siri21.ServiceDelivery;
 
 /**
  * Apply asynchronously estimated timetable updates in the graph-writer thread and forward the

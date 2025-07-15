@@ -78,13 +78,13 @@ class CostLinearFunctionTest {
     return TestTableParser.of(
       """
       #  function  ||          expected values
-      #            ||  0s |  1s |  2s |  10s | 11s | 61s
-       0s + 0.0 t  ||   0 |   0 |   0 |   0  |   0 |   0
-       7s + 0.0 t  ||   7 |   7 |   7 |   7  |   7 |   7
-       0s + 1.0 t  ||   0 |   1 |   2 |  10  |  11 |  61
-       0s + 1.05 t ||   0 |   1 |   2 |  11  |  12 |  64
-       8s + 2.0 t  ||   8 |  10 |  12 |  28  |  30 | 130
-       8s + 2.04 t ||   8 |  10 |  12 |  28  |  30 | 130
+      #            ||    0s |    1s |    2s |    10s |   11s |   61s
+       0s + 0.0 t  ||     0 |     0 |     0 |     0  |     0 |     0
+       7s + 0.0 t  ||   700 |   700 |   700 |   700  |   700 |   700
+       0s + 1.0 t  ||   000 |   100 |   200 |  1000  |  1100 |  6100
+       0s + 1.05 t ||   000 |   105 |   210 |  1050  |  1155 |  6405
+       8s + 2.0 t  ||   800 |  1000 |  1200 |  2800  |  3000 | 13000
+       8s + 2.04 t ||   800 |  1000 |  1200 |  2800  |  3000 | 13000
       """
     );
   }
@@ -102,11 +102,11 @@ class CostLinearFunctionTest {
   ) {
     var subject = CostLinearFunction.of(function);
 
-    assertEquals(exp0s, subject.calculate(Cost.ZERO).toSeconds());
-    assertEquals(exp1s, subject.calculate(COST_1s).toSeconds());
-    assertEquals(exp2s, subject.calculate(COST_2s).toSeconds());
-    assertEquals(exp10s, subject.calculate(COST_10s).toSeconds());
-    assertEquals(exp11s, subject.calculate(COST_11s).toSeconds());
-    assertEquals(exp61s, subject.calculate(COST_61s).toSeconds());
+    assertEquals(exp0s, subject.calculate(Cost.ZERO).toCentiSeconds());
+    assertEquals(exp1s, subject.calculate(COST_1s).toCentiSeconds());
+    assertEquals(exp2s, subject.calculate(COST_2s).toCentiSeconds());
+    assertEquals(exp10s, subject.calculate(COST_10s).toCentiSeconds());
+    assertEquals(exp11s, subject.calculate(COST_11s).toCentiSeconds());
+    assertEquals(exp61s, subject.calculate(COST_61s).toCentiSeconds());
   }
 }

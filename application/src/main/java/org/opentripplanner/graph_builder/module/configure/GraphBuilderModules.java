@@ -12,20 +12,19 @@ import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
-import org.opentripplanner.ext.emissions.EmissionsModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
-import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -36,13 +35,13 @@ import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -70,13 +69,12 @@ public class GraphBuilderModules {
     List<OsmProvider> providers = new ArrayList<>();
     for (ConfiguredDataSource<
       OsmExtractParameters
-    > osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
+    > osmConfiguredDataSource : dataSources.getOsmConfiguredDataSource()) {
       providers.add(
         new DefaultOsmProvider(
           osmConfiguredDataSource.dataSource(),
           osmConfiguredDataSource.config().osmTagMapper(),
           osmConfiguredDataSource.config().timeZone(),
-          osmConfiguredDataSource.config().includeOsmSubwayEntrances(),
           config.osmCacheDataInMem,
           issueStore
         )
@@ -104,17 +102,12 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     TimetableRepository timetableRepository,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    FareServiceFactory fareServiceFactory
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
-    for (ConfiguredDataSource<
-      GtfsFeedParameters
-    > gtfsData : dataSources.getGtfsConfiguredDatasource()) {
-      GtfsBundle gtfsBundle = new GtfsBundle(gtfsData);
-
-      gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
-      gtfsBundle.setMaxStopToShapeSnapDistance(config.maxStopToShapeSnapDistance);
-      gtfsBundles.add(gtfsBundle);
+    for (var gtfsData : dataSources.getGtfsConfiguredDataSource()) {
+      gtfsBundles.add(new GtfsBundle(gtfsData.dataSource(), gtfsData.config()));
     }
     return new GtfsModule(
       gtfsBundles,
@@ -122,23 +115,9 @@ public class GraphBuilderModules {
       graph,
       issueStore,
       config.getTransitServicePeriod(),
-      config.fareServiceFactory
-    );
-  }
-
-  @Provides
-  @Singleton
-  static EmissionsModule provideEmissionsModule(
-    GraphBuilderDataSources dataSources,
-    BuildConfig config,
-    @Nullable EmissionsDataModel emissionsDataModel,
-    DataImportIssueStore issueStore
-  ) {
-    return new EmissionsModule(
-      dataSources.getGtfsConfiguredDatasource(),
-      config,
-      emissionsDataModel,
-      issueStore
+      fareServiceFactory,
+      config.maxStopToShapeSnapDistance,
+      config.getSubwayAccessTimeSeconds()
     );
   }
 
@@ -153,7 +132,7 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore
   ) {
     return new NetexConfigure(config).createNetexModule(
-      dataSources.getNetexConfiguredDatasource(),
+      dataSources.getNetexConfiguredDataSource(),
       timetableRepository,
       parkingService,
       graph,
@@ -175,7 +154,8 @@ public class GraphBuilderModules {
       parkingRepository,
       timetableRepository,
       issueStore,
-      config.areaVisibility
+      config.areaVisibility,
+      config.maxAreaNodes
     );
   }
 
@@ -197,7 +177,8 @@ public class GraphBuilderModules {
         parkingRepository,
         timetableRepository,
         issueStore,
-        config.areaVisibility
+        config.areaVisibility,
+        config.maxAreaNodes
       )
     );
     pruneIslands.setPruningThresholdIslandWithoutStops(
@@ -228,7 +209,7 @@ public class GraphBuilderModules {
       );
     } else if (dataSources.has(DEM)) {
       gridCoverageFactories.addAll(
-        createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDatasource())
+        createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDataSource())
       );
     }
     // Refactoring this class, it was made clear that this allows for adding multiple elevation
@@ -285,6 +266,7 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
+  @Nullable
   static EdgeUpdaterModule provideDataOverlayFactory(BuildConfig config, Graph graph) {
     return DataOverlayFactory.create(graph, config.dataOverlay);
   }
@@ -313,6 +295,15 @@ public class GraphBuilderModules {
   @Singleton
   static DataImportIssueSummary providesDataImportIssueSummary(DataImportIssueStore issueStore) {
     return new DataImportIssueSummary(issueStore.listIssues());
+  }
+
+  @Provides
+  @Singleton
+  static TurnRestrictionModule provideTurnRestrictionModule(
+    Graph graph,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository
+  ) {
+    return new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
   }
 
   @Provides

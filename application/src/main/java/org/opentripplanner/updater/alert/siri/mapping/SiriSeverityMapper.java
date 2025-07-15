@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.alert.siri.mapping;
 
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
-import uk.org.siri.siri20.SeverityEnumeration;
+import uk.org.siri.siri21.SeverityEnumeration;
 
 /**
  * Util class for mapping SIRI's severity enums into internal {@link AlertSeverity}.
@@ -17,14 +17,14 @@ public class SiriSeverityMapper {
       return AlertSeverity.WARNING;
     }
     return switch (severity) {
-      case PTI_26_255, UNDEFINED -> AlertSeverity.UNDEFINED;
-      case PTI_26_0, UNKNOWN -> AlertSeverity.UNKNOWN_SEVERITY;
-      case PTI_26_6, NO_IMPACT -> AlertSeverity.INFO;
-      case PTI_26_1, VERY_SLIGHT -> AlertSeverity.VERY_SLIGHT;
-      case PTI_26_2, SLIGHT -> AlertSeverity.SLIGHT;
-      case PTI_26_4, SEVERE -> AlertSeverity.SEVERE;
-      case PTI_26_5, VERY_SEVERE -> AlertSeverity.VERY_SEVERE;
-      case PTI_26_3, NORMAL -> AlertSeverity.WARNING;
+      case UNDEFINED -> AlertSeverity.UNDEFINED;
+      case UNKNOWN -> AlertSeverity.UNKNOWN_SEVERITY;
+      case NO_IMPACT -> AlertSeverity.INFO;
+      case VERY_SLIGHT -> AlertSeverity.VERY_SLIGHT;
+      case SLIGHT -> AlertSeverity.SLIGHT;
+      case SEVERE -> AlertSeverity.SEVERE;
+      case VERY_SEVERE -> AlertSeverity.VERY_SEVERE;
+      case NORMAL -> AlertSeverity.WARNING;
     };
   }
 }

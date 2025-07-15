@@ -17,16 +17,19 @@ import org.opentripplanner.utils.collection.MapUtils;
 /** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {
 
+  private final IdFactory idFactory;
   private final Map<org.onebusaway.gtfs.model.Stop, RegularStop> mappedStops = new HashMap<>();
   private final SiteRepositoryBuilder siteRepositoryBuilder;
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;
 
   StopMapper(
+    IdFactory idFactory,
     TranslationHelper translationHelper,
     Function<FeedScopedId, Station> stationLookUp,
     SiteRepositoryBuilder siteRepositoryBuilder
   ) {
+    this.idFactory = idFactory;
     this.translationHelper = translationHelper;
     this.stationLookUp = stationLookUp;
     this.siteRepositoryBuilder = siteRepositoryBuilder;
@@ -43,7 +46,7 @@ class StopMapper {
 
   private RegularStop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
     assertLocationTypeIsStop(gtfsStop);
-    StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
+    StopMappingWrapper base = new StopMappingWrapper(idFactory, gtfsStop);
     RegularStopBuilder builder = siteRepositoryBuilder
       .regularStop(base.getId())
       .withCode(base.getCode())

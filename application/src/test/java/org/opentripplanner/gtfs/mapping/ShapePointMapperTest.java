@@ -27,7 +27,7 @@ public class ShapePointMapperTest {
   private static final int SEQUENCE = 3;
 
   private static final ShapePoint SHAPE_POINT = new ShapePoint();
-  private final ShapePointMapper subject = new ShapePointMapper();
+  private final ShapePointMapper subject = new ShapePointMapper(new IdFactory("A"));
 
   static {
     SHAPE_POINT.setId(ID);
@@ -58,13 +58,15 @@ public class ShapePointMapperTest {
 
   @Test
   public void testMapWithNulls() throws Exception {
-    org.opentripplanner.model.ShapePoint result = subject.map(new ShapePoint());
+    var orginal = new ShapePoint();
+    orginal.setShapeId(AGENCY_AND_ID);
+    org.opentripplanner.model.ShapePoint result = subject.map(orginal);
 
     assertFalse(result.isDistTraveledSet());
     assertEquals(0d, result.getLat(), 0.00001);
     assertEquals(0d, result.getLon(), 0.00001);
     assertEquals(0d, result.getSequence(), 0.00001);
-    assertNull(result.getShapeId());
+    assertEquals("A:1", result.getShapeId().toString());
   }
 
   /** Mapping the same object twice, should return the the same instance. */

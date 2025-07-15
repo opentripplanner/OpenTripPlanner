@@ -79,8 +79,7 @@ class GraphQLUtilsTest {
   void testGetLocaleWithEnvLocale() {
     var frenchLocale = Locale.FRENCH;
     var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
-      .localContext(Map.of("locale", Locale.GERMAN))
-      .locale(frenchLocale)
+      .locale(Locale.FRENCH)
       .build();
 
     var locale = GraphQLUtils.getLocale(env);
@@ -90,10 +89,11 @@ class GraphQLUtilsTest {
 
   @Test
   void testGetLocaleWithLocalContextLocale() {
-    // Should use locale from local context if env locale is not defined
+    // Should use locale from local context even if env locale is defined
 
     var frenchLocale = Locale.FRENCH;
     var envWithNoLocale = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
+      .locale(Locale.GERMAN)
       .localContext(Map.of("locale", Locale.FRENCH))
       .build();
 

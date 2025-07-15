@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.street.model.TurnRestrictionTest.getParentLabelString;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,9 +12,13 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
@@ -76,28 +81,37 @@ public class TurnCostTest {
     StreetEdge maple_main3 = edge(maple3, main3, 100.0, false);
     StreetEdge main_broad3 = edge(main3, broad3, 100.0, false);
 
+    var osmInfoGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     // Turn restrictions are only for driving modes.
     // - can't turn from 1st onto Main.
     // - can't turn from 2nd onto Main.
     // - can't turn from 2nd onto Broad.
-    DisallowTurn(maple_main1, main1_2);
-    DisallowTurn(maple_main2, main2_3);
-    DisallowTurn(main_broad2, broad2_3);
+    DisallowTurn(osmInfoGraphBuildRepository, maple_main1, main1_2);
+    DisallowTurn(osmInfoGraphBuildRepository, maple_main2, main2_3);
+    DisallowTurn(osmInfoGraphBuildRepository, main_broad2, broad2_3);
 
     // Hold onto some vertices for the tests
     topRight = maple1;
     bottomLeft = broad3;
 
-    // Make a prototype routing request.
-    proto = new RouteRequest();
-    proto.withPreferences(preferences ->
-      preferences
-        .withCar(it -> it.withReluctance(1.0))
-        .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
-        .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
-        .withWalk(walk -> walk.withSpeed(1.0).withStairsReluctance(1.0).withReluctance(1.0))
-        .withStreet(it -> it.withTurnReluctance(1.0))
+    Graph graph = StreetModelForTest.makeGraph(topRight);
+    TurnRestrictionModule turnRestrictionModule = new TurnRestrictionModule(
+      graph,
+      osmInfoGraphBuildRepository
     );
+    turnRestrictionModule.buildGraph();
+
+    // Make a prototype routing request.
+    proto = RouteRequest.of()
+      .withPreferences(preferences ->
+        preferences
+          .withCar(it -> it.withReluctance(1.0))
+          .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
+          .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
+          .withWalk(walk -> walk.withSpeed(1.0).withStairsReluctance(1.0).withReluctance(1.0))
+          .withStreet(it -> it.withTurnReluctance(1.0))
+      )
+      .buildDefault();
 
     // Turn costs are all 0 by default.
     calculator = new ConstantIntersectionTraversalCalculator(0.0);
@@ -143,11 +157,9 @@ public class TurnCostTest {
 
   @Test
   public void testForwardCarNoTurnCosts() {
-    RouteRequest options = proto.clone();
-
     // Without turn costs, this path costs 3x100 + 1x50 = 300.
     GraphPath<State, Edge, Vertex> path = checkForwardRouteDuration(
-      options,
+      proto,
       StreetMode.CAR,
       topRight,
       bottomLeft,
@@ -157,11 +169,11 @@ public class TurnCostTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
-    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
-    assertEquals("broad_1st", states.get(2).getVertex().getLabelString());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
+    assertEquals("maple_1st", getParentLabelString(states.get(0).getVertex()));
+    assertEquals("main_1st", getParentLabelString(states.get(1).getVertex()));
+    assertEquals("broad_1st", getParentLabelString(states.get(2).getVertex()));
+    assertEquals("broad_2nd", getParentLabelString(states.get(3).getVertex()));
+    assertEquals("broad_3rd", getParentLabelString(states.get(4).getVertex()));
   }
 
   @Test
@@ -181,11 +193,11 @@ public class TurnCostTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
-    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
-    assertEquals("broad_1st", states.get(2).getVertex().getLabelString());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
+    assertEquals("maple_1st", getParentLabelString(states.get(0).getVertex()));
+    assertEquals("main_1st", getParentLabelString(states.get(1).getVertex()));
+    assertEquals("broad_1st", getParentLabelString(states.get(2).getVertex()));
+    assertEquals("broad_2nd", getParentLabelString(states.get(3).getVertex()));
+    assertEquals("broad_3rd", getParentLabelString(states.get(4).getVertex()));
 
     assertEquals(0, states.get(0).getElapsedTimeSeconds());
     assertEquals(50, states.get(1).getElapsedTimeSeconds()); // maple_main1 = 50
@@ -260,10 +272,14 @@ public class TurnCostTest {
       .buildAndConnect();
   }
 
-  private void DisallowTurn(StreetEdge from, StreetEdge to) {
+  private void DisallowTurn(
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    StreetEdge from,
+    StreetEdge to
+  ) {
     TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
     TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
-    TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes, null);
-    from.addTurnRestriction(restrict);
+    TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
+    osmInfoGraphBuildRepository.addTurnRestriction(restrict);
   }
 }

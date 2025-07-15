@@ -39,6 +39,7 @@ import org.opentripplanner.transit.api.request.FindRoutesRequest;
 import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
+import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -164,16 +165,6 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public void addAgency(Agency agency) {
-    this.timetableRepository.addAgency(agency);
-  }
-
-  @Override
-  public void addFeedInfo(FeedInfo info) {
-    this.timetableRepository.addFeedInfo(info);
-  }
-
-  @Override
   public Collection<Notice> findNotices(AbstractTransitEntity<?, ?> entity) {
     return this.timetableRepository.getNoticesByElement().get(entity);
   }
@@ -247,15 +238,6 @@ public class DefaultTransitService implements TransitEditorService {
   public Collection<Route> findRoutes(FindRoutesRequest request) {
     Matcher<Route> matcher = RouteMatcherFactory.of(request, this.getFlexIndex()::contains);
     return listRoutes().stream().filter(matcher::match).toList();
-  }
-
-  /**
-   * Add a route to the transit model.
-   * Used only in unit tests.
-   */
-  @Override
-  public void addRoutes(Route route) {
-    this.timetableRepositoryIndex.addRoutes(route);
   }
 
   @Override
@@ -430,7 +412,8 @@ public class DefaultTransitService implements TransitEditorService {
       timeRange,
       numberOfDepartures,
       arrivalDeparture,
-      includeCancelledTrips
+      includeCancelledTrips,
+      TripTimeOnDate.compareByDeparture()
     );
   }
 
@@ -451,7 +434,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public List<TripTimeOnDate> findTripTimeOnDate(
+  public List<TripTimeOnDate> findTripTimesOnDate(
     StopLocation stop,
     TripPattern pattern,
     Instant startTime,
@@ -470,6 +453,12 @@ public class DefaultTransitService implements TransitEditorService {
       arrivalDeparture,
       includeCancellations
     );
+  }
+
+  @Override
+  public List<TripTimeOnDate> findTripTimesOnDate(TripTimeOnDateRequest request) {
+    OTPRequestTimeoutException.checkForTimeout();
+    return stopTimesHelper.findTripTimesOnDate(request);
   }
 
   /**
@@ -622,16 +611,6 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     return timetableRepository.getOrCreateServiceIdForDate(serviceDate);
-  }
-
-  @Override
-  public void addTransitMode(TransitMode mode) {
-    this.timetableRepository.addTransitMode(mode);
-  }
-
-  @Override
-  public Set<TransitMode> listTransitModes() {
-    return this.timetableRepository.getTransitModes();
   }
 
   @Override
@@ -804,5 +783,10 @@ public class DefaultTransitService implements TransitEditorService {
         return t1.getTrip().getId().compareTo(t2.getTrip().getId());
       }
     }
+  }
+
+  @Override
+  public boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop) {
+    return timetableRepositoryIndex.hasScheduledServicesAfter(date, stop);
   }
 }

@@ -39,7 +39,7 @@ public class DisposableEdgeCollection {
   public void disposeEdges() {
     if (scope == Scope.REALTIME) {
       for (Edge e : edges) {
-        graph.getLinker().removeEdgeFromIndex(e, scope);
+        graph.removeEdge(e, scope);
       }
     }
     Collection<Vertex> vertices = new ArrayList<>();

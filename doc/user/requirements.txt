@@ -1,4 +1,4 @@
 mkdocs==1.6.1
-mkdocs-material==9.5.49
-mike@git+https://github.com/jimporter/mike.git@f0522f245e64687dd18384fbd86b721175711474
+mkdocs-material==9.6.14
+mike==2.1.3
 mkdocs-no-sitemap-plugin==0.0.1

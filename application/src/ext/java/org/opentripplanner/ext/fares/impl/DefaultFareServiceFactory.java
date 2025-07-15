@@ -38,7 +38,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
   private final List<FareTransferRule> fareTransferRules = new ArrayList<>();
 
   // mapping the stop ids to area ids. one stop can be in several areas.
-  private final Multimap<FeedScopedId, String> stopAreas = ArrayListMultimap.create();
+  private final Multimap<FeedScopedId, FeedScopedId> stopAreas = ArrayListMultimap.create();
 
   @Override
   public FareService makeFareService() {

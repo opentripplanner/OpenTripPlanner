@@ -27,13 +27,14 @@ import org.opentripplanner.routing.api.request.preference.AccessEgressPreference
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.EscalatorPreferences;
-import org.opentripplanner.routing.api.request.preference.MaxStopCountLimit;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
+import org.opentripplanner.routing.api.request.request.TransitRequest;
+import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -54,7 +55,7 @@ public class RouteRequestConfig {
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c) {
-    return mapRouteRequest(c, new RouteRequest());
+    return mapRouteRequest(c, RouteRequest.defaultValue());
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c, RouteRequest dft) {
@@ -62,12 +63,12 @@ public class RouteRequestConfig {
       return dft;
     }
 
-    RouteRequest request = dft.clone();
+    var requestBuilder = dft.copyOf();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
 
-    request.setArriveBy(
+    requestBuilder.withArriveBy(
       c
         .of("arriveBy")
         .since(V2_0)
@@ -75,11 +76,8 @@ public class RouteRequestConfig {
         .asBoolean(dft.arriveBy())
     );
 
-    request.setLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
-
-    request
-      .journey()
-      .setModes(
+    requestBuilder.withJourney(b ->
+      b.setModes(
         c
           .of("modes")
           .since(V2_0)
@@ -89,24 +87,25 @@ public class RouteRequestConfig {
           .asCustomStringType(RequestModes.defaultRequestModes(), "WALK", s ->
             new QualifiedModeSet(s).getRequestModes()
           )
-      );
+      )
+    );
 
-    request.setNumItineraries(
+    requestBuilder.withNumItineraries(
       c
         .of("numItineraries")
         .since(V2_0)
         .summary("The maximum number of itineraries to return.")
         .asInt(dft.numItineraries())
     );
-    request.setSearchWindow(
+    requestBuilder.withSearchWindow(
       c
         .of("searchWindow")
         .since(V2_0)
         .summary("The duration of the search-window.")
         .description(
           """
-          This is the time/duration in seconds from the earliest-departure-time(EDT) to the
-          latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
+          This is the time/duration in seconds from the earliest-departure-time (EDT) to the
+          latest-departure-time (LDT). In case of a reverse search it will be the time from earliest to
           latest arrival time (LAT - EAT).
 
           All optimal travels that depart within the search window is guaranteed to be found.
@@ -128,8 +127,6 @@ public class RouteRequestConfig {
         .asDuration(dft.searchWindow())
     );
 
-    request.setWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
-
     NodeAdapter unpreferred = c
       .of("unpreferred")
       .since(V2_2)
@@ -147,43 +144,50 @@ public class RouteRequestConfig {
         """
       )
       .asObject();
-    request
-      .journey()
-      .transit()
-      .setUnpreferredRoutes(
-        unpreferred
-          .of("routes")
-          .since(V2_2)
-          .summary(
-            "The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`"
-          )
-          .description("How much cost is added is configured in `unpreferredCost`.")
-          .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
-      );
+    requestBuilder.withJourney(jb -> {
+      jb.withWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
 
-    request
-      .journey()
-      .transit()
-      .setUnpreferredAgencies(
-        unpreferred
-          .of("agencies")
-          .since(V2_2)
-          .summary(
-            "The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`"
-          )
-          .description("How much cost is added is configured in `unpreferredCost`.")
-          .asFeedScopedIds(request.journey().transit().unpreferredAgencies())
-      );
-
-    TransitGroupPriorityConfig.mapTransitRequest(c, request.journey().transit());
+      jb.withTransit(b -> {
+        mapTransit(unpreferred, b, dft.journey().transit());
+        TransitGroupPriorityConfig.mapTransitRequest(c, b);
+      });
+    });
 
     // Map preferences
-    request.withPreferences(preferences -> mapPreferences(c, preferences));
+    requestBuilder.withPreferences(preferences -> mapPreferences(c, preferences));
 
-    return request;
+    return requestBuilder.buildDefault();
   }
 
-  private static void mapPreferences(NodeAdapter c, RoutingPreferences.Builder preferences) {
+  private static void mapTransit(
+    NodeAdapter c,
+    TransitRequestBuilder builder,
+    TransitRequest defaultValues
+  ) {
+    builder.withUnpreferredRoutes(
+      c
+        .of("routes")
+        .since(V2_2)
+        .summary(
+          "The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`"
+        )
+        .description("How much cost is added is configured in `unpreferredCost`.")
+        .asFeedScopedIds(defaultValues.unpreferredRoutes())
+    );
+
+    builder.withUnpreferredAgencies(
+      c
+        .of("agencies")
+        .since(V2_2)
+        .summary(
+          "The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`"
+        )
+        .description("How much cost is added is configured in `unpreferredCost`.")
+        .asFeedScopedIds(defaultValues.unpreferredAgencies())
+    );
+  }
+
+  private static void mapPreferences(NodeAdapter c, RoutingPreferencesBuilder preferences) {
     preferences.withTransit(it -> mapTransitPreferences(c, it));
     preferences.withBike(it -> mapBikePreferences(c, it));
     preferences.withStreet(it -> mapStreetPreferences(c, it));
@@ -194,6 +198,9 @@ public class RouteRequestConfig {
     preferences.withWalk(it -> mapWalkPreferences(c, it));
     preferences.withWheelchair(it -> mapWheelchairPreferences(c, it, WHEELCHAIR_ACCESSIBILITY));
     preferences.withItineraryFilter(it -> mapItineraryFilterParams("itineraryFilters", c, it));
+
+    var dft = RouteRequest.defaultValue().preferences();
+    preferences.withLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
   }
 
   private static void mapTransitPreferences(NodeAdapter c, TransitPreferences.Builder builder) {
@@ -476,7 +483,7 @@ public class RouteRequestConfig {
                 Use this to add a time and cost penalty to an access/egress legs for a given street
                 mode. This will favour other street-modes and transit. This has a performance penalty,
                 since the search-window is increased with the same amount as the maximum penalty for
-                the access legs used. In other cases where the access(CAR) is faster than transit the
+                the access legs used. In other cases where the access (CAR) is faster than transit the
                 performance will be better.
 
                 The default values are
@@ -513,7 +520,7 @@ public class RouteRequestConfig {
                 """
                 This is a performance limit and should therefore be set high. Results close to the limit are not
                 guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
-                duration can be set per mode(`maxDurationForMode`), because some street modes searches
+                duration can be set per mode (`maxDurationForMode`), because some street modes searches
                 are much more resource intensive than others. A default value is applied if the mode specific value
                 does not exist.
                 """
@@ -566,7 +573,7 @@ public class RouteRequestConfig {
             """
             This is a performance limit and should therefore be set high. Results close to the limit are not
             guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
-            duration can be set per mode(`maxDirectStreetDurationForMode`), because some street modes searches
+            duration can be set per mode (`maxDirectStreetDurationForMode`), because some street modes searches
             are much more resource intensive than others. A default value is applied if the mode specific value
             does not exist."
             """
@@ -601,7 +608,7 @@ public class RouteRequestConfig {
           )
           .description(
             """
-            The street search(AStar) aborts after this duration and any paths found are returned to the client.
+            The street search (AStar) aborts after this duration and any paths found are returned to the client.
             The street part of the routing may take a long time if searching very long distances. You can set
             the street routing timeout to avoid tying up server resources on pointless searches and ensure that
             your users receive a timely response. You can also limit the max duration. There are is also a
@@ -743,7 +750,7 @@ public class RouteRequestConfig {
             days/periods like holidays into account. In other words, pick the two points within your area that
             has the worst connection and then try to travel on the worst possible day, and find the maximum
             journey duration. Using a value that is too high has the effect of including more patterns in the
-            search, hence, making it a bit slower. Recommended values would be from 12 hours(small town/city),
+            search, hence, making it a bit slower. Recommended values would be from 12 hours (small town/city),
             1 day (region) to 2 days (country like Norway)."
             """
           )

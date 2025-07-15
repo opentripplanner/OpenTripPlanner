@@ -1,5 +1,6 @@
 package org.opentripplanner.model.fare;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -15,27 +16,30 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * A ticket that a user can purchase to travel.
  * <p>
  * It may be valid for the entirety of an itinerary or just for some of its legs.
- *
- * @param id       Identity of the product
- * @param name     Human-readable name of the product
- * @param price    The price of the fare product
- * @param validity Maximum duration that the product is valid for, if null then unlimited duration.
- * @param category Rider category, for example seniors or students
- * @param medium   Medium to "hold" the fare, like "cash", "HSL app" or
  */
 @Sandbox
-public record FareProduct(
-  FeedScopedId id,
-  String name,
-  Money price,
-  @Nullable Duration validity,
-  @Nullable RiderCategory category,
-  @Nullable FareMedium medium
-) {
-  public FareProduct {
-    Objects.requireNonNull(id);
-    Objects.requireNonNull(name);
-    Objects.requireNonNull(price);
+public final class FareProduct implements Serializable {
+
+  private final FeedScopedId id;
+  private final String name;
+  private final Money price;
+
+  @Nullable
+  private final Duration validity;
+
+  @Nullable
+  private final RiderCategory category;
+
+  @Nullable
+  private final FareMedium medium;
+
+  FareProduct(FareProductBuilder builder) {
+    this.id = Objects.requireNonNull(builder.id());
+    this.name = Objects.requireNonNull(builder.name());
+    this.price = Objects.requireNonNull(builder.price());
+    this.validity = builder.validity();
+    this.category = builder.category();
+    this.medium = builder.medium();
   }
 
   public static FareProductBuilder of(FeedScopedId id, String name, Money price) {
@@ -86,5 +90,52 @@ public record FareProduct(
       buf.append(category.id()).append(category.name());
     }
     return UUID.nameUUIDFromBytes(buf.toString().getBytes(StandardCharsets.UTF_8)).toString();
+  }
+
+  public FeedScopedId id() {
+    return id;
+  }
+
+  public String name() {
+    return name;
+  }
+
+  public Money price() {
+    return price;
+  }
+
+  @Nullable
+  public Duration validity() {
+    return validity;
+  }
+
+  @Nullable
+  public RiderCategory category() {
+    return category;
+  }
+
+  @Nullable
+  public FareMedium medium() {
+    return medium;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) return true;
+    if (obj == null || obj.getClass() != this.getClass()) return false;
+    var that = (FareProduct) obj;
+    return (
+      Objects.equals(this.id, that.id) &&
+      Objects.equals(this.name, that.name) &&
+      Objects.equals(this.price, that.price) &&
+      Objects.equals(this.validity, that.validity) &&
+      Objects.equals(this.category, that.category) &&
+      Objects.equals(this.medium, that.medium)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, price, validity, category, medium);
   }
 }

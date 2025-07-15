@@ -41,6 +41,11 @@ public interface TransitAlertService {
 
   Collection<TransitAlert> getRouteAlerts(FeedScopedId route);
 
+  /**
+   * Get Trip alerts for any date
+   */
+  Collection<TransitAlert> getTripAlerts(FeedScopedId trip);
+
   Collection<TransitAlert> getTripAlerts(FeedScopedId trip, LocalDate serviceDate);
 
   Collection<TransitAlert> getAgencyAlerts(FeedScopedId agency);

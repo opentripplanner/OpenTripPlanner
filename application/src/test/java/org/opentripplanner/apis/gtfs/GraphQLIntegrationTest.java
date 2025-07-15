@@ -17,6 +17,7 @@ import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.timetable.OccupancyStatus.FEW_SEATS_AVAILABLE;
 
+import com.google.common.collect.ImmutableListMultimap;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,10 +30,11 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
@@ -41,30 +43,28 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.fares.FaresToItineraryMapper;
+import org.opentripplanner.ext.fares.ItineraryFaresDecorator;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
-import org.opentripplanner.model.plan.Emissions;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.RelativeDirection;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.model.plan.WalkStepBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.walkstep.RelativeDirection;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
+import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -72,7 +72,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -107,8 +106,8 @@ import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -120,6 +119,7 @@ class GraphQLIntegrationTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
+  private static final Station OMEGA = TEST_MODEL.station("Omega").build();
   private static final Place A = TEST_MODEL.place("A", 5.0, 8.0);
   private static final Place B = TEST_MODEL.place("B", 6.0, 8.5);
   private static final Place C = TEST_MODEL.place("C", 7.0, 9.0);
@@ -128,8 +128,6 @@ class GraphQLIntegrationTest {
   private static final Place F = TEST_MODEL.place("F", 9.0, 10.5);
   private static final Place G = TEST_MODEL.place("G", 9.5, 11.0);
   private static final Place H = TEST_MODEL.place("H", 10.0, 11.5);
-
-  private static final Station STATION = TEST_MODEL.station("STATION").build();
 
   private static final List<RegularStop> STOP_LOCATIONS = Stream.of(A, B, C, D, E, F, G, H)
     .map(p -> (RegularStop) p.stop)
@@ -159,8 +157,6 @@ class GraphQLIntegrationTest {
       .withCurrentRangeMeters(null)
       .withCurrentFuelPercent(null)
       .build();
-
-  static final Graph GRAPH = new Graph();
 
   static final Instant ALERT_START_TIME = OffsetDateTime.parse(
     "2023-02-15T12:03:28+01:00"
@@ -192,7 +188,7 @@ class GraphQLIntegrationTest {
 
     var siteRepositoryBuilder = TEST_MODEL.siteRepositoryBuilder();
     STOP_LOCATIONS.forEach(siteRepositoryBuilder::withRegularStop);
-    siteRepositoryBuilder.withStation(STATION);
+    siteRepositoryBuilder.withStation(OMEGA);
     var siteRepository = siteRepositoryBuilder.build();
     var timetableRepository = new TimetableRepository(siteRepository, DEDUPLICATOR);
 
@@ -259,8 +255,13 @@ class GraphQLIntegrationTest {
     timetableRepository.index();
 
     TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-    tripTimes2.cancelTrip();
-    timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
+    timetableSnapshot.update(
+      new RealTimeTripUpdate(
+        pattern,
+        tripTimes2.createRealTimeFromScheduledTimes().cancelTrip().build(),
+        secondDate
+      )
+    );
 
     var routes = Arrays.stream(TransitMode.values())
       .sorted(Comparator.comparing(Enum::name))
@@ -285,8 +286,7 @@ class GraphQLIntegrationTest {
         t,
         TEST_MODEL.stopTimesEvery5Minutes(4, t, "00:00"),
         new Deduplicator()
-      );
-      realTimeTripTimes.setServiceCode(SERVICE_CODE);
+      ).withServiceCode(SERVICE_CODE);
       timetableSnapshot.update(
         new RealTimeTripUpdate(
           TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
@@ -331,9 +331,12 @@ class GraphQLIntegrationTest {
       public Set<Route> findRoutes(StopLocation stop) {
         return Set.of(ROUTE);
       }
-    };
 
-    routes.forEach(transitService::addRoutes);
+      @Override
+      public Collection<Route> listRoutes() {
+        return routes;
+      }
+    };
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)
@@ -365,23 +368,26 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    Itinerary i1 = newItinerary(A, T11_00)
+    // TODO - Use itineraryBuilder() here not build() and complete building the itinerary using
+    //        the ItineraryBuilder and not going back and forth between the Itinerary and the
+    //        builder.
+    var i1 = newItinerary(A, T11_00)
       .walk(20, B, List.of(step1, step2, step3))
       .bus(busRoute, 122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
       .carHail(D10m, E)
       .build();
 
-    add10MinuteDelay(i1);
+    i1 = add10MinuteDelay(i1);
 
-    var busLeg = i1.getTransitLeg(1);
-    var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
-    railLeg = railLeg.copy().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
-    ArrayList<Leg> legs = new ArrayList<>(i1.getLegs());
+    var busLeg = i1.transitLeg(1);
+    var railLeg = (ScheduledTransitLeg) i1.transitLeg(2);
+    railLeg = railLeg.copyOf().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
+    ArrayList<Leg> legs = new ArrayList<>(i1.legs());
     legs.set(2, railLeg);
-    i1.setLegs(legs);
+    i1 = i1.copyOf().withLegs(legs).build();
 
-    var fares = new ItineraryFares();
+    var fares = new ItineraryFare();
 
     var dayPass = fareProduct("day-pass");
     fares.addItineraryProducts(List.of(dayPass));
@@ -389,15 +395,13 @@ class GraphQLIntegrationTest {
     var singleTicket = fareProduct("single-ticket");
     fares.addFareProduct(railLeg, singleTicket);
     fares.addFareProduct(busLeg, singleTicket);
-    i1.setFare(fares);
 
-    i1.setFare(fares);
-    FaresToItineraryMapper.addFaresToLegs(fares, i1);
+    i1 = ItineraryFaresDecorator.decorateItineraryWithFare(i1, fares);
 
-    i1.setAccessibilityScore(0.5f);
+    i1 = i1.copyOf().withAccessibilityScore(0.5f).build();
 
-    var emissions = new Emissions(new Grams(123.0));
-    i1.setEmissionsPerPerson(emissions);
+    var emission = Emission.ofCo2Gram(123.0);
+    i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);
@@ -405,13 +409,13 @@ class GraphQLIntegrationTest {
     var realtimeVehicleService = new DefaultRealtimeVehicleService(transitService);
     var occypancyVehicle = RealtimeVehicle.builder()
       .withTrip(trip)
-      .withTime(Instant.MAX)
+      .withTime(SERVICE_DATE.atStartOfDay(BERLIN).plusHours(16).toInstant())
       .withVehicleId(id("vehicle-1"))
       .withOccupancyStatus(FEW_SEATS_AVAILABLE)
       .build();
     var positionVehicle = RealtimeVehicle.builder()
       .withTrip(trip)
-      .withTime(Instant.MIN)
+      .withTime(SERVICE_DATE.atStartOfDay(BERLIN).plusHours(19).toInstant())
       .withVehicleId(id("vehicle-2"))
       .withLabel("vehicle2")
       .withCoordinates(new WgsCoordinate(60.0, 80.0))
@@ -420,14 +424,19 @@ class GraphQLIntegrationTest {
       .withStop(pattern.getStop(0))
       .withStopStatus(IN_TRANSIT_TO)
       .build();
-    realtimeVehicleService.setRealtimeVehicles(pattern, List.of(occypancyVehicle, positionVehicle));
+    realtimeVehicleService.setRealtimeVehiclesForFeed(
+      pattern.getId().getFeedId(),
+      new ImmutableListMultimap.Builder()
+        .putAll(pattern, List.of(occypancyVehicle, positionVehicle))
+        .build()
+    );
 
     DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
     defaultVehicleRentalService.addVehicleRentalStation(VEHICLE_RENTAL_STATION);
     defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_1);
     defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_2);
 
-    var routeRequest = new RouteRequest();
+    var routeRequest = RouteRequest.defaultValue();
     context = new GraphQLRequestContext(
       new TestRoutingService(List.of(i1)),
       transitService,
@@ -460,18 +469,24 @@ class GraphQLIntegrationTest {
     }
   }
 
-  private static void add10MinuteDelay(Itinerary i1) {
-    i1.transformTransitLegs(tl -> {
-      if (tl instanceof ScheduledTransitLeg stl) {
-        var rtt = (RealTimeTripTimes) stl.getTripTimes();
+  private static Itinerary add10MinuteDelay(Itinerary i1) {
+    return i1
+      .copyOf()
+      .transformTransitLegs(tl -> {
+        if (tl instanceof ScheduledTransitLeg stl) {
+          TripTimes scheduledTimes = stl.tripTimes();
+          var builder = scheduledTimes.createRealTimeFromScheduledTimes();
 
-        for (var i = 0; i < rtt.getNumStops(); i++) {
-          rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);
-          rtt.updateDepartureTime(i, rtt.getDepartureTime(i) + TEN_MINUTES);
+          for (var i = 0; i < scheduledTimes.getNumStops(); i++) {
+            builder.withArrivalTime(i, scheduledTimes.getArrivalTime(i) + TEN_MINUTES);
+            builder.withDepartureTime(i, scheduledTimes.getDepartureTime(i) + TEN_MINUTES);
+          }
+
+          return stl.copyOf().withTripTimes(builder.build()).build();
         }
-      }
-      return tl;
-    });
+        return tl;
+      })
+      .build();
   }
 
   @FilePatternSource(
@@ -487,7 +502,8 @@ class GraphQLIntegrationTest {
       2000,
       2000,
       Locale.ENGLISH,
-      context
+      context,
+      Collections.emptyList()
     );
     var actualJson = responseBody(response);
     assertEquals(200, response.getStatus());
@@ -534,14 +550,10 @@ class GraphQLIntegrationTest {
   }
 
   private static FareProduct fareProduct(String name) {
-    return new FareProduct(
-      id(name),
-      name,
-      Money.euros(10),
-      null,
-      new RiderCategory(id("senior-citizens"), "Senior citizens", null),
-      new FareMedium(id("oyster"), "TfL Oyster Card")
-    );
+    return FareProduct.of(id(name), name, Money.euros(10))
+      .withCategory(new RiderCategory(id("senior-citizens"), "Senior citizens", null))
+      .withMedium(new FareMedium(id("oyster"), "TfL Oyster Card"))
+      .build();
   }
 
   /**

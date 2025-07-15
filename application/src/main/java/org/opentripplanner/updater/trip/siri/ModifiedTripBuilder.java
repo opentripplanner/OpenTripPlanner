@@ -19,7 +19,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
@@ -27,8 +27,8 @@ import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.EstimatedVehicleJourney;
-import uk.org.siri.siri20.OccupancyEnumeration;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
+import uk.org.siri.siri21.OccupancyEnumeration;
 
 /**
  * A helper class for creating new StopPattern and TripTimes based on a SIRI-ET
@@ -102,10 +102,10 @@ class ModifiedTripBuilder {
    * in form the SIRI-ET update.
    */
   public Result<TripUpdate, UpdateError> build() {
-    RealTimeTripTimes newTimes = existingTripTimes.copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = existingTripTimes.createRealTimeFromScheduledTimes();
 
     if (cancellation) {
-      return cancelTrip(newTimes);
+      return cancelTrip(builder);
     }
 
     if (calls.size() < existingTripTimes.getNumStops()) {
@@ -137,54 +137,53 @@ class ModifiedTripBuilder {
 
     StopPattern stopPattern = result.successValue();
     if (stopPattern.isAllStopsNonRoutable()) {
-      return cancelTrip(newTimes);
+      return cancelTrip(builder);
     }
 
-    applyUpdates(newTimes);
+    applyUpdates(builder);
 
     if (pattern.getStopPattern().equals(stopPattern)) {
       // This is the first update, and StopPattern has not been changed
-      newTimes.setRealTimeState(RealTimeState.UPDATED);
+      builder.withRealTimeState(RealTimeState.UPDATED);
     } else {
       // This update modified stopPattern
-      newTimes.setRealTimeState(RealTimeState.MODIFIED);
+      builder.withRealTimeState(RealTimeState.MODIFIED);
     }
 
-    // TODO - Handle DataValidationException at the outermost level (pr trip)
-    try {
-      newTimes.validateNonIncreasingTimes();
-    } catch (DataValidationException e) {
-      LOG.info(
-        "Invalid SIRI-ET data for trip {} - TripTimes failed to validate after applying SIRI delay propagation. {}",
-        newTimes.getTrip().getId(),
-        e.getMessage()
-      );
-      return DataValidationExceptionMapper.toResult(e, dataSource);
-    }
-
-    int numStopsInUpdate = newTimes.getNumStops();
+    int numStopsInUpdate = builder.numberOfStops();
     int numStopsInPattern = pattern.numberOfStops();
     if (numStopsInUpdate != numStopsInPattern) {
       LOG.info(
         "Invalid SIRI-ET data for trip {} - Inconsistent number of updated stops ({}) and stops in pattern ({})",
-        newTimes.getTrip().getId(),
+        builder.getTrip().getId(),
         numStopsInUpdate,
         numStopsInPattern
       );
       return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS, dataSource);
     }
 
-    LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
-    return Result.success(new TripUpdate(stopPattern, newTimes, serviceDate, dataSource));
+    // TODO - Handle DataValidationException at the outermost level (pr trip)
+    try {
+      var newTimes = builder.build();
+      LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
+      return Result.success(new TripUpdate(stopPattern, newTimes, serviceDate, dataSource));
+    } catch (DataValidationException e) {
+      LOG.info(
+        "Invalid SIRI-ET data for trip {} - TripTimes failed to validate after applying SIRI delay propagation. {}",
+        builder.getTrip().getId(),
+        e.getMessage()
+      );
+      return DataValidationExceptionMapper.toResult(e, dataSource);
+    }
   }
 
   /**
    * Full cancellation of a trip.
    */
-  private Result<TripUpdate, UpdateError> cancelTrip(RealTimeTripTimes newTimes) {
-    newTimes.cancelTrip();
+  private Result<TripUpdate, UpdateError> cancelTrip(RealTimeTripTimesBuilder builder) {
+    builder.cancelTrip();
     return Result.success(
-      new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate, dataSource)
+      new TripUpdate(pattern.getStopPattern(), builder.build(), serviceDate, dataSource)
     );
   }
 
@@ -193,7 +192,7 @@ class ModifiedTripBuilder {
    * Precondition: the number of calls is equal to the number of stops in the pattern (this is
    * verified before calling this method).
    */
-  private void applyUpdates(RealTimeTripTimes newTimes) {
+  private void applyUpdates(RealTimeTripTimesBuilder builder) {
     ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
     Set<CallWrapper> alreadyVisited = new HashSet<>();
 
@@ -218,14 +217,14 @@ class ModifiedTripBuilder {
         throw new IllegalStateException(
           "The stop at index %d on the trip %s cannot be matched with any call. This implies a bug.".formatted(
               stopIndex,
-              newTimes.getTrip().getId()
+              builder.getTrip().getId()
             )
         );
       }
 
       TimetableHelper.applyUpdates(
         startOfService,
-        newTimes,
+        builder,
         stopIndex,
         stopIndex == (stopsInPattern.size() - 1),
         predictionInaccurate,

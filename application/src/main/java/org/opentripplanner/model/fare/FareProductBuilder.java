@@ -22,6 +22,10 @@ public class FareProductBuilder {
     this.price = price;
   }
 
+  public FeedScopedId id() {
+    return id;
+  }
+
   public FareProductBuilder withValidity(Duration validity) {
     this.validity = validity;
     return this;
@@ -37,7 +41,27 @@ public class FareProductBuilder {
     return this;
   }
 
+  public String name() {
+    return name;
+  }
+
+  public Money price() {
+    return price;
+  }
+
+  public Duration validity() {
+    return validity;
+  }
+
+  public RiderCategory category() {
+    return category;
+  }
+
+  public FareMedium medium() {
+    return medium;
+  }
+
   public FareProduct build() {
-    return new FareProduct(id, name, price, validity, category, medium);
+    return new FareProduct(this);
   }
 }

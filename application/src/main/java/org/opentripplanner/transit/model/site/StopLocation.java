@@ -92,8 +92,9 @@ public interface StopLocation extends LogInfo {
   }
 
   /**
-   * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
-   * which only permits one zone per stop.
+   * This was to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
+   * which only permits one zone per stop. It has now spread to several other APIs but can be removed
+   * when there is a suitable replacement.
    */
   @Nullable
   default String getFirstZoneAsString() {

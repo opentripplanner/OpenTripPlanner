@@ -24,7 +24,9 @@ public class ServiceCalendarDateMapperTest {
   private static final ServiceDate DATE = new ServiceDate(2017, 10, 15);
 
   private static final int EXCEPTION_TYPE = 2;
-  private final ServiceCalendarDateMapper subject = new ServiceCalendarDateMapper();
+  private final ServiceCalendarDateMapper subject = new ServiceCalendarDateMapper(
+    new IdFactory("A")
+  );
 
   static {
     SERVICE_DATE.setId(ID);
@@ -53,11 +55,12 @@ public class ServiceCalendarDateMapperTest {
   @Test
   public void testMapWithNulls() {
     ServiceCalendarDate input = new ServiceCalendarDate();
+    input.setServiceId(AGENCY_AND_ID);
     org.opentripplanner.model.calendar.ServiceCalendarDate result = subject.map(input);
 
     assertNull(result.getDate());
     assertEquals(0, result.getExceptionType());
-    assertNull(result.getServiceId());
+    assertEquals("A:1", result.getServiceId().toString());
   }
 
   /** Mapping the same object twice, should return the the same instance. */

@@ -54,6 +54,7 @@ public interface ReadOnlyHierarchicalVersionMapById<V> {
    * of:
    * TODO TOP2 https://github.com/opentripplanner/OpenTripPlanner/issues/2781
    */
+  @Deprecated
   Collection<String> localKeys();
 
   /**

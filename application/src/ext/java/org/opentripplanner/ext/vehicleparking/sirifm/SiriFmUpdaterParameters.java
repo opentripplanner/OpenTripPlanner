@@ -11,7 +11,7 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParamete
 
 /**
  * Class that extends {@link VehicleParkingUpdaterParameters} with parameters required by {@link
- * SiriFmDatasource}.
+ * SiriFmDataSource}.
  */
 public record SiriFmUpdaterParameters(
   String configRef,

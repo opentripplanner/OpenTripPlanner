@@ -9,10 +9,16 @@ import org.opentripplanner.utils.collection.MapUtils;
 /** Responsible for mapping GTFS ServiceCalendarDate into the OTP model. */
 class ServiceCalendarDateMapper {
 
+  private final IdFactory idFactory;
+
   private final Map<
     org.onebusaway.gtfs.model.ServiceCalendarDate,
     ServiceCalendarDate
   > mappedServiceDates = new HashMap<>();
+
+  ServiceCalendarDateMapper(IdFactory idFactory) {
+    this.idFactory = idFactory;
+  }
 
   Collection<ServiceCalendarDate> map(
     Collection<org.onebusaway.gtfs.model.ServiceCalendarDate> allServiceDates
@@ -27,7 +33,7 @@ class ServiceCalendarDateMapper {
 
   private ServiceCalendarDate doMap(org.onebusaway.gtfs.model.ServiceCalendarDate rhs) {
     return new ServiceCalendarDate(
-      AgencyAndIdMapper.mapAgencyAndId(rhs.getServiceId()),
+      idFactory.createId(rhs.getServiceId(), "calendar date"),
       ServiceDateMapper.mapLocalDate(rhs.getDate()),
       rhs.getExceptionType()
     );

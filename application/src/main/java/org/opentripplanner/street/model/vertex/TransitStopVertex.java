@@ -4,6 +4,7 @@ import static org.opentripplanner.street.search.TraverseMode.CAR;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
@@ -40,7 +41,7 @@ public class TransitStopVertex extends StationElementVertex {
    */
   TransitStopVertex(RegularStop stop, Set<TransitMode> modes) {
     super(stop.getId(), stop.getLon(), stop.getLat(), stop.getName());
-    this.stop = stop;
+    this.stop = Objects.requireNonNull(stop);
     this.modes = modes != null ? modes : new HashSet<>();
     this.wheelchairAccessibility = stop.getWheelchairAccessibility();
   }

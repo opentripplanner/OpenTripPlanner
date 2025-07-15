@@ -2,7 +2,7 @@ package org.opentripplanner.updater.trip.siri.updater;
 
 import java.util.Optional;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
-import uk.org.siri.siri20.Siri;
+import uk.org.siri.siri21.Siri;
 
 /**
  * Interface for a blocking, polling approach to retrieving SIRI realtime timetable updates.

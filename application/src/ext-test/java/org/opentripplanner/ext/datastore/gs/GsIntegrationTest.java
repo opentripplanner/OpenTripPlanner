@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.api.GsParameters;
+import org.opentripplanner.ext.datastore.gs.config.GsConfig;
 
 /**
  * This is a manual integration test to test the Google Cloud Storage integration. To set up the
@@ -35,16 +37,18 @@ public class GsIntegrationTest {
 
   private static final String CREDENTIALS_FILE =
     "<Insert path to local Google Service Credential file here>";
+  private static final String HOST = "<Insert host here>";
   private static final String BUCKET_NAME = "<Insert bucket name here>";
   private static final URI GTFS_URI = toUri(BUCKET_NAME, "gtfs.zip");
   private static final String DATA = "{ \"key\" : \"data\" }";
 
+  private static final GsParameters GS_PARAMETERS = new GsConfig(HOST, CREDENTIALS_FILE);
   private GsDataSourceRepository repo;
 
   @BeforeEach
   public void setUp() {
     // Open a repository
-    repo = new GsDataSourceRepository(CREDENTIALS_FILE);
+    repo = new GsDataSourceRepository(GS_PARAMETERS);
     repo.open();
   }
 

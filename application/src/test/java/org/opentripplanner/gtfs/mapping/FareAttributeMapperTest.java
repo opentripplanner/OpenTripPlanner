@@ -39,7 +39,7 @@ public class FareAttributeMapperTest {
 
   private static final int TRANSFERS = 2;
   private static final Currency NOK = Currency.getInstance("NOK");
-  private final FareAttributeMapper subject = new FareAttributeMapper();
+  private final FareAttributeMapper subject = new FareAttributeMapper(new IdFactory("A"));
 
   static {
     FARE_ATTRIBUTE.setId(ID);

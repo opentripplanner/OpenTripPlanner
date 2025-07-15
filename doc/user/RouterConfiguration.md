@@ -35,6 +35,8 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |-------------------------------------------------------------------------------------------|:---------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                                                                                                                                      | *Optional* |               |  2.1  |
 | [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                                                                                                                                      | *Optional* |               |  2.1  |
+| gtfsApi                                                                                   |        `object`       | Configuration for the GTFS GraphQL API.                                                                                                                                                                              | *Optional* |               |  2.8  |
+|    [tracingTags](#gtfsApi_tracingTags)                                                    |       `string[]`      | Used to group requests based on headers or query parameters when monitoring OTP.                                                                                                                                     | *Optional* |               |   na  |
 | [rideHailingServices](sandbox/RideHailing.md)                                             |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                                                                                                                                            | *Optional* |               |  2.3  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                                                                                                                                        | *Optional* |               |  2.0  |
 | [server](#server)                                                                         |        `object`       | Configuration for router server.                                                                                                                                                                                     | *Optional* |               |  2.4  |
@@ -68,7 +70,8 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                                                                                                                                              | *Optional* | `false`       |   na  |
 |    [maxNumberOfResultFields](#transmodelApi_maxNumberOfResultFields)                      |       `integer`       | The maximum number of fields in a GraphQL result                                                                                                                                                                     | *Optional* | `1000000`     |  2.6  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                                                                                                                                          | *Optional* |               |   na  |
-| [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                                                                                                                                           | *Optional* |               |  1.5  |
+| [triasApi](sandbox/TriasApi.md)                                                           |        `object`       | Configuration for the TRIAS API.                                                                                                                                                                                     | *Optional* |               |  2.8  |
+| [updaters](Realtime-Updaters.md)                                                          |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                                                                                                                                           | *Optional* |               |  1.5  |
 | [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | Vector tile configuration                                                                                                                                                                                            | *Optional* |               |   na  |
 | [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory.                                                                                                                                                              | *Optional* |               |  2.0  |
 
@@ -97,6 +100,13 @@ or format check on the version and it can be any string.
 
 Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
 
+
+<h3 id="gtfsApi_tracingTags">tracingTags</h3>
+
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /gtfsApi 
+
+Used to group requests based on headers or query parameters when monitoring OTP.
 
 <h3 id="server">server</h3>
 
@@ -134,7 +144,7 @@ Maximum processing time for an API request
 
 This timeout limits the server-side processing time for a given API request. This does not include
 network latency nor waiting time in the HTTP server thread pool. The default value is
-`-1s`(no timeout). The timeout is applied to all APIs (REST, Transmodel & GTFS GraphQL).
+`-1s`(no timeout). The timeout is applied to all APIs (Transmodel & GTFS GraphQL).
 The timeout is not enforced when the parallel routing OTP feature is in use.
 
 
@@ -166,9 +176,9 @@ on how-to configure the "server.traceParameters" instance.
 
 The log event key used.
 
-OTP stores the key/value pair in the log MDC(Mapped Diagnostic Context). To use it you normally
-include the key in the log pattern like this: `%X{LOG-KEY}`. See your log framework for details.
-Only log4j and logback support this.
+OTP stores the key/value pair in the log MDC (Mapped Diagnostic Context). To use it
+you normally include the key in the log pattern like this: `%X{LOG-KEY}`. See your
+log framework for details. Only log4j and logback support this.
 
 
 <h3 id="timetableUpdates_maxSnapshotFrequency">maxSnapshotFrequency</h3>
@@ -274,14 +284,14 @@ The maximum number of distinct transfers parameters to cache pre-calculated tran
 
 The dynamic search window coefficients used to calculate the EDT, LAT and SW.
 
-The dynamic search window coefficients is used to calculate EDT(*earliest-departure-time*),
-LAT(*latest-arrival-time*) and SW(*raptor-search-window*) request parameters using heuristics. The
+The dynamic search window coefficients is used to calculate EDT (*earliest-departure-time*),
+LAT (*latest-arrival-time*) and SW (*raptor-search-window*) request parameters using heuristics. The
 heuristics perform a Raptor search (one-iteration) to find a trip which we use to find a lower
 bound for the travel duration time - the "minTransitTime". The heuristic search is used for other
 purposes too, and is very fast.
 
 At least the EDT or the LAT must be passed into Raptor to perform a Range Raptor search. If
-unknown/missing the parameters(EDT, LAT, DW) are dynamically calculated. The dynamic coefficients
+unknown/missing the parameters (EDT, LAT, DW) are dynamically calculated. The dynamic coefficients
 affect the performance and should be tuned to match the deployment.
 
 The request parameters are calculated like this:
@@ -675,6 +685,12 @@ Used to group requests when monitoring OTP.
   },
   "transmodelApi" : {
     "hideFeedId" : true
+  },
+  "gtfsApi" : {
+    "tracingTags" : [
+      "example-header-name",
+      "example-query-parameter-name"
+    ]
   },
   "vectorTiles" : {
     "basePath" : "/otp_ct/vectorTiles",

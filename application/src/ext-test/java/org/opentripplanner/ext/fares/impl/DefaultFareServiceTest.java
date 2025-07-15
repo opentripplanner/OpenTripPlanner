@@ -20,7 +20,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
@@ -47,7 +47,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
     service.addFareRules(FareType.regular, List.of());
     var itin = newItinerary(A, T11_00).bus(1, T11_05, T11_12, B).build();
     var fare = service.calculateFares(itin);
-    assertEquals(ItineraryFares.empty(), fare);
+    assertEquals(ItineraryFare.empty(), fare);
   }
 
   @Test
@@ -60,7 +60,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var fare = service.calculateFares(itin);
     assertNotNull(fare);
 
-    var legProducts = fare.getLegProducts().get(itin.getTransitLeg(0));
+    var legProducts = fare.getLegProducts().get(itin.transitLeg(0));
     assertEquals(
       List.of(
         // reminder: the FareProductUse's id are a (non-random) UUID computed from the start time of the leg
@@ -85,8 +85,8 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var legProducts = fare.getLegProducts();
 
-    var firstLeg = itin.getTransitLeg(0);
-    var secondLeg = itin.getTransitLeg(1);
+    var firstLeg = itin.transitLeg(0);
+    var secondLeg = itin.transitLeg(1);
 
     var firstProducts = legProducts.get(firstLeg);
     var secondProducts = legProducts.get(secondLeg);
@@ -131,8 +131,8 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var legProducts = fare.getLegProducts();
 
-    var firstLeg = itin.getLegs().getFirst();
-    var secondLeg = itin.getLegs().get(1);
+    var firstLeg = itin.legs().getFirst();
+    var secondLeg = itin.legs().get(1);
     assertEquals(
       List.of(
         new FareProductUse("ccadd1d3-f284-31a4-9d58-0a300198950f", AIRPORT_TO_CITY_CENTER_PRODUCT)
@@ -195,14 +195,14 @@ class DefaultFareServiceTest implements PlanTestConstants {
     );
 
     var legProducts = result.getLegProducts();
-    var firstBusLeg = itin.getTransitLeg(0);
+    var firstBusLeg = itin.transitLeg(0);
     assertEquals(
       List.of(
         new FareProductUse("1d270201-412b-3b86-80f6-92ab144fa2e5", AIRPORT_TO_CITY_CENTER_PRODUCT)
       ),
       legProducts.get(firstBusLeg)
     );
-    var secondBusLeg = itin.getTransitLeg(2);
+    var secondBusLeg = itin.transitLeg(2);
     assertEquals(
       List.of(new FareProductUse("678d201c-e839-35c3-ae7b-1bc3834da5e5", OTHER_FEED_PRODUCT)),
       legProducts.get(secondBusLeg)
@@ -224,9 +224,9 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var legProducts = result.getLegProducts();
 
-    var firstBusLeg = itin.getTransitLeg(0);
-    var secondBusLeg = itin.getTransitLeg(2);
-    var finalBusLeg = itin.getTransitLeg(4);
+    var firstBusLeg = itin.transitLeg(0);
+    var secondBusLeg = itin.transitLeg(2);
+    var finalBusLeg = itin.transitLeg(4);
 
     assertEquals(
       List.of(new FareProductUse("5d0d58f4-b97a-38db-921c-8b5fc6392b54", OTHER_FEED_PRODUCT)),

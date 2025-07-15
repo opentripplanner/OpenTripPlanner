@@ -6,11 +6,21 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 import java.time.Duration;
 import java.time.Instant;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class PageCursorFactory {
+
+  /**
+   * The search-window start and end is [inclusive, exclusive], so to calculate the start of the
+   * search-window from the last time included in the search window we need to include one extra
+   * minute at the end.
+   * <p>
+   * The value is set to a minute because raptor operates in one minute increments.
+   */
+  private static final Duration SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION = Duration.ofMinutes(1);
 
   private final SortOrder sortOrder;
   private final Duration newSearchWindow;
@@ -18,9 +28,10 @@ public class PageCursorFactory {
   private Instant currentEdt = null;
   private Instant currentLat = null;
   private Duration currentSearchWindow = null;
-  private boolean wholeSwUsed = true;
+  private boolean wholeSearchWindowUsed = true;
   private ItinerarySortKey itineraryPageCut = null;
   private PageCursorInput pageCursorInput = null;
+  private Instant firstSearchLatestItineraryDeparture = null;
 
   private PageCursor nextCursor = null;
   private PageCursor prevCursor = null;
@@ -32,10 +43,12 @@ public class PageCursorFactory {
 
   /**
    * Set the original search earliest-departure-time({@code edt}), latest-arrival-time ({@code lat},
-   * optional) and the search-window used.
+   * optional) and the search-window used. Also resolve the page-type and
+   * first-search-latest-itinerary-departure.
    */
   public PageCursorFactory withOriginalSearch(
     @Nullable PageType pageType,
+    @Nullable Instant firstItineraryResultDeparture,
     Instant edt,
     Instant lat,
     Duration searchWindow
@@ -43,6 +56,11 @@ public class PageCursorFactory {
     this.currentPageType = pageType == null
       ? resolvePageTypeForTheFirstSearch(sortOrder)
       : pageType;
+    this.firstSearchLatestItineraryDeparture = resolveFirstSearchLatestItineraryDeparture(
+      pageType,
+      firstItineraryResultDeparture,
+      edt
+    );
 
     this.currentEdt = edt;
     this.currentLat = lat;
@@ -51,18 +69,23 @@ public class PageCursorFactory {
   }
 
   /**
+   * This adds the page cursor input to the factory. The cursor input contains information about filtering results.
+   * <p>
    * If there were itineraries removed in the current search because the numItineraries parameter
    * was used, then we want to allow the caller to move within some of the itineraries that were
    * removed in the next and previous pages. This means we will use information from when we cropped
    * the list of itineraries to create the new search encoded in the page cursors. We will also add
    * information necessary for removing potential duplicates when paging.
    *
-   * @param pageCursorFactoryParams contains the result from the {@code PagingDuplicateFilter}
+   * @param pageCursorInput contains the generated page cursor input
    */
-  public PageCursorFactory withRemovedItineraries(PageCursorInput pageCursorFactoryParams) {
-    this.wholeSwUsed = false;
-    this.pageCursorInput = pageCursorFactoryParams;
-    this.itineraryPageCut = pageCursorFactoryParams.pageCut();
+  public PageCursorFactory withPageCursorInput(PageCursorInput pageCursorInput) {
+    this.pageCursorInput = pageCursorInput;
+    // If the whole search window was not used (i.e. if there were removed itineraries)
+    if (pageCursorInput.pageCut() != null) {
+      this.wholeSearchWindowUsed = false;
+      this.itineraryPageCut = pageCursorInput.pageCut();
+    }
     return this;
   }
 
@@ -87,7 +110,7 @@ public class PageCursorFactory {
       .addDateTime("currentLat", currentLat)
       .addDuration("currentSearchWindow", currentSearchWindow)
       .addDuration("newSearchWindow", newSearchWindow)
-      .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
+      .addBoolIfTrue("searchWindowCropped", !wholeSearchWindowUsed)
       .addObj("pageCursorFactoryParams", pageCursorInput)
       .addObj("nextCursor", nextCursor)
       .addObj("prevCursor", prevCursor)
@@ -103,6 +126,26 @@ public class PageCursorFactory {
     return sortOrder.isSortedByAscendingArrivalTime() ? NEXT_PAGE : PREVIOUS_PAGE;
   }
 
+  /**
+   * If the first search is an arrive by search (PREVIOUS_PAGE type), the current search window is
+   * misleading. Instead of using the current search window to set the page cursor of the next
+   * page, the departure time of the latest itinerary result is used to avoid missing itineraries.
+   */
+  private Instant resolveFirstSearchLatestItineraryDeparture(
+    @Nullable PageType pageType,
+    @Nullable Instant firstItineraryResultDeparture,
+    Instant edt
+  ) {
+    if (pageType == null && resolvePageTypeForTheFirstSearch(sortOrder) == PREVIOUS_PAGE) {
+      if (firstItineraryResultDeparture != null) {
+        return firstItineraryResultDeparture;
+      } else {
+        return edt;
+      }
+    }
+    return null;
+  }
+
   /** Create page cursor pair (next and previous) */
   private void createPageCursors() {
     if (currentEdt == null || nextCursor != null || prevCursor != null) {
@@ -112,7 +155,7 @@ public class PageCursorFactory {
     Instant prevEdt;
     Instant nextEdt;
 
-    if (wholeSwUsed) {
+    if (wholeSearchWindowUsed) {
       prevEdt = edtBeforeNewSw();
       nextEdt = edtAfterUsedSw();
     }
@@ -122,20 +165,24 @@ public class PageCursorFactory {
         prevEdt = edtBeforeNewSw();
         nextEdt = pageCursorInput.earliestRemovedDeparture();
       } else {
-        // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
-        // search-window from the last time included in the search window we need to include one extra
-        // minute at the end.
-        prevEdt = pageCursorInput.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
+        prevEdt = pageCursorInput
+          .latestRemovedDeparture()
+          .minus(newSearchWindow)
+          .plus(SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION);
         nextEdt = edtAfterUsedSw();
       }
     }
+
+    Cost generalizedCostMaxLimit = pageCursorInput.generalizedCostMaxLimit();
+
     prevCursor = new PageCursor(
       PREVIOUS_PAGE,
       sortOrder,
       prevEdt,
       currentLat,
       newSearchWindow,
-      itineraryPageCut
+      itineraryPageCut,
+      generalizedCostMaxLimit
     );
     nextCursor = new PageCursor(
       NEXT_PAGE,
@@ -143,7 +190,8 @@ public class PageCursorFactory {
       nextEdt,
       null,
       newSearchWindow,
-      itineraryPageCut
+      itineraryPageCut,
+      generalizedCostMaxLimit
     );
   }
 
@@ -152,6 +200,15 @@ public class PageCursorFactory {
   }
 
   private Instant edtAfterUsedSw() {
-    return currentEdt.plus(currentSearchWindow);
+    Instant defaultEdt = currentEdt.plus(currentSearchWindow);
+    if (firstSearchLatestItineraryDeparture != null) {
+      Instant edtFromLatestItineraryDeparture = firstSearchLatestItineraryDeparture.plus(
+        SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION
+      );
+      if (edtFromLatestItineraryDeparture.isBefore(defaultEdt)) {
+        return edtFromLatestItineraryDeparture;
+      }
+    }
+    return defaultEdt;
   }
 }

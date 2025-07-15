@@ -25,6 +25,7 @@ import org.opentripplanner.transit.model.timetable.Direction;
 public class TripMapperTest {
 
   private static final String FEED_ID = "FEED";
+  private static final IdFactory ID_FACTORY = new IdFactory(FEED_ID);
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
   private static final int BIKES_ALLOWED = 1;
   private static final int CARS_ALLOWED = 1;
@@ -43,7 +44,13 @@ public class TripMapperTest {
 
   private static TripMapper defaultTripMapper() {
     return new TripMapper(
-      new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),
+      ID_FACTORY,
+      new RouteMapper(
+        ID_FACTORY,
+        new AgencyMapper(ID_FACTORY),
+        ISSUE_STORE,
+        new TranslationHelper()
+      ),
       new DirectionMapper(ISSUE_STORE),
       new TranslationHelper()
     );
@@ -76,12 +83,12 @@ public class TripMapperTest {
   void testMap() throws Exception {
     org.opentripplanner.transit.model.timetable.Trip result = subject.map(TRIP);
 
-    assertEquals("A:1", result.getId().toString());
+    assertEquals("FEED:1", result.getId().toString());
     assertEquals(BLOCK_ID, result.getGtfsBlockId());
     assertEquals(Direction.INBOUND, result.getDirection());
     assertNotNull(result.getRoute());
-    assertEquals("A:1", result.getServiceId().toString());
-    assertEquals("A:1", result.getShapeId().toString());
+    assertEquals("FEED:1", result.getServiceId().toString());
+    assertEquals("FEED:1", result.getShapeId().toString());
     assertEquals(TRIP_HEADSIGN, result.getHeadsign().toString());
     assertEquals(TRIP_SHORT_NAME, result.getShortName());
     assertEquals(Accessibility.POSSIBLE, result.getWheelchairBoarding());
@@ -93,6 +100,7 @@ public class TripMapperTest {
   void testMapWithNulls() throws Exception {
     Trip input = new Trip();
     input.setId(AGENCY_AND_ID);
+    input.setServiceId(AGENCY_AND_ID);
     input.setRoute(new GtfsTestData().route);
 
     org.opentripplanner.transit.model.timetable.Trip result = subject.map(input);
@@ -101,7 +109,7 @@ public class TripMapperTest {
     assertNotNull(result.getRoute());
 
     assertNull(result.getGtfsBlockId());
-    assertNull(result.getServiceId());
+    assertEquals("FEED:1", result.getServiceId().toString());
     assertNull(result.getShapeId());
     assertNull(result.getHeadsign());
     assertNull(result.getShortName());
@@ -137,6 +145,7 @@ public class TripMapperTest {
   ) {
     var flexTrip = new Trip();
     flexTrip.setId(new AgencyAndId("1", "1"));
+    flexTrip.setServiceId(AGENCY_AND_ID);
     flexTrip.setSafeDurationFactor(inputFactor);
     flexTrip.setSafeDurationOffset(inputOffset);
     flexTrip.setRoute(new GtfsTestData().route);

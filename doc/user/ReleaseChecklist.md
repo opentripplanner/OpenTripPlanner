@@ -39,6 +39,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
 * Bump the SNAPSHOT version in the POM to the release version
     * Edit version in POM, removing SNAPSHOT and increasing version numbers as needed (following
       semantic versioning)
+    * `mvn versions:set -DnewVersion=x.y.z`
     * `git add pom.xml`
     * `git commit -m "prepare release x.y.z"`
 * Run a test build of the release locally, without deploying it
@@ -79,7 +80,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * `git push`
 * Set up next development iteration
     * Add a new section header to `doc/user/Changelog.md` like `x.y+1.0-SNAPSHOT (in progress)`
-    * Edit minor version in `pom.xml` to `x.y+1.0-SNAPSHOT`
+    * Edit version in `pom.xml`s: `mvn versions:set -DnewVersion=x.y.z-SNAPSHOT`
     * `git add pom.xml doc/user/Changelog.md`
     * `git commit -m "Prepare next development iteration x.y+1.0-SNAPSHOT"`
     * `git push`

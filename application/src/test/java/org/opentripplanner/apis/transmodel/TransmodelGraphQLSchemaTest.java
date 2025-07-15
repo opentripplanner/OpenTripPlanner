@@ -22,7 +22,7 @@ class TransmodelGraphQLSchemaTest {
   @Test
   void testSchemaBuild() {
     var schema = TransmodelGraphQLSchema.create(
-      new RouteRequest(),
+      RouteRequest.defaultValue(),
       ZoneIds.OSLO,
       ApiDocumentationProfile.DEFAULT,
       TransitTuningParameters.FOR_TEST

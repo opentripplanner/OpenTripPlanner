@@ -2,10 +2,11 @@ package org.opentripplanner.standalone.configure;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -61,9 +62,10 @@ public class LoadApplication {
       obj.worldEnvelopeRepository,
       obj.parkingRepository,
       obj.issueSummary,
-      obj.emissionsDataModel,
+      obj.emissionRepository,
       obj.stopConsolidationRepository,
-      obj.streetLimitationParameters
+      obj.streetLimitationParameters,
+      obj.fareServiceFactory
     );
   }
 
@@ -78,7 +80,8 @@ public class LoadApplication {
       DataImportIssueSummary.empty(),
       factory.emptyEmissionsDataModel(),
       factory.emptyStopConsolidationRepository(),
-      factory.emptyStreetLimitationParameters()
+      factory.emptyStreetLimitationParameters(),
+      factory.emptyFareServiceFactory()
     );
   }
 
@@ -100,9 +103,10 @@ public class LoadApplication {
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueSummary issueSummary,
-    @Nullable EmissionsDataModel emissionsDataModel,
+    @Nullable EmissionRepository emissionRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
-    StreetLimitationParameters streetLimitationParameters
+    StreetLimitationParameters streetLimitationParameters,
+    FareServiceFactory fareServiceFactory
   ) {
     return new ConstructApplication(
       cli,
@@ -113,10 +117,11 @@ public class LoadApplication {
       config(),
       graphBuilderDataSources(),
       issueSummary,
-      emissionsDataModel,
+      emissionRepository,
       parkingRepository,
       stopConsolidationRepository,
-      streetLimitationParameters
+      streetLimitationParameters,
+      fareServiceFactory
     );
   }
 }

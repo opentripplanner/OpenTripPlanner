@@ -32,18 +32,17 @@ public class DirectStreetRouter {
     }
     OTPRequestTimeoutException.checkForTimeout();
 
-    RouteRequest directRequest = request.clone();
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         serverContext.graph(),
-        directRequest.from(),
-        directRequest.to(),
+        request.from(),
+        request.to(),
         request.journey().direct().mode(),
         request.journey().direct().mode()
       )
     ) {
       var maxCarSpeed = serverContext.streetLimitationParametersService().getMaxCarSpeed();
-      if (!straightLineDistanceIsWithinLimit(directRequest, temporaryVertices, maxCarSpeed)) {
+      if (!straightLineDistanceIsWithinLimit(request, temporaryVertices, maxCarSpeed)) {
         return Collections.emptyList();
       }
 
@@ -54,7 +53,7 @@ public class DirectStreetRouter {
         maxCarSpeed
       );
       List<GraphPath<State, Edge, Vertex>> paths = gpFinder.graphPathFinderEntryPoint(
-        directRequest,
+        request,
         temporaryVertices
       );
 
@@ -65,10 +64,10 @@ public class DirectStreetRouter {
         serverContext.graph().ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
-      ItinerariesHelper.decorateItinerariesWithRequestData(
+      response = ItinerariesHelper.decorateItinerariesWithRequestData(
         response,
-        directRequest.wheelchair(),
-        directRequest.preferences().wheelchair()
+        request.journey().wheelchair(),
+        request.preferences().wheelchair()
       );
       return response;
     } catch (PathNotFoundException e) {

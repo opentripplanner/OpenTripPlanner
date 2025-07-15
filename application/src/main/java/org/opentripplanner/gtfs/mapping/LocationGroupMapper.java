@@ -1,22 +1,23 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.site.GroupStop;
-import org.opentripplanner.transit.model.site.GroupStopBuilder;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.opentripplanner.utils.collection.MapUtils;
 
-public class LocationGroupMapper {
+class LocationGroupMapper {
 
+  private static final LocalizedString FALLBACK_NAME = new LocalizedString("locationGroup");
+  private final IdFactory idFactory;
   private final StopMapper stopMapper;
   private final LocationMapper locationMapper;
   private final SiteRepositoryBuilder siteRepositoryBuilder;
@@ -24,10 +25,12 @@ public class LocationGroupMapper {
   private final Map<LocationGroup, GroupStop> mappedLocationGroups = new HashMap<>();
 
   public LocationGroupMapper(
+    IdFactory idFactory,
     StopMapper stopMapper,
     LocationMapper locationMapper,
     SiteRepositoryBuilder siteRepositoryBuilder
   ) {
+    this.idFactory = idFactory;
     this.stopMapper = stopMapper;
     this.locationMapper = locationMapper;
     this.siteRepositoryBuilder = siteRepositoryBuilder;
@@ -38,14 +41,15 @@ public class LocationGroupMapper {
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  GroupStop map(LocationGroup original) {
+  GroupStop map(@Nullable LocationGroup original) {
     return original == null ? null : mappedLocationGroups.computeIfAbsent(original, this::doMap);
   }
 
   private GroupStop doMap(LocationGroup element) {
-    GroupStopBuilder groupStopBuilder = siteRepositoryBuilder
-      .groupStop(mapAgencyAndId(element.getId()))
-      .withName(new NonLocalizedString(element.getName()));
+    var id = idFactory.createId(element.getId(), "location group");
+    // the GTFS spec allows name-less location groups: https://gtfs.org/documentation/schedule/reference/#location_groupstxt
+    var name = NonLocalizedString.ofNullableOrElse(element.getName(), FALLBACK_NAME);
+    var groupStopBuilder = siteRepositoryBuilder.groupStop(id).withName(name);
 
     for (var location : element.getLocations()) {
       Objects.requireNonNull(

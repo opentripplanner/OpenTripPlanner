@@ -5,17 +5,23 @@ import java.util.Collection;
 import java.util.Currency;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class FareProductMapper {
+class FareProductMapper {
 
   public static int NOT_SET = -999;
 
+  private final IdFactory idFactory;
   private final Set<FareProduct> mappedFareProducts = new HashSet<>();
+
+  public FareProductMapper(IdFactory idFactory) {
+    this.idFactory = idFactory;
+  }
 
   public FareProduct map(org.onebusaway.gtfs.model.FareProduct rhs) {
     var currency = Currency.getInstance(rhs.getCurrency());
@@ -25,14 +31,15 @@ public class FareProductMapper {
     if (rhs.getDurationUnit() != NOT_SET) {
       duration = toDuration(rhs.getDurationUnit(), rhs.getDurationAmount());
     }
-    var fp = new FareProduct(
-      AgencyAndIdMapper.mapAgencyAndId(rhs.getFareProductId()),
+    var fp = FareProduct.of(
+      idFactory.createId(rhs.getFareProductId(), "fare product"),
       rhs.getName(),
-      price,
-      duration,
-      toInternalModel(rhs.getRiderCategory()),
-      toInternalModel(rhs.getFareMedium())
-    );
+      price
+    )
+      .withValidity(duration)
+      .withCategory(toInternalModel(rhs.getRiderCategory()))
+      .withMedium(toInternalModel(rhs.getFareMedium()))
+      .build();
     mappedFareProducts.add(fp);
     return fp;
   }
@@ -43,18 +50,19 @@ public class FareProductMapper {
     return allFareProducts.stream().map(this::map).toList();
   }
 
-  public Collection<FareProduct> getByFareProductId(FeedScopedId fareProductId) {
+  public Collection<FareProduct> findFareProducts(FeedScopedId fareProductId) {
     return mappedFareProducts.stream().filter(p -> p.id().equals(fareProductId)).toList();
   }
 
-  private static RiderCategory toInternalModel(
-    org.onebusaway.gtfs.model.RiderCategory riderCategory
+  @Nullable
+  private RiderCategory toInternalModel(
+    @Nullable org.onebusaway.gtfs.model.RiderCategory riderCategory
   ) {
     if (riderCategory == null) {
       return null;
     } else {
       return new RiderCategory(
-        AgencyAndIdMapper.mapAgencyAndId(riderCategory.getId()),
+        idFactory.createId(riderCategory.getId(), "rider category"),
         riderCategory.getName(),
         riderCategory.getEligibilityUrl()
       );
@@ -76,11 +84,12 @@ public class FareProductMapper {
     };
   }
 
-  private static FareMedium toInternalModel(org.onebusaway.gtfs.model.FareMedium c) {
+  @Nullable
+  private FareMedium toInternalModel(@Nullable org.onebusaway.gtfs.model.FareMedium c) {
     if (c == null) {
       return null;
     } else {
-      return new FareMedium(AgencyAndIdMapper.mapAgencyAndId(c.getId()), c.getName());
+      return new FareMedium(idFactory.createId(c.getId(), "fare medium"), c.getName());
     }
   }
 }

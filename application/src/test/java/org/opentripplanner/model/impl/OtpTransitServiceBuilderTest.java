@@ -64,7 +64,7 @@ public class OtpTransitServiceBuilderTest {
     assertEquals(2, frequencies.size());
 
     assertEquals(
-      "Frequency{trip: agency:15.1, start: 6:00, end: 10:00:01}",
+      "Frequency{trip: F:15.1, start: 6:00, end: 10:00:01}",
       frequencies.get(0).toString()
     );
   }
@@ -74,7 +74,7 @@ public class OtpTransitServiceBuilderTest {
     Collection<Route> routes = subject.getRoutes().values();
 
     assertEquals(19, routes.size());
-    assertEquals("Route{agency:1 BUS 1}", first(routes).toString());
+    assertEquals("Route{F:1 BUS 1}", first(routes).toString());
   }
 
   @Test

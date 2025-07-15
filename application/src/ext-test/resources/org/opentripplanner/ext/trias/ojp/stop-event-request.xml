@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ojp:OJP version="2.0" xmlns:ifopt="http://www.ifopt.org.uk/ifopt" xmlns:opengis="http://www.opengis.net/gml/3.2" xmlns:ns7="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ojp="http://www.vdv.de/ojp" xmlns:siri="http://www.siri.org.uk/siri" xmlns:acsb="http://www.ifopt.org.uk/acsb" xmlns:netex="http://www.netex.org.uk/netex">
+    <ojp:OJPRequest>
+        <siri:ServiceRequest>
+            <siri:RequestTimestamp>2025-01-27T13:34:00</siri:RequestTimestamp>
+            <siri:RequestorRef>OpenTripPlanner Explorer</siri:RequestorRef>
+            <ojp:OJPStopEventRequest>
+                <siri:RequestTimestamp>2025-01-27T13:34:00</siri:RequestTimestamp>
+                <siri:MessageIdentifier>mymessage-1</siri:MessageIdentifier>
+                <ojp:Location>
+                    <ojp:PlaceRef>
+                        <siri:StopPointRef>8507000</siri:StopPointRef>
+                    </ojp:PlaceRef>
+                    <ojp:DepArrTime>2025-02-13T13:03:36</ojp:DepArrTime>
+                    <ojp:IndividualTransportOption>
+                        <ojp:ItModeAndModeOfOperation>
+                            <ojp:PersonalMode>foot</ojp:PersonalMode>
+                        </ojp:ItModeAndModeOfOperation>
+                        <ojp:MaxDistance>999</ojp:MaxDistance>
+                    </ojp:IndividualTransportOption>
+                </ojp:Location>
+                <ojp:Params>
+                    <ojp:ModeFilter>
+                        <ojp:Exclude>true</ojp:Exclude>
+                        <ojp:PtMode>bus</ojp:PtMode>
+                    </ojp:ModeFilter>
+                    <ojp:LineFilter>
+                        <ojp:Line>
+                            <siri:LineRef>aaa</siri:LineRef>
+                        </ojp:Line>
+                        <ojp:Line>
+                            <siri:LineRef>bbb</siri:LineRef>
+                        </ojp:Line>
+                        <ojp:Line>
+                            <siri:LineRef>ccc</siri:LineRef>
+                        </ojp:Line>
+                        <ojp:Exclude>true</ojp:Exclude>
+                    </ojp:LineFilter>
+                    <ojp:OperatorFilter>
+                        <ojp:Exclude>true</ojp:Exclude>
+                        <ojp:OperatorRef>vvs-111</ojp:OperatorRef>
+                        <ojp:OperatorRef>vvs-222</ojp:OperatorRef>
+                    </ojp:OperatorFilter>
+                    <ojp:NumberOfResults>1</ojp:NumberOfResults>
+                    <ojp:StopEventType>departure</ojp:StopEventType>
+                    <ojp:IncludePreviousCalls>true</ojp:IncludePreviousCalls>
+                    <ojp:IncludeOnwardCalls>true</ojp:IncludeOnwardCalls>
+                    <ojp:UseRealtimeData>full</ojp:UseRealtimeData>
+                </ojp:Params>
+            </ojp:OJPStopEventRequest>
+        </siri:ServiceRequest>
+    </ojp:OJPRequest>
+</ojp:OJP>

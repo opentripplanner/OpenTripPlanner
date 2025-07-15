@@ -104,13 +104,6 @@ virtual servers, then switching a load balancer over to those new servers. Becau
 is complex and exposes potentially damaging functionality over the network, it has been removed from
 OTP2 to simplify the code base and make it easier to reason about security.
 
-### Routing request parameters
-
-Less parameters are available on the OTP2 REST API than in OTP1. Often there is no practical loss of
-functionality, just a different way of expressing things due to the new routing algorithms. A
-summary of parameters that have been removed and their replacements can be found in the [migration
-guide](Version-Comparison.md#migration-guide)
-
 ## OTP Trip planning and Transit index APIs
 
 OTP1 had two APIs for trip planning, the REST API and an GraphQL API (early version of the
@@ -119,7 +112,6 @@ GraphQL API, the only supported way of sending requests to the OTP routing engin
 
 Details of those two APIs are available at the following pages:
 
-
 - [GTFS GraphQL API](apis/GTFS-GraphQL-API.md) - HSL's GraphQL API used by the Digitransit
   project.
 - [Transmodel API](apis/TransmodelApi.md) - Entur's Transmodel API
@@ -127,6 +119,8 @@ Details of those two APIs are available at the following pages:
 The plan is to merge the two APIs above, clean it up and make it the new official API. The HSL API
 uses GTFS terminology, while the Entur API is Transmodel (NeTEx) based. Both APIs are similar in
 semantics and structure, and provide the same functionality. 
+
+The REST API of OTP1 has been permanently removed in 2025.
 
 ## Additional characteristics added in OTP2
 

@@ -31,7 +31,7 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
-import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
+import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSource;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.opentripplanner.utils.logging.Throttle;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -50,7 +50,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   private final Throttle unlinkedPlaceThrottle;
 
-  private final VehicleRentalDatasource source;
+  private final VehicleRentalDataSource source;
   private final String nameForLogging;
 
   private Map<StreetEdge, RentalRestrictionExtension> latestModifiedEdges = Map.of();
@@ -63,7 +63,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   public VehicleRentalUpdater(
     VehicleRentalUpdaterParameters parameters,
-    VehicleRentalDatasource source,
+    VehicleRentalDataSource source,
     VertexLinker vertexLinker,
     VehicleRentalRepository repository
   ) throws IllegalArgumentException {
@@ -228,9 +228,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         latestModifiedEdges.forEach(StreetEdge::removeRentalExtension);
 
-        var updater = new GeofencingVertexUpdater(
-          context.graph().getStreetIndex()::getEdgesForEnvelope
-        );
+        var updater = new GeofencingVertexUpdater(context.graph()::findEdges);
         latestModifiedEdges = updater.applyGeofencingZones(geofencingZones);
         latestAppliedGeofencingZones = geofencingZones;
 

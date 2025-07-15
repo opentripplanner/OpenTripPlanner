@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.impl;
 
-import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -137,7 +136,7 @@ public class GraphPathFinder {
     Set<Vertex> to
   ) {
     OTPRequestTimeoutException.checkForTimeout();
-    Instant reqTime = request.dateTime();
+    var reqTime = request.dateTime() == null ? RouteRequest.normalizeNow() : request.dateTime();
 
     List<GraphPath<State, Edge, Vertex>> paths = getPaths(request, from, to);
 

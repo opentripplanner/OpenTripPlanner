@@ -1,16 +1,16 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import gnu.trove.list.TLongList;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalInt;
+import java.util.function.Consumer;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
-import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
@@ -40,18 +40,25 @@ class ElevatorProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ElevatorProcessor.class);
 
-  private final DataImportIssueStore issueStore;
   private final OsmDatabase osmdb;
   private final VertexGenerator vertexGenerator;
+  private final Consumer<String> osmEntityDurationIssueConsumer;
 
   public ElevatorProcessor(
     DataImportIssueStore issueStore,
     OsmDatabase osmdb,
     VertexGenerator vertexGenerator
   ) {
-    this.issueStore = issueStore;
     this.osmdb = osmdb;
     this.vertexGenerator = vertexGenerator;
+    this.osmEntityDurationIssueConsumer = v ->
+      issueStore.add(
+        Issue.issue(
+          "InvalidDuration",
+          "Duration for osm node {} is not a valid duration: '{}'; the value is ignored.",
+          v
+        )
+      );
   }
 
   public void buildElevatorEdges(Graph graph) {
@@ -93,7 +100,10 @@ class ElevatorProcessor {
           levelName
         );
       }
-      int travelTime = parseDuration(node).orElse(-1);
+      long travelTime = node
+        .getDuration(osmEntityDurationIssueConsumer)
+        .map(Duration::toSeconds)
+        .orElse(-1L);
 
       var wheelchair = node.wheelchairAccessibility();
 
@@ -102,7 +112,7 @@ class ElevatorProcessor {
         wheelchair,
         !node.isBicycleExplicitlyDenied(),
         levels.length,
-        travelTime
+        (int) travelTime
       );
     } // END elevator edge loop
 
@@ -136,7 +146,10 @@ class ElevatorProcessor {
         );
       }
 
-      int travelTime = parseDuration(elevatorWay).orElse(-1);
+      long travelTime = elevatorWay
+        .getDuration(osmEntityDurationIssueConsumer)
+        .map(Duration::toSeconds)
+        .orElse(-1L);
       int levels = nodes.size();
       var wheelchair = elevatorWay.wheelchairAccessibility();
 
@@ -145,7 +158,7 @@ class ElevatorProcessor {
         wheelchair,
         !elevatorWay.isBicycleExplicitlyDenied(),
         levels,
-        travelTime
+        (int) travelTime
       );
       LOG.debug("Created elevatorHopEdges for way {}", elevatorWay.getId());
     }
@@ -220,18 +233,5 @@ class ElevatorProcessor {
     // https://www.openstreetmap.org/way/503412863
     // https://www.openstreetmap.org/way/187719215
     return nodeRefs.get(0) != nodeRefs.get(nodeRefs.size() - 1);
-  }
-
-  private OptionalInt parseDuration(OsmEntity element) {
-    return element.getTagAsInt("duration", v ->
-      issueStore.add(
-        Issue.issue(
-          "InvalidDuration",
-          "Duration for osm node %d is not a number: '%s'; it's replaced with '-1' (unknown).",
-          element.getId(),
-          v
-        )
-      )
-    );
   }
 }

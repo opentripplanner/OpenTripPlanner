@@ -8,7 +8,6 @@ import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * This filter removes all transit results which have a generalized-cost higher than the max-limit
@@ -36,7 +35,7 @@ public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
     List<Itinerary> transitItineraries = itineraries
       .stream()
       .filter(Itinerary::hasTransit)
-      .sorted(Comparator.comparingInt(Itinerary::getGeneralizedCostIncludingPenalty))
+      .sorted(Comparator.comparing(Itinerary::generalizedCostIncludingPenalty))
       .toList();
 
     return transitItineraries
@@ -46,20 +45,19 @@ public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
   }
 
   private boolean generalizedCostExceedsLimit(Itinerary subject, Itinerary transitItinerary) {
-    return subject.getGeneralizedCostIncludingPenalty() > calculateLimit(subject, transitItinerary);
+    return subject
+      .generalizedCostIncludingPenalty()
+      .greaterThan(calculateLimit(subject, transitItinerary));
   }
 
-  private int calculateLimit(Itinerary subject, Itinerary transitItinerary) {
-    return (
-      costLimitFunction
-        .calculate(Cost.costOfSeconds(transitItinerary.getGeneralizedCostIncludingPenalty()))
-        .toSeconds() +
-      getWaitTimeCost(transitItinerary, subject)
-    );
+  private Cost calculateLimit(Itinerary subject, Itinerary transitItinerary) {
+    return costLimitFunction
+      .calculate(transitItinerary.generalizedCostIncludingPenalty())
+      .plus(getWaitTimeCost(transitItinerary, subject));
   }
 
-  private int getWaitTimeCost(Itinerary a, Itinerary b) {
-    return IntUtils.round(
+  private Cost getWaitTimeCost(Itinerary a, Itinerary b) {
+    return Cost.costOfSeconds(
       intervalRelaxFactor *
       Math.min(
         Math.abs(ChronoUnit.SECONDS.between(a.startTime(), b.startTime())),

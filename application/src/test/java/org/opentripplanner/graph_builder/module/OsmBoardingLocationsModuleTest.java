@@ -116,7 +116,7 @@ class OsmBoardingLocationsModuleTest {
     );
 
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
+    graph.index();
 
     assertEquals(0, busVertex.getIncoming().size());
     assertEquals(0, busVertex.getOutgoing().size());
@@ -125,7 +125,7 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getOutgoing().size());
 
     var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
-    new OsmBoardingLocationsModule(graph, osmService, timetableRepository).buildGraph();
+    new OsmBoardingLocationsModule(graph, osmService).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module
@@ -216,6 +216,7 @@ class OsmBoardingLocationsModuleTest {
       .withBoardingAreaRefTags(Set.of("naptan:AtcoCode"))
       .build();
     osmModule.buildGraph();
+    graph.index();
 
     var factory = new VertexFactory(graph);
 
@@ -298,11 +299,9 @@ class OsmBoardingLocationsModuleTest {
       );
     }
 
-    var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     new OsmBoardingLocationsModule(
       graph,
-      new DefaultOsmInfoGraphBuildService(osmInfoRepository),
-      timetableRepository
+      new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);

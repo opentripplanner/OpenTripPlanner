@@ -32,7 +32,7 @@ public enum SortOrder {
   STREET_AND_DEPARTURE_TIME;
 
   /**
-   * The itineraries are sorted with by arrival time with the earliest arrival time first. When
+   * The itineraries are sorted by arrival time with the earliest arrival time first. When
    * paging we need to know which end of the list of itineraries we should crop. This method is used
    * to decide that together with the current page type (next/previous).
    * <p>

@@ -17,13 +17,14 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -83,7 +84,8 @@ public class SerializedGraphObject implements Serializable {
   public final DataImportIssueSummary issueSummary;
   public final StopConsolidationRepository stopConsolidationRepository;
   private final int routingTripPatternCounter;
-  public final EmissionsDataModel emissionsDataModel;
+  public final EmissionRepository emissionRepository;
+  public final FareServiceFactory fareServiceFactory;
   public final StreetLimitationParameters streetLimitationParameters;
   public final VehicleParkingRepository parkingRepository;
 
@@ -96,9 +98,10 @@ public class SerializedGraphObject implements Serializable {
     BuildConfig buildConfig,
     RouterConfig routerConfig,
     DataImportIssueSummary issueSummary,
-    EmissionsDataModel emissionsDataModel,
+    EmissionRepository emissionRepository,
     StopConsolidationRepository stopConsolidationRepository,
-    StreetLimitationParameters streetLimitationParameters
+    StreetLimitationParameters streetLimitationParameters,
+    FareServiceFactory fareServiceFactory
   ) {
     this.graph = graph;
     this.edges = graph.getEdges();
@@ -109,11 +112,12 @@ public class SerializedGraphObject implements Serializable {
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
     this.issueSummary = issueSummary;
-    this.emissionsDataModel = emissionsDataModel;
+    this.emissionRepository = emissionRepository;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();
     this.stopConsolidationRepository = stopConsolidationRepository;
     this.streetLimitationParameters = streetLimitationParameters;
+    this.fareServiceFactory = fareServiceFactory;
   }
 
   public static void verifyTheOutputGraphIsWritableIfDataSourceExist(DataSource graphOutput) {
@@ -223,11 +227,12 @@ public class SerializedGraphObject implements Serializable {
 
   @SuppressWarnings("Convert2MethodRef")
   private static OutputStream wrapOutputStreamWithProgressTracker(
+    String name,
     OutputStream outputStream,
     long size
   ) {
     return ProgressTracker.track(
-      "Save graph",
+      "Save " + name,
       500_000,
       size,
       outputStream,
@@ -256,7 +261,7 @@ public class SerializedGraphObject implements Serializable {
 
   private void save(OutputStream outputStream, String graphName, long size) {
     LOG.info("Writing graph {}  ...", graphName);
-    outputStream = wrapOutputStreamWithProgressTracker(outputStream, size);
+    outputStream = wrapOutputStreamWithProgressTracker(graphName, outputStream, size);
     Kryo kryo = KryoBuilder.create();
     Output output = new Output(outputStream);
     output.write(OtpProjectInfo.projectInfo().graphFileHeaderInfo.header());

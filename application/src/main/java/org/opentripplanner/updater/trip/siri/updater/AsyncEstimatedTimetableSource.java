@@ -2,7 +2,7 @@ package org.opentripplanner.updater.trip.siri.updater;
 
 import java.util.concurrent.Future;
 import java.util.function.Function;
-import uk.org.siri.siri20.ServiceDelivery;
+import uk.org.siri.siri21.ServiceDelivery;
 
 /**
  * A source of estimated timetables produced by an asynchronous (push) SIRI-ET feed.

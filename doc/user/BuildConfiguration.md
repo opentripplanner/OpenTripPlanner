@@ -26,9 +26,8 @@ Sections follow that describe particular settings in more depth.
 | [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)                       |       `double`       | The distance between elevation samples in meters.                                                                                                              | *Optional* | `10.0`                            |  2.0  |
 | embedRouterConfig                                                                         |       `boolean`      | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                                                   | *Optional* | `true`                            |  2.0  |
 | [graph](#graph)                                                                           |         `uri`        | URI to the graph object file for reading and writing.                                                                                                          | *Optional* |                                   |  2.0  |
-| [gsCredentials](#gsCredentials)                                                           |       `string`       | Local file system path to Google Cloud Platform service accounts credentials file.                                                                             | *Optional* |                                   |  2.0  |
 | [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)                   |       `boolean`      | Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.                                              | *Optional* | `false`                           |  2.0  |
-| maxAreaNodes                                                                              |       `integer`      | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                                  | *Optional* | `150`                             |  2.1  |
+| maxAreaNodes                                                                              |       `integer`      | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                                  | *Optional* | `200`                             |  2.1  |
 | [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                                 |       `integer`      | When to split the import report.                                                                                                                               | *Optional* | `1000`                            |  2.0  |
 | maxElevationPropagationMeters                                                             |       `integer`      | The maximum distance to propagate elevation to vertices which have no elevation.                                                                               | *Optional* | `2000`                            |  1.5  |
 | [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                                 |       `double`       | Maximum distance between route shapes and their stops.                                                                                                         | *Optional* | `150.0`                           |  2.1  |
@@ -55,8 +54,9 @@ Sections follow that describe particular settings in more depth.
 | demDefaults                                                                               |       `object`       | Default properties for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.3  |
 |    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)                        |       `double`       | Specify a multiplier to convert elevation units from source to meters.                                                                                         | *Optional* | `1.0`                             |  2.3  |
 | [elevationBucket](#elevationBucket)                                                       |       `object`       | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                             | *Optional* |                                   |   na  |
-| [emissions](sandbox/Emissions.md)                                                         |       `object`       | Emissions configuration.                                                                                                                                       | *Optional* |                                   |  2.5  |
+| [emission](sandbox/Emission.md)                                                           |       `object`       | Emissions configuration.                                                                                                                                       | *Optional* |                                   |  2.5  |
 | [fares](sandbox/Fares.md)                                                                 |       `object`       | Fare configuration.                                                                                                                                            | *Optional* |                                   |  2.0  |
+| gsConfig                                                                                  |       `object`       | Configuration for Google Cloud Storage                                                                                                                         | *Optional* |                                   |  2.8  |
 | gtfsDefaults                                                                              |       `object`       | The gtfsDefaults section allows you to specify default properties for GTFS files.                                                                              | *Optional* |                                   |  2.3  |
 |    blockBasedInterlining                                                                  |       `boolean`      | Whether to create stay-seated transfers in between two trips with the same block id.                                                                           | *Optional* | `true`                            |  2.3  |
 |    [discardMinTransferTimes](#gd_discardMinTransferTimes)                                 |       `boolean`      | Should minimum transfer times in GTFS files be discarded.                                                                                                      | *Optional* | `false`                           |  2.3  |
@@ -273,10 +273,9 @@ for detailed discussion of this.
 
 OTP allows you to adjust the elevation values reported in API responses in two ways. The first way
 is to store ellipsoid (GPS) elevation values internally, but apply a single geoid difference value
-in the OTP client where appropriate to display elevations above sea level. This ellipsoid to geoid
-difference is returned in each trip plan response in the
-[ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/ext/java/org/opentripplanner/ext/restapi/model/ElevationMetadata.java)
-field. Using a single value can be sufficient for smaller OTP deployments, but might result in
+in the OTP client where appropriate to display elevations above sea level. 
+
+Using a single value can be sufficient for smaller OTP deployments, but might result in
 incorrect values at the edges of larger OTP deployments. If your OTP instance uses this, it is
 recommended to set a default request value in the `router-config.json` file as follows:
 
@@ -453,20 +452,6 @@ The default is the approximate resolution of 1/3 arc-second NED data. This shoul
 URI to the graph object file for reading and writing.
 
 The file is created or overwritten if OTP saves the graph to the file.
-
-<h3 id="gsCredentials">gsCredentials</h3>
-
-**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
-**Path:** / 
-
-Local file system path to Google Cloud Platform service accounts credentials file.
-
-The credentials is used to access GCS urls. When using GCS from outside of Google Cloud you
-need to provide a path the the service credentials. Environment variables in the path are
-resolved.
-
-This is a path to a file on the local file system, not an URI.
-
 
 <h3 id="includeEllipsoidToGeoidDifference">includeEllipsoidToGeoidDifference</h3>
 
@@ -864,7 +849,7 @@ it is considered a match. Any legal Java Regular expression is allowed.
 
 Pattern for matching group NeTEx files.
 
-This field is used to match *group files* in the module file(zip file entries).
+This field is used to match *group files* in the module file (zip file entries).
 *group files* are loaded right the after *shared group files* are loaded.
 Files are grouped together by the first group pattern in the regular expression.
 The pattern `"(\w{3})-.*\.xml"` matches `"RUT-Line-208-Hagalia-Nevlunghavn.xml"`
@@ -878,7 +863,7 @@ with group `"RUT"`.
 
 Pattern for matching ignored files in a NeTEx bundle.
 
-This field is used to exclude matching *files* in the module file(zip file entries).
+This field is used to exclude matching *files* in the module file (zip file entries).
 The *ignored* files are *not* loaded.
 
 
@@ -909,7 +894,7 @@ File names are matched in the following order - and treated accordingly to the f
 
 Pattern for matching shared group NeTEx files in a NeTEx bundle.
 
-This field is used to match *shared group files* in the module file(zip file entries).
+This field is used to match *shared group files* in the module file (zip file entries).
 Typically this is used to group all files from one agency together.
 
 *Shared group files* are loaded after shared files, but before the matching group
@@ -1119,7 +1104,7 @@ with the `stopBoardAlightDuringTransferCost` parameter in the router configurati
 
 Pattern for matching group NeTEx files.
 
-This field is used to match *group files* in the module file(zip file entries).
+This field is used to match *group files* in the module file (zip file entries).
 *group files* are loaded right the after *shared group files* are loaded.
 Files are grouped together by the first group pattern in the regular expression.
 The pattern `"(\w{3})-.*\.xml"` matches `"RUT-Line-208-Hagalia-Nevlunghavn.xml"`
@@ -1133,7 +1118,7 @@ with group `"RUT"`.
 
 Pattern for matching ignored files in a NeTEx bundle.
 
-This field is used to exclude matching *files* in the module file(zip file entries).
+This field is used to exclude matching *files* in the module file (zip file entries).
 The *ignored* files are *not* loaded.
 
 
@@ -1164,7 +1149,7 @@ File names are matched in the following order - and treated accordingly to the f
 
 Pattern for matching shared group NeTEx files in a NeTEx bundle.
 
-This field is used to match *shared group files* in the module file(zip file entries).
+This field is used to match *shared group files* in the module file (zip file entries).
 Typically this is used to group all files from one agency together.
 
 *Shared group files* are loaded after shared files, but before the matching group
@@ -1302,10 +1287,6 @@ the centroid.
     }
   ],
   "stopConsolidationFile" : "consolidated-stops.csv",
-  "emissions" : {
-    "carAvgCo2PerKm" : 170,
-    "carAvgOccupancy" : 1.3
-  },
   "transferParametersForMode" : {
     "CAR" : {
       "disableDefaultTransfers" : true,

@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.createArgsCopy;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.executionContext;
 
 import java.util.List;
 import java.util.Locale;
@@ -17,27 +15,29 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 class RouteRequestMapperModesTest {
 
+  private final _RouteRequestTestContext testCtx = _RouteRequestTestContext.of(Locale.ENGLISH);
+
   @Test
   void testDirectOnly() {
-    var modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var modesArgs = testCtx.basicRequest();
     modesArgs.put("modes", Map.ofEntries(entry("directOnly", true)));
-    var env = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(modesArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     assertFalse(routeRequest.journey().transit().enabled());
   }
 
   @Test
   void testTransitOnly() {
-    var modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var modesArgs = testCtx.basicRequest();
     modesArgs.put("modes", Map.ofEntries(entry("transitOnly", true)));
-    var env = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(modesArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     assertEquals(StreetMode.NOT_SET, routeRequest.journey().direct().mode());
   }
 
   @Test
   void testStreetModesWithOneValidMode() {
-    var modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var modesArgs = testCtx.basicRequest();
     var bicycle = List.of("BICYCLE");
     modesArgs.put(
       "modes",
@@ -53,8 +53,8 @@ class RouteRequestMapperModesTest {
         )
       )
     );
-    var env = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(modesArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     assertEquals(StreetMode.CAR, routeRequest.journey().direct().mode());
     assertEquals(StreetMode.BIKE, routeRequest.journey().access().mode());
     assertEquals(StreetMode.BIKE, routeRequest.journey().egress().mode());
@@ -63,18 +63,18 @@ class RouteRequestMapperModesTest {
 
   @Test
   void testStreetModesWithOneInvalidMode() {
-    var modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var modesArgs = testCtx.basicRequest();
     var bicycleRental = List.of("BICYCLE_RENTAL");
     modesArgs.put("modes", Map.ofEntries(entry("direct", bicycleRental)));
-    var env = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(modesArgs);
     assertThrows(IllegalArgumentException.class, () ->
-      RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT)
+      RouteRequestMapper.toRouteRequest(env, testCtx.context())
     );
   }
 
   @Test
   void testStreetModesWithTwoValidModes() {
-    var modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var modesArgs = testCtx.basicRequest();
     var bicycleRental = List.of("BICYCLE_RENTAL", "WALK");
     modesArgs.put(
       "modes",
@@ -86,8 +86,8 @@ class RouteRequestMapperModesTest {
         )
       )
     );
-    var env = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(modesArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     assertEquals(StreetMode.BIKE_RENTAL, routeRequest.journey().direct().mode());
     assertEquals(StreetMode.BIKE_RENTAL, routeRequest.journey().access().mode());
     assertEquals(StreetMode.BIKE_RENTAL, routeRequest.journey().egress().mode());
@@ -96,7 +96,7 @@ class RouteRequestMapperModesTest {
 
   @Test
   void testStreetModesWithTwoInvalidModes() {
-    var modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var modesArgs = testCtx.basicRequest();
     var rentals = List.of("BICYCLE_RENTAL", "CAR_RENTAL");
     modesArgs.put(
       "modes",
@@ -105,12 +105,12 @@ class RouteRequestMapperModesTest {
         entry("transit", Map.ofEntries(entry("access", rentals), entry("egress", rentals)))
       )
     );
-    var rentalEnv = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var rentalEnv = testCtx.executionContext(modesArgs);
     assertThrows(IllegalArgumentException.class, () ->
-      RouteRequestMapper.toRouteRequest(rentalEnv, RouteRequestMapperTest.CONTEXT)
+      RouteRequestMapper.toRouteRequest(rentalEnv, testCtx.context())
     );
 
-    modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    modesArgs = testCtx.basicRequest();
     var bicycleWalk = List.of("BICYCLE", "WALK");
     modesArgs.put(
       "modes",
@@ -118,19 +118,15 @@ class RouteRequestMapperModesTest {
         entry("transit", Map.ofEntries(entry("access", bicycleWalk), entry("egress", bicycleWalk)))
       )
     );
-    var bicycleWalkEnv = executionContext(
-      modesArgs,
-      Locale.ENGLISH,
-      RouteRequestMapperTest.CONTEXT
-    );
+    var bicycleWalkEnv = testCtx.executionContext(modesArgs);
     assertThrows(IllegalArgumentException.class, () ->
-      RouteRequestMapper.toRouteRequest(bicycleWalkEnv, RouteRequestMapperTest.CONTEXT)
+      RouteRequestMapper.toRouteRequest(bicycleWalkEnv, testCtx.context())
     );
   }
 
   @Test
   void testStreetModesWithThreeModes() {
-    var modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var modesArgs = testCtx.basicRequest();
     var rentals = List.of("WALK", "BICYCLE_RENTAL", "CAR_RENTAL");
     modesArgs.put(
       "modes",
@@ -139,15 +135,15 @@ class RouteRequestMapperModesTest {
         entry("transit", Map.ofEntries(entry("access", rentals), entry("egress", rentals)))
       )
     );
-    var env = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(modesArgs);
     assertThrows(IllegalArgumentException.class, () ->
-      RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT)
+      RouteRequestMapper.toRouteRequest(env, testCtx.context())
     );
   }
 
   @Test
   void testTransitModes() {
-    var modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var modesArgs = testCtx.basicRequest();
     var tramCost = 1.5;
     modesArgs.put(
       "modes",
@@ -169,56 +165,56 @@ class RouteRequestMapperModesTest {
         )
       )
     );
-    var env = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(modesArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var reluctanceForMode = routeRequest.preferences().transit().reluctanceForMode();
     assertEquals(tramCost, reluctanceForMode.get(TransitMode.TRAM));
     assertNull(reluctanceForMode.get(TransitMode.FERRY));
     assertEquals(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: [FERRY, TRAM]}]}]",
+      "[(select: [(transportModes: [FERRY, TRAM])])]",
       routeRequest.journey().transit().filters().toString()
     );
   }
 
   @Test
   void testStreetModesWithEmptyModes() {
-    var modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var modesArgs = testCtx.basicRequest();
     var empty = List.of();
     modesArgs.put("modes", Map.ofEntries(entry("direct", empty)));
-    var directEnv = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var directEnv = testCtx.executionContext(modesArgs);
     assertThrows(IllegalArgumentException.class, () ->
-      RouteRequestMapper.toRouteRequest(directEnv, RouteRequestMapperTest.CONTEXT)
+      RouteRequestMapper.toRouteRequest(directEnv, testCtx.context())
     );
 
-    modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    modesArgs = testCtx.basicRequest();
     modesArgs.put("modes", Map.ofEntries(entry("transit", Map.ofEntries(entry("access", empty)))));
-    var accessEnv = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var accessEnv = testCtx.executionContext(modesArgs);
     assertThrows(IllegalArgumentException.class, () ->
-      RouteRequestMapper.toRouteRequest(accessEnv, RouteRequestMapperTest.CONTEXT)
+      RouteRequestMapper.toRouteRequest(accessEnv, testCtx.context())
     );
 
-    modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    modesArgs = testCtx.basicRequest();
     modesArgs.put("modes", Map.ofEntries(entry("transit", Map.ofEntries(entry("egress", empty)))));
-    var egressEnv = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var egressEnv = testCtx.executionContext(modesArgs);
     assertThrows(IllegalArgumentException.class, () ->
-      RouteRequestMapper.toRouteRequest(egressEnv, RouteRequestMapperTest.CONTEXT)
+      RouteRequestMapper.toRouteRequest(egressEnv, testCtx.context())
     );
 
-    modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    modesArgs = testCtx.basicRequest();
     modesArgs.put(
       "modes",
       Map.ofEntries(entry("transit", Map.ofEntries(entry("transfer", empty))))
     );
-    var transferEnv = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var transferEnv = testCtx.executionContext(modesArgs);
     assertThrows(IllegalArgumentException.class, () ->
-      RouteRequestMapper.toRouteRequest(transferEnv, RouteRequestMapperTest.CONTEXT)
+      RouteRequestMapper.toRouteRequest(transferEnv, testCtx.context())
     );
 
-    modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    modesArgs = testCtx.basicRequest();
     modesArgs.put("modes", Map.ofEntries(entry("transit", Map.ofEntries(entry("transit", empty)))));
-    var transitEnv = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var transitEnv = testCtx.executionContext(modesArgs);
     assertThrows(IllegalArgumentException.class, () ->
-      RouteRequestMapper.toRouteRequest(transitEnv, RouteRequestMapperTest.CONTEXT)
+      RouteRequestMapper.toRouteRequest(transitEnv, testCtx.context())
     );
   }
 }

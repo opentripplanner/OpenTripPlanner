@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder;
 
 import static org.opentripplanner.datastore.api.FileType.DEM;
+import static org.opentripplanner.datastore.api.FileType.EMISSION;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
@@ -14,17 +15,21 @@ import java.net.URI;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpBaseDirectory;
+import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
+import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
+import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -103,20 +108,47 @@ public class GraphBuilderDataSources {
     return inputData.containsKey(type);
   }
 
-  public Iterable<DataSource> get(FileType type) {
-    return inputData.get(type);
+  public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDataSource() {
+    return ofStream(OSM).map(this::mapOsmData).toList();
   }
 
-  public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDatasource() {
-    return inputData
-      .get(OSM)
-      .stream()
-      .map(it -> new ConfiguredDataSource<>(it, getOsmExtractConfig(it)))
-      .toList();
+  public Iterable<ConfiguredDataSource<DemExtractParameters>> getDemConfiguredDataSource() {
+    return ofStream(DEM).map(this::mapDemData).toList();
   }
 
-  private OsmExtractParameters getOsmExtractConfig(DataSource dataSource) {
-    return buildConfig.osm.parameters
+  public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getGtfsConfiguredDataSource() {
+    return ofStream(GTFS).map(this::mapGtfsFeed).toList();
+  }
+
+  public Iterable<
+    ConfiguredCompositeDataSource<NetexFeedParameters>
+  > getNetexConfiguredDataSource() {
+    return ofStream(NETEX).map(this::mapNetexFeed).toList();
+  }
+
+  public Iterable<ConfiguredDataSource<EmissionFeedParameters>> getEmissionConfiguredDataSource() {
+    return ofStream(EMISSION).map(this::mapEmissionFeed).toList();
+  }
+
+  /**
+   * Returns the optional data source for the stop consolidation configuration.
+   */
+  public Optional<DataSource> stopConsolidation() {
+    return store.stopConsolidation();
+  }
+
+  public CompositeDataSource getBuildReportDir() {
+    return store.getBuildReportDir();
+  }
+
+  public File getCacheDirectory() {
+    return cacheDirectory;
+  }
+
+  /* private methods */
+
+  private ConfiguredDataSource<OsmExtractParameters> mapOsmData(DataSource dataSource) {
+    var p = buildConfig.osm.parameters
       .stream()
       .filter(osmExtractConfig -> uriMatch(osmExtractConfig.source(), dataSource.uri()))
       .findFirst()
@@ -125,18 +157,11 @@ public class GraphBuilderDataSources {
           .withSource(dataSource.uri())
           .build()
       );
+    return new ConfiguredDataSource<>(dataSource, p);
   }
 
-  public Iterable<ConfiguredDataSource<DemExtractParameters>> getDemConfiguredDatasource() {
-    return inputData
-      .get(DEM)
-      .stream()
-      .map(it -> new ConfiguredDataSource<>(it, getDemExtractConfig(it)))
-      .toList();
-  }
-
-  private DemExtractParameters getDemExtractConfig(DataSource dataSource) {
-    return buildConfig.dem
+  private ConfiguredDataSource<DemExtractParameters> mapDemData(DataSource dataSource) {
+    var p = buildConfig.dem
       .demExtracts()
       .stream()
       .filter(demExtractConfig -> uriMatch(demExtractConfig.source(), dataSource.uri()))
@@ -146,47 +171,37 @@ public class GraphBuilderDataSources {
           .withSource(dataSource.uri())
           .build()
       );
+    return new ConfiguredDataSource<>(dataSource, p);
   }
 
-  public Iterable<ConfiguredDataSource<GtfsFeedParameters>> getGtfsConfiguredDatasource() {
-    return inputData
-      .get(GTFS)
-      .stream()
-      .map(it -> new ConfiguredDataSource<>(it, getGtfsFeedConfig(it)))
-      .toList();
-  }
-
-  private GtfsFeedParameters getGtfsFeedConfig(DataSource dataSource) {
-    return buildConfig.transitFeeds
+  private ConfiguredCompositeDataSource<GtfsFeedParameters> mapGtfsFeed(DataSource dataSource) {
+    var p = buildConfig.transitFeeds
       .gtfsFeeds()
       .stream()
       .filter(gtfsFeedConfig -> uriMatch(gtfsFeedConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(buildConfig.gtfsDefaults.copyOf().withSource(dataSource.uri()).build());
+      .orElse(buildConfig.gtfsDefaults.withFeedInfo().withSource(dataSource.uri()).build());
+    return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
   }
 
-  public Iterable<ConfiguredDataSource<NetexFeedParameters>> getNetexConfiguredDatasource() {
-    return inputData
-      .get(NETEX)
-      .stream()
-      .map(it -> new ConfiguredDataSource<>(it, getNetexConfig(it)))
-      .toList();
-  }
-
-  public NetexFeedParameters getNetexConfig(DataSource dataSource) {
-    return buildConfig.transitFeeds
+  private ConfiguredCompositeDataSource<NetexFeedParameters> mapNetexFeed(DataSource dataSource) {
+    var p = buildConfig.transitFeeds
       .netexFeeds()
       .stream()
       .filter(netexFeedConfig -> uriMatch(netexFeedConfig.source(), dataSource.uri()))
       .findFirst()
       .orElse(buildConfig.netexDefaults.copyOf().withSource(dataSource.uri()).build());
+    return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
   }
 
-  /**
-   * Returns the optional data source for the stop consolidation configuration.
-   */
-  public Optional<DataSource> stopConsolidation() {
-    return store.stopConsolidation();
+  private ConfiguredDataSource<EmissionFeedParameters> mapEmissionFeed(DataSource dataSource) {
+    var p = buildConfig.emission
+      .feeds()
+      .stream()
+      .filter(c -> uriMatch(c.source(), dataSource.uri()))
+      .findFirst()
+      .orElseThrow();
+    return new ConfiguredDataSource<>(dataSource, p);
   }
 
   /**
@@ -203,16 +218,6 @@ public class GraphBuilderDataSources {
         baseDirectory.toPath().resolve(configURI.toString()).toUri().equals(datasourceURI))
     );
   }
-
-  public CompositeDataSource getBuildReportDir() {
-    return store.getBuildReportDir();
-  }
-
-  public File getCacheDirectory() {
-    return cacheDirectory;
-  }
-
-  /* private methods */
 
   private boolean hasOneOf(FileType... types) {
     for (FileType type : types) {
@@ -299,5 +304,9 @@ public class GraphBuilderDataSources {
         skipData.putAll(type, store.listExistingSourcesFor(type));
       }
     }
+  }
+
+  private Stream<DataSource> ofStream(FileType type) {
+    return inputData.get(type).stream();
   }
 }

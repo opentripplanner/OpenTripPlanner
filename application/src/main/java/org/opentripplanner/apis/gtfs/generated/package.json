@@ -9,11 +9,12 @@
     "generate": "graphql-codegen -c graphql-codegen.yml"
   },
   "license": "LGPL-3.0",
+  "//": "once https://github.com/dotansimha/graphql-code-generator-community/pull/1095 has been merged, we can go back to the upstream version of @graphql-codegen/java",
   "dependencies": {
     "@graphql-codegen/add": "5.0.3",
-    "@graphql-codegen/cli": "5.0.5",
-    "@graphql-codegen/java": "4.0.1",
-    "@graphql-codegen/java-resolvers": "3.0.0",
-    "graphql": "16.10.0"
+    "@graphql-codegen/cli": "5.0.7",
+    "@graphql-codegen/java": "git+https://github.com/opentripplanner/graphql-code-generator-java.git#5190df9e4d85191716e812bc8bf4d3fbca4d54aa",
+    "@graphql-codegen/java-resolvers": "3.0.1",
+    "graphql": "16.11.0"
   }
 }

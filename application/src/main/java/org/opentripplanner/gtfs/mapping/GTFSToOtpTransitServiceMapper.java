@@ -8,6 +8,7 @@ import static org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP;
 
 import java.util.Collection;
 import java.util.function.Function;
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -42,16 +43,15 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final LocationGroupMapper locationGroupMapper;
 
-  private final FareAttributeMapper fareAttributeMapper = new FareAttributeMapper();
+  private final FareAttributeMapper fareAttributeMapper;
 
-  private final ServiceCalendarDateMapper serviceCalendarDateMapper =
-    new ServiceCalendarDateMapper();
+  private final ServiceCalendarDateMapper serviceCalendarDateMapper;
 
   private final FeedInfoMapper feedInfoMapper;
 
-  private final ShapePointMapper shapePointMapper = new ShapePointMapper();
+  private final ShapePointMapper shapePointMapper;
 
-  private final ServiceCalendarMapper serviceCalendarMapper = new ServiceCalendarMapper();
+  private final ServiceCalendarMapper serviceCalendarMapper;
 
   private final PathwayMapper pathwayMapper;
 
@@ -94,6 +94,7 @@ public class GTFSToOtpTransitServiceMapper {
     GtfsRelationalDao data,
     StopTransferPriority stationTransferPreference
   ) {
+    var idFactory = new IdFactory(feedId);
     this.issueStore = issueStore;
     this.builder = builder;
     // Create callbacks for mappers to retrieve stop and stations
@@ -102,29 +103,39 @@ public class GTFSToOtpTransitServiceMapper {
 
     this.data = data;
     this.discardMinTransferTimes = discardMinTransferTimes;
+    serviceCalendarMapper = new ServiceCalendarMapper(idFactory);
+    serviceCalendarDateMapper = new ServiceCalendarDateMapper(idFactory);
+    shapePointMapper = new ShapePointMapper(idFactory);
     translationHelper = new TranslationHelper();
     feedInfoMapper = new FeedInfoMapper(feedId);
-    agencyMapper = new AgencyMapper(feedId);
-    stationMapper = new StationMapper(translationHelper, stationTransferPreference);
-    stopMapper = new StopMapper(translationHelper, stationLookup, builder.siteRepository());
-    entranceMapper = new EntranceMapper(translationHelper, stationLookup);
-    pathwayNodeMapper = new PathwayNodeMapper(translationHelper, stationLookup);
-    boardingAreaMapper = new BoardingAreaMapper(translationHelper, stopLookup);
-    locationMapper = new LocationMapper(builder.siteRepository(), issueStore);
+    agencyMapper = new AgencyMapper(idFactory);
+    stationMapper = new StationMapper(idFactory, translationHelper, stationTransferPreference);
+    stopMapper = new StopMapper(
+      idFactory,
+      translationHelper,
+      stationLookup,
+      builder.siteRepository()
+    );
+    entranceMapper = new EntranceMapper(idFactory, translationHelper, stationLookup);
+    pathwayNodeMapper = new PathwayNodeMapper(idFactory, translationHelper, stationLookup);
+    boardingAreaMapper = new BoardingAreaMapper(idFactory, translationHelper, stopLookup);
+    locationMapper = new LocationMapper(idFactory, builder.siteRepository(), issueStore);
     locationGroupMapper = new LocationGroupMapper(
+      idFactory,
       stopMapper,
       locationMapper,
       builder.siteRepository()
     );
     pathwayMapper = new PathwayMapper(
+      idFactory,
       stopMapper,
       entranceMapper,
       pathwayNodeMapper,
       boardingAreaMapper
     );
-    routeMapper = new RouteMapper(agencyMapper, issueStore, translationHelper);
+    routeMapper = new RouteMapper(idFactory, agencyMapper, issueStore, translationHelper);
     directionMapper = new DirectionMapper(issueStore);
-    tripMapper = new TripMapper(routeMapper, directionMapper, translationHelper);
+    tripMapper = new TripMapper(idFactory, routeMapper, directionMapper, translationHelper);
     bookingRuleMapper = new BookingRuleMapper();
     stopTimeMapper = new StopTimeMapper(
       stopMapper,
@@ -135,22 +146,22 @@ public class GTFSToOtpTransitServiceMapper {
       translationHelper
     );
     frequencyMapper = new FrequencyMapper(tripMapper);
+    fareAttributeMapper = new FareAttributeMapper(idFactory);
     fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);
-    fareProductMapper = new FareProductMapper();
-    fareLegRuleMapper = new FareLegRuleMapper(fareProductMapper, issueStore);
-    fareTransferRuleMapper = new FareTransferRuleMapper(fareProductMapper, issueStore);
+    fareProductMapper = new FareProductMapper(idFactory);
+    fareLegRuleMapper = new FareLegRuleMapper(idFactory, fareProductMapper, issueStore);
+    fareTransferRuleMapper = new FareTransferRuleMapper(idFactory, fareProductMapper);
   }
 
   public OtpTransitServiceBuilder getBuilder() {
     return builder;
   }
 
-  public FareRulesData getFareRulesService() {
+  public FareRulesData fareRulesData() {
     return fareRulesBuilder;
   }
 
   public void mapStopTripAndRouteDataIntoBuilder() {
-    var siteRepository = builder.siteRepository();
     translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
 
     builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
@@ -188,16 +199,16 @@ public class GTFSToOtpTransitServiceMapper {
       .addAll(fareTransferRuleMapper.map(data.getAllFareTransferRules()));
   }
 
-  private void mapGtfsStopsToOtpTypes(Collection<org.onebusaway.gtfs.model.Stop> stops) {
+  private void mapGtfsStopsToOtpTypes(Collection<Stop> stops) {
     // Map station first, so we can link to them
-    for (org.onebusaway.gtfs.model.Stop it : stops) {
+    for (Stop it : stops) {
       if (it.getLocationType() == LOCATION_TYPE_STATION) {
         builder.siteRepository().withStation(stationMapper.map(it));
       }
     }
 
     // Map Stop, Entrance and PathwayNode, link to station
-    for (org.onebusaway.gtfs.model.Stop it : stops) {
+    for (Stop it : stops) {
       if (it.getLocationType() == LOCATION_TYPE_STOP) {
         builder.siteRepository().withRegularStop(stopMapper.map(it));
       } else if (it.getLocationType() == LOCATION_TYPE_ENTRANCE_EXIT) {
@@ -208,7 +219,7 @@ public class GTFSToOtpTransitServiceMapper {
     }
 
     // Map BoardingArea, link to stop
-    for (org.onebusaway.gtfs.model.Stop it : stops) {
+    for (Stop it : stops) {
       if (it.getLocationType() == LOCATION_TYPE_BOARDING_AREA) {
         builder.getBoardingAreas().add(boardingAreaMapper.map(it));
       }

@@ -9,8 +9,10 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
@@ -20,6 +22,10 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  */
 class InvalidInputTest implements RealtimeTestConstants {
 
+  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+
   public static List<LocalDate> cases() {
     return List.of(SERVICE_DATE.minusYears(10), SERVICE_DATE.plusYears(10));
   }
@@ -28,10 +34,10 @@ class InvalidInputTest implements RealtimeTestConstants {
   @MethodSource("cases")
   void invalidTripDate(LocalDate date) {
     var tripInput = TripInput.of(TRIP_1_ID)
-      .addStop(STOP_A1, "0:00:10", "0:00:11")
-      .addStop(STOP_B1, "0:00:20", "0:00:21")
+      .addStop(STOP_A, "0:00:10", "0:00:11")
+      .addStop(STOP_B, "0:00:20", "0:00:21")
       .build();
-    var env = RealtimeTestEnvironment.of().addTrip(tripInput).build();
+    var env = ENV_BUILDER.addTrip(tripInput).build();
 
     var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(2, 60, 80)

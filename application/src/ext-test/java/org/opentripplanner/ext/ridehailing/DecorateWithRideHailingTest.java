@@ -51,7 +51,7 @@ class DecorateWithRideHailingTest implements PlanTestConstants {
 
     var filtered = filter.filter(List.of(i));
 
-    var leg = filtered.get(0).getLegs().get(0);
+    var leg = filtered.get(0).legs().get(0);
 
     assertInstanceOf(RideHailingLeg.class, leg);
 

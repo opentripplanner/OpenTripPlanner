@@ -2,7 +2,7 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.transit.model.site.PathwayMode;
 
-public class PathwayModeMapper {
+class PathwayModeMapper {
 
   public static PathwayMode map(int pathwayMode) {
     return switch (pathwayMode) {

@@ -12,10 +12,11 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -35,7 +36,7 @@ public class BicycleRoutingTest {
     herrenbergGraph = model.graph();
 
     model.timetableRepository().index();
-    herrenbergGraph.index(model.timetableRepository().getSiteRepository());
+    herrenbergGraph.index();
   }
 
   /**
@@ -44,8 +45,8 @@ public class BicycleRoutingTest {
    */
   @Test
   public void shouldRespectGeneralNoThroughTraffic() {
-    var mozartStr = new GenericLocation(48.59713, 8.86107);
-    var fritzLeharStr = new GenericLocation(48.59696, 8.85806);
+    var mozartStr = GenericLocation.fromCoordinate(48.59713, 8.86107);
+    var fritzLeharStr = GenericLocation.fromCoordinate(48.59696, 8.85806);
 
     var polyline1 = computePolyline(herrenbergGraph, mozartStr, fritzLeharStr);
     assertThatPolylinesAreEqual(polyline1, "_srgHutau@h@B|@Jf@B?PdABJT@jA?DSp@_@fFsAT{@DBpC");
@@ -60,8 +61,8 @@ public class BicycleRoutingTest {
    */
   @Test
   public void shouldNotRespectMotorCarNoThru() {
-    var schiessmauer = new GenericLocation(48.59737, 8.86350);
-    var zeppelinStr = new GenericLocation(48.59972, 8.86239);
+    var schiessmauer = GenericLocation.fromCoordinate(48.59737, 8.86350);
+    var zeppelinStr = GenericLocation.fromCoordinate(48.59972, 8.86239);
 
     var polyline1 = computePolyline(herrenbergGraph, schiessmauer, zeppelinStr);
     assertThatPolylinesAreEqual(polyline1, "otrgH{cbu@S_AU_AmAdAyApAGDs@h@_@\\_ClBe@^?S");
@@ -71,15 +72,18 @@ public class BicycleRoutingTest {
   }
 
   private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(dateTime);
-    request.setFrom(from);
-    request.setTo(to);
-    request.withPreferences(p ->
-      p.withBike(it -> it.withOptimizeType(VehicleRoutingOptimizeType.SHORTEST_DURATION))
-    );
+    RouteRequest request = RouteRequest.of()
+      .withDateTime(dateTime)
+      .withFrom(from)
+      .withTo(to)
+      .withPreferences(p ->
+        p.withBike(it -> it.withOptimizeType(VehicleRoutingOptimizeType.SHORTEST_DURATION))
+      )
+      .withJourney(jb -> {
+        jb.withDirect(new StreetRequest(StreetMode.BIKE));
+      })
+      .buildRequest();
 
-    request.journey().direct().setMode(StreetMode.BIKE);
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
       request.from(),
@@ -102,7 +106,7 @@ public class BicycleRoutingTest {
     // make sure that we only get BICYCLE legs
     itineraries.forEach(i ->
       i
-        .getLegs()
+        .legs()
         .forEach(l -> {
           if (l instanceof StreetLeg stLeg) {
             assertEquals(TraverseMode.BICYCLE, stLeg.getMode());
@@ -111,7 +115,7 @@ public class BicycleRoutingTest {
           }
         })
     );
-    Geometry legGeometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
+    Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
     return EncodedPolyline.encode(legGeometry).points();
   }
 }

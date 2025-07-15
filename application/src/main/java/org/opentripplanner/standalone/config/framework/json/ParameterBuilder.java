@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.CO
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.DOUBLE;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.DURATION;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.FEED_SCOPED_ID;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.GRAM;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.INTEGER;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.LOCALE;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.LONG;
@@ -36,6 +37,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -149,6 +151,10 @@ public class ParameterBuilder {
 
   public int asInt(int defaultValue) {
     return ofOptional(INTEGER, defaultValue, JsonNode::asInt);
+  }
+
+  public Gram asGram(Gram defaultValue) {
+    return Gram.of(ofOptional(GRAM, defaultValue.toString(), JsonNode::asText));
   }
 
   public long asLong(long defaultValue) {

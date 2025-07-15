@@ -87,10 +87,6 @@ The following OTP-based services are presented as production-quality deployments
 by an official transportation authority or government. OTP is also known to be used on the back end
 of several popular multi-city mobile trip planning applications.
 
-* **The Netherlands (nationwide)** [Plannerstack Foundation](http://www.plannerstack.org/) provides
-  national scale trip planning APIs using OTP and other open source trip planners, based
-  on [OpenOV's extremely detailed open data](http://gtfs.openov.nl/) including minutely real-time
-  updates for every vehicle in the country.
 * [OTP Android](https://play.google.com/store/apps/details?id=edu.usf.cutr.opentripplanner.android)
   by CUTR-USF and Vreixo González can find itineraries on many different OTP servers via a service
   discovery mechanism.

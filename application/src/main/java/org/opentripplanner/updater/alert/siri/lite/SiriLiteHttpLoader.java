@@ -10,7 +10,7 @@ import org.opentripplanner.updater.support.siri.SiriHelper;
 import org.opentripplanner.updater.support.siri.SiriLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.Siri;
+import uk.org.siri.siri21.Siri;
 
 /**
  * Load real-time updates from SIRI-SX and SIRI-ET feeds over HTTP via a single request

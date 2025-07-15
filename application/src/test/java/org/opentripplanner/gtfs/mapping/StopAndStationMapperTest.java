@@ -49,6 +49,7 @@ public class StopAndStationMapperTest {
   private static final Stop STOP = new Stop();
 
   private final StopMapper subject = new StopMapper(
+    new IdFactory("A"),
     new TranslationHelper(),
     stationId -> null,
     new SiteRepository().withContext()

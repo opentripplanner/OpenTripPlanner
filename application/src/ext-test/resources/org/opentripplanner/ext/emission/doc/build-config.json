@@ -1,0 +1,12 @@
+{
+  "emission": {
+    "carAvgCo2PerKm": 170,
+    "carAvgOccupancy": 1.3,
+    "feeds": [
+      {
+        "feedId": "MY",
+        "source": "https://my.org/emissions/latest"
+      }
+    ]
+  }
+}

@@ -54,8 +54,9 @@ public class TransferCacheTest {
     TimetableRepository timetableRepository
   ) {
     IntStream.range(1, 7).forEach(reluctance -> {
-      RouteRequest routeRequest = new RouteRequest();
-      routeRequest.withPreferences(b -> b.withWalk(c -> c.withReluctance(reluctance)));
+      var routeRequest = RouteRequest.of()
+        .withPreferences(b -> b.withWalk(c -> c.withReluctance(reluctance)))
+        .buildDefault();
       timer.recordTimer("transfer_cache_computation", () ->
         timetableRepository.getRaptorTransitData().initTransferCacheForRequest(routeRequest)
       );

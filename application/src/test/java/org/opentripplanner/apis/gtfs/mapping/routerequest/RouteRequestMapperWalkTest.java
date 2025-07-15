@@ -2,8 +2,6 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.createArgsCopy;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.executionContext;
 
 import java.util.Locale;
 import java.util.Map;
@@ -12,9 +10,11 @@ import org.opentripplanner.framework.model.Cost;
 
 class RouteRequestMapperWalkTest {
 
+  private final _RouteRequestTestContext testCtx = _RouteRequestTestContext.of(Locale.ENGLISH);
+
   @Test
   void testWalkPreferences() {
-    var walkArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var walkArgs = testCtx.basicRequest();
     var reluctance = 7.5;
     var speed = 15d;
     var boardCost = Cost.costOfSeconds(50);
@@ -38,8 +38,8 @@ class RouteRequestMapperWalkTest {
         )
       )
     );
-    var env = executionContext(walkArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(walkArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var walkPreferences = routeRequest.preferences().walk();
     assertEquals(reluctance, walkPreferences.reluctance());
     assertEquals(speed, walkPreferences.speed());

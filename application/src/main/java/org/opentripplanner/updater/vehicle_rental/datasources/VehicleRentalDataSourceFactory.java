@@ -8,7 +8,7 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRent
 
 public class VehicleRentalDataSourceFactory {
 
-  public static VehicleRentalDatasource create(
+  public static VehicleRentalDataSource create(
     VehicleRentalDataSourceParameters source,
     OtpHttpClientFactory otpHttpClientFactory
   ) {
