@@ -48,6 +48,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add tracing tags for headers and query parameters to GTFS API [#6712](https://github.com/opentripplanner/OpenTripPlanner/pull/6712)
 - Reduce graph build memory by gc-ing OsmDatabase early [#6724](https://github.com/opentripplanner/OpenTripPlanner/pull/6724)
 - Allow filtering of intermediate stops in GraphQL API [#6725](https://github.com/opentripplanner/OpenTripPlanner/pull/6725)
+- VehicleRental: simplify form factor mapping to allow moped rentals [#6720](https://github.com/opentripplanner/OpenTripPlanner/pull/6720)
+- Extract interpolation logic for GTFS-RT trip time updater [#6729](https://github.com/opentripplanner/OpenTripPlanner/pull/6729)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)

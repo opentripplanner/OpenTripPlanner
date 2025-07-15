@@ -22,6 +22,7 @@ export function DepartureArrivalSelect({
       </Form.Label>
       <Form.Select
         size="sm"
+        className="input-medium"
         onChange={(e) => (e.target.value === 'arrival' ? onChange(true) : onChange(false))}
         value={tripQueryVariables.arriveBy ? 'arrival' : 'departure'}
         style={{ verticalAlign: 'bottom' }}

@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 class BackwardsDelayAlwaysInterpolatorTest {
 
   static final Trip TRIP = TimetableRepositoryForTest.trip("TRIP_ID").build();
-  public static final int STOP_COUNT = 5;
+  static final int STOP_COUNT = 5;
   static final ScheduledTripTimes SCHEDULED_TRIP_TIMES = TripTimesFactory.tripTimes(
     TRIP,
     TimetableRepositoryForTest.of().stopTimesEvery5Minutes(STOP_COUNT, TRIP, "00:00"),

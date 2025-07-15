@@ -329,7 +329,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-extended-scalars</artifactId>
-            <version>22.0</version>
+            <version>24.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
@@ -365,7 +365,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.55.4</version>
+            <version>1.55.5</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>

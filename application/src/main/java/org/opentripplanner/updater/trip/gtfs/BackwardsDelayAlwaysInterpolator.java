@@ -7,8 +7,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
  * This class fills in missing times before the first updated time by assuming that the vehicle
  * kept the same delay all the way from the starting stop to the first updated stop.
  */
-
-class BackwardsDelayAlwaysInterpolator extends BackwardsDelayInterpolatorBase {
+class BackwardsDelayAlwaysInterpolator extends AbstractBackwardsDelayInterpolator {
 
   @Override
   protected void fillInMissingTimes(RealTimeTripTimesBuilder builder, int firstUpdatedIndex) {
