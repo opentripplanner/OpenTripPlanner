@@ -25,8 +25,6 @@ class StopTimeMapper {
   private final TripMapper tripMapper;
   private final BookingRuleMapper bookingRuleMapper;
 
-  private final Map<org.onebusaway.gtfs.model.StopTime, StopTime> mappedStopTimes = new HashMap<>();
-
   private final TranslationHelper translationHelper;
 
   StopTimeMapper(
@@ -50,8 +48,8 @@ class StopTimeMapper {
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  StopTime map(org.onebusaway.gtfs.model.StopTime orginal) {
-    return orginal == null ? null : mappedStopTimes.computeIfAbsent(orginal, this::doMap);
+  private StopTime map(org.onebusaway.gtfs.model.StopTime orginal) {
+    return orginal == null ? null : this.doMap(orginal);
   }
 
   private StopTime doMap(org.onebusaway.gtfs.model.StopTime rhs) {

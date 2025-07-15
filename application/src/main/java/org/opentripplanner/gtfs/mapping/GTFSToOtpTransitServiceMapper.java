@@ -184,6 +184,8 @@ public class GTFSToOtpTransitServiceMapper {
 
     builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
     builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
+    // shape points is a large collection, so after mapping it can be cleared
+    data.getAllStopTimes().clear();
     builder.getFlexTimePenalty().putAll(tripMapper.flexSafeTimePenalties());
     builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
 
