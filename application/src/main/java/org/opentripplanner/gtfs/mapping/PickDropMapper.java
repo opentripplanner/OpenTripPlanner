@@ -2,12 +2,17 @@ package org.opentripplanner.gtfs.mapping;
 
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.model.PickDrop;
 
 public class PickDropMapper {
 
-  public static PickDrop map(String gtfsCode) {
-    return map(Integer.parseInt(gtfsCode));
+  public static PickDrop map(@Nullable String gtfsCode) {
+    if (gtfsCode == null || gtfsCode.isBlank()) {
+      return PickDrop.SCHEDULED;
+    } else {
+      return map(Integer.parseInt(gtfsCode));
+    }
   }
 
   public static PickDrop map(int gtfsCode) {

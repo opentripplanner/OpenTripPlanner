@@ -5,8 +5,11 @@ import java.time.LocalTime;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.BookingRule;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
@@ -15,7 +18,12 @@ import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 /** Responsible for mapping GTFS BookingRule into the OTP model. */
 class BookingRuleMapper {
 
-  private final Map<AgencyAndId, BookingInfo> cachedBookingInfos = new HashMap<>();
+  private final Map<FeedScopedId, BookingInfo> cachedBookingInfos = new HashMap<>();
+  private final IdFactory idFactory;
+
+  BookingRuleMapper(IdFactory idFactory) {
+    this.idFactory = idFactory;
+  }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
   BookingInfo map(BookingRule rule) {
@@ -23,7 +31,9 @@ class BookingRuleMapper {
       return null;
     }
 
-    return cachedBookingInfos.computeIfAbsent(rule.getId(), k ->
+    var id = idFactory.createId(rule.getId(), "booking rule");
+
+    return cachedBookingInfos.computeIfAbsent(id, k ->
       BookingInfo.of()
         .withContactInfo(contactInfo(rule))
         .withBookingMethods(bookingMethods())
@@ -36,6 +46,11 @@ class BookingRuleMapper {
         .withDropOffMessage(dropOffMessage(rule))
         .build()
     );
+  }
+
+  @Nullable
+  BookingInfo findBookingRule(FeedScopedId id) {
+    return cachedBookingInfos.get(id);
   }
 
   private ContactInfo contactInfo(BookingRule rule) {

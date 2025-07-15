@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.stream.Stream;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.DelimitedTextParser;
+import org.opentripplanner.utils.lang.StringUtils;
 
 public class StreamingCsvReader {
 
@@ -36,7 +37,8 @@ public class StreamingCsvReader {
   }
 
   private Stream<Map<String, String>> stream(String fileName) throws IOException {
-    var source = inputSource.getResource(fileName);
+    try(var source = inputSource.getResource(fileName)){
+
     var streamReader = new InputStreamReader(source);
     BufferedReader lineReader = new BufferedReader(streamReader);
 
@@ -53,15 +55,18 @@ public class StreamingCsvReader {
       .lines()
       .map(line -> {
         var elements = DelimitedTextParser.parse(line);
-        var values = new HashMap<String, String>();
+        var values = new HashMap<String, String>(fields.size());
 
         for (int i = 0; i < fields.size(); i++) {
-          String csvFieldName = fields.get(i);
-          String value = elements.get(i);
-          values.put(csvFieldName, value);
+          var fieldName = fields.get(i);
+          var value = elements.get(i);
+          if (StringUtils.hasValue(value)) {
+            values.put(fieldName, value);
+          }
         }
 
         return values;
       });
+    }
   }
 }

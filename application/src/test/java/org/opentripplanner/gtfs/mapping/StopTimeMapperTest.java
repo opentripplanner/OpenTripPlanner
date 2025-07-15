@@ -90,14 +90,12 @@ public class StopTimeMapperTest {
   private final StopTimeMapper subject = new StopTimeMapper(
     stopMapper,
     locationMapper,
-    locationGroupMapper,
     new TripMapper(
       ID_FACTORY,
       new RouteMapper(ID_FACTORY, new AgencyMapper(ID_FACTORY), ISSUE_STORE, translationHelper),
       new DirectionMapper(ISSUE_STORE),
       translationHelper
     ),
-    bookingRuleMapper,
     new TranslationHelper()
   );
 

@@ -110,14 +110,12 @@ public class TransferMapperTest {
     STOP_TIME_MAPPER = new StopTimeMapper(
       STOP_MAPPER,
       LOCATION_MAPPER,
-      LOCATION_GROUP_MAPPER,
       new TripMapper(
         ID_FACTORY,
         new RouteMapper(ID_FACTORY, new AgencyMapper(ID_FACTORY), ISSUE_STORE, TRANSLATION_HELPER),
         new DirectionMapper(ISSUE_STORE),
         TRANSLATION_HELPER
       ),
-      BOOKING_RULE_MAPPER,
       new TranslationHelper()
     );
 
