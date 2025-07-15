@@ -303,7 +303,8 @@ public class GeometryProcessor {
     List<List<IndexedLineSegment>> possibleSegmentsForStop,
     List<StopTime> stopTimes
   ) {
-    var prevSegmentIndex = Integer.MIN_VALUE;
+    IndexedLineSegment prevSegment = null;
+    var prevSegmentFraction = 0.0;
     List<LinearLocation> locations = new ArrayList<>(stopTimes.size());
     for (
       var stopPositionInPattern = 0;
@@ -328,7 +329,18 @@ public class GeometryProcessor {
       List<List<IndexedLineSegment>> continuousSegments = new LinkedList<>();
       for (IndexedLineSegment segment : possibleSegmentsForStop.get(stopPositionInPattern)) {
         //can't go backwards along line
-        if (segment.index >= prevSegmentIndex) {
+        if (prevSegment == null || segment.index >= prevSegment.index) {
+          // can't go backwards in the same segment
+          if (prevSegment != null && segment.index == prevSegment.index) {
+            var splitX = segment.start.x + (segment.end.x - segment.start.x) * prevSegmentFraction;
+            var splitY = segment.start.y + (segment.end.y - segment.start.y) * prevSegmentFraction;
+            var splitZ = segment.start.z + (segment.end.z - segment.start.z) * prevSegmentFraction;
+            segment = new IndexedLineSegment(
+              segment.index,
+              new Coordinate(splitX, splitY, splitZ),
+              segment.end
+            );
+          }
           boolean shouldStartNewSegment;
           if (continuousSegments.isEmpty()) {
             shouldStartNewSegment = true;
@@ -337,9 +349,10 @@ public class GeometryProcessor {
           } else {
             var lastSegment = continuousSegments.getLast().getLast();
             var segmentsForNextStop = possibleSegmentsForStop.get(stopPositionInPattern + 1);
+            var s = segment;
             shouldStartNewSegment = segmentsForNextStop
               .stream()
-              .anyMatch(item -> item.index > lastSegment.index && item.index < segment.index);
+              .anyMatch(item -> item.index > lastSegment.index && item.index < s.index);
           }
           if (shouldStartNewSegment) {
             // start a new continuous segment
@@ -360,13 +373,15 @@ public class GeometryProcessor {
         }
       }
       // we found one!
-      LinearLocation location = new LinearLocation(
-        0,
-        bestMatch.index,
-        bestMatch.fraction(stopCoord)
-      );
+      // best match may be the split segment with the previous stop, in this case we need to load the full segment
+      IndexedLineSegment matchedSegment = prevSegment != null &&
+        bestMatch.index == prevSegment.index
+        ? prevSegment
+        : bestMatch;
+      prevSegmentFraction = matchedSegment.fraction(stopCoord);
+      LinearLocation location = new LinearLocation(0, bestMatch.index, prevSegmentFraction);
       locations.add(location);
-      prevSegmentIndex = bestMatch.index;
+      prevSegment = matchedSegment;
     }
     return locations;
   }
