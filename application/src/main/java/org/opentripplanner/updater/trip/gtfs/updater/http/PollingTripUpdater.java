@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.updater.TripUpdateGraphWriterRunnable;
 import org.opentripplanner.updater.trip.metrics.BatchTripUpdateMetrics;
@@ -30,6 +31,10 @@ public class PollingTripUpdater extends PollingGraphUpdater {
   private final String feedId;
 
   /**
+   * Defines when delays are propagated to next stops.
+   */
+  private final ForwardsDelayPropagationType forwardsDelayPropagationType;
+  /**
    * Defines when delays are propagated to previous stops and if these stops are given the NO_DATA
    * flag.
    */
@@ -49,6 +54,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
     // Create update streamer from preferences
     this.feedId = parameters.feedId();
     this.updateSource = new HttpTripUpdateSource(parameters);
+    this.forwardsDelayPropagationType = parameters.forwardsDelayPropagationType();
     this.backwardsDelayPropagationType = parameters.backwardsDelayPropagationType();
     this.adapter = adapter;
     this.fuzzyTripMatching = parameters.fuzzyTripMatching();
@@ -77,6 +83,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
       TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
         adapter,
         fuzzyTripMatching,
+        forwardsDelayPropagationType,
         backwardsDelayPropagationType,
         incrementality,
         updates,
