@@ -101,10 +101,6 @@ class StopMapper {
     return builder.build();
   }
 
-  public SiteRepositoryBuilder siteRepositoryBuilder() {
-    return siteRepositoryBuilder;
-  }
-
   private void assertLocationTypeIsStop(Stop gtfsStop) {
     if (gtfsStop.getLocationType() != Stop.LOCATION_TYPE_STOP) {
       throw new IllegalArgumentException(

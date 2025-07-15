@@ -137,13 +137,7 @@ public class GTFSToOtpTransitServiceMapper {
     directionMapper = new DirectionMapper(issueStore);
     tripMapper = new TripMapper(idFactory, routeMapper, directionMapper, translationHelper);
     bookingRuleMapper = new BookingRuleMapper(idFactory);
-    stopTimeMapper = new StopTimeMapper(
-      idFactory,
-      stopMapper,
-      tripMapper,
-      bookingRuleMapper,
-      translationHelper
-    );
+    stopTimeMapper = new StopTimeMapper(idFactory, builder, bookingRuleMapper, translationHelper);
     frequencyMapper = new FrequencyMapper(tripMapper);
     fareAttributeMapper = new FareAttributeMapper(idFactory);
     fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);
@@ -187,6 +181,7 @@ public class GTFSToOtpTransitServiceMapper {
     builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
 
     builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
+    data.getAllBookingRules().forEach(bookingRuleMapper::map);
     builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(csvSource));
     builder.getFlexTimePenalty().putAll(tripMapper.flexSafeTimePenalties());
 

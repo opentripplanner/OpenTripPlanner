@@ -6,17 +6,15 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.onebusaway.csv_entities.CsvInputSource;
-import org.onebusaway.csv_entities.schema.DefaultEntitySchemaFactory;
-import org.onebusaway.csv_entities.schema.EntitySchema;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.opentripplanner.utils.lang.StringUtils;
 
 /**
@@ -24,54 +22,49 @@ import org.opentripplanner.utils.lang.StringUtils;
  */
 class StopTimeMapper {
 
-  public static final EntitySchema SCHEMA = new DefaultEntitySchemaFactory()
-    .getSchema(org.onebusaway.gtfs.model.StopTime.class);
-  public static final String TIMEPOINT = "timepoint";
-  public static final String SHAPE_DIST_TRAVELED = "shape_dist_traveled";
-  public static final String STOP_SEQUENCE = "stop_sequence";
-  public static final String DEPARTURE_TIME = "departure_time";
-  public static final String ARRIVAL_TIME = "arrival_time";
-  public static final String PICKUP_TYPE = "pickup_type";
-  public static final String DROP_OFF_TYPE = "drop_off_type";
-  public static final String PICKUP_BOOKING_RULE_ID = "pickup_booking_rule_id";
-  public static final String DROP_OFF_BOOKING_RULE_ID = "drop_off_booking_rule_id";
-  public static final String START_PICKUP_DROP_OFF_WINDOW = "start_pickup_drop_off_window";
-  public static final String END_PICKUP_DROP_OFF_WINDOW = "end_pickup_drop_off_window";
-  public static final String CONTINUOUS_PICKUP = "continuous_pickup";
-  public static final String CONTINUOUS_DROP_OFF = "continuous_drop_off";
+  private static final String TIMEPOINT = "timepoint";
+  private static final String SHAPE_DIST_TRAVELED = "shape_dist_traveled";
+  private static final String STOP_SEQUENCE = "stop_sequence";
+  private static final String DEPARTURE_TIME = "departure_time";
+  private static final String ARRIVAL_TIME = "arrival_time";
+  private static final String PICKUP_TYPE = "pickup_type";
+  private static final String DROP_OFF_TYPE = "drop_off_type";
+  private static final String PICKUP_BOOKING_RULE_ID = "pickup_booking_rule_id";
+  private static final String DROP_OFF_BOOKING_RULE_ID = "drop_off_booking_rule_id";
+  private static final String START_PICKUP_DROP_OFF_WINDOW = "start_pickup_drop_off_window";
+  private static final String END_PICKUP_DROP_OFF_WINDOW = "end_pickup_drop_off_window";
+  private static final String CONTINUOUS_PICKUP = "continuous_pickup";
+  private static final String CONTINUOUS_DROP_OFF = "continuous_drop_off";
+  private static final String STOP_ID = "stop_id";
+  private static final String LOCATION_ID = "location_id";
+  private static final String STOP_GROUP_ID = "stop_group_id";
+  private static final String STOP_HEADSIGN = "stop_headsign";
+  private static final String FILE = "stops_times.txt";
   private final IdFactory idFactory;
-
-  private final TripMapper tripMapper;
 
   private final BookingRuleMapper bookingRuleMapper;
   private final TranslationHelper translationHelper;
-  private final SiteRepositoryBuilder siteRepositoryBuilder;
+  private final OtpTransitServiceBuilder builder;
 
   StopTimeMapper(
     IdFactory idFactory,
-    StopMapper stopMapper,
-    TripMapper tripMapper,
+    OtpTransitServiceBuilder builder,
     BookingRuleMapper bookingRuleMapper,
     TranslationHelper translationHelper
   ) {
     this.idFactory = idFactory;
-    this.siteRepositoryBuilder = stopMapper.siteRepositoryBuilder();
-    this.tripMapper = tripMapper;
+    this.builder = builder;
     this.bookingRuleMapper = bookingRuleMapper;
     this.translationHelper = translationHelper;
   }
 
   Stream<StopTime> map(CsvInputSource inputSource) throws IOException {
-    var trips = tripMapper
-      .getMappedTrips()
-      .stream()
-      .collect(Collectors.toMap(AbstractTransitEntity::getId, t -> t));
     return new StreamingCsvReader(inputSource)
-      .rows(SCHEMA.getFilename())
-      .map(st -> this.doMap(new StopTimeRow(st, idFactory), trips));
+      .rows(FILE)
+      .map(st -> this.doMap(new StopTimeRow(st, idFactory), builder.getTripsById()));
   }
 
-  private StopTime doMap(StopTimeRow row, Map<FeedScopedId, Trip> trips) {
+  private StopTime doMap(StopTimeRow row, EntityById<Trip> trips) {
     StopTime lhs = new StopTime();
 
     var tripId = idFactory.createId(row.requiredString("trip_id"), "stop time's trip");
@@ -81,23 +74,36 @@ class StopTimeMapper {
     );
     lhs.setTrip(trip);
 
-    var stopId = row.string("stop_id");
-    var stopLocationId = row.string("stop_location_id");
-    var locationGroupId = row.string("stop_group_id");
+    var stopId = row.string(STOP_ID);
+    var stopLocationId = row.string(LOCATION_ID);
+    var locationGroupId = row.string(STOP_GROUP_ID);
 
+    var siteRepositoryBuilder = builder.siteRepository();
     if (stopId != null) {
       var id = idFactory.createId(stopId, "stop_time's stop");
-      lhs.setStop(Objects.requireNonNull(siteRepositoryBuilder.regularStopsById().get(id)));
+      var stop = Objects.requireNonNull(
+        siteRepositoryBuilder.regularStopsById().get(id),
+        "Stop '%s' not found".formatted(stopId)
+      );
+      lhs.setStop(stop);
     } else if (stopLocationId != null) {
-      var id = idFactory.createId(stopLocationId, "stop time's stop location");
-      lhs.setStop(Objects.requireNonNull(siteRepositoryBuilder.areaStopById().get(id)));
+      var id = idFactory.createId(stopLocationId, "stop time's location");
+      var stop = Objects.requireNonNull(
+        siteRepositoryBuilder.areaStopById().get(id),
+        "Stop location '%s' not found".formatted(id)
+      );
+      lhs.setStop(stop);
     } else if (locationGroupId != null) {
       var id = idFactory.createId(locationGroupId, "stop time's location group");
       lhs.setStop(Objects.requireNonNull(siteRepositoryBuilder.groupStopById().get(id)));
+    } else {
+      throw new IllegalArgumentException(
+        "Stop time must have either a %s, %s, or %s".formatted(STOP_ID, LOCATION_ID, STOP_GROUP_ID)
+      );
     }
 
-    lhs.setArrivalTime(row.requiredTime(ARRIVAL_TIME));
-    lhs.setDepartureTime(row.requiredTime(DEPARTURE_TIME));
+    lhs.setArrivalTime(row.time(ARRIVAL_TIME));
+    lhs.setDepartureTime(row.time(DEPARTURE_TIME));
     lhs.setStopSequence(row.integer(STOP_SEQUENCE));
 
     lhs.setTimepoint(row.integer(TIMEPOINT));
@@ -115,15 +121,26 @@ class StopTimeMapper {
       PickDropMapper.mapFlexContinuousPickDrop(row.integer(CONTINUOUS_DROP_OFF))
     );
 
+    row.optionalString(STOP_HEADSIGN).ifPresent(hs -> lhs.setStopHeadsign(I18NString.of(hs)));
     row
       .id(PICKUP_BOOKING_RULE_ID)
       .ifPresent(id ->
-        lhs.setPickupBookingInfo(Objects.requireNonNull(bookingRuleMapper.findBookingRule(id)))
+        lhs.setPickupBookingInfo(
+          Objects.requireNonNull(
+            bookingRuleMapper.findBookingRule(id),
+            "Pickup booking rule '%s' not found".formatted(id)
+          )
+        )
       );
     row
       .id(DROP_OFF_BOOKING_RULE_ID)
       .ifPresent(id ->
-        lhs.setPickupBookingInfo(Objects.requireNonNull(bookingRuleMapper.findBookingRule(id)))
+        lhs.setPickupBookingInfo(
+          Objects.requireNonNull(
+            bookingRuleMapper.findBookingRule(id),
+            "Drop off booking rule '%s' not found".formatted(id)
+          )
+        )
       );
 
     return lhs;
@@ -135,7 +152,7 @@ class StopTimeMapper {
         return row.get(field);
       } else {
         throw new IllegalArgumentException(
-          "Missing required field '%s' in stop time CSV row".formatted(field)
+          "Missing required field '%s' in stop time CSV row: %s".formatted(field, row)
         );
       }
     }
@@ -159,16 +176,6 @@ class StopTimeMapper {
       }
     }
 
-    public int requiredTime(String field) {
-      var value = row.get(field);
-      if (value != null) {
-        return getStringAsSeconds(value);
-      } else {
-        throw new IllegalArgumentException(
-          "Missing required field '%s' in stop_times.txt".formatted(field)
-        );
-      }
-    }
     public int time(String field) {
       var value = row.get(field);
       if (value != null) {
@@ -180,6 +187,10 @@ class StopTimeMapper {
 
     public Optional<FeedScopedId> id(String field) {
       return Optional.ofNullable(row.get(field)).map(s -> idFactory.createId(s, field));
+    }
+
+    public Optional<String> optionalString(String stopHeadsign) {
+      return Optional.ofNullable(row.get(stopHeadsign)).filter(StringUtils::hasValue);
     }
   }
 }

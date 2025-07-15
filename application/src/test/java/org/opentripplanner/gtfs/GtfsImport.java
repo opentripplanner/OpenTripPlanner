@@ -3,6 +3,8 @@ package org.opentripplanner.gtfs;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
@@ -11,11 +13,12 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsFeedIdResolver;
 class GtfsImport {
 
   private final String feedId;
+  private final GtfsReader reader;
 
   private GtfsMutableRelationalDao dao = null;
 
   GtfsImport(String defaultFeedId, File path) throws IOException {
-    GtfsReader reader = new GtfsReader();
+    reader = new GtfsReader();
     reader.setInputLocation(path);
 
     if (defaultFeedId != null) {
@@ -31,6 +34,10 @@ class GtfsImport {
 
   String getFeedId() {
     return feedId;
+  }
+
+  CsvInputSource inputSource() {
+    return reader.getInputSource();
   }
 
   /* private methods */
