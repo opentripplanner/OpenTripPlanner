@@ -50,6 +50,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Allow filtering of intermediate stops in GraphQL API [#6725](https://github.com/opentripplanner/OpenTripPlanner/pull/6725)
 - VehicleRental: simplify form factor mapping to allow moped rentals [#6720](https://github.com/opentripplanner/OpenTripPlanner/pull/6720)
 - fix(deps): update dependency com.graphql-java:graphql-java-extended-scalars to v24 [#6745](https://github.com/opentripplanner/OpenTripPlanner/pull/6745)
+- Extract interpolation logic for GTFS-RT trip time updater [#6729](https://github.com/opentripplanner/OpenTripPlanner/pull/6729)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
