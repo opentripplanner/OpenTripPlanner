@@ -14,7 +14,6 @@ import static org.opentripplanner.updater.trip.gtfs.moduletests.addition.AddedTe
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
@@ -89,7 +88,10 @@ public class ModifiedTest implements RealtimeTestConstants {
       );
       assertEquals(RealTimeState.DELETED, originalTripTimesForToday.getRealTimeState());
       assertEquals(I18NString.of("Original Headsign"), trip.getHeadsign());
-      assertEquals(I18NString.of("Original Headsign"), originalTripTimesScheduled.getTripHeadsign());
+      assertEquals(
+        I18NString.of("Original Headsign"),
+        originalTripTimesScheduled.getTripHeadsign()
+      );
       assertEquals(I18NString.of("Original Headsign"), originalTripTimesForToday.getTripHeadsign());
       assertEquals(I18NString.of("Original Headsign"), originalTripTimesScheduled.getHeadsign(0));
       assertEquals(I18NString.of("Original Headsign"), originalTripTimesScheduled.getHeadsign(1));

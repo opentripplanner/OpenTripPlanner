@@ -933,6 +933,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       stopTimes,
       deduplicator
     ).createRealTimeFromScheduledTimes();
+    builder.withTripHeadsign(I18NString.of(tripHeadsign));
 
     // Update all times to mark trip times as realtime
     for (int stopIndex = 0; stopIndex < builder.numberOfStops(); stopIndex++) {
