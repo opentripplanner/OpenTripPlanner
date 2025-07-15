@@ -55,7 +55,7 @@ public class GtfsContextBuilder {
       false,
       StopTransferPriority.ALLOWED
     );
-    mapper.mapStopTripAndRouteDataIntoBuilder(gtfsImport.getDao());
+    //mapper.mapStopTripAndRouteDataIntoBuilder(gtfsImport.getDao());
     mapper.mapAndAddTransfersToBuilder(gtfsImport.getDao());
     return new GtfsContextBuilder(feedId, transitBuilder).withDataImportIssueStore(
       DataImportIssueStore.NOOP

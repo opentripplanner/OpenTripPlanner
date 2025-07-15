@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -32,13 +33,13 @@ public class TripStopTimes {
     return list == null ? EMPTY_LIST : Collections.unmodifiableList(list);
   }
 
-  public void addAll(Collection<StopTime> values) {
+  public void addAll(Stream<StopTime> values) {
     Set<Trip> keysUpdated = new HashSet<>();
-    for (StopTime value : values) {
+    values.forEach(value -> {
       Trip key = value.getTrip();
       keysUpdated.add(key);
       map.computeIfAbsent(key, trip -> new ArrayList<>()).add(value);
-    }
+    });
     // Sort and updated stops for all keys touched.
     for (Trip key : keysUpdated) {
       Collections.sort(map.get(key));

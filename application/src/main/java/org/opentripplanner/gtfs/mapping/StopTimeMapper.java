@@ -1,22 +1,38 @@
 package org.opentripplanner.gtfs.mapping;
 
-import java.util.Collection;
-import java.util.HashMap;
+import static org.onebusaway.gtfs.serialization.mappings.StopTimeFieldMappingFactory.getStringAsSeconds;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.onebusaway.csv_entities.CsvInputSource;
+import org.onebusaway.csv_entities.schema.DefaultEntitySchemaFactory;
+import org.onebusaway.csv_entities.schema.DefaultFieldMapping;
+import org.onebusaway.csv_entities.schema.EntitySchema;
+import org.onebusaway.csv_entities.schema.EntitySchemaFactory;
+import org.onebusaway.csv_entities.schema.FieldMappingFactory;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.serialization.mappings.StopTimeFieldMappingFactory;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.utils.collection.MapUtils;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 
 /**
  * Responsible for mapping GTFS StopTime into the OTP Transit model.
  */
 class StopTimeMapper {
 
-  private final StopMapper stopMapper;
+  public static final String FILE = "stop_times.txt";
+  public static final EntitySchema SCHEMA = new DefaultEntitySchemaFactory().getSchema(org.onebusaway.gtfs.model.StopTime.class);
+  private final IdFactory idFactory;
 
   private final LocationMapper locationMapper;
 
@@ -26,8 +42,10 @@ class StopTimeMapper {
   private final BookingRuleMapper bookingRuleMapper;
 
   private final TranslationHelper translationHelper;
+  private final SiteRepositoryBuilder siteRepositoryBuilder;
 
   StopTimeMapper(
+    IdFactory idFactory,
     StopMapper stopMapper,
     LocationMapper locationMapper,
     LocationGroupMapper locationGroupMapper,
@@ -35,7 +53,8 @@ class StopTimeMapper {
     BookingRuleMapper bookingRuleMapper,
     TranslationHelper translationHelper
   ) {
-    this.stopMapper = stopMapper;
+    this.idFactory = idFactory;
+    this.siteRepositoryBuilder = stopMapper.siteRepositoryBuilder();
     this.locationMapper = locationMapper;
     this.locationGroupMapper = locationGroupMapper;
     this.tripMapper = tripMapper;
@@ -43,63 +62,56 @@ class StopTimeMapper {
     this.translationHelper = translationHelper;
   }
 
-  Collection<StopTime> map(Collection<org.onebusaway.gtfs.model.StopTime> times) {
-    return MapUtils.mapToList(times, this::map);
+  Stream<StopTime> map(CsvInputSource inputSource) throws IOException {
+    var trips = tripMapper.getMappedTrips().stream().collect(Collectors.toMap(AbstractTransitEntity::getId, t -> t));
+    if(inputSource.hasResource(FILE)){
+      var source = inputSource.getResource(FILE);
+      var streamReader = new InputStreamReader(source);
+      return new StreamingCsvReader().read(streamReader).map(st -> this.doMap(st, trips));
+    }
+    else {
+      return Stream.empty();
+    }
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe. */
-  private StopTime map(org.onebusaway.gtfs.model.StopTime orginal) {
-    return orginal == null ? null : this.doMap(orginal);
-  }
-
-  private StopTime doMap(org.onebusaway.gtfs.model.StopTime rhs) {
+  private StopTime doMap(Map<String, String> row, Map<FeedScopedId, Trip> trips) {
     StopTime lhs = new StopTime();
 
-    lhs.setTrip(tripMapper.map(rhs.getTrip()));
-    var stopLocation = rhs.getStopLocation();
-    Objects.requireNonNull(
-      stopLocation,
-      "Trip %s contains stop_time with no stop, location or group.".formatted(rhs.getTrip())
-    );
-    switch (stopLocation) {
-      case Stop stop -> lhs.setStop(stopMapper.map(stop));
-      case Location location -> lhs.setStop(locationMapper.map(location));
-      case LocationGroup locGroup -> lhs.setStop(locationGroupMapper.map(locGroup));
-      default -> throw new IllegalArgumentException(
-        "Unknown location type: %s".formatted(stopLocation)
-      );
+    var tripId = idFactory.createId(row.get("trip_id"), "stop time's trip");
+    var trip = Objects.requireNonNull(trips.get(tripId), "Stop time refers to non-existent trip with id %s".formatted(tripId));
+    lhs.setTrip(trip);
+
+    var stopId = row.get("stop_id");
+    var stopLocationId = row.get("stop_location_id");
+    var locationGroupId= row.get("stop_group_id");
+
+    if(stopId != null){
+      var id = idFactory.createId(stopId, "stop id");
+      lhs.setStop(Objects.requireNonNull(siteRepositoryBuilder.regularStopsById().get(id)));
     }
 
-    I18NString stopHeadsign = null;
-    if (rhs.getStopHeadsign() != null) {
-      stopHeadsign = translationHelper.getTranslation(
-        org.onebusaway.gtfs.model.StopTime.class,
-        "stopHeadsign",
-        rhs.getTrip().getId().toString(),
-        Integer.toString(rhs.getStopSequence()),
-        rhs.getStopHeadsign()
-      );
-    }
+    lhs.setArrivalTime(getStringAsSeconds(row.get("arrival_time")));
+    lhs.setDepartureTime(getStringAsSeconds(row.get("departure_time")));
+    //lhs.setTimepoint(row.getTimepoint());
+    lhs.setStopSequence(Integer.parseInt(row.get("stop_sequence")));
+    //lhs.setStopHeadsign(stopHeadsign);
+    lhs.setPickupType(PickDropMapper.map(row.get("pickup_type")));
+    lhs.setDropOffType(PickDropMapper.map(row.get("drop_off_type")));
 
-    lhs.setArrivalTime(rhs.getArrivalTime());
-    lhs.setDepartureTime(rhs.getDepartureTime());
-    lhs.setTimepoint(rhs.getTimepoint());
-    lhs.setStopSequence(rhs.getStopSequence());
-    lhs.setStopHeadsign(stopHeadsign);
-    lhs.setPickupType(PickDropMapper.map(rhs.getPickupType()));
-    lhs.setDropOffType(PickDropMapper.map(rhs.getDropOffType()));
-    lhs.setShapeDistTraveled(rhs.getShapeDistTraveled());
-    lhs.setFlexWindowStart(rhs.getStartPickupDropOffWindow());
-    lhs.setFlexWindowEnd(rhs.getEndPickupDropOffWindow());
+    /**
+    lhs.setShapeDistTraveled( row.get("shape_dist_traveled"));
+    lhs.setFlexWindowStart(row.getStartPickupDropOffWindow());
+    lhs.setFlexWindowEnd(row.getEndPickupDropOffWindow());
 
     lhs.setFlexContinuousPickup(
-      PickDropMapper.mapFlexContinuousPickDrop(rhs.getContinuousPickup())
+      PickDropMapper.mapFlexContinuousPickDrop(row.getContinuousPickup())
     );
     lhs.setFlexContinuousDropOff(
-      PickDropMapper.mapFlexContinuousPickDrop(rhs.getContinuousDropOff())
+      PickDropMapper.mapFlexContinuousPickDrop(row.getContinuousDropOff())
     );
-    lhs.setPickupBookingInfo(bookingRuleMapper.map(rhs.getPickupBookingRule()));
-    lhs.setDropOffBookingInfo(bookingRuleMapper.map(rhs.getDropOffBookingRule()));
+    lhs.setPickupBookingInfo(bookingRuleMapper.map(row.getPickupBookingRule()));
+    lhs.setDropOffBookingInfo(bookingRuleMapper.map(row.getDropOffBookingRule()));
+       */
 
     return lhs;
   }

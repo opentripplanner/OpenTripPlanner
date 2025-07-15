@@ -23,6 +23,7 @@ import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.RiderCategory;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.StopAreaElement;
+import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
@@ -147,7 +148,7 @@ public class GtfsModule implements GraphBuilderModule {
           gtfsBundle.parameters().discardMinTransferTimes(),
           gtfsBundle.parameters().stationTransferPreference()
         );
-        mapper.mapStopTripAndRouteDataIntoBuilder(gtfsDao);
+        mapper.mapStopTripAndRouteDataIntoBuilder(gtfsDao, gtfsBundle.getCsvInputSource());
 
         OtpTransitServiceBuilder builder = mapper.getBuilder();
         var fareRulesData = mapper.fareRulesData();
@@ -373,6 +374,9 @@ public class GtfsModule implements GraphBuilderModule {
    * it can easily lead to graph build failures.
    */
   private boolean skipEntityClass(Class<?> entityClass) {
+    if(entityClass == StopTime.class) {
+      return true;
+    }
     return OTPFeature.FaresV2.isOff() && FARES_V2_CLASSES.contains(entityClass);
   }
 

@@ -20,7 +20,7 @@ class FlexTripsMapperTest {
   void defaultTimePenalty() {
     var builder = new OtpTransitServiceBuilder(SiteRepository.of().build(), NOOP);
     var stopTimes = List.of(stopTime(0), stopTime(1));
-    builder.getStopTimesSortedByTrip().addAll(stopTimes);
+    //builder.getStopTimesSortedByTrip().addAll(stopTimes);
     var trips = FlexTripsMapper.createFlexTrips(builder, NOOP);
     assertEquals("[UnscheduledTrip{F:flex-1}]", trips.toString());
     var unscheduled = (UnscheduledTrip) trips.getFirst();

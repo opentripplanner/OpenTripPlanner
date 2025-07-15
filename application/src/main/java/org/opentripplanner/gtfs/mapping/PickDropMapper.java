@@ -6,6 +6,9 @@ import org.opentripplanner.model.PickDrop;
 
 public class PickDropMapper {
 
+  public static PickDrop map(String gtfsCode) {
+    return map(Integer.parseInt(gtfsCode));
+  }
   public static PickDrop map(int gtfsCode) {
     return switch (gtfsCode) {
       case 0 -> PickDrop.SCHEDULED;

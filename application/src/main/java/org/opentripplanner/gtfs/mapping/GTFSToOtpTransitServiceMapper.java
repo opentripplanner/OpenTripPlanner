@@ -6,8 +6,10 @@ import static org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE;
 import static org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION;
 import static org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.function.Function;
+import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsDao;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
@@ -136,6 +138,7 @@ public class GTFSToOtpTransitServiceMapper {
     tripMapper = new TripMapper(idFactory, routeMapper, directionMapper, translationHelper);
     bookingRuleMapper = new BookingRuleMapper();
     stopTimeMapper = new StopTimeMapper(
+      idFactory,
       stopMapper,
       locationMapper,
       locationGroupMapper,
@@ -160,7 +163,7 @@ public class GTFSToOtpTransitServiceMapper {
     return fareRulesBuilder;
   }
 
-  public void mapStopTripAndRouteDataIntoBuilder(GtfsRelationalDao data) {
+  public void mapStopTripAndRouteDataIntoBuilder(GtfsRelationalDao data, CsvInputSource csvSource) throws IOException {
     translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
 
     builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
@@ -182,12 +185,13 @@ public class GTFSToOtpTransitServiceMapper {
       builder.siteRepository().withGroupStops(locationGroupMapper.map(data.getAllLocationGroups()));
     }
 
+    builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
+
     builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
-    builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
+    builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(csvSource));
     // shape points is a large collection, so after mapping it can be cleared
     data.getAllStopTimes().clear();
     builder.getFlexTimePenalty().putAll(tripMapper.flexSafeTimePenalties());
-    builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
 
     fareRulesBuilder.fareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
     fareRulesBuilder.fareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
