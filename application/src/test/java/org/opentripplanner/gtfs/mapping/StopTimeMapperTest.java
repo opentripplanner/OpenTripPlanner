@@ -74,28 +74,18 @@ public class StopTimeMapperTest {
     stationId -> null,
     siteRepositoryBuilder
   );
-  private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
-  private final LocationMapper locationMapper = new LocationMapper(
-    ID_FACTORY,
-    siteRepositoryBuilder,
-    DataImportIssueStore.NOOP
-  );
-  private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
-    ID_FACTORY,
-    stopMapper,
-    locationMapper,
-    siteRepositoryBuilder
-  );
+  private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper(ID_FACTORY);
   private final TranslationHelper translationHelper = new TranslationHelper();
   private final StopTimeMapper subject = new StopTimeMapper(
+    ID_FACTORY,
     stopMapper,
-    locationMapper,
     new TripMapper(
       ID_FACTORY,
       new RouteMapper(ID_FACTORY, new AgencyMapper(ID_FACTORY), ISSUE_STORE, translationHelper),
       new DirectionMapper(ISSUE_STORE),
       translationHelper
     ),
+    bookingRuleMapper,
     new TranslationHelper()
   );
 

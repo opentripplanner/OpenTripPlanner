@@ -37,36 +37,35 @@ public class StreamingCsvReader {
   }
 
   private Stream<Map<String, String>> stream(String fileName) throws IOException {
-    try(var source = inputSource.getResource(fileName)){
+    try (var source = inputSource.getResource(fileName)) {
+      var streamReader = new InputStreamReader(source);
+      BufferedReader lineReader = new BufferedReader(streamReader);
 
-    var streamReader = new InputStreamReader(source);
-    BufferedReader lineReader = new BufferedReader(streamReader);
+      // Skip the initial UTF BOM, if present
+      lineReader.mark(1);
+      int c = lineReader.read();
 
-    // Skip the initial UTF BOM, if present
-    lineReader.mark(1);
-    int c = lineReader.read();
+      if (c != 0xFEFF) {
+        lineReader.reset();
+      }
+      var fields = DelimitedTextParser.parse(lineReader.readLine()).stream().toList();
 
-    if (c != 0xFEFF) {
-      lineReader.reset();
-    }
-    var fields = DelimitedTextParser.parse(lineReader.readLine()).stream().toList();
+      return lineReader
+        .lines()
+        .map(line -> {
+          var elements = DelimitedTextParser.parse(line);
+          var values = new HashMap<String, String>(fields.size());
 
-    return lineReader
-      .lines()
-      .map(line -> {
-        var elements = DelimitedTextParser.parse(line);
-        var values = new HashMap<String, String>(fields.size());
-
-        for (int i = 0; i < fields.size(); i++) {
-          var fieldName = fields.get(i);
-          var value = elements.get(i);
-          if (StringUtils.hasValue(value)) {
-            values.put(fieldName, value);
+          for (int i = 0; i < fields.size(); i++) {
+            var fieldName = fields.get(i);
+            var value = elements.get(i);
+            if (StringUtils.hasValue(value)) {
+              values.put(fieldName, value);
+            }
           }
-        }
 
-        return values;
-      });
+          return values;
+        });
     }
   }
 }
