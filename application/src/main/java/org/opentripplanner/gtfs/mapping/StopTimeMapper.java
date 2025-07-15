@@ -3,22 +3,13 @@ package org.opentripplanner.gtfs.mapping;
 import static org.onebusaway.gtfs.serialization.mappings.StopTimeFieldMappingFactory.getStringAsSeconds;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.schema.DefaultEntitySchemaFactory;
-import org.onebusaway.csv_entities.schema.DefaultFieldMapping;
 import org.onebusaway.csv_entities.schema.EntitySchema;
-import org.onebusaway.csv_entities.schema.EntitySchemaFactory;
-import org.onebusaway.csv_entities.schema.FieldMappingFactory;
-import org.onebusaway.gtfs.model.Location;
-import org.onebusaway.gtfs.model.LocationGroup;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.serialization.mappings.StopTimeFieldMappingFactory;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -30,8 +21,8 @@ import org.opentripplanner.transit.service.SiteRepositoryBuilder;
  */
 class StopTimeMapper {
 
-  public static final String FILE = "stop_times.txt";
-  public static final EntitySchema SCHEMA = new DefaultEntitySchemaFactory().getSchema(org.onebusaway.gtfs.model.StopTime.class);
+  public static final EntitySchema SCHEMA = new DefaultEntitySchemaFactory()
+    .getSchema(org.onebusaway.gtfs.model.StopTime.class);
   private final IdFactory idFactory;
 
   private final LocationMapper locationMapper;
@@ -63,29 +54,30 @@ class StopTimeMapper {
   }
 
   Stream<StopTime> map(CsvInputSource inputSource) throws IOException {
-    var trips = tripMapper.getMappedTrips().stream().collect(Collectors.toMap(AbstractTransitEntity::getId, t -> t));
-    if(inputSource.hasResource(FILE)){
-      var source = inputSource.getResource(FILE);
-      var streamReader = new InputStreamReader(source);
-      return new StreamingCsvReader().read(streamReader).map(st -> this.doMap(st, trips));
-    }
-    else {
-      return Stream.empty();
-    }
+    var trips = tripMapper
+      .getMappedTrips()
+      .stream()
+      .collect(Collectors.toMap(AbstractTransitEntity::getId, t -> t));
+    return new StreamingCsvReader(inputSource)
+      .rows(SCHEMA.getFilename())
+      .map(st -> this.doMap(st, trips));
   }
 
   private StopTime doMap(Map<String, String> row, Map<FeedScopedId, Trip> trips) {
     StopTime lhs = new StopTime();
 
     var tripId = idFactory.createId(row.get("trip_id"), "stop time's trip");
-    var trip = Objects.requireNonNull(trips.get(tripId), "Stop time refers to non-existent trip with id %s".formatted(tripId));
+    var trip = Objects.requireNonNull(
+      trips.get(tripId),
+      "Stop time refers to non-existent trip with id %s".formatted(tripId)
+    );
     lhs.setTrip(trip);
 
     var stopId = row.get("stop_id");
     var stopLocationId = row.get("stop_location_id");
-    var locationGroupId= row.get("stop_group_id");
+    var locationGroupId = row.get("stop_group_id");
 
-    if(stopId != null){
+    if (stopId != null) {
       var id = idFactory.createId(stopId, "stop id");
       lhs.setStop(Objects.requireNonNull(siteRepositoryBuilder.regularStopsById().get(id)));
     }

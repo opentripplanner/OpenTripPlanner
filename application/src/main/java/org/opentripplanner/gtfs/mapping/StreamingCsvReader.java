@@ -16,13 +16,30 @@ package org.opentripplanner.gtfs.mapping;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;
+import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.DelimitedTextParser;
 
 public class StreamingCsvReader {
 
-  public Stream<Map<String, String>> read(Reader reader) throws IOException {
+  private final CsvInputSource inputSource;
 
-    BufferedReader lineReader = new BufferedReader(reader);
+  public StreamingCsvReader(CsvInputSource inputSource) {
+    this.inputSource = Objects.requireNonNull(inputSource);
+  }
+
+  public Stream<Map<String, String>> rows(String fileName) throws IOException {
+    if (inputSource.hasResource(fileName)) {
+      return stream(fileName);
+    } else {
+      return Stream.empty();
+    }
+  }
+
+  private Stream<Map<String, String>> stream(String fileName) throws IOException {
+    var source = inputSource.getResource(fileName);
+    var streamReader = new InputStreamReader(source);
+    BufferedReader lineReader = new BufferedReader(streamReader);
+
     // Skip the initial UTF BOM, if present
     lineReader.mark(1);
     int c = lineReader.read();
@@ -33,19 +50,18 @@ public class StreamingCsvReader {
     var fields = DelimitedTextParser.parse(lineReader.readLine()).stream().toList();
 
     return lineReader
-        .lines()
-        .map(
-            line -> {
-              var elements = DelimitedTextParser.parse(line);
-              var values = new HashMap<String, String>();
+      .lines()
+      .map(line -> {
+        var elements = DelimitedTextParser.parse(line);
+        var values = new HashMap<String, String>();
 
-              for (int i = 0; i < fields.size(); i++) {
-                String csvFieldName = fields.get(i);
-                String value = elements.get(i);
-                values.put(csvFieldName, value);
-              }
+        for (int i = 0; i < fields.size(); i++) {
+          String csvFieldName = fields.get(i);
+          String value = elements.get(i);
+          values.put(csvFieldName, value);
+        }
 
-              return values;
-            });
+        return values;
+      });
   }
 }

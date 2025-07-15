@@ -20,8 +20,6 @@ class StopMapper {
   private final IdFactory idFactory;
   private final Map<org.onebusaway.gtfs.model.Stop, RegularStop> mappedStops = new HashMap<>();
 
-
-
   private final SiteRepositoryBuilder siteRepositoryBuilder;
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;
@@ -102,9 +100,11 @@ class StopMapper {
 
     return builder.build();
   }
+
   public SiteRepositoryBuilder siteRepositoryBuilder() {
     return siteRepositoryBuilder;
   }
+
   private void assertLocationTypeIsStop(Stop gtfsStop) {
     if (gtfsStop.getLocationType() != Stop.LOCATION_TYPE_STOP) {
       throw new IllegalArgumentException(

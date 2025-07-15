@@ -163,7 +163,8 @@ public class GTFSToOtpTransitServiceMapper {
     return fareRulesBuilder;
   }
 
-  public void mapStopTripAndRouteDataIntoBuilder(GtfsRelationalDao data, CsvInputSource csvSource) throws IOException {
+  public void mapStopTripAndRouteDataIntoBuilder(GtfsRelationalDao data, CsvInputSource csvSource)
+    throws IOException {
     translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
 
     builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
@@ -172,7 +173,7 @@ public class GTFSToOtpTransitServiceMapper {
     builder.getFeedInfos().addAll(feedInfoMapper.map(data.getAllFeedInfos()));
     builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
     builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
-    var shapes = shapePointMapper.map(data.getAllShapePoints());
+    var shapes = shapePointMapper.map(csvSource);
     builder.getShapePoints().putAll(shapes);
     // shape points is a large collection, so after mapping it can be cleared
     data.getAllShapePoints().clear();
@@ -189,8 +190,6 @@ public class GTFSToOtpTransitServiceMapper {
 
     builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
     builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(csvSource));
-    // shape points is a large collection, so after mapping it can be cleared
-    data.getAllStopTimes().clear();
     builder.getFlexTimePenalty().putAll(tripMapper.flexSafeTimePenalties());
 
     fareRulesBuilder.fareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
