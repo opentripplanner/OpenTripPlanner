@@ -311,6 +311,7 @@ public class GtfsModule implements GraphBuilderModule {
   private GtfsMutableRelationalDao loadBundle(GtfsBundle gtfsBundle) throws IOException {
     var dao = new GtfsRelationalDaoImpl();
     dao.setPackShapePoints(true);
+    dao.setPackStopTimes(true);
     StoreImpl store = new StoreImpl(dao);
     store.open();
     LOG.info("reading {}", gtfsBundle.feedInfo());

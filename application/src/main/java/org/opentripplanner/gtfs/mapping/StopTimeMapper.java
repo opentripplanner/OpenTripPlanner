@@ -101,12 +101,6 @@ class StopTimeMapper {
     lhs.setPickupBookingInfo(bookingRuleMapper.map(rhs.getPickupBookingRule()));
     lhs.setDropOffBookingInfo(bookingRuleMapper.map(rhs.getDropOffBookingRule()));
 
-    // Skip mapping of proxy
-    // private transient StopTimeProxy proxy;
-    if (rhs.getProxy() != null) {
-      throw new IllegalStateException("Did not expect proxy to be set!");
-    }
-
     return lhs;
   }
 }
