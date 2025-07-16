@@ -122,7 +122,9 @@ class GraphQLIntegrationTest {
   private static final Station OMEGA = TEST_MODEL.station("Omega").build();
   private static final Place A = TEST_MODEL.place("A", 5.0, 8.0);
   private static final Place B = TEST_MODEL.place("B", 6.0, 8.5);
-  private static final Place C = TEST_MODEL.place("C", 7.0, 9.0);
+  private static final Place C = TEST_MODEL.place("C", builder ->
+    builder.withParentStation(OMEGA).withCoordinate(7.0, 9.0)
+  );
   private static final Place D = TEST_MODEL.place("D", 8.0, 9.5);
   private static final Place E = TEST_MODEL.place("E", 9.0, 10.0);
   private static final Place F = TEST_MODEL.place("F", 9.0, 10.5);
@@ -355,6 +357,7 @@ class GraphQLIntegrationTest {
       .build();
 
     var entitySelector = new EntitySelector.Stop(A.stop.getId());
+    var stationEntitySelector = new EntitySelector.Stop(OMEGA.getId());
     var alert = TransitAlert.of(id("an-alert"))
       .withHeaderText(I18NString.of("A header"))
       .withDescriptionText(I18NString.of("A description"))
@@ -366,6 +369,12 @@ class GraphQLIntegrationTest {
       .addTimePeriod(
         new TimePeriod(ALERT_START_TIME.getEpochSecond(), ALERT_END_TIME.getEpochSecond())
       )
+      .build();
+    var stationAlert = TransitAlert.of(id("a-station-alert"))
+      .withHeaderText(I18NString.of("Station closed"))
+      .withDescriptionText(I18NString.of("This station is currently closed"))
+      .withEffect(AlertEffect.NO_SERVICE)
+      .addEntity(stationEntitySelector)
       .build();
 
     // TODO - Use itineraryBuilder() here not build() and complete building the itinerary using
@@ -403,7 +412,7 @@ class GraphQLIntegrationTest {
     var emission = Emission.ofCo2Gram(123.0);
     i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
-    var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
+    var alerts = ListUtils.combine(List.of(alert, stationAlert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);
 
     var realtimeVehicleService = new DefaultRealtimeVehicleService(transitService);
