@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
@@ -29,10 +30,13 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.routing.alternativelegs.NavigationDirection;
+import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.service.TransitService;
 
 public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
@@ -271,12 +275,24 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<Boolean> walkingBike() {
-    return environment -> getSource(environment).walkingBike();
+  public DataFetcher<TripOnServiceDate> tripOnServiceDate() {
+    return env -> {
+      var leg = getSource(env);
+      if (leg.isTransitLeg()) {
+        var trip = leg.trip();
+        return TripOnServiceDate.of(trip.getId())
+          .withTrip(trip)
+          .withServiceDate(leg.serviceDate())
+          .build();
+      } else {
+        return null;
+      }
+    };
   }
 
-  private Leg getSource(DataFetchingEnvironment environment) {
-    return environment.getSource();
+  @Override
+  public DataFetcher<Boolean> walkingBike() {
+    return environment -> getSource(environment).walkingBike();
   }
 
   @Override
@@ -346,5 +362,13 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       }
       return LegReferenceSerializer.encode(ref);
     };
+  }
+
+  private Leg getSource(DataFetchingEnvironment environment) {
+    return environment.getSource();
+  }
+
+  private TransitService transitService(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().transitService();
   }
 }

@@ -193,6 +193,17 @@ public class TripTimeOnDate {
     return tripTimes;
   }
 
+  /**
+   * Returns true if there are either a scheduled arrival or a scheduled departure time.
+   * If neither is the case, this indicates that it's a flexible time window instead.
+   */
+  public boolean hasScheduledTimes() {
+    return (
+      tripTimes.getScheduledArrivalTime(stopIndex) != StopTime.MISSING_VALUE &&
+      tripTimes.getScheduledDepartureTime(stopIndex) != StopTime.MISSING_VALUE
+    );
+  }
+
   public int getScheduledArrival() {
     return tripTimes.getScheduledArrivalTime(stopIndex);
   }

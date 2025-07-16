@@ -25,6 +25,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorC
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
+import org.opentripplanner.apis.gtfs.model.CallScheduledTime;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
@@ -264,7 +265,7 @@ public class GraphQLDataFetchers {
 
   /** What is scheduled for a trip on a service date for a stop location. */
   public interface GraphQLCallSchedule {
-    public DataFetcher<Object> time();
+    public DataFetcher<CallScheduledTime> time();
   }
 
   /** Scheduled times for a trip on a service date for a stop location. */
@@ -272,6 +273,12 @@ public class GraphQLDataFetchers {
 
   /** Location where a transit vehicle stops at. */
   public interface GraphQLCallStopLocation extends TypeResolver {}
+
+  public interface GraphQLCallWindow {
+    public DataFetcher<java.time.OffsetDateTime> end();
+
+    public DataFetcher<java.time.OffsetDateTime> start();
+  }
 
   /** Car park represents a location where cars can be parked. */
   public interface GraphQLCarPark {
@@ -585,6 +592,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Trip> trip();
 
+    public DataFetcher<TripOnServiceDate> tripOnServiceDate();
+
     public DataFetcher<Boolean> walkingBike();
   }
 
@@ -610,6 +619,22 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> date();
 
     public DataFetcher<Iterable<Object>> timeSpans();
+  }
+
+  public interface GraphQLLocation {
+    public DataFetcher<Object> geometry();
+
+    public DataFetcher<String> id();
+
+    public DataFetcher<String> name();
+  }
+
+  public interface GraphQLLocationGroup {
+    public DataFetcher<String> id();
+
+    public DataFetcher<Iterable<Object>> members();
+
+    public DataFetcher<String> name();
   }
 
   /** An amount of money. */
@@ -1125,7 +1150,12 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> zoneId();
   }
 
-  /** Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop location. */
+  /**
+   * Represents the time or time window when a specific trip on a specific date arrives to and/or departs
+   * from a specific stop location.
+   *
+   * This may contain real-time information, if available.
+   */
   public interface GraphQLStopCall {
     public DataFetcher<CallRealTime> realTime();
 

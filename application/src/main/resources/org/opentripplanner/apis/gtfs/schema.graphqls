@@ -85,10 +85,10 @@ interface PlaceInterface {
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
 "Scheduled times for a trip on a service date for a stop location."
-union CallScheduledTime = ArrivalDepartureTime
+union CallScheduledTime = ArrivalDepartureTime | TimeWindow
 
 "Location where a transit vehicle stops at."
-union CallStopLocation = Stop
+union CallStopLocation = Location | LocationGroup | Stop
 
 "Rental place union that represents either a VehicleRentalStation or a RentalVehicle"
 union RentalPlace = RentalVehicle | VehicleRentalStation
@@ -850,6 +850,7 @@ type Leg {
   transitLeg: Boolean
   "For transit legs, the trip that is used for traversing the leg. For non-transit legs, `null`."
   trip: Trip
+  tripOnServiceDate: TripOnServiceDate
   "Whether this leg is walking with a bike."
   walkingBike: Boolean
 }
@@ -879,6 +880,18 @@ type LocalTimeSpanDate {
   date: String!
   "The time spans for this date."
   timeSpans: [LocalTimeSpan]
+}
+
+type Location {
+  geometry: StopGeometries!
+  id: String!
+  name: String!
+}
+
+type LocationGroup {
+  id: String!
+  members: [Stop!]!
+  name: String!
 }
 
 "An amount of money."
@@ -2272,7 +2285,12 @@ type Stop implements Node & PlaceInterface {
   zoneId: String
 }
 
-"Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop location."
+"""
+Represents the time or time window when a specific trip on a specific date arrives to and/or departs
+from a specific stop location.
+
+This may contain real-time information, if available.
+"""
 type StopCall {
   "Real-time estimates for arrival and departure times for this stop location."
   realTime: CallRealTime
@@ -2435,6 +2453,11 @@ type TicketType implements Node {
   Corresponds to field `zoneId` in **Stop** type.
   """
   zones: [String!]
+}
+
+type TimeWindow {
+  end: OffsetDateTime!
+  start: OffsetDateTime!
 }
 
 "Text with language"
