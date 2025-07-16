@@ -80,7 +80,6 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     EntitySelector.Stop entitySelector = new EntitySelector.Stop(stopId, stopConditions);
     var result = findMatchingAlerts(entitySelector);
     var quay = timetableRepository.getSiteRepository().getStopLocation(stopId);
-    // TODO - SIRI: Add alerts from parent- and multimodal-stops
 
     if (quay != null && quay.isPartOfStation()) {
       // Add alerts for parent-station
