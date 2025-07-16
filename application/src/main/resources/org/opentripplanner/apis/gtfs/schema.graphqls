@@ -714,6 +714,10 @@ type Leg {
   """
   arrivalDelay: Int @deprecated(reason : "Use `start.estimated.delay` instead.")
   """
+  All the calls (stop times) of this _leg_ (but not trip) including the boarding and alighting one.
+  """
+  calls: [StopCall!]!
+  """
   For transit leg, the offset from the scheduled departure time of the boarding
   stop in this leg, i.e. scheduled time of departure at boarding stop =
   `startTime - departureDelay`
@@ -850,7 +854,6 @@ type Leg {
   transitLeg: Boolean
   "For transit legs, the trip that is used for traversing the leg. For non-transit legs, `null`."
   trip: Trip
-  tripOnServiceDate: TripOnServiceDate
   "Whether this leg is walking with a bike."
   walkingBike: Boolean
 }

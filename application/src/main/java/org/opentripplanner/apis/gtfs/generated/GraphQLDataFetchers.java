@@ -274,12 +274,6 @@ public class GraphQLDataFetchers {
   /** Location where a transit vehicle stops at. */
   public interface GraphQLCallStopLocation extends TypeResolver {}
 
-  public interface GraphQLCallWindow {
-    public DataFetcher<java.time.OffsetDateTime> end();
-
-    public DataFetcher<java.time.OffsetDateTime> start();
-  }
-
   /** Car park represents a location where cars can be parked. */
   public interface GraphQLCarPark {
     public DataFetcher<String> carParkId();
@@ -524,6 +518,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Integer> arrivalDelay();
 
+    public DataFetcher<Iterable<TripTimeOnDate>> calls();
+
     public DataFetcher<Integer> departureDelay();
 
     public DataFetcher<Double> distance();
@@ -591,8 +587,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<Boolean> transitLeg();
 
     public DataFetcher<Trip> trip();
-
-    public DataFetcher<TripOnServiceDate> tripOnServiceDate();
 
     public DataFetcher<Boolean> walkingBike();
   }
@@ -1262,6 +1256,12 @@ public class GraphQLDataFetchers {
     public DataFetcher<Double> price();
 
     public DataFetcher<Iterable<String>> zones();
+  }
+
+  public interface GraphQLTimeWindow {
+    public DataFetcher<java.time.OffsetDateTime> end();
+
+    public DataFetcher<java.time.OffsetDateTime> start();
   }
 
   /** Text with language */

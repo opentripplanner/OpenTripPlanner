@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import org.opentripplanner.apis.gtfs.support.filter.StopArrivalByTypeFilter;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -31,12 +33,14 @@ import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.routing.alternativelegs.NavigationDirection;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
+import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
@@ -53,6 +57,34 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<Integer> arrivalDelay() {
     return environment -> getSource(environment).arrivalDelay();
+  }
+
+  @Override
+  public DataFetcher<Iterable<TripTimeOnDate>> calls() {
+    return env -> {
+      var leg = getSource(env);
+      if (leg.isTransitLeg()) {
+        var transitService = transitService(env);
+        var pattern = transitService.findPattern(leg.trip(), leg.serviceDate());
+        var timetable = transitService.findTimetable(pattern, leg.serviceDate());
+        var midnight = ServiceDateUtils.asStartOfService(
+          leg.serviceDate(),
+          transitService.getTimeZone()
+        ).toInstant();
+        var tripTimeOnDates = TripTimeOnDate.fromTripTimesWithScheduleFallback(
+          timetable,
+          leg.trip(),
+          leg.serviceDate(),
+          midnight
+        );
+        return tripTimeOnDates.subList(
+          leg.boardStopPosInPattern(),
+          leg.alightStopPosInPattern() + 1
+        );
+      } else {
+        return List.of();
+      }
+    };
   }
 
   @Override
@@ -272,22 +304,6 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<Trip> trip() {
     return environment -> getSource(environment).trip();
-  }
-
-  @Override
-  public DataFetcher<TripOnServiceDate> tripOnServiceDate() {
-    return env -> {
-      var leg = getSource(env);
-      if (leg.isTransitLeg()) {
-        var trip = leg.trip();
-        return TripOnServiceDate.of(trip.getId())
-          .withTrip(trip)
-          .withServiceDate(leg.serviceDate())
-          .build();
-      } else {
-        return null;
-      }
-    };
   }
 
   @Override
