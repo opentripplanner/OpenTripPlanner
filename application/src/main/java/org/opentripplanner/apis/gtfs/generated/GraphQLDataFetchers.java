@@ -518,8 +518,6 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Integer> arrivalDelay();
 
-    public DataFetcher<Iterable<TripTimeOnDate>> calls();
-
     public DataFetcher<Integer> departureDelay();
 
     public DataFetcher<Double> distance();
@@ -581,6 +579,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Long> startTime();
 
     public DataFetcher<Iterable<WalkStep>> steps();
+
+    public DataFetcher<Iterable<TripTimeOnDate>> stopCalls();
 
     public DataFetcher<StopArrival> to();
 

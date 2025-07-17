@@ -714,10 +714,6 @@ type Leg {
   """
   arrivalDelay: Int @deprecated(reason : "Use `start.estimated.delay` instead.")
   """
-  All the calls (stop times) of this _leg_ (but not trip) including the boarding and alighting one.
-  """
-  calls: [StopCall!]!
-  """
   For transit leg, the offset from the scheduled departure time of the boarding
   stop in this leg, i.e. scheduled time of departure at boarding stop =
   `startTime - departureDelay`
@@ -774,7 +770,7 @@ type Leg {
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
   """
-  intermediatePlaces: [Place]
+  intermediatePlaces: [Place] @deprecated(reason : "Use `leg.calls` instead")
   """
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
@@ -782,7 +778,7 @@ type Leg {
   The `include` parameter allows filtering of the returned places by stop type. If not provided, the
   field returns all types. An empty list is not permitted.
   """
-  intermediateStops(include: [StopType!]): [Stop]
+  intermediateStops(include: [StopType!]): [Stop] @deprecated(reason : "Use `leg.calls` instead")
   "The leg's geometry."
   legGeometry: Geometry
   "The mode (e.g. `WALK`) used when traversing this leg."
@@ -848,6 +844,8 @@ type Leg {
   startTime: Long @deprecated(reason : "Use `start.estimated.time` instead which contains timezone information.")
   "The turn-by-turn navigation instructions."
   steps: [step]
+  "All the stop calls (stop times) of this _leg_ (but not trip) including the boarding and alighting one."
+  stopCalls: [StopCall!]!
   "The Place where the leg ends."
   to: Place!
   "Whether this leg is a transit leg or not."

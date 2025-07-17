@@ -60,34 +60,6 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<Iterable<TripTimeOnDate>> calls() {
-    return env -> {
-      var leg = getSource(env);
-      if (leg.isTransitLeg()) {
-        var transitService = transitService(env);
-        var pattern = transitService.findPattern(leg.trip(), leg.serviceDate());
-        var timetable = transitService.findTimetable(pattern, leg.serviceDate());
-        var midnight = ServiceDateUtils.asStartOfService(
-          leg.serviceDate(),
-          transitService.getTimeZone()
-        ).toInstant();
-        var tripTimeOnDates = TripTimeOnDate.fromTripTimesWithScheduleFallback(
-          timetable,
-          leg.trip(),
-          leg.serviceDate(),
-          midnight
-        );
-        return tripTimeOnDates.subList(
-          leg.boardStopPosInPattern(),
-          leg.alightStopPosInPattern() + 1
-        );
-      } else {
-        return List.of();
-      }
-    };
-  }
-
-  @Override
   public DataFetcher<Integer> departureDelay() {
     return environment -> getSource(environment).departureDelay();
   }
@@ -280,6 +252,34 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<Iterable<WalkStep>> steps() {
     return environment -> getSource(environment).listWalkSteps();
+  }
+
+  @Override
+  public DataFetcher<Iterable<TripTimeOnDate>> stopCalls() {
+    return env -> {
+      var leg = getSource(env);
+      if (leg.isTransitLeg()) {
+        var transitService = transitService(env);
+        var pattern = transitService.findPattern(leg.trip(), leg.serviceDate());
+        var timetable = transitService.findTimetable(pattern, leg.serviceDate());
+        var midnight = ServiceDateUtils.asStartOfService(
+          leg.serviceDate(),
+          transitService.getTimeZone()
+        ).toInstant();
+        var tripTimeOnDates = TripTimeOnDate.fromTripTimesWithScheduleFallback(
+          timetable,
+          leg.trip(),
+          leg.serviceDate(),
+          midnight
+        );
+        return tripTimeOnDates.subList(
+          leg.boardStopPosInPattern(),
+          leg.alightStopPosInPattern() + 1
+        );
+      } else {
+        return List.of();
+      }
+    };
   }
 
   @Override
