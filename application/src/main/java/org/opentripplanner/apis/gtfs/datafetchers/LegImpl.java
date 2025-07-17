@@ -13,6 +13,7 @@ import org.opentripplanner.apis.gtfs.mapping.LocalDateMapper;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
 import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
+import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.filter.StopArrivalByTypeFilter;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
@@ -253,17 +254,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<Iterable<TripTimeOnDate>> stopCalls() {
     return env -> {
       var leg = getSource(env);
-      if (leg.isTransitLeg()) {
-        var calls = transitService(env)
-          .findTripTimesOnDate(leg.trip(), leg.serviceDate())
-          .orElseThrow(() ->
-            new IllegalStateException(
-              "Cannot find times for %s on service date %s".formatted(leg.trip(), leg.serviceDate())
-            )
-          );
-        calls.subList(leg.boardStopPosInPattern(), leg.alightStopPosInPattern() + 1);
-      }
-      return List.of();
+      var service = new ApiTransitService(transitService(env));
+      return service.findStopCalls(leg);
     };
   }
 
