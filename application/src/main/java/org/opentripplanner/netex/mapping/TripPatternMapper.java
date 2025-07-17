@@ -154,6 +154,19 @@ class TripPatternMapper {
     }
   }
 
+  void collectGtfsReplacements(
+    GtfsReplacementCollector gtfsReplacementCollector,
+    JourneyPattern_VersionStructure journeyPattern
+  ) {
+    Collection<ServiceJourney> serviceJourneys = serviceJourneysByPatternId.get(
+      journeyPattern.getId()
+    );
+
+    for (ServiceJourney serviceJourney : serviceJourneys) {
+      tripMapper.collectGtfsReplacements(gtfsReplacementCollector, serviceJourney);
+    }
+  }
+
   Optional<TripPatternMapperResult> mapTripPattern(JourneyPattern_VersionStructure journeyPattern) {
     Collection<ServiceJourney> serviceJourneys = serviceJourneysByPatternId.get(
       journeyPattern.getId()

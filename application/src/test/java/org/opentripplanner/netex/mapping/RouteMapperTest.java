@@ -10,13 +10,18 @@ import com.google.common.collect.ArrayListMultimap;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -46,6 +51,34 @@ class RouteMapperTest {
   private static final String FERRY_WITHOUT_BICYCLES_ID = "RUT:Line:2:NoBicycles";
 
   private static final Set<String> EMPTY_FERRY_WITHOUT_BICYCLE_IDS = Collections.emptySet();
+  private static final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("S01");
+
+  private static final NetexTestDataSample sample = new NetexTestDataSample();
+  private static final TripPatternMapper tripPatternMapper = new TripPatternMapper(
+    DataImportIssueStore.NOOP,
+    MappingSupport.ID_FACTORY,
+    new DefaultEntityById<>(),
+    sample.getStopsById(),
+    new DefaultEntityById<>(),
+    new DefaultEntityById<>(),
+    sample.getOtpRouteByid(),
+    sample.getRouteById(),
+    sample.getJourneyPatternById(),
+    sample.getQuayIdByStopPointRef(),
+    new HierarchicalMap<>(),
+    new HierarchicalMapById<>(),
+    sample.getServiceJourneyById(),
+    new HierarchicalMapById<>(),
+    new HierarchicalMapById<>(),
+    new HierarchicalMapById<>(),
+    new HierarchicalMapById<>(),
+    ArrayListMultimap.create(),
+    Map.of(NetexTestDataSample.SERVICE_JOURNEY_ID, SERVICE_ID),
+    new Deduplicator(),
+    150
+  );
+  private static final GtfsReplacementCollector gtfsReplacementCollector =
+    new GtfsReplacementCollector();
 
   @Test
   void mapRouteWithDefaultAgency() {
@@ -62,10 +95,11 @@ class RouteMapperTest {
       new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
-      EMPTY_FERRY_WITHOUT_BICYCLE_IDS
+      EMPTY_FERRY_WITHOUT_BICYCLE_IDS,
+      tripPatternMapper
     );
 
-    Route route = routeMapper.mapRoute(line);
+    Route route = routeMapper.mapRoute(line, gtfsReplacementCollector);
 
     assertEquals(MappingSupport.ID_FACTORY.createId(LINE_ID), route.getId());
     assertEquals("Line 1", route.getLongName().toString());
@@ -103,10 +137,11 @@ class RouteMapperTest {
       transitBuilder.getGroupOfRouteById(),
       netexIndex.readOnlyView(),
       TimetableRepositoryForTest.TIME_ZONE_ID,
-      EMPTY_FERRY_WITHOUT_BICYCLE_IDS
+      EMPTY_FERRY_WITHOUT_BICYCLE_IDS,
+      tripPatternMapper
     );
 
-    Route route = routeMapper.mapRoute(line);
+    Route route = routeMapper.mapRoute(line, gtfsReplacementCollector);
 
     assertEquals(AUTHORITY_ID, route.getAgency().getId().getId());
   }
@@ -129,10 +164,11 @@ class RouteMapperTest {
       new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
-      EMPTY_FERRY_WITHOUT_BICYCLE_IDS
+      EMPTY_FERRY_WITHOUT_BICYCLE_IDS,
+      tripPatternMapper
     );
 
-    Route route = routeMapper.mapRoute(line);
+    Route route = routeMapper.mapRoute(line, gtfsReplacementCollector);
 
     assertEquals("7F0000", route.getColor());
     assertEquals("007F00", route.getTextColor());
@@ -154,13 +190,17 @@ class RouteMapperTest {
       new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
-      Set.of(FERRY_WITHOUT_BICYCLES_ID)
+      Set.of(FERRY_WITHOUT_BICYCLES_ID),
+      tripPatternMapper
     );
 
-    Route ferryWithBicycles = routeMapper.mapRoute(lineWithBicycles);
+    Route ferryWithBicycles = routeMapper.mapRoute(lineWithBicycles, gtfsReplacementCollector);
     assertEquals(BikeAccess.ALLOWED, ferryWithBicycles.getBikesAllowed());
 
-    Route ferryWithOutBicycles = routeMapper.mapRoute(lineWithOutBicycles);
+    Route ferryWithOutBicycles = routeMapper.mapRoute(
+      lineWithOutBicycles,
+      gtfsReplacementCollector
+    );
     assertEquals(BikeAccess.NOT_ALLOWED, ferryWithOutBicycles.getBikesAllowed());
   }
 
@@ -179,10 +219,11 @@ class RouteMapperTest {
       new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
-      EMPTY_FERRY_WITHOUT_BICYCLE_IDS
+      EMPTY_FERRY_WITHOUT_BICYCLE_IDS,
+      tripPatternMapper
     );
 
-    Route route = routeMapper.mapRoute(line);
+    Route route = routeMapper.mapRoute(line, gtfsReplacementCollector);
 
     assertNull(route.getBranding());
   }
@@ -211,10 +252,11 @@ class RouteMapperTest {
       new DefaultEntityById<>(),
       netexIndex.readOnlyView(),
       TimetableRepositoryForTest.TIME_ZONE_ID,
-      EMPTY_FERRY_WITHOUT_BICYCLE_IDS
+      EMPTY_FERRY_WITHOUT_BICYCLE_IDS,
+      tripPatternMapper
     );
 
-    Route route = routeMapper.mapRoute(line);
+    Route route = routeMapper.mapRoute(line, gtfsReplacementCollector);
 
     Branding branding = route.getBranding();
     assertNotNull(branding);
@@ -247,10 +289,11 @@ class RouteMapperTest {
       transitBuilder.getGroupOfRouteById(),
       netexIndex.readOnlyView(),
       TimetableRepositoryForTest.TIME_ZONE_ID,
-      EMPTY_FERRY_WITHOUT_BICYCLE_IDS
+      EMPTY_FERRY_WITHOUT_BICYCLE_IDS,
+      tripPatternMapper
     );
 
-    Route route = routeMapper.mapRoute(line);
+    Route route = routeMapper.mapRoute(line, gtfsReplacementCollector);
 
     List<GroupOfRoutes> groupsOfLines = route.getGroupsOfRoutes();
 

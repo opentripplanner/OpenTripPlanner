@@ -47,6 +47,7 @@ class RouteMapper {
   private final NetexEntityIndexReadOnlyView netexIndex;
   private final AuthorityToAgencyMapper authorityMapper;
   private final Set<String> ferryIdsNotAllowedForBicycle;
+  private final TripPatternMapper tripPatternMapper;
 
   RouteMapper(
     DataImportIssueStore issueStore,
@@ -58,7 +59,8 @@ class RouteMapper {
     EntityById<GroupOfRoutes> groupOfRoutesById,
     NetexEntityIndexReadOnlyView netexIndex,
     String timeZone,
-    Set<String> ferryIdsNotAllowedForBicycle
+    Set<String> ferryIdsNotAllowedForBicycle,
+    TripPatternMapper tripPatternMapper
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
@@ -70,9 +72,10 @@ class RouteMapper {
     this.netexIndex = netexIndex;
     this.authorityMapper = new AuthorityToAgencyMapper(idFactory, timeZone);
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
+    this.tripPatternMapper = tripPatternMapper;
   }
 
-  Route mapRoute(Line_VersionStructure line) {
+  Route mapRoute(Line_VersionStructure line, GtfsReplacementCollector gtfsReplacementCollector) {
     RouteBuilder builder = Route.of(idFactory.createId(line.getId()));
 
     builder.getGroupsOfRoutes().addAll(getGroupOfRoutes(line));
@@ -98,6 +101,7 @@ class RouteMapper {
 
     builder.withMode(mode.mainMode());
     builder.withNetexSubmode(mode.subMode());
+    builder.withGtfsReplacement(gtfsReplacementCollector.getGtfsReplacement(line.getId()));
 
     if (line instanceof FlexibleLine_VersionStructure) {
       builder.withFlexibleLineType(
