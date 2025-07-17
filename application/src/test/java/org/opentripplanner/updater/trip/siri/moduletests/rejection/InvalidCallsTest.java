@@ -37,7 +37,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
 
   @Test
   void testTooFewCalls() {
-    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -58,7 +58,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
 
   @Test
   void testTooManyCalls() {
-    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -83,7 +83,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
 
   @Test
   void testMismatchedStop() {
-    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -106,7 +106,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
 
   @Test
   void testUnknownStop() {
-    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)

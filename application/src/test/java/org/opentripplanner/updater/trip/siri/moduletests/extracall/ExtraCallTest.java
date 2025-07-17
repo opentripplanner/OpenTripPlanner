@@ -29,7 +29,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraCall() {
-    var env = ENV_BUILDER.trip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     var updates = updateWithExtraCall(env);
 
@@ -44,7 +44,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraCallMultipleTimes() {
-    var env = ENV_BUILDER.trip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     var updates = updateWithExtraCall(env);
     env.applyEstimatedTimetable(updates);
@@ -59,7 +59,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraCallAndCancellation() {
-    var env = ENV_BUILDER.trip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     var updates = updateWithExtraCall(env);
     env.applyEstimatedTimetable(updates);
@@ -83,7 +83,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraUnknownStop() {
-    var env = ENV_BUILDER.trip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -107,7 +107,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraCallSameNumberOfStops() {
-    var env = ENV_BUILDER.trip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -129,7 +129,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraCallAndIllegalChangeOfOtherStops() {
-    var env = ENV_BUILDER.trip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)

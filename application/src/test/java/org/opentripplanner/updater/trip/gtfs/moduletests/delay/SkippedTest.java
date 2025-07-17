@@ -39,7 +39,7 @@ class SkippedTest implements RealtimeTestConstants {
 
   @Test
   void scheduledTripWithSkippedAndScheduled() {
-    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)
@@ -70,7 +70,7 @@ class SkippedTest implements RealtimeTestConstants {
    */
   @Test
   void scheduledTripWithPreviouslySkipped() {
-    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)
@@ -114,7 +114,7 @@ class SkippedTest implements RealtimeTestConstants {
    */
   @Test
   void skippedNoData() {
-    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     String tripId = TRIP_2_ID;
 

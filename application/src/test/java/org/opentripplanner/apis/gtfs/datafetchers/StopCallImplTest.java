@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
@@ -15,7 +14,6 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.FlexTripInput;
-import org.opentripplanner.updater.trip.FlexTripInput.FlexCall;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
@@ -43,9 +41,14 @@ class StopCallImplTest implements RealtimeTestConstants {
     .addStop(STOP_C, "13:00:00", "13:00:00")
     .build();
 
+  private final FlexTripInput FLEX_TRIP_INPUT = FlexTripInput.of(TRIP_1_ID)
+    .addStop(STOP_D, "10:00", "10:30")
+    .addStop(STOP_E, "11:00", "11:30")
+    .build();
+
   @Test
   void fixedTrip() throws Exception {
-    var realtimeEnv = envBuilder.trip(TRIP_INPUT).build();
+    var realtimeEnv = envBuilder.addTrip(TRIP_INPUT).build();
     var tripTimes = realtimeEnv.getTripTimesForTrip(TRIP_1_ID);
     var pattern = realtimeEnv.getPatternForTrip(TRIP_1_ID);
 
@@ -65,14 +68,7 @@ class StopCallImplTest implements RealtimeTestConstants {
   @Test
   void flexTrip() {
     OTPFeature.FlexRouting.testOn(() -> {
-      var realtimeEnv = envBuilder
-        .addFlexTrip(
-          new FlexTripInput(
-            TRIP_1_ID,
-            List.of(new FlexCall(STOP_D, "10:00", "10:30"), new FlexCall(STOP_E, "11:00", "11:30"))
-          )
-        )
-        .build();
+      var realtimeEnv = envBuilder.addFlexTrip(FLEX_TRIP_INPUT).build();
       var tripTimes = realtimeEnv.getTripTimesForTrip(TRIP_1_ID);
       var pattern = realtimeEnv.getPatternForTrip(TRIP_1_ID);
 

@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.IntStream;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -29,7 +28,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.updater.trip.FlexTripInput.FlexCall;
+import org.opentripplanner.updater.trip.FlexTripInput.FlexStop;
 
 public class RealtimeTestEnvironmentBuilder {
 
@@ -42,14 +41,7 @@ public class RealtimeTestEnvironmentBuilder {
 
   RealtimeTestEnvironmentBuilder() {}
 
-  public RealtimeTestEnvironmentBuilder trip(TripInput... trip) {
-    for (var t : trip) {
-      trip(t);
-    }
-    return this;
-  }
-
-  public RealtimeTestEnvironmentBuilder trip(TripInput trip) {
+  public RealtimeTestEnvironmentBuilder addTrip(TripInput trip) {
     this.tripInputs.add(trip);
     return this;
   }
@@ -205,7 +197,7 @@ public class RealtimeTestEnvironmentBuilder {
     TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 
     var stopPattern = TimetableRepositoryForTest.stopPattern(
-      tripInput.stops().stream().map(FlexCall::stop).toList()
+      tripInput.stops().stream().map(FlexStop::stop).toList()
     );
 
     addNewPattern(tripInput.id(), tripInput.route(), stopPattern, tripTimes, timetableRepository);

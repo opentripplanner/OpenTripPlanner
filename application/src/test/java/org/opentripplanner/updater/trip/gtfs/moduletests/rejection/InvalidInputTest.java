@@ -37,7 +37,7 @@ class InvalidInputTest implements RealtimeTestConstants {
       .addStop(STOP_A, "0:00:10", "0:00:11")
       .addStop(STOP_B, "0:00:20", "0:00:21")
       .build();
-    var env = ENV_BUILDER.trip(tripInput).build();
+    var env = ENV_BUILDER.addTrip(tripInput).build();
 
     var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(2, 60, 80)

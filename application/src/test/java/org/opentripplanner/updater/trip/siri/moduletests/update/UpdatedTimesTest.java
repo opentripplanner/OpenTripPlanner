@@ -28,7 +28,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithDatedVehicleJourneyRef() {
-    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = updatedJourneyBuilder(env)
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -47,7 +47,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithFramedVehicleJourneyRef() {
-    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = updatedJourneyBuilder(env)
       .withFramedVehicleJourneyRef(builder ->
@@ -64,7 +64,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithoutJourneyRef() {
-    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);

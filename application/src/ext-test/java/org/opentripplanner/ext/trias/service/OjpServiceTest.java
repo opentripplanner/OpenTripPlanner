@@ -72,7 +72,7 @@ class OjpServiceTest implements RealtimeTestConstants {
   @ParameterizedTest
   @MethodSource("stopPointRefCases")
   void stopPointRef(FeedScopedId ref) {
-    var env = envBuilder.trip(TRIP_INPUT).build();
+    var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
     var result = service.findCallsAtStop(ref, PARAMS);
     assertThat(result).hasSize(1);
@@ -82,7 +82,7 @@ class OjpServiceTest implements RealtimeTestConstants {
 
   @Test
   void notFound() {
-    var env = envBuilder.trip(TRIP_INPUT).build();
+    var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
     assertThrows(EntityNotFoundException.class, () ->
       service.findCallsAtStop(id("unknown"), PARAMS)
@@ -117,7 +117,7 @@ class OjpServiceTest implements RealtimeTestConstants {
         return List.of();
       }
     };
-    var env = envBuilder.trip(TRIP_INPUT).build();
+    var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), finder);
     var result = service.findCallsAtStop(WgsCoordinate.GREENWICH, PARAMS);
     assertThat(result).hasSize(1);
@@ -127,7 +127,7 @@ class OjpServiceTest implements RealtimeTestConstants {
 
   @Test
   void tooManyDepartures() {
-    var env = envBuilder.trip(TRIP_INPUT).build();
+    var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
     assertThrows(IllegalArgumentException.class, () ->
       service.findCallsAtStop(STOP_A.getId(), params(101))

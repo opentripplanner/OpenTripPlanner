@@ -22,7 +22,7 @@ public class CanceledTripTest implements RealtimeTestConstants {
 
   @Test
   void listCanceledTrips() {
-    var env = ENV_BUILDER.trip(
+    var env = ENV_BUILDER.addTrip(
       TripInput.of(TRIP_1_ID)
         .addStop(STOP_A, "0:00:10", "0:00:11")
         .addStop(STOP_B, "0:00:20", "0:00:21")

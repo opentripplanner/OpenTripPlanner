@@ -24,7 +24,7 @@ class NotMonitoredTest implements RealtimeTestConstants {
 
   @Test
   void testNotMonitored() {
-    var env = ENV_BUILDER.trip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withMonitored(false)

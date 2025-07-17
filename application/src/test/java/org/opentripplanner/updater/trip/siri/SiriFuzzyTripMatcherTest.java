@@ -27,7 +27,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
   void match() {
     TripInput trip1Input = tripInput(TRIP_1_ID);
 
-    var env = ENV_BUILDER.trip(trip1Input).build();
+    var env = ENV_BUILDER.addTrip(trip1Input).build();
     var evj = estimatedVehicleJourney(env);
 
     var result = match(evj, env);
@@ -39,7 +39,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     var trip1input = tripInput(TRIP_1_ID);
     var trip2input = tripInput(TRIP_2_ID);
 
-    var env = ENV_BUILDER.trip(trip1input).trip(trip2input).build();
+    var env = ENV_BUILDER.addTrip(trip1input).addTrip(trip2input).build();
 
     var evj = estimatedVehicleJourney(env);
 
@@ -53,7 +53,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     var scheduledStopPointId = "ssp-1";
     var trip1input = tripInput(TRIP_1_ID);
 
-    var env = ENV_BUILDER.trip(trip1input).build();
+    var env = ENV_BUILDER.addTrip(trip1input).build();
     env.timetableRepository.addScheduledStopPointMapping(Map.of(id(scheduledStopPointId), STOP_B));
 
     var journey = new SiriEtBuilder(env.getDateTimeHelper())
@@ -74,7 +74,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
   void unknownStopPointRef() {
     var trip1input = tripInput(TRIP_1_ID);
 
-    var env = ENV_BUILDER.trip(trip1input).build();
+    var env = ENV_BUILDER.addTrip(trip1input).build();
 
     var journey = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedCalls(builder ->
