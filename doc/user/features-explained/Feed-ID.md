@@ -48,6 +48,11 @@ although its addition to the `feed_info.txt` file has been [discussed several ti
 
 As a fallback method, OTP assigns a feedId as an increasing integer to all GTFS data processed at build.
 
-This method has several drawbacks. First, if multiple GTFS datasets are used, the value automatically assigned by OTP is difficult to predict. Second, OTP could assign a different value if another GTFS dataset is added later. While it is possible to identify the feedId attributed to a given GTFS dataset by debugging a graph, this method doesn't allow for proper configuration of real-time feeds beforehand. 
+This method has several drawbacks. First, if multiple GTFS datasets are used, the value automatically 
+assigned by OTP is difficult to predict. Second, OTP could assign a different value if another GTFS 
+dataset is added later. While it is possible to identify the `feedId` attributed to a given transit 
+dataset by debugging a graph, this method doesn't allow for proper configuration of real-time feeds 
+beforehand. 
 
-Unless OTP manages a single dataset, this method should be avoided at all cost if one wants to link real-time feeds with static data.
+Unless OTP manages a single dataset, this method should be avoided at all costs if one wants to link 
+real-time feeds with static data.
