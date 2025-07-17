@@ -31,7 +31,7 @@ class NegativeTimesTest implements RealtimeTestConstants {
 
   @Test
   void testNegativeHopTime() {
-    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.trip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -51,7 +51,7 @@ class NegativeTimesTest implements RealtimeTestConstants {
 
   @Test
   void testNegativeDwellTime() {
-    var env = ENV_BUILDER.addTrip(TRIP_2_INPUT).build();
+    var env = ENV_BUILDER.trip(TRIP_2_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_2_ID)

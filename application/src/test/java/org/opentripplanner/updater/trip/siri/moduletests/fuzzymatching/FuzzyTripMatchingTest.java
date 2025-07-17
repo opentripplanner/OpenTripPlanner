@@ -28,7 +28,7 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithFuzzyMatching() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
 
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
@@ -42,7 +42,7 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithFuzzyMatchingAndMissingAimedDepartureTime() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withFramedVehicleJourneyRef(builder ->

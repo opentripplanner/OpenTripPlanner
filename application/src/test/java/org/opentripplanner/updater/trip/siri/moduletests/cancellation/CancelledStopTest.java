@@ -26,7 +26,7 @@ class CancelledStopTest implements RealtimeTestConstants {
 
   @Test
   void testCancelStop() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.trip(TRIP_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
