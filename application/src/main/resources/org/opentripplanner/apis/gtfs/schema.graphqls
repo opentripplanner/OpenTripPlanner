@@ -846,7 +846,7 @@ type Leg {
   steps: [step]
   """
   All the stop calls (stop times) of this _leg_ (but not trip) including the boarding and alighting one.
-
+    
   Non-transit legs return an empty list.
   """
   stopCalls: [StopCall!]!
@@ -893,11 +893,11 @@ A stop that isn't a fixed point but zone where passengers can board or alight an
 This is mostly used by demand-responsive services.
 """
 type Location {
+  "The geometry representing the geographic extend of the location."
+  geometry: StopGeometries!
   gtfsId: String!
   "Optional name of the location."
   name: String
-  "The geometry representing the geographic extend of the location."
-  geometry: StopGeometries!
 }
 
 """
@@ -907,10 +907,10 @@ This is mostly used by demand-responsive services.
 """
 type LocationGroup {
   gtfsId: String!
-  "Optional name of the group."
-  name: String
   "The members that are part of the group."
   members: [Stop!]!
+  "Optional name of the group."
+  name: String
 }
 
 "An amount of money."
