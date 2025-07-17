@@ -770,7 +770,7 @@ type Leg {
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
   """
-  intermediatePlaces: [Place] @deprecated(reason : "Use `leg.calls` instead")
+  intermediatePlaces: [Place] @deprecated(reason : "Use `leg.stopCalls` instead")
   """
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
@@ -778,7 +778,7 @@ type Leg {
   The `include` parameter allows filtering of the returned places by stop type. If not provided, the
   field returns all types. An empty list is not permitted.
   """
-  intermediateStops(include: [StopType!]): [Stop] @deprecated(reason : "Use `leg.calls` instead")
+  intermediateStops(include: [StopType!]): [Stop] @deprecated(reason : "Use `leg.stopCalls` instead")
   "The leg's geometry."
   legGeometry: Geometry
   "The mode (e.g. `WALK`) used when traversing this leg."
