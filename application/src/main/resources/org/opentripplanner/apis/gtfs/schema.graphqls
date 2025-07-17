@@ -844,7 +844,11 @@ type Leg {
   startTime: Long @deprecated(reason : "Use `start.estimated.time` instead which contains timezone information.")
   "The turn-by-turn navigation instructions."
   steps: [step]
-  "All the stop calls (stop times) of this _leg_ (but not trip) including the boarding and alighting one."
+  """
+  All the stop calls (stop times) of this _leg_ (but not trip) including the boarding and alighting one.
+
+  Non-transit legs return an empty list.
+  """
   stopCalls: [StopCall!]!
   "The Place where the leg ends."
   to: Place!
