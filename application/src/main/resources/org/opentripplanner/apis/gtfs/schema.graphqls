@@ -887,16 +887,30 @@ type LocalTimeSpanDate {
   timeSpans: [LocalTimeSpan]
 }
 
+"""
+A stop that isn't a fixed point but zone where passengers can board or alight anywhere.
+
+This is mostly used by demand-responsive services.
+"""
 type Location {
+  gtfsId: String!
+  "Optional name of the location."
+  name: String
+  "The geometry representing the geographic extend of the location."
   geometry: StopGeometries!
-  id: String!
-  name: String!
 }
 
+"""
+A group of fixed stops that is visited in an arbitrary order.
+
+This is mostly used by demand-responsive services.
+"""
 type LocationGroup {
-  id: String!
+  gtfsId: String!
+  "Optional name of the group."
+  name: String
+  "The members that are part of the group."
   members: [Stop!]!
-  name: String!
 }
 
 "An amount of money."

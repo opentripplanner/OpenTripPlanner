@@ -19,6 +19,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.IntUtils;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -472,5 +473,16 @@ public class TripTimeOnDate {
 
   private Instant toInstant(int secondsSinceMidnight) {
     return Instant.ofEpochSecond(midnight).plusSeconds(secondsSinceMidnight);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(TripTimeOnDate.class)
+      .addObj("trip", tripTimes.getTrip())
+      .addNum("index", stopIndex)
+      .addServiceTime("arrival", getScheduledArrival())
+      .addServiceTime("departure", getScheduledArrival())
+      .addDate("serviceDate", serviceDate)
+      .toString();
   }
 }

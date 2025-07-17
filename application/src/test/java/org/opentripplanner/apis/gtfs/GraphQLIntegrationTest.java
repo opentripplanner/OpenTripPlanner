@@ -15,6 +15,7 @@ import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
+import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
 import static org.opentripplanner.transit.model.timetable.OccupancyStatus.FEW_SEATS_AVAILABLE;
 
 import com.google.common.collect.ImmutableListMultimap;
@@ -291,14 +292,7 @@ class GraphQLIntegrationTest {
         new RealTimeTripUpdate(
           TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
             .withRoute(t.getRoute())
-            .withStopPattern(
-              TimetableRepositoryForTest.stopPattern(
-                (RegularStop) A.stop,
-                (RegularStop) B.stop,
-                (RegularStop) C.stop,
-                (RegularStop) D.stop
-              )
-            )
+            .withStopPattern(TimetableRepositoryForTest.stopPattern(A.stop, B.stop, C.stop, D.stop))
             .withCreatedByRealtimeUpdater(true)
             .build(),
           realTimeTripTimes,

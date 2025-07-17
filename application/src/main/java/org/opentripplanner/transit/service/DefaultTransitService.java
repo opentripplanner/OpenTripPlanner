@@ -122,7 +122,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate) {
+  public Optional<List<TripTimeOnDate>> findTripTimesOnDate(Trip trip, LocalDate serviceDate) {
     TripPattern pattern = findPattern(trip, serviceDate);
 
     Timetable timetable = findTimetable(pattern, serviceDate);

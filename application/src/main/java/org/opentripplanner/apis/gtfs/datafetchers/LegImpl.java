@@ -2,7 +2,6 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -32,15 +31,11 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.routing.alternativelegs.NavigationDirection;
-import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
-import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
@@ -259,26 +254,16 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
     return env -> {
       var leg = getSource(env);
       if (leg.isTransitLeg()) {
-        var transitService = transitService(env);
-        var pattern = transitService.findPattern(leg.trip(), leg.serviceDate());
-        var timetable = transitService.findTimetable(pattern, leg.serviceDate());
-        var midnight = ServiceDateUtils.asStartOfService(
-          leg.serviceDate(),
-          transitService.getTimeZone()
-        ).toInstant();
-        var tripTimeOnDates = TripTimeOnDate.fromTripTimesWithScheduleFallback(
-          timetable,
-          leg.trip(),
-          leg.serviceDate(),
-          midnight
-        );
-        return tripTimeOnDates.subList(
-          leg.boardStopPosInPattern(),
-          leg.alightStopPosInPattern() + 1
-        );
-      } else {
-        return List.of();
+        var calls = transitService(env)
+          .findTripTimesOnDate(leg.trip(), leg.serviceDate())
+          .orElseThrow(() ->
+            new IllegalStateException(
+              "Cannot find times for %s on service date %s".formatted(leg.trip(), leg.serviceDate())
+            )
+          );
+        calls.subList(leg.boardStopPosInPattern(), leg.alightStopPosInPattern() + 1);
       }
+      return List.of();
     };
   }
 
