@@ -124,7 +124,11 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void several() {
-    var transitService = envBuilder.addTrip(TRIP_INPUT2).addTrip(TRIP_INPUT3).build().getTransitService();
+    var transitService = envBuilder
+      .addTrip(TRIP_INPUT2)
+      .addTrip(TRIP_INPUT3)
+      .build()
+      .getTransitService();
 
     var instant = instant("12:10");
     var result = transitService.findTripTimesOnDate(
