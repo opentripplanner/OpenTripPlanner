@@ -867,7 +867,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       stopTime.setTrip(trip);
       stopTime.setStop(stop);
       // Set arrival time
-      final var arrival = added.scheduledArrivalTime();
+      final var arrival = added.scheduledArrivalTimeWithRealTimeFallback();
       if (arrival.isPresent()) {
         final var arrivalTime = arrival.getAsLong() - midnightSecondsSinceEpoch;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
@@ -882,7 +882,7 @@ public class GtfsRealTimeTripUpdateAdapter {
         stopTime.setArrivalTime((int) arrivalTime);
       }
       // Set departure time
-      final var departure = added.scheduledDepartureTime();
+      final var departure = added.scheduledDepartureTimeWithRealTimeFallback();
       if (departure.isPresent()) {
         final long departureTime = departure.getAsLong() - midnightSecondsSinceEpoch;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {

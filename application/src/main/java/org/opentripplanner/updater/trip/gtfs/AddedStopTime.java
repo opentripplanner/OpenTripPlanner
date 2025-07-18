@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs;
 
 import com.google.transit.realtime.GtfsRealtime;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties;
 import de.mfdz.MfdzRealtimeExtensions;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -45,7 +44,7 @@ final class AddedStopTime {
   }
 
   private PickDrop getPickDrop(
-    @Nullable StopTimeProperties.DropOffPickupType dropOffPickupType,
+    @Nullable GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties.DropOffPickupType dropOffPickupType,
     @Nullable MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType extensionDropOffPickup
   ) {
     if (isSkipped()) {
@@ -64,7 +63,7 @@ final class AddedStopTime {
   }
 
   private Optional<
-    StopTimeProperties
+    GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties
   > getStopTimeProperties() {
     return stopTimeUpdate.hasStopTimeProperties()
       ? Optional.of(stopTimeUpdate.getStopTimeProperties())
@@ -82,9 +81,9 @@ final class AddedStopTime {
       );
   }
 
-  OptionalLong scheduledArrivalTime() {
+  OptionalLong scheduledArrivalTimeWithRealTimeFallback() {
     return stopTimeUpdate.hasArrival()
-      ? getScheduledTime(stopTimeUpdate.getArrival())
+      ? getScheduledTimeWithRealTimeFallback(stopTimeUpdate.getArrival())
       : OptionalLong.empty();
   }
 
@@ -94,9 +93,9 @@ final class AddedStopTime {
       : OptionalLong.empty();
   }
 
-  OptionalLong scheduledDepartureTime() {
+  OptionalLong scheduledDepartureTimeWithRealTimeFallback() {
     return stopTimeUpdate.hasDeparture()
-      ? getScheduledTime(stopTimeUpdate.getDeparture())
+      ? getScheduledTimeWithRealTimeFallback(stopTimeUpdate.getDeparture())
       : OptionalLong.empty();
   }
 
@@ -116,7 +115,7 @@ final class AddedStopTime {
    * Get the scheduled time of a StopTimeEvent.
    * If it is not specified, calculate it from time - delay.
    */
-  private OptionalLong getScheduledTime(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
+  private OptionalLong getScheduledTimeWithRealTimeFallback(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
     return stopTimeEvent.hasScheduledTime()
       ? OptionalLong.of(stopTimeEvent.getScheduledTime())
       : getTime(stopTimeEvent).stream().map(time -> time - getDelay(stopTimeEvent)).findFirst();
