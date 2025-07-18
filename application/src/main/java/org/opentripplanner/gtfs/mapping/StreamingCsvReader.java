@@ -15,7 +15,7 @@ public class StreamingCsvReader {
     this.inputSource = Objects.requireNonNull(inputSource);
   }
 
-  public Stream<Map<String, String>> rows(String fileName) throws IOException {
+  public Stream<GtfsRow> rows(String fileName) throws IOException {
     if (inputSource.hasResource(fileName)) {
       return stream(fileName);
     } else {
@@ -23,7 +23,7 @@ public class StreamingCsvReader {
     }
   }
 
-  private Stream<Map<String, String>> stream(String fileName) throws IOException {
+  private Stream<GtfsRow> stream(String fileName) throws IOException {
     var source = inputSource.getResource(fileName);
     var streamReader = new InputStreamReader(source);
     BufferedReader lineReader = new BufferedReader(streamReader);
@@ -46,17 +46,13 @@ public class StreamingCsvReader {
 
         for (int i = 0; i < fields.size() && i < elements.size(); i++) {
           var fieldName = fields.get(i);
-          try {
-            var value = elements.get(i);
-            if (StringUtils.hasValue(value)) {
-              values.put(fieldName, value);
-            }
-          } catch (Exception e) {
-            System.out.println(elements);
+          var value = elements.get(i);
+          if (StringUtils.hasValue(value)) {
+            values.put(fieldName, value);
           }
         }
 
-        return values;
+        return new GtfsRow(values);
       });
   }
 }

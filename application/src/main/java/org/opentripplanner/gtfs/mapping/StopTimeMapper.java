@@ -1,13 +1,12 @@
 package org.opentripplanner.gtfs.mapping;
 
 import static org.onebusaway.gtfs.serialization.mappings.StopTimeFieldMappingFactory.getStringAsSeconds;
+import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
@@ -15,12 +14,13 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * Responsible for mapping GTFS StopTime into the OTP Transit model.
  */
 class StopTimeMapper {
+
+  private static final String FILE = "stop_times.txt";
 
   private static final String TIMEPOINT = "timepoint";
   private static final String SHAPE_DIST_TRAVELED = "shape_dist_traveled";
@@ -39,9 +39,9 @@ class StopTimeMapper {
   private static final String LOCATION_ID = "location_id";
   private static final String STOP_GROUP_ID = "stop_group_id";
   private static final String STOP_HEADSIGN = "stop_headsign";
-  private static final String FILE = "stops_times.txt";
-  private final IdFactory idFactory;
+  private static final String TRIP_ID = "trip_id";
 
+  private final IdFactory idFactory;
   private final BookingRuleMapper bookingRuleMapper;
   private final TranslationHelper translationHelper;
   private final OtpTransitServiceBuilder builder;
@@ -61,22 +61,23 @@ class StopTimeMapper {
   Stream<StopTime> map(CsvInputSource inputSource) throws IOException {
     return new StreamingCsvReader(inputSource)
       .rows(FILE)
+      .map(r -> new StopTimeRow(r, idFactory))
       .map(st -> this.doMap(new StopTimeRow(st, idFactory), builder.getTripsById()));
   }
 
   private StopTime doMap(StopTimeRow row, EntityById<Trip> trips) {
     StopTime lhs = new StopTime();
 
-    var tripId = idFactory.createId(row.requiredString("trip_id"), "stop time's trip");
+    var tripId = idFactory.createId(row.string(TRIP_ID), "stop time's trip");
     var trip = Objects.requireNonNull(
       trips.get(tripId),
       "Stop time refers to non-existent trip with id %s".formatted(tripId)
     );
     lhs.setTrip(trip);
 
-    var stopId = row.string(STOP_ID);
-    var stopLocationId = row.string(LOCATION_ID);
-    var locationGroupId = row.string(STOP_GROUP_ID);
+    var stopId = row.nullableString(STOP_ID);
+    var stopLocationId = row.nullableString(LOCATION_ID);
+    var locationGroupId = row.nullableString(STOP_GROUP_ID);
 
     var siteRepositoryBuilder = builder.siteRepository();
     if (stopId != null) {
@@ -98,7 +99,11 @@ class StopTimeMapper {
       lhs.setStop(Objects.requireNonNull(siteRepositoryBuilder.groupStopById().get(id)));
     } else {
       throw new IllegalArgumentException(
-        "Stop time must have either a %s, %s, or %s".formatted(STOP_ID, LOCATION_ID, STOP_GROUP_ID)
+        "Stop time entry must have either a %s, %s, or %s".formatted(
+            STOP_ID,
+            LOCATION_ID,
+            STOP_GROUP_ID
+          )
       );
     }
 
@@ -106,24 +111,23 @@ class StopTimeMapper {
     lhs.setDepartureTime(row.time(DEPARTURE_TIME));
     lhs.setStopSequence(row.integer(STOP_SEQUENCE));
 
-    lhs.setTimepoint(row.integer(TIMEPOINT));
-    lhs.setShapeDistTraveled(row.getDouble(SHAPE_DIST_TRAVELED));
-    lhs.setPickupType(PickDropMapper.map(row.string(PICKUP_TYPE)));
-    lhs.setDropOffType(PickDropMapper.map(row.string(DROP_OFF_TYPE)));
+    lhs.setTimepoint(row.optionalInteger(TIMEPOINT).orElse(MISSING_VALUE));
+    lhs.setShapeDistTraveled(row.optionalDouble(SHAPE_DIST_TRAVELED).orElse(MISSING_VALUE));
+    lhs.setPickupType(PickDropMapper.map(row.nullableString(PICKUP_TYPE)));
+    lhs.setDropOffType(PickDropMapper.map(row.nullableString(DROP_OFF_TYPE)));
 
     lhs.setFlexWindowStart(row.time(START_PICKUP_DROP_OFF_WINDOW));
     lhs.setFlexWindowEnd(row.time(END_PICKUP_DROP_OFF_WINDOW));
-
-    lhs.setFlexContinuousPickup(
-      PickDropMapper.mapFlexContinuousPickDrop(row.integer(CONTINUOUS_PICKUP))
-    );
-    lhs.setFlexContinuousDropOff(
-      PickDropMapper.mapFlexContinuousPickDrop(row.integer(CONTINUOUS_DROP_OFF))
-    );
+    row
+      .optionalInteger(CONTINUOUS_PICKUP)
+      .ifPresent(i -> lhs.setFlexContinuousPickup(PickDropMapper.mapFlexContinuousPickDrop(i)));
+    row
+      .optionalInteger(CONTINUOUS_DROP_OFF)
+      .ifPresent(i -> lhs.setFlexContinuousDropOff(PickDropMapper.mapFlexContinuousPickDrop(i)));
 
     row.optionalString(STOP_HEADSIGN).ifPresent(hs -> lhs.setStopHeadsign(I18NString.of(hs)));
     row
-      .id(PICKUP_BOOKING_RULE_ID)
+      .optionalId(PICKUP_BOOKING_RULE_ID)
       .ifPresent(id ->
         lhs.setPickupBookingInfo(
           Objects.requireNonNull(
@@ -133,7 +137,7 @@ class StopTimeMapper {
         )
       );
     row
-      .id(DROP_OFF_BOOKING_RULE_ID)
+      .optionalId(DROP_OFF_BOOKING_RULE_ID)
       .ifPresent(id ->
         lhs.setPickupBookingInfo(
           Objects.requireNonNull(
@@ -146,51 +150,26 @@ class StopTimeMapper {
     return lhs;
   }
 
-  record StopTimeRow(Map<String, String> row, IdFactory idFactory) {
-    public String requiredString(String field) {
-      if (row.containsKey(field)) {
-        return row.get(field);
-      } else {
-        throw new IllegalArgumentException(
-          "Missing required field '%s' in stop time CSV row: %s".formatted(field, row)
-        );
-      }
-    }
-    @Nullable
-    public String string(String field) {
-      return row.get(field);
-    }
-    public int integer(String field) {
-      var value = row.get(field);
-      if (StringUtils.hasValue(value)) {
-        return Integer.parseInt(value);
-      } else {
-        return StopTime.MISSING_VALUE;
-      }
-    }
-    public double getDouble(String field) {
-      if (row.containsKey(field)) {
-        return Double.parseDouble(row.get(field));
-      } else {
-        return StopTime.MISSING_VALUE;
-      }
+  static final class StopTimeRow extends GtfsRow {
+
+    private final IdFactory idFactory;
+
+    StopTimeRow(GtfsRow row, IdFactory idFactory) {
+      super(row.fields);
+      this.idFactory = idFactory;
     }
 
     public int time(String field) {
-      var value = row.get(field);
+      var value = fields.get(field);
       if (value != null) {
         return getStringAsSeconds(value);
       } else {
-        return StopTime.MISSING_VALUE;
+        return MISSING_VALUE;
       }
     }
 
-    public Optional<FeedScopedId> id(String field) {
-      return Optional.ofNullable(row.get(field)).map(s -> idFactory.createId(s, field));
-    }
-
-    public Optional<String> optionalString(String stopHeadsign) {
-      return Optional.ofNullable(row.get(stopHeadsign)).filter(StringUtils::hasValue);
+    public Optional<FeedScopedId> optionalId(String field) {
+      return optionalString(field).map(String::intern).map(s -> idFactory.createId(s, field));
     }
   }
 }

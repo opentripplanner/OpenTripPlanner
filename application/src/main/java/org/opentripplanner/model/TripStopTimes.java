@@ -55,20 +55,10 @@ public class TripStopTimes {
   }
 
   public void removeIf(Predicate<Trip> test) {
-    List<Trip> removeKeys = map.keySet().stream().filter(test).collect(Collectors.toList());
+    List<Trip> removeKeys = map.keySet().stream().filter(test).toList();
     for (Trip removeKey : removeKeys) {
       map.remove(removeKey);
     }
-  }
-
-  /**
-   * Return a copy of the internal map. Changes in the source are not reflected in the destination
-   * (returned Map), and visa versa.
-   * <p>
-   * The returned map is immutable.
-   */
-  public Map<Trip, List<StopTime>> asImmutableMap() {
-    return Map.copyOf(map);
   }
 
   public int size() {
