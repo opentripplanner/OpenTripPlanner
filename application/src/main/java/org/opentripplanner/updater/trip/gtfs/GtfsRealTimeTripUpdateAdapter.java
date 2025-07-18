@@ -166,7 +166,7 @@ public class GtfsRealTimeTripUpdateAdapter {
 
       tripDescriptor
         .tripId()
-        .map(id -> new FeedScopedId(feedId, id))
+        .flatMap(id -> id.isBlank() ? Optional.empty() : Optional.of(new FeedScopedId(feedId, id)))
         .ifPresentOrElse(
           tripId -> {
             LocalDate serviceDate;

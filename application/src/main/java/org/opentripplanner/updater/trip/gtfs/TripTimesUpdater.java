@@ -342,6 +342,12 @@ class TripTimesUpdater {
       }
 
       setArrivalAndDeparture(builder, stopIndex, addedStopTime, midnightSecondsSinceEpoch);
+      if (builder.getArrivalTime(stopIndex) == null) {
+        builder.withArrivalDelay(stopIndex, 0);
+      }
+      if (builder.getDepartureTime(stopIndex) == null) {
+        builder.withDepartureDelay(stopIndex, 0);
+      }
     }
 
     // Set service code of new trip times
@@ -368,17 +374,18 @@ class TripTimesUpdater {
   ) {
     var arrivalTime = update.arrivalTime();
     var departureTime = update.departureTime();
-    int arrivalDelay = update.arrivalDelay();
-    int departureDelay = update.departureDelay();
+    var arrivalDelay = update.arrivalDelay();
+    var departureDelay = update.departureDelay();
     arrivalTime.ifPresentOrElse(
       time ->
         builder.withArrivalTime(stopPositionInPattern, (int) (time - midnightSecondsSinceEpoch)),
-      () -> builder.withArrivalDelay(stopPositionInPattern, arrivalDelay)
+      () -> arrivalDelay.ifPresent(delay -> builder.withArrivalDelay(stopPositionInPattern, delay))
     );
     departureTime.ifPresentOrElse(
       time ->
         builder.withDepartureTime(stopPositionInPattern, (int) (time - midnightSecondsSinceEpoch)),
-      () -> builder.withDepartureDelay(stopPositionInPattern, departureDelay)
+      () ->
+        departureDelay.ifPresent(delay -> builder.withDepartureDelay(stopPositionInPattern, delay))
     );
   }
 

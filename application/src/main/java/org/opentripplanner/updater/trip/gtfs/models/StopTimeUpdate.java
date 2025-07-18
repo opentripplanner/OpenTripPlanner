@@ -156,23 +156,30 @@ public final class StopTimeUpdate {
   private OptionalLong getScheduledTimeWithRealTimeFallback(StopTimeEvent stopTimeEvent) {
     return stopTimeEvent.hasScheduledTime()
       ? OptionalLong.of(stopTimeEvent.getScheduledTime())
-      : getTime(stopTimeEvent).stream().map(time -> time - getDelay(stopTimeEvent)).findFirst();
+      : getTime(stopTimeEvent)
+        .stream()
+        .map(time -> time - getDelay(stopTimeEvent).orElse(0))
+        .findFirst();
   }
 
-  public int arrivalDelay() {
-    return stopTimeUpdate.hasArrival() ? getDelay(stopTimeUpdate.getArrival()) : 0;
+  public OptionalInt arrivalDelay() {
+    return stopTimeUpdate.hasArrival()
+      ? getDelay(stopTimeUpdate.getArrival())
+      : OptionalInt.empty();
   }
 
-  public int departureDelay() {
-    return stopTimeUpdate.hasDeparture() ? getDelay(stopTimeUpdate.getDeparture()) : 0;
+  public OptionalInt departureDelay() {
+    return stopTimeUpdate.hasDeparture()
+      ? getDelay(stopTimeUpdate.getDeparture())
+      : OptionalInt.empty();
   }
 
-  private int getDelay(StopTimeEvent stopTimeEvent) {
+  private OptionalInt getDelay(StopTimeEvent stopTimeEvent) {
     return stopTimeEvent.hasDelay()
-      ? stopTimeEvent.getDelay()
-      : stopTimeEvent.hasScheduledTime()
-        ? (int) (stopTimeEvent.getTime() - stopTimeEvent.getScheduledTime())
-        : 0;
+      ? OptionalInt.of(stopTimeEvent.getDelay())
+      : stopTimeEvent.hasTime() && stopTimeEvent.hasScheduledTime()
+        ? OptionalInt.of((int) (stopTimeEvent.getTime() - stopTimeEvent.getScheduledTime()))
+        : OptionalInt.empty();
   }
 
   public boolean hasArrival() {
