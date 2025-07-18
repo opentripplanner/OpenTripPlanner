@@ -42,9 +42,9 @@ public class ModifiedTest implements RealtimeTestConstants {
       "SW1234" // we can't change trip short name at real-time yet
     );
     builder
-      .addStopTime(STOP_A_ID, 30)
-      .addStopTime(STOP_B_ID, 45, "Changed Headsign")
-      .addStopTime(STOP_C_ID, 60);
+      .addStopTime(STOP_A_ID, "00:30")
+      .addStopTime(STOP_B_ID, "00:45", "Changed Headsign")
+      .addStopTime(STOP_C_ID, "01:00");
 
     var tripUpdate = builder.build();
 

@@ -28,6 +28,7 @@ import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
+import org.opentripplanner.utils.time.TimeUtils;
 
 class AddedTest implements RealtimeTestConstants {
 
@@ -39,9 +40,9 @@ class AddedTest implements RealtimeTestConstants {
   @Test
   void addedTrip() {
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
-      .addStopTime(STOP_A_ID, 30)
-      .addStopTime(STOP_B_ID, 40)
-      .addStopTime(STOP_C_ID, 55)
+      .addStopTime(STOP_A_ID, "00:30")
+      .addStopTime(STOP_B_ID, "00:40")
+      .addStopTime(STOP_C_ID, "00:55")
       .build();
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
@@ -52,13 +53,13 @@ class AddedTest implements RealtimeTestConstants {
   void addedTripWithNewRoute() {
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       .addTripExtension()
-      .addStopTime(STOP_A_ID, 30, DropOffPickupType.PHONE_AGENCY)
+      .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
       .addStopTime(
         STOP_B_ID,
-        40,
+        "00:40",
         GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties.DropOffPickupType.COORDINATE_WITH_DRIVER
       )
-      .addStopTime(STOP_B_ID, 55, DropOffPickupType.NONE)
+      .addStopTime(STOP_B_ID, "00:55", DropOffPickupType.NONE)
       .build();
 
     var result = env.applyTripUpdate(tripUpdate);
@@ -91,9 +92,9 @@ class AddedTest implements RealtimeTestConstants {
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       // add extension to set route name, url, mode
       .addTripExtension()
-      .addStopTime(STOP_A_ID, 30, DropOffPickupType.PHONE_AGENCY)
-      .addStopTime("UNKNOWN_STOP_ID", 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-      .addStopTime(STOP_C_ID, 55, DropOffPickupType.NONE)
+      .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
+      .addStopTime("UNKNOWN_STOP_ID", "00:40", DropOffPickupType.COORDINATE_WITH_DRIVER)
+      .addStopTime(STOP_C_ID, "00:55", DropOffPickupType.NONE)
       .build();
 
     var result = env.applyTripUpdate(tripUpdate);
@@ -114,9 +115,9 @@ class AddedTest implements RealtimeTestConstants {
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       // add extension to set route name, url, mode
       .addTripExtension()
-      .addStopTime(STOP_A_ID, 30, DropOffPickupType.PHONE_AGENCY)
-      .addStopTime(STOP_B_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-      .addStopTime(STOP_C_ID, 55, DropOffPickupType.NONE)
+      .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
+      .addStopTime(STOP_B_ID, "00:40", DropOffPickupType.COORDINATE_WITH_DRIVER)
+      .addStopTime(STOP_C_ID, "00:55", DropOffPickupType.NONE)
       .build();
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
@@ -143,11 +144,11 @@ class AddedTest implements RealtimeTestConstants {
       "SW1234"
     );
     builder
-      .addStopTime(STOP_A_ID, 30, DropOffPickupType.PHONE_AGENCY)
-      .addSkippedStop(STOP_B_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-      .addSkippedStop(STOP_C_ID, 48)
-      .addStopTime(STOP_D_ID, 55, "A (non-stop)")
-      .addStopTime(STOP_A_ID, 60);
+      .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
+      .addSkippedStop(STOP_B_ID, "00:40", DropOffPickupType.COORDINATE_WITH_DRIVER)
+      .addSkippedStop(STOP_C_ID, "00:48")
+      .addStopTime(STOP_D_ID, "00:55", "A (non-stop)")
+      .addStopTime(STOP_A_ID, "01:00");
     var tripUpdate = builder.build();
 
     env.applyTripUpdate(tripUpdate);
@@ -178,9 +179,9 @@ class AddedTest implements RealtimeTestConstants {
     var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE);
 
     builder
-      .addStopTime(STOP_A_ID, 10000)
-      .addStopTimeWithDelay(STOP_B_ID, 11300, 300)
-      .addStopTimeWithScheduled(STOP_C_ID, 12500, 12000);
+      .addStopTime(STOP_A_ID, "08:00")
+      .addStopTimeWithDelay(STOP_B_ID, "08:35", 300)
+      .addStopTimeWithScheduled(STOP_C_ID, "09:10", "09:00");
 
     var tripUpdate = builder.build();
     env.applyTripUpdate(tripUpdate);
@@ -191,11 +192,11 @@ class AddedTest implements RealtimeTestConstants {
     var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
     var tripTimes = forToday.getTripTimes(id(ADDED_TRIP_ID));
     assertEquals(0, tripTimes.getDepartureDelay(0));
-    assertEquals(10000, tripTimes.getDepartureTime(0));
+    assertEquals(TimeUtils.time("08:00"), tripTimes.getDepartureTime(0));
     assertEquals(300, tripTimes.getArrivalDelay(1));
-    assertEquals(11300, tripTimes.getArrivalTime(1));
-    assertEquals(500, tripTimes.getArrivalDelay(2));
-    assertEquals(12500, tripTimes.getArrivalTime(2));
+    assertEquals(TimeUtils.time("08:35"), tripTimes.getArrivalTime(1));
+    assertEquals(600, tripTimes.getArrivalDelay(2));
+    assertEquals(TimeUtils.time("09:10"), tripTimes.getArrivalTime(2));
   }
 
   private static TripPattern assertAddedTrip(String tripId, RealtimeTestEnvironment env) {
