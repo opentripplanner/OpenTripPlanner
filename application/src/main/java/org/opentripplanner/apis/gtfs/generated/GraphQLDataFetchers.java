@@ -615,16 +615,26 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<Object>> timeSpans();
   }
 
+  /**
+   * A stop that isn't a fixed point but zone where passengers can board or alight anywhere.
+   *
+   * This is mostly used by demand-responsive services.
+   */
   public interface GraphQLLocation {
     public DataFetcher<Object> geometry();
 
-    public DataFetcher<String> id();
+    public DataFetcher<String> gtfsId();
 
     public DataFetcher<String> name();
   }
 
+  /**
+   * A group of fixed stops that is visited in an arbitrary order.
+   *
+   * This is mostly used by demand-responsive services.
+   */
   public interface GraphQLLocationGroup {
-    public DataFetcher<String> id();
+    public DataFetcher<String> gtfsId();
 
     public DataFetcher<Iterable<Object>> members();
 
@@ -1258,6 +1268,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<String>> zones();
   }
 
+  /** A time window when a vehicle visit a stop, area or group of stops. */
   public interface GraphQLTimeWindow {
     public DataFetcher<java.time.OffsetDateTime> end();
 

@@ -2474,6 +2474,7 @@ type TicketType implements Node {
   zones: [String!]
 }
 
+"A time window when a vehicle visit a stop, area or group of stops."
 type TimeWindow {
   end: OffsetDateTime!
   start: OffsetDateTime!
