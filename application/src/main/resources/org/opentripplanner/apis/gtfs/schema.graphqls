@@ -830,7 +830,7 @@ type Leg {
   realTime: Boolean
   "State of real-time data"
   realtimeState: RealtimeState
-  "Whether this leg is traversed with a rented bike."
+  "Whether this leg is traversed with a rented vehicle."
   rentedBike: Boolean
   "Estimate of a hailed ride like Uber."
   rideHailingEstimate: RideHailingEstimate
