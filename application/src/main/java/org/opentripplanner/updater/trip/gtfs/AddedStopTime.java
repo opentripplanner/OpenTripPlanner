@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip.gtfs;
 
 import com.google.transit.realtime.GtfsRealtime;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties;
 import de.mfdz.MfdzRealtimeExtensions;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -44,7 +45,7 @@ final class AddedStopTime {
   }
 
   private PickDrop getPickDrop(
-    @Nullable GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties.DropOffPickupType dropOffPickupType,
+    @Nullable StopTimeProperties.DropOffPickupType dropOffPickupType,
     @Nullable MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType extensionDropOffPickup
   ) {
     if (isSkipped()) {
@@ -63,7 +64,7 @@ final class AddedStopTime {
   }
 
   private Optional<
-    GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties
+    StopTimeProperties
   > getStopTimeProperties() {
     return stopTimeUpdate.hasStopTimeProperties()
       ? Optional.of(stopTimeUpdate.getStopTimeProperties())
