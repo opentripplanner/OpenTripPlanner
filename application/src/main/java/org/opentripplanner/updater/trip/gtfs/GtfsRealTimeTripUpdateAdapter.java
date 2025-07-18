@@ -234,7 +234,7 @@ public class GtfsRealTimeTripUpdateAdapter {
             forwardsDelayPropagationType,
             backwardsDelayPropagationType
           );
-          case NEW, ADDED -> validateAndHandleAddedTrip(
+          case NEW, ADDED -> validateAndHandleNewTrip(
             tripUpdate,
             tripDescriptor,
             tripId,
@@ -462,7 +462,7 @@ public class GtfsRealTimeTripUpdateAdapter {
    * @param tripDescriptor GTFS-RT TripDescriptor
    * @return empty Result if successful or one containing an error
    */
-  private Result<UpdateSuccess, UpdateError> validateAndHandleAddedTrip(
+  private Result<UpdateSuccess, UpdateError> validateAndHandleNewTrip(
     final TripUpdate tripUpdate,
     final TripDescriptor tripDescriptor,
     final FeedScopedId tripId,
@@ -516,9 +516,9 @@ public class GtfsRealTimeTripUpdateAdapter {
     }
 
     //
-    // Handle added trip
+    // Handle new trip
     //
-    return handleAddedTrip(
+    return handleNewTrip(
       tripUpdate,
       stopTimeUpdates,
       tripDescriptor,
@@ -667,7 +667,7 @@ public class GtfsRealTimeTripUpdateAdapter {
    * @param serviceDate     service date for added trip
    * @return empty Result if successful or one containing an error
    */
-  private Result<UpdateSuccess, UpdateError> handleAddedTrip(
+  private Result<UpdateSuccess, UpdateError> handleNewTrip(
     final TripUpdate tripUpdate,
     final List<StopTimeUpdate> stopTimeUpdates,
     final TripDescriptor tripDescriptor,
@@ -726,7 +726,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       tripBuilder.withShortName(tripShortName);
     }
 
-    return addNewOrReplacementTripToGraphAndBuffer(
+    return addNewOrReplacementTripToSnapshot(
       tripBuilder.build(),
       tripUpdate.getVehicle(),
       stopTimeUpdates,
@@ -824,7 +824,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   }
 
   /**
-   * Add a new or replacement trip to the graph and the buffer
+   * Add a new or replacement trip to the snapshot
    *
    * @param trip              trip
    * @param vehicleDescriptor accessibility information of the vehicle
@@ -833,7 +833,7 @@ public class GtfsRealTimeTripUpdateAdapter {
    * @param realTimeState     real-time state of new trip
    * @return empty Result if successful or one containing an error
    */
-  private Result<UpdateSuccess, UpdateError> addNewOrReplacementTripToGraphAndBuffer(
+  private Result<UpdateSuccess, UpdateError> addNewOrReplacementTripToSnapshot(
     final Trip trip,
     final GtfsRealtime.VehicleDescriptor vehicleDescriptor,
     final List<StopTimeUpdate> stopTimeUpdates,
@@ -902,7 +902,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       stopTime.setDropOffType(added.dropOff());
       added
         .stopHeadsign()
-        .ifPresent(headsign -> stopTime.setStopHeadsign(new NonLocalizedString(headsign)));
+        .ifPresent(stopTime::setStopHeadsign);
       // Add stop time to list
       stopTimes.add(stopTime);
     }
@@ -1185,7 +1185,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     cancelScheduledTrip(tripId, serviceDate, CancelationType.DELETE);
 
     // Add new trip
-    return addNewOrReplacementTripToGraphAndBuffer(
+    return addNewOrReplacementTripToSnapshot(
       trip,
       tripUpdate.getVehicle(),
       tripUpdate.getStopTimeUpdateList(),
