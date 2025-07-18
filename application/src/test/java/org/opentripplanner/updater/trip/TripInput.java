@@ -15,7 +15,12 @@ import org.opentripplanner.utils.time.TimeUtils;
  * A simple data structure that is used by the {@link RealtimeTestEnvironment} to create
  * trips, trips on date and patterns.
  */
-public record TripInput(String id, Route route, List<StopCall> stops, @Nullable I18NString headsign) {
+public record TripInput(
+  String id,
+  Route route,
+  List<StopCall> stops,
+  @Nullable I18NString headsign
+) {
   public static TripInputBuilder of(String id) {
     return new TripInputBuilder(id);
   }

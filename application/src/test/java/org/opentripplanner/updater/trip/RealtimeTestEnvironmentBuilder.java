@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.IntStream;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -118,7 +117,7 @@ public class RealtimeTestEnvironmentBuilder {
   private static void createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
     var trip = Trip.of(id(tripInput.id()))
       .withRoute(tripInput.route())
-      .withHeadsign(tripInput.headsign() == null ? null : I18NString.of(tripInput.headsign()))
+      .withHeadsign(tripInput.headsign() == null ? null : tripInput.headsign())
       .withServiceId(SERVICE_ID)
       .build();
 

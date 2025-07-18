@@ -1,6 +1,7 @@
-package org.opentripplanner.updater.trip.gtfs;
+package org.opentripplanner.updater.trip.gtfs.models;
 
 import com.google.transit.realtime.GtfsRealtime;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import de.mfdz.MfdzRealtimeExtensions;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -14,37 +15,75 @@ import org.opentripplanner.model.PickDrop;
  * This class purely exists to encapsulate the logic for extracting conversion of the GTFS-RT
  * updates into a separate place.
  */
-final class AddedStopTime {
+public final class StopTimeUpdate {
 
   private final GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate;
 
-  AddedStopTime(GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate) {
+  public StopTimeUpdate(GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate) {
     this.stopTimeUpdate = stopTimeUpdate;
   }
 
-  PickDrop pickup() {
-    return getPickDrop(
-      getStopTimeProperties()
+  public Optional<PickDrop> pickup() {
+    return stopTimeProperties()
+      .flatMap(p ->
+        p.hasPickupType() ? Optional.of(p.getPickupType().getNumber()) : Optional.empty()
+      )
+      .or(() ->
+        stopTimePropertiesExtension()
+          .flatMap(p ->
+            p.hasPickupType() ? Optional.of(p.getPickupType().getNumber()) : Optional.empty()
+          )
+      )
+      .map(PickDropMapper::map);
+  }
+
+  public Optional<PickDrop> dropoff() {
+    return stopTimeProperties()
+      .flatMap(p ->
+        p.hasDropOffType() ? Optional.of(p.getDropOffType().getNumber()) : Optional.empty()
+      )
+      .or(() ->
+        stopTimePropertiesExtension()
+          .flatMap(p ->
+            p.hasDropoffType() ? Optional.of(p.getDropoffType().getNumber()) : Optional.empty()
+          )
+      )
+      .map(PickDropMapper::map);
+  }
+
+  /**
+   * @return the effective pickup type even if it is not explicitly specified, for the use in NEW trips.
+   */
+  public PickDrop effectivePickup() {
+    return getEffectivePickDrop(
+      stopTimeProperties()
         .map(properties -> properties.hasPickupType() ? properties.getPickupType() : null)
         .orElse(null),
-      getStopTimePropertiesExtension()
+      stopTimePropertiesExtension()
         .map(properties -> properties.hasPickupType() ? properties.getPickupType() : null)
         .orElse(null)
     );
   }
 
-  PickDrop dropOff() {
-    return getPickDrop(
-      getStopTimeProperties()
+  /**
+   * @return the effective dropoff type even if it is not explicitly specified, for the use in NEW trips.
+   */
+  public PickDrop effectiveDropoff() {
+    return getEffectivePickDrop(
+      stopTimeProperties()
         .map(properties -> properties.hasDropOffType() ? properties.getDropOffType() : null)
         .orElse(null),
-      getStopTimePropertiesExtension()
+      stopTimePropertiesExtension()
         .map(properties -> properties.hasDropoffType() ? properties.getDropoffType() : null)
         .orElse(null)
     );
   }
 
-  private PickDrop getPickDrop(
+  public GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship() {
+    return stopTimeUpdate.getScheduleRelationship();
+  }
+
+  private PickDrop getEffectivePickDrop(
     @Nullable GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties.DropOffPickupType dropOffPickupType,
     @Nullable MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType extensionDropOffPickup
   ) {
@@ -63,9 +102,7 @@ final class AddedStopTime {
     return PickDrop.SCHEDULED;
   }
 
-  private Optional<
-    GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties
-  > getStopTimeProperties() {
+  private Optional<GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties> stopTimeProperties() {
     return stopTimeUpdate.hasStopTimeProperties()
       ? Optional.of(stopTimeUpdate.getStopTimeProperties())
       : Optional.empty();
@@ -73,8 +110,8 @@ final class AddedStopTime {
 
   private Optional<
     MfdzRealtimeExtensions.StopTimePropertiesExtension
-  > getStopTimePropertiesExtension() {
-    return getStopTimeProperties()
+  > stopTimePropertiesExtension() {
+    return stopTimeProperties()
       .map(stopTimeProperties ->
         stopTimeProperties.hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
           ? stopTimeProperties.getExtension(MfdzRealtimeExtensions.stopTimeProperties)
@@ -82,31 +119,31 @@ final class AddedStopTime {
       );
   }
 
-  OptionalLong scheduledArrivalTimeWithRealTimeFallback() {
+  public OptionalLong scheduledArrivalTimeWithRealTimeFallback() {
     return stopTimeUpdate.hasArrival()
       ? getScheduledTimeWithRealTimeFallback(stopTimeUpdate.getArrival())
       : OptionalLong.empty();
   }
 
-  OptionalLong arrivalTime() {
+  public OptionalLong arrivalTime() {
     return stopTimeUpdate.hasArrival()
       ? getTime(stopTimeUpdate.getArrival())
       : OptionalLong.empty();
   }
 
-  OptionalLong scheduledDepartureTimeWithRealTimeFallback() {
+  public OptionalLong scheduledDepartureTimeWithRealTimeFallback() {
     return stopTimeUpdate.hasDeparture()
       ? getScheduledTimeWithRealTimeFallback(stopTimeUpdate.getDeparture())
       : OptionalLong.empty();
   }
 
-  OptionalLong departureTime() {
+  public OptionalLong departureTime() {
     return stopTimeUpdate.hasDeparture()
       ? getTime(stopTimeUpdate.getDeparture())
       : OptionalLong.empty();
   }
 
-  private OptionalLong getTime(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
+  private OptionalLong getTime(StopTimeEvent stopTimeEvent) {
     return stopTimeEvent.hasTime()
       ? OptionalLong.of(stopTimeEvent.getTime())
       : OptionalLong.empty();
@@ -116,21 +153,21 @@ final class AddedStopTime {
    * Get the scheduled time of a StopTimeEvent.
    * If it is not specified, calculate it from time - delay.
    */
-  private OptionalLong getScheduledTimeWithRealTimeFallback(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
+  private OptionalLong getScheduledTimeWithRealTimeFallback(StopTimeEvent stopTimeEvent) {
     return stopTimeEvent.hasScheduledTime()
       ? OptionalLong.of(stopTimeEvent.getScheduledTime())
       : getTime(stopTimeEvent).stream().map(time -> time - getDelay(stopTimeEvent)).findFirst();
   }
 
-  int arrivalDelay() {
+  public int arrivalDelay() {
     return stopTimeUpdate.hasArrival() ? getDelay(stopTimeUpdate.getArrival()) : 0;
   }
 
-  int departureDelay() {
+  public int departureDelay() {
     return stopTimeUpdate.hasDeparture() ? getDelay(stopTimeUpdate.getDeparture()) : 0;
   }
 
-  private int getDelay(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
+  private int getDelay(StopTimeEvent stopTimeEvent) {
     return stopTimeEvent.hasDelay()
       ? stopTimeEvent.getDelay()
       : stopTimeEvent.hasScheduledTime()
@@ -138,29 +175,68 @@ final class AddedStopTime {
         : 0;
   }
 
-  boolean isSkipped() {
+  public boolean hasArrival() {
+    return stopTimeUpdate.hasArrival();
+  }
+
+  public boolean hasDeparture() {
+    return stopTimeUpdate.hasDeparture();
+  }
+
+  /**
+   * Check if the arrival for a SCHEDULED trip update is valid.
+   * If it is provided, it must either contain a time or delay.
+   * This check does not apply to a NEW trip update where it is possible to provide only a scheduled time.
+   */
+  public boolean isArrivalValid() {
+    return (
+      !stopTimeUpdate.hasArrival() ||
+      stopTimeUpdate.getArrival().hasTime() ||
+      stopTimeUpdate.getArrival().hasDelay()
+    );
+  }
+
+  /**
+   * Check if the departure for a SCHEDULED trip update is valid.
+   * If it is provided, it must either contain a time or delay.
+   * This check does not apply to a NEW trip update where it is possible to provide only a scheduled time.
+   */
+  public boolean isDepartureValid() {
+    return (
+      !stopTimeUpdate.hasDeparture() ||
+      stopTimeUpdate.getDeparture().hasTime() ||
+      stopTimeUpdate.getDeparture().hasDelay()
+    );
+  }
+
+  public boolean isSkipped() {
     return (
       stopTimeUpdate.getScheduleRelationship() ==
       GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED
     );
   }
 
-  OptionalInt stopSequence() {
+  public OptionalInt stopSequence() {
     return stopTimeUpdate.hasStopSequence()
       ? OptionalInt.of(stopTimeUpdate.getStopSequence())
       : OptionalInt.empty();
   }
 
-  Optional<String> stopId() {
+  public Optional<String> stopId() {
     return stopTimeUpdate.hasStopId() ? Optional.of(stopTimeUpdate.getStopId()) : Optional.empty();
   }
 
-  Optional<I18NString> stopHeadsign() {
+  public Optional<I18NString> stopHeadsign() {
     return (
         stopTimeUpdate.hasStopTimeProperties() &&
         stopTimeUpdate.getStopTimeProperties().hasStopHeadsign()
       )
       ? Optional.of(I18NString.of(stopTimeUpdate.getStopTimeProperties().getStopHeadsign()))
       : Optional.empty();
+  }
+
+  public Optional<String> assignedStopId() {
+    return stopTimeProperties()
+      .flatMap(p -> p.hasAssignedStopId() ? Optional.of(p.getAssignedStopId()) : Optional.empty());
   }
 }

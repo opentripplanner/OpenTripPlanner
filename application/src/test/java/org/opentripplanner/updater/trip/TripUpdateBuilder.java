@@ -120,11 +120,7 @@ public class TripUpdateBuilder {
     );
   }
 
-  public TripUpdateBuilder addStopTime(
-    String stopId,
-    String time,
-    DropOffPickupType pickDrop
-  ) {
+  public TripUpdateBuilder addStopTime(String stopId, String time, DropOffPickupType pickDrop) {
     return addStopTime(
       stopId,
       time,
@@ -243,11 +239,7 @@ public class TripUpdateBuilder {
     );
   }
 
-  public TripUpdateBuilder addSkippedStop(
-    String stopId,
-    String time,
-    DropOffPickupType pickDrop
-  ) {
+  public TripUpdateBuilder addSkippedStop(String stopId, String time, DropOffPickupType pickDrop) {
     return addStopTime(
       stopId,
       time,
