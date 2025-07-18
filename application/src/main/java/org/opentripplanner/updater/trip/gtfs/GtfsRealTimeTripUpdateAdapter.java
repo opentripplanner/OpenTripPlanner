@@ -938,8 +938,8 @@ public class GtfsRealTimeTripUpdateAdapter {
         builder.withCanceled(stopIndex);
       }
 
-      OptionalLong arrivalTime = addedStopTime.arrivalTime();
-      OptionalLong departureTime = addedStopTime.departureTime();
+      var arrivalTime = addedStopTime.arrivalTime();
+      var departureTime = addedStopTime.departureTime();
       int arrivalDelay = addedStopTime.arrivalDelay();
       int departureDelay = addedStopTime.departureDelay();
       int stop = stopIndex;
