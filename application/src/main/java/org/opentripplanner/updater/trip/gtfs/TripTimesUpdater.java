@@ -366,8 +366,8 @@ class TripTimesUpdater {
     StopTimeUpdate update,
     long midnightSecondsSinceEpoch
   ) {
-    OptionalLong arrivalTime = update.arrivalTime();
-    OptionalLong departureTime = update.departureTime();
+    var arrivalTime = update.arrivalTime();
+    var departureTime = update.departureTime();
     int arrivalDelay = update.arrivalDelay();
     int departureDelay = update.departureDelay();
     arrivalTime.ifPresentOrElse(
