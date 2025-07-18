@@ -27,7 +27,7 @@ public class ModifiedTest implements RealtimeTestConstants {
     var TRIP_INPUT = TripInput.of(TRIP_1_ID)
       .addStop(STOP_A, "8:30:00", "8:30:00")
       .addStop(STOP_B, "8:40:00", "8:40:00")
-      .withHeadsign("Original Headsign")
+      .withHeadsign(I18NString.of("Original Headsign"))
       .build();
     var env = RealtimeTestEnvironment.of()
       .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
@@ -59,6 +59,7 @@ public class ModifiedTest implements RealtimeTestConstants {
     // Original trip pattern
     {
       var trip = transitService.getTrip(tripId);
+      assertNotNull(trip);
       var originalTripPattern = transitService.findPattern(trip);
 
       var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
