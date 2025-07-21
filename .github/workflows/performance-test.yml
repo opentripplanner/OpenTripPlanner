@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - location-group-perf
 
 jobs:
   perf-test:
@@ -25,7 +26,7 @@ jobs:
           - location: germany # all of Germany (500k stops, 200k patterns) but no OSM
             iterations: 1
             jfr-delay: "50s"
-            profile: core
+            profile: extended
 
           - location: norway
             iterations: 4
@@ -35,7 +36,7 @@ jobs:
           - location: skanetrafiken
             iterations: 1
             jfr-delay: "50s"
-            profile: core
+            profile: extended
 
           # extended locations that are run only after merging to dev-2.x
 
@@ -48,7 +49,7 @@ jobs:
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
             iterations: 1
             jfr-delay: "50s"
-            profile: extended
+            profile: core
 
           - location: switzerland
             iterations: 1
@@ -58,7 +59,7 @@ jobs:
           - location: washington-state
             iterations: 1
             jfr-delay: "20s"
-            profile: extended
+            profile: core
 
     steps:
       - uses: actions/checkout@v4
