@@ -2,6 +2,7 @@ package org.opentripplanner.street.model.vertex;
 
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.search.TraverseMode;
 
 /**
  * This vertex is created from all barrier tags.
@@ -16,21 +17,22 @@ import org.opentripplanner.street.model.edge.StreetEdge;
  */
 public class BarrierVertex extends OsmVertex {
 
-  public static final StreetTraversalPermission defaultBarrierPermissions =
+  public static final StreetTraversalPermission DEFAULT_PERMISSION =
     StreetTraversalPermission.ALL;
   private StreetTraversalPermission barrierPermissions;
 
-  public BarrierVertex(double x, double y, long nodeId) {
+  public BarrierVertex(double x, double y, long nodeId, StreetTraversalPermission barrierPermissions) {
     super(x, y, nodeId);
-    barrierPermissions = defaultBarrierPermissions;
+    this.barrierPermissions = barrierPermissions;
   }
 
   public StreetTraversalPermission getBarrierPermissions() {
     return barrierPermissions;
   }
 
-  public void setBarrierPermissions(StreetTraversalPermission barrierPermissions) {
-    this.barrierPermissions = barrierPermissions;
+  @Override
+  public boolean disallows(TraverseMode mode) {
+    return barrierPermissions.disallows(mode);
   }
 
   /*

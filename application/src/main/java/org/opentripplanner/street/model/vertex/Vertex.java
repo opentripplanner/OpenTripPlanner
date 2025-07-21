@@ -16,6 +16,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.slf4j.Logger;
@@ -263,6 +264,10 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
    */
   public Set<AreaStop> areaStops() {
     return Set.of();
+  }
+
+  public boolean disallows(TraverseMode mode) {
+    return false;
   }
 
   /**

@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 
-public class StreetTraversalPermissionTest {
+class StreetTraversalPermissionTest {
 
   @Test
-  public void testGetCode() {
+  void testGetCode() {
     StreetTraversalPermission perm1 = StreetTraversalPermission.BICYCLE_AND_CAR;
     StreetTraversalPermission perm2 = StreetTraversalPermission.get(perm1.code);
     assertEquals(perm1, perm2);
@@ -22,14 +22,14 @@ public class StreetTraversalPermissionTest {
   }
 
   @Test
-  public void testRemove() {
+  void testRemove() {
     StreetTraversalPermission perm1 = StreetTraversalPermission.CAR;
     StreetTraversalPermission none = perm1.remove(StreetTraversalPermission.CAR);
     assertEquals(StreetTraversalPermission.NONE, none);
   }
 
   @Test
-  public void testAllowsStreetTraversalPermission() {
+  void testAllowsStreetTraversalPermission() {
     StreetTraversalPermission perm1 = StreetTraversalPermission.ALL;
     assertTrue(perm1.allows(StreetTraversalPermission.CAR));
     assertTrue(perm1.allows(StreetTraversalPermission.BICYCLE));
@@ -38,14 +38,14 @@ public class StreetTraversalPermissionTest {
   }
 
   @Test
-  public void testAllowsTraverseMode() {
+  void testAllowsTraverseMode() {
     StreetTraversalPermission perm1 = StreetTraversalPermission.ALL;
     assertTrue(perm1.allows(TraverseMode.CAR));
     assertTrue(perm1.allows(TraverseMode.WALK));
   }
 
   @Test
-  public void testAllowsTraverseModeSet() {
+  void testAllowsTraverseModeSet() {
     StreetTraversalPermission perm = StreetTraversalPermission.BICYCLE_AND_CAR;
     assertTrue(perm.allows(TraverseModeSet.allModes()));
     assertTrue(perm.allows(new TraverseModeSet(TraverseMode.CAR, TraverseMode.BICYCLE)));
@@ -54,7 +54,7 @@ public class StreetTraversalPermissionTest {
   }
 
   @Test
-  public void testAllowsAnythingNothing() {
+  void testAllowsAnythingNothing() {
     StreetTraversalPermission perm = StreetTraversalPermission.CAR;
     assertTrue(perm.allowsAnything());
     assertFalse(perm.allowsNothing());
@@ -65,7 +65,7 @@ public class StreetTraversalPermissionTest {
   }
 
   @Test
-  public void testIntersect() {
+  void testIntersect() {
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
     StreetTraversalPermission bike_walk = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 

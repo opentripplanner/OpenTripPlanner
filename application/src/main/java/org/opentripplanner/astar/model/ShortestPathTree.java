@@ -46,9 +46,6 @@ public class ShortestPathTree<
 
   private final Map<Vertex, List<State>> stateSets;
 
-  /** Indicates that the search timed out or was otherwise aborted. */
-  private boolean aborted = false;
-
   public ShortestPathTree(DominanceFunction<State> dominanceFunction) {
     this.dominanceFunction = dominanceFunction;
     // Initialized with a reasonable size, see #4445
@@ -241,7 +238,6 @@ public class ShortestPathTree<
   }
 
   public void setAborted() {
-    aborted = true;
   }
 
   public String toString() {

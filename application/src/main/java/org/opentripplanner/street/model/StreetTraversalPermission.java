@@ -78,6 +78,16 @@ public enum StreetTraversalPermission {
       return true;
     } else return mode == TraverseMode.CAR && allows(StreetTraversalPermission.CAR);
   }
+  public boolean disallows(TraverseMode mode) {
+    if(this == NONE) {
+      return true;
+    }
+    return switch (mode) {
+      case WALK -> this == CAR || this == BICYCLE_AND_CAR;
+      case BICYCLE, SCOOTER -> this == CAR || this == PEDESTRIAN_AND_CAR;
+      case CAR, FLEX -> this == PEDESTRIAN || this == PEDESTRIAN_AND_BICYCLE;
+    };
+  }
 
   /**
    * Returns true if there are any modes allowed by this permission.

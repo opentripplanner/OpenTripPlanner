@@ -157,18 +157,14 @@ public class StreetEdge
    * with different tags
    * <p>
    * If start/end isn't bollard it just checks the street permissions.
-   * <p>
-   * It is used in {@link #canTraverse(TraverseMode)}
    */
   public boolean canTraverse(TraverseMode mode) {
-    StreetTraversalPermission permission = getPermission();
-    if (fromv instanceof BarrierVertex) {
-      permission = permission.intersection(((BarrierVertex) fromv).getBarrierPermissions());
+    if (fromv.disallows(mode)) {
+      return false;
     }
-    if (tov instanceof BarrierVertex) {
-      permission = permission.intersection(((BarrierVertex) tov).getBarrierPermissions());
+    if (tov.disallows(mode)) {
+      return false;
     }
-
     return permission.allows(mode);
   }
 
@@ -208,10 +204,6 @@ public class StreetEdge
     TraverseMode traverseMode,
     boolean walkingBike
   ) {
-    if (traverseMode == null) {
-      return Double.NaN;
-    }
-
     final double speed =
       switch (traverseMode) {
         case WALK -> walkingBike

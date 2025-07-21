@@ -96,9 +96,8 @@ class VertexGenerator {
       }
 
       if (node.isBarrier()) {
-        BarrierVertex bv = vertexFactory.barrier(nid, coordinate);
-        bv.setBarrierPermissions(node.overridePermissions(BarrierVertex.defaultBarrierPermissions));
-        iv = bv;
+        var permissions = node.overridePermissions(BarrierVertex.DEFAULT_PERMISSION);
+        iv = vertexFactory.barrier(nid, coordinate, permissions);
       }
 
       if (includeOsmSubwayEntrances && node.isSubwayEntrance()) {

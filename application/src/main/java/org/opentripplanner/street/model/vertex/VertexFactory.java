@@ -10,6 +10,7 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.BoardingArea;
@@ -87,8 +88,8 @@ public class VertexFactory {
     return addToGraph(new SplitterVertex(uniqueSplitLabel, x, y, originalEdge.getName()));
   }
 
-  public BarrierVertex barrier(long nid, Coordinate coordinate) {
-    return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid));
+  public BarrierVertex barrier(long nid, Coordinate coordinate, StreetTraversalPermission permissions) {
+    return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid, permissions));
   }
 
   public ExitVertex exit(long nid, Coordinate coordinate, String exitName) {
