@@ -237,8 +237,7 @@ public class ShortestPathTree<
     return allStates;
   }
 
-  public void setAborted() {
-  }
+  public void setAborted() {}
 
   public String toString() {
     return "ShortestPathTree(" + this.stateSets.size() + " vertices)";

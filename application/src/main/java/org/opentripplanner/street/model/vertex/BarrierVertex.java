@@ -17,11 +17,15 @@ import org.opentripplanner.street.search.TraverseMode;
  */
 public class BarrierVertex extends OsmVertex {
 
-  public static final StreetTraversalPermission DEFAULT_PERMISSION =
-    StreetTraversalPermission.ALL;
+  public static final StreetTraversalPermission DEFAULT_PERMISSION = StreetTraversalPermission.ALL;
   private StreetTraversalPermission barrierPermissions;
 
-  public BarrierVertex(double x, double y, long nodeId, StreetTraversalPermission barrierPermissions) {
+  public BarrierVertex(
+    double x,
+    double y,
+    long nodeId,
+    StreetTraversalPermission barrierPermissions
+  ) {
     super(x, y, nodeId);
     this.barrierPermissions = barrierPermissions;
   }

@@ -138,7 +138,12 @@ public class BarrierVertexTest {
     assertTrue(endVertex_to_bv_forward.canTraverse(TraverseMode.WALK));
 
     //tests bollard which allows only walking
-    BarrierVertex onlyWalkBollard = new BarrierVertex(1.5, 1, 0, StreetTraversalPermission.PEDESTRIAN);
+    BarrierVertex onlyWalkBollard = new BarrierVertex(
+      1.5,
+      1,
+      0,
+      StreetTraversalPermission.PEDESTRIAN
+    );
     StreetEdge edge = edge(onlyWalkBollard, endVertex, 100, false);
 
     assertTrue(edge.canTraverse(new TraverseModeSet(TraverseMode.CAR)));

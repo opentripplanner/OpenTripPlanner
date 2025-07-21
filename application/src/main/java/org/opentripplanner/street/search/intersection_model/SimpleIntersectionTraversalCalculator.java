@@ -9,6 +9,11 @@ public class SimpleIntersectionTraversalCalculator
   extends AbstractIntersectionTraversalCalculator
   implements Serializable {
 
+  private static final int MIN_RIGHT_TURN_ANGLE = 45;
+  private static final int MAX_RIGHT_TURN_ANGLE = 135;
+  private static final int MIN_LEFT_TURN_ANGLE = 225;
+  private static final int MAX_LEFT_TURN_ANGLE = 315;
+  public static final double TURN_TRAFFIC_LIGHT_SECS = 15.0;
   private final DrivingDirection drivingDirection;
 
   private final double acrossTrafficBicycleTurnMultiplier = getSafeBicycleTurnModifier() * 3;
@@ -38,43 +43,6 @@ public class SimpleIntersectionTraversalCalculator
     } else {
       return computeWalkingTraversalDuration(v, from, to, toSpeed);
     }
-  }
-
-  public int getMinRightTurnAngle() {
-    return 45;
-  }
-
-  public int getMaxRightTurnAngle() {
-    return 135;
-  }
-
-  public int getMinLeftTurnAngle() {
-    return 225;
-  }
-
-  public int getMaxLeftTurnAngle() {
-    return 315;
-  }
-
-  /**
-   * Expected time it takes to make a right at a light.
-   */
-  public double getExpectedRightAtLightTimeSec() {
-    return 15.0;
-  }
-
-  /**
-   * Expected time it takes to continue straight at a light.
-   */
-  public double getExpectedStraightAtLightTimeSec() {
-    return 15.0;
-  }
-
-  /**
-   * Expected time it takes to turn left at a light.
-   */
-  public double getExpectedLeftAtLightTimeSec() {
-    return 15.0;
   }
 
   /**
@@ -154,14 +122,7 @@ public class SimpleIntersectionTraversalCalculator
   ) {
     int turnAngle = calculateTurnAngle(from, to);
     if (v.hasDrivingTrafficLight()) {
-      // Use constants that apply when there are stop lights.
-      if (isSafeTurn(turnAngle)) {
-        return getExpectedRightAtLightTimeSec();
-      } else if (isTurnAcrossTraffic(turnAngle)) {
-        return getExpectedLeftAtLightTimeSec();
-      } else {
-        return getExpectedStraightAtLightTimeSec();
-      }
+      return TURN_TRAFFIC_LIGHT_SECS;
     } else {
       //assume highway vertex
       if (from.getCarSpeed() > 25 && to.getCarSpeed() > 25) {
@@ -212,10 +173,10 @@ public class SimpleIntersectionTraversalCalculator
   }
 
   private boolean isLeftTurn(int turnAngle) {
-    return turnAngle >= getMinLeftTurnAngle() && turnAngle < getMaxLeftTurnAngle();
+    return turnAngle >= MIN_LEFT_TURN_ANGLE && turnAngle < MAX_LEFT_TURN_ANGLE;
   }
 
   private boolean isRightTurn(int turnAngle) {
-    return turnAngle >= getMinRightTurnAngle() && turnAngle < getMaxRightTurnAngle();
+    return turnAngle >= MIN_RIGHT_TURN_ANGLE && turnAngle < MAX_RIGHT_TURN_ANGLE;
   }
 }

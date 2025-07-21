@@ -88,7 +88,11 @@ public class VertexFactory {
     return addToGraph(new SplitterVertex(uniqueSplitLabel, x, y, originalEdge.getName()));
   }
 
-  public BarrierVertex barrier(long nid, Coordinate coordinate, StreetTraversalPermission permissions) {
+  public BarrierVertex barrier(
+    long nid,
+    Coordinate coordinate,
+    StreetTraversalPermission permissions
+  ) {
     return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid, permissions));
   }
 

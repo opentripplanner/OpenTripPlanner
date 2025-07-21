@@ -78,8 +78,9 @@ public enum StreetTraversalPermission {
       return true;
     } else return mode == TraverseMode.CAR && allows(StreetTraversalPermission.CAR);
   }
+
   public boolean disallows(TraverseMode mode) {
-    if(this == NONE) {
+    if (this == NONE) {
       return true;
     }
     return switch (mode) {
