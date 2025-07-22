@@ -34,7 +34,6 @@ public abstract class AStarBuilder<
   private SearchTerminationStrategy<State> terminationStrategy;
   private DominanceFunction<State> dominanceFunction;
   private Edge originBackEdge;
-  private Collection<State> initialStates;
 
   protected AStarBuilder() {}
 
@@ -104,11 +103,6 @@ public abstract class AStarBuilder<
     return builder;
   }
 
-  public Builder setInitialStates(Collection<State> initialStates) {
-    this.initialStates = initialStates;
-    return builder;
-  }
-
   public ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
     return build().getShortestPathTree();
   }
@@ -123,15 +117,11 @@ public abstract class AStarBuilder<
 
     Collection<State> initialStates;
 
-    if (this.initialStates != null) {
-      initialStates = this.initialStates;
-    } else {
-      initialStates = createInitialStates(origin);
+    initialStates = createInitialStates(origin);
 
-      if (originBackEdge != null) {
-        for (var state : initialStates) {
-          state.initBackEdge(originBackEdge);
-        }
+    if (originBackEdge != null) {
+      for (var state : initialStates) {
+        state.initBackEdge(originBackEdge);
       }
     }
 
