@@ -208,7 +208,7 @@ class FinlandMapperTest {
 
   @Test
   void testWalkingAllowedOnCycleway() {
-    assertEquals(PEDESTRIAN, wps.getDataForWay(WayTestData.cycleway()).getPermission());
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(WayTestData.cycleway()).getPermission());
   }
 
   /**

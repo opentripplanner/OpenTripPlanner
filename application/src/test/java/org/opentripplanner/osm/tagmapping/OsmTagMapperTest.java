@@ -117,7 +117,7 @@ class OsmTagMapperTest {
   @Test
   void testCyclewaySharedWithFoot() {
     assertEquals(
-      PEDESTRIAN,
+      PEDESTRIAN_AND_BICYCLE,
       wps.getDataForWay(WayTestData.cyclewaySharedWithFoot()).getPermission()
     );
   }
