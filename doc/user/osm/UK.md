@@ -24,26 +24,15 @@ Lower safety values make an OSM way more desirable and higher values less desira
 
 | specifier                                               | permission               | bike safety                   | walk safety |
 |---------------------------------------------------------|--------------------------|-------------------------------|-------------|
-| `highway=trunk_link`                                    | `ALL`                    | 2.06                          |             |
-| `highway=trunk`                                         | `ALL`                    | 7.47                          |             |
-| `highway=trunk; cycleway=lane`                          | `ALL`                    | 1.5                           |             |
-| `highway=trunk_link; cycleway=lane`                     | `ALL`                    | 1.15                          |             |
-| `highway=trunk; cycleway=share_busway`                  | `ALL`                    | 1.75                          |             |
-| `highway=trunk_link; cycleway=share_busway`             | `ALL`                    | 1.25                          |             |
-| `highway=trunk; cycleway=opposite_lane`                 | `ALL`                    | forward: 7.47 <br> back: 1.5  |             |
-| `highway=trunk_link; cycleway=opposite_lane`            | `ALL`                    | forward: 2.06 <br> back: 1.15 |             |
-| `highway=trunk; cycleway=track`                         | `ALL`                    | 0.95                          |             |
-| `highway=trunk_link; cycleway=track`                    | `ALL`                    | 0.85                          |             |
-| `highway=trunk; cycleway=opposite_track`                | `ALL`                    | forward: 7.47 <br> back: 0.95 |             |
-| `highway=trunk_link; cycleway=opposite_track`           | `ALL`                    | forward: 2.06 <br> back: 0.85 |             |
-| `highway=trunk; bicycle=designated`                     | `ALL`                    | 7.25                          |             |
-| `highway=trunk_link; bicycle=designated`                | `ALL`                    | 2.0                           |             |
+| `highway=cycleway`                                      | `PEDESTRIAN_AND_BICYCLE` | 0.6                           |             |
+| `highway=bridleway`                                     | `PEDESTRIAN_AND_BICYCLE` | 1.3                           |             |
 | `indoor=area`                                           | `PEDESTRIAN`             |                               |             |
 | `indoor=corridor`                                       | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=3`                                           | `NONE`                   |                               |             |
 | `mtb:scale=4`                                           | `NONE`                   |                               |             |
 | `mtb:scale=5`                                           | `NONE`                   |                               |             |
 | `mtb:scale=6`                                           | `NONE`                   |                               |             |
+| `highway=bridleway`                                     | `NONE`                   | 1.3                           |             |
 | `highway=corridor`                                      | `PEDESTRIAN`             |                               |             |
 | `highway=steps`                                         | `PEDESTRIAN`             |                               |             |
 | `highway=crossing`                                      | `PEDESTRIAN`             |                               |             |
@@ -51,14 +40,13 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `public_transport=platform`                             | `PEDESTRIAN`             |                               |             |
 | `railway=platform`                                      | `PEDESTRIAN`             |                               |             |
 | `footway=sidewalk; highway=footway`                     | `PEDESTRIAN`             |                               |             |
+| `highway=pedestrian`                                    | `PEDESTRIAN`             | 0.9                           |             |
+| `highway=footway`                                       | `PEDESTRIAN`             | 1.1                           |             |
 | `mtb:scale=1`                                           | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=2`                                           | `PEDESTRIAN`             |                               |             |
+| `highway=cycleway`                                      | `BICYCLE`                | 0.6                           |             |
 | `mtb:scale=0`                                           | `PEDESTRIAN_AND_BICYCLE` |                               |             |
-| `highway=cycleway`                                      | `PEDESTRIAN_AND_BICYCLE` | 0.6                           |             |
 | `highway=path`                                          | `PEDESTRIAN_AND_BICYCLE` | 0.75                          |             |
-| `highway=pedestrian`                                    | `PEDESTRIAN_AND_BICYCLE` | 0.9                           |             |
-| `highway=footway`                                       | `PEDESTRIAN_AND_BICYCLE` | 1.1                           |             |
-| `highway=bridleway`                                     | `PEDESTRIAN_AND_BICYCLE` | 1.3                           |             |
 | `highway=living_street`                                 | `ALL`                    | 0.9                           |             |
 | `highway=unclassified`                                  | `ALL`                    |                               |             |
 | `highway=road`                                          | `ALL`                    |                               |             |
@@ -73,9 +61,9 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=secondary_link`                                | `ALL`                    | 1.5                           |             |
 | `highway=primary`                                       | `ALL`                    | 2.06                          |             |
 | `highway=primary_link`                                  | `ALL`                    | 2.06                          |             |
-| `highway=trunk_link`                                    | `CAR`                    | 2.06                          |             |
+| `highway=trunk`                                         | `ALL`                    | 7.47                          |             |
+| `highway=trunk_link`                                    | `ALL`                    | 2.06                          |             |
 | `highway=motorway_link`                                 | `CAR`                    | 2.06                          |             |
-| `highway=trunk`                                         | `CAR`                    | 7.47                          |             |
 | `highway=motorway`                                      | `CAR`                    | 8.0                           |             |
 | `motorroad=yes`                                         | `CAR`                    |                               |             |
 | `present(highway); cycleway=lane`                       | `PEDESTRIAN_AND_BICYCLE` | 0.87                          |             |
@@ -88,8 +76,8 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=secondary_link; cycleway=lane`                 | `ALL`                    | 0.96                          |             |
 | `highway=primary; cycleway=lane`                        | `ALL`                    | 1.15                          |             |
 | `highway=primary_link; cycleway=lane`                   | `ALL`                    | 1.15                          |             |
-| `highway=trunk; cycleway=lane`                          | `BICYCLE_AND_CAR`        | 1.5                           |             |
-| `highway=trunk_link; cycleway=lane`                     | `BICYCLE_AND_CAR`        | 1.15                          |             |
+| `highway=trunk; cycleway=lane`                          | `ALL`                    | 1.5                           |             |
+| `highway=trunk_link; cycleway=lane`                     | `ALL`                    | 1.15                          |             |
 | `highway=motorway; cycleway=lane`                       | `BICYCLE_AND_CAR`        | 2.0                           |             |
 | `highway=motorway_link; cycleway=lane`                  | `BICYCLE_AND_CAR`        | 1.15                          |             |
 | `present(highway); cycleway=share_busway`               | `PEDESTRIAN_AND_BICYCLE` | 0.92                          |             |
@@ -168,14 +156,17 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=pedestrian; bicycle=designated`                | `PEDESTRIAN_AND_BICYCLE` | 0.75                          |             |
 | `footway=sidewalk; highway=footway; bicycle=yes`        | `PEDESTRIAN_AND_BICYCLE` | 2.5                           |             |
 | `footway=sidewalk; highway=footway; bicycle=designated` | `PEDESTRIAN_AND_BICYCLE` | 1.1                           |             |
-| `highway=footway; footway=crossing`                     | `PEDESTRIAN_AND_BICYCLE` | 2.5                           |             |
+| `highway=footway; footway=crossing`                     | `PEDESTRIAN`             | 2.5                           |             |
 | `highway=footway; footway=crossing; bicycle=designated` | `PEDESTRIAN_AND_BICYCLE` | 1.1                           |             |
 | `highway=track; bicycle=yes`                            | `PEDESTRIAN_AND_BICYCLE` | 1.18                          |             |
 | `highway=track; bicycle=designated`                     | `PEDESTRIAN_AND_BICYCLE` | 0.99                          |             |
 | `highway=track; bicycle=yes; present(surface)`          | `PEDESTRIAN_AND_BICYCLE` | 1.18                          |             |
 | `highway=track; bicycle=designated; present(surface)`   | `PEDESTRIAN_AND_BICYCLE` | 0.99                          |             |
 | `highway=track; present(surface)`                       | `PEDESTRIAN_AND_BICYCLE` | 1.3                           |             |
-| `present(highway); bicycle=designated`                  | `ALL`                    | 0.97                          |             |
+| `present(highway); bicycle=designated`                  | `BICYCLE`                | 0.97                          |             |
+| `highway=footway; bicycle=designated`                   | `PEDESTRIAN_AND_BICYCLE` | 0.8                           |             |
+| `highway=cycleway; bicycle=designated`                  | `BICYCLE`                | 0.6                           |             |
+| `highway=bridleway; bicycle=designated`                 | `BICYCLE`                | 0.8                           |             |
 | `highway=service; bicycle=designated`                   | `ALL`                    | 0.84                          |             |
 | `highway=residential; bicycle=designated`               | `ALL`                    | 0.95                          |             |
 | `highway=unclassified; bicycle=designated`              | `ALL`                    | 0.95                          |             |
