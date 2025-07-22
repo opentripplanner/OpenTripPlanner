@@ -32,6 +32,9 @@ public class UKMapperTest {
 
   @Test
   void bridleway() {
-    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(WayTestData.bridleway()).getPermission());
+    assertEquals(
+      PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForWay(WayTestData.bridleway()).getPermission()
+    );
   }
 }

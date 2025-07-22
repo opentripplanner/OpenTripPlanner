@@ -211,6 +211,14 @@ class FinlandMapperTest {
     assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(WayTestData.cycleway()).getPermission());
   }
 
+  @Test
+  void testCyclingAllowedOnPedestrianAreas() {
+    assertEquals(
+      PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForWay(WayTestData.pedestrianArea()).getPermission()
+    );
+  }
+
   /**
    * Test that biking is not allowed in footway areas and transit platforms
    */
