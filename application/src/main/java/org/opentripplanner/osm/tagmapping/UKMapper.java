@@ -29,6 +29,7 @@ class UKMapper extends OsmTagMapper {
   @Override
   public void populateProperties(WayPropertySet props) {
     props.setProperties("highway=cycleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.6));
+    props.setProperties("highway=bridleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.3));
 
     /*
      * Automobile speeds in UK. Based on recorded free flow speeds for motorways, trunk and primary and

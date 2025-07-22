@@ -29,4 +29,9 @@ public class UKMapperTest {
   void cycleway() {
     assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(WayTestData.cycleway()).getPermission());
   }
+
+  @Test
+  void bridleway() {
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(WayTestData.bridleway()).getPermission());
+  }
 }
