@@ -1,6 +1,5 @@
-package org.opentripplanner.updater.trip.gtfs.models;
+package org.opentripplanner.updater.trip.gtfs.model;
 
-import com.google.transit.realtime.GtfsRealtime;
 import de.mfdz.MfdzRealtimeExtensions;
 import java.util.Objects;
 

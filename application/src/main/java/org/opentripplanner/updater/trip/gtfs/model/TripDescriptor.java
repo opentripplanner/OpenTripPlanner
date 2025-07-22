@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.gtfs.models;
+package org.opentripplanner.updater.trip.gtfs.model;
 
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
@@ -25,12 +25,6 @@ public class TripDescriptor {
     return tripDescriptor.hasRouteId()
       ? Optional.of(tripDescriptor.getRouteId())
       : Optional.empty();
-  }
-
-  public OptionalInt directionId() {
-    return tripDescriptor.hasDirectionId()
-      ? OptionalInt.of(tripDescriptor.getDirectionId())
-      : OptionalInt.empty();
   }
 
   public OptionalInt startTime() {

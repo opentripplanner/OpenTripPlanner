@@ -40,7 +40,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
-import org.opentripplanner.updater.trip.gtfs.models.TripUpdate;
+import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 
 public class TripTimesUpdaterTest {
 

@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.addition;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
+import static com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties.DropOffPickupType.COORDINATE_WITH_DRIVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -54,11 +55,7 @@ class AddedTest implements RealtimeTestConstants {
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       .addTripExtension()
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
-      .addStopTime(
-        STOP_B_ID,
-        "00:40",
-        GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties.DropOffPickupType.COORDINATE_WITH_DRIVER
-      )
+      .addStopTime(STOP_B_ID, "00:40", COORDINATE_WITH_DRIVER)
       .addStopTime(STOP_B_ID, "00:55", DropOffPickupType.NONE)
       .build();
 

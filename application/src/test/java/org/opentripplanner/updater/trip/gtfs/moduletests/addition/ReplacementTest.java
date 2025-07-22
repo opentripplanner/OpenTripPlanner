@@ -20,10 +20,10 @@ import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
-public class ModifiedTest implements RealtimeTestConstants {
+public class ReplacementTest implements RealtimeTestConstants {
 
   @Test
-  void modifiedTrip() {
+  void replacementTrip() {
     var TRIP_INPUT = TripInput.of(TRIP_1_ID)
       .addStop(STOP_A, "8:30:00", "8:30:00")
       .addStop(STOP_B, "8:40:00", "8:40:00")

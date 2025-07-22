@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.gtfs.models;
+package org.opentripplanner.updater.trip.gtfs.model;
 
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
@@ -180,14 +180,6 @@ public final class StopTimeUpdate {
       : stopTimeEvent.hasTime() && stopTimeEvent.hasScheduledTime()
         ? OptionalInt.of((int) (stopTimeEvent.getTime() - stopTimeEvent.getScheduledTime()))
         : OptionalInt.empty();
-  }
-
-  public boolean hasArrival() {
-    return stopTimeUpdate.hasArrival();
-  }
-
-  public boolean hasDeparture() {
-    return stopTimeUpdate.hasDeparture();
   }
 
   /**

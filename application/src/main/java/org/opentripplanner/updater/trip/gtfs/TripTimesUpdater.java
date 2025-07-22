@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.OptionalLong;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
@@ -38,8 +37,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
-import org.opentripplanner.updater.trip.gtfs.models.StopTimeUpdate;
-import org.opentripplanner.updater.trip.gtfs.models.TripUpdate;
+import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
+import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -230,13 +229,13 @@ class TripTimesUpdater {
    * @return empty Result if successful or one containing an error
    */
   public static Result<TripTimesWithStopPattern, UpdateError> createNewTripTimesFromGTFSRT(
-    final Trip trip,
-    @Nullable final Accessibility wheelchairAccessibility,
-    final List<StopAndStopTimeUpdate> stopAndStopTimeUpdates,
+    Trip trip,
+    @Nullable Accessibility wheelchairAccessibility,
+    List<StopAndStopTimeUpdate> stopAndStopTimeUpdates,
     ZoneId timeZone,
-    final LocalDate serviceDate,
-    final RealTimeState realTimeState,
-    @Nullable final I18NString tripHeadsign,
+    LocalDate serviceDate,
+    RealTimeState realTimeState,
+    @Nullable I18NString tripHeadsign,
     Deduplicator deduplicator,
     int serviceCode
   ) {
@@ -259,7 +258,7 @@ class TripTimesUpdater {
         var seq = stopSequence.getAsInt();
         if (seq < 0) {
           LOG.debug(
-            "{} trip {} on {} contains negative stop sequence, skipping.",
+              "{} trip {} on {} contains negative stop sequence, skipping.",
             realTimeState,
             trip.getId(),
             serviceDate
@@ -320,8 +319,6 @@ class TripTimesUpdater {
       // Add stop time to list
       stopTimes.add(stopTime);
     }
-
-    // TODO: filter/interpolate stop times like in PatternHopFactory?
 
     // Create new trip times
     final RealTimeTripTimesBuilder builder = TripTimesFactory.tripTimes(

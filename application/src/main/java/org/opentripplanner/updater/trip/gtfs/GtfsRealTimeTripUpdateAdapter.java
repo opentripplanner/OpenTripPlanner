@@ -6,7 +6,6 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_IM
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_TRIP_FOR_CANCELLATION_FOUND;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_UPDATES;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VALID_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
@@ -14,7 +13,6 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 import static org.opentripplanner.updater.trip.gtfs.TripTimesUpdater.getWheelchairAccessibility;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimaps;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
@@ -35,7 +33,6 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -62,9 +59,9 @@ import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
-import org.opentripplanner.updater.trip.gtfs.models.AddedRoute;
-import org.opentripplanner.updater.trip.gtfs.models.StopTimeUpdate;
-import org.opentripplanner.updater.trip.gtfs.models.TripUpdate;
+import org.opentripplanner.updater.trip.gtfs.model.AddedRoute;
+import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
+import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -166,7 +163,8 @@ public class GtfsRealTimeTripUpdateAdapter {
 
       tripDescriptor
         .tripId()
-        .flatMap(id -> id.isBlank() ? Optional.empty() : Optional.of(new FeedScopedId(feedId, id)))
+        .filter(StringUtils::hasValue)
+        .map(id -> new FeedScopedId(feedId, id))
         .ifPresentOrElse(
           tripId -> {
             LocalDate serviceDate;
@@ -225,7 +223,11 @@ public class GtfsRealTimeTripUpdateAdapter {
                   CancelationType.DELETE,
                   updateIncrementality
                 );
-                case REPLACEMENT -> validateAndHandleModifiedTrip(tripUpdate, tripId, serviceDate);
+                case REPLACEMENT -> validateAndHandleReplacementTrip(
+                  tripUpdate,
+                  tripId,
+                  serviceDate
+                );
                 case UNSCHEDULED -> UpdateError.result(tripId, NOT_IMPLEMENTED_UNSCHEDULED);
                 case DUPLICATED -> UpdateError.result(tripId, NOT_IMPLEMENTED_DUPLICATED);
               };
@@ -574,7 +576,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   }
 
   private Route createRoute(
-    org.opentripplanner.updater.trip.gtfs.models.TripDescriptor tripDescriptor,
+    org.opentripplanner.updater.trip.gtfs.model.TripDescriptor tripDescriptor,
     FeedScopedId tripId
   ) {
     // the route in this update doesn't already exist, but the update contains the information so it will be created
@@ -631,7 +633,7 @@ public class GtfsRealTimeTripUpdateAdapter {
 
   private Optional<Route> getRoute(
     String feedId,
-    org.opentripplanner.updater.trip.gtfs.models.TripDescriptor tripDescriptor
+    org.opentripplanner.updater.trip.gtfs.model.TripDescriptor tripDescriptor
   ) {
     return tripDescriptor
       .routeId()
@@ -784,7 +786,7 @@ public class GtfsRealTimeTripUpdateAdapter {
    * @param tripUpdate     GTFS-RT TripUpdate message
    * @return empty Result if successful or one containing an error
    */
-  private Result<UpdateSuccess, UpdateError> validateAndHandleModifiedTrip(
+  private Result<UpdateSuccess, UpdateError> validateAndHandleReplacementTrip(
     final TripUpdate tripUpdate,
     final FeedScopedId tripId,
     final LocalDate serviceDate

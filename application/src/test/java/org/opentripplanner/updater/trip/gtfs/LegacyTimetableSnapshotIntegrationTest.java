@@ -30,7 +30,7 @@ import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateError;
-import org.opentripplanner.updater.trip.gtfs.models.TripUpdate;
+import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 
 /**
  * The test class is called legacy not because it tests a legacy feature but because the test
