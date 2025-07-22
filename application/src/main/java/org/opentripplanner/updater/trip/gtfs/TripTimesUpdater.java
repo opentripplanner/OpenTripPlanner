@@ -258,7 +258,7 @@ class TripTimesUpdater {
         var seq = stopSequence.getAsInt();
         if (seq < 0) {
           LOG.debug(
-              "{} trip {} on {} contains negative stop sequence, skipping.",
+            "{} trip {} on {} contains negative stop sequence, skipping.",
             realTimeState,
             trip.getId(),
             serviceDate
