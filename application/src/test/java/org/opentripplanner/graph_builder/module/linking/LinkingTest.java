@@ -130,7 +130,7 @@ public class LinkingTest {
     var transitStopVertices = g1.getVerticesOfType(TransitStopVertex.class);
     assertEquals(966, transitStopVertices.size());
 
-    // Count unlinked stops, these are stops that is more than ~150 meters from the road network
+    // Count unlinked stops, these are stops that are more than ~150 meters from the road network
     int unlinkedStopsCounter = 0;
     // compare the linkages
     for (TransitStopVertex ts : transitStopVertices) {

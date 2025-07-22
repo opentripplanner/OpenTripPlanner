@@ -44,10 +44,13 @@ import org.opentripplanner.street.search.TemporaryVerticesContainer;
  */
 public class StreetModeLinkingTest extends GraphRoutingTest {
 
-  /** Aproximate 11m */
+  /** 
+   * This is used to make parallel streets by adding the value to the longitude.
+   * The value make streets about 11m apart. 
+   */
   private static final double STREET_DELTA = 0.0001;
 
-  /** The ofset is used to place coordinates, close to a line(street) - but not directly on it. */
+  /** The offset is used to place coordinates, close to a line(street) - but not directly on it. */
   private static final double OFFSET = STREET_DELTA / 10.0;
 
   private static final double LONGITUDE_0 = 20.0000;
@@ -61,7 +64,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   // Place stop/from/to locations 1m above the first street longitude.
   private static final double LONGITUDE_LOCATION = LONGITUDE_0 - OFFSET;
 
-  // Make paralell streets ~10 meters apart for each street traversal permission
+  // Make parallel streets ~10 meters apart for each street traversal permission
   private static int testCaseIndex = 0;
   private static final StreetTC CAR_TC = StreetTC.of(StreetTraversalPermission.CAR);
   private static final StreetTC ALL_TC = StreetTC.of(StreetTraversalPermission.ALL);
@@ -74,11 +77,11 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   );
 
   /**
-   * A place used as dymmy to/from, when testing from/to. It can be anywhere, except
+   * A place used as dummy to/from, when testing from/to. It can be anywhere, except
    * the same location as the place under test.
    */
   private static final GenericLocation ANY_PLACE = new GenericLocation(
-    "Any place - not uesd",
+    "Any place - not used",
     null,
     LATITUDE_START,
     LONGITUDE_0

@@ -22,7 +22,7 @@ class TestGraph {
 
   /**
    * Add a regular grid of stops to the graph. Note! Not all of these stops
-   * are within 100m of a atreet and will not be linked to the street graph.
+   * are within 100m of a street and will not be linked to the street graph.
    */
   public static void addRegularStopGrid(Graph graph) {
     int count = 0;
