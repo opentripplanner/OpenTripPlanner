@@ -100,7 +100,7 @@ public class WayTestData {
     return way;
   }
 
-  public static OsmWay cycleway() {
+  public static OsmWay highwayWithCycleLane() {
     var way = new OsmWay();
     way.addTag("highway", "residential");
     way.addTag("cycleway", "lane");
@@ -121,10 +121,59 @@ public class WayTestData {
     return way;
   }
 
+  public static OsmWay footway() {
+    var way = new OsmWay();
+    way.addTag("highway", "footway");
+    return way;
+  }
+
+  public static OsmWay footwaySharedWithBicycle() {
+    var way = new OsmWay();
+    way.addTag("highway", "footway");
+    way.addTag("foot", "designated");
+    way.addTag("bicycle", "designated");
+    return way;
+  }
+
+  public static OsmWay cycleway() {
+    var way = new OsmWay();
+    way.addTag("highway", "cycleway");
+    return way;
+  }
+
+  public static OsmWay cyclewaySharedWithFoot() {
+    var way = new OsmWay();
+    way.addTag("highway", "cycleway");
+    way.addTag("foot", "designated");
+    way.addTag("bicycle", "designated");
+    return way;
+  }
+
   public static OsmWay footwaySidewalk() {
     var way = new OsmWay();
     way.addTag("footway", "sidewalk");
     way.addTag("highway", "footway");
+    return way;
+  }
+
+  public static OsmWay bridleway() {
+    var way = new OsmWay();
+    way.addTag("highway", "bridleway");
+    return way;
+  }
+
+  public static OsmWay bridlewaySharedWithFootAndBicycle() {
+    var way = new OsmWay();
+    way.addTag("highway", "bridleway");
+    way.addTag("foot", "designated");
+    way.addTag("bicycle", "designated");
+    return way;
+  }
+
+  public static OsmWay pedestrianArea() {
+    var way = new OsmWay();
+    way.addTag("area", "yes");
+    way.addTag("highway", "pedestrian");
     return way;
   }
 
@@ -150,9 +199,35 @@ public class WayTestData {
     return way;
   }
 
+  public static OsmWay path() {
+    var way = new OsmWay();
+    way.addTag("highway", "path");
+    return way;
+  }
+
+  public static OsmWay motorway() {
+    var way = new OsmWay();
+    way.addTag("highway", "motorway");
+    return way;
+  }
+
+  public static OsmWay motorwayWithBicycleAllowed() {
+    var way = new OsmWay();
+    way.addTag("highway", "motorway");
+    way.addTag("bicycle", "yes");
+    return way;
+  }
+
   public static OsmEntity highwayTrunk() {
     var way = new OsmEntity();
     way.addTag("highway", "trunk");
+    return way;
+  }
+
+  public static OsmEntity highwayPrimaryWithMotorroad() {
+    var way = new OsmEntity();
+    way.addTag("highway", "primary");
+    way.addTag("motorroad", "yes");
     return way;
   }
 
