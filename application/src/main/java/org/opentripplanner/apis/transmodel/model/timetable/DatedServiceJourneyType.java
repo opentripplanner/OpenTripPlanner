@@ -31,12 +31,17 @@ public class DatedServiceJourneyType {
   private static final String NAME = "DatedServiceJourney";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  public static GraphQLObjectType create(
+  private final IdResolver idResolver;
+
+  public DatedServiceJourneyType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType create(
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType journeyPatternType,
     GraphQLType estimatedCallType,
-    GraphQLType quayType,
-    IdResolver idResolver
+    GraphQLType quayType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)

@@ -32,7 +32,13 @@ public class ServiceJourneyType {
   private static final String NAME = "ServiceJourney";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  public static GraphQLObjectType create(
+  private final IdResolver idResolver;
+
+  public ServiceJourneyType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType create(
     GraphQLOutputType bookingArrangementType,
     GraphQLOutputType linkGeometryType,
     GraphQLOutputType operatorType,
@@ -42,8 +48,7 @@ public class ServiceJourneyType {
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType journeyPatternType,
     GraphQLOutputType estimatedCallType,
-    GraphQLOutputType timetabledPassingTimeType,
-    IdResolver idResolver
+    GraphQLOutputType timetabledPassingTimeType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)

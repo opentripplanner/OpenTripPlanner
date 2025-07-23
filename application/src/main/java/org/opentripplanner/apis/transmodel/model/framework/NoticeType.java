@@ -9,7 +9,13 @@ import org.opentripplanner.transit.model.basic.Notice;
 
 public class NoticeType {
 
-  public static GraphQLObjectType create(IdResolver idResolver) {
+  private final IdResolver idResolver;
+
+  public NoticeType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType create() {
     return GraphQLObjectType.newObject()
       .name("Notice")
       .field(GqlUtil.newTransitIdField(idResolver))

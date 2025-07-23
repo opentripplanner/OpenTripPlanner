@@ -12,11 +12,13 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 public class QuayAtDistanceType {
 
-  public static GraphQLObjectType createQD(
-    GraphQLOutputType quayType,
-    Relay relay,
-    IdResolver idResolver
-  ) {
+  private final IdResolver idResolver;
+
+  public QuayAtDistanceType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType createQD(GraphQLOutputType quayType, Relay relay) {
     return GraphQLObjectType.newObject()
       .name("QuayAtDistance")
       .field(

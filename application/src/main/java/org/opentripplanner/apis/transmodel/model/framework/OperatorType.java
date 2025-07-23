@@ -13,10 +13,15 @@ import org.opentripplanner.ext.trias.id.IdResolver;
 
 public class OperatorType {
 
-  public static GraphQLObjectType create(
+  private final IdResolver idResolver;
+
+  public OperatorType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType create(
     GraphQLOutputType lineType,
-    GraphQLOutputType serviceJourneyType,
-    IdResolver idResolver
+    GraphQLOutputType serviceJourneyType
   ) {
     return GraphQLObjectType.newObject()
       .name("Operator")

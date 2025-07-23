@@ -147,6 +147,23 @@ public class TransmodelGraphQLSchemaFactory {
   private final ZoneId timeZoneId;
   private final IdResolver idResolver;
   private final ApiDocumentationProfile docProfile;
+  private final AuthorityType authorityTypeFactory;
+  private final OperatorType operatorTypeFactory;
+  private final BrandingType brandingTypeFactory;
+  private final NoticeType noticeTypeFactory;
+  private final TariffZoneType tariffZoneTypeFactory;
+  private final BikeParkType bikeParkTypeFactory;
+  private final StopPlaceType stopPlaceTypeFactory;
+  private final QuayType quayTypeFactory;
+  private final QuayAtDistanceType quayAtDistanceTypeFactory;
+  private final LineType lineTypeFactory;
+  private final JourneyPatternType journeyPatternTypeFactory;
+  private final ServiceJourneyType serviceJourneyTypeFactory;
+  private final DatedServiceJourneyType datedServiceJourneyTypeFactory;
+  private final TripQuery tripQueryFactory;
+  private final ViaTripQuery viaTripQueryFactory;
+  private final GroupOfLinesType groupOfLinesTypeFactory;
+  private final DatedServiceJourneyQuery datedServiceJourneyQueryFactory;
 
   private final Relay relay = new Relay();
 
@@ -162,6 +179,23 @@ public class TransmodelGraphQLSchemaFactory {
     this.transitTuningParameters = transitTuningParameters;
     this.idResolver = idResolver;
     this.docProfile = docProfile;
+    this.authorityTypeFactory = new AuthorityType(idResolver);
+    this.operatorTypeFactory = new OperatorType(idResolver);
+    this.brandingTypeFactory = new BrandingType(idResolver);
+    this.noticeTypeFactory = new NoticeType(idResolver);
+    this.tariffZoneTypeFactory = new TariffZoneType(idResolver);
+    this.bikeParkTypeFactory = new BikeParkType(idResolver);
+    this.stopPlaceTypeFactory = new StopPlaceType(idResolver);
+    this.quayTypeFactory = new QuayType(idResolver);
+    this.quayAtDistanceTypeFactory = new QuayAtDistanceType(idResolver);
+    this.lineTypeFactory = new LineType(idResolver);
+    this.journeyPatternTypeFactory = new JourneyPatternType(idResolver);
+    this.serviceJourneyTypeFactory = new ServiceJourneyType(idResolver);
+    this.datedServiceJourneyTypeFactory = new DatedServiceJourneyType(idResolver);
+    this.tripQueryFactory = new TripQuery(idResolver);
+    this.viaTripQueryFactory = new ViaTripQuery(idResolver);
+    this.groupOfLinesTypeFactory = new GroupOfLinesType(idResolver);
+    this.datedServiceJourneyQueryFactory = new DatedServiceJourneyQuery(idResolver);
   }
 
   public GraphQLSchema create() {
@@ -195,39 +229,36 @@ public class TransmodelGraphQLSchemaFactory {
     GraphQLOutputType systemNoticeType = SystemNoticeType.create();
     GraphQLOutputType linkGeometryType = PointsOnLinkType.create();
     GraphQLOutputType serverInfoType = ServerInfoType.create();
-    GraphQLOutputType authorityType = AuthorityType.create(
+    GraphQLOutputType authorityType = authorityTypeFactory.create(
       LineType.REF,
-      PtSituationElementType.REF,
-      idResolver
+      PtSituationElementType.REF
     );
-    GraphQLOutputType operatorType = OperatorType.create(
+    GraphQLOutputType operatorType = operatorTypeFactory.create(
       LineType.REF,
-      ServiceJourneyType.REF,
-      idResolver
+      ServiceJourneyType.REF
     );
-    GraphQLOutputType brandingType = BrandingType.create(idResolver);
-    GraphQLOutputType noticeType = NoticeType.create(idResolver);
+    GraphQLOutputType brandingType = brandingTypeFactory.create();
+    GraphQLOutputType noticeType = noticeTypeFactory.create();
     GraphQLOutputType rentalVehicleTypeType = RentalVehicleTypeType.create();
 
     // Stop
-    GraphQLOutputType tariffZoneType = TariffZoneType.createTZ(idResolver);
+    GraphQLOutputType tariffZoneType = tariffZoneTypeFactory.createTZ();
     GraphQLInterfaceType placeInterface = PlaceInterfaceType.create();
     GraphQLOutputType bikeRentalStationType = BikeRentalStationType.create(placeInterface);
     GraphQLOutputType rentalVehicleType = RentalVehicleType.create(
       rentalVehicleTypeType,
       placeInterface
     );
-    GraphQLOutputType bikeParkType = BikeParkType.createB(placeInterface, idResolver);
-    GraphQLOutputType stopPlaceType = StopPlaceType.create(
+    GraphQLOutputType bikeParkType = bikeParkTypeFactory.createB(placeInterface);
+    GraphQLOutputType stopPlaceType = stopPlaceTypeFactory.create(
       placeInterface,
       QuayType.REF,
       tariffZoneType,
       EstimatedCallType.REF,
       PtSituationElementType.REF,
-      dateTimeScalar,
-      idResolver
+      dateTimeScalar
     );
-    GraphQLOutputType quayType = QuayType.create(
+    GraphQLOutputType quayType = quayTypeFactory.create(
       placeInterface,
       stopPlaceType,
       LineType.REF,
@@ -235,8 +266,7 @@ public class TransmodelGraphQLSchemaFactory {
       EstimatedCallType.REF,
       PtSituationElementType.REF,
       tariffZoneType,
-      dateTimeScalar,
-      idResolver
+      dateTimeScalar
     );
 
     GraphQLOutputType stopToStopGeometryType = StopToStopGeometryType.create(
@@ -244,18 +274,14 @@ public class TransmodelGraphQLSchemaFactory {
       quayType
     );
 
-    GraphQLNamedOutputType quayAtDistance = QuayAtDistanceType.createQD(
-      quayType,
-      relay,
-      idResolver
-    );
+    GraphQLNamedOutputType quayAtDistance = quayAtDistanceTypeFactory.createQD(quayType, relay);
     GraphQLNamedOutputType placeAtDistanceType = PlaceAtDistanceType.create(relay, placeInterface);
 
     // Network
     GraphQLObjectType presentationType = PresentationType.create();
-    GraphQLOutputType groupOfLinesType = GroupOfLinesType.create(idResolver);
+    GraphQLOutputType groupOfLinesType = groupOfLinesTypeFactory.create();
     GraphQLOutputType destinationDisplayType = DestinationDisplayType.create();
-    GraphQLOutputType lineType = LineType.create(
+    GraphQLOutputType lineType = lineTypeFactory.create(
       bookingArrangementType,
       authorityType,
       operatorType,
@@ -266,8 +292,7 @@ public class TransmodelGraphQLSchemaFactory {
       ServiceJourneyType.REF,
       PtSituationElementType.REF,
       brandingType,
-      groupOfLinesType,
-      idResolver
+      groupOfLinesType
     );
     GraphQLOutputType interchangeType = InterchangeType.create(lineType, ServiceJourneyType.REF);
 
@@ -293,15 +318,14 @@ public class TransmodelGraphQLSchemaFactory {
       dateTimeScalar,
       relay
     );
-    GraphQLOutputType journeyPatternType = JourneyPatternType.create(
+    GraphQLOutputType journeyPatternType = journeyPatternTypeFactory.create(
       linkGeometryType,
       noticeType,
       quayType,
       lineType,
       ServiceJourneyType.REF,
       stopToStopGeometryType,
-      ptSituationElementType,
-      idResolver
+      ptSituationElementType
     );
     GraphQLOutputType estimatedCallType = EstimatedCallType.create(
       bookingArrangementType,
@@ -314,7 +338,7 @@ public class TransmodelGraphQLSchemaFactory {
       dateTimeScalar
     );
 
-    GraphQLOutputType serviceJourneyType = ServiceJourneyType.create(
+    GraphQLOutputType serviceJourneyType = serviceJourneyTypeFactory.create(
       bookingArrangementType,
       linkGeometryType,
       operatorType,
@@ -324,16 +348,14 @@ public class TransmodelGraphQLSchemaFactory {
       ptSituationElementType,
       journeyPatternType,
       estimatedCallType,
-      TimetabledPassingTimeType.REF,
-      idResolver
+      TimetabledPassingTimeType.REF
     );
 
-    GraphQLOutputType datedServiceJourneyType = DatedServiceJourneyType.create(
+    GraphQLOutputType datedServiceJourneyType = datedServiceJourneyTypeFactory.create(
       serviceJourneyType,
       journeyPatternType,
       estimatedCallType,
-      quayType,
-      idResolver
+      quayType
     );
 
     GraphQLOutputType timetabledPassingTime = TimetabledPassingTimeType.create(
@@ -392,27 +414,25 @@ public class TransmodelGraphQLSchemaFactory {
     GraphQLInputObjectType durationPerStreetModeInput = StreetModeDurationInputType.create();
     GraphQLInputObjectType penaltyForStreetMode = PenaltyForStreetModeType.create();
 
-    GraphQLFieldDefinition tripQuery = TripQuery.create(
+    GraphQLFieldDefinition tripQuery = tripQueryFactory.create(
       routing,
       transitTuningParameters,
       tripType,
       durationPerStreetModeInput,
       penaltyForStreetMode,
-      dateTimeScalar,
-      idResolver
+      dateTimeScalar
     );
 
     GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
     GraphQLInputObjectType viaLocationInputType = ViaLocationInputType.create();
     GraphQLInputObjectType viaSegmentInputType = ViaSegmentInputType.create();
 
-    GraphQLFieldDefinition viaTripQuery = ViaTripQuery.create(
+    GraphQLFieldDefinition viaTripQuery = viaTripQueryFactory.create(
       routing,
       viaTripType,
       viaLocationInputType,
       viaSegmentInputType,
-      dateTimeScalar,
-      idResolver
+      dateTimeScalar
     );
 
     GraphQLInputObjectType inputPlaceIds = GraphQLInputObjectType.newInputObject()
@@ -1513,8 +1533,8 @@ public class TransmodelGraphQLSchemaFactory {
           .dataFetcher(e -> projectInfo())
           .build()
       )
-      .field(DatedServiceJourneyQuery.createGetById(datedServiceJourneyType, idResolver))
-      .field(DatedServiceJourneyQuery.createQuery(datedServiceJourneyType, idResolver))
+      .field(datedServiceJourneyQueryFactory.createGetById(datedServiceJourneyType))
+      .field(datedServiceJourneyQueryFactory.createQuery(datedServiceJourneyType))
       .build();
 
     return GraphQLSchema.newSchema()

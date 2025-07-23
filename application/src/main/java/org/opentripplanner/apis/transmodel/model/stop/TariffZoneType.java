@@ -9,9 +9,15 @@ import org.opentripplanner.transit.model.site.FareZone;
 
 public class TariffZoneType {
 
+  private final IdResolver idResolver;
+
   private static final String NAME = "TariffZone";
 
-  public static GraphQLObjectType createTZ(IdResolver idResolver) {
+  public TariffZoneType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType createTZ() {
     return GraphQLObjectType.newObject()
       .name(NAME)
       .field(GqlUtil.newTransitIdField(idResolver))

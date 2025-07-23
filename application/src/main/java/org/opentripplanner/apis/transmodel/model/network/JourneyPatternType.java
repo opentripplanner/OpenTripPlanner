@@ -29,15 +29,20 @@ public class JourneyPatternType {
   private static final String NAME = "JourneyPattern";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  public static GraphQLObjectType create(
+  private final IdResolver idResolver;
+
+  public JourneyPatternType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType create(
     GraphQLOutputType linkGeometryType,
     GraphQLOutputType noticeType,
     GraphQLOutputType quayType,
     GraphQLOutputType lineType,
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType stopToStopGeometryType,
-    GraphQLNamedOutputType ptSituationElementType,
-    IdResolver idResolver
+    GraphQLNamedOutputType ptSituationElementType
   ) {
     return GraphQLObjectType.newObject()
       .name("JourneyPattern")

@@ -10,12 +10,15 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
 public class BikeParkType {
 
+  private final IdResolver idResolver;
+
   public static final String NAME = "BikePark";
 
-  public static GraphQLObjectType createB(
-    GraphQLInterfaceType placeInterface,
-    IdResolver idResolver
-  ) {
+  public BikeParkType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType createB(GraphQLInterfaceType placeInterface) {
     return GraphQLObjectType.newObject()
       .name(NAME)
       .withInterface(placeInterface)

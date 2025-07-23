@@ -23,10 +23,13 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
  */
 public class DatedServiceJourneyQuery {
 
-  public static GraphQLFieldDefinition createGetById(
-    GraphQLOutputType datedServiceJourneyType,
-    IdResolver idResolver
-  ) {
+  private final IdResolver idResolver;
+
+  public DatedServiceJourneyQuery(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLFieldDefinition createGetById(GraphQLOutputType datedServiceJourneyType) {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("datedServiceJourney")
       .type(datedServiceJourneyType)
@@ -40,10 +43,7 @@ public class DatedServiceJourneyQuery {
       .build();
   }
 
-  public static GraphQLFieldDefinition createQuery(
-    GraphQLOutputType datedServiceJourneyType,
-    IdResolver idResolver
-  ) {
+  public GraphQLFieldDefinition createQuery(GraphQLOutputType datedServiceJourneyType) {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("datedServiceJourneys")
       .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(datedServiceJourneyType))))

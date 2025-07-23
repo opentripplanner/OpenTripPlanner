@@ -52,14 +52,19 @@ public class StopPlaceType {
   public static final String NAME = "StopPlace";
   public static final GraphQLOutputType REF = new GraphQLTypeReference(NAME);
 
-  public static GraphQLObjectType create(
+  private final IdResolver idResolver;
+
+  public StopPlaceType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType create(
     GraphQLInterfaceType placeInterface,
     GraphQLOutputType quayType,
     GraphQLOutputType tariffZoneType,
     GraphQLOutputType estimatedCallType,
     GraphQLOutputType ptSituationElementType,
-    GraphQLScalarType dateTimeScalar,
-    IdResolver idResolver
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)

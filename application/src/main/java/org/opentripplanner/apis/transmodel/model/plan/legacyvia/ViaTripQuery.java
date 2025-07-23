@@ -18,13 +18,18 @@ import org.opentripplanner.ext.trias.id.IdResolver;
 
 public class ViaTripQuery {
 
-  public static GraphQLFieldDefinition create(
+  private final TransmodelGraphQLPlanner graphQLPlanner;
+
+  public ViaTripQuery(IdResolver idResolver) {
+    this.graphQLPlanner = new TransmodelGraphQLPlanner(idResolver);
+  }
+
+  public GraphQLFieldDefinition create(
     DefaultRouteRequestType routing,
     GraphQLOutputType viaTripType,
     GraphQLInputObjectType viaLocationInputType,
     GraphQLInputObjectType viaSegmentInputType,
-    GraphQLScalarType dateTimeScalar,
-    IdResolver idResolver
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("viaTrip")
@@ -159,7 +164,7 @@ public class ViaTripQuery {
           .defaultValueProgrammatic("no")
           .build()
       )
-      .dataFetcher(environment -> new TransmodelGraphQLPlanner(idResolver).planVia(environment))
+      .dataFetcher(graphQLPlanner::planVia)
       .build();
   }
 }

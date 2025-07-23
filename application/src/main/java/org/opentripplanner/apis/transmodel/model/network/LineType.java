@@ -24,7 +24,13 @@ public class LineType {
   private static final String NAME = "Line";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  public static GraphQLObjectType create(
+  private final IdResolver idResolver;
+
+  public LineType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType create(
     GraphQLOutputType bookingArrangementType,
     GraphQLOutputType authorityType,
     GraphQLOutputType operatorType,
@@ -35,8 +41,7 @@ public class LineType {
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType brandingType,
-    GraphQLOutputType groupOfLinesType,
-    IdResolver idResolver
+    GraphQLOutputType groupOfLinesType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)

@@ -37,14 +37,19 @@ public class TripQuery {
     visited in the order they are listed.
     """;
 
-  public static GraphQLFieldDefinition create(
+  private final IdResolver idResolver;
+
+  public TripQuery(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLFieldDefinition create(
     DefaultRouteRequestType routing,
     TransitTuningParameters transitTuningParameters,
     GraphQLOutputType tripType,
     GraphQLInputObjectType durationPerStreetModeType,
     GraphQLInputObjectType penaltyForStreetMode,
-    GraphQLScalarType dateTimeScalar,
-    IdResolver idResolver
+    GraphQLScalarType dateTimeScalar
   ) {
     RoutingPreferences preferences = routing.request.preferences();
 

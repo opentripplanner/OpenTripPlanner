@@ -15,7 +15,13 @@ public class GroupOfLinesType {
 
   private static final String NAME = "GroupOfLines";
 
-  public static GraphQLObjectType create(IdResolver idResolver) {
+  private final IdResolver idResolver;
+
+  public GroupOfLinesType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType create() {
     return GraphQLObjectType.newObject()
       .name(NAME)
       .description(

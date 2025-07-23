@@ -16,10 +16,15 @@ import org.opentripplanner.transit.model.organization.Agency;
 
 public class AuthorityType {
 
-  public static GraphQLObjectType create(
+  private final IdResolver idResolver;
+
+  public AuthorityType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType create(
     GraphQLOutputType lineType,
-    GraphQLOutputType ptSituationElementType,
-    IdResolver idResolver
+    GraphQLOutputType ptSituationElementType
   ) {
     return GraphQLObjectType.newObject()
       .name("Authority")

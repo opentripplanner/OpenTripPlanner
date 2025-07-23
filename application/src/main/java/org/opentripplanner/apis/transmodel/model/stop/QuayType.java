@@ -39,7 +39,13 @@ public class QuayType {
   private static final String NAME = "Quay";
   public static final GraphQLOutputType REF = new GraphQLTypeReference(NAME);
 
-  public static GraphQLObjectType create(
+  private final IdResolver idResolver;
+
+  public QuayType(IdResolver idResolver) {
+    this.idResolver = idResolver;
+  }
+
+  public GraphQLObjectType create(
     GraphQLInterfaceType placeInterface,
     GraphQLOutputType stopPlaceType,
     GraphQLOutputType lineType,
@@ -47,8 +53,7 @@ public class QuayType {
     GraphQLOutputType estimatedCallType,
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType tariffZoneType,
-    GraphQLScalarType dateTimeScalar,
-    IdResolver idResolver
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
