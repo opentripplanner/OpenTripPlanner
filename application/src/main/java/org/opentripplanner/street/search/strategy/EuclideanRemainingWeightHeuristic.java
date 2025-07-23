@@ -17,21 +17,21 @@ import org.opentripplanner.street.search.state.VehicleRentalState;
  */
 public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic<State> {
 
-  private static final Float DEFAULT_MAX_CAR_SPEED = StreetConstants.DEFAULT_MAX_CAR_SPEED;
+  private static final float DEFAULT_MAX_CAR_SPEED = StreetConstants.DEFAULT_MAX_CAR_SPEED;
 
   private double lat;
   private double lon;
   private double maxStreetSpeed;
   private double walkingSpeed;
   private boolean arriveBy;
-  private float maxCarSpeed;
+  private final float maxCarSpeed;
 
   public EuclideanRemainingWeightHeuristic() {
     this(DEFAULT_MAX_CAR_SPEED);
   }
 
-  public EuclideanRemainingWeightHeuristic(Float maxCarSpeed) {
-    this.maxCarSpeed = maxCarSpeed != null ? maxCarSpeed : DEFAULT_MAX_CAR_SPEED;
+  public EuclideanRemainingWeightHeuristic(float maxCarSpeed) {
+    this.maxCarSpeed = maxCarSpeed;
   }
 
   // TODO This currently only uses the first toVertex. If there are multiple toVertices, it will
