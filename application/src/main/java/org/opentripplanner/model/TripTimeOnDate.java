@@ -195,7 +195,7 @@ public class TripTimeOnDate {
   }
 
   /**
-   * Returns true if there are either a scheduled arrival or a scheduled departure time.
+   * Returns true if there is either a scheduled arrival or a scheduled departure time.
    * If neither is the case, this indicates that it's a flexible time window instead.
    */
   public boolean hasScheduledTimes() {

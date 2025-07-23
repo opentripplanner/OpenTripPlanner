@@ -618,7 +618,7 @@ public class GraphQLDataFetchers {
   /**
    * A stop that isn't a fixed point but zone where passengers can board or alight anywhere.
    *
-   * This is mostly used by demand-responsive services.
+  * This is mostly used by demand-response services.
    */
   public interface GraphQLLocation {
     public DataFetcher<Object> geometry();
@@ -629,7 +629,7 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * A group of fixed stops that is visited in an arbitrary order.
+   * A group of fixed stops that are visited in an arbitrary order.
    *
    * This is mostly used by demand-responsive services.
    */
