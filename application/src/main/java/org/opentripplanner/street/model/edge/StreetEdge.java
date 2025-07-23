@@ -159,12 +159,6 @@ public class StreetEdge
    * If start/end isn't bollard it just checks the street permissions.
    */
   public boolean canTraverse(TraverseMode mode) {
-    if (fromv.disallows(mode)) {
-      return false;
-    }
-    if (tov.disallows(mode)) {
-      return false;
-    }
     return permission.allows(mode);
   }
 
