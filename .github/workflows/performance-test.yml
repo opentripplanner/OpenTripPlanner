@@ -31,7 +31,7 @@ jobs:
           - location: norway
             iterations: 4
             jfr-delay: "35s"
-            profile: core
+            profile: extended
 
           - location: skanetrafiken
             iterations: 1
