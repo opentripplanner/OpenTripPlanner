@@ -1,7 +1,5 @@
 package org.opentripplanner.astar.model;
 
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,8 +13,6 @@ import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.astar.spi.DominanceFunction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class keeps track which graph vertices have been visited and their associated states, so
@@ -39,8 +35,6 @@ public class ShortestPathTree<
   Edge extends AStarEdge<State, Edge, Vertex>,
   Vertex extends AStarVertex<State, Edge, Vertex>
 > {
-
-  private static final Logger LOG = LoggerFactory.getLogger(ShortestPathTree.class);
 
   public final DominanceFunction<State> dominanceFunction;
 
@@ -74,37 +68,6 @@ public class ShortestPathTree<
       return null;
     } else {
       return new GraphPath<>(s);
-    }
-  }
-
-  /** Print out a summary of the number of states and vertices. */
-  public void dump() {
-    Multiset<Integer> histogram = HashMultiset.create();
-    int statesCount = 0;
-    int maxSize = 0;
-    for (Map.Entry<Vertex, List<State>> kv : stateSets.entrySet()) {
-      List<State> states = kv.getValue();
-      int size = states.size();
-      histogram.add(size);
-      statesCount += size;
-      if (size > maxSize) {
-        maxSize = size;
-      }
-    }
-    LOG.info(
-      "SPT: vertices: " +
-      stateSets.size() +
-      " states: total: " +
-      statesCount +
-      " per vertex max: " +
-      maxSize +
-      " avg: " +
-      ((statesCount * 1.0) / stateSets.size())
-    );
-    List<Integer> nStates = new ArrayList<>(histogram.elementSet());
-    Collections.sort(nStates);
-    for (Integer nState : nStates) {
-      LOG.info("{} states: {} vertices.", nState, histogram.count(nState));
     }
   }
 
@@ -236,8 +199,6 @@ public class ShortestPathTree<
     }
     return allStates;
   }
-
-  public void setAborted() {}
 
   public String toString() {
     return "ShortestPathTree(" + this.stateSets.size() + " vertices)";
