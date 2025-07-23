@@ -97,7 +97,7 @@ public class ConstructApplication {
     // use Dagger DI to do it - passing in a parameter to enable it or not.
     var graphVisualizer = cli.visualize ? new GraphVisualizer(graph) : null;
 
-    ConstructApplicationFactory.Builder builder = org.opentripplanner.standalone.configure.DaggerConstructApplicationFactory.builder();
+    ConstructApplicationFactory.Builder builder = DaggerConstructApplicationFactory.builder();
     this.factory = builder
       .configModel(config)
       .graph(graph)
