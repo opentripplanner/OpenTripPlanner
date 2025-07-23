@@ -63,13 +63,13 @@ public class StateEditor {
     }
 
     // Note that we use equals(), not ==, here to allow for dynamically created vertices
-    if (parentVertex.equals(fromVertex)) {
+    if (parentVertex == fromVertex) {
       // from and to vertices are the same on eg. vehicle rental and parking vertices, thus, we
       // can't know the direction of travel from the above check. The expression below is simplified
       // fromVertex.equals(toVertex) ? parent.getOptions().arriveBy : false;
       traversingBackward = fromVertex.equals(toVertex) && parent.getRequest().arriveBy();
       child.vertex = toVertex;
-    } else if (parentVertex.equals(toVertex)) {
+    } else if (parentVertex == toVertex) {
       traversingBackward = true;
       child.vertex = fromVertex;
     } else {
