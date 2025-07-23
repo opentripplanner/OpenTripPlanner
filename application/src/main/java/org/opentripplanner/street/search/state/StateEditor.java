@@ -38,7 +38,7 @@ public class StateEditor {
   }
 
   public StateEditor(State parent, Edge e) {
-    child = parent.clone();
+    child = parent.copy();
     child.backState = parent;
     child.backEdge = e;
 

@@ -22,7 +22,7 @@ import org.opentripplanner.street.search.intersection_model.IntersectionTraversa
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-public class State implements AStarState<State, Edge, Vertex>, Cloneable {
+public class State implements AStarState<State, Edge, Vertex> {
 
   private static final State[] EMPTY_STATES = {};
   private final StreetSearchRequest request;
@@ -78,6 +78,17 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     }
     this.walkDistance = 0;
     this.time_ms = startTime.toEpochMilli();
+  }
+
+  private State(State other) {
+    this.request = other.request;
+    this.weight = other.weight;
+    this.vertex = other.vertex;
+    this.stateData = other.stateData;
+    this.backState = other.backState;
+    this.backEdge = other.backEdge;
+    this.walkDistance = other.walkDistance;
+    this.time_ms = other.time_ms;
   }
 
   /**
@@ -476,14 +487,8 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return true;
   }
 
-  protected State clone() {
-    State ret;
-    try {
-      ret = (State) super.clone();
-    } catch (CloneNotSupportedException e1) {
-      throw new IllegalStateException("This is not happening");
-    }
-    return ret;
+  protected State copy() {
+    return new State(this);
   }
 
   public String toString() {
