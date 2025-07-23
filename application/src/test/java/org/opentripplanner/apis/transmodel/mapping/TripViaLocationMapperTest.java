@@ -17,7 +17,6 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.transmodel.model.framework.CoordinateInputType;
 import org.opentripplanner.ext.trias.id.UseFeedIdResolver;
@@ -36,19 +35,16 @@ class TripViaLocationMapperTest {
     so wee just ignore it."
     """;
 
-  private TripViaLocationMapper tripViaLocationMapper;
-
-  @BeforeEach
-  void setup() {
-    tripViaLocationMapper = new TripViaLocationMapper(new UseFeedIdResolver());
-  }
+  private static final TripViaLocationMapper MAPPER = new TripViaLocationMapper(
+    new UseFeedIdResolver()
+  );
 
   @Test
   void testMapToVisitViaLocations() {
     Map<String, Object> input = Map.ofEntries(
       entry(FIELD_VISIT, visitInput(LABEL, MIN_WAIT_TIME, LIST_IDS_INPUT, null))
     );
-    var result = tripViaLocationMapper.mapToViaLocations(List.of(input));
+    var result = MAPPER.mapToViaLocations(List.of(input));
 
     var via = result.getFirst();
 
@@ -65,7 +61,7 @@ class TripViaLocationMapperTest {
   @Test
   void testMapToVisitViaLocationsWithBareMinimum() {
     Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, List.of("F:1")));
-    var result = tripViaLocationMapper.mapToViaLocations(List.of(input));
+    var result = MAPPER.mapToViaLocations(List.of(input));
 
     var via = result.getFirst();
 
@@ -79,7 +75,7 @@ class TripViaLocationMapperTest {
   void testMapToVisitViaLocationsWithoutIdsOrCoordinates() {
     Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, null));
     var ex = assertThrows(IllegalArgumentException.class, () ->
-      tripViaLocationMapper.mapToViaLocations(List.of(input))
+      MAPPER.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "A via location must have at least one stop location or a coordinate.",
@@ -91,7 +87,7 @@ class TripViaLocationMapperTest {
   void testMapToVisitViaLocationsWithAnEmptyListOfIds() {
     Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, List.of()));
     var ex = assertThrows(IllegalArgumentException.class, () ->
-      tripViaLocationMapper.mapToViaLocations(List.of(input))
+      MAPPER.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "A via location must have at least one stop location or a coordinate.",
@@ -102,7 +98,7 @@ class TripViaLocationMapperTest {
   @Test
   void tetMapToPassThrough() {
     Map<String, Object> input = mapOf(FIELD_PASS_THROUGH, passThroughInput(LABEL, LIST_IDS_INPUT));
-    var result = tripViaLocationMapper.mapToViaLocations(List.of(input));
+    var result = MAPPER.mapToViaLocations(List.of(input));
     var via = result.getFirst();
 
     assertEquals(LABEL, via.label());
@@ -120,7 +116,7 @@ class TripViaLocationMapperTest {
       FIELD_PASS_THROUGH,
       mapOf(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
     );
-    var result = tripViaLocationMapper.mapToViaLocations(List.of(input));
+    var result = MAPPER.mapToViaLocations(List.of(input));
     var via = result.getFirst();
 
     assertNull(via.label());
@@ -135,7 +131,7 @@ class TripViaLocationMapperTest {
       mapOf(FIELD_STOP_LOCATION_IDS, List.of())
     );
     var ex = assertThrows(IllegalArgumentException.class, () ->
-      tripViaLocationMapper.mapToViaLocations(List.of(input))
+      MAPPER.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "A pass-through via-location must have at least one stop location.",
@@ -150,7 +146,7 @@ class TripViaLocationMapperTest {
       entry(FIELD_PASS_THROUGH, passThroughInput(LABEL, LIST_IDS_INPUT))
     );
     var ex = assertThrows(IllegalArgumentException.class, () ->
-      tripViaLocationMapper.mapToViaLocations(List.of(input))
+      MAPPER.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "Only one entry in 'via @oneOf' is allowed. Set: 'visit', 'passThrough'",
@@ -158,7 +154,7 @@ class TripViaLocationMapperTest {
     );
 
     ex = assertThrows(IllegalArgumentException.class, () ->
-      tripViaLocationMapper.mapToViaLocations(List.of(Map.of()))
+      MAPPER.mapToViaLocations(List.of(Map.of()))
     );
     assertEquals(
       "No entries in 'via @oneOf'. One of 'visit', 'passThrough' must be set.",
@@ -169,7 +165,7 @@ class TripViaLocationMapperTest {
   @Test
   void testToLegacyPassThroughLocations() {
     Map<String, Object> input = Map.of("name", LABEL, "placeIds", LIST_IDS_INPUT);
-    var result = tripViaLocationMapper.toLegacyPassThroughLocations(List.of(input));
+    var result = MAPPER.toLegacyPassThroughLocations(List.of(input));
     var via = result.getFirst();
 
     assertEquals(LABEL, via.label());
@@ -184,7 +180,7 @@ class TripViaLocationMapperTest {
   @Test
   void testToLegacyPassThroughLocationsWithBareMinimum() {
     Map<String, Object> input = mapOf("placeIds", LIST_IDS_INPUT);
-    var result = tripViaLocationMapper.toLegacyPassThroughLocations(List.of(input));
+    var result = MAPPER.toLegacyPassThroughLocations(List.of(input));
     var via = result.getFirst();
 
     assertNull(via.label());
@@ -195,16 +191,14 @@ class TripViaLocationMapperTest {
 
   @Test
   void testToLegacyPassThroughLocationsWithoutIds() {
-    var result = tripViaLocationMapper.toLegacyPassThroughLocations(
-      List.of(mapOf("placeIds", null))
-    );
+    var result = MAPPER.toLegacyPassThroughLocations(List.of(mapOf("placeIds", null)));
     assertTrue(result.isEmpty(), REASON_EMPTY_IDS_ALLOWED_PASS_THROUGH);
   }
 
   @Test
   void testToLegacyPassThroughLocationsWithEmptyList() {
     Map<String, Object> input = Map.ofEntries(entry("name", LABEL), entry("placeIds", List.of()));
-    var result = tripViaLocationMapper.toLegacyPassThroughLocations(List.of(input));
+    var result = MAPPER.toLegacyPassThroughLocations(List.of(input));
     assertTrue(result.isEmpty(), REASON_EMPTY_IDS_ALLOWED_PASS_THROUGH);
   }
 

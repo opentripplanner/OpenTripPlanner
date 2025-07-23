@@ -38,9 +38,11 @@ public class TripQuery {
     """;
 
   private final IdResolver idResolver;
+  private final TransmodelGraphQLPlanner graphQLPlanner;
 
   public TripQuery(IdResolver idResolver) {
     this.idResolver = idResolver;
+    this.graphQLPlanner = new TransmodelGraphQLPlanner(idResolver);
   }
 
   public GraphQLFieldDefinition create(
@@ -591,7 +593,7 @@ public class TripQuery {
           )
           .build()
       )
-      .dataFetcher(environment -> new TransmodelGraphQLPlanner(idResolver).plan(environment))
+      .dataFetcher(graphQLPlanner::plan)
       .build();
   }
 
