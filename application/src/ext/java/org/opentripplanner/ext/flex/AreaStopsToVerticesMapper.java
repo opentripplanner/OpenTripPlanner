@@ -1,10 +1,8 @@
 package org.opentripplanner.ext.flex;
 
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMultimap;
 import jakarta.inject.Inject;
 import java.util.Collection;
-import java.util.stream.Stream;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -55,49 +53,33 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
 
     LOG.info(progress.startMessage());
 
-    var results = timetableRepository
+    timetableRepository
       .getSiteRepository()
       .listAreaStops()
       .parallelStream()
-      .map(areaStop -> {
-        var matchedVertices = matchingVerticesForStop(graph, areaStop);
+      .forEach(areaStop -> {
+        applyAreaStopToVertices(areaStop, graph);
         // Keep lambda! A method-ref would cause incorrect class and line number to be logged
         progress.step(m -> LOG.info(m));
-        return matchedVertices;
-      })
-      // flapMap would convert the stream back to sequential so we use this workaround
-      // https://dev.to/hugaomarques/why-your-parallelstream-might-not-be-parallel-at-all-g7e
-      .reduce(Stream::concat)
-      .orElseGet(Stream::empty);
-
-    ImmutableMultimap<StreetVertex, AreaStop> mappedResults = results.collect(
-      ImmutableListMultimap.<MatchResult, StreetVertex, AreaStop>flatteningToImmutableListMultimap(
-        MatchResult::vertex,
-        mr -> Stream.of(mr.stop())
-      )
-    );
-
-    mappedResults
-      .keySet()
-      .parallelStream()
-      .forEach(vertex -> vertex.addAreaStops(mappedResults.get(vertex)));
+      });
 
     LOG.info(progress.completeMessage());
   }
 
-  private static Stream<MatchResult> matchingVerticesForStop(Graph graph, AreaStop areaStop) {
+  private static void applyAreaStopToVertices(AreaStop areaStop, Graph graph) {
     var vertices = graph.findVertices(areaStop.getGeometry().getEnvelopeInternal());
 
-    final var progress = progressTracker(areaStop, vertices);
+    @Nullable
+    var progress = progressTracker(areaStop, vertices);
 
     var geometryFactory = GeometryUtils.getGeometryFactory();
 
-    return vertices
+    vertices
       .parallelStream()
       .filter(StreetVertex.class::isInstance)
       .map(StreetVertex.class::cast)
       .filter(StreetVertex::isEligibleForCarPickupDropoff)
-      .filter(vertx -> {
+      .forEach(vertx -> {
         // The street index overselects, so need to check for exact geometry inclusion
         Point p = geometryFactory.createPoint(vertx.getCoordinate());
         var intersects = areaStop.getGeometry().intersects(p);
@@ -105,9 +87,13 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
           // Keep lambda! A method-ref would cause incorrect class and line number to be logged
           progress.step(m -> LOG.info(m));
         }
-        return intersects;
-      })
-      .map(vertx -> new MatchResult(vertx, areaStop));
+        if (intersects) {
+          vertx.addAreaStops(List.of(areaStop));
+        }
+      });
+    if (progress != null) {
+      LOG.info(progress.completeMessage());
+    }
   }
 
   /**
@@ -127,9 +113,4 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       return progress;
     }
   }
-
-  /**
-   * The result of an area stop being matched with a vertex.
-   */
-  private record MatchResult(StreetVertex vertex, AreaStop stop) {}
 }
