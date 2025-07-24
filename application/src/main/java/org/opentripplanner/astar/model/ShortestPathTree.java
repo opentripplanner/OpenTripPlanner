@@ -3,6 +3,7 @@ package org.opentripplanner.astar.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -43,7 +44,7 @@ public class ShortestPathTree<
   public ShortestPathTree(DominanceFunction<State> dominanceFunction) {
     this.dominanceFunction = dominanceFunction;
     // Initialized with a reasonable size, see #4445
-    stateSets = new IdentityHashMap<>(10_000);
+    stateSets = new HashMap<>(10_000);
   }
 
   /** @return a list of GraphPaths, sometimes empty but never null. */
