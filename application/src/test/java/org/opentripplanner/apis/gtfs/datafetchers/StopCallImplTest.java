@@ -81,6 +81,8 @@ class StopCallImplTest implements RealtimeTestConstants {
         realtimeEnv.getTransitService()
       );
 
+      // using try-catch is not very nice here - ideally we would just add it to the method signature.
+      // however, this test is run with the flex feature enabled in a runnable which prevents this.
       try {
         CallSchedule schedule = impl.schedule().get(env);
         assertEquals(new CallSchedule(new TimeWindow(TEN_AM, TEN_AM.plusMinutes(30))), schedule);
