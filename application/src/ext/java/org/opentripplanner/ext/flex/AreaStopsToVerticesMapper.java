@@ -55,7 +55,6 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       .getSiteRepository()
       .listAreaStops()
       .parallelStream()
-      .sorted(Comparator.comparing(s -> s.getGeometry().getArea()))
       .map(areaStop -> {
         var matchedVertices = matchingVerticesForStop(graph, areaStop);
         // Keep lambda! A method-ref would cause incorrect class and line number to be logged
@@ -73,7 +72,6 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
         mr -> Stream.of(mr.stop())
       )
     );
-    results.close();
 
     mappedResults
       .keySet()
