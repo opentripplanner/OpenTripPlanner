@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -39,11 +40,15 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   private transient Edge[] outgoing = new Edge[0];
   private RentalRestrictionExtension rentalRestrictions = RentalRestrictionExtension.NO_RESTRICTION;
 
+  private final int index;
+  private static final AtomicInteger indexFactory = new AtomicInteger(0);
+
   /* CONSTRUCTORS */
 
   protected Vertex(double x, double y) {
     this.x = x;
     this.y = y;
+    this.index = indexFactory.getAndIncrement();
   }
 
   /* PUBLIC METHODS */
@@ -319,6 +324,11 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
       }
     }
     return copy;
+  }
+
+  @Override
+  public int hashCode() {
+    return index;
   }
 
   private void writeObject(ObjectOutputStream out) throws IOException {
