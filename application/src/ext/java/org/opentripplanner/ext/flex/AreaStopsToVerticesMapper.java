@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import jakarta.inject.Inject;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Point;
@@ -26,6 +25,11 @@ import org.slf4j.LoggerFactory;
 public class AreaStopsToVerticesMapper implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(AreaStopsToVerticesMapper.class);
+  /**
+   * The number of vertices that above which an area is considered "large" and therefore will
+   * have a progress tracker about processing the geometry.
+   */
+  private static final int LARGE_AREA_LIMIT = 30_000;
 
   private final Graph graph;
   private final TimetableRepository timetableRepository;
@@ -61,7 +65,7 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
         progress.step(m -> LOG.info(m));
         return matchedVertices;
       })
-      // flapMap converts the stream back to sequential so we use this workaround
+      // flapMap would convert the stream back to sequential so we use this workaround
       // https://dev.to/hugaomarques/why-your-parallelstream-might-not-be-parallel-at-all-g7e
       .reduce(Stream::concat)
       .orElseGet(Stream::empty);
@@ -111,12 +115,12 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
    */
   @Nullable
   private static ProgressTracker progressTracker(AreaStop areaStop, Collection<Vertex> vertices) {
-    if (vertices.size() < 10_000) {
+    if (vertices.size() < LARGE_AREA_LIMIT) {
       return null;
     } else {
       var progress = ProgressTracker.track(
-        "Checking vertices of area stop %s".formatted(areaStop.getId()),
-        5000,
+        "Computing vertices of area stop %s".formatted(areaStop.getId()),
+        10000,
         vertices.size()
       );
       LOG.info(progress.startMessage());
