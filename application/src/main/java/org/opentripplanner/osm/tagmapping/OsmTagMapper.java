@@ -60,7 +60,7 @@ public class OsmTagMapper {
     props.setProperties("mtb:scale=4", noneWayProperties);
     props.setProperties("mtb:scale=5", noneWayProperties);
     props.setProperties("mtb:scale=6", noneWayProperties);
-    props.setProperties("highway=bridleway", withModes(NONE).bicycleSafety(1.3));
+    props.setProperties("highway=bridleway", withModes(NONE).walkSafety(1.3).bicycleSafety(1.3));
 
     /* PEDESTRIAN */
     props.setProperties("highway=corridor", pedestrianWayProperties);
@@ -70,35 +70,56 @@ public class OsmTagMapper {
     props.setProperties("public_transport=platform", pedestrianWayProperties);
     props.setProperties("railway=platform", pedestrianWayProperties);
     props.setProperties("footway=sidewalk;highway=footway", pedestrianWayProperties);
-    props.setProperties("highway=pedestrian", withModes(PEDESTRIAN).bicycleSafety(0.9));
-    props.setProperties("highway=footway", withModes(PEDESTRIAN).bicycleSafety(1.1));
+    props.setProperties(
+      "highway=pedestrian",
+      withModes(PEDESTRIAN).walkSafety(0.6).bicycleSafety(0.9)
+    );
+    props.setProperties(
+      "highway=footway",
+      withModes(PEDESTRIAN).walkSafety(0.6).bicycleSafety(1.1)
+    );
     props.setProperties("mtb:scale=1", pedestrianWayProperties);
     props.setProperties("mtb:scale=2", pedestrianWayProperties);
 
     /* BICYCLE */
-    props.setProperties("highway=cycleway", withModes(BICYCLE).bicycleSafety(0.6));
+    props.setProperties("highway=cycleway", withModes(BICYCLE).walkSafety(1.1).bicycleSafety(0.6));
 
     /* PEDESTRIAN_AND_BICYCLE */
     props.setProperties("mtb:scale=0", pedestrianAndBicycleWayProperties);
-    props.setProperties("highway=path", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75));
+    props.setProperties(
+      "highway=path",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(0.75).bicycleSafety(0.75)
+    );
 
     /* ALL */
-    props.setProperties("highway=living_street", withModes(ALL).bicycleSafety(0.9));
+    props.setProperties(
+      "highway=living_street",
+      withModes(ALL).bicycleSafety(0.9).walkSafety(0.75)
+    );
     props.setProperties("highway=unclassified", allWayProperties);
     props.setProperties("highway=road", allWayProperties);
-    props.setProperties("highway=byway", withModes(ALL).bicycleSafety(1.3));
-    props.setProperties("highway=track", withModes(ALL).bicycleSafety(1.3));
-    props.setProperties("highway=service", withModes(ALL).bicycleSafety(1.1));
-    props.setProperties("highway=residential", withModes(ALL).bicycleSafety(0.98));
-    props.setProperties("highway=residential_link", withModes(ALL).bicycleSafety(0.98));
+    props.setProperties("highway=byway", withModes(ALL).walkSafety(0.98).bicycleSafety(1.3));
+    props.setProperties("highway=track", withModes(ALL).walkSafety(0.98).bicycleSafety(1.3));
+    props.setProperties("highway=service", withModes(ALL).walkSafety(1.1).bicycleSafety(1.1));
+    props.setProperties("highway=residential", withModes(ALL).walkSafety(0.98).bicycleSafety(0.98));
+    props.setProperties(
+      "highway=residential_link",
+      withModes(ALL).walkSafety(0.98).bicycleSafety(0.98)
+    );
     props.setProperties("highway=tertiary", allWayProperties);
     props.setProperties("highway=tertiary_link", allWayProperties);
-    props.setProperties("highway=secondary", withModes(ALL).bicycleSafety(1.5));
-    props.setProperties("highway=secondary_link", withModes(ALL).bicycleSafety(1.5));
-    props.setProperties("highway=primary", withModes(ALL).bicycleSafety(2.06));
-    props.setProperties("highway=primary_link", withModes(ALL).bicycleSafety(2.06));
-    props.setProperties("highway=trunk", withModes(ALL).bicycleSafety(7.47));
-    props.setProperties("highway=trunk_link", withModes(ALL).bicycleSafety(2.06));
+    props.setProperties("highway=secondary", withModes(ALL).bicycleSafety(1.5).walkSafety(1.5));
+    props.setProperties(
+      "highway=secondary_link",
+      withModes(ALL).bicycleSafety(1.5).walkSafety(1.5)
+    );
+    props.setProperties("highway=primary", withModes(ALL).bicycleSafety(2.06).walkSafety(3.5));
+    props.setProperties(
+      "highway=primary_link",
+      withModes(ALL).bicycleSafety(2.06).walkSafety(2.06)
+    );
+    props.setProperties("highway=trunk", withModes(ALL).bicycleSafety(7.47).walkSafety(7.47));
+    props.setProperties("highway=trunk_link", withModes(ALL).bicycleSafety(2.06).walkSafety(3.5));
 
     /* DRIVING ONLY */
     // trunk and motorway links are often short distances and necessary connections
@@ -531,6 +552,17 @@ public class OsmTagMapper {
       ofBicycleSafety(0.7)
     );
 
+    props.setMixinProperties(
+      new LogicalOrSpecifier(
+        // do not add no or separate here
+        "sidewalk=yes",
+        "sidewalk=left",
+        "sidewalk=right",
+        "sidewalk=both"
+      ),
+      ofWalkSafety(0.8)
+    );
+    props.setMixinProperties("sidewalk=lane", ofWalkSafety(1.0));
     /*
      * Automobile speeds in the United States: Based on my (mattwigway) personal experience, primarily in California
      */

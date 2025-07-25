@@ -179,11 +179,27 @@ class OsmTagMapperTest {
   }
 
   @Test
+  void testWalkSafetyOnTrunkRoad() {
+    assertTrue(wps.getDataForWay(WayTestData.highwayTrunk()).walkSafety().forward() > 5.0);
+  }
+
+  @Test
+  void testWalkSafetyOnTrunkRoadWithPavement() {
+    assertTrue(
+      wps
+        .getDataForWay(WayTestData.highwayTrunk().addTag("sidewalk", "yes"))
+        .walkSafety()
+        .forward() <
+      2.0
+    );
+  }
+
+  @Test
   void testFootModifier() {
     OsmEntity tags = new OsmEntity();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
-    tags.addTag("access", "private");
+    tags.addTag("access", "private"); 
     tags.addTag("foot", "yes");
 
     assertTrue(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
