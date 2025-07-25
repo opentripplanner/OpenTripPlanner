@@ -3,11 +3,13 @@ package org.opentripplanner.netex.mapping;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Collections;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -23,6 +25,9 @@ class NetexMapperTest {
   private static final RegularStop STOP = RegularStop.of(new FeedScopedId(FEED_ID, QUAY_ID), () -> 1
   ).build();
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
+  private static final SubmodeMappingService SUBMODE_MAPPING_SERVICE = new SubmodeMappingService(
+    Collections.EMPTY_MAP
+  );
 
   @Test
   void sspWithAssignment() {
@@ -38,7 +43,8 @@ class NetexMapperTest {
       Set.of(),
       Set.of(),
       10,
-      false
+      false,
+      SUBMODE_MAPPING_SERVICE
     );
 
     var index = new NetexEntityIndex();
@@ -64,7 +70,8 @@ class NetexMapperTest {
       Set.of(),
       Set.of(),
       10,
-      false
+      false,
+      SUBMODE_MAPPING_SERVICE
     );
 
     var index = new NetexEntityIndex();

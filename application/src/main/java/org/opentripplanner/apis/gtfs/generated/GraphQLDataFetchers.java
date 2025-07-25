@@ -1265,11 +1265,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<TripOccupancy> occupancy();
 
-    public DataFetcher<GraphQLTransitMode> originalMode();
-
     public DataFetcher<TripPattern> pattern();
-
-    public DataFetcher<GraphQLTransitMode> replacementMode();
 
     public DataFetcher<Route> route();
 

@@ -2,34 +2,61 @@ package org.opentripplanner.netex.mapping;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class GtfsReplacementCollector {
 
-  private final Map<String, Counters> countersMap;
+  private final SubmodeMappingService submodeMappingService;
+  private final Map<String, Map<String, Integer>> lineIdAndSubmodeToCount;
+  private final Map<String, Integer> lineIdTotal;
 
-  public GtfsReplacementCollector() {
-    countersMap = new HashMap<>();
-  }
-
-  record Counters(int replacements, int total) {
-    public Counters sum(Counters other) {
-      return new Counters(replacements + other.replacements, total + other.total);
-    }
+  public GtfsReplacementCollector(SubmodeMappingService submodeMappingService) {
+    lineIdAndSubmodeToCount = new HashMap<>();
+    lineIdTotal = new HashMap<>();
+    this.submodeMappingService = submodeMappingService;
   }
 
   public void collectTransitMode(String lineId, NetexMainAndSubMode transitMode) {
-    var replacement = "replacementRailService".equals(transitMode.subMode());
-    var counters = new Counters(replacement ? 1 : 0, 1);
-    countersMap.merge(lineId, counters, Counters::sum);
+    if (!lineIdAndSubmodeToCount.containsKey(lineId)) {
+      lineIdAndSubmodeToCount.put(lineId, new HashMap<>());
+    }
+    var submodeToCount = lineIdAndSubmodeToCount.get(lineId);
+    submodeToCount.merge(transitMode.subMode(), 1, Integer::sum);
+    lineIdTotal.merge(lineId, 1, Integer::sum);
   }
 
-  public boolean getGtfsReplacement(String lineId) {
-    if (countersMap.containsKey(lineId)) {
-      var counters = countersMap.get(lineId);
-      return counters.replacements == counters.total;
-    } else {
-      return true;
+  private String findEffectiveSubmode(String lineId) {
+    int total = lineIdTotal.getOrDefault(lineId, 0);
+    if (lineIdAndSubmodeToCount.containsKey(lineId)) {
+      for (var submode : lineIdAndSubmodeToCount.get(lineId).keySet()) {
+        int count = lineIdAndSubmodeToCount.get(lineId).get(submode);
+        if (count == total) {
+          return submode;
+        }
+      }
     }
+    return null;
+  }
+
+  public TransitMode findGtfsReplacementMode(String lineId) {
+    String submode = findEffectiveSubmode(lineId);
+    if (submode != null) {
+      return submodeMappingService.findGtfsReplacementMode(submode);
+    } else if (lineIdTotal.getOrDefault(lineId, 0) == 0) {
+      return submodeMappingService.findGtfsReplacementMode(null);
+    }
+    return null;
+  }
+
+  public Integer findGtfsReplacementType(String lineId) {
+    String submode = findEffectiveSubmode(lineId);
+    if (submode != null) {
+      return submodeMappingService.findGtfsReplacementType(submode);
+    } else if (lineIdTotal.getOrDefault(lineId, 0) == 0) {
+      return submodeMappingService.findGtfsReplacementType(null);
+    }
+    return null;
   }
 }

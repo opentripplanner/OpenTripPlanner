@@ -15,6 +15,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -69,6 +70,7 @@ public class NetexMapper {
   private final Set<FeedScopedId> routeToCentroidStopPlaceIds;
   private final double maxStopToShapeSnapDistance;
   private final boolean noTransfersOnIsolatedStops;
+  private final SubmodeMappingService submodeMappingService;
 
   /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
   private GroupNetexMapper groupMapper;
@@ -97,7 +99,8 @@ public class NetexMapper {
     Set<String> ferryIdsNotAllowedForBicycle,
     Collection<FeedScopedId> routeToCentroidStopPlaceIds,
     double maxStopToShapeSnapDistance,
-    boolean noTransfersOnIsolatedStops
+    boolean noTransfersOnIsolatedStops,
+    SubmodeMappingService submodeMappingService
   ) {
     this.transitBuilder = transitBuilder;
     this.deduplicator = deduplicator;
@@ -109,6 +112,7 @@ public class NetexMapper {
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
     this.tripCalendarBuilder = new TripCalendarBuilder(this.calendarServiceBuilder, issueStore);
+    this.submodeMappingService = submodeMappingService;
   }
 
   /**
@@ -149,7 +153,13 @@ public class NetexMapper {
     // Add the empty service id, as it can be used for routes expected to be added from realtime
     // updates or DSJs which are replaced, and where we want to keep the original DSJ
     ServiceCalendar emptyCalendar = calendarServiceBuilder.createEmptyCalendar();
-    var serviceIds = transitBuilder.getTripsById().values().stream().map(Trip::getServiceId).distinct().toArray();
+    var serviceIds = transitBuilder
+      .getTripsById()
+      .values()
+      .stream()
+      .map(Trip::getServiceId)
+      .distinct()
+      .toArray();
     if (
       transitBuilder
         .getTripsById()
@@ -446,7 +456,9 @@ public class NetexMapper {
   }
 
   private GtfsReplacementCollector collectGtfsReplacements(Map<String, FeedScopedId> serviceIds) {
-    GtfsReplacementCollector gtfsReplacementCollector = new GtfsReplacementCollector();
+    GtfsReplacementCollector gtfsReplacementCollector = new GtfsReplacementCollector(
+      submodeMappingService
+    );
     for (JourneyPattern_VersionStructure journeyPattern : currentNetexIndex
       .getJourneyPatternsById()
       .localValues()) {

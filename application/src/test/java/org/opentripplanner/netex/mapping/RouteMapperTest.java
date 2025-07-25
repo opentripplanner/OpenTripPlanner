@@ -15,6 +15,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
@@ -78,7 +79,7 @@ class RouteMapperTest {
     150
   );
   private static final GtfsReplacementCollector gtfsReplacementCollector =
-    new GtfsReplacementCollector();
+    new GtfsReplacementCollector(new SubmodeMappingService(Collections.EMPTY_MAP));
 
   @Test
   void mapRouteWithDefaultAgency() {

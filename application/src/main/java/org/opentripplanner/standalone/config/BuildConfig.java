@@ -375,6 +375,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
+
     // Time Zone dependent config
     {
       // We need a time zone for setting transit service start and end. Getting the wrong time-zone

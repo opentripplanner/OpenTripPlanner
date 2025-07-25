@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -26,6 +27,8 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.SubmodeMappingMatcher;
+import org.opentripplanner.model.impl.SubmodeMappingRow;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.DefaultOsmProvider;
@@ -87,6 +90,14 @@ public class ConstantsForTests {
     FileType.NETEX
   );
 
+  private static final TimetableRepository SUBMODE_MAPPING_TIMETABLE_REPOSITORY =
+    new TimetableRepository() {
+      @Override
+      public Map<SubmodeMappingMatcher, SubmodeMappingRow> getSubmodeMapping() {
+        return Collections.emptyMap();
+      }
+    };
+
   private static ConstantsForTests instance = null;
   private TestOtpModel portlandGraph = null;
   private TestOtpModel portlandGraphWithElevation = null;
@@ -114,7 +125,11 @@ public class ConstantsForTests {
       DataImportIssueStore.NOOP
     );
 
-    return new NetexConfigure(buildConfig).netexBundle(transitService, configuredDataSource);
+    return new NetexConfigure(buildConfig).netexBundle(
+      transitService,
+      configuredDataSource,
+      SUBMODE_MAPPING_TIMETABLE_REPOSITORY
+    );
   }
 
   public static NetexBundle createMinimalNetexEpipBundle() {
@@ -132,7 +147,11 @@ public class ConstantsForTests {
       DataImportIssueStore.NOOP
     );
 
-    return new NetexConfigure(buildConfig).netexBundle(transitService, configuredDataSource);
+    return new NetexConfigure(buildConfig).netexBundle(
+      transitService,
+      configuredDataSource,
+      SUBMODE_MAPPING_TIMETABLE_REPOSITORY
+    );
   }
 
   /**

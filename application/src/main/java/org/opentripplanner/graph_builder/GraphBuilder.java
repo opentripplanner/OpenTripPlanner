@@ -109,6 +109,9 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.osmModule());
     }
 
+    // Submode mapping has to be initialized before processing timetables
+    graphBuilder.addModule(factory.submodeMappingModule());
+
     if (hasGtfs) {
       graphBuilder.addModule(factory.gtfsModule());
     }
@@ -139,8 +142,6 @@ public class GraphBuilder implements Runnable {
     if (hasOsm) {
       graphBuilder.addModule(factory.turnRestrictionModule());
     }
-
-    graphBuilder.addModule(factory.submodeMappingModule());
 
     // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
     // existence of stops in islands. If an island has a stop, it actually may be a real island and should

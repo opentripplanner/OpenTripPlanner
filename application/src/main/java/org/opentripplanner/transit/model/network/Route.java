@@ -31,7 +31,8 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
   // TODO: consolidate gtfsType and netexSubmode
   private final Integer gtfsType;
   private final Integer gtfsSortOrder;
-  private final boolean gtfsReplacement;
+  private final TransitMode gtfsReplacementMode;
+  private final Integer gtfsReplacementType;
   private final SubMode netexSubmode;
   private final String flexibleLineType;
   private final String description;
@@ -57,7 +58,8 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     this.groupsOfRoutes = listOfNullSafe(builder.getGroupsOfRoutes());
     this.gtfsType = builder.getGtfsType();
     this.gtfsSortOrder = IntUtils.requireNullOrNotNegative(builder.getGtfsSortOrder(), "sortOrder");
-    this.gtfsReplacement = builder.getGtfsReplacement();
+    this.gtfsReplacementMode = builder.getGtfsReplacementMode();
+    this.gtfsReplacementType = builder.getGtfsReplacementType();
     this.netexSubmode = SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode());
     this.flexibleLineType = builder.getFlexibleLineType();
     this.description = builder.getDescription();
@@ -83,7 +85,8 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
       Objects.equals(this.mode, other.mode) &&
       Objects.equals(this.gtfsType, other.gtfsType) &&
       Objects.equals(this.gtfsSortOrder, other.gtfsSortOrder) &&
-      Objects.equals(this.gtfsReplacement, other.gtfsReplacement) &&
+      Objects.equals(this.gtfsReplacementMode, other.gtfsReplacementMode) &&
+      Objects.equals(this.gtfsReplacementType, other.gtfsReplacementType) &&
       Objects.equals(this.flexibleLineType, other.flexibleLineType) &&
       Objects.equals(this.netexSubmode, other.netexSubmode) &&
       Objects.equals(this.description, other.description) &&
@@ -163,8 +166,14 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     return gtfsSortOrder;
   }
 
-  public boolean getGtfsReplacement() {
-    return gtfsReplacement;
+  @Nullable
+  public TransitMode getGtfsReplacementMode() {
+    return gtfsReplacementMode;
+  }
+
+  @Nullable
+  public Integer getGtfsReplacementType() {
+    return gtfsReplacementType;
   }
 
   /**

@@ -19,7 +19,6 @@ import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -176,8 +175,10 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
   public DataFetcher<GraphQLTransitMode> mode() {
     return environment -> {
       var route = getSource(environment);
-      var mode = route.getGtfsReplacement() ? TransitMode.BUS : route.getMode();
-      return TransitModeMapper.map(mode);
+      if (route.getGtfsReplacementMode() != null) {
+        return TransitModeMapper.map(route.getGtfsReplacementMode());
+      }
+      return TransitModeMapper.map(route.getMode());
     };
   }
 
@@ -230,7 +231,10 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
   public DataFetcher<Integer> type() {
     return environment -> {
       var route = getSource(environment);
-      return route.getGtfsReplacement() ? Integer.valueOf(714) : route.getGtfsType();
+      if (route.getGtfsReplacementType() != null) {
+        return route.getGtfsReplacementType();
+      }
+      return route.getGtfsType();
     };
   }
 

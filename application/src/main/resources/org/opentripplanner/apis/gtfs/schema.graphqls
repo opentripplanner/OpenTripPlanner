@@ -2501,20 +2501,8 @@ type Trip implements Node {
   trip.
   """
   occupancy: TripOccupancy
-  """
-  The original TransitMode, even if trip is a replacement. In GTFS Trips, implied
-  by trip.route.type or configured in submode-mapping.csv. In NeTEx Trips, trip.mode
-  or configured in submode-mapping.csv.
-  """
-  originalMode: TransitMode!
   "The pattern the trip is running on"
   pattern: Pattern
-  """
-  Replacing TransitMode if trip is a replacement, null otherwise. In GTFS Trips
-  trip.route.mode or configured in submode-mapping.csv. In NeTEx Trips implied
-  by trip.submode or configured in submode-mapping.csv.
-  """
-  replacementMode: TransitMode
   "The route the trip is running on"
   route: Route!
   "Short name of the route this trip is running. See field `shortName` of Route."

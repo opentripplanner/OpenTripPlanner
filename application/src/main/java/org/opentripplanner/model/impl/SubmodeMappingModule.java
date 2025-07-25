@@ -27,6 +27,8 @@ public class SubmodeMappingModule implements GraphBuilderModule {
   private static final String NETEX_SUBMODE = "NeTEx submode";
   private static final String REPLACEMENT_MODE = "Replacement mode";
   private static final String ORIGINAL_MODE = "Original mode";
+  private static final String GTFS_REPLACEMENT_MODE = "GTFS replacement mode";
+  private static final String GTFS_REPLACEMENT_TYPE = "GTFS replacement type";
   private static final String[] MANDATORY = { INPUT_FEED_TYPE, INPUT_LABEL };
 
   private final TimetableRepository timetableRepository;
@@ -72,8 +74,20 @@ public class SubmodeMappingModule implements GraphBuilderModule {
         var originalMode = isEmpty(reader.get(ORIGINAL_MODE))
           ? null
           : TransitMode.valueOf(reader.get(ORIGINAL_MODE));
+        var gtfsReplacementMode = isEmpty(reader.get(GTFS_REPLACEMENT_MODE))
+          ? null
+          : TransitMode.valueOf(reader.get(GTFS_REPLACEMENT_MODE));
+        var gtfsReplacementType = isEmpty(reader.get(GTFS_REPLACEMENT_TYPE))
+          ? null
+          : Integer.parseInt(reader.get(GTFS_REPLACEMENT_TYPE));
         var matcher = new SubmodeMappingMatcher(inputFeedType, inputLabel);
-        var row = new SubmodeMappingRow(netexSubmode, replacementMode, originalMode);
+        var row = new SubmodeMappingRow(
+          netexSubmode,
+          replacementMode,
+          originalMode,
+          gtfsReplacementMode,
+          gtfsReplacementType
+        );
         map.put(matcher, row);
       }
     } catch (IOException ioe) {
@@ -86,11 +100,11 @@ public class SubmodeMappingModule implements GraphBuilderModule {
     var map = new HashMap<SubmodeMappingMatcher, SubmodeMappingRow>();
     map.put(
       new SubmodeMappingMatcher(FeedType.GTFS, "714"),
-      new SubmodeMappingRow("railReplacementBus", null, TransitMode.RAIL)
+      new SubmodeMappingRow("railReplacementBus", null, TransitMode.RAIL, null, null)
     );
     map.put(
-      new SubmodeMappingMatcher(FeedType.NETEX, "railreplacementBus"),
-      new SubmodeMappingRow("railReplacementBus", TransitMode.BUS, null)
+      new SubmodeMappingMatcher(FeedType.NETEX, "railReplacementBus"),
+      new SubmodeMappingRow("railReplacementBus", TransitMode.BUS, null, TransitMode.BUS, 714)
     );
     return map;
   }

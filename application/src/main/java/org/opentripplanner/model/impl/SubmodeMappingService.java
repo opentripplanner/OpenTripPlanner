@@ -1,11 +1,8 @@
 package org.opentripplanner.model.impl;
 
 import java.util.Map;
-import java.util.Optional;
 import org.opentripplanner.model.FeedType;
-import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * Trips can come from both GTFS and NeTEx sources, and to make GTFS Route.type and NeTEx
@@ -13,16 +10,18 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * submode-mapping.csv which contains entries keyed with input feed type (GTFS or NeTEx)
  * and input label (Route.type in the case of GTFS and Trip.submode in the case of NeTEx),
  * and the output values of NeTEx submode (not used currently because the transmodel query
- * api side is not done yet), Replacement mode, and Original mode (both TransitMode, and
- * optional).
+ * api side is not done yet), Replacement mode (no longer used after Joel's requested
+ * changes), Original mode (no longer used after Joel's requested changes), GTFS replacement
+ * mode (transit mode to use for route in GTFS query if all trips match the submode in NeTEx
+ * source), GTFS replacement type (extended type to use for route in GTFS query if all trips
+ * match the submode in NeTEx source).
  * <p>
- * In GTFS queries Trip.replacementMode (optional) and Trip.originalMode (mandatory) will
- * be populated by logic in this service.
+ * In GTFS queries Route.mode and Route.type can be overriden by this logic.
  * <p>
  * An example submode-mapping.csv:
  * <code>
- * Input feed type,Input label,NeTEx submode,Replacement mode,Original mode
- * NeTEx,replacementRailService,railReplacementBus,BUS,
+ * Input feed type,Input label,NeTEx submode,Replacement mode,Original mode,GTFS replacement mode,GTFS replacement type
+ * NeTEx,replacementRailService,railReplacementBus,BUS,,BUS,714
  * </code>
  * My NeTEx feed source uses a funny nonstandard submode "replacementRailService" which I
  * map to a standard one here. BUS will end up in Trip.replacementMode.
@@ -36,52 +35,19 @@ public class SubmodeMappingService {
     this.map = map;
   }
 
-  public Optional<SubmodeMappingRow> mapGtfsExtendedType(int extendedType) {
-    return Optional.ofNullable(
-      map.get(new SubmodeMappingMatcher(FeedType.GTFS, Integer.toString(extendedType)))
-    );
+  public TransitMode findGtfsReplacementMode(String submode) {
+    var row = map.get(new SubmodeMappingMatcher(FeedType.NETEX, submode));
+    if (row != null) {
+      return row.gtfsReplacementMode();
+    }
+    return null;
   }
 
-  public Optional<SubmodeMappingRow> mapNetexSubmode(SubMode submode) {
-    return Optional.ofNullable(
-      map.get(new SubmodeMappingMatcher(FeedType.NETEX, submode.toString()))
-    );
-  }
-
-  // For replacement services in NeTEx feeds, trip.mode is the original mode and
-  // trip.netexSubMode implies the replacement mode.
-  // For replacement services in GTFS feeds, route.mode is the replacement mode
-  // and route.type implies the original mode.
-  // We allow overriding, but if the mapping file fails to specify, we return the logical choice.
-  public TransitMode findOriginalMode(Trip trip) {
-    var route = trip.getRoute();
-    if (trip.getNetexSubMode() == SubMode.UNKNOWN && route.getGtfsType() != null) {
-      Optional<SubmodeMappingRow> mapping = mapGtfsExtendedType(route.getGtfsType());
-      if (mapping.isPresent() && mapping.get().originalMode() != null) {
-        return mapping.get().originalMode();
-      }
+  public Integer findGtfsReplacementType(String submode) {
+    var row = map.get(new SubmodeMappingMatcher(FeedType.NETEX, submode));
+    if (row != null) {
+      return row.gtfsReplacementType();
     }
-    return trip.getMode();
-  }
-
-  public Optional<TransitMode> findReplacementMode(Trip trip) {
-    if (trip.getNetexSubMode() != SubMode.UNKNOWN) {
-      Optional<SubmodeMappingRow> mapping = mapNetexSubmode(trip.getNetexSubMode());
-      if (mapping.isPresent()) {
-        return Optional.ofNullable(mapping.get().replacementMode());
-      }
-    }
-    var route = trip.getRoute();
-    if (route.getGtfsType() != null) {
-      Optional<SubmodeMappingRow> mapping = mapGtfsExtendedType(route.getGtfsType());
-      if (mapping.isPresent()) {
-        if (mapping.get().replacementMode() != null) {
-          return Optional.of(mapping.get().replacementMode());
-        } else {
-          return Optional.of(route.getMode());
-        }
-      }
-    }
-    return Optional.empty();
+    return null;
   }
 }

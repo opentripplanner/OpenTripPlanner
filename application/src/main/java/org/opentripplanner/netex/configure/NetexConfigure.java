@@ -42,13 +42,12 @@ public class NetexConfigure {
     DataImportIssueStore issueStore
   ) {
     List<NetexBundle> netexBundles = new ArrayList<>();
-
     for (ConfiguredCompositeDataSource<NetexFeedParameters> it : netexSources) {
       var transitServiceBuilder = new OtpTransitServiceBuilder(
         timetableRepository.getSiteRepository(),
         issueStore
       );
-      netexBundles.add(netexBundle(transitServiceBuilder, it));
+      netexBundles.add(netexBundle(transitServiceBuilder, it, timetableRepository));
     }
 
     return new NetexModule(
@@ -65,7 +64,8 @@ public class NetexConfigure {
   /** public to enable testing */
   public NetexBundle netexBundle(
     OtpTransitServiceBuilder transitServiceBuilder,
-    ConfiguredCompositeDataSource<NetexFeedParameters> configuredDataSource
+    ConfiguredCompositeDataSource<NetexFeedParameters> configuredDataSource,
+    TimetableRepository timetableRepository
   ) {
     var source = configuredDataSource.dataSource();
     var config = configuredDataSource.config();
@@ -79,7 +79,8 @@ public class NetexConfigure {
       buildParams.transitRouteToStationCentroid(),
       buildParams.maxStopToShapeSnapDistance,
       config.noTransfersOnIsolatedStops(),
-      config.ignoredFeatures()
+      config.ignoredFeatures(),
+      timetableRepository
     );
   }
 

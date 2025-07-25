@@ -101,7 +101,8 @@ class RouteMapper {
 
     builder.withMode(mode.mainMode());
     builder.withNetexSubmode(mode.subMode());
-    builder.withGtfsReplacement(gtfsReplacementCollector.getGtfsReplacement(line.getId()));
+    builder.withGtfsReplacementMode(gtfsReplacementCollector.findGtfsReplacementMode(line.getId()));
+    builder.withGtfsReplacementType(gtfsReplacementCollector.findGtfsReplacementType(line.getId()));
 
     if (line instanceof FlexibleLine_VersionStructure) {
       builder.withFlexibleLineType(
