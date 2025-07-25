@@ -21,7 +21,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
-import org.opentripplanner.osm.wayproperty.SafetyFeatures;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.utils.text.Table;
 import org.opentripplanner.utils.text.TableBuilder;
@@ -94,20 +93,32 @@ public class OsmMapperDocTest {
     for (var prop : wps.getMixins()) {
       propTable.addRow(
         "`%s`".formatted(prop.specifier().toDocString()),
-        tableValues(prop.bicycleSafety()),
-        tableValues(prop.walkSafety())
+        tableValues(
+          prop.bicycleSafety(),
+          prop.forwardBicycleSafety(),
+          prop.backwardBicycleSafety()
+        ),
+        tableValues(prop.walkSafety(), prop.forwardWalkSafety(), prop.backwardWalkSafety())
       );
     }
     return propTable.build();
   }
 
-  private static String tableValues(SafetyFeatures safety) {
-    if (!safety.modifies()) {
+  private static String tableValues(double value) {
+    if (value == 1.0) {
       return "";
-    } else if (safety.isSymmetric()) {
-      return Double.toString(safety.forward());
     } else {
-      return "forward: %s <br> back: %s".formatted(safety.forward(), safety.back());
+      return Double.toString(value);
+    }
+  }
+
+  private static String tableValues(double value, double forward, double backward) {
+    if (value == 1.0 && forward == 1.0 && backward == 1.0) {
+      return "";
+    } else if (value == forward && value == backward) {
+      return Double.toString(value);
+    } else {
+      return "no direction: %s <br> forward: %s <br> back: %s".formatted(value, forward, backward);
     }
   }
 }

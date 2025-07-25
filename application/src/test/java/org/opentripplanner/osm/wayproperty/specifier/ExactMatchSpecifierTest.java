@@ -17,15 +17,15 @@ class ExactMatchSpecifierTest extends SpecifierTest {
   @Test
   public void carTunnel() {
     var tunnel = WayTestData.carTunnel();
-    assertScore(200, highwayPrimarySpec, tunnel);
-    assertScore(0, pedestrianUndergroundIndoorTunnelSpec, tunnel);
+    assertScore(200, highwayPrimarySpec, tunnel, null);
+    assertScore(0, pedestrianUndergroundIndoorTunnelSpec, tunnel, null);
   }
 
   @Test
   public void pedestrianTunnelSpecificity() {
     OsmEntity tunnel = WayTestData.pedestrianTunnel();
-    assertScore(0, highwayPrimarySpec, tunnel);
-    assertScore(600, pedestrianUndergroundTunnelSpec, tunnel);
-    assertScore(800, pedestrianUndergroundIndoorTunnelSpec, tunnel);
+    assertScore(0, highwayPrimarySpec, tunnel, null);
+    assertScore(600, pedestrianUndergroundTunnelSpec, tunnel, null);
+    assertScore(800, pedestrianUndergroundIndoorTunnelSpec, tunnel, null);
   }
 }

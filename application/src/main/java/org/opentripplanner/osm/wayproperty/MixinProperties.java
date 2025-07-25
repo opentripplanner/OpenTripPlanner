@@ -1,5 +1,7 @@
 package org.opentripplanner.osm.wayproperty;
 
+import javax.annotation.Nullable;
+import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
 
 /**
@@ -11,6 +13,28 @@ import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
  */
 public record MixinProperties(
   OsmSpecifier specifier,
-  SafetyFeatures walkSafety,
-  SafetyFeatures bicycleSafety
-) {}
+  double walkSafety,
+  double bicycleSafety,
+  double forwardWalkSafety,
+  double forwardBicycleSafety,
+  double backwardWalkSafety,
+  double backwardBicycleSafety
+) {
+  double getWalkSafety(@Nullable TraverseDirection direction) {
+    return direction == null
+      ? walkSafety
+      : switch (direction) {
+        case FORWARD -> forwardWalkSafety;
+        case BACKWARD -> backwardWalkSafety;
+      };
+  }
+
+  double getBicycleSafety(@Nullable TraverseDirection direction) {
+    return direction == null
+      ? bicycleSafety
+      : switch (direction) {
+        case FORWARD -> forwardBicycleSafety;
+        case BACKWARD -> backwardBicycleSafety;
+      };
+  }
+}

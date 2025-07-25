@@ -413,7 +413,7 @@ class WalkableAreaBuilder {
 
   private WayProperties findAreaProperties(OsmEntity entity) {
     if (!wayPropertiesCache.containsKey(entity)) {
-      var wayData = entity.getOsmProvider().getWayPropertySet().getDataForWay(entity);
+      var wayData = entity.getOsmProvider().getWayPropertySet().getDataForEntity(entity, null);
       wayPropertiesCache.put(entity, wayData);
       return wayData;
     } else {
@@ -490,7 +490,7 @@ class WalkableAreaBuilder {
       vertex2.getLabel()
     );
 
-    float carSpeed = parent.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(parent, false);
+    float carSpeed = parent.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(parent, null);
 
     I18NString name = namer.getNameForWay(parent, label);
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
@@ -525,7 +525,7 @@ class WalkableAreaBuilder {
 
     AreaEdge street = streetEdgeBuilder.buildAndConnect();
     AreaEdge backStreet = backStreetEdgeBuilder.buildAndConnect();
-    normalizer.applyWayProperties(street, backStreet, wayData, parent);
+    normalizer.applyWayProperties(street, backStreet, wayData, wayData, parent);
     return Set.of(street, backStreet);
   }
 
@@ -544,10 +544,10 @@ class WalkableAreaBuilder {
       namedArea.setName(name);
 
       WayProperties wayData = findAreaProperties(areaEntity);
-      double bicycleSafety = wayData.bicycleSafety().forward();
+      double bicycleSafety = wayData.bicycleSafety();
       namedArea.setBicycleSafetyMultiplier(bicycleSafety);
 
-      double walkSafety = wayData.walkSafety().forward();
+      double walkSafety = wayData.walkSafety();
       namedArea.setWalkSafetyMultiplier(walkSafety);
       namedArea.setOriginalEdges(intersection);
       namedArea.setPermission(wayData.getPermission());

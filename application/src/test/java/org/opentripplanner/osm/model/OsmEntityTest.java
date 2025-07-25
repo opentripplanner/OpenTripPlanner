@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.osm.TraverseDirection.BACKWARD;
+import static org.opentripplanner.osm.TraverseDirection.FORWARD;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -106,47 +108,66 @@ public class OsmEntityTest {
   @Test
   void testDoesAllowTagAccess() {
     OsmEntity o = new OsmEntity();
-    assertFalse(o.doesTagAllowAccess("foo"));
+    assertFalse(o.isExplicitlyAllowed("foo"));
 
     o.addTag("foo", "bar");
-    assertFalse(o.doesTagAllowAccess("foo"));
+    assertFalse(o.isExplicitlyAllowed("foo"));
 
     o.addTag("foo", "designated");
-    assertTrue(o.doesTagAllowAccess("foo"));
+    assertTrue(o.isExplicitlyAllowed("foo"));
 
     o.addTag("foo", "official");
-    assertTrue(o.doesTagAllowAccess("foo"));
+    assertTrue(o.isExplicitlyAllowed("foo"));
   }
 
   @Test
   void testIsGeneralAccessDenied() {
     OsmEntity o = new OsmEntity();
-    assertFalse(o.isGeneralAccessDenied());
+    assertFalse(o.isGeneralAccessDenied(null));
 
     o.addTag("access", "something");
-    assertFalse(o.isGeneralAccessDenied());
+    assertFalse(o.isGeneralAccessDenied(null));
 
     o.addTag("access", "license");
-    assertTrue(o.isGeneralAccessDenied());
+    assertTrue(o.isGeneralAccessDenied(null));
 
     o.addTag("access", "no");
-    assertTrue(o.isGeneralAccessDenied());
+    assertTrue(o.isGeneralAccessDenied(null));
+  }
+
+  @Test
+  void testIsDirectionalGeneralAccessDenied() {
+    OsmEntity o = new OsmEntity();
+    o.addTag("access", "yes");
+    o.addTag("access:backward", "no");
+    assertFalse(o.isGeneralAccessDenied(null));
+    assertTrue(o.isGeneralAccessDenied(BACKWARD));
+    assertFalse(o.isGeneralAccessDenied(FORWARD));
   }
 
   @Test
   void testBicycleDenied() {
     OsmEntity tags = new OsmEntity();
-    assertFalse(tags.isBicycleExplicitlyDenied());
+    assertFalse(tags.isBicycleDenied());
 
     for (var allowedValue : List.of("yes", "unknown", "somevalue")) {
       tags.addTag("bicycle", allowedValue);
-      assertFalse(tags.isBicycleExplicitlyDenied(), "bicycle=" + allowedValue);
+      assertFalse(tags.isBicycleDenied(), "bicycle=" + allowedValue);
     }
 
     for (var deniedValue : List.of("no", "dismount", "license")) {
       tags.addTag("bicycle", deniedValue);
-      assertTrue(tags.isBicycleExplicitlyDenied(), "bicycle=" + deniedValue);
+      assertTrue(tags.isBicycleDenied(), "bicycle=" + deniedValue);
     }
+  }
+
+  @Test
+  void testBicycleDeniedOnVehicleDenied() {
+    OsmEntity noVehicle = new OsmEntity();
+    noVehicle.addTag("vehicle", "no");
+    assertTrue(noVehicle.isBicycleDenied());
+    noVehicle.addTag("bicycle", "yes");
+    assertFalse(noVehicle.isBicycleDenied());
   }
 
   @Test

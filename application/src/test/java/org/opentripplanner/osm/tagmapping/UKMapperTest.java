@@ -19,22 +19,25 @@ public class UKMapperTest {
 
   @Test
   void indoor() {
-    var corridor = wps.getDataForWay(WayTestData.indoor("corridor"));
+    var corridor = wps.getDataForEntity(WayTestData.indoor("corridor"), null);
     assertEquals(PEDESTRIAN, corridor.getPermission());
-    var area = wps.getDataForWay(WayTestData.indoor("area"));
+    var area = wps.getDataForEntity(WayTestData.indoor("area"), null);
     assertEquals(PEDESTRIAN, area.getPermission());
   }
 
   @Test
   void cycleway() {
-    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(WayTestData.cycleway()).getPermission());
+    assertEquals(
+      PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForEntity(WayTestData.cycleway(), null).getPermission()
+    );
   }
 
   @Test
   void bridleway() {
     assertEquals(
       PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForWay(WayTestData.bridleway()).getPermission()
+      wps.getDataForEntity(WayTestData.bridleway(), null).getPermission()
     );
   }
 }

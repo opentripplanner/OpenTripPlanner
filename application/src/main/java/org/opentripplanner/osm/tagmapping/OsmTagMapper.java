@@ -11,6 +11,8 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import javax.annotation.Nullable;
+import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
@@ -200,51 +202,75 @@ public class OsmTagMapper {
     /* cycleway=opposite_lane */
     props.setProperties(
       "highway=*;cycleway=opposite_lane",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1, 0.87)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1),
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1),
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.87)
     );
     props.setProperties(
       "highway=service;cycleway=opposite_lane",
-      withModes(ALL).bicycleSafety(1.1, 0.77)
+      withModes(ALL).bicycleSafety(1.1),
+      withModes(ALL).bicycleSafety(1.1),
+      withModes(ALL).bicycleSafety(0.77)
     );
     props.setProperties(
       "highway=residential;cycleway=opposite_lane",
-      withModes(ALL).bicycleSafety(0.98, 0.77)
+      withModes(ALL).bicycleSafety(0.98),
+      withModes(ALL).bicycleSafety(0.98),
+      withModes(ALL).bicycleSafety(0.77)
     );
     props.setProperties(
       "highway=residential_link;cycleway=opposite_lane",
-      withModes(ALL).bicycleSafety(0.98, 0.77)
+      withModes(ALL).bicycleSafety(0.98),
+      withModes(ALL).bicycleSafety(0.98),
+      withModes(ALL).bicycleSafety(0.77)
     );
     props.setProperties(
       "highway=tertiary;cycleway=opposite_lane",
-      withModes(ALL).bicycleSafety(1, 0.87)
+      withModes(ALL).bicycleSafety(1),
+      withModes(ALL).bicycleSafety(1),
+      withModes(ALL).bicycleSafety(0.87)
     );
     props.setProperties(
       "highway=tertiary_link;cycleway=opposite_lane",
-      withModes(ALL).bicycleSafety(1, 0.87)
+      withModes(ALL).bicycleSafety(1),
+      withModes(ALL).bicycleSafety(1),
+      withModes(ALL).bicycleSafety(0.87)
     );
     props.setProperties(
       "highway=secondary;cycleway=opposite_lane",
-      withModes(ALL).bicycleSafety(1.5, 0.96)
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(0.96)
     );
     props.setProperties(
       "highway=secondary_link;cycleway=opposite_lane",
-      withModes(ALL).bicycleSafety(1.5, 0.96)
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(0.96)
     );
     props.setProperties(
       "highway=primary;cycleway=opposite_lane",
-      withModes(ALL).bicycleSafety(2.06, 1.15)
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(1.15)
     );
     props.setProperties(
       "highway=primary_link;cycleway=opposite_lane",
-      withModes(ALL).bicycleSafety(2.06, 1.15)
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(1.15)
     );
     props.setProperties(
       "highway=trunk;cycleway=opposite_lane",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(7.47, 1.5)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(7.47),
+      withModes(BICYCLE_AND_CAR).bicycleSafety(7.47),
+      withModes(BICYCLE_AND_CAR).bicycleSafety(1.15)
     );
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_lane",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(2.06, 1.15)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(2.06),
+      withModes(BICYCLE_AND_CAR).bicycleSafety(2.06),
+      withModes(BICYCLE_AND_CAR).bicycleSafety(1.15)
     );
 
     /* cycleway=track */
@@ -276,51 +302,75 @@ public class OsmTagMapper {
     /* cycleway=opposite_track */
     props.setProperties(
       "highway=*;cycleway=opposite_track",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.0, 0.75)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.0),
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.0),
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75)
     );
     props.setProperties(
       "highway=service;cycleway=opposite_track",
-      withModes(ALL).bicycleSafety(1.1, 0.65)
+      withModes(ALL).bicycleSafety(1.1),
+      withModes(ALL).bicycleSafety(1.1),
+      withModes(ALL).bicycleSafety(0.65)
     );
     props.setProperties(
       "highway=residential;cycleway=opposite_track",
-      withModes(ALL).bicycleSafety(0.98, 0.65)
+      withModes(ALL).bicycleSafety(0.98),
+      withModes(ALL).bicycleSafety(0.98),
+      withModes(ALL).bicycleSafety(0.65)
     );
     props.setProperties(
       "highway=residential_link;cycleway=opposite_track",
-      withModes(ALL).bicycleSafety(0.98, 0.65)
+      withModes(ALL).bicycleSafety(0.98),
+      withModes(ALL).bicycleSafety(0.98),
+      withModes(ALL).bicycleSafety(0.65)
     );
     props.setProperties(
       "highway=tertiary;cycleway=opposite_track",
-      withModes(ALL).bicycleSafety(1, 0.75)
+      withModes(ALL).bicycleSafety(1),
+      withModes(ALL).bicycleSafety(1),
+      withModes(ALL).bicycleSafety(0.75)
     );
     props.setProperties(
       "highway=tertiary_link;cycleway=opposite_track",
-      withModes(ALL).bicycleSafety(1, 0.75)
+      withModes(ALL).bicycleSafety(1),
+      withModes(ALL).bicycleSafety(1),
+      withModes(ALL).bicycleSafety(0.75)
     );
     props.setProperties(
       "highway=secondary;cycleway=opposite_track",
-      withModes(ALL).bicycleSafety(1.5, 0.8)
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(0.8)
     );
     props.setProperties(
       "highway=secondary_link;cycleway=opposite_track",
-      withModes(ALL).bicycleSafety(1.5, 0.8)
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(0.8)
     );
     props.setProperties(
       "highway=primary;cycleway=opposite_track",
-      withModes(ALL).bicycleSafety(2.06, 0.85)
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(0.85)
     );
     props.setProperties(
       "highway=primary_link;cycleway=opposite_track",
-      withModes(ALL).bicycleSafety(2.06, 0.85)
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(0.85)
     );
     props.setProperties(
       "highway=trunk;cycleway=opposite_track",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(7.47, 0.95)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(7.47),
+      withModes(BICYCLE_AND_CAR).bicycleSafety(7.47),
+      withModes(BICYCLE_AND_CAR).bicycleSafety(0.95)
     );
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_track",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(2.06, 0.85)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(2.06),
+      withModes(BICYCLE_AND_CAR).bicycleSafety(2.06),
+      withModes(BICYCLE_AND_CAR).bicycleSafety(0.85)
     );
 
     /* cycleway=shared_lane a.k.a. bike boulevards or neighborhood greenways */
@@ -362,7 +412,9 @@ public class OsmTagMapper {
     /* cycleway=opposite */
     props.setProperties(
       "highway=*;cycleway=opposite",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1, 1.4)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1),
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1),
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.4)
     );
     props.setProperties("highway=service;cycleway=opposite", withModes(ALL).bicycleSafety(1.1));
     props.setProperties(
@@ -377,19 +429,27 @@ public class OsmTagMapper {
     props.setProperties("highway=tertiary_link;cycleway=opposite", allWayProperties);
     props.setProperties(
       "highway=secondary;cycleway=opposite",
-      withModes(ALL).bicycleSafety(1.5, 1.71)
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(1.71)
     );
     props.setProperties(
       "highway=secondary_link;cycleway=opposite",
-      withModes(ALL).bicycleSafety(1.5, 1.71)
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(1.5),
+      withModes(ALL).bicycleSafety(1.71)
     );
     props.setProperties(
       "highway=primary;cycleway=opposite",
-      withModes(ALL).bicycleSafety(2.06, 2.99)
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(2.99)
     );
     props.setProperties(
       "highway=primary_link;cycleway=opposite",
-      withModes(ALL).bicycleSafety(2.06, 2.99)
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(2.06),
+      withModes(ALL).bicycleSafety(2.99)
     );
 
     /*
@@ -746,8 +806,8 @@ public class OsmTagMapper {
     );
   }
 
-  public float getCarSpeedForWay(OsmEntity way, boolean backward) {
-    return way.getOsmProvider().getWayPropertySet().getCarSpeedForWay(way, backward);
+  public float getCarSpeedForWay(OsmEntity way, @Nullable TraverseDirection direction) {
+    return way.getOsmProvider().getWayPropertySet().getCarSpeedForWay(way, direction);
   }
 
   public Float getMaxUsedCarSpeed(WayPropertySet wayPropertySet) {

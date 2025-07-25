@@ -2,6 +2,8 @@ package org.opentripplanner.osm.wayproperty.specifier;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -35,46 +37,27 @@ public class BestMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public Scores matchScores(OsmEntity way) {
-    int backwardScore = 0, forwardScore = 0;
-    int backwardMatches = 0, forwardMatches = 0;
-
-    for (var test : conditions) {
-      var forwardMatch = test.matchForward(way);
-      var backwardMatch = test.matchBackward(way);
-
-      int backwardTagScore = toTagScore(backwardMatch);
-      backwardScore += backwardTagScore;
-      if (backwardTagScore > 0) {
-        backwardMatches++;
-      }
-      int forwardTagScore = toTagScore(forwardMatch);
-      forwardScore += forwardTagScore;
-      if (forwardTagScore > 0) {
-        forwardMatches++;
-      }
-    }
-
-    int allMatchBackwardBonus = (backwardMatches == conditions.length) ? 10 : 0;
-    backwardScore += allMatchBackwardBonus;
-    int allMatchForwardBonus = (forwardMatches == conditions.length) ? 10 : 0;
-    forwardScore += allMatchForwardBonus;
-    return new Scores(forwardScore, backwardScore);
-  }
-
-  @Override
-  public int matchScore(OsmEntity way) {
+  public int matchScore(OsmEntity way, @Nullable TraverseDirection direction) {
     int score = 0;
     int matches = 0;
+
     for (var test : conditions) {
-      var matchValue = test.match(way);
-      int tagScore = toTagScore(matchValue);
+      var match = direction == null
+        ? test.match(way)
+        : switch (direction) {
+          case FORWARD -> test.matchForward(way);
+          case BACKWARD -> test.matchBackward(way);
+        };
+
+      int tagScore = toTagScore(match);
       score += tagScore;
       if (tagScore > 0) {
-        matches += 1;
+        matches++;
       }
     }
-    score += matches == conditions.length ? 10 : 0;
+
+    int allMatchBonus = matches == conditions.length ? 10 : 0;
+    score += allMatchBonus;
     return score;
   }
 
