@@ -224,6 +224,13 @@ public class WayTestData {
     return way;
   }
 
+  public static OsmEntity highwayTrunkWithMotorroad() {
+    var way = new OsmEntity();
+    way.addTag("highway", "trunk");
+    way.addTag("motorroad", "yes");
+    return way;
+  }
+
   public static OsmEntity highwayPrimaryWithMotorroad() {
     var way = new OsmEntity();
     way.addTag("highway", "primary");

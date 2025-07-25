@@ -169,6 +169,11 @@ class OsmTagMapperTest {
   }
 
   @Test
+  void testTrunkMotorroad() {
+    assertEquals(CAR, wps.getDataForWay(WayTestData.highwayTrunkWithMotorroad()).getPermission());
+  }
+
+  @Test
   void testTertiary() {
     assertEquals(ALL, wps.getDataForWay(WayTestData.highwayTertiary()).getPermission());
   }
