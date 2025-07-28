@@ -22,9 +22,9 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.api.types.Route;
 import org.opentripplanner.client.model.Coordinate;
 import org.opentripplanner.client.model.LegMode;
-import org.opentripplanner.client.model.Route;
 import org.opentripplanner.client.model.TripPlan;
 import org.opentripplanner.client.parameters.TripPlanParameters;
 import org.opentripplanner.client.parameters.TripPlanParametersBuilder;
@@ -112,8 +112,8 @@ public class SeattleSmokeTest {
     );
     var itin = plan.itineraries().getFirst();
     var flexLeg = itin.transitLegs().getFirst();
-    assertEquals(CCSWW_ROUTE, flexLeg.route().name());
-    assertEquals(CCSWW_ROUTE, flexLeg.route().agency().name());
+    assertEquals(CCSWW_ROUTE, flexLeg.route().getLongName());
+    assertEquals(CCSWW_ROUTE, flexLeg.route().getAgency().getName());
   }
 
   @Test
@@ -126,7 +126,9 @@ public class SeattleSmokeTest {
     var walkAndFlex = plan
       .transitItineraries()
       .stream()
-      .filter(i -> i.transitLegs().stream().anyMatch(l -> l.route().name().equals(CCSWW_ROUTE)))
+      .filter(i ->
+        i.transitLegs().stream().anyMatch(l -> l.route().getLongName().equals(CCSWW_ROUTE))
+      )
       .findFirst()
       .get();
     assertEquals(2, walkAndFlex.legs().size());
@@ -140,7 +142,7 @@ public class SeattleSmokeTest {
   public void monorailRoute() throws IOException {
     var modes = SmokeTest.API_CLIENT.routes()
       .stream()
-      .map(Route::mode)
+      .map(Route::getMode)
       .map(Objects::toString)
       .collect(Collectors.toSet());
     // for some reason the monorail feed says its route is of type rail
@@ -160,8 +162,10 @@ public class SeattleSmokeTest {
 
     var first = itineraries.getFirst();
     var leg = first.transitLegs().getFirst();
-    assertThat(Set.of("510", "415")).contains(leg.route().shortName().get());
-    assertThat(Set.of("Sound Transit", "Community Transit")).contains(leg.route().agency().name());
+    assertThat(Set.of("510", "415")).contains(leg.route().getShortName());
+    assertThat(Set.of("Sound Transit", "Community Transit")).contains(
+      leg.route().getAgency().getName()
+    );
 
     var stop = leg.from().stop().get();
     assertEquals("Olive Way & 6th Ave", stop.name());
