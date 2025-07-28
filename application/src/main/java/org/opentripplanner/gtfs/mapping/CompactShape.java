@@ -13,10 +13,10 @@ import org.opentripplanner.model.ShapePoint;
  * A representation that stores GTFS shape points in a memory-efficient way and allows you to
  * iterate over them for further processing.
  * <p>
- * Shape points are stored in an automatically expanding sparse array of original coordinate values,
- * so when they are added out of order, the shape doesn't need to be encoded or sorted again.
- * It is a compromise between efficient memory consumption and efficient use of CPU by not compressing
- * or encoding the points.
+ * Shape points are stored in an automatically expanding Trove IntList of original sequence numbers,
+ * coordinate values, shape dist travelled and an index to allow the shape points to be added in
+ * arbitrary order and have large gaps in between the sequence numbers (at the cost of more memory
+ * consumption).
  * <p>
  * It is package-private but implements Iterable, so you should use that as the return type of the
  * mapping process.
