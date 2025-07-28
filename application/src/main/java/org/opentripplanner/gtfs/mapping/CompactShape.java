@@ -1,7 +1,12 @@
 package org.opentripplanner.gtfs.mapping;
 
-import java.util.Arrays;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import java.util.Iterator;
+import java.util.PrimitiveIterator;
+import java.util.stream.IntStream;
 import org.opentripplanner.model.ShapePoint;
 
 /**
@@ -19,95 +24,56 @@ import org.opentripplanner.model.ShapePoint;
 class CompactShape implements Iterable<ShapePoint> {
 
   private static final double NO_VALUE = -9999;
-  private static final int INCREASE = 50;
-  private double[] lats;
-  private double[] lons;
-  // we only initialize this if we need it
-  private double[] distTraveleds;
-  private int maxSequence = (int) NO_VALUE;
+  private static final int CAPACITY = 50;
+  private final TDoubleList lats = new TDoubleArrayList(CAPACITY, NO_VALUE);
+  private final TDoubleList lons = new TDoubleArrayList(CAPACITY, NO_VALUE);
+  private final TDoubleList distTraveleds = new TDoubleArrayList(CAPACITY, NO_VALUE);
+  /**
+   * The mapping from GTFS sequence number to index in the array lists. This allows the
+   * shape points to be inserted in any order and the sequence number to have very large
+   * gaps - at the cost of consuming a bit more memory.
+   */
+  private final TIntIntMap seqIndex = new TIntIntHashMap();
 
-  public CompactShape() {
-    this.lats = new double[INCREASE];
-    this.lons = new double[INCREASE];
-    Arrays.fill(this.lats, NO_VALUE);
-    Arrays.fill(this.lons, NO_VALUE);
-    // distTraveleds is created on demand if required
-  }
+  CompactShape() {}
 
   public void addPoint(org.onebusaway.gtfs.model.ShapePoint shapePoint) {
-    int index = shapePoint.getSequence();
-    ensureLatLonCapacity(index);
-    lats[index] = shapePoint.getLat();
-    lons[index] = shapePoint.getLon();
+    lats.add(shapePoint.getLat());
+    lons.add(shapePoint.getLon());
     if (shapePoint.isDistTraveledSet()) {
-      ensureDistTraveledCapacity(index);
-      distTraveleds[index] = shapePoint.getDistTraveled();
+      distTraveleds.add(shapePoint.getDistTraveled());
+    } else {
+      distTraveleds.add(NO_VALUE);
     }
-    if (maxSequence < index) {
-      maxSequence = index;
-    }
+
+    int seq = shapePoint.getSequence();
+    seqIndex.put(seq, lats.size() - 1);
   }
 
   @Override
   public Iterator<ShapePoint> iterator() {
     return new Iterator<>() {
-      private int index = 0;
+      private final PrimitiveIterator.OfInt seqIterator = IntStream.of(seqIndex.keys())
+        .sorted()
+        .iterator();
 
       @Override
       public boolean hasNext() {
-        return index <= maxSequence;
+        return seqIterator.hasNext();
       }
 
       @Override
       public ShapePoint next() {
-        var lat = lats[index];
-        while (lat == NO_VALUE) {
-          index++;
-          lat = lats[index];
+        var seq = seqIterator.nextInt();
+        var index = seqIndex.get(seq);
+        var lat = lats.get(index);
+        var lon = lons.get(index);
+        Double distTraveled = distTraveleds.get(index);
+        if (distTraveled == NO_VALUE) {
+          distTraveled = null;
         }
-        var lon = lons[index];
-        Double distTraveled = null;
-        if (distTraveleds != null && index - 1 < distTraveleds.length) {
-          distTraveled = distTraveleds[index];
-          if (distTraveled == NO_VALUE) {
-            distTraveled = null;
-          }
-        }
-        var ret = new ShapePoint(index, lat, lon, distTraveled);
-        index++;
-        return ret;
+        return new ShapePoint(seq, lat, lon, distTraveled);
       }
     };
-  }
-
-  private void ensureLatLonCapacity(int index) {
-    if (lats.length - 1 < index) {
-      int oldLength = lats.length;
-      int newLength = increaseCapacity(index);
-      lats = Arrays.copyOf(lats, newLength);
-      lons = Arrays.copyOf(lons, newLength);
-      for (var i = oldLength; i < newLength; i++) {
-        lats[i] = NO_VALUE;
-        lons[i] = NO_VALUE;
-      }
-    }
-  }
-
-  private void ensureDistTraveledCapacity(int index) {
-    if (this.distTraveleds == null) {
-      this.distTraveleds = new double[Math.max(INCREASE, index + 1)];
-      Arrays.fill(distTraveleds, NO_VALUE);
-    } else if (distTraveleds.length - 1 < index) {
-      int oldLength = distTraveleds.length;
-      int newLength = increaseCapacity(index);
-      this.distTraveleds = Arrays.copyOf(distTraveleds, newLength);
-      for (var i = oldLength; i < newLength; i++) {
-        distTraveleds[i] = NO_VALUE;
-      }
-    }
-  }
-
-  private static int increaseCapacity(int index) {
-    return index + INCREASE;
   }
 }

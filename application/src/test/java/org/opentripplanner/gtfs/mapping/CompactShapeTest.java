@@ -122,6 +122,24 @@ class CompactShapeTest {
     );
   }
 
+  @Test
+  void largeSeq() {
+    var shape = new CompactShape();
+
+    shape.addPoint(shapePoint(0, 1, 1, 1d));
+    shape.addPoint(shapePoint(10_000, 2, 2, 2d));
+    shape.addPoint(shapePoint(30_000, 3, 3, 4d));
+    shape.addPoint(shapePoint(40_000_000, 4, 4, 5d));
+    shape.addPoint(shapePoint(Integer.MAX_VALUE, 5, 5, 6d));
+
+    var points = ImmutableList.copyOf(shape);
+
+    assertEquals(
+      "[0 (1.0, 1.0) dist=1.0, 10,000 (2.0, 2.0) dist=2.0, 30,000 (3.0, 3.0) dist=4.0, 40,000,000 (4.0, 4.0) dist=5.0, 2,147,483,647 (5.0, 5.0) dist=6.0]",
+      points.toString()
+    );
+  }
+
   private static ShapePoint shapePoint(int sequence, double lat, double lon) {
     return shapePoint(sequence, lat, lon, null);
   }

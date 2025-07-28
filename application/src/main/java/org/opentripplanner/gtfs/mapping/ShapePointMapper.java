@@ -20,9 +20,12 @@ class ShapePointMapper {
     var ret = new HashMap<FeedScopedId, CompactShape>();
     for (var shapePoint : allShapePoints) {
       var shapeId = idFactory.createId(shapePoint.getShapeId(), "shape point");
-      var shapeBuilder = ret.getOrDefault(shapeId, new CompactShape());
-      shapeBuilder.addPoint(shapePoint);
-      ret.put(shapeId, shapeBuilder);
+      var shape = ret.get(shapeId);
+      if (shape == null) {
+        shape = new CompactShape();
+        ret.put(shapeId, shape);
+      }
+      shape.addPoint(shapePoint);
     }
 
     return ret;
