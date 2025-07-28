@@ -13,7 +13,7 @@
     {
       "type": "gtfs",
       "source": "https://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip",
-      "feedId": "septa-bus"
+      "feedId": "patco"
     }
   ],
   "fares": "combine-interlined-legs"
