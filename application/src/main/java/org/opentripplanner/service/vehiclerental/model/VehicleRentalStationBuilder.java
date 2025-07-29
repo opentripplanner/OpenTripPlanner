@@ -46,140 +46,161 @@ public class VehicleRentalStationBuilder {
 
   VehicleRentalStationBuilder(VehicleRentalStation original) {
     this.original = original;
+    this.id = original.id();
+    this.name = original.name();
+    this.shortName = original.shortName();
+    this.longitude = original.longitude();
+    this.latitude = original.latitude();
+    this.address = original.address();
+    this.crossStreet = original.crossStreet();
+    this.regionId = original.regionId();
+    this.postCode = original.postCode();
+    this.rentalMethods = original.rentalMethods();
+    this.isVirtualStation = original.isVirtualStation();
+    this.stationArea = original.stationArea();
+    this.capacity = original.capacity();
+    this.vehicleTypeAreaCapacity = original.vehicleTypeAreaCapacity();
+    this.vehicleTypeDockCapacity = original.vehicleTypeDockCapacity();
+    this.isValetStation = original.isValetStation();
+    this.system = original.system();
+    this.rentalUris = original.rentalUris();
+    this.vehiclesAvailable = original.vehiclesAvailable();
+    this.vehiclesDisabled = original.vehiclesDisabled();
+    this.vehicleTypesAvailable = original.vehicleTypesAvailable();
+    this.spacesAvailable = original.spacesAvailable();
+    this.spacesDisabled = original.spacesDisabled();
+    this.vehicleSpacesAvailable = original.vehicleSpacesAvailable();
+    this.isInstalled = original.isInstalled();
+    this.isRenting = original.isRenting();
+    this.isReturning = original.isReturning();
+    this.lastReported = original.lastReported();
+    this.overloadingAllowed = original.overloadingAllowed();
+    this.isArrivingInRentalVehicleAtDestinationAllowed = original.isArrivingInRentalVehicleAtDestinationAllowed();
+    this.realTimeData = original.isRealTimeData();
   }
 
   public FeedScopedId id() {
-    return id == null ? original.id() : id;
+    return id;
   }
 
   public I18NString name() {
-    return name == null ? original.name() : name;
+    return name;
   }
 
   public String shortName() {
-    return shortName == null ? original.shortName() : shortName;
+    return shortName;
   }
 
   public double longitude() {
-    return longitude == null ? original.longitude() : longitude;
+    return longitude;
   }
 
   public double latitude() {
-    return latitude == null ? original.latitude() : latitude;
+    return latitude;
   }
 
   public String address() {
-    return address == null ? original.address() : address;
+    return address;
   }
 
   public String crossStreet() {
-    return crossStreet == null ? original.crossStreet() : crossStreet;
+    return crossStreet;
   }
 
   public String regionId() {
-    return regionId == null ? original.regionId() : regionId;
+    return regionId;
   }
 
   public String postCode() {
-    return postCode == null ? original.postCode() : postCode;
+    return postCode;
   }
 
   public Set<String> rentalMethods() {
-    return rentalMethods.isEmpty() ? original.rentalMethods() : rentalMethods;
+    return rentalMethods;
   }
 
   public boolean isVirtualStation() {
-    return isVirtualStation == null ? original.isVirtualStation() : isVirtualStation;
+    return isVirtualStation;
   }
 
   public Geometry stationArea() {
-    return stationArea == null ? original.stationArea() : stationArea;
+    return stationArea;
   }
 
   public Integer capacity() {
-    return capacity == null ? original.capacity() : capacity;
+    return capacity;
   }
 
   public Map<RentalVehicleType, Integer> vehicleTypeAreaCapacity() {
-    return vehicleTypeAreaCapacity.isEmpty()
-      ? original.vehicleTypeAreaCapacity()
-      : vehicleTypeAreaCapacity;
+    return vehicleTypeAreaCapacity;
   }
 
   public Map<RentalVehicleType, Integer> vehicleTypeDockCapacity() {
-    return vehicleTypeDockCapacity.isEmpty()
-      ? original.vehicleTypeDockCapacity()
-      : vehicleTypeDockCapacity;
+    return vehicleTypeDockCapacity;
   }
 
   public boolean isValetStation() {
-    return isValetStation == null ? original.isValetStation() : isValetStation;
+    return isValetStation;
   }
 
   public VehicleRentalSystem system() {
-    return system == null ? original.system() : system;
+    return system;
   }
 
   public VehicleRentalStationUris rentalUris() {
-    return rentalUris == null ? original.rentalUris() : rentalUris;
+    return rentalUris;
   }
 
   public int vehiclesAvailable() {
-    return vehiclesAvailable == null ? original.vehiclesAvailable() : vehiclesAvailable;
+    return vehiclesAvailable;
   }
 
   public int vehiclesDisabled() {
-    return vehiclesDisabled == null ? original.vehiclesDisabled() : vehiclesDisabled;
+    return vehiclesDisabled;
   }
 
   public Map<RentalVehicleType, Integer> vehicleTypesAvailable() {
-    return vehicleTypesAvailable.isEmpty()
-      ? original.vehicleTypesAvailable()
-      : vehicleTypesAvailable;
+    return vehicleTypesAvailable;
   }
 
   public int spacesAvailable() {
-    return spacesAvailable == null ? original.spacesAvailable() : spacesAvailable;
+    return spacesAvailable;
   }
 
   public int spacesDisabled() {
-    return spacesDisabled == null ? original.spacesDisabled() : spacesDisabled;
+    return spacesDisabled;
   }
 
   public Map<RentalVehicleType, Integer> vehicleSpacesAvailable() {
-    return vehicleSpacesAvailable.isEmpty()
-      ? original.vehicleSpacesAvailable()
-      : vehicleSpacesAvailable;
+    return vehicleSpacesAvailable;
   }
 
   public boolean isInstalled() {
-    return isInstalled == null ? original.isInstalled() : isInstalled;
+    return isInstalled;
   }
 
   public boolean isRenting() {
-    return isRenting == null ? original.isRenting() : isRenting;
+    return isRenting;
   }
 
   public boolean isReturning() {
-    return isReturning == null ? original.isReturning() : isReturning;
+    return isReturning;
   }
 
   public Instant lastReported() {
-    return lastReported == null ? original.lastReported() : lastReported;
+    return lastReported;
   }
 
   public boolean isOverloadingAllowed() {
-    return overloadingAllowed == null ? original.overloadingAllowed() : overloadingAllowed;
+    return overloadingAllowed;
   }
 
   public boolean isArrivingInRentalVehicleAtDestinationAllowed() {
-    return isArrivingInRentalVehicleAtDestinationAllowed == null
-      ? original.isArrivingInRentalVehicleAtDestinationAllowed()
-      : isArrivingInRentalVehicleAtDestinationAllowed;
+    return isArrivingInRentalVehicleAtDestinationAllowed;
   }
 
   public boolean isRealTimeData() {
-    return realTimeData == null ? original.isRealTimeData() : realTimeData;
+    return realTimeData;
   }
 
   public VehicleRentalStationBuilder withId(@Nullable FeedScopedId id) {
