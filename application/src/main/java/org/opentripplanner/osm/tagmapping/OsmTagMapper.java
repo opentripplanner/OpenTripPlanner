@@ -180,13 +180,10 @@ public class OsmTagMapper {
       "highway=primary_link;cycleway=share_busway",
       withModes(ALL).bicycleSafety(1.25)
     );
-    props.setProperties(
-      "highway=trunk;cycleway=share_busway",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(1.75)
-    );
+    props.setProperties("highway=trunk;cycleway=share_busway", withModes(ALL).bicycleSafety(1.75));
     props.setProperties(
       "highway=trunk_link;cycleway=share_busway",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(1.25)
+      withModes(ALL).bicycleSafety(1.25)
     );
     props.setProperties(
       "highway=motorway;cycleway=share_busway",
@@ -240,11 +237,11 @@ public class OsmTagMapper {
     );
     props.setProperties(
       "highway=trunk;cycleway=opposite_lane",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(7.47, 1.5)
+      withModes(ALL).bicycleSafety(7.47, 1.5)
     );
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_lane",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(2.06, 1.15)
+      withModes(ALL).bicycleSafety(2.06, 1.15)
     );
 
     /* cycleway=track */
@@ -264,14 +261,8 @@ public class OsmTagMapper {
     props.setProperties("highway=secondary_link;cycleway=track", withModes(ALL).bicycleSafety(0.8));
     props.setProperties("highway=primary;cycleway=track", withModes(ALL).bicycleSafety(0.85));
     props.setProperties("highway=primary_link;cycleway=track", withModes(ALL).bicycleSafety(0.85));
-    props.setProperties(
-      "highway=trunk;cycleway=track",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(0.95)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=track",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(0.85)
-    );
+    props.setProperties("highway=trunk;cycleway=track", withModes(ALL).bicycleSafety(0.95));
+    props.setProperties("highway=trunk_link;cycleway=track", withModes(ALL).bicycleSafety(0.85));
 
     /* cycleway=opposite_track */
     props.setProperties(
@@ -316,11 +307,11 @@ public class OsmTagMapper {
     );
     props.setProperties(
       "highway=trunk;cycleway=opposite_track",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(7.47, 0.95)
+      withModes(ALL).bicycleSafety(7.47, 0.95)
     );
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_track",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(2.06, 0.85)
+      withModes(ALL).bicycleSafety(2.06, 0.85)
     );
 
     /* cycleway=shared_lane a.k.a. bike boulevards or neighborhood greenways */
@@ -497,14 +488,8 @@ public class OsmTagMapper {
     );
     props.setProperties("highway=primary;bicycle=designated", withModes(ALL).bicycleSafety(2));
     props.setProperties("highway=primary_link;bicycle=designated", withModes(ALL).bicycleSafety(2));
-    props.setProperties(
-      "highway=trunk;bicycle=designated",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(7.25)
-    );
-    props.setProperties(
-      "highway=trunk_link;bicycle=designated",
-      withModes(BICYCLE_AND_CAR).bicycleSafety(2)
-    );
+    props.setProperties("highway=trunk;bicycle=designated", withModes(ALL).bicycleSafety(7.25));
+    props.setProperties("highway=trunk_link;bicycle=designated", withModes(ALL).bicycleSafety(2));
     props.setProperties(
       "highway=motorway;bicycle=designated",
       withModes(BICYCLE_AND_CAR).bicycleSafety(7.76)

@@ -90,8 +90,8 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=secondary_link; cycleway=share_busway`         | `ALL`                    | 0.99                          |             |
 | `highway=primary; cycleway=share_busway`                | `ALL`                    | 1.25                          |             |
 | `highway=primary_link; cycleway=share_busway`           | `ALL`                    | 1.25                          |             |
-| `highway=trunk; cycleway=share_busway`                  | `BICYCLE_AND_CAR`        | 1.75                          |             |
-| `highway=trunk_link; cycleway=share_busway`             | `BICYCLE_AND_CAR`        | 1.25                          |             |
+| `highway=trunk; cycleway=share_busway`                  | `ALL`                    | 1.75                          |             |
+| `highway=trunk_link; cycleway=share_busway`             | `ALL`                    | 1.25                          |             |
 | `highway=motorway; cycleway=share_busway`               | `BICYCLE_AND_CAR`        | 2.5                           |             |
 | `highway=motorway_link; cycleway=share_busway`          | `BICYCLE_AND_CAR`        | 1.25                          |             |
 | `present(highway); cycleway=opposite_lane`              | `PEDESTRIAN_AND_BICYCLE` | forward: 1.0 <br> back: 0.87  |             |
@@ -104,8 +104,8 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=secondary_link; cycleway=opposite_lane`        | `ALL`                    | forward: 1.5 <br> back: 0.96  |             |
 | `highway=primary; cycleway=opposite_lane`               | `ALL`                    | forward: 2.06 <br> back: 1.15 |             |
 | `highway=primary_link; cycleway=opposite_lane`          | `ALL`                    | forward: 2.06 <br> back: 1.15 |             |
-| `highway=trunk; cycleway=opposite_lane`                 | `BICYCLE_AND_CAR`        | forward: 7.47 <br> back: 1.5  |             |
-| `highway=trunk_link; cycleway=opposite_lane`            | `BICYCLE_AND_CAR`        | forward: 2.06 <br> back: 1.15 |             |
+| `highway=trunk; cycleway=opposite_lane`                 | `ALL`                    | forward: 7.47 <br> back: 1.5  |             |
+| `highway=trunk_link; cycleway=opposite_lane`            | `ALL`                    | forward: 2.06 <br> back: 1.15 |             |
 | `present(highway); cycleway=track`                      | `PEDESTRIAN_AND_BICYCLE` | 0.75                          |             |
 | `highway=service; cycleway=track`                       | `ALL`                    | 0.65                          |             |
 | `highway=residential; cycleway=track`                   | `ALL`                    | 0.65                          |             |
@@ -116,8 +116,8 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=secondary_link; cycleway=track`                | `ALL`                    | 0.8                           |             |
 | `highway=primary; cycleway=track`                       | `ALL`                    | 0.85                          |             |
 | `highway=primary_link; cycleway=track`                  | `ALL`                    | 0.85                          |             |
-| `highway=trunk; cycleway=track`                         | `BICYCLE_AND_CAR`        | 0.95                          |             |
-| `highway=trunk_link; cycleway=track`                    | `BICYCLE_AND_CAR`        | 0.85                          |             |
+| `highway=trunk; cycleway=track`                         | `ALL`                    | 0.95                          |             |
+| `highway=trunk_link; cycleway=track`                    | `ALL`                    | 0.85                          |             |
 | `present(highway); cycleway=opposite_track`             | `PEDESTRIAN_AND_BICYCLE` | forward: 1.0 <br> back: 0.75  |             |
 | `highway=service; cycleway=opposite_track`              | `ALL`                    | forward: 1.1 <br> back: 0.65  |             |
 | `highway=residential; cycleway=opposite_track`          | `ALL`                    | forward: 0.98 <br> back: 0.65 |             |
@@ -128,8 +128,8 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=secondary_link; cycleway=opposite_track`       | `ALL`                    | forward: 1.5 <br> back: 0.8   |             |
 | `highway=primary; cycleway=opposite_track`              | `ALL`                    | forward: 2.06 <br> back: 0.85 |             |
 | `highway=primary_link; cycleway=opposite_track`         | `ALL`                    | forward: 2.06 <br> back: 0.85 |             |
-| `highway=trunk; cycleway=opposite_track`                | `BICYCLE_AND_CAR`        | forward: 7.47 <br> back: 0.95 |             |
-| `highway=trunk_link; cycleway=opposite_track`           | `BICYCLE_AND_CAR`        | forward: 2.06 <br> back: 0.85 |             |
+| `highway=trunk; cycleway=opposite_track`                | `ALL`                    | forward: 7.47 <br> back: 0.95 |             |
+| `highway=trunk_link; cycleway=opposite_track`           | `ALL`                    | forward: 2.06 <br> back: 0.85 |             |
 | `present(highway); cycleway=shared_lane`                | `PEDESTRIAN_AND_BICYCLE` | 0.77                          |             |
 | `highway=service; cycleway=shared_lane`                 | `ALL`                    | 0.73                          |             |
 | `highway=residential; cycleway=shared_lane`             | `ALL`                    | 0.77                          |             |
@@ -177,8 +177,8 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=secondary_link; bicycle=designated`            | `ALL`                    | 1.46                          |             |
 | `highway=primary; bicycle=designated`                   | `ALL`                    | 2.0                           |             |
 | `highway=primary_link; bicycle=designated`              | `ALL`                    | 2.0                           |             |
-| `highway=trunk; bicycle=designated`                     | `BICYCLE_AND_CAR`        | 7.25                          |             |
-| `highway=trunk_link; bicycle=designated`                | `BICYCLE_AND_CAR`        | 2.0                           |             |
+| `highway=trunk; bicycle=designated`                     | `ALL`                    | 7.25                          |             |
+| `highway=trunk_link; bicycle=designated`                | `ALL`                    | 2.0                           |             |
 | `highway=motorway; bicycle=designated`                  | `BICYCLE_AND_CAR`        | 7.76                          |             |
 | `highway=motorway_link; bicycle=designated`             | `BICYCLE_AND_CAR`        | 2.0                           |             |
 
