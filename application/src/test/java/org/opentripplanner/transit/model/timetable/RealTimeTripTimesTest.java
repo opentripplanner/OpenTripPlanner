@@ -165,7 +165,7 @@ class RealTimeTripTimesTest {
   @Test
   public void testIncompleteTimes() {
     assertThrows(
-      IllegalStateException.class,
+      DataValidationException.class,
       createInitialTripTimes().createRealTimeWithoutScheduledTimes()::build
     );
   }
@@ -196,12 +196,10 @@ class RealTimeTripTimesTest {
   }
 
   /**
-   * Test negative hop time with stop cancellations.
+   * Test hop time with stop cancellations when buses run late.
    * Scheduled: 5 at 300, 6 at 360, 7 at 420
-   * Test case: 5 at 421, 6 cancelled (with internal representation 481, since delays are propagated
-   * to later stops without arrival or departure), 7 at 420
-   * Result: Error to be present at stop 7, due to negative hop time. Error should stay after
-   * interpolation, since 6 would be then less than 5 due to interpolation.
+   * Test case: 5 at 421, 6 cancelled (with delay passing through skipped stop at 481), 7 at 420
+   * Result: Error to be present at stop 7, due to negative hop time.
    */
   @Test
   public void testNegativeHopTimeWithStopCancellations() {
@@ -221,39 +219,10 @@ class RealTimeTripTimesTest {
   }
 
   /**
-   * Test positive hop time with stop cancellations when buses run late.
+   * Test hop time with stop cancellations when buses run early.
    * Scheduled: 5 at 300, 6 at 360, 7 at 420
-   * Test case: 5 at 400, 6 cancelled (with internal representation 460, since delays are propagated
-   * to later stops without arrival or departure), 7 at 420.
-   * Result: Expect error before interpolation. Expect no errors, after interpolation.
-   */
-  @Test
-  public void testPositiveHopTimeWithStopCancellationsLate() {
-    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
-
-    builder.withDepartureTime(5, 400);
-    builder.withArrivalTime(6, 460);
-    builder.withDepartureTime(6, 460);
-    builder.withCanceled(6);
-    builder.withArrivalTime(7, 420);
-
-    var error = assertThrows(DataValidationException.class, builder::build);
-    assertEquals(
-      "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
-      error.error().message()
-    );
-
-    assertTrue(builder.interpolateMissingTimes());
-
-    builder.build();
-  }
-
-  /**
-   * Test positive hop time with stop cancellations when buses run early.
-   * Scheduled: 5 at 300, 6 at 360, 7 at 420
-   * Test case: 5 at 300, 6 cancelled(with internal representation 360, since delays are propagated
-   * to later stops without arrival or departure), 7 at 320.
-   * Result: Expect errors, but no errors after interpolation.
+   * Test case: 5 at 300, 6 cancelled (without delay from schedule), 7 at 320.
+   * Result: Expect error at stop 7, due to negative hop time.
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsEarly() {
@@ -268,18 +237,13 @@ class RealTimeTripTimesTest {
       "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
-
-    assertTrue(builder.interpolateMissingTimes());
-    builder.build();
   }
 
   /**
    * Test positive hop time with stop cancellations at the beginning of the trip.
    * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
    * Test case: 0 and 1 cancelled, start trip at stop 2 at time 0.
-   * Result: Expect errors, since 0 and 1 is cancelled and not backward propagated. Expect no
-   * interpolation, since there is no times to interpolate before 0. Expect same error after
-   * interpolation.
+   * Result: Expect error, since the arrival time at 2 is earlier than the departure time at 1.
    */
   @Test
   public void testPositiveHopTimeWithTerminalCancellation() {
@@ -295,43 +259,16 @@ class RealTimeTripTimesTest {
       "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
-
-    assertFalse(builder.interpolateMissingTimes());
-    error = assertThrows(DataValidationException.class, builder::build);
-    assertEquals(
-      "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.",
-      error.error().message()
-    );
   }
 
   /**
-   * Test positive hop time with stop cancellations at the beginning of the trip.
-   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
-   * Test case: 6 and 7 are cancelled.
-   * Result: Expect no errors and no interpolations, since there is no time to interpolate at the
-   * end terminal.
-   */
-  @Test
-  public void testInterpolationWithTerminalCancellation() {
-    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
-
-    builder.withCanceled(6);
-    builder.withCanceled(7);
-
-    assertFalse(builder.interpolateMissingTimes());
-
-    builder.build();
-  }
-
-  /**
-   * Test interpolation with multiple cancelled stops together.
+   * Test multiple cancelled stops together.
    * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
    * Test case: 0 at 0, 1 to 6 are cancelled, 7 at time 350.
-   * Result: Expect errors, since 7 is less than the scheduled time at 6. Expect no errors after
-   * interpolation.
+   * Result: Expect errors, since 7 is less than the scheduled time at 6.
    */
   @Test
-  public void testInterpolationWithMultipleStopCancellations() {
+  public void testMultipleStopCancellations() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withCanceled(1);
@@ -348,21 +285,16 @@ class RealTimeTripTimesTest {
       "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
-
-    assertTrue(builder.interpolateMissingTimes());
-
-    builder.build();
   }
 
   /**
-   * Test interpolation with multiple cancelled stops together.
+   * Test multiple cancelled stops together.
    * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
    * Test case: 0 at 0, 1 2 cancelled, 3 at 90, 4 5 6 cancelled, 7 at time 240.
-   * Result: Expect errors, since 3 is less than scheduled time at 2, and 7 is less than the
-   * propagated delay time at 6. Expect no errors after interpolation.
+   * Result: Expect errors, since 3 is less than scheduled time at 2.
    */
   @Test
-  public void testInterpolationWithMultipleStopCancellations2() {
+  public void testMultipleStopCancellations2() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withCanceled(1);
@@ -380,9 +312,6 @@ class RealTimeTripTimesTest {
       "NEGATIVE_HOP_TIME for stop position 3 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
-
-    assertTrue(builder.interpolateMissingTimes());
-    builder.build();
   }
 
   @Test
