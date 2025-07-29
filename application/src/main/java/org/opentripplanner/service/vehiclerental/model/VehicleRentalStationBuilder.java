@@ -75,7 +75,8 @@ public class VehicleRentalStationBuilder {
     this.isReturning = original.isReturning();
     this.lastReported = original.lastReported();
     this.overloadingAllowed = original.overloadingAllowed();
-    this.isArrivingInRentalVehicleAtDestinationAllowed = original.isArrivingInRentalVehicleAtDestinationAllowed();
+    this.isArrivingInRentalVehicleAtDestinationAllowed =
+      original.isArrivingInRentalVehicleAtDestinationAllowed();
     this.realTimeData = original.isRealTimeData();
   }
 
