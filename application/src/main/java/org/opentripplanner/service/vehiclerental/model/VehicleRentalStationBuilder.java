@@ -48,10 +48,6 @@ public class VehicleRentalStationBuilder {
     this.original = original;
   }
 
-  public VehicleRentalStation original() {
-    return original;
-  }
-
   public FeedScopedId id() {
     return id == null ? original.id() : id;
   }

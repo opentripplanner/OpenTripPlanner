@@ -156,10 +156,6 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
       this.maxRangeMeters = original.maxRangeMeters;
     }
 
-    public RentalVehicleType original() {
-      return original;
-    }
-
     public FeedScopedId id() {
       return id;
     }

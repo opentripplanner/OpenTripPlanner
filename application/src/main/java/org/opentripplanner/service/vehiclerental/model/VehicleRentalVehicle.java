@@ -335,10 +335,6 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
       this.availableUntil = original.availableUntil;
     }
 
-    public VehicleRentalVehicle original() {
-      return original;
-    }
-
     public Builder withId(@Nullable FeedScopedId id) {
       this.id = id;
       return this;

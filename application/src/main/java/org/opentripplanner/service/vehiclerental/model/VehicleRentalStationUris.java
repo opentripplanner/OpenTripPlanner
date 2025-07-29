@@ -134,10 +134,6 @@ public final class VehicleRentalStationUris {
       this.web = original.web;
     }
 
-    public VehicleRentalStationUris original() {
-      return original;
-    }
-
     public String android() {
       return android;
     }

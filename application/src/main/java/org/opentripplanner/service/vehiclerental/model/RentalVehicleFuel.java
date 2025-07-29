@@ -95,10 +95,6 @@ public final class RentalVehicleFuel {
       this.range = original.range;
     }
 
-    public RentalVehicleFuel original() {
-      return original;
-    }
-
     public Builder withPercent(@Nullable Ratio percent) {
       this.percent = percent;
       return this;

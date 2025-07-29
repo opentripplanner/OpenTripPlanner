@@ -293,10 +293,6 @@ public final class VehicleRentalSystem {
       this.iosApp = original.iosApp;
     }
 
-    public VehicleRentalSystem original() {
-      return original;
-    }
-
     public String systemId() {
       return systemId;
     }

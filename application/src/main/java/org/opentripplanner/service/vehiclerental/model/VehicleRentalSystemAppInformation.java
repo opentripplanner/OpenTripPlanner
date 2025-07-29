@@ -89,10 +89,6 @@ public final class VehicleRentalSystemAppInformation {
       this.discoveryUri = original.discoveryUri;
     }
 
-    public VehicleRentalSystemAppInformation original() {
-      return original;
-    }
-
     public Builder withStoreUri(@Nullable String storeUri) {
       this.storeUri = storeUri;
       return this;
