@@ -26,6 +26,20 @@ Lower safety values make an OSM way more desirable and higher values less desira
 |---------------------------------------------------------|--------------------------|-------------------------------|-------------|
 | `highway=cycleway`                                      | `PEDESTRIAN_AND_BICYCLE` | 0.6                           |             |
 | `highway=bridleway`                                     | `PEDESTRIAN_AND_BICYCLE` | 1.3                           |             |
+| `highway=trunk`                                         | `ALL`                    | 2.5                           | 2.5         |
+| `highway=trunk_link`                                    | `ALL`                    | 2.06                          | 2.5         |
+| `highway=trunk; cycleway=lane`                          | `ALL`                    | 1.5                           | 2.5         |
+| `highway=trunk_link; cycleway=lane`                     | `ALL`                    | 1.15                          | 2.5         |
+| `highway=trunk; cycleway=share_busway`                  | `ALL`                    | 1.75                          | 2.5         |
+| `highway=trunk_link; cycleway=share_busway`             | `ALL`                    | 1.25                          | 2.5         |
+| `highway=trunk; cycleway=opposite_lane`                 | `ALL`                    | forward: 2.5 <br> back: 1.5   | 2.5         |
+| `highway=trunk_link; cycleway=opposite_lane`            | `ALL`                    | forward: 2.06 <br> back: 1.15 | 2.5         |
+| `highway=trunk; cycleway=track`                         | `ALL`                    | 0.95                          | 2.5         |
+| `highway=trunk_link; cycleway=track`                    | `ALL`                    | 0.85                          | 2.5         |
+| `highway=trunk; cycleway=opposite_track`                | `ALL`                    | forward: 2.5 <br> back: 0.95  | 2.5         |
+| `highway=trunk_link; cycleway=opposite_track`           | `ALL`                    | forward: 2.5 <br> back: 0.85  | 2.5         |
+| `highway=trunk; bicycle=designated`                     | `ALL`                    | 1.75                          | 2.5         |
+| `highway=trunk_link; bicycle=designated`                | `ALL`                    | 1.75                          | 2.5         |
 | `indoor=area`                                           | `PEDESTRIAN`             |                               |             |
 | `indoor=corridor`                                       | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=3`                                           | `NONE`                   |                               |             |
@@ -195,6 +209,7 @@ way properties. Multiple mixins can apply to the same way and their effects comp
 
 | matcher                                                                                                               | bicycle safety | walk safety |
 |-----------------------------------------------------------------------------------------------------------------------|----------------|-------------|
+| `expressway=yes`                                                                                                      | 5.0            | 5.0         |
 | `lcn=yes¦rcn=yes¦ncn=yes¦bicycle_road=yes¦cyclestreet=yes`                                                            | 0.7            |             |
 | `highway=trunk; sidewalk=yes¦highway=trunk; sidewalk=left¦highway=trunk; sidewalk=right¦highway=trunk; sidewalk=both` |                | 0.25        |
 | `highway=trunk; sidewalk=lane`                                                                                        |                | 0.6         |
