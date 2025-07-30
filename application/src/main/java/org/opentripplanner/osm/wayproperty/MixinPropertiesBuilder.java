@@ -8,12 +8,9 @@ import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
  */
 public class MixinPropertiesBuilder {
 
-  private double walkSafety = 1;
-  private double bicycleSafety = 1;
-  private double forwardBicycleSafety = 1;
-  private double backwardBicycleSafety = 1;
-  private double forwardWalkSafety = 1;
-  private double backwardWalkSafety = 1;
+  final MixinDirectionalPropertiesBuilder defaultBuilder = new MixinDirectionalPropertiesBuilder();
+  final MixinDirectionalPropertiesBuilder forwardBuilder = new MixinDirectionalPropertiesBuilder();
+  final MixinDirectionalPropertiesBuilder backwardBuilder = new MixinDirectionalPropertiesBuilder();
 
   public static MixinPropertiesBuilder ofWalkSafety(double safety) {
     return new MixinPropertiesBuilder().walkSafety(safety);
@@ -34,9 +31,9 @@ public class MixinPropertiesBuilder {
    * 1, with all others scaled proportionately.
    */
   public MixinPropertiesBuilder bicycleSafety(double value, double forward, double back) {
-    this.bicycleSafety = value;
-    this.forwardBicycleSafety = forward;
-    this.backwardBicycleSafety = back;
+    this.defaultBuilder.bicycleSafety(value);
+    this.forwardBuilder.bicycleSafety(forward);
+    this.backwardBuilder.bicycleSafety(back);
     return this;
   }
 
@@ -47,21 +44,18 @@ public class MixinPropertiesBuilder {
    * 1, with all others scaled proportionately.
    */
   public MixinPropertiesBuilder walkSafety(double walkSafety) {
-    this.walkSafety = walkSafety;
-    this.forwardWalkSafety = walkSafety;
-    this.backwardWalkSafety = walkSafety;
+    this.defaultBuilder.walkSafety(walkSafety);
+    this.forwardBuilder.walkSafety(walkSafety);
+    this.backwardBuilder.walkSafety(walkSafety);
     return this;
   }
 
   public MixinProperties build(OsmSpecifier spec) {
     return new MixinProperties(
       spec,
-      walkSafety,
-      bicycleSafety,
-      forwardWalkSafety,
-      forwardBicycleSafety,
-      backwardWalkSafety,
-      backwardBicycleSafety
+      defaultBuilder.build(),
+      forwardBuilder.build(),
+      backwardBuilder.build()
     );
   }
 }

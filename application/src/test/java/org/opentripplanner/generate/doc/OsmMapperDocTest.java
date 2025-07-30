@@ -94,11 +94,15 @@ public class OsmMapperDocTest {
       propTable.addRow(
         "`%s`".formatted(prop.specifier().toDocString()),
         tableValues(
-          prop.bicycleSafety(),
-          prop.forwardBicycleSafety(),
-          prop.backwardBicycleSafety()
+          prop.defaultProperties().bicycleSafety(),
+          prop.forwardProperties().bicycleSafety(),
+          prop.backwardProperties().bicycleSafety()
         ),
-        tableValues(prop.walkSafety(), prop.forwardWalkSafety(), prop.backwardWalkSafety())
+        tableValues(
+          prop.defaultProperties().walkSafety(),
+          prop.forwardProperties().walkSafety(),
+          prop.backwardProperties().walkSafety()
+        )
       );
     }
     return propTable.build();
