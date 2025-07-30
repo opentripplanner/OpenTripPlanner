@@ -545,7 +545,15 @@ public class WayPropertySet {
       var properties = mixin.getDirectionalProperties(direction);
       bicycle *= properties.bicycleSafety();
       walk *= properties.walkSafety();
+      permission = permission
+        .add(properties.addedPermission())
+        .remove(properties.removedPermission());
     }
-    return result.mutate().bicycleSafety(bicycle).walkSafety(walk).build();
+    return result
+      .mutate()
+      .bicycleSafety(bicycle)
+      .walkSafety(walk)
+      .withPermission(permission)
+      .build();
   }
 }

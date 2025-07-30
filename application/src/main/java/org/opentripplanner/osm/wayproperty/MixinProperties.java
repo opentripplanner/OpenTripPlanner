@@ -5,8 +5,7 @@ import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
 
 /**
- * Mixins are like {@link WayProperties} but they only contain walk and bicycle safety features (not
- * modes).
+ * Mixins are like {@link WayProperties} but they are applied on top of the way properties.
  * <p>
  * They don't override other properties but their safety values are multiplied with the existing
  * values. As opposed to way properties, more than one mixins can apply to a single way.

@@ -11,6 +11,7 @@ import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.CONSTANT_SPE
 import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.HAMBURG;
 import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.HOUSTON;
 import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.PORTLAND;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
 import java.io.File;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.utils.text.Table;
 import org.opentripplanner.utils.text.TableBuilder;
 
@@ -88,11 +90,27 @@ public class OsmMapperDocTest {
 
   private static Table mixinTable(WayPropertySet wps) {
     var propTable = new TableBuilder();
-    propTable.withHeaders("matcher", "bicycle safety", "walk safety");
+    propTable.withHeaders(
+      "matcher",
+      "add permission",
+      "remove permission",
+      "bicycle safety",
+      "walk safety"
+    );
 
     for (var prop : wps.getMixins()) {
       propTable.addRow(
         "`%s`".formatted(prop.specifier().toDocString()),
+        tableValues(
+          prop.defaultProperties().addedPermission(),
+          prop.forwardProperties().addedPermission(),
+          prop.backwardProperties().addedPermission()
+        ),
+        tableValues(
+          prop.defaultProperties().removedPermission(),
+          prop.forwardProperties().removedPermission(),
+          prop.backwardProperties().removedPermission()
+        ),
         tableValues(
           prop.defaultProperties().bicycleSafety(),
           prop.forwardProperties().bicycleSafety(),
@@ -113,6 +131,36 @@ public class OsmMapperDocTest {
       return "";
     } else {
       return Double.toString(value);
+    }
+  }
+
+  private static String tableValues(
+    StreetTraversalPermission value,
+    StreetTraversalPermission forward,
+    StreetTraversalPermission backward
+  ) {
+    if (value == NONE && forward == NONE && backward == NONE) {
+      return "";
+    } else if (value == forward && value == backward) {
+      return value.toString();
+    } else {
+      StringBuilder result = new StringBuilder();
+      if (value != NONE) {
+        result.append("no direction: ").append(value);
+      }
+      if (forward != NONE) {
+        if (!result.isEmpty()) {
+          result.append("<br>");
+        }
+        result.append("forward: ").append(forward);
+      }
+      if (backward != NONE) {
+        if (!result.isEmpty()) {
+          result.append("<br>");
+        }
+        result.append("backward: ").append(backward);
+      }
+      return result.toString();
     }
   }
 

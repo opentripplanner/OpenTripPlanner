@@ -10,7 +10,6 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.TraverseDirection;
-import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -64,7 +63,7 @@ public class GermanyMapperTest {
       way.addTag("zone:traffic", "DE:urban");
       assertEquals(0.9, wps.getDataForWay(way).forward().bicycleSafety(), epsilon);
       // walk safety should be default
-      assertEquals(1, wps.getDataForWay(way).forward().walkSafety(), epsilon);
+      assertEquals(0.9, wps.getDataForWay(way).forward().walkSafety(), epsilon);
     }
 
     @Test
@@ -108,8 +107,8 @@ public class GermanyMapperTest {
     way.addTag("highway", "track");
     way.addTag("tracktype", "grade1");
     assertEquals(
-      wps.getDataForEntity(way, null).getPermission(),
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForEntity(way, null).getPermission()
     );
 
     // https://www.openstreetmap.org/way/5155805
