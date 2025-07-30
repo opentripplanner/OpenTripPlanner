@@ -175,9 +175,9 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 ## Streaming TripUpdates via MQTT
 
 This updater connects to an MQTT broker and processes TripUpdates in a streaming fashion. This means
-that they will be applied individually in near-realtime rather than in batches at a certain interval.
+that they will be applied individually in near-real-time rather than in batches at a certain interval.
 
-This system powers the realtime updates in Helsinki and more information can be found 
+This system powers the real-time updates in Helsinki and more information can be found 
 [on Github](https://github.com/HSLdevcom/transitdata).
 
 <!-- mqtt-gtfs-rt-updater BEGIN -->

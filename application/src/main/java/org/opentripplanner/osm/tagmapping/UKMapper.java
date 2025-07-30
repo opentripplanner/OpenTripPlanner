@@ -5,6 +5,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 
@@ -22,7 +23,6 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
  *
  * @author marcusyoung
  * @see OsmTagMapper
- * @see OsmTagMapper
  */
 class UKMapper extends OsmTagMapper {
 
@@ -30,6 +30,71 @@ class UKMapper extends OsmTagMapper {
   public void populateProperties(WayPropertySet props) {
     props.setProperties("highway=cycleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.6));
     props.setProperties("highway=bridleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.3));
+
+    // reduce trunk safety compared to default mapper
+    props.setProperties("highway=trunk", withModes(ALL).walkSafety(2.5).bicycleSafety(2.5));
+    props.setProperties("highway=trunk_link", withModes(ALL).walkSafety(2.5).bicycleSafety(2.06));
+    props.setProperties(
+      "highway=trunk;cycleway=lane",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.5)
+    );
+    props.setProperties(
+      "highway=trunk_link;cycleway=lane",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.15)
+    );
+    props.setProperties(
+      "highway=trunk;cycleway=share_busway",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.75)
+    );
+    props.setProperties(
+      "highway=trunk_link;cycleway=share_busway",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.25)
+    );
+    props.setProperties(
+      "highway=trunk;cycleway=opposite_lane",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.5)
+    );
+    props.setProperties(
+      "highway=trunk_link;cycleway=opposite_lane",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.15)
+    );
+    props.setProperties(
+      "highway=trunk;cycleway=track",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(0.95)
+    );
+    props.setProperties(
+      "highway=trunk_link;cycleway=track",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(0.85)
+    );
+    props.setProperties(
+      "highway=trunk;cycleway=opposite_track",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(0.95)
+    );
+    props.setProperties(
+      "highway=trunk_link;cycleway=opposite_track",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(0.85)
+    );
+    props.setProperties(
+      "highway=trunk;bicycle=designated",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.75)
+    );
+    props.setProperties(
+      "highway=trunk_link;bicycle=designated",
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.75)
+    );
+
+    props.setMixinProperties(
+      "expressway=yes",
+      MixinPropertiesBuilder.ofBicycleSafety(5).walkSafety(5)
+    );
 
     /*
      * Automobile speeds in UK. Based on recorded free flow speeds for motorways, trunk and primary and

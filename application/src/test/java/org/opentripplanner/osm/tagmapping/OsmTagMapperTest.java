@@ -192,6 +192,27 @@ class OsmTagMapperTest {
   }
 
   @Test
+  void testTrunkWalkSafety() {
+    var rawScore = wps.getDataForWay(WayTestData.highwayTrunk()).forward().walkSafety();
+    var scoreWithLane = wps
+      .getDataForWay((OsmWay) WayTestData.highwayTrunk().addTag("sidewalk", "lane"))
+      .forward()
+      .walkSafety();
+    var scoreWithSidewalk = wps
+      .getDataForWay((OsmWay) WayTestData.highwayTrunk().addTag("sidewalk", "both"))
+      .forward()
+      .walkSafety();
+    var scoreWithSeparateSidewalk = wps
+      .getDataForWay((OsmWay) WayTestData.highwayTrunk().addTag("sidewalk", "separate"))
+      .forward()
+      .walkSafety();
+    assertTrue(rawScore > 5);
+    assertTrue(scoreWithLane < rawScore);
+    assertTrue(scoreWithSidewalk < scoreWithLane);
+    assertEquals(rawScore, scoreWithSeparateSidewalk);
+  }
+
+  @Test
   void testTertiary() {
     assertEquals(ALL, wps.getDataForEntity(WayTestData.highwayTertiary(), null).getPermission());
   }

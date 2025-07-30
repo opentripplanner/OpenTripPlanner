@@ -1,6 +1,7 @@
 package org.opentripplanner.osm.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
@@ -39,5 +40,17 @@ public class UKMapperTest {
       PEDESTRIAN_AND_BICYCLE,
       wps.getDataForEntity(WayTestData.bridleway(), null).getPermission()
     );
+  }
+
+  @Test
+  void trunk() {
+    var way = WayTestData.highwayTrunk();
+    assertEquals(ALL, wps.getDataForWay(way).forward().getPermission());
+    assertEquals(2.5, wps.getDataForWay(way).forward().walkSafety());
+    assertEquals(2.5, wps.getDataForWay(way).forward().bicycleSafety());
+    way.addTag("oneway", "yes");
+    way.addTag("expressway", "yes");
+    assertEquals(12.5, wps.getDataForWay(way).forward().walkSafety());
+    assertEquals(12.5, wps.getDataForWay(way).forward().bicycleSafety());
   }
 }
