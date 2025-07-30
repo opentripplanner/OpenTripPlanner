@@ -14,6 +14,9 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.streetEd
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -380,22 +383,29 @@ public class StreetEdgeTest {
     assertEquals(expectedWeight, result.getWeight(), DELTA);
   }
 
-  @Test
-  void testBikeSpeed() {
+  @ParameterizedTest
+  @EnumSource(value = TraverseMode.class, names = { "BICYCLE", "SCOOTER" })
+  void testBikeSpeed(TraverseMode mode) {
     StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, ALL).withCarSpeed(8.0f).buildAndConnect();
     assertEquals(
       5.0f,
       e1.calculateSpeed(
-        RoutingPreferences.DEFAULT.copyOf().withBike(bike -> bike.withSpeed(5.0f)).build(),
-        TraverseMode.BICYCLE,
+        RoutingPreferences.DEFAULT.copyOf()
+          .withBike(bike -> bike.withSpeed(5.0f))
+          .withScooter(scooter -> scooter.withSpeed(5.0f))
+          .build(),
+        mode,
         false
       )
     );
     assertEquals(
       8.0f,
       e1.calculateSpeed(
-        RoutingPreferences.DEFAULT.copyOf().withBike(bike -> bike.withSpeed(10.0f)).build(),
-        TraverseMode.BICYCLE,
+        RoutingPreferences.DEFAULT.copyOf()
+          .withBike(bike -> bike.withSpeed(10.0f))
+          .withScooter(scooter -> scooter.withSpeed(10.0f))
+          .build(),
+        mode,
         false
       )
     );
