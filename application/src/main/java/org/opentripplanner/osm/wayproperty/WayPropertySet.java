@@ -546,10 +546,6 @@ public class WayPropertySet {
       bicycle *= properties.bicycleSafety();
       walk *= properties.walkSafety();
     }
-    return result
-      .mutate()
-      .bicycleSafety(bicycle)
-      .walkSafety(walk)
-      .build();
+    return result.mutate().bicycleSafety(bicycle).walkSafety(walk).build();
   }
 }

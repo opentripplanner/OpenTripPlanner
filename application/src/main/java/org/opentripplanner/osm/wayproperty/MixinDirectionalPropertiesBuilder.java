@@ -40,9 +40,6 @@ public class MixinDirectionalPropertiesBuilder {
   }
 
   public MixinDirectionalProperties build() {
-    return new MixinDirectionalProperties(
-      walkSafety,
-      bicycleSafety
-    );
+    return new MixinDirectionalProperties(walkSafety, bicycleSafety);
   }
 }
