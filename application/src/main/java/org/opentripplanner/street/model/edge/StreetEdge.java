@@ -217,7 +217,7 @@ public class StreetEdge
         case WALK -> walkingBike
           ? preferences.bike().walking().speed()
           : preferences.walk().speed();
-        case BICYCLE -> preferences.bike().speed();
+        case BICYCLE -> Math.min(preferences.bike().speed(), getCarSpeed());
         case CAR -> getCarSpeed();
         case SCOOTER -> preferences.scooter().speed();
         case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);

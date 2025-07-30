@@ -148,7 +148,7 @@ public abstract class GraphRoutingTest {
       int length,
       StreetTraversalPermission permissions
     ) {
-      return streetBuilder(from, to, length, permissions).buildAndConnect();
+      return streetBuilder(from, to, length, permissions).withCarSpeed(40).buildAndConnect();
     }
 
     public List<StreetEdge> street(
