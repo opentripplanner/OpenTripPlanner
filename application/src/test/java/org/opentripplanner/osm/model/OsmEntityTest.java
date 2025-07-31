@@ -214,6 +214,12 @@ public class OsmEntityTest {
     var osm3 = new OsmEntity();
     osm3.addTag("wheelchair", "yes");
     assertTrue(osm3.isWheelchairAccessible());
+
+    var osm4 = new OsmNode();
+    osm4.addTag("barrier", "stile");
+    assertFalse(osm4.isWheelchairAccessible());
+    osm4.addTag("wheelchair", "yes");
+    assertTrue(osm4.isWheelchairAccessible());
   }
 
   @Test

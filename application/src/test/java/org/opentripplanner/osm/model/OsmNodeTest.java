@@ -18,4 +18,22 @@ public class OsmNodeTest {
     node.addTag("highway", "elevator");
     assertTrue(node.isMultiLevel());
   }
+
+  @Test
+  public void isBarrier() {
+    OsmNode node = new OsmNode();
+    assertFalse(node.isBarrier());
+
+    node = new OsmNode();
+    node.addTag("barrier", "unknown");
+    assertFalse(node.isBarrier());
+
+    node = new OsmNode();
+    node.addTag("barrier", "bollard");
+    assertTrue(node.isBarrier());
+
+    node = new OsmNode();
+    node.addTag("access", "no");
+    assertTrue(node.isBarrier());
+  }
 }
