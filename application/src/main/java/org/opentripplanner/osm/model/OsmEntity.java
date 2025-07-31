@@ -780,9 +780,8 @@ public class OsmEntity {
    */
   public boolean isWheelchairAccessible() {
     return (
-      isTagTrue("wheelchair") &&
-      !isTagFalse("wheelchair") &&
-      !isOneOfTags("barrier", WHEELCHAIR_INACCESSIBLE_BARRIERS)
+      isTagTrue("wheelchair") ||
+      (!isTagFalse("wheelchair") && !isOneOfTags("barrier", WHEELCHAIR_INACCESSIBLE_BARRIERS))
     );
   }
 
