@@ -80,7 +80,7 @@ class VertexGenerator {
       // make a separate node for every level
       return recordLevel(node, way);
     }
-    // make a separate vertex if the node is in a barrier
+    // make a separate vertex if the node is on a barrier
     if (nodesInBarrierWays.containsKey(node)) {
       return getSplitVertexOnBarrier(node, way);
     }
@@ -190,7 +190,7 @@ class VertexGenerator {
     return splitVerticesOnBarriers;
   }
 
-  public Multimap<OsmNode, OsmWay> getNodeToBarrierMap() {
+  public Multimap<OsmNode, OsmWay> nodesInBarrierWays() {
     return nodesInBarrierWays;
   }
 
@@ -198,7 +198,8 @@ class VertexGenerator {
     for (OsmWay way : osmdb.getWays()) {
       if (way.isBarrier()) {
         TLongList nodes = way.getNodeRefs();
-        for (int i = 1; i < nodes.size() - 1; i++) {
+        boolean isClosed = nodes.get(0) == nodes.get(nodes.size() - 1);
+        for (int i = isClosed ? 0 : 1; i < nodes.size() - 1; i++) {
           nodesInBarrierWays.put(osmdb.getNode(nodes.get(i)), way);
         }
       }

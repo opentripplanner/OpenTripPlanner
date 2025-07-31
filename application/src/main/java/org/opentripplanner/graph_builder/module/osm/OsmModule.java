@@ -261,7 +261,7 @@ public class OsmModule implements GraphBuilderModule {
     List<OsmAreaGroup> areaGroups = groupAreas(
       osmdb,
       osmdb.getWalkableAreas(),
-      vertexGenerator.getNodeToBarrierMap()
+      vertexGenerator.nodesInBarrierWays()
     );
     WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
       graph,

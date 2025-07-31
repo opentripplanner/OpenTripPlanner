@@ -5,7 +5,7 @@ package org.opentripplanner.street.model.vertex;
  */
 public class OsmVertexOnWay extends OsmVertex {
 
-  private final long wayId;
+  public final long wayId;
 
   public OsmVertexOnWay(double x, double y, long nodeId, long wayId) {
     super(x, y, nodeId);
