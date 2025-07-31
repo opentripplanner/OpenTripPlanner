@@ -1,14 +1,18 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -20,6 +24,7 @@ import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionExcepti
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.osm.model.OsmWay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,29 +91,63 @@ class OsmAreaGroup {
     }
   }
 
-  public static List<OsmAreaGroup> groupAreas(Map<OsmArea, OsmLevel> areasLevels) {
+  private static Collection<OsmWay> getBarriers(
+    Multimap<OsmNode, OsmWay> barriers,
+    OsmNode first,
+    OsmNode second
+  ) {
+    return CollectionUtils.intersection(barriers.get(first), barriers.get(second));
+  }
+
+  public static List<OsmAreaGroup> groupAreas(
+    Map<OsmArea, OsmLevel> areasLevels,
+    Multimap<OsmNode, OsmWay> barriers
+  ) {
     DisjointSet<OsmArea> groups = new DisjointSet<>();
-    Multimap<OsmNode, OsmArea> areasForNode = LinkedListMultimap.create();
+    Multimap<OsmNode, OsmArea> areasForNode = HashMultimap.create();
+    Multimap<OsmArea, OsmWay> barriersForArea = HashMultimap.create();
     for (OsmArea area : areasLevels.keySet()) {
       for (Ring ring : area.outermostRings) {
         for (Ring inner : ring.getHoles()) {
           for (OsmNode node : inner.nodes) {
             areasForNode.put(node, area);
+            for (OsmNode anotherNode : inner.nodes) {
+              if (anotherNode != node) {
+                var sharedBarriers = getBarriers(barriers, node, anotherNode);
+                for (var barrier : sharedBarriers) {
+                  barriersForArea.put(area, barrier);
+                }
+              }
+            }
           }
         }
         for (OsmNode node : ring.nodes) {
           areasForNode.put(node, area);
+          for (OsmNode anotherNode : ring.nodes) {
+            if (anotherNode != node) {
+              var sharedBarriers = getBarriers(barriers, node, anotherNode);
+              for (var barrier : sharedBarriers) {
+                barriersForArea.put(area, barrier);
+              }
+            }
+          }
         }
       }
     }
 
-    // areas that can be joined must share nodes and levels
+    // areas that can be joined must share nodes and levels, and do not share nodes of the same barrier
     for (OsmNode osmNode : areasForNode.keySet()) {
       for (OsmArea area1 : areasForNode.get(osmNode)) {
         OsmLevel level1 = areasLevels.get(area1);
         for (OsmArea area2 : areasForNode.get(osmNode)) {
           OsmLevel level2 = areasLevels.get(area2);
-          if ((level1 == null && level2 == null) || (level1 != null && level1.equals(level2))) {
+          boolean onSameLevel =
+            (level1 == null && level2 == null) || (level1 != null && level1.equals(level2));
+          boolean shareBarrier = !CollectionUtils.intersection(
+            barriersForArea.get(area1),
+            barriersForArea.get(area2)
+          ).isEmpty();
+          if (onSameLevel && !shareBarrier) {
             groups.union(area1, area2);
           }
         }

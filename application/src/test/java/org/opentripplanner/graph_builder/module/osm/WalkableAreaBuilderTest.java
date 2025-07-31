@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.common.collect.ImmutableMultimap;
 import java.io.File;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -66,7 +67,10 @@ public class WalkableAreaBuilderTest {
       .getWalkableAreas()
       .stream()
       .collect(toMap(a -> a, a -> osmdb.getLevelForWay(a.parent)));
-    final List<OsmAreaGroup> areaGroups = OsmAreaGroup.groupAreas(areasLevels);
+    final List<OsmAreaGroup> areaGroups = OsmAreaGroup.groupAreas(
+      areasLevels,
+      ImmutableMultimap.of()
+    );
 
     final Consumer<OsmAreaGroup> build = visibility
       ? walkableAreaBuilder::buildWithVisibility

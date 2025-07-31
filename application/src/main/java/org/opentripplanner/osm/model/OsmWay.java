@@ -3,6 +3,7 @@ package org.opentripplanner.osm.model;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -157,7 +158,7 @@ public class OsmWay extends OsmEntity {
       getNodeRefs().size() > 2
     );
   }
-  
+
   public boolean isBarrier() {
     return hasTag("barrier");
   }

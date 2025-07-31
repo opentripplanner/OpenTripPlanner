@@ -792,7 +792,7 @@ public class StreetEdge
       : builder.millimeterLength();
     if (lengthInMillimeter == 0) {
       LOG.warn(
-        "StreetEdge {} from {} to {} has length of 0. This is usually an error.",
+        "StreetEdge {} from {} to {} has length of 0. This is usually an error unless it is a barrier crossing.",
         name,
         builder.fromVertex(),
         builder.toVertex()

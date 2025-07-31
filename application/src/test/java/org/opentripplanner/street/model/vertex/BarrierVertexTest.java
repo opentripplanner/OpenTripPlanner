@@ -25,10 +25,9 @@ public class BarrierVertexTest {
   @Test
   public void testBarrierPermissions() {
     OsmNode simpleBarrier = new OsmNode();
-    assertFalse(simpleBarrier.isMotorVehicleBarrier());
+    assertFalse(simpleBarrier.isBarrier());
     simpleBarrier.addTag("barrier", "bollard");
-    assertTrue(simpleBarrier.isMotorVehicleBarrier());
-    String label = "simpleBarrier";
+    assertTrue(simpleBarrier.isBarrier());
     BarrierVertex bv = new BarrierVertex(simpleBarrier.lon, simpleBarrier.lat, 0);
     bv.setBarrierPermissions(
       simpleBarrier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
