@@ -26,13 +26,16 @@ public class BarrierEdgeBuilder {
     var permission = StreetTraversalPermission.ALL;
     var wheelchairAccessible = true;
     I18NString name = null;
-    for (var barrier : barriers) {
-      permission = permission.intersection(
-        barrier.overridePermissions(StreetTraversalPermission.ALL)
-      );
-      wheelchairAccessible = wheelchairAccessible && barrier.isWheelchairAccessible();
-      if (!barrier.hasNoName()) {
-        name = edgeNamer.getNameForWay(barrier, ("barrier " + barrier.getId()).intern());
+    
+    if (!node.isTag("barrier", "entrance")) {
+      for (var barrier : barriers) {
+        permission = permission.intersection(
+          barrier.overridePermissions(StreetTraversalPermission.ALL)
+        );
+        wheelchairAccessible = wheelchairAccessible && barrier.isWheelchairAccessible();
+        if (!barrier.hasNoName()) {
+          name = edgeNamer.getNameForWay(barrier, ("barrier " + barrier.getId()).intern());
+        }
       }
     }
 
@@ -54,7 +57,7 @@ public class BarrierEdgeBuilder {
             .withGeometry(
               GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()))
             )
-            .withName("barrier crossing at node " + vs[i].nodeId)
+            .withName(name == null ? I18NString.of("barrier crossing at node " + vs[i].nodeId) : name)
             .withPermission(permission)
             .withWheelchairAccessible(wheelchairAccessible)
             .withBogusName(name == null);
