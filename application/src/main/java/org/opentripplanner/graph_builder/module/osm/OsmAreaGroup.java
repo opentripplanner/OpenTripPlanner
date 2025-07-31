@@ -1,14 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -104,42 +101,23 @@ class OsmAreaGroup {
     Multimap<OsmNode, OsmWay> barriers
   ) {
     DisjointSet<OsmArea> groups = new DisjointSet<>();
-    Multimap<OsmNode, OsmArea> areasForNode = HashMultimap.create();
+    Multimap<OsmNodePair, OsmArea> areasForNodePair = HashMultimap.create();
     Multimap<OsmArea, OsmWay> barriersForArea = HashMultimap.create();
     for (OsmArea area : areasLevels.keySet()) {
       for (Ring ring : area.outermostRings) {
         for (Ring inner : ring.getHoles()) {
-          for (OsmNode node : inner.nodes) {
-            areasForNode.put(node, area);
-            for (OsmNode anotherNode : inner.nodes) {
-              if (anotherNode != node) {
-                var sharedBarriers = getBarriers(barriers, node, anotherNode);
-                for (var barrier : sharedBarriers) {
-                  barriersForArea.put(area, barrier);
-                }
-              }
-            }
-          }
+          processRing(area, inner, barriers, areasForNodePair, barriersForArea);
         }
-        for (OsmNode node : ring.nodes) {
-          areasForNode.put(node, area);
-          for (OsmNode anotherNode : ring.nodes) {
-            if (anotherNode != node) {
-              var sharedBarriers = getBarriers(barriers, node, anotherNode);
-              for (var barrier : sharedBarriers) {
-                barriersForArea.put(area, barrier);
-              }
-            }
-          }
-        }
+        processRing(area, ring, barriers, areasForNodePair, barriersForArea);
       }
     }
 
-    // areas that can be joined must share nodes and levels, and do not share nodes of the same barrier
-    for (OsmNode osmNode : areasForNode.keySet()) {
-      for (OsmArea area1 : areasForNode.get(osmNode)) {
+    // areas that can be joined must share levels and also at least two consecutive nodes,
+    // and do not share nodes of the same barrier
+    for (var nodePair : areasForNodePair.keySet()) {
+      for (OsmArea area1 : areasForNodePair.get(nodePair)) {
         OsmLevel level1 = areasLevels.get(area1);
-        for (OsmArea area2 : areasForNode.get(osmNode)) {
+        for (OsmArea area2 : areasForNodePair.get(nodePair)) {
           OsmLevel level2 = areasLevels.get(area2);
           boolean onSameLevel =
             (level1 == null && level2 == null) || (level1 != null && level1.equals(level2));
@@ -172,6 +150,31 @@ class OsmAreaGroup {
       }
     }
     return out;
+  }
+
+  private static void processRing(
+    OsmArea area,
+    Ring ring,
+    Multimap<OsmNode, OsmWay> barriers,
+    Multimap<OsmNodePair, OsmArea> areasForNodePair,
+    Multimap<OsmArea, OsmWay> barriersForArea
+  ) {
+    var nodes = ring.nodes;
+    // the end node of a ring must be the same of the start node
+    for (var i = 0; i < nodes.size() - 1; i++) {
+      var pair = new OsmNodePair(nodes.get(i), nodes.get(i + 1));
+      areasForNodePair.put(pair, area);
+    }
+    for (OsmNode node : ring.nodes) {
+      for (OsmNode anotherNode : ring.nodes) {
+        if (anotherNode != node) {
+          var sharedBarriers = getBarriers(barriers, node, anotherNode);
+          for (var barrier : sharedBarriers) {
+            barriersForArea.put(area, barrier);
+          }
+        }
+      }
+    }
   }
 
   public OsmEntity getSomeOsmObject() {
