@@ -245,7 +245,11 @@ public class OsmDatabase {
 
     /* filter out ways that are not relevant for routing */
     if (
-      !(way.isRoutable() || way.isParkAndRide() || way.isBikeParking() || way.isBoardingLocation())
+      !(way.isRoutable() ||
+        way.isParkAndRide() ||
+        way.isBikeParking() ||
+        way.isBoardingLocation() ||
+        way.isBarrier())
     ) {
       return;
     }
