@@ -157,6 +157,10 @@ public class OsmWay extends OsmEntity {
       getNodeRefs().size() > 2
     );
   }
+  
+  public boolean isBarrier() {
+    return hasTag("barrier");
+  }
 
   /**
    * Given a set of {@code permissions} check if it can really be applied to both directions

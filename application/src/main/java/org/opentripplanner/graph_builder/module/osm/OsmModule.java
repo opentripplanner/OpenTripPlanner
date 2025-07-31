@@ -178,6 +178,7 @@ public class OsmModule implements GraphBuilderModule {
 
     // figure out which nodes that are actually intersections
     vertexGenerator.initIntersectionNodes();
+    vertexGenerator.initNodesInBarrierWays();
 
     buildBasicGraph(osmdb, vertexGenerator);
     buildWalkableAreas(osmdb, vertexGenerator, !params.areaVisibility());

@@ -31,6 +31,16 @@ class VertexGenerator {
   private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
 
   private final HashMap<Long, Map<OsmLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
+
+  /**
+   * The map from node ID to the barrier it belongs to.
+   */
+  private final Map<Long, OsmWay> nodesInBarrierWays = new HashMap<>();
+
+  /**
+   * The map from node ID on barriers to the split vertex for each routable way connecting it.
+   */
+  private final Map<Long, Map<Long, OsmVertex>> splitVerticesOnBarriers = new HashMap<>();
   private final OsmDatabase osmdb;
   private final Set<String> boardingAreaRefTags;
   private final Boolean includeOsmSubwayEntrances;
@@ -66,6 +76,10 @@ class VertexGenerator {
     if (node.isMultiLevel()) {
       // make a separate node for every level
       return recordLevel(node, way);
+    }
+    // make a separate vertex if the node is in a barrier
+    if (nodesInBarrierWays.containsKey(node.getId())) {
+      return getSplitVertexOnBarrier(node, way);
     }
     // single-level case
     long nid = node.getId();
@@ -107,18 +121,26 @@ class VertexGenerator {
       }
 
       if (iv == null) {
-        iv = vertexFactory.osm(
-          coordinate,
-          node,
-          node.hasHighwayTrafficLight(),
-          node.hasCrossingTrafficLight()
-        );
+        iv = vertexFactory.osm(node);
       }
 
       intersectionNodes.put(nid, iv);
     }
 
     return iv;
+  }
+  
+  private IntersectionVertex getSplitVertexOnBarrier(OsmNode node, OsmEntity way) {
+    splitVerticesOnBarriers.putIfAbsent(node.getId(), new HashMap<>());
+    var vertices = splitVerticesOnBarriers.get(node.getId());
+    var existing = vertices.get(way.getId());
+    if (existing != null) {
+      return existing;
+    }
+    
+    var vertex = vertexFactory.osm(node);
+    vertices.put(way.getId(), vertex);
+    return vertex;
   }
 
   /**
@@ -150,6 +172,25 @@ class VertexGenerator {
     )) {
       for (Ring outerRing : area.outermostRings) {
         intersectAreaRingNodes(possibleIntersectionNodes, outerRing);
+      }
+    }
+  }
+
+  /**
+   * Tracks OSM nodes which are in the middle of a linear barrier. We don't want to walk through
+   * walls.
+   */
+  Map<Long, OsmWay> nodesInBarrierWays() {
+    return nodesInBarrierWays;
+  }
+
+  void initNodesInBarrierWays() {
+    for (OsmWay way : osmdb.getWays()) {
+      if (way.isBarrier()) {
+        TLongList nodes = way.getNodeRefs();
+        for (int i = 1; i < nodes.size() - 1; i++) {
+          nodesInBarrierWays.put(nodes.get(i), way);
+        }
       }
     }
   }

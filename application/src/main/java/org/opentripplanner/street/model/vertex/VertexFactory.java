@@ -106,19 +106,14 @@ public class VertexFactory {
     );
   }
 
-  public OsmVertex osm(
-    Coordinate coordinate,
-    OsmNode node,
-    boolean highwayTrafficLight,
-    boolean crossingTrafficLight
-  ) {
+  public OsmVertex osm(OsmNode node) {
     return addToGraph(
       new OsmVertex(
-        coordinate.x,
-        coordinate.y,
+        node.getCoordinate().x,
+        node.getCoordinate().y,
         node.getId(),
-        highwayTrafficLight,
-        crossingTrafficLight
+        node.hasHighwayTrafficLight(),
+        node.hasCrossingTrafficLight()
       )
     );
   }
