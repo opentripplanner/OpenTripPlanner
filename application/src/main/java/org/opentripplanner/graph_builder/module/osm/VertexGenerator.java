@@ -141,7 +141,7 @@ class VertexGenerator {
       return existing;
     }
 
-    var vertex = vertexFactory.osm(node);
+    var vertex = vertexFactory.osmOnLinearBarrier(node, way);
     vertices.put(way, vertex);
     return vertex;
   }
