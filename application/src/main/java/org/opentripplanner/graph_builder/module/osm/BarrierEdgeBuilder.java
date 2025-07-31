@@ -5,6 +5,7 @@ import java.util.List;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
+import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
@@ -21,7 +22,7 @@ public class BarrierEdgeBuilder {
   /**
    * Link the vertices provided which share the barriers given
    */
-  public void build(Collection<OsmVertex> vertices, Collection<OsmWay> barriers) {
+  public void build(OsmNode node, Collection<OsmVertex> vertices, Collection<OsmWay> barriers) {
     var permission = StreetTraversalPermission.ALL;
     var wheelchairAccessible = true;
     I18NString name = null;
@@ -34,6 +35,8 @@ public class BarrierEdgeBuilder {
         name = edgeNamer.getNameForWay(barrier, ("barrier " + barrier.getId()).intern());
       }
     }
+
+    permission = node.overridePermissions(permission);
     if (permission.allowsNothing()) {
       return;
     }

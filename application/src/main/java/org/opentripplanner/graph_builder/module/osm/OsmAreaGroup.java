@@ -143,10 +143,12 @@ class OsmAreaGroup {
           OsmLevel level2 = areasLevels.get(area2);
           boolean onSameLevel =
             (level1 == null && level2 == null) || (level1 != null && level1.equals(level2));
-          boolean shareBarrier = !CollectionUtils.intersection(
-            barriersForArea.get(area1),
-            barriersForArea.get(area2)
-          ).isEmpty();
+          boolean shareBarrier =
+            area1 != area2 &&
+            !CollectionUtils.intersection(
+              barriersForArea.get(area1),
+              barriersForArea.get(area2)
+            ).isEmpty();
           if (onSameLevel && !shareBarrier) {
             groups.union(area1, area2);
           }

@@ -484,9 +484,9 @@ public class OsmModule implements GraphBuilderModule {
       50,
       verticesGroups.size()
     );
-    // This won't work correctly if there are overlapping barriers
     for (var item : verticesGroups.entrySet()) {
       barrierEdgeBuilder.build(
+        item.getKey(),
         item.getValue().values(),
         vertexGenerator.getLinearBarriersAtNode(item.getKey())
       );

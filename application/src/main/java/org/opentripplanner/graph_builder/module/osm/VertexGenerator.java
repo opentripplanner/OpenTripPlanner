@@ -81,7 +81,7 @@ class VertexGenerator {
       return recordLevel(node, way);
     }
     // make a separate vertex if the node is in a barrier
-    if (nodesInBarrierWays.containsKey(node.getId())) {
+    if (nodesInBarrierWays.containsKey(node)) {
       return getSplitVertexOnBarrier(node, way);
     }
     // single-level case
