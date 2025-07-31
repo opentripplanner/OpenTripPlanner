@@ -1,11 +1,13 @@
 package org.opentripplanner.gtfs.mapping;
 
 import gnu.trove.list.TDoubleList;
+import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.PrimitiveIterator;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.opentripplanner.model.ShapePoint;
 
@@ -13,67 +15,40 @@ import org.opentripplanner.model.ShapePoint;
  * A representation that stores GTFS shape points in a memory-efficient way and allows you to
  * iterate over them for further processing.
  * <p>
- * Shape points are stored in an automatically expanding Trove IntList of original sequence numbers,
- * coordinate values, shape dist travelled and an index to allow the shape points to be added in
- * arbitrary order and have large gaps in between the sequence numbers (at the cost of more memory
- * consumption).
+ * The fields of ShapePoints are stored densely in an automatically expanding Trove primitive lists.
+ * When later needed, they are reconstituted into objects and sorted on their sequence number.
+ * Only an iterator over the sorted collection escapes rather than the collection itself, providing
+ * some assurance that the objects will be quickly garbage collected.
  * <p>
- * It is package-private but implements Iterable, so you should use that as the return type of the
- * mapping process.
+ * This class is package-private but implements Iterable, so you should use that as the return type
+ * of the mapping process.
  */
 class CompactShape implements Iterable<ShapePoint> {
 
-  private static final double NO_VALUE = -9999;
-  private static final int CAPACITY = 50;
-  private final TDoubleList lats = new TDoubleArrayList(CAPACITY, NO_VALUE);
-  private final TDoubleList lons = new TDoubleArrayList(CAPACITY, NO_VALUE);
-  private final TDoubleList distTraveleds = new TDoubleArrayList(CAPACITY, NO_VALUE);
-  /**
-   * The mapping from GTFS sequence number to index in the array lists. This allows the
-   * shape points to be inserted in any order and the sequence number to have very large
-   * gaps - at the cost of consuming a bit more memory.
-   */
-  private final TIntIntMap seqIndex = new TIntIntHashMap();
+  private static final int INITIAL_CAPACITY = 50;
+  private static final double NO_DISTANCE = -9999;
 
-  CompactShape() {}
+  private final TIntList seqs = new TIntArrayList(INITIAL_CAPACITY);
+  private final TDoubleList lats = new TDoubleArrayList(INITIAL_CAPACITY);
+  private final TDoubleList lons = new TDoubleArrayList(INITIAL_CAPACITY);
+  private final TDoubleList dists = new TDoubleArrayList(INITIAL_CAPACITY);
 
   public void addPoint(org.onebusaway.gtfs.model.ShapePoint shapePoint) {
+    seqs.add(shapePoint.getSequence());
     lats.add(shapePoint.getLat());
     lons.add(shapePoint.getLon());
-    if (shapePoint.isDistTraveledSet()) {
-      distTraveleds.add(shapePoint.getDistTraveled());
-    } else {
-      distTraveleds.add(NO_VALUE);
-    }
-
-    int seq = shapePoint.getSequence();
-    seqIndex.put(seq, lats.size() - 1);
+    dists.add(shapePoint.isDistTraveledSet() ? shapePoint.getDistTraveled() : NO_DISTANCE);
   }
 
   @Override
   public Iterator<ShapePoint> iterator() {
-    return new Iterator<>() {
-      private final PrimitiveIterator.OfInt seqIterator = IntStream.of(seqIndex.keys())
-        .sorted()
-        .iterator();
-
-      @Override
-      public boolean hasNext() {
-        return seqIterator.hasNext();
-      }
-
-      @Override
-      public ShapePoint next() {
-        var seq = seqIterator.nextInt();
-        var index = seqIndex.get(seq);
-        var lat = lats.get(index);
-        var lon = lons.get(index);
-        Double distTraveled = distTraveleds.get(index);
-        if (distTraveled == NO_VALUE) {
-          distTraveled = null;
-        }
-        return new ShapePoint(seq, lat, lon, distTraveled);
-      }
-    };
+    List<ShapePoint> points = IntStream.range(0, lats.size())
+      .mapToObj(i -> {
+        double dist = dists.get(i);
+        return new ShapePoint(seqs.get(i), lats.get(i), lons.get(i), dist < 0 ? null : dist);
+      })
+      .collect(Collectors.toList());
+    Collections.sort(points);
+    return points.iterator();
   }
 }
