@@ -838,12 +838,11 @@ public class OsmEntity {
   }
 
   public StreetTraversalPermission getBarrierPermission() {
-    var barrierType = getTag("barrier");
-    if (barrierType == null) {
-      return StreetTraversalPermission.ALL;
+    String barrier = getTag("barrier");
+    if (barrier == null) {
+      return ALL;
     }
-
-    return BARRIER_PERMISSIONS.get(barrierType);
+    return Objects.requireNonNullElse(BARRIER_PERMISSIONS.get(barrier), ALL);
   }
 
   /**

@@ -191,7 +191,7 @@ class VertexGenerator {
   }
 
   public Multimap<OsmNode, OsmWay> getNodeToBarrierMap() {
-    return null;
+    return nodesInBarrierWays;
   }
 
   void initNodesInBarrierWays() {
