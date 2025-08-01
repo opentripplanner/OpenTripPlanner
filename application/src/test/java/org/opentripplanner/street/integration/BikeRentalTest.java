@@ -59,18 +59,18 @@ public class BikeRentalTest extends GraphRoutingTest {
       new Builder() {
         @Override
         public void build() {
-          S1 = stop("S1", 47.500, 19.001);
-          A = intersection("A", 47.500, 19.000);
-          B = intersection("B", 47.510, 19.000);
-          C = intersection("C", 47.520, 19.000);
-          D = intersection("D", 47.530, 19.000);
-          E1 = entrance("E1", 47.530, 19.001);
+          S1 = stop("S1", 47.5000, 19.0001);
+          A = intersection("A", 47.5000, 19.0000);
+          B = intersection("B", 47.5003, 19.0000);
+          C = intersection("C", 47.5087, 19.0000);
+          D = intersection("D", 47.5090, 19.0000);
+          E1 = entrance("E1", 47.5090, 19.0001);
 
-          T1 = streetLocation("T1", 47.500, 18.999);
-          T2 = streetLocation("T1", 47.530, 18.999);
+          T1 = streetLocation("T1", 47.5000, 18.9999);
+          T2 = streetLocation("T2", 47.5090, 18.9999);
 
-          B1 = vehicleRentalStation("B1", 47.510, 19.001);
-          B2 = vehicleRentalStation("B2", 47.520, 19.001);
+          B1 = vehicleRentalStation("B1", 47.5003, 19.0001);
+          B2 = vehicleRentalStation("B2", 47.5087, 19.0001);
 
           biLink(A, S1);
           biLink(D, E1);
@@ -635,8 +635,10 @@ public class BikeRentalTest extends GraphRoutingTest {
     RouteRequest options,
     StreetMode streetMode
   ) {
+    EuclideanRemainingWeightHeuristic heuristic = new EuclideanRemainingWeightHeuristic();
+    heuristic.initialize(streetMode, Set.of(toVertex), arriveBy, options.preferences());
     var tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setHeuristic(heuristic)
       .setRequest(options)
       .setStreetRequest(new StreetRequest(streetMode))
       .setFrom(fromVertex)

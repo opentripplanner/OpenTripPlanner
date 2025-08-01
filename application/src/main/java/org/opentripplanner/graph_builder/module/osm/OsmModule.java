@@ -28,7 +28,6 @@ import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertiesPair;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
@@ -84,7 +83,7 @@ public class OsmModule implements GraphBuilderModule {
     this.parkingRepository = parkingRepository;
     this.issueStore = issueStore;
     this.params = params;
-    this.normalizer = new SafetyValueNormalizer(graph, issueStore);
+    this.normalizer = new SafetyValueNormalizer(graph);
     this.streetLimitationParameters = Objects.requireNonNull(streetLimitationParameters);
   }
 
@@ -136,8 +135,18 @@ public class OsmModule implements GraphBuilderModule {
     LOG.info("Building street graph from OSM");
     build(osmdb, vertexGenerator);
     graph.hasStreets = true;
-    streetLimitationParameters.initMaxCarSpeed(getMaxCarSpeed());
-    streetLimitationParameters.initMaxAreaNodes(params.maxAreaNodes());
+    float maxCarSpeed = getMaxCarSpeed();
+    LOG.info("Maximum car speed in graph: {} m/s", maxCarSpeed);
+    streetLimitationParameters.initMaxCarSpeed(maxCarSpeed);
+    int maxAreaNodes = params.maxAreaNodes();
+    LOG.info("Maximum number of nodes in an area: {}", maxAreaNodes);
+    streetLimitationParameters.initMaxAreaNodes(maxAreaNodes);
+    float bestBikeSafety = normalizer.getBestBikeSafety();
+    LOG.info("Best bike safety: {}", bestBikeSafety);
+    streetLimitationParameters.setBestBikeSafety(bestBikeSafety);
+    float bestWalkSafety = normalizer.getBestWalkSafety();
+    LOG.info("Best walk safety: {}", bestWalkSafety);
+    streetLimitationParameters.setBestWalkSafety(bestWalkSafety);
   }
 
   @Override
@@ -211,8 +220,6 @@ public class OsmModule implements GraphBuilderModule {
     TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore, osmInfoGraphBuildRepository);
 
     params.edgeNamer().postprocess();
-
-    normalizer.applySafetyFactors();
   }
 
   /**

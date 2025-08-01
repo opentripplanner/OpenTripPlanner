@@ -13,6 +13,9 @@ public class StreetLimitationParameters implements Serializable {
   private float maxCarSpeed = StreetConstants.DEFAULT_MAX_CAR_SPEED;
   private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
 
+  private float bestBikeSafety = 1;
+  private float bestWalkSafety = 1;
+
   @Inject
   public StreetLimitationParameters() {}
 
@@ -43,5 +46,21 @@ public class StreetLimitationParameters implements Serializable {
    */
   public int maxAreaNodes() {
     return maxAreaNodes;
+  }
+
+  public float bestBikeSafety() {
+    return bestBikeSafety;
+  }
+
+  public void setBestBikeSafety(float bestBikeSafety) {
+    this.bestBikeSafety = bestBikeSafety;
+  }
+
+  public float bestWalkSafety() {
+    return bestWalkSafety;
+  }
+
+  public void setBestWalkSafety(float bestWalkSafety) {
+    this.bestWalkSafety = bestWalkSafety;
   }
 }

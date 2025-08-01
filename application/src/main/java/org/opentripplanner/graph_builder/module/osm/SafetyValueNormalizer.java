@@ -1,35 +1,31 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.street.model.edge.Area;
-import org.opentripplanner.street.model.edge.AreaEdge;
-import org.opentripplanner.street.model.edge.AreaGroup;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
-import org.opentripplanner.street.model.vertex.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Normalizes bike & walk safety values so that the lowest one is no lower than 1.0.
+ * Collects the minimum bike & walk safety values while applying them to the graph.
  * <p>
- * Normalization of the safety values is desirable because that means that the heuristic
- * can somewhat accurately predict the remaining cost of the path and won't prune out
- * optimal paths.
+ * The heuristic function needs to know the minimum values so it never overestimates
+ * the remaining cost of the path and won't prune out optimal paths.
  * <p>
- * Further reading: https://github.com/opentripplanner/OpenTripPlanner/issues/4442
+ * Further reading: <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/4442">Issue 4442</a>
+ * <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/6775">Issue 6775</a>
  */
 class SafetyValueNormalizer {
 
+  private static final Logger LOG = LoggerFactory.getLogger(SafetyValueNormalizer.class);
+
   private final Graph graph;
-  private final DataImportIssueStore issueStore;
+
   /**
    * The bike safety factor of the safest street
    */
@@ -39,39 +35,16 @@ class SafetyValueNormalizer {
    */
   private float bestWalkSafety = 1.0f;
 
-  SafetyValueNormalizer(Graph graph, DataImportIssueStore issueStore) {
+  SafetyValueNormalizer(Graph graph) {
     this.graph = graph;
-    this.issueStore = issueStore;
   }
 
-  /**
-   * The safest bike lane should have a safety weight no lower than the time weight of a flat
-   * street. This method divides the safety lengths by the length ratio of the safest street,
-   * ensuring this property.
-   */
-  void applySafetyFactors() {
-    issueStore.add(new Graphwide("Multiplying all bike safety values by " + (1 / bestBikeSafety)));
+  public float getBestBikeSafety() {
+    return bestBikeSafety;
+  }
 
-    issueStore.add(new Graphwide("Multiplying all walk safety values by " + (1 / bestWalkSafety)));
-    HashSet<Edge> seenEdges = new HashSet<>();
-    HashSet<AreaGroup> seenAreas = new HashSet<>();
-    for (Vertex vertex : graph.getVertices()) {
-      for (Edge e : vertex.getOutgoing()) {
-        if (e instanceof AreaEdge) {
-          AreaGroup areaGroup = ((AreaEdge) e).getArea();
-          if (seenAreas.contains(areaGroup)) continue;
-          seenAreas.add(areaGroup);
-          for (Area area : areaGroup.getAreas()) {
-            area.setBicycleSafetyMultiplier(area.getBicycleSafetyMultiplier() / bestBikeSafety);
-            area.setWalkSafetyMultiplier(area.getWalkSafetyMultiplier() / bestWalkSafety);
-          }
-        }
-        applyFactors(seenEdges, e);
-      }
-      for (Edge e : vertex.getIncoming()) {
-        applyFactors(seenEdges, e);
-      }
-    }
+  public float getBestWalkSafety() {
+    return bestWalkSafety;
   }
 
   void applyWayProperties(
@@ -91,15 +64,17 @@ class SafetyValueNormalizer {
     boolean walkNoThrough = tagMapperForWay.isWalkThroughTrafficExplicitlyDisallowed(way);
 
     if (street != null) {
-      double bicycleSafety = forwardWayData.bicycleSafety();
-      street.setBicycleSafetyFactor((float) bicycleSafety);
+      float bicycleSafety = (float) forwardWayData.bicycleSafety();
+      street.setBicycleSafetyFactor(bicycleSafety);
       if (bicycleSafety < bestBikeSafety) {
-        bestBikeSafety = (float) bicycleSafety;
+        bestBikeSafety = bicycleSafety;
+        LOG.info("bike safety reduced to {} for street {} forward", bestBikeSafety, street);
       }
-      double walkSafety = forwardWayData.walkSafety();
-      street.setWalkSafetyFactor((float) walkSafety);
+      float walkSafety = (float) forwardWayData.walkSafety();
+      street.setWalkSafetyFactor(walkSafety);
       if (walkSafety < bestWalkSafety) {
-        bestWalkSafety = (float) walkSafety;
+        bestWalkSafety = walkSafety;
+        LOG.info("walk safety reduced to {} for street {} forward", bestWalkSafety, street);
       }
       if (notes != null) {
         for (var it : notes) {
@@ -112,14 +87,16 @@ class SafetyValueNormalizer {
     }
 
     if (backStreet != null) {
-      double bicycleSafety = backwardWayData.bicycleSafety();
+      float bicycleSafety = (float) backwardWayData.bicycleSafety();
       if (bicycleSafety < bestBikeSafety) {
-        bestBikeSafety = (float) bicycleSafety;
+        bestBikeSafety = bicycleSafety;
+        LOG.info("bike safety reduced to {} for street {} backward", bestBikeSafety, backStreet);
       }
-      backStreet.setBicycleSafetyFactor((float) bicycleSafety);
-      double walkSafety = backwardWayData.walkSafety();
+      backStreet.setBicycleSafetyFactor(bicycleSafety);
+      float walkSafety = (float) backwardWayData.walkSafety();
       if (walkSafety < bestWalkSafety) {
-        bestWalkSafety = (float) walkSafety;
+        bestWalkSafety = walkSafety;
+        LOG.info("walk safety reduced to {} for street {} backward", bestWalkSafety, backStreet);
       }
       backStreet.setWalkSafetyFactor((float) walkSafety);
       if (notes != null) {
@@ -130,18 +107,6 @@ class SafetyValueNormalizer {
       backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
       backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
       backStreet.setWalkNoThruTraffic(walkNoThrough);
-    }
-  }
-
-  private void applyFactors(HashSet<Edge> seenEdges, Edge e) {
-    if (!(e instanceof StreetEdge pse)) {
-      return;
-    }
-
-    if (!seenEdges.contains(e)) {
-      seenEdges.add(e);
-      pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
-      pse.setWalkSafetyFactor(pse.getWalkSafetyFactor() / bestWalkSafety);
     }
   }
 }
