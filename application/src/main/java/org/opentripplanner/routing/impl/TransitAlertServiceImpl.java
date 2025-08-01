@@ -79,14 +79,14 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   ) {
     EntitySelector.Stop entitySelector = new EntitySelector.Stop(stopId, stopConditions);
     var result = findMatchingAlerts(entitySelector);
-    var quay = timetableRepository.getSiteRepository().getStopLocation(stopId);
+    var stop = timetableRepository.getSiteRepository().getStopLocation(stopId);
 
-    if (quay != null && quay.isPartOfStation()) {
+    if (stop != null && stop.isPartOfStation()) {
       // Add alerts for parent-station
       result.addAll(
         findMatchingAlerts(
           new EntitySelector.Stop(
-            Objects.requireNonNull(quay.getParentStation()).getId(),
+            Objects.requireNonNull(stop.getParentStation()).getId(),
             stopConditions
           )
         )
