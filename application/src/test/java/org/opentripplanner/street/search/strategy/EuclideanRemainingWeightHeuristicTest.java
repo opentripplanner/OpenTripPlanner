@@ -101,12 +101,22 @@ class EuclideanRemainingWeightHeuristicTest {
         RoutingPreferences.of()
           .withBike(b -> b.withOptimizeType(VehicleRoutingOptimizeType.SAFEST_STREETS))
           .build(),
-        24
+        28.8
       ),
       // a slow car
       Arguments.argumentSet("slow car", slowCar, StreetMode.CAR, RoutingPreferences.DEFAULT, 100),
       // slow car speed should not affect cycling
-      Arguments.argumentSet("slow car", slowCar, StreetMode.BIKE, RoutingPreferences.DEFAULT, 40)
+      Arguments.argumentSet("slow car", slowCar, StreetMode.BIKE, RoutingPreferences.DEFAULT, 40),
+      // minimum safety 0.8 with safety factor 0.6 = effectively safety factor 0.88
+      Arguments.argumentSet(
+        "intermediate walk safety",
+        safeStreets,
+        StreetMode.WALK,
+        RoutingPreferences.of()
+          .withWalk(w -> w.withSpeed(1).withReluctance(1).withSafetyFactor(0.6))
+          .build(),
+        88
+      )
     );
   }
 

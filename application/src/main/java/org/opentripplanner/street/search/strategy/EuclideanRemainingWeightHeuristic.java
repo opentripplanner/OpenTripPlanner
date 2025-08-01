@@ -1,5 +1,7 @@
 package org.opentripplanner.street.search.strategy;
 
+import static org.opentripplanner.street.model.edge.StreetEdgeReluctanceCalculator.getSafetyForSafestStreet;
+
 import java.util.Comparator;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -7,6 +9,8 @@ import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -61,6 +65,24 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     lon = target.getLon();
   }
 
+  private double scaleSafety(double safety, double safetyFactor) {
+    return 1 + (safety - 1) * safetyFactor;
+  }
+
+  private double getEffectiveSafetyForOptimization(
+    VehicleRoutingOptimizeType optimizeType,
+    TimeSlopeSafetyTriangle triangle,
+    double safety
+  ) {
+    return switch (optimizeType) {
+      case SHORTEST_DURATION -> 1.0;
+      case SAFE_STREETS -> safety;
+      case FLAT_STREETS -> 1.0;
+      case SAFEST_STREETS -> getSafetyForSafestStreet(safety);
+      case TRIANGLE -> scaleSafety(safety, triangle.safety());
+    };
+  }
+
   /**
    * @return the minimum of (pace × reluctance × safety) for the applicable modes
    */
@@ -68,15 +90,24 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     double drivingPace = streetMode.includesDriving()
       ? 1.0 / streetLimitationParametersService.getMaxCarSpeed()
       : Double.MAX_VALUE;
+    double bestBikeSafety = streetLimitationParametersService.getBestBikeSafety();
     double cyclingPace = streetMode.includesBiking()
       ? (1.0 / preferences.bike().speed()) *
       preferences.bike().reluctance() *
-      streetLimitationParametersService.getBestBikeSafety()
+      getEffectiveSafetyForOptimization(
+        preferences.bike().optimizeType(),
+        preferences.bike().optimizeTriangle(),
+        bestBikeSafety
+      )
       : Double.MAX_VALUE;
     double scooterPace = streetMode.includesScooter()
       ? (1.0 / preferences.scooter().speed()) *
       preferences.scooter().reluctance() *
-      streetLimitationParametersService.getBestBikeSafety()
+      getEffectiveSafetyForOptimization(
+        preferences.scooter().optimizeType(),
+        preferences.scooter().optimizeTriangle(),
+        bestBikeSafety
+      )
       : Double.MAX_VALUE;
     double walkingPace = streetMode.includesWalking()
       ? getWalkingCostPerDistance(preferences)
@@ -90,7 +121,10 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     return (
       (1.0 / preferences.walk().speed()) *
       preferences.walk().reluctance() *
-      streetLimitationParametersService.getBestWalkSafety()
+      scaleSafety(
+        streetLimitationParametersService.getBestWalkSafety(),
+        preferences.walk().safetyFactor()
+      )
     );
   }
 
