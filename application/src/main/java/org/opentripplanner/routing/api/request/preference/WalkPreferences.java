@@ -92,7 +92,10 @@ public final class WalkPreferences implements Serializable {
     return boardCost.toSeconds();
   }
 
-  /** Used instead of walk reluctance for stairs */
+  /**
+   * Used on top of reluctance for stairs. If the value is set to 1, walking on stairs is treated
+   * the same as walking on flat ground.
+   */
   public double stairsReluctance() {
     return stairsReluctance;
   }

@@ -841,7 +841,9 @@ public class RouteRequestConfig {
         c
           .of("stairsReluctance")
           .since(V2_0)
-          .summary("Used instead of walkReluctance for stairs.")
+          .summary(
+            "A multiplier to specify how bad walking on stairs is, compared to walking on flat ground."
+          )
           .asDouble(dft.stairsReluctance())
       )
       .withStairsTimeFactor(
