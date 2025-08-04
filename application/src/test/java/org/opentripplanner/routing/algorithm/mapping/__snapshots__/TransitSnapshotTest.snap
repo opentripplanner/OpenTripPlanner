@@ -10,7 +10,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 7447,
+      "generalizedCost" : 7445,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -25,7 +25,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 7447,
+          "generalizedCost" : 7445,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 205,
@@ -280,7 +280,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4025,
+      "generalizedCost" : 4023,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -295,7 +295,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1543,
+          "generalizedCost" : 1542,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 37,
@@ -724,7 +724,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 37,
+          "generalizedCost" : 36,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 7,
@@ -803,7 +803,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4281,
+      "generalizedCost" : 4279,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -818,7 +818,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1398,
+          "generalizedCost" : 1397,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 45,
@@ -1156,7 +1156,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1511,
+          "generalizedCost" : 1510,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 29,
@@ -1261,7 +1261,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 2314,
+      "generalizedCost" : 2312,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -1276,7 +1276,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 95,
+          "generalizedCost" : 94,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 4,
@@ -1692,7 +1692,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 405,
+          "generalizedCost" : 404,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 13,
@@ -1804,7 +1804,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4025,
+      "generalizedCost" : 4023,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -1819,7 +1819,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1543,
+          "generalizedCost" : 1542,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 37,
@@ -2248,7 +2248,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 37,
+          "generalizedCost" : 36,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 7,
@@ -2327,7 +2327,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4295,
+      "generalizedCost" : 4293,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -2342,7 +2342,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1398,
+          "generalizedCost" : 1397,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 45,
@@ -2680,7 +2680,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1511,
+          "generalizedCost" : 1510,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 29,
@@ -2769,7 +2769,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 6717,
+      "generalizedCost" : 6716,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -2787,7 +2787,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 6717,
+          "generalizedCost" : 6716,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 208,
@@ -3003,7 +3003,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 3863,
+      "generalizedCost" : 3862,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -3488,7 +3488,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 286,
+          "generalizedCost" : 285,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 7,
@@ -3593,7 +3593,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 2894,
+      "generalizedCost" : 2893,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -3923,7 +3923,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1388,
+          "generalizedCost" : 1387,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 39,
@@ -4074,7 +4074,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 3704,
+      "generalizedCost" : 3703,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -4586,7 +4586,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 691,
+          "generalizedCost" : 690,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 13,
@@ -4678,7 +4678,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 2924,
+      "generalizedCost" : 2923,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -5008,7 +5008,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1388,
+          "generalizedCost" : 1387,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 39,
@@ -5159,7 +5159,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 3704,
+      "generalizedCost" : 3703,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -5671,7 +5671,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 691,
+          "generalizedCost" : 690,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 13,
@@ -5747,7 +5747,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 7384,
+      "generalizedCost" : 7382,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -5762,7 +5762,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Stark    St. & SE 17th Ave. (P0)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 7384,
+          "generalizedCost" : 7382,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 252,
@@ -6007,7 +6007,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 6283,
+      "generalizedCost" : 6282,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -6025,7 +6025,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 6283,
+          "generalizedCost" : 6282,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 202,
@@ -6205,7 +6205,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 4597,
+      "generalizedCost" : 4596,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -6223,7 +6223,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "generalizedCost" : 4597,
+          "generalizedCost" : 4596,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 143,

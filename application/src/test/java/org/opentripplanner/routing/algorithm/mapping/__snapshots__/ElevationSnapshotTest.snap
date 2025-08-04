@@ -10,7 +10,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 1617,
+      "generalizedCost" : 1615,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -25,7 +25,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1617,
+          "generalizedCost" : 1615,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1193,60.2,1272,55.5,1589,55.5,1668,40.4,1851,40.4,1920,37.3,1932,37.3,2079,55.5,2504,55.5,2504,NaN,2637,NaN",
           "legGeometry" : {
@@ -141,7 +141,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 1103,
+      "generalizedCost" : 1101,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -156,7 +156,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 304,
+          "generalizedCost" : 303,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4,93,66.6,107,66.2",
           "legGeometry" : {
@@ -317,7 +317,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 334,
+          "generalizedCost" : 333,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,52.2,1,52.2,11,51.9,21,51.6,31,51.3,41,51.2,51,51.2,61,50.7,71,50.9,81,50.5,91,50.4,101,50.0,111,49.7,121,49.4,131,49.0,138,48.9,148,49.2,158,49.5,168,49.8,178,50.1,188,50.4,198,50.7,208,51.0,217,51.2,219,51.1",
           "legGeometry" : {
@@ -407,7 +407,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 3648,
+      "generalizedCost" : 3646,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -422,7 +422,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 3648,
+          "generalizedCost" : 3646,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1466,60.2,1540,55.5,2299,55.5,2299,NaN,2432,NaN",
           "legGeometry" : {
@@ -560,7 +560,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2305,
+      "generalizedCost" : 2303,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -575,7 +575,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 259,
+          "generalizedCost" : 258,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.3,116,29.4,126,29.4,136,29.4,146,29.4,156,29.3,168,29.3",
           "legGeometry" : {
@@ -823,7 +823,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 923,
+          "generalizedCost" : 922,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,52.7,9,52.6,19,52.7,29,52.9,43,53.0,53,53.2,63,53.3,73,53.4,83,53.6,93,53.7,103,54.0,113,54.3,123,54.6,133,54.9,143,55.2,153,55.4,167,55.7,177,56.0,187,56.3,197,56.5,207,56.6,217,56.9,227,57.2,237,57.5,247,57.8,257,58.1,267,58.5,277,58.8,287,59.1,297,59.3,307,59.6,317,59.9,325,60.2,335,60.5,345,60.8,355,61.1,365,61.2,375,61.5,385,61.8,395,62.0,405,62.3,415,62.5,425,62.7,435,63.6,445,64.5,455,65.3,470,66.6,484,67.4,494,67.2,504,66.8,514,66.3,524,65.8,534,65.2,544,64.7,554,64.1,563,63.7",
           "legGeometry" : {
@@ -929,7 +929,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2464,
+      "generalizedCost" : 2462,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -944,7 +944,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 442,
+          "generalizedCost" : 441,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,260,29.7,270,29.8,280,29.7,288,29.7",
           "legGeometry" : {
@@ -1205,7 +1205,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 819,
+          "generalizedCost" : 818,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,82.0,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
           "legGeometry" : {
@@ -1324,7 +1324,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2396,
+      "generalizedCost" : 2394,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -1339,7 +1339,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 391,
+          "generalizedCost" : 390,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.2,116,29.3,126,29.2,136,29.2,146,29.2,156,29.2,166,29.3,176,29.3,183,29.3,195,29.4,205,29.5,215,29.6,225,29.6,235,29.6,250,29.4,253,29.4",
           "legGeometry" : {
@@ -1587,7 +1587,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 927,
+          "generalizedCost" : 926,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,55.5,25,55.5,183,60.2,341,60.2,421,60.2,431,60.4,441,60.6,451,60.9,461,61.2,471,61.5,481,61.8,491,62.0,499,62.2,509,62.5,519,62.9,529,63.3,539,63.5,549,63.3,559,63.2,569,63.4,579,63.7,581,63.7",
           "legGeometry" : {
@@ -1693,7 +1693,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2786,
+      "generalizedCost" : 2784,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -1708,7 +1708,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 949,
+          "generalizedCost" : 948,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,263,29.6,273,29.6,283,29.5,293,29.5,303,29.7,314,29.6,324,29.7,334,29.7,344,29.7,354,29.8,367,29.8,375,29.9,385,29.9,395,30.0,405,30.0,415,30.1,425,30.0,438,30.1,447,30.0,457,29.9,467,29.9,477,30.0,487,30.0,497,30.0,507,30.1,514,30.1,526,30.2,536,30.3,546,30.3,556,30.5,566,30.6,576,30.7,586,30.8,599,30.9,605,30.9,619,30.9",
           "legGeometry" : {
@@ -2034,7 +2034,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 410,
+          "generalizedCost" : 409,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,60.3,12,60.2,22,60.5,32,60.8,42,61.1,52,61.2,62,61.5,72,61.8,82,62.0,92,62.3,102,62.5,112,62.7,122,63.6,132,64.5,142,65.3,157,66.6,171,67.4,181,67.2,191,66.8,201,66.3,211,65.8,221,65.2,231,64.7,241,64.1,250,63.7",
           "legGeometry" : {
@@ -2140,7 +2140,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2305,
+      "generalizedCost" : 2303,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2155,7 +2155,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 259,
+          "generalizedCost" : 258,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.3,116,29.4,126,29.4,136,29.4,146,29.4,156,29.3,168,29.3",
           "legGeometry" : {
@@ -2403,7 +2403,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 923,
+          "generalizedCost" : 922,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,52.7,9,52.6,19,52.7,29,52.9,43,53.0,53,53.2,63,53.3,73,53.4,83,53.6,93,53.7,103,54.0,113,54.3,123,54.6,133,54.9,143,55.2,153,55.4,167,55.7,177,56.0,187,56.3,197,56.5,207,56.6,217,56.9,227,57.2,237,57.5,247,57.8,257,58.1,267,58.5,277,58.8,287,59.1,297,59.3,307,59.6,317,59.9,325,60.2,335,60.5,345,60.8,355,61.1,365,61.2,375,61.5,385,61.8,395,62.0,405,62.3,415,62.5,425,62.7,435,63.6,445,64.5,455,65.3,470,66.6,484,67.4,494,67.2,504,66.8,514,66.3,524,65.8,534,65.2,544,64.7,554,64.1,563,63.7",
           "legGeometry" : {
@@ -2509,7 +2509,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2524,
+      "generalizedCost" : 2522,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2524,7 +2524,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 442,
+          "generalizedCost" : 441,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,260,29.7,270,29.8,280,29.7,288,29.7",
           "legGeometry" : {
@@ -2785,7 +2785,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 819,
+          "generalizedCost" : 818,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,82.0,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
           "legGeometry" : {

@@ -10,7 +10,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 467,
+      "generalizedCost" : 465,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -25,7 +25,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
             "name" : "NW Pettygrove Ave. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 61,
+          "generalizedCost" : 60,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 6,
@@ -144,7 +144,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
             },
             "vertexType" : "BIKEPARK"
           },
-          "generalizedCost" : 285,
+          "generalizedCost" : 284,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 6,
@@ -233,7 +233,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 713,
+      "generalizedCost" : 711,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -248,7 +248,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "Chapman Elementary School (P3)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 169,
+          "generalizedCost" : 168,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 10,
@@ -365,7 +365,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "corner of Northwest 22nd Avenue and path",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 253,
+          "generalizedCost" : 252,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 12,
@@ -428,7 +428,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 713,
+      "generalizedCost" : 711,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -443,7 +443,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "Chapman Elementary School (P3)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 297,
+          "generalizedCost" : 296,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 10,
@@ -560,7 +560,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "corner of Northwest 22nd Avenue and path",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 129,
+          "generalizedCost" : 128,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 12,
@@ -623,7 +623,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 52,
+      "generalizedCost" : 50,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -638,7 +638,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "NW Pettygrove Ave. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 52,
+          "generalizedCost" : 50,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 6,

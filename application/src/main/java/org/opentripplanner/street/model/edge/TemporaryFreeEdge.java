@@ -26,7 +26,6 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
   @Override
   public State[] traverse(State s0) {
     StateEditor s1 = s0.edit(this);
-    s1.incrementWeight(1);
     s1.setBackMode(null);
 
     if (s0.isRentingVehicleFromStation() && s0.mayKeepRentedVehicleAtDestination()) {
