@@ -59,15 +59,33 @@ class WalkRoutingTest {
     var end = GenericLocation.fromCoordinate(59.94641, 10.77522);
     var base = dateTime.truncatedTo(ChronoUnit.SECONDS);
     var time = base.plusMillis(offset);
-    var results = route(roundabout, start, end, time, true);
-    assertEquals(1, results.size());
-    var states = results.get(0).states;
-    var diff = ChronoUnit.MILLIS.between(
-      states.getFirst().getTimeAccurate(),
-      states.getLast().getTimeAccurate()
+
+    var baseResults = route(roundabout, start, end, base, false);
+    assertEquals(1, baseResults.size());
+    var baseStates = baseResults.get(0).states;
+    var baseDiff = ChronoUnit.MILLIS.between(
+      baseStates.getFirst().getTimeAccurate(),
+      baseStates.getLast().getTimeAccurate()
     );
-    // should be same for every parametrized offset, otherwise irrelevant
-    assertEquals(13926, diff);
+
+    var departFromResults = route(roundabout, start, end, time, false);
+    assertEquals(1, departFromResults.size());
+    var departAtStates = departFromResults.get(0).states;
+    var departFromDiff = ChronoUnit.MILLIS.between(
+      departAtStates.getFirst().getTimeAccurate(),
+      departAtStates.getLast().getTimeAccurate()
+    );
+
+    var arriveByResults = route(roundabout, start, end, time, true);
+    assertEquals(1, arriveByResults.size());
+    var arriveByStates = arriveByResults.get(0).states;
+    var arriveByDiff = ChronoUnit.MILLIS.between(
+      arriveByStates.getFirst().getTimeAccurate(),
+      arriveByStates.getLast().getTimeAccurate()
+    );
+    // should be same for every parametrized offset and both depart at and arrive by
+    assertEquals(baseDiff, departFromDiff);
+    assertEquals(baseDiff, arriveByDiff);
   }
 
   private static List<GraphPath<State, Edge, Vertex>> route(
