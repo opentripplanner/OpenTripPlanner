@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.state.State;
 
 /**
@@ -65,36 +66,21 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
     }
 
     /*
-     * The OTP algorithm tries hard to never visit the same node twice. This is generally a good idea because it avoids
-     * useless loops in the traversal leading to way faster processing time.
+     * The previous implementation has been removed. It has resulted in turn costs not calculated
+     * correctly, resulting in forward and backward search returning different paths with the
+     * generalized cost differing by a few seconds.
      *
-     * However there is are certain rare pathological cases where through a series of turn restrictions and/or roadworks
-     * you absolutely must visit a vertex twice if you want to produce a result. One example would be a route like this:
-     *   https://tinyurl.com/ycqux93g (Note: At the time of writing this Hindenburgstr. is closed due to roadworks.)
+     * We no longer assumes one want to push a bike instead of looping around, as it is possible
+     * to have a high bike switch cost or bike walk reluctance.
      *
-     * Therefore, if we are close to the start or the end of a route we allow this.
-     *
-     * More discussion: https://github.com/opentripplanner/OpenTripPlanner/issues/3393
-     *
-     * == Bicycles ==
-     *
-     * We used to allow also loops for bicycles as turn restrictions also apply to them, however
-     * this causes problems when the start/destination is close to an area that has a very complex
-     * network of edges due to the visibility calculation. In such a case it can lead to timeouts as
-     * too many loops are produced.
-     *
-     * Example: https://github.com/opentripplanner/OpenTripPlanner/issues/3564
-     *
-     * In any case, cyclists can always get off the bike and push it across the street so not
-     * including the loops should still result in a route. Often this will be preferable to
-     * taking a detour due to turn restrictions anyway.
+     * Also, the turn cost of walking depends on the angle turned as well, so we can't simply keep
+     * a single state on a vertex as it may result in a straighter path being missed.
      */
     if (
+      a.getVertex() instanceof IntersectionVertex &&
       a.backEdge != b.getBackEdge() &&
-      (a.backEdge instanceof StreetEdge) &&
-      a.getBackMode() != null &&
-      a.getBackMode().isInCar() &&
-      a.getRequest().isCloseToStartOrEnd(a.getVertex())
+      a.backEdge instanceof StreetEdge &&
+      b.backEdge instanceof StreetEdge
     ) {
       return false;
     }
