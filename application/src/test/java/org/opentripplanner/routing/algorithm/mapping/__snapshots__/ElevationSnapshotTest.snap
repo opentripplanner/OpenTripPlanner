@@ -2,7 +2,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
   [
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 720,
+      "duration" : 718,
       "elevationGained" : 18.9,
       "elevationLost" : 30.64,
       "endTime" : "2009-10-21T23:10:00.000+00:00",
@@ -10,7 +10,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 1617,
+      "generalizedCost" : 1615,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -19,13 +19,13 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
           "distance" : 2636.74,
           "endTime" : "2009-10-21T23:10:00.000+00:00",
           "from" : {
-            "departure" : "2009-10-21T22:58:00.000+00:00",
+            "departure" : "2009-10-21T22:58:02.000+00:00",
             "lat" : 45.52832,
             "lon" : -122.70059,
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1617,
+          "generalizedCost" : 1615,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1193,60.2,1272,55.5,1589,55.5,1668,40.4,1851,40.4,1920,37.3,1932,37.3,2079,55.5,2504,55.5,2504,NaN,2637,NaN",
           "legGeometry" : {
@@ -37,7 +37,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
           "realTime" : false,
           "rentedBike" : false,
           "route" : "",
-          "startTime" : "2009-10-21T22:58:00.000+00:00",
+          "startTime" : "2009-10-21T22:58:02.000+00:00",
           "steps" : [
             {
               "absoluteDirection" : "NORTH",
@@ -116,14 +116,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
           "walkingBike" : false
         }
       ],
-      "startTime" : "2009-10-21T22:58:00.000+00:00",
+      "startTime" : "2009-10-21T22:58:02.000+00:00",
       "tooSloped" : false,
       "transfers" : 0,
       "transitTime" : 0,
       "waitingTime" : 0,
       "walkDistance" : 2636.74,
       "walkLimitExceeded" : false,
-      "walkTime" : 720
+      "walkTime" : 718
     }
   ]
 ]
@@ -399,22 +399,22 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
   [
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 1834,
+      "duration" : 1831,
       "elevationGained" : 0.7,
       "elevationLost" : 12.44,
-      "endTime" : "2009-10-21T23:40:34.000+00:00",
+      "endTime" : "2009-10-21T23:40:31.000+00:00",
       "fare" : {
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 3648,
+      "generalizedCost" : 3645,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
           "distance" : 2431.99,
-          "endTime" : "2009-10-21T23:40:34.000+00:00",
+          "endTime" : "2009-10-21T23:40:31.000+00:00",
           "from" : {
             "departure" : "2009-10-21T23:10:00.000+00:00",
             "lat" : 45.52832,
@@ -422,7 +422,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 3648,
+          "generalizedCost" : 3645,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1466,60.2,1540,55.5,2299,55.5,2299,NaN,2432,NaN",
           "legGeometry" : {
@@ -503,7 +503,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
             }
           ],
           "to" : {
-            "arrival" : "2009-10-21T23:40:34.000+00:00",
+            "arrival" : "2009-10-21T23:40:31.000+00:00",
             "lat" : 45.54549,
             "lon" : -122.69659,
             "name" : "Sulzer Pump (P4)",
@@ -520,7 +520,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
       "waitingTime" : 0,
       "walkDistance" : 2431.99,
       "walkLimitExceeded" : false,
-      "walkTime" : 1834
+      "walkTime" : 1831
     }
   ]
 ]
@@ -899,10 +899,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
     },
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 1241,
+      "duration" : 1242,
       "elevationGained" : 5.48,
       "elevationLost" : 23.58,
-      "endTime" : "2009-10-21T23:34:56.000+00:00",
+      "endTime" : "2009-10-21T23:34:57.000+00:00",
       "fare" : {
         "details" : { },
         "fare" : { },
@@ -929,7 +929,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2464,
+      "generalizedCost" : 2465,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -1193,7 +1193,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "arrivalDelay" : 0,
           "departureDelay" : 0,
           "distance" : 563.7,
-          "endTime" : "2009-10-21T23:34:56.000+00:00",
+          "endTime" : "2009-10-21T23:34:57.000+00:00",
           "from" : {
             "arrival" : "2009-10-21T23:28:03.000+00:00",
             "departure" : "2009-10-21T23:28:03.000+00:00",
@@ -1205,7 +1205,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 819,
+          "generalizedCost" : 820,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,82.0,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
           "legGeometry" : {
@@ -1273,7 +1273,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             }
           ],
           "to" : {
-            "arrival" : "2009-10-21T23:34:56.000+00:00",
+            "arrival" : "2009-10-21T23:34:57.000+00:00",
             "lat" : 45.52832,
             "lon" : -122.70059,
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
@@ -1290,7 +1290,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
       "waitingTime" : 0,
       "walkDistance" : 851.52,
       "walkLimitExceeded" : false,
-      "walkTime" : 638
+      "walkTime" : 639
     },
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
@@ -1663,7 +1663,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
     },
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 1514,
+      "duration" : 1512,
       "elevationGained" : 9.48,
       "elevationLost" : 4.76,
       "endTime" : "2009-10-21T23:46:15.000+00:00",
@@ -1693,7 +1693,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2786,
+      "generalizedCost" : 2785,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -1702,13 +1702,13 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "distance" : 618.76,
           "endTime" : "2009-10-21T23:29:00.000+00:00",
           "from" : {
-            "departure" : "2009-10-21T23:21:01.000+00:00",
+            "departure" : "2009-10-21T23:21:03.000+00:00",
             "lat" : 45.52523,
             "lon" : -122.67525,
             "name" : "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 949,
+          "generalizedCost" : 947,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,263,29.6,273,29.6,283,29.5,293,29.5,303,29.7,314,29.6,324,29.7,334,29.7,344,29.7,354,29.8,367,29.8,375,29.9,385,29.9,395,30.0,405,30.0,415,30.1,425,30.0,438,30.1,447,30.0,457,29.9,467,29.9,477,30.0,487,30.0,497,30.0,507,30.1,514,30.1,526,30.2,536,30.3,546,30.3,556,30.5,566,30.6,576,30.7,586,30.8,599,30.9,605,30.9,619,30.9",
           "legGeometry" : {
@@ -1720,7 +1720,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "realTime" : false,
           "rentedBike" : false,
           "route" : "",
-          "startTime" : "2009-10-21T23:21:01.000+00:00",
+          "startTime" : "2009-10-21T23:21:03.000+00:00",
           "steps" : [
             {
               "absoluteDirection" : "WEST",
@@ -2099,14 +2099,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "walkingBike" : false
         }
       ],
-      "startTime" : "2009-10-21T23:21:01.000+00:00",
+      "startTime" : "2009-10-21T23:21:03.000+00:00",
       "tooSloped" : false,
       "transfers" : 0,
       "transitTime" : 827,
       "waitingTime" : 0,
       "walkDistance" : 868.78,
       "walkLimitExceeded" : false,
-      "walkTime" : 687
+      "walkTime" : 685
     },
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
@@ -2479,10 +2479,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
     },
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 1301,
+      "duration" : 1302,
       "elevationGained" : 5.48,
       "elevationLost" : 23.58,
-      "endTime" : "2009-10-21T23:50:56.000+00:00",
+      "endTime" : "2009-10-21T23:50:57.000+00:00",
       "fare" : {
         "details" : { },
         "fare" : { },
@@ -2509,7 +2509,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2524,
+      "generalizedCost" : 2525,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2773,7 +2773,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "arrivalDelay" : 0,
           "departureDelay" : 0,
           "distance" : 563.7,
-          "endTime" : "2009-10-21T23:50:56.000+00:00",
+          "endTime" : "2009-10-21T23:50:57.000+00:00",
           "from" : {
             "arrival" : "2009-10-21T23:44:03.000+00:00",
             "departure" : "2009-10-21T23:44:03.000+00:00",
@@ -2785,7 +2785,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 819,
+          "generalizedCost" : 820,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,82.0,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
           "legGeometry" : {
@@ -2853,7 +2853,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             }
           ],
           "to" : {
-            "arrival" : "2009-10-21T23:50:56.000+00:00",
+            "arrival" : "2009-10-21T23:50:57.000+00:00",
             "lat" : 45.52832,
             "lon" : -122.70059,
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
@@ -2870,7 +2870,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
       "waitingTime" : 0,
       "walkDistance" : 851.52,
       "walkLimitExceeded" : false,
-      "walkTime" : 638
+      "walkTime" : 639
     }
   ]
 ]
