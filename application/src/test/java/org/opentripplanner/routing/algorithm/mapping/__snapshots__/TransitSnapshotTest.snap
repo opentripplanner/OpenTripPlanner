@@ -6197,22 +6197,22 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
   [
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 2321,
+      "duration" : 2320,
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
-      "endTime" : "2009-11-17T18:38:41.000+00:00",
+      "endTime" : "2009-11-17T18:38:40.000+00:00",
       "fare" : {
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 4597,
+      "generalizedCost" : 4595,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 2985.43,
-          "endTime" : "2009-11-17T18:38:41.000+00:00",
+          "distance" : 2984.84,
+          "endTime" : "2009-11-17T18:38:40.000+00:00",
           "from" : {
             "departure" : "2009-11-17T18:00:00.000+00:00",
             "lat" : 45.530244,
@@ -6223,11 +6223,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "generalizedCost" : 4597,
+          "generalizedCost" : 4595,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
-            "length" : 143,
-            "points" : "_s{tGvpukV??c@tADDFDDDHHYx@Wt@{@lBS^MROZ]h@Y`@[`@k@r@kAtASVEDa@f@EDm@l@s@p@JVA@GOCBzEfKxF`M|AfDJRLPVb@DBBBBBDBB@CRE\\C?A@A@ABAB?DAHATC\\AXAVCZATAPAPATG`AATAPAL?J?F?F?D?F@x@AJ@D@B@DAB?RK@I??TBlBCJ?D?BAFAB?DADABEFCDA@CDC?c@@{@@O?K?eBBM?M@@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?RDbH@xA?D?P?RDpH"
+            "length" : 128,
+            "points" : "_s{tGvpukV??c@tADDFDDDHHYx@Wt@{@lBS^MROZ]h@Y`@[`@k@r@kAtASVEDa@f@EDm@l@s@p@JVA@GOCBzEfKxF`M|AfDJRLPVb@DBBBBBDBB@CRE\\C?A@A@ABGEEAGbAK~AGz@IlAEd@?TAP?L?L@Z?`@?R?T?TBlBCJ?D?BAFAB?DADABEFCDA@CDC?c@@{@@O?K?eBBM?M@@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?RDbH@xA?D?P?RDpH"
           },
           "mode" : "WALK",
           "pathway" : false,
@@ -6344,7 +6344,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection" : "NORTHWEST",
               "area" : false,
               "bogusName" : false,
-              "distance" : 298.37,
+              "distance" : 297.78,
               "elevation" : "",
               "lat" : 45.5298172,
               "lon" : -122.6778163,
@@ -6381,7 +6381,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             }
           ],
           "to" : {
-            "arrival" : "2009-11-17T18:38:41.000+00:00",
+            "arrival" : "2009-11-17T18:38:40.000+00:00",
             "lat" : 45.531,
             "lon" : -122.70029,
             "name" : "NW Northrup St. & NW 24th Ave. (P3)",
@@ -6396,9 +6396,9 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers" : 0,
       "transitTime" : 0,
       "waitingTime" : 0,
-      "walkDistance" : 2985.43,
+      "walkDistance" : 2984.84,
       "walkLimitExceeded" : false,
-      "walkTime" : 2321
+      "walkTime" : 2320
     }
   ]
 ]
