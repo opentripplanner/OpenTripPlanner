@@ -1037,10 +1037,6 @@ public class StreetEdge
         turnDuration = 0;
       }
 
-      if (!traverseMode.isInCar()) {
-        s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
-      }
-
       time_ms += (long) Math.ceil(1000.0 * turnDuration);
       weight += preferences.street().turnReluctance() * turnDuration;
     }
