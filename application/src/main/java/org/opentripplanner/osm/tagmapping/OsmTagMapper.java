@@ -107,7 +107,10 @@ public class OsmTagMapper {
 
     // Do not walk on "moottoriliikennetie"/"Kraftfahrstrasse"/"Limited access road"
     // https://en.wikipedia.org/wiki/Limited-access_road
-    props.setProperties(new ExactMatchSpecifier("motorroad=yes"), withModes(CAR));
+    props.setProperties(
+      new ExactMatchSpecifier("motorroad=yes"),
+      withModes(CAR).walkSafety(7.47).bicycleSafety(7.47)
+    );
 
     /* cycleway=lane */
     props.setProperties(
