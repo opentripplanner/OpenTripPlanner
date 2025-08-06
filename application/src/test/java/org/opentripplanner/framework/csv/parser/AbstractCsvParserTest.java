@@ -98,7 +98,7 @@ class AbstractCsvParserTest {
 
     var missingValue = issueStore.listIssues().getFirst();
 
-    assertEquals("EmissionValueMissing", missingValue.getType());
+    assertEquals("TestValueMissing", missingValue.getType());
     assertEquals("Value for 'id' is missing: ', 1, 28.0' (@line:2)", missingValue.getMessage());
     assertEquals(1, issueStore.listIssues().size());
   }
@@ -123,7 +123,7 @@ class AbstractCsvParserTest {
 
     var intParseError = issueStore.listIssues().getFirst();
 
-    assertEquals("EmissionNumberFormat", intParseError.getType());
+    assertEquals("TestNumberFormat", intParseError.getType());
     assertEquals(
       "Unable to parse value 'not an int' for 'intValue' of type int: " +
       "'F:2, not an int, 38.0' (@line:3)",
@@ -154,8 +154,8 @@ class AbstractCsvParserTest {
     var valueTooSmall = issueStore.listIssues().getFirst();
     var valueTooBig = issueStore.listIssues().getLast();
 
-    assertEquals("EmissionOutsideRange", valueTooSmall.getType());
-    assertEquals("EmissionOutsideRange", valueTooBig.getType());
+    assertEquals("TestOutsideRange", valueTooSmall.getType());
+    assertEquals("TestOutsideRange", valueTooBig.getType());
     assertEquals(
       "The int value '-1' for intValue is outside expected range [0, 100]: 'F:1, -1, 1.0' (@line:2)",
       valueTooSmall.getMessage()
@@ -185,7 +185,7 @@ class AbstractCsvParserTest {
 
     var doubleParseError = issueStore.listIssues().getFirst();
 
-    assertEquals("EmissionNumberFormat", doubleParseError.getType());
+    assertEquals("TestNumberFormat", doubleParseError.getType());
     assertEquals(
       "Unable to parse value 'not a double' for 'doubleValue' of type double: " +
       "'F:2, 2, not a double' (@line:3)",
@@ -216,8 +216,8 @@ class AbstractCsvParserTest {
     var valueTooSmall = issueStore.listIssues().getFirst();
     var valueTooBig = issueStore.listIssues().getLast();
 
-    assertEquals("EmissionOutsideRange", valueTooSmall.getType());
-    assertEquals("EmissionOutsideRange", valueTooBig.getType());
+    assertEquals("TestOutsideRange", valueTooSmall.getType());
+    assertEquals("TestOutsideRange", valueTooBig.getType());
     assertEquals(
       "The double value '-1.0E-6' for doubleValue is outside expected range [0.0, 100.0): 'F:1, 1, -0.000001' (@line:2)",
       valueTooSmall.getMessage()
@@ -251,7 +251,7 @@ class AbstractCsvParserTest {
     }
 
     public TestCsvParser(DataImportIssueStore issueStore, String csvText) {
-      super(issueStore, CsvReader.parse(csvText));
+      super(issueStore, CsvReader.parse(csvText), "Test");
     }
 
     @Override

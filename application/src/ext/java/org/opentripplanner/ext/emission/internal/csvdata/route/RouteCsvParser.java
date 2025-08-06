@@ -26,7 +26,7 @@ class RouteCsvParser extends AbstractCsvParser<RouteRow> {
   );
 
   public RouteCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
-    super(issueStore, reader);
+    super(issueStore, reader, "RouteEmission");
   }
 
   @Override

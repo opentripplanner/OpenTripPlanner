@@ -29,7 +29,7 @@ class TripHopsCsvParser extends AbstractCsvParser<TripHopsRow> {
   private static final DoubleRange CO2_RANGE = DoubleRange.of(-1_000_000.0, 1_000_000_000.0);
 
   public TripHopsCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
-    super(issueStore, reader);
+    super(issueStore, reader, "TripEmission");
   }
 
   @Override

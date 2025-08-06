@@ -18,13 +18,18 @@ public abstract class AbstractCsvParser<T> {
   private static final String TYPE_INT = "int";
   private final DataImportIssueStore issueStore;
   private final CsvReader reader;
+  private final String issueType;
 
   private T next;
   private int lineNumber = 0;
 
-  public AbstractCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
+  /**
+   * @param issueType The type of data read, this is used to group issues.
+   */
+  public AbstractCsvParser(DataImportIssueStore issueStore, CsvReader reader, String issueType) {
     this.issueStore = issueStore;
     this.reader = reader;
+    this.issueType = issueType;
   }
 
   protected abstract List<String> headers();
@@ -95,7 +100,7 @@ public abstract class AbstractCsvParser<T> {
     try {
       var value = reader.get(columnName);
       if (StringUtils.hasNoValue(value)) {
-        issueStore.add(new ValueMissingIssue(columnName, line()));
+        issueStore.add(new ValueMissingIssue(columnName, line(), issueType));
         throw new EmissionHandledParseException();
       }
       return value;
@@ -117,7 +122,9 @@ public abstract class AbstractCsvParser<T> {
     Object expectedRange
   ) throws EmissionHandledParseException {
     if (!inRange.test(value)) {
-      issueStore.add(new ValueOutsideRangeIssue(columnName, value, type, expectedRange, line()));
+      issueStore.add(
+        new ValueOutsideRangeIssue(columnName, value, type, expectedRange, line(), issueType)
+      );
       throw new EmissionHandledParseException();
     }
   }
@@ -128,7 +135,7 @@ public abstract class AbstractCsvParser<T> {
     try {
       return mapper.apply(value);
     } catch (NumberFormatException e) {
-      issueStore.add(new NumberFormatIssue(columnName, value, type, line()));
+      issueStore.add(new NumberFormatIssue(columnName, value, type, line(), issueType));
       throw new EmissionHandledParseException();
     }
   }

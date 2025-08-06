@@ -1,20 +1,14 @@
 package org.opentripplanner.framework.csv.parser;
 
-import org.opentripplanner.framework.error.OtpError;
+class ValueMissingIssue extends AbstractIssue {
 
-class ValueMissingIssue implements OtpError {
-
-  private final String columnName;
-  private final String csvLine;
-
-  public ValueMissingIssue(String columnName, String csvLine) {
-    this.columnName = columnName;
-    this.csvLine = csvLine;
+  public ValueMissingIssue(String columnName, String csvLine, String issueType) {
+    super(columnName, csvLine, issueType);
   }
 
   @Override
   public String errorCode() {
-    return "EmissionValueMissing";
+    return issueType() + "ValueMissing";
   }
 
   @Override
@@ -24,6 +18,6 @@ class ValueMissingIssue implements OtpError {
 
   @Override
   public Object[] messageArguments() {
-    return new Object[] { columnName, csvLine };
+    return new Object[] { columnName(), csvLine() };
   }
 }

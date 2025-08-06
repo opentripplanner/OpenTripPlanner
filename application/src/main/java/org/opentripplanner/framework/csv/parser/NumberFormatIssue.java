@@ -1,25 +1,27 @@
 package org.opentripplanner.framework.csv.parser;
 
 import java.util.Objects;
-import org.opentripplanner.framework.error.OtpError;
 
-final class NumberFormatIssue implements OtpError {
+final class NumberFormatIssue extends AbstractIssue {
 
-  private final String columnName;
   private final Object value;
-  private final String type;
-  private final String csvLine;
+  private final String valueType;
 
-  public NumberFormatIssue(String columnName, Object value, String type, String csvLine) {
-    this.columnName = columnName;
+  public NumberFormatIssue(
+    String columnName,
+    Object value,
+    String valueType,
+    String csvLine,
+    String type
+  ) {
+    super(columnName, csvLine, type);
     this.value = value;
-    this.type = type;
-    this.csvLine = csvLine;
+    this.valueType = valueType;
   }
 
   @Override
   public String errorCode() {
-    return "EmissionNumberFormat";
+    return issueType() + "NumberFormat";
   }
 
   @Override
@@ -29,6 +31,6 @@ final class NumberFormatIssue implements OtpError {
 
   @Override
   public Object[] messageArguments() {
-    return new Object[] { Objects.toString(value), columnName, type, csvLine };
+    return new Object[] { Objects.toString(value), columnName(), valueType, csvLine() };
   }
 }
