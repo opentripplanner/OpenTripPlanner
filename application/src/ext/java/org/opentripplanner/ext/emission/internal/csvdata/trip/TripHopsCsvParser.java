@@ -2,8 +2,8 @@ package org.opentripplanner.ext.emission.internal.csvdata.trip;
 
 import com.csvreader.CsvReader;
 import java.util.List;
-import org.opentripplanner.ext.emission.internal.csvdata.csvparser.AbstractCsvParser;
-import org.opentripplanner.ext.emission.internal.csvdata.csvparser.EmissionHandledParseException;
+import org.opentripplanner.framework.csv.parser.AbstractCsvParser;
+import org.opentripplanner.framework.csv.parser.EmissionHandledParseException;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.utils.lang.DoubleRange;

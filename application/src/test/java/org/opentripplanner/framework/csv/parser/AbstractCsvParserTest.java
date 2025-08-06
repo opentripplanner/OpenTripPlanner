@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emission.internal.csvdata.csvparser;
+package org.opentripplanner.framework.csv.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

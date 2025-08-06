@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emission.internal.csvdata.csvparser;
+package org.opentripplanner.framework.csv.parser;
 
 /**
  * Signal a handled parse exception. The error is added to the issue store - nothing needs to
