@@ -25,10 +25,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Graph graph;
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
+  private final TransitService transitService;
 
   /**
    * Constructor used in tests. This initializes transferParametersForMode as an empty map.
@@ -69,6 +72,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
     this.transferRequests = transferRequests;
     this.transferParametersForMode = Map.of();
+    this.transitService = new DefaultTransitService(timetableRepository);
   }
 
   public DirectTransferGenerator(
@@ -85,6 +89,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
     this.transferRequests = transferRequests;
     this.transferParametersForMode = transferParametersForMode;
+    this.transitService = new DefaultTransitService(timetableRepository);
   }
 
   @Override
@@ -98,6 +103,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     List<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
     Set<StopLocation> carsAllowedStops =
       timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
+    Set<StopLocation> bikesAllowedStops =
+      timetableRepository.getStopLocationsUsedForBikesAllowedTrips();
 
     LOG.info("Creating transfers based on requests:");
     transferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
@@ -142,7 +149,13 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
-        calculateDefaultTransfers(transferConfiguration, ts0, stop, distinctTransfers);
+        calculateDefaultTransfers(
+          transferConfiguration,
+          ts0,
+          stop,
+          distinctTransfers,
+          bikesAllowedStops
+        );
         calculateFlexTransfers(transferConfiguration, ts0, stop, distinctTransfers);
         calculateCarsAllowedTransfers(
           transferConfiguration,
@@ -253,9 +266,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     // Check that the mode specified in transferParametersForMode can also be found in transferRequests.
     for (StreetMode mode : transferParametersForMode.keySet()) {
       if (
-        !transferRequests
+        transferRequests
           .stream()
-          .anyMatch(transferProfile -> transferProfile.journey().transfer().mode() == mode)
+          .noneMatch(transferProfile -> transferProfile.journey().transfer().mode() == mode)
       ) {
         throw new IllegalArgumentException(
           String.format(
@@ -320,6 +333,13 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     );
   }
 
+  private boolean doesNotServeBikes(Set<StopLocation> bikesAllowedStops, StopLocation stop) {
+    if (OTPFeature.LimitBikeTransfer.isOff()) {
+      return false;
+    }
+    return !transitService.findPatterns(stop).isEmpty() && !bikesAllowedStops.contains(stop);
+  }
+
   /**
    * This method calculates default transfers.
    */
@@ -327,10 +347,16 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     TransferConfiguration transferConfiguration,
     TransitStopVertex ts0,
     RegularStop stop,
-    Map<TransferKey, PathTransfer> distinctTransfers
+    Map<TransferKey, PathTransfer> distinctTransfers,
+    Set<StopLocation> bikesAllowedStops
   ) {
     for (RouteRequest transferProfile : transferConfiguration.defaultTransferRequests()) {
       StreetMode mode = transferProfile.journey().transfer().mode();
+
+      if (mode.includesBiking() && doesNotServeBikes(bikesAllowedStops, stop)) {
+        return;
+      }
+
       var nearbyStops = transferConfiguration
         .defaultNearbyStopFinderForMode()
         .get(mode)
@@ -340,6 +366,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         if (sd.stop == stop) {
           continue;
         }
+        if (mode.includesBiking() && doesNotServeBikes(bikesAllowedStops, sd.stop)) {
+          continue;
+        }
+
         if (sd.stop.transfersNotAllowed()) {
           continue;
         }

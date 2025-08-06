@@ -54,6 +54,11 @@ public enum OTPFeature {
   ),
   FloatingBike(true, false, "Enable floating bike routing."),
   GtfsGraphQlApi(true, false, "Enable the [GTFS GraphQL API](apis/GTFS-GraphQL-API.md)."),
+  LimitBikeTransfer(
+    false,
+    false,
+    "Limit the generation of bike transfers to only stops serving bikes or empty stops."
+  ),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
    * time, but the definitive transfer time. Use this to override what we think the transfer will
