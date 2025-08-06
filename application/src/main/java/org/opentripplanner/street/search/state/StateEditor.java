@@ -343,7 +343,7 @@ public class StateEditor {
    * vehicle parked is important for allowing co-dominance of walking and driving states.
    */
   public void setVehicleParked(boolean vehicleParked, TraverseMode nonTransitMode) {
-      LOG.error("parked vehicle {} {}", vehicleparked, nonTransitMode);
+    resetEnteredNoThroughTrafficArea();
     cloneStateDataAsNeeded();
     child.stateData.vehicleParked = vehicleParked;
     child.stateData.currentMode = nonTransitMode;
