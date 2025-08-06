@@ -69,10 +69,11 @@ class VertexGeneratorTest {
     subject.initNodesInBarrierWays();
 
     var nodesInBarrierWays = subject.nodesInBarrierWays();
-    assertEquals(4, nodesInBarrierWays.size());
-    assertEquals(0, nodesInBarrierWays.get(n1).size());
+    // 3 nodes on chain and 3 nodes on circular chain
+    assertEquals(6, nodesInBarrierWays.size());
+    assertEquals(1, nodesInBarrierWays.get(n1).size());
     assertEquals(1, nodesInBarrierWays.get(n2).size());
-    assertEquals(1, nodesInBarrierWays.get(n3).size());
+    assertEquals(2, nodesInBarrierWays.get(n3).size());
     assertEquals(1, nodesInBarrierWays.get(n4).size());
     assertEquals(1, nodesInBarrierWays.get(n5).size());
 
@@ -82,16 +83,16 @@ class VertexGeneratorTest {
     var vertexForW2AtEndOfBarrier = subject.getVertexForOsmNode(n1, w2);
 
     assertNotEquals(vertexForW1OnBarrier, vertexForW2OnBarrier);
-    assertEquals(vertexForW1AtEndOfBarrier, vertexForW2AtEndOfBarrier);
+    assertNotEquals(vertexForW1AtEndOfBarrier, vertexForW2AtEndOfBarrier);
 
     assertInstanceOf(OsmVertexOnWay.class, vertexForW2OnBarrier);
     assertEquals(n2.getId(), ((OsmVertexOnWay) vertexForW2OnBarrier).nodeId);
     assertEquals(w2.getId(), ((OsmVertexOnWay) vertexForW2OnBarrier).wayId);
-    assertInstanceOf(OsmVertex.class, vertexForW2AtEndOfBarrier);
+    assertInstanceOf(OsmVertexOnWay.class, vertexForW2AtEndOfBarrier);
 
     Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers =
       subject.splitVerticesOnBarriers();
-    assertEquals(1, splitVerticesOnBarriers.size());
+    assertEquals(2, splitVerticesOnBarriers.size());
     assertEquals(
       Map.of(w1, vertexForW1OnBarrier, w2, vertexForW2OnBarrier),
       splitVerticesOnBarriers.get(n2)

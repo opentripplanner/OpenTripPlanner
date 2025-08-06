@@ -199,7 +199,7 @@ class VertexGenerator {
       if (way.isBarrier()) {
         TLongList nodes = way.getNodeRefs();
         boolean isClosed = nodes.get(0) == nodes.get(nodes.size() - 1);
-        for (int i = isClosed ? 0 : 1; i < nodes.size() - 1; i++) {
+        for (int i = 0; i < nodes.size() - (isClosed ? 1 : 0); i++) {
           nodesInBarrierWays.put(osmdb.getNode(nodes.get(i)), way);
         }
       }
