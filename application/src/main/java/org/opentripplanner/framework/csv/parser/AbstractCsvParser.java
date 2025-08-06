@@ -35,7 +35,7 @@ public abstract class AbstractCsvParser<T> {
   protected abstract List<String> headers();
 
   @Nullable
-  protected abstract T createNextRow() throws EmissionHandledParseException;
+  protected abstract T createNextRow() throws HandledCsvParseException;
 
   public boolean headersMatch() {
     try {
@@ -64,7 +64,7 @@ public abstract class AbstractCsvParser<T> {
         }
       } catch (IOException e) {
         throw new RuntimeException(e);
-      } catch (EmissionHandledParseException ignore) {
+      } catch (HandledCsvParseException ignore) {
         // Issue is already handled. Continue with next row until file is complete
       }
     }
@@ -74,34 +74,33 @@ public abstract class AbstractCsvParser<T> {
     return next;
   }
 
-  protected int getInt(String columnName) throws EmissionHandledParseException {
+  protected int getInt(String columnName) throws HandledCsvParseException {
     return getNumber(columnName, TYPE_INT, Integer::parseInt);
   }
 
-  protected int getInt(String columnName, IntRange expectedRange)
-    throws EmissionHandledParseException {
+  protected int getInt(String columnName, IntRange expectedRange) throws HandledCsvParseException {
     int value = getInt(columnName);
     validateInRange(columnName, TYPE_INT, value, expectedRange::contains, expectedRange);
     return value;
   }
 
-  protected double getDouble(String columnName) throws EmissionHandledParseException {
+  protected double getDouble(String columnName) throws HandledCsvParseException {
     return getNumber(columnName, TYPE_DOUBLE, Double::parseDouble);
   }
 
   protected double getDouble(String columnName, DoubleRange expectedRange)
-    throws EmissionHandledParseException {
+    throws HandledCsvParseException {
     double value = getDouble(columnName);
     validateInRange(columnName, TYPE_DOUBLE, value, expectedRange::contains, expectedRange);
     return value;
   }
 
-  protected String getString(String columnName) throws EmissionHandledParseException {
+  protected String getString(String columnName) throws HandledCsvParseException {
     try {
       var value = reader.get(columnName);
       if (StringUtils.hasNoValue(value)) {
         issueStore.add(new ValueMissingIssue(columnName, line(), issueType));
-        throw new EmissionHandledParseException();
+        throw new HandledCsvParseException();
       }
       return value;
     } catch (IOException e) {
@@ -120,23 +119,23 @@ public abstract class AbstractCsvParser<T> {
     T value,
     Predicate<T> inRange,
     Object expectedRange
-  ) throws EmissionHandledParseException {
+  ) throws HandledCsvParseException {
     if (!inRange.test(value)) {
       issueStore.add(
         new ValueOutsideRangeIssue(columnName, value, type, expectedRange, line(), issueType)
       );
-      throw new EmissionHandledParseException();
+      throw new HandledCsvParseException();
     }
   }
 
   private <T> T getNumber(String columnName, String type, Function<String, T> mapper)
-    throws EmissionHandledParseException {
+    throws HandledCsvParseException {
     var value = getString(columnName);
     try {
       return mapper.apply(value);
     } catch (NumberFormatException e) {
       issueStore.add(new NumberFormatIssue(columnName, value, type, line(), issueType));
-      throw new EmissionHandledParseException();
+      throw new HandledCsvParseException();
     }
   }
 

@@ -3,7 +3,7 @@ package org.opentripplanner.ext.emission.internal.csvdata.trip;
 import com.csvreader.CsvReader;
 import java.util.List;
 import org.opentripplanner.framework.csv.parser.AbstractCsvParser;
-import org.opentripplanner.framework.csv.parser.EmissionHandledParseException;
+import org.opentripplanner.framework.csv.parser.HandledCsvParseException;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.utils.lang.DoubleRange;
@@ -38,7 +38,7 @@ class TripHopsCsvParser extends AbstractCsvParser<TripHopsRow> {
   }
 
   @Override
-  protected TripHopsRow createNextRow() throws EmissionHandledParseException {
+  protected TripHopsRow createNextRow() throws HandledCsvParseException {
     return new TripHopsRow(
       getString(TRIP_ID),
       getString(START_STOP_ID),

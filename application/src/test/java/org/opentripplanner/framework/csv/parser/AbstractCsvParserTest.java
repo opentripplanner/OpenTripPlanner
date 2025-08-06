@@ -261,7 +261,7 @@ class AbstractCsvParserTest {
 
     @Nullable
     @Override
-    protected Row createNextRow() throws EmissionHandledParseException {
+    protected Row createNextRow() throws HandledCsvParseException {
       return new Row(
         getString(ID),
         getInt(INT_VALUE, INT_RANGE),
