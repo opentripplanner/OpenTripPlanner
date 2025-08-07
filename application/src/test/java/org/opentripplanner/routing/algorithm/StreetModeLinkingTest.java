@@ -26,7 +26,6 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -44,9 +43,9 @@ import org.opentripplanner.street.search.TemporaryVerticesContainer;
  */
 public class StreetModeLinkingTest extends GraphRoutingTest {
 
-  /** 
+  /**
    * This is used to make parallel streets by adding the value to the longitude.
-   * The value make streets about 11m apart. 
+   * The value make streets about 11m apart.
    */
   private static final double STREET_DELTA = 0.0001;
 
@@ -65,14 +64,15 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   private static final double LONGITUDE_LOCATION = LONGITUDE_0 - OFFSET;
 
   // Make parallel streets ~10 meters apart for each street traversal permission
-  private static int testCaseIndex = 0;
-  private static final StreetTC CAR_TC = StreetTC.of(StreetTraversalPermission.CAR);
-  private static final StreetTC ALL_TC = StreetTC.of(StreetTraversalPermission.ALL);
-  private static final StreetTC PEDESTRIAN_TC = StreetTC.of(StreetTraversalPermission.PEDESTRIAN);
-  private static final StreetTC PEDESTRIAN_BICYCLE_TC = StreetTC.of(
+  private static final LinkingTestCase CAR_TC = LinkingTestCase.of(StreetTraversalPermission.CAR);
+  private static final LinkingTestCase ALL_TC = LinkingTestCase.of(StreetTraversalPermission.ALL);
+  private static final LinkingTestCase PEDESTRIAN_TC = LinkingTestCase.of(
+    StreetTraversalPermission.PEDESTRIAN
+  );
+  private static final LinkingTestCase PEDESTRIAN_BICYCLE_TC = LinkingTestCase.of(
     StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
   );
-  private static final StreetTC BICYCLE_CAR_TC = StreetTC.of(
+  private static final LinkingTestCase BICYCLE_CAR_TC = LinkingTestCase.of(
     StreetTraversalPermission.BICYCLE_AND_CAR
   );
 
@@ -91,6 +91,26 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   private TransitStopVertex stop;
   private GenericLocation stopLocation;
 
+  private static GenericLocation closeToCarSt() {
+    return CAR_TC.placeCloseToStreet();
+  }
+
+  private static GenericLocation closeToAllSt() {
+    return ALL_TC.placeCloseToStreet();
+  }
+
+  private static GenericLocation closeToPedestrianSt() {
+    return PEDESTRIAN_TC.placeCloseToStreet();
+  }
+
+  private static GenericLocation closeToPedestrianAndBicycleSt() {
+    return PEDESTRIAN_BICYCLE_TC.placeCloseToStreet();
+  }
+
+  private static GenericLocation closeToBicycleAndCarSt() {
+    return BICYCLE_CAR_TC.placeCloseToStreet();
+  }
+
   @BeforeEach
   protected void setUp() throws Exception {
     // Place stop in the middle of the lines(LATITUDE), and slightly above the first line
@@ -99,11 +119,13 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       new GraphRoutingTest.Builder() {
         @Override
         public void build() {
-          CAR_TC.streetEdge(this, false);
-          ALL_TC.streetEdge(this, false);
-          PEDESTRIAN_TC.streetEdge(this, true);
-          PEDESTRIAN_BICYCLE_TC.streetEdge(this, false);
-          BICYCLE_CAR_TC.streetEdge(this, false);
+          CAR_TC.createStreetEdgeBuilder(this).buildAndConnect();
+          ALL_TC.createStreetEdgeBuilder(this).buildAndConnect();
+          PEDESTRIAN_TC.createStreetEdgeBuilder(this)
+            .withWheelchairAccessible(true)
+            .buildAndConnect();
+          PEDESTRIAN_BICYCLE_TC.createStreetEdgeBuilder(this).buildAndConnect();
+          BICYCLE_CAR_TC.createStreetEdgeBuilder(this).buildAndConnect();
           stop = stop("STOP", LATITUDE_MIDDLE, LONGITUDE_LOCATION);
         }
       }
@@ -131,11 +153,11 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     for (StreetMode mode : modes) {
       args.addAll(
         List.of(
-          Arguments.of(mode, CAR_TC, ALL_TC),
-          Arguments.of(mode, ALL_TC, ALL_TC),
-          Arguments.of(mode, PEDESTRIAN_TC, PEDESTRIAN_TC),
-          Arguments.of(mode, PEDESTRIAN_BICYCLE_TC, PEDESTRIAN_BICYCLE_TC),
-          Arguments.of(mode, BICYCLE_CAR_TC, PEDESTRIAN_BICYCLE_TC)
+          Arguments.of(mode, closeToCarSt(), ALL_TC),
+          Arguments.of(mode, closeToAllSt(), ALL_TC),
+          Arguments.of(mode, closeToPedestrianSt(), PEDESTRIAN_TC),
+          Arguments.of(mode, closeToPedestrianAndBicycleSt(), PEDESTRIAN_BICYCLE_TC),
+          Arguments.of(mode, closeToBicycleAndCarSt(), PEDESTRIAN_BICYCLE_TC)
         )
       );
     }
@@ -150,66 +172,52 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   @MethodSource("testPedestrianLinkingTestCases")
   public void testPedestrianLinking(
     StreetMode mode,
-    StreetTC placeCloseToStreetTestCase,
-    StreetTC expectedStreet
+    GenericLocation placeCloseToStreetTestCase,
+    LinkingTestCase expectedStreet
   ) {
-    testLinking(placeCloseToStreetTestCase, expectedStreet, mode);
+    assertLinking(placeCloseToStreetTestCase, expectedStreet, mode);
   }
 
   @Test
   public void testCarLinking() {
-    testLinking(CAR_TC, CAR_TC, CAR);
-    testLinking(ALL_TC, ALL_TC, CAR);
-    testLinking(PEDESTRIAN_TC, ALL_TC, CAR);
-    testLinking(PEDESTRIAN_BICYCLE_TC, BICYCLE_CAR_TC, CAR);
-    testLinking(BICYCLE_CAR_TC, BICYCLE_CAR_TC, CAR);
-    assertLinkedLocation(stopLocation, CAR_TC, CAR_TC, CAR);
+    assertLinking(closeToCarSt(), CAR_TC, CAR);
+    assertLinking(closeToAllSt(), ALL_TC, CAR);
+    assertLinking(closeToPedestrianSt(), ALL_TC, CAR);
+    assertLinking(closeToPedestrianAndBicycleSt(), BICYCLE_CAR_TC, CAR);
+    assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, CAR);
+    assertLinking(stopLocation, CAR_TC, CAR_TC, CAR);
   }
 
   @Test
   public void testCarParkLinking() {
-    testLinking(CAR_TC, CAR_TC, ALL_TC, CAR_TO_PARK);
-    testLinking(ALL_TC, ALL_TC, ALL_TC, CAR_TO_PARK);
-    testLinking(PEDESTRIAN_TC, ALL_TC, PEDESTRIAN_TC, CAR_TO_PARK);
-    testLinking(PEDESTRIAN_BICYCLE_TC, BICYCLE_CAR_TC, PEDESTRIAN_BICYCLE_TC, CAR_TO_PARK);
-    testLinking(BICYCLE_CAR_TC, BICYCLE_CAR_TC, PEDESTRIAN_BICYCLE_TC, CAR_TO_PARK);
-    assertLinkedLocation(stopLocation, CAR_TC, ALL_TC, CAR_TO_PARK);
+    assertLinking(closeToCarSt(), CAR_TC, ALL_TC, CAR_TO_PARK);
+    assertLinking(closeToAllSt(), ALL_TC, ALL_TC, CAR_TO_PARK);
+    assertLinking(closeToPedestrianSt(), ALL_TC, PEDESTRIAN_TC, CAR_TO_PARK);
+    assertLinking(
+      closeToPedestrianAndBicycleSt(),
+      BICYCLE_CAR_TC,
+      PEDESTRIAN_BICYCLE_TC,
+      CAR_TO_PARK
+    );
+    assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, PEDESTRIAN_BICYCLE_TC, CAR_TO_PARK);
+    assertLinking(stopLocation, CAR_TC, ALL_TC, CAR_TO_PARK);
   }
 
   // TODO: Linking to wheelchair accessible streets is currently not implemented,
   //       is this relevant?
 
-  private void testLinking(
-    StreetTC linkPlaceOnStreet,
-    StreetTC expectedLinkedStreet,
-    StreetMode... streetModes
-  ) {
-    assertLinkedLocation(
-      linkPlaceOnStreet.placeCloseToStreet(),
-      expectedLinkedStreet,
-      expectedLinkedStreet,
-      streetModes
-    );
-  }
-
-  private void testLinking(
-    StreetTC linkPlaceOnStreet,
-    StreetTC expectedFromStreetName,
-    StreetTC expectedToStreetName,
-    StreetMode... streetModes
-  ) {
-    assertLinkedLocation(
-      linkPlaceOnStreet.placeCloseToStreet(),
-      expectedFromStreetName,
-      expectedToStreetName,
-      streetModes
-    );
-  }
-
-  private void assertLinkedLocation(
+  private void assertLinking(
     GenericLocation location,
-    StreetTC expectedFromStreetName,
-    StreetTC expectedToStreetName,
+    LinkingTestCase expectedStreetName,
+    StreetMode... streetModes
+  ) {
+    assertLinking(location, expectedStreetName, expectedStreetName, streetModes);
+  }
+
+  private void assertLinking(
+    GenericLocation location,
+    LinkingTestCase expectedFromStreetName,
+    LinkingTestCase expectedToStreetName,
     StreetMode... streetModes
   ) {
     for (final StreetMode streetMode : streetModes) {
@@ -283,27 +291,45 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     );
   }
 
-  private static final double setupStreetLongitude(int index) {
-    return LONGITUDE_0 + STREET_DELTA * index;
-  }
+  /**
+   * A linking test case consists of a street with a given traversal permission and can be used to
+   * provide a generic location close, but not directly on, the street. When linking the location
+   * the test-case should be the first choice if the permissions are ok, if not link to the nearby
+   * test-case streets.
+   */
+  record LinkingTestCase(
+    String name,
+    int index,
+    double longitude,
+    StreetTraversalPermission permissions
+  ) {
+    private static int indexCounter = 0;
 
-  /** Street test case */
-  record StreetTC(String name, int index, double longitude, StreetTraversalPermission permissions) {
-    static StreetTC of(StreetTraversalPermission permission) {
+    /**
+     * Generate a street from A to B. The streets are horisontal and paralell to each other with
+     * about 10-11m apart (see {@link #STREET_DELTA}).
+     */
+    static LinkingTestCase of(StreetTraversalPermission permission) {
       var name =
         permission.name().charAt(0) +
         permission.name().substring(1).toLowerCase(Locale.ROOT).replace("_and_", " & ") +
         " st";
-      int index = testCaseIndex++;
+      int index = indexCounter++;
       double longitude = LONGITUDE_0 + STREET_DELTA * index;
-      return new StreetTC(name, index, longitude, permission);
+      return new LinkingTestCase(name, index, longitude, permission);
     }
 
+    /**
+     * Create a random place relativly close, but not on the street generated by this test-case.
+     * The longitude for the place is the same as the street plus the {@link #OFFSET}. If this
+     * test-case is street N, then the closest street for the location is in order:
+     * {@code N, N+1, N-1, N+2, N-2 ... }
+     */
     GenericLocation placeCloseToStreet() {
       return new GenericLocation("On " + name, null, LATITUDE_MIDDLE, longitude + OFFSET);
     }
 
-    StreetEdge streetEdge(GraphRoutingTest.Builder factory, boolean wheelchair) {
+    StreetEdgeBuilder createStreetEdgeBuilder(GraphRoutingTest.Builder factory) {
       var from = factory.intersection("V" + index + "_START", LATITUDE_START, longitude);
       var to = factory.intersection("V" + index + "_END", LATITUDE_END, longitude);
       return new StreetEdgeBuilder<>()
@@ -315,9 +341,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         .withName(name)
         .withMeterLength(100)
         .withPermission(permissions)
-        .withBack(false)
-        .withWheelchairAccessible(wheelchair)
-        .buildAndConnect();
+        .withBack(false);
     }
   }
 }
