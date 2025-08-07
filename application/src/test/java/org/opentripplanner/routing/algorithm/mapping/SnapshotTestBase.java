@@ -39,6 +39,7 @@ import org.opentripplanner.TestServerContext;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -176,37 +177,41 @@ public abstract class SnapshotTestBase {
   }
 
   protected void expectRequestResponseToMatchSnapshot(RouteRequest request) {
-    List<Itinerary> itineraries = retrieveItineraries(request);
+    OTPFeature.ConsiderIncomingEdgeInDominance.testOn(() -> {
+      List<Itinerary> itineraries = retrieveItineraries(request);
 
-    logDebugInformationOnFailure(request, () -> expectItinerariesToMatchSnapshot(itineraries));
+      logDebugInformationOnFailure(request, () -> expectItinerariesToMatchSnapshot(itineraries));
+    });
   }
 
   protected void expectArriveByToMatchDepartAtAndSnapshot(RouteRequest request) {
-    List<Itinerary> departByItineraries = retrieveItineraries(request);
+    OTPFeature.ConsiderIncomingEdgeInDominance.testOn(() -> {
+      List<Itinerary> departByItineraries = retrieveItineraries(request);
 
-    logDebugInformationOnFailure(request, () -> assertFalse(departByItineraries.isEmpty()));
+      logDebugInformationOnFailure(request, () -> assertFalse(departByItineraries.isEmpty()));
 
-    logDebugInformationOnFailure(request, () ->
-      expectItinerariesToMatchSnapshot(departByItineraries)
-    );
+      logDebugInformationOnFailure(request, () ->
+        expectItinerariesToMatchSnapshot(departByItineraries)
+      );
 
-    RouteRequest arriveBy = request
-      .copyOf()
-      .withArriveBy(true)
-      .withDateTime(departByItineraries.get(0).legs().getLast().endTime().toInstant())
-      .buildRequest();
+      RouteRequest arriveBy = request
+        .copyOf()
+        .withArriveBy(true)
+        .withDateTime(departByItineraries.get(0).legs().getLast().endTime().toInstant())
+        .buildRequest();
 
-    List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy);
+      List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy);
 
-    var departAtItinerary = departByItineraries.get(0);
-    var arriveByItinerary = arriveByItineraries.get(0);
+      var departAtItinerary = departByItineraries.get(0);
+      var arriveByItinerary = arriveByItineraries.get(0);
 
-    logDebugInformationOnFailure(arriveBy, () ->
-      assertEquals(
-        asJsonString(itineraryMapper.mapItinerary(departAtItinerary)),
-        asJsonString(itineraryMapper.mapItinerary(arriveByItinerary))
-      )
-    );
+      logDebugInformationOnFailure(arriveBy, () ->
+        assertEquals(
+          asJsonString(itineraryMapper.mapItinerary(departAtItinerary)),
+          asJsonString(itineraryMapper.mapItinerary(arriveByItinerary))
+        )
+      );
+    });
   }
 
   protected void expectItinerariesToMatchSnapshot(List<Itinerary> itineraries) {

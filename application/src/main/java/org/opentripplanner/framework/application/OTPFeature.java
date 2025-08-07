@@ -33,6 +33,22 @@ public enum OTPFeature {
     ConsiderPatternsForDirectTransfers is off has no effect.
     """
   ),
+  ConsiderIncomingEdgeInDominance(
+    false,
+    false,
+    """
+    Turning this on will consider the incoming edge in the dominance function in A* search, such
+    that multiple states from different edges are all kept. This is needed to ensure that the
+    optimal path is found because the turn cost depends on both the incoming edge and the
+    outgoing edge.
+
+    If this is not enabled, such states are kept only for limited edge cases which may be required
+    to produce a result at all. This makes the search much faster at the expense of possibly
+    producing suboptimal results.
+
+    For more information, see https://github.com/opentripplanner/OpenTripPlanner/pull/6777
+    """
+  ),
   ConsiderPatternsForDirectTransfers(
     true,
     false,
