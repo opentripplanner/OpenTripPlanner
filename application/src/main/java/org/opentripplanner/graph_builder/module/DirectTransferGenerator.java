@@ -363,7 +363,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         if (sd.stop == stop) {
           continue;
         }
-        if (mode.includesBiking() && doesNotServeBikes(bikesAllowedStops, sd.stop)) {
+        if (mode == StreetMode.BIKE && doesNotServeBikes(bikesAllowedStops, sd.stop)) {
           continue;
         }
 
