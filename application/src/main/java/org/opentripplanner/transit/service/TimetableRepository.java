@@ -40,7 +40,6 @@ import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.transit.model.basic.Notice;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -586,26 +585,45 @@ public class TimetableRepository implements Serializable {
    * @return set of stop locations that are used for trips that allow cars
    */
   public Set<StopLocation> getStopLocationsUsedForCarsAllowedTrips() {
-    Predicate<TripTimes> tripTimesPredicate = tt ->
-      tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED;
-    return getStopLocationsForTripTimesPredicate(tripTimesPredicate);
+    Set<StopLocation> stopLocations = getAllTripPatterns()
+      .stream()
+      .filter(t ->
+        t
+          .getScheduledTimetable()
+          .getTripTimes()
+          .stream()
+          .anyMatch(tt -> tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED)
+      )
+      .flatMap(t -> t.getStops().stream())
+      .collect(Collectors.toSet());
+
+    stopLocations.addAll(
+      stopLocations
+        .stream()
+        .filter(GroupStop.class::isInstance)
+        .map(GroupStop.class::cast)
+        .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
+        .toList()
+    );
+    return stopLocations;
   }
 
   /**
    * Get the stops that are used by transit capable of transporting bikes.
+   * Real-time updates are not considered.
    */
   public Set<StopLocation> getStopLocationsUsedForBikesAllowedTrips() {
-    Predicate<TripTimes> tripTimesPredicate = tt ->
-      tt.getTrip().getBikesAllowed() == BikeAccess.ALLOWED;
-    return getStopLocationsForTripTimesPredicate(tripTimesPredicate);
-  }
-
-  private Set<StopLocation> getStopLocationsForTripTimesPredicate(
-    Predicate<TripTimes> tripTimesPredicate
-  ) {
     Set<StopLocation> stopLocations = getAllTripPatterns()
       .stream()
-      .filter(t -> t.getScheduledTimetable().getTripTimes().stream().anyMatch(tripTimesPredicate))
+      .filter(
+        t ->
+          t.getRoute().getBikesAllowed() == BikeAccess.ALLOWED ||
+          t
+            .getScheduledTimetable()
+            .getTripTimes()
+            .stream()
+            .anyMatch(tt -> tt.getTrip().getBikesAllowed() == BikeAccess.ALLOWED)
+      )
       .flatMap(t -> t.getStops().stream())
       .collect(Collectors.toSet());
 

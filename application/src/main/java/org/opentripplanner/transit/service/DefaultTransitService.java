@@ -392,12 +392,6 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<Trip> findTrips(StopLocation stop) {
-    OTPRequestTimeoutException.checkForTimeout();
-    return timetableRepositoryIndex.getTripsForStop(stop);
-  }
-
-  @Override
   public MultiModalStation findMultiModalStation(Station station) {
     return this.timetableRepository.getSiteRepository().getMultiModalStationForStation(station);
   }

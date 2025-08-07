@@ -57,7 +57,16 @@ public enum OTPFeature {
   LimitBikeTransfer(
     false,
     false,
-    "Limit the generation of bike transfers to only stops serving bikes or empty stops."
+    """
+    Limit the generation of bike transfers to only stops serving bikes.
+
+    If ConsiderPatternsForDirectTransfers is off, unused stops are also included in case a
+    real-time bike trip uses an otherwise-unused stop.
+
+    If ConsiderPatternsForDirectTransfers is on, unused stops are not included because of how that
+    feature works. IncludeEmptyRailStopsInTransfers can be used to include unused rail stops in
+    such case.
+    """
   ),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer

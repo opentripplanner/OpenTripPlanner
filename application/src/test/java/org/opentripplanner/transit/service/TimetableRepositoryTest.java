@@ -4,8 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.stopPattern;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.tripPattern;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner._support.time.ZoneIds;
@@ -15,8 +20,12 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -119,5 +128,23 @@ class TimetableRepositoryTest {
     var stop = TimetableRepositoryForTest.of().stop("stop-1").build();
     repo.addScheduledStopPointMapping(Map.of(sspId, stop));
     assertEquals(stop, repo.findStopByScheduledStopPoint(sspId).get());
+  }
+
+  @Test
+  void stopsUsedForBike() {
+    var repo = new TimetableRepository();
+    var S11 = TimetableRepositoryForTest.of().stop("S11").build();
+    var S12 = TimetableRepositoryForTest.of().stop("S12").build();
+    var S13 = TimetableRepositoryForTest.of().stop("S13").build();
+    var S21 = TimetableRepositoryForTest.of().stop("S21").build();
+    var S22 = TimetableRepositoryForTest.of().stop("S22").build();
+    var S23 = TimetableRepositoryForTest.of().stop("S23").build();
+    var R1 = route("R1").withMode(TransitMode.BUS).build();
+    var R2 = route("R2").withMode(TransitMode.BUS).withBikesAllowed(BikeAccess.ALLOWED).build();
+    var TP1 = tripPattern("TP1", R1).withStopPattern(stopPattern(S11, S12, S13)).build();
+    var TP2 = tripPattern("TP2", R2).withStopPattern(stopPattern(S21, S22, S23)).build();
+    repo.addTripPattern(id("TP1"), TP1);
+    repo.addTripPattern(id("TP2"), TP2);
+    assertEquals(Set.of(S21, S22, S23), repo.getStopLocationsUsedForBikesAllowedTrips());
   }
 }

@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
@@ -30,6 +31,7 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -414,6 +416,65 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   }
 
   @Test
+  public void testBikeRequestWithLimitBikeTransferConsideringPattern() {
+    OTPFeature.LimitBikeTransfer.testOn(() ->
+      OTPFeature.IncludeEmptyRailStopsInTransfers.testOn(() -> {
+        var transferRequests = List.of(REQUEST_WITH_BIKE_TRANSFER);
+
+        TestOtpModel model = model(true);
+        var graph = model.graph();
+        graph.hasStreets = true;
+
+        var timetableRepository = model.timetableRepository();
+        new DirectTransferGenerator(
+          graph,
+          timetableRepository,
+          DataImportIssueStore.NOOP,
+          MAX_TRANSFER_DURATION,
+          transferRequests
+        ).buildGraph();
+
+        var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
+        assertTransfers(bikeTransfers, tr(S0, 100, List.of(V0, V21), S21));
+      })
+    );
+  }
+
+  @Test
+  public void testBikeRequestWithLimitBikeTransferWithoutConsideringPattern() {
+    OTPFeature.LimitBikeTransfer.testOn(() ->
+      OTPFeature.ConsiderPatternsForDirectTransfers.testOff(() -> {
+        var transferRequests = List.of(REQUEST_WITH_BIKE_TRANSFER);
+
+        TestOtpModel model = model(true);
+        var graph = model.graph();
+        graph.hasStreets = true;
+
+        var timetableRepository = model.timetableRepository();
+        new DirectTransferGenerator(
+          graph,
+          timetableRepository,
+          DataImportIssueStore.NOOP,
+          MAX_TRANSFER_DURATION,
+          transferRequests
+        ).buildGraph();
+
+        var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
+        assertTransfers(
+          bikeTransfers,
+          // no transfers involving S11, S12 and S13
+          tr(S0, 100, List.of(V0, V21), S21),
+          tr(S0, 200, List.of(V0, V22), S22),
+          tr(S0, 300, List.of(V0, V22, V23), S23),
+          tr(S21, 100, List.of(V21, V22), S22),
+          tr(S21, 200, List.of(V21, V22, V23), S23),
+          tr(S22, 100, List.of(V22, V23), S23)
+        );
+      })
+    );
+  }
+
+  @Test
   public void testBikeRequestWithPatternsAndWithCarsAllowedPatternsWithoutCarInTransferRequests() {
     var transferRequests = List.of(REQUEST_WITH_BIKE_TRANSFER);
 
@@ -551,7 +612,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
             builder.withTransfersNotAllowed(withNoTransfersOnStations)
           );
 
-          S0 = stop("S0", 47.495, 19.001, station);
+          S0 = stop("S0", 47.495, 19.001, station, TransitMode.RAIL);
           S11 = stop("S11", 47.500, 19.001, station);
           S12 = stop("S12", 47.520, 19.001, station);
           S13 = stop("S13", 47.540, 19.001, station);
@@ -601,7 +662,12 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
             tripPattern(
               TripPattern.of(TimetableRepositoryForTest.id("TP2"))
-                .withRoute(route("R2", TransitMode.BUS, agency))
+                .withRoute(
+                  route("R2", TransitMode.BUS, agency)
+                    .copy()
+                    .withBikesAllowed(BikeAccess.ALLOWED)
+                    .build()
+                )
                 .withStopPattern(new StopPattern(List.of(st(S21), st(S22), st(S23))))
                 .build()
             );

@@ -139,11 +139,6 @@ public interface TransitService {
    */
   Collection<TripPattern> findPatterns(StopLocation stop, boolean includeRealtimeUpdates);
 
-  /**
-   * Return all the trips for a specific stop (not taking into account real-time updates).
-   */
-  Collection<Trip> findTrips(StopLocation stop);
-
   Collection<Operator> listOperators();
 
   Operator getOperator(FeedScopedId id);

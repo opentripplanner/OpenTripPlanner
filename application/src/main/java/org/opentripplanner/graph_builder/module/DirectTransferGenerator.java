@@ -25,7 +25,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -54,7 +53,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Graph graph;
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
-  private final TransitService transitService;
 
   /**
    * Constructor used in tests. This initializes transferParametersForMode as an empty map.
@@ -72,7 +70,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
     this.transferRequests = transferRequests;
     this.transferParametersForMode = Map.of();
-    this.transitService = new DefaultTransitService(timetableRepository);
   }
 
   public DirectTransferGenerator(
@@ -89,7 +86,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
     this.transferRequests = transferRequests;
     this.transferParametersForMode = transferParametersForMode;
-    this.transitService = new DefaultTransitService(timetableRepository);
   }
 
   @Override
@@ -136,7 +132,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     stops
       .stream()
-      .parallel()
+      //.parallel()
       .forEach(ts0 -> {
         /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
          * Use map based on the list of edges, so that only distinct transfers are stored. */
@@ -334,6 +330,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   }
 
   private boolean doesNotServeBikes(Set<StopLocation> bikesAllowedStops, StopLocation stop) {
+    var transitService = new DefaultTransitService(timetableRepository);
     if (OTPFeature.LimitBikeTransfer.isOff()) {
       return false;
     }
