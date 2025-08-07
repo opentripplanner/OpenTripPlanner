@@ -50,6 +50,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Allow filtering of intermediate stops in GraphQL API [#6725](https://github.com/opentripplanner/OpenTripPlanner/pull/6725)
 - VehicleRental: simplify form factor mapping to allow moped rentals [#6720](https://github.com/opentripplanner/OpenTripPlanner/pull/6720)
 - Extract interpolation logic for GTFS-RT trip time updater [#6729](https://github.com/opentripplanner/OpenTripPlanner/pull/6729)
+- Handle alerts for stations [#6750](https://github.com/opentripplanner/OpenTripPlanner/pull/6750)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
