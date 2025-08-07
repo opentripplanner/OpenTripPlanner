@@ -153,10 +153,10 @@ class TripTimesForDaysIndexTest {
   }
 
   static List<int[]> toTimes(String list) {
-    // String.split has surprising behavior which will fail to split the string "|" to two empty strings
+    // The limit is needed to split | into two empty strings
     // https://errorprone.info/bugpattern/StringSplitter
-    var args = Splitter.on("|").splitToStream(list);
-    return args
+    var args = list.split("\\|", -1);
+    return Arrays.stream(args)
       .map(it ->
         it.trim().isEmpty()
           ? new int[0]
