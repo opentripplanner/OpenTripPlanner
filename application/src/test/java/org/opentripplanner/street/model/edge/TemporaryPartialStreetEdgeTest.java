@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -40,10 +42,11 @@ public class TemporaryPartialStreetEdgeTest {
     v3 = vertex("maple_3rd", 0.0, 2.0);
     v4 = vertex("maple_4th", -1.0, 2.0);
 
-    e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
-    e1Reverse = edge(v2, v1, 1.0, StreetTraversalPermission.ALL);
-    e2 = edge(v2, v3, 1.0, StreetTraversalPermission.ALL);
-    e3 = edge(v3, v4, 1.0, StreetTraversalPermission.ALL);
+    LineString geom = GeometryUtils.makeLineString(2.0, 2.0, 3, 1, 2.0, 1.0);
+    e1 = edge(v1, v2, StreetTraversalPermission.ALL, geom);
+    e1Reverse = edge(v2, v1, StreetTraversalPermission.ALL, geom.reverse());
+    e2 = edge(v2, v3, StreetTraversalPermission.ALL, null);
+    e3 = edge(v3, v4, StreetTraversalPermission.ALL, null);
   }
 
   @Test
@@ -63,6 +66,8 @@ public class TemporaryPartialStreetEdgeTest {
     assertTrue(pEdge.isReverseOf(e1Reverse));
     assertEquals(e1.getPermission(), pEdge.getPermission());
     assertEquals(e1.getCarSpeed(), pEdge.getCarSpeed(), 0.0);
+    assertEquals(e1.getOutAngle(), pEdge.getOutAngle());
+    assertEquals(e1.getInAngle(), pEdge.getInAngle());
   }
 
   @Test
@@ -266,8 +271,8 @@ public class TemporaryPartialStreetEdgeTest {
   private StreetEdge edge(
     StreetVertex vA,
     StreetVertex vB,
-    double length,
-    StreetTraversalPermission perm
+    StreetTraversalPermission perm,
+    @Nullable LineString geom
   ) {
     var labelA = vA.getLabel();
     var labelB = vB.getLabel();
@@ -275,14 +280,16 @@ public class TemporaryPartialStreetEdgeTest {
     Coordinate[] coords = new Coordinate[2];
     coords[0] = vA.getCoordinate();
     coords[1] = vB.getCoordinate();
-    LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+    if (geom == null) {
+      geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+    }
 
     return new StreetEdgeBuilder<>()
       .withFromVertex(vA)
       .withToVertex(vB)
       .withGeometry(geom)
       .withName(name)
-      .withMeterLength(length)
+      .withMeterLength(geom.getLength())
       .withPermission(perm)
       .withBack(false)
       .buildAndConnect();
