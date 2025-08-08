@@ -361,7 +361,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     }
 
     // Get new TripTimes based on scheduled timetable
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       pattern.getScheduledTimetable(),
       tripUpdate,
       timeZone,
@@ -556,7 +556,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       return UpdateError.result(tripId, TOO_FEW_STOPS);
     }
 
-    var result = TripTimesUpdater.createNewTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createNewTripTimesFromGtfsRt(
       trip,
       getWheelchairAccessibility(tripUpdate).orElse(null),
       stopAndStopTimeUpdates,

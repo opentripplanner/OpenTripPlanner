@@ -85,7 +85,7 @@ public class TripTimesUpdaterTest {
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
     var tripUpdate = tripUpdateBuilder.build();
 
-    Result<TripTimesPatch, UpdateError> result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    Result<TripTimesPatch, UpdateError> result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -115,7 +115,7 @@ public class TripTimesUpdaterTest {
     stopTimeUpdateBuilder.setStopSequence(0);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
     tripUpdate = tripUpdateBuilder.build();
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -146,7 +146,7 @@ public class TripTimesUpdaterTest {
       LocalDateTime.of(2009, Month.AUGUST, 7, 0, 10, 0, 0).atZone(TIME_ZONE).toEpochSecond()
     );
     var tripUpdate = tripUpdateBuilder.build();
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -182,7 +182,7 @@ public class TripTimesUpdaterTest {
     var tripUpdate = tripUpdateBuilder.build();
     var timetable = TripTimesUpdaterTest.timetable;
     assertEquals(20 * 60, timetable.getTripTimes(tripId).getArrivalTime(2));
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -209,7 +209,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(0);
     tripUpdate = tripUpdateBuilder.build();
-    result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -238,7 +238,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder.setDelay(1);
     tripUpdate = tripUpdateBuilder.build();
 
-    result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -265,7 +265,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setDelay(120);
     tripUpdate = tripUpdateBuilder.build();
-    result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -291,7 +291,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setDelay(120);
     tripUpdate = tripUpdateBuilder.build();
-    result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -326,7 +326,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder.setDelay(-1);
     var tripUpdate = tripUpdateBuilder.build();
 
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -349,7 +349,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder.setDelay(15);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -391,7 +391,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder.setDelay(40);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -429,7 +429,7 @@ public class TripTimesUpdaterTest {
     stopTimeUpdateBuilder.setStopSequence(3);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -480,7 +480,7 @@ public class TripTimesUpdaterTest {
       .setPickupType(StopTimeUpdate.StopTimeProperties.DropOffPickupType.NONE)
       .setDropOffType(StopTimeUpdate.StopTimeProperties.DropOffPickupType.COORDINATE_WITH_DRIVER);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -530,7 +530,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(15);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -570,7 +570,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder.setDelay(15);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -605,7 +605,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder.setDelay(15);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -636,7 +636,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder.setDelay(15);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -663,7 +663,7 @@ public class TripTimesUpdaterTest {
     StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(-100);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -704,7 +704,7 @@ public class TripTimesUpdaterTest {
     StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(-700);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -750,7 +750,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(15);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -784,7 +784,7 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder.setDelay(-700);
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -835,7 +835,7 @@ public class TripTimesUpdaterTest {
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -882,7 +882,7 @@ public class TripTimesUpdaterTest {
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -928,7 +928,7 @@ public class TripTimesUpdaterTest {
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -964,7 +964,7 @@ public class TripTimesUpdaterTest {
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -1010,7 +1010,7 @@ public class TripTimesUpdaterTest {
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       timetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -1064,7 +1064,7 @@ public class TripTimesUpdaterTest {
     var scheduledTimetable = patternIndex
       .get(new FeedScopedId(feedId, TRIP_ID_WITH_MORE_STOPS))
       .getScheduledTimetable();
-    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       scheduledTimetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -1129,7 +1129,7 @@ public class TripTimesUpdaterTest {
       .get(new FeedScopedId(feedId, TRIP_ID_WITH_MORE_STOPS))
       .getScheduledTimetable();
 
-    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
       scheduledTimetable,
       new TripUpdate(tripUpdate),
       TIME_ZONE,
@@ -1191,7 +1191,7 @@ public class TripTimesUpdaterTest {
       builder.addRawStopTime(emptyStopTime(2, setEmptyEvent));
       GtfsRealtime.TripUpdate tripUpdate = builder.build();
 
-      var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
         timetable,
         new TripUpdate(tripUpdate),
         TIME_ZONE,

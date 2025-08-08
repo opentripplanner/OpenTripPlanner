@@ -70,7 +70,7 @@ class TripTimesUpdater {
    * trip descriptor of the TripUpdate and a list of stop indices that have been skipped with the
    * realtime update; or an error if something went wrong
    */
-  public static Result<TripTimesPatch, UpdateError> createUpdatedTripTimesFromGTFSRT(
+  public static Result<TripTimesPatch, UpdateError> createUpdatedTripTimesFromGtfsRt(
     Timetable timetable,
     TripUpdate tripUpdate,
     ZoneId timeZone,
@@ -228,7 +228,7 @@ class TripTimesUpdater {
    * @param realTimeState     real-time state of new trip
    * @return empty Result if successful or one containing an error
    */
-  public static Result<TripTimesWithStopPattern, UpdateError> createNewTripTimesFromGTFSRT(
+  public static Result<TripTimesWithStopPattern, UpdateError> createNewTripTimesFromGtfsRt(
     Trip trip,
     @Nullable Accessibility wheelchairAccessibility,
     List<StopAndStopTimeUpdate> stopAndStopTimeUpdates,
