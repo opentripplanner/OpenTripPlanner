@@ -406,8 +406,8 @@ public class GtfsRealTimeTripUpdateAdapter {
     if (!updatedPickup.isEmpty() || !updatedDropoff.isEmpty() || !newStops.isEmpty()) {
       StopPattern newStopPattern = pattern
         .copyPlannedStopPattern()
-        .updatePickup(updatedPickup)
-        .updateDropoff(updatedDropoff)
+        .updatePickups(updatedPickup)
+        .updateDropoffs(updatedDropoff)
         .replaceStops(newStops)
         .build();
 
@@ -535,7 +535,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     TripUpdate tripUpdate,
     LocalDate serviceDate,
     RealTimeState realTimeState,
-    boolean isAddedRoute
+    boolean hasANewRouteBeenCreated
   ) {
     FeedScopedId tripId = trip.getId();
     var stopAndStopTimeUpdates = matchStopsToStopTimeUpdates(tripUpdate, tripId, serviceDate);
@@ -570,7 +570,7 @@ public class GtfsRealTimeTripUpdateAdapter {
 
     return result
       .flatMap(value ->
-        addNewOrReplacementTripToSnapshot(value, serviceDate, realTimeState, isAddedRoute)
+        addNewOrReplacementTripToSnapshot(value, serviceDate, realTimeState, hasANewRouteBeenCreated)
       )
       .mapSuccess(s -> s.addWarnings(warnings));
   }
@@ -653,7 +653,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     final TripTimesWithStopPattern tripTimesWithStopPattern,
     final LocalDate serviceDate,
     final RealTimeState realTimeState,
-    final boolean isAddedRoute
+    final boolean hasANewRouteBeenCreated
   ) {
     RealTimeTripTimes tripTimes = tripTimesWithStopPattern.tripTimes();
     Trip trip = tripTimes.getTrip();
@@ -694,7 +694,7 @@ public class GtfsRealTimeTripUpdateAdapter {
           ? TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(serviceDate).build()
           : null,
         realTimeState == RealTimeState.ADDED,
-        isAddedRoute
+        hasANewRouteBeenCreated
       )
     );
   }
