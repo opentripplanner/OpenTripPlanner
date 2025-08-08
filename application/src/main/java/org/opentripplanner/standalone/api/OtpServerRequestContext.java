@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -146,6 +147,7 @@ public interface OtpServerRequestContext {
   /* Sandbox modules */
 
   @Nullable
+<<<<<<< HEAD
   default List<ExtensionRequestContext> listExtensionRequestContexts(RouteRequest request) {
     var list = new ArrayList<ExtensionRequestContext>();
     if (OTPFeature.DataOverlay.isOn()) {
@@ -157,6 +159,18 @@ public interface OtpServerRequestContext {
       );
     }
     return list;
+=======
+  CarpoolingService carpoolingService();
+
+  @Nullable
+  default DataOverlayContext dataOverlayContext(RouteRequest request) {
+    return OTPFeature.DataOverlay.isOnElseNull(() ->
+      new DataOverlayContext(
+        graph().dataOverlayParameterBindings,
+        request.preferences().system().dataOverlay()
+      )
+    );
+>>>>>>> 5bec82e6a3 (feat: carpooling skeleton)
   }
 
   @Nullable
