@@ -127,8 +127,8 @@ public final class StopTimeUpdate {
   public boolean isArrivalValid() {
     return (
       !stopTimeUpdate.hasArrival() ||
-        stopTimeUpdate.getArrival().hasTime() ||
-        stopTimeUpdate.getArrival().hasDelay()
+      stopTimeUpdate.getArrival().hasTime() ||
+      stopTimeUpdate.getArrival().hasDelay()
     );
   }
 
@@ -140,15 +140,15 @@ public final class StopTimeUpdate {
   public boolean isDepartureValid() {
     return (
       !stopTimeUpdate.hasDeparture() ||
-        stopTimeUpdate.getDeparture().hasTime() ||
-        stopTimeUpdate.getDeparture().hasDelay()
+      stopTimeUpdate.getDeparture().hasTime() ||
+      stopTimeUpdate.getDeparture().hasDelay()
     );
   }
 
   public boolean isSkipped() {
     return (
       stopTimeUpdate.getScheduleRelationship() ==
-        GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED
+      GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED
     );
   }
 
@@ -164,9 +164,9 @@ public final class StopTimeUpdate {
 
   public Optional<I18NString> stopHeadsign() {
     return (
-      stopTimeUpdate.hasStopTimeProperties() &&
+        stopTimeUpdate.hasStopTimeProperties() &&
         stopTimeUpdate.getStopTimeProperties().hasStopHeadsign()
-    )
+      )
       ? Optional.of(I18NString.of(stopTimeUpdate.getStopTimeProperties().getStopHeadsign()))
       : Optional.empty();
   }

@@ -570,7 +570,12 @@ public class GtfsRealTimeTripUpdateAdapter {
 
     return result
       .flatMap(value ->
-        addNewOrReplacementTripToSnapshot(value, serviceDate, realTimeState, hasANewRouteBeenCreated)
+        addNewOrReplacementTripToSnapshot(
+          value,
+          serviceDate,
+          realTimeState,
+          hasANewRouteBeenCreated
+        )
       )
       .mapSuccess(s -> s.addWarnings(warnings));
   }
