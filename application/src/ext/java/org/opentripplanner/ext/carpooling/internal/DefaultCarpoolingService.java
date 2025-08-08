@@ -19,7 +19,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *   DIRECT_DISTANCE = SphericalDistanceLibrary.fastDistance(fromLocation, toLocation)
    *   // 3000m is about 45 minutes of walking
    *   MAX_WALK_DISTANCE = max(DIRECT_DISTANCE, 3000m)
-   *   MAX_COST = DIRECT_DISTANCE * walkReluctance
+   *   MAX_COST = MAX_WALK_DISTANCE * walkReluctance + DIRECT_DISTANCE - MAX_WALK_DISTANCE
    *
    * Search for access / egress candidates (AreaStops) using
    * - accessDistance = SphericalDistanceLibrary.fastDistance(fromLocation, stop.center);
