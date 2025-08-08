@@ -13,7 +13,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 class CalculateOnDemandRaptorTransferIndex implements RaptorTransferIndex {
 
   private final List<List<Transfer>> forwardTransfers;
-  private final List<List<TransferWithSource>> reversedTransfers;
+  private List<List<TransferWithSource>> reversedTransfers;
   private final Collection<DefaultRaptorTransfer>[] forwardRaptorTransfers;
 
   private final Collection<DefaultRaptorTransfer>[] reversedRaptorTransfers;
@@ -26,25 +26,30 @@ class CalculateOnDemandRaptorTransferIndex implements RaptorTransferIndex {
     List<List<Transfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {
-    forwardTransfers = transfersByStopIndex;
-    reversedTransfers = Stream.generate(() ->
-      (List<TransferWithSource>) new ArrayList<TransferWithSource>()
-    )
-      .limit(transfersByStopIndex.size())
-      .toList();
     this.request = request;
+    forwardTransfers = transfersByStopIndex;
 
-    for (var i = 0; i < transfersByStopIndex.size(); ++i) {
-      var transfers = transfersByStopIndex.get(i);
-      for (var transfer : transfers) {
-        reversedTransfers.get(transfer.getToStop()).add(new TransferWithSource(transfer, i));
+    //noinspection unchecked
+    forwardRaptorTransfers = new Collection[transfersByStopIndex.size()];
+    //noinspection unchecked
+    reversedRaptorTransfers = new Collection[transfersByStopIndex.size()];
+  }
+
+  private synchronized void initializeReversedTransfers() {
+    if (reversedTransfers == null) {
+      reversedTransfers = Stream.generate(() ->
+        (List<TransferWithSource>) new ArrayList<TransferWithSource>()
+      )
+        .limit(forwardTransfers.size())
+        .toList();
+
+      for (var i = 0; i < forwardTransfers.size(); ++i) {
+        var transfers = forwardTransfers.get(i);
+        for (var transfer : transfers) {
+          reversedTransfers.get(transfer.getToStop()).add(new TransferWithSource(transfer, i));
+        }
       }
     }
-
-    //noinspection unchecked
-    forwardRaptorTransfers = new Collection[forwardTransfers.size()];
-    //noinspection unchecked
-    reversedRaptorTransfers = new Collection[reversedTransfers.size()];
   }
 
   @Override
@@ -61,6 +66,8 @@ class CalculateOnDemandRaptorTransferIndex implements RaptorTransferIndex {
 
   @Override
   public Collection<DefaultRaptorTransfer> getReversedTransfers(int stopIndex) {
+    initializeReversedTransfers();
+
     if (reversedRaptorTransfers[stopIndex] == null) {
       reversedRaptorTransfers[stopIndex] = getReversedRaptorTransfers(
         reversedTransfers.get(stopIndex)
