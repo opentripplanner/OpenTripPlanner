@@ -66,6 +66,36 @@ public class TemporaryPartialStreetEdgeTest {
   }
 
   @Test
+  void testAngles() {
+    var from = vertex("from", 0, 0);
+    var to = vertex("to", 0.001, 0.002);
+    var geom = GeometryUtils.makeLineString(0, 0, 0.001, 0.001, 0.002, 0.001);
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(from)
+      .withToVertex(to)
+      .withGeometry(geom)
+      .withMeterLength(geom.getLength())
+      .withBack(false)
+      .withPermission(StreetTraversalPermission.ALL)
+      .buildAndConnect();
+
+    TemporaryPartialStreetEdge pEdge = newTemporaryPartialStreetEdge(
+      edge,
+      from,
+      to,
+      edge.getGeometry(),
+      "pEdge",
+      edge.getDistanceMeters()
+    );
+
+    // this need to be changed when the internal representation changes to north based
+    assertEquals(-135, edge.getInAngle(), 2);
+    assertEquals(-90, edge.getOutAngle(), 2);
+    assertEquals(-135, pEdge.getInAngle(), 2);
+    assertEquals(-90, pEdge.getOutAngle(), 2);
+  }
+
+  @Test
   public void testTraversal() {
     StreetSearchRequest request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();
 
