@@ -118,11 +118,12 @@ public class OsmEntity {
     "chain",
     "fence",
     "jersey_barrier",
-    "kerb",
     "log",
     "tank_trap",
     "tyres"
   );
+
+  private static final Set<String> WHEELCHAIR_ACCESSIBLE_KERBS = Set.of("flush", "lowered", "no");
 
   private static final Consumer<String> NO_OP = i -> {};
 
@@ -779,10 +780,19 @@ public class OsmEntity {
    *         of other information.
    */
   public boolean isWheelchairAccessible() {
-    return (
-      isTagTrue("wheelchair") ||
-      (!isTagFalse("wheelchair") && !isOneOfTags("barrier", WHEELCHAIR_INACCESSIBLE_BARRIERS))
-    );
+    if (isTagTrue("wheelchair")) {
+      return true;
+    }
+    if (isTagFalse("wheelchair")) {
+      return false;
+    }
+    if (isOneOfTags("barrier", WHEELCHAIR_INACCESSIBLE_BARRIERS)) {
+      return false;
+    }
+    if (isTag("barrier", "kerb")) {
+      return isOneOfTags("kerb", WHEELCHAIR_ACCESSIBLE_KERBS);
+    }
+    return true;
   }
 
   /**

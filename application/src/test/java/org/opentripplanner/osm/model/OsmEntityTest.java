@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -214,12 +215,27 @@ public class OsmEntityTest {
     var osm3 = new OsmEntity();
     osm3.addTag("wheelchair", "yes");
     assertTrue(osm3.isWheelchairAccessible());
+  }
 
-    var osm4 = new OsmNode();
-    osm4.addTag("barrier", "stile");
-    assertFalse(osm4.isWheelchairAccessible());
-    osm4.addTag("wheelchair", "yes");
-    assertTrue(osm4.isWheelchairAccessible());
+  private static Stream<Arguments> barrierWheelchairAccessibilityCases() {
+    return Stream.of(
+      Arguments.of(new OsmNode().addTag("barrier", "stile"), false),
+      Arguments.of(new OsmNode().addTag("barrier", "stile").addTag("wheelchair", "yes"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb"), false),
+      // https://wiki.openstreetmap.org/wiki/Key:kerb
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "flush"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "lowered"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "no"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "raised"), false),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "rolled"), false),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "yes"), false)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("barrierWheelchairAccessibilityCases")
+  void isBarrierWheelchairAccessible(OsmEntity osm, boolean expected) {
+    assertEquals(expected, osm.isWheelchairAccessible());
   }
 
   @Test
