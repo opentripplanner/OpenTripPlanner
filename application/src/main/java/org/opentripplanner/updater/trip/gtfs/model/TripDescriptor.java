@@ -9,6 +9,9 @@ import java.util.OptionalInt;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
+/**
+ * Specify which trip a real-time update applies and how it should be applied.
+ */
 public class TripDescriptor {
 
   private final GtfsRealtime.TripDescriptor tripDescriptor;

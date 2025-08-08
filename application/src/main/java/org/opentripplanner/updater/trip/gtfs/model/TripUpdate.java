@@ -6,6 +6,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.i18n.I18NString;
 
+/**
+ * A real-time update for trip, which may contain updated stop times and trip properties.
+ */
 public final class TripUpdate {
 
   private final com.google.transit.realtime.GtfsRealtime.TripUpdate tripUpdate;
