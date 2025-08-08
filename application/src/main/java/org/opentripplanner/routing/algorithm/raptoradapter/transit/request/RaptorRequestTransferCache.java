@@ -6,7 +6,7 @@ import com.google.common.cache.LoadingCache;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndexInterface;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -24,28 +24,29 @@ public class RaptorRequestTransferCache {
 
   private static final Logger LOG = LoggerFactory.getLogger(RaptorRequestTransferCache.class);
 
-  private final LoadingCache<CacheKey, RaptorTransferIndex> transferCache;
+  private final LoadingCache<CacheKey, RaptorTransferIndexInterface> transferCache;
 
   public RaptorRequestTransferCache(int maximumSize) {
     transferCache = CacheBuilder.newBuilder().maximumSize(maximumSize).build(cacheLoader());
   }
 
-  public LoadingCache<CacheKey, RaptorTransferIndex> getTransferCache() {
+  public LoadingCache<CacheKey, RaptorTransferIndexInterface> getTransferCache() {
     return transferCache;
   }
 
   public void put(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
     final CacheKey cacheKey = new CacheKey(transfersByStopIndex, request);
-    final RaptorTransferIndex raptorTransferIndex = RaptorTransferIndex.createInitialSetup(
-      transfersByStopIndex,
-      cacheKey.request
-    );
+    final RaptorTransferIndexInterface raptorTransferIndex =
+      RaptorTransferIndexInterface.createPreCached(transfersByStopIndex, cacheKey.request);
 
     LOG.info("Initializing cache with request: {}", cacheKey.options);
     transferCache.put(cacheKey, raptorTransferIndex);
   }
 
-  public RaptorTransferIndex get(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
+  public RaptorTransferIndexInterface get(
+    List<List<Transfer>> transfersByStopIndex,
+    RouteRequest request
+  ) {
     try {
       return transferCache.get(new CacheKey(transfersByStopIndex, request));
     } catch (ExecutionException e) {
@@ -53,12 +54,12 @@ public class RaptorRequestTransferCache {
     }
   }
 
-  private CacheLoader<CacheKey, RaptorTransferIndex> cacheLoader() {
+  private CacheLoader<CacheKey, RaptorTransferIndexInterface> cacheLoader() {
     return new CacheLoader<>() {
       @Override
-      public RaptorTransferIndex load(CacheKey cacheKey) {
+      public RaptorTransferIndexInterface load(CacheKey cacheKey) {
         LOG.info("Adding runtime request to cache: {}", cacheKey.options);
-        return RaptorTransferIndex.createRequestScope(
+        return RaptorTransferIndexInterface.createOnDemand(
           cacheKey.transfersByStopIndex,
           cacheKey.request
         );

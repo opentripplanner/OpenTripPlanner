@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.street.model.edge.Edge;
@@ -80,7 +79,7 @@ public class Transfer {
     return modes.contains(mode);
   }
 
-  public Optional<RaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
+  public Optional<DefaultRaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
     WalkPreferences walkPreferences = request.preferences().walk();
     if (edges == null || edges.isEmpty()) {
       double durationSeconds = distanceMeters / walkPreferences.speed();
