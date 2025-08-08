@@ -16,7 +16,7 @@ public interface RaptorTransferIndex {
     List<List<Transfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {
-    return new PreCalculatedRaptorTransferIndex(transfersByStopIndex, request);
+    return new PreCachedRaptorTransferIndex(transfersByStopIndex, request);
   }
 
   /**
@@ -26,7 +26,7 @@ public interface RaptorTransferIndex {
     List<List<Transfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {
-    return new CalculateOnDemandRaptorTransferIndex(transfersByStopIndex, request);
+    return new OnDemandRaptorTransferIndex(transfersByStopIndex, request);
   }
 
   static Collection<DefaultRaptorTransfer> getRaptorTransfers(

@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.stream.IntStream;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
-class PreCalculatedRaptorTransferIndex implements RaptorTransferIndex {
+class PreCachedRaptorTransferIndex implements RaptorTransferIndex {
 
   private final List<DefaultRaptorTransfer>[] forwardTransfers;
 
   private final List<DefaultRaptorTransfer>[] reversedTransfers;
 
-  PreCalculatedRaptorTransferIndex(
+  PreCachedRaptorTransferIndex(
     List<List<Transfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {
