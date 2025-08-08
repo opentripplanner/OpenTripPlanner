@@ -327,7 +327,7 @@ public final class StopPattern implements Serializable {
      *
      * @return StopPatternBuilder
      */
-    public StopPatternBuilder updatePickup(Map<Integer, PickDrop> updatedPickups) {
+    public StopPatternBuilder updatePickups(Map<Integer, PickDrop> updatedPickups) {
       for (var entry : updatedPickups.entrySet()) {
         pickups.with(entry.getKey(), entry.getValue());
       }
@@ -339,7 +339,7 @@ public final class StopPattern implements Serializable {
      *
      * @return StopPatternBuilder
      */
-    public StopPatternBuilder updateDropoff(Map<Integer, PickDrop> updatedDropoffs) {
+    public StopPatternBuilder updateDropoffs(Map<Integer, PickDrop> updatedDropoffs) {
       for (var entry : updatedDropoffs.entrySet()) {
         dropoffs.with(entry.getKey(), entry.getValue());
       }

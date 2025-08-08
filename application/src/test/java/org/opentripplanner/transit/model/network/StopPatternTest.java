@@ -96,8 +96,8 @@ class StopPatternTest {
 
     var updated = pattern
       .copyOf()
-      .updatePickup(Map.of(0, PickDrop.CALL_AGENCY, 1, PickDrop.COORDINATE_WITH_DRIVER))
-      .updateDropoff(Map.of(2, PickDrop.CANCELLED))
+      .updatePickups(Map.of(0, PickDrop.CALL_AGENCY, 1, PickDrop.COORDINATE_WITH_DRIVER))
+      .updateDropoffs(Map.of(2, PickDrop.CANCELLED))
       .build();
     assertEquals(PickDrop.CALL_AGENCY, updated.getPickup(0));
     assertEquals(PickDrop.COORDINATE_WITH_DRIVER, updated.getPickup(1));
