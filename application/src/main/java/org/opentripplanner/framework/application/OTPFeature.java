@@ -102,6 +102,7 @@ public enum OTPFeature {
     "Make all polling updaters wait for graph updates to complete before finishing. " +
     "If this is not enabled, the updaters will finish after submitting the task to update the graph."
   ),
+  CarPooling(false, true, "Enable the carpooling sandbox module."),
   Emission(false, true, "Enable the emission sandbox module."),
   DataOverlay(
     false,

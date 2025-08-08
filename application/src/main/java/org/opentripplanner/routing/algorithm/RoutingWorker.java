@@ -104,13 +104,14 @@ public class RoutingWorker {
         var r1 = CompletableFuture.supplyAsync(this::routeDirectStreet);
         var r2 = CompletableFuture.supplyAsync(this::routeDirectFlex);
         var r3 = CompletableFuture.supplyAsync(this::routeTransit);
+        var r4 = CompletableFuture.supplyAsync(this::routeCarpooling);
 
-        result.merge(r1.join(), r2.join(), r3.join());
+        result.merge(r1.join(), r2.join(), r3.join(), r4.join());
       } catch (CompletionException e) {
         RoutingValidationException.unwrapAndRethrowCompletionException(e);
       }
     } else {
-      result.merge(routeDirectStreet(), routeDirectFlex(), routeTransit());
+      result.merge(routeDirectStreet(), routeDirectFlex(), routeTransit(), routeCarpooling());
     }
 
     // Set C2 value for Street and FLEX if transit-group-priority is used
@@ -253,6 +254,23 @@ public class RoutingWorker {
       return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedDirectFlexRouter();
+    }
+  }
+
+  private RoutingResult routeCarpooling() {
+    if (OTPFeature.CarPooling.isOff()) {
+      return RoutingResult.ok(List.of());
+    }
+    // TODO CARPOOLING Add carpooling timer
+    // debugTimingAggregator.startedCarpoolingRouter();
+    try {
+      // TODO CARPOOLING
+      return RoutingResult.ok(serverContext.carpoolingService().route(request));
+    } catch (RoutingValidationException e) {
+      return RoutingResult.failed(e.getRoutingErrors());
+    } finally {
+      // TODO CARPOOLING Add
+      //debugTimingAggregator.finishedCarpoolingRouter();
     }
   }
 
