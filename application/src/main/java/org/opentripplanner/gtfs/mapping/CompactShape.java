@@ -42,13 +42,12 @@ class CompactShape implements Iterable<ShapePoint> {
 
   @Override
   public Iterator<ShapePoint> iterator() {
-    List<ShapePoint> points = IntStream.range(0, lats.size())
+    return IntStream.range(0, lats.size())
       .mapToObj(i -> {
         double dist = dists.get(i);
         return new ShapePoint(seqs.get(i), lats.get(i), lons.get(i), dist < 0 ? null : dist);
       })
-      .collect(Collectors.toList());
-    Collections.sort(points);
-    return points.iterator();
+      .sorted()
+      .iterator();
   }
 }
