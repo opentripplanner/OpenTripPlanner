@@ -15,7 +15,7 @@ import org.opentripplanner.model.ShapePoint;
  * A representation that stores GTFS shape points in a memory-efficient way and allows you to
  * iterate over them for further processing.
  * <p>
- * The fields of ShapePoints are stored densely in an automatically expanding Trove primitive lists.
+ * The fields of ShapePoints are stored densely in automatically expanding Trove primitive lists.
  * When later needed, they are reconstituted into objects and sorted on their sequence number.
  * Only an iterator over the sorted collection escapes rather than the collection itself, providing
  * some assurance that the objects will be quickly garbage collected.
