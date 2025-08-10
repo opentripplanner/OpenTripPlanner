@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.leg.LegCallTime;
