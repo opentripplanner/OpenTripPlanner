@@ -909,7 +909,7 @@ This is mostly used by demand-responsive services.
 type LocationGroup {
   "ÌD of the location group in format `FeedId:LocationGroupId`"
   gtfsId: String!
-  "The members that are part of the group."
+  "The stops that are part of the group (cannot be stations)."
   members: [Stop!]!
   "Optional name of the group."
   name: String
