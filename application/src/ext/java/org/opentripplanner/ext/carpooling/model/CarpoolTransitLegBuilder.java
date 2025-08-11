@@ -9,6 +9,7 @@ import java.util.Set;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class CarpoolTransitLegBuilder {
 
@@ -18,6 +19,7 @@ public class CarpoolTransitLegBuilder {
   private Set<TransitAlert> transitAlerts = new HashSet<>();
   private List<FareProductUse> fareProducts = new ArrayList<>();
   private Emission emissionPerPerson;
+  private Trip trip;
 
   CarpoolTransitLegBuilder() {}
 
@@ -46,6 +48,15 @@ public class CarpoolTransitLegBuilder {
 
   public ZonedDateTime endTime() {
     return endTime;
+  }
+
+  public CarpoolTransitLegBuilder withTrip(Trip trip) {
+    this.trip = trip;
+    return this;
+  }
+
+  public Trip trip() {
+    return trip;
   }
 
   public CarpoolTransitLegBuilder withGeneralizedCost(int generalizedCost) {

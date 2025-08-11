@@ -5,11 +5,10 @@ import dagger.Provides;
 import jakarta.inject.Singleton;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
+import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
+import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingService;
 import org.opentripplanner.framework.application.OTPFeature;
 
-/**
- * TODO CARPOOLING
- */
 @Module
 public class CarpoolingModule {
 
@@ -19,8 +18,7 @@ public class CarpoolingModule {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    // TODO CARPOOLING
-    return null;
+    return new DefaultCarpoolingRepository();
   }
 
   @Provides
@@ -28,7 +26,6 @@ public class CarpoolingModule {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    // TODO CARPOOLING
-    return null;
+    return new DefaultCarpoolingService(repository);
   }
 }

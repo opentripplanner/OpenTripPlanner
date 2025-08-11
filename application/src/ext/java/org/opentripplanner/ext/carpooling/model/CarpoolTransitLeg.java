@@ -46,6 +46,8 @@ public class CarpoolTransitLeg implements TransitLeg {
 
   private final List<FareProductUse> fareProducts;
 
+  private final Trip trip;
+
   CarpoolTransitLeg(CarpoolTransitLegBuilder builder) {
     this.startTime = Objects.requireNonNull(builder.startTime());
     this.endTime = Objects.requireNonNull(builder.endTime());
@@ -53,6 +55,7 @@ public class CarpoolTransitLeg implements TransitLeg {
     this.transitAlerts = Set.copyOf(builder.alerts());
     this.fareProducts = List.copyOf(builder.fareProducts());
     this.emissionPerPerson = builder.emissionPerPerson();
+    this.trip = Objects.requireNonNull(builder.trip(), "Trip must not be null");
   }
 
   /**
@@ -84,8 +87,7 @@ public class CarpoolTransitLeg implements TransitLeg {
 
   @Override
   public Trip trip() {
-    // TODO CARPOOLING
-    return null;
+    return trip;
   }
 
   @Override
