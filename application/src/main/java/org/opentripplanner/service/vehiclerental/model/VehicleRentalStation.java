@@ -393,7 +393,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       .stream()
       .map(vtc -> new RentalVehicleTypeCount(vtc.getKey(), vtc.getValue()))
       // we sort to have reproducible results in tests
-      .sorted(Comparator.comparing(count -> count.vehicleType().id().toString()))
+      .sorted(Comparator.comparing(RentalVehicleTypeCount::vehicleType))
       .toList();
   }
 
