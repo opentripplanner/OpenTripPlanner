@@ -115,16 +115,12 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
     RentalVehicleType that = (RentalVehicleType) o;
-    return (
-      Objects.equals(id, that.id) &&
-      Objects.equals(name, that.name) &&
-      formFactor == that.formFactor &&
-      propulsionType == that.propulsionType &&
-      Objects.equals(maxRangeMeters, that.maxRangeMeters)
-    );
+    return id.equals(that.id);
   }
 
   @Override
