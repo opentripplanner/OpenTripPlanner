@@ -120,6 +120,7 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
     }
 
     RentalVehicleType that = (RentalVehicleType) o;
+
     return id.equals(that.id);
   }
 
