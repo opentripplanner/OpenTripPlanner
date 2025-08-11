@@ -78,8 +78,6 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
     return new Builder(this);
   }
 
-  // New accessor methods following foo() convention
-  @Nullable
   public FeedScopedId id() {
     return id;
   }
@@ -335,7 +333,7 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
       this.availableUntil = original.availableUntil;
     }
 
-    public Builder withId(@Nullable FeedScopedId id) {
+    public Builder withId(FeedScopedId id) {
       this.id = id;
       return this;
     }
