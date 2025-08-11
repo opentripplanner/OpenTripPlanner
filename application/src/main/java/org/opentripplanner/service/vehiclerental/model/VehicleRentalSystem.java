@@ -15,26 +15,37 @@ public final class VehicleRentalSystem {
 
   @Nullable
   private final String systemId;
+
   @Nullable
   private final String language;
+
   @Nullable
   private final String name;
+
   @Nullable
   private final String shortName;
+
   @Nullable
   private final String operator;
+
   @Nullable
   private final String url;
+
   @Nullable
   private final String purchaseUrl;
+
   @Nullable
   private final String startDate;
+
   @Nullable
   private final String phoneNumber;
+
   @Nullable
   private final String email;
+
   @Nullable
   private final String feedContactEmail;
+
   @Nullable
   private final String licenseUrl;
 
