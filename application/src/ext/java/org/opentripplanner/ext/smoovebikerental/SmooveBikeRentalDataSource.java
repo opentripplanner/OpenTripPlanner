@@ -78,7 +78,9 @@ public class SmooveBikeRentalDataSource
     FeedScopedId stationId = new FeedScopedId(networkName, nameParts[0]);
     String[] coordinates = node.path("coordinates").asText().split(",");
 
-    double latitude, longitude;
+    double latitude;
+    double longitude;
+
     try {
       latitude = Double.parseDouble(coordinates[0].trim());
       longitude = Double.parseDouble(coordinates[1].trim());
