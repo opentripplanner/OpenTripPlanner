@@ -36,12 +36,12 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   private final String regionId;
   private final String postCode;
   private final Set<String> rentalMethods;
-  private boolean isVirtualStation = false;
+  private final boolean isVirtualStation;
   private final Geometry stationArea;
   private final Integer capacity;
   private final Map<RentalVehicleType, Integer> vehicleTypeAreaCapacity;
   private final Map<RentalVehicleType, Integer> vehicleTypeDockCapacity;
-  private boolean isValetStation = false;
+  private final boolean isValetStation;
   private final VehicleRentalSystem system;
   private final VehicleRentalStationUris rentalUris;
 
