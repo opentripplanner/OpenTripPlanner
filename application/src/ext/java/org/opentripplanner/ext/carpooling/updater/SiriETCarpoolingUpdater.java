@@ -2,14 +2,17 @@ package org.opentripplanner.ext.carpooling.updater;
 
 import java.util.List;
 import java.util.function.Consumer;
+import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.support.siri.SiriFileLoader;
+import org.opentripplanner.updater.support.siri.SiriHttpLoader;
+import org.opentripplanner.updater.support.siri.SiriLoader;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
-import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
-import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableHandler;
+import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableSource;
+import org.opentripplanner.updater.trip.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,37 +30,32 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
    */
   private final EstimatedTimetableSource updateSource;
 
+  private final CarpoolingRepository repository;
+
   /**
    * Feed id that is used for the trip ids in the TripUpdates
    */
   private final String feedId;
 
-  private final EstimatedTimetableHandler estimatedTimetableHandler;
-
   private final Consumer<UpdateResult> metricsConsumer;
 
   public SiriETCarpoolingUpdater(
-    Parameters config,
-    SiriRealTimeTripUpdateAdapter adapter,
-    EstimatedTimetableSource source,
-    Consumer<UpdateResult> metricsConsumer
+    SiriETCarpoolingUpdaterParameters config,
+    CarpoolingRepository repository
   ) {
     super(config);
     this.feedId = config.feedId();
 
-    this.updateSource = source;
+    SiriLoader siriHttpLoader = siriLoader(config);
+    updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters(), siriHttpLoader);
+
+    this.repository = repository;
 
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
-    estimatedTimetableHandler = new EstimatedTimetableHandler(
-      adapter,
-      config.fuzzyTripMatching(),
-      feedId
-    );
-
-    this.metricsConsumer = metricsConsumer;
+    this.metricsConsumer = TripUpdateMetrics.streaming(config);
   }
 
   /**
@@ -79,14 +77,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
         List<EstimatedTimetableDeliveryStructure> etds =
           serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {
-          updateGraph(context -> {
-            var result = estimatedTimetableHandler.applyUpdate(etds, incrementality, context);
-            ResultLogger.logUpdateResult(feedId, "siri-et", result);
-            metricsConsumer.accept(result);
-            if (markPrimed) {
-              primed = true;
-            }
-          });
+          LOG.info("Received {} estimated timetable deliveries", etds.size());
         }
       }
     } while (moreData);
@@ -106,5 +97,18 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
     boolean blockReadinessUntilInitialized();
 
     boolean fuzzyTripMatching();
+  }
+
+  private static SiriLoader siriLoader(SiriETCarpoolingUpdaterParameters config) {
+    // Load real-time updates from a file.
+    if (SiriFileLoader.matchesUrl(config.url())) {
+      return new SiriFileLoader(config.url());
+    }
+    return new SiriHttpLoader(
+      config.url(),
+      config.timeout(),
+      config.httpRequestHeaders(),
+      config.previewInterval()
+    );
   }
 }

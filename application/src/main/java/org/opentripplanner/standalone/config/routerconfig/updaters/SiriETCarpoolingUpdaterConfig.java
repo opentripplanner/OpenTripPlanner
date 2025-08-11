@@ -5,13 +5,13 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
 import java.time.Duration;
+import org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.updater.trip.siri.updater.SiriETUpdaterParameters;
 
 public class SiriETCarpoolingUpdaterConfig {
 
-  public static SiriETUpdaterParameters create(String configRef, NodeAdapter c) {
-    return new SiriETUpdaterParameters(
+  public static SiriETCarpoolingUpdaterParameters create(String configRef, NodeAdapter c) {
+    return new SiriETCarpoolingUpdaterParameters(
       configRef,
       c.of("feedId").since(V2_0).summary("The ID of the feed to apply the updates to.").asString(),
       c

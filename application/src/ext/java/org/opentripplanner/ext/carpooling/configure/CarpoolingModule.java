@@ -5,30 +5,34 @@ import dagger.Provides;
 import jakarta.inject.Singleton;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
+import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
+import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingService;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 
-/**
- * TODO CARPOOLING
- */
 @Module
 public class CarpoolingModule {
 
   @Provides
   @Singleton
-  public CarpoolingRepository provideCarpoolingRepository() {
+  public CarpoolingRepository provideCarpoolingRepository(Graph graph) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    // TODO CARPOOLING
-    return null;
+    return new DefaultCarpoolingRepository(graph);
   }
 
   @Provides
-  public static CarpoolingService provideCarpoolingService(CarpoolingRepository repository) {
+  public static CarpoolingService provideCarpoolingService(
+    StreetLimitationParametersService streetLimitationParametersService,
+    CarpoolingRepository repository,
+    Graph graph
+  ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    // TODO CARPOOLING
-    return null;
+    return new DefaultCarpoolingService(streetLimitationParametersService, repository, graph);
   }
 }

@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.opentripplanner.ext.carpooling.CarpoolingRepository;
+import org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureUpdater;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
@@ -51,6 +53,7 @@ public class UpdaterConfigurator {
   private final UpdatersParameters updatersParameters;
   private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
+  private final CarpoolingRepository carpoolingRepository;
   private final VehicleParkingRepository parkingRepository;
   private final TimetableSnapshotManager snapshotManager;
 
@@ -61,6 +64,7 @@ public class UpdaterConfigurator {
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
+    CarpoolingRepository carpoolingRepository,
     TimetableSnapshotManager snapshotManager,
     UpdatersParameters updatersParameters
   ) {
@@ -72,6 +76,7 @@ public class UpdaterConfigurator {
     this.updatersParameters = updatersParameters;
     this.parkingRepository = parkingRepository;
     this.snapshotManager = snapshotManager;
+    this.carpoolingRepository = carpoolingRepository;
   }
 
   public static void configure(
@@ -81,6 +86,7 @@ public class UpdaterConfigurator {
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
+    CarpoolingRepository carpoolingRepository,
     TimetableSnapshotManager snapshotManager,
     UpdatersParameters updatersParameters
   ) {
@@ -91,6 +97,7 @@ public class UpdaterConfigurator {
       vehicleRentalRepository,
       parkingRepository,
       timetableRepository,
+      carpoolingRepository,
       snapshotManager,
       updatersParameters
     ).configure();
@@ -186,9 +193,7 @@ public class UpdaterConfigurator {
       updaters.add(SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriETCarpoolingUpdaterParameters()) {
-      updaters.add(
-        SiriETCarpoolingModule.createSiriETCarpoolingUpdater(configItem, provideSiriAdapter())
-      );
+      updaters.add(new SiriETCarpoolingUpdater(configItem, carpoolingRepository));
     }
     for (var configItem : updatersParameters.getSiriETLiteUpdaterParameters()) {
       updaters.add(SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriAdapter()));
