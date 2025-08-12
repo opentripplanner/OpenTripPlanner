@@ -68,7 +68,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
 
   @Override
   public void addVehicleRentalStation(VehicleRentalPlace vehicleRentalStation) {
-    rentalPlaces.put(vehicleRentalStation.getId(), vehicleRentalStation);
+    rentalPlaces.put(vehicleRentalStation.id(), vehicleRentalStation);
   }
 
   @Override
@@ -83,12 +83,13 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
       .stream()
       .anyMatch(place -> {
         if (place instanceof VehicleRentalVehicle vehicle) {
-          return vehicle.vehicleType.formFactor == RentalFormFactor.BICYCLE;
+          return vehicle.vehicleType().formFactor() == RentalFormFactor.BICYCLE;
         } else if (place instanceof VehicleRentalStation station) {
-          return station.vehicleTypesAvailable
+          return station
+            .vehicleTypesAvailable()
             .keySet()
             .stream()
-            .anyMatch(t -> t.formFactor == RentalFormFactor.BICYCLE);
+            .anyMatch(t -> t.formFactor() == RentalFormFactor.BICYCLE);
         } else {
           return false;
         }
@@ -108,7 +109,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
     );
 
     return getVehicleRentalStationsAsStream()
-      .filter(b -> envelope.contains(new Coordinate(b.getLongitude(), b.getLatitude())))
+      .filter(b -> envelope.contains(new Coordinate(b.longitude(), b.latitude())))
       .toList();
   }
 
@@ -124,7 +125,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
   public List<VehicleRentalPlace> getVehicleRentalPlacesForEnvelope(Envelope envelope) {
     Stream<VehicleRentalPlace> vehicleRentalPlaceStream = getVehicleRentalPlaces()
       .stream()
-      .filter(vr -> envelope.contains(new Coordinate(vr.getLongitude(), vr.getLatitude())));
+      .filter(vr -> envelope.contains(new Coordinate(vr.longitude(), vr.latitude())));
 
     return vehicleRentalPlaceStream.toList();
   }
