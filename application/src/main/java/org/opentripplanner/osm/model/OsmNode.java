@@ -8,8 +8,6 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OsmNode extends OsmEntity {
 
-  static final Set<String> MOTOR_VEHICLE_BARRIERS = Set.of("bollard", "bar", "chain");
-
   public double lat;
   public double lon;
 

@@ -1,11 +1,15 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.DefaultOsmProvider;
+import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.test.support.ResourceLoader;
 
 public class OsmDatabaseTest {
@@ -47,5 +51,37 @@ public class OsmDatabaseTest {
     var way = osmdb.getWay(302732658L);
     assertNotNull(way);
     assertEquals("platform", way.getTag("public_transport"));
+  }
+
+  @Test
+  void isNodeBelongsToWayShouldNotReturnTrueForNodesSolelyOnBarriers() {
+    var osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
+
+    var n1 = new OsmNode(0, 0);
+    n1.setId(1);
+    var n2 = new OsmNode(0, 1);
+    n2.setId(2);
+    var n3 = new OsmNode(0, 2);
+    n3.setId(3);
+
+    var chain = new OsmWay();
+    chain.addTag("barrier", "chain");
+    chain.setId(999);
+    chain.addNodeRef(1);
+    chain.addNodeRef(2);
+
+    var path = new OsmWay();
+    path.setId(1);
+    path.addTag("highway", "path");
+    path.addNodeRef(2);
+    path.addNodeRef(3);
+
+    osmdb.addWay(chain);
+    osmdb.addWay(path);
+    osmdb.doneSecondPhaseWays();
+
+    assertFalse(osmdb.isNodeBelongsToWay(1L));
+    assertTrue(osmdb.isNodeBelongsToWay(2L));
+    assertTrue(osmdb.isNodeBelongsToWay(3L));
   }
 }

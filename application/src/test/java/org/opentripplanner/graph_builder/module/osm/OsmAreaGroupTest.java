@@ -9,9 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
+import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 
 class OsmAreaGroupTest {
 
@@ -22,9 +25,12 @@ class OsmAreaGroupTest {
   private static final OsmWay L0_WAY5 = new OsmWay();
   private static final OsmWay L1_WAY1 = new OsmWay();
 
+  private static final OsmWay PEDESTRIAN_WAY1 = new OsmWay();
+  private static final OsmWay PEDESTRIAN_WAY2 = new OsmWay();
   private static final OsmWay BARRIER1 = new OsmWay();
   private static final OsmWay BARRIER2 = new OsmWay();
   private static final OsmWay BARRIER3 = new OsmWay();
+  private static final OsmWay BOLLARD = new OsmWay();
 
   private static final OsmLevel LEVEL_0 = new OsmLevel(
     0,
@@ -62,22 +68,26 @@ class OsmAreaGroupTest {
       nodes.get(key).setId(key);
     }
 
+    L0_WAY1.addTag("highway", "living_street");
     L0_WAY1.addNodeRef(1);
     L0_WAY1.addNodeRef(2);
     L0_WAY1.addNodeRef(3);
     L0_WAY1.addNodeRef(4);
     L0_WAY1.addNodeRef(1);
 
+    L0_WAY2.addTag("highway", "living_street");
     L0_WAY2.addNodeRef(5);
     L0_WAY2.addNodeRef(2);
     L0_WAY2.addNodeRef(1);
     L0_WAY2.addNodeRef(5);
 
+    L0_WAY3.addTag("highway", "living_street");
     L0_WAY3.addNodeRef(1);
     L0_WAY3.addNodeRef(5);
     L0_WAY3.addNodeRef(6);
     L0_WAY3.addNodeRef(1);
 
+    L0_WAY4.addTag("highway", "living_street");
     L0_WAY4.addNodeRef(1);
     L0_WAY4.addNodeRef(2);
     L0_WAY4.addNodeRef(3);
@@ -86,6 +96,7 @@ class OsmAreaGroupTest {
     L0_WAY4.addNodeRef(9);
     L0_WAY4.addNodeRef(1);
 
+    L0_WAY5.addTag("highway", "living_street");
     L0_WAY5.addNodeRef(2);
     L0_WAY5.addNodeRef(10);
     L0_WAY5.addNodeRef(7);
@@ -93,21 +104,70 @@ class OsmAreaGroupTest {
     L0_WAY5.addNodeRef(6);
     L0_WAY5.addNodeRef(2);
 
+    L1_WAY1.addTag("highway", "living_street");
     L1_WAY1.addTag("level", "1");
     L1_WAY1.addNodeRef(1);
     L1_WAY1.addNodeRef(2);
     L1_WAY1.addNodeRef(5);
     L1_WAY1.addNodeRef(1);
 
+    PEDESTRIAN_WAY1.addTag("highway", "pedestrian");
+    PEDESTRIAN_WAY1.addTag("access", "no");
+    PEDESTRIAN_WAY1.addTag("foot", "yes");
+    PEDESTRIAN_WAY1.addNodeRef(1);
+    PEDESTRIAN_WAY1.addNodeRef(2);
+    PEDESTRIAN_WAY1.addNodeRef(3);
+    PEDESTRIAN_WAY1.addNodeRef(4);
+    PEDESTRIAN_WAY1.addNodeRef(1);
+
+    PEDESTRIAN_WAY2.addTag("highway", "pedestrian");
+    PEDESTRIAN_WAY2.addTag("access", "no");
+    PEDESTRIAN_WAY2.addTag("foot", "yes");
+    PEDESTRIAN_WAY2.addNodeRef(5);
+    PEDESTRIAN_WAY2.addNodeRef(2);
+    PEDESTRIAN_WAY2.addNodeRef(1);
+    PEDESTRIAN_WAY2.addNodeRef(5);
+
     BARRIER1.addNodeRef(1);
     BARRIER1.addNodeRef(2);
     BARRIER1.addNodeRef(3);
+    BARRIER1.addTag("barrier", "wall");
 
     BARRIER2.addNodeRef(1);
     BARRIER2.addNodeRef(4);
+    BARRIER2.addTag("barrier", "wall");
 
     BARRIER3.addNodeRef(2);
     BARRIER3.addNodeRef(3);
+    BARRIER3.addTag("barrier", "wall");
+
+    BOLLARD.addNodeRef(1);
+    BOLLARD.addNodeRef(2);
+    BOLLARD.addNodeRef(3);
+    BOLLARD.addTag("barrier", "bollard");
+  }
+
+  private static final OsmProvider osmProvider = new TestOsmProvider(
+    List.of(),
+    List.of(
+      L0_WAY1,
+      L0_WAY2,
+      L0_WAY3,
+      L0_WAY4,
+      L0_WAY5,
+      L1_WAY1,
+      PEDESTRIAN_WAY1,
+      PEDESTRIAN_WAY2,
+      BARRIER1,
+      BARRIER2,
+      BARRIER3,
+      BOLLARD
+    ),
+    nodes.valueCollection().stream().toList()
+  );
+
+  static {
+    new OsmTagMapper().populateProperties(osmProvider.getWayPropertySet());
   }
 
   @Test
@@ -134,6 +194,39 @@ class OsmAreaGroupTest {
     var result = OsmAreaGroup.groupAreas(
       Map.of(a1, LEVEL_0, a2, LEVEL_0),
       generateBarrierMap(BARRIER1)
+    );
+    assertEquals(2, result.size());
+  }
+
+  @Test
+  void shouldGroupWithBollardBetweenPedestrianAreas() {
+    OsmArea a1 = createArea(PEDESTRIAN_WAY1);
+    OsmArea a2 = createArea(PEDESTRIAN_WAY2);
+    var result = OsmAreaGroup.groupAreas(
+      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      generateBarrierMap(BOLLARD)
+    );
+    assertEquals(1, result.size());
+  }
+
+  @Test
+  void shouldNotGroupWithWallBetweenPedestrianAreas() {
+    OsmArea a1 = createArea(PEDESTRIAN_WAY1);
+    OsmArea a2 = createArea(PEDESTRIAN_WAY2);
+    var result = OsmAreaGroup.groupAreas(
+      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      generateBarrierMap(BARRIER1)
+    );
+    assertEquals(2, result.size());
+  }
+
+  @Test
+  void shouldNotGroupWithBollardBetweenCarAccessibleAreas() {
+    OsmArea a1 = createArea(L0_WAY1);
+    OsmArea a2 = createArea(L0_WAY2);
+    var result = OsmAreaGroup.groupAreas(
+      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      generateBarrierMap(BOLLARD)
     );
     assertEquals(2, result.size());
   }
