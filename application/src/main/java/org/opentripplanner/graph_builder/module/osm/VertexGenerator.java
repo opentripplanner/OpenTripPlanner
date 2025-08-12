@@ -133,6 +133,11 @@ class VertexGenerator {
     return iv;
   }
 
+  /**
+   * If a node is on a barrier, a vertex needs to be created for each way using it.
+   * 
+   * @return a vertex for the given node specific to the given way
+   */
   private IntersectionVertex getSplitVertexOnBarrier(OsmNode node, OsmEntity way) {
     splitVerticesOnBarriers.putIfAbsent(node, new HashMap<>());
     var vertices = splitVerticesOnBarriers.get(node);
