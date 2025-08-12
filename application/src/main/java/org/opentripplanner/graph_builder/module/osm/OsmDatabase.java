@@ -244,13 +244,7 @@ public class OsmDatabase {
     }
 
     /* filter out ways that are not relevant for routing */
-    if (
-      !(way.isRoutable() ||
-        way.isParkAndRide() ||
-        way.isBikeParking() ||
-        way.isBoardingLocation() ||
-        way.isBarrier())
-    ) {
+    if (!(relevantForRouting(way) || way.isBarrier())) {
       return;
     }
 
@@ -274,6 +268,12 @@ public class OsmDatabase {
     }
 
     waysById.put(wayId, way);
+  }
+
+  private static boolean relevantForRouting(OsmWay way) {
+    return (
+      way.isRoutable() || way.isParkAndRide() || way.isBikeParking() || way.isBoardingLocation()
+    );
   }
 
   public void addRelation(OsmRelation relation) {
@@ -325,7 +325,10 @@ public class OsmDatabase {
     // only 2 steps -- ways+relations, followed by used nodes.
     // Ways can be tag-filtered in phase 1.
 
-    markNodesForKeeping(waysById.valueCollection(), waysNodeIds);
+    markNodesForKeeping(
+      waysById.valueCollection().stream().filter(OsmDatabase::relevantForRouting).toList(),
+      waysNodeIds
+    );
     markNodesForKeeping(areaWaysById.valueCollection(), areaNodeIds);
   }
 
