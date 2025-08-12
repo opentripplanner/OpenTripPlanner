@@ -70,8 +70,8 @@ class WalkRoutingTest {
     assertEquals(1, backwardResults.size());
     var backwardStates = forwardResults.getFirst().states;
     var backwardDiff = ChronoUnit.MILLIS.between(
-      forwardStates.getFirst().getTimeAccurate(),
-      forwardStates.getLast().getTimeAccurate()
+      backwardStates.getFirst().getTimeAccurate(),
+      backwardStates.getLast().getTimeAccurate()
     );
     // should be same for every parametrized offset, otherwise irrelevant
     int expected = 11483;
