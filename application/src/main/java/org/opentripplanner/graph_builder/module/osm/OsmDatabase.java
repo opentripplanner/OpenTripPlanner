@@ -796,7 +796,7 @@ public class OsmDatabase {
     StreetTraversalPermission permissions = area.parent
       .getOsmProvider()
       .getWayPropertySet()
-      .getDataForWay(area.parent)
+      .getDataForEntity(area.parent, null)
       .getPermission();
     if (area.parent.isRoutable() && permissions != StreetTraversalPermission.NONE) {
       walkableAreas.add(area);

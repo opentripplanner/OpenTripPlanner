@@ -2,7 +2,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
   [
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 720,
+      "duration" : 717,
       "elevationGained" : 18.9,
       "elevationLost" : 30.64,
       "endTime" : "2009-10-21T23:10:00.000+00:00",
@@ -10,41 +10,41 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 1617,
+      "generalizedCost" : 1402,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 2636.74,
+          "distance" : 2635.31,
           "endTime" : "2009-10-21T23:10:00.000+00:00",
           "from" : {
-            "departure" : "2009-10-21T22:58:00.000+00:00",
+            "departure" : "2009-10-21T22:58:03.000+00:00",
             "lat" : 45.52832,
             "lon" : -122.70059,
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1617,
+          "generalizedCost" : 1402,
           "interlineWithPreviousLeg" : false,
-          "legElevation" : "0,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1193,60.2,1272,55.5,1589,55.5,1668,40.4,1851,40.4,1920,37.3,1932,37.3,2079,55.5,2504,55.5,2504,NaN,2637,NaN",
+          "legElevation" : "0,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1032,60.2,1190,55.5,1430,55.5,1506,40.4,1849,40.4,1919,37.3,1931,37.3,2078,55.5,2503,55.5,2503,NaN,2635,NaN",
           "legGeometry" : {
-            "length" : 60,
-            "points" : "}f{tGv}{kVC?mCBmCDoCDmCDmCBoCDmCDkCDoCB_CBM@iGEE@MB[H}@@s@@oCDmCBC@CkEAiEAg@AaC?YCqEAkECiEK?wDD}@@I?IAECKMKOIKyAmBCCQScB`DeAzBOVYj@eCxECF{@eAq@nAcAzBeAbBKDy@Ou@a@k@]c@_@Ws@M{@BsA"
+            "length" : 59,
+            "points" : "}f{tGv}{kVC?mCBmCDoCDmCDmCBoCDmCDkCDoCB_CBM@iGEE@MB[H}@@s@@GsKAkCCkCA}BCkE?EAcEoCB{BBS@K?wDD}@@I?IAECKMKOIKyAmBCCQScB`DeAzBOVYj@eCxECF{@eAq@nAcAzBeAbBKDy@Ou@a@k@]c@_@Ws@M{@BsA"
           },
           "mode" : "BICYCLE",
           "pathway" : false,
           "realTime" : false,
           "rentedBike" : false,
           "route" : "",
-          "startTime" : "2009-10-21T22:58:00.000+00:00",
+          "startTime" : "2009-10-21T22:58:03.000+00:00",
           "steps" : [
             {
               "absoluteDirection" : "NORTH",
               "area" : false,
               "bogusName" : false,
-              "distance" : 1193.29,
-              "elevation" : "0,63.7,1,63.7,3,63.7,13,63.4,23,63.2,33,63.3,43,63.5,53,63.3,63,62.9,73,62.5,83,62.2,93,62.0,103,61.7,113,61.5,123,61.2,133,60.9,143,60.6,153,60.3,161,60.2,241,60.2,1195,60.2",
+              "distance" : 1032.39,
+              "elevation" : "0,63.7,1,63.7,3,63.7,13,63.4,23,63.2,33,63.3,43,63.5,53,63.3,63,62.9,73,62.5,83,62.2,93,62.0,103,61.7,113,61.5,123,61.2,133,60.9,143,60.6,153,60.3,161,60.2,241,60.2,1034,60.2",
               "lat" : 45.5283199,
               "lon" : -122.7005963,
               "relativeDirection" : "DEPART",
@@ -56,23 +56,23 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
               "absoluteDirection" : "EAST",
               "area" : false,
               "bogusName" : false,
-              "distance" : 474.29,
-              "elevation" : "0,60.2,79,55.5,396,55.5,474,40.4",
-              "lat" : 45.539042,
-              "lon" : -122.7009919,
+              "distance" : 473.92,
+              "elevation" : "0,60.2,157,55.5,397,55.5,474,40.4",
+              "lat" : 45.5375956,
+              "lon" : -122.7009344,
               "relativeDirection" : "RIGHT",
               "stayOn" : false,
-              "streetName" : "Northwest York Street",
+              "streetName" : "Northwest Wilson Street",
               "walkingBike" : false
             },
             {
               "absoluteDirection" : "NORTH",
               "area" : false,
               "bogusName" : false,
-              "distance" : 264.57,
-              "elevation" : "0,40.4,183,40.4,252,37.3,265,37.3",
-              "lat" : 45.5391456,
-              "lon" : -122.6949041,
+              "distance" : 424.41,
+              "elevation" : "0,40.4,343,40.4,412,37.3,424,37.3",
+              "lat" : 45.5377086,
+              "lon" : -122.6948518,
               "relativeDirection" : "LEFT",
               "stayOn" : false,
               "streetName" : "Northwest 21st Avenue",
@@ -116,14 +116,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
           "walkingBike" : false
         }
       ],
-      "startTime" : "2009-10-21T22:58:00.000+00:00",
+      "startTime" : "2009-10-21T22:58:03.000+00:00",
       "tooSloped" : false,
       "transfers" : 0,
       "transitTime" : 0,
       "waitingTime" : 0,
-      "walkDistance" : 2636.74,
+      "walkDistance" : 2635.31,
       "walkLimitExceeded" : false,
-      "walkTime" : 720
+      "walkTime" : 717
     }
   ]
 ]
@@ -141,7 +141,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 1103,
+      "generalizedCost" : 978,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -243,7 +243,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 464,
+          "generalizedCost" : 339,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,484,52.4,493,52.2",
           "legGeometry" : {

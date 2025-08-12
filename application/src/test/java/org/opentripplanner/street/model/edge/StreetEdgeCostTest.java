@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -71,6 +72,38 @@ class StreetEdgeCostTest {
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withBike(b -> b.withReluctance(bikeReluctance)));
+
+    State result = traverse(edge, req.withMode(StreetMode.BIKE).build());
+    assertNotNull(result);
+    assertEquals(expectedCost, (long) result.weight);
+
+    assertEquals(20, result.getElapsedTimeSeconds());
+  }
+
+  static Stream<Arguments> bikeSafetyCases() {
+    return Stream.of(
+      Arguments.of(VehicleRoutingOptimizeType.SHORTEST_DURATION, 20),
+      Arguments.of(VehicleRoutingOptimizeType.SAFE_STREETS, 40),
+      Arguments.of(VehicleRoutingOptimizeType.SAFEST_STREETS, 160)
+    );
+  }
+
+  @ParameterizedTest(name = "bikeOptimizeType of {0} should lead to traversal costs of {1}")
+  @MethodSource("bikeSafetyCases")
+  public void bikeSafety(VehicleRoutingOptimizeType type, long expectedCost) {
+    double length = 100;
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withName("edge")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBicycleSafetyFactor(2)
+      .withBack(false)
+      .buildAndConnect();
+
+    var req = StreetSearchRequest.of();
+    req.withPreferences(p -> p.withBike(b -> b.withReluctance(1.0).withOptimizeType(type)));
 
     State result = traverse(edge, req.withMode(StreetMode.BIKE).build());
     assertNotNull(result);

@@ -1,6 +1,8 @@
 package org.opentripplanner.osm.wayproperty.specifier;
 
 import java.util.Arrays;
+import javax.annotation.Nullable;
+import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.model.OsmEntity;
 
 /**
@@ -28,28 +30,15 @@ public interface OsmSpecifier {
    * Calculates a pair of scores expressing how well an OSM entity's tags match this specifier.
    * <p>
    * Tags in this specifier are matched against those for the forward and backward direction of the OSM way
-   * separately. See: http://wiki.openstreetmap.org/wiki/Forward_%26_backward,_left_%26_right
+   * if a direction is specified. See: http://wiki.openstreetmap.org/wiki/Forward_%26_backward,_left_%26_right
    *
    * @param way an OSM tagged object to compare to this specifier
    */
-  Scores matchScores(OsmEntity way);
-
-  /**
-   * Calculates a score expressing how well an OSM entity's tags match this specifier. This does
-   * exactly the same thing as {@link OsmSpecifier#matchScores(OsmEntity)} but without regard for
-   * :left, :right, :forward, :backward and :both.
-   */
-  int matchScore(OsmEntity way);
+  int matchScore(OsmEntity way, @Nullable TraverseDirection direction);
 
   /**
    * Convert this specifier to a human-readable identifier that represents this in (generated)
    * documentation.
    */
   String toDocString();
-
-  record Scores(int forward, int backward) {
-    public static Scores of(int s) {
-      return new Scores(s, s);
-    }
-  }
 }

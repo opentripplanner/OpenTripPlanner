@@ -55,7 +55,7 @@ public class WalkableAreaBuilderTest {
       osmInfoRepository,
       new VertexGenerator(osmdb, graph, Set.of(), false),
       new DefaultNamer(),
-      new SafetyValueNormalizer(graph, DataImportIssueStore.NOOP),
+      new SafetyValueNormalizer(graph),
       DataImportIssueStore.NOOP,
       maxAreaNodes,
       platformEntriesLinking,

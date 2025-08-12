@@ -1,6 +1,5 @@
 package org.opentripplanner.osm.wayproperty.specifier;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.cyclewayLaneTrack;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.cyclewayLeft;
 
@@ -9,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.model.OsmEntity;
 
 class BestMatchSpecifierTest extends SpecifierTest {
@@ -28,24 +28,16 @@ class BestMatchSpecifierTest extends SpecifierTest {
   @Test
   void carTunnel() {
     var tunnel = WayTestData.carTunnel();
-    assertScore(110, highwayPrimary, tunnel);
-    assertScore(200, pedestrianUndergroundTunnel, tunnel);
+    assertScore(110, highwayPrimary, tunnel, TraverseDirection.FORWARD);
+    assertScore(200, pedestrianUndergroundTunnel, tunnel, TraverseDirection.FORWARD);
   }
 
   @Test
   void pedestrianTunnel() {
     var tunnel = WayTestData.pedestrianTunnel();
 
-    assertScore(0, highwayPrimary, tunnel);
-    assertScore(410, pedestrianUndergroundTunnel, tunnel);
-  }
-
-  @Test
-  void leftRightMatch() {
-    var way = WayTestData.cyclewayLeft();
-    var result = bikeLane.matchScores(way);
-    assertEquals(210, result.backward());
-    assertEquals(100, result.forward());
+    assertScore(0, highwayPrimary, tunnel, TraverseDirection.FORWARD);
+    assertScore(410, pedestrianUndergroundTunnel, tunnel, TraverseDirection.FORWARD);
   }
 
   static Stream<Arguments> leftRightTestCases() {
@@ -62,8 +54,7 @@ class BestMatchSpecifierTest extends SpecifierTest {
   )
   @MethodSource("leftRightTestCases")
   void leftRight(OsmEntity way, OsmSpecifier spec, int expectedBackward, int expectedForward) {
-    var result = spec.matchScores(way);
-    assertEquals(expectedBackward, result.backward());
-    assertEquals(expectedForward, result.forward());
+    assertScore(expectedBackward, spec, way, TraverseDirection.BACKWARD);
+    assertScore(expectedForward, spec, way, TraverseDirection.FORWARD);
   }
 }

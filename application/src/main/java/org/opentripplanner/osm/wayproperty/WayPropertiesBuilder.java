@@ -10,8 +10,8 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 public class WayPropertiesBuilder {
 
   private StreetTraversalPermission permission;
-  private SafetyFeatures bicycleSafetyFeatures = null;
-  private SafetyFeatures walkSafetyFeatures = null;
+  private Double bicycleSafetyFeatures = null;
+  private Double walkSafetyFeatures = null;
 
   public WayPropertiesBuilder(StreetTraversalPermission permission) {
     this.permission = permission;
@@ -25,41 +25,17 @@ public class WayPropertiesBuilder {
 
   /**
    * Sets the same safety value for normal and back edge.
-   *
-   * Note that the safeties here will be adjusted such that the safest street has a safety value of
-   * 1, with all others scaled proportionately.
    */
   public WayPropertiesBuilder bicycleSafety(double bicycleSafety) {
-    this.bicycleSafetyFeatures = new SafetyFeatures(bicycleSafety, bicycleSafety);
-    return this;
-  }
-
-  /**
-   * Note that the safeties here will be adjusted such that the safest street has a safety value of
-   * 1, with all others scaled proportionately.
-   */
-  public WayPropertiesBuilder bicycleSafety(double bicycleSafety, double bicycleSafetyBack) {
-    this.bicycleSafetyFeatures = new SafetyFeatures(bicycleSafety, bicycleSafetyBack);
+    this.bicycleSafetyFeatures = bicycleSafety;
     return this;
   }
 
   /**
    * Sets the same safety value for normal and back edge.
-   *
-   * Note that the safeties here will be adjusted such that the safest street has a safety value of
-   * 1, with all others scaled proportionately.
    */
   public WayPropertiesBuilder walkSafety(double walkSafety) {
-    this.walkSafetyFeatures = new SafetyFeatures(walkSafety, walkSafety);
-    return this;
-  }
-
-  /**
-   * Note that the safeties here will be adjusted such that the safest street has a safety value of
-   * 1, with all others scaled proportionately.
-   */
-  public WayPropertiesBuilder walkSafety(double walkSafety, double walkSafetyBack) {
-    this.walkSafetyFeatures = new SafetyFeatures(walkSafety, walkSafetyBack);
+    this.walkSafetyFeatures = walkSafety;
     return this;
   }
 
@@ -73,12 +49,12 @@ public class WayPropertiesBuilder {
   }
 
   @Nullable
-  protected SafetyFeatures bicycleSafety() {
+  protected Double bicycleSafety() {
     return bicycleSafetyFeatures;
   }
 
   @Nullable
-  protected SafetyFeatures walkSafety() {
+  protected Double walkSafety() {
     return walkSafetyFeatures;
   }
 

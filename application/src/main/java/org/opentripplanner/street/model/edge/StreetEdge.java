@@ -1,12 +1,12 @@
 package org.opentripplanner.street.model.edge;
 
+import static org.opentripplanner.street.model.edge.StreetEdgeReluctanceCalculator.computeReluctance;
+import static org.opentripplanner.street.model.edge.StreetEdgeReluctanceCalculator.getSafetyForSafestStreet;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.locationtech.jts.geom.LineString;
@@ -22,8 +22,6 @@ import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.TurnRestriction;
-import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
@@ -48,8 +46,6 @@ public class StreetEdge
   implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairTraversalInformation {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
-
-  private static final double SAFEST_STREETS_SAFETY_FACTOR = 0.1;
 
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
@@ -1067,14 +1063,7 @@ public class StreetEdge
     double speed
   ) {
     var time = getDistanceMeters() / speed;
-    var weight =
-      time *
-      StreetEdgeReluctanceCalculator.computeReluctance(
-        preferences,
-        traverseMode,
-        walkingBike,
-        isStairs()
-      );
+    var weight = time * computeReluctance(preferences, traverseMode, walkingBike, isStairs());
     return new TraversalCosts(time, weight);
   }
 
@@ -1089,13 +1078,8 @@ public class StreetEdge
       ? pref.bike().optimizeType()
       : pref.scooter().optimizeType();
     switch (optimizeType) {
-      case SAFEST_STREETS -> {
-        weight = (bicycleSafetyFactor * getDistanceMeters()) / speed;
-        if (bicycleSafetyFactor <= SAFEST_STREETS_SAFETY_FACTOR) {
-          // safest streets are treated as even safer than they really are
-          weight *= 0.66;
-        }
-      }
+      case SAFEST_STREETS -> weight = // we exaggerate the safety for this preference
+        (getSafetyForSafestStreet(bicycleSafetyFactor) * getDistanceMeters()) / speed;
       case SAFE_STREETS -> weight = getEffectiveBicycleSafetyDistance() / speed;
       case FLAT_STREETS -> /* see notes in StreetVertex on speed overhead */weight =
         getEffectiveBikeDistanceForWorkCost() / speed;
@@ -1112,12 +1096,7 @@ public class StreetEdge
       }
       default -> weight = getDistanceMeters() / speed;
     }
-    var reluctance = StreetEdgeReluctanceCalculator.computeReluctance(
-      pref,
-      mode,
-      false,
-      isStairs()
-    );
+    var reluctance = computeReluctance(pref, mode, false, isStairs());
     weight *= reluctance;
     return new TraversalCosts(time, weight);
   }
@@ -1157,12 +1136,7 @@ public class StreetEdge
         weight /= speed;
       }
 
-      weight *= StreetEdgeReluctanceCalculator.computeReluctance(
-        preferences,
-        traverseMode,
-        walkingBike,
-        isStairs()
-      );
+      weight *= computeReluctance(preferences, traverseMode, walkingBike, isStairs());
     }
 
     return new TraversalCosts(time, weight);

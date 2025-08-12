@@ -97,7 +97,9 @@ class VertexGenerator {
 
       if (node.isBarrier()) {
         BarrierVertex bv = vertexFactory.barrier(nid, coordinate);
-        bv.setBarrierPermissions(node.overridePermissions(BarrierVertex.defaultBarrierPermissions));
+        bv.setBarrierPermissions(
+          node.overridePermissions(BarrierVertex.defaultBarrierPermissions, null)
+        );
         iv = bv;
       }
 

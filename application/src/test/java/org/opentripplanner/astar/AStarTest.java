@@ -17,6 +17,7 @@ import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.algorithm.MultiTargetTerminationStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model._data.SimpleConcreteEdge;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -93,8 +94,10 @@ public class AStarTest {
       .buildDefault();
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
+    EuclideanRemainingWeightHeuristic heuristic = new EuclideanRemainingWeightHeuristic();
+    heuristic.initialize(StreetMode.WALK, Set.of(to), false, request.preferences());
     ShortestPathTree tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setHeuristic(heuristic)
       .setRequest(request)
       .setFrom(from)
       .setTo(to)
@@ -217,8 +220,10 @@ public class AStarTest {
     );
     TemporaryConcreteEdge.createTemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
+    EuclideanRemainingWeightHeuristic heuristic = new EuclideanRemainingWeightHeuristic();
+    heuristic.initialize(StreetMode.WALK, Set.of(to), false, request.preferences());
     ShortestPathTree tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setHeuristic(heuristic)
       .setRequest(request)
       .setFrom(from)
       .setTo(to)
@@ -257,8 +262,10 @@ public class AStarTest {
 
     Vertex v1 = graph.getVertex("56th_24th");
     Vertex v2 = graph.getVertex("leary_20th");
+    EuclideanRemainingWeightHeuristic heuristic = new EuclideanRemainingWeightHeuristic();
+    heuristic.initialize(StreetMode.WALK, targets, false, request.preferences());
     ShortestPathTree tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setHeuristic(heuristic)
       .setTerminationStrategy(strategy)
       .setRequest(request)
       .setFrom(v1)
