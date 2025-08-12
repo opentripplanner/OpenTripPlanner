@@ -3,7 +3,7 @@ package org.opentripplanner.apis.transmodel.mapping;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.ext.trias.id.IdResolver;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 
@@ -11,7 +11,7 @@ class TransitFilterNewWayMapper {
 
   private final SelectRequestMapper selectRequestMapper;
 
-  TransitFilterNewWayMapper(IdResolver idResolver) {
+  TransitFilterNewWayMapper(FeedScopedIdMapper idResolver) {
     this.selectRequestMapper = new SelectRequestMapper(idResolver);
   }
 

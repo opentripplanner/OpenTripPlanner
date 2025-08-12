@@ -5,8 +5,8 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
@@ -23,7 +23,7 @@ public class ViaRequestMapper {
   private final GenericLocationMapper genericLocationMapper;
   private final ViaSegmentMapper viaSegmentMapper;
 
-  public ViaRequestMapper(IdResolver idResolver) {
+  public ViaRequestMapper(FeedScopedIdMapper idResolver) {
     viaLocationDeprecatedMapper = new ViaLocationDeprecatedMapper(idResolver);
     genericLocationMapper = new GenericLocationMapper(idResolver);
     viaSegmentMapper = new ViaSegmentMapper(idResolver);

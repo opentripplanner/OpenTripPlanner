@@ -6,8 +6,8 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import java.util.Optional;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 
@@ -15,9 +15,9 @@ public class GroupOfLinesType {
 
   private static final String NAME = "GroupOfLines";
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  public GroupOfLinesType(IdResolver idResolver) {
+  public GroupOfLinesType(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 
@@ -34,7 +34,7 @@ public class GroupOfLinesType {
           .dataFetcher(env ->
             Optional.ofNullable((AbstractTransitEntity<?, ?>) env.getSource())
               .map(AbstractTransitEntity::getId)
-              .map(idResolver::toString)
+              .map(idResolver::mapToApi)
               .orElse(null)
           )
           .build()

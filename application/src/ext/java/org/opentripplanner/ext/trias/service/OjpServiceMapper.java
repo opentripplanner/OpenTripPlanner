@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.ext.trias.id.IdResolver;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.ext.trias.mapping.PtModeMapper;
 import org.opentripplanner.ext.trias.mapping.StopEventResponseMapper;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -44,10 +44,10 @@ public class OjpServiceMapper {
   public static final int DEFAULT_NUM_DEPARTURES = 1;
   private static final Duration DEFAULT_TIME_WINDOW = Duration.ofHours(2);
   private final OjpService vdvService;
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
   private final ZoneId zoneId;
 
-  public OjpServiceMapper(OjpService vdvService, IdResolver idResolver, ZoneId zoneId) {
+  public OjpServiceMapper(OjpService vdvService, FeedScopedIdMapper idResolver, ZoneId zoneId) {
     this.vdvService = vdvService;
     this.idResolver = idResolver;
     this.zoneId = zoneId;

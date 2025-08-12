@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -18,9 +18,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class TransitFilterOldWayMapper {
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  TransitFilterOldWayMapper(IdResolver idResolver) {
+  TransitFilterOldWayMapper(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 

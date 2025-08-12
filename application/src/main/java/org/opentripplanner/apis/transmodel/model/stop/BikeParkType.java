@@ -5,16 +5,16 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.ext.trias.id.IdResolver;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
 public class BikeParkType {
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
   public static final String NAME = "BikePark";
 
-  public BikeParkType(IdResolver idResolver) {
+  public BikeParkType(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 
@@ -27,7 +27,7 @@ public class BikeParkType {
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(environment ->
-            idResolver.toString(((VehicleParking) environment.getSource()).getId())
+            idResolver.mapToApi(((VehicleParking) environment.getSource()).getId())
           )
           .build()
       )

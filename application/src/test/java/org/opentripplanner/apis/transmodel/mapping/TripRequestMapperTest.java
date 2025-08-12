@@ -29,9 +29,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.api.model.transit.UseFeedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
-import org.opentripplanner.ext.trias.id.UseFeedIdResolver;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
@@ -78,7 +78,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
     Map.of("place", "F:Quay:2")
   );
 
-  private static final TripRequestMapper MAPPER = new TripRequestMapper(new UseFeedIdResolver());
+  private static final TripRequestMapper MAPPER = new TripRequestMapper(new UseFeedIdMapper());
   private TransmodelRequestContext context;
 
   static {

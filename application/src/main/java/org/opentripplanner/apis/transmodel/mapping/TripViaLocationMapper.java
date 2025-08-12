@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.framework.CoordinateInputType;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.model.plan.ViaLocationInputType;
 import org.opentripplanner.apis.transmodel.support.OneOfInputValidator;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
@@ -22,9 +22,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 @SuppressWarnings("unchecked")
 class TripViaLocationMapper {
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  TripViaLocationMapper(IdResolver idResolver) {
+  TripViaLocationMapper(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 

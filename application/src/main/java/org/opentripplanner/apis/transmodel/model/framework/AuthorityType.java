@@ -10,15 +10,15 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.transit.model.organization.Agency;
 
 public class AuthorityType {
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  public AuthorityType(IdResolver idResolver) {
+  public AuthorityType(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 

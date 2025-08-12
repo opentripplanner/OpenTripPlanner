@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -39,7 +39,7 @@ public class JourneyWhiteListed {
   public final Set<FeedScopedId> authorityIds;
   public final Set<FeedScopedId> lineIds;
 
-  public JourneyWhiteListed(DataFetchingEnvironment environment, IdResolver idResolver) {
+  public JourneyWhiteListed(DataFetchingEnvironment environment, FeedScopedIdMapper idResolver) {
     Map<String, List<String>> whiteList = environment.getArgument("whiteListed");
     if (whiteList == null) {
       this.authorityIds = Set.of();

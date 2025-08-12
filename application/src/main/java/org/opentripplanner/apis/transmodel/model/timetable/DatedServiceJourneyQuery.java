@@ -8,10 +8,10 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import java.time.LocalDate;
 import java.util.List;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequestBuilder;
@@ -23,9 +23,9 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
  */
 public class DatedServiceJourneyQuery {
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  public DatedServiceJourneyQuery(IdResolver idResolver) {
+  public DatedServiceJourneyQuery(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 

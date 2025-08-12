@@ -45,7 +45,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    */
   @Nullable
   public static FeedScopedId parse(@Nullable String value) throws IllegalArgumentException {
-    if (value == null || value.isEmpty()) { // ToDo: better check for isBlank?
+    if (StringUtils.hasNoValue(value)) {
       return null;
     }
     int index = value.indexOf(ID_SEPARATOR);

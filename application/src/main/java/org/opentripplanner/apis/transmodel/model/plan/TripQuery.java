@@ -12,6 +12,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLPlanner;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
@@ -20,7 +21,6 @@ import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PassThroughPointInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PenaltyForStreetModeType;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
@@ -37,10 +37,10 @@ public class TripQuery {
     visited in the order they are listed.
     """;
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
   private final TransmodelGraphQLPlanner graphQLPlanner;
 
-  public TripQuery(IdResolver idResolver) {
+  public TripQuery(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
     this.graphQLPlanner = new TransmodelGraphQLPlanner(idResolver);
   }

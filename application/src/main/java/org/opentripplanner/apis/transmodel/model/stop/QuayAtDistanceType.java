@@ -7,14 +7,14 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import java.util.Optional;
-import org.opentripplanner.ext.trias.id.IdResolver;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 public class QuayAtDistanceType {
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  public QuayAtDistanceType(IdResolver idResolver) {
+  public QuayAtDistanceType(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 
@@ -31,7 +31,7 @@ public class QuayAtDistanceType {
               Optional.ofNullable((NearbyStop) environment.getSource())
                 .map(
                   nearbyStop ->
-                    nearbyStop.distance + ";" + idResolver.toString(nearbyStop.stop.getId())
+                    nearbyStop.distance + ";" + idResolver.mapToApi(nearbyStop.stop.getId())
                 )
                 .orElse(null)
             )

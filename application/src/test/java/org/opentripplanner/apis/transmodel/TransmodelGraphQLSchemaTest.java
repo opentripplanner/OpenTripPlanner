@@ -10,8 +10,8 @@ import graphql.schema.idl.SchemaPrinter;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.api.model.transit.UseFeedIdMapper;
 import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
-import org.opentripplanner.ext.trias.id.UseFeedIdResolver;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
@@ -23,11 +23,11 @@ class TransmodelGraphQLSchemaTest {
 
   @Test
   void testSchemaBuild() {
-    TransmodelGraphQLSchemaFactory factory = new TransmodelGraphQLSchemaFactory(
+    var factory = new TransmodelGraphQLSchemaFactory(
       RouteRequest.defaultValue(),
       ZoneIds.OSLO,
       TransitTuningParameters.FOR_TEST,
-      new UseFeedIdResolver(),
+      new UseFeedIdMapper(),
       ApiDocumentationProfile.DEFAULT
     );
 

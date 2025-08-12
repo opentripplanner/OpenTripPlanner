@@ -5,7 +5,7 @@ import static org.opentripplanner.routing.api.response.InputField.INTERMEDIATE_P
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.ext.trias.id.IdResolver;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.routing.api.request.ViaLocationDeprecated;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -16,7 +16,7 @@ class ViaLocationDeprecatedMapper {
 
   private final GenericLocationMapper genericLocationMapper;
 
-  ViaLocationDeprecatedMapper(IdResolver idResolver) {
+  ViaLocationDeprecatedMapper(FeedScopedIdMapper idResolver) {
     this.genericLocationMapper = new GenericLocationMapper(idResolver);
   }
 

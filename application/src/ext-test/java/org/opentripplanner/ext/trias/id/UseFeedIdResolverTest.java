@@ -4,11 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.api.model.transit.UseFeedIdMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class UseFeedIdResolverTest {
 
-  private static final IdResolver RESOLVER = new UseFeedIdResolver();
+  private static final FeedScopedIdMapper RESOLVER = new UseFeedIdMapper();
 
   @Test
   void parse() {
@@ -23,7 +25,7 @@ class UseFeedIdResolverTest {
 
   @Test
   void tostring() {
-    var id = RESOLVER.toString(new FeedScopedId("aaa", "bbb"));
+    var id = RESOLVER.mapToApi(new FeedScopedId("aaa", "bbb"));
     assertEquals("aaa:bbb", id);
   }
 }

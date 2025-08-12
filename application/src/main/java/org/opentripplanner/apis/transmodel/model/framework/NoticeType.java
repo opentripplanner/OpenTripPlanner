@@ -3,15 +3,15 @@ package org.opentripplanner.apis.transmodel.model.framework;
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.transit.model.basic.Notice;
 
 public class NoticeType {
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  public NoticeType(IdResolver idResolver) {
+  public NoticeType(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 

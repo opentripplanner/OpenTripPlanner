@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -32,9 +32,9 @@ public class ServiceJourneyType {
   private static final String NAME = "ServiceJourney";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  public ServiceJourneyType(IdResolver idResolver) {
+  public ServiceJourneyType(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 

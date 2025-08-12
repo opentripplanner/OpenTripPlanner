@@ -2,7 +2,7 @@ package org.opentripplanner.apis.transmodel.mapping;
 
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.ext.trias.id.IdResolver;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 
@@ -10,7 +10,7 @@ class ViaSegmentMapper {
 
   private final TransitFilterNewWayMapper transitFilterNewWayMapper;
 
-  ViaSegmentMapper(IdResolver idResolver) {
+  ViaSegmentMapper(FeedScopedIdMapper idResolver) {
     transitFilterNewWayMapper = new TransitFilterNewWayMapper(idResolver);
   }
 

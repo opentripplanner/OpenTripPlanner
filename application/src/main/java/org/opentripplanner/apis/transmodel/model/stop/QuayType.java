@@ -19,12 +19,12 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -39,9 +39,9 @@ public class QuayType {
   private static final String NAME = "Quay";
   public static final GraphQLOutputType REF = new GraphQLTypeReference(NAME);
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  public QuayType(IdResolver idResolver) {
+  public QuayType(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 

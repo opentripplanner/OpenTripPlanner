@@ -5,10 +5,10 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.mapping.TripRequestMapper;
 import org.opentripplanner.apis.transmodel.mapping.ViaRequestMapper;
 import org.opentripplanner.apis.transmodel.model.PlanResponse;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
@@ -25,7 +25,7 @@ public class TransmodelGraphQLPlanner {
   private final TripRequestMapper tripRequestMapper;
   private final ViaRequestMapper viaRequestMapper;
 
-  public TransmodelGraphQLPlanner(IdResolver idResolver) {
+  public TransmodelGraphQLPlanner(FeedScopedIdMapper idResolver) {
     this.tripRequestMapper = new TripRequestMapper(idResolver);
     this.viaRequestMapper = new ViaRequestMapper(idResolver);
   }

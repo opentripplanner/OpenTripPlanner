@@ -10,13 +10,14 @@ import java.util.Set;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class IdResolverTest {
 
-  private static final IdResolver ID_RESOLVER = new IdResolverTestImpl();
+  private static final FeedScopedIdMapper ID_RESOLVER = new IdResolverTestImpl();
 
-  private static class IdResolverTestImpl implements IdResolver {
+  private static class IdResolverTestImpl implements FeedScopedIdMapper {
 
     @Override
     public FeedScopedId parse(String id) {
@@ -24,7 +25,7 @@ class IdResolverTest {
     }
 
     @Override
-    public String toString(FeedScopedId feedScopedId) {
+    public String mapToApi(FeedScopedId feedScopedId) {
       throw new NotImplementedException("Not implemented");
     }
   }

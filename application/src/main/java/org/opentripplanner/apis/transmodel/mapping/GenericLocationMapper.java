@@ -1,15 +1,15 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
 import java.util.Map;
-import org.opentripplanner.ext.trias.id.IdResolver;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GenericLocationMapper {
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  GenericLocationMapper(IdResolver idResolver) {
+  GenericLocationMapper(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 

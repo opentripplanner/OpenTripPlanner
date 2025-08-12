@@ -45,6 +45,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
 import org.opentripplanner.apis.support.graphql.injectdoc.CustomDocumentation;
 import org.opentripplanner.apis.support.graphql.injectdoc.InjectCustomDocumentation;
@@ -108,7 +109,6 @@ import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.TimetabledPassingTimeType;
 import org.opentripplanner.apis.transmodel.model.timetable.TripMetadataType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -145,7 +145,7 @@ public class TransmodelGraphQLSchemaFactory {
   private final DefaultRouteRequestType routing;
   private final TransitTuningParameters transitTuningParameters;
   private final ZoneId timeZoneId;
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
   private final ApiDocumentationProfile docProfile;
   private final AuthorityType authorityTypeFactory;
   private final OperatorType operatorTypeFactory;
@@ -171,7 +171,7 @@ public class TransmodelGraphQLSchemaFactory {
     RouteRequest defaultRequest,
     ZoneId timeZoneId,
     TransitTuningParameters transitTuningParameters,
-    IdResolver idResolver,
+    FeedScopedIdMapper idResolver,
     ApiDocumentationProfile docProfile
   ) {
     this.timeZoneId = timeZoneId;
@@ -202,18 +202,6 @@ public class TransmodelGraphQLSchemaFactory {
     GraphQLSchema schema = createDefault();
     schema = decorateSchemaWithCustomDocumentation(schema, docProfile);
     return schema;
-  }
-
-  private static GraphQLSchema decorateSchemaWithCustomDocumentation(
-    GraphQLSchema schema,
-    ApiDocumentationProfile docProfile
-  ) {
-    var customDocumentation = CustomDocumentation.of(docProfile);
-    if (customDocumentation.isEmpty()) {
-      return schema;
-    }
-    var visitor = new InjectCustomDocumentation(customDocumentation);
-    return SchemaTransformer.transformSchema(schema, visitor);
   }
 
   @SuppressWarnings("unchecked")
@@ -1544,6 +1532,18 @@ public class TransmodelGraphQLSchemaFactory {
       .additionalType(Relay.pageInfoType)
       .additionalDirective(TransmodelDirectives.TIMING_DATA)
       .build();
+  }
+
+  private static GraphQLSchema decorateSchemaWithCustomDocumentation(
+    GraphQLSchema schema,
+    ApiDocumentationProfile docProfile
+  ) {
+    var customDocumentation = CustomDocumentation.of(docProfile);
+    if (customDocumentation.isEmpty()) {
+      return schema;
+    }
+    var visitor = new InjectCustomDocumentation(customDocumentation);
+    return SchemaTransformer.transformSchema(schema, visitor);
   }
 
   private Stream<FeedScopedId> resolveIds(DataFetchingEnvironment env) {

@@ -27,12 +27,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -52,9 +52,9 @@ public class StopPlaceType {
   public static final String NAME = "StopPlace";
   public static final GraphQLOutputType REF = new GraphQLTypeReference(NAME);
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  public StopPlaceType(IdResolver idResolver) {
+  public StopPlaceType(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 
@@ -77,7 +77,7 @@ public class StopPlaceType {
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(env ->
-            idResolver.toString(((MonoOrMultiModalStation) env.getSource()).getId())
+            idResolver.mapToApi(((MonoOrMultiModalStation) env.getSource()).getId())
           )
           .build()
       )

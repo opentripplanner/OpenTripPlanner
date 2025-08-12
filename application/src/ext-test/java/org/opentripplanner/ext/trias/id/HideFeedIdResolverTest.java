@@ -3,11 +3,12 @@ package org.opentripplanner.ext.trias.id;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.api.model.transit.HideFeedIdMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class HideFeedIdResolverTest {
 
-  private static final HideFeedIdResolver RESOLVER = new HideFeedIdResolver("aaa");
+  private static final HideFeedIdMapper RESOLVER = new HideFeedIdMapper("aaa");
 
   @Test
   void parse() {
@@ -17,7 +18,7 @@ class HideFeedIdResolverTest {
 
   @Test
   void tostring() {
-    var id = RESOLVER.toString(new FeedScopedId("aaa", "bbb"));
+    var id = RESOLVER.mapToApi(new FeedScopedId("aaa", "bbb"));
     assertEquals("bbb", id);
   }
 }

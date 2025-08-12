@@ -11,10 +11,10 @@ import graphql.schema.GraphQLTypeReference;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -24,9 +24,9 @@ public class LineType {
   private static final String NAME = "Line";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  public LineType(IdResolver idResolver) {
+  public LineType(FeedScopedIdMapper idResolver) {
     this.idResolver = idResolver;
   }
 
@@ -55,7 +55,7 @@ public class LineType {
           .dataFetcher(environment ->
             Optional.ofNullable((AbstractTransitEntity<?, ?>) environment.getSource())
               .map(AbstractTransitEntity::getId)
-              .map(idResolver::toString)
+              .map(idResolver::mapToApi)
               .orElse(null)
           )
           .build()

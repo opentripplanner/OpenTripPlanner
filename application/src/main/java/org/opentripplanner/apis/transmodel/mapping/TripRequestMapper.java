@@ -6,11 +6,11 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.ext.trias.id.IdResolver;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
 public class TripRequestMapper {
@@ -19,9 +19,9 @@ public class TripRequestMapper {
   private final GenericLocationMapper genericLocationMapper;
   private final TransitFilterNewWayMapper transitFilterNewWayMapper;
   private final TransitFilterOldWayMapper transitFilterOldWayMapper;
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idResolver;
 
-  public TripRequestMapper(IdResolver idResolver) {
+  public TripRequestMapper(FeedScopedIdMapper idResolver) {
     this.tripViaLocationMapper = new TripViaLocationMapper(idResolver);
     this.genericLocationMapper = new GenericLocationMapper(idResolver);
     this.transitFilterNewWayMapper = new TransitFilterNewWayMapper(idResolver);
