@@ -8,6 +8,7 @@ import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingService;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.routing.graph.Graph;
 
 @Module
 public class CarpoolingModule {
@@ -22,10 +23,13 @@ public class CarpoolingModule {
   }
 
   @Provides
-  public static CarpoolingService provideCarpoolingService(CarpoolingRepository repository) {
+  public static CarpoolingService provideCarpoolingService(
+    CarpoolingRepository repository,
+    Graph graph
+  ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    return new DefaultCarpoolingService(repository);
+    return new DefaultCarpoolingService(repository, graph);
   }
 }

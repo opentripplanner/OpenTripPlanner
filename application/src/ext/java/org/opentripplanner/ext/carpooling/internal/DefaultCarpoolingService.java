@@ -5,27 +5,51 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.model.CarpoolTransitLeg;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.transit.model.site.AreaStop;
 
 public class DefaultCarpoolingService implements CarpoolingService {
 
   private final CarpoolingRepository repository;
+  private final Graph graph;
 
-  public DefaultCarpoolingService(CarpoolingRepository repository) {
+  public DefaultCarpoolingService(CarpoolingRepository repository, Graph graph) {
     this.repository = repository;
+    this.graph = graph;
   }
 
   /**
@@ -61,12 +85,17 @@ public class DefaultCarpoolingService implements CarpoolingService {
    */
   @Override
   public List<Itinerary> route(RouteRequest request) throws RoutingValidationException {
-    if (Objects.requireNonNull(request.from()).lat == null || Objects.requireNonNull(request.from()).lng == null) {
+    if (
+      Objects.requireNonNull(request.from()).lat == null ||
+      Objects.requireNonNull(request.from()).lng == null
+    ) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE))
       );
     }
-    if (Objects.requireNonNull(request.to()).lat == null || Objects.requireNonNull(request.to()).lng == null
+    if (
+      Objects.requireNonNull(request.to()).lat == null ||
+      Objects.requireNonNull(request.to()).lng == null
     ) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE))
@@ -134,51 +163,281 @@ public class DefaultCarpoolingService implements CarpoolingService {
     // Sort candidates by estimated cost
     candidates.sort(Comparator.comparingDouble(a -> a.estimatedCost));
 
-    // Create itineraries for the top candidates (limit to 3)
+    // Perform A* routing for the top candidates and create itineraries
     List<Itinerary> itineraries = new ArrayList<>();
     int maxResults = Math.min(candidates.size(), 3);
 
     for (int i = 0; i < maxResults; i++) {
       CarpoolTripCandidate candidate = candidates.get(i);
 
-      // For now, create a simplified itinerary with basic structure
-      // TODO: Implement actual A* routing for precise distances and times
-      Itinerary itinerary = createItineraryForCandidate(candidate, request);
-      if (itinerary != null) {
-        itineraries.add(itinerary);
+      // Perform A* routing for all three segments
+      CarpoolRouting routing = performCarpoolRouting(candidate.trip, request);
+
+      // Only create itinerary if all routing segments succeeded
+      if (routing.isComplete()) {
+        Itinerary itinerary = createItineraryFromRouting(candidate.trip, routing);
+        if (itinerary != null) {
+          itineraries.add(itinerary);
+        }
       }
     }
 
     return itineraries;
   }
 
-  private Itinerary createItineraryForCandidate(
-    CarpoolTripCandidate candidate,
+  /**
+   * Performs A* routing for all three segments of a carpool trip:
+   * 1. Access path (walking from origin to pickup)
+   * 2. Carpool path (driving from pickup to dropoff)
+   * 3. Egress path (walking from dropoff to destination)
+   */
+  private CarpoolRouting performCarpoolRouting(CarpoolTrip trip, RouteRequest request) {
+    Coordinate origin = request.from().getCoordinate();
+    Coordinate destination = request.to().getCoordinate();
+    Coordinate pickup = trip.getBoardingArea().getCoordinate().asJtsCoordinate();
+    Coordinate dropoff = trip.getAlightingArea().getCoordinate().asJtsCoordinate();
+
+    // 1. Access path: Walk from origin to pickup
+    GraphPath<State, Edge, Vertex> accessPath = routeBetweenCoordinates(
+      origin,
+      pickup,
+      StreetMode.WALK,
+      request
+    );
+
+    // 2. Carpool path: Drive from pickup to dropoff
+    GraphPath<State, Edge, Vertex> carpoolPath = routeBetweenCoordinates(
+      pickup,
+      dropoff,
+      StreetMode.CAR,
+      request
+    );
+
+    // 3. Egress path: Walk from dropoff to destination
+    GraphPath<State, Edge, Vertex> egressPath = routeBetweenCoordinates(
+      dropoff,
+      destination,
+      StreetMode.WALK,
+      request
+    );
+
+    return new CarpoolRouting(accessPath, carpoolPath, egressPath);
+  }
+
+  /**
+   * Creates a vertex from the given coordinate using the graph's vertex linker.
+   * This reuses OTP's existing vertex resolution functionality.
+   */
+  private Vertex createVertexFromCoordinate(Coordinate coordinate, StreetMode streetMode) {
+    GenericLocation location = GenericLocation.fromCoordinate(coordinate.y, coordinate.x);
+
+    try (
+      TemporaryVerticesContainer container = new TemporaryVerticesContainer(
+        graph,
+        location,
+        location,
+        streetMode,
+        streetMode
+      )
+    ) {
+      // For origin vertices, use fromVertices; for destination vertices, use toVertices
+      // Since we're creating individual vertices, we can use either set
+      return container.getFromVertices().iterator().next();
+    }
+  }
+
+  /**
+   * Performs A* street routing between two coordinates using the specified street mode.
+   * Returns the routing result with distance, time, and geometry.
+   */
+  @Nullable
+  private GraphPath<State, Edge, Vertex> routeBetweenCoordinates(
+    Coordinate from,
+    Coordinate to,
+    StreetMode streetMode,
     RouteRequest request
   ) {
-    // This is a simplified implementation - would need full A* routing for production
-    CarpoolTrip trip = candidate.trip;
+    try {
+      Vertex fromVertex = createVertexFromCoordinate(from, streetMode);
+      Vertex toVertex = createVertexFromCoordinate(to, streetMode);
 
-    // Create basic itinerary structure
-    // In a full implementation, this would use A* to calculate actual walking paths
-    // and create proper legs with geometry and timing
+      return StreetSearchBuilder.of()
+        .setHeuristic(new EuclideanRemainingWeightHeuristic())
+        .setRequest(request)
+        .setStreetRequest(new StreetRequest(streetMode))
+        .setFrom(fromVertex)
+        .setTo(toVertex)
+        .getPathsToTarget()
+        .stream()
+        .findFirst()
+        .orElse(null);
+    } catch (Exception e) {
+      // If A* routing fails (e.g., WALKING_BETTER_THAN_TRANSIT), return null
+      // This allows the service to gracefully handle problematic coordinates
+      return null;
+    }
+  }
 
-    // Create a carpooling transit leg
+  /**
+   * Creates a complete itinerary from A* routing results with proper walking and carpool legs
+   */
+  private Itinerary createItineraryFromRouting(CarpoolTrip trip, CarpoolRouting routing) {
+    List<Leg> legs = new ArrayList<>();
+
+    // 1. Access walking leg (origin to pickup)
+    if (routing.accessPath != null) {
+      Leg accessLeg = createWalkingLegFromPath(routing.accessPath, "Walk to pickup");
+      if (accessLeg != null) {
+        legs.add(accessLeg);
+      }
+    }
+
+    // 2. Carpool transit leg (pickup to dropoff)
     CarpoolTransitLeg carpoolLeg = CarpoolTransitLeg.of()
       .withStartTime(trip.getStartTime())
       .withEndTime(trip.getEndTime())
       .withTrip(trip.getTrip())
-      .withGeneralizedCost((int) candidate.estimatedCost)
+      .withGeneralizedCost((int) routing.totalCost)
       .build();
+    legs.add(carpoolLeg);
 
-    // TODO: Add walking leg from origin to pickup area
-    // TODO: Add carpooling transit leg
-    // TODO: Add walking leg from dropoff area to destination
+    // 3. Egress walking leg (dropoff to destination)
+    if (routing.egressPath != null) {
+      Leg egressLeg = createWalkingLegFromPath(routing.egressPath, "Walk from dropoff");
+      if (egressLeg != null) {
+        legs.add(egressLeg);
+      }
+    }
 
-    // For now, return null to indicate incomplete implementation
-    return Itinerary.ofDirect(List.of(carpoolLeg))
-      .withGeneralizedCost(Cost.costOfSeconds(carpoolLeg.generalizedCost()))
+    return Itinerary.ofDirect(legs)
+      .withGeneralizedCost(Cost.costOfSeconds((int) routing.totalCost))
       .build();
+  }
+
+  /**
+   * Creates a walking leg from a GraphPath with proper geometry and timing.
+   * This reuses the same pattern as OTP's GraphPathToItineraryMapper but simplified
+   * for carpooling service use.
+   */
+  @Nullable
+  private Leg createWalkingLegFromPath(GraphPath<State, Edge, Vertex> path, String name) {
+    if (path == null || path.states.isEmpty()) {
+      return null;
+    }
+
+    List<State> states = path.states;
+    State firstState = states.getFirst();
+    State lastState = states.getLast();
+
+    // Extract edges (skip first state which doesn't have a back edge)
+    List<Edge> edges = states
+      .stream()
+      .skip(1)
+      .map(State::getBackEdge)
+      .filter(Objects::nonNull)
+      .toList();
+
+    if (edges.isEmpty()) {
+      return null;
+    }
+
+    // Calculate total distance
+    double distanceMeters = edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+
+    // Create geometry from edges
+    LineString geometry = GeometryUtils.concatenateLineStrings(edges, Edge::getGeometry);
+
+    // Build the walking leg
+    return StreetLeg.of()
+      .withMode(TraverseMode.WALK)
+      .withStartTime(firstState.getTime().atZone(java.time.ZoneId.systemDefault()))
+      .withEndTime(lastState.getTime().atZone(java.time.ZoneId.systemDefault()))
+      .withFrom(createPlaceFromState(firstState, name + " start"))
+      .withTo(createPlaceFromState(lastState, name + " end"))
+      .withDistanceMeters(distanceMeters)
+      .withGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
+      .withGeometry(geometry)
+      .withWalkSteps(List.of()) // Simplified - no detailed walk steps for now
+      .build();
+  }
+
+  /**
+   * Creates a Place from a State, similar to GraphPathToItineraryMapper.makePlace
+   * but simplified for carpooling service use.
+   */
+  private Place createPlaceFromState(State state, String defaultName) {
+    Vertex vertex = state.getVertex();
+    I18NString name = vertex.getName();
+
+    // Use intersection name for street vertices to get better names
+    if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
+      name = ((StreetVertex) vertex).getIntersectionName();
+    }
+
+    // If no name available, use default
+    if (name == null || name.toString().trim().isEmpty()) {
+      name = new NonLocalizedString(defaultName);
+    }
+
+    return Place.normal(vertex, name);
+  }
+
+  /**
+   * Holds the A* routing results for all three segments of a carpool journey
+   */
+  private static class CarpoolRouting {
+
+    @Nullable
+    final GraphPath<State, Edge, Vertex> accessPath;
+
+    @Nullable
+    final GraphPath<State, Edge, Vertex> carpoolPath;
+
+    @Nullable
+    final GraphPath<State, Edge, Vertex> egressPath;
+
+    final double totalCost;
+    final int totalDuration;
+    final double totalDistance;
+
+    CarpoolRouting(
+      @Nullable GraphPath<State, Edge, Vertex> accessPath,
+      @Nullable GraphPath<State, Edge, Vertex> carpoolPath,
+      @Nullable GraphPath<State, Edge, Vertex> egressPath
+    ) {
+      this.accessPath = accessPath;
+      this.carpoolPath = carpoolPath;
+      this.egressPath = egressPath;
+
+      // Calculate totals from the paths
+      double cost = 0;
+      int duration = 0;
+      double distance = 0;
+
+      if (accessPath != null) {
+        cost += accessPath.getWeight();
+        duration += accessPath.getDuration();
+        distance += accessPath.edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+      }
+      if (carpoolPath != null) {
+        cost += carpoolPath.getWeight();
+        duration += carpoolPath.getDuration();
+        distance += carpoolPath.edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+      }
+      if (egressPath != null) {
+        cost += egressPath.getWeight();
+        duration += egressPath.getDuration();
+        distance += egressPath.edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+      }
+
+      this.totalCost = cost;
+      this.totalDuration = duration;
+      this.totalDistance = distance;
+    }
+
+    boolean isComplete() {
+      return accessPath != null && carpoolPath != null && egressPath != null;
+    }
   }
 
   private static class CarpoolTripCandidate {
