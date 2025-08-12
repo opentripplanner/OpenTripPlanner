@@ -41,6 +41,7 @@ import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.ItineraryFaresDecorator;
@@ -57,6 +58,7 @@ import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -455,7 +457,8 @@ class GraphQLIntegrationTest {
       realtimeVehicleService,
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       finder,
-      routeRequest
+      routeRequest,
+      TestServerContext.createSubmodeMappingService()
     );
   }
 

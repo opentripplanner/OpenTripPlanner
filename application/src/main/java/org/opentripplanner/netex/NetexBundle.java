@@ -10,6 +10,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.netex.config.IgnorableFeature;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.netex.index.NetexEntityIndex;
@@ -21,6 +22,7 @@ import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.validation.Validator;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +52,7 @@ public class NetexBundle implements Closeable {
   private final double maxStopToShapeSnapDistance;
   private final boolean noTransfersOnIsolatedStops;
   private final Set<IgnorableFeature> ignoredFeatures;
+  private final TimetableRepository timetableRepository;
   /** The NeTEx entities loaded from the input files and passed on to the mapper. */
   private NetexEntityIndex index = new NetexEntityIndex();
   /** Report errors to issue store */
@@ -67,7 +70,8 @@ public class NetexBundle implements Closeable {
     Collection<FeedScopedId> routeToCentroidStopPlaceIds,
     double maxStopToShapeSnapDistance,
     boolean noTransfersOnIsolatedStops,
-    Set<IgnorableFeature> ignorableFeatures
+    Set<IgnorableFeature> ignorableFeatures,
+    TimetableRepository timetableRepository
   ) {
     this.feedId = feedId;
     this.source = source;
@@ -78,6 +82,7 @@ public class NetexBundle implements Closeable {
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
     this.ignoredFeatures = Set.copyOf(ignorableFeatures);
+    this.timetableRepository = timetableRepository;
   }
 
   /** load the bundle, map it to the OTP transit model and return */
@@ -88,6 +93,7 @@ public class NetexBundle implements Closeable {
     LOG.info("Reading {}", hierarchy.description());
 
     this.issueStore = issueStore;
+    var submodeMappingService = new SubmodeMappingService(timetableRepository.getSubmodeMapping());
 
     // init parser and mapper
     xmlParser = new NetexXmlParser();
@@ -99,7 +105,8 @@ public class NetexBundle implements Closeable {
       ferryIdsNotAllowedForBicycle,
       routeToCentroidStopPlaceIds,
       maxStopToShapeSnapDistance,
-      noTransfersOnIsolatedStops
+      noTransfersOnIsolatedStops,
+      submodeMappingService
     );
 
     // Load data

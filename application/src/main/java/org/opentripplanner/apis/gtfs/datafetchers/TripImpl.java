@@ -22,10 +22,12 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.apis.gtfs.mapping.BikesAllowedMapper;
+import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -425,5 +427,9 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
 
   private Trip getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
+  }
+
+  private SubmodeMappingService getSubmodeMappingService(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().submodeMappingService();
   }
 }

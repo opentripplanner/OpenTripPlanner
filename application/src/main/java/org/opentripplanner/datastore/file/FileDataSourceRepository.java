@@ -9,6 +9,7 @@ import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 import static org.opentripplanner.datastore.api.FileType.REPORT;
+import static org.opentripplanner.datastore.api.FileType.SUBMODE;
 import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
 import static org.opentripplanner.datastore.base.LocalDataSourceRepository.isCurrentDir;
 
@@ -35,6 +36,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
 
   private final Pattern GRAPH_PATTERN = Pattern.compile("(?i)(street)?graph.*\\.obj");
   private final Pattern EMISSION_PATTERN = Pattern.compile("(?i)(emission).*\\.(txt|csv)");
+  private final String SUBMODE_FILENAME = "submode-mapping.csv";
 
   private final File baseDir;
   private final Pattern gtfsLocalFilePattern;
@@ -191,6 +193,9 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     }
     if (EMISSION_PATTERN.matcher(name).find()) {
       return EMISSION;
+    }
+    if (SUBMODE_FILENAME.equals(name)) {
+      return SUBMODE;
     }
     if (GRAPH_PATTERN.matcher(name).find()) {
       return GRAPH;

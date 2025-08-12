@@ -13,11 +13,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
@@ -66,7 +68,8 @@ class _RouteRequestTestContext {
       new DefaultRealtimeVehicleService(transitService),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
-      routeRequest
+      routeRequest,
+      TestServerContext.createSubmodeMappingService()
     );
   }
 

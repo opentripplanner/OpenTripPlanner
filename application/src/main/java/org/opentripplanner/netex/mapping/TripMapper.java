@@ -64,6 +64,36 @@ class TripMapper {
     this.operatorsById = operatorsById;
   }
 
+  private NetexMainAndSubMode findTransitMode(ServiceJourney serviceJourney) {
+    try {
+      return transportModeMapper.map(
+        serviceJourney.getTransportMode(),
+        serviceJourney.getTransportSubmode()
+      );
+    } catch (TransportModeMapper.UnsupportedModeException e) {
+      issueStore.add(
+        "UnsupportedModeInServiceJourney",
+        "Unsupported mode in ServiceJourney. Mode: %s, sj: %s",
+        e.mode,
+        serviceJourney.getId()
+      );
+      return null;
+    }
+  }
+
+  void collectGtfsReplacements(
+    GtfsReplacementCollector gtfsReplacementCollector,
+    ServiceJourney serviceJourney
+  ) {
+    if (serviceJourney.getTransportMode() != null) {
+      NetexMainAndSubMode transitMode = findTransitMode(serviceJourney);
+      if (transitMode != null) {
+        String lineId = resolveLineId(serviceJourney);
+        gtfsReplacementCollector.collectTransitMode(lineId, transitMode);
+      }
+    }
+  }
+
   /**
    * Map a service journey to a trip.
    * <p>
@@ -113,19 +143,8 @@ class TripMapper {
     builder.withOperator(findOperator(serviceJourney));
 
     if (serviceJourney.getTransportMode() != null) {
-      NetexMainAndSubMode transitMode = null;
-      try {
-        transitMode = transportModeMapper.map(
-          serviceJourney.getTransportMode(),
-          serviceJourney.getTransportSubmode()
-        );
-      } catch (TransportModeMapper.UnsupportedModeException e) {
-        issueStore.add(
-          "UnsupportedModeInServiceJourney",
-          "Unsupported mode in ServiceJourney. Mode: %s, sj: %s",
-          e.mode,
-          serviceJourney.getId()
-        );
+      NetexMainAndSubMode transitMode = findTransitMode(serviceJourney);
+      if (transitMode == null) {
         return null;
       }
       builder.withMode(transitMode.mainMode());
@@ -173,23 +192,27 @@ class TripMapper {
     return null;
   }
 
-  private org.opentripplanner.transit.model.network.Route resolveRoute(
-    ServiceJourney serviceJourney
-  ) {
-    String lineRef = null;
+  private String resolveLineId(ServiceJourney serviceJourney) {
     // Check for direct connection to Line
     JAXBElement<? extends LineRefStructure> lineRefStruct = serviceJourney.getLineRef();
 
     if (lineRefStruct != null) {
       // Connect to Line referenced directly from ServiceJourney
-      lineRef = lineRefStruct.getValue().getRef();
+      return lineRefStruct.getValue().getRef();
     } else if (serviceJourney.getJourneyPatternRef() != null) {
       // Connect to Line referenced through JourneyPattern->Route
       JourneyPattern_VersionStructure journeyPattern = journeyPatternsById.lookup(
         serviceJourney.getJourneyPatternRef().getValue().getRef()
       );
-      lineRef = JourneyPatternHelper.getLineFromRoute(routeById, journeyPattern);
+      return JourneyPatternHelper.getLineFromRoute(routeById, journeyPattern);
     }
+    return null;
+  }
+
+  private org.opentripplanner.transit.model.network.Route resolveRoute(
+    ServiceJourney serviceJourney
+  ) {
+    String lineRef = resolveLineId(serviceJourney);
     org.opentripplanner.transit.model.network.Route route = otpRouteById.get(
       idFactory.createId(lineRef)
     );

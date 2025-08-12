@@ -8,6 +8,7 @@ import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 import static org.opentripplanner.datastore.api.FileType.REPORT;
+import static org.opentripplanner.datastore.api.FileType.SUBMODE;
 import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -102,6 +103,7 @@ public class OtpDataStore {
     addAll(findMultipleCompositeSources(config.gtfsFiles(), GTFS));
     addAll(findMultipleCompositeSources(config.netexFiles(), NETEX));
     addAll(findMultipleSources(config.emissionFiles(), EMISSION));
+    addAll(findMultipleSources(null, SUBMODE));
 
     streetGraph = findSingleSource(config.streetGraph(), STREET_GRAPH_FILENAME, GRAPH);
     graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);
@@ -207,7 +209,7 @@ public class OtpDataStore {
     }
   }
 
-  private List<DataSource> findMultipleSources(Collection<URI> uris, FileType type) {
+  private List<DataSource> findMultipleSources(@Nullable Collection<URI> uris, FileType type) {
     if (uris == null || uris.isEmpty()) {
       return localRepository.listExistingSources(type);
     }

@@ -173,7 +173,13 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   @Override
   public DataFetcher<GraphQLTransitMode> mode() {
-    return environment -> TransitModeMapper.map(getSource(environment).getMode());
+    return environment -> {
+      var route = getSource(environment);
+      if (route.getGtfsReplacementMode() != null) {
+        return TransitModeMapper.map(route.getGtfsReplacementMode());
+      }
+      return TransitModeMapper.map(route.getMode());
+    };
   }
 
   @Override
@@ -223,7 +229,13 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   @Override
   public DataFetcher<Integer> type() {
-    return environment -> getSource(environment).getGtfsType();
+    return environment -> {
+      var route = getSource(environment);
+      if (route.getGtfsReplacementType() != null) {
+        return route.getGtfsReplacementType();
+      }
+      return route.getGtfsType();
+    };
   }
 
   @Override

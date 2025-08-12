@@ -17,6 +17,7 @@ public enum FileType {
   EMISSION("🌿", "Emission data"),
   GRAPH("🌐", "OTP Graph file"),
   REPORT("📈", "Issue report"),
+  SUBMODE("🚝", "Submode mapping"),
   UNKNOWN("❓", "Unknown file");
 
   private final String icon;

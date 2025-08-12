@@ -5,11 +5,13 @@ import static org.opentripplanner.standalone.configure.ConstructApplication.crea
 import io.micrometer.core.instrument.Metrics;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -103,6 +105,7 @@ public class TestServerContext {
       List.of(),
       request,
       createStreetLimitationParametersService(),
+      createSubmodeMappingService(),
       routerConfig.transitTuningConfig(),
       transitService,
       routerConfig.triasApiParameters(),
@@ -159,5 +162,9 @@ public class TestServerContext {
     TransitService transitService
   ) {
     return new DefaultViaCoordinateTransferFactory(graph, transitService, Duration.ofMinutes(30));
+  }
+
+  public static SubmodeMappingService createSubmodeMappingService() {
+    return new SubmodeMappingService(Collections.emptyMap());
   }
 }

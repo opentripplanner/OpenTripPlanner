@@ -15,6 +15,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -69,12 +70,14 @@ public class NetexMapper {
   private final Set<FeedScopedId> routeToCentroidStopPlaceIds;
   private final double maxStopToShapeSnapDistance;
   private final boolean noTransfersOnIsolatedStops;
+  private final SubmodeMappingService submodeMappingService;
 
   /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
   private GroupNetexMapper groupMapper;
 
   /** All read netex entities by their id */
   private NetexEntityIndexReadOnlyView currentNetexIndex;
+  private TripPatternMapper tripPatternMapper;
 
   /**
    * Shared/cached entity index, used by more than one mapper. This index provides alternative
@@ -96,7 +99,8 @@ public class NetexMapper {
     Set<String> ferryIdsNotAllowedForBicycle,
     Collection<FeedScopedId> routeToCentroidStopPlaceIds,
     double maxStopToShapeSnapDistance,
-    boolean noTransfersOnIsolatedStops
+    boolean noTransfersOnIsolatedStops,
+    SubmodeMappingService submodeMappingService
   ) {
     this.transitBuilder = transitBuilder;
     this.deduplicator = deduplicator;
@@ -108,6 +112,7 @@ public class NetexMapper {
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
     this.tripCalendarBuilder = new TripCalendarBuilder(this.calendarServiceBuilder, issueStore);
+    this.submodeMappingService = submodeMappingService;
   }
 
   /**
@@ -148,6 +153,13 @@ public class NetexMapper {
     // Add the empty service id, as it can be used for routes expected to be added from realtime
     // updates or DSJs which are replaced, and where we want to keep the original DSJ
     ServiceCalendar emptyCalendar = calendarServiceBuilder.createEmptyCalendar();
+    var serviceIds = transitBuilder
+      .getTripsById()
+      .values()
+      .stream()
+      .map(Trip::getServiceId)
+      .distinct()
+      .toArray();
     if (
       transitBuilder
         .getTripsById()
@@ -157,6 +169,32 @@ public class NetexMapper {
     ) {
       transitBuilder.getCalendars().add(emptyCalendar);
     }
+  }
+
+  private TripPatternMapper getTripPatternMapper(Map<String, FeedScopedId> serviceIds) {
+    return new TripPatternMapper(
+      issueStore,
+      idFactory,
+      transitBuilder.getOperatorsById(),
+      transitBuilder.siteRepository().regularStopsById(),
+      transitBuilder.siteRepository().areaStopById(),
+      transitBuilder.siteRepository().groupStopById(),
+      transitBuilder.getRoutes(),
+      currentNetexIndex.getRouteById(),
+      currentNetexIndex.getJourneyPatternsById(),
+      currentNetexIndex.getQuayIdByStopPointRef(),
+      currentNetexIndex.getFlexibleStopPlaceByStopPointRef(),
+      currentNetexIndex.getDestinationDisplayById(),
+      currentNetexIndex.getServiceJourneyById(),
+      currentNetexIndex.getServiceLinkById(),
+      currentNetexIndex.getFlexibleLineById(),
+      currentNetexIndex.getOperatingDayById(),
+      currentNetexIndex.getDatedServiceJourneys(),
+      currentMapperIndexes.getDatedServiceJourneysBySjId(),
+      serviceIds,
+      deduplicator,
+      maxStopToShapeSnapDistance
+    );
   }
 
   /**
@@ -195,9 +233,12 @@ public class NetexMapper {
     mapDayTypeAssignments();
 
     // DayType and DSJ is mapped to a service calendar and a serviceId is generated
-    Map<String, FeedScopedId> serviceIds = createCalendarForServiceJourney();
 
-    mapRoute();
+    Map<String, FeedScopedId> serviceIds = createCalendarForServiceJourney();
+    this.tripPatternMapper = getTripPatternMapper(serviceIds);
+
+    var gtfsReplacementCollector = collectGtfsReplacements(serviceIds);
+    mapRoute(gtfsReplacementCollector);
     mapGroupsOfLines();
     mapTripPatterns(serviceIds);
     mapNoticeAssignments();
@@ -414,7 +455,19 @@ public class NetexMapper {
     );
   }
 
-  private void mapRoute() {
+  private GtfsReplacementCollector collectGtfsReplacements(Map<String, FeedScopedId> serviceIds) {
+    GtfsReplacementCollector gtfsReplacementCollector = new GtfsReplacementCollector(
+      submodeMappingService
+    );
+    for (JourneyPattern_VersionStructure journeyPattern : currentNetexIndex
+      .getJourneyPatternsById()
+      .localValues()) {
+      tripPatternMapper.collectGtfsReplacements(gtfsReplacementCollector, journeyPattern);
+    }
+    return gtfsReplacementCollector;
+  }
+
+  private void mapRoute(GtfsReplacementCollector gtfsReplacementCollector) {
     RouteMapper routeMapper = new RouteMapper(
       issueStore,
       idFactory,
@@ -425,16 +478,17 @@ public class NetexMapper {
       transitBuilder.getGroupOfRouteById(),
       currentNetexIndex,
       currentNetexIndex.getTimeZone(),
-      ferryIdsNotAllowedForBicycle
+      ferryIdsNotAllowedForBicycle,
+      tripPatternMapper
     );
     for (Line line : currentNetexIndex.getLineById().localValues()) {
-      Route route = routeMapper.mapRoute(line);
+      Route route = routeMapper.mapRoute(line, gtfsReplacementCollector);
       if (route != null) {
         transitBuilder.getRoutes().add(route);
       }
     }
     for (FlexibleLine line : currentNetexIndex.getFlexibleLineById().localValues()) {
-      Route route = routeMapper.mapRoute(line);
+      Route route = routeMapper.mapRoute(line, gtfsReplacementCollector);
       if (route != null) {
         transitBuilder.getRoutes().add(route);
       }
@@ -442,30 +496,6 @@ public class NetexMapper {
   }
 
   private void mapTripPatterns(Map<String, FeedScopedId> serviceIds) {
-    TripPatternMapper tripPatternMapper = new TripPatternMapper(
-      issueStore,
-      idFactory,
-      transitBuilder.getOperatorsById(),
-      transitBuilder.siteRepository().regularStopsById(),
-      transitBuilder.siteRepository().areaStopById(),
-      transitBuilder.siteRepository().groupStopById(),
-      transitBuilder.getRoutes(),
-      currentNetexIndex.getRouteById(),
-      currentNetexIndex.getJourneyPatternsById(),
-      currentNetexIndex.getQuayIdByStopPointRef(),
-      currentNetexIndex.getFlexibleStopPlaceByStopPointRef(),
-      currentNetexIndex.getDestinationDisplayById(),
-      currentNetexIndex.getServiceJourneyById(),
-      currentNetexIndex.getServiceLinkById(),
-      currentNetexIndex.getFlexibleLineById(),
-      currentNetexIndex.getOperatingDayById(),
-      currentNetexIndex.getDatedServiceJourneys(),
-      currentMapperIndexes.getDatedServiceJourneysBySjId(),
-      serviceIds,
-      deduplicator,
-      maxStopToShapeSnapDistance
-    );
-
     for (JourneyPattern_VersionStructure journeyPattern : currentNetexIndex
       .getJourneyPatternsById()
       .localValues()) {

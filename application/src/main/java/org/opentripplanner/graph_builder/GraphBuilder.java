@@ -109,6 +109,9 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.osmModule());
     }
 
+    // Submode mapping has to be initialized before processing timetables
+    graphBuilder.addModule(factory.submodeMappingModule());
+
     if (hasGtfs) {
       graphBuilder.addModule(factory.gtfsModule());
     }

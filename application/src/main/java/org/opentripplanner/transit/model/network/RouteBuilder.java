@@ -23,6 +23,8 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
   private TransitMode mode;
   private Integer gtfsType;
   private Integer gtfsSortOrder;
+  private TransitMode gtfsReplacementMode;
+  private Integer gtfsReplacementType;
   private String netexSubmode;
   private String flexibleLineType;
   private String description;
@@ -46,6 +48,8 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
     this.mode = original.getMode();
     this.gtfsType = original.getGtfsType();
     this.gtfsSortOrder = original.getGtfsSortOrder();
+    this.gtfsReplacementMode = original.getGtfsReplacementMode();
+    this.gtfsReplacementType = original.getGtfsReplacementType();
     this.netexSubmode = original.getNetexSubmode().name();
     this.flexibleLineType = original.getFlexibleLineType();
     this.description = original.getDescription();
@@ -132,6 +136,24 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
 
   public RouteBuilder withGtfsSortOrder(Integer gtfsSortOrder) {
     this.gtfsSortOrder = gtfsSortOrder;
+    return this;
+  }
+
+  public TransitMode getGtfsReplacementMode() {
+    return gtfsReplacementMode;
+  }
+
+  public Integer getGtfsReplacementType() {
+    return gtfsReplacementType;
+  }
+
+  public RouteBuilder withGtfsReplacementMode(TransitMode mode) {
+    this.gtfsReplacementMode = mode;
+    return this;
+  }
+
+  public RouteBuilder withGtfsReplacementType(Integer type) {
+    this.gtfsReplacementType = type;
     return this;
   }
 

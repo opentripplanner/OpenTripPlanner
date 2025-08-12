@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs;
 
 import graphql.schema.GraphQLSchema;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
@@ -20,7 +21,8 @@ public record GraphQLRequestContext(
   RealtimeVehicleService realTimeVehicleService,
   GraphQLSchema schema,
   GraphFinder graphFinder,
-  RouteRequest defaultRouteRequest
+  RouteRequest defaultRouteRequest,
+  SubmodeMappingService submodeMappingService
 ) {
   public static GraphQLRequestContext ofServerContext(OtpServerRequestContext context) {
     return new GraphQLRequestContext(
@@ -32,7 +34,8 @@ public record GraphQLRequestContext(
       context.realtimeVehicleService(),
       context.schema(),
       context.graphFinder(),
-      context.defaultRouteRequest()
+      context.defaultRouteRequest(),
+      context.submodeMappingService()
     );
   }
 
