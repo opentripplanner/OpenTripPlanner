@@ -9,7 +9,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * A station entrance extracted from OSM and therefore not (yet) associated with the transit
  * entity {@link org.opentripplanner.transit.model.site.Station}.
  */
-public class StationEntranceVertex extends OsmVertex {
+public class StationEntranceVertex extends BarrierVertex {
 
   private static final String FEED_ID = "osm";
   private final String code;
