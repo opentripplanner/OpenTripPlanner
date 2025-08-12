@@ -417,61 +417,59 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
   @Test
   public void testBikeRequestWithLimitBikeTransferConsideringPattern() {
-    OTPFeature.LimitBikeTransfer.testOn(() ->
-      OTPFeature.IncludeEmptyRailStopsInTransfers.testOn(() -> {
-        var transferRequests = List.of(REQUEST_WITH_BIKE_TRANSFER);
+    OTPFeature.IncludeEmptyRailStopsInTransfers.testOn(() -> {
+      var transferRequests = List.of(REQUEST_WITH_BIKE_TRANSFER);
 
-        TestOtpModel model = model(true);
-        var graph = model.graph();
-        graph.hasStreets = true;
+      TestOtpModel model = model(true);
+      var graph = model.graph();
+      graph.hasStreets = true;
 
-        var timetableRepository = model.timetableRepository();
-        new DirectTransferGenerator(
-          graph,
-          timetableRepository,
-          DataImportIssueStore.NOOP,
-          MAX_TRANSFER_DURATION,
-          transferRequests
-        ).buildGraph();
+      var timetableRepository = model.timetableRepository();
+      new DirectTransferGenerator(
+        graph,
+        timetableRepository,
+        DataImportIssueStore.NOOP,
+        MAX_TRANSFER_DURATION,
+        transferRequests,
+        Map.of(StreetMode.BIKE, new TransferParameters(null, null, Duration.parse("PT1H"), true))
+      ).buildGraph();
 
-        var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
-        assertTransfers(bikeTransfers, tr(S0, 100, List.of(V0, V21), S21));
-      })
-    );
+      var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
+      assertTransfers(bikeTransfers, tr(S0, 100, List.of(V0, V21), S21));
+    });
   }
 
   @Test
   public void testBikeRequestWithLimitBikeTransferWithoutConsideringPattern() {
-    OTPFeature.LimitBikeTransfer.testOn(() ->
-      OTPFeature.ConsiderPatternsForDirectTransfers.testOff(() -> {
-        var transferRequests = List.of(REQUEST_WITH_BIKE_TRANSFER);
+    OTPFeature.ConsiderPatternsForDirectTransfers.testOff(() -> {
+      var transferRequests = List.of(REQUEST_WITH_BIKE_TRANSFER);
 
-        TestOtpModel model = model(true);
-        var graph = model.graph();
-        graph.hasStreets = true;
+      TestOtpModel model = model(true);
+      var graph = model.graph();
+      graph.hasStreets = true;
 
-        var timetableRepository = model.timetableRepository();
-        new DirectTransferGenerator(
-          graph,
-          timetableRepository,
-          DataImportIssueStore.NOOP,
-          MAX_TRANSFER_DURATION,
-          transferRequests
-        ).buildGraph();
+      var timetableRepository = model.timetableRepository();
+      new DirectTransferGenerator(
+        graph,
+        timetableRepository,
+        DataImportIssueStore.NOOP,
+        MAX_TRANSFER_DURATION,
+        transferRequests,
+        Map.of(StreetMode.BIKE, new TransferParameters(null, null, Duration.parse("PT1H"), true))
+      ).buildGraph();
 
-        var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
-        assertTransfers(
-          bikeTransfers,
-          // no transfers involving S11, S12 and S13
-          tr(S0, 100, List.of(V0, V21), S21),
-          tr(S0, 200, List.of(V0, V22), S22),
-          tr(S0, 300, List.of(V0, V22, V23), S23),
-          tr(S21, 100, List.of(V21, V22), S22),
-          tr(S21, 200, List.of(V21, V22, V23), S23),
-          tr(S22, 100, List.of(V22, V23), S23)
-        );
-      })
-    );
+      var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
+      assertTransfers(
+        bikeTransfers,
+        // no transfers involving S11, S12 and S13
+        tr(S0, 100, List.of(V0, V21), S21),
+        tr(S0, 200, List.of(V0, V22), S22),
+        tr(S0, 300, List.of(V0, V22, V23), S23),
+        tr(S21, 100, List.of(V21, V22), S22),
+        tr(S21, 200, List.of(V21, V22, V23), S23),
+        tr(S22, 100, List.of(V22, V23), S23)
+      );
+    });
   }
 
   @Test
@@ -662,13 +660,20 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
             tripPattern(
               TripPattern.of(TimetableRepositoryForTest.id("TP2"))
-                .withRoute(
-                  route("R2", TransitMode.BUS, agency)
-                    .copy()
-                    .withBikesAllowed(BikeAccess.ALLOWED)
-                    .build()
-                )
+                .withRoute(route("R2", TransitMode.BUS, agency))
                 .withStopPattern(new StopPattern(List.of(st(S21), st(S22), st(S23))))
+                .withScheduledTimeTableBuilder(builder ->
+                  builder.addTripTimes(
+                    ScheduledTripTimes.of()
+                      .withTrip(
+                        TimetableRepositoryForTest.trip("bikesAllowedTrip")
+                          .withBikesAllowed(BikeAccess.ALLOWED)
+                          .build()
+                      )
+                      .withDepartureTimes("00:00 01:00 02:00")
+                      .build()
+                  )
+                )
                 .build()
             );
           }

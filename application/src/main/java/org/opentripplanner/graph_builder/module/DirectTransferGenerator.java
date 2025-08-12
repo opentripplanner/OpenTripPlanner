@@ -132,7 +132,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     stops
       .stream()
-      //.parallel()
+      .parallel()
       .forEach(ts0 -> {
         /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
          * Use map based on the list of edges, so that only distinct transfers are stored. */
@@ -145,20 +145,24 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
-        calculateDefaultTransfers(
-          transferConfiguration,
-          ts0,
-          stop,
-          distinctTransfers,
-          bikesAllowedStops
-        );
+        var transitService = new DefaultTransitService(timetableRepository);
+        calculateDefaultTransfers(transferConfiguration, ts0, stop, distinctTransfers);
         calculateFlexTransfers(transferConfiguration, ts0, stop, distinctTransfers);
         calculateCarsAllowedTransfers(
+          transitService,
           transferConfiguration,
           ts0,
           stop,
           distinctTransfers,
           carsAllowedStops
+        );
+        calculateBikesAllowedTransfers(
+          transitService,
+          transferConfiguration,
+          ts0,
+          stop,
+          distinctTransfers,
+          bikesAllowedStops
         );
 
         LOG.debug(
@@ -254,10 +258,12 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private TransferConfiguration parseTransferParameters(NearbyStopFinder nearbyStopFinder) {
     List<RouteRequest> defaultTransferRequests = new ArrayList<>();
     List<RouteRequest> carsAllowedStopTransferRequests = new ArrayList<>();
+    List<RouteRequest> bikesAllowedStopTransferRequests = new ArrayList<>();
     List<RouteRequest> flexTransferRequests = new ArrayList<>();
     HashMap<StreetMode, NearbyStopFinder> defaultNearbyStopFinderForMode = new HashMap<>();
     // These are used for calculating transfers only between carsAllowedStops.
     HashMap<StreetMode, NearbyStopFinder> carsAllowedStopNearbyStopFinderForMode = new HashMap<>();
+    HashMap<StreetMode, NearbyStopFinder> bikesAllowedStopNearbyStopFinderForMode = new HashMap<>();
 
     // Check that the mode specified in transferParametersForMode can also be found in transferRequests.
     for (StreetMode mode : transferParametersForMode.keySet()) {
@@ -304,6 +310,16 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             createNearbyStopFinder(carsAllowedStopMaxTransferDuration)
           );
         }
+        // Create transfers between bikesAllowedStops for the specific mode if bikesAllowedStopMaxTransferDuration is set in the build config.
+        Duration bikesAllowedStopMaxTransferDuration =
+          transferParameters.bikesAllowedStopMaxTransferDuration();
+        if (bikesAllowedStopMaxTransferDuration != null) {
+          bikesAllowedStopTransferRequests.add(transferProfile);
+          bikesAllowedStopNearbyStopFinderForMode.put(
+            mode,
+            createNearbyStopFinder(bikesAllowedStopMaxTransferDuration)
+          );
+        }
       } else {
         defaultTransferRequests.add(transferProfile);
         defaultNearbyStopFinderForMode.put(mode, nearbyStopFinder);
@@ -323,18 +339,12 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     return new TransferConfiguration(
       defaultTransferRequests,
       carsAllowedStopTransferRequests,
+      bikesAllowedStopTransferRequests,
       flexTransferRequests,
       defaultNearbyStopFinderForMode,
-      carsAllowedStopNearbyStopFinderForMode
+      carsAllowedStopNearbyStopFinderForMode,
+      bikesAllowedStopNearbyStopFinderForMode
     );
-  }
-
-  private boolean doesNotServeBikes(Set<StopLocation> bikesAllowedStops, StopLocation stop) {
-    var transitService = new DefaultTransitService(timetableRepository);
-    if (OTPFeature.LimitBikeTransfer.isOff()) {
-      return false;
-    }
-    return !transitService.findPatterns(stop).isEmpty() && !bikesAllowedStops.contains(stop);
   }
 
   /**
@@ -344,16 +354,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     TransferConfiguration transferConfiguration,
     TransitStopVertex ts0,
     RegularStop stop,
-    Map<TransferKey, PathTransfer> distinctTransfers,
-    Set<StopLocation> bikesAllowedStops
+    Map<TransferKey, PathTransfer> distinctTransfers
   ) {
     for (RouteRequest transferProfile : transferConfiguration.defaultTransferRequests()) {
       StreetMode mode = transferProfile.journey().transfer().mode();
-
-      if (mode.includesBiking() && doesNotServeBikes(bikesAllowedStops, stop)) {
-        return;
-      }
-
       var nearbyStops = transferConfiguration
         .defaultNearbyStopFinderForMode()
         .get(mode)
@@ -363,10 +367,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         if (sd.stop == stop) {
           continue;
         }
-        if (mode == StreetMode.BIKE && doesNotServeBikes(bikesAllowedStops, sd.stop)) {
-          continue;
-        }
-
         if (sd.stop.transfersNotAllowed()) {
           continue;
         }
@@ -411,43 +411,99 @@ public class DirectTransferGenerator implements GraphBuilderModule {
    * This method calculates transfers between stops that are visited by trips that allow cars, if configured.
    */
   private void calculateCarsAllowedTransfers(
+    TransitService transitService,
     TransferConfiguration transferConfiguration,
     TransitStopVertex ts0,
     RegularStop stop,
     Map<TransferKey, PathTransfer> distinctTransfers,
     Set<StopLocation> carsAllowedStops
   ) {
-    if (carsAllowedStops.contains(stop)) {
+    if (isEmptyOrAllowed(transitService, carsAllowedStops, stop)) {
       for (RouteRequest transferProfile : transferConfiguration.carsAllowedStopTransferRequests()) {
-        StreetMode mode = transferProfile.journey().transfer().mode();
-        var nearbyStops = transferConfiguration
-          .carsAllowedStopNearbyStopFinderForMode()
-          .get(mode)
-          .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false);
-        for (NearbyStop sd : nearbyStops) {
-          // Skip the origin stop, loop transfers are not needed.
-          if (sd.stop == stop) {
-            continue;
-          }
-          if (sd.stop.transfersNotAllowed()) {
-            continue;
-          }
-          // Only calculate transfers between carsAllowedStops.
-          if (!carsAllowedStops.contains(sd.stop)) {
-            continue;
-          }
-          createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
-        }
+        calculatedCarsOrBikesAllowedTransferForStop(
+          transitService,
+          ts0,
+          stop,
+          distinctTransfers,
+          carsAllowedStops,
+          transferProfile,
+          transferConfiguration.carsAllowedStopNearbyStopFinderForMode()
+        );
       }
+    }
+  }
+
+  /**
+   * This method calculates transfers between stops that are visited by trips that allow bikes, if configured.
+   */
+  private void calculateBikesAllowedTransfers(
+    TransitService transitService,
+    TransferConfiguration transferConfiguration,
+    TransitStopVertex ts0,
+    RegularStop stop,
+    Map<TransferKey, PathTransfer> distinctTransfers,
+    Set<StopLocation> bikesAllowedStops
+  ) {
+    if (isEmptyOrAllowed(transitService, bikesAllowedStops, stop)) {
+      for (RouteRequest transferProfile : transferConfiguration.bikesAllowedStopTransferRequests()) {
+        calculatedCarsOrBikesAllowedTransferForStop(
+          transitService,
+          ts0,
+          stop,
+          distinctTransfers,
+          bikesAllowedStops,
+          transferProfile,
+          transferConfiguration.bikesAllowedStopNearbyStopFinderForMode()
+        );
+      }
+    }
+  }
+
+  private static boolean isEmptyOrAllowed(
+    TransitService transitService,
+    Set<StopLocation> carsAllowedStops,
+    StopLocation stop
+  ) {
+    return carsAllowedStops.contains(stop) || transitService.findPatterns(stop).isEmpty();
+  }
+
+  private void calculatedCarsOrBikesAllowedTransferForStop(
+    TransitService transitService,
+    TransitStopVertex ts0,
+    RegularStop stop,
+    Map<TransferKey, PathTransfer> distinctTransfers,
+    Set<StopLocation> allowedStops,
+    RouteRequest transferProfile,
+    HashMap<StreetMode, NearbyStopFinder> nearbyStopFinder
+  ) {
+    StreetMode mode = transferProfile.journey().transfer().mode();
+    var nearbyStops = nearbyStopFinder
+      .get(mode)
+      .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false);
+    for (NearbyStop sd : nearbyStops) {
+      // Skip the origin stop, loop transfers are not needed.
+      if (sd.stop == stop) {
+        continue;
+      }
+      if (sd.stop.transfersNotAllowed()) {
+        continue;
+      }
+      // Only calculate transfers between allowedStops.
+      if (!isEmptyOrAllowed(transitService, allowedStops, sd.stop)) {
+        continue;
+      }
+      createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
     }
   }
 
   private record TransferConfiguration(
     List<RouteRequest> defaultTransferRequests,
     List<RouteRequest> carsAllowedStopTransferRequests,
+    List<RouteRequest> bikesAllowedStopTransferRequests,
     List<RouteRequest> flexTransferRequests,
     HashMap<StreetMode, NearbyStopFinder> defaultNearbyStopFinderForMode,
-    HashMap<StreetMode, NearbyStopFinder> carsAllowedStopNearbyStopFinderForMode
+    HashMap<StreetMode, NearbyStopFinder> carsAllowedStopNearbyStopFinderForMode,
+    HashMap<StreetMode, NearbyStopFinder> bikesAllowedStopNearbyStopFinderForMode
   ) {}
 
   private record TransferKey(StopLocation source, StopLocation target, List<Edge> edges) {}

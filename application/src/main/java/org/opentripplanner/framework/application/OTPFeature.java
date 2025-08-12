@@ -54,20 +54,6 @@ public enum OTPFeature {
   ),
   FloatingBike(true, false, "Enable floating bike routing."),
   GtfsGraphQlApi(true, false, "Enable the [GTFS GraphQL API](apis/GTFS-GraphQL-API.md)."),
-  LimitBikeTransfer(
-    false,
-    false,
-    """
-    Limit the generation of bike transfers to only stops serving bikes.
-
-    If ConsiderPatternsForDirectTransfers is off, unused stops are also included in case a
-    real-time bike trip uses an otherwise-unused stop.
-
-    If ConsiderPatternsForDirectTransfers is on, unused stops are not included because of how that
-    feature works. IncludeEmptyRailStopsInTransfers can be used to include unused rail stops in
-    such case.
-    """
-  ),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
    * time, but the definitive transfer time. Use this to override what we think the transfer will

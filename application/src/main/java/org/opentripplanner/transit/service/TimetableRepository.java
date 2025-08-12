@@ -585,27 +585,9 @@ public class TimetableRepository implements Serializable {
    * @return set of stop locations that are used for trips that allow cars
    */
   public Set<StopLocation> getStopLocationsUsedForCarsAllowedTrips() {
-    Set<StopLocation> stopLocations = getAllTripPatterns()
-      .stream()
-      .filter(t ->
-        t
-          .getScheduledTimetable()
-          .getTripTimes()
-          .stream()
-          .anyMatch(tt -> tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED)
-      )
-      .flatMap(t -> t.getStops().stream())
-      .collect(Collectors.toSet());
-
-    stopLocations.addAll(
-      stopLocations
-        .stream()
-        .filter(GroupStop.class::isInstance)
-        .map(GroupStop.class::cast)
-        .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
-        .toList()
+    return getStopLocationsUsedByTripTimes(
+      tt -> tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED
     );
-    return stopLocations;
   }
 
   /**
@@ -613,17 +595,17 @@ public class TimetableRepository implements Serializable {
    * Real-time updates are not considered.
    */
   public Set<StopLocation> getStopLocationsUsedForBikesAllowedTrips() {
+    return getStopLocationsUsedByTripTimes(
+      tt -> tt.getTrip().getBikesAllowed() == BikeAccess.ALLOWED
+    );
+  }
+
+  private Set<StopLocation> getStopLocationsUsedByTripTimes(
+    Predicate<TripTimes> tripTimesPredicate
+  ) {
     Set<StopLocation> stopLocations = getAllTripPatterns()
       .stream()
-      .filter(
-        t ->
-          t.getRoute().getBikesAllowed() == BikeAccess.ALLOWED ||
-          t
-            .getScheduledTimetable()
-            .getTripTimes()
-            .stream()
-            .anyMatch(tt -> tt.getTrip().getBikesAllowed() == BikeAccess.ALLOWED)
-      )
+      .filter(t -> t.getScheduledTimetable().getTripTimes().stream().anyMatch(tripTimesPredicate))
       .flatMap(t -> t.getStops().stream())
       .collect(Collectors.toSet());
 
