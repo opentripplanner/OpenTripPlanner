@@ -800,11 +800,7 @@ public class OsmDatabase {
    * Handler for a new OsmArea (single way area or multipolygon relations)
    */
   private void addArea(OsmArea area) {
-    StreetTraversalPermission permissions = area.parent
-      .getOsmProvider()
-      .getWayPropertySet()
-      .getDataForWay(area.parent)
-      .getPermission();
+    StreetTraversalPermission permissions = area.getPermission();
     if (area.parent.isRoutable() && permissions != StreetTraversalPermission.NONE) {
       walkableAreas.add(area);
     }

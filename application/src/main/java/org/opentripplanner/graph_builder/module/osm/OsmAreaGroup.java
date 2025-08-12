@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.locationtech.jts.geom.Coordinate;
@@ -121,12 +122,23 @@ class OsmAreaGroup {
           OsmLevel level2 = areasLevels.get(area2);
           boolean onSameLevel =
             (level1 == null && level2 == null) || (level1 != null && level1.equals(level2));
-          boolean shareBarrier =
-            area1 != area2 &&
-            !CollectionUtils.intersection(
-              barriersForArea.get(area1),
-              barriersForArea.get(area2)
-            ).isEmpty();
+          var crossablePermissions = Objects.requireNonNull(area1)
+            .getPermission()
+            .intersection(Objects.requireNonNull(area2).getPermission());
+          Collection<OsmWay> sharedBarriers = CollectionUtils.intersection(
+            barriersForArea.get(area1),
+            barriersForArea.get(area2)
+          )
+            .stream()
+            .filter(
+              barrier ->
+                crossablePermissions.intersection(
+                  Objects.requireNonNull(barrier).getPermission()
+                ) !=
+                crossablePermissions
+            )
+            .toList();
+          boolean shareBarrier = area1 != area2 && !sharedBarriers.isEmpty();
           if (onSameLevel && !shareBarrier) {
             groups.union(area1, area2);
           }

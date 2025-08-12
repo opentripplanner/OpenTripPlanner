@@ -846,7 +846,11 @@ public class OsmEntity {
     return levels;
   }
 
-  public StreetTraversalPermission getBarrierPermission() {
+  public StreetTraversalPermission getPermission() {
+    return getOsmProvider().getWayPropertySet().getDataForWay(this).getPermission();
+  }
+
+  private StreetTraversalPermission getBarrierPermission() {
     String barrier = getTag("barrier");
     if (barrier == null) {
       return ALL;
