@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSRentalUris;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -75,7 +76,7 @@ public class GbfsFreeVehicleStatusMapper {
       var builder = VehicleRentalVehicle.of()
         .withId(new FeedScopedId(system.systemId(), vehicle.getBikeId()))
         .withSystem(system)
-        .withName(new NonLocalizedString(getName(vehicle)))
+        .withName(getName(vehicle))
         .withLongitude(vehicle.getLon())
         .withLatitude(vehicle.getLat())
         .withVehicleType(
@@ -119,7 +120,7 @@ public class GbfsFreeVehicleStatusMapper {
     }
   }
 
-  private String getName(GBFSBike vehicle) {
+  private I18NString getName(GBFSBike vehicle) {
     var typeId = vehicle.getVehicleTypeId();
     if (typeId != null) {
       var type = vehicleTypes.get(typeId);

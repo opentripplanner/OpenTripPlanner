@@ -1,6 +1,8 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import org.mobilitydata.gbfs.v2_3.system_information.GBFSData;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystemAppInformation;
 
@@ -29,10 +31,9 @@ public class GbfsSystemInformationMapper {
 
     return new VehicleRentalSystem(
       systemId,
-      systemInformation.getLanguage(),
-      systemInformation.getName(),
-      systemInformation.getShortName(),
-      systemInformation.getOperator(),
+      I18NString.of(systemInformation.getName()),
+      NonLocalizedString.ofNullable(systemInformation.getShortName()),
+      NonLocalizedString.ofNullable(systemInformation.getOperator()),
       systemInformation.getUrl(),
       systemInformation.getPurchaseUrl(),
       systemInformation.getStartDate(),

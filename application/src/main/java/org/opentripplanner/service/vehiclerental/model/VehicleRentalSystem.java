@@ -3,6 +3,7 @@ package org.opentripplanner.service.vehiclerental.model;
 import java.util.Objects;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -17,16 +18,13 @@ public final class VehicleRentalSystem {
   private final String systemId;
 
   @Nullable
-  private final String language;
+  private final I18NString name;
 
   @Nullable
-  private final String name;
+  private final I18NString shortName;
 
   @Nullable
-  private final String shortName;
-
-  @Nullable
-  private final String operator;
+  private final I18NString operator;
 
   @Nullable
   private final String url;
@@ -57,7 +55,6 @@ public final class VehicleRentalSystem {
 
   private VehicleRentalSystem() {
     this.systemId = null;
-    this.language = null;
     this.name = null;
     this.shortName = null;
     this.operator = null;
@@ -75,7 +72,6 @@ public final class VehicleRentalSystem {
 
   private VehicleRentalSystem(Builder builder) {
     this.systemId = builder.systemId;
-    this.language = builder.language;
     this.name = builder.name;
     this.shortName = builder.shortName;
     this.operator = builder.operator;
@@ -93,10 +89,9 @@ public final class VehicleRentalSystem {
 
   public VehicleRentalSystem(
     String systemId,
-    String language,
-    String name,
-    String shortName,
-    String operator,
+    I18NString name,
+    I18NString shortName,
+    I18NString operator,
     String url,
     String purchaseUrl,
     String startDate,
@@ -109,7 +104,6 @@ public final class VehicleRentalSystem {
     VehicleRentalSystemAppInformation iosApp
   ) {
     this.systemId = systemId;
-    this.language = language;
     this.name = name;
     this.shortName = shortName;
     this.operator = operator;
@@ -139,22 +133,17 @@ public final class VehicleRentalSystem {
   }
 
   @Nullable
-  public String language() {
-    return language;
-  }
-
-  @Nullable
-  public String name() {
+  public I18NString name() {
     return name;
   }
 
   @Nullable
-  public String shortName() {
+  public I18NString shortName() {
     return shortName;
   }
 
   @Nullable
-  public String operator() {
+  public I18NString operator() {
     return operator;
   }
 
@@ -219,7 +208,6 @@ public final class VehicleRentalSystem {
     VehicleRentalSystem that = (VehicleRentalSystem) o;
     return (
       Objects.equals(systemId, that.systemId) &&
-      Objects.equals(language, that.language) &&
       Objects.equals(name, that.name) &&
       Objects.equals(shortName, that.shortName) &&
       Objects.equals(operator, that.operator) &&
@@ -240,7 +228,6 @@ public final class VehicleRentalSystem {
   public int hashCode() {
     return Objects.hash(
       systemId,
-      language,
       name,
       shortName,
       operator,
@@ -261,10 +248,9 @@ public final class VehicleRentalSystem {
   public String toString() {
     return ToStringBuilder.of(VehicleRentalSystem.class)
       .addStr("systemId", systemId, DEFAULT.systemId)
-      .addStr("language", language, DEFAULT.language)
-      .addStr("name", name, DEFAULT.name)
-      .addStr("shortName", shortName, DEFAULT.shortName)
-      .addStr("operator", operator, DEFAULT.operator)
+      .addObj("name", name, DEFAULT.name)
+      .addObj("shortName", shortName, DEFAULT.shortName)
+      .addObj("operator", operator, DEFAULT.operator)
       .addStr("url", url, DEFAULT.url)
       .addStr("purchaseUrl", purchaseUrl, DEFAULT.purchaseUrl)
       .addStr("startDate", startDate, DEFAULT.startDate)
@@ -282,10 +268,9 @@ public final class VehicleRentalSystem {
 
     private final VehicleRentalSystem original;
     private String systemId;
-    private String language;
-    private String name;
-    private String shortName;
-    private String operator;
+    private I18NString name;
+    private I18NString shortName;
+    private I18NString operator;
     private String url;
     private String purchaseUrl;
     private String startDate;
@@ -300,7 +285,6 @@ public final class VehicleRentalSystem {
     private Builder(VehicleRentalSystem original) {
       this.original = original;
       this.systemId = original.systemId;
-      this.language = original.language;
       this.name = original.name;
       this.shortName = original.shortName;
       this.operator = original.operator;
@@ -325,38 +309,29 @@ public final class VehicleRentalSystem {
       return this;
     }
 
-    public String language() {
-      return language;
-    }
-
-    public Builder withLanguage(@Nullable String language) {
-      this.language = language;
-      return this;
-    }
-
-    public String name() {
+    public I18NString name() {
       return name;
     }
 
-    public Builder withName(@Nullable String name) {
+    public Builder withName(@Nullable I18NString name) {
       this.name = name;
       return this;
     }
 
-    public String shortName() {
+    public I18NString shortName() {
       return shortName;
     }
 
-    public Builder withShortName(@Nullable String shortName) {
+    public Builder withShortName(@Nullable I18NString shortName) {
       this.shortName = shortName;
       return this;
     }
 
-    public String operator() {
+    public I18NString operator() {
       return operator;
     }
 
-    public Builder withOperator(@Nullable String operator) {
+    public Builder withOperator(@Nullable I18NString operator) {
       this.operator = operator;
       return this;
     }

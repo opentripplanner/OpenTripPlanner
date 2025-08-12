@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.basic.Distance;
@@ -74,7 +75,6 @@ public class TestFreeFloatingRentalVehicleBuilder {
       null,
       null,
       null,
-      null,
       url,
       null,
       null,
@@ -125,7 +125,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
       .withId(
         new FeedScopedId(TestFreeFloatingRentalVehicleBuilder.NETWORK_1, rentalFormFactor.name())
       )
-      .withName(rentalFormFactor.name())
+      .withName(I18NString.of(rentalFormFactor.name()))
       .withFormFactor(rentalFormFactor)
       .withPropulsionType(RentalVehicleType.PropulsionType.ELECTRIC)
       .withMaxRangeMeters(100000d)

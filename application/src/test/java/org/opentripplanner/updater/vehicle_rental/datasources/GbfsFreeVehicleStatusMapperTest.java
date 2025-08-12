@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -14,10 +15,9 @@ class GbfsFreeVehicleStatusMapperTest {
 
   public static final VehicleRentalSystem SYSTEM = new VehicleRentalSystem(
     "123",
-    "de",
-    "123",
-    "123",
-    "123",
+    I18NString.of("123"),
+    I18NString.of("123"),
+    I18NString.of("123"),
     "https://example.com",
     "https://example.com",
     null,
@@ -35,7 +35,7 @@ class GbfsFreeVehicleStatusMapperTest {
       "scooter",
       new RentalVehicleType(
         new FeedScopedId("1", "scooter"),
-        "Scooter",
+        I18NString.of("Scooter"),
         RentalFormFactor.SCOOTER,
         RentalVehicleType.PropulsionType.COMBUSTION,
         null

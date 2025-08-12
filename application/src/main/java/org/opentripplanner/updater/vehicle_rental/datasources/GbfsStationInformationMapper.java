@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.mobilitydata.gbfs.v2_3.station_information.GBFSRentalUris;
 import org.mobilitydata.gbfs.v2_3.station_information.GBFSStation;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
@@ -59,7 +60,7 @@ public class GbfsStationInformationMapper {
       .withLongitude(station.getLon())
       .withLatitude(station.getLat())
       .withName(new NonLocalizedString(station.getName()))
-      .withShortName(station.getShortName())
+      .withShortName(NonLocalizedString.ofNullable(station.getShortName()))
       .withAddress(station.getAddress())
       .withCrossStreet(station.getCrossStreet())
       .withRegionId(station.getRegionId())
