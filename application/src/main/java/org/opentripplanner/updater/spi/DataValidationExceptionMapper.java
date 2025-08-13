@@ -39,6 +39,8 @@ public class DataValidationExceptionMapper {
     return switch (code) {
       case NEGATIVE_DWELL_TIME -> UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
       case NEGATIVE_HOP_TIME -> UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME;
+      case MISSING_ARRIVAL_TIME -> UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
+      case MISSING_DEPARTURE_TIME -> UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
     };
   }
 }
