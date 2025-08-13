@@ -770,40 +770,7 @@ public class OsmDatabase {
         addArea(new OsmArea(relation, outerWays, innerWays, nodesById));
       } catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
         issueStore.add(new InvalidOsmGeometry(relation));
-        continue;
       }
-      //      for (OsmRelationMember member : relation.getMembers()) {
-      //        // multipolygons for attribute mapping
-      //        if (!(member.hasTypeWay() && waysById.containsKey(member.getRef()))) {
-      //          continue;
-      //        }
-      //
-      //        OsmWay way = waysById.get(member.getRef());
-      //        if (way == null) {
-      //          continue;
-      //        }
-      //
-      //        // Make a copy of the original way and replace it in the way database.
-      //        // This is to prevent a barrier acting as the inner ring become a routable highway
-      //        var copiedWay = way.copy();
-      //        if (!(relevantForRouting(way) || way.isBarrier())) {
-      //          waysById.remove(way.getId());
-      //        } else {
-      //          waysById.put(copiedWay.getId(), copiedWay);
-      //        }
-      //        String[] relationCopyTags = { "highway", "name", "ref" };
-      //        for (String tag : relationCopyTags) {
-      //          if (relation.hasTag(tag) && !way.hasTag(tag)) {
-      //            way.addTag(tag, relation.getTag(tag));
-      //          }
-      //        }
-      //        if (relation.isRailwayPlatform() && !way.hasTag("railway")) {
-      //          way.addTag("railway", "platform");
-      //        }
-      //        if (relation.isPlatform() && !way.hasTag("public_transport")) {
-      //          way.addTag("public_transport", "platform");
-      //        }
-      //      }
     }
   }
 
