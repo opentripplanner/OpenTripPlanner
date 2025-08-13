@@ -148,8 +148,8 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   /**
-   * We close all datasources after the entire graph build is compleate. We do this
-   * because a datsource (GFTS zip file) might be accessed by more than one graph
+   * We close all data sources after the entire graph build is complete. We do this
+   * because a data source (GFTS zip file) might be accessed by more than one graph
    * builder module. This also allows us to cache remote files(downloaded over http), not
    * downloading the files more than one time.
    */
