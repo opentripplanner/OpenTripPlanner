@@ -198,7 +198,7 @@ public class VertexLinker {
         INITIAL_SEARCH_RADIUS_DEGREES,
         tempEdges
       );
-      if (streetVertices.isEmpty()) {
+      if (streetVertices.isEmpty() && scope == Scope.REQUEST) {
         streetVertices = linkToStreetEdges(
           vertex,
           traverseModes,
@@ -270,8 +270,8 @@ public class VertexLinker {
     // street edges traversable by at least one of the given modes and are still present in the
     // graph. Calculate a distance to each of those edges, and keep only the ones within the search
     // radius.
-    List<DistanceTo<StreetEdge>> candidateEdges = graph
-      .findEdges(env, scope)
+    var candidateEdges = graph.findEdges(env, scope);
+    List<DistanceTo<StreetEdge>> candidateDistanceToEdges = candidateEdges
       .stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
@@ -286,7 +286,7 @@ public class VertexLinker {
       direction,
       scope,
       tempEdges,
-      candidateEdges,
+      candidateDistanceToEdges,
       xscale
     );
   }
