@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.LinkingDirection;
@@ -41,7 +42,7 @@ class VertexLinkerTest {
       graph.addVertex(v2);
       graph.index();
 
-      var linker = new VertexLinker(graph);
+      var linker = TestVertexLinker.of(graph);
 
       linker.linkVertexPermanently(
         toBeLinked,

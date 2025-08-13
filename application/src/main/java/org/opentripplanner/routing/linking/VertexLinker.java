@@ -21,7 +21,6 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
@@ -90,16 +89,18 @@ public class VertexLinker {
 
   private final VertexFactory vertexFactory;
 
-  private boolean areaVisibility = true;
-  private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
+  private final VisibilityMode visibilityMode;
+  private final int maxAreaNodes;
 
   /**
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
    * given time.
    */
-  public VertexLinker(Graph graph) {
-    this.graph = graph;
+  public VertexLinker(Graph graph, VisibilityMode visibilityMode, int maxAreaNodes) {
+    this.graph = Objects.requireNonNull(graph);
     this.vertexFactory = new VertexFactory(graph);
+    this.visibilityMode = Objects.requireNonNull(visibilityMode);
+    this.maxAreaNodes = maxAreaNodes;
   }
 
   public void linkVertexPermanently(
@@ -134,14 +135,6 @@ public class VertexLinker {
     if (edge.getGeometry() != null) {
       graph.removeEdge(edge, scope);
     }
-  }
-
-  public void setAreaVisibility(boolean areaVisibility) {
-    this.areaVisibility = areaVisibility;
-  }
-
-  public void setMaxAreaNodes(int maxAreaNodes) {
-    this.maxAreaNodes = maxAreaNodes;
   }
 
   /** projected distance from stop to edge, in latitude degrees */
@@ -393,7 +386,10 @@ public class VertexLinker {
     IntersectionVertex split = findSplitVertex(vertex, edge, xScale, scope, direction, tempEdges);
 
     // check if vertex is inside an area
-    if (this.areaVisibility && edge instanceof AreaEdge aEdge) {
+    if (
+      this.visibilityMode == VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES &&
+      edge instanceof AreaEdge aEdge
+    ) {
       AreaGroup ag = aEdge.getArea();
       // is area already linked ?
       start = linkedAreas.get(ag);

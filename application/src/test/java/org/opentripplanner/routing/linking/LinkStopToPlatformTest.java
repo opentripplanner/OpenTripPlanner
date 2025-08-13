@@ -3,6 +3,7 @@ package org.opentripplanner.routing.linking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;
@@ -244,7 +246,7 @@ public class LinkStopToPlatformTest {
 
     var vertexFactory = new VertexFactory(graph);
     var v = vertexFactory.intersection("boardingLocation", 10.00000001, 60.00000001);
-    graph.getLinker().addPermanentAreaVertex(v, ag);
+    TestVertexLinker.of(graph).addPermanentAreaVertex(v, ag);
 
     // vertex links to the single visibility point with 2 edges
     assertEquals(10, graph.getEdges().size());
@@ -412,8 +414,7 @@ public class LinkStopToPlatformTest {
   }
 
   private void linkStops(Graph graph, int maxAreaNodes, boolean permanent) {
-    VertexLinker linker = graph.getLinker();
-    linker.setMaxAreaNodes(maxAreaNodes);
+    var linker = new VertexLinker(graph, COMPUTE_AREA_VISIBILITY_LINES, maxAreaNodes);
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
       if (permanent) {
         linker.linkVertexPermanently(
