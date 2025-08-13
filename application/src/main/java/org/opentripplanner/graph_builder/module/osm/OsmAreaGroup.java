@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -103,7 +104,7 @@ class OsmAreaGroup {
   ) {
     DisjointSet<OsmArea> groups = new DisjointSet<>();
     Multimap<OsmNodePair, OsmArea> areasForNodePair = HashMultimap.create();
-    Multimap<OsmArea, OsmWay> barriersForArea = HashMultimap.create();
+    Map<OsmArea, Map<OsmWay, Set<OsmNode>>> barriersForArea = new HashMap<>();
     for (OsmArea area : areasLevels.keySet()) {
       for (Ring ring : area.outermostRings) {
         for (Ring inner : ring.getHoles()) {
@@ -114,7 +115,7 @@ class OsmAreaGroup {
     }
 
     // areas that can be joined must share levels and also at least two consecutive nodes,
-    // and do not share nodes of the same barrier
+    // and do not share any two nodes of the same barrier
     for (var nodePair : areasForNodePair.keySet()) {
       for (OsmArea area1 : areasForNodePair.get(nodePair)) {
         OsmLevel level1 = areasLevels.get(area1);
@@ -126,16 +127,21 @@ class OsmAreaGroup {
             .getPermission()
             .intersection(Objects.requireNonNull(area2).getPermission());
           Collection<OsmWay> sharedBarriers = CollectionUtils.intersection(
-            barriersForArea.get(area1),
-            barriersForArea.get(area2)
+            barriersForArea.getOrDefault(area1, Map.of()).keySet(),
+            barriersForArea.getOrDefault(area2, Map.of()).keySet()
           )
             .stream()
             .filter(
               barrier ->
                 crossablePermissions.intersection(
-                  Objects.requireNonNull(barrier).getPermission()
-                ) !=
-                crossablePermissions
+                    Objects.requireNonNull(barrier).getPermission()
+                  ) !=
+                  crossablePermissions &&
+                CollectionUtils.intersection(
+                  barriersForArea.get(area1).get(barrier),
+                  barriersForArea.get(area2).get(barrier)
+                ).size() >=
+                2
             )
             .toList();
           boolean shareBarrier = area1 != area2 && !sharedBarriers.isEmpty();
@@ -169,7 +175,7 @@ class OsmAreaGroup {
     Ring ring,
     Multimap<OsmNode, OsmWay> barriers,
     Multimap<OsmNodePair, OsmArea> areasForNodePair,
-    Multimap<OsmArea, OsmWay> barriersForArea
+    Map<OsmArea, Map<OsmWay, Set<OsmNode>>> barriersForArea
   ) {
     var nodes = ring.nodes;
     // the end node of a ring must be the same of the start node
@@ -182,7 +188,16 @@ class OsmAreaGroup {
         if (anotherNode != node) {
           var sharedBarriers = getBarriers(barriers, node, anotherNode);
           for (var barrier : sharedBarriers) {
-            barriersForArea.put(area, barrier);
+            if (!barriersForArea.containsKey(area)) {
+              barriersForArea.put(area, new HashMap<>());
+            }
+            var barrierMap = barriersForArea.get(area);
+            if (!barrierMap.containsKey(barrier)) {
+              barrierMap.put(barrier, new HashSet<>());
+            }
+            var nodesOnBarrier = barrierMap.get(barrier);
+            nodesOnBarrier.add(node);
+            nodesOnBarrier.add(anotherNode);
           }
         }
       }
@@ -229,4 +244,6 @@ class OsmAreaGroup {
 
     return ring;
   }
+
+  private record BarrierOnArea(OsmWay barrier, Set<OsmNode> nodes) {}
 }

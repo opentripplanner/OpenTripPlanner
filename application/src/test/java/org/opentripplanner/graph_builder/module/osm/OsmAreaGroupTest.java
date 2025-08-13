@@ -30,6 +30,7 @@ class OsmAreaGroupTest {
   private static final OsmWay BARRIER1 = new OsmWay();
   private static final OsmWay BARRIER2 = new OsmWay();
   private static final OsmWay BARRIER3 = new OsmWay();
+  private static final OsmWay BARRIER4 = new OsmWay();
   private static final OsmWay BOLLARD = new OsmWay();
 
   private static final OsmLevel LEVEL_0 = new OsmLevel(
@@ -141,6 +142,11 @@ class OsmAreaGroupTest {
     BARRIER3.addNodeRef(3);
     BARRIER3.addTag("barrier", "wall");
 
+    BARRIER4.addNodeRef(1);
+    BARRIER4.addNodeRef(4);
+    BARRIER4.addNodeRef(5);
+    BARRIER4.addTag("barrier", "wall");
+
     BOLLARD.addNodeRef(1);
     BOLLARD.addNodeRef(2);
     BOLLARD.addNodeRef(3);
@@ -161,6 +167,7 @@ class OsmAreaGroupTest {
       BARRIER1,
       BARRIER2,
       BARRIER3,
+      BARRIER4,
       BOLLARD
     ),
     nodes.valueCollection().stream().toList()
@@ -175,6 +182,18 @@ class OsmAreaGroupTest {
     OsmArea a1 = createArea(L0_WAY1);
     OsmArea a2 = createArea(L0_WAY2);
     var result = OsmAreaGroup.groupAreas(Map.of(a1, LEVEL_0, a2, LEVEL_0), generateBarrierMap());
+    assertEquals(1, result.size());
+    assertEquals(Set.of(a1, a2), Set.copyOf(result.getFirst().areas));
+  }
+
+  @Test
+  void shouldGroupWithBarrierNotSharingSameTwoNodes() {
+    OsmArea a1 = createArea(L0_WAY1);
+    OsmArea a2 = createArea(L0_WAY2);
+    var result = OsmAreaGroup.groupAreas(
+      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      generateBarrierMap(BARRIER4)
+    );
     assertEquals(1, result.size());
     assertEquals(Set.of(a1, a2), Set.copyOf(result.getFirst().areas));
   }
