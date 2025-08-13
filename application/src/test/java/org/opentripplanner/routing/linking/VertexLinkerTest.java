@@ -24,12 +24,12 @@ class VertexLinkerTest {
   @Test
   void flex() {
     OTPFeature.FlexRouting.testOn(() -> {
-      var v1 = StreetModelForTest.intersectionVertex(0, 0);
+      var v1 = StreetModelForTest.intersectionVertex(0.0, 0.0);
       v1.addAreaStops(Set.of(AREA_STOP_1));
-      var v2 = StreetModelForTest.intersectionVertex(0.1, 0.1);
+      var v2 = StreetModelForTest.intersectionVertex(0.001, 0.001);
       v2.addAreaStops(Set.of(AREA_STOP_2));
 
-      var toBeLinked = StreetModelForTest.intersectionVertex(0.05, 0.06);
+      var toBeLinked = StreetModelForTest.intersectionVertex(0.0005, 0.0006);
 
       assertThat(toBeLinked.areaStops()).isEmpty();
 

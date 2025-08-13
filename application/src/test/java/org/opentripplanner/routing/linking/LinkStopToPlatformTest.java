@@ -25,7 +25,6 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
-import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
@@ -153,18 +152,19 @@ public class LinkStopToPlatformTest {
    */
   @Test
   void testLinkStopInsideArea() {
-    // test platform is a simple rectangle. It creates a graph of 8 edges.
+    // Test platform is a simple rectangle. It creates a graph of 8 edges.
+    // The stop linking link to edges 100m away (0.000899 degrees), so we make the rectangle smaller
     Coordinate[] platform = {
-      new Coordinate(10, 60.004),
-      new Coordinate(10.008, 60.004),
-      new Coordinate(10.008, 60),
+      new Coordinate(10, 60.0006),
+      new Coordinate(10.0008, 60.0006),
+      new Coordinate(10.0008, 60),
       new Coordinate(10, 60),
     };
     // add entrance to every corner of the platform (this array defines indices)
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
     // place one stop inside the platform, near bottom edge mid point
-    Coordinate[] stops = { new Coordinate(10.004, 60.001) };
+    Coordinate[] stops = { new Coordinate(10.0004, 60.0001) };
 
     Graph graph = prepareTest(platform, visibilityPoints, stops);
     linkStops(graph, 100, true);

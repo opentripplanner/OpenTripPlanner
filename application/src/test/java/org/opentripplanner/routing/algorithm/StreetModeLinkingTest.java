@@ -1,80 +1,132 @@
 package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
+import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
+import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_PICKUP;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
+import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
+import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
+import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 /**
  * This tests linking of GenericLocations to streets for each StreetMode. The test has 5 parallel
  * streets and a linking is performed for each mode in the middle of each street. Currently linking
- * is handled in three different ways: for CAR, CAR_PARK and everything else, which is reflected in
- * the tests.
+ * is handled in three different ways:
+ * <ul>
+ *   <li>CAR - TODO : short hint on business rule we want to enforce in test </li>
+ *   <li>CAR_PARK - TODO : short hint on business rule we want to enforce in test </li>
+ *   <li>everything else - TODO : short hint on business rule we want to enforce in test </li>
+ * </ul>
  */
 public class StreetModeLinkingTest extends GraphRoutingTest {
 
-  private static final GenericLocation PLACE_1 = GenericLocation.fromCoordinate(47.5015, 19.015);
-  private static final GenericLocation PLACE_2 = GenericLocation.fromCoordinate(47.5025, 19.015);
+  /**
+   * This is used to make parallel streets by adding the value to the longitude.
+   * The value make streets about 11m apart.
+   */
+  private static final double STREET_DELTA = 0.0001;
+
+  /** The offset is used to place coordinates, close to a line(street) - but not directly on it. */
+  private static final double OFFSET = STREET_DELTA / 10.0;
+
+  private static final double LONGITUDE_0 = 20.0000;
+
+  // Make the start and end of each line about 300m apart
+  private static final double LATITUDE_START = 47.0050;
+  private static final double LATITUDE_END = LATITUDE_START + 0.0027;
+
+  private static final double LATITUDE_MIDDLE = (LATITUDE_START + LATITUDE_END) / 2;
+
+  // Place stop/from/to locations 1m above the first street longitude.
+  private static final double LONGITUDE_LOCATION = LONGITUDE_0 - OFFSET;
+
+  // Make parallel streets ~10 meters apart for each street traversal permission
+  private static final LinkingTestCase CAR_TC = LinkingTestCase.of(StreetTraversalPermission.CAR);
+  private static final LinkingTestCase ALL_TC = LinkingTestCase.of(StreetTraversalPermission.ALL);
+  private static final LinkingTestCase PEDESTRIAN_TC = LinkingTestCase.of(
+    StreetTraversalPermission.PEDESTRIAN
+  );
+  private static final LinkingTestCase PEDESTRIAN_BICYCLE_TC = LinkingTestCase.of(
+    StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
+  );
+  private static final LinkingTestCase BICYCLE_CAR_TC = LinkingTestCase.of(
+    StreetTraversalPermission.BICYCLE_AND_CAR
+  );
+
+  /**
+   * A place used as dummy to/from, when testing from/to. It can be anywhere, except
+   * the same location as the place under test.
+   */
+  private static final GenericLocation ANY_PLACE = new GenericLocation(
+    "Any place - not used",
+    null,
+    LATITUDE_START,
+    LONGITUDE_0
+  );
 
   private Graph graph;
+  private TransitStopVertex stop;
+  private GenericLocation stopLocation;
+
+  private static GenericLocation closeToCarSt() {
+    return CAR_TC.placeCloseToStreet();
+  }
+
+  private static GenericLocation closeToAllSt() {
+    return ALL_TC.placeCloseToStreet();
+  }
+
+  private static GenericLocation closeToPedestrianSt() {
+    return PEDESTRIAN_TC.placeCloseToStreet();
+  }
+
+  private static GenericLocation closeToPedestrianAndBicycleSt() {
+    return PEDESTRIAN_BICYCLE_TC.placeCloseToStreet();
+  }
+
+  private static GenericLocation closeToBicycleAndCarSt() {
+    return BICYCLE_CAR_TC.placeCloseToStreet();
+  }
 
   @BeforeEach
   protected void setUp() throws Exception {
+    // Place stop in the middle of the lines(LATITUDE), and slightly above the first line
+
     var otpModel = modelOf(
       new GraphRoutingTest.Builder() {
         @Override
         public void build() {
-          street(
-            intersection("A1", 47.5000, 19.00),
-            intersection("A2", 47.5020, 19.00),
-            100,
-            StreetTraversalPermission.CAR
-          );
-
-          street(
-            intersection("B1", 47.5000, 19.01),
-            intersection("B2", 47.5020, 19.01),
-            100,
-            StreetTraversalPermission.ALL
-          );
-
-          street(
-            intersection("C1", 47.5000, 19.02),
-            intersection("C2", 47.5020, 19.02),
-            100,
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
-          );
-
-          streetBuilder(
-            intersection("D1", 47.500, 19.03),
-            intersection("D2", 47.502, 19.03),
-            100,
-            StreetTraversalPermission.PEDESTRIAN
-          )
-            .withWheelchairAccessible(false)
+          CAR_TC.createStreetEdgeBuilder(this).buildAndConnect();
+          ALL_TC.createStreetEdgeBuilder(this).buildAndConnect();
+          PEDESTRIAN_TC.createStreetEdgeBuilder(this)
+            .withWheelchairAccessible(true)
             .buildAndConnect();
-
-          street(
-            intersection("E1", 47.500, 19.04),
-            intersection("E2", 47.502, 19.04),
-            100,
-            StreetTraversalPermission.BICYCLE_AND_CAR
-          );
-
-          stop("STOP", 47.501, 19.04);
+          PEDESTRIAN_BICYCLE_TC.createStreetEdgeBuilder(this).buildAndConnect();
+          BICYCLE_CAR_TC.createStreetEdgeBuilder(this).buildAndConnect();
+          stop = stop("STOP", LATITUDE_MIDDLE, LONGITUDE_LOCATION);
         }
       }
     );
@@ -82,171 +134,121 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
     graph.hasStreets = true;
     TestStreetLinkerModule.link(graph, otpModel.timetableRepository());
+    this.stopLocation = new GenericLocation(stop.getLabelString(), stop.getId(), null, null);
+  }
+
+  private static List<Arguments> testPedestrianLinkingTestCases() {
+    var args = new ArrayList<Arguments>();
+    var modes = List.of(
+      WALK,
+      BIKE,
+      BIKE_TO_PARK,
+      BIKE_RENTAL,
+      SCOOTER_RENTAL,
+      FLEXIBLE,
+      CAR_PICKUP,
+      CAR_RENTAL
+    );
+
+    for (StreetMode mode : modes) {
+      args.addAll(
+        List.of(
+          Arguments.of(mode, closeToCarSt(), ALL_TC),
+          Arguments.of(mode, closeToAllSt(), ALL_TC),
+          Arguments.of(mode, closeToPedestrianSt(), PEDESTRIAN_TC),
+          Arguments.of(mode, closeToPedestrianAndBicycleSt(), PEDESTRIAN_BICYCLE_TC),
+          Arguments.of(mode, closeToBicycleAndCarSt(), PEDESTRIAN_BICYCLE_TC)
+        )
+      );
+    }
+    return args;
+  }
+
+  /**
+   * Only CAR linking is handled specially, since walking with a bike is always a possibility,
+   * and so no difference is made between BIKE/WALK:
+   */
+  @ParameterizedTest
+  @MethodSource("testPedestrianLinkingTestCases")
+  public void testPedestrianLinking(
+    StreetMode mode,
+    GenericLocation placeCloseToStreetTestCase,
+    LinkingTestCase expectedStreet
+  ) {
+    assertLinking(placeCloseToStreetTestCase, expectedStreet, mode);
   }
 
   @Test
   public void testCarLinking() {
-    /*
-    assertLinkedFromTo(47.501, 19.00, "A1A2 street", StreetMode.CAR);
-    assertLinkedFromTo(47.501, 19.01, "B1B2 street", StreetMode.CAR);
-    assertLinkedFromTo(47.501, 19.02, "B1B2 street", StreetMode.CAR);
-    assertLinkedFromTo(47.501, 19.03, "E1E2 street", StreetMode.CAR);
-    assertLinkedFromTo(47.501, 19.04, "E1E2 street", StreetMode.CAR);
-     */
-    assertLinkedFromTo("STOP", "E1E2 street", StreetMode.CAR);
+    assertLinking(closeToCarSt(), CAR_TC, CAR);
+    assertLinking(closeToAllSt(), ALL_TC, CAR);
+    assertLinking(closeToPedestrianSt(), ALL_TC, CAR);
+    assertLinking(closeToPedestrianAndBicycleSt(), BICYCLE_CAR_TC, CAR);
+    assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, CAR);
+    assertLinking(stopLocation, CAR_TC, CAR_TC, CAR);
   }
 
   @Test
   public void testCarParkLinking() {
-    var setup = (BiFunction<Double, Double, Consumer<RouteRequestBuilder>>) (
-      Double latitude,
-      Double longitude
-    ) ->
-      (RouteRequestBuilder rr) -> {
-        rr.withFrom(GenericLocation.fromCoordinate(latitude, longitude));
-        rr.withTo(GenericLocation.fromCoordinate(latitude, longitude));
-      };
-
-    assertLinking(setup.apply(47.501, 19.00), "A1A2 street", "B1B2 street", StreetMode.CAR_TO_PARK);
-    assertLinking(setup.apply(47.501, 19.01), "B1B2 street", "B1B2 street", StreetMode.CAR_TO_PARK);
-    assertLinking(setup.apply(47.501, 19.02), "B1B2 street", "C1C2 street", StreetMode.CAR_TO_PARK);
-    assertLinking(setup.apply(47.501, 19.03), "E1E2 street", "D1D2 street", StreetMode.CAR_TO_PARK);
-    assertLinking(setup.apply(47.501, 19.04), "E1E2 street", "D1D2 street", StreetMode.CAR_TO_PARK);
+    assertLinking(closeToCarSt(), CAR_TC, ALL_TC, CAR_TO_PARK);
+    assertLinking(closeToAllSt(), ALL_TC, ALL_TC, CAR_TO_PARK);
+    assertLinking(closeToPedestrianSt(), ALL_TC, PEDESTRIAN_TC, CAR_TO_PARK);
     assertLinking(
-      rr -> {
-        rr.withFrom(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
-        rr.withTo(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
-      },
-      "E1E2 street",
-      "D1D2 street",
-      StreetMode.CAR_TO_PARK
+      closeToPedestrianAndBicycleSt(),
+      BICYCLE_CAR_TC,
+      PEDESTRIAN_BICYCLE_TC,
+      CAR_TO_PARK
     );
+    assertLinking(closeToBicycleAndCarSt(), BICYCLE_CAR_TC, PEDESTRIAN_BICYCLE_TC, CAR_TO_PARK);
+    assertLinking(stopLocation, CAR_TC, ALL_TC, CAR_TO_PARK);
   }
 
-  // Only CAR linking is handled specially, since walking with a bike is always a possibility,
-  // and so no difference is made between BIKE/WALK:
+  // TODO: Linking to wheelchair accessible streets is currently not implemented,
+  //       is this relevant?
 
-  @Test
-  public void testDefaultLinking() {
-    var streetModes = new StreetMode[] {
-      StreetMode.WALK,
-      StreetMode.BIKE,
-      StreetMode.BIKE_TO_PARK,
-      StreetMode.BIKE_RENTAL,
-      StreetMode.SCOOTER_RENTAL,
-      StreetMode.FLEXIBLE,
-      StreetMode.CAR_PICKUP,
-      StreetMode.CAR_RENTAL,
-    };
-
-    assertLinkedFromTo(47.501, 19.00, "B1B2 street", streetModes);
-    assertLinkedFromTo(47.501, 19.01, "B1B2 street", streetModes);
-    assertLinkedFromTo(47.501, 19.02, "C1C2 street", streetModes);
-    assertLinkedFromTo(47.501, 19.03, "D1D2 street", streetModes);
-    assertLinkedFromTo(47.501, 19.04, "D1D2 street", streetModes);
-    assertLinkedFromTo("STOP", "D1D2 street", streetModes);
-  }
-
-  // Linking to wheelchair accessible streets is currently not implemented.
-
-  @Test
-  @Disabled
-  public void testWheelchairLinking() {
-    assertLinking(
-      rr -> {
-        rr.withFrom(GenericLocation.fromCoordinate(47.5010, 19.03));
-        rr.withTo(GenericLocation.fromCoordinate(47.5010, 19.03));
-        rr.withJourney(j -> j.withWheelchair(true));
-      },
-      "C1C2 street",
-      "C1C2 street",
-      StreetMode.WALK
-    );
-  }
-
-  private void assertLinkedFromTo(
-    double latitude,
-    double longitude,
-    String streetName,
+  private void assertLinking(
+    GenericLocation location,
+    LinkingTestCase expectedStreetName,
     StreetMode... streetModes
   ) {
-    assertLinking(
-      rr -> {
-        rr.withFrom(GenericLocation.fromCoordinate(latitude, longitude));
-        rr.withTo(GenericLocation.fromCoordinate(latitude, longitude));
-      },
-      streetName,
-      streetName,
-      streetModes
-    );
-  }
-
-  private void assertLinkedFromTo(String stopId, String streetName, StreetMode... streetModes) {
-    assertLinking(
-      rr -> {
-        rr.withFrom(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
-        rr.withTo(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
-      },
-      streetName,
-      streetName,
-      streetModes
-    );
+    assertLinking(location, expectedStreetName, expectedStreetName, streetModes);
   }
 
   private void assertLinking(
-    Consumer<RouteRequestBuilder> consumer,
-    String fromStreetName,
-    String toStreetName,
+    GenericLocation location,
+    LinkingTestCase expectedFromStreetName,
+    LinkingTestCase expectedToStreetName,
     StreetMode... streetModes
   ) {
     for (final StreetMode streetMode : streetModes) {
-      var builder = RouteRequest.of();
-
-      consumer.accept(builder);
-
-      // Set to, so that origin and destination are different
-      builder.withTo(PLACE_1);
-
-      var request = builder.buildRequest();
-
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          request.from(),
-          request.to(),
+          location,
+          ANY_PLACE,
           streetMode,
           streetMode
         )
       ) {
-        if (fromStreetName != null) {
-          assertFromLink(
-            fromStreetName,
-            streetMode,
-            temporaryVertices.getFromVertices().iterator().next()
-          );
-        }
+        assertFromLink(
+          expectedFromStreetName.name(),
+          streetMode,
+          temporaryVertices.getFromVertices().iterator().next()
+        );
       }
 
-      builder = RouteRequest.of();
-
-      consumer.accept(builder);
-
-      // Set from, so that origin and destination are different
-      builder.withFrom(PLACE_2);
-      request = builder.buildRequest();
-
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          request.from(),
-          request.to(),
+          ANY_PLACE,
+          location,
           streetMode,
           streetMode
         )
       ) {
-        if (toStreetName != null) {
+        if (expectedToStreetName != null) {
           assertToLink(
-            toStreetName,
+            expectedToStreetName.name(),
             streetMode,
             temporaryVertices.getToVertices().iterator().next()
           );
@@ -264,6 +266,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       .getOutgoing()
       .iterator()
       .next();
+
     assertEquals(
       streetName,
       outgoing.getDefaultName(),
@@ -286,5 +289,59 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       outgoing.getDefaultName(),
       streetMode + " should be linked to " + streetName
     );
+  }
+
+  /**
+   * A linking test case consists of a street with a given traversal permission and can be used to
+   * provide a generic location close, but not directly on, the street. When linking the location
+   * the test-case should be the first choice if the permissions are ok, if not link to the nearby
+   * test-case streets.
+   */
+  record LinkingTestCase(
+    String name,
+    int index,
+    double longitude,
+    StreetTraversalPermission permissions
+  ) {
+    private static int indexCounter = 0;
+
+    /**
+     * Generate a street from A to B. The streets are horisontal and paralell to each other with
+     * about 10-11m apart (see {@link #STREET_DELTA}).
+     */
+    static LinkingTestCase of(StreetTraversalPermission permission) {
+      var name =
+        permission.name().charAt(0) +
+        permission.name().substring(1).toLowerCase(Locale.ROOT).replace("_and_", " & ") +
+        " st";
+      int index = indexCounter++;
+      double longitude = LONGITUDE_0 + STREET_DELTA * index;
+      return new LinkingTestCase(name, index, longitude, permission);
+    }
+
+    /**
+     * Create a random place relativly close, but not on the street generated by this test-case.
+     * The longitude for the place is the same as the street plus the {@link #OFFSET}. If this
+     * test-case is street N, then the closest street for the location is in order:
+     * {@code N, N+1, N-1, N+2, N-2 ... }
+     */
+    GenericLocation placeCloseToStreet() {
+      return new GenericLocation("On " + name, null, LATITUDE_MIDDLE, longitude + OFFSET);
+    }
+
+    StreetEdgeBuilder createStreetEdgeBuilder(GraphRoutingTest.Builder factory) {
+      var from = factory.intersection("V" + index + "_START", LATITUDE_START, longitude);
+      var to = factory.intersection("V" + index + "_END", LATITUDE_END, longitude);
+      return new StreetEdgeBuilder<>()
+        .withFromVertex(from)
+        .withToVertex(to)
+        .withGeometry(
+          GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon())
+        )
+        .withName(name)
+        .withMeterLength(100)
+        .withPermission(permissions)
+        .withBack(false);
+    }
   }
 }
