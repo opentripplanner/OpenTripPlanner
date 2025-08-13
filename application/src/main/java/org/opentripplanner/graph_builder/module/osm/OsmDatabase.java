@@ -139,8 +139,8 @@ public class OsmDatabase {
     return nodesById.get(nodeId);
   }
 
-  public OsmWay getWay(Long nodeId) {
-    return waysById.get(nodeId);
+  public OsmWay getWay(Long wayId) {
+    return waysById.get(wayId);
   }
 
   public Collection<OsmWay> getWays() {
@@ -704,6 +704,9 @@ public class OsmDatabase {
       }
       try {
         addArea(new OsmArea(way, List.of(way), Collections.emptyList(), nodesById));
+        // do not keep the way used in an area, it creates duplicated edges from the basic
+        // street graph and from the area processing
+        waysById.remove(way.getId());
       } catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
         // this area cannot be constructed, but we already have all the
         // necessary nodes to construct it. So, something must be wrong with
@@ -769,30 +772,38 @@ public class OsmDatabase {
         issueStore.add(new InvalidOsmGeometry(relation));
         continue;
       }
-
-      for (OsmRelationMember member : relation.getMembers()) {
-        // multipolygons for attribute mapping
-        if (!(member.hasTypeWay() && waysById.containsKey(member.getRef()))) {
-          continue;
-        }
-
-        OsmEntity way = waysById.get(member.getRef());
-        if (way == null) {
-          continue;
-        }
-        String[] relationCopyTags = { "highway", "name", "ref" };
-        for (String tag : relationCopyTags) {
-          if (relation.hasTag(tag) && !way.hasTag(tag)) {
-            way.addTag(tag, relation.getTag(tag));
-          }
-        }
-        if (relation.isRailwayPlatform() && !way.hasTag("railway")) {
-          way.addTag("railway", "platform");
-        }
-        if (relation.isPlatform() && !way.hasTag("public_transport")) {
-          way.addTag("public_transport", "platform");
-        }
-      }
+      //      for (OsmRelationMember member : relation.getMembers()) {
+      //        // multipolygons for attribute mapping
+      //        if (!(member.hasTypeWay() && waysById.containsKey(member.getRef()))) {
+      //          continue;
+      //        }
+      //
+      //        OsmWay way = waysById.get(member.getRef());
+      //        if (way == null) {
+      //          continue;
+      //        }
+      //
+      //        // Make a copy of the original way and replace it in the way database.
+      //        // This is to prevent a barrier acting as the inner ring become a routable highway
+      //        var copiedWay = way.copy();
+      //        if (!(relevantForRouting(way) || way.isBarrier())) {
+      //          waysById.remove(way.getId());
+      //        } else {
+      //          waysById.put(copiedWay.getId(), copiedWay);
+      //        }
+      //        String[] relationCopyTags = { "highway", "name", "ref" };
+      //        for (String tag : relationCopyTags) {
+      //          if (relation.hasTag(tag) && !way.hasTag(tag)) {
+      //            way.addTag(tag, relation.getTag(tag));
+      //          }
+      //        }
+      //        if (relation.isRailwayPlatform() && !way.hasTag("railway")) {
+      //          way.addTag("railway", "platform");
+      //        }
+      //        if (relation.isPlatform() && !way.hasTag("public_transport")) {
+      //          way.addTag("public_transport", "platform");
+      //        }
+      //      }
     }
   }
 

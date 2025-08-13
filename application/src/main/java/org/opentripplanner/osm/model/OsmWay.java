@@ -202,4 +202,18 @@ public class OsmWay extends OsmEntity {
   public String url() {
     return String.format("https://www.openstreetmap.org/way/%d", getId());
   }
+
+  public OsmWay copy() {
+    var copy = new OsmWay();
+    copy.setId(getId());
+    copy.setCreativeName(creativeName);
+    copy.setOsmProvider(getOsmProvider());
+    for (var i : getNodeRefs().toArray()) {
+      copy.addNodeRef(i);
+    }
+    for (var tag : getTags().entrySet()) {
+      copy.addTag(tag.getKey(), tag.getValue());
+    }
+    return copy;
+  }
 }
