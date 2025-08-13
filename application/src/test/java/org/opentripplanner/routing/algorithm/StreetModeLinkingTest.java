@@ -221,6 +221,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     LinkingTestCase expectedToStreetName,
     StreetMode... streetModes
   ) {
+    var linker = TestVertexLinker.of(graph);
     for (final StreetMode streetMode : streetModes) {
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
@@ -242,6 +243,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
+          linker,
           ANY_PLACE,
           location,
           streetMode,
