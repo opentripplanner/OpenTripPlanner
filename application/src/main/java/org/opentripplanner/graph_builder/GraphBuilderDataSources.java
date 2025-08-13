@@ -153,6 +153,7 @@ public class GraphBuilderDataSources implements Closeable {
    * builder module. This also allows us to cache remote files(downloaded over http), not
    * downloading the files more than one time.
    */
+  @Override
   public void close() {
     for (DataSource dataSource : inputData.values()) {
       try {

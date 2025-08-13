@@ -10,7 +10,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 @Module
-public class ConfigureGraphBuilderModule {
+public class GraphBuilderModule {
 
   @Provides
   @Singleton
