@@ -53,6 +53,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Handle alerts for stations [#6750](https://github.com/opentripplanner/OpenTripPlanner/pull/6750)
 - Fix TripTimesForDaysIndex generation for empty days [#6732](https://github.com/opentripplanner/OpenTripPlanner/pull/6732)
 - Refactor rentalvehicles models [#6734](https://github.com/opentripplanner/OpenTripPlanner/pull/6734)
+- Dependent fare products [#6681](https://github.com/opentripplanner/OpenTripPlanner/pull/6681)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
