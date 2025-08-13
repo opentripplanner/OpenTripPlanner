@@ -12,6 +12,8 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class AlertEntityTypeResolver implements TypeResolver {
@@ -21,7 +23,7 @@ public class AlertEntityTypeResolver implements TypeResolver {
     Object o = environment.getObject();
     GraphQLSchema schema = environment.getSchema();
 
-    if (o instanceof RegularStop) {
+    if (o instanceof StopLocation || o instanceof StopLocationsGroup) {
       return schema.getObjectType("Stop");
     }
     if (o instanceof Agency) {
