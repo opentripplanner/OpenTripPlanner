@@ -65,13 +65,13 @@
         <google.dagger.version>2.56.2</google.dagger.version>
         <jackson.version>2.19.2</jackson.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
-        <jersey.version>3.1.10</jersey.version>
+        <jersey.version>3.1.11</jersey.version>
         <junit.version>5.13.3</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.18</logback.version>
         <lucene.version>10.2.2</lucene.version>
-        <micrometer.version>1.15.2</micrometer.version>
+        <micrometer.version>1.15.3</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.31.1</protobuf.version>
