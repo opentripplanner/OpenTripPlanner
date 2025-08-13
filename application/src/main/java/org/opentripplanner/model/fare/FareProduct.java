@@ -2,7 +2,6 @@ package org.opentripplanner.model.fare;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -25,9 +24,6 @@ public final class FareProduct implements Serializable {
   private final Money price;
 
   @Nullable
-  private final Duration validity;
-
-  @Nullable
   private final RiderCategory category;
 
   @Nullable
@@ -37,7 +33,6 @@ public final class FareProduct implements Serializable {
     this.id = Objects.requireNonNull(builder.id());
     this.name = Objects.requireNonNull(builder.name());
     this.price = Objects.requireNonNull(builder.price());
-    this.validity = builder.validity();
     this.category = builder.category();
     this.medium = builder.medium();
   }
@@ -46,17 +41,12 @@ public final class FareProduct implements Serializable {
     return new FareProductBuilder(id, name, price);
   }
 
-  public boolean coversDuration(Duration journeyDuration) {
-    return (Objects.nonNull(validity) && validity.toSeconds() > journeyDuration.toSeconds());
-  }
-
   @Override
   public String toString() {
     return ToStringBuilder.of(FareProduct.class)
       .addStr("id", id.toString())
       .addStr("name", name)
       .addObj("amount", price)
-      .addDuration("duration", validity)
       .addObj("category", category)
       .addObj("medium", medium)
       .toString();
@@ -80,9 +70,6 @@ public final class FareProduct implements Serializable {
       .append(price.currency().getCurrencyCode())
       .append(price.minorUnitAmount());
 
-    if (validity != null) {
-      buf.append(validity.toSeconds());
-    }
     if (medium != null) {
       buf.append(medium.id()).append(medium.name());
     }
@@ -104,9 +91,8 @@ public final class FareProduct implements Serializable {
     return price;
   }
 
-  @Nullable
-  public Duration validity() {
-    return validity;
+  public boolean isFree() {
+    return price.isZero();
   }
 
   @Nullable
@@ -128,7 +114,6 @@ public final class FareProduct implements Serializable {
       Objects.equals(this.id, that.id) &&
       Objects.equals(this.name, that.name) &&
       Objects.equals(this.price, that.price) &&
-      Objects.equals(this.validity, that.validity) &&
       Objects.equals(this.category, that.category) &&
       Objects.equals(this.medium, that.medium)
     );
@@ -136,6 +121,6 @@ public final class FareProduct implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, price, validity, category, medium);
+    return Objects.hash(id, name, price, category, medium);
   }
 }
