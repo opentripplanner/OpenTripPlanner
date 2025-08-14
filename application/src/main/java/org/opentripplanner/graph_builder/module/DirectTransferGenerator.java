@@ -420,7 +420,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   ) {
     if (isEmptyOrAllowed(transitService, carsAllowedStops, stop)) {
       for (RouteRequest transferProfile : transferConfiguration.carsAllowedStopTransferRequests()) {
-        calculatedCarsOrBikesAllowedTransferForStop(
+        calculateTransfersForStopWithAllowedStops(
           transitService,
           ts0,
           stop,
@@ -446,7 +446,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   ) {
     if (isEmptyOrAllowed(transitService, bikesAllowedStops, stop)) {
       for (RouteRequest transferProfile : transferConfiguration.bikesAllowedStopTransferRequests()) {
-        calculatedCarsOrBikesAllowedTransferForStop(
+        calculateTransfersForStopWithAllowedStops(
           transitService,
           ts0,
           stop,
@@ -467,7 +467,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     return carsAllowedStops.contains(stop) || transitService.findPatterns(stop).isEmpty();
   }
 
-  private void calculatedCarsOrBikesAllowedTransferForStop(
+  private void calculateTransfersForStopWithAllowedStops(
     TransitService transitService,
     TransitStopVertex ts0,
     RegularStop stop,
