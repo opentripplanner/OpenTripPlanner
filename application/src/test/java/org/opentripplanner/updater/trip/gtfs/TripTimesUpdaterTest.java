@@ -32,7 +32,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TripTimesPatch;
+import org.opentripplanner.updater.trip.gtfs.model.TripTimesPatch;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;

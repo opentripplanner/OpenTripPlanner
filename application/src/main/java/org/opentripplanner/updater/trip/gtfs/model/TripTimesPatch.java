@@ -1,6 +1,7 @@
-package org.opentripplanner.model;
+package org.opentripplanner.updater.trip.gtfs.model;
 
 import java.util.Map;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
