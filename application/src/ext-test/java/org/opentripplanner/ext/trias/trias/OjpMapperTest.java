@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.api.model.transit.UseFeedIdMapper;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.ext.trias.mapping.StopEventResponseMapper;
 import org.opentripplanner.ext.trias.service.CallAtStop;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -80,7 +80,7 @@ class OjpMapperTest {
     var mapper = new StopEventResponseMapper(
       Set.of(),
       ZoneIds.BERLIN,
-      new UseFeedIdMapper(),
+      new DefaultFeedIdMapper(),
       RESOLVE_FEED_LANG
     );
 
@@ -105,7 +105,7 @@ class OjpMapperTest {
     var mapper = new StopEventResponseMapper(
       Set.of(),
       ZoneIds.BERLIN,
-      new UseFeedIdMapper(),
+      new DefaultFeedIdMapper(),
       RESOLVE_FEED_LANG
     );
     var ojp = mapper.mapCalls(List.of(new CallAtStop(TRIP_TIMES_ON_DATE, WALK_TIME)), timestamp);

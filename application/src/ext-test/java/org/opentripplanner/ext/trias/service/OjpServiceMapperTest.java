@@ -22,17 +22,17 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.api.model.transit.UseFeedIdMapper;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.ojp.time.XmlDateTime;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class OjpServiceMapperTest {
 
   private static final ZonedDateTime ZDT = ZonedDateTime.parse("2025-02-17T14:24:02+01:00");
-  private static final UseFeedIdMapper ID_RESOLVER = new UseFeedIdMapper();
+  private static final DefaultFeedIdMapper FEED_ID_MAPPER = new DefaultFeedIdMapper();
   private static final OjpServiceMapper SERVICE = new OjpServiceMapper(
     null,
-    ID_RESOLVER,
+    FEED_ID_MAPPER,
     ZoneIds.BERLIN
   );
 

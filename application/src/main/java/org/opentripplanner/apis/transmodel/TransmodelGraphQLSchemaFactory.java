@@ -1556,6 +1556,6 @@ public class TransmodelGraphQLSchemaFactory {
     if (ids == null) {
       return null;
     }
-    return idResolver.parseListNullSafe(ids);
+    return idResolver.parseList(ids);
   }
 }

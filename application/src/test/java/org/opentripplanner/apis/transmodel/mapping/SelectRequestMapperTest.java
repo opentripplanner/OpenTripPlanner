@@ -12,11 +12,13 @@ import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.api.model.transit.UseFeedIdMapper;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 
 class SelectRequestMapperTest {
 
-  private static final SelectRequestMapper MAPPER = new SelectRequestMapper(new UseFeedIdMapper());
+  private static final SelectRequestMapper MAPPER = new SelectRequestMapper(
+    new DefaultFeedIdMapper()
+  );
 
   @Test
   void mapFullSelectRequest() throws JsonProcessingException {

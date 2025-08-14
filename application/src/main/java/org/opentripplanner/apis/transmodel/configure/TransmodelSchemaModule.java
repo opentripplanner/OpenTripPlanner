@@ -5,9 +5,9 @@ import dagger.Provides;
 import graphql.schema.GraphQLSchema;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.api.model.transit.HideFeedIdMapper;
-import org.opentripplanner.api.model.transit.UseFeedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLSchemaFactory;
 import org.opentripplanner.apis.transmodel.mapping.FixedFeedIdGenerator;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -26,19 +26,19 @@ public class TransmodelSchemaModule {
     TimetableRepository timetableRepository,
     RouterConfig routerConfig
   ) {
-    FeedScopedIdMapper idResolver;
+    FeedScopedIdMapper feedIdMapper;
     if (routerConfig.transmodelApi().hideFeedId()) {
       String fixedFeedId = FixedFeedIdGenerator.generate(timetableRepository.getAgencies());
-      idResolver = new HideFeedIdMapper(fixedFeedId);
+      feedIdMapper = new HideFeedIdMapper(fixedFeedId);
     } else {
-      idResolver = new UseFeedIdMapper();
+      feedIdMapper = new DefaultFeedIdMapper();
     }
 
     TransmodelGraphQLSchemaFactory factory = new TransmodelGraphQLSchemaFactory(
       defaultRouteRequest,
       timetableRepository.getTimeZone(),
       routerConfig.transitTuningConfig(),
-      idResolver,
+      feedIdMapper,
       routerConfig.server().apiDocumentationProfile()
     );
 

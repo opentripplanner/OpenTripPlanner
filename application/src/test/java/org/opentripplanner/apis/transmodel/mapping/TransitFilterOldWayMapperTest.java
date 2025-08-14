@@ -9,7 +9,7 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.api.model.transit.UseFeedIdMapper;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -20,7 +20,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 class TransitFilterOldWayMapperTest {
 
   private static final TransitFilterOldWayMapper MAPPER = new TransitFilterOldWayMapper(
-    new UseFeedIdMapper()
+    new DefaultFeedIdMapper()
   );
 
   private TransitRequestBuilder transitBuilder = TransitRequest.of();

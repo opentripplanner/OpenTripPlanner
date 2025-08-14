@@ -21,9 +21,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.xml.transform.TransformerException;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.api.model.transit.HideFeedIdMapper;
-import org.opentripplanner.api.model.transit.UseFeedIdMapper;
 import org.opentripplanner.ext.trias.mapping.ErrorMapper;
 import org.opentripplanner.ext.trias.parameters.TriasApiParameters;
 import org.opentripplanner.ext.trias.service.OjpService;
@@ -58,7 +58,7 @@ public class TriasResource {
     if (triasApiConfig.hideFeedId()) {
       return new HideFeedIdMapper(triasApiConfig.hardcodedInputFeedId());
     } else {
-      return new UseFeedIdMapper();
+      return new DefaultFeedIdMapper();
     }
   }
 

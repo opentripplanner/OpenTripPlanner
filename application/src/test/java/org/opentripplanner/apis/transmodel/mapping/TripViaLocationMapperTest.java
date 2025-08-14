@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.api.model.transit.UseFeedIdMapper;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.transmodel.model.framework.CoordinateInputType;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 
@@ -36,7 +36,7 @@ class TripViaLocationMapperTest {
     """;
 
   private static final TripViaLocationMapper MAPPER = new TripViaLocationMapper(
-    new UseFeedIdMapper()
+    new DefaultFeedIdMapper()
   );
 
   @Test

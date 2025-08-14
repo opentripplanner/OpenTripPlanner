@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.trias.id;
+package org.opentripplanner.api.model.transit;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -10,10 +10,9 @@ import java.util.Set;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-class IdResolverTest {
+class FeedScopedIdMapperTest {
 
   private static final FeedScopedIdMapper ID_RESOLVER = new IdResolverTestImpl();
 

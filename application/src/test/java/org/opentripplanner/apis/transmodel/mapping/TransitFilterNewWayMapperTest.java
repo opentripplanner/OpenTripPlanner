@@ -10,12 +10,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.api.model.transit.UseFeedIdMapper;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 
 class TransitFilterNewWayMapperTest {
 
   private static final TransitFilterNewWayMapper MAPPER = new TransitFilterNewWayMapper(
-    new UseFeedIdMapper()
+    new DefaultFeedIdMapper()
   );
 
   @Test
