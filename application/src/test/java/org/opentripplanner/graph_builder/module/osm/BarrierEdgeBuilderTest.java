@@ -12,6 +12,7 @@ import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.OsmVertexOnWay;
 
 class BarrierEdgeBuilderTest {
@@ -155,5 +156,30 @@ class BarrierEdgeBuilderTest {
     assertEquals(0, v2.getDegreeOut());
     assertEquals(0, v3.getDegreeIn());
     assertEquals(0, v3.getDegreeOut());
+  }
+
+  @Test
+  void connectThreeVerticesWithWallAndGate() {
+    var v1 = new OsmVertexOnWay(0, 0, 0, 1);
+    var v2 = new OsmVertexOnWay(0, 0, 0, 2);
+    var v3 = new OsmVertexOnWay(0, 0, 0, 3);
+
+    var node = new OsmNode();
+    node.addTag("barrier", "gate");
+    node.addTag("access", "no");
+    node.addTag("foot", "yes");
+
+    // A gate can be used to pass the wall, so edges should be built
+    subject.build(node, List.of(v1, v2, v3), List.of(WALL));
+    assertEquals(2, v1.getDegreeIn());
+    assertEquals(2, v1.getDegreeOut());
+    assertEquals(2, v2.getDegreeIn());
+    assertEquals(2, v2.getDegreeOut());
+    assertEquals(2, v3.getDegreeIn());
+    assertEquals(2, v3.getDegreeOut());
+    for (var edge : v1.getOutgoingStreetEdges()) {
+      assertEquals(PEDESTRIAN, edge.getPermission());
+      assertTrue(edge.isWheelchairAccessible());
+    }
   }
 }

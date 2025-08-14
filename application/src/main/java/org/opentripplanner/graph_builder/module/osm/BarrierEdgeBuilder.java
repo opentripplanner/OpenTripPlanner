@@ -27,7 +27,7 @@ public class BarrierEdgeBuilder {
     var wheelchairAccessible = true;
     I18NString name = null;
 
-    if (!node.isTag("barrier", "entrance")) {
+    if (!node.hasTag("barrier")) {
       for (var barrier : barriers) {
         permission = permission.intersection(
           barrier.overridePermissions(StreetTraversalPermission.ALL)
