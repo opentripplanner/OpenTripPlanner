@@ -100,7 +100,7 @@ public abstract class SiriAzureUpdaterParameters {
 
   /**
    * Gets the startup timeout for real-time service initialization.
-   * 
+   *
    * @return timeout in milliseconds
    */
   public int getStartupTimeout() {
@@ -109,7 +109,7 @@ public abstract class SiriAzureUpdaterParameters {
 
   /**
    * Sets the startup timeout for real-time service initialization.
-   * 
+   *
    * @param startupTimeout timeout in milliseconds, should be positive
    */
   public void setStartupTimeout(int startupTimeout) {

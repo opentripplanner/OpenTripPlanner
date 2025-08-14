@@ -271,7 +271,7 @@ public class SiriAzureUpdater implements GraphUpdater {
    * Executes a task with retry logic and timeout constraint for graceful degradation.
    * Retries for retryable exceptions with exponential backoff until startupTimeout is exceeded.
    * InterruptedException is propagated immediately without consuming timeout budget.
-   * 
+   *
    * @param task The task to execute, must not be null
    * @param description A description of the task for logging purposes, must not be null
    * @throws InterruptedException If the thread is interrupted during execution
