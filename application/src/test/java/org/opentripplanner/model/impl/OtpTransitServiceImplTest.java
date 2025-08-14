@@ -2,11 +2,11 @@ package org.opentripplanner.model.impl;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,9 +18,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Pathway;
@@ -31,7 +28,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public class OtpTransitServiceImplTest {
 
-  private static final FeedScopedId STATION_ID = TimetableRepositoryForTest.id("station");
+  private static final FeedScopedId STATION_ID = id("station");
 
   // The subject is used as read only; hence static is ok
   private static OtpTransitService subject;
@@ -109,20 +106,6 @@ public class OtpTransitServiceImplTest {
   }
 
   @Test
-  public void testGetAllStopTimes() {
-    List<StopTime> stopTimes = new ArrayList<>();
-    for (Trip trip : subject.getAllTrips()) {
-      stopTimes.addAll(subject.getStopTimesForTrip(trip));
-    }
-
-    assertEquals(88, stopTimes.size());
-    assertEquals(
-      "StopTime(seq=1 stop=F:A trip=F:1.1 times=00:00:00-00:00:00)",
-      first(stopTimes).toString()
-    );
-  }
-
-  @Test
   public void testListTrips() {
     Collection<Trip> trips = subject.getAllTrips();
 
@@ -132,7 +115,7 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetStopForId() {
-    RegularStop stop = subject.siteRepository().getRegularStop(TimetableRepositoryForTest.id("P"));
+    RegularStop stop = subject.siteRepository().getRegularStop(id("P"));
     assertEquals("RegularStop{F:P P}", stop.toString());
   }
 
@@ -142,26 +125,6 @@ public class OtpTransitServiceImplTest {
       subject.siteRepository().getStationById(STATION_ID).getChildStops()
     );
     assertEquals("[RegularStop{F:A A}]", stops.toString());
-  }
-
-  @Test
-  public void testGetShapePointsForShapeId() {
-    List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(
-      TimetableRepositoryForTest.id("5")
-    );
-    assertEquals(
-      "[#1 (41,-72), #2 (41,-72), #3 (40,-72), #4 (41,-73), #5 (41,-74)]",
-      shapePoints.stream().map(OtpTransitServiceImplTest::toString).toList().toString()
-    );
-  }
-
-  @Test
-  public void testGetStopTimesForTrip() {
-    List<StopTime> stopTimes = subject.getStopTimesForTrip(first(subject.getAllTrips()));
-    assertEquals(
-      "[RegularStop{F:A A}, RegularStop{F:B B}, RegularStop{F:C C}]",
-      stopTimes.stream().map(StopTime::getStop).toList().toString()
-    );
   }
 
   @Test
@@ -181,17 +144,7 @@ public class OtpTransitServiceImplTest {
     return text.replace("agency:", "").replace(FEED_ID + ":", "");
   }
 
-  private static <T> List<T> sort(Collection<? extends T> c) {
-    return c.stream().sorted(comparing(T::toString)).collect(toList());
-  }
-
   private static <T> T first(Collection<? extends T> c) {
     return c.stream().min(comparing(T::toString)).orElseThrow();
-  }
-
-  private static String toString(ShapePoint sp) {
-    int lat = (int) sp.getLat();
-    int lon = (int) sp.getLon();
-    return "#" + sp.getSequence() + " (" + lat + "," + lon + ")";
   }
 }

@@ -12,6 +12,7 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
@@ -46,6 +47,7 @@ import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataS
 public class UpdaterConfigurator {
 
   private final Graph graph;
+  private final VertexLinker linker;
   private final TimetableRepository timetableRepository;
   private final UpdatersParameters updatersParameters;
   private final RealtimeVehicleRepository realtimeVehicleRepository;
@@ -55,6 +57,7 @@ public class UpdaterConfigurator {
 
   private UpdaterConfigurator(
     Graph graph,
+    VertexLinker linker,
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
@@ -63,6 +66,7 @@ public class UpdaterConfigurator {
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
+    this.linker = linker;
     this.realtimeVehicleRepository = realtimeVehicleRepository;
     this.vehicleRentalRepository = vehicleRentalRepository;
     this.timetableRepository = timetableRepository;
@@ -73,6 +77,7 @@ public class UpdaterConfigurator {
 
   public static void configure(
     Graph graph,
+    VertexLinker linker,
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
@@ -82,6 +87,7 @@ public class UpdaterConfigurator {
   ) {
     new UpdaterConfigurator(
       graph,
+      linker,
       realtimeVehicleRepository,
       vehicleRentalRepository,
       parkingRepository,
@@ -143,7 +149,7 @@ public class UpdaterConfigurator {
     }
     return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(
       parameters,
-      graph.getLinker(),
+      linker,
       vehicleRentalRepository
     );
   }
@@ -165,9 +171,7 @@ public class UpdaterConfigurator {
           configItem.sourceParameters(),
           otpHttpClientFactory
         );
-        updaters.add(
-          new VehicleRentalUpdater(configItem, source, graph.getLinker(), vehicleRentalRepository)
-        );
+        updaters.add(new VehicleRentalUpdater(configItem, source, linker, vehicleRentalRepository));
       }
     }
     for (var configItem : updatersParameters.getGtfsRealtimeAlertsUpdaterParameters()) {
@@ -204,9 +208,7 @@ public class UpdaterConfigurator {
             configItem,
             openingHoursCalendarService
           );
-          updaters.add(
-            new VehicleParkingUpdater(configItem, source, graph.getLinker(), parkingRepository)
-          );
+          updaters.add(new VehicleParkingUpdater(configItem, source, linker, parkingRepository));
         }
         case AVAILABILITY_ONLY -> {
           var source = AvailabilityDataSourceFactory.create(configItem);

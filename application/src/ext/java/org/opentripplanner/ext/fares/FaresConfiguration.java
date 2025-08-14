@@ -2,12 +2,12 @@ package org.opentripplanner.ext.fares;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.impl.AtlantaFareServiceFactory;
-import org.opentripplanner.ext.fares.impl.CombineInterlinedLegsFactory;
-import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.HSLFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.NoopFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.OrcaFareFactory;
+import org.opentripplanner.ext.fares.impl.gtfs.CombineInterlinedLegsFactory;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;

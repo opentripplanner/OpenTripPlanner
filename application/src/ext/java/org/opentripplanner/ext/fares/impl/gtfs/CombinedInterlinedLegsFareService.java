@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl.gtfs;
 
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 
