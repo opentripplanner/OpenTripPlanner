@@ -71,7 +71,7 @@ public class SeattleSmokeTest {
       testAccessibleRouting(50);
     }
 
-    private TripPlan testAccessibleRouting(float walkReluctance) throws IOException {
+    private TripPlan testAccessibleRouting(double walkReluctance) throws IOException {
       var req = new TripPlanParametersBuilder()
         .withFrom(SODO)
         .withTo(CLYDE_HILL)
