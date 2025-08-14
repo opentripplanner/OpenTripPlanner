@@ -61,7 +61,7 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=trunk_link`                                    | `ALL`                    | 2.06        | 7.47        |
 | `highway=motorway_link`                                 | `CAR`                    | 2.06        |             |
 | `highway=motorway`                                      | `CAR`                    | 8.0         |             |
-| `motorroad=yes`                                         | `CAR`                    |             |             |
+| `motorroad=yes`                                         | `CAR`                    | 7.47        | 7.47        |
 | `present(highway); cycleway=lane`                       | `PEDESTRIAN_AND_BICYCLE` | 0.87        |             |
 | `highway=service; cycleway=lane`                        | `ALL`                    | 0.77        |             |
 | `highway=residential; cycleway=lane`                    | `ALL`                    | 0.77        |             |

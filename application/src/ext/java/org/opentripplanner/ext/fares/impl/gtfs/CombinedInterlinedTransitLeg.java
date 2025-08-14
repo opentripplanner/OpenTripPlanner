@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static org.opentripplanner.model.plan.Itinerary.UNKNOWN;
 
@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -127,7 +127,7 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   }
 
   @Override
-  public List<FareProductUse> fareProducts() {
+  public List<FareOffer> fareOffers() {
     return List.of();
   }
 
@@ -157,7 +157,7 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   }
 
   @Override
-  public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
+  public TransitLeg decorateWithFareOffers(List<FareOffer> fares) {
     throw new UnsupportedOperationException();
   }
 }

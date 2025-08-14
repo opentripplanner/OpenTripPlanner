@@ -324,7 +324,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>24.1</version>
+            <version>24.2</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
