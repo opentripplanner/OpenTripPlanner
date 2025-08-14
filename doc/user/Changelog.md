@@ -57,6 +57,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Limit linking of stops and RT vehicle rental/parking to 100m [#6759](https://github.com/opentripplanner/OpenTripPlanner/pull/6759)
 - Lower graph build memory by processing GTFS shapes more efficiently [#6752](https://github.com/opentripplanner/OpenTripPlanner/pull/6752)
 - Update OsmTagMapper according to the default restrictions on OpenStreetMap Wiki [#6760](https://github.com/opentripplanner/OpenTripPlanner/pull/6760)
+-  Add OTP version when updaters are ready log event [#6799](https://github.com/opentripplanner/OpenTripPlanner/pull/6799)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
