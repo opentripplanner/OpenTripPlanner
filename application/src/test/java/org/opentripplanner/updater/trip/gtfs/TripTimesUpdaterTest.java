@@ -32,7 +32,6 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.updater.trip.gtfs.model.TripTimesPatch;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -40,6 +39,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
+import org.opentripplanner.updater.trip.gtfs.model.TripTimesPatch;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 
 public class TripTimesUpdaterTest {
