@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
@@ -80,6 +81,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   private class Callback implements MqttCallbackExtended {
 
+    private final Semaphore limit = new Semaphore(64);
+
     @Override
     public void connectComplete(boolean reconnect, String serverURI) {
       LOG.info("Connected to MQTT broker: {}", serverURI);
@@ -97,9 +100,14 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
     @Override
     public void messageArrived(String topic, MqttMessage message) {
-      virtualThreadExecutor.submit(() ->
-        serviceDelivery(message.getPayload()).ifPresent(serviceDeliveryConsumer::apply));
-      primed = true;  // ToDo figure out how determine if all historic messages where processed
+      if (limit.tryAcquire()) {
+        virtualThreadExecutor.submit(() ->
+          serviceDelivery(message.getPayload()).ifPresent(serviceDeliveryConsumer::apply)
+        );
+      } else {
+        serviceDelivery(message.getPayload()).ifPresent(serviceDeliveryConsumer::apply);
+      }
+      primed = true; // ToDo figure out how determine if all historic messages where processed
     }
 
     @Override
