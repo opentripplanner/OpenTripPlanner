@@ -17,9 +17,14 @@
       longName
       shortName
     }
+    alerts {
+      alertHeaderText
+      alertDescriptionText
+    }
     # The following should always be empty because the pattern list of station is always empty
-    alerts(types: [PATTERNS, ROUTES]) {
-      id
+    patternAndRouteAlerts: alerts(types: [PATTERNS, ROUTES]) {
+      alertHeaderText
+      alertDescriptionText
     }
   }
 }

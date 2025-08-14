@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.stopconsolidation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.FARE_PRODUCT_USE;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.ANY_FARE_OFFER;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_C;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_D;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_05;
@@ -39,7 +39,7 @@ class DecorateConsolidatedStopNamesTest {
       .build();
 
     var first = (ScheduledTransitLeg) itinerary.legs().getFirst();
-    var withFp = first.copyOf().withFareProducts(List.of(FARE_PRODUCT_USE)).build();
+    var withFp = first.copyOf().withFareProducts(List.of(ANY_FARE_OFFER)).build();
     var legs = new ArrayList<>(itinerary.legs());
     legs.set(0, withFp);
 
@@ -52,7 +52,7 @@ class DecorateConsolidatedStopNamesTest {
     assertEquals(STOP_D.getName(), updatedLeg.to().name);
 
     // Check that the fares were carried over
-    assertEquals(List.of(FARE_PRODUCT_USE), updatedLeg.fareProducts());
+    assertEquals(List.of(ANY_FARE_OFFER), updatedLeg.fareOffers());
   }
 
   @Test

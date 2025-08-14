@@ -1,10 +1,14 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
+import static org.opentripplanner.standalone.config.framework.json.EnumMapper.docEnumValueList;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_8;
 
+import org.opentripplanner.standalone.config.framework.json.EnumMapper;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdaterParameters;
 
 public class MqttGtfsRealtimeUpdaterConfig {
@@ -22,25 +26,16 @@ public class MqttGtfsRealtimeUpdaterConfig {
         .summary("Whether to match trips fuzzily.")
         .asBoolean(false),
       c
+        .of("forwardsDelayPropagationType")
+        .since(V2_8)
+        .summary(ForwardsDelayPropagationType.DEFAULT.typeDescription())
+        .description(docEnumValueList(ForwardsDelayPropagationType.values()))
+        .asEnum(ForwardsDelayPropagationType.DEFAULT),
+      c
         .of("backwardsDelayPropagationType")
         .since(V2_2)
-        .summary("How backwards propagation should be handled.")
-        .description(
-          """
-            REQUIRED_NO_DATA:
-            Default value. Only propagates delays backwards when it is required to ensure that the times
-            are increasing, and it sets the NO_DATA flag on the stops so these automatically updated times
-            are not exposed through APIs.
-
-            REQUIRED:
-            Only propagates delays backwards when it is required to ensure that the times are increasing.
-            The updated times are exposed through APIs.
-
-            ALWAYS:
-            Propagates delays backwards on stops with no estimates regardless if it's required or not.
-            The updated times are exposed through APIs.
-          """
-        )
+        .summary(BackwardsDelayPropagationType.REQUIRED_NO_DATA.typeDescription())
+        .description(docEnumValueList(BackwardsDelayPropagationType.values()))
         .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA)
     );
   }

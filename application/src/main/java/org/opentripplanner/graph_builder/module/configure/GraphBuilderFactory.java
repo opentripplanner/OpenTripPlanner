@@ -33,6 +33,8 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.linking.configure.VertexLinkerGraphBuildingModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.configure.OsmInfoGraphBuildServiceModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -47,6 +49,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
     GraphBuilderModules.class,
     OsmInfoGraphBuildServiceModule.class,
     EmissionGraphBuilderModule.class,
+    VertexLinkerGraphBuildingModule.class,
   }
 )
 public interface GraphBuilderFactory {
@@ -82,6 +85,8 @@ public interface GraphBuilderFactory {
   StopConsolidationModule stopConsolidationModule();
 
   FareServiceFactory fareServiceFactory();
+
+  VertexLinker vertexLinker();
 
   @Component.Builder
   interface Builder {

@@ -44,8 +44,6 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.FareZone;
-import org.opentripplanner.transit.model.site.GroupOfStations;
-import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
@@ -89,7 +87,7 @@ public class OtpTransitServiceBuilder {
 
   private final EntityById<Route> routesById = new DefaultEntityById<>();
 
-  private final Multimap<FeedScopedId, ShapePoint> shapePoints = ArrayListMultimap.create();
+  private final Map<FeedScopedId, Iterable<ShapePoint>> shapePoints = new HashMap<>();
 
   private final EntityById<Entrance> entrancesById = new DefaultEntityById<>();
 
@@ -159,10 +157,6 @@ public class OtpTransitServiceBuilder {
     return siteRepositoryBuilder;
   }
 
-  public ImmutableEntityById<GroupOfStations> getGroupsOfStationsById() {
-    return siteRepositoryBuilder.groupOfStationById();
-  }
-
   public ImmutableEntityById<MultiModalStation> getMultiModalStationsById() {
     return siteRepositoryBuilder.multiModalStationById();
   }
@@ -187,7 +181,7 @@ public class OtpTransitServiceBuilder {
     return routesById;
   }
 
-  public Multimap<FeedScopedId, ShapePoint> getShapePoints() {
+  public Map<FeedScopedId, Iterable<ShapePoint>> getShapePoints() {
     return shapePoints;
   }
 
@@ -213,10 +207,6 @@ public class OtpTransitServiceBuilder {
 
   public ImmutableEntityById<AreaStop> getAreaStops() {
     return siteRepositoryBuilder.areaStopById();
-  }
-
-  public ImmutableEntityById<GroupStop> getGroupStops() {
-    return siteRepositoryBuilder.groupStopById();
   }
 
   public TripStopTimes getStopTimesSortedByTrip() {

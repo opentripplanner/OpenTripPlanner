@@ -16,6 +16,7 @@ export function AccessSelect({
       <Form.Select
         id="accessSelect"
         size="sm"
+        className="input-medium"
         onChange={(e) => {
           if (e.target.value !== 'not_selected') {
             setTripQueryVariables({

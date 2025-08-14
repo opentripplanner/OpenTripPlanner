@@ -6,7 +6,7 @@ import org.glassfish.grizzly.http.server.Request;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.HttpForTest;
 import org.opentripplanner.transit.service.TimetableRepository;

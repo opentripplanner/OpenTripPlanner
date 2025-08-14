@@ -15,6 +15,7 @@ import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 
 class FinlandMapperTest {
 
@@ -203,6 +204,19 @@ class FinlandMapperTest {
     way.addTag("winter_road", "yes");
     wayData = wps.getDataForWay(way);
     assertEquals(wayData.getPermission(), NONE);
+  }
+
+  @Test
+  void testWalkingAllowedOnCycleway() {
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(WayTestData.cycleway()).getPermission());
+  }
+
+  @Test
+  void testCyclingAllowedOnPedestrianAreas() {
+    assertEquals(
+      PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForWay(WayTestData.pedestrianArea()).getPermission()
+    );
   }
 
   /**

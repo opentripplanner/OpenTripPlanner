@@ -16,6 +16,7 @@ export function DirectModeSelect({
       <Form.Select
         id="directModeSelect"
         size="sm"
+        className="input-medium"
         onChange={(e) => {
           if (e.target.value !== 'not_selected') {
             setTripQueryVariables({

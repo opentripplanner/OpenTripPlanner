@@ -102,30 +102,34 @@ public class TestFreeFloatingRentalVehicleBuilder {
   }
 
   public VehicleRentalVehicle build() {
-    var vehicle = new VehicleRentalVehicle();
-    var stationName = "free-floating-" + vehicleType.formFactor.name().toLowerCase();
-    vehicle.id = new FeedScopedId(this.network, stationName);
-    vehicle.name = new NonLocalizedString(stationName);
-    vehicle.latitude = latitude;
-    vehicle.longitude = longitude;
-    vehicle.vehicleType = vehicleType;
-    vehicle.system = system;
-    vehicle.fuel = new RentalVehicleFuel(
-      currentFuelPercent,
-      Distance.ofMetersBoxed(currentRangeMeters, ignore -> {}).orElse(null)
-    );
-    vehicle.availableUntil = DEFAULT_AVAILABLE_UNTIL;
-    return vehicle;
+    var stationName = "free-floating-" + vehicleType.formFactor().name().toLowerCase();
+    return VehicleRentalVehicle.of()
+      .withId(new FeedScopedId(this.network, stationName))
+      .withName(new NonLocalizedString(stationName))
+      .withLatitude(latitude)
+      .withLongitude(longitude)
+      .withVehicleType(vehicleType)
+      .withSystem(system)
+      .withFuel(
+        RentalVehicleFuel.of()
+          .withPercent(currentFuelPercent)
+          .withRange(Distance.ofMetersBoxed(currentRangeMeters, ignore -> {}).orElse(null))
+          .build()
+      )
+      .withAvailableUntil(DEFAULT_AVAILABLE_UNTIL)
+      .build();
   }
 
   private TestFreeFloatingRentalVehicleBuilder buildVehicleType(RentalFormFactor rentalFormFactor) {
-    this.vehicleType = new RentalVehicleType(
-      new FeedScopedId(TestFreeFloatingRentalVehicleBuilder.NETWORK_1, rentalFormFactor.name()),
-      rentalFormFactor.name(),
-      rentalFormFactor,
-      RentalVehicleType.PropulsionType.ELECTRIC,
-      100000d
-    );
+    this.vehicleType = RentalVehicleType.of()
+      .withId(
+        new FeedScopedId(TestFreeFloatingRentalVehicleBuilder.NETWORK_1, rentalFormFactor.name())
+      )
+      .withName(rentalFormFactor.name())
+      .withFormFactor(rentalFormFactor)
+      .withPropulsionType(RentalVehicleType.PropulsionType.ELECTRIC)
+      .withMaxRangeMeters(100000d)
+      .build();
     return this;
   }
 }

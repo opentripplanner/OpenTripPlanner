@@ -16,7 +16,7 @@ import org.opentripplanner.apis.gtfs.support.filter.StopArrivalByTypeFilter;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.leg.LegCallTime;
@@ -93,8 +93,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<Iterable<FareProductUse>> fareProducts() {
-    return environment -> getSource(environment).fareProducts();
+  public DataFetcher<Iterable<FareOffer>> fareProducts() {
+    return environment -> getSource(environment).fareOffers();
   }
 
   @Override

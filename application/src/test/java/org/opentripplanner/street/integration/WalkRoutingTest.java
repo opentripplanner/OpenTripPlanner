@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -87,6 +88,7 @@ class WalkRoutingTest {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
+        TestVertexLinker.of(graph),
         request.from(),
         request.to(),
         request.journey().direct().mode(),

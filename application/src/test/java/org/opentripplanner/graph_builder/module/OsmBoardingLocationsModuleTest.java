@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
@@ -125,7 +126,7 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getOutgoing().size());
 
     var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
-    new OsmBoardingLocationsModule(graph, osmService).buildGraph();
+    new OsmBoardingLocationsModule(graph, TestVertexLinker.of(graph), osmService).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module
@@ -301,6 +302,7 @@ class OsmBoardingLocationsModuleTest {
 
     new OsmBoardingLocationsModule(
       graph,
+      TestVertexLinker.of(graph),
       new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();
 

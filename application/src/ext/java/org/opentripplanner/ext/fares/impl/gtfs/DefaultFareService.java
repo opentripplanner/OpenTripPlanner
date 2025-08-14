@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl.gtfs;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -16,11 +16,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.fares.impl.HSLFareService;
+import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareService;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -59,9 +61,6 @@ class FareSearch {
     Arrays.fill(endOfComponent, -1);
   }
 }
-
-/** Holds fare and corresponding fareId */
-record FareAndId(Money fare, FeedScopedId fareId) {}
 
 /**
  * This fare service module handles GTFS fares in multiple feeds separately so that each fare attribute
@@ -105,7 +104,6 @@ public class DefaultFareService implements FareService {
       .legs()
       .stream()
       .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
-      .map(Leg.class::cast)
       .toList();
 
     fareLegs = combineInterlinedLegs(fareLegs);
@@ -181,7 +179,7 @@ public class DefaultFareService implements FareService {
   ) {
     FareSearch r = performSearch(fareType, legs, fareRules);
 
-    Multimap<Leg, FareProductUse> fareProductUses = LinkedHashMultimap.create();
+    Multimap<Leg, FareOffer> fareProductUses = LinkedHashMultimap.create();
     int start = 0;
     int end = legs.size() - 1;
     while (start <= end) {
@@ -219,13 +217,8 @@ public class DefaultFareService implements FareService {
       }
 
       if (!applicableLegs.isEmpty()) {
-        final var use = new FareProductUse(
-          product.uniqueInstanceId(applicableLegs.getFirst().startTime()),
-          product
-        );
-        applicableLegs.forEach(leg -> {
-          fareProductUses.put(leg, use);
-        });
+        var offer = FareOffer.of(applicableLegs.getFirst().startTime(), product);
+        applicableLegs.forEach(leg -> fareProductUses.put(leg, offer));
       }
 
       start = via + 1;

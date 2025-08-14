@@ -106,7 +106,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
             .stream()
             .map(stationInformationMapper::mapStationInformation)
             .filter(Objects::nonNull)
-            .peek(stationStatusMapper::fillStationStatus)
+            .map(stationStatusMapper::mapStationStatus)
             .toList()
         );
       }
@@ -135,7 +135,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
     if (params.geofencingZones()) {
       var zones = loader.getFeed(GBFSGeofencingZones.class);
       if (zones != null) {
-        var mapper = new GbfsGeofencingZoneMapper(system.systemId);
+        var mapper = new GbfsGeofencingZoneMapper(system.systemId());
         this.geofencingZones = mapper.mapGeofencingZone(zones);
       } else {
         if (logGeofencingZonesDoesNotExistWarning) {
@@ -185,13 +185,13 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
       .stream()
       .map(vehicleTypeMapper::mapRentalVehicleType)
       .distinct()
-      .collect(Collectors.toMap(v -> v.id.getId(), Function.identity()));
+      .collect(Collectors.toMap(v -> v.id().getId(), Function.identity()));
   }
 
   private Map<String, RentalVehicleType> getVehicleTypes(VehicleRentalSystem system) {
     GBFSVehicleTypes rawVehicleTypes = loader.getFeed(GBFSVehicleTypes.class);
     if (rawVehicleTypes != null) {
-      GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper(system.systemId);
+      GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper(system.systemId());
       List<GBFSVehicleType> gbfsVehicleTypes = rawVehicleTypes.getData().getVehicleTypes();
       return mapVehicleTypes(vehicleTypeMapper, gbfsVehicleTypes);
     }

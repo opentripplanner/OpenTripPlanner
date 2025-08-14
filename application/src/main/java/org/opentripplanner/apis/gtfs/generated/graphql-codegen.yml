@@ -124,8 +124,8 @@ config:
     RideHailingProvider: org.opentripplanner.apis.gtfs.model.RideHailingProvider#RideHailingProvider
     Currency: java.util.Currency#Currency
     Money: org.opentripplanner.transit.model.basic.Money#Money
-    FareProductUse: org.opentripplanner.model.fare.FareProductUse#FareProductUse
-    FareProduct: org.opentripplanner.model.fare.FareProduct#FareProduct
+    FareProductUse: org.opentripplanner.model.fare.FareOffer#FareOffer
+    FareProduct: org.opentripplanner.model.fare.FareOffer#FareOffer
     FareMedium: org.opentripplanner.model.fare.FareMedium#FareMedium
     RiderCategory: org.opentripplanner.model.fare.RiderCategory#RiderCategory
     StopPosition: org.opentripplanner.apis.gtfs.model.StopPosition#StopPosition

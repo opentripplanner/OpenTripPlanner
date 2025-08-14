@@ -7,6 +7,9 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
+/**
+ * A rule set for matching a leg for fare calculation purposes.
+ */
 public record FareLegRule(
   FeedScopedId id,
   @Nullable FeedScopedId legGroupId,

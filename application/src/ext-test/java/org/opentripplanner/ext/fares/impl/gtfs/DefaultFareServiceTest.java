@@ -1,25 +1,26 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_A_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_B_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_C_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.FREE_TRANSFERS_IN_CITY_SET;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.INSIDE_CITY_CENTER_SET;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_ATTRIBUTE;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_ROUTE;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_SET;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.SUBURB_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.AIRPORT_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.CITY_CENTER_A_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.CITY_CENTER_B_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.CITY_CENTER_C_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.FREE_TRANSFERS_IN_CITY_SET;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.INSIDE_CITY_CENTER_SET;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.OTHER_FEED_ATTRIBUTE;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.OTHER_FEED_ROUTE;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.OTHER_FEED_SET;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.OTHER_FEED_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.SUBURB_STOP;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.fare.FareOffer;
+import org.opentripplanner.model.fare.FareOffer.DefaultFareOffer;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -62,11 +63,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var legProducts = fare.getLegProducts().get(itin.transitLeg(0));
     assertEquals(
-      List.of(
-        // reminder: the FareProductUse's id are a (non-random) UUID computed from the start time of the leg
-        // plus some properties from the product itself like the id, price, rider category and medium
-        new FareProductUse("1d270201-412b-3b86-80f6-92ab144fa2e5", AIRPORT_TO_CITY_CENTER_PRODUCT)
-      ),
+      List.of(new DefaultFareOffer(itin.startTime(), AIRPORT_TO_CITY_CENTER_PRODUCT)),
       legProducts
     );
   }
@@ -92,19 +89,12 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var secondProducts = legProducts.get(secondLeg);
 
     assertEquals(firstProducts, secondProducts);
-    assertEquals(
-      List.of(
-        new FareProductUse(
-          "ddbf1572-18bc-3724-8b64-e1c7d5c8b6c6",
-          FareProduct.of(
-            FREE_TRANSFERS_IN_CITY_SET.getFareAttribute().getId(),
-            "regular",
-            TEN_DOLLARS.plus(TEN_DOLLARS)
-          ).build()
-        )
-      ),
-      firstProducts
-    );
+    final FareProduct regular = FareProduct.of(
+      FREE_TRANSFERS_IN_CITY_SET.getFareAttribute().getId(),
+      "regular",
+      TEN_DOLLARS.plus(TEN_DOLLARS)
+    ).build();
+    assertEquals(List.of(FareOffer.of(firstLeg.startTime(), regular)), firstProducts);
   }
 
   @Test
@@ -134,15 +124,11 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var firstLeg = itin.legs().getFirst();
     var secondLeg = itin.legs().get(1);
     assertEquals(
-      List.of(
-        new FareProductUse("ccadd1d3-f284-31a4-9d58-0a300198950f", AIRPORT_TO_CITY_CENTER_PRODUCT)
-      ),
+      List.of(new DefaultFareOffer(firstLeg.startTime(), AIRPORT_TO_CITY_CENTER_PRODUCT)),
       legProducts.get(firstLeg)
     );
     assertEquals(
-      List.of(
-        new FareProductUse("c58974dd-9a2f-3f42-90ec-c62a7b0dfd51", AIRPORT_TO_CITY_CENTER_PRODUCT)
-      ),
+      List.of(new DefaultFareOffer(secondLeg.startTime(), AIRPORT_TO_CITY_CENTER_PRODUCT)),
       legProducts.get(secondLeg)
     );
   }
@@ -163,9 +149,9 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var fareProducts = List.copyOf(fare.getLegProducts().values());
     assertEquals(1, fareProducts.size());
 
-    var fp = fareProducts.get(0).product();
-    assertEquals(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), fp.id());
-    assertEquals(TEN_DOLLARS, fp.price());
+    var fp = fareProducts.get(0);
+    assertEquals(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), fp.fareProduct().id());
+    assertEquals(TEN_DOLLARS, fp.fareProduct().price());
 
     var legProducts = fare.getLegProducts();
     assertEquals(1, legProducts.size());
@@ -186,7 +172,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .getLegProducts()
       .values()
       .stream()
-      .map(r -> r.product().id())
+      .map(r -> r.fareProduct().id())
       .toList();
 
     assertEquals(
@@ -197,14 +183,12 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var legProducts = result.getLegProducts();
     var firstBusLeg = itin.transitLeg(0);
     assertEquals(
-      List.of(
-        new FareProductUse("1d270201-412b-3b86-80f6-92ab144fa2e5", AIRPORT_TO_CITY_CENTER_PRODUCT)
-      ),
+      List.of(new DefaultFareOffer(firstBusLeg.startTime(), AIRPORT_TO_CITY_CENTER_PRODUCT)),
       legProducts.get(firstBusLeg)
     );
     var secondBusLeg = itin.transitLeg(2);
     assertEquals(
-      List.of(new FareProductUse("678d201c-e839-35c3-ae7b-1bc3834da5e5", OTHER_FEED_PRODUCT)),
+      List.of(new DefaultFareOffer(secondBusLeg.startTime(), OTHER_FEED_PRODUCT)),
       legProducts.get(secondBusLeg)
     );
   }
@@ -229,17 +213,15 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var finalBusLeg = itin.transitLeg(4);
 
     assertEquals(
-      List.of(new FareProductUse("5d0d58f4-b97a-38db-921c-8b5fc6392b54", OTHER_FEED_PRODUCT)),
+      List.of(new DefaultFareOffer(firstBusLeg.startTime(), OTHER_FEED_PRODUCT)),
       legProducts.get(firstBusLeg)
     );
     assertEquals(
-      List.of(
-        new FareProductUse("1d270201-412b-3b86-80f6-92ab144fa2e5", AIRPORT_TO_CITY_CENTER_PRODUCT)
-      ),
+      List.of(new DefaultFareOffer(secondBusLeg.startTime(), AIRPORT_TO_CITY_CENTER_PRODUCT)),
       legProducts.get(secondBusLeg)
     );
     assertEquals(
-      List.of(new FareProductUse("5d0d58f4-b97a-38db-921c-8b5fc6392b54", OTHER_FEED_PRODUCT)),
+      List.of(new DefaultFareOffer(secondBusLeg.startTime(), OTHER_FEED_PRODUCT)),
       legProducts.get(finalBusLeg)
     );
   }
@@ -258,7 +240,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .getLegProducts()
       .values()
       .stream()
-      .map(r -> r.product().id())
+      .map(r -> r.fareProduct().id())
       .toList();
     assertEquals(List.of(OTHER_FEED_ATTRIBUTE.getId()), resultProductIds);
   }

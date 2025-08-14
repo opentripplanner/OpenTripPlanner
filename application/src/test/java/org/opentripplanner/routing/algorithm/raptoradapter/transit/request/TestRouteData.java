@@ -193,7 +193,6 @@ public class TestRouteData {
     s.setDepartureTime(time);
     s.setStopSequence(seq);
     s.setStopHeadsign(new NonLocalizedString("NA"));
-    s.setRouteShortName("NA");
     return s;
   }
 

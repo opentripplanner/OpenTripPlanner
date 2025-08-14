@@ -36,6 +36,15 @@
         "descriptionDe": "Erste Zeichenabfolge",
         "urlDefault": null,
         "urlDe": null
+      },
+      {
+        "id": "QWxlcnQ6RjphLXN0YXRpb24tYWxlcnQ",
+        "headerDefault": "Station closed",
+        "headerDe": "Station closed",
+        "descriptionDefault": "This station is currently closed",
+        "descriptionDe": "This station is currently closed",
+        "urlDefault": null,
+        "urlDe": null
       }
     ]
   }

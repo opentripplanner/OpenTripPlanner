@@ -6,14 +6,11 @@ import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -54,15 +51,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Collection<FeedScopedId> serviceIds;
 
-  private final Map<FeedScopedId, List<ShapePoint>> shapePointsByShapeId;
-
   private final Map<FeedScopedId, Entrance> entrancesById;
 
   private final Map<FeedScopedId, PathwayNode> pathwayNodesById;
 
   private final Map<FeedScopedId, BoardingArea> boardingAreasById;
-
-  private final Map<Trip, List<StopTime>> stopTimesByTrip;
 
   private final Collection<ConstrainedTransfer> transfers;
 
@@ -84,11 +77,9 @@ class OtpTransitServiceImpl implements OtpTransitService {
     this.operators = immutableList(builder.getOperatorsById().values());
     this.pathways = immutableList(builder.getPathways());
     this.serviceIds = immutableList(builder.findAllServiceIds());
-    this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());
     this.entrancesById = builder.getEntrances().asImmutableMap();
     this.pathwayNodesById = builder.getPathwayNodes().asImmutableMap();
     this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
-    this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
     this.transfers = immutableList(builder.getTransfers());
     this.tripPatterns = immutableList(builder.getTripPatterns().values());
     this.trips = immutableList(builder.getTripsById().values());
@@ -138,15 +129,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
   }
 
   @Override
-  public List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId) {
-    final List<ShapePoint> points = shapePointsByShapeId.get(shapeId);
-    if (points == null) {
-      return List.of();
-    }
-    return immutableList(points);
-  }
-
-  @Override
   public Collection<Entrance> getAllEntrances() {
     return immutableList(entrancesById.values());
   }
@@ -159,11 +141,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
   @Override
   public Collection<BoardingArea> getAllBoardingAreas() {
     return immutableList(boardingAreasById.values());
-  }
-
-  @Override
-  public List<StopTime> getStopTimesForTrip(Trip trip) {
-    return immutableList(stopTimesByTrip.get(trip));
   }
 
   @Override
@@ -212,18 +189,5 @@ class OtpTransitServiceImpl implements OtpTransitService {
       list = new ArrayList<>(c);
     }
     return Collections.unmodifiableList(list);
-  }
-
-  private Map<FeedScopedId, List<ShapePoint>> mapShapePoints(
-    Multimap<FeedScopedId, ShapePoint> shapePoints
-  ) {
-    Map<FeedScopedId, List<ShapePoint>> map = new HashMap<>();
-    for (Map.Entry<FeedScopedId, Collection<ShapePoint>> entry : shapePoints.asMap().entrySet()) {
-      map.put(entry.getKey(), new ArrayList<>(entry.getValue()));
-    }
-    for (List<ShapePoint> list : map.values()) {
-      Collections.sort(list);
-    }
-    return map;
   }
 }

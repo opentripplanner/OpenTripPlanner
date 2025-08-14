@@ -3,12 +3,12 @@ package org.opentripplanner.ext.fares;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode.SAME_ROUTE;
+import static org.opentripplanner.ext.fares.impl.gtfs.CombinedInterlinedLegsFareService.CombinationMode.SAME_ROUTE;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService;
 import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareService;
+import org.opentripplanner.ext.fares.impl.gtfs.CombinedInterlinedLegsFareService;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 
 class FaresConfigurationTest extends JsonSupport {

@@ -12,7 +12,7 @@ public class RentalVehicleTypeImpl implements GraphQLRentalVehicleType {
   @Override
   public DataFetcher<GraphQLFormFactor> formFactor() {
     return environment ->
-      switch (getSource(environment).formFactor) {
+      switch (getSource(environment).formFactor()) {
         case CARGO_BICYCLE -> GraphQLFormFactor.CARGO_BICYCLE;
         case CAR -> GraphQLFormFactor.CAR;
         case BICYCLE -> GraphQLFormFactor.BICYCLE;
@@ -27,7 +27,7 @@ public class RentalVehicleTypeImpl implements GraphQLRentalVehicleType {
   @Override
   public DataFetcher<GraphQLPropulsionType> propulsionType() {
     return environment ->
-      switch (getSource(environment).propulsionType) {
+      switch (getSource(environment).propulsionType()) {
         case HUMAN -> GraphQLPropulsionType.HUMAN;
         case ELECTRIC_ASSIST -> GraphQLPropulsionType.ELECTRIC_ASSIST;
         case ELECTRIC -> GraphQLPropulsionType.ELECTRIC;

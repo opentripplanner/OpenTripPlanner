@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl.gtfs;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ArrayListMultimap;
@@ -54,6 +54,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
     fillFareRules(fareRulesData.fareAttributes(), fareRulesData.fareRules(), regularFareRules);
     this.fareLegRules.addAll(fareRulesData.fareLegRules());
     this.fareTransferRules.addAll(fareRulesData.fareTransferRules());
+    this.stopAreas.putAll(fareRulesData.stopAreas());
   }
 
   public void configure(JsonNode config) {

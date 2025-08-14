@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.apis.vectortiles.model.LayerType;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.NoopFareServiceFactory;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.HttpForTest;
@@ -32,7 +32,7 @@ class DebugVectorTilesResourceTest {
       TestServerContext.createServerContext(
         new Graph(),
         new TimetableRepository(),
-        new DefaultFareService()
+        new NoopFareServiceFactory().makeFareService()
       )
     );
     var req = HttpForTest.containerRequest();

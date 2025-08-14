@@ -287,7 +287,7 @@ public class OsmEntityTest {
 
   @Test
   void fallbackName() {
-    var nameless = WayTestData.cycleway();
+    var nameless = WayTestData.highwayWithCycleLane();
     assertTrue(nameless.hasNoName());
 
     var namedTunnel = WayTestData.carTunnel();

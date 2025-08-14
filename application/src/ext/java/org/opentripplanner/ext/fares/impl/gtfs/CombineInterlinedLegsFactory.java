@@ -1,7 +1,7 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl.gtfs;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode;
+import org.opentripplanner.ext.fares.impl.gtfs.CombinedInterlinedLegsFareService.CombinationMode;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;

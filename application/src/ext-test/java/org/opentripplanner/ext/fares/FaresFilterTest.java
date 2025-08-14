@@ -6,8 +6,8 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
@@ -36,7 +36,7 @@ public class FaresFilterTest implements PlanTestConstants {
 
     var leg = i1.legs().get(1);
     var fp = FareProduct.of(id("fp"), "fare product", Money.euros(10.00f)).build();
-    fares.addFareProduct(leg, fp);
+    fares.addFareProduct(leg, FareOffer.of(leg.startTime(), fp));
 
     var filter = new DecorateWithFare((FareService) itinerary -> fares);
 
@@ -46,9 +46,6 @@ public class FaresFilterTest implements PlanTestConstants {
 
     var busLeg = i1.transitLeg(1);
 
-    assertEquals(
-      List.of(new FareProductUse("c1a04702-1fb6-32d4-ba02-483bf68111ed", fp)),
-      busLeg.fareProducts()
-    );
+    assertEquals(List.of(FareOffer.of(busLeg.startTime(), fp)), busLeg.fareOffers());
   }
 }
