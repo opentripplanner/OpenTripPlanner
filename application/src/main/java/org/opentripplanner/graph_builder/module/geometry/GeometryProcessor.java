@@ -539,7 +539,6 @@ public class GeometryProcessor {
       last = sp;
       currentSeq = sp.sequence();
     }
-    filtered.trimToSize();
     return filtered;
   }
 

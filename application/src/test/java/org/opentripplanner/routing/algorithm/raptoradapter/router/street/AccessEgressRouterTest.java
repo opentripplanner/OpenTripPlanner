@@ -8,6 +8,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -255,6 +256,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     try (
       var verticesContainer = new TemporaryVerticesContainer(
         graph,
+        TestVertexLinker.of(graph),
         from,
         to,
         StreetMode.WALK,

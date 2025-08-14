@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.checkerframework.checker.units.qual.C;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /** Responsible for mapping GTFS ShapePoint into the OTP model. */
@@ -20,11 +21,9 @@ class ShapePointMapper {
     var ret = new HashMap<FeedScopedId, CompactShape>();
     for (var shapePoint : allShapePoints) {
       var shapeId = idFactory.createId(shapePoint.getShapeId(), "shape point");
-      var shapeBuilder = ret.getOrDefault(shapeId, new CompactShape());
-      shapeBuilder.addPoint(shapePoint);
-      ret.put(shapeId, shapeBuilder);
+      var shape = ret.computeIfAbsent(shapeId, id -> new CompactShape());
+      shape.addPoint(shapePoint);
     }
-
     return ret;
   }
 }

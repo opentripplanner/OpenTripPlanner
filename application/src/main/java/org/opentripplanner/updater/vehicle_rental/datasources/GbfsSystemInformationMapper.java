@@ -12,16 +12,16 @@ public class GbfsSystemInformationMapper {
 
     if (systemInformation.getRentalApps() != null) {
       if (systemInformation.getRentalApps().getAndroid() != null) {
-        android = new VehicleRentalSystemAppInformation(
-          systemInformation.getRentalApps().getAndroid().getStoreUri(),
-          systemInformation.getRentalApps().getAndroid().getDiscoveryUri()
-        );
+        android = VehicleRentalSystemAppInformation.of()
+          .withStoreUri(systemInformation.getRentalApps().getAndroid().getStoreUri())
+          .withDiscoveryUri(systemInformation.getRentalApps().getAndroid().getDiscoveryUri())
+          .build();
       }
       if (systemInformation.getRentalApps().getIos() != null) {
-        ios = new VehicleRentalSystemAppInformation(
-          systemInformation.getRentalApps().getIos().getStoreUri(),
-          systemInformation.getRentalApps().getIos().getDiscoveryUri()
-        );
+        ios = VehicleRentalSystemAppInformation.of()
+          .withStoreUri(systemInformation.getRentalApps().getIos().getStoreUri())
+          .withDiscoveryUri(systemInformation.getRentalApps().getIos().getDiscoveryUri())
+          .build();
       }
     }
 
