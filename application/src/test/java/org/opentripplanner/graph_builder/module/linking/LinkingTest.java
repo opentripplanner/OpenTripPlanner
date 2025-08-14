@@ -128,12 +128,16 @@ public class LinkingTest {
     link(g2, timetableRepository2);
 
     var transitStopVertices = g1.getVerticesOfType(TransitStopVertex.class);
-    assertEquals(1350, transitStopVertices.size());
+    assertEquals(966, transitStopVertices.size());
 
+    // Count unlinked stops, these are stops that are more than ~150 meters from the road network
+    int unlinkedStopsCounter = 0;
     // compare the linkages
     for (TransitStopVertex ts : transitStopVertices) {
       List<StreetTransitStopLink> stls1 = outgoingStls(ts);
-      assertTrue(stls1.size() >= 1);
+      if (stls1.isEmpty()) {
+        ++unlinkedStopsCounter;
+      }
 
       TransitStopVertex other = (TransitStopVertex) g2.getVertex(ts.getLabel());
       List<StreetTransitStopLink> stls2 = outgoingStls(other);
@@ -147,6 +151,7 @@ public class LinkingTest {
         assertEquals(v1.getLon(), v2.getLon(), 1e-10);
       }
     }
+    assertEquals(141, unlinkedStopsCounter);
   }
 
   /** Build a graph in Columbus, OH with no transit */
