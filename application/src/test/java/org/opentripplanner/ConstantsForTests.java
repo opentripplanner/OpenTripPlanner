@@ -19,6 +19,7 @@ import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
@@ -346,7 +347,7 @@ public class ConstantsForTests {
 
   private static void addPortlandVehicleRentals(Graph graph) {
     try {
-      VertexLinker linker = graph.getLinker();
+      VertexLinker linker = TestVertexLinker.of(graph);
       CsvReader reader = new CsvReader(PORTLAND_BIKE_SHARE_CSV, ',', StandardCharsets.UTF_8);
       reader.readHeaders();
       while (reader.readRecord()) {

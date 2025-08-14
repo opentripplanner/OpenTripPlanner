@@ -14,6 +14,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 import org.opentripplanner.street.model.edge.LinkingDirection;
@@ -29,15 +30,18 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
   private final Graph graph;
   private final TransitService transitService;
   private final Duration radiusAsDuration;
+  private final VertexLinker linker;
 
   @Inject
   public DefaultViaCoordinateTransferFactory(
     Graph graph,
+    VertexLinker linker,
     TransitService transitService,
     Duration radiusAsDuration
   ) {
     this.graph = graph;
     this.transitService = transitService;
+    this.linker = linker;
 
     // We divide the regular transfer radius by two, since we have two "transfers" after each
     // other here. This reduces the number of possible transfers to one fourth. The radius should
@@ -63,20 +67,18 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
 
       var m = mapTransferMode(request.journey().modes().transferMode);
 
-      tempEdges = graph
-        .getLinker()
-        .linkVertexForRequest(
-          viaVertex,
-          new TraverseModeSet(m),
-          LinkingDirection.BIDIRECTIONAL,
-          (via, street) -> {
-            var v = (TemporaryStreetLocation) via;
-            return List.of(
-              TemporaryFreeEdge.createTemporaryFreeEdge(street, v),
-              TemporaryFreeEdge.createTemporaryFreeEdge(v, street)
-            );
-          }
-        );
+      tempEdges = linker.linkVertexForRequest(
+        viaVertex,
+        new TraverseModeSet(m),
+        LinkingDirection.BIDIRECTIONAL,
+        (via, street) -> {
+          var v = (TemporaryStreetLocation) via;
+          return List.of(
+            TemporaryFreeEdge.createTemporaryFreeEdge(street, v),
+            TemporaryFreeEdge.createTemporaryFreeEdge(v, street)
+          );
+        }
+      );
 
       var toStops = findNearbyStops(nearbyStopFinder, viaVertex, request, false);
       var fromStops = findNearbyStops(nearbyStopFinder, viaVertex, request, true);
