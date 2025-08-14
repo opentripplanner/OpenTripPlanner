@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
@@ -130,6 +131,17 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     // Parse the transfer configuration from the parameters given in the build config.
     TransferConfiguration transferConfiguration = parseTransferParameters(nearbyStopFinder);
 
+    var transitService = new DefaultTransitService(timetableRepository);
+    var emptyStops = timetableRepository
+      .getSiteRepository()
+      .listStopLocations()
+      .stream()
+      .filter(stop -> transitService.findPatterns(stop).isEmpty())
+      .toList();
+
+    carsAllowedStops.addAll(emptyStops);
+    bikesAllowedStops.addAll(emptyStops);
+
     stops
       .stream()
       .parallel()
@@ -145,11 +157,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
-        var transitService = new DefaultTransitService(timetableRepository);
         calculateDefaultTransfers(transferConfiguration, ts0, stop, distinctTransfers);
         calculateFlexTransfers(transferConfiguration, ts0, stop, distinctTransfers);
         calculateCarsAllowedTransfers(
-          transitService,
           transferConfiguration,
           ts0,
           stop,
@@ -157,7 +167,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           carsAllowedStops
         );
         calculateBikesAllowedTransfers(
-          transitService,
           transferConfiguration,
           ts0,
           stop,
@@ -411,17 +420,15 @@ public class DirectTransferGenerator implements GraphBuilderModule {
    * This method calculates transfers between stops that are visited by trips that allow cars, if configured.
    */
   private void calculateCarsAllowedTransfers(
-    TransitService transitService,
     TransferConfiguration transferConfiguration,
     TransitStopVertex ts0,
     RegularStop stop,
     Map<TransferKey, PathTransfer> distinctTransfers,
     Set<StopLocation> carsAllowedStops
   ) {
-    if (isEmptyOrAllowed(transitService, carsAllowedStops, stop)) {
+    if (carsAllowedStops.contains(stop)) {
       for (RouteRequest transferProfile : transferConfiguration.carsAllowedStopTransferRequests()) {
         calculateTransfersForStopWithAllowedStops(
-          transitService,
           ts0,
           stop,
           distinctTransfers,
@@ -437,17 +444,15 @@ public class DirectTransferGenerator implements GraphBuilderModule {
    * This method calculates transfers between stops that are visited by trips that allow bikes, if configured.
    */
   private void calculateBikesAllowedTransfers(
-    TransitService transitService,
     TransferConfiguration transferConfiguration,
     TransitStopVertex ts0,
     RegularStop stop,
     Map<TransferKey, PathTransfer> distinctTransfers,
     Set<StopLocation> bikesAllowedStops
   ) {
-    if (isEmptyOrAllowed(transitService, bikesAllowedStops, stop)) {
+    if (bikesAllowedStops.contains(stop)) {
       for (RouteRequest transferProfile : transferConfiguration.bikesAllowedStopTransferRequests()) {
         calculateTransfersForStopWithAllowedStops(
-          transitService,
           ts0,
           stop,
           distinctTransfers,
@@ -459,16 +464,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     }
   }
 
-  private static boolean isEmptyOrAllowed(
-    TransitService transitService,
-    Set<StopLocation> carsAllowedStops,
-    StopLocation stop
-  ) {
-    return carsAllowedStops.contains(stop) || transitService.findPatterns(stop).isEmpty();
-  }
-
   private void calculateTransfersForStopWithAllowedStops(
-    TransitService transitService,
     TransitStopVertex ts0,
     RegularStop stop,
     Map<TransferKey, PathTransfer> distinctTransfers,
@@ -489,7 +485,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         continue;
       }
       // Only calculate transfers between allowedStops.
-      if (!isEmptyOrAllowed(transitService, allowedStops, sd.stop)) {
+      if (!allowedStops.contains(sd.stop)) {
         continue;
       }
       createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);

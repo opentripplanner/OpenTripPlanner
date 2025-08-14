@@ -63,7 +63,7 @@ public class TransferParametersMapper {
           When compared to walking, using a bike can cover larger distances within the same duration specified in the `maxTransferDuration` field.
           This can lead to large amounts of transfers calculated between stops that do not require bike transfers between them.
           This in turn can lead to a large increase in memory for the stored graph, depending on the data used in the graph.
-          
+
           For bikes, using this parameter in conjunction with `disableDefaultTransfers` allows calculating transfers only between stops
           which have trips which allow carrying bikes. This avoids storing and calculating transfers which are never used so the transit search
           can be faster compared to the default transfers.
