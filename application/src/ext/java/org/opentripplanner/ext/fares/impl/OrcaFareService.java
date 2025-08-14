@@ -15,9 +15,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareMedium;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
@@ -532,21 +534,18 @@ public class OrcaFareService extends DefaultFareService {
     } else {
       medium = CASH_MEDIUM;
     }
-    var duration = Duration.ZERO;
     var fareProduct = FareProduct.of(id, "rideCost", totalFare)
-      .withValidity(duration)
       .withCategory(riderCategory)
       .withMedium(medium)
       .build();
-    itineraryFare.addFareProduct(leg, fareProduct);
+    itineraryFare.addFareProduct(leg, FareOffer.of(leg.startTime(), fareProduct));
     // If a transfer was used, then also add a transfer fare product.
     if (transferDiscount.isPositive()) {
       var transferFareProduct = FareProduct.of(id, "transfer", transferDiscount)
-        .withValidity(duration)
         .withCategory(riderCategory)
         .withMedium(medium)
         .build();
-      itineraryFare.addFareProduct(leg, transferFareProduct);
+      itineraryFare.addFareProduct(leg, FareOffer.of(leg.startTime(), transferFareProduct));
     }
   }
 

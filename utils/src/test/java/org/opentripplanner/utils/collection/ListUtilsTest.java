@@ -8,6 +8,7 @@ import static org.opentripplanner.utils.collection.ListUtils.last;
 import static org.opentripplanner.utils.collection.ListUtils.requireAtLeastNElements;
 
 import java.util.List;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ListUtilsTest {
@@ -77,4 +78,50 @@ class ListUtilsTest {
   }
 
   private record Wrapper(int i, String string) {}
+
+  @Nested
+  class OverlappingPairs {
+
+    @Test
+    void overlappingPairs() {
+      var list = List.of(1, 2, 3, 4);
+      var res = ListUtils.partitionIntoOverlappingPairs(list);
+      assertEquals(List.of(new Pair(1, 2), new Pair(2, 3), new Pair(3, 4)), res);
+    }
+
+    @Test
+    void singleOverlappingPair() {
+      var list = List.of(1, 2);
+      var res = ListUtils.partitionIntoOverlappingPairs(list);
+      assertEquals(List.of(new Pair(1, 2)), res);
+    }
+
+    @Test
+    void singleItemInList() {
+      var list = List.of(2);
+      var res = ListUtils.partitionIntoOverlappingPairs(list);
+      assertEquals(List.of(), res);
+    }
+
+    @Test
+    void emptyList() {
+      var list = List.of();
+      var res = ListUtils.partitionIntoOverlappingPairs(list);
+      assertEquals(List.of(), res);
+    }
+  }
+
+  @Test
+  void split() {
+    var list = List.of(1, 2, 3, 4);
+    var res = ListUtils.partitionIntoSplits(list);
+    assertEquals(
+      List.of(
+        new Split<>(1, List.of(2, 3, 4)),
+        new Split<>(2, List.of(3, 4)),
+        new Split<>(3, List.of(4))
+      ),
+      res
+    );
+  }
 }
