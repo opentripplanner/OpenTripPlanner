@@ -110,6 +110,12 @@ public class SiriAzureUpdater implements GraphUpdater {
    */
   private final int timeout;
 
+  /**
+   * The timeout used for startup operations before graceful degradation.
+   * Thread-safe as it's final and set during construction.
+   */
+  private final long startupTimeoutMs;
+
   SiriAzureUpdater(SiriAzureUpdaterParameters config, SiriAzureMessageHandler messageHandler) {
     this.messageHandler = Objects.requireNonNull(messageHandler);
 
@@ -127,6 +133,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     this.topicName = Objects.requireNonNull(config.getTopicName(), "topicName must not be null");
     this.updaterType = Objects.requireNonNull(config.getType(), "type must not be null");
     this.timeout = config.getTimeout();
+    this.startupTimeoutMs = config.getStartupTimeout();
     this.autoDeleteOnIdle = config.getAutoDeleteOnIdle();
     this.prefetchCount = config.getPrefetchCount();
 
@@ -228,14 +235,26 @@ public class SiriAzureUpdater implements GraphUpdater {
         }
       });
     } catch (ServiceBusException e) {
-      LOG.error("Service Bus encountered an error during setup: {}", e.getMessage(), e);
+      LOG.error(
+        "REALTIME_ALERT component=ServiceBus status=UNAVAILABLE error=\"{}\"",
+        e.getMessage()
+      );
     } catch (URISyntaxException e) {
-      LOG.error("Invalid URI provided for Service Bus setup: {}", e.getMessage(), e);
+      LOG.error("REALTIME_ALERT component=History status=UNAVAILABLE error=\"{}\"", e.getMessage());
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       LOG.warn("Updater was interrupted during setup.");
     } catch (Exception e) {
-      LOG.error("An unexpected error occurred during setup: {}", e.getMessage(), e);
+      LOG.error(
+        "REALTIME_ALERT component=RealtimeSetup status=UNAVAILABLE error=\"{}\"",
+        e.getMessage()
+      );
+    } finally {
+      // CRITICAL: Always set primed so OTP can start
+      if (!isPrimed()) {
+        LOG.warn("Real-time setup incomplete, starting OTP without real-time data");
+        setPrimed();
+      }
     }
   }
 
@@ -249,17 +268,22 @@ public class SiriAzureUpdater implements GraphUpdater {
   }
 
   /**
-   * Executes a task with retry logic. Retries indefinitely for retryable exceptions with exponential backoff.
-   *  Does not retry for InterruptedException and propagates it
-   * @param task The task to execute.
-   * @param description A description of the task for logging purposes.
-   * @throws InterruptedException If the thread is interrupted while waiting between retries.
+   * Executes a task with retry logic and timeout constraint for graceful degradation.
+   * Retries for retryable exceptions with exponential backoff until startupTimeout is exceeded.
+   * InterruptedException is propagated immediately without consuming timeout budget.
+   * 
+   * @param task The task to execute, must not be null
+   * @param description A description of the task for logging purposes, must not be null
+   * @throws InterruptedException If the thread is interrupted during execution
+   * @throws RuntimeException If startup timeout is exceeded
+   * @throws Exception Any non-retryable exception from the task
    */
   void executeWithRetry(CheckedRunnable task, String description) throws Exception {
     int sleepPeriod = 1000; // Start with 1-second delay
     int attemptCounter = 1;
+    long startTime = System.currentTimeMillis();
 
-    while (true) {
+    while (System.currentTimeMillis() - startTime < startupTimeoutMs) {
       try {
         task.run();
         LOG.info("{} succeeded.", description);
@@ -288,6 +312,9 @@ public class SiriAzureUpdater implements GraphUpdater {
         sleepPeriod = Math.min(sleepPeriod * 2, 60 * 1000); // Exponential backoff with a cap at 60 seconds
       }
     }
+
+    // Timeout reached - throw exception
+    throw new RuntimeException(description + " timed out after " + startupTimeoutMs + "ms");
   }
 
   boolean shouldRetry(Exception e) {
