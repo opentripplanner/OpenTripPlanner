@@ -184,7 +184,7 @@
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>otp-client</artifactId>
-            <version>1.2.0</version>
+            <version>1.2.2</version>
             <scope>test</scope>
         </dependency>
         <!-- Provides some shared serializers for Kryo. Introduces transitive dependencies on Trove, and Kryo. -->
