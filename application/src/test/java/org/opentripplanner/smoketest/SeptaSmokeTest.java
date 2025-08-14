@@ -1,6 +1,7 @@
 package org.opentripplanner.smoketest;
 
 import static org.opentripplanner.client.model.RequestMode.BICYCLE_RENT;
+import static org.opentripplanner.client.model.RequestMode.SUBWAY;
 import static org.opentripplanner.client.model.RequestMode.TRANSIT;
 import static org.opentripplanner.client.model.RequestMode.WALK;
 
@@ -29,6 +30,9 @@ public class SeptaSmokeTest {
 
   Coordinate pierceStreet = new Coordinate(39.93014, -75.18047);
   Coordinate templeUniversity = new Coordinate(39.98069, -75.14886);
+
+  Coordinate locustStreet = new Coordinate(39.94776, -75.16757);
+  Coordinate franklinSquare = new Coordinate(39.95517, -75.15113);
 
   @Test
   public void routeFromAirportToNorthPhiladelphia() {
@@ -72,6 +76,14 @@ public class SeptaSmokeTest {
     SmokeTest.basicRouteTest(
       new SmokeTestRequest(pierceStreet, templeUniversity, Set.of(BICYCLE_RENT)),
       List.of("WALK", "BICYCLE", "WALK")
+    );
+  }
+
+  @Test
+  public void patco() {
+    SmokeTest.basicRouteTest(
+      new SmokeTestRequest(locustStreet, franklinSquare, Set.of(SUBWAY)),
+      List.of("WALK", "SUBWAY", "WALK")
     );
   }
 }

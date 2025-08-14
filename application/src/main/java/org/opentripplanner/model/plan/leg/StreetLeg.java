@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -191,7 +191,7 @@ public class StreetLeg implements Leg {
   }
 
   @Override
-  public List<FareProductUse> fareProducts() {
+  public List<FareOffer> fareOffers() {
     return List.of();
   }
 

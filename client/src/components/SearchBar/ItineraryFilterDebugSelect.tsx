@@ -16,7 +16,7 @@ export function ItineraryFilterDebugSelect({
       <Form.Select
         id="itineraryDebugFilterSelect"
         size="sm"
-        className="input-medium"
+        className="input-small"
         onChange={(e) => {
           setTripQueryVariables({
             ...tripQueryVariables,

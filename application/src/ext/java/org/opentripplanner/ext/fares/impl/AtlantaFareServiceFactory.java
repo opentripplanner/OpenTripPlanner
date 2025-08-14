@@ -3,6 +3,7 @@ package org.opentripplanner.ext.fares.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.model.OtpTransitService;

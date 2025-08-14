@@ -40,7 +40,7 @@ abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends L
     return getVehicleRentalPlaces(service)
       .stream()
       .map(rental -> {
-        Coordinate coordinate = new Coordinate(rental.getLongitude(), rental.getLatitude());
+        Coordinate coordinate = new Coordinate(rental.longitude(), rental.latitude());
         Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
         point.setUserData(rental);
         return (Geometry) point;

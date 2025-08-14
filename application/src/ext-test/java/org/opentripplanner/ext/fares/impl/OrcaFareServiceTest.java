@@ -33,11 +33,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.fares.impl._support.FareModelForTest;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -98,30 +98,32 @@ public class OrcaFareServiceTest {
 
     var rideCost = legFareProducts
       .stream()
-      .map(FareProductUse::product)
-      .filter(
-        fp ->
+      .filter(fpl -> {
+        var fp = fpl.fareProduct();
+        return (
           fp.medium().name().equals("electronic") &&
           fp.category().name().equals("regular") &&
           fp.name().equals("rideCost")
-      )
+        );
+      })
       .findFirst();
     if (rideCost.isEmpty()) {
       Assertions.fail("Missing leg fare product.");
     }
-    Assertions.assertEquals(fare, rideCost.get().price().minorUnitAmount());
+    assertEquals(fare, rideCost.get().fareProduct().price().minorUnitAmount());
 
     var transfer = legFareProducts
       .stream()
-      .map(FareProductUse::product)
-      .filter(
-        fp ->
+      .filter(fpl -> {
+        var fp = fpl.fareProduct();
+        return (
           fp.medium().name().equals("electronic") &&
           fp.category().name().equals("regular") &&
           fp.name().equals("transfer")
-      )
+        );
+      })
       .findFirst();
-    Assertions.assertEquals(hasXfer, transfer.isPresent(), "Incorrect transfer leg fare product.");
+    assertEquals(hasXfer, transfer.isPresent(), "Incorrect transfer leg fare product.");
   }
 
   /**
@@ -534,16 +536,16 @@ public class OrcaFareServiceTest {
     assertFalse(fares.getItineraryProducts().isEmpty());
     assertFalse(fares.getLegProducts().isEmpty());
 
-    var firstLeg = itinerary.legs().get(0);
+    var firstLeg = itinerary.legs().getFirst();
     var uses = fares.getLegProducts().get(firstLeg);
     assertEquals(7, uses.size());
 
     var regular = uses
       .stream()
-      .filter(u -> u.product().category().name().equals("regular"))
+      .filter(u -> u.fareProduct().category().name().equals("regular"))
       .toList()
-      .get(0);
-    assertEquals(Money.usDollars(3.49f), regular.product().price());
+      .getFirst();
+    assertEquals(Money.usDollars(3.49f), regular.fareProduct().price());
   }
 
   private static Leg getLeg(String agencyId, long startTimeMins) {

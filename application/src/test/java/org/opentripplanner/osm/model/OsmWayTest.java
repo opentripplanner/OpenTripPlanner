@@ -163,7 +163,7 @@ public class OsmWayTest {
 
   @Test
   void escalator() {
-    assertFalse(WayTestData.cycleway().isEscalator());
+    assertFalse(WayTestData.highwayWithCycleLane().isEscalator());
 
     var escalator = new OsmWay();
     escalator.addTag("highway", "steps");

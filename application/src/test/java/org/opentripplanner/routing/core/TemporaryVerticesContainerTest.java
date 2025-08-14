@@ -15,6 +15,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -28,7 +29,6 @@ import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.SiteRepository;
 
 public class TemporaryVerticesContainerTest {
 
@@ -60,7 +60,14 @@ public class TemporaryVerticesContainerTest {
   @Test
   public void temporaryChangesRemovedOnClose() {
     // When - the container is created
-    subject = new TemporaryVerticesContainer(g, from, to, StreetMode.WALK, StreetMode.WALK);
+    subject = new TemporaryVerticesContainer(
+      g,
+      TestVertexLinker.of(g),
+      from,
+      to,
+      StreetMode.WALK,
+      StreetMode.WALK
+    );
 
     // Then:
     originAndDestinationInsertedCorrect();

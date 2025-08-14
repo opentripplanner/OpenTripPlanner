@@ -3,7 +3,7 @@ package org.opentripplanner.ext.flex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.FARE_PRODUCT_USE;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.ANY_FARE_OFFER;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.Duration;
@@ -49,7 +49,7 @@ class FlexibleTransitLegTest implements PlanTestConstants {
       .withEndTime(END_TIME)
       .withFlexTripEdge(EDGE)
       .build();
-    assertNotNull(leg.fareProducts());
+    assertNotNull(leg.fareOffers());
     assertNotNull(leg.listTransitAlerts());
   }
 
@@ -73,7 +73,7 @@ class FlexibleTransitLegTest implements PlanTestConstants {
       .withStartTime(START_TIME)
       .withEndTime(END_TIME)
       .withFlexTripEdge(EDGE)
-      .withFareProducts(List.of(FARE_PRODUCT_USE))
+      .withFareProducts(List.of(ANY_FARE_OFFER))
       .withAlerts(Set.of(ALERT))
       .withEmissionPerPerson(EMISSION)
       .build();
@@ -84,7 +84,7 @@ class FlexibleTransitLegTest implements PlanTestConstants {
     assertEquals(START_TIME, copy.startTime());
     assertEquals(END_TIME, copy.endTime());
     assertEquals(Set.of(ALERT), copy.listTransitAlerts());
-    assertEquals(List.of(FARE_PRODUCT_USE), copy.fareProducts());
+    assertEquals(List.of(ANY_FARE_OFFER), copy.fareOffers());
     assertEquals(EMISSION, copy.emissionPerPerson());
   }
 
@@ -94,7 +94,7 @@ class FlexibleTransitLegTest implements PlanTestConstants {
       .withStartTime(START_TIME)
       .withEndTime(END_TIME)
       .withFlexTripEdge(EDGE)
-      .withFareProducts(List.of(FARE_PRODUCT_USE))
+      .withFareProducts(List.of(ANY_FARE_OFFER))
       .withAlerts(Set.of(ALERT))
       .build();
 
@@ -102,7 +102,7 @@ class FlexibleTransitLegTest implements PlanTestConstants {
 
     assertEquals(START_TIME.plus(TIME_SHIFT), shifted.startTime());
     assertEquals(END_TIME.plus(TIME_SHIFT), shifted.endTime());
-    assertEquals(List.of(FARE_PRODUCT_USE), shifted.fareProducts());
+    assertEquals(List.of(ANY_FARE_OFFER), shifted.fareOffers());
     assertEquals(Set.of(ALERT), shifted.listTransitAlerts());
   }
 }

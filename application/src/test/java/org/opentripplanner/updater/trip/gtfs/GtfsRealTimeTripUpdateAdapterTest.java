@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
-import static org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
@@ -180,7 +179,8 @@ public class GtfsRealTimeTripUpdateAdapterTest {
     // WHEN
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
+      ForwardsDelayPropagationType.DEFAULT,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA,
       DIFFERENTIAL,
       List.of(tripUpdate),
       feedId

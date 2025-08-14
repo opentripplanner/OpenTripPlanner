@@ -126,14 +126,14 @@ public class MapperTest {
 
   @Test
   void footDiscouraged() {
-    var regular = WayTestData.pedestrianTunnel();
+    var regular = WayTestData.highwayTertiary();
     var props = wps.getDataForWay(regular);
-    assertEquals(PEDESTRIAN_AND_BICYCLE, props.getPermission());
+    assertEquals(ALL, props.getPermission());
     assertEquals(1, props.walkSafety().forward());
 
-    var discouraged = WayTestData.pedestrianTunnel().addTag("foot", "discouraged");
+    var discouraged = WayTestData.highwayTertiary().addTag("foot", "discouraged");
     var discouragedProps = wps.getDataForWay(discouraged);
-    assertEquals(PEDESTRIAN_AND_BICYCLE, discouragedProps.getPermission());
+    assertEquals(ALL, discouragedProps.getPermission());
     assertEquals(3, discouragedProps.walkSafety().forward());
   }
 
@@ -152,14 +152,14 @@ public class MapperTest {
 
   @Test
   void footUseSidepath() {
-    var regular = WayTestData.pedestrianTunnel();
+    var regular = WayTestData.highwayTertiary();
     var props = wps.getDataForWay(regular);
-    assertEquals(PEDESTRIAN_AND_BICYCLE, props.getPermission());
+    assertEquals(ALL, props.getPermission());
     assertEquals(1, props.walkSafety().forward());
 
-    var useSidepath = WayTestData.pedestrianTunnel().addTag("foot", "use_sidepath");
+    var useSidepath = WayTestData.highwayTertiary().addTag("foot", "use_sidepath");
     var useSidepathProps = wps.getDataForWay(useSidepath);
-    assertEquals(PEDESTRIAN_AND_BICYCLE, useSidepathProps.getPermission());
+    assertEquals(ALL, useSidepathProps.getPermission());
     assertEquals(5, useSidepathProps.walkSafety().forward());
   }
 

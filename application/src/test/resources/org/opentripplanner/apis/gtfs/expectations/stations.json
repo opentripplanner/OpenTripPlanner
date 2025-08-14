@@ -9,7 +9,13 @@
         "vehicleMode": null,
         "allRoutes": null,
         "routesWithinRange": null,
-        "alerts": []
+        "alerts": [
+          {
+            "alertHeaderText": "Station closed",
+            "alertDescriptionText": "This station is currently closed"
+          }
+        ],
+        "patternAndRouteAlerts": []
       }
     ]
   }

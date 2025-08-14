@@ -1,6 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -41,7 +40,7 @@ class FareTransferRuleMapperTest {
     rule.setFareProductId(id);
 
     var transferRule = map(fareProduct, rule);
-    assertEquals(FEED_ID, transferRule.feedId());
+    assertEquals(FEED_ID, transferRule.id().getFeedId());
     assertNull(transferRule.fromLegGroup());
     assertNull(transferRule.toLegGroup());
   }
@@ -71,7 +70,6 @@ class FareTransferRuleMapperTest {
     var subject = new FareTransferRuleMapper(ID_FACTORY, fareProductMapper);
     var transferRule = subject.map(List.of(rule)).stream().toList().getFirst();
     assertTrue(transferRule.isFree());
-    assertThat(transferRule.fareProducts()).isEmpty();
   }
 
   private FareProduct fareProduct() {

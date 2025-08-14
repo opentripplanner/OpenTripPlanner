@@ -65,7 +65,7 @@ class LegImplTest implements PlanTestConstants {
     .withAlightStopIndexInPattern(4)
     .withTripPattern(PATTERN)
     .build();
-  private static final LegImpl SUBJECT = new LegImpl();
+  private static final LegImpl IMPL = new LegImpl();
   private static final Map<String, Object> INCLUDE_STOP_ONLY = Map.of(
     "include",
     List.of(GraphQLTypes.GraphQLStopType.STOP)
@@ -75,34 +75,34 @@ class LegImplTest implements PlanTestConstants {
   @Test
   void intermediateStops() throws Exception {
     var env = dataFetchingEnvironment(LEG);
-    var stops = SUBJECT.intermediateStops().get(env);
+    var stops = IMPL.intermediateStops().get(env);
     assertThat(stops).containsExactly(REGULAR_STOP, AREA_STOP, GROUP_STOP);
   }
 
   @Test
-  void intermediateStopsWithInclude() throws Exception {
+  void intermediateStopsWithFilter() throws Exception {
     var env = dataFetchingEnvironment(LEG, INCLUDE_STOP_ONLY);
-    var stops = SUBJECT.intermediateStops().get(env);
+    var stops = IMPL.intermediateStops().get(env);
     assertThat(stops).containsExactly(REGULAR_STOP);
   }
 
   @Test
   void intermediatePlaces() throws Exception {
     var env = dataFetchingEnvironment(LEG);
-    var stops = toStops(SUBJECT.intermediatePlaces().get(env));
+    var stops = toStops(IMPL.intermediatePlaces().get(env));
     assertThat(stops).containsExactly(REGULAR_STOP, AREA_STOP, GROUP_STOP);
   }
 
   @Test
   void walkLeg() throws Exception {
     var env = dataFetchingEnvironment(WALK_LEG);
-    assertNull(SUBJECT.intermediatePlaces().get(env));
+    assertNull(IMPL.intermediatePlaces().get(env));
   }
 
   @Test
-  void walkLegWithInclude() throws Exception {
+  void walkLegWithFilter() throws Exception {
     var env = dataFetchingEnvironment(WALK_LEG, INCLUDE_STOP_ONLY);
-    assertNull(SUBJECT.intermediateStops().get(env));
+    assertNull(IMPL.intermediateStops().get(env));
   }
 
   private static Stream<StopLocation> toStops(Iterable<StopArrival> stopArrivals) {

@@ -35,7 +35,6 @@ public class GbfsStationInformationMapper {
   }
 
   public VehicleRentalStation mapStationInformation(GBFSStation station) {
-    VehicleRentalStation rentalStation = new VehicleRentalStation();
     if (
       station.getStationId() == null ||
       station.getStationId().isBlank() ||
@@ -47,64 +46,74 @@ public class GbfsStationInformationMapper {
       LOG.info(
         String.format(
           "GBFS station for %s system has issues with required fields: \n%s",
-          system.systemId,
+          system.systemId(),
           station
         )
       );
       return null;
     }
-    rentalStation.id = new FeedScopedId(system.systemId, station.getStationId());
-    rentalStation.system = system;
-    rentalStation.longitude = station.getLon();
-    rentalStation.latitude = station.getLat();
-    rentalStation.name = new NonLocalizedString(station.getName());
-    rentalStation.shortName = station.getShortName();
-    rentalStation.address = station.getAddress();
-    rentalStation.crossStreet = station.getCrossStreet();
-    rentalStation.regionId = station.getRegionId();
-    rentalStation.postCode = station.getPostCode();
-    rentalStation.isVirtualStation = station.getIsVirtualStation() != null
-      ? station.getIsVirtualStation()
-      : false;
-    rentalStation.isValetStation = station.getIsValetStation() != null
-      ? station.getIsValetStation()
-      : false;
-    // TODO: Convert geometry
-    // rentalStation.stationArea = station.getStationArea();
-    rentalStation.capacity = station.getCapacity() != null
-      ? station.getCapacity().intValue()
-      : null;
 
-    rentalStation.vehicleTypeAreaCapacity = station.getVehicleCapacity() != null &&
-      vehicleTypes != null
-      ? station
-        .getVehicleCapacity()
-        .getAdditionalProperties()
-        .entrySet()
-        .stream()
-        .collect(Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue()))
-      : null;
-    rentalStation.vehicleTypeDockCapacity = station.getVehicleTypeCapacity() != null &&
-      vehicleTypes != null
-      ? station
-        .getVehicleTypeCapacity()
-        .getAdditionalProperties()
-        .entrySet()
-        .stream()
-        .collect(Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue()))
-      : null;
+    var builder = VehicleRentalStation.of()
+      .withId(new FeedScopedId(system.systemId(), station.getStationId()))
+      .withSystem(system)
+      .withLongitude(station.getLon())
+      .withLatitude(station.getLat())
+      .withName(new NonLocalizedString(station.getName()))
+      .withShortName(station.getShortName())
+      .withAddress(station.getAddress())
+      .withCrossStreet(station.getCrossStreet())
+      .withRegionId(station.getRegionId())
+      .withPostCode(station.getPostCode())
+      .withIsVirtualStation(
+        station.getIsVirtualStation() != null ? station.getIsVirtualStation() : false
+      )
+      .withIsValetStation(station.getIsValetStation() != null ? station.getIsValetStation() : false)
+      // TODO: Convert geometry
+      // .withStationArea(station.getStationArea())
+      .withCapacity(station.getCapacity() != null ? station.getCapacity().intValue() : null)
+      .withIsArrivingInRentalVehicleAtDestinationAllowed(allowKeepingRentedVehicleAtDestination)
+      .withOverloadingAllowed(overloadingAllowed);
 
-    rentalStation.isArrivingInRentalVehicleAtDestinationAllowed =
-      allowKeepingRentedVehicleAtDestination;
+    if (station.getVehicleCapacity() != null && vehicleTypes != null) {
+      builder.withVehicleTypeAreaCapacity(
+        station
+          .getVehicleCapacity()
+          .getAdditionalProperties()
+          .entrySet()
+          .stream()
+          .collect(
+            Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue())
+          )
+      );
+    }
+
+    if (station.getVehicleTypeCapacity() != null && vehicleTypes != null) {
+      builder.withVehicleTypeDockCapacity(
+        station
+          .getVehicleTypeCapacity()
+          .getAdditionalProperties()
+          .entrySet()
+          .stream()
+          .collect(
+            Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue())
+          )
+      );
+    }
 
     GBFSRentalUris rentalUris = station.getRentalUris();
     if (rentalUris != null) {
       String androidUri = rentalUris.getAndroid();
       String iosUri = rentalUris.getIos();
       String webUri = rentalUris.getWeb();
-      rentalStation.rentalUris = new VehicleRentalStationUris(androidUri, iosUri, webUri);
+      builder.withRentalUris(
+        VehicleRentalStationUris.of()
+          .withAndroid(androidUri)
+          .withIos(iosUri)
+          .withWeb(webUri)
+          .build()
+      );
     }
-    rentalStation.overloadingAllowed = overloadingAllowed;
-    return rentalStation;
+
+    return builder.build();
   }
 }

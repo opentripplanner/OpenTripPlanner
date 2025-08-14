@@ -15,5 +15,5 @@ public record ApiItineraryFares(
   Map<String, ApiMoney> fare,
   Map<String, List<Object>> details,
   List<ApiFareProduct> coveringItinerary,
-  List<ApiLegProducts> legProducts
+  List<ApiFareProduct> legProducts
 ) {}

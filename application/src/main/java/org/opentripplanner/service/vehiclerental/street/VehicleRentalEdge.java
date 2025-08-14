@@ -1,8 +1,7 @@
 package org.opentripplanner.service.vehiclerental.street;
 
-import java.util.Collections;
-import java.util.Set;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -37,8 +36,7 @@ public class VehicleRentalEdge extends Edge {
       return State.empty();
     }
 
-    var allowedRentalFormFactors = allowedModes(s0.getRequest().mode());
-    if (!allowedRentalFormFactors.isEmpty() && !allowedRentalFormFactors.contains(formFactor)) {
+    if (!isFormFactorAllowed(s0.getRequest().mode(), formFactor)) {
       return State.empty();
     }
 
@@ -46,7 +44,7 @@ public class VehicleRentalEdge extends Edge {
 
     VehicleRentalPlaceVertex stationVertex = (VehicleRentalPlaceVertex) tov;
     VehicleRentalPlace station = stationVertex.getStation();
-    String network = station.getNetwork();
+    String network = station.network();
     var preferences = s0.getPreferences().rental(formFactor.traverseMode);
     boolean realtimeAvailability = preferences.useAvailabilityInformation();
 
@@ -63,7 +61,7 @@ public class VehicleRentalEdge extends Edge {
         case HAVE_RENTED -> {
           if (
             (realtimeAvailability && !station.allowDropoffNow()) ||
-            !station.getAvailableDropoffFormFactors(realtimeAvailability).contains(formFactor)
+            !station.availableDropoffFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -79,7 +77,7 @@ public class VehicleRentalEdge extends Edge {
           // traversing from renting to walking.
           if (
             s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.contains(network) ||
-            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
+            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -93,7 +91,7 @@ public class VehicleRentalEdge extends Edge {
         case RENTING_FROM_STATION -> {
           if (
             (realtimeAvailability && !station.allowPickupNow()) ||
-            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
+            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -118,7 +116,7 @@ public class VehicleRentalEdge extends Edge {
         case BEFORE_RENTING -> {
           if (
             (realtimeAvailability && !station.allowPickupNow()) ||
-            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
+            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -139,16 +137,10 @@ public class VehicleRentalEdge extends Edge {
           if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {
             return State.empty();
           }
-          var formFactors = station.getAvailableDropoffFormFactors(realtimeAvailability);
+          var formFactors = station.availableDropoffFormFactors(realtimeAvailability);
           if (
             (realtimeAvailability && !station.allowDropoffNow()) ||
             !formFactors.contains(formFactor)
-          ) {
-            return State.empty();
-          }
-          if (
-            !allowedRentalFormFactors.isEmpty() &&
-            Collections.disjoint(allowedRentalFormFactors, formFactors)
           ) {
             return State.empty();
           }
@@ -190,16 +182,7 @@ public class VehicleRentalEdge extends Edge {
     return rentedNetwork.equals(stationNetwork);
   }
 
-  private static Set<RentalFormFactor> allowedModes(StreetMode streetMode) {
-    return switch (streetMode) {
-      case BIKE_RENTAL -> Set.of(RentalFormFactor.BICYCLE, RentalFormFactor.CARGO_BICYCLE);
-      case SCOOTER_RENTAL -> Set.of(
-        RentalFormFactor.SCOOTER,
-        RentalFormFactor.SCOOTER_SEATED,
-        RentalFormFactor.SCOOTER_STANDING
-      );
-      case CAR_RENTAL -> Set.of(RentalFormFactor.CAR);
-      default -> Set.of();
-    };
+  private static boolean isFormFactorAllowed(StreetMode streetMode, RentalFormFactor formFactor) {
+    return formFactor.traverseMode == StreetModeToRentalTraverseModeMapper.map(streetMode);
   }
 }

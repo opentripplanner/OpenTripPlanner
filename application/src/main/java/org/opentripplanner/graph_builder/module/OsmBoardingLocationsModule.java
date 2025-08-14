@@ -73,18 +73,20 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   @Inject
   public OsmBoardingLocationsModule(
     Graph graph,
+    VertexLinker linker,
     OsmInfoGraphBuildService osmInfoGraphBuildService
   ) {
     this.graph = graph;
     this.osmInfoGraphBuildService = osmInfoGraphBuildService;
     this.vertexFactory = new VertexFactory(graph);
+    this.linker = linker;
   }
 
   @Override
   public void buildGraph() {
     LOG.info("Improving boarding locations by checking OSM entities...");
 
-    this.linker = graph.getLinkerSafe();
+    graph.index();
     int successes = 0;
 
     for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {

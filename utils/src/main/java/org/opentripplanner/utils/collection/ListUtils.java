@@ -63,7 +63,7 @@ public class ListUtils {
    * Take a single nullable variable and return an empty list if it is null. Otherwise
    * return a list with one element.
    */
-  public static <T> List<T> ofNullable(T input) {
+  public static <T> List<T> ofNullable(@Nullable T input) {
     if (input == null) {
       return List.of();
     } else {
@@ -82,7 +82,7 @@ public class ListUtils {
 
   /**
    * Check if a list has at least the given {@code minLimit} number of elements(inclusive).
-   * @throws IllegalStateException if the list has fewer lements.
+   * @throws IllegalStateException if the list has fewer elements.
    * @throws NumberFormatException if the list is {@code null}
    */
   public static <T> List<T> requireAtLeastNElements(List<T> list, int minLimit) {
@@ -90,5 +90,49 @@ public class ListUtils {
       throw new IllegalArgumentException("The list must have at least " + minLimit + " elements.");
     }
     return list;
+  }
+
+  /**
+   * Take a list of items and split it into a list of "overlapping" pairs. For example
+   * [A,B,C,D] becomes [[A,B],[B,C],[C,D]].
+   */
+  public static <T> List<Pair<T>> partitionIntoOverlappingPairs(List<T> input) {
+    if (input.size() < 2) {
+      return List.of();
+    }
+    if (input.size() == 2) {
+      return List.of(new Pair<>(input.getFirst(), input.getLast()));
+    }
+    var output = new ArrayList<Pair<T>>(input.size() - 1);
+    for (int i = 0; i < input.size() - 1; i++) {
+      T first = input.get(i);
+      T second = input.get(i + 1);
+      output.add(new org.opentripplanner.utils.collection.Pair<>(first, second));
+    }
+    return output;
+  }
+
+  /**
+   * Takes a list of at least 2 items and partitions them into "splits".
+   * For example, [A,B,C,D] becomes
+   *   [
+   *     [A,[B,C,D]],
+   *     [B,[C,D],
+   *     [C,[D]]
+   *   ]
+   */
+  public static <T> List<Split<T>> partitionIntoSplits(List<T> input) {
+    requireAtLeastNElements(input, 2);
+    var ret = new ArrayList<Split<T>>();
+    for (int i = 0; i < input.size() - 1; i++) {
+      var sublist = input.subList(i, input.size());
+      ret.add(partitionIntoSplit(sublist));
+    }
+    return ret;
+  }
+
+  private static <T> Split<T> partitionIntoSplit(List<T> list) {
+    requireAtLeastNElements(list, 2);
+    return new Split<>(list.getFirst(), list.subList(1, list.size()));
   }
 }

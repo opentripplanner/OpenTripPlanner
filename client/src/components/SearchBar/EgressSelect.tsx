@@ -16,6 +16,7 @@ export function EgressSelect({
       <Form.Select
         id="egressSelect"
         size="sm"
+        className="input-medium"
         onChange={(e) => {
           if (e.target.value !== 'not_selected') {
             setTripQueryVariables({

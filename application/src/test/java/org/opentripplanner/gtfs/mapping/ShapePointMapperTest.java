@@ -6,15 +6,19 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Collection;
+import com.google.common.collect.ImmutableList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ShapePoint;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class ShapePointMapperTest {
 
-  private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+  private static final AgencyAndId OBA_ID = new AgencyAndId("A", "1");
+  private static final FeedScopedId SHAPE_ID = new FeedScopedId("A", "1");
 
   private static final Integer ID = 45;
 
@@ -35,46 +39,32 @@ public class ShapePointMapperTest {
     SHAPE_POINT.setLat(LAT);
     SHAPE_POINT.setLon(LON);
     SHAPE_POINT.setSequence(SEQUENCE);
-    SHAPE_POINT.setShapeId(AGENCY_AND_ID);
+    SHAPE_POINT.setShapeId(OBA_ID);
   }
 
   @Test
-  public void testMapCollection() throws Exception {
-    assertNull(subject.map((Collection<ShapePoint>) null));
+  public void testMapCollection() {
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(SHAPE_POINT)).size());
   }
 
   @Test
-  public void testMap() throws Exception {
-    org.opentripplanner.model.ShapePoint result = subject.map(SHAPE_POINT);
-
-    assertEquals(DIST_TRAVELED, result.getDistTraveled(), 0.0001d);
-    assertEquals(LAT, result.getLat(), 0.0001d);
-    assertEquals(LON, result.getLon(), 0.0001d);
-    assertEquals(SEQUENCE, result.getSequence());
-    assertEquals("A:1", result.getShapeId().toString());
+  public void testMap() {
+    var result = map(List.of(SHAPE_POINT));
+    assertEquals(DIST_TRAVELED, result.distTraveled(), 0.0001d);
+    assertEquals(LAT, result.lat(), 0.0001d);
+    assertEquals(LON, result.lon(), 0.0001d);
+    assertEquals(SEQUENCE, result.sequence());
   }
 
   @Test
-  public void testMapWithNulls() throws Exception {
-    var orginal = new ShapePoint();
-    orginal.setShapeId(AGENCY_AND_ID);
-    org.opentripplanner.model.ShapePoint result = subject.map(orginal);
-
-    assertFalse(result.isDistTraveledSet());
-    assertEquals(0d, result.getLat(), 0.00001);
-    assertEquals(0d, result.getLon(), 0.00001);
-    assertEquals(0d, result.getSequence(), 0.00001);
-    assertEquals("A:1", result.getShapeId().toString());
+  void string() {
+    var result = map(List.of(SHAPE_POINT)).toString();
+    assertEquals("3 (60.0, 45.0) dist=2.0", result);
   }
 
-  /** Mapping the same object twice, should return the the same instance. */
-  @Test
-  public void testMapCache() throws Exception {
-    org.opentripplanner.model.ShapePoint result1 = subject.map(SHAPE_POINT);
-    org.opentripplanner.model.ShapePoint result2 = subject.map(SHAPE_POINT);
-
-    assertSame(result1, result2);
+  private org.opentripplanner.model.ShapePoint map(List<ShapePoint> shapePoint) {
+    final Map<FeedScopedId, CompactShape> map = subject.map(shapePoint);
+    return ImmutableList.copyOf(map.get(SHAPE_ID)).getFirst();
   }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;

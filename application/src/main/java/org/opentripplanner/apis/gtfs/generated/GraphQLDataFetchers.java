@@ -37,8 +37,7 @@ import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.fare.FareMedium;
-import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
@@ -389,6 +388,20 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
   }
 
+  public interface GraphQLDependentFareProduct {
+    public DataFetcher<Iterable<FareOffer>> dependencies();
+
+    public DataFetcher<String> id();
+
+    public DataFetcher<FareMedium> medium();
+
+    public DataFetcher<String> name();
+
+    public DataFetcher<Money> price();
+
+    public DataFetcher<RiderCategory> riderCategory();
+  }
+
   public interface GraphQLEmissions {
     public DataFetcher<org.opentripplanner.framework.model.Gram> co2();
   }
@@ -443,7 +456,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLFareProductUse {
     public DataFetcher<String> id();
 
-    public DataFetcher<FareProduct> product();
+    public DataFetcher<FareOffer> product();
   }
 
   /** A feed provides routing data (stops, routes, timetables, etc.) from one or more public transport agencies. */
@@ -531,7 +544,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Long> endTime();
 
-    public DataFetcher<Iterable<FareProductUse>> fareProducts();
+    public DataFetcher<Iterable<FareOffer>> fareProducts();
 
     public DataFetcher<StopArrival> from();
 

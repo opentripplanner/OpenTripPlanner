@@ -14,15 +14,18 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_50;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.transit.model.basic.Money;
 
 class ItineraryFareTest {
+
+  private static final ZonedDateTime ANY_ZDT = ZonedDateTime.parse("2025-06-24T12:16:09Z");
 
   @Test
   void legProduct() {
@@ -37,26 +40,17 @@ class ItineraryFareTest {
 
     var fares = new ItineraryFare();
 
-    var busTicket = fareProduct("bus");
-    var railTicketA = fareProduct("rail-a");
-    var railTicketB = fareProduct("rail-b");
+    var busTicket = fareOffer("bus");
+    var railTicketA = fareOffer("rail-a");
+    var railTicketB = fareOffer("rail-b");
 
     fares.addFareProduct(busLeg, busTicket);
     fares.addFareProduct(railLeg, railTicketA);
     fares.addFareProduct(railLeg, railTicketB);
 
-    assertEquals(
-      List.of(new FareProductUse("606b5587-d460-3b2a-bf83-fa0bc03c24f3", busTicket)),
-      fares.getLegProducts().get(busLeg)
-    );
+    assertEquals(List.of(busTicket), fares.getLegProducts().get(busLeg));
 
-    assertEquals(
-      List.of(
-        new FareProductUse("5ac59bb6-56fa-31c9-9f2b-915797a22763", railTicketA),
-        new FareProductUse("73f4c43f-b237-36d6-bc0a-2fc3aad98780", railTicketB)
-      ),
-      fares.getLegProducts().get(railLeg)
-    );
+    assertEquals(List.of(railTicketA, railTicketB), fares.getLegProducts().get(railLeg));
   }
 
   @Test
@@ -64,7 +58,7 @@ class ItineraryFareTest {
     assertTrue(ItineraryFare.empty().isEmpty());
   }
 
-  private static FareProduct fareProduct(String id) {
-    return FareProduct.of(id(id), id, Money.euros(10)).build();
+  private static FareOffer fareOffer(String id) {
+    return FareOffer.of(ANY_ZDT, FareProduct.of(id(id), id, Money.euros(10)).build());
   }
 }

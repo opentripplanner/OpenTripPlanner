@@ -4,7 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE_AND_CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import java.util.List;
 import java.util.Locale;
@@ -12,12 +17,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.wayproperty.WayPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 class OsmTagMapperTest {
 
   private static final Locale FI = Locale.of("FI");
+  private static final WayPropertySet wps = new WayPropertySet();
+
+  static {
+    var source = new OsmTagMapper();
+    source.populateProperties(wps);
+  }
 
   @Test
   void isMotorThroughTrafficExplicitlyDisallowed() {
@@ -82,6 +94,109 @@ class OsmTagMapperTest {
     assertTrue(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
     assertTrue(osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(tags));
     assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
+  }
+
+  @Test
+  void testFootway() {
+    assertEquals(PEDESTRIAN, wps.getDataForWay(WayTestData.footway()).getPermission());
+  }
+
+  @Test
+  void testFootwaySharedWithBicycle() {
+    assertEquals(
+      PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForWay(WayTestData.footwaySharedWithBicycle()).getPermission()
+    );
+  }
+
+  @Test
+  void testCycleway() {
+    assertEquals(BICYCLE, wps.getDataForWay(WayTestData.cycleway()).getPermission());
+  }
+
+  @Test
+  void testCyclewaySharedWithFoot() {
+    assertEquals(
+      PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForWay(WayTestData.cyclewaySharedWithFoot()).getPermission()
+    );
+  }
+
+  @Test
+  void testPedestrian() {
+    assertEquals(PEDESTRIAN, wps.getDataForWay(WayTestData.pedestrianArea()).getPermission());
+  }
+
+  @Test
+  void testBridleway() {
+    assertEquals(NONE, wps.getDataForWay(WayTestData.bridleway()).getPermission());
+  }
+
+  @Test
+  void testPath() {
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(WayTestData.path()).getPermission());
+  }
+
+  @Test
+  void testBridlewaySharedWithFootAndBicycle() {
+    assertEquals(
+      PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForWay(WayTestData.bridlewaySharedWithFootAndBicycle()).getPermission()
+    );
+  }
+
+  @Test
+  void testMotorway() {
+    assertEquals(CAR, wps.getDataForWay(WayTestData.motorway()).getPermission());
+  }
+
+  @Test
+  void testMotorwayWithBicycleAllowed() {
+    assertEquals(
+      BICYCLE_AND_CAR,
+      wps.getDataForWay(WayTestData.motorwayWithBicycleAllowed()).getPermission()
+    );
+  }
+
+  @Test
+  void testPrimaryMotorroad() {
+    assertEquals(CAR, wps.getDataForWay(WayTestData.highwayPrimaryWithMotorroad()).getPermission());
+  }
+
+  @Test
+  void testTrunk() {
+    assertEquals(ALL, wps.getDataForWay(WayTestData.highwayTrunk()).getPermission());
+  }
+
+  @Test
+  void testTrunkMotorroad() {
+    assertEquals(CAR, wps.getDataForWay(WayTestData.highwayTrunkWithMotorroad()).getPermission());
+  }
+
+  @Test
+  void testTrunkWalkSafety() {
+    var rawScore = wps.getDataForWay(WayTestData.highwayTrunk()).walkSafety().forward();
+    var scoreWithLane = wps
+      .getDataForWay(WayTestData.highwayTrunk().addTag("sidewalk", "lane"))
+      .walkSafety()
+      .forward();
+    var scoreWithSidewalk = wps
+      .getDataForWay(WayTestData.highwayTrunk().addTag("sidewalk", "both"))
+      .walkSafety()
+      .forward();
+    var scoreWithSeparateSidewalk = wps
+      .getDataForWay(WayTestData.highwayTrunk().addTag("sidewalk", "separate"))
+      .walkSafety()
+      .forward();
+    assertTrue(rawScore > 5);
+    assertTrue(scoreWithLane < rawScore);
+    assertTrue(scoreWithSidewalk < scoreWithLane);
+    assertEquals(rawScore, scoreWithSeparateSidewalk);
+  }
+
+  @Test
+  void testTertiary() {
+    assertEquals(ALL, wps.getDataForWay(WayTestData.highwayTertiary()).getPermission());
   }
 
   @Test

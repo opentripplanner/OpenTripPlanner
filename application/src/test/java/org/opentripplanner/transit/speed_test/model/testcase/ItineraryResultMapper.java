@@ -86,7 +86,7 @@ class ItineraryResultMapper {
       } else if (
         leg instanceof StreetLeg streetLeg && streetLeg.from().vehicleRentalPlace != null
       ) {
-        var name = streetLeg.from().vehicleRentalPlace.getName().toString();
+        var name = streetLeg.from().vehicleRentalPlace.name().toString();
         buf.pickupRental(name, (int) leg.duration().toSeconds());
       } else if (leg instanceof TransitLeg transitLeg) {
         buf.transit(

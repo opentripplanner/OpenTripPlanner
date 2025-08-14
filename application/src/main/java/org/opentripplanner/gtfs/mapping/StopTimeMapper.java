@@ -88,7 +88,6 @@ class StopTimeMapper {
     lhs.setTimepoint(rhs.getTimepoint());
     lhs.setStopSequence(rhs.getStopSequence());
     lhs.setStopHeadsign(stopHeadsign);
-    lhs.setRouteShortName(rhs.getRouteShortName());
     lhs.setPickupType(PickDropMapper.map(rhs.getPickupType()));
     lhs.setDropOffType(PickDropMapper.map(rhs.getDropOffType()));
     lhs.setShapeDistTraveled(rhs.getShapeDistTraveled());

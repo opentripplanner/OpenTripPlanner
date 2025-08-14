@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareMedium;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -17,7 +17,6 @@ import org.opentripplanner.routing.algorithm.mapping._support.model.ApiCurrency;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiFareProduct;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiFareQualifier;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiItineraryFares;
-import org.opentripplanner.routing.algorithm.mapping._support.model.ApiLegProducts;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiMoney;
 import org.opentripplanner.transit.model.basic.Money;
 
@@ -37,27 +36,20 @@ class FareMapper {
       Map.of(),
       Map.of(),
       toApiFareProducts(fares.getItineraryProducts()),
-      toApiLegProducts(itinerary, fares.getLegProducts())
+      toApiLegProducts(fares.getLegProducts())
     );
   }
 
-  private List<ApiLegProducts> toApiLegProducts(
-    Itinerary itinerary,
-    Multimap<Leg, FareProductUse> legProducts
-  ) {
+  private List<ApiFareProduct> toApiLegProducts(Multimap<Leg, FareOffer> legProducts) {
     if (legProducts.isEmpty()) {
       return null;
     } else {
       return legProducts
         .keySet()
         .stream()
-        .map(leg -> {
-          var index = itinerary.findLegIndex(leg);
+        .flatMap(leg -> {
           // eventually we want to implement products that span multiple legs (but not the entire itinerary)
-          return new ApiLegProducts(
-            List.of(index),
-            instancesToApiFareProducts(legProducts.get(leg))
-          );
+          return instancesToApiFareProducts(legProducts.get(leg)).stream();
         })
         .toList();
     }
@@ -75,8 +67,8 @@ class FareMapper {
       .orElse(null);
   }
 
-  private List<ApiFareProduct> instancesToApiFareProducts(Collection<FareProductUse> product) {
-    return toApiFareProducts(product.stream().map(FareProductUse::product).toList());
+  private List<ApiFareProduct> instancesToApiFareProducts(Collection<FareOffer> product) {
+    return toApiFareProducts(product.stream().map(FareOffer::fareProduct).toList());
   }
 
   private List<ApiFareProduct> toApiFareProducts(Collection<FareProduct> product) {

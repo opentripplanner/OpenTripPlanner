@@ -15,8 +15,8 @@ class PortlandMapper extends OsmTagMapper {
   public void populateProperties(WayPropertySet props) {
     props.setMixinProperties("footway=sidewalk", ofWalkSafety(1.1));
     props.setMixinProperties(new ExactMatchSpecifier(new Absent("name")), ofWalkSafety(1.2));
-    props.setMixinProperties("highway=trunk", ofWalkSafety(1.2));
-    props.setMixinProperties("highway=trunk_link", ofWalkSafety(1.2));
+    props.setMixinProperties("highway=trunk", ofWalkSafety(1.2 / 7.47));
+    props.setMixinProperties("highway=trunk_link", ofWalkSafety(1.2 / 7.47));
     props.setMixinProperties("highway=primary", ofWalkSafety(1.2));
     props.setMixinProperties("highway=primary_link", ofWalkSafety(1.2));
     props.setMixinProperties("highway=secondary", ofWalkSafety(1.1));

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ class HoustonMapperTest {
     tunnel.addTag("name", "Harris County Tunnel");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(PEDESTRIAN, wps.getDataForWay(tunnel).getPermission());
   }
 
   @Test
@@ -53,7 +54,7 @@ class HoustonMapperTest {
     tunnel.addTag("layer", "-1");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(PEDESTRIAN, wps.getDataForWay(tunnel).getPermission());
   }
 
   @Test
@@ -67,7 +68,7 @@ class HoustonMapperTest {
     tunnel.addTag("surface", "concrete");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(ALL, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(tunnel).getPermission());
 
     // https://www.openstreetmap.org/way/101884176
     tunnel = new OsmEntity();

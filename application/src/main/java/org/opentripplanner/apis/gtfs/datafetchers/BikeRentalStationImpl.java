@@ -42,38 +42,38 @@ public class BikeRentalStationImpl implements GraphQLDataFetchers.GraphQLBikeRen
 
   @Override
   public DataFetcher<Integer> bikesAvailable() {
-    return environment -> getSource(environment).getVehiclesAvailable();
+    return environment -> getSource(environment).vehiclesAvailable();
   }
 
   @Override
   public DataFetcher<Integer> capacity() {
-    return environment -> getSource(environment).getCapacity();
+    return environment -> getSource(environment).capacity();
   }
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment ->
-      new Relay.ResolvedGlobalId("BikeRentalStation", getSource(environment).getId().toString());
+      new Relay.ResolvedGlobalId("BikeRentalStation", getSource(environment).id().toString());
   }
 
   @Override
   public DataFetcher<Double> lat() {
-    return environment -> getSource(environment).getLatitude();
+    return environment -> getSource(environment).latitude();
   }
 
   @Override
   public DataFetcher<Double> lon() {
-    return environment -> getSource(environment).getLongitude();
+    return environment -> getSource(environment).longitude();
   }
 
   @Override
   public DataFetcher<String> name() {
-    return environment -> getSource(environment).getName().toString(getLocale(environment));
+    return environment -> getSource(environment).name().toString(getLocale(environment));
   }
 
   @Override
   public DataFetcher<Iterable<String>> networks() {
-    return environment -> List.of(getSource(environment).getNetwork());
+    return environment -> List.of(getSource(environment).network());
   }
 
   @Override
@@ -89,12 +89,12 @@ public class BikeRentalStationImpl implements GraphQLDataFetchers.GraphQLBikeRen
 
   @Override
   public DataFetcher<VehicleRentalStationUris> rentalUris() {
-    return environment -> getSource(environment).getRentalUris();
+    return environment -> getSource(environment).rentalUris();
   }
 
   @Override
   public DataFetcher<Integer> spacesAvailable() {
-    return environment -> getSource(environment).getSpacesAvailable();
+    return environment -> getSource(environment).spacesAvailable();
   }
 
   @Override
@@ -114,7 +114,7 @@ public class BikeRentalStationImpl implements GraphQLDataFetchers.GraphQLBikeRen
 
   @Override
   public DataFetcher<String> stationId() {
-    return environment -> getSource(environment).getStationId();
+    return environment -> getSource(environment).stationId();
   }
 
   private VehicleRentalPlace getSource(DataFetchingEnvironment environment) {

@@ -267,6 +267,7 @@ public class LegacyTimetableSnapshotIntegrationTest {
       tripUpdate,
       timeZone,
       serviceDate,
+      ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     if (result.isSuccess()) {

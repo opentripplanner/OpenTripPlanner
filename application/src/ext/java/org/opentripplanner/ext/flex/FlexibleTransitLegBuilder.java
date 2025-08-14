@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
@@ -18,7 +18,7 @@ public class FlexibleTransitLegBuilder {
   private ZonedDateTime endTime;
   private int generalizedCost;
   private Set<TransitAlert> transitAlerts = new HashSet<>();
-  private List<FareProductUse> fareProducts = new ArrayList<>();
+  private List<FareOffer> fareOffers = new ArrayList<>();
   private Emission emissionPerPerson;
 
   FlexibleTransitLegBuilder() {}
@@ -29,7 +29,7 @@ public class FlexibleTransitLegBuilder {
     endTime = original.endTime();
     generalizedCost = original.generalizedCost();
     transitAlerts = original.listTransitAlerts();
-    fareProducts = original.fareProducts();
+    fareOffers = original.fareOffers();
     emissionPerPerson = original.emissionPerPerson();
   }
 
@@ -78,13 +78,13 @@ public class FlexibleTransitLegBuilder {
     return transitAlerts;
   }
 
-  public FlexibleTransitLegBuilder withFareProducts(List<FareProductUse> allUses) {
-    this.fareProducts = List.copyOf(allUses);
+  public FlexibleTransitLegBuilder withFareProducts(List<FareOffer> allUses) {
+    this.fareOffers = List.copyOf(allUses);
     return this;
   }
 
-  public List<FareProductUse> fareProducts() {
-    return fareProducts;
+  public List<FareOffer> fareOffers() {
+    return fareOffers;
   }
 
   public FlexibleTransitLegBuilder withEmissionPerPerson(Emission emissionPerPerson) {

@@ -275,7 +275,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     graph.hasStreets = true;
     var timetableRepository = otpModel.timetableRepository();
 
-    TransferParameters.Builder transferParametersBuilder = new TransferParameters.Builder();
+    var transferParametersBuilder = new TransferParameters.Builder();
     transferParametersBuilder.withCarsAllowedStopMaxTransferDuration(Duration.ofMinutes(60));
     transferParametersBuilder.withDisableDefaultTransfers(true);
     Map<StreetMode, TransferParameters> transferParametersForMode = new HashMap<>();
