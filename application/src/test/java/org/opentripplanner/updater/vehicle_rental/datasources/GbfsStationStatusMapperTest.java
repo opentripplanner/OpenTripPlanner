@@ -5,6 +5,7 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleDocksAvailable;
@@ -49,6 +50,8 @@ class GbfsStationStatusMapperTest {
       new RentalVehicleEntityCounts(3, List.of(new RentalVehicleTypeCount(TYPE_CAR, 3))),
       mapped.vehicleSpaceCounts()
     );
+
+    assertEquals(Set.of(RentalFormFactor.CAR), mapped.formFactors());
   }
 
   @Test
@@ -79,6 +82,33 @@ class GbfsStationStatusMapperTest {
       new RentalVehicleEntityCounts(99, List.of(new RentalVehicleTypeCount(TYPE_CAR, 88))),
       mapped.vehicleSpaceCounts()
     );
+    assertEquals(Set.of(RentalFormFactor.CAR), mapped.formFactors());
+  }
+
+  @Test
+  void avaialbleSpacesFromTypesWithoutAvailableVehicles() {
+    var gbfsStation = new GBFSStation();
+    gbfsStation.setStationId(ID);
+    gbfsStation.setNumDocksAvailable(88);
+    gbfsStation.setNumBikesAvailable(1);
+    var type = new GBFSVehicleTypesAvailable();
+    type.setCount(0);
+    type.setVehicleTypeId(TYPE_CAR.id().getId());
+
+    gbfsStation.setVehicleTypesAvailable(List.of(type));
+
+    var mapper = new GbfsStationStatusMapper(
+      Map.of(ID, gbfsStation),
+      Map.of(TYPE_CAR.id().getId(), TYPE_CAR)
+    );
+
+    var mapped = mapper.mapStationStatus(STATION);
+
+    assertEquals(
+      new RentalVehicleEntityCounts(88, List.of(new RentalVehicleTypeCount(TYPE_CAR, 88))),
+      mapped.vehicleSpaceCounts()
+    );
+    assertEquals(Set.of(RentalFormFactor.CAR), mapped.formFactors());
   }
 
   @Test
@@ -99,5 +129,6 @@ class GbfsStationStatusMapperTest {
       new RentalVehicleEntityCounts(1, List.of(new RentalVehicleTypeCount(bikeType, 1))),
       mapped.vehicleSpaceCounts()
     );
+    assertEquals(Set.of(RentalFormFactor.BICYCLE), mapped.formFactors());
   }
 }
