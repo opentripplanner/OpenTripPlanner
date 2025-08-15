@@ -101,9 +101,13 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     @Override
     public void messageArrived(String topic, MqttMessage message) {
       if (limit.tryAcquire()) {
-        virtualThreadExecutor.submit(() ->
-          serviceDelivery(message.getPayload()).ifPresent(serviceDeliveryConsumer::apply)
-        );
+        try {
+          virtualThreadExecutor.submit(() ->
+            serviceDelivery(message.getPayload()).ifPresent(serviceDeliveryConsumer::apply)
+          );
+        } finally {
+          limit.release();
+        }
       } else {
         serviceDelivery(message.getPayload()).ifPresent(serviceDeliveryConsumer::apply);
       }
