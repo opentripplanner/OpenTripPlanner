@@ -83,7 +83,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
     private final ArrayList<ServiceDelivery> initialServiceDeliveries = new ArrayList<>();
     private static final Duration thresholdHistoricData = Duration.ofMinutes(5);
-    private static final int SECONDS_SINCE_LAST_HISTORIC_DELIVERY = 10;
+    private static final int SECONDS_SINCE_LAST_HISTORIC_DELIVERY = 7;
     private Instant timestampOfLastHistoricDelivery;
 
     @Override
@@ -117,6 +117,9 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
       if (serviceDelivery.getResponseTimestamp().plus(thresholdHistoricData).isBefore(ZonedDateTime.now())) {
         initialServiceDeliveries.add(serviceDelivery);
+        if (initialServiceDeliveries.size() % 500 == 0) {
+          LOG.info("Service deliveries received: {}", initialServiceDeliveries.size());
+        }
         timestampOfLastHistoricDelivery = Instant.now();
         return;
       }
