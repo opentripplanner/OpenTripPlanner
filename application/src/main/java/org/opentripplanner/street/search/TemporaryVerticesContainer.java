@@ -32,9 +32,6 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +112,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (from.stopId == null) {
       return Set.of();
     }
-    return graph.findStopOrChildStopsVertices(from.stopId);
+    return resolveStopId(from.stopId);
   }
 
   /**
@@ -127,7 +124,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (to.stopId == null) {
       return Set.of();
     }
-    return graph.findStopOrChildStopsVertices(to.stopId);
+    return resolveStopId(to.stopId);
   }
 
   /* PRIVATE METHODS */
@@ -173,13 +170,9 @@ public class TemporaryVerticesContainer implements AutoCloseable {
         if (!stopVertices.isEmpty()) {
           return stopVertices;
         } else {
-          var vertices = resolveStopIds
-            .apply(location.stopId)
-            .stream()
-            .flatMap(id -> graph.findStopOrChildStopsVertices(id).stream().map(Vertex.class::cast))
-            .collect(Collectors.toUnmodifiableSet());
+          var vertices = resolveStopId(location.stopId);
           if (!vertices.isEmpty()) {
-            return vertices;
+            return vertices.stream().map(v -> (Vertex) v).collect(Collectors.toSet());
           }
         }
       }
@@ -199,6 +192,14 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     }
 
     return null;
+  }
+
+  private Set<TransitStopVertex> resolveStopId(FeedScopedId stopId) {
+    return resolveStopIds
+      .apply(stopId)
+      .stream()
+      .flatMap(id -> graph.findStopOrChildStopsVertices(id).stream())
+      .collect(Collectors.toUnmodifiableSet());
   }
 
   private TraverseMode getTraverseModeForLinker(StreetMode streetMode, boolean endVertex) {
