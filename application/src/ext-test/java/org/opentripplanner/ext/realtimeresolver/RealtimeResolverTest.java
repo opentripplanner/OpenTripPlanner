@@ -143,12 +143,12 @@ class RealtimeResolverTest {
   }
 
   private static TripTimes delay(TripTimes tt, int seconds) {
-    var delayed = tt.copyScheduledTimes();
-    IntStream.range(0, delayed.getNumStops()).forEach(i -> {
-      delayed.updateArrivalDelay(i, seconds);
-      delayed.updateDepartureDelay(i, seconds);
+    var builder = tt.createRealTimeFromScheduledTimes();
+    IntStream.range(0, tt.getNumStops()).forEach(i -> {
+      builder.withArrivalDelay(i, seconds);
+      builder.withDepartureDelay(i, seconds);
     });
-    return delayed;
+    return builder.build();
   }
 
   private static List<TripPattern> itineraryPatterns(Itinerary itinerary) {

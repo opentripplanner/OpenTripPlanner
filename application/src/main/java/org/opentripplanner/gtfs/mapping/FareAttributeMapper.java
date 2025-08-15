@@ -35,7 +35,9 @@ class FareAttributeMapper {
       Currency.getInstance(rhs.getCurrencyType()),
       rhs.getPrice()
     );
-    FareAttributeBuilder builder = FareAttribute.of(idFactory.createId(rhs.getId()))
+    FareAttributeBuilder builder = FareAttribute.of(
+      idFactory.createId(rhs.getId(), "fare attribute")
+    )
       .setPrice(price)
       .setPaymentMethod(rhs.getPaymentMethod());
 

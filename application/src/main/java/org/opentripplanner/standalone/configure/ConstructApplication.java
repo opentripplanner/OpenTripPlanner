@@ -18,6 +18,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -38,7 +39,6 @@ import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.TripPatternCache;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
@@ -180,12 +180,12 @@ public class ConstructApplication {
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(
       graph(),
+      vertexLinker(),
       realtimeVehicleRepository(),
       vehicleRentalRepository(),
       vehicleParkingRepository(),
       timetableRepository(),
       snapshotManager(),
-      tripPatternCache(),
       routerConfig().updaterConfig()
     );
 
@@ -294,10 +294,6 @@ public class ConstructApplication {
     return factory.timetableSnapshotManager();
   }
 
-  private TripPatternCache tripPatternCache() {
-    return factory.tripPatternCache();
-  }
-
   public VehicleParkingService vehicleParkingService() {
     return factory.vehicleParkingService();
   }
@@ -308,6 +304,10 @@ public class ConstructApplication {
 
   public Graph graph() {
     return factory.graph();
+  }
+
+  public VertexLinker vertexLinker() {
+    return factory.vertexLinker();
   }
 
   public WorldEnvelopeRepository worldEnvelopeRepository() {

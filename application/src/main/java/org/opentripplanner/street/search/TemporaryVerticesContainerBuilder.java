@@ -64,9 +64,9 @@ public class TemporaryVerticesContainerBuilder {
   private Set<TransitStopVertex> fromStopVertices = Set.of();
   private Set<TransitStopVertex> toStopVertices = Set.of();
 
-  TemporaryVerticesContainerBuilder(Graph graph) {
+  TemporaryVerticesContainerBuilder(Graph graph, VertexLinker vertexLinker) {
     this.graph = graph;
-    this.vertexLinker = graph.getLinker();
+    this.vertexLinker = vertexLinker;
   }
 
   public TemporaryVerticesContainerBuilder withFrom(GenericLocation location, StreetMode mode) {

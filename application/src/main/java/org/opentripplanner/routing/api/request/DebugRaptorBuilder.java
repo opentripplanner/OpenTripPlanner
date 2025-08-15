@@ -18,6 +18,7 @@ public class DebugRaptorBuilder implements Serializable {
 
   private static final Pattern FIRST_STOP_PATTERN = Pattern.compile("(\\d+)\\*");
   private static final int FIRST_STOP_INDEX = 0;
+  private static final int NOT_SET = -999_999_999;
 
   private List<Integer> stops;
   private List<Integer> path;
@@ -30,7 +31,7 @@ public class DebugRaptorBuilder implements Serializable {
 
     this.stops = null;
     this.path = null;
-    this.debugPathFromStopIndex = original.debugPathFromStopIndex();
+    this.debugPathFromStopIndex = NOT_SET;
     this.eventTypes = null;
   }
 
@@ -68,8 +69,7 @@ public class DebugRaptorBuilder implements Serializable {
   }
 
   public DebugRaptorBuilder withEventTypes(Collection<DebugEventType> eventTypes) {
-    this.eventTypes.clear();
-    this.eventTypes.addAll(eventTypes);
+    this.eventTypes = Set.copyOf(eventTypes);
     return this;
   }
 
@@ -82,7 +82,9 @@ public class DebugRaptorBuilder implements Serializable {
     var value = new DebugRaptor(
       ifNotNull(stops, original.stops()),
       ifNotNull(path, original.path()),
-      debugPathFromStopIndex,
+      debugPathFromStopIndex == NOT_SET
+        ? original.debugPathFromStopIndex()
+        : debugPathFromStopIndex,
       ifNotNull(eventTypes, original.eventTypes())
     );
     return original.equals(value) ? original : value;

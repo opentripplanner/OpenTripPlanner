@@ -134,51 +134,84 @@ class RealTimeTripTimesTest {
 
   @Test
   public void testStopUpdate() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    updatedTripTimesA.updateArrivalTime(3, 190);
-    updatedTripTimesA.updateDepartureTime(3, 190);
-    updatedTripTimesA.updateArrivalTime(5, 311);
-    updatedTripTimesA.updateDepartureTime(5, 312);
+    builder.withArrivalTime(3, 190);
+    builder.withDepartureTime(3, 190);
+    builder.withArrivalTime(5, 311);
+    builder.withDepartureTime(5, 312);
 
-    assertEquals(3 * 60 + 10, updatedTripTimesA.getArrivalTime(3));
-    assertEquals(3 * 60 + 10, updatedTripTimesA.getDepartureTime(3));
-    assertEquals(5 * 60 + 11, updatedTripTimesA.getArrivalTime(5));
-    assertEquals(5 * 60 + 12, updatedTripTimesA.getDepartureTime(5));
+    var updatedTripTimesA = builder.build();
+
+    assertEquals(190, updatedTripTimesA.getArrivalTime(3));
+    assertEquals(190, updatedTripTimesA.getDepartureTime(3));
+    assertEquals(311, updatedTripTimesA.getArrivalTime(5));
+    assertEquals(312, updatedTripTimesA.getDepartureTime(5));
+  }
+
+  @Test
+  public void testOnlyScheduledTimesAreCopied() {
+    var initialTripTimes = createInitialTripTimes();
+    var realTimeTripTimes = initialTripTimes
+      .createRealTimeFromScheduledTimes()
+      .withArrivalDelay(3, -1)
+      .build();
+    assertEquals(
+      initialTripTimes.getArrivalTime(3),
+      realTimeTripTimes.createRealTimeFromScheduledTimes().build().getArrivalTime(3)
+    );
+  }
+
+  @Test
+  public void testIncompleteTimes() {
+    assertThrows(
+      DataValidationException.class,
+      createInitialTripTimes().createRealTimeWithoutScheduledTimes()::build
+    );
+  }
+
+  @Test
+  public void testCompleteTimes() {
+    var builder = createInitialTripTimes().createRealTimeWithoutScheduledTimes();
+    var delay = 30;
+    for (var i = 0; i < builder.numberOfStops(); ++i) {
+      builder.withArrivalDelay(i, delay).withDepartureDelay(i, delay);
+    }
+    var tripTimes = builder.build();
+    for (var i = 0; i < tripTimes.getNumStops(); ++i) {
+      assertEquals(delay, tripTimes.getArrivalDelay(i));
+      assertEquals(delay, tripTimes.getDepartureDelay(i));
+    }
   }
 
   @Test
   public void testPassedUpdate() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    updatedTripTimesA.updateDepartureTime(0, 30);
+    builder.withDepartureTime(0, 30);
+    var updatedTripTimesA = builder.build();
 
     assertEquals(30, updatedTripTimesA.getDepartureTime(0));
     assertEquals(60, updatedTripTimesA.getArrivalTime(1));
   }
 
   /**
-   * Test negative hop time with stop cancellations.
+   * Test hop time with stop cancellations when buses run late.
    * Scheduled: 5 at 300, 6 at 360, 7 at 420
-   * Test case: 5 at 421, 6 cancelled (with internal representation 481, since delays are propagated
-   * to later stops without arrival or departure), 7 at 420
-   * Result: Error to be present at stop 7, due to negative hop time. Error should stay after
-   * interpolation, since 6 would be then less than 5 due to interpolation.
+   * Test case: 5 at 421, 6 cancelled (with delay passing through skipped stop at 481), 7 at 420
+   * Result: Error to be present at stop 7, due to negative hop time.
    */
   @Test
   public void testNegativeHopTimeWithStopCancellations() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    updatedTripTimes.updateDepartureTime(5, 421);
-    updatedTripTimes.updateArrivalTime(6, 481);
-    updatedTripTimes.updateDepartureTime(6, 481);
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.updateArrivalTime(7, 420);
+    builder.withDepartureTime(5, 421);
+    builder.withArrivalTime(6, 481);
+    builder.withDepartureTime(6, 481);
+    builder.withCanceled(6);
+    builder.withArrivalTime(7, 420);
 
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    var error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
@@ -186,95 +219,42 @@ class RealTimeTripTimesTest {
   }
 
   /**
-   * Test positive hop time with stop cancellations when buses run late.
+   * Test hop time with stop cancellations when buses run early.
    * Scheduled: 5 at 300, 6 at 360, 7 at 420
-   * Test case: 5 at 400, 6 cancelled (with internal representation 460, since delays are propagated
-   * to later stops without arrival or departure), 7 at 420.
-   * Result: Expect error before interpolation. Expect no errors, after interpolation.
-   */
-  @Test
-  public void testPositiveHopTimeWithStopCancellationsLate() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
-
-    updatedTripTimes.updateDepartureTime(5, 400);
-    updatedTripTimes.updateArrivalTime(6, 460);
-    updatedTripTimes.updateDepartureTime(6, 460);
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.updateArrivalTime(7, 420);
-
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
-    assertEquals(
-      "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
-      error.error().message()
-    );
-
-    assertTrue(updatedTripTimes.interpolateMissingTimes());
-
-    updatedTripTimes.validateNonIncreasingTimes();
-  }
-
-  /**
-   * Test positive hop time with stop cancellations when buses run early.
-   * Scheduled: 5 at 300, 6 at 360, 7 at 420
-   * Test case: 5 at 300, 6 cancelled(with internal representation 360, since delays are propagated
-   * to later stops without arrival or departure), 7 at 320.
-   * Result: Expect errors, but no errors after interpolation.
+   * Test case: 5 at 300, 6 cancelled (without delay from schedule), 7 at 320.
+   * Result: Expect error at stop 7, due to negative hop time.
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsEarly() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    updatedTripTimes.updateDepartureTime(5, 300);
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.updateArrivalTime(7, 320);
+    builder.withDepartureTime(5, 300);
+    builder.withCanceled(6);
+    builder.withArrivalTime(7, 320);
 
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    var error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
-
-    assertTrue(updatedTripTimes.interpolateMissingTimes());
-    updatedTripTimes.validateNonIncreasingTimes();
   }
 
   /**
    * Test positive hop time with stop cancellations at the beginning of the trip.
    * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
    * Test case: 0 and 1 cancelled, start trip at stop 2 at time 0.
-   * Result: Expect errors, since 0 and 1 is cancelled and not backward propagated. Expect no
-   * interpolation, since there is no times to interpolate before 0. Expect same error after
-   * interpolation.
+   * Result: Expect error, since the arrival time at 2 is earlier than the departure time at 1.
    */
   @Test
   public void testPositiveHopTimeWithTerminalCancellation() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    updatedTripTimes.setCancelled(0);
-    updatedTripTimes.setCancelled(1);
-    updatedTripTimes.updateArrivalTime(2, 0);
-    updatedTripTimes.updateDepartureTime(2, 10);
+    builder.withCanceled(0);
+    builder.withCanceled(1);
+    builder.withArrivalTime(2, 0);
+    builder.withDepartureTime(2, 10);
 
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
-    assertEquals(
-      "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.",
-      error.error().message()
-    );
-
-    assertFalse(updatedTripTimes.interpolateMissingTimes());
-    error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    var error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
@@ -282,123 +262,90 @@ class RealTimeTripTimesTest {
   }
 
   /**
-   * Test positive hop time with stop cancellations at the beginning of the trip.
-   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
-   * Test case: 6 and 7 are cancelled.
-   * Result: Expect no errors and no interpolations, since there is no time to interpolate at the
-   * end terminal.
-   */
-  @Test
-  public void testInterpolationWithTerminalCancellation() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
-
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.setCancelled(7);
-
-    assertFalse(updatedTripTimes.interpolateMissingTimes());
-
-    updatedTripTimes.validateNonIncreasingTimes();
-  }
-
-  /**
-   * Test interpolation with multiple cancelled stops together.
+   * Test multiple cancelled stops together.
    * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
    * Test case: 0 at 0, 1 to 6 are cancelled, 7 at time 350.
-   * Result: Expect errors, since 7 is less than the scheduled time at 6. Expect no errors after
-   * interpolation.
+   * Result: Expect errors, since 7 is less than the scheduled time at 6.
    */
   @Test
-  public void testInterpolationWithMultipleStopCancellations() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+  public void testMultipleStopCancellations() {
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    updatedTripTimes.setCancelled(1);
-    updatedTripTimes.setCancelled(2);
-    updatedTripTimes.setCancelled(3);
-    updatedTripTimes.setCancelled(4);
-    updatedTripTimes.setCancelled(5);
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.updateArrivalTime(7, 350);
-    updatedTripTimes.updateDepartureTime(7, 350);
+    builder.withCanceled(1);
+    builder.withCanceled(2);
+    builder.withCanceled(3);
+    builder.withCanceled(4);
+    builder.withCanceled(5);
+    builder.withCanceled(6);
+    builder.withArrivalTime(7, 350);
+    builder.withDepartureTime(7, 350);
 
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    var error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
-
-    assertTrue(updatedTripTimes.interpolateMissingTimes());
-
-    updatedTripTimes.validateNonIncreasingTimes();
   }
 
   /**
-   * Test interpolation with multiple cancelled stops together.
+   * Test multiple cancelled stops together.
    * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
    * Test case: 0 at 0, 1 2 cancelled, 3 at 90, 4 5 6 cancelled, 7 at time 240.
-   * Result: Expect errors, since 3 is less than scheduled time at 2, and 7 is less than the
-   * propagated delay time at 6. Expect no errors after interpolation.
+   * Result: Expect errors, since 3 is less than scheduled time at 2.
    */
   @Test
-  public void testInterpolationWithMultipleStopCancellations2() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+  public void testMultipleStopCancellations2() {
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    updatedTripTimes.setCancelled(1);
-    updatedTripTimes.setCancelled(2);
-    updatedTripTimes.updateArrivalTime(3, 90);
-    updatedTripTimes.updateDepartureTime(3, 90);
-    updatedTripTimes.setCancelled(4);
-    updatedTripTimes.setCancelled(5);
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.updateArrivalTime(7, 240);
-    updatedTripTimes.updateDepartureTime(7, 240);
+    builder.withCanceled(1);
+    builder.withCanceled(2);
+    builder.withArrivalTime(3, 90);
+    builder.withDepartureTime(3, 90);
+    builder.withCanceled(4);
+    builder.withCanceled(5);
+    builder.withCanceled(6);
+    builder.withArrivalTime(7, 240);
+    builder.withDepartureTime(7, 240);
 
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    var error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 3 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
-
-    assertTrue(updatedTripTimes.interpolateMissingTimes());
-    updatedTripTimes.validateNonIncreasingTimes();
   }
 
   @Test
   public void testNonIncreasingUpdateCrossingMidnight() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
-    updatedTripTimesA.updateDepartureTime(0, 50);
+    builder.withArrivalTime(0, -300); //"Yesterday"
+    builder.withDepartureTime(0, 50);
 
-    updatedTripTimesA.validateNonIncreasingTimes();
+    builder.build();
   }
 
   @Test
   public void testDelay() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
-    updatedTripTimesA.updateDepartureDelay(0, 10);
-    updatedTripTimesA.updateArrivalDelay(6, 13);
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
+    builder.withDepartureDelay(0, 10);
+    builder.withArrivalDelay(6, 13);
 
-    assertEquals(10, updatedTripTimesA.getDepartureTime(0));
-    assertEquals(6 * 60 + 13, updatedTripTimesA.getArrivalTime(6));
+    assertEquals(10, builder.getDepartureTime(0));
+    assertEquals(6 * 60 + 13, builder.getArrivalTime(6));
   }
 
   @Test
   public void testCancel() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
-    updatedTripTimesA.cancelTrip();
-    assertEquals(RealTimeState.CANCELED, updatedTripTimesA.getRealTimeState());
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
+    builder.cancelTrip();
+    assertEquals(RealTimeState.CANCELED, builder.build().getRealTimeState());
   }
 
   @Test
   public void testNoData() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
-    updatedTripTimesA.setNoData(1);
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
+    builder.withNoData(1);
+    var updatedTripTimesA = builder.build();
     assertFalse(updatedTripTimesA.isNoDataStop(0));
     assertTrue(updatedTripTimesA.isNoDataStop(1));
     assertFalse(updatedTripTimesA.isNoDataStop(2));
@@ -406,11 +353,12 @@ class RealTimeTripTimesTest {
 
   @Test
   public void testRealTimeUpdated() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
-    assertFalse(updatedTripTimesA.isRealTimeUpdated(1));
-    updatedTripTimesA.setRealTimeState(RealTimeState.UPDATED);
-    assertTrue(updatedTripTimesA.isRealTimeUpdated(1));
-    updatedTripTimesA.setNoData(1);
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
+    assertFalse(builder.build().isRealTimeUpdated(1));
+    builder.withRealTimeState(RealTimeState.UPDATED);
+    assertTrue(builder.build().isRealTimeUpdated(1));
+    builder.withNoData(1);
+    var updatedTripTimesA = builder.build();
     assertTrue(updatedTripTimesA.isRealTimeUpdated(0));
     assertFalse(updatedTripTimesA.isRealTimeUpdated(1));
   }
@@ -442,12 +390,12 @@ class RealTimeTripTimesTest {
   public void validateNegativeDwellTime() {
     var expMsg = "NEGATIVE_DWELL_TIME for stop position 3 in trip Trip{F:testTripId RRtestTripId}.";
     var tt = createInitialTripTimes();
-    var updatedTt = tt.copyScheduledTimes();
+    var updatedTt = tt.createRealTimeFromScheduledTimes();
 
-    updatedTt.updateArrivalTime(3, 69);
-    updatedTt.updateDepartureTime(3, 68);
+    updatedTt.withArrivalTime(3, 69);
+    updatedTt.withDepartureTime(3, 68);
 
-    var ex = assertThrows(DataValidationException.class, updatedTt::validateNonIncreasingTimes);
+    var ex = assertThrows(DataValidationException.class, updatedTt::build);
     var error = (TimetableValidationError) ex.error();
 
     assertEquals(3, error.stopIndex());
@@ -460,12 +408,12 @@ class RealTimeTripTimesTest {
   public void validateNegativeHopTime() {
     var expMsg = "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.";
     var tt = createInitialTripTimes();
-    var updatedTt = tt.copyScheduledTimes();
+    var updatedTt = tt.createRealTimeFromScheduledTimes();
 
-    updatedTt.updateDepartureTime(1, 100);
-    updatedTt.updateArrivalTime(2, 99);
+    updatedTt.withDepartureTime(1, 100);
+    updatedTt.withArrivalTime(2, 99);
 
-    var ex = assertThrows(DataValidationException.class, updatedTt::validateNonIncreasingTimes);
+    var ex = assertThrows(DataValidationException.class, updatedTt::build);
     var error = (TimetableValidationError) ex.error();
 
     assertEquals(2, error.stopIndex());

@@ -11,6 +11,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -84,7 +85,10 @@ public class BicycleRoutingTest {
       })
       .buildRequest();
 
-    var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph)
+    var temporaryVerticesContainer = TemporaryVerticesContainer.of(
+      graph,
+      TestVertexLinker.of(graph)
+    )
       .withFrom(from, StreetMode.BIKE)
       .withTo(to, StreetMode.BIKE)
       .build();

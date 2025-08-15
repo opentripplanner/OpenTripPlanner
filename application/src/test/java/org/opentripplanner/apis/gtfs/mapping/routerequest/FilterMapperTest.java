@@ -26,7 +26,7 @@ class FilterMapperTest {
     );
     var result = FilterMapper.mapFilters(MainAndSubMode.all(), List.of(filter)).stream().toList();
     assertEquals(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES, agencies: [feed:A]}], not: [SelectRequest{transportModes: [], routes: [feed:A]}]}]",
+      "[(select: [(transportModes: ALL, agencies: [feed:A])], not: [(transportModes: EMPTY, routes: [feed:A])])]",
       result.toString()
     );
   }

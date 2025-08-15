@@ -29,7 +29,8 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
@@ -69,7 +70,11 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
       new DefaultRealtimeVehicleService(transitService),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
-      GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
+      GraphFinder.getInstance(
+        graph,
+        TestVertexLinker.of(graph),
+        transitService::findRegularStopsByBoundingBox
+      ),
       routeRequest
     );
   }
@@ -111,22 +116,19 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   static Stream<Arguments> banningCases() {
     return Stream.of(
-      of(Map.of(), "[TransitFilterRequest{}]"),
+      of(Map.of(), "[ALL]"),
       of(
         Map.of("routes", "trimet:555"),
-        "[TransitFilterRequest{not: [SelectRequest{transportModes: [], routes: [trimet:555]}]}]"
+        "[(not: [(transportModes: EMPTY, routes: [trimet:555])])]"
       ),
-      of(
-        Map.of("agencies", ""),
-        "[TransitFilterRequest{not: [SelectRequest{transportModes: []}]}]"
-      ),
+      of(Map.of("agencies", ""), "[(not: [(transportModes: EMPTY)])]"),
       of(
         Map.of("agencies", "trimet:666"),
-        "[TransitFilterRequest{not: [SelectRequest{transportModes: [], agencies: [trimet:666]}]}]"
+        "[(not: [(transportModes: EMPTY, agencies: [trimet:666])])]"
       ),
       of(
         Map.of("agencies", "trimet:666", "routes", "trimet:444"),
-        "[TransitFilterRequest{not: [SelectRequest{transportModes: [], routes: [trimet:444]}, SelectRequest{transportModes: [], agencies: [trimet:666]}]}]"
+        "[(not: [(transportModes: EMPTY, routes: [trimet:444]), (transportModes: EMPTY, agencies: [trimet:666])])]"
       )
     );
   }
@@ -147,20 +149,11 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   static Stream<Arguments> transportModesCases() {
     return Stream.of(
-      of(List.of(), "[ExcludeAllTransitFilter{}]"),
-      of(List.of(mode("BICYCLE")), "[ExcludeAllTransitFilter{}]"),
-      of(
-        List.of(mode("BUS")),
-        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS]}]}]"
-      ),
-      of(
-        List.of(mode("BUS"), mode("COACH")),
-        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH]}]}]"
-      ),
-      of(
-        List.of(mode("BUS"), mode("MONORAIL")),
-        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, MONORAIL]}]}]"
-      )
+      of(List.of(), "[ExcludeAllTransitFilter]"),
+      of(List.of(mode("BICYCLE")), "[ExcludeAllTransitFilter]"),
+      of(List.of(mode("BUS")), "[(select: [(transportModes: [BUS])])]"),
+      of(List.of(mode("BUS"), mode("COACH")), "[(select: [(transportModes: [BUS, COACH])])]"),
+      of(List.of(mode("BUS"), mode("MONORAIL")), "[(select: [(transportModes: [BUS, MONORAIL])])]")
     );
   }
 

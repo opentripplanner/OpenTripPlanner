@@ -20,7 +20,8 @@ import org.opentripplanner.model.TripTimesPatch;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -54,6 +55,7 @@ class TripTimesUpdater {
     GtfsRealtime.TripUpdate tripUpdate,
     ZoneId timeZone,
     LocalDate updateServiceDate,
+    ForwardsDelayPropagationType forwardsDelayPropagationType,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
     Result<TripTimesPatch, UpdateError> invalidInput = Result.failure(
@@ -75,7 +77,7 @@ class TripTimesUpdater {
     GtfsRealtime.TripDescriptor tripDescriptor = tripUpdate.getTrip();
     if (!tripDescriptor.hasTripId()) {
       LOG.debug("TripDescriptor object has no TripId field");
-      Result.failure(UpdateError.noTripId(TRIP_NOT_FOUND));
+      return Result.failure(UpdateError.noTripId(TRIP_NOT_FOUND));
     }
 
     String tripId = tripDescriptor.getTripId();
@@ -90,7 +92,7 @@ class TripTimesUpdater {
       LOG.trace("tripId {} found in timetable.", tripId);
     }
 
-    RealTimeTripTimes newTimes = tripTimes.copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = tripTimes.createRealTimeWithoutScheduledTimes();
     List<Integer> skippedStopIndices = new ArrayList<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
@@ -103,9 +105,7 @@ class TripTimesUpdater {
     }
     GtfsRealtime.TripUpdate.StopTimeUpdate update = updates.next();
 
-    int numStops = newTimes.getNumStops();
-    Integer delay = null;
-    Integer firstUpdatedIndex = null;
+    int numStops = tripTimes.getNumStops();
 
     final long today = ServiceDateUtils.asStartOfService(
       updateServiceDate,
@@ -116,7 +116,7 @@ class TripTimesUpdater {
       boolean match = false;
       if (update != null) {
         if (update.hasStopSequence()) {
-          match = update.getStopSequence() == newTimes.gtfsSequenceOfStopIndex(i);
+          match = update.getStopSequence() == tripTimes.gtfsSequenceOfStopIndex(i);
         } else if (update.hasStopId()) {
           match = timetable.getPattern().getStop(i).getId().getId().equals(update.getStopId());
         }
@@ -132,40 +132,24 @@ class TripTimesUpdater {
           scheduleRelationship ==
           GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED
         ) {
-          // Set status to cancelled and delays to previously recorded delays or to 0 otherwise.
-          // Note: This will discard the times from TripUpdates even if they are present.
+          // Set status to cancelled
           skippedStopIndices.add(i);
-          newTimes.setCancelled(i);
-          int delayOrZero = delay != null ? delay : 0;
-          newTimes.updateArrivalDelay(i, delayOrZero);
-          newTimes.updateDepartureDelay(i, delayOrZero);
+          builder.withCanceled(i);
         } else if (
           scheduleRelationship ==
           GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.NO_DATA
         ) {
           // Set status to NO_DATA and delays to 0.
           // Note: GTFS-RT requires NO_DATA stops to have no arrival departure times.
-          newTimes.updateArrivalDelay(i, 0);
-          newTimes.updateDepartureDelay(i, 0);
-          delay = 0;
-          newTimes.setNoData(i);
+          builder.withNoData(i);
         } else {
           // Else the status is SCHEDULED, update times as needed.
           if (update.hasArrival()) {
-            if (firstUpdatedIndex == null) {
-              firstUpdatedIndex = i;
-            }
             GtfsRealtime.TripUpdate.StopTimeEvent arrival = update.getArrival();
-            if (arrival.hasDelay()) {
-              delay = arrival.getDelay();
-              if (arrival.hasTime()) {
-                newTimes.updateArrivalTime(i, (int) (arrival.getTime() - today));
-              } else {
-                newTimes.updateArrivalDelay(i, delay);
-              }
-            } else if (arrival.hasTime()) {
-              newTimes.updateArrivalTime(i, (int) (arrival.getTime() - today));
-              delay = newTimes.getArrivalDelay(i);
+            if (arrival.hasTime()) {
+              builder.withArrivalTime(i, (int) (arrival.getTime() - today));
+            } else if (arrival.hasDelay()) {
+              builder.withArrivalDelay(i, arrival.getDelay());
             } else {
               LOG.debug(
                 "Arrival time at index {} of trip {} has neither a delay nor a time.",
@@ -174,25 +158,14 @@ class TripTimesUpdater {
               );
               return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME, i));
             }
-          } else if (delay != null) {
-            newTimes.updateArrivalDelay(i, delay);
           }
 
           if (update.hasDeparture()) {
-            if (firstUpdatedIndex == null) {
-              firstUpdatedIndex = i;
-            }
             GtfsRealtime.TripUpdate.StopTimeEvent departure = update.getDeparture();
-            if (departure.hasDelay()) {
-              delay = departure.getDelay();
-              if (departure.hasTime()) {
-                newTimes.updateDepartureTime(i, (int) (departure.getTime() - today));
-              } else {
-                newTimes.updateDepartureDelay(i, delay);
-              }
-            } else if (departure.hasTime()) {
-              newTimes.updateDepartureTime(i, (int) (departure.getTime() - today));
-              delay = newTimes.getDepartureDelay(i);
+            if (departure.hasTime()) {
+              builder.withDepartureTime(i, (int) (departure.getTime() - today));
+            } else if (departure.hasDelay()) {
+              builder.withDepartureDelay(i, departure.getDelay());
             } else {
               LOG.debug(
                 "Departure time at index {} of trip {} has neither a delay nor a time.",
@@ -201,8 +174,6 @@ class TripTimesUpdater {
               );
               return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME, i));
             }
-          } else if (delay != null) {
-            newTimes.updateDepartureDelay(i, delay);
           }
         }
 
@@ -211,10 +182,6 @@ class TripTimesUpdater {
         } else {
           update = null;
         }
-      } else if (delay != null) {
-        // If not match and has previously set delays, propagate delays.
-        newTimes.updateArrivalDelay(i, delay);
-        newTimes.updateDepartureDelay(i, delay);
       }
     }
     if (update != null) {
@@ -225,51 +192,43 @@ class TripTimesUpdater {
       return Result.failure(new UpdateError(feedScopedTripId, INVALID_STOP_SEQUENCE));
     }
 
-    // Backwards propagation for past stops that are no longer present in GTFS-RT, that is, up until
-    // the first SCHEDULED stop sequence included in the GTFS-RT feed.
-    if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
-      if (
-        (backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED_NO_DATA &&
-          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, true)) ||
-        (backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED &&
-          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, false)) ||
-        (backwardsDelayPropagationType == BackwardsDelayPropagationType.ALWAYS &&
-          newTimes.adjustTimesBeforeAlways(firstUpdatedIndex))
-      ) {
-        LOG.debug(
-          "Propagated delay from stop index {} backwards on trip {}.",
-          firstUpdatedIndex,
-          tripId
-        );
-      }
+    // Interpolate missing times for stops which don't have times associated. Note: Currently for
+    // GTFS-RT updates ONLY not for SIRI updates.
+    if (
+      ForwardsDelayInterpolator.getInstance(forwardsDelayPropagationType).interpolateDelay(builder)
+    ) {
+      LOG.debug("Interpolated delays for for missing stops on trip {}.", tripId);
     }
 
-    // Interpolate missing times from SKIPPED stops since they don't necessarily have times
-    // associated. Note: Currently for GTFS-RT updates ONLY not for SIRI updates.
-    if (newTimes.interpolateMissingTimes()) {
-      LOG.debug("Interpolated delays for cancelled stops on trip {}.", tripId);
-    }
-
-    // Validate for non-increasing times. Log error if present.
-    try {
-      newTimes.validateNonIncreasingTimes();
-    } catch (DataValidationException e) {
-      return DataValidationExceptionMapper.toResult(e);
-    }
+    var backwardPropagationIndex = BackwardsDelayInterpolator.getInstance(
+      backwardsDelayPropagationType
+    ).propagateBackwards(builder);
+    backwardPropagationIndex.ifPresent(index ->
+      LOG.debug("Propagated delay from stop index {} backwards on trip {}.", index, tripId)
+    );
 
     if (tripUpdate.hasVehicle()) {
       var vehicleDescriptor = tripUpdate.getVehicle();
       if (vehicleDescriptor.hasWheelchairAccessible()) {
         GtfsRealtimeMapper.mapWheelchairAccessible(
           vehicleDescriptor.getWheelchairAccessible()
-        ).ifPresent(newTimes::updateWheelchairAccessibility);
+        ).ifPresent(builder::withWheelchairAccessibility);
       }
     }
 
-    LOG.trace(
-      "A valid TripUpdate object was applied to trip {} using the Timetable class update method.",
-      tripId
-    );
-    return Result.success(new TripTimesPatch(newTimes, skippedStopIndices));
+    // Make sure that updated trip times have the correct real time state
+    builder.withRealTimeState(RealTimeState.UPDATED);
+
+    // Validate for non-increasing times. Log error if present.
+    try {
+      var result = builder.build();
+      LOG.trace(
+        "A valid TripUpdate object was applied to trip {} using the Timetable class update method.",
+        tripId
+      );
+      return Result.success(new TripTimesPatch(result, skippedStopIndices));
+    } catch (DataValidationException e) {
+      return DataValidationExceptionMapper.toResult(e);
+    }
   }
 }

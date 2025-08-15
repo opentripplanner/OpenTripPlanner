@@ -209,6 +209,14 @@ public class TimetableRepositoryForTest {
     return stopTime;
   }
 
+  public StopTime stopTime(Trip trip, int seq, int arrival, int departure) {
+    var stopTime = stopTime(trip, seq);
+    stopTime.setArrivalTime(arrival);
+    stopTime.setDepartureTime(departure);
+    stopTime.setStopHeadsign(I18NString.of("Stop headsign at stop %s".formatted(seq)));
+    return stopTime;
+  }
+
   public Place place(String name, Consumer<RegularStopBuilder> stopBuilder) {
     var stop = stop(name);
     stopBuilder.accept(stop);
@@ -242,11 +250,11 @@ public class TimetableRepositoryForTest {
     return builder.build();
   }
 
-  public static StopPattern stopPattern(RegularStop... stops) {
+  public static StopPattern stopPattern(StopLocation... stops) {
     return stopPattern(Arrays.asList(stops));
   }
 
-  public static StopPattern stopPattern(List<RegularStop> stops) {
+  public static StopPattern stopPattern(List<StopLocation> stops) {
     var builder = StopPattern.create(stops.size());
     for (int i = 0; i < stops.size(); i++) {
       builder.stops.with(i, stops.get(i));

@@ -96,7 +96,7 @@ public class SelectRequest implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(SelectRequest.class)
+    return ToStringBuilder.ofEmbeddedType()
       .addObj("transportModes", transportModesToString(), null)
       .addCol("agencies", agencies, List.of())
       .addObj("routes", routes, List.of())
@@ -123,11 +123,14 @@ public class SelectRequest implements Serializable {
     if (transportModes == null) {
       return null;
     }
+    if (transportModes.isEmpty()) {
+      return "EMPTY";
+    }
     if (transportModes.stream().allMatch(MainAndSubMode::isMainModeOnly)) {
       int size = transportModes.size();
       int total = MainAndSubMode.all().size();
       if (size == total) {
-        return "ALL-MAIN-MODES";
+        return "ALL";
       }
       if (size + 3 >= total) {
         // If 3 or less of the main modes are *excluded* we guess that the user did exclude, and

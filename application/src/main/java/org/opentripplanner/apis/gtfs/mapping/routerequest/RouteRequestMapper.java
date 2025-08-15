@@ -70,7 +70,8 @@ public class RouteRequestMapper {
       setPreferences(preferences, request, isTripPlannedForNow, args, environment)
     );
 
-    request.withJourney(journeyRequestBuilder -> setModes(journeyRequestBuilder, args, environment)
+    request.withJourney(journeyRequestBuilder ->
+      setModes(journeyRequestBuilder, args, environment)
     );
 
     // sadly we need to use the raw collection because it is cast to the wrong type

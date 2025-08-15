@@ -11,6 +11,7 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
@@ -22,7 +23,6 @@ import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.TripPatternCache;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdater;
 import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdater;
@@ -46,52 +46,52 @@ import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataS
 public class UpdaterConfigurator {
 
   private final Graph graph;
+  private final VertexLinker linker;
   private final TimetableRepository timetableRepository;
   private final UpdatersParameters updatersParameters;
   private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
   private final VehicleParkingRepository parkingRepository;
   private final TimetableSnapshotManager snapshotManager;
-  private final TripPatternCache tripPatternCache;
 
   private UpdaterConfigurator(
     Graph graph,
+    VertexLinker linker,
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     TimetableSnapshotManager snapshotManager,
-    TripPatternCache tripPatternCache,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
+    this.linker = linker;
     this.realtimeVehicleRepository = realtimeVehicleRepository;
     this.vehicleRentalRepository = vehicleRentalRepository;
     this.timetableRepository = timetableRepository;
     this.updatersParameters = updatersParameters;
     this.parkingRepository = parkingRepository;
     this.snapshotManager = snapshotManager;
-    this.tripPatternCache = tripPatternCache;
   }
 
   public static void configure(
     Graph graph,
+    VertexLinker linker,
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     TimetableSnapshotManager snapshotManager,
-    TripPatternCache tripPatternCache,
     UpdatersParameters updatersParameters
   ) {
     new UpdaterConfigurator(
       graph,
+      linker,
       realtimeVehicleRepository,
       vehicleRentalRepository,
       parkingRepository,
       timetableRepository,
       snapshotManager,
-      tripPatternCache,
       updatersParameters
     ).configure();
   }
@@ -148,7 +148,7 @@ public class UpdaterConfigurator {
     }
     return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(
       parameters,
-      graph.getLinker(),
+      linker,
       vehicleRentalRepository
     );
   }
@@ -170,9 +170,7 @@ public class UpdaterConfigurator {
           configItem.sourceParameters(),
           otpHttpClientFactory
         );
-        updaters.add(
-          new VehicleRentalUpdater(configItem, source, graph.getLinker(), vehicleRentalRepository)
-        );
+        updaters.add(new VehicleRentalUpdater(configItem, source, linker, vehicleRentalRepository));
       }
     }
     for (var configItem : updatersParameters.getGtfsRealtimeAlertsUpdaterParameters()) {
@@ -209,9 +207,7 @@ public class UpdaterConfigurator {
             configItem,
             openingHoursCalendarService
           );
-          updaters.add(
-            new VehicleParkingUpdater(configItem, source, graph.getLinker(), parkingRepository)
-          );
+          updaters.add(new VehicleParkingUpdater(configItem, source, linker, parkingRepository));
         }
         case AVAILABILITY_ONLY -> {
           var source = AvailabilityDataSourceFactory.create(configItem);
@@ -232,19 +228,12 @@ public class UpdaterConfigurator {
   }
 
   private SiriRealTimeTripUpdateAdapter provideSiriAdapter() {
-    return new SiriRealTimeTripUpdateAdapter(
-      timetableRepository,
-      snapshotManager,
-      tripPatternCache
-    );
+    return new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
   }
 
   private GtfsRealTimeTripUpdateAdapter provideGtfsAdapter() {
-    return new GtfsRealTimeTripUpdateAdapter(
-      timetableRepository,
-      snapshotManager,
-      tripPatternCache,
-      () -> LocalDate.now(timetableRepository.getTimeZone())
+    return new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
+      LocalDate.now(timetableRepository.getTimeZone())
     );
   }
 

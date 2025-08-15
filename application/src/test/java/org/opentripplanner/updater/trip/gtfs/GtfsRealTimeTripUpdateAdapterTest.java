@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
-import static org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
@@ -34,8 +33,6 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.TripPatternCache;
-import org.opentripplanner.updater.trip.TripPatternIdGenerator;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class GtfsRealTimeTripUpdateAdapterTest {
@@ -182,7 +179,8 @@ public class GtfsRealTimeTripUpdateAdapterTest {
     // WHEN
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
+      ForwardsDelayPropagationType.DEFAULT,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA,
       DIFFERENTIAL,
       List.of(tripUpdate),
       feedId
@@ -252,11 +250,8 @@ public class GtfsRealTimeTripUpdateAdapterTest {
   }
 
   private GtfsRealTimeTripUpdateAdapter defaultUpdater() {
-    return new GtfsRealTimeTripUpdateAdapter(
-      timetableRepository,
-      snapshotManager,
-      new TripPatternCache(new TripPatternIdGenerator(), transitService::findPattern),
-      () -> SERVICE_DATE
+    return new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
+      SERVICE_DATE
     );
   }
 }

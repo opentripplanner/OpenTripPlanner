@@ -29,6 +29,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
@@ -48,7 +49,7 @@ class OjpMapperTest {
   private static final Trip TRIP = TimetableRepositoryForTest.trip(TRIP_ID).build();
 
   private static final String START_TIME = "07:30:00";
-  private static final RealTimeTripTimes TRIP_TIMES = TripTimesFactory.tripTimes(
+  private static final TripTimes TRIP_TIMES = TripTimesFactory.tripTimes(
     TRIP,
     TEST_MODEL.stopTimesEvery5Minutes(5, TRIP, START_TIME),
     new Deduplicator()

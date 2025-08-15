@@ -171,7 +171,8 @@ class RouteRequestTest {
       .buildDefault();
     assertEquals("RouteRequest{searchWindow: 2h, numItineraries: 10}", subject.toString());
 
-    assertThrows(IllegalStateException.class, () -> RouteRequest.of().withFrom(FROM).buildDefault()
+    assertThrows(IllegalStateException.class, () ->
+      RouteRequest.of().withFrom(FROM).buildDefault()
     );
     assertThrows(IllegalStateException.class, () -> RouteRequest.of().withTo(TO).buildDefault());
     assertThrows(IllegalStateException.class, () ->
@@ -231,7 +232,7 @@ class RouteRequestTest {
         bookingTime:2025-05-17T11:15:00Z,
         numItineraries:10,
         preferences:RoutingPreferences{transfer:TransferPreferences{maxTransfers:10}},
-        journey:JourneyRequest{access:StreetRequest{mode:BIKE}}
+        journey:(access:(mode:BIKE))
       }
       """,
       subject.toString()

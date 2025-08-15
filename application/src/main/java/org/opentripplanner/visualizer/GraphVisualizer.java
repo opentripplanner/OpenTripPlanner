@@ -68,6 +68,9 @@ import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.linking.VisibilityMode;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -511,7 +514,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)
     try (
-      var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph)
+      var temporaryVerticesContainer = TemporaryVerticesContainer.of(
+        graph,
+        new VertexLinker(
+          graph,
+          VisibilityMode.TRAVERSE_AREA_EDGES,
+          StreetConstants.DEFAULT_MAX_AREA_NODES
+        )
+      )
         .withFrom(request.from(), request.journey().direct().mode())
         .withTo(request.from(), request.journey().direct().mode())
         .build()

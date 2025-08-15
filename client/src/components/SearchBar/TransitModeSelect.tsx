@@ -1,4 +1,4 @@
-import { TransportMode, TripQueryVariables } from '../../gql/graphql.ts';
+import { StreetMode, TransportMode, TripQueryVariables } from '../../gql/graphql.ts';
 import MultiSelectDropdown from './MultiSelectDropdown.tsx';
 import { useCallback, useMemo } from 'react';
 
@@ -34,11 +34,15 @@ export function TransitModeSelect({
               : undefined,
         });
       } else {
+        const accessMode = tripQueryVariables.modes?.accessMode || StreetMode.Foot;
+        const egressMode = tripQueryVariables.modes?.egressMode || StreetMode.Foot;
         setTripQueryVariables({
           ...tripQueryVariables,
           modes: {
             ...tripQueryVariables.modes,
             transportModes: newTransportModes.length > 0 ? newTransportModes : undefined,
+            accessMode: accessMode,
+            egressMode: egressMode,
           },
         });
       }

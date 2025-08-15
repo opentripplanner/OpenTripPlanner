@@ -171,7 +171,7 @@ class RouteRequestMapperModesTest {
     assertEquals(tramCost, reluctanceForMode.get(TransitMode.TRAM));
     assertNull(reluctanceForMode.get(TransitMode.FERRY));
     assertEquals(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: [FERRY, TRAM]}]}]",
+      "[(select: [(transportModes: [FERRY, TRAM])])]",
       routeRequest.journey().transit().filters().toString()
     );
   }

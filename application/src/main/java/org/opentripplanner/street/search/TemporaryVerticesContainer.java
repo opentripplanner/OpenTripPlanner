@@ -6,6 +6,7 @@ import java.util.Set;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.FromToViaVertexRequest;
@@ -33,8 +34,8 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     this.toStopVertices = builder.toStopVertices();
   }
 
-  public static TemporaryVerticesContainerBuilder of(Graph graph) {
-    return new TemporaryVerticesContainerBuilder(graph);
+  public static TemporaryVerticesContainerBuilder of(Graph graph, VertexLinker linker) {
+    return new TemporaryVerticesContainerBuilder(graph, linker);
   }
 
   /**

@@ -20,6 +20,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -46,7 +47,7 @@ public class TimetableHelperTest {
     ZoneIds.CET
   );
 
-  private RealTimeTripTimes tripTimes;
+  private RealTimeTripTimesBuilder builder;
 
   @BeforeEach
   public void setUp() {
@@ -72,7 +73,11 @@ public class TimetableHelperTest {
       .build();
 
     Trip trip = Trip.of(new FeedScopedId(FEED_ID, "TRIP_ID")).withRoute(route).build();
-    tripTimes = TripTimesFactory.tripTimes(trip, List.of(stopTime), new Deduplicator());
+    builder = TripTimesFactory.tripTimes(
+      trip,
+      List.of(stopTime),
+      new Deduplicator()
+    ).createRealTimeFromScheduledTimes();
   }
 
   @Test
@@ -87,7 +92,7 @@ public class TimetableHelperTest {
       .build();
 
     // Act
-    TimetableHelper.applyUpdates(START_OF_SERVICE, tripTimes, 0, false, false, estimatedCall, null);
+    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, estimatedCall, null);
 
     // Assert
     assertStatuses(0, OccupancyStatus.MANY_SEATS_AVAILABLE, false, false, true);
@@ -105,7 +110,7 @@ public class TimetableHelperTest {
       .build();
 
     // Act
-    TimetableHelper.applyUpdates(START_OF_SERVICE, tripTimes, 0, false, false, estimatedCall, null);
+    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, estimatedCall, null);
 
     // Assert
 
@@ -126,7 +131,7 @@ public class TimetableHelperTest {
       .build();
 
     // Act
-    TimetableHelper.applyUpdates(START_OF_SERVICE, tripTimes, 0, false, false, recordedCall, null);
+    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
 
     // Assert
 
@@ -146,7 +151,7 @@ public class TimetableHelperTest {
       .build();
 
     // Act
-    TimetableHelper.applyUpdates(START_OF_SERVICE, tripTimes, 0, false, false, recordedCall, null);
+    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
 
     // Assert
     assertStatuses(0, OccupancyStatus.FULL, false, false, true);
@@ -165,7 +170,7 @@ public class TimetableHelperTest {
       .build();
 
     // Act
-    TimetableHelper.applyUpdates(START_OF_SERVICE, tripTimes, 0, false, false, recordedCall, null);
+    TimetableHelper.applyUpdates(START_OF_SERVICE, builder, 0, false, false, recordedCall, null);
 
     // Assert
     assertStatuses(0, OccupancyStatus.STANDING_ROOM_ONLY, false, true, false);
@@ -179,7 +184,7 @@ public class TimetableHelperTest {
     // Act
     TimetableHelper.applyUpdates(
       START_OF_SERVICE,
-      tripTimes,
+      builder,
       0,
       false,
       true,
@@ -198,6 +203,7 @@ public class TimetableHelperTest {
     boolean recorded,
     boolean predictionInaccurate
   ) {
+    RealTimeTripTimes tripTimes = builder.build();
     assertEquals(
       predictionInaccurate,
       tripTimes.isPredictionInaccurate(index),

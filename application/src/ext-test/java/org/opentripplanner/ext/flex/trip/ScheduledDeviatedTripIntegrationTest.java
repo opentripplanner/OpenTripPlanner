@@ -14,10 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.ext.flex.FlexIntegrationTestData;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
@@ -171,7 +172,10 @@ class ScheduledDeviatedTripIntegrationTest {
     var additionalSearchDays = AdditionalSearchDays.defaults(dateTime);
 
     try (
-      var temporaryVerticesContainer = TemporaryVerticesContainer.of(serverContext.graph())
+      var temporaryVerticesContainer = TemporaryVerticesContainer.of(
+        serverContext.graph(),
+        TestVertexLinker.of(graph)
+      )
         .withFrom(from, StreetMode.WALK)
         .withTo(to, StreetMode.WALK)
         .build()

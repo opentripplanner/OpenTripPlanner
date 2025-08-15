@@ -18,6 +18,7 @@ import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -564,7 +565,7 @@ public class TestHalfEdges {
       .buildRequest();
 
     try (
-      var container = TemporaryVerticesContainer.of(graph)
+      var container = TemporaryVerticesContainer.of(graph, TestVertexLinker.of(graph))
         .withFrom(walking.from(), StreetMode.WALK)
         .withTo(walking.to(), StreetMode.WALK)
         .build();
