@@ -134,5 +134,6 @@ config:
     CallRealTime: org.opentripplanner.apis.gtfs.model.CallRealTime#CallRealTime
     RentalPlace: org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace#VehicleRentalPlace
     CallSchedule: org.opentripplanner.apis.gtfs.model.CallSchedule#CallSchedule
+    CallScheduledTime: org.opentripplanner.apis.gtfs.model.CallScheduledTime#CallScheduledTime
     RentalVehicleFuel: org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel#RentalVehicleFuel
 
