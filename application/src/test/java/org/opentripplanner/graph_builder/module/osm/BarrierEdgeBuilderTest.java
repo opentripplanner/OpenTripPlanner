@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -179,6 +180,29 @@ class BarrierEdgeBuilderTest {
     assertEquals(2, v3.getDegreeOut());
     for (var edge : v1.getOutgoingStreetEdges()) {
       assertEquals(PEDESTRIAN, edge.getPermission());
+      assertTrue(edge.isWheelchairAccessible());
+    }
+  }
+
+  @Test
+  void connectThreeVerticesWithWallAndBollard() {
+    var v1 = new OsmVertexOnWay(0, 0, 0, 1);
+    var v2 = new OsmVertexOnWay(0, 0, 0, 2);
+    var v3 = new OsmVertexOnWay(0, 0, 0, 3);
+
+    var node = new OsmNode();
+    node.addTag("barrier", "bollard");
+
+    // I consider this tagging a hole on the wall, so edges should be built
+    subject.build(node, List.of(v1, v2, v3), List.of(WALL));
+    assertEquals(2, v1.getDegreeIn());
+    assertEquals(2, v1.getDegreeOut());
+    assertEquals(2, v2.getDegreeIn());
+    assertEquals(2, v2.getDegreeOut());
+    assertEquals(2, v3.getDegreeIn());
+    assertEquals(2, v3.getDegreeOut());
+    for (var edge : v1.getOutgoingStreetEdges()) {
+      assertEquals(PEDESTRIAN_AND_BICYCLE, edge.getPermission());
       assertTrue(edge.isWheelchairAccessible());
     }
   }

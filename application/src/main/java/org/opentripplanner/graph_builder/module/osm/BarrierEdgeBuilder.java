@@ -27,6 +27,9 @@ public class BarrierEdgeBuilder {
     var wheelchairAccessible = true;
     I18NString name = null;
 
+    // I consider a node with barrier=* on a linear barrier a hole in that linear barrier.
+    // For example, a node marked with barrier=bollard on a barrier=wall is a hole in the wall,
+    // which allows pedestrians and bikes passing through.
     if (!node.hasTag("barrier")) {
       for (var barrier : barriers) {
         permission = permission.intersection(
