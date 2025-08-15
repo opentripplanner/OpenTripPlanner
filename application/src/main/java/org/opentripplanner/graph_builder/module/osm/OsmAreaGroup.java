@@ -216,7 +216,7 @@ class OsmAreaGroup {
           barrierMap.put(barrier, new HashSet<>());
         }
         var nodesOnBarrier = barrierMap.get(barrier);
-        nodesOnBarrier.add(new OsmNodePair(node, nextNode));
+        nodesOnBarrier.add(pair);
       }
     }
   }
