@@ -81,7 +81,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   private class Callback implements MqttCallbackExtended {
 
-    private final Semaphore limit = new Semaphore(64);
+    private final Semaphore limit = new Semaphore(32);
 
     @Override
     public void connectComplete(boolean reconnect, String serverURI) {
