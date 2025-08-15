@@ -67,7 +67,11 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   @Override
   public boolean isPrimed() {
-    return primed;
+    // return primed;
+    // consumption of initial data is currently too slow, return always true so the application
+    // is still starting.
+    // ToDo: make initial data consumption faster so that prime can be returned here
+    return true;
   }
 
   @Override
@@ -81,8 +85,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   private class Callback implements MqttCallbackExtended {
 
-    private final ArrayList<ServiceDelivery> initialServiceDeliveries = new ArrayList<>();
-    private static final Duration thresholdHistoricData = Duration.ofMinutes(5);
+    private final ArrayList<ServiceDelivery> initialServiceDeliveries = new ArrayList<>(50000);
+    private static final Duration THRESHOLD_HISTORIC_DATA = Duration.ofMinutes(5);
     private static final int SECONDS_SINCE_LAST_HISTORIC_DELIVERY = 7;
     private Instant timestampOfLastHistoricDelivery;
 
@@ -115,17 +119,17 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
         return;
       }
 
-      if (serviceDelivery.getResponseTimestamp().plus(thresholdHistoricData).isBefore(ZonedDateTime.now())) {
-        initialServiceDeliveries.add(serviceDelivery);
-        if (initialServiceDeliveries.size() % 500 == 0) {
-          LOG.info("Service deliveries received: {}", initialServiceDeliveries.size());
-        }
+      initialServiceDeliveries.add(serviceDelivery);
+      if (initialServiceDeliveries.size() % 500 == 0) {
+        LOG.info("Service deliveries received: {}", initialServiceDeliveries.size());
+      }
+
+      if (serviceDelivery.getResponseTimestamp().plus(THRESHOLD_HISTORIC_DATA).isBefore(ZonedDateTime.now())) {
         timestampOfLastHistoricDelivery = Instant.now();
-        return;
       }
 
       if (timestampOfLastHistoricDelivery.plusSeconds(SECONDS_SINCE_LAST_HISTORIC_DELIVERY).isBefore(Instant.now())) {
-        LOG.info("Initial service delivery completed, start processing");
+        LOG.info("Initial service delivery completed, start processing of {} messages",  initialServiceDeliveries.size());
         initialServiceDeliveries.forEach(serviceDeliveryConsumer::apply);
         LOG.info("Initial service delivery processing complete");
         primed = true;
