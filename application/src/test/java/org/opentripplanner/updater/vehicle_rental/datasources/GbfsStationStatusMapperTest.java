@@ -47,7 +47,7 @@ class GbfsStationStatusMapperTest {
 
     assertEquals(
       new RentalVehicleEntityCounts(3, List.of(new RentalVehicleTypeCount(TYPE_CAR, 3))),
-      mapped.getVehicleSpaceCounts()
+      mapped.vehicleSpaceCounts()
     );
   }
 
@@ -57,15 +57,15 @@ class GbfsStationStatusMapperTest {
     gbfsStation.setStationId(ID);
     gbfsStation.setNumDocksAvailable(99);
     gbfsStation.setNumBikesAvailable(4);
-    var t = new GBFSVehicleTypesAvailable();
-    t.setCount(1);
-    t.setVehicleTypeId(TYPE_CAR.id().getId());
+    var type = new GBFSVehicleTypesAvailable();
+    type.setCount(1);
+    type.setVehicleTypeId(TYPE_CAR.id().getId());
 
     var a = new GBFSVehicleDocksAvailable();
     a.setCount(88);
     a.setVehicleTypeIds(List.of(TYPE_CAR.id().getId()));
 
-    gbfsStation.setVehicleTypesAvailable(List.of(t));
+    gbfsStation.setVehicleTypesAvailable(List.of(type));
     gbfsStation.setVehicleDocksAvailable(List.of(a));
 
     var mapper = new GbfsStationStatusMapper(
@@ -77,7 +77,7 @@ class GbfsStationStatusMapperTest {
 
     assertEquals(
       new RentalVehicleEntityCounts(99, List.of(new RentalVehicleTypeCount(TYPE_CAR, 88))),
-      mapped.getVehicleSpaceCounts()
+      mapped.vehicleSpaceCounts()
     );
   }
 
@@ -97,7 +97,7 @@ class GbfsStationStatusMapperTest {
     var bikeType = RentalVehicleType.getDefaultType("F");
     assertEquals(
       new RentalVehicleEntityCounts(1, List.of(new RentalVehicleTypeCount(bikeType, 1))),
-      mapped.getVehicleSpaceCounts()
+      mapped.vehicleSpaceCounts()
     );
   }
 }
