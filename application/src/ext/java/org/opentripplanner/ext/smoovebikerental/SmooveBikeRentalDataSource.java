@@ -50,7 +50,6 @@ public class SmooveBikeRentalDataSource
       .withSystemId(networkName)
       .withLanguage("fi")
       .withName("Helsinki/Espoo")
-      .withTimezone("Europe/Helsinki")
       .build();
   }
 

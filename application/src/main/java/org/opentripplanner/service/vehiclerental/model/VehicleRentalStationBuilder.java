@@ -78,7 +78,6 @@ public class VehicleRentalStationBuilder {
     return latitude;
   }
 
-
   public Integer capacity() {
     return capacity;
   }
@@ -167,7 +166,6 @@ public class VehicleRentalStationBuilder {
     this.latitude = latitude;
     return this;
   }
-
 
   public VehicleRentalStationBuilder withCapacity(@Nullable Integer capacity) {
     this.capacity = capacity;

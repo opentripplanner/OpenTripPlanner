@@ -69,23 +69,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
   }
 
   public TestFreeFloatingRentalVehicleBuilder withSystem(String id, String url) {
-    this.system = new VehicleRentalSystem(
-      id,
-      null,
-      null,
-      null,
-      null,
-      url,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
+    this.system = new VehicleRentalSystem(id, null, null, null, null, url);
     return this;
   }
 

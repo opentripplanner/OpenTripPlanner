@@ -18,16 +18,7 @@ class GbfsFreeVehicleStatusMapperTest {
     "123",
     "123",
     "123",
-    "https://example.com",
-    "https://example.com",
-    null,
-    null,
-    "help@foo.com",
-    "hello@foo.com",
-    "Europe/Berlin",
-    null,
-    null,
-    null
+    "https://example.com"
   );
   public static final GbfsFreeVehicleStatusMapper MAPPER = new GbfsFreeVehicleStatusMapper(
     SYSTEM,
