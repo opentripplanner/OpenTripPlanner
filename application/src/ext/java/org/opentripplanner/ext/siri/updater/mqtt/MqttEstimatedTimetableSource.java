@@ -2,11 +2,12 @@ package org.opentripplanner.ext.siri.updater.mqtt;
 
 import jakarta.xml.bind.JAXBException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.Semaphore;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
@@ -32,7 +33,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   private Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer;
   private volatile boolean primed;
-  private final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
   private MqttClient client;
 
@@ -81,11 +81,15 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   private class Callback implements MqttCallbackExtended {
 
-    private final Semaphore limit = new Semaphore(32);
+    private final ArrayList<ServiceDelivery> initialServiceDeliveries = new ArrayList<>();
+    private static final Duration thresholdHistoricData = Duration.ofMinutes(5);
+    private static final int SECONDS_SINCE_LAST_HISTORIC_DELIVERY = 10;
+    private Instant timestampOfLastHistoricDelivery;
 
     @Override
     public void connectComplete(boolean reconnect, String serverURI) {
       LOG.info("Connected to MQTT broker: {}", serverURI);
+      timestampOfLastHistoricDelivery = Instant.now();
       try {
         client.subscribe(parameters.topic(), parameters.qos());
       } catch (MqttException e) {
@@ -100,18 +104,29 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
     @Override
     public void messageArrived(String topic, MqttMessage message) {
-      if (limit.tryAcquire()) {
-        try {
-          virtualThreadExecutor.submit(() ->
-            serviceDelivery(message.getPayload()).ifPresent(serviceDeliveryConsumer::apply)
-          );
-        } finally {
-          limit.release();
-        }
-      } else {
-        serviceDelivery(message.getPayload()).ifPresent(serviceDeliveryConsumer::apply);
+      var serviceDeliveryOptional = serviceDelivery(message.getPayload());
+      if (serviceDeliveryOptional.isEmpty()) {
+        return;
       }
-      primed = true; // ToDo figure out how determine if all historic messages where processed
+
+      var serviceDelivery = serviceDeliveryOptional.get();
+      if (primed) {
+        serviceDeliveryConsumer.apply(serviceDelivery);
+        return;
+      }
+
+      if (serviceDelivery.getResponseTimestamp().plus(thresholdHistoricData).isBefore(ZonedDateTime.now())) {
+        initialServiceDeliveries.add(serviceDelivery);
+        timestampOfLastHistoricDelivery = Instant.now();
+        return;
+      }
+
+      if (timestampOfLastHistoricDelivery.plusSeconds(SECONDS_SINCE_LAST_HISTORIC_DELIVERY).isBefore(Instant.now())) {
+        LOG.info("Initial service delivery completed, start processing");
+        initialServiceDeliveries.forEach(serviceDeliveryConsumer::apply);
+        LOG.info("Initial service delivery processing complete");
+        primed = true;
+      }
     }
 
     @Override
