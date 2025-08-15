@@ -2,10 +2,13 @@ package org.opentripplanner.street.search;
 
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -28,6 +31,10 @@ import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,15 +55,18 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   private final GenericLocation from;
   private final GenericLocation to;
   private final VertexLinker vertexLinker;
+  private final Function<FeedScopedId, Collection<FeedScopedId>> resolveStopIds;
 
   public TemporaryVerticesContainer(
     Graph graph,
     VertexLinker linker,
+    Function<FeedScopedId, Collection<FeedScopedId>> resolveStopIds,
     GenericLocation from,
     GenericLocation to,
     StreetMode accessMode,
     StreetMode egressMode
   ) {
+    this.resolveStopIds = resolveStopIds;
     this.tempEdges = new HashSet<>();
 
     this.graph = graph;
@@ -157,11 +167,20 @@ public class TemporaryVerticesContainer implements AutoCloseable {
         }
       }
     } else {
-      // Check if Stop/StopCollection is found by FeedScopeId
       if (location.stopId != null) {
-        var streetVertices = graph.findStopVertices(location.stopId);
-        if (!streetVertices.isEmpty()) {
-          return streetVertices;
+        // Check if Stop or station centroid is found
+        var stopVertices = graph.findStopVertices(location.stopId);
+        if (!stopVertices.isEmpty()) {
+          return stopVertices;
+        } else {
+          var vertices = resolveStopIds
+            .apply(location.stopId)
+            .stream()
+            .flatMap(id -> graph.findStopOrChildStopsVertices(id).stream().map(Vertex.class::cast))
+            .collect(Collectors.toUnmodifiableSet());
+          if (!vertices.isEmpty()) {
+            return vertices;
+          }
         }
       }
     }

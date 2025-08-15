@@ -257,6 +257,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       var verticesContainer = new TemporaryVerticesContainer(
         graph,
         TestVertexLinker.of(graph),
+        id -> Set.of(),
         from,
         to,
         StreetMode.WALK,

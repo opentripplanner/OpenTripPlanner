@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
@@ -382,6 +383,7 @@ public class TransitRouter {
     return new TemporaryVerticesContainer(
       serverContext.graph(),
       serverContext.vertexLinker(),
+      serverContext.transitService()::findStopOrChildIds,
       request.from(),
       request.to(),
       request.journey().access().mode(),

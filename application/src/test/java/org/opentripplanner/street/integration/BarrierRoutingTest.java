@@ -8,6 +8,7 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -186,6 +187,7 @@ public class BarrierRoutingTest {
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
       TestVertexLinker.of(graph),
+      id -> Set.of(),
       from,
       to,
       streetMode,

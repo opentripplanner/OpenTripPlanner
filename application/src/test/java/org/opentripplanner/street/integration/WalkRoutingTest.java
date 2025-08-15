@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -89,6 +90,7 @@ class WalkRoutingTest {
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
         TestVertexLinker.of(graph),
+        id -> Set.of(),
         request.from(),
         request.to(),
         request.journey().direct().mode(),

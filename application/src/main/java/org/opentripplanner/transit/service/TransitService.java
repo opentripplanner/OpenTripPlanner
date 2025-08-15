@@ -160,6 +160,8 @@ public interface TransitService {
    */
   Collection<StopLocation> findStopOrChildStops(FeedScopedId id);
 
+  Collection<FeedScopedId> findStopOrChildIds(FeedScopedId id);
+
   Collection<StopLocationsGroup> listStopLocationGroups();
 
   StopLocationsGroup getStopLocationsGroup(FeedScopedId id);

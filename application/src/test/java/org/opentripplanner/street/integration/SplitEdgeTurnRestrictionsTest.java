@@ -6,6 +6,7 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
@@ -168,6 +169,7 @@ public class SplitEdgeTurnRestrictionsTest {
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
       TestVertexLinker.of(graph),
+      id -> Set.of(),
       from,
       to,
       StreetMode.CAR,

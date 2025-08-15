@@ -101,6 +101,7 @@ public class StreetGraphFinder implements GraphFinder {
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
         linker,
+        id -> List.of(),
         GenericLocation.fromCoordinate(lat, lon),
         GenericLocation.UNKNOWN,
         StreetMode.WALK,

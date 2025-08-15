@@ -227,6 +227,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
           linker,
+          id -> List.of(),
           location,
           ANY_PLACE,
           streetMode,
@@ -244,6 +245,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
           linker,
+          id -> List.of(),
           ANY_PLACE,
           location,
           streetMode,

@@ -219,7 +219,7 @@ public class Graph implements Serializable {
    */
   public Set<TransitStopVertex> findStopOrChildStopsVertices(FeedScopedId stopId) {
     requireIndex();
-    return streetIndex.getStopOrChildStopsVertices(stopId);
+    return streetIndex.findStopOrChildStopVertices(stopId);
   }
 
   /**
@@ -324,9 +324,9 @@ public class Graph implements Serializable {
 
   /**
    * Get the street vertices for an id. If the id corresponds to a regular stop we will return the
-   * coordinate for the stop.
-   * If the id corresponds to a station we will either return the coordinates of the child stops or
-   * the station centroid if the station is configured to route to centroid.
+   * vertex for the stop.
+   * If the id corresponds to a station centroid if the station is configured to route to centroid
+   * then that vertex will be returned.
    */
   public Set<Vertex> findStopVertices(FeedScopedId stopId) {
     requireIndex();
