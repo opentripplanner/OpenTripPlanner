@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;

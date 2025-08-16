@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -146,19 +147,8 @@ public class TemporaryVerticesContainerTest {
   }
 
   private void createStreetEdge(StreetVertex v0, StreetVertex v1, String name) {
-    LineString geom = gf.createLineString(
-      new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() }
-    );
     double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
-    new StreetEdgeBuilder<>()
-      .withFromVertex(v0)
-      .withToVertex(v1)
-      .withGeometry(geom)
-      .withName(name)
-      .withMeterLength(dist)
-      .withPermission(StreetTraversalPermission.ALL)
-      .withBack(false)
-      .buildAndConnect();
+    StreetModelForTest.streetEdgeBuilder(v0, v1, dist, StreetTraversalPermission.ALL).withName(I18NString.of(name)).buildAndConnect();
   }
 
   private void assertVertexEdgeIsNotReferencingTemporaryElements(Vertex src, Edge e, Vertex v) {

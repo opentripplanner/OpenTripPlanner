@@ -15,6 +15,7 @@ import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -227,7 +228,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
           linker,
-          id -> List.of(),
+          id -> Set.of(),
           location,
           ANY_PLACE,
           streetMode,
@@ -245,7 +246,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
           linker,
-          id -> List.of(),
+          id -> Set.of(),
           ANY_PLACE,
           location,
           streetMode,

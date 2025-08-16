@@ -292,14 +292,6 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<FeedScopedId> findStopOrChildIds(FeedScopedId id) {
-    return findStopOrChildStops(id)
-      .stream()
-      .map(StopLocation::getId)
-      .collect(Collectors.toUnmodifiableSet());
-  }
-
-  @Override
   public Collection<StopLocationsGroup> listStopLocationGroups() {
     OTPRequestTimeoutException.checkForTimeout();
     return timetableRepository.getSiteRepository().listStopLocationGroups();
