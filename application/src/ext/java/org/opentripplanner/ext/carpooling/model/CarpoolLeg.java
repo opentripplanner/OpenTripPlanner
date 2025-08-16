@@ -14,17 +14,23 @@ import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.leg.LegCallTime;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.StopArrival;
+import org.opentripplanner.model.plan.legreference.LegReference;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -32,7 +38,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
  * particular vehicle, which is running on flexible trip, i.e. not using fixed schedule and stops.
  */
-public class CarpoolTransitLeg implements TransitLeg {
+public class CarpoolLeg implements Leg {
 
   private final ZonedDateTime startTime;
 
@@ -46,48 +52,113 @@ public class CarpoolTransitLeg implements TransitLeg {
 
   private final List<FareProductUse> fareProducts;
 
-  private final Trip trip;
+  private final Place from;
 
-  CarpoolTransitLeg(CarpoolTransitLegBuilder builder) {
+  private final Place to;
+
+  private final LineString geometry;
+
+  private final double distanceMeters;
+
+  CarpoolLeg(CarpoolLegBuilder builder) {
     this.startTime = Objects.requireNonNull(builder.startTime());
     this.endTime = Objects.requireNonNull(builder.endTime());
     this.generalizedCost = builder.generalizedCost();
     this.transitAlerts = Set.copyOf(builder.alerts());
     this.fareProducts = List.copyOf(builder.fareProducts());
     this.emissionPerPerson = builder.emissionPerPerson();
-    this.trip = Objects.requireNonNull(builder.trip(), "Trip must not be null");
+    this.from = builder.from();
+    this.to = builder.to();
+    this.geometry = builder.geometry();
+    this.distanceMeters = builder.distanceMeters();
   }
 
   /**
-   * Return an empty builder for {@link CarpoolTransitLeg}.
+   * Return an empty builder for {@link CarpoolLeg}.
    */
-  public static CarpoolTransitLegBuilder of() {
-    return new CarpoolTransitLegBuilder();
+  public static CarpoolLegBuilder of() {
+    return new CarpoolLegBuilder();
   }
 
-  public CarpoolTransitLegBuilder copyOf() {
-    return new CarpoolTransitLegBuilder(this);
+  public CarpoolLegBuilder copyOf() {
+    return new CarpoolLegBuilder(this);
+  }
+
+  @Override
+  public boolean isTransitLeg() {
+    return false;
+  }
+
+  @Override
+  public boolean isScheduledTransitLeg() {
+    return Leg.super.isScheduledTransitLeg();
+  }
+
+  @Override
+  public ScheduledTransitLeg asScheduledTransitLeg() {
+    return Leg.super.asScheduledTransitLeg();
+  }
+
+  @Override
+  public Boolean isInterlinedWithPreviousLeg() {
+    return Leg.super.isInterlinedWithPreviousLeg();
+  }
+
+  @Override
+  public boolean isWalkingLeg() {
+    return Leg.super.isWalkingLeg();
+  }
+
+  @Override
+  public boolean isStreetLeg() {
+    return Leg.super.isStreetLeg();
+  }
+
+  @Override
+  public Duration duration() {
+    return Leg.super.duration();
+  }
+
+  @Override
+  public boolean isPartiallySameTransitLeg(Leg other) {
+    return Leg.super.isPartiallySameTransitLeg(other);
+  }
+
+  @Override
+  public boolean hasSameMode(Leg other) {
+    return false;
+  }
+
+  @Override
+  public boolean isPartiallySameLeg(Leg other) {
+    return Leg.super.isPartiallySameLeg(other);
+  }
+
+  @Override
+  public boolean overlapInTime(Leg other) {
+    return Leg.super.overlapInTime(other);
   }
 
   @Override
   public Agency agency() {
-    return trip().getRoute().getAgency();
+    return null;
   }
 
   @Override
   @Nullable
   public Operator operator() {
-    return trip().getOperator();
+    return null;
   }
 
   @Override
   public Route route() {
-    return trip().getRoute();
+    return null;
   }
 
+  @Nullable
   @Override
-  public Trip trip() {
-    return trip;
+  public TripOnServiceDate tripOnServiceDate() {
+    return Leg.super.tripOnServiceDate();
   }
 
   @Override
@@ -107,11 +178,6 @@ public class CarpoolTransitLeg implements TransitLeg {
   }
 
   @Override
-  public TransitMode mode() {
-    return trip().getMode();
-  }
-
-  @Override
   public ZonedDateTime startTime() {
     return startTime;
   }
@@ -122,24 +188,61 @@ public class CarpoolTransitLeg implements TransitLeg {
   }
 
   @Override
+  public int departureDelay() {
+    return Leg.super.departureDelay();
+  }
+
+  @Override
+  public int arrivalDelay() {
+    return Leg.super.arrivalDelay();
+  }
+
+  @Override
+  public boolean isRealTimeUpdated() {
+    return Leg.super.isRealTimeUpdated();
+  }
+
+  @Nullable
+  @Override
+  public RealTimeState realTimeState() {
+    return Leg.super.realTimeState();
+  }
+
+  @Override
   public boolean isFlexibleTrip() {
     return true;
   }
 
+  @Nullable
+  @Override
+  public Boolean isNonExactFrequency() {
+    return Leg.super.isNonExactFrequency();
+  }
+
+  @Nullable
+  @Override
+  public Integer headway() {
+    return Leg.super.headway();
+  }
+
   @Override
   public double distanceMeters() {
-    // TODO CARPOOLING
-    return 999_999.0;
+    return distanceMeters;
+  }
+
+  @Override
+  public int agencyTimeZoneOffset() {
+    return Leg.super.agencyTimeZoneOffset();
   }
 
   @Override
   public Integer routeType() {
-    return trip().getRoute().getGtfsType();
+    return null;
   }
 
   @Override
   public I18NString headsign() {
-    return trip().getHeadsign();
+    return null;
   }
 
   @Override
@@ -148,16 +251,20 @@ public class CarpoolTransitLeg implements TransitLeg {
     return null;
   }
 
+  @Nullable
+  @Override
+  public String routeBrandingUrl() {
+    return Leg.super.routeBrandingUrl();
+  }
+
   @Override
   public Place from() {
-    // TODO CARPOOLING
-    return null;
+    return from;
   }
 
   @Override
   public Place to() {
-    // TODO CARPOOLING
-    return null;
+    return to;
   }
 
   @Override
@@ -167,23 +274,28 @@ public class CarpoolTransitLeg implements TransitLeg {
 
   @Override
   public LineString legGeometry() {
-    // TODO CARPOOLING
-    return null;
+    return geometry;
+  }
+
+  @Nullable
+  @Override
+  public ElevationProfile elevationProfile() {
+    return Leg.super.elevationProfile();
+  }
+
+  @Override
+  public List<WalkStep> listWalkSteps() {
+    return Leg.super.listWalkSteps();
+  }
+
+  @Override
+  public Set<StreetNote> listStreetNotes() {
+    return Leg.super.listStreetNotes();
   }
 
   @Override
   public Set<TransitAlert> listTransitAlerts() {
     return transitAlerts;
-  }
-
-  @Override
-  public TransitLeg decorateWithAlerts(Set<TransitAlert> alerts) {
-    return copyOf().withAlerts(alerts).build();
-  }
-
-  @Override
-  public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
-    return copyOf().withFareProducts(fares).build();
   }
 
   @Override
@@ -210,6 +322,18 @@ public class CarpoolTransitLeg implements TransitLeg {
     return null;
   }
 
+  @Nullable
+  @Override
+  public ConstrainedTransfer transferFromPrevLeg() {
+    return Leg.super.transferFromPrevLeg();
+  }
+
+  @Nullable
+  @Override
+  public ConstrainedTransfer transferToNextLeg() {
+    return Leg.super.transferToNextLeg();
+  }
+
   @Override
   public Integer boardStopPosInPattern() {
     // TODO CARPOOLING
@@ -222,9 +346,39 @@ public class CarpoolTransitLeg implements TransitLeg {
     return 1;
   }
 
+  @Nullable
+  @Override
+  public Integer boardingGtfsStopSequence() {
+    return Leg.super.boardingGtfsStopSequence();
+  }
+
+  @Nullable
+  @Override
+  public Integer alightGtfsStopSequence() {
+    return Leg.super.alightGtfsStopSequence();
+  }
+
+  @Nullable
+  @Override
+  public Boolean walkingBike() {
+    return Leg.super.walkingBike();
+  }
+
+  @Nullable
+  @Override
+  public Float accessibilityScore() {
+    return Leg.super.accessibilityScore();
+  }
+
   @Override
   public int generalizedCost() {
     return generalizedCost;
+  }
+
+  @Nullable
+  @Override
+  public LegReference legReference() {
+    return Leg.super.legReference();
   }
 
   @Override
@@ -233,6 +387,11 @@ public class CarpoolTransitLeg implements TransitLeg {
       .withStartTime(startTime.plus(duration))
       .withEndTime(endTime.plus(duration))
       .build();
+  }
+
+  @Override
+  public Set<FareZone> fareZones() {
+    return Leg.super.fareZones();
   }
 
   @Nullable
@@ -247,9 +406,25 @@ public class CarpoolTransitLeg implements TransitLeg {
     return copyOf().withEmissionPerPerson(emissionPerPerson).build();
   }
 
+  @Nullable
+  @Override
+  public Boolean rentedVehicle() {
+    return Leg.super.rentedVehicle();
+  }
+
+  @Nullable
+  @Override
+  public String vehicleRentalNetwork() {
+    return Leg.super.vehicleRentalNetwork();
+  }
+
   @Override
   public List<FareProductUse> fareProducts() {
     return fareProducts;
+  }
+
+  public TransitMode mode() {
+    return TransitMode.CARPOOL;
   }
 
   /**
@@ -257,16 +432,13 @@ public class CarpoolTransitLeg implements TransitLeg {
    */
   @Override
   public String toString() {
-    return ToStringBuilder.of(CarpoolTransitLeg.class)
+    return ToStringBuilder.of(CarpoolLeg.class)
       .addObj("from", from())
       .addObj("to", to())
       .addTime("startTime", startTime)
       .addTime("endTime", endTime)
       .addNum("distance", distanceMeters(), "m")
       .addNum("cost", generalizedCost)
-      .addObjOp("agencyId", agency(), AbstractTransitEntity::getId)
-      .addObjOp("routeId", route(), AbstractTransitEntity::getId)
-      .addObjOp("tripId", trip(), AbstractTransitEntity::getId)
       .addObj("serviceDate", serviceDate())
       .addObj("legGeometry", legGeometry())
       .addCol("transitAlerts", transitAlerts)

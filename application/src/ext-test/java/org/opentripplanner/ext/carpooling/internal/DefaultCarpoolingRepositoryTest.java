@@ -34,7 +34,7 @@ class DefaultCarpoolingRepositoryTest {
 
   @BeforeEach
   void setup() {
-    repository = new DefaultCarpoolingRepository();
+    repository = new DefaultCarpoolingRepository(null);
 
     carpoolTrip1 = new CarpoolTripBuilder(TRIP_ID_1)
       .withBoardingArea(PICKUP_AREA)

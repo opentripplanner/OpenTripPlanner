@@ -26,6 +26,7 @@ import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -509,6 +510,10 @@ public class LegType {
     }
     if (leg instanceof TransitLeg tl) {
       return transitLegAccessor.apply(tl);
+    }
+    if (leg instanceof CarpoolLeg cl) {
+      // CarpoolLeg is a special case, it has no StreetLeg or TransitLeg, but we can still return the mode
+      return cl.mode();
     }
     throw new IllegalStateException("Unhandled leg type: " + leg);
   }

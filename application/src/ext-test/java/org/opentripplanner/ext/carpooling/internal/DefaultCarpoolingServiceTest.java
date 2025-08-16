@@ -20,7 +20,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
-import org.opentripplanner.ext.carpooling.model.CarpoolTransitLeg;
+import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
@@ -133,7 +133,7 @@ class DefaultCarpoolingServiceTest extends GraphRoutingTest {
     when(mockRepository.getCarpoolTrips()).thenReturn(List.of());
 
     // When: Routing is requested
-    List<Itinerary> result = carpoolingService.route(request);
+    List<Itinerary> result = carpoolingService.route(serverContext, request);
 
     // Then: Empty list is returned (no available trips)
     assertTrue(result.isEmpty());
@@ -163,7 +163,7 @@ class DefaultCarpoolingServiceTest extends GraphRoutingTest {
     when(mockRepository.getCarpoolTrips()).thenReturn(List.of(carpoolTrip));
 
     // When: Routing is requested
-    List<Itinerary> result = carpoolingService.route(request);
+    List<Itinerary> result = carpoolingService.route(serverContext, request);
 
     // Then: Verify A* routing produces valid results
     assertNotNull(result, "Should return a result list");
@@ -195,7 +195,7 @@ class DefaultCarpoolingServiceTest extends GraphRoutingTest {
       boolean hasCarpoolLeg = itinerary
         .legs()
         .stream()
-        .anyMatch(leg -> leg instanceof CarpoolTransitLeg);
+        .anyMatch(leg -> leg instanceof CarpoolLeg);
 
       assertTrue(hasCarpoolLeg, "Should contain a carpool transit leg");
 
@@ -250,7 +250,7 @@ class DefaultCarpoolingServiceTest extends GraphRoutingTest {
     when(mockRepository.getCarpoolTrips()).thenReturn(List.of(trip1, trip2));
 
     // When: Routing is requested
-    List<Itinerary> result = carpoolingService.route(request);
+    List<Itinerary> result = carpoolingService.route(serverContext, request);
 
     // Then: Multiple trips should be processed with A* routing
     // Result count depends on feasible paths found, but no exception should be thrown

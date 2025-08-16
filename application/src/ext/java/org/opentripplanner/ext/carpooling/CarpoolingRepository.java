@@ -1,8 +1,11 @@
 package org.opentripplanner.ext.carpooling;
 
+import com.google.common.collect.ArrayListMultimap;
 import java.util.Collection;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.AreaStop;
 
 /**
  * The CarpoolingRepository interface allows for the management and retrieval of carpooling trips.
@@ -27,4 +30,13 @@ public interface CarpoolingRepository {
    * Get a specific carpool trip by ID.
    */
   CarpoolTrip getCarpoolTrip(FeedScopedId tripId);
+
+  boolean isCarpoolBoardingArea(FeedScopedId areaId);
+  boolean isCarpoolAlightingArea(FeedScopedId areaId);
+
+  CarpoolTrip getCarpoolTripByBoardingArea(FeedScopedId boardingAreaId);
+  CarpoolTrip getCarpoolTripByAlightingArea(FeedScopedId alightingAreaId);
+
+  ArrayListMultimap<StreetVertex, AreaStop> getBoardingAreasForVertex();
+  ArrayListMultimap<StreetVertex, AreaStop> getAlightingAreasForVertex();
 }
