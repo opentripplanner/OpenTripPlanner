@@ -198,7 +198,7 @@ public class FlexRouter {
 
     @Override
     public TransitStopVertex getStopVertexForStopId(FeedScopedId stopId) {
-      return graph.getStopVertexForStopId(stopId);
+      return graph.getStopVertex(stopId);
     }
 
     @Override

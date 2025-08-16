@@ -4,6 +4,7 @@ import static java.lang.Integer.min;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
@@ -101,7 +102,7 @@ public class StreetGraphFinder implements GraphFinder {
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
         linker,
-        id -> List.of(),
+        id -> Set.of(),
         GenericLocation.fromCoordinate(lat, lon),
         GenericLocation.UNKNOWN,
         StreetMode.WALK,

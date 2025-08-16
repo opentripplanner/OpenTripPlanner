@@ -148,7 +148,9 @@ public class TemporaryVerticesContainerTest {
 
   private void createStreetEdge(StreetVertex v0, StreetVertex v1, String name) {
     double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
-    StreetModelForTest.streetEdgeBuilder(v0, v1, dist, StreetTraversalPermission.ALL).withName(I18NString.of(name)).buildAndConnect();
+    StreetModelForTest.streetEdgeBuilder(v0, v1, dist, StreetTraversalPermission.ALL)
+      .withName(I18NString.of(name))
+      .buildAndConnect();
   }
 
   private void assertVertexEdgeIsNotReferencingTemporaryElements(Vertex src, Edge e, Vertex v) {

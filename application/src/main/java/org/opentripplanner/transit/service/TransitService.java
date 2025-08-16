@@ -162,10 +162,10 @@ public interface TransitService {
   Collection<StopLocation> findStopOrChildStops(FeedScopedId id);
 
   default Set<FeedScopedId> findStopOrChildIds(FeedScopedId id) {
-      return findStopOrChildStops(id)
-        .stream()
-        .map(StopLocation::getId)
-        .collect(Collectors.toUnmodifiableSet());
+    return findStopOrChildStops(id)
+      .stream()
+      .map(StopLocation::getId)
+      .collect(Collectors.toUnmodifiableSet());
   }
 
   Collection<StopLocationsGroup> listStopLocationGroups();

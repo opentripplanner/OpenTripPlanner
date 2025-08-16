@@ -112,7 +112,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (from.stopId == null) {
       return Set.of();
     }
-    return resolveStopId(from.stopId);
+    return findStopVertices(from.stopId);
   }
 
   /**
@@ -124,7 +124,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (to.stopId == null) {
       return Set.of();
     }
-    return resolveStopId(to.stopId);
+    return findStopVertices(to.stopId);
   }
 
   /* PRIVATE METHODS */
@@ -152,7 +152,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (mode.isInCar()) {
       // Fetch coordinate from stop, if not given in request
       if (location.stopId != null && location.getCoordinate() == null) {
-        var stopVertex = graph.getStopVertexForStopId(location.stopId);
+        var stopVertex = graph.getStopVertex(location.stopId);
         if (stopVertex != null) {
           var c = stopVertex.getStop().getCoordinate();
           location = new GenericLocation(
@@ -166,13 +166,16 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     } else {
       if (location.stopId != null) {
         // Check if Stop or station centroid is found
-        var stopVertices = graph.findStopVertices(location.stopId);
-        if (!stopVertices.isEmpty()) {
-          return stopVertices;
+        var stopVertices = graph.findStreetVertex(location.stopId);
+        if (stopVertices.isPresent()) {
+          return Set.of(stopVertices.get());
         } else {
-          var vertices = resolveStopId(location.stopId);
+          var vertices = findStopVertices(location.stopId);
           if (!vertices.isEmpty()) {
-            return vertices.stream().map(v -> (Vertex) v).collect(Collectors.toSet());
+            return vertices
+              .stream()
+              .map(Vertex.class::cast)
+              .collect(Collectors.toUnmodifiableSet());
           }
         }
       }
@@ -194,11 +197,11 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     return null;
   }
 
-  private Set<TransitStopVertex> resolveStopId(FeedScopedId stopId) {
+  private Set<TransitStopVertex> findStopVertices(FeedScopedId stopId) {
     return resolveStopIds
       .apply(stopId)
       .stream()
-      .flatMap(id -> graph.findStopOrChildStopsVertices(id).stream())
+      .flatMap(id -> graph.findStopVertex(id).stream())
       .collect(Collectors.toUnmodifiableSet());
   }
 

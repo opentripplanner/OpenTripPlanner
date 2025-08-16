@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -207,19 +208,29 @@ public class Graph implements Serializable {
    * Return the vertex corresponding to the stop id, or null.
    */
   @Nullable
-  public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
+  public TransitStopVertex getStopVertex(FeedScopedId id) {
     requireIndex();
-    return streetIndex.findTransitStopVertex(id);
+    return streetIndex.getStopVertex(id);
   }
 
   /**
-   * If the {@code id} is a stop id return a set with a single element.
-   * If it is a station id return a set containing all child stop vertices, or an empty
-   * set otherwise.
+   * If the {@code id} is a stop id return the corresponding vertex, otherwise return an empty
+   * optional.
    */
-  public Set<TransitStopVertex> findStopOrChildStopsVertices(FeedScopedId stopId) {
+  public Optional<TransitStopVertex> findStopVertex(FeedScopedId stopId) {
     requireIndex();
-    return streetIndex.findStopOrChildStopVertices(stopId);
+    return streetIndex.findStopVertex(stopId);
+  }
+
+  /**
+   * Get the street vertices for an id. If the id corresponds to a regular stop it will return the
+   * vertex for the stop.
+   * If the id corresponds to a station centroid if the station is configured to route to centroid
+   * then that vertex will be returned.
+   */
+  public Optional<Vertex> findStreetVertex(FeedScopedId stopId) {
+    requireIndex();
+    return streetIndex.findStreetVertex(stopId);
   }
 
   /**
@@ -319,18 +330,7 @@ public class Graph implements Serializable {
    */
   public Collection<Vertex> findVertices(Envelope env) {
     requireIndex();
-    return streetIndex.getVerticesForEnvelope(env);
-  }
-
-  /**
-   * Get the street vertices for an id. If the id corresponds to a regular stop we will return the
-   * vertex for the stop.
-   * If the id corresponds to a station centroid if the station is configured to route to centroid
-   * then that vertex will be returned.
-   */
-  public Set<Vertex> findStopVertices(FeedScopedId stopId) {
-    requireIndex();
-    return streetIndex.findStopVertices(stopId);
+    return streetIndex.findVertices(env);
   }
 
   /**

@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.graph;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
@@ -58,15 +57,36 @@ class StreetIndex {
     postSetup(graph.getVertices());
   }
 
+  /**
+   * @see Graph#getStopVertex(FeedScopedId)
+   */
   @Nullable
-  TransitStopVertex findTransitStopVertex(FeedScopedId stopId) {
+  TransitStopVertex getStopVertex(FeedScopedId stopId) {
     return stopVerticesById.get(stopId);
+  }
+
+  /**
+   * @see Graph#findStreetVertex(FeedScopedId)
+   */
+  Optional<TransitStopVertex> findStopVertex(FeedScopedId id) {
+    return Optional.ofNullable(stopVerticesById.get(id));
+  }
+
+  /**
+   * @see Graph#findStreetVertex(FeedScopedId)
+   */
+  Optional<Vertex> findStreetVertex(FeedScopedId id) {
+    var stationVertex = stationCentroidVertices.get(id);
+    if (stationVertex != null) {
+      return Optional.of(stationVertex);
+    }
+    return findStopVertex(id).map(Vertex.class::cast);
   }
 
   /**
    * Returns the vertices intersecting with the specified envelope.
    */
-  List<Vertex> getVerticesForEnvelope(Envelope envelope) {
+  List<Vertex> findVertices(Envelope envelope) {
     List<Vertex> vertices = vertexIndex.query(envelope);
     // Here we assume vertices list modifiable
     vertices.removeIf(v -> !envelope.contains(new Coordinate(v.getLon(), v.getLat())));
@@ -74,7 +94,8 @@ class StreetIndex {
   }
 
   /**
-   * Return the edges whose geometry intersect with the specified envelope. Warning: edges disconnected from the graph
+   * Return the edges whose geometry intersect with the specified envelope.
+   * Warning: edges disconnected from the graph
    * will not be indexed.
    */
   Collection<Edge> findEdges(Envelope envelope) {
@@ -86,40 +107,6 @@ class StreetIndex {
           envelope.intersects(edgeGeometryOrStraightLine(e).getEnvelopeInternal())
       )
       .toList();
-  }
-
-  @Override
-  public String toString() {
-    return (
-      getClass().getName() +
-      " -- edgeTree: " +
-      edgeIndex.toString() +
-      " -- verticesTree: " +
-      vertexIndex.toString()
-    );
-  }
-
-  /**
-   * @param id Id of a RegularStaop
-   * @return The associated TransitStopVertex or the empty set.
-   */
-  Set<TransitStopVertex> findStopOrChildStopVertices(FeedScopedId id) {
-    if (stopVerticesById.containsKey(id)) {
-      return Set.of(stopVerticesById.get(id));
-    } else {
-      return Set.of();
-    }
-  }
-
-  /**
-   * @see Graph#findStopVertices(FeedScopedId)
-   */
-  Set<Vertex> findStopVertices(FeedScopedId id) {
-    var stationVertex = stationCentroidVertices.get(id);
-    if (stationVertex != null) {
-      return Set.of(stationVertex);
-    }
-    return Collections.unmodifiableSet(findStopOrChildStopVertices(id));
   }
 
   Collection<Edge> findEdges(Envelope env, Scope scope) {
@@ -140,6 +127,19 @@ class StreetIndex {
   void remove(Vertex vertex) {
     vertexIndex.remove(new Envelope(vertex.getCoordinate()), vertex);
   }
+
+  @Override
+  public String toString() {
+    return (
+      getClass().getName() +
+      " -- edgeTree: " +
+      edgeIndex.toString() +
+      " -- verticesTree: " +
+      vertexIndex.toString()
+    );
+  }
+
+  // private methods
 
   private static LineString edgeGeometryOrStraightLine(Edge e) {
     LineString geometry = e.getGeometry();
