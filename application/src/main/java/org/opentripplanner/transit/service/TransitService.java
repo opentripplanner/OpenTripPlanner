@@ -157,10 +157,17 @@ public interface TransitService {
    * Return all stops associated with the given id. If a Station, a MultiModalStation, or a
    * GroupOfStations matches the id, then all child stops are returned. If the id matches a regular
    * stop, area stop or stop group, then a list with one item is returned.
-   * An empty list is if nothing is found.
+   * An empty collection is returned if nothing is found.
    */
   Collection<StopLocation> findStopOrChildStops(FeedScopedId id);
 
+  /**
+   * Return all stop ids associated with the given id.
+   * <p>
+   * If a Station, a MultiModalStation, or a GroupOfStations matches the id, then all child stops
+   * are returned. If the id matches a regular stop, area stop or stop group, then a list with one
+   * item is returned.
+   */
   default Set<FeedScopedId> findStopOrChildIds(FeedScopedId id) {
     return findStopOrChildStops(id)
       .stream()
