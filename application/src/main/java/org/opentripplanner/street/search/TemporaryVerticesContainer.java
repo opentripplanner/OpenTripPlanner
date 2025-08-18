@@ -120,7 +120,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (from.stopId == null) {
       return Set.of();
     }
-    return findChildStopVertices(from.stopId);
+    return findStopOrChildStopVertices(from.stopId);
   }
 
   /**
@@ -132,7 +132,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (to.stopId == null) {
       return Set.of();
     }
-    return findChildStopVertices(to.stopId);
+    return findStopOrChildStopVertices(to.stopId);
   }
 
   /* PRIVATE METHODS */
@@ -206,6 +206,10 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     }
 
     return null;
+  }
+
+  private Set<TransitStopVertex> findStopOrChildStopVertices(FeedScopedId stopId) {
+    return graph.findStopVertex(stopId).map(Set::of).orElseGet(() -> findChildStopVertices(stopId));
   }
 
   private Set<TransitStopVertex> findChildStopVertices(FeedScopedId stopId) {
