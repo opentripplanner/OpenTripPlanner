@@ -26,7 +26,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   // GBFS Static information
   private final FeedScopedId id;
   private final I18NString name;
-  private final String shortName;
+  private final I18NString shortName;
   private final double longitude;
   private final double latitude;
   private final Integer capacity;
@@ -119,7 +119,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   @Nullable
-  public String shortName() {
+  public I18NString shortName() {
     return shortName;
   }
 

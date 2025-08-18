@@ -12,7 +12,7 @@ public class VehicleRentalStationBuilder {
   private final VehicleRentalStation original;
   private FeedScopedId id;
   private I18NString name;
-  private String shortName;
+  private I18NString shortName;
   private Double longitude;
   private Double latitude;
   private Integer capacity;
@@ -66,7 +66,7 @@ public class VehicleRentalStationBuilder {
     return name;
   }
 
-  public String shortName() {
+  public I18NString shortName() {
     return shortName;
   }
 
@@ -152,7 +152,7 @@ public class VehicleRentalStationBuilder {
     return this;
   }
 
-  public VehicleRentalStationBuilder withShortName(@Nullable String shortName) {
+  public VehicleRentalStationBuilder withShortName(@Nullable I18NString shortName) {
     this.shortName = shortName;
     return this;
   }
