@@ -87,13 +87,7 @@ public class GbfsFreeVehicleStatusMapper {
         )
         .withIsReserved(vehicle.getIsReserved() != null ? vehicle.getIsReserved() : false)
         .withIsDisabled(vehicle.getIsDisabled() != null ? vehicle.getIsDisabled() : false)
-        .withLastReported(
-          vehicle.getLastReported() != null
-            ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
-            : null
-        )
-        .withFuel(RentalVehicleFuel.of().withPercent(fuelRatio).withRange(rangeMeters).build())
-        .withPricingPlanId(vehicle.getPricingPlanId());
+        .withFuel(RentalVehicleFuel.of().withPercent(fuelRatio).withRange(rangeMeters).build());
 
       String availableUntil = vehicle.getAvailableUntil();
       if (StringUtils.hasValue(availableUntil)) {

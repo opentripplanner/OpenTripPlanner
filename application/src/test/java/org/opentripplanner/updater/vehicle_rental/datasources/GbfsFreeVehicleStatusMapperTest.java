@@ -18,16 +18,7 @@ class GbfsFreeVehicleStatusMapperTest {
     I18NString.of("123"),
     I18NString.of("123"),
     I18NString.of("123"),
-    "https://example.com",
-    "https://example.com",
-    null,
-    null,
-    "help@foo.com",
-    "hello@foo.com",
-    "Europe/Berlin",
-    null,
-    null,
-    null
+    "https://example.com"
   );
   public static final GbfsFreeVehicleStatusMapper MAPPER = new GbfsFreeVehicleStatusMapper(
     SYSTEM,
