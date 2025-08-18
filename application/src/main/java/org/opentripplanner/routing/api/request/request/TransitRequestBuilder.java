@@ -13,9 +13,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class TransitRequestBuilder {
 
   private List<TransitFilter> filters;
-  private List<FeedScopedId> preferredAgencies;
   private List<FeedScopedId> unpreferredAgencies;
-  private List<FeedScopedId> preferredRoutes;
   private List<FeedScopedId> unpreferredRoutes;
   private List<FeedScopedId> bannedTrips;
   private List<TransitGroupSelect> priorityGroupsByAgency;
@@ -26,9 +24,7 @@ public class TransitRequestBuilder {
   public TransitRequestBuilder(TransitRequest original) {
     this.original = original;
     this.filters = null;
-    this.preferredAgencies = null;
     this.unpreferredAgencies = null;
-    this.preferredRoutes = null;
     this.unpreferredRoutes = null;
     this.bannedTrips = null;
     this.priorityGroupsByAgency = null;
@@ -54,20 +50,8 @@ public class TransitRequestBuilder {
     return setFilters(List.of(ExcludeAllTransitFilter.of()));
   }
 
-  @Deprecated
-  public TransitRequestBuilder withPreferredAgencies(List<FeedScopedId> preferredAgencies) {
-    this.preferredAgencies = preferredAgencies;
-    return this;
-  }
-
   public TransitRequestBuilder withUnpreferredAgencies(List<FeedScopedId> unpreferredAgencies) {
     this.unpreferredAgencies = unpreferredAgencies;
-    return this;
-  }
-
-  @Deprecated
-  public TransitRequestBuilder withPreferredRoutes(List<FeedScopedId> preferredRoutes) {
-    this.preferredRoutes = preferredRoutes;
     return this;
   }
 
@@ -104,9 +88,7 @@ public class TransitRequestBuilder {
   public TransitRequest build() {
     var newValue = new TransitRequest(
       ifNotNull(filters, original.filters()),
-      ifNotNull(preferredAgencies, original.preferredAgencies()),
       ifNotNull(unpreferredAgencies, original.unpreferredAgencies()),
-      ifNotNull(preferredRoutes, original.preferredRoutes()),
       ifNotNull(unpreferredRoutes, original.unpreferredRoutes()),
       ifNotNull(bannedTrips, original.bannedTrips()),
       ifNotNull(priorityGroupsByAgency, original.priorityGroupsByAgency()),
