@@ -22,7 +22,9 @@ import org.onebusaway.gtfs.model.FareTransferRule;
 import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.RiderCategory;
 import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.StopAreaElement;
+import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
@@ -53,6 +55,11 @@ import org.slf4j.LoggerFactory;
 
 public class GtfsModule implements GraphBuilderModule {
 
+  /**
+   * For these files we have hand-rolled streaming parsers so we skip them in OBA to conserve
+   * memory.
+   */
+  public static final Set<Class<?>> SKIPPED_CLASSES = Set.of(StopTime.class, ShapePoint.class);
   public static final Set<Class<?>> FARES_V2_CLASSES = Set.of(
     FareProduct.class,
     FareLegRule.class,
@@ -147,7 +154,7 @@ public class GtfsModule implements GraphBuilderModule {
           gtfsBundle.parameters().discardMinTransferTimes(),
           gtfsBundle.parameters().stationTransferPreference()
         );
-        mapper.mapStopTripAndRouteDataIntoBuilder(gtfsDao);
+        mapper.mapStopTripAndRouteDataIntoBuilder(gtfsDao, gtfsBundle.getCsvInputSource());
 
         OtpTransitServiceBuilder builder = mapper.getBuilder();
         var fareRulesData = mapper.fareRulesData();
@@ -311,6 +318,7 @@ public class GtfsModule implements GraphBuilderModule {
   private GtfsMutableRelationalDao loadBundle(GtfsBundle gtfsBundle) throws IOException {
     var dao = new GtfsRelationalDaoImpl();
     dao.setPackShapePoints(true);
+    dao.setPackStopTimes(true);
     StoreImpl store = new StoreImpl(dao);
     store.open();
     LOG.info("reading {}", gtfsBundle.feedInfo());
@@ -372,7 +380,11 @@ public class GtfsModule implements GraphBuilderModule {
    * it can easily lead to graph build failures.
    */
   private boolean skipEntityClass(Class<?> entityClass) {
-    return OTPFeature.FaresV2.isOff() && FARES_V2_CLASSES.contains(entityClass);
+    if (SKIPPED_CLASSES.contains(entityClass)) {
+      return true;
+    } else {
+      return OTPFeature.FaresV2.isOff() && FARES_V2_CLASSES.contains(entityClass);
+    }
   }
 
   /**

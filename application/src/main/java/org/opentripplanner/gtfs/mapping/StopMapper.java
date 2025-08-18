@@ -19,6 +19,7 @@ class StopMapper {
 
   private final IdFactory idFactory;
   private final Map<org.onebusaway.gtfs.model.Stop, RegularStop> mappedStops = new HashMap<>();
+
   private final SiteRepositoryBuilder siteRepositoryBuilder;
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;

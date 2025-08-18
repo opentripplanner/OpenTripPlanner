@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -7,226 +8,83 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.graph_builder.issue.api.DataImportIssueStore.NOOP;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.io.IOException;
 import java.util.List;
-import org.geojson.LngLatAlt;
-import org.geojson.Polygon;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Location;
-import org.onebusaway.gtfs.model.LocationGroup;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 
 public class StopTimeMapperTest {
 
   private static final String FEED_ID = "FEED";
   private static final IdFactory ID_FACTORY = new IdFactory(FEED_ID);
 
-  private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+  public static final String CSV =
+    """
+    trip_id,arrival_time,departure_time,stop_id,stop_sequence,shape_dist_traveled,pickup_type,drop_off_type,stop_headsign
+    1.1,00:05:00,00:05:00,A,1,3.4,3,2,Head Sign
+    1.1,00:10:00,00:10:00,B,2,,1,1,
+    1.1,00:20:00,00:20:00,C,3,,0,0,
+    1.2,00:20:00,00:20:00,A,1,,0,0,
+    1.2,00:30:00,00:30:00,B,2,,0,0,
+    1.2,00:40:00,00:40:00,C,3,,0,0,
+    1.3,08:00:00,08:00:00,A,1,,2,2,
+    1.3,08:10:00,08:20:00,B,2,,0,0,
+    1.3,08:30:00,08:30:00,C,3,,0,0,
+    """;
+  public static final Route ROUTE = TimetableRepositoryForTest.route("r1").build();
 
-  private static final Integer ID = 45;
-
-  private static final int ARRIVAL_TIME = 1000;
-
-  private static final int DEPARTURE_TIME = 2000;
-
-  private static final int DROP_OFF_TYPE = 2;
-
-  private static final int PICKUP_TYPE = 3;
-
-  private static final double SHAPE_DIST_TRAVELED = 2.5d;
-
-  private static final String STOP_NAME = "Stop";
-
-  private static final String HEAD_SIGN = "Head Sign";
-
-  private static final int STOP_SEQUENCE = 4;
-
-  private static final int TIMEPOINT = 50;
-
-  private static final Trip TRIP = new GtfsTestData().trip;
-
-  public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
-  private static final List<LngLatAlt> ZONE_COORDINATES = Arrays.stream(
-    Polygons.BERLIN.getCoordinates()
-  )
-    .map(c -> new LngLatAlt(c.x, c.y))
-    .toList();
-
-  private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
-
-  private final StopMapper stopMapper = new StopMapper(
-    ID_FACTORY,
-    new TranslationHelper(),
-    stationId -> null,
-    siteRepositoryBuilder
-  );
-  private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
-  private final LocationMapper locationMapper = new LocationMapper(
-    ID_FACTORY,
-    siteRepositoryBuilder,
-    DataImportIssueStore.NOOP
-  );
-  private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
-    ID_FACTORY,
-    stopMapper,
-    locationMapper,
-    siteRepositoryBuilder
-  );
+  private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper(ID_FACTORY);
   private final TranslationHelper translationHelper = new TranslationHelper();
   private final StopTimeMapper subject = new StopTimeMapper(
-    stopMapper,
-    locationMapper,
-    locationGroupMapper,
-    new TripMapper(
-      ID_FACTORY,
-      new RouteMapper(ID_FACTORY, new AgencyMapper(ID_FACTORY), ISSUE_STORE, translationHelper),
-      new DirectionMapper(ISSUE_STORE),
-      translationHelper
-    ),
+    ID_FACTORY,
+    builder(),
     bookingRuleMapper,
-    new TranslationHelper()
+    translationHelper
   );
 
-  /**
-   * Build a static ("regular") stop.
-   */
-  private static Stop buildStop() {
-    var stop = new Stop();
-    stop.setId(AGENCY_AND_ID);
-    stop.setName(STOP_NAME);
-    stop.setLat(53.12);
-    stop.setLon(12.34);
-    return stop;
-  }
-
-  /**
-   * Builds a stop time with a fixed stop.
-   */
-  static StopTime buildDefaultStopTime() {
-    var stopTime = buildStopTime();
-    var stop = buildStop();
-    stopTime.setStop(stop);
-    return stopTime;
-  }
-
-  /**
-   * Builds a stop time without a stop. Useful for testing flex fields.
-   */
-  private static StopTime buildStopTime() {
-    TRIP.setId(AGENCY_AND_ID);
-
-    var stopTime = new StopTime();
-    stopTime.setId(ID);
-    stopTime.setArrivalTime(ARRIVAL_TIME);
-    stopTime.setDepartureTime(DEPARTURE_TIME);
-    stopTime.setDropOffType(DROP_OFF_TYPE);
-    stopTime.setPickupType(PICKUP_TYPE);
-    stopTime.setShapeDistTraveled(SHAPE_DIST_TRAVELED);
-    stopTime.setStopHeadsign(HEAD_SIGN);
-    stopTime.setStopSequence(STOP_SEQUENCE);
-    stopTime.setTimepoint(TIMEPOINT);
-    stopTime.setTrip(TRIP);
-    return stopTime;
-  }
-
   @Test
-  public void testMapCollection() {
-    assertNull(subject.map((Collection<StopTime>) null));
-    assertTrue(subject.map(Collections.emptyList()).isEmpty());
-    assertEquals(1, subject.map(Collections.singleton(buildDefaultStopTime())).size());
-  }
+  public void testMap() throws IOException {
+    var stopTimes = subject.map(new TestCsvSource(CSV)).toList();
 
-  @Test
-  public void testMap() {
-    var result = subject.map(buildDefaultStopTime());
-
-    assertEquals(ARRIVAL_TIME, result.getArrivalTime());
-    assertEquals(DEPARTURE_TIME, result.getDepartureTime());
-    assertEquals(PickDrop.CALL_AGENCY, result.getDropOffType());
+    assertThat(stopTimes).hasSize(9);
+    var result = stopTimes.getFirst();
+    assertEquals(300, result.getArrivalTime());
+    assertEquals(300, result.getDepartureTime());
     assertEquals(PickDrop.COORDINATE_WITH_DRIVER, result.getPickupType());
-    assertEquals(SHAPE_DIST_TRAVELED, result.getShapeDistTraveled(), 0.0001d);
+    assertEquals(PickDrop.CALL_AGENCY, result.getDropOffType());
+    assertEquals(3.4d, result.getShapeDistTraveled(), 0.0001d);
     assertNotNull(result.getStop());
-    assertEquals(HEAD_SIGN, result.getStopHeadsign().toString());
-    assertEquals(STOP_SEQUENCE, result.getStopSequence());
-    assertEquals(TIMEPOINT, result.getTimepoint());
+    assertEquals("Head Sign", result.getStopHeadsign().toString());
+    assertEquals(1, result.getStopSequence());
+    assertEquals(-999, result.getTimepoint());
     assertNotNull(result.getTrip());
   }
 
-  @Test
-  public void testMapWithNulls() {
-    var st = new StopTime();
-    st.setStop(buildStop());
-    var result = subject.map(st);
+  private OtpTransitServiceBuilder builder() {
+    var siteRepositoryBuilder = SiteRepository.of();
+    var builder = new OtpTransitServiceBuilder(siteRepositoryBuilder.build(), NOOP);
+    List.of("A", "B", "C").forEach(id -> {
+      var s = builder
+        .siteRepository()
+        .regularStop(ID_FACTORY.createNullableId(id))
+        .withName(I18NString.of(id))
+        .withCoordinate(0, 0)
+        .build();
+      builder.siteRepository().withRegularStop(s);
+    });
 
-    assertFalse(result.isArrivalTimeSet());
-    assertFalse(result.isDepartureTimeSet());
-    assertEquals(PickDrop.SCHEDULED, result.getDropOffType());
-    assertEquals(PickDrop.SCHEDULED, result.getPickupType());
-    assertFalse(result.isShapeDistTraveledSet());
-    assertNotNull(result.getStop());
-    assertNull(result.getStopHeadsign());
-    assertEquals(0, result.getStopSequence());
-    assertFalse(result.isTimepointSet());
-  }
+    List.of("1.1", "1.2", "1.3").forEach(id -> {
+      builder.getTripsById().add(Trip.of(ID_FACTORY.createNullableId(id)).withRoute(ROUTE).build());
+    });
 
-  /** Mapping the same object twice, should return the same instance. */
-  @Test
-  public void testMapCache() {
-    var st = buildDefaultStopTime();
-    var result1 = subject.map(st);
-    var result2 = subject.map(st);
-    assertSame(result1, result2);
-  }
-
-  @Test
-  public void testNull() {
-    var st = buildStopTime();
-    Assertions.assertThrows(NullPointerException.class, () -> subject.map(st));
-  }
-
-  @Test
-  public void testFlexLocation() {
-    var st = buildStopTime();
-    var flexLocation = new Location();
-    flexLocation.setId(AGENCY_AND_ID);
-    var polygon = new Polygon();
-    polygon.setExteriorRing(ZONE_COORDINATES);
-    flexLocation.setGeometry(polygon);
-    st.setStop(flexLocation);
-    var mapped = subject.map(st);
-
-    assertInstanceOf(AreaStop.class, mapped.getStop());
-    var areaStop = (AreaStop) mapped.getStop();
-    assertEquals(Polygons.BERLIN, areaStop.getGeometry());
-    assertEquals("FEED:1", areaStop.getId().toString());
-  }
-
-  @Test
-  public void testFlexLocationGroup() {
-    var st = buildStopTime();
-    var locGroup = new LocationGroup();
-    locGroup.setName("A location group");
-    locGroup.setId(AGENCY_AND_ID);
-    locGroup.addLocation(buildStop());
-    st.setStop(locGroup);
-    var mapped = subject.map(st);
-    assertInstanceOf(GroupStop.class, mapped.getStop());
-
-    var groupStop = (GroupStop) mapped.getStop();
-    assertEquals("[RegularStop{FEED:1 Stop}]", groupStop.getChildLocations().toString());
+    return builder;
   }
 }
