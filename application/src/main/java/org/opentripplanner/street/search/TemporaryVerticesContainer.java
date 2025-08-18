@@ -173,9 +173,9 @@ public class TemporaryVerticesContainer implements AutoCloseable {
       }
     } else {
       if (location.stopId != null) {
-        // Check if stop or station centroid is found
+        // check if stop or station centroid is found
         // station centroids are a special vertex to indicate that you don't want to route
-        // to/from the child stops because they are to spread out.
+        // to/from the child stops because they are too spread out.
         var stopVertices = graph.findStopOrCentroidVertex(location.stopId);
         if (stopVertices.isPresent()) {
           return Set.of(stopVertices.get());
