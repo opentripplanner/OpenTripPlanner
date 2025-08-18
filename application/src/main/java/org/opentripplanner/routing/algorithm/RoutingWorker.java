@@ -264,7 +264,6 @@ public class RoutingWorker {
     // TODO CARPOOLING Add carpooling timer
     // debugTimingAggregator.startedCarpoolingRouter();
     try {
-      // TODO CARPOOLING
       return RoutingResult.ok(serverContext.carpoolingService().route(serverContext, request));
     } catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());

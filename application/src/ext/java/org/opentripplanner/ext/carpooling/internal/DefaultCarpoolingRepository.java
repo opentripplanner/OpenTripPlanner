@@ -25,8 +25,8 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
 
   private final Map<FeedScopedId, CarpoolTrip> trips = new ConcurrentHashMap<>();
 
-  private final Map<FeedScopedId, CarpoolTrip> boardingAreas = new ConcurrentHashMap<>();
-  private final Map<FeedScopedId, CarpoolTrip> alightingAreas = new ConcurrentHashMap<>();
+  private final Map<AreaStop, CarpoolTrip> boardingAreas = new ConcurrentHashMap<>();
+  private final Map<AreaStop, CarpoolTrip> alightingAreas = new ConcurrentHashMap<>();
 
   private final ArrayListMultimap<StreetVertex, AreaStop> boardingAreasByVertex =
     ArrayListMultimap.create();
@@ -49,8 +49,8 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
     var boardingArea = trip.getBoardingArea();
     var alightingArea = trip.getAlightingArea();
 
-    boardingAreas.put(boardingArea.getId(), trip);
-    alightingAreas.put(alightingArea.getId(), trip);
+    boardingAreas.put(boardingArea, trip);
+    alightingAreas.put(alightingArea, trip);
 
     streetVerticesWithinAreaStop(boardingArea).forEach(v -> {
       boardingAreasByVertex.put(v, boardingArea);
@@ -97,13 +97,23 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   }
 
   @Override
-  public CarpoolTrip getCarpoolTripByBoardingArea(FeedScopedId boardingAreaId) {
-    return boardingAreas.get(boardingAreaId);
+  public Map<AreaStop, CarpoolTrip> getCarpoolTripsByBoardingArea() {
+    return boardingAreas;
   }
 
   @Override
-  public CarpoolTrip getCarpoolTripByAlightingArea(FeedScopedId alightingAreaId) {
-    return alightingAreas.get(alightingAreaId);
+  public Map<AreaStop, CarpoolTrip> getCarpoolTripsByAlightingArea() {
+    return alightingAreas;
+  }
+
+  @Override
+  public CarpoolTrip getCarpoolTripByBoardingArea(AreaStop boardingArea) {
+    return boardingAreas.get(boardingArea);
+  }
+
+  @Override
+  public CarpoolTrip getCarpoolTripByAlightingArea(AreaStop alightingArea) {
+    return alightingAreas.get(alightingArea);
   }
 
   @Override

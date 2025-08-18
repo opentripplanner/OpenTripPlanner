@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling;
 
 import com.google.common.collect.ArrayListMultimap;
 import java.util.Collection;
+import java.util.Map;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -34,8 +35,11 @@ public interface CarpoolingRepository {
   boolean isCarpoolBoardingArea(FeedScopedId areaId);
   boolean isCarpoolAlightingArea(FeedScopedId areaId);
 
-  CarpoolTrip getCarpoolTripByBoardingArea(FeedScopedId boardingAreaId);
-  CarpoolTrip getCarpoolTripByAlightingArea(FeedScopedId alightingAreaId);
+  Map<AreaStop, CarpoolTrip> getCarpoolTripsByBoardingArea();
+  Map<AreaStop, CarpoolTrip> getCarpoolTripsByAlightingArea();
+
+  CarpoolTrip getCarpoolTripByBoardingArea(AreaStop stop);
+  CarpoolTrip getCarpoolTripByAlightingArea(AreaStop stop);
 
   ArrayListMultimap<StreetVertex, AreaStop> getBoardingAreasForVertex();
   ArrayListMultimap<StreetVertex, AreaStop> getAlightingAreasForVertex();
