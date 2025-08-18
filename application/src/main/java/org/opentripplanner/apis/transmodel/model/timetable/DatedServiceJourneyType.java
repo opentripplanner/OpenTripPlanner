@@ -141,7 +141,7 @@ public class DatedServiceJourneyType {
           .dataFetcher(environment -> {
             TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);
             return GqlUtil.getTransitService(environment)
-              .getTripTimeOnDates(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
+              .findTripTimesOnDate(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
               .orElse(List.of());
           })
           .build()

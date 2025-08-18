@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -66,6 +67,14 @@ public class ServiceDateUtils {
     int secondsOffset
   ) {
     return asStartOfService(localDate, zoneId).plusSeconds(secondsOffset);
+  }
+
+  public static OffsetDateTime toOffsetDateTime(
+    LocalDate localDate,
+    ZoneId zoneId,
+    int secondsOffset
+  ) {
+    return toZonedDateTime(localDate, zoneId, secondsOffset).toOffsetDateTime();
   }
 
   public static int secondsSinceStartOfTime(ZonedDateTime timeZero, LocalDate localDate) {

@@ -240,7 +240,7 @@ public class ServiceJourneyType {
               .map(LocalDate.class::cast)
               .orElse(LocalDate.now(GqlUtil.getTransitService(environment).getTimeZone()));
             return GqlUtil.getTransitService(environment)
-              .getTripTimeOnDates(trip(environment), serviceDate)
+              .findTripTimesOnDate(trip(environment), serviceDate)
               .orElse(List.of());
           })
           .build()

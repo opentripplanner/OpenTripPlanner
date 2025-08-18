@@ -16,6 +16,6 @@ public interface RealtimeTestConstants {
   String STOP_B_ID = "B";
   String STOP_C_ID = "C";
   String STOP_D_ID = "D";
-  String STOP_E_ID = "D";
+  String STOP_E_ID = "E";
   String STOP_F_ID = "F";
 }

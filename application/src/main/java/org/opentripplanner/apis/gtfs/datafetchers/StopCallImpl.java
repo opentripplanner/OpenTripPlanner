@@ -7,9 +7,11 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.ZonedDateTime;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
+import org.opentripplanner.apis.gtfs.model.CallScheduledTime;
+import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTime;
+import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.timetable.EstimatedTime;
 import org.opentripplanner.transit.service.TransitService;
@@ -40,14 +42,27 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
   public DataFetcher<CallSchedule> schedule() {
     return environment -> {
       var tripTime = getSource(environment);
-      var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
-      var scheduledDeparture = getZonedDateTime(environment, tripTime.getScheduledDeparture());
-      return new CallSchedule(
-        new ArrivalDepartureTime(
-          scheduledArrival == null ? null : scheduledArrival.toOffsetDateTime(),
-          scheduledDeparture == null ? null : scheduledDeparture.toOffsetDateTime()
-        )
-      );
+
+      if (tripTime.hasScheduledTimes()) {
+        var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
+        var scheduledDeparture = getZonedDateTime(environment, tripTime.getScheduledDeparture());
+        return new CallSchedule(new ArrivalDepartureTime(scheduledArrival, scheduledDeparture));
+      } else {
+        var transitService = getTransitService(environment);
+        var flexTrip = transitService.getFlexIndex().getTripById(tripTime.getTrip().getId());
+        if (flexTrip == null) {
+          return null;
+        }
+        var startSecs = flexTrip.earliestDepartureTime(tripTime.getStopIndex());
+        var endSecs = flexTrip.latestArrivalTime(tripTime.getStopIndex());
+
+        var serviceDay = tripTime.getServiceDay();
+        var timeZone = transitService.getTimeZone();
+        var start = ServiceDateUtils.toOffsetDateTime(serviceDay, timeZone, startSecs);
+        var end = ServiceDateUtils.toOffsetDateTime(serviceDay, timeZone, endSecs);
+
+        return new CallSchedule(new TimeWindow(start, end));
+      }
     };
   }
 

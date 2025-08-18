@@ -122,7 +122,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate) {
+  public Optional<List<TripTimeOnDate>> findTripTimesOnDate(Trip trip, LocalDate serviceDate) {
     TripPattern pattern = findPattern(trip, serviceDate);
 
     Timetable timetable = findTimetable(pattern, serviceDate);
@@ -721,17 +721,6 @@ public class DefaultTransitService implements TransitEditorService {
     return Collections.unmodifiableMap(timetableRepositoryIndex.getServiceCodesRunningForDate());
   }
 
-  /**
-   * For each pattern visiting this {@link StopLocation} return its {@link TransitMode}
-   */
-  private Stream<TransitMode> getPatternModesOfStop(StopLocation stop) {
-    if (stop.getVehicleType() != null) {
-      return Stream.of(stop.getVehicleType());
-    } else {
-      return findPatterns(stop).stream().map(TripPattern::getMode);
-    }
-  }
-
   @Override
   public TransferService getTransferService() {
     return timetableRepository.getTransferService();
@@ -740,6 +729,11 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public boolean transitFeedCovers(Instant dateTime) {
     return timetableRepository.transitFeedCovers(dateTime);
+  }
+
+  @Override
+  public boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop) {
+    return timetableRepositoryIndex.hasScheduledServicesAfter(date, stop);
   }
 
   /**
@@ -755,6 +749,17 @@ public class DefaultTransitService implements TransitEditorService {
       .stream()
       .sorted(Map.Entry.<T, Long>comparingByValue().reversed())
       .map(Map.Entry::getKey);
+  }
+
+  /**
+   * For each pattern visiting this {@link StopLocation} return its {@link TransitMode}
+   */
+  private Stream<TransitMode> getPatternModesOfStop(StopLocation stop) {
+    if (stop.getVehicleType() != null) {
+      return Stream.of(stop.getVehicleType());
+    } else {
+      return findPatterns(stop).stream().map(TripPattern::getMode);
+    }
   }
 
   private int getDepartureTime(TripOnServiceDate trip) {
@@ -779,14 +784,9 @@ public class DefaultTransitService implements TransitEditorService {
       } else if (departure1 > departure2) {
         return 1;
       } else {
-        // identical departure day and time, so sort by unique feedscope id
+        // identical departure day and time, so sort by unique feed-scoped id
         return t1.getTrip().getId().compareTo(t2.getTrip().getId());
       }
     }
-  }
-
-  @Override
-  public boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop) {
-    return timetableRepositoryIndex.hasScheduledServicesAfter(date, stop);
   }
 }
