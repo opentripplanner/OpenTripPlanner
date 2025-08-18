@@ -19,8 +19,8 @@ jobs:
         locations:
           - name: seattle
             sleep: 30
-          #- name: atlanta
-          #  sleep: 15
+          - name: atlanta
+            sleep: 15
           - name: houston
             sleep: 30
           - name: denver
