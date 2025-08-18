@@ -387,7 +387,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         if (orig.vertex instanceof VehicleRentalPlaceVertex stationVertex) {
           editor.dropOffRentedVehicleAtStation(
             ((VehicleRentalEdge) edge).formFactor,
-            stationVertex.getStation().getNetwork(),
+            stationVertex.getStation().network(),
             false
           );
         } else {
@@ -402,14 +402,14 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         if (orig.getBackState().isRentingVehicleFromStation()) {
           editor.beginVehicleRentingAtStation(
             ((VehicleRentalEdge) edge).formFactor,
-            stationVertex.getStation().getNetwork(),
+            stationVertex.getStation().network(),
             orig.backState.mayKeepRentedVehicleAtDestination(),
             false
           );
         } else if (orig.getBackState().isRentingFloatingVehicle()) {
           editor.beginFloatingVehicleRenting(
             ((VehicleRentalEdge) edge).formFactor,
-            stationVertex.getStation().getNetwork(),
+            stationVertex.getStation().network(),
             false
           );
         }

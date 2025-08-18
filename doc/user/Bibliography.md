@@ -23,7 +23,7 @@ producing true Pareto-optimal sets of results.
 - Delling, Pajor, Werneck. Round-Based Public Transit Routing (2012)
   <BR>This is a tabular approach to routing in public transit networks that does not use an (
   explicit) graph. It is simpler and can outperform classic graph algorithms.
-  <BR>http://research.microsoft.com/pubs/156567/raptor_alenex.pdf
+  <BR>https://www.microsoft.com/en-us/research/wp-content/uploads/2012/01/raptor_alenex.pdf
 
 - Delling, Dibbelt, and Pajor. Fast and Exact Public Transit Routing with Restricted Pareto Sets (
   2019)

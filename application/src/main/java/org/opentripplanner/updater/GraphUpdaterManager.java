@@ -12,6 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -273,8 +274,9 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
         try {
           if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {
             LOG.info(
-              "OTP UPDATERS INITIALIZED ({} updaters) - OTP is ready for routing!",
-              updaterList.size()
+              "OTP UPDATERS INITIALIZED ({} updaters) - OTP {} is ready for routing!",
+              updaterList.size(),
+              OtpProjectInfo.projectInfo().version
             );
             return;
           }

@@ -44,7 +44,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.ItineraryFaresDecorator;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -54,6 +54,8 @@ import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
+import org.opentripplanner.model.fare.FareOffer;
+import org.opentripplanner.model.fare.FareOffer.DefaultFareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
@@ -122,7 +124,9 @@ class GraphQLIntegrationTest {
   private static final Station OMEGA = TEST_MODEL.station("Omega").build();
   private static final Place A = TEST_MODEL.place("A", 5.0, 8.0);
   private static final Place B = TEST_MODEL.place("B", 6.0, 8.5);
-  private static final Place C = TEST_MODEL.place("C", 7.0, 9.0);
+  private static final Place C = TEST_MODEL.place("C", builder ->
+    builder.withParentStation(OMEGA).withCoordinate(7.0, 9.0)
+  );
   private static final Place D = TEST_MODEL.place("D", 8.0, 9.5);
   private static final Place E = TEST_MODEL.place("E", 9.0, 10.0);
   private static final Place F = TEST_MODEL.place("F", 9.0, 10.5);
@@ -291,14 +295,7 @@ class GraphQLIntegrationTest {
         new RealTimeTripUpdate(
           TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
             .withRoute(t.getRoute())
-            .withStopPattern(
-              TimetableRepositoryForTest.stopPattern(
-                (RegularStop) A.stop,
-                (RegularStop) B.stop,
-                (RegularStop) C.stop,
-                (RegularStop) D.stop
-              )
-            )
+            .withStopPattern(TimetableRepositoryForTest.stopPattern(A.stop, B.stop, C.stop, D.stop))
             .withCreatedByRealtimeUpdater(true)
             .build(),
           realTimeTripTimes,
@@ -355,6 +352,7 @@ class GraphQLIntegrationTest {
       .build();
 
     var entitySelector = new EntitySelector.Stop(A.stop.getId());
+    var stationEntitySelector = new EntitySelector.Stop(OMEGA.getId());
     var alert = TransitAlert.of(id("an-alert"))
       .withHeaderText(I18NString.of("A header"))
       .withDescriptionText(I18NString.of("A description"))
@@ -366,6 +364,12 @@ class GraphQLIntegrationTest {
       .addTimePeriod(
         new TimePeriod(ALERT_START_TIME.getEpochSecond(), ALERT_END_TIME.getEpochSecond())
       )
+      .build();
+    var stationAlert = TransitAlert.of(id("a-station-alert"))
+      .withHeaderText(I18NString.of("Station closed"))
+      .withDescriptionText(I18NString.of("This station is currently closed"))
+      .withEffect(AlertEffect.NO_SERVICE)
+      .addEntity(stationEntitySelector)
       .build();
 
     // TODO - Use itineraryBuilder() here not build() and complete building the itinerary using
@@ -393,8 +397,8 @@ class GraphQLIntegrationTest {
     fares.addItineraryProducts(List.of(dayPass));
 
     var singleTicket = fareProduct("single-ticket");
-    fares.addFareProduct(railLeg, singleTicket);
-    fares.addFareProduct(busLeg, singleTicket);
+    fares.addFareProduct(railLeg, FareOffer.of(railLeg.startTime(), singleTicket));
+    fares.addFareProduct(busLeg, FareOffer.of(busLeg.startTime(), singleTicket));
 
     i1 = ItineraryFaresDecorator.decorateItineraryWithFare(i1, fares);
 
@@ -403,7 +407,7 @@ class GraphQLIntegrationTest {
     var emission = Emission.ofCo2Gram(123.0);
     i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
-    var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
+    var alerts = ListUtils.combine(List.of(alert, stationAlert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);
 
     var realtimeVehicleService = new DefaultRealtimeVehicleService(transitService);
