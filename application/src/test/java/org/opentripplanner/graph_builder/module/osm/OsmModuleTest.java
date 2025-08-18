@@ -7,9 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.transit.model.basic.Accessibility.NOT_POSSIBLE;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -19,9 +22,12 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.CreativeNamer;
 import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
@@ -41,16 +47,20 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.OsmVertexOnWay;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OsmModuleTest {
 
   private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(OsmModuleTest.class);
+  private static final Logger log = LoggerFactory.getLogger(OsmModuleTest.class);
 
   @Test
   public void testGraphBuilder() {
@@ -340,6 +350,53 @@ public class OsmModuleTest {
 
     // assert that pruning removed traversal restrictions
     assertEquals(barrier.getBarrierPermissions(), ALL);
+  }
+
+  @Test
+  void testLinearCrossingNonIntersection() {
+    var way = new OsmWay();
+    way.addTag("highway", "path");
+    way.addNodeRef(1);
+    way.addNodeRef(2);
+    way.addNodeRef(3);
+    way.addNodeRef(4);
+    way.setId(1);
+
+    var barrier = new OsmWay();
+    barrier.addTag("barrier", "fence");
+    barrier.addNodeRef(99);
+    barrier.addNodeRef(2);
+    barrier.addNodeRef(98);
+    barrier.setId(2);
+
+    var osmProvider = new TestOsmProvider(
+      List.of(),
+      List.of(way, barrier),
+      Set.of(1, 2, 3, 4, 98, 99)
+        .stream()
+        .map(id -> {
+          var node = new OsmNode((double) id / 1000, 0);
+          node.setId(id);
+          return node;
+        })
+        .toList()
+    );
+
+    var graph = new Graph();
+    var subject = OsmModule.of(
+      osmProvider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    );
+    subject.build().buildGraph();
+
+    assertEquals(3, graph.getVertices().size());
+    var barrierVertices = graph.getVerticesOfType(BarrierVertex.class);
+    assertEquals(1, barrierVertices.size());
+    BarrierVertex barrierVertex = barrierVertices.getFirst();
+    assertEquals(NONE, barrierVertex.getBarrierPermissions());
+    assertEquals(NOT_POSSIBLE, barrierVertex.wheelchairAccessibility());
   }
 
   private BuildResult buildParkingLots() {

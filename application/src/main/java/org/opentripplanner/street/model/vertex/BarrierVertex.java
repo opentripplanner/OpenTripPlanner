@@ -2,6 +2,7 @@ package org.opentripplanner.street.model.vertex;
 
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
  * This vertex is created from all barrier tags.
@@ -16,10 +17,12 @@ public class BarrierVertex extends OsmVertex {
   public static final StreetTraversalPermission defaultBarrierPermissions =
     StreetTraversalPermission.ALL;
   private StreetTraversalPermission barrierPermissions;
+  protected Accessibility wheelchairAccessibility;
 
-  public BarrierVertex(double x, double y, long nodeId) {
+  public BarrierVertex(double x, double y, long nodeId, Accessibility wheelchairAccessibility) {
     super(x, y, nodeId);
     barrierPermissions = defaultBarrierPermissions;
+    this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
   public StreetTraversalPermission getBarrierPermissions() {
@@ -28,6 +31,14 @@ public class BarrierVertex extends OsmVertex {
 
   public void setBarrierPermissions(StreetTraversalPermission barrierPermissions) {
     this.barrierPermissions = barrierPermissions;
+  }
+
+  public Accessibility wheelchairAccessibility() {
+    return wheelchairAccessibility;
+  }
+
+  public void setWheelchairAccessibility(Accessibility wheelchairAccessibility) {
+    this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
   /*

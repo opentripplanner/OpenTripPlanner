@@ -88,8 +88,12 @@ public class VertexFactory {
     return addToGraph(new SplitterVertex(uniqueSplitLabel, x, y, originalEdge.getName()));
   }
 
-  public BarrierVertex barrier(long nid, Coordinate coordinate) {
-    return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid));
+  public BarrierVertex barrier(
+    long nid,
+    Coordinate coordinate,
+    Accessibility wheelchairAccessibility
+  ) {
+    return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid, wheelchairAccessibility));
   }
 
   public ExitVertex exit(long nid, Coordinate coordinate, String exitName) {

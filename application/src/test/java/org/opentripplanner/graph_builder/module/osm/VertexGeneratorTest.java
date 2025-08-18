@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.BARRIER_VERTEX;
+import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +16,7 @@ import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.OsmVertexOnWay;
 
@@ -86,10 +90,10 @@ class VertexGeneratorTest {
     assertEquals(2, nodesInBarrierWays.get(n3).size());
     assertEquals(1, nodesInBarrierWays.get(n4).size());
 
-    var vertexForW1OnBarrier = subject.getVertexForOsmNode(n3, w1);
-    var vertexForW2OnBarrier = subject.getVertexForOsmNode(n3, w2);
-    var vertexForW1NotOnBarrier = subject.getVertexForOsmNode(n10, w1);
-    var vertexForW2NotOnBarrier = subject.getVertexForOsmNode(n10, w2);
+    var vertexForW1OnBarrier = subject.getVertexForOsmNode(n3, w1, SPLIT);
+    var vertexForW2OnBarrier = subject.getVertexForOsmNode(n3, w2, SPLIT);
+    var vertexForW1NotOnBarrier = subject.getVertexForOsmNode(n10, w1, SPLIT);
+    var vertexForW2NotOnBarrier = subject.getVertexForOsmNode(n10, w2, SPLIT);
 
     assertNotEquals(vertexForW1OnBarrier, vertexForW2OnBarrier);
     assertEquals(vertexForW1NotOnBarrier, vertexForW2NotOnBarrier);
@@ -106,5 +110,11 @@ class VertexGeneratorTest {
       Map.of(w1, vertexForW1OnBarrier, w2, vertexForW2OnBarrier),
       splitVerticesOnBarriers.get(n3)
     );
+
+    var barrierVertexOnBarrier = subject.getVertexForOsmNode(n3, w1, BARRIER_VERTEX);
+    assertInstanceOf(BarrierVertex.class, barrierVertexOnBarrier);
+    assertEquals(PEDESTRIAN, ((BarrierVertex) barrierVertexOnBarrier).getBarrierPermissions());
+    var barrierVertexNotOnBarrier = subject.getVertexForOsmNode(n10, w1, BARRIER_VERTEX);
+    assertFalse(barrierVertexNotOnBarrier instanceof BarrierVertex);
   }
 }

@@ -241,15 +241,15 @@ public class OsmEntityTest {
   @Test
   void wheelchairAccessibility() {
     var osm1 = new OsmEntity();
-    assertEquals(Accessibility.NO_INFORMATION, osm1.wheelchairAccessibility());
+    assertEquals(Accessibility.NO_INFORMATION, osm1.explicitWheelchairAccessibility());
 
     var osm2 = new OsmEntity();
     osm2.addTag("wheelchair", "no");
-    assertEquals(Accessibility.NOT_POSSIBLE, osm2.wheelchairAccessibility());
+    assertEquals(Accessibility.NOT_POSSIBLE, osm2.explicitWheelchairAccessibility());
 
     var osm3 = new OsmEntity();
     osm3.addTag("wheelchair", "yes");
-    assertEquals(Accessibility.POSSIBLE, osm3.wheelchairAccessibility());
+    assertEquals(Accessibility.POSSIBLE, osm3.explicitWheelchairAccessibility());
   }
 
   @Test

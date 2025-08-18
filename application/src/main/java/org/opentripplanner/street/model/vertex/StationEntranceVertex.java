@@ -13,7 +13,6 @@ public class StationEntranceVertex extends BarrierVertex {
 
   private static final String FEED_ID = "osm";
   private final String code;
-  private final Accessibility wheelchairAccessibility;
 
   public StationEntranceVertex(
     double lat,
@@ -22,9 +21,8 @@ public class StationEntranceVertex extends BarrierVertex {
     String code,
     Accessibility wheelchairAccessibility
   ) {
-    super(lat, lon, nodeId);
+    super(lat, lon, nodeId, wheelchairAccessibility);
     this.code = code;
-    this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
   /**
@@ -41,10 +39,6 @@ public class StationEntranceVertex extends BarrierVertex {
   @Nullable
   public String code() {
     return code;
-  }
-
-  public Accessibility wheelchairAccessibility() {
-    return wheelchairAccessibility;
   }
 
   @Override

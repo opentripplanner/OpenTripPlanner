@@ -211,9 +211,9 @@ public class OsmEntity {
   }
 
   /**
-   * Returns the level of wheelchair access of the element.
+   * Returns the level of wheelchair access of the element explicitly set on the entity.
    */
-  public Accessibility wheelchairAccessibility() {
+  public Accessibility explicitWheelchairAccessibility() {
     if (isTagTrue("wheelchair")) {
       return Accessibility.POSSIBLE;
     } else if (isTagFalse("wheelchair")) {

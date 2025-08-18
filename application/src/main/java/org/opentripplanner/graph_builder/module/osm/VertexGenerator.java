@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
@@ -8,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -21,8 +24,8 @@ import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
-import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
+import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
  * Tracks the generation of vertices and returns an existing instance if a vertex is encountered
@@ -69,10 +72,15 @@ class VertexGenerator {
    *
    * @param node The node to fetch a label for.
    * @param way  The way it is connected to (for fetching level information).
+   * @param linearBarrierNodeType How should the node be handled if it is on a linear barrier
    * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
    * {@link OsmBoardingLocationVertex}
    */
-  IntersectionVertex getVertexForOsmNode(OsmNode node, OsmEntity way) {
+  IntersectionVertex getVertexForOsmNode(
+    OsmNode node,
+    OsmEntity way,
+    LinearBarrierNodeType linearBarrierNodeType
+  ) {
     // If the node should be decomposed to multiple levels,
     // use the numeric level because it is unique, the human level may not be (although
     // it will likely lead to some head-scratching if it is not).
@@ -82,7 +90,8 @@ class VertexGenerator {
       return recordLevel(node, way);
     }
     // make a separate vertex if the node is on a barrier
-    if (nodesInBarrierWays.containsKey(node)) {
+    boolean isNodeOnLinearBarrier = nodesInBarrierWays.containsKey(node);
+    if (linearBarrierNodeType == SPLIT && isNodeOnLinearBarrier) {
       return getSplitVertexOnBarrier(node, way);
     }
     // single-level case
@@ -115,20 +124,42 @@ class VertexGenerator {
 
       if (includeOsmSubwayEntrances && node.isSubwayEntrance()) {
         String ref = node.getTag("ref");
-        StationEntranceVertex bv = vertexFactory.stationEntrance(
+        iv = vertexFactory.stationEntrance(
           nid,
           coordinate,
           ref,
-          node.wheelchairAccessibility()
+          node.explicitWheelchairAccessibility()
         );
-        bv.setBarrierPermissions(node.overridePermissions(BarrierVertex.defaultBarrierPermissions));
-        iv = bv;
       }
 
-      if (iv == null && node.isBarrier()) {
-        BarrierVertex bv = vertexFactory.barrier(nid, coordinate);
-        bv.setBarrierPermissions(node.overridePermissions(BarrierVertex.defaultBarrierPermissions));
-        iv = bv;
+      if (iv == null && (node.isBarrier() || isNodeOnLinearBarrier)) {
+        iv = vertexFactory.barrier(nid, coordinate, node.explicitWheelchairAccessibility());
+      }
+
+      if (iv instanceof BarrierVertex bv) {
+        if (node.isBarrier()) {
+          bv.setBarrierPermissions(
+            node.overridePermissions(BarrierVertex.defaultBarrierPermissions)
+          );
+          if (
+            bv.wheelchairAccessibility() == Accessibility.NO_INFORMATION &&
+            !node.isWheelchairAccessible()
+          ) {
+            bv.setWheelchairAccessibility(Accessibility.NOT_POSSIBLE);
+          }
+        } else if (isNodeOnLinearBarrier) {
+          for (var barrier : nodesInBarrierWays.get(node)) {
+            bv.setBarrierPermissions(
+              Objects.requireNonNull(barrier).overridePermissions(bv.getBarrierPermissions())
+            );
+            if (
+              bv.wheelchairAccessibility() == Accessibility.NO_INFORMATION &&
+              !barrier.isWheelchairAccessible()
+            ) {
+              bv.setWheelchairAccessibility(Accessibility.NOT_POSSIBLE);
+            }
+          }
+        }
       }
 
       if (iv == null) {
