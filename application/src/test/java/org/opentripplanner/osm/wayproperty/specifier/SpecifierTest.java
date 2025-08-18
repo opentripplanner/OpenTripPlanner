@@ -12,7 +12,7 @@ public class SpecifierTest {
     int expectedScore,
     OsmSpecifier spec,
     OsmEntity way,
-    @Nullable TraverseDirection direction
+    TraverseDirection direction
   ) {
     var score = spec.matchScore(way, direction);
     assertEquals(expectedScore, score);
