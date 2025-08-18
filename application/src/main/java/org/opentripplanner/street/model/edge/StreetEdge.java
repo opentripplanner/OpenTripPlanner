@@ -788,7 +788,7 @@ public class StreetEdge
       : builder.millimeterLength();
     if (
       lengthInMillimeter == 0 &&
-      !(getFromVertex() instanceof OsmVertexOnWay && getToVertex() instanceof OsmVertexOnWay)
+      !(getFromVertex() instanceof OsmVertexOnWay || getToVertex() instanceof OsmVertexOnWay)
     ) {
       LOG.warn(
         "StreetEdge {} from {} to {} has length of 0. This is usually an error.",

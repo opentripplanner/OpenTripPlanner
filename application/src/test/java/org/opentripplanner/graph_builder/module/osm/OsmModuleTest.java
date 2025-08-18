@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -9,6 +10,7 @@ import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 import static org.opentripplanner.transit.model.basic.Accessibility.NOT_POSSIBLE;
 
 import java.io.File;
@@ -29,6 +31,7 @@ import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.CreativeNamer;
 import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayProperties;
@@ -43,10 +46,12 @@ import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepo
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
+import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.OsmVertexOnWay;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -397,6 +402,104 @@ public class OsmModuleTest {
     BarrierVertex barrierVertex = barrierVertices.getFirst();
     assertEquals(NONE, barrierVertex.getBarrierPermissions());
     assertEquals(NOT_POSSIBLE, barrierVertex.wheelchairAccessibility());
+  }
+
+  @Test
+  void testHighwayReachingBarrierOnArea() {
+    var n1 = new OsmNode(0, 0);
+    n1.setId(1);
+    var n2 = new OsmNode(0.001, 0);
+    n2.setId(2);
+    var n3 = new OsmNode(0, -0.001);
+    n3.setId(3);
+    var n4 = new OsmNode(0, 0.001);
+    n4.setId(4);
+    var n5 = new OsmNode(-0.001, 0.001);
+    n5.setId(5);
+    var n6 = new OsmNode(-0.001, -0.001);
+    n6.setId(6);
+
+    var path = new OsmWay();
+    path.addTag("highway", "path");
+    path.addNodeRef(1);
+    path.addNodeRef(2);
+    path.setId(1);
+
+    var chain = new OsmWay();
+    chain.addTag("barrier", "chain");
+    chain.addNodeRef(3);
+    chain.addNodeRef(1);
+    chain.addNodeRef(4);
+    chain.setId(2);
+
+    var barrier = new OsmWay();
+    barrier.addTag("highway", "pedestrian");
+    barrier.addTag("bicycle", "yes");
+    barrier.addTag("area", "yes");
+    barrier.addNodeRef(1);
+    barrier.addNodeRef(4);
+    barrier.addNodeRef(5);
+    barrier.addNodeRef(6);
+    barrier.addNodeRef(3);
+    barrier.addNodeRef(1);
+
+    var osmProvider = new TestOsmProvider(
+      List.of(),
+      List.of(path, chain, barrier),
+      List.of(n1, n2, n3, n4, n5, n6)
+    );
+    new OsmTagMapper().populateProperties(osmProvider.getWayPropertySet());
+
+    var graph = new Graph();
+    var subject = OsmModule.of(
+      osmProvider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    );
+    subject.build().buildGraph();
+
+    // the vertex for node 1 has been split, one for the area and one for the crossing of the linear
+    // way
+    Collection<Vertex> vertices = graph.getVertices();
+    assertEquals(7, vertices.size());
+    assertEquals(3, graph.getVerticesOfType(OsmVertexOnWay.class).size());
+    assertEquals(1, graph.getVerticesOfType(BarrierVertex.class).size());
+    assertEquals(
+      2,
+      graph.getVerticesOfType(OsmVertex.class).stream().filter(v -> v.nodeId == 1).toList().size()
+    );
+
+    // check traversal permission starting from node 2
+    var v2 = graph
+      .getVerticesOfType(OsmVertex.class)
+      .stream()
+      .filter(v -> v.nodeId == 2)
+      .findFirst()
+      .orElseThrow();
+    assertEquals(1, v2.getOutgoing().size());
+    // we first reach the barrier crossing on the path at v1
+    var v1OnPath = v2.getOutgoingStreetEdges().getFirst().getToVertex();
+    assertInstanceOf(BarrierVertex.class, v1OnPath);
+    assertEquals(1, ((BarrierVertex) v1OnPath).nodeId);
+    assertEquals(PEDESTRIAN, ((BarrierVertex) v1OnPath).getBarrierPermissions());
+    // at that barrier crossing, we can either return to the origin or enter the area
+    assertEquals(2, v1OnPath.getOutgoing().size());
+    // we then enter the area
+    var barrierCrossing = v1OnPath
+      .getOutgoingStreetEdges()
+      .stream()
+      .filter(e -> e.getToVertex() instanceof OsmVertexOnWay)
+      .findFirst()
+      .orElseThrow();
+    assertEquals(PEDESTRIAN, barrierCrossing.getPermission());
+    var v1OnArea = barrierCrossing.getToVertex();
+    for (var edge : v1OnArea.getOutgoingStreetEdges()) {
+      // we check that we can cycle freely within the area, not encumbered by the chain
+      if (edge instanceof AreaEdge) {
+        assertEquals(PEDESTRIAN_AND_BICYCLE, edge.getPermission());
+      }
+    }
   }
 
   private BuildResult buildParkingLots() {

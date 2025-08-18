@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.osm.model.OsmEntity;
@@ -159,6 +160,9 @@ class VertexGenerator {
               bv.setWheelchairAccessibility(Accessibility.NOT_POSSIBLE);
             }
           }
+          splitVerticesOnBarriers.putIfAbsent(node, new HashMap<>());
+          var vertices = splitVerticesOnBarriers.get(node);
+          vertices.put(null, bv);
         }
       }
 
@@ -228,7 +232,9 @@ class VertexGenerator {
   }
 
   /**
-   * Get a mapping from a barrier way ID to a map of vertices, indexed by the node ID
+   * Get a mapping from a node to a map of vertices for that node, indexed by the applicable area
+   * the vertex is in. The null-indexed vertex, if exists, is the vertex which hasn't been split
+   * for a particular area and is applicable for all linear crossing of the barrier.
    */
   Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers() {
     return splitVerticesOnBarriers;
