@@ -6,8 +6,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
@@ -66,15 +70,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   }
 
   @Override
-  public boolean isPrimed() {
-    // return primed;
-    // consumption of initial data is currently too slow, return always true so the application
-    // is still starting.
-    // ToDo: make initial data consumption faster so that prime can be returned here
-    return true;
-  }
-
-  @Override
   public void teardown() {
     try {
       client.disconnect();
@@ -83,12 +78,26 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     }
   }
 
+  @Override
+  public boolean isPrimed() {
+    // return primed;
+    // consumption of initial data is currently too slow, return always true so the application
+    // is still starting.
+    // ToDo: make initial data consumption faster so that prime can be returned here
+    return true;
+  }
+
   private class Callback implements MqttCallbackExtended {
 
-    private final ArrayList<ServiceDelivery> initialServiceDeliveries = new ArrayList<>(50000);
     private static final Duration THRESHOLD_HISTORIC_DATA = Duration.ofMinutes(5);
     private static final int SECONDS_SINCE_LAST_HISTORIC_DELIVERY = 7;
-    private Instant timestampOfLastHistoricDelivery;
+    private final BlockingQueue<byte[]> messageQueue = new LinkedBlockingQueue<>();
+    private final AtomicInteger primedMessageCounter = new AtomicInteger();
+    private volatile Instant timestampOfLastHistoricDelivery;
+
+    public Callback() {
+      startPrimingWorker();
+    }
 
     @Override
     public void connectComplete(boolean reconnect, String serverURI) {
@@ -103,41 +112,88 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
     @Override
     public void connectionLost(Throwable cause) {
-      LOG.warn("Connection to MQTT broker lost: {}", parameters.url());
+      LOG.warn("Connection to MQTT broker lost: {}", parameters.url(), cause);
     }
 
     @Override
-    public void messageArrived(String topic, MqttMessage message) {
-      var serviceDeliveryOptional = serviceDelivery(message.getPayload());
-      if (serviceDeliveryOptional.isEmpty()) {
-        return;
-      }
+    public void messageArrived(String topic, MqttMessage message) throws InterruptedException {
+      int numberOfMessages = primedMessageCounter.incrementAndGet();
+      messageQueue.put(message.getPayload());
 
-      var serviceDelivery = serviceDeliveryOptional.get();
-      if (primed) {
-        serviceDeliveryConsumer.apply(serviceDelivery);
-        return;
-      }
-
-      initialServiceDeliveries.add(serviceDelivery);
-      if (initialServiceDeliveries.size() % 500 == 0) {
-        LOG.info("Service deliveries received: {}", initialServiceDeliveries.size());
-      }
-
-      if (serviceDelivery.getResponseTimestamp().plus(THRESHOLD_HISTORIC_DATA).isBefore(ZonedDateTime.now())) {
-        timestampOfLastHistoricDelivery = Instant.now();
-      }
-
-      if (timestampOfLastHistoricDelivery.plusSeconds(SECONDS_SINCE_LAST_HISTORIC_DELIVERY).isBefore(Instant.now())) {
-        LOG.info("Initial service delivery completed, start processing of {} messages",  initialServiceDeliveries.size());
-        initialServiceDeliveries.forEach(serviceDeliveryConsumer::apply);
-        LOG.info("Initial service delivery processing complete");
-        primed = true;
+      if (!primed && numberOfMessages % 1000 == 0) {
+        LOG.info("Received {} messages during priming", numberOfMessages);
       }
     }
 
     @Override
-    public void deliveryComplete(IMqttDeliveryToken token) {}
+    public void deliveryComplete(IMqttDeliveryToken token) {
+    }
+
+    private void startPrimingWorker() {
+      Thread worker = new Thread(() -> {
+
+        try {
+          List<byte[]> batch = new ArrayList<>();
+          while (!primed && !Thread.currentThread().isInterrupted()) {
+
+            batch.add(messageQueue.take());
+            messageQueue.drainTo(batch, 1000);
+
+            List<ServiceDelivery> serviceDeliveries = batch.parallelStream()
+              .map(this::serviceDelivery)
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .toList();
+
+            Optional<ZonedDateTime> optionalEarliestTimestamp = serviceDeliveries.stream()
+              .map(ServiceDelivery::getResponseTimestamp)
+              .min(ZonedDateTime::compareTo);
+
+            if (optionalEarliestTimestamp.isEmpty()) {
+              continue;
+            }
+
+            ZonedDateTime earliestTimestamp = optionalEarliestTimestamp.get();
+
+            if (earliestTimestamp.plus(THRESHOLD_HISTORIC_DATA).isBefore(ZonedDateTime.now())) {
+              timestampOfLastHistoricDelivery = Instant.now();
+            }
+
+            serviceDeliveries.forEach(serviceDeliveryConsumer::apply);
+
+            batch.clear();
+
+            if (timestampOfLastHistoricDelivery.plusSeconds(SECONDS_SINCE_LAST_HISTORIC_DELIVERY).isBefore(Instant.now())) {
+              LOG.info("Initial service delivery processing of {} messages complete", primedMessageCounter.get());
+              primed = true;
+              startLiveWorker();
+            }
+          }
+          LOG.info("Priming worker done");
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+      }, "mqtt-siri-priming-worker");
+      worker.setDaemon(true);
+      worker.start();
+
+    }
+
+    private void startLiveWorker() {
+      Thread worker = new Thread(() -> {
+        LOG.info("Live worker started");
+        try {
+          while (!Thread.currentThread().isInterrupted()) {
+            var serviceDeliveryOptional = serviceDelivery(messageQueue.take());
+            serviceDeliveryOptional.ifPresent(serviceDeliveryConsumer::apply);
+          }
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+      }, "mqtt-siri-live-worker");
+      worker.setDaemon(true);
+      worker.start();
+    }
 
     private Optional<ServiceDelivery> serviceDelivery(byte[] payload) {
       Siri siri;
