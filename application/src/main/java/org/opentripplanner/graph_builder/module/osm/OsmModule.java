@@ -1,7 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.opentripplanner.osm.TraverseDirection.BACKWARD;
-import static org.opentripplanner.osm.TraverseDirection.FORWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
+import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
 import com.google.common.collect.Iterables;
 import gnu.trove.iterator.TLongIterator;
@@ -23,12 +24,11 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.osm.OsmProvider;
-import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.wayproperty.WayProperties;
+import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.WayPropertiesPair;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
@@ -608,6 +608,12 @@ public class OsmModule implements GraphBuilderModule {
     LineString geometry,
     TraverseDirection direction
   ) {
+    if (direction == DIRECTIONLESS) {
+      throw new IllegalArgumentException(
+        "A direction must be specified when getting an edge for a street."
+      );
+    }
+
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
     I18NString name = params.edgeNamer().getNameForWay(way, label);

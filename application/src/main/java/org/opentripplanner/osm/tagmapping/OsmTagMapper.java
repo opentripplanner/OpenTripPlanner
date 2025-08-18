@@ -12,8 +12,8 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
@@ -830,7 +830,7 @@ public class OsmTagMapper {
     );
   }
 
-  public float getCarSpeedForWay(OsmEntity way, @Nullable TraverseDirection direction) {
+  public float getCarSpeedForWay(OsmEntity way, TraverseDirection direction) {
     return way.getOsmProvider().getWayPropertySet().getCarSpeedForWay(way, direction);
   }
 

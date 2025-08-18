@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
@@ -796,7 +798,7 @@ public class OsmDatabase {
     StreetTraversalPermission permissions = area.parent
       .getOsmProvider()
       .getWayPropertySet()
-      .getDataForEntity(area.parent, null)
+      .getDataForEntity(area.parent)
       .getPermission();
     if (area.parent.isRoutable() && permissions != StreetTraversalPermission.NONE) {
       walkableAreas.add(area);

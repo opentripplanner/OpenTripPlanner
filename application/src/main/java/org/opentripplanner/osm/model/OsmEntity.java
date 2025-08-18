@@ -1,6 +1,8 @@
 package org.opentripplanner.osm.model;
 
+import static org.opentripplanner.osm.model.Permission.ALLOW;
 import static org.opentripplanner.osm.model.Permission.DENY;
+import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
 
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
@@ -21,7 +23,6 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.OsmProvider;
-import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -61,7 +62,10 @@ public class OsmEntity {
    */
   protected static final Set<String> CHECKED_MODES = Set.of("foot", "bicycle", "motorcar");
 
-  // we are skeptical of access=yes tags so we do not process it here
+  /**
+   * Mapping for the fallback key for checking access restrictions for each access mode in OSM
+   * However, access is not included because we are skeptical of access=yes tags.
+   */
   private static final Map<String, String> MODE_HIERARACHY = Map.of(
     "motorcar",
     "motor_vehicle",
@@ -190,14 +194,15 @@ public class OsmEntity {
     return isTag("footway", "sidewalk") && isTag("highway", "footway");
   }
 
-  protected Optional<Permission> checkModePermission(
-    String mode,
-    @Nullable TraverseDirection direction
-  ) {
+  protected Optional<Permission> checkModePermission(String mode) {
+    return checkModePermission(mode, DIRECTIONLESS);
+  }
+
+  protected Optional<Permission> checkModePermission(String mode, TraverseDirection direction) {
     // check if the exact directional tag allows or denies access
-    if (direction != null) {
+    if (direction != DIRECTIONLESS) {
       if (isExplicitlyAllowed(mode + direction.tagSuffix())) {
-        return Optional.of(Permission.ALLOW);
+        return Optional.of(ALLOW);
       }
       if (isExplicitlyDenied(mode + direction.tagSuffix())) {
         return Optional.of(DENY);
@@ -205,7 +210,7 @@ public class OsmEntity {
     }
     // check if the exact tag allows or denies access
     if (isExplicitlyAllowed(mode)) {
-      return Optional.of(Permission.ALLOW);
+      return Optional.of(ALLOW);
     }
     if (isExplicitlyDenied(mode)) {
       return Optional.of(DENY);
@@ -510,8 +515,20 @@ public class OsmEntity {
 
   /**
    * Returns true if access is generally denied to this element (potentially with exceptions).
+   * 
+   * @return true if access is denied in general, regardless if permission is explicitly given
+   * when traversing in a specific (forward or backward) direction.
    */
-  public boolean isGeneralAccessDenied(@Nullable TraverseDirection direction) {
+  public boolean isGeneralAccessDenied() {
+    return isGeneralAccessDenied(DIRECTIONLESS);
+  }
+
+  /**
+   * Returns true if access is generally denied to this element (potentially with exceptions)
+   * when traversing in the specified direction. 
+   * Note that oneway tags are not handled in this method.
+   */
+  public boolean isGeneralAccessDenied(TraverseDirection direction) {
     return checkModePermission("access", direction).map(x -> x == DENY).orElse(false);
   }
 
@@ -557,27 +574,29 @@ public class OsmEntity {
    */
   private Optional<Optional<TraverseDirection>> isExplicitlyOneWay(@Nullable String mode) {
     String key = mode == null ? "oneway" : "oneway:" + mode;
-    return isTagFalse(key)
-      ? Optional.of(Optional.empty())
-      : isTagTrue(key)
-        ? Optional.of(Optional.of(TraverseDirection.FORWARD))
-        : isTag(key, "-1")
-          ? Optional.of(Optional.of(TraverseDirection.BACKWARD))
-          : Optional.empty();
+    if (isTagFalse(key)) {
+      return Optional.of(Optional.empty());
+    }
+    if (isTagTrue(key)) {
+      return Optional.of(Optional.of(TraverseDirection.FORWARD));
+    }
+    return isTag(key, "-1")
+      ? Optional.of(Optional.of(TraverseDirection.BACKWARD))
+      : Optional.empty();
   }
 
   /**
    * Returns true if bicycles are denied.
    */
   public boolean isBicycleDenied() {
-    return checkModePermission("bicycle", null).equals(Optional.of(DENY));
+    return checkModePermission("bicycle").equals(Optional.of(DENY));
   }
 
   /**
    * Returns true if pedestrians are denied.
    */
   public boolean isPedestrianDenied() {
-    return checkModePermission("foot", null).equals(Optional.of(DENY));
+    return checkModePermission("foot").equals(Optional.of(DENY));
   }
 
   /**
@@ -728,17 +747,14 @@ public class OsmEntity {
       return false;
     } else if (hasTag("highway") || isPlatform() || isIndoorRoutable()) {
       if (
-        isGeneralAccessDenied(null) &&
+        isGeneralAccessDenied(DIRECTIONLESS) &&
         isGeneralAccessDenied(TraverseDirection.FORWARD) &&
         isGeneralAccessDenied(TraverseDirection.BACKWARD)
       ) {
         // There are exceptions.
         for (var mode : CHECKED_MODES) {
-          if (checkModePermission(mode, null).equals(Optional.of(Permission.ALLOW))) {
-            return true;
-          }
           for (var direction : TraverseDirection.values()) {
-            if (checkModePermission(mode, direction).equals(Optional.of(Permission.ALLOW))) {
+            if (checkModePermission(mode, direction).equals(Optional.of(ALLOW))) {
               return true;
             }
           }
@@ -829,9 +845,17 @@ public class OsmEntity {
    * Given an assumed traversal permissions, check if there are explicit additional tags, like bicycle=no
    * or bicycle=yes that override them.
    */
+  public StreetTraversalPermission overridePermissions(StreetTraversalPermission def) {
+    return overridePermissions(def, DIRECTIONLESS);
+  }
+
+  /**
+   * Given an assumed traversal permissions, check if there are explicit additional tags, like bicycle=no
+   * or bicycle=yes that override them when traversing in the given direction.
+   */
   public StreetTraversalPermission overridePermissions(
     StreetTraversalPermission def,
-    @Nullable TraverseDirection direction
+    TraverseDirection direction
   ) {
     StreetTraversalPermission permission = def;
 
@@ -867,32 +891,6 @@ public class OsmEntity {
       permission = StreetTraversalPermission.NONE;
     }
 
-    /*
-     * pedestrian rules: everything is two-way (assuming pedestrians are allowed at all) bicycle
-     * rules: default: permissions;
-     *
-     * cycleway=dismount means walk your bike -- the engine will automatically try walking bikes
-     * any time it is forbidden to ride them, so the only thing to do here is to remove bike
-     * permissions
-     *
-     * oneway=... sets permissions for cars and bikes oneway:bicycle overwrites these
-     * permissions for bikes only
-     *
-     * now, cycleway=opposite_lane, opposite, opposite_track can allow once oneway has been set
-     * by oneway:bicycle, but should give a warning if it conflicts with oneway:bicycle
-     *
-     * bicycle:backward=yes works like oneway:bicycle=no bicycle:backwards=no works like
-     * oneway:bicycle=yes
-     */
-
-    // Compute bike permissions, check consistency.
-    //    if (isBicycleExplicitlyAllowed()) {
-    //      permission = permission.add(StreetTraversalPermission.BICYCLE);
-    //    }
-    //
-    //    if (isBicycleDismountForced()) {
-    //      permission = permission.remove(StreetTraversalPermission.BICYCLE);
-    //    }
     return permission;
   }
 

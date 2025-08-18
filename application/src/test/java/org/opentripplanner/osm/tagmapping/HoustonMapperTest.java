@@ -32,7 +32,7 @@ class HoustonMapperTest {
     tunnel.addTag("name", "Lamar Tunnel");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(NONE, wps.getDataForEntity(tunnel, null).getPermission());
+    assertEquals(NONE, wps.getDataForEntity(tunnel).getPermission());
   }
 
   @Test
@@ -44,7 +44,7 @@ class HoustonMapperTest {
     tunnel.addTag("name", "Harris County Tunnel");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(PEDESTRIAN, wps.getDataForEntity(tunnel, null).getPermission());
+    assertEquals(PEDESTRIAN, wps.getDataForEntity(tunnel).getPermission());
   }
 
   @Test
@@ -55,7 +55,7 @@ class HoustonMapperTest {
     tunnel.addTag("layer", "-1");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(PEDESTRIAN, wps.getDataForEntity(tunnel, null).getPermission());
+    assertEquals(PEDESTRIAN, wps.getDataForEntity(tunnel).getPermission());
   }
 
   @Test
@@ -69,7 +69,7 @@ class HoustonMapperTest {
     tunnel.addTag("surface", "concrete");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForEntity(tunnel, null).getPermission());
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForEntity(tunnel).getPermission());
 
     // https://www.openstreetmap.org/way/101884176
     tunnel = new OsmEntity();
@@ -77,7 +77,7 @@ class HoustonMapperTest {
     tunnel.addTag("layer", "-1");
     tunnel.addTag("name", "Hogg Woods Trail");
     tunnel.addTag("tunnel", "yes");
-    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForEntity(tunnel, null).getPermission());
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForEntity(tunnel).getPermission());
   }
 
   @Test
@@ -120,7 +120,7 @@ class HoustonMapperTest {
     tunnel.addTag("layer", "-1");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(ALL, wps.getDataForEntity(tunnel, null).getPermission());
+    assertEquals(ALL, wps.getDataForEntity(tunnel).getPermission());
   }
 
   @Test
@@ -132,6 +132,6 @@ class HoustonMapperTest {
     tunnel.addTag("layer", "-1");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(ALL, wps.getDataForEntity(tunnel, null).getPermission());
+    assertEquals(ALL, wps.getDataForEntity(tunnel).getPermission());
   }
 }
