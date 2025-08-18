@@ -56,22 +56,23 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   private final GenericLocation from;
   private final GenericLocation to;
   private final VertexLinker vertexLinker;
-  private final Function<FeedScopedId, Collection<FeedScopedId>> resolveChildStops;
+  private final Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds;
 
   /**
-   * @param resolveChildStops A function that takes a site id (stop, station, multi-modal station...)
-   *                          and returns a list of child stop ids.
+   * @param resolveSiteIds A function that takes a site id (stop, station, multi-modal station...)
+   *                          and returns a list of the input value (if it's a stop) or of the of
+   *                          child stop ids if it's a grouping of stops.
    */
   public TemporaryVerticesContainer(
     Graph graph,
     VertexLinker linker,
-    Function<FeedScopedId, Collection<FeedScopedId>> resolveChildStops,
+    Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds,
     GenericLocation from,
     GenericLocation to,
     StreetMode accessMode,
     StreetMode egressMode
   ) {
-    this.resolveChildStops = resolveChildStops;
+    this.resolveSiteIds = resolveSiteIds;
     this.tempEdges = new HashSet<>();
 
     this.graph = graph;
@@ -181,7 +182,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
           return Set.of(stopVertices.get());
         } else {
           // in the regular case you want to resolve a (multi-modal) station into its child stops
-          var vertices = findChildStopVertices(location.stopId);
+          var vertices = findStopOrChildStopVertices(location.stopId);
           if (!vertices.isEmpty()) {
             return vertices
               .stream()
@@ -209,11 +210,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   }
 
   private Set<TransitStopVertex> findStopOrChildStopVertices(FeedScopedId stopId) {
-    return graph.findStopVertex(stopId).map(Set::of).orElseGet(() -> findChildStopVertices(stopId));
-  }
-
-  private Set<TransitStopVertex> findChildStopVertices(FeedScopedId stopId) {
-    return resolveChildStops
+    return resolveSiteIds
       .apply(stopId)
       .stream()
       .flatMap(id -> graph.findStopVertex(id).stream())

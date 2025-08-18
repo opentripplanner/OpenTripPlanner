@@ -53,7 +53,7 @@ class TemporaryVerticesContainerTest {
     var container = new TemporaryVerticesContainer(
       graph,
       TestVertexLinker.of(graph),
-      id -> Set.of(),
+      Set::of,
       GenericLocation.fromCoordinate(stopA.getLat(), stopA.getLon()),
       GenericLocation.fromCoordinate(stopD.getLat(), stopD.getLon()),
       WALK,
@@ -71,7 +71,7 @@ class TemporaryVerticesContainerTest {
     var container = new TemporaryVerticesContainer(
       graph,
       TestVertexLinker.of(graph),
-      id -> Set.of(),
+      Set::of,
       stopToLocation(stopA),
       stopToLocation(stopB),
       WALK,
