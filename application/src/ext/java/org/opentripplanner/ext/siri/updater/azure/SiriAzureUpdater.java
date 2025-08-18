@@ -236,18 +236,24 @@ public class SiriAzureUpdater implements GraphUpdater {
       });
     } catch (ServiceBusException e) {
       LOG.error(
-        "REALTIME_ALERT component=ServiceBus status=UNAVAILABLE error=\"{}\"",
-        e.getMessage()
+        "REALTIME_STARTUP_ALERT component=ServiceBus status=UNAVAILABLE error=\"{}\"",
+        e.getMessage(),
+        new RuntimeException("Real-time ServiceBus unavailable during startup", e)
       );
     } catch (URISyntaxException e) {
-      LOG.error("REALTIME_ALERT component=History status=UNAVAILABLE error=\"{}\"", e.getMessage());
+      LOG.error(
+        "REALTIME_STARTUP_ALERT component=History status=UNAVAILABLE error=\"{}\"", 
+        e.getMessage(),
+        new RuntimeException("Real-time History service unavailable during startup", e)
+      );
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       LOG.warn("Updater was interrupted during setup.");
     } catch (Exception e) {
       LOG.error(
-        "REALTIME_ALERT component=RealtimeSetup status=UNAVAILABLE error=\"{}\"",
-        e.getMessage()
+        "REALTIME_STARTUP_ALERT component=RealtimeSetup status=UNAVAILABLE error=\"{}\"",
+        e.getMessage(),
+        new RuntimeException("Real-time setup failed during startup", e)
       );
     } finally {
       // CRITICAL: Always set primed so OTP can start
