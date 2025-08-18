@@ -174,21 +174,25 @@ public class TemporaryVerticesContainer implements AutoCloseable {
       }
     } else {
       if (location.stopId != null) {
-        // check if stop or station centroid is found
-        // station centroids are a special vertex to indicate that you don't want to route
-        // to/from the child stops because they are too spread out.
-        var stopVertices = graph.findStopOrCentroidVertex(location.stopId);
-        if (stopVertices.isPresent()) {
-          return Set.of(stopVertices.get());
-        } else {
-          // in the regular case you want to resolve a (multi-modal) station into its child stops
-          var vertices = findStopOrChildStopVertices(location.stopId);
-          if (!vertices.isEmpty()) {
-            return vertices
-              .stream()
-              .map(Vertex.class::cast)
-              .collect(Collectors.toUnmodifiableSet());
-          }
+        // check if there is a stop by the given id
+        var stopVertex = graph.findStopVertex(location.stopId);
+        if (stopVertex.isPresent()) {
+          return Set.of(stopVertex.get());
+        }
+
+        // station centroids may be used instead of child stop vertices for stations
+        var centroidVertex = graph.findStationCentroidVertex(location.stopId);
+        if (centroidVertex.isPresent()) {
+          return Set.of(centroidVertex.get());
+        }
+
+        // in the regular case you want to resolve a (multi-modal) station into its child stops
+        var childVertices = findStopOrChildStopVertices(location.stopId);
+        if (!childVertices.isEmpty()) {
+          return childVertices
+            .stream()
+            .map(Vertex.class::cast)
+            .collect(Collectors.toUnmodifiableSet());
         }
       }
     }

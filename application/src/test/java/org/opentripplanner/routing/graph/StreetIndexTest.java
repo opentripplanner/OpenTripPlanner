@@ -26,22 +26,19 @@ class StreetIndexTest {
   @Test
   void stopId() {
     var streetIndex = buildIndex();
-    assertEquals(stopVertex, streetIndex.getStopVertex(stop.getId()));
     assertThat(streetIndex.findStopVertex(stop.getId())).hasValue(stopVertex);
   }
 
   @Test
   void nonExistentId() {
     var streetIndex = buildIndex();
-    assertNull(streetIndex.getStopVertex(id("non-existent-stop-id")));
     assertThat(streetIndex.findStopVertex(id("non-existent-stop-id"))).isEmpty();
   }
 
   @Test
   void stationCentroid() {
     var streetIndex = buildIndex();
-    assertNull(streetIndex.getStopVertex(station.getId()));
-    assertThat(streetIndex.findStopOrCentroidVertex(station.getId())).hasValue(centroidVertex);
+    assertThat(streetIndex.findStationCentroidVertex(station.getId())).hasValue(centroidVertex);
   }
 
   private StreetIndex buildIndex() {

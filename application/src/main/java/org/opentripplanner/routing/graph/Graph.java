@@ -22,6 +22,7 @@ import org.opentripplanner.routing.linking.Scope;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
@@ -210,7 +211,7 @@ public class Graph implements Serializable {
   @Nullable
   public TransitStopVertex getStopVertex(FeedScopedId id) {
     requireIndex();
-    return streetIndex.getStopVertex(id);
+    return streetIndex.findStopVertex(id).orElse(null);
   }
 
   /**
@@ -223,15 +224,12 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Get the vertex for a site id. If the id corresponds to a regular stop it will return the
-   * vertex for the stop.
-   * If the id corresponds to a station and the station is configured to route to centroid
-   * then that vertex will be returned.
-   * Otherwise, an empty optional will be returned.
+   * If the {@code id} is a station id and it is configured to route to its center,
+   * return the corresponding vertex, otherwise return an empty optional.
    */
-  public Optional<Vertex> findStopOrCentroidVertex(FeedScopedId stopId) {
+  public Optional<StationCentroidVertex> findStationCentroidVertex(FeedScopedId stopId) {
     requireIndex();
-    return streetIndex.findStopOrCentroidVertex(stopId);
+    return streetIndex.findStationCentroidVertex(stopId);
   }
 
   /**

@@ -16,20 +16,32 @@ import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model._data.StreetModelForTest;
+import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
+import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 
 class TemporaryVerticesContainerTest {
 
   private static final WgsCoordinate CENTER = new WgsCoordinate(0, 0);
   private static final int DISTANCE = 20;
 
+  private static final FeedScopedId ALPHA_ID = id("alpha");
   private static final FeedScopedId OMEGA_ID = id("omega");
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+
+  private final Station stationAlpha = testModel
+    .station("alpha")
+    .withId(ALPHA_ID)
+    .withCoordinate(CENTER)
+    .withShouldRouteToCentroid(true)
+    .build();
+
   private final RegularStop stopA = testModel
     .stop("A")
     .withCoordinate(CENTER.moveEastMeters(DISTANCE))
@@ -46,7 +58,7 @@ class TemporaryVerticesContainerTest {
     .stop("D")
     .withCoordinate(CENTER.moveNorthMeters(DISTANCE))
     .build();
-  private final Graph graph = buildGraph(stopA, stopB, stopC, stopD);
+  private final Graph graph = buildGraph(stationAlpha, stopA, stopB, stopC, stopD);
 
   @Test
   void coordinates() {
@@ -102,10 +114,31 @@ class TemporaryVerticesContainerTest {
     assertThat(toStops(container.getFromStopVertices())).containsExactly(stopC, stopD);
   }
 
-  private static Graph buildGraph(RegularStop... stops) {
+  @Test
+  void centroid() {
+    var container = new TemporaryVerticesContainer(
+      graph,
+      TestVertexLinker.of(graph),
+      Set::of,
+      GenericLocation.fromStopId("station", ALPHA_ID.getFeedId(), ALPHA_ID.getId()),
+      stopToLocation(stopB),
+      WALK,
+      WALK
+    );
+    var fromVertices = List.copyOf(container.getFromVertices());
+    assertThat(fromVertices).hasSize(1);
+
+    var station = ((StationCentroidVertex) fromVertices.getFirst()).getStation();
+    assertEquals(station, this.stationAlpha);
+  }
+
+  private static Graph buildGraph(Station station, RegularStop... stops) {
     var graph = new Graph();
     var center = StreetModelForTest.intersectionVertex(CENTER.asJtsCoordinate());
     graph.addVertex(center);
+    var centroidVertex = new StationCentroidVertex(station);
+    graph.addVertex(centroidVertex);
+    StreetStationCentroidLink.createStreetStationLink(centroidVertex, center);
     Arrays.stream(stops).forEach(s -> {
       graph.addVertex(TransitStopVertex.of().withStop(s).build());
       var vertex = StreetModelForTest.intersectionVertex(s.getCoordinate().asJtsCoordinate());

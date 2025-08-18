@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -34,7 +33,7 @@ class StreetIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetIndex.class);
 
-  private final Map<FeedScopedId, TransitStopVertex> stopVerticesById;
+  private final Map<FeedScopedId, TransitStopVertex> stopVertices;
 
   /**
    * This list contains transitStationVertices for the stations that are configured to route to centroid
@@ -50,36 +49,24 @@ class StreetIndex {
   StreetIndex(Graph graph) {
     this.edgeIndex = new EdgeSpatialIndex();
     this.vertexIndex = new HashGridSpatialIndex<>();
-    this.stopVerticesById = indexStopIds(graph);
+    this.stopVertices = indexStopIds(graph);
 
     this.stationCentroidVertices = indexStationCentroids(graph);
     postSetup(graph.getVertices());
   }
 
   /**
-   * @see Graph#getStopVertex(FeedScopedId)
-   */
-  @Nullable
-  TransitStopVertex getStopVertex(FeedScopedId stopId) {
-    return stopVerticesById.get(stopId);
-  }
-
-  /**
    * @see Graph#findStopVertex(FeedScopedId) (FeedScopedId)
    */
   Optional<TransitStopVertex> findStopVertex(FeedScopedId id) {
-    return Optional.ofNullable(stopVerticesById.get(id));
+    return Optional.ofNullable(stopVertices.get(id));
   }
 
   /**
-   * @see Graph#findStopOrCentroidVertex(FeedScopedId)
+   * @see Graph#findStationCentroidVertex(FeedScopedId)
    */
-  Optional<Vertex> findStopOrCentroidVertex(FeedScopedId id) {
-    var stationVertex = stationCentroidVertices.get(id);
-    if (stationVertex != null) {
-      return Optional.of(stationVertex);
-    }
-    return findStopVertex(id).map(Vertex.class::cast);
+  Optional<StationCentroidVertex> findStationCentroidVertex(FeedScopedId id) {
+    return Optional.ofNullable(stationCentroidVertices.get(id));
   }
 
   /**
