@@ -9,8 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
@@ -54,7 +57,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
       client = new MqttClient(parameters.url(), clientId, persistence);
 
       MqttConnectOptions connOpts = new MqttConnectOptions();
-      connOpts.setCleanSession(true);
+      connOpts.setMaxInflight(100);
+      connOpts.setCleanSession(false);
       connOpts.setAutomaticReconnect(true);
       if (parameters.user() != null && parameters.password() != null) {
         connOpts.setUserName(parameters.user());
@@ -91,12 +95,21 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
     private static final Duration THRESHOLD_HISTORIC_DATA = Duration.ofMinutes(5);
     private static final int SECONDS_SINCE_LAST_HISTORIC_DELIVERY = 7;
+    public static final int MAX_PRIMING_THREADS = 1;
     private final BlockingQueue<byte[]> messageQueue = new LinkedBlockingQueue<>();
     private final AtomicInteger primedMessageCounter = new AtomicInteger();
     private volatile Instant timestampOfLastHistoricDelivery;
 
     public Callback() {
-      startPrimingWorker();
+      ThreadPoolExecutor primingExecutor = new ThreadPoolExecutor(
+        0,
+        MAX_PRIMING_THREADS,
+        30L,
+        TimeUnit.SECONDS,
+        new LinkedBlockingQueue<>(),
+        Executors.defaultThreadFactory()
+      );
+      primingExecutor.submit(new PrimeRunner());
     }
 
     @Override
@@ -129,40 +142,22 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     public void deliveryComplete(IMqttDeliveryToken token) {
     }
 
-    private void startPrimingWorker() {
-      Thread worker = new Thread(() -> {
+    private class PrimeRunner implements Runnable {
 
+      @Override
+      public void run() {
         try {
-          List<byte[]> batch = new ArrayList<>();
           while (!primed && !Thread.currentThread().isInterrupted()) {
-
-            batch.add(messageQueue.take());
-            messageQueue.drainTo(batch, 1000);
-
-            List<ServiceDelivery> serviceDeliveries = batch.parallelStream()
-              .map(this::serviceDelivery)
-              .filter(Optional::isPresent)
-              .map(Optional::get)
-              .toList();
-
-            Optional<ZonedDateTime> optionalEarliestTimestamp = serviceDeliveries.stream()
-              .map(ServiceDelivery::getResponseTimestamp)
-              .min(ZonedDateTime::compareTo);
-
-            if (optionalEarliestTimestamp.isEmpty()) {
-              continue;
+            byte[] payload = messageQueue.take();
+            var optionalServiceDelivery = serviceDelivery(payload);
+            if (optionalServiceDelivery.isEmpty()) {
+              return;
             }
-
-            ZonedDateTime earliestTimestamp = optionalEarliestTimestamp.get();
-
-            if (earliestTimestamp.plus(THRESHOLD_HISTORIC_DATA).isBefore(ZonedDateTime.now())) {
+            ServiceDelivery serviceDelivery = optionalServiceDelivery.get();
+            if (serviceDelivery.getResponseTimestamp().plus(THRESHOLD_HISTORIC_DATA).isBefore(ZonedDateTime.now())) {
               timestampOfLastHistoricDelivery = Instant.now();
             }
-
-            serviceDeliveries.forEach(serviceDeliveryConsumer::apply);
-
-            batch.clear();
-
+            serviceDeliveryConsumer.apply(serviceDelivery);
             if (timestampOfLastHistoricDelivery.plusSeconds(SECONDS_SINCE_LAST_HISTORIC_DELIVERY).isBefore(Instant.now())) {
               LOG.info("Initial service delivery processing of {} messages complete", primedMessageCounter.get());
               primed = true;
@@ -171,12 +166,9 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
           }
           LOG.info("Priming worker done");
         } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
+          throw new RuntimeException(e);
         }
-      }, "mqtt-siri-priming-worker");
-      worker.setDaemon(true);
-      worker.start();
-
+      }
     }
 
     private void startLiveWorker() {
