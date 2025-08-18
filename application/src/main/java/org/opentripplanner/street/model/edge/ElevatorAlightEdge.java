@@ -30,7 +30,9 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
   private final LineString the_geom;
 
   /**
-   * @param level It's a float for future expansion.
+   * @param from the vertex inside the elevator
+   * @param to the vertex on the street network
+   * @param level a human-readable label of the alighting level
    */
   private ElevatorAlightEdge(ElevatorVertex from, Vertex to, I18NString level) {
     super(from, to);
