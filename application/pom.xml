@@ -365,7 +365,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.55.5</version>
+            <version>1.56.0</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
@@ -375,7 +375,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.16.3</version>
+            <version>1.17.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
