@@ -26,7 +26,6 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   // GBFS Static information
   private final FeedScopedId id;
   private final I18NString name;
-  private final I18NString shortName;
   private final double longitude;
   private final double latitude;
   private final Integer capacity;
@@ -54,7 +53,6 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   public VehicleRentalStation() {
     this.id = null;
     this.name = null;
-    this.shortName = null;
     this.longitude = 0.0;
     this.latitude = 0.0;
     this.capacity = null;
@@ -78,7 +76,6 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   VehicleRentalStation(VehicleRentalStationBuilder builder) {
     this.id = builder.id();
     this.name = builder.name();
-    this.shortName = builder.shortName();
     this.longitude = builder.longitude();
     this.latitude = builder.latitude();
     this.capacity = builder.capacity();
@@ -116,11 +113,6 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   @Nullable
   public I18NString name() {
     return name;
-  }
-
-  @Nullable
-  public I18NString shortName() {
-    return shortName;
   }
 
   public double longitude() {
@@ -339,7 +331,6 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       realTimeData == that.realTimeData &&
       Objects.equals(id, that.id) &&
       Objects.equals(name, that.name) &&
-      Objects.equals(shortName, that.shortName) &&
       Objects.equals(capacity, that.capacity) &&
       Objects.equals(vehicleTypeAreaCapacity, that.vehicleTypeAreaCapacity) &&
       Objects.equals(vehicleTypeDockCapacity, that.vehicleTypeDockCapacity) &&
@@ -355,7 +346,6 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     return Objects.hash(
       id,
       name,
-      shortName,
       longitude,
       latitude,
       capacity,

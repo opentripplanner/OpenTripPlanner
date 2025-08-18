@@ -107,7 +107,7 @@ public final class VehicleRentalSystem {
 
   @Override
   public int hashCode() {
-    return Objects.hash(systemId,  name, shortName, operator, url);
+    return Objects.hash(systemId, name, shortName, operator, url);
   }
 
   @Override

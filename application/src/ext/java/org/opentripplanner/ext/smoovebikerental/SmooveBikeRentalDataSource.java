@@ -50,8 +50,6 @@ public class SmooveBikeRentalDataSource
     system = VehicleRentalSystem.of()
       .withSystemId(networkName)
       .withName(I18NString.of("Helsinki/Espoo"))
-      .withLanguage("fi")
-      .withName("Helsinki/Espoo")
       .build();
   }
 

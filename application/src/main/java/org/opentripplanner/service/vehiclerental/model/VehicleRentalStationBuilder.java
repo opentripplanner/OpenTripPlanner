@@ -36,7 +36,6 @@ public class VehicleRentalStationBuilder {
     this.original = original;
     this.id = original.id();
     this.name = original.name();
-    this.shortName = original.shortName();
     this.longitude = original.longitude();
     this.latitude = original.latitude();
     this.capacity = original.capacity();
