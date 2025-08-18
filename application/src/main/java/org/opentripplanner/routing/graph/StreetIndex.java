@@ -127,17 +127,6 @@ class StreetIndex {
     vertexIndex.remove(new Envelope(vertex.getCoordinate()), vertex);
   }
 
-  @Override
-  public String toString() {
-    return (
-      getClass().getName() +
-      " -- edgeTree: " +
-      edgeIndex.toString() +
-      " -- verticesTree: " +
-      vertexIndex.toString()
-    );
-  }
-
   // private methods
 
   private static LineString edgeGeometryOrStraightLine(Edge e) {
