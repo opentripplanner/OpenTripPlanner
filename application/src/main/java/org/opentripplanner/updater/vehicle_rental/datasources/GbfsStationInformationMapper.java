@@ -59,7 +59,7 @@ public class GbfsStationInformationMapper {
       .withLongitude(station.getLon())
       .withLatitude(station.getLat())
       .withName(new NonLocalizedString(station.getName()))
-      .withShortName(station.getShortName())
+      .withShortName(NonLocalizedString.ofNullable(station.getShortName()))
       .withAddress(station.getAddress())
       .withCrossStreet(station.getCrossStreet())
       .withRegionId(station.getRegionId())

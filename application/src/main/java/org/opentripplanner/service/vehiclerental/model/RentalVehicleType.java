@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -26,7 +27,7 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
   private final FeedScopedId id;
 
   @Nullable
-  private final String name;
+  private final I18NString name;
 
   private final RentalFormFactor formFactor;
   private final PropulsionType propulsionType;
@@ -36,7 +37,7 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
 
   private RentalVehicleType() {
     this.id = new FeedScopedId("DEFAULT", "DEFAULT");
-    this.name = "Default vehicle type";
+    this.name = I18NString.of("Default vehicle type");
     this.formFactor = RentalFormFactor.BICYCLE;
     this.propulsionType = PropulsionType.HUMAN;
     this.maxRangeMeters = null;
@@ -52,7 +53,7 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
 
   public RentalVehicleType(
     FeedScopedId id,
-    String name,
+    I18NString name,
     RentalFormFactor formFactor,
     PropulsionType propulsionType,
     Double maxRangeMeters
@@ -78,7 +79,7 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
       (id ->
           new RentalVehicleType(
             new FeedScopedId(id, "DEFAULT"),
-            "Default vehicle type",
+            I18NString.of("Default vehicle type"),
             RentalFormFactor.BICYCLE,
             PropulsionType.HUMAN,
             null
@@ -91,7 +92,7 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
   }
 
   @Nullable
-  public String name() {
+  public I18NString name() {
     return name;
   }
 
@@ -133,7 +134,7 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
   public String toString() {
     return ToStringBuilder.of(RentalVehicleType.class)
       .addObj("id", id, DEFAULT.id)
-      .addStr("name", name, DEFAULT.name)
+      .addObj("name", name, DEFAULT.name)
       .addEnum("formFactor", formFactor, DEFAULT.formFactor)
       .addEnum("propulsionType", propulsionType, DEFAULT.propulsionType)
       .addObj("maxRangeMeters", maxRangeMeters, DEFAULT.maxRangeMeters)
@@ -144,7 +145,7 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
 
     private final RentalVehicleType original;
     private FeedScopedId id;
-    private String name;
+    private I18NString name;
     private RentalFormFactor formFactor;
     private PropulsionType propulsionType;
     private Double maxRangeMeters;
@@ -167,11 +168,11 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
       return this;
     }
 
-    public String name() {
+    public I18NString name() {
       return name;
     }
 
-    public Builder withName(@Nullable String name) {
+    public Builder withName(@Nullable I18NString name) {
       this.name = name;
       return this;
     }
