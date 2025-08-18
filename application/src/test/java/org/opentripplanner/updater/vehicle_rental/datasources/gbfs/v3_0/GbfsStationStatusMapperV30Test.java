@@ -1,6 +1,5 @@
-package org.opentripplanner.updater.vehicle_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -11,6 +10,7 @@ import static org.opentripplanner.street.model.RentalFormFactor.BICYCLE;
 import static org.opentripplanner.street.model.RentalFormFactor.CAR;
 import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static shadow.org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
@@ -19,17 +19,15 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
-import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleDocksAvailable;
-import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleTypesAvailable;
-import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
+import org.mobilitydata.gbfs.v3_0.station_status.GBFSStation;
+import org.mobilitydata.gbfs.v3_0.station_status.GBFSVehicleDocksAvailable;
+import org.mobilitydata.gbfs.v3_0.station_status.GBFSVehicleTypesAvailable;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
-import org.opentripplanner.service.vehiclerental.model.ReturnPolicy;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.street.model.RentalFormFactor;
 
-class GbfsStationStatusMapperTest {
+class GbfsStationStatusMapperV30Test {
 
   private static final RentalVehicleType TYPE_CAR = RentalVehicleType.of()
     .withFormFactor(CAR)
@@ -44,14 +42,14 @@ class GbfsStationStatusMapperTest {
   void availableSpacesFromVehicles() {
     final var gbfsStation = station();
     gbfsStation.setNumDocksAvailable(3);
-    gbfsStation.setNumBikesAvailable(4);
+    gbfsStation.setNumVehiclesAvailable(4);
     var t = new GBFSVehicleTypesAvailable();
     t.setCount(1);
     t.setVehicleTypeId(TYPE_CAR.id().getId());
 
     gbfsStation.setVehicleTypesAvailable(List.of(t));
 
-    var mapper = new GbfsStationStatusMapper(
+    var mapper = new GbfsStationStatusMapperV30(
       Map.of(ID, gbfsStation),
       Map.of(TYPE_CAR.id().getId(), TYPE_CAR)
     );
@@ -72,7 +70,7 @@ class GbfsStationStatusMapperTest {
   void availableSpacesFromTypes() {
     var gbfsStation = station();
     gbfsStation.setNumDocksAvailable(99);
-    gbfsStation.setNumBikesAvailable(4);
+    gbfsStation.setNumVehiclesAvailable(4);
     var type = new GBFSVehicleTypesAvailable();
     type.setCount(1);
     type.setVehicleTypeId(TYPE_CAR.id().getId());
@@ -84,7 +82,7 @@ class GbfsStationStatusMapperTest {
     gbfsStation.setVehicleTypesAvailable(List.of(type));
     gbfsStation.setVehicleDocksAvailable(List.of(a));
 
-    var mapper = new GbfsStationStatusMapper(
+    var mapper = new GbfsStationStatusMapperV30(
       Map.of(ID, gbfsStation),
       Map.of(TYPE_CAR.id().getId(), TYPE_CAR)
     );
@@ -108,14 +106,14 @@ class GbfsStationStatusMapperTest {
   void availableSpacesFromTypesWithoutAvailableVehicles() {
     var gbfsStation = station();
     gbfsStation.setNumDocksAvailable(88);
-    gbfsStation.setNumBikesAvailable(1);
+    gbfsStation.setNumVehiclesAvailable(1);
     var type = new GBFSVehicleTypesAvailable();
     type.setCount(0);
     type.setVehicleTypeId(TYPE_CAR.id().getId());
 
     gbfsStation.setVehicleTypesAvailable(List.of(type));
 
-    var mapper = new GbfsStationStatusMapper(
+    var mapper = new GbfsStationStatusMapperV30(
       Map.of(ID, gbfsStation),
       Map.of(TYPE_CAR.id().getId(), TYPE_CAR)
     );
@@ -135,9 +133,9 @@ class GbfsStationStatusMapperTest {
   void noTypes() {
     var gbfsStation = station();
     gbfsStation.setNumDocksAvailable(1);
-    gbfsStation.setNumBikesAvailable(4);
+    gbfsStation.setNumVehiclesAvailable(4);
 
-    var mapper = new GbfsStationStatusMapper(Map.of(ID, gbfsStation), Map.of());
+    var mapper = new GbfsStationStatusMapperV30(Map.of(ID, gbfsStation), Map.of());
 
     var mapped = mapper.mapStationStatus(STATION);
 
@@ -154,15 +152,15 @@ class GbfsStationStatusMapperTest {
   void noSpaces(RentalFormFactor formFactor) {
     var gbfsStation = station();
     gbfsStation.setNumDocksAvailable(0);
-    gbfsStation.setNumBikesAvailable(4);
+    gbfsStation.setNumVehiclesAvailable(4);
 
-    var mapper = new GbfsStationStatusMapper(Map.of(ID, gbfsStation), Map.of());
+    var mapper = new GbfsStationStatusMapperV30(Map.of(ID, gbfsStation), Map.of());
 
     var mapped = mapper.mapStationStatus(STATION);
 
     var spaces = mapped.vehicleSpaceCounts();
     assertEquals(0, spaces.total());
-    assertThat(spaces.byType()).isEmpty();
+    assertTrue(spaces.byType().isEmpty());
     assertEquals(Set.of(BICYCLE), mapped.formFactors());
     assertSame(ANY_TYPE, mapped.returnPolicy());
 
