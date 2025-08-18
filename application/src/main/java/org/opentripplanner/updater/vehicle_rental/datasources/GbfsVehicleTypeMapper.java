@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.street.model.RentalFormFactor;
