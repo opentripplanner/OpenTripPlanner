@@ -223,14 +223,15 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Get the street vertices for an id. If the id corresponds to a regular stop it will return the
+   * Get the vertex for a site id. If the id corresponds to a regular stop it will return the
    * vertex for the stop.
-   * If the id corresponds to a station centroid if the station is configured to route to centroid
+   * If the id corresponds to a station and the station is configured to route to centroid
    * then that vertex will be returned.
+   * Otherwise, an empty optional will be returned.
    */
-  public Optional<Vertex> findStreetVertex(FeedScopedId stopId) {
+  public Optional<Vertex> findStopOrCentroidVertex(FeedScopedId stopId) {
     requireIndex();
-    return streetIndex.findStreetVertex(stopId);
+    return streetIndex.findStopOrCentroidVertex(stopId);
   }
 
   /**

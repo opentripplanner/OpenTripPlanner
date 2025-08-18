@@ -37,7 +37,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for linking the RouteRequest origin and destination to the Graph used
- * in the A-Star search, as well as removing them after the search has been done. It implements
+ * in the A-Star search, as well as removing them after the search has been done.
+ * <p>
+ * It also facilitates the lookup of site ids to the correct vertices.
+ * <p>
+ * It implements
  * AutoCloseable, in order to be able to use the try-with-resources statement, making the clean-up
  * automatic.
  */
@@ -52,18 +56,22 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   private final GenericLocation from;
   private final GenericLocation to;
   private final VertexLinker vertexLinker;
-  private final Function<FeedScopedId, Collection<FeedScopedId>> resolveStopIds;
+  private final Function<FeedScopedId, Collection<FeedScopedId>> resolveChildStops;
 
+  /**
+   * @param resolveChildStops A function that takes a site id (stop, station, multi-modal station...)
+   *                          and returns a list of child stop ids.
+   */
   public TemporaryVerticesContainer(
     Graph graph,
     VertexLinker linker,
-    Function<FeedScopedId, Collection<FeedScopedId>> resolveStopIds,
+    Function<FeedScopedId, Collection<FeedScopedId>> resolveChildStops,
     GenericLocation from,
     GenericLocation to,
     StreetMode accessMode,
     StreetMode egressMode
   ) {
-    this.resolveStopIds = resolveStopIds;
+    this.resolveChildStops = resolveChildStops;
     this.tempEdges = new HashSet<>();
 
     this.graph = graph;
@@ -112,7 +120,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (from.stopId == null) {
       return Set.of();
     }
-    return findStopVertices(from.stopId);
+    return findChildStopVertices(from.stopId);
   }
 
   /**
@@ -124,7 +132,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (to.stopId == null) {
       return Set.of();
     }
-    return findStopVertices(to.stopId);
+    return findChildStopVertices(to.stopId);
   }
 
   /* PRIVATE METHODS */
@@ -165,12 +173,15 @@ public class TemporaryVerticesContainer implements AutoCloseable {
       }
     } else {
       if (location.stopId != null) {
-        // Check if Stop or station centroid is found
-        var stopVertices = graph.findStreetVertex(location.stopId);
+        // Check if stop or station centroid is found
+        // station centroids are a special vertex to indicate that you don't want to route
+        // to/from the child stops because they are to spread out.
+        var stopVertices = graph.findStopOrCentroidVertex(location.stopId);
         if (stopVertices.isPresent()) {
           return Set.of(stopVertices.get());
         } else {
-          var vertices = findStopVertices(location.stopId);
+          // in the regular case you want to resolve a (multi-modal) station into its child stops
+          var vertices = findChildStopVertices(location.stopId);
           if (!vertices.isEmpty()) {
             return vertices
               .stream()
@@ -197,8 +208,8 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     return null;
   }
 
-  private Set<TransitStopVertex> findStopVertices(FeedScopedId stopId) {
-    return resolveStopIds
+  private Set<TransitStopVertex> findChildStopVertices(FeedScopedId stopId) {
+    return resolveChildStops
       .apply(stopId)
       .stream()
       .flatMap(id -> graph.findStopVertex(id).stream())

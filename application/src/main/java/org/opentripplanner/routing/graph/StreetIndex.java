@@ -50,8 +50,7 @@ class StreetIndex {
   StreetIndex(Graph graph) {
     this.edgeIndex = new EdgeSpatialIndex();
     this.vertexIndex = new HashGridSpatialIndex<>();
-    var stopVertices = graph.getVerticesOfType(TransitStopVertex.class);
-    this.stopVerticesById = indexStopIds(stopVertices);
+    this.stopVerticesById = indexStopIds(graph);
 
     this.stationCentroidVertices = indexStationCentroids(graph);
     postSetup(graph.getVertices());
@@ -66,16 +65,16 @@ class StreetIndex {
   }
 
   /**
-   * @see Graph#findStreetVertex(FeedScopedId)
+   * @see Graph#findStopVertex(FeedScopedId) (FeedScopedId)
    */
   Optional<TransitStopVertex> findStopVertex(FeedScopedId id) {
     return Optional.ofNullable(stopVerticesById.get(id));
   }
 
   /**
-   * @see Graph#findStreetVertex(FeedScopedId)
+   * @see Graph#findStopOrCentroidVertex(FeedScopedId)
    */
-  Optional<Vertex> findStreetVertex(FeedScopedId id) {
+  Optional<Vertex> findStopOrCentroidVertex(FeedScopedId id) {
     var stationVertex = stationCentroidVertices.get(id);
     if (stationVertex != null) {
       return Optional.of(stationVertex);
@@ -175,9 +174,8 @@ class StreetIndex {
     LOG.info(progress.completeMessage());
   }
 
-  private static Map<FeedScopedId, TransitStopVertex> indexStopIds(
-    Collection<TransitStopVertex> vertices
-  ) {
+  private static Map<FeedScopedId, TransitStopVertex> indexStopIds(Graph graph) {
+    var vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var map = new HashMap<FeedScopedId, TransitStopVertex>();
     for (TransitStopVertex it : vertices) {
       map.put(it.getStop().getId(), it);

@@ -1,7 +1,10 @@
 package org.opentripplanner.street.search;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -20,7 +23,7 @@ class TemporaryVerticesContainerTest {
   private final RegularStop stopC = testModel.stop("C").build();
 
   @Test
-  void foo() {
+  void stopId() {
     var graph = new Graph();
 
     Stream.of(stopA, stopB, stopC).forEach(s ->
@@ -32,12 +35,23 @@ class TemporaryVerticesContainerTest {
       graph,
       TestVertexLinker.of(graph),
       id -> Set.of(),
-      GenericLocation.fromStopId("a", "F", "A"),
-      GenericLocation.fromStopId("a", "F", "B"),
+      stopToLocation(stopA),
+      stopToLocation(stopB),
       WALK,
       WALK
     );
-    var x = container.getToVertices();
-    System.out.println(x);
+    var from = container.getFromVertices();
+    assertThat(from).hasSize(1);
+    var fromStop = ((TransitStopVertex) List.copyOf(from).getFirst()).getStop();
+
+    assertEquals(stopA, fromStop);
+  }
+
+  private GenericLocation stopToLocation(RegularStop s) {
+    return GenericLocation.fromStopId(
+      s.getName().toString(),
+      s.getId().getFeedId(),
+      s.getId().getId()
+    );
   }
 }
