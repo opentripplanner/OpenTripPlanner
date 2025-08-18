@@ -67,8 +67,7 @@ public class OsmNode extends OsmEntity {
     return (
       isMotorVehicleBarrier() ||
       isGeneralAccessDenied() ||
-      CHECKED_MODES.stream()
-        .anyMatch(mode -> checkModePermission(mode).equals(Optional.of(DENY)))
+      CHECKED_MODES.stream().anyMatch(mode -> checkModePermission(mode).equals(Optional.of(DENY)))
     );
   }
 

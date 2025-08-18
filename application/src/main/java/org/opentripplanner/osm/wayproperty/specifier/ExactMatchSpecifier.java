@@ -42,15 +42,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
 
   @Override
   public int matchScore(OsmEntity way, TraverseDirection direction) {
-    return (
-        switch (direction) {
-          case DIRECTIONLESS -> allTagsMatch(way);
-          case FORWARD -> allForwardTagsMatch(way);
-          case BACKWARD -> allBackwardTagsMatch(way);
-        }
-      )
-      ? bestMatchScore
-      : NO_MATCH_SCORE;
+    return allTagsMatch(way, direction) ? bestMatchScore : NO_MATCH_SCORE;
   }
 
   @Override
@@ -68,6 +60,14 @@ public class ExactMatchSpecifier implements OsmSpecifier {
 
   public boolean allForwardTagsMatch(OsmEntity way) {
     return conditions.stream().allMatch(c -> c.isForwardMatch(way));
+  }
+
+  private boolean allTagsMatch(OsmEntity way, TraverseDirection direction) {
+    return switch (direction) {
+      case DIRECTIONLESS -> allTagsMatch(way);
+      case FORWARD -> allForwardTagsMatch(way);
+      case BACKWARD -> allBackwardTagsMatch(way);
+    };
   }
 
   public static ExactMatchSpecifier exact(String spec) {

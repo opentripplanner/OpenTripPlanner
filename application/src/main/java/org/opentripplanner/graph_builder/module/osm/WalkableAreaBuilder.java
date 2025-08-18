@@ -491,7 +491,10 @@ class WalkableAreaBuilder {
       vertex2.getLabel()
     );
 
-    float carSpeed = parent.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS);
+    float carSpeed = parent
+      .getOsmProvider()
+      .getOsmTagMapper()
+      .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS);
 
     I18NString name = namer.getNameForWay(parent, label);
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()

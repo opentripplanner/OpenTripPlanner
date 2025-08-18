@@ -515,7 +515,7 @@ public class OsmEntity {
 
   /**
    * Returns true if access is generally denied to this element (potentially with exceptions).
-   * 
+   *
    * @return true if access is denied in general, regardless if permission is explicitly given
    * when traversing in a specific (forward or backward) direction.
    */
@@ -525,7 +525,7 @@ public class OsmEntity {
 
   /**
    * Returns true if access is generally denied to this element (potentially with exceptions)
-   * when traversing in the specified direction. 
+   * when traversing in the specified direction.
    * Note that oneway tags are not handled in this method.
    */
   public boolean isGeneralAccessDenied(TraverseDirection direction) {
