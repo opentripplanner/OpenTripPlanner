@@ -19,14 +19,14 @@ public class TripRequestMapper {
   private final GenericLocationMapper genericLocationMapper;
   private final TransitFilterNewWayMapper transitFilterNewWayMapper;
   private final TransitFilterOldWayMapper transitFilterOldWayMapper;
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public TripRequestMapper(FeedScopedIdMapper idResolver) {
-    this.tripViaLocationMapper = new TripViaLocationMapper(idResolver);
-    this.genericLocationMapper = new GenericLocationMapper(idResolver);
-    this.transitFilterNewWayMapper = new TransitFilterNewWayMapper(idResolver);
-    this.transitFilterOldWayMapper = new TransitFilterOldWayMapper(idResolver);
-    this.idResolver = idResolver;
+  public TripRequestMapper(FeedScopedIdMapper idMapper) {
+    this.tripViaLocationMapper = new TripViaLocationMapper(idMapper);
+    this.genericLocationMapper = new GenericLocationMapper(idMapper);
+    this.transitFilterNewWayMapper = new TransitFilterNewWayMapper(idMapper);
+    this.transitFilterOldWayMapper = new TransitFilterOldWayMapper(idMapper);
+    this.idMapper = idMapper;
   }
 
   /**
@@ -73,20 +73,20 @@ public class TripRequestMapper {
 
       journeyBuilder.withTransit(transitBuilder -> {
         callWith.argument("preferred.authorities", (Collection<String> authorities) ->
-          transitBuilder.withPreferredAgencies(idResolver.parseListNullSafe(authorities))
+          transitBuilder.withPreferredAgencies(idMapper.parseListNullSafe(authorities))
         );
         callWith.argument("unpreferred.authorities", (Collection<String> authorities) ->
-          transitBuilder.withUnpreferredAgencies(idResolver.parseListNullSafe(authorities))
+          transitBuilder.withUnpreferredAgencies(idMapper.parseListNullSafe(authorities))
         );
 
         callWith.argument("preferred.lines", (List<String> lines) ->
-          transitBuilder.withPreferredRoutes(idResolver.parseListNullSafe(lines))
+          transitBuilder.withPreferredRoutes(idMapper.parseListNullSafe(lines))
         );
         callWith.argument("unpreferred.lines", (List<String> lines) ->
-          transitBuilder.withUnpreferredRoutes(idResolver.parseListNullSafe(lines))
+          transitBuilder.withUnpreferredRoutes(idMapper.parseListNullSafe(lines))
         );
         callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) ->
-          transitBuilder.withBannedTrips(idResolver.parseListNullSafe(serviceJourneys))
+          transitBuilder.withBannedTrips(idMapper.parseListNullSafe(serviceJourneys))
         );
 
         if (GqlUtil.hasArgument(environment, "filters")) {

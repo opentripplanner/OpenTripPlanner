@@ -9,16 +9,16 @@ import org.opentripplanner.transit.model.organization.Branding;
 
 public class BrandingType {
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public BrandingType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public BrandingType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType create() {
     return GraphQLObjectType.newObject()
       .name("Branding")
-      .field(GqlUtil.newTransitIdField(idResolver))
+      .field(GqlUtil.newTransitIdField(idMapper))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("name")

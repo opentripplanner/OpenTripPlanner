@@ -7,10 +7,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GenericLocationMapper {
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  GenericLocationMapper(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  GenericLocationMapper(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   /**
@@ -26,7 +26,7 @@ class GenericLocationMapper {
     }
 
     String placeRef = (String) m.get("place");
-    FeedScopedId stopId = idResolver.parseNullSafe(placeRef);
+    FeedScopedId stopId = idMapper.parseNullSafe(placeRef);
     String name = (String) m.get("name");
     name = name == null ? "" : name;
 

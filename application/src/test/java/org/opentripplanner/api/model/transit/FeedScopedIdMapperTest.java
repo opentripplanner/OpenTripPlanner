@@ -14,7 +14,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class FeedScopedIdMapperTest {
 
-  private static final FeedScopedIdMapper ID_RESOLVER = new IdResolverTestImpl();
+  private static final FeedScopedIdMapper SUBJECT = new IdResolverTestImpl();
 
   private static class IdResolverTestImpl implements FeedScopedIdMapper {
 
@@ -34,17 +34,17 @@ class FeedScopedIdMapperTest {
 
     @Test
     void shouldResolveToEmptyList_whenNull() {
-      assertNotNull(ID_RESOLVER.parseListNullSafe(null));
+      assertNotNull(SUBJECT.parseListNullSafe(null));
     }
 
     @Test
     void shouldResolveToEmptyList_whenEmpty() {
-      assertNotNull(ID_RESOLVER.parseListNullSafe(Set.of()));
+      assertNotNull(SUBJECT.parseListNullSafe(Set.of()));
     }
 
     @Test
     void shouldResolveToEmptyList_whenOnlyNullElements() {
-      List<FeedScopedId> mappedIds = ID_RESOLVER.parseListNullSafe(
+      List<FeedScopedId> mappedIds = SUBJECT.parseListNullSafe(
         Arrays.asList(new String[] { null })
       );
       assertNotNull(mappedIds);
@@ -53,7 +53,7 @@ class FeedScopedIdMapperTest {
 
     @Test
     void shouldResolveToEmptyList_whenOnlyBlankElements() {
-      List<FeedScopedId> mappedIds = ID_RESOLVER.parseListNullSafe(List.of(""));
+      List<FeedScopedId> mappedIds = SUBJECT.parseListNullSafe(List.of(""));
       assertNotNull(mappedIds);
       assertTrue(mappedIds.isEmpty());
     }
@@ -64,19 +64,19 @@ class FeedScopedIdMapperTest {
 
     @Test
     void shouldResolveToNull_whenNull() {
-      FeedScopedId feedScopedId = ID_RESOLVER.parseNullSafe(null);
+      FeedScopedId feedScopedId = SUBJECT.parseNullSafe(null);
       assertNull(feedScopedId);
     }
 
     @Test
     void shouldResolveToNull_whenEmpty() {
-      FeedScopedId feedScopedId = ID_RESOLVER.parseNullSafe("");
+      FeedScopedId feedScopedId = SUBJECT.parseNullSafe("");
       assertNull(feedScopedId);
     }
 
     @Test
     void shouldResolveToNull_whenBlank() {
-      FeedScopedId feedScopedId = ID_RESOLVER.parseNullSafe(" ");
+      FeedScopedId feedScopedId = SUBJECT.parseNullSafe(" ");
       assertNull(feedScopedId);
     }
   }

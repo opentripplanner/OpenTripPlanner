@@ -25,9 +25,9 @@ public class TransmodelGraphQLPlanner {
   private final TripRequestMapper tripRequestMapper;
   private final ViaRequestMapper viaRequestMapper;
 
-  public TransmodelGraphQLPlanner(FeedScopedIdMapper idResolver) {
-    this.tripRequestMapper = new TripRequestMapper(idResolver);
-    this.viaRequestMapper = new ViaRequestMapper(idResolver);
+  public TransmodelGraphQLPlanner(FeedScopedIdMapper idMapper) {
+    this.tripRequestMapper = new TripRequestMapper(idMapper);
+    this.viaRequestMapper = new ViaRequestMapper(idMapper);
   }
 
   public DataFetcherResult<PlanResponse> plan(DataFetchingEnvironment environment) {

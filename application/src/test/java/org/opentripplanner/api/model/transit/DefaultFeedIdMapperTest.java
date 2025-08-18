@@ -8,22 +8,23 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class DefaultFeedIdMapperTest {
 
-  private static final FeedScopedIdMapper MAPPER = new DefaultFeedIdMapper();
+  private static final FeedScopedIdMapper SUBJECT = new DefaultFeedIdMapper();
 
   @Test
   void parse() {
-    var id = MAPPER.parse("aaa:bbb");
+    var id = SUBJECT.parse("aaa:bbb");
     assertEquals(new FeedScopedId("aaa", "bbb"), id);
   }
 
   @Test
   void shouldThrowInvalidArgumentException_whenIdIsInvalid() {
-    assertThrows(IllegalArgumentException.class, () -> MAPPER.parse("invalid"));
+    var e = assertThrows(IllegalArgumentException.class, () -> SUBJECT.parse("invalid"));
+    assertEquals("invalid feed-scoped-id: invalid", e.getMessage());
   }
 
   @Test
   void tostring() {
-    var id = MAPPER.mapToApi(new FeedScopedId("aaa", "bbb"));
+    var id = SUBJECT.mapToApi(new FeedScopedId("aaa", "bbb"));
     assertEquals("aaa:bbb", id);
   }
 }
