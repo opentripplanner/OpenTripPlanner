@@ -50,14 +50,14 @@ public class GqlUtil {
     return ((TransmodelRequestContext) environment.getContext()).getServerContext().graphFinder();
   }
 
-  public static GraphQLFieldDefinition newTransitIdField(FeedScopedIdMapper idResolver) {
+  public static GraphQLFieldDefinition newTransitIdField(FeedScopedIdMapper idMapper) {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("id")
       .type(new GraphQLNonNull(Scalars.GraphQLID))
       .dataFetcher(env ->
         Optional.ofNullable((AbstractTransitEntity<?, ?>) env.getSource())
           .map(AbstractTransitEntity::getId)
-          .map(idResolver::mapToApi)
+          .map(idMapper::mapToApi)
           .orElse("")
       )
       .build();

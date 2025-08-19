@@ -23,10 +23,10 @@ public class ViaRequestMapper {
   private final GenericLocationMapper genericLocationMapper;
   private final ViaSegmentMapper viaSegmentMapper;
 
-  public ViaRequestMapper(FeedScopedIdMapper idResolver) {
-    viaLocationDeprecatedMapper = new ViaLocationDeprecatedMapper(idResolver);
-    genericLocationMapper = new GenericLocationMapper(idResolver);
-    viaSegmentMapper = new ViaSegmentMapper(idResolver);
+  public ViaRequestMapper(FeedScopedIdMapper idMapper) {
+    viaLocationDeprecatedMapper = new ViaLocationDeprecatedMapper(idMapper);
+    genericLocationMapper = new GenericLocationMapper(idMapper);
+    viaSegmentMapper = new ViaSegmentMapper(idMapper);
   }
 
   /**

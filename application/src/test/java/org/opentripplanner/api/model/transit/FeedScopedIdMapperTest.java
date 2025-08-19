@@ -1,11 +1,11 @@
 package org.opentripplanner.api.model.transit;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.Nested;
@@ -14,9 +14,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class FeedScopedIdMapperTest {
 
-  private static final FeedScopedIdMapper SUBJECT = new IdResolverTestImpl();
+  private static final FeedScopedIdMapper SUBJECT = new IdMapperTestImpl();
 
-  private static class IdResolverTestImpl implements FeedScopedIdMapper {
+  private static class IdMapperTestImpl implements FeedScopedIdMapper {
 
     @Override
     public FeedScopedId parse(String id) {
@@ -63,21 +63,24 @@ class FeedScopedIdMapperTest {
   class ParseNullSafe {
 
     @Test
-    void shouldResolveToNull_whenNull() {
-      FeedScopedId feedScopedId = SUBJECT.parseNullSafe(null);
-      assertNull(feedScopedId);
+    void shouldResolveToEmpty_whenNull() {
+      Optional<FeedScopedId> feedScopedId = SUBJECT.parseNullSafe(null);
+      assertNotNull(feedScopedId);
+      assertTrue(feedScopedId.isEmpty());
     }
 
     @Test
-    void shouldResolveToNull_whenEmpty() {
-      FeedScopedId feedScopedId = SUBJECT.parseNullSafe("");
-      assertNull(feedScopedId);
+    void shouldResolveToEmpty_whenEmpty() {
+      Optional<FeedScopedId> feedScopedId = SUBJECT.parseNullSafe("");
+      assertNotNull(feedScopedId);
+      assertTrue(feedScopedId.isEmpty());
     }
 
     @Test
-    void shouldResolveToNull_whenBlank() {
-      FeedScopedId feedScopedId = SUBJECT.parseNullSafe(" ");
-      assertNull(feedScopedId);
+    void shouldResolveToEmpty_whenBlank() {
+      Optional<FeedScopedId> feedScopedId = SUBJECT.parseNullSafe(" ");
+      assertNotNull(feedScopedId);
+      assertTrue(feedScopedId.isEmpty());
     }
   }
 }

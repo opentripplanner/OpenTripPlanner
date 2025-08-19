@@ -39,10 +39,10 @@ public class QuayType {
   private static final String NAME = "Quay";
   public static final GraphQLOutputType REF = new GraphQLTypeReference(NAME);
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public QuayType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public QuayType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType create(
@@ -61,7 +61,7 @@ public class QuayType {
         "A place such as platform, stance, or quayside where passengers have access to PT vehicles."
       )
       .withInterface(placeInterface)
-      .field(GqlUtil.newTransitIdField(idResolver))
+      .field(GqlUtil.newTransitIdField(idMapper))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
@@ -291,7 +291,7 @@ public class QuayType {
             Duration timeRange = Duration.ofSeconds(timeRangeInput);
             StopLocation stop = environment.getSource();
 
-            JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idResolver);
+            JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idMapper);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
             Long startTimeInput = environment.getArgument("startTime");

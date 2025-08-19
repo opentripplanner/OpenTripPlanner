@@ -50,11 +50,11 @@ public class TriasResource {
     var zoneId = context.triasApiParameters().timeZone().orElse(transitService.getTimeZone());
     var vdvService = new OjpService(context.transitService(), context.graphFinder());
 
-    FeedScopedIdMapper idResolver = idResolver(context.triasApiParameters());
-    this.ojpService = new OjpServiceMapper(vdvService, idResolver, zoneId);
+    FeedScopedIdMapper idMapper = idMapper(context.triasApiParameters());
+    this.ojpService = new OjpServiceMapper(vdvService, idMapper, zoneId);
   }
 
-  private FeedScopedIdMapper idResolver(TriasApiParameters triasApiConfig) {
+  private FeedScopedIdMapper idMapper(TriasApiParameters triasApiConfig) {
     if (triasApiConfig.hideFeedId()) {
       return new HideFeedIdMapper(triasApiConfig.hardcodedInputFeedId());
     } else {

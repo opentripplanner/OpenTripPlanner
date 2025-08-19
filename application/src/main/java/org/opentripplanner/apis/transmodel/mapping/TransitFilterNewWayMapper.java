@@ -11,8 +11,8 @@ class TransitFilterNewWayMapper {
 
   private final SelectRequestMapper selectRequestMapper;
 
-  TransitFilterNewWayMapper(FeedScopedIdMapper idResolver) {
-    this.selectRequestMapper = new SelectRequestMapper(idResolver);
+  TransitFilterNewWayMapper(FeedScopedIdMapper idMapper) {
+    this.selectRequestMapper = new SelectRequestMapper(idMapper);
   }
 
   @SuppressWarnings("unchecked")

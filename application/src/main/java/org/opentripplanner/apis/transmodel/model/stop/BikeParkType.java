@@ -10,12 +10,12 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
 public class BikeParkType {
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
   public static final String NAME = "BikePark";
 
-  public BikeParkType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public BikeParkType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType createB(GraphQLInterfaceType placeInterface) {
@@ -27,7 +27,7 @@ public class BikeParkType {
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(environment ->
-            idResolver.mapToApi(((VehicleParking) environment.getSource()).getId())
+            idMapper.mapToApi(((VehicleParking) environment.getSource()).getId())
           )
           .build()
       )

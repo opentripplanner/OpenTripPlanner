@@ -12,10 +12,10 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 public class QuayAtDistanceType {
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public QuayAtDistanceType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public QuayAtDistanceType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType createQD(GraphQLOutputType quayType, Relay relay) {
@@ -31,7 +31,7 @@ public class QuayAtDistanceType {
               Optional.ofNullable((NearbyStop) environment.getSource())
                 .map(
                   nearbyStop ->
-                    nearbyStop.distance + ";" + idResolver.mapToApi(nearbyStop.stop.getId())
+                    nearbyStop.distance + ";" + idMapper.mapToApi(nearbyStop.stop.getId())
                 )
                 .orElse(null)
             )

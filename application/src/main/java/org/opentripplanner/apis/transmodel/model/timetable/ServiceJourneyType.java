@@ -32,10 +32,10 @@ public class ServiceJourneyType {
   private static final String NAME = "ServiceJourney";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public ServiceJourneyType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public ServiceJourneyType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType create(
@@ -53,7 +53,7 @@ public class ServiceJourneyType {
     return GraphQLObjectType.newObject()
       .name(NAME)
       .description("A planned vehicle journey with passengers.")
-      .field(GqlUtil.newTransitIdField(idResolver))
+      .field(GqlUtil.newTransitIdField(idMapper))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("line")

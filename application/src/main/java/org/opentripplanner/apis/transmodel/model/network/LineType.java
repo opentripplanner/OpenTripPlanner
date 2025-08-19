@@ -24,10 +24,10 @@ public class LineType {
   private static final String NAME = "Line";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public LineType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public LineType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType create(
@@ -55,7 +55,7 @@ public class LineType {
           .dataFetcher(environment ->
             Optional.ofNullable((AbstractTransitEntity<?, ?>) environment.getSource())
               .map(AbstractTransitEntity::getId)
-              .map(idResolver::mapToApi)
+              .map(idMapper::mapToApi)
               .orElse(null)
           )
           .build()

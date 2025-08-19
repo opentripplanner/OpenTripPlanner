@@ -23,10 +23,10 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
  */
 public class DatedServiceJourneyQuery {
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public DatedServiceJourneyQuery(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public DatedServiceJourneyQuery(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLFieldDefinition createGetById(GraphQLOutputType datedServiceJourneyType) {
@@ -36,7 +36,7 @@ public class DatedServiceJourneyQuery {
       .description("Get a single dated service journey based on its id")
       .argument(GraphQLArgument.newArgument().name("id").type(Scalars.GraphQLString))
       .dataFetcher(environment -> {
-        FeedScopedId id = idResolver.parseNullSafe(environment.getArgument("id"));
+        FeedScopedId id = idMapper.parseNullSafe(environment.getArgument("id")).orElse(null);
 
         return GqlUtil.getTransitService(environment).getTripOnServiceDate(id);
       })
@@ -94,19 +94,19 @@ public class DatedServiceJourneyQuery {
         // are pushing this check into the domain request.
         var authorities = FilterValues.ofEmptyIsEverything(
           "authorities",
-          idResolver.parseListNullSafe(environment.getArgument("authorities"))
+          idMapper.parseListNullSafe(environment.getArgument("authorities"))
         );
         var lines = FilterValues.ofEmptyIsEverything(
           "lines",
-          idResolver.parseListNullSafe(environment.getArgument("lines"))
+          idMapper.parseListNullSafe(environment.getArgument("lines"))
         );
         var serviceJourneys = FilterValues.ofEmptyIsEverything(
           "serviceJourneys",
-          idResolver.parseListNullSafe(environment.getArgument("serviceJourneys"))
+          idMapper.parseListNullSafe(environment.getArgument("serviceJourneys"))
         );
         var replacementFor = FilterValues.ofEmptyIsEverything(
           "replacementFor",
-          idResolver.parseListNullSafe(environment.getArgument("replacementFor"))
+          idMapper.parseListNullSafe(environment.getArgument("replacementFor"))
         );
         var privateCodes = FilterValues.ofEmptyIsEverything(
           "privateCodes",

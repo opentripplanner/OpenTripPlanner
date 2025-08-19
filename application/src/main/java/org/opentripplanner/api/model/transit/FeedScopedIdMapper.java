@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -16,15 +17,14 @@ public interface FeedScopedIdMapper {
   /**
    * @param id a string representation of the id that should be parsed. May be <code>null</code> or
    *           blank
-   * @return <code>null</code> if the input id is <code>null</code> or blank, otherwise a
-   * <code>FeedScopedId</code>
+   * @return <code>Optional.empty()</code> if the input id is <code>null</code> or blank, otherwise a
+   * <code>FeedScopedId</code> wrapped in an <Optional
    */
-  @Nullable
-  default FeedScopedId parseNullSafe(@Nullable String id) {
+  default Optional<FeedScopedId> parseNullSafe(@Nullable String id) {
     if (id == null || id.isBlank()) {
-      return null;
+      return Optional.empty();
     }
-    return parse(id);
+    return Optional.ofNullable(parse(id));
   }
 
   /**
@@ -34,7 +34,12 @@ public interface FeedScopedIdMapper {
    * collection are filtered out.
    */
   default List<FeedScopedId> parseList(Collection<String> ids) {
-    return ids.stream().map(this::parseNullSafe).filter(Objects::nonNull).toList();
+    return ids
+      .stream()
+      .map(this::parseNullSafe)
+      .filter(Optional::isPresent)
+      .map(Optional::get)
+      .toList();
   }
 
   /**
@@ -51,7 +56,7 @@ public interface FeedScopedIdMapper {
     if (ids == null) {
       return Collections.emptyList();
     }
-    return ids.stream().map(this::parseNullSafe).filter(Objects::nonNull).toList();
+    return parseList(ids);
   }
 
   String mapToApi(FeedScopedId id);

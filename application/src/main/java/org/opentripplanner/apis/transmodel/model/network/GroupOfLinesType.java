@@ -15,10 +15,10 @@ public class GroupOfLinesType {
 
   private static final String NAME = "GroupOfLines";
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public GroupOfLinesType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public GroupOfLinesType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType create() {
@@ -34,7 +34,7 @@ public class GroupOfLinesType {
           .dataFetcher(env ->
             Optional.ofNullable((AbstractTransitEntity<?, ?>) env.getSource())
               .map(AbstractTransitEntity::getId)
-              .map(idResolver::mapToApi)
+              .map(idMapper::mapToApi)
               .orElse(null)
           )
           .build()

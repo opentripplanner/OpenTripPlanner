@@ -18,10 +18,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class TransitFilterOldWayMapper {
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  TransitFilterOldWayMapper(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  TransitFilterOldWayMapper(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   @SuppressWarnings("unchecked")
@@ -42,7 +42,7 @@ class TransitFilterOldWayMapper {
 
     var whiteListedAgencies = new ArrayList<FeedScopedId>();
     callWith.argument("whiteListed.authorities", (Collection<String> authorities) ->
-      whiteListedAgencies.addAll(idResolver.parseListNullSafe(authorities))
+      whiteListedAgencies.addAll(idMapper.parseListNullSafe(authorities))
     );
     if (!whiteListedAgencies.isEmpty()) {
       selectorBuilders.add(SelectRequest.of().withAgencies(whiteListedAgencies));
@@ -50,7 +50,7 @@ class TransitFilterOldWayMapper {
 
     var whiteListedLines = new ArrayList<FeedScopedId>();
     callWith.argument("whiteListed.lines", (List<String> lines) ->
-      whiteListedLines.addAll(idResolver.parseListNullSafe(lines))
+      whiteListedLines.addAll(idMapper.parseListNullSafe(lines))
     );
     if (!whiteListedLines.isEmpty()) {
       selectorBuilders.add(SelectRequest.of().withRoutes(whiteListedLines));
@@ -72,7 +72,7 @@ class TransitFilterOldWayMapper {
 
       var bannedAgencies = new ArrayList<FeedScopedId>();
       callWith.argument("banned.authorities", (Collection<String> authorities) ->
-        bannedAgencies.addAll(idResolver.parseListNullSafe(authorities))
+        bannedAgencies.addAll(idMapper.parseListNullSafe(authorities))
       );
       if (!bannedAgencies.isEmpty()) {
         filterBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
@@ -80,7 +80,7 @@ class TransitFilterOldWayMapper {
 
       var bannedLines = new ArrayList<FeedScopedId>();
       callWith.argument("banned.lines", (List<String> lines) ->
-        bannedLines.addAll(idResolver.parseListNullSafe(lines))
+        bannedLines.addAll(idMapper.parseListNullSafe(lines))
       );
       if (!bannedLines.isEmpty()) {
         filterBuilder.addNot(SelectRequest.of().withRoutes(bannedLines).build());

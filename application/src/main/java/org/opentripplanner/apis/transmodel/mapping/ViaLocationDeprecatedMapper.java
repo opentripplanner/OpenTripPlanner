@@ -16,8 +16,8 @@ class ViaLocationDeprecatedMapper {
 
   private final GenericLocationMapper genericLocationMapper;
 
-  ViaLocationDeprecatedMapper(FeedScopedIdMapper idResolver) {
-    this.genericLocationMapper = new GenericLocationMapper(idResolver);
+  ViaLocationDeprecatedMapper(FeedScopedIdMapper idMapper) {
+    this.genericLocationMapper = new GenericLocationMapper(idMapper);
   }
 
   ViaLocationDeprecated mapViaLocation(Map<String, Object> viaLocation) {

@@ -10,8 +10,8 @@ class ViaSegmentMapper {
 
   private final TransitFilterNewWayMapper transitFilterNewWayMapper;
 
-  ViaSegmentMapper(FeedScopedIdMapper idResolver) {
-    transitFilterNewWayMapper = new TransitFilterNewWayMapper(idResolver);
+  ViaSegmentMapper(FeedScopedIdMapper idMapper) {
+    transitFilterNewWayMapper = new TransitFilterNewWayMapper(idMapper);
   }
 
   JourneyRequest mapViaSegment(RouteRequest defaultRequest, Map<String, Object> viaSegment) {

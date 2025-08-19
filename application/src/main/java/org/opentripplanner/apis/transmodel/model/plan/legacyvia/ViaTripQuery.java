@@ -20,8 +20,8 @@ public class ViaTripQuery {
 
   private final TransmodelGraphQLPlanner graphQLPlanner;
 
-  public ViaTripQuery(FeedScopedIdMapper idResolver) {
-    this.graphQLPlanner = new TransmodelGraphQLPlanner(idResolver);
+  public ViaTripQuery(FeedScopedIdMapper idMapper) {
+    this.graphQLPlanner = new TransmodelGraphQLPlanner(idMapper);
   }
 
   public GraphQLFieldDefinition create(

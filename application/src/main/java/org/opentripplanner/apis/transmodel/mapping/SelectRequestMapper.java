@@ -12,10 +12,10 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 class SelectRequestMapper {
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  SelectRequestMapper(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  SelectRequestMapper(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   @SuppressWarnings("unchecked")
@@ -24,17 +24,17 @@ class SelectRequestMapper {
 
     if (input.containsKey("lines")) {
       var lines = (List<String>) input.get("lines");
-      selectRequestBuilder.withRoutes(idResolver.parseListNullSafe(lines));
+      selectRequestBuilder.withRoutes(idMapper.parseListNullSafe(lines));
     }
 
     if (input.containsKey("authorities")) {
       var authorities = (List<String>) input.get("authorities");
-      selectRequestBuilder.withAgencies(idResolver.parseListNullSafe(authorities));
+      selectRequestBuilder.withAgencies(idMapper.parseListNullSafe(authorities));
     }
 
     if (input.containsKey("groupOfLines")) {
       var groupOfLines = (List<String>) input.get("groupOfLines");
-      selectRequestBuilder.withGroupOfRoutes(idResolver.parseListNullSafe(groupOfLines));
+      selectRequestBuilder.withGroupOfRoutes(idMapper.parseListNullSafe(groupOfLines));
     }
 
     if (input.containsKey("transportModes")) {

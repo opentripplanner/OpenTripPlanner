@@ -16,10 +16,10 @@ import org.opentripplanner.transit.model.organization.Agency;
 
 public class AuthorityType {
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public AuthorityType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public AuthorityType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType create(
@@ -31,7 +31,7 @@ public class AuthorityType {
       .description(
         "Authority involved in public transportation. An organisation under which the responsibility of organising the transport service in a certain area is placed."
       )
-      .field(GqlUtil.newTransitIdField(idResolver))
+      .field(GqlUtil.newTransitIdField(idMapper))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("name")

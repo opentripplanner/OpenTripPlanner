@@ -52,10 +52,10 @@ public class StopPlaceType {
   public static final String NAME = "StopPlace";
   public static final GraphQLOutputType REF = new GraphQLTypeReference(NAME);
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public StopPlaceType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public StopPlaceType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType create(
@@ -77,7 +77,7 @@ public class StopPlaceType {
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(env ->
-            idResolver.mapToApi(((MonoOrMultiModalStation) env.getSource()).getId())
+            idMapper.mapToApi(((MonoOrMultiModalStation) env.getSource()).getId())
           )
           .build()
       )
@@ -353,7 +353,7 @@ public class StopPlaceType {
             Duration timeRange = Duration.ofSeconds(timeRangeInput);
 
             MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
-            JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idResolver);
+            JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idMapper);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
             Instant startTime = environment.containsArgument("startTime")

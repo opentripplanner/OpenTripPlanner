@@ -31,10 +31,10 @@ public class DatedServiceJourneyType {
   private static final String NAME = "DatedServiceJourney";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public DatedServiceJourneyType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public DatedServiceJourneyType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType create(
@@ -46,7 +46,7 @@ public class DatedServiceJourneyType {
     return GraphQLObjectType.newObject()
       .name(NAME)
       .description("A planned journey on a specific day")
-      .field(GqlUtil.newTransitIdField(idResolver))
+      .field(GqlUtil.newTransitIdField(idMapper))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("operatingDay")

@@ -29,10 +29,10 @@ public class JourneyPatternType {
   private static final String NAME = "JourneyPattern";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public JourneyPatternType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public JourneyPatternType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType create(
@@ -46,7 +46,7 @@ public class JourneyPatternType {
   ) {
     return GraphQLObjectType.newObject()
       .name("JourneyPattern")
-      .field(GqlUtil.newTransitIdField(idResolver))
+      .field(GqlUtil.newTransitIdField(idMapper))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("line")

@@ -22,10 +22,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 @SuppressWarnings("unchecked")
 class TripViaLocationMapper {
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  TripViaLocationMapper(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  TripViaLocationMapper(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   List<ViaLocation> mapToViaLocations(final List<Map<String, Object>> via) {
@@ -79,7 +79,7 @@ class TripViaLocationMapper {
 
   private List<FeedScopedId> mapStopLocationIds(Map<String, Object> map) {
     var c = (Collection<String>) map.get(ViaLocationInputType.FIELD_STOP_LOCATION_IDS);
-    return c == null ? List.of() : c.stream().map(idResolver::parseNullSafe).toList();
+    return c == null ? List.of() : idMapper.parseList(c);
   }
 
   private static List<WgsCoordinate> mapCoordinate(Map<String, Object> map) {
@@ -99,10 +99,7 @@ class TripViaLocationMapper {
     if (placeIds == null || placeIds.isEmpty()) {
       return null;
     }
-    final List<FeedScopedId> stopLocationIds = placeIds
-      .stream()
-      .map(idResolver::parseNullSafe)
-      .toList();
+    final List<FeedScopedId> stopLocationIds = idMapper.parseList(placeIds);
     return new PassThroughViaLocation(name, stopLocationIds);
   }
 }

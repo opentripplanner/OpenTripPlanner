@@ -145,7 +145,7 @@ public class TransmodelGraphQLSchemaFactory {
   private final DefaultRouteRequestType routing;
   private final TransitTuningParameters transitTuningParameters;
   private final ZoneId timeZoneId;
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
   private final ApiDocumentationProfile docProfile;
   private final AuthorityType authorityTypeFactory;
   private final OperatorType operatorTypeFactory;
@@ -171,31 +171,31 @@ public class TransmodelGraphQLSchemaFactory {
     RouteRequest defaultRequest,
     ZoneId timeZoneId,
     TransitTuningParameters transitTuningParameters,
-    FeedScopedIdMapper idResolver,
+    FeedScopedIdMapper idMapper,
     ApiDocumentationProfile docProfile
   ) {
     this.timeZoneId = timeZoneId;
     this.routing = new DefaultRouteRequestType(defaultRequest);
     this.transitTuningParameters = transitTuningParameters;
-    this.idResolver = idResolver;
+    this.idMapper = idMapper;
     this.docProfile = docProfile;
-    this.authorityTypeFactory = new AuthorityType(idResolver);
-    this.operatorTypeFactory = new OperatorType(idResolver);
-    this.brandingTypeFactory = new BrandingType(idResolver);
-    this.noticeTypeFactory = new NoticeType(idResolver);
-    this.tariffZoneTypeFactory = new TariffZoneType(idResolver);
-    this.bikeParkTypeFactory = new BikeParkType(idResolver);
-    this.stopPlaceTypeFactory = new StopPlaceType(idResolver);
-    this.quayTypeFactory = new QuayType(idResolver);
-    this.quayAtDistanceTypeFactory = new QuayAtDistanceType(idResolver);
-    this.lineTypeFactory = new LineType(idResolver);
-    this.journeyPatternTypeFactory = new JourneyPatternType(idResolver);
-    this.serviceJourneyTypeFactory = new ServiceJourneyType(idResolver);
-    this.datedServiceJourneyTypeFactory = new DatedServiceJourneyType(idResolver);
-    this.tripQueryFactory = new TripQuery(idResolver);
-    this.viaTripQueryFactory = new ViaTripQuery(idResolver);
-    this.groupOfLinesTypeFactory = new GroupOfLinesType(idResolver);
-    this.datedServiceJourneyQueryFactory = new DatedServiceJourneyQuery(idResolver);
+    this.authorityTypeFactory = new AuthorityType(idMapper);
+    this.operatorTypeFactory = new OperatorType(idMapper);
+    this.brandingTypeFactory = new BrandingType(idMapper);
+    this.noticeTypeFactory = new NoticeType(idMapper);
+    this.tariffZoneTypeFactory = new TariffZoneType(idMapper);
+    this.bikeParkTypeFactory = new BikeParkType(idMapper);
+    this.stopPlaceTypeFactory = new StopPlaceType(idMapper);
+    this.quayTypeFactory = new QuayType(idMapper);
+    this.quayAtDistanceTypeFactory = new QuayAtDistanceType(idMapper);
+    this.lineTypeFactory = new LineType(idMapper);
+    this.journeyPatternTypeFactory = new JourneyPatternType(idMapper);
+    this.serviceJourneyTypeFactory = new ServiceJourneyType(idMapper);
+    this.datedServiceJourneyTypeFactory = new DatedServiceJourneyType(idMapper);
+    this.tripQueryFactory = new TripQuery(idMapper);
+    this.viaTripQueryFactory = new ViaTripQuery(idMapper);
+    this.groupOfLinesTypeFactory = new GroupOfLinesType(idMapper);
+    this.datedServiceJourneyQueryFactory = new DatedServiceJourneyQuery(idMapper);
   }
 
   public GraphQLSchema create() {
@@ -479,7 +479,10 @@ public class TransmodelGraphQLSchemaFactory {
               .build()
           )
           .dataFetcher(env ->
-            StopPlaceType.fetchStopPlaceById(idResolver.parseNullSafe(env.getArgument("id")), env)
+            StopPlaceType.fetchStopPlaceById(
+              idMapper.parseNullSafe(env.getArgument("id")).orElse(null),
+              env
+            )
           )
           .build()
       )
@@ -600,7 +603,7 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .dataFetcher(environment ->
             GqlUtil.getTransitService(environment).getStopLocation(
-              idResolver.parseNullSafe(environment.getArgument("id"))
+              idMapper.parseNullSafe(environment.getArgument("id")).orElse(null)
             )
           )
           .build()
@@ -900,10 +903,8 @@ public class TransmodelGraphQLSchemaFactory {
             @SuppressWarnings("rawtypes")
             Map filterByIds = environment.getArgument("filterByIds");
             if (filterByIds != null) {
-              filterByStops = idResolver.parseListNullSafe(
-                ((List<String>) filterByIds.get("quays"))
-              );
-              filterByRoutes = idResolver.parseListNullSafe(
+              filterByStops = idMapper.parseListNullSafe(((List<String>) filterByIds.get("quays")));
+              filterByRoutes = idMapper.parseListNullSafe(
                 ((List<String>) filterByIds.get("lines"))
               );
               filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null
@@ -995,7 +996,7 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .dataFetcher(environment -> {
             return GqlUtil.getTransitService(environment).getAgency(
-              idResolver.parseNullSafe(environment.getArgument("id"))
+              idMapper.parseNullSafe(environment.getArgument("id")).orElse(null)
             );
           })
           .build()
@@ -1025,7 +1026,7 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .dataFetcher(environment ->
             GqlUtil.getTransitService(environment).getOperator(
-              idResolver.parseNullSafe(environment.getArgument("id"))
+              idMapper.parseNullSafe(environment.getArgument("id")).orElse(null)
             )
           )
           .build()
@@ -1055,7 +1056,9 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .dataFetcher(environment -> {
             final String id = environment.getArgument("id");
-            return GqlUtil.getTransitService(environment).getRoute(idResolver.parseNullSafe(id));
+            return GqlUtil.getTransitService(environment).getRoute(
+              idMapper.parseNullSafe(id).orElse(null)
+            );
           })
           .build()
       )
@@ -1123,7 +1126,7 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .dataFetcher(environment -> {
             if (environment.containsArgument("ids")) {
-              var ids = idResolver.parseListNullSafe(environment.getArgument("ids"));
+              var ids = idMapper.parseListNullSafe(environment.getArgument("ids"));
 
               // flexibleLines gets special treatment because it has a default value.
               if (
@@ -1184,7 +1187,7 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .dataFetcher(environment ->
             GqlUtil.getTransitService(environment).getGroupOfRoutes(
-              idResolver.parseNullSafe(environment.getArgument("id"))
+              idMapper.parseNullSafe(environment.getArgument("id")).orElse(null)
             )
           )
           .build()
@@ -1211,7 +1214,7 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .dataFetcher(environment -> {
             return GqlUtil.getTransitService(environment).getTrip(
-              idResolver.parseNullSafe(environment.getArgument("id"))
+              idMapper.parseNullSafe(environment.getArgument("id")).orElse(null)
             );
           })
           .build()
@@ -1360,7 +1363,7 @@ public class TransmodelGraphQLSchemaFactory {
               .build()
           )
           .dataFetcher(environment -> {
-            var bikeParkId = idResolver.parseNullSafe(environment.getArgument("id"));
+            var bikeParkId = idMapper.parseNullSafe(environment.getArgument("id"));
             return GqlUtil.getVehicleParkingService(environment)
               .listBikeParks()
               .stream()
@@ -1481,7 +1484,7 @@ public class TransmodelGraphQLSchemaFactory {
             }
             return GqlUtil.getTransitService(environment)
               .getTransitAlertService()
-              .getAlertById(idResolver.parseNullSafe(situationNumber));
+              .getAlertById(idMapper.parseNullSafe(situationNumber).orElse(null));
           })
           .build()
       )
@@ -1549,13 +1552,13 @@ public class TransmodelGraphQLSchemaFactory {
   private Stream<FeedScopedId> resolveIds(DataFetchingEnvironment env) {
     return Optional.ofNullable(env.<Collection<String>>getArgument("ids"))
       .stream()
-      .flatMap(ids -> ids.stream().filter(StringUtils::hasValue).map(idResolver::parse));
+      .flatMap(ids -> ids.stream().filter(StringUtils::hasValue).map(idMapper::parse));
   }
 
   private @Nullable List<FeedScopedId> toNullableIdList(@Nullable List<String> ids) {
     if (ids == null) {
       return null;
     }
-    return idResolver.parseList(ids);
+    return idMapper.parseList(ids);
   }
 }

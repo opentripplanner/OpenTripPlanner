@@ -39,14 +39,14 @@ public class JourneyWhiteListed {
   public final Set<FeedScopedId> authorityIds;
   public final Set<FeedScopedId> lineIds;
 
-  public JourneyWhiteListed(DataFetchingEnvironment environment, FeedScopedIdMapper idResolver) {
+  public JourneyWhiteListed(DataFetchingEnvironment environment, FeedScopedIdMapper idMapper) {
     Map<String, List<String>> whiteList = environment.getArgument("whiteListed");
     if (whiteList == null) {
       this.authorityIds = Set.of();
       this.lineIds = Set.of();
     } else {
-      this.authorityIds = Set.copyOf(idResolver.parseListNullSafe(whiteList.get("authorities")));
-      this.lineIds = Set.copyOf(idResolver.parseListNullSafe(whiteList.get("lines")));
+      this.authorityIds = Set.copyOf(idMapper.parseListNullSafe(whiteList.get("authorities")));
+      this.lineIds = Set.copyOf(idMapper.parseListNullSafe(whiteList.get("lines")));
     }
   }
 

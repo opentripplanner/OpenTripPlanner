@@ -37,12 +37,10 @@ public class TripQuery {
     visited in the order they are listed.
     """;
 
-  private final FeedScopedIdMapper idResolver;
   private final TransmodelGraphQLPlanner graphQLPlanner;
 
-  public TripQuery(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
-    this.graphQLPlanner = new TransmodelGraphQLPlanner(idResolver);
+  public TripQuery(FeedScopedIdMapper idMapper) {
+    this.graphQLPlanner = new TransmodelGraphQLPlanner(idMapper);
   }
 
   public GraphQLFieldDefinition create(

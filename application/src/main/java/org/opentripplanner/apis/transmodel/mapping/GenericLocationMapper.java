@@ -26,7 +26,7 @@ class GenericLocationMapper {
     }
 
     String placeRef = (String) m.get("place");
-    FeedScopedId stopId = idMapper.parseNullSafe(placeRef);
+    FeedScopedId stopId = idMapper.parseNullSafe(placeRef).orElse(null);
     String name = (String) m.get("name");
     name = name == null ? "" : name;
 

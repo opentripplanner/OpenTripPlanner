@@ -9,18 +9,18 @@ import org.opentripplanner.transit.model.site.FareZone;
 
 public class TariffZoneType {
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
   private static final String NAME = "TariffZone";
 
-  public TariffZoneType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public TariffZoneType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType createTZ() {
     return GraphQLObjectType.newObject()
       .name(NAME)
-      .field(GqlUtil.newTransitIdField(idResolver))
+      .field(GqlUtil.newTransitIdField(idMapper))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("name")

@@ -9,16 +9,16 @@ import org.opentripplanner.transit.model.basic.Notice;
 
 public class NoticeType {
 
-  private final FeedScopedIdMapper idResolver;
+  private final FeedScopedIdMapper idMapper;
 
-  public NoticeType(FeedScopedIdMapper idResolver) {
-    this.idResolver = idResolver;
+  public NoticeType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
   }
 
   public GraphQLObjectType create() {
     return GraphQLObjectType.newObject()
       .name("Notice")
-      .field(GqlUtil.newTransitIdField(idResolver))
+      .field(GqlUtil.newTransitIdField(idMapper))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("text")
