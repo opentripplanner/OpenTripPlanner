@@ -32,6 +32,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
 
   private final CarpoolingRepository repository;
 
+  private final CarpoolSiriMapper mapper;
+
   /**
    * Feed id that is used for the trip ids in the TripUpdates
    */
@@ -56,6 +58,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
     this.metricsConsumer = TripUpdateMetrics.streaming(config);
+
+    this.mapper = new CarpoolSiriMapper();
   }
 
   /**
@@ -77,6 +81,19 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
         List<EstimatedTimetableDeliveryStructure> etds =
           serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {
+          for (EstimatedTimetableDeliveryStructure etd : etds) {
+            var ejvfs = etd.getEstimatedJourneyVersionFrames();
+            for (var ejvf : ejvfs) {
+              if (ejvf.getEstimatedVehicleJourneies() == null) {
+                LOG.warn("Received an empty EstimatedJourneyVersionFrame, skipping");
+                continue;
+              }
+              ejvf.getEstimatedVehicleJourneies().forEach(ejv -> {
+                var carpoolTrip = mapper.mapSiriToCarpoolTrip(ejv);
+                repository.addCarpoolTrip(carpoolTrip);
+              });
+            }
+          }
           LOG.info("Received {} estimated timetable deliveries", etds.size());
         }
       }

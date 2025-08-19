@@ -9,6 +9,7 @@ import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.gtfs.configure.SchemaModule;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchemaModule;
+import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.configure.CarpoolingModule;
 import org.opentripplanner.ext.emission.EmissionRepository;
@@ -107,6 +108,9 @@ public interface ConstructApplicationFactory {
 
   @Nullable
   CarpoolingService carpoolingService();
+
+  @Nullable
+  CarpoolingRepository carpoolingRepository();
 
   @Nullable
   EmissionRepository emissionRepository();
