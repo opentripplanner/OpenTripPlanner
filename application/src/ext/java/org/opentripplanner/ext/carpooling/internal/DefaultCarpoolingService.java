@@ -3,7 +3,6 @@ package org.opentripplanner.ext.carpooling.internal;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.time.Duration;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,25 +13,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.data.KristiansandCarpoolingData;
-import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolItineraryCandidate;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.leg.StreetLeg;
-import org.opentripplanner.routing.algorithm.mapping.StreetModeToTransferTraverseModeMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
@@ -141,7 +130,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         candidate.alightingStop().state.getVertex(),
         streetLimitationParametersService.getMaxCarSpeed());
 
-      Itinerary itinerary = createItineraryFromRouting(request, candidate, routing);
+      Itinerary itinerary = CarpoolItineraryMapper.mapToItinerary(request, candidate, routing);
       if (itinerary != null) {
         itineraries.add(itinerary);
       }
@@ -164,7 +153,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       throw new RuntimeException(e);
     }
 
-    // Prepare access/egress transfers
+    // Prepare access/egress
     Collection<NearbyStop> accessStops = getClosestAreaStopsToVertex(
       request,
       request.journey().access(),
@@ -303,147 +292,5 @@ public class DefaultCarpoolingService implements CarpoolingService {
     paths.sort(new PathComparator(request.arriveBy()));
 
     return paths.getFirst();
-  }
-
-  /**
-   * Creates a complete itinerary from A* routing results with proper walking and carpool legs
-   */
-  private Itinerary createItineraryFromRouting(RouteRequest request, CarpoolItineraryCandidate candidate, GraphPath<State, Edge, Vertex> carpoolPath) {
-    List<Leg> legs = new ArrayList<>();
-
-    // 1. Access walking leg (origin to pickup)
-    Leg accessLeg = createWalkingLegFromPath(
-      request.journey().access(),
-      candidate.boardingStop(),
-      null,
-      candidate.trip().getStartTime(),
-      "Walk to pickup"
-    );
-    if (accessLeg != null) {
-      legs.add(accessLeg);
-    }
-
-    var drivingEndTime = candidate.trip()
-      .getStartTime()
-      .plus(
-        Duration.between(
-          carpoolPath.states.getFirst().getTime(),
-          carpoolPath.states.getLast().getTime()
-        )
-      );
-
-    // 2. Carpool transit leg (pickup to dropoff)
-    CarpoolLeg carpoolLeg = CarpoolLeg.of()
-      .withStartTime(candidate.trip().getStartTime())
-      .withEndTime(drivingEndTime)
-      .withFrom(
-        createPlaceFromVertex(
-          carpoolPath.states.getFirst().getVertex(),
-          "Pickup at " + candidate.trip().getBoardingArea().getName()
-        )
-      )
-      .withTo(
-        createPlaceFromVertex(
-          carpoolPath.states.getLast().getVertex(),
-          "Dropoff at " + candidate.trip().getAlightingArea().getName()
-        )
-      )
-      .withGeometry(
-        GeometryUtils.concatenateLineStrings(carpoolPath.edges, Edge::getGeometry)
-      )
-      .withDistanceMeters(
-        carpoolPath.edges.stream().mapToDouble(Edge::getDistanceMeters).sum()
-      )
-      .withGeneralizedCost((int) carpoolPath.getWeight())
-      .build();
-    legs.add(carpoolLeg);
-
-    // 3. Egress walking leg (dropoff to destination)
-    Leg egressLeg = createWalkingLegFromPath(
-      request.journey().egress(),
-      candidate.alightingStop(),
-      drivingEndTime,
-      null,
-      "Walk from dropoff"
-    );
-    if (egressLeg != null) {
-      legs.add(egressLeg);
-    }
-
-    return Itinerary.ofDirect(legs)
-      .withGeneralizedCost(Cost.costOfSeconds(accessLeg.generalizedCost() +
-        carpoolLeg.generalizedCost() + egressLeg.generalizedCost()))
-      .build();
-  }
-
-  /**
-   * Creates a walking leg from a GraphPath with proper geometry and timing.
-   * This reuses the same pattern as OTP's GraphPathToItineraryMapper but simplified
-   * for carpooling service use.
-   */
-  @Nullable
-  private Leg createWalkingLegFromPath(
-    StreetRequest streetRequest,
-    NearbyStop nearbyStop,
-    ZonedDateTime legStartTime,
-    ZonedDateTime legEndTime,
-    String name
-  ) {
-    if (nearbyStop == null || nearbyStop.edges.isEmpty()) {
-      return null;
-    }
-
-    var graphPath = new GraphPath<>(nearbyStop.state);
-
-    var firstState = graphPath.states.getFirst();
-    var lastState = graphPath.states.getLast();
-
-    List<Edge> edges = nearbyStop.edges;
-
-    if (edges.isEmpty()) {
-      return null;
-    }
-
-    // Create geometry from edges
-    LineString geometry = GeometryUtils.concatenateLineStrings(edges, Edge::getGeometry);
-
-    var legDuration = Duration.between(firstState.getTime(), lastState.getTime());
-    if (legStartTime != null && legEndTime == null) {
-      legEndTime = legStartTime.plus(legDuration);
-    } else if (legEndTime != null && legStartTime == null) {
-      legStartTime = legEndTime.minus(legDuration);
-    }
-
-    // Build the walking leg
-    return StreetLeg.of()
-      .withMode(StreetModeToTransferTraverseModeMapper.map(streetRequest.mode() == StreetMode.NOT_SET ? StreetMode.WALK : streetRequest.mode()))
-      .withStartTime(legStartTime)
-      .withEndTime(legEndTime)
-      .withFrom(createPlaceFromVertex(firstState.getVertex(), name + " start"))
-      .withTo(createPlaceFromVertex(lastState.getVertex(), name + " end"))
-      .withDistanceMeters(nearbyStop.distance)
-      .withGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
-      .withGeometry(geometry)
-      .build();
-  }
-
-  /**
-   * Creates a Place from a State, similar to GraphPathToItineraryMapper.makePlace
-   * but simplified for carpooling service use.
-   */
-  private Place createPlaceFromVertex(Vertex vertex, String defaultName) {
-    I18NString name = vertex.getName();
-
-    // Use intersection name for street vertices to get better names
-    if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
-      name = ((StreetVertex) vertex).getIntersectionName();
-    }
-
-    // If no name available, use default
-    if (name == null || name.toString().trim().isEmpty()) {
-      name = new NonLocalizedString(defaultName);
-    }
-
-    return Place.normal(vertex, name);
   }
 }
