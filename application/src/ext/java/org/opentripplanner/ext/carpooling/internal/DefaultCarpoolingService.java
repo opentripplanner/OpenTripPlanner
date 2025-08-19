@@ -189,8 +189,14 @@ public class DefaultCarpoolingService implements CarpoolingService {
         tripToAlightingStop.get(trip)
       ))
       .filter(candidate ->
-        candidate.trip().getStartTime().toInstant().isAfter(candidate.boardingStop().state.getTime())
-          && candidate.trip().getStartTime().toInstant().isBefore(candidate.boardingStop().state.getTime().plus(MAX_BOOKING_WINDOW)))
+        // Only include candidates that leave after first possible arrival at the boarding area
+        candidate.trip().getStartTime().toInstant().isAfter(
+          candidate.boardingStop().state.getTime()
+        )
+          // AND leave within the next 2 hours
+          && candidate.trip().getStartTime().toInstant().isBefore(
+            candidate.boardingStop().state.getTime().plus(MAX_BOOKING_WINDOW))
+      )
       .toList();
     return itineraryCandidates;
   }
