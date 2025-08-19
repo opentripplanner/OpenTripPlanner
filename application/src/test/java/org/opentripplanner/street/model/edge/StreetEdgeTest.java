@@ -388,7 +388,7 @@ public class StreetEdgeTest {
   void testBikeSpeed(TraverseMode mode) {
     StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, ALL).withCarSpeed(8.0f).buildAndConnect();
     assertEquals(
-      5.0f,
+      5.0,
       e1.calculateSpeed(
         RoutingPreferences.DEFAULT.copyOf()
           .withBike(bike -> bike.withSpeed(5.0f))
@@ -399,7 +399,52 @@ public class StreetEdgeTest {
       )
     );
     assertEquals(
-      8.0f,
+      8.0,
+      e1.calculateSpeed(
+        RoutingPreferences.DEFAULT.copyOf()
+          .withBike(bike -> bike.withSpeed(10.0f))
+          .withScooter(scooter -> scooter.withSpeed(10.0f))
+          .build(),
+        mode,
+        false
+      )
+    );
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = TraverseMode.class, names = { "BICYCLE", "SCOOTER" })
+  void testBikeSpeedWithElevation(TraverseMode mode) {
+    StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, ALL)
+      .withCarSpeed(8.0f)
+      .withElevationExtension(
+        new StreetElevationExtension(
+          100,
+          false,
+          new PackedCoordinateSequence.Float(0, 2, 0),
+          1.0f,
+          1.2,
+          1.5,
+          1.1,
+          1.3,
+          1.0,
+          0.1f,
+          false
+        )
+      )
+      .buildAndConnect();
+    assertEquals(
+      9.0,
+      e1.calculateSpeed(
+        RoutingPreferences.DEFAULT.copyOf()
+          .withBike(bike -> bike.withSpeed(9.0f))
+          .withScooter(scooter -> scooter.withSpeed(9.0f))
+          .build(),
+        mode,
+        false
+      )
+    );
+    assertEquals(
+      9.6,
       e1.calculateSpeed(
         RoutingPreferences.DEFAULT.copyOf()
           .withBike(bike -> bike.withSpeed(10.0f))
