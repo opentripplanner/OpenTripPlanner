@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripTimesForDaysIndex.applyOffsets;
 
+import com.google.common.base.Splitter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,11 +46,15 @@ class TripTimesForDaysIndexTest {
     return Arrays.stream(
       """
       # Test with one day
+      [empty]        ->  [empty]
       1              ->  0:0
       1 2            ->  0:0 0:1
       1 1            ->  0:0 0:1
 
       # Test with two days
+      |              ->  [empty]
+      1 |            ->  0:0
+      | 1            ->  1:0
       1 | 2          ->  0:0 1:0
       2 | 1          ->  1:0 0:0
       1 | 1          ->  0:0 1:0
@@ -67,6 +72,8 @@ class TripTimesForDaysIndexTest {
       1 | 1 | 2      ->  0:0 1:0 2:0
 
       # Test all overlapping times with 3 days and 5 times
+      | 1 2 | 3 4 5  ->  1:0 1:1 2:0 2:1 2:2
+      1 2 | | 3 4 5  ->  0:0 0:1 2:0 2:1 2:2
       1 2 3 | 4 | 5  ->  0:0 0:1 0:2 1:0 2:0
       1 2 3 | 5 | 4  ->  0:0 0:1 0:2 2:0 1:0
       1 2 | 3 4 | 5  ->  0:0 0:1 1:0 1:1 2:0
@@ -108,9 +115,14 @@ class TripTimesForDaysIndexTest {
       """.split("\n")
     )
       .map(String::trim)
-      .filter(s -> s.length() > 0)
+      .filter(s -> !s.isEmpty())
       .filter(s -> !s.startsWith("#"))
-      .map(s -> Arguments.of(s.substring(0, 14).trim(), s.substring(18).trim()))
+      .map(s ->
+        Arguments.of(
+          s.substring(0, 14).replaceAll("\\[empty]", "").trim(),
+          s.substring(18).replaceAll("\\[empty]", "").trim()
+        )
+      )
       .toList();
   }
 
@@ -141,9 +153,15 @@ class TripTimesForDaysIndexTest {
   }
 
   static List<int[]> toTimes(String list) {
-    var args = list.split("\\|");
+    // The limit is needed to split | into two empty strings
+    // https://errorprone.info/bugpattern/StringSplitter
+    var args = list.split("\\|", -1);
     return Arrays.stream(args)
-      .map(it -> Arrays.stream(it.trim().split(" ")).mapToInt(Integer::parseInt).toArray())
+      .map(it ->
+        it.trim().isEmpty()
+          ? new int[0]
+          : Arrays.stream(it.trim().split(" ")).mapToInt(Integer::parseInt).toArray()
+      )
       .toList();
   }
 }

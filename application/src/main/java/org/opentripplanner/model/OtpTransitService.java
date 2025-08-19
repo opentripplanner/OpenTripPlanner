@@ -2,7 +2,6 @@ package org.opentripplanner.model;
 
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -52,19 +51,11 @@ public interface OtpTransitService {
    */
   Collection<FeedScopedId> getAllServiceIds();
 
-  List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);
-
   Collection<Entrance> getAllEntrances();
 
   Collection<PathwayNode> getAllPathwayNodes();
 
   Collection<BoardingArea> getAllBoardingAreas();
-
-  /**
-   * @return the list of {@link StopTime} objects associated with the trip, sorted by {@link
-   * StopTime#getStopSequence()}
-   */
-  List<StopTime> getStopTimesForTrip(Trip trip);
 
   Collection<ConstrainedTransfer> getAllTransfers();
 
