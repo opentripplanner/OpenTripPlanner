@@ -2,12 +2,12 @@ package org.opentripplanner.framework.csv.parser;
 
 import java.util.Objects;
 
-final class NumberFormatIssue extends AbstractIssue {
+final class FormatIssue extends AbstractIssue {
 
   private final Object value;
   private final String valueType;
 
-  public NumberFormatIssue(
+  public FormatIssue(
     String columnName,
     Object value,
     String valueType,
@@ -21,7 +21,7 @@ final class NumberFormatIssue extends AbstractIssue {
 
   @Override
   public String errorCode() {
-    return issueType() + "NumberFormat";
+    return issueType() + "Format";
   }
 
   @Override

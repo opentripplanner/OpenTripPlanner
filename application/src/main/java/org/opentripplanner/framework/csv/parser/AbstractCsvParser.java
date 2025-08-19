@@ -2,10 +2,14 @@ package org.opentripplanner.framework.csv.parser;
 
 import com.csvreader.CsvReader;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.utils.lang.DoubleRange;
@@ -14,8 +18,18 @@ import org.opentripplanner.utils.lang.StringUtils;
 
 public abstract class AbstractCsvParser<T> {
 
+  /** This allow both the GTFS Date format YYYYMMDD */
+  private static final DateTimeFormatter GTFS_LOCAL_DATE_FORMATER = DateTimeFormatter.ofPattern(
+    "yyyyMMdd"
+  );
+  private static final Pattern GTFS_LOCAL_DATE_PATTERN = Pattern.compile("\\d{8}");
+
+  private static final IntRange GTFS_BOOLEAN_RANGE = IntRange.ofInclusive(0, 1);
+
   private static final String TYPE_DOUBLE = "double";
   private static final String TYPE_INT = "int";
+  private static final String TYPE_BOOLEAN = "boolean";
+  private static final String TYPE_LOCAL_DATE = "local-date";
   private final DataImportIssueStore issueStore;
   private final CsvReader reader;
   private final String issueType;
@@ -84,6 +98,18 @@ public abstract class AbstractCsvParser<T> {
     return value;
   }
 
+  protected boolean getGtfsBoolean(String columnName) throws HandledCsvParseException {
+    int value = getNumber(columnName, TYPE_BOOLEAN, Integer::parseInt);
+    validateInRange(
+      columnName,
+      TYPE_BOOLEAN,
+      value,
+      GTFS_BOOLEAN_RANGE::contains,
+      GTFS_BOOLEAN_RANGE
+    );
+    return value == 1;
+  }
+
   protected double getDouble(String columnName) throws HandledCsvParseException {
     return getNumber(columnName, TYPE_DOUBLE, Double::parseDouble);
   }
@@ -105,6 +131,21 @@ public abstract class AbstractCsvParser<T> {
       return value;
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  protected LocalDate getLocalDate(String columnName) throws HandledCsvParseException {
+    var value = getString(columnName);
+    try {
+      return LocalDate.parse(
+        value,
+        GTFS_LOCAL_DATE_PATTERN.matcher(value).matches()
+          ? GTFS_LOCAL_DATE_FORMATER
+          : DateTimeFormatter.ISO_LOCAL_DATE
+      );
+    } catch (DateTimeParseException e) {
+      issueStore.add(new FormatIssue(columnName, value, TYPE_LOCAL_DATE, line(), issueType));
+      throw new HandledCsvParseException();
     }
   }
 
@@ -134,7 +175,7 @@ public abstract class AbstractCsvParser<T> {
     try {
       return mapper.apply(value);
     } catch (NumberFormatException e) {
-      issueStore.add(new NumberFormatIssue(columnName, value, type, line(), issueType));
+      issueStore.add(new FormatIssue(columnName, value, type, line(), issueType));
       throw new HandledCsvParseException();
     }
   }
