@@ -14,10 +14,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
@@ -25,15 +23,16 @@ import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.data.KristiansandCarpoolingData;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.model.CarpoolItineraryCandidate;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.routing.algorithm.mapping.StreetModeToTransferTraverseModeMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
@@ -44,26 +43,30 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
-import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.model.site.AreaStop;
 
 public class DefaultCarpoolingService implements CarpoolingService {
 
+  private static final Duration MAX_BOOKING_WINDOW = Duration.ofHours(2);
+  private static final int DEFAULT_MAX_CARPOOL_RESULTS = 3;
+
+  private final StreetLimitationParametersService streetLimitationParametersService;
   private final CarpoolingRepository repository;
   private final Graph graph;
 
-  public DefaultCarpoolingService(CarpoolingRepository repository, Graph graph) {
+  public DefaultCarpoolingService(StreetLimitationParametersService streetLimitationParametersService, CarpoolingRepository repository, Graph graph) {
     KristiansandCarpoolingData.populateRepository(repository, graph);
+    this.streetLimitationParametersService = streetLimitationParametersService;
     this.repository = repository;
     this.graph = graph;
   }
@@ -99,7 +102,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * Create Itineraries for the top 3 results and return
    * </pre>
    */
-  public List<Itinerary> route(OtpServerRequestContext serverContext, RouteRequest request)
+  public List<Itinerary> route(RouteRequest request)
     throws RoutingValidationException {
     if (
       Objects.requireNonNull(request.from()).lat == null ||
@@ -118,102 +121,27 @@ public class DefaultCarpoolingService implements CarpoolingService {
       );
     }
 
-    List<CarpoolTrip> availableTrips;
-
-    try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        graph,
-        request.from(),
-        request.to(),
-        request.journey().direct().mode(),
-        request.journey().direct().mode()
-      )
-    ) {
-      // Prepare access/egress transfers
-      Collection<NearbyStop> accessStops = getClosestAreaStopsToVertex(
-        request,
-        temporaryVertices.getFromVertices(),
-        repository.getBoardingAreasForVertex(),
-        repository.getCarpoolTripsByBoardingArea(),
-        serverContext.flexParameters().maxAccessWalkDuration(),
-        false
-      );
-
-      Collection<NearbyStop> egressStops = getClosestAreaStopsToVertex(
-        request,
-        temporaryVertices.getToVertices(),
-        repository.getAlightingAreasForVertex(),
-        repository.getCarpoolTripsByAlightingArea(),
-        serverContext.flexParameters().maxEgressWalkDuration(),
-        true
-      );
-
-      Set<CarpoolTrip> boardingTrips = accessStops
-        .stream()
-        .map(stop -> {
-          var trip = repository.getCarpoolTripByBoardingArea((AreaStop)stop.stop);
-          trip.setBoardingStop(stop);
-          return trip;
-        })
-        .collect(Collectors.toSet());
-
-      Set<CarpoolTrip> alightingTrips = egressStops
-        .stream()
-        .map(stop -> {
-          var trip = repository.getCarpoolTripByAlightingArea((AreaStop)stop.stop);
-          trip.setAlightingStop(stop);
-          return trip;
-        })
-        .collect(Collectors.toSet());
-
-      // Relevant trips are in both the boarding and alighting sets
-      List<CarpoolTrip> relevantTrips = boardingTrips
-        .stream()
-        .filter(alightingTrips::contains)
-        .collect(Collectors.toList());
-
-      // Now that we have the relevant trips, we can proceed with routing for access, egress, and carpool segments
-      if (relevantTrips.isEmpty()) {
-        // No relevant carpool trips found, return empty list
-        return Collections.emptyList();
-      }
-
-      // Relevant trips leave between the arrival at the access and two hours from then
-      relevantTrips = relevantTrips
-        .stream()
-        .filter(trip ->
-          trip.getStartTime().toInstant().isAfter(trip.getBoardingStop().state.getTime())
-            && trip.getStartTime().toInstant().isBefore(trip.getBoardingStop().state.getTime().plusSeconds(2 * 3600)))
-        .collect(Collectors.toList());
-
-      // At this point we have relevant trips with boarding and alighting stops as NearbyStops.
-      // Now we need to route from starting point to the vertex in the nearby stops, between the vertices, and from the stop in the alighting stop to the destination
-      if (relevantTrips.isEmpty()) {
-        // No relevant carpool trips found within the next 2 hours, return empty list
-        return Collections.emptyList();
-      }
-      availableTrips = relevantTrips;
+    List<CarpoolItineraryCandidate> itineraryCandidates = getCarpoolItineraryCandidates(request);
+    if (itineraryCandidates.isEmpty()) {
+      // No relevant carpool trips found within the next 2 hours, return empty list
+      return Collections.emptyList();
     }
 
     // Perform A* routing for the top candidates and create itineraries
     List<Itinerary> itineraries = new ArrayList<>();
-    int maxResults = Math.min(availableTrips.size(), 3);
+    int maxResults = Math.min(itineraryCandidates.size(), DEFAULT_MAX_CARPOOL_RESULTS);
 
     for (int i = 0; i < maxResults; i++) {
-      CarpoolTrip trip = availableTrips.get(i);
+      CarpoolItineraryCandidate candidate = itineraryCandidates.get(i);
 
-      Coordinate pickup = trip.getBoardingStop().state.getVertex().getCoordinate();
-      Coordinate dropoff = trip.getAlightingStop().state.getVertex().getCoordinate();
-      GraphPath<State, Edge, Vertex> routing = routeBetweenCoordinates(
-        serverContext,
-        pickup,
-        dropoff,
-        StreetMode.CAR,
-        request
-      );
+      GraphPath<State, Edge, Vertex> routing = carpoolRouting(
+        request,
+        new StreetRequest(StreetMode.CAR),
+        candidate.boardingStop().state.getVertex(),
+        candidate.alightingStop().state.getVertex(),
+        streetLimitationParametersService.getMaxCarSpeed());
 
-      // Only create itinerary if all routing segments succeeded
-      Itinerary itinerary = createItineraryFromRouting(trip, routing);
+      Itinerary itinerary = createItineraryFromRouting(request, candidate, routing);
       if (itinerary != null) {
         itineraries.add(itinerary);
       }
@@ -222,46 +150,103 @@ public class DefaultCarpoolingService implements CarpoolingService {
     return itineraries;
   }
 
+  private List<CarpoolItineraryCandidate> getCarpoolItineraryCandidates(RouteRequest request) {
+    TemporaryVerticesContainer temporaryVertices;
+
+    try {
+      temporaryVertices = new TemporaryVerticesContainer(
+        graph,
+        request.from(),
+        request.to(),
+        request.journey().access().mode(),
+        request.journey().egress().mode());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+    // Prepare access/egress transfers
+    Collection<NearbyStop> accessStops = getClosestAreaStopsToVertex(
+      request,
+      request.journey().access(),
+      temporaryVertices.getFromVertices(),
+      null,
+      repository.getBoardingAreasForVertex());
+
+    Collection<NearbyStop> egressStops = getClosestAreaStopsToVertex(
+      request,
+      request.journey().egress(),
+      null,
+      temporaryVertices.getToVertices(),
+      repository.getAlightingAreasForVertex());
+
+    Map<CarpoolTrip, NearbyStop> tripToBoardingStop = accessStops.stream()
+      .collect(Collectors.toMap(
+        stop -> repository.getCarpoolTripByBoardingArea((AreaStop) stop.stop),
+        stop -> stop
+      ));
+
+    Map<CarpoolTrip, NearbyStop> tripToAlightingStop = egressStops.stream()
+      .collect(Collectors.toMap(
+        stop -> repository.getCarpoolTripByAlightingArea((AreaStop) stop.stop),
+        stop -> stop
+      ));
+
+    // Find trips that have both boarding and alighting stops
+    List<CarpoolItineraryCandidate> itineraryCandidates = tripToBoardingStop.keySet().stream()
+      .filter(tripToAlightingStop::containsKey)
+      .map(trip -> new CarpoolItineraryCandidate(
+        trip,
+        tripToBoardingStop.get(trip),
+        tripToAlightingStop.get(trip)
+      ))
+      .filter(candidate ->
+        candidate.trip().getStartTime().toInstant().isAfter(candidate.boardingStop().state.getTime())
+          && candidate.trip().getStartTime().toInstant().isBefore(candidate.boardingStop().state.getTime().plus(MAX_BOOKING_WINDOW)))
+      .toList();
+    return itineraryCandidates;
+  }
+
   private List<NearbyStop> getClosestAreaStopsToVertex(
     RouteRequest request,
+    StreetRequest streetRequest,
     Set<Vertex> originVertices,
-    Multimap<StreetVertex, AreaStop> destinations,
-    Map<AreaStop, CarpoolTrip> areaStopToTripMap,
-    Duration maxWalkDuration,
-    boolean reverseDirection
+    Set<Vertex> destinationVertices,
+    Multimap<StreetVertex, AreaStop> destinationAreas
   ) {
+    var maxAccessEgressDuration = request.preferences().street().accessEgress().maxDuration().valueOf(streetRequest.mode());
+    var arriveBy = originVertices == null && destinationVertices != null;
+
     var streetSearch = StreetSearchBuilder.of()
       .setSkipEdgeStrategy(
-        new DurationSkipEdgeStrategy<>(maxWalkDuration)
+        new DurationSkipEdgeStrategy<>(maxAccessEgressDuration)
       )
       .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)
-      .setArriveBy(reverseDirection)
-      .setStreetRequest(request.journey().direct())
-      .setFrom(reverseDirection ? null : originVertices)
-      .setTo(reverseDirection ? originVertices : null);
+      .setArriveBy(arriveBy)
+      .setStreetRequest(streetRequest)
+      .setFrom(originVertices)
+      .setTo(destinationVertices);
 
-    ShortestPathTree<State, Edge, Vertex> spt = streetSearch.getShortestPathTree();
+    var spt = streetSearch.getShortestPathTree();
 
     if (spt == null) {
       return Collections.emptyList();
     }
 
+    // Get the reachable AreaStops from the vertices in the SPT
     Multimap<AreaStop, State> locationsMap = ArrayListMultimap.create();
-
     for (State state : spt.getAllStates()) {
       Vertex targetVertex = state.getVertex();
       if (
-        targetVertex instanceof StreetVertex streetVertex && destinations.containsKey(streetVertex)
+        targetVertex instanceof StreetVertex streetVertex && destinationAreas.containsKey(streetVertex)
       ) {
-        for (AreaStop areaStop : destinations.get(streetVertex)) {
-          if (areaStopToTripMap.containsKey(areaStop)) {
-            locationsMap.put(areaStop, state);
-          }
+        for (AreaStop areaStop : destinationAreas.get(streetVertex)) {
+          locationsMap.put(areaStop, state);
         }
       }
     }
 
+    // Map the minimum reachable state for each AreaStop and the AreaStop to NearbyStop
     List<NearbyStop> stopsFound = new ArrayList<>();
     for (var locationStates : locationsMap.asMap().entrySet()) {
       AreaStop areaStop = locationStates.getKey();
@@ -292,67 +277,53 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * Returns the routing result with distance, time, and geometry.
    */
   @Nullable
-  private GraphPath<State, Edge, Vertex> routeBetweenCoordinates(
-    OtpServerRequestContext serverContext,
-    Coordinate from,
-    Coordinate to,
-    StreetMode streetMode,
-    RouteRequest request
+  private GraphPath<State, Edge, Vertex> carpoolRouting(
+    RouteRequest request,
+    StreetRequest streetRequest,
+    Vertex from,
+    Vertex to,
+    float maxCarSpeed
   ) {
-    try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        graph,
-        GenericLocation.fromCoordinate(from.getY(), from.getX()),
-        GenericLocation.fromCoordinate(to.getY(), to.getX()),
-        streetMode,
-        streetMode
-      )
-    ) {
-      var maxCarSpeed = serverContext.streetLimitationParametersService().getMaxCarSpeed();
+    StreetPreferences preferences = request.preferences().street();
 
-      StreetPreferences preferences = request.preferences().street();
-
-      StreetSearchBuilder aStar = StreetSearchBuilder.of()
-        .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
-        .setSkipEdgeStrategy(
-          new DurationSkipEdgeStrategy(
-            preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
-          )
+    var streetSearch = StreetSearchBuilder.of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
+      .setSkipEdgeStrategy(
+        new DurationSkipEdgeStrategy(
+          preferences.maxDirectDuration().valueOf(streetRequest.mode())
         )
-        // FORCING the dominance function to weight only
-        .setDominanceFunction(new DominanceFunctions.MinimumWeight())
-        .setRequest(request)
-        .setStreetRequest(new StreetRequest(streetMode))
-        .setFrom(temporaryVertices.getFromVertices())
-        .setTo(temporaryVertices.getToVertices());
+      )
+      .setDominanceFunction(new DominanceFunctions.MinimumWeight())
+      .setRequest(request)
+      .setStreetRequest(streetRequest)
+      .setFrom(from)
+      .setTo(to);
 
-      List<GraphPath<State, Edge, Vertex>> paths = aStar.getPathsToTarget();
-      paths.sort(new PathComparator(request.arriveBy()));
+    List<GraphPath<State, Edge, Vertex>> paths = streetSearch.getPathsToTarget();
+    paths.sort(new PathComparator(request.arriveBy()));
 
-      return paths.getFirst();
-    } catch (Exception e) {
-      return null;
-    }
+    return paths.getFirst();
   }
 
   /**
    * Creates a complete itinerary from A* routing results with proper walking and carpool legs
    */
-  private Itinerary createItineraryFromRouting(CarpoolTrip trip, GraphPath<State, Edge, Vertex> carpoolPath) {
+  private Itinerary createItineraryFromRouting(RouteRequest request, CarpoolItineraryCandidate candidate, GraphPath<State, Edge, Vertex> carpoolPath) {
     List<Leg> legs = new ArrayList<>();
 
     // 1. Access walking leg (origin to pickup)
     Leg accessLeg = createWalkingLegFromPath(
-      trip.getBoardingStop(),
+      request.journey().access(),
+      candidate.boardingStop(),
       null,
-      trip.getStartTime(),
+      candidate.trip().getStartTime(),
       "Walk to pickup"
     );
     if (accessLeg != null) {
       legs.add(accessLeg);
     }
 
-    var drivingEndTime = trip
+    var drivingEndTime = candidate.trip()
       .getStartTime()
       .plus(
         Duration.between(
@@ -363,18 +334,18 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
     // 2. Carpool transit leg (pickup to dropoff)
     CarpoolLeg carpoolLeg = CarpoolLeg.of()
-      .withStartTime(trip.getStartTime())
+      .withStartTime(candidate.trip().getStartTime())
       .withEndTime(drivingEndTime)
       .withFrom(
-        createPlaceFromState(
-          carpoolPath.states.getFirst(),
-          "Pickup at " + trip.getBoardingArea().getName()
+        createPlaceFromVertex(
+          carpoolPath.states.getFirst().getVertex(),
+          "Pickup at " + candidate.trip().getBoardingArea().getName()
         )
       )
       .withTo(
-        createPlaceFromState(
-          carpoolPath.states.getLast(),
-          "Dropoff at " + trip.getAlightingArea().getName()
+        createPlaceFromVertex(
+          carpoolPath.states.getLast().getVertex(),
+          "Dropoff at " + candidate.trip().getAlightingArea().getName()
         )
       )
       .withGeometry(
@@ -389,7 +360,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
     // 3. Egress walking leg (dropoff to destination)
     Leg egressLeg = createWalkingLegFromPath(
-      trip.getAlightingStop(),
+      request.journey().egress(),
+      candidate.alightingStop(),
       drivingEndTime,
       null,
       "Walk from dropoff"
@@ -411,6 +383,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    */
   @Nullable
   private Leg createWalkingLegFromPath(
+    StreetRequest streetRequest,
     NearbyStop nearbyStop,
     ZonedDateTime legStartTime,
     ZonedDateTime legEndTime,
@@ -425,7 +398,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var firstState = graphPath.states.getFirst();
     var lastState = graphPath.states.getLast();
 
-    // Extract edges (skip first state which doesn't have a back edge)
     List<Edge> edges = nearbyStop.edges;
 
     if (edges.isEmpty()) {
@@ -444,11 +416,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
     // Build the walking leg
     return StreetLeg.of()
-      .withMode(TraverseMode.WALK)
+      .withMode(StreetModeToTransferTraverseModeMapper.map(streetRequest.mode() == StreetMode.NOT_SET ? StreetMode.WALK : streetRequest.mode()))
       .withStartTime(legStartTime)
       .withEndTime(legEndTime)
-      .withFrom(createPlaceFromState(firstState, name + " start"))
-      .withTo(createPlaceFromState(lastState, name + " end"))
+      .withFrom(createPlaceFromVertex(firstState.getVertex(), name + " start"))
+      .withTo(createPlaceFromVertex(lastState.getVertex(), name + " end"))
       .withDistanceMeters(nearbyStop.distance)
       .withGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
       .withGeometry(geometry)
@@ -459,8 +431,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * Creates a Place from a State, similar to GraphPathToItineraryMapper.makePlace
    * but simplified for carpooling service use.
    */
-  private Place createPlaceFromState(State state, String defaultName) {
-    Vertex vertex = state.getVertex();
+  private Place createPlaceFromVertex(Vertex vertex, String defaultName) {
     I18NString name = vertex.getName();
 
     // Use intersection name for street vertices to get better names

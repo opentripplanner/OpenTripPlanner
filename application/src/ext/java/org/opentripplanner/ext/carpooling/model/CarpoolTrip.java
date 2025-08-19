@@ -2,7 +2,6 @@ package org.opentripplanner.ext.carpooling.model;
 
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
@@ -26,9 +25,6 @@ public class CarpoolTrip
   private final String provider;
   private final int availableSeats;
 
-  private NearbyStop boardingStop;
-  private NearbyStop alightingStop;
-
   public CarpoolTrip(CarpoolTripBuilder builder) {
     super(builder.getId());
     this.boardingArea = builder.getBoardingArea();
@@ -46,22 +42,6 @@ public class CarpoolTrip
 
   public AreaStop getAlightingArea() {
     return alightingArea;
-  }
-
-  public NearbyStop getAlightingStop() {
-    return alightingStop;
-  }
-
-  public void setAlightingStop(NearbyStop alightingStop) {
-    this.alightingStop = alightingStop;
-  }
-
-  public NearbyStop getBoardingStop() {
-    return boardingStop;
-  }
-
-  public void setBoardingStop(NearbyStop boardingStop) {
-    this.boardingStop = boardingStop;
   }
 
   public ZonedDateTime getStartTime() {

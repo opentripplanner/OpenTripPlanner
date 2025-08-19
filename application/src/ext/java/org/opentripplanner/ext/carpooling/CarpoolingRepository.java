@@ -22,22 +22,6 @@ public interface CarpoolingRepository {
    */
   void addCarpoolTrip(CarpoolTrip trip);
 
-  /**
-   * Remove a carpool trip from the repository.
-   */
-  void removeCarpoolTrip(FeedScopedId tripId);
-
-  /**
-   * Get a specific carpool trip by ID.
-   */
-  CarpoolTrip getCarpoolTrip(FeedScopedId tripId);
-
-  boolean isCarpoolBoardingArea(FeedScopedId areaId);
-  boolean isCarpoolAlightingArea(FeedScopedId areaId);
-
-  Map<AreaStop, CarpoolTrip> getCarpoolTripsByBoardingArea();
-  Map<AreaStop, CarpoolTrip> getCarpoolTripsByAlightingArea();
-
   CarpoolTrip getCarpoolTripByBoardingArea(AreaStop stop);
   CarpoolTrip getCarpoolTripByAlightingArea(AreaStop stop);
 

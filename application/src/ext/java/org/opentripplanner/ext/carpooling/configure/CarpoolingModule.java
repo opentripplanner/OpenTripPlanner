@@ -10,6 +10,7 @@ import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 
 @Module
 public class CarpoolingModule {
@@ -25,12 +26,13 @@ public class CarpoolingModule {
 
   @Provides
   public static CarpoolingService provideCarpoolingService(
+    StreetLimitationParametersService streetLimitationParametersService,
     CarpoolingRepository repository,
     Graph graph
   ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    return new DefaultCarpoolingService(repository, graph);
+    return new DefaultCarpoolingService(streetLimitationParametersService, repository, graph);
   }
 }
