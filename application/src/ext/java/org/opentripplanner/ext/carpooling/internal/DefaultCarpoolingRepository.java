@@ -13,8 +13,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultCarpoolingRepository implements CarpoolingRepository {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultCarpoolingRepository.class);
 
   private final Graph graph;
 
@@ -54,6 +58,9 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
     streetVerticesWithinAreaStop(alightingArea).forEach(v -> {
       alightingAreasByVertex.put(v, alightingArea);
     });
+    LOG.info("Added carpooling trip for start time: {}",
+      trip.getStartTime()
+    );
   }
 
   private List<StreetVertex> streetVerticesWithinAreaStop(AreaStop stop) {

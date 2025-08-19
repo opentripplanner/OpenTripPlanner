@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -50,8 +50,6 @@ public class CarpoolLeg implements Leg {
 
   private final Emission emissionPerPerson;
 
-  private final List<FareProductUse> fareProducts;
-
   private final Place from;
 
   private final Place to;
@@ -65,7 +63,6 @@ public class CarpoolLeg implements Leg {
     this.endTime = Objects.requireNonNull(builder.endTime());
     this.generalizedCost = builder.generalizedCost();
     this.transitAlerts = Set.copyOf(builder.alerts());
-    this.fareProducts = List.copyOf(builder.fareProducts());
     this.emissionPerPerson = builder.emissionPerPerson();
     this.from = builder.from();
     this.to = builder.to();
@@ -394,6 +391,11 @@ public class CarpoolLeg implements Leg {
     return Leg.super.fareZones();
   }
 
+  @Override
+  public List<FareOffer> fareOffers() {
+    return List.of();
+  }
+
   @Nullable
   @Override
   public Emission emissionPerPerson() {
@@ -416,11 +418,6 @@ public class CarpoolLeg implements Leg {
   @Override
   public String vehicleRentalNetwork() {
     return Leg.super.vehicleRentalNetwork();
-  }
-
-  @Override
-  public List<FareProductUse> fareProducts() {
-    return fareProducts;
   }
 
   public TransitMode mode() {
