@@ -124,7 +124,9 @@ class SiriAzureUpdaterTest {
       .when(task)
       .run();
 
-    updater.executeWithRetry(task, "Test Task");
+    // Use longer timeout for this test since it does many retries with exponential backoff
+    // Test still runs fast since sleep() is mocked, but timeout logic needs headroom
+    updater.executeWithRetry(task, "Test Task", 300_000); // 5 minutes
 
     verify(updater, times(totalSleepCalls)).sleep(anyInt());
 
@@ -158,7 +160,7 @@ class SiriAzureUpdaterTest {
     doThrow(serviceBusException).when(task).run();
 
     try {
-      updater.executeWithRetry(task, "Test Task");
+      updater.executeWithRetry(task, "Test Task", mockConfig.getStartupTimeout());
     } catch (ServiceBusException e) {
       assertEquals(
         ServiceBusFailureReason.MESSAGE_SIZE_EXCEEDED,
@@ -194,7 +196,7 @@ class SiriAzureUpdaterTest {
       .when(updater)
       .sleep(anyInt());
 
-    updater.executeWithRetry(task, "Test Task");
+    updater.executeWithRetry(task, "Test Task", mockConfig.getStartupTimeout());
 
     boolean completed = latch.await(5, TimeUnit.SECONDS);
     assertTrue(completed, "Expected sleep calls were not made.");
@@ -225,7 +227,7 @@ class SiriAzureUpdaterTest {
     doNothing().when(task).run();
     doNothing().when(updater).sleep(anyInt());
 
-    updater.executeWithRetry(task, "Test Task");
+    updater.executeWithRetry(task, "Test Task", mockConfig.getStartupTimeout());
 
     verify(updater, never()).sleep(anyInt());
     verify(task, times(1)).run();
@@ -254,7 +256,7 @@ class SiriAzureUpdaterTest {
       .when(updater)
       .sleep(anyInt());
 
-    updater.executeWithRetry(task, "Test Task");
+    updater.executeWithRetry(task, "Test Task", mockConfig.getStartupTimeout());
 
     boolean completed = latch.await(5, TimeUnit.SECONDS);
     assertTrue(completed, "Expected sleep call was not made.");
@@ -330,7 +332,7 @@ class SiriAzureUpdaterTest {
     InterruptedException thrownException = assertThrows(
       InterruptedException.class,
       () -> {
-        longTimeoutUpdater.executeWithRetry(task, "Test Task");
+        longTimeoutUpdater.executeWithRetry(task, "Test Task", mockConfig.getStartupTimeout());
       },
       "Expected executeWithRetry to throw InterruptedException"
     );
@@ -359,7 +361,7 @@ class SiriAzureUpdaterTest {
 
     doNothing().when(updater).sleep(anyInt());
 
-    updater.executeWithRetry(task, "Test Task");
+    updater.executeWithRetry(task, "Test Task", mockConfig.getStartupTimeout());
 
     ArgumentCaptor<Integer> sleepCaptor = ArgumentCaptor.forClass(Integer.class);
     verify(updater, times(expectedSleepCalls)).sleep(sleepCaptor.capture());
@@ -388,7 +390,7 @@ class SiriAzureUpdaterTest {
     Exception thrown = assertThrows(
       NullPointerException.class,
       () -> {
-        updater.executeWithRetry(task, "Test Task");
+        updater.executeWithRetry(task, "Test Task", mockConfig.getStartupTimeout());
       },
       "Expected executeWithRetry to throw NullPointerException"
     );
@@ -410,14 +412,16 @@ class SiriAzureUpdaterTest {
     // fail with a retryable exception
     doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY)).when(task).run();
 
+    // Use a very short timeout for this test to avoid waiting
+    int shortTimeout = 100; // 100ms
     RuntimeException thrown = assertThrows(
       RuntimeException.class,
-      () -> timeoutUpdater.executeWithRetry(task, "Test Task"),
+      () -> timeoutUpdater.executeWithRetry(task, "Test Task", shortTimeout),
       "Expected executeWithRetry to throw RuntimeException due to timeout"
     );
 
     assertTrue(
-      thrown.getMessage().contains("timed out after 30000ms"),
+      thrown.getMessage().contains("timed out after " + shortTimeout + "ms"),
       "Exception message should mention timeout: " + thrown.getMessage()
     );
 
@@ -443,7 +447,9 @@ class SiriAzureUpdaterTest {
       .run();
 
     // Should not throw - should succeed before timeout
-    assertDoesNotThrow(() -> timeoutUpdater.executeWithRetry(task, "Test Task"));
+    assertDoesNotThrow(() ->
+      timeoutUpdater.executeWithRetry(task, "Test Task", mockConfig.getStartupTimeout())
+    );
 
     verify(task, times(3)).run(); // 2 failures + 1 success
     verify(timeoutUpdater, times(2)).sleep(anyInt()); // 2 sleep calls for retries
@@ -463,7 +469,7 @@ class SiriAzureUpdaterTest {
 
     RuntimeException thrown = assertThrows(
       RuntimeException.class,
-      () -> zeroTimeoutUpdater.executeWithRetry(task, "Test Task"),
+      () -> zeroTimeoutUpdater.executeWithRetry(task, "Test Task", 0),
       "Expected executeWithRetry to throw RuntimeException immediately with zero timeout"
     );
 
@@ -489,7 +495,8 @@ class SiriAzureUpdaterTest {
       .when(failingUpdater)
       .executeWithRetry(
         any(SiriAzureUpdater.CheckedRunnable.class),
-        contains("Setting up Service Bus")
+        eq(SiriAzureUpdater.StartupStep.SETUP_SUBSCRIPTION.getDescription()),
+        anyInt()
       );
 
     // Initially not primed
@@ -509,7 +516,7 @@ class SiriAzureUpdaterTest {
     // Mock all setup methods to succeed
     doNothing()
       .when(workingUpdater)
-      .executeWithRetry(any(SiriAzureUpdater.CheckedRunnable.class), anyString());
+      .executeWithRetry(any(SiriAzureUpdater.CheckedRunnable.class), anyString(), anyInt());
 
     assertFalse(workingUpdater.isPrimed(), "Updater should not be primed initially");
 
@@ -537,21 +544,21 @@ class SiriAzureUpdaterTest {
    */
   @Test
   void testCustomStartupTimeoutConfiguration() throws Exception {
-    when(mockConfig.getStartupTimeout()).thenReturn(60_000); // 1 minute (not actual test time)
+    when(mockConfig.getStartupTimeout()).thenReturn(60_000);
     SiriAzureUpdater customTimeoutUpdater = spy(createUpdater(mockConfig));
 
-    // Mock sleep to avoid waiting in test, but verify timeout value is used correctly
     doNothing().when(customTimeoutUpdater).sleep(anyInt());
     doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY)).when(task).run();
 
+    int testTimeout = 200;
     RuntimeException thrown = assertThrows(RuntimeException.class, () ->
-      customTimeoutUpdater.executeWithRetry(task, "Test Task")
+      customTimeoutUpdater.executeWithRetry(task, "Test Task", testTimeout)
     );
 
-    // Verify the exception message contains the custom timeout value
+    // Verify the exception message contains the test timeout value
     assertTrue(
-      thrown.getMessage().contains("timed out after 60000ms"),
-      "Exception should mention custom timeout: " + thrown.getMessage()
+      thrown.getMessage().contains("timed out after " + testTimeout + "ms"),
+      "Exception should mention timeout: " + thrown.getMessage()
     );
 
     // Verify retries were attempted
@@ -579,7 +586,8 @@ class SiriAzureUpdaterTest {
       .when(failingUpdater)
       .executeWithRetry(
         any(SiriAzureUpdater.CheckedRunnable.class),
-        contains("Setting up Service Bus")
+        eq(SiriAzureUpdater.StartupStep.SETUP_SUBSCRIPTION.getDescription()),
+        anyInt()
       );
 
     failingUpdater.run();
@@ -590,7 +598,7 @@ class SiriAzureUpdaterTest {
       .anyMatch(event ->
         event
           .getFormattedMessage()
-          .contains("REALTIME_ALERT component=ServiceBus status=UNAVAILABLE")
+          .contains("REALTIME_STARTUP_ALERT component=RealtimeSetup status=UNAVAILABLE")
       );
 
     assertTrue(foundRealtimeAlert, "Should log REALTIME_ALERT for ServiceBus exceptions");
@@ -616,14 +624,16 @@ class SiriAzureUpdaterTest {
       .when(failingUpdater)
       .executeWithRetry(
         any(SiriAzureUpdater.CheckedRunnable.class),
-        contains("Setting up Service Bus")
+        eq(SiriAzureUpdater.StartupStep.SETUP_SUBSCRIPTION.getDescription()),
+        anyInt()
       );
 
     doThrow(new URISyntaxException("invalid", "Invalid URI"))
       .when(failingUpdater)
       .executeWithRetry(
         any(SiriAzureUpdater.CheckedRunnable.class),
-        contains("Initializing historical")
+        eq(SiriAzureUpdater.StartupStep.INITIALIZE_HISTORY.getDescription()),
+        anyInt()
       );
 
     failingUpdater.run();
@@ -632,7 +642,9 @@ class SiriAzureUpdaterTest {
     boolean foundHistoryAlert = listAppender.list
       .stream()
       .anyMatch(event ->
-        event.getFormattedMessage().contains("REALTIME_ALERT component=History status=UNAVAILABLE")
+        event
+          .getFormattedMessage()
+          .contains("REALTIME_STARTUP_ALERT component=RealtimeSetup status=UNAVAILABLE")
       );
 
     assertTrue(foundHistoryAlert, "Should log REALTIME_ALERT for History exceptions");
@@ -655,7 +667,7 @@ class SiriAzureUpdaterTest {
     // Make setup fail with a generic exception
     doThrow(new RuntimeException("Generic error"))
       .when(failingUpdater)
-      .executeWithRetry(any(SiriAzureUpdater.CheckedRunnable.class), anyString());
+      .executeWithRetry(any(SiriAzureUpdater.CheckedRunnable.class), anyString(), anyInt());
 
     failingUpdater.run();
 
@@ -665,7 +677,7 @@ class SiriAzureUpdaterTest {
       .anyMatch(event ->
         event
           .getFormattedMessage()
-          .contains("REALTIME_ALERT component=RealtimeSetup status=UNAVAILABLE")
+          .contains("REALTIME_STARTUP_ALERT component=RealtimeSetup status=UNAVAILABLE")
       );
 
     assertTrue(foundSetupAlert, "Should log REALTIME_ALERT for RealtimeSetup exceptions");
@@ -688,7 +700,7 @@ class SiriAzureUpdaterTest {
     // Make setup fail so finally block sets primed
     doThrow(new RuntimeException("Setup failed"))
       .when(failingUpdater)
-      .executeWithRetry(any(SiriAzureUpdater.CheckedRunnable.class), anyString());
+      .executeWithRetry(any(SiriAzureUpdater.CheckedRunnable.class), anyString(), anyInt());
 
     failingUpdater.run();
 
@@ -721,7 +733,9 @@ class SiriAzureUpdaterTest {
     doNothing().when(updater).sleep(anyInt());
 
     // Should succeed after retries
-    assertDoesNotThrow(() -> updater.executeWithRetry(task, "Backward Compatibility Test"));
+    assertDoesNotThrow(() ->
+      updater.executeWithRetry(task, "Backward Compatibility Test", mockConfig.getStartupTimeout())
+    );
 
     verify(task, times(3)).run(); // 2 failures + 1 success
     verify(updater, times(2)).sleep(anyInt()); // 2 retries
@@ -741,7 +755,7 @@ class SiriAzureUpdaterTest {
 
     // Should throw immediately, not wait for timeout
     ServiceBusException thrown = assertThrows(ServiceBusException.class, () ->
-      updater.executeWithRetry(task, "Non-retryable Test")
+      updater.executeWithRetry(task, "Non-retryable Test", mockConfig.getStartupTimeout())
     );
 
     assertEquals(ServiceBusFailureReason.MESSAGE_SIZE_EXCEEDED, thrown.getReason());
@@ -759,7 +773,7 @@ class SiriAzureUpdaterTest {
     doThrow(new InterruptedException("Thread interrupted")).when(task).run();
 
     InterruptedException thrown = assertThrows(InterruptedException.class, () ->
-      testUpdater.executeWithRetry(task, "Interrupted Test")
+      testUpdater.executeWithRetry(task, "Interrupted Test", mockConfig.getStartupTimeout())
     );
 
     assertEquals("Thread interrupted", thrown.getMessage());
@@ -784,7 +798,7 @@ class SiriAzureUpdaterTest {
 
     doNothing().when(updater).sleep(anyInt());
 
-    updater.executeWithRetry(task, "Backoff Test");
+    updater.executeWithRetry(task, "Backoff Test", mockConfig.getStartupTimeout());
 
     ArgumentCaptor<Integer> sleepCaptor = ArgumentCaptor.forClass(Integer.class);
     verify(updater, times(4)).sleep(sleepCaptor.capture());

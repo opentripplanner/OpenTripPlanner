@@ -14,16 +14,24 @@ import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.MoreExecutors;
 import jakarta.xml.bind.JAXBException;
+import java.io.UncheckedIOException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nullable;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -51,13 +59,25 @@ import uk.org.siri.siri21.Siri;
  */
 public class SiriAzureUpdater implements GraphUpdater {
 
-  /**
-   *  custom functional interface that allows throwing checked exceptions, thereby
-   *  preserving the exception's intent and type.
-   */
   @FunctionalInterface
   interface CheckedRunnable {
     void run() throws Exception;
+  }
+
+  public enum StartupStep {
+    SETUP_SUBSCRIPTION("Setting up Service Bus subscription to topic"),
+    INITIALIZE_HISTORY("Initializing historical Siri data"),
+    START_PROCESSOR("Starting Service Bus event processor");
+
+    private final String description;
+
+    StartupStep(String description) {
+      this.description = description;
+    }
+
+    public String getDescription() {
+      return description;
+    }
   }
 
   private static final Set<ServiceBusFailureReason> RETRYABLE_REASONS = Set.of(
@@ -80,7 +100,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     ServiceBusFailureReason.MESSAGING_ENTITY_ALREADY_EXISTS
   );
 
-  private final Logger LOG = LoggerFactory.getLogger(getClass());
+  private static final Logger log = LoggerFactory.getLogger(SiriAzureUpdater.class);
   private final String updaterType;
   private final AuthenticationType authenticationType;
   private final String fullyQualifiedNamespace;
@@ -96,6 +116,17 @@ public class SiriAzureUpdater implements GraphUpdater {
   private String subscriptionName;
 
   private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
+  private static final int MESSAGE_COUNTER_LOG_INTERVAL = 100;
+  private static final int ERROR_RETRY_WAIT_SECONDS = 5;
+  private static final int INITIAL_RETRY_DELAY_MS = 1000;
+  private static final int MAX_RETRY_DELAY_MS = 60_000;
+  private static final int SHUTDOWN_TIMEOUT_SECONDS = 5;
+  private static final int SHUTDOWN_FORCE_TIMEOUT_SECONDS = 2;
+  private final ExecutorService backgroundRetryExecutor = Executors.newSingleThreadExecutor(r -> {
+    Thread t = new Thread(r, "azure-siri-background-retry");
+    t.setDaemon(true);
+    return t;
+  });
 
   protected final SiriAzureMessageHandler messageHandler;
 
@@ -110,11 +141,12 @@ public class SiriAzureUpdater implements GraphUpdater {
    */
   private final int timeout;
 
-  /**
-   * The timeout used for startup operations before graceful degradation.
-   * Thread-safe as it's final and set during construction.
-   */
   private final long startupTimeoutMs;
+  private final AtomicReference<Set<StartupStep>> completedSteps = new AtomicReference<>(
+    new HashSet<>()
+  );
+  private volatile long startTime;
+  private volatile boolean shutdownHookRegistered = false;
 
   SiriAzureUpdater(SiriAzureUpdaterParameters config, SiriAzureMessageHandler messageHandler) {
     this.messageHandler = Objects.requireNonNull(messageHandler);
@@ -199,6 +231,8 @@ public class SiriAzureUpdater implements GraphUpdater {
 
   @Override
   public void run() {
+    startTime = System.currentTimeMillis();
+
     // In Kubernetes this should be the POD identifier
     subscriptionName = System.getenv("HOSTNAME");
     if (subscriptionName == null || subscriptionName.isBlank()) {
@@ -206,51 +240,29 @@ public class SiriAzureUpdater implements GraphUpdater {
     }
 
     try {
-      executeWithRetry(this::setupSubscription, "Setting up Service Bus subscription to topic");
+      tryWithBackgroundRetry(this::setupSubscription, StartupStep.SETUP_SUBSCRIPTION);
 
-      executeWithRetry(
+      tryWithBackgroundRetry(
         () -> {
           var initialData = fetchInitialSiriData();
           if (initialData.isEmpty()) {
-            LOG.info("Got empty response from history endpoint");
+            log.info("Got empty response from history endpoint");
           } else {
             processInitialSiriData(initialData.get());
           }
         },
-        "Initializing historical Siri data"
+        StartupStep.INITIALIZE_HISTORY
       );
 
-      executeWithRetry(this::startEventProcessor, "Starting Service Bus event processor");
+      tryWithBackgroundRetry(this::startEventProcessor, StartupStep.START_PROCESSOR);
 
+      // Always set primed so OTP can start, even if real-time setup is incomplete
       setPrimed();
 
-      ApplicationShutdownSupport.addShutdownHook("azure-siri-updater-shutdown", () -> {
-        LOG.info("Calling shutdownHook on {} updater", updaterType);
-        if (eventProcessor != null) {
-          eventProcessor.close();
-        }
-        if (serviceBusAdmin != null) {
-          serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
-          LOG.info("Subscription '{}' deleted on topic '{}'.", subscriptionName, topicName);
-        }
-      });
-    } catch (ServiceBusException e) {
-      LOG.error(
-        "REALTIME_STARTUP_ALERT component=ServiceBus status=UNAVAILABLE error=\"{}\"",
-        e.getMessage(),
-        new RuntimeException("Real-time ServiceBus unavailable during startup", e)
-      );
-    } catch (URISyntaxException e) {
-      LOG.error(
-        "REALTIME_STARTUP_ALERT component=History status=UNAVAILABLE error=\"{}\"", 
-        e.getMessage(),
-        new RuntimeException("Real-time History service unavailable during startup", e)
-      );
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      LOG.warn("Updater was interrupted during setup.");
+      // Register shutdown hook only once, and only after subscriptionName is set
+      registerShutdownHookIfNeeded();
     } catch (Exception e) {
-      LOG.error(
+      log.error(
         "REALTIME_STARTUP_ALERT component=RealtimeSetup status=UNAVAILABLE error=\"{}\"",
         e.getMessage(),
         new RuntimeException("Real-time setup failed during startup", e)
@@ -258,9 +270,12 @@ public class SiriAzureUpdater implements GraphUpdater {
     } finally {
       // CRITICAL: Always set primed so OTP can start
       if (!isPrimed()) {
-        LOG.warn("Real-time setup incomplete, starting OTP without real-time data");
+        log.warn("Real-time setup incomplete, starting OTP without real-time data");
         setPrimed();
       }
+
+      // Ensure shutdown hook is registered even if startup failed
+      registerShutdownHookIfNeeded();
     }
   }
 
@@ -274,53 +289,64 @@ public class SiriAzureUpdater implements GraphUpdater {
   }
 
   /**
-   * Executes a task with retry logic and timeout constraint for graceful degradation.
-   * Retries for retryable exceptions with exponential backoff until startupTimeout is exceeded.
-   * InterruptedException is propagated immediately without consuming timeout budget.
+   * Executes a task with retry logic, optionally with timeout constraint.
+   * Retries for retryable exceptions with exponential backoff.
    *
-   * @param task The task to execute, must not be null
-   * @param description A description of the task for logging purposes, must not be null
-   * @throws InterruptedException If the thread is interrupted during execution
-   * @throws RuntimeException If startup timeout is exceeded
+   * @param task The task to execute
+   * @param description A description for logging
+   * @param timeoutMs Timeout in milliseconds, or null for indefinite retries
+   * @throws InterruptedException If interrupted
+   * @throws RuntimeException If timeout is exceeded (only when timeoutMs is specified)
    * @throws Exception Any non-retryable exception from the task
    */
-  void executeWithRetry(CheckedRunnable task, String description) throws Exception {
-    int sleepPeriod = 1000; // Start with 1-second delay
+  void executeWithRetry(CheckedRunnable task, String description, Integer timeoutMs)
+    throws Exception {
+    int sleepPeriod = INITIAL_RETRY_DELAY_MS;
     int attemptCounter = 1;
     long startTime = System.currentTimeMillis();
 
-    while (System.currentTimeMillis() - startTime < startupTimeoutMs) {
+    while (
+      (timeoutMs == null && !Thread.currentThread().isInterrupted()) ||
+      (timeoutMs != null && System.currentTimeMillis() - startTime < timeoutMs)
+    ) {
       try {
         task.run();
-        LOG.info("{} succeeded.", description);
+        log.info("{} succeeded after {} attempts.", description, attemptCounter);
         return;
       } catch (InterruptedException ie) {
-        LOG.warn("{} was interrupted during execution.", description);
-        Thread.currentThread().interrupt(); // Restore interrupted status
+        log.warn("{} was interrupted.", description);
+        Thread.currentThread().interrupt();
         throw ie;
       } catch (Exception e) {
-        LOG.warn("{} failed. Error: {} (Attempt {})", description, e.getMessage(), attemptCounter);
+        log.warn("{} failed. Error: {} (Attempt {})", description, e.getMessage(), attemptCounter);
 
         if (!shouldRetry(e)) {
-          LOG.error("{} encountered a non-retryable error: {}.", description, e.getMessage());
-          throw e; // Stop retries if the error is non-retryable
+          log.error("{} encountered a non-retryable error: {}.", description, e.getMessage());
+          throw e;
         }
 
-        LOG.warn("{} will retry in {} ms.", description, sleepPeriod);
+        log.debug("{} will retry in {} ms.", description, sleepPeriod);
         attemptCounter++;
+
         try {
           sleep(sleepPeriod);
         } catch (InterruptedException ie) {
-          LOG.warn("{} was interrupted during sleep.", description);
-          Thread.currentThread().interrupt(); // Restore interrupted status
+          log.warn("{} was interrupted during sleep.", description);
+          Thread.currentThread().interrupt();
           throw ie;
         }
-        sleepPeriod = Math.min(sleepPeriod * 2, 60 * 1000); // Exponential backoff with a cap at 60 seconds
+
+        sleepPeriod = Math.min(sleepPeriod * 2, MAX_RETRY_DELAY_MS);
       }
     }
 
-    // Timeout reached - throw exception
-    throw new RuntimeException(description + " timed out after " + startupTimeoutMs + "ms");
+    // Only reachable if timeout was specified and exceeded
+    if (timeoutMs != null) {
+      throw new RuntimeException(description + " timed out after " + timeoutMs + "ms");
+    }
+
+    // Thread was interrupted during indefinite retry
+    throw new InterruptedException(description + " was interrupted");
   }
 
   boolean shouldRetry(Exception e) {
@@ -328,22 +354,205 @@ public class SiriAzureUpdater implements GraphUpdater {
       ServiceBusFailureReason reason = sbException.getReason();
 
       if (RETRYABLE_REASONS.contains(reason)) {
-        LOG.warn("Transient error encountered: {}. Retrying...", reason);
+        log.warn("Transient error encountered: {}. Retrying...", reason);
         return true;
       } else if (NON_RETRYABLE_REASONS.contains(reason)) {
-        LOG.error("Non-recoverable error encountered: {}. Not retrying.", reason);
+        log.error("Non-recoverable error encountered: {}. Not retrying.", reason);
         return false;
       } else {
-        LOG.warn("Unhandled ServiceBusFailureReason: {}. Retrying by default.", reason);
+        log.warn("Unhandled ServiceBusFailureReason: {}. Retrying by default.", reason);
         return true;
       }
     } else if (ExceptionUtils.hasCause(e, OtpHttpClientException.class)) {
       // retry for OtpHttpClientException as it is thrown if historical data can't be read at the moment
       return true;
+    } else if (getNetworkErrorType(e).isPresent()) {
+      log.warn(
+        "Network connectivity error encountered: {}. Retrying...",
+        getNetworkErrorType(e).get()
+      );
+      return true;
     }
 
-    LOG.warn("Non-ServiceBus exception encountered: {}. Not retrying.", e.getClass().getName());
+    log.warn("Non-ServiceBus exception encountered: {}. Not retrying.", e.getClass().getName());
     return false;
+  }
+
+  /**
+   * Checks if the exception represents a transient network connectivity issue.
+   * @return Optional with error description if it's a network error, empty otherwise
+   */
+  private Optional<String> getNetworkErrorType(Exception e) {
+    // DNS resolution failures - commonly transient (DNS server issues, VPN connectivity)
+    if (ExceptionUtils.hasCause(e, UnknownHostException.class)) {
+      return Optional.of("DNS resolution failure");
+    }
+    
+    if (ExceptionUtils.hasCause(e, SocketTimeoutException.class)) {
+      return Optional.of("Socket timeout");
+    }
+    
+    // Check for ConnectTimeoutException (from Netty) wrapped in UncheckedIOException
+    if (ExceptionUtils.hasCause(e, UncheckedIOException.class)) {
+      Throwable cause = ExceptionUtils.getRootCause(e);
+      if (cause != null && cause.getClass().getSimpleName().contains("ConnectTimeoutException")) {
+        return Optional.of("Connection timeout");
+      }
+    }
+    
+    return Optional.empty();
+  }
+
+  /**
+   * Attempts to execute a startup step with immediate timeout, falling back to background retry.
+   * If the step succeeds within the startup timeout, marks it complete and returns.
+   * If timeout occurs, starts background retry and allows OTP startup to continue.
+   *
+   * @param task The task to execute
+   * @param step The startup step being executed
+   */
+  private void tryWithBackgroundRetry(CheckedRunnable task, StartupStep step) {
+    try {
+      executeWithRetry(task, step.getDescription(), (int) startupTimeoutMs);
+      markStepCompleted(step);
+    } catch (RuntimeException e) {
+      if (e.getMessage().contains("timed out")) {
+        log.warn(
+          "REALTIME_STARTUP_ALERT component={} status=RETRYING error=\"{}\"",
+          step.getDescription(),
+          e.getMessage()
+        );
+        startBackgroundRetry(task, step);
+      } else {
+        throw e;
+      }
+    } catch (Exception e) {
+      log.error(
+        "REALTIME_STARTUP_ALERT component={} status=UNAVAILABLE error=\"{}\"",
+        step.getDescription(),
+        e.getMessage()
+      );
+      throw new RuntimeException("Non-retryable error in " + step.getDescription(), e);
+    }
+  }
+
+  /**
+   * Starts background retry for a failed startup step.
+   * Retries indefinitely with exponential backoff until success or shutdown.
+   */
+  private void startBackgroundRetry(CheckedRunnable task, StartupStep step) {
+    backgroundRetryExecutor.submit(() -> {
+      try {
+        executeWithRetry(task, step.getDescription() + " (background recovery)", null); // null = indefinite retry
+        markStepCompleted(step);
+        log.info("REALTIME_STARTUP_ALERT component={} status=RESTORED", step.getDescription());
+        checkFullRecovery();
+      } catch (InterruptedException e) {
+        log.info("Background retry interrupted for {}, shutting down", step.getDescription());
+        Thread.currentThread().interrupt();
+      } catch (Exception e) {
+        log.error(
+          "REALTIME_STARTUP_ALERT component={} status=PERMANENT_FAILURE error=\"{}\"",
+          step.getDescription(),
+          e.getMessage()
+        );
+      }
+    });
+  }
+
+  /**
+   * Marks a startup step as completed and tracks progress.
+   */
+  private void markStepCompleted(StartupStep step) {
+    completedSteps.updateAndGet(steps -> {
+      Set<StartupStep> newSteps = new HashSet<>(steps);
+      newSteps.add(step);
+      return newSteps;
+    });
+  }
+
+  /**
+   * Checks if all startup steps have been completed and logs full recovery.
+   * Thread-safe by using immutable set values.
+   */
+  private void checkFullRecovery() {
+    Set<StartupStep> currentSteps = completedSteps.get();
+    Set<StartupStep> allSteps = Set.of(StartupStep.values());
+
+    if (currentSteps.containsAll(allSteps)) {
+      long degradedDuration = System.currentTimeMillis() - startTime;
+      log.info(
+        "REALTIME_STARTUP_ALERT status=FULLY_RESTORED degraded_duration_ms={}",
+        degradedDuration
+      );
+    }
+  }
+
+  /**
+   * Registers shutdown hook safely to avoid race conditions and double registration.
+   * Only registers once and ensures all necessary resources are available.
+   */
+  private void registerShutdownHookIfNeeded() {
+    if (!shutdownHookRegistered && subscriptionName != null) {
+      synchronized (this) {
+        if (!shutdownHookRegistered && subscriptionName != null) {
+          ApplicationShutdownSupport.addShutdownHook(
+            "azure-siri-updater-shutdown-" + updaterType,
+            this::performShutdown
+          );
+          shutdownHookRegistered = true;
+        }
+      }
+    }
+  }
+
+  /**
+   * Performs orderly shutdown of all resources with proper error handling.
+   */
+  private void performShutdown() {
+    log.info("Starting shutdown for {} updater", updaterType);
+
+    // 1. Stop accepting new background retry tasks
+    backgroundRetryExecutor.shutdown();
+
+    // 2. Wait briefly for tasks to complete gracefully
+    try {
+      if (!backgroundRetryExecutor.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+        log.warn("Background retry executor did not terminate gracefully, forcing shutdown");
+        backgroundRetryExecutor.shutdownNow();
+
+        // Give interrupted tasks a chance to exit
+        if (!backgroundRetryExecutor.awaitTermination(SHUTDOWN_FORCE_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+          log.error("Background retry executor failed to terminate");
+        }
+      }
+    } catch (InterruptedException e) {
+      log.warn("Shutdown interrupted, forcing immediate termination");
+      backgroundRetryExecutor.shutdownNow();
+      Thread.currentThread().interrupt();
+    }
+
+    // 3. Close event processor
+    if (eventProcessor != null) {
+      try {
+        eventProcessor.close();
+        log.debug("Event processor closed successfully");
+      } catch (Exception e) {
+        log.warn("Error closing event processor: {}", e.getMessage());
+      }
+    }
+
+    // 4. Delete subscription if we have admin client and subscription name
+    if (serviceBusAdmin != null && subscriptionName != null) {
+      try {
+        serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
+        log.info("Subscription '{}' deleted on topic '{}'", subscriptionName, topicName);
+      } catch (Exception e) {
+        log.warn("Error deleting subscription '{}': {}", subscriptionName, e.getMessage());
+      }
+    }
+
+    log.info("Shutdown complete for {} updater", updaterType);
   }
 
   /**
@@ -375,16 +584,16 @@ public class SiriAzureUpdater implements GraphUpdater {
 
     // Make sure there is no old subscription on serviceBus
     if (serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName)) {
-      LOG.info(
+      log.info(
         "Subscription '{}' already exists. Deleting existing subscription.",
         subscriptionName
       );
       serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
-      LOG.info("Service Bus deleted subscription {}.", subscriptionName);
+      log.info("Service Bus deleted subscription {}.", subscriptionName);
     }
     serviceBusAdmin.createSubscription(topicName, subscriptionName, options);
 
-    LOG.info("{} updater created subscription {}", updaterType, subscriptionName);
+    log.info("{} updater created subscription {}", updaterType, subscriptionName);
   }
 
   /**
@@ -423,7 +632,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       .buildProcessorClient();
 
     eventProcessor.start();
-    LOG.info(
+    log.info(
       "Service Bus processor started for topic '{}' and subscription '{}', prefetching {} messages.",
       topicName,
       subscriptionName,
@@ -435,8 +644,8 @@ public class SiriAzureUpdater implements GraphUpdater {
     var message = messageContext.getMessage();
     MESSAGE_COUNTER.incrementAndGet();
 
-    if (MESSAGE_COUNTER.get() % 100 == 0) {
-      LOG.debug("Total SIRI-{} messages received={}", updaterType, MESSAGE_COUNTER.get());
+    if (MESSAGE_COUNTER.get() % MESSAGE_COUNTER_LOG_INTERVAL == 0) {
+      log.debug("Total SIRI-{} messages received={}", updaterType, MESSAGE_COUNTER.get());
     }
 
     try {
@@ -445,15 +654,15 @@ public class SiriAzureUpdater implements GraphUpdater {
       var serviceDelivery = siri.getServiceDelivery();
       if (serviceDelivery == null) {
         if (siri.getHeartbeatNotification() != null) {
-          LOG.debug("Updater {} received SIRI heartbeat message", updaterType);
+          log.debug("Updater {} received SIRI heartbeat message", updaterType);
         } else {
-          LOG.debug("Updater {} received SIRI message without ServiceDelivery", updaterType);
+          log.debug("Updater {} received SIRI message without ServiceDelivery", updaterType);
         }
       } else {
         messageHandler.handleMessage(serviceDelivery, message.getMessageId());
       }
     } catch (JAXBException | XMLStreamException e) {
-      LOG.error(e.getLocalizedMessage(), e);
+      log.error(e.getLocalizedMessage(), e);
     }
   }
 
@@ -480,14 +689,14 @@ public class SiriAzureUpdater implements GraphUpdater {
     }
     var headers = HttpHeaders.of().acceptApplicationXML().build().asMap();
 
-    LOG.info(
+    log.info(
       "Fetching initial Siri data from {}, timeout is {} ms.",
       this.dataInitializationUrl,
       timeout
     );
 
     try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
-      var otpHttpClient = otpHttpClientFactory.create(LOG);
+      var otpHttpClient = otpHttpClientFactory.create(log);
       var t1 = System.currentTimeMillis();
       var siriOptional = otpHttpClient.executeAndMapOptional(
         new HttpGet(dataInitializationUrl),
@@ -496,10 +705,10 @@ public class SiriAzureUpdater implements GraphUpdater {
         SiriXml::parseXml
       );
       var t2 = System.currentTimeMillis();
-      LOG.info("Fetched initial data in {} ms", (t2 - t1));
+      log.info("Fetched initial data in {} ms", (t2 - t1));
 
       if (siriOptional.isEmpty()) {
-        LOG.info("Got status 204 'No Content'.");
+        log.info("Got status 204 'No Content'.");
       }
 
       return siriOptional.map(Siri::getServiceDelivery);
@@ -513,7 +722,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       if (f != null) {
         f.get();
       }
-      LOG.info("{} updater initialized in {} ms.", updaterType, (System.currentTimeMillis() - t1));
+      log.info("{} updater initialized in {} ms.", updaterType, (System.currentTimeMillis() - t1));
     } catch (ExecutionException | InterruptedException e) {
       throw new SiriAzureInitializationException("Error applying history", e);
     }
@@ -525,14 +734,14 @@ public class SiriAzureUpdater implements GraphUpdater {
    * @param errorContext Context for errors handled by the ServiceBusProcessorClient.
    */
   private void errorConsumer(ServiceBusErrorContext errorContext) {
-    LOG.error(
+    log.error(
       "Error when receiving messages from namespace={}, Entity={}",
       errorContext.getFullyQualifiedNamespace(),
       errorContext.getEntityPath()
     );
 
     if (!(errorContext.getException() instanceof ServiceBusException e)) {
-      LOG.error("Non-ServiceBusException occurred!", errorContext.getException());
+      log.error("Non-ServiceBusException occurred!", errorContext.getException());
       return;
     }
 
@@ -542,27 +751,27 @@ public class SiriAzureUpdater implements GraphUpdater {
       reason == ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED ||
       reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND // should this be recoverable?
     ) {
-      LOG.error(
+      log.error(
         "An unrecoverable error occurred. Stopping processing with reason {} {}",
         reason,
         e.getMessage()
       );
     } else if (reason == ServiceBusFailureReason.MESSAGE_LOCK_LOST) {
-      LOG.error("Message lock lost for message", e);
+      log.error("Message lock lost for message", e);
     } else if (
       reason == ServiceBusFailureReason.SERVICE_BUSY ||
       reason == ServiceBusFailureReason.UNAUTHORIZED
     ) {
-      LOG.error("Service Bus is busy or unauthorized, wait and try again");
+      log.error("Service Bus is busy or unauthorized, wait and try again");
       try {
-        // Choosing an arbitrary amount of time to wait until trying again.
-        TimeUnit.SECONDS.sleep(5);
+        // Wait before retrying when Service Bus is busy or unauthorized
+        TimeUnit.SECONDS.sleep(ERROR_RETRY_WAIT_SECONDS);
       } catch (InterruptedException ie) {
         Thread.currentThread().interrupt();
-        LOG.info("OTP is shutting down, stopping processing of ServiceBus error messages");
+        log.info("OTP is shutting down, stopping processing of ServiceBus error messages");
       }
     } else {
-      LOG.error(e.getLocalizedMessage(), e);
+      log.error(e.getLocalizedMessage(), e);
     }
   }
 }
