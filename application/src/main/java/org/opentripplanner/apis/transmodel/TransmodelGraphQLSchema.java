@@ -451,7 +451,7 @@ public class TransmodelGraphQLSchema {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("stopPlaces")
-          .description("Get all stopPlaces")
+          .description("Get stopPlaces by ids. The ids argument must be set to a non-null value.")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(stopPlaceType)))
           .argument(
@@ -461,20 +461,13 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(env -> {
-            if (env.getArgument("ids") != null) {
-              var ids = mapIDsToDomainNullSafe(env.getArgument("ids"));
-              return ids
-                .stream()
-                .map(id -> StopPlaceType.fetchStopPlaceById(id, env))
-                .collect(Collectors.toList());
+            if (env.getArgument("ids") == null) {
+              throw new IllegalArgumentException("ids argument must be set to a non-null value.");
             }
-            TransitService transitService = GqlUtil.getTransitService(env);
-            return transitService
-              .listStations()
+            var ids = mapIDsToDomainNullSafe(env.getArgument("ids"));
+            return ids
               .stream()
-              .map(station ->
-                new MonoOrMultiModalStation(station, transitService.findMultiModalStation(station))
-              )
+              .map(id -> StopPlaceType.fetchStopPlaceById(id, env))
               .collect(Collectors.toList());
           })
           .build()
