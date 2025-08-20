@@ -83,6 +83,12 @@ public interface VehicleRentalPlace {
   /** System information for the vehicle rental provider */
   VehicleRentalSystem vehicleRentalSystem();
 
+  /**
+   * Returns true if any vehicle type is allowed to be returned to this place.
+   * @see ReturnPolicy
+   */
+  boolean returningAnyTypeAllowed();
+
   default boolean networkIsNotAllowed(VehicleRentalPreferences preferences) {
     if (
       network() == null &&

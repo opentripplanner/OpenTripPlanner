@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collector;
@@ -9,6 +8,7 @@ import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleTypesAvailable;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.ReturnPolicy;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,13 +62,8 @@ public class GbfsStationStatusMapper {
 
     int spacesDisabled = status.getNumDocksDisabled() != null ? status.getNumDocksDisabled() : 0;
 
-    boolean isInstalled = toBoolean(status.getIsInstalled());
     boolean isRenting = toBoolean(status.getIsRenting());
     boolean isReturning = toBoolean(status.getIsReturning());
-
-    Instant lastReported = status.getLastReported() != null
-      ? Instant.ofEpochSecond(status.getLastReported().longValue())
-      : null;
 
     return station
       .copyOf()
@@ -78,10 +73,9 @@ public class GbfsStationStatusMapper {
       .withSpacesAvailable(spacesAvailable)
       .withVehicleSpacesAvailable(vehicleSpacesAvailable)
       .withSpacesDisabled(spacesDisabled)
-      .withIsInstalled(isInstalled)
       .withIsRenting(isRenting)
       .withIsReturning(isReturning)
-      .withLastReported(lastReported)
+      .withReturnPolicy(returnPolicy(status))
       .build();
   }
 
@@ -98,14 +92,7 @@ public class GbfsStationStatusMapper {
     if (docksAvailable == null && typesAvailable == null) {
       // no per-type information available at all, assume it's bicycle
       return Map.of(RentalVehicleType.getDefaultType(station.network()), spacesAvailable);
-    } else if (typesAvailable != null && docksAvailable == null) {
-      // we have available vehicles, but no per-type information on spaces, so
-      // we assume that for each available vehicle there are places to return
-      return typesAvailable
-        .stream()
-        .map(a -> new VehicleTypeCount(vehicleTypes.get(a.getVehicleTypeId()), spacesAvailable))
-        .collect(TYPE_MAP_COLLECTOR);
-    } else {
+    } else if (docksAvailable != null) {
       return docksAvailable
         .stream()
         .flatMap(available ->
@@ -115,6 +102,16 @@ public class GbfsStationStatusMapper {
             .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount()))
         )
         .collect(TYPE_MAP_COLLECTOR);
+    } else {
+      return Map.of();
+    }
+  }
+
+  private static ReturnPolicy returnPolicy(GBFSStation station) {
+    if (station.getVehicleDocksAvailable() == null) {
+      return ReturnPolicy.ANY_TYPE;
+    } else {
+      return ReturnPolicy.SPECIFIC_TYPES;
     }
   }
 

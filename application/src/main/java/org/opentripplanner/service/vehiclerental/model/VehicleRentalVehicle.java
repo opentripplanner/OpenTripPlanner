@@ -196,6 +196,11 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
     return system;
   }
 
+  @Override
+  public boolean returningAnyTypeAllowed() {
+    return false;
+  }
+
   public RentalVehicleFuel getFuel() {
     return fuel;
   }

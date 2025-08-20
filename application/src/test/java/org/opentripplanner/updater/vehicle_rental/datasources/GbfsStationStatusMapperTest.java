@@ -1,6 +1,8 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
@@ -46,12 +48,10 @@ class GbfsStationStatusMapperTest {
 
     var mapped = mapper.mapStationStatus(STATION);
 
-    assertEquals(
-      new RentalVehicleEntityCounts(3, List.of(new RentalVehicleTypeCount(TYPE_CAR, 3))),
-      mapped.vehicleSpaceCounts()
-    );
+    assertEquals(new RentalVehicleEntityCounts(3, List.of()), mapped.vehicleSpaceCounts());
 
     assertEquals(Set.of(RentalFormFactor.CAR), mapped.formFactors());
+    assertTrue(mapped.returningAnyTypeAllowed());
   }
 
   @Test
@@ -83,10 +83,11 @@ class GbfsStationStatusMapperTest {
       mapped.vehicleSpaceCounts()
     );
     assertEquals(Set.of(RentalFormFactor.CAR), mapped.formFactors());
+    assertFalse(mapped.returningAnyTypeAllowed());
   }
 
   @Test
-  void avaialbleSpacesFromTypesWithoutAvailableVehicles() {
+  void availableSpacesFromTypesWithoutAvailableVehicles() {
     var gbfsStation = new GBFSStation();
     gbfsStation.setStationId(ID);
     gbfsStation.setNumDocksAvailable(88);
@@ -104,11 +105,9 @@ class GbfsStationStatusMapperTest {
 
     var mapped = mapper.mapStationStatus(STATION);
 
-    assertEquals(
-      new RentalVehicleEntityCounts(88, List.of(new RentalVehicleTypeCount(TYPE_CAR, 88))),
-      mapped.vehicleSpaceCounts()
-    );
+    assertEquals(new RentalVehicleEntityCounts(88, List.of()), mapped.vehicleSpaceCounts());
     assertEquals(Set.of(RentalFormFactor.CAR), mapped.formFactors());
+    assertTrue(mapped.returningAnyTypeAllowed());
   }
 
   @Test
@@ -130,5 +129,6 @@ class GbfsStationStatusMapperTest {
       mapped.vehicleSpaceCounts()
     );
     assertEquals(Set.of(RentalFormFactor.BICYCLE), mapped.formFactors());
+    assertTrue(mapped.returningAnyTypeAllowed());
   }
 }

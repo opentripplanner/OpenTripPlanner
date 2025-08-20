@@ -49,6 +49,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   private final boolean overloadingAllowed;
   private final boolean isArrivingInRentalVehicleAtDestinationAllowed;
   private final boolean realTimeData;
+  private final ReturnPolicy returnPolicy;
 
   public VehicleRentalStation() {
     this.id = null;
@@ -71,6 +72,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     this.overloadingAllowed = false;
     this.isArrivingInRentalVehicleAtDestinationAllowed = false;
     this.realTimeData = true;
+    this.returnPolicy = ReturnPolicy.SPECIFIC_TYPES;
   }
 
   VehicleRentalStation(VehicleRentalStationBuilder builder) {
@@ -95,6 +97,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     this.isArrivingInRentalVehicleAtDestinationAllowed =
       builder.isArrivingInRentalVehicleAtDestinationAllowed();
     this.realTimeData = builder.isRealTimeData();
+    this.returnPolicy = builder.returnPolicy();
   }
 
   public static VehicleRentalStationBuilder of() {
@@ -264,6 +267,11 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   @Override
+  public boolean returningAnyTypeAllowed() {
+    return returnPolicy.equals(ReturnPolicy.ANY_TYPE);
+  }
+
+  @Override
   public String toString() {
     return String.format(
       ROOT,
@@ -297,6 +305,10 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       spacesAvailable,
       vehicleRentalTypeMapToList(vehicleSpacesAvailable)
     );
+  }
+
+  public ReturnPolicy returnPolicy() {
+    return returnPolicy;
   }
 
   private List<RentalVehicleTypeCount> vehicleRentalTypeMapToList(

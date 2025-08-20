@@ -1,5 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -140,7 +141,7 @@ public class VehicleRentalEdge extends Edge {
           var formFactors = station.availableDropoffFormFactors(realtimeAvailability);
           if (
             (realtimeAvailability && !station.allowDropoffNow()) ||
-            !formFactors.contains(formFactor)
+              !formFactors.contains(formFactor)
           ) {
             return State.empty();
           }
@@ -171,7 +172,7 @@ public class VehicleRentalEdge extends Edge {
    * @param rentedNetwork  The networks of the station we rented the bike from.
    * @return true if the bike can be dropped off here, false if not.
    */
-  private boolean hasCompatibleNetworks(String stationNetwork, String rentedNetwork) {
+  private boolean hasCompatibleNetworks(String stationNetwork, @Nullable String rentedNetwork) {
     /*
      * Special case for "null" networks ("catch-all" network defined).
      */
