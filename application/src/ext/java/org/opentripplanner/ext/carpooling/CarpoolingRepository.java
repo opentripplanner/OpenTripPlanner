@@ -10,7 +10,6 @@ import org.opentripplanner.transit.model.site.AreaStop;
  * The CarpoolingRepository interface allows for the management and retrieval of carpooling trips.
  */
 public interface CarpoolingRepository {
-
   Collection<CarpoolTrip> getCarpoolTrips();
   void addCarpoolTrip(CarpoolTrip trip);
   CarpoolTrip getCarpoolTripByBoardingArea(AreaStop stop);

@@ -22,7 +22,6 @@ public class CarpoolSiriMapper {
   private static final AtomicInteger COUNTER = new AtomicInteger(0);
 
   public CarpoolTrip mapSiriToCarpoolTrip(EstimatedVehicleJourney journey) {
-
     var calls = journey.getEstimatedCalls().getEstimatedCalls();
     if (calls.size() != 2) {
       throw new IllegalArgumentException("Carpool trips must have exactly 2 stops for now.");
@@ -62,8 +61,7 @@ public class CarpoolSiriMapper {
     if (stopAssignments == null || stopAssignments.size() != 1) {
       throw new IllegalArgumentException("Expected exactly one stop assignment for call: " + call);
     }
-    var flexibleArea = stopAssignments.getFirst()
-      .getExpectedFlexibleArea();
+    var flexibleArea = stopAssignments.getFirst().getExpectedFlexibleArea();
 
     if (flexibleArea == null || flexibleArea.getPolygon() == null) {
       throw new IllegalArgumentException("Missing flexible area for stop");
@@ -78,9 +76,7 @@ public class CarpoolSiriMapper {
   }
 
   private Polygon createPolygonFromGml(net.opengis.gml._3.PolygonType gmlPolygon) {
-    var abstractRing = gmlPolygon.getExterior()
-      .getAbstractRing()
-      .getValue();
+    var abstractRing = gmlPolygon.getExterior().getAbstractRing().getValue();
 
     if (!(abstractRing instanceof net.opengis.gml._3.LinearRingType)) {
       throw new IllegalArgumentException("Expected LinearRingType for polygon exterior");

@@ -6,6 +6,5 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.RoutingValidationException;
 
 public interface CarpoolingService {
-  List<Itinerary> route(RouteRequest request)
-    throws RoutingValidationException;
+  List<Itinerary> route(RouteRequest request) throws RoutingValidationException;
 }

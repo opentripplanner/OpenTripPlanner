@@ -33,7 +33,11 @@ public class CarpoolItineraryMapper {
   /**
    * Creates a complete itinerary from A* routing results with proper access/egress legs and carpool legs
    */
-  public static Itinerary mapToItinerary(RouteRequest request, CarpoolItineraryCandidate candidate, GraphPath<State, Edge, Vertex> carpoolPath) {
+  public static Itinerary mapToItinerary(
+    RouteRequest request,
+    CarpoolItineraryCandidate candidate,
+    GraphPath<State, Edge, Vertex> carpoolPath
+  ) {
     List<Leg> legs = new ArrayList<>();
 
     // 1. Access walking leg (origin to pickup)
@@ -48,7 +52,8 @@ public class CarpoolItineraryMapper {
       legs.add(accessLeg);
     }
 
-    var drivingEndTime = candidate.trip()
+    var drivingEndTime = candidate
+      .trip()
       .getStartTime()
       .plus(
         Duration.between(
@@ -73,12 +78,8 @@ public class CarpoolItineraryMapper {
           "Dropoff at " + candidate.trip().getAlightingArea().getName()
         )
       )
-      .withGeometry(
-        GeometryUtils.concatenateLineStrings(carpoolPath.edges, Edge::getGeometry)
-      )
-      .withDistanceMeters(
-        carpoolPath.edges.stream().mapToDouble(Edge::getDistanceMeters).sum()
-      )
+      .withGeometry(GeometryUtils.concatenateLineStrings(carpoolPath.edges, Edge::getGeometry))
+      .withDistanceMeters(carpoolPath.edges.stream().mapToDouble(Edge::getDistanceMeters).sum())
       .withGeneralizedCost((int) carpoolPath.getWeight())
       .build();
     legs.add(carpoolLeg);
@@ -96,8 +97,11 @@ public class CarpoolItineraryMapper {
     }
 
     return Itinerary.ofDirect(legs)
-      .withGeneralizedCost(Cost.costOfSeconds(accessLeg.generalizedCost() +
-        carpoolLeg.generalizedCost() + egressLeg.generalizedCost()))
+      .withGeneralizedCost(
+        Cost.costOfSeconds(
+          accessLeg.generalizedCost() + carpoolLeg.generalizedCost() + egressLeg.generalizedCost()
+        )
+      )
       .build();
   }
 
@@ -141,7 +145,11 @@ public class CarpoolItineraryMapper {
 
     // Build the walking leg
     return StreetLeg.of()
-      .withMode(StreetModeToTransferTraverseModeMapper.map(streetRequest.mode() == StreetMode.NOT_SET ? StreetMode.WALK : streetRequest.mode()))
+      .withMode(
+        StreetModeToTransferTraverseModeMapper.map(
+          streetRequest.mode() == StreetMode.NOT_SET ? StreetMode.WALK : streetRequest.mode()
+        )
+      )
       .withStartTime(legStartTime)
       .withEndTime(legEndTime)
       .withFrom(createPlaceFromVertex(firstState.getVertex(), name + " start"))

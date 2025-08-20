@@ -88,10 +88,12 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
                 LOG.warn("Received an empty EstimatedJourneyVersionFrame, skipping");
                 continue;
               }
-              ejvf.getEstimatedVehicleJourneies().forEach(ejv -> {
-                var carpoolTrip = mapper.mapSiriToCarpoolTrip(ejv);
-                repository.addCarpoolTrip(carpoolTrip);
-              });
+              ejvf
+                .getEstimatedVehicleJourneies()
+                .forEach(ejv -> {
+                  var carpoolTrip = mapper.mapSiriToCarpoolTrip(ejv);
+                  repository.addCarpoolTrip(carpoolTrip);
+                });
             }
           }
           LOG.info("Received {} estimated timetable deliveries", etds.size());

@@ -19,8 +19,8 @@ import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.data.KristiansandCarpoolingData;
-import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolItineraryCandidate;
+import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -53,7 +53,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private final CarpoolingRepository repository;
   private final Graph graph;
 
-  public DefaultCarpoolingService(StreetLimitationParametersService streetLimitationParametersService, CarpoolingRepository repository, Graph graph) {
+  public DefaultCarpoolingService(
+    StreetLimitationParametersService streetLimitationParametersService,
+    CarpoolingRepository repository,
+    Graph graph
+  ) {
     KristiansandCarpoolingData.populateRepository(repository, graph);
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.repository = repository;
@@ -91,8 +95,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * Create Itineraries for the top 3 results and return
    * </pre>
    */
-  public List<Itinerary> route(RouteRequest request)
-    throws RoutingValidationException {
+  public List<Itinerary> route(RouteRequest request) throws RoutingValidationException {
     if (
       Objects.requireNonNull(request.from()).lat == null ||
       Objects.requireNonNull(request.from()).lng == null
@@ -128,7 +131,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
         new StreetRequest(StreetMode.CAR),
         candidate.boardingStop().state.getVertex(),
         candidate.alightingStop().state.getVertex(),
-        streetLimitationParametersService.getMaxCarSpeed());
+        streetLimitationParametersService.getMaxCarSpeed()
+      );
 
       Itinerary itinerary = CarpoolItineraryMapper.mapToItinerary(request, candidate, routing);
       if (itinerary != null) {
@@ -148,7 +152,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
         request.from(),
         request.to(),
         request.journey().access().mode(),
-        request.journey().egress().mode());
+        request.journey().egress().mode()
+      );
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -159,44 +164,57 @@ public class DefaultCarpoolingService implements CarpoolingService {
       request.journey().access(),
       temporaryVertices.getFromVertices(),
       null,
-      repository.getBoardingAreasForVertex());
+      repository.getBoardingAreasForVertex()
+    );
 
     Collection<NearbyStop> egressStops = getClosestAreaStopsToVertex(
       request,
       request.journey().egress(),
       null,
       temporaryVertices.getToVertices(),
-      repository.getAlightingAreasForVertex());
+      repository.getAlightingAreasForVertex()
+    );
 
-    Map<CarpoolTrip, NearbyStop> tripToBoardingStop = accessStops.stream()
-      .collect(Collectors.toMap(
-        stop -> repository.getCarpoolTripByBoardingArea((AreaStop) stop.stop),
-        stop -> stop
-      ));
+    Map<CarpoolTrip, NearbyStop> tripToBoardingStop = accessStops
+      .stream()
+      .collect(
+        Collectors.toMap(
+          stop -> repository.getCarpoolTripByBoardingArea((AreaStop) stop.stop),
+          stop -> stop
+        )
+      );
 
-    Map<CarpoolTrip, NearbyStop> tripToAlightingStop = egressStops.stream()
-      .collect(Collectors.toMap(
-        stop -> repository.getCarpoolTripByAlightingArea((AreaStop) stop.stop),
-        stop -> stop
-      ));
+    Map<CarpoolTrip, NearbyStop> tripToAlightingStop = egressStops
+      .stream()
+      .collect(
+        Collectors.toMap(
+          stop -> repository.getCarpoolTripByAlightingArea((AreaStop) stop.stop),
+          stop -> stop
+        )
+      );
 
     // Find trips that have both boarding and alighting stops
-    List<CarpoolItineraryCandidate> itineraryCandidates = tripToBoardingStop.keySet().stream()
+    List<CarpoolItineraryCandidate> itineraryCandidates = tripToBoardingStop
+      .keySet()
+      .stream()
       .filter(tripToAlightingStop::containsKey)
-      .map(trip -> new CarpoolItineraryCandidate(
-        trip,
-        tripToBoardingStop.get(trip),
-        tripToAlightingStop.get(trip)
-      ))
+      .map(trip ->
+        new CarpoolItineraryCandidate(
+          trip,
+          tripToBoardingStop.get(trip),
+          tripToAlightingStop.get(trip)
+        )
+      )
       .filter(candidate -> {
         // Only include candidates that leave after first possible arrival at the boarding area
         // AND leave within the next 2 hours
         var tripStartTime = candidate.trip().getStartTime().toInstant();
         var accessArrivalTime = candidate.boardingStop().state.getTime();
-        return tripStartTime.isAfter(accessArrivalTime) &&
-          tripStartTime.isBefore(accessArrivalTime.plus(MAX_BOOKING_WINDOW));
-        }
-      )
+        return (
+          tripStartTime.isAfter(accessArrivalTime) &&
+          tripStartTime.isBefore(accessArrivalTime.plus(MAX_BOOKING_WINDOW))
+        );
+      })
       .toList();
     return itineraryCandidates;
   }
@@ -208,13 +226,16 @@ public class DefaultCarpoolingService implements CarpoolingService {
     Set<Vertex> destinationVertices,
     Multimap<StreetVertex, AreaStop> destinationAreas
   ) {
-    var maxAccessEgressDuration = request.preferences().street().accessEgress().maxDuration().valueOf(streetRequest.mode());
+    var maxAccessEgressDuration = request
+      .preferences()
+      .street()
+      .accessEgress()
+      .maxDuration()
+      .valueOf(streetRequest.mode());
     var arriveBy = originVertices == null && destinationVertices != null;
 
     var streetSearch = StreetSearchBuilder.of()
-      .setSkipEdgeStrategy(
-        new DurationSkipEdgeStrategy<>(maxAccessEgressDuration)
-      )
+      .setSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxAccessEgressDuration))
       .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)
       .setArriveBy(arriveBy)
@@ -233,7 +254,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
     for (State state : spt.getAllStates()) {
       Vertex targetVertex = state.getVertex();
       if (
-        targetVertex instanceof StreetVertex streetVertex && destinationAreas.containsKey(streetVertex)
+        targetVertex instanceof StreetVertex streetVertex &&
+        destinationAreas.containsKey(streetVertex)
       ) {
         for (AreaStop areaStop : destinationAreas.get(streetVertex)) {
           locationsMap.put(areaStop, state);
@@ -284,9 +306,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var streetSearch = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
       .setSkipEdgeStrategy(
-        new DurationSkipEdgeStrategy(
-          preferences.maxDirectDuration().valueOf(streetRequest.mode())
-        )
+        new DurationSkipEdgeStrategy(preferences.maxDirectDuration().valueOf(streetRequest.mode()))
       )
       .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)
