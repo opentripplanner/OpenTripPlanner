@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -201,11 +200,6 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
 
     public Builder withMaxRangeMeters(@Nullable Double maxRangeMeters) {
       this.maxRangeMeters = maxRangeMeters;
-      return this;
-    }
-
-    public Builder apply(Consumer<Builder> body) {
-      body.accept(this);
       return this;
     }
 
