@@ -74,6 +74,15 @@ public class OsmEntity {
     "bicycle",
     "vehicle"
   );
+  public static final Set<String> NO_ACCESS_TAGS = Set.of("no", "license", "dismount");
+  public static final Map<StreetTraversalPermission, String> OSM_TAGS_FOR_TRAVERSAL_PERMISSION = Map.of(
+    StreetTraversalPermission.CAR,
+    "motorcar",
+    StreetTraversalPermission.BICYCLE,
+    "bicycle",
+    StreetTraversalPermission.PEDESTRIAN,
+    "foot"
+  );
 
   /* To save memory this is only created when an entity actually has tags. */
   private Map<String, String> tags;
@@ -825,7 +834,7 @@ public class OsmEntity {
    * Returns true if this tag is explicitly access to this entity.
    */
   private boolean isExplicitlyDenied(String key) {
-    return isOneOfTags(key, Set.of("no", "license", "dismount"));
+    return isOneOfTags(key, NO_ACCESS_TAGS);
   }
 
   /**
@@ -863,17 +872,8 @@ public class OsmEntity {
       permission = StreetTraversalPermission.NONE;
     }
 
-    var mappings = Map.of(
-      StreetTraversalPermission.CAR,
-      "motorcar",
-      StreetTraversalPermission.BICYCLE,
-      "bicycle",
-      StreetTraversalPermission.PEDESTRIAN,
-      "foot"
-    );
-
     // handle explicit permissions
-    for (var entry : mappings.entrySet()) {
+    for (var entry : OSM_TAGS_FOR_TRAVERSAL_PERMISSION.entrySet()) {
       var modePermission = checkModePermission(entry.getValue(), direction);
       if (modePermission.isPresent()) {
         permission = switch (modePermission.get()) {

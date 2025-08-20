@@ -1,7 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
