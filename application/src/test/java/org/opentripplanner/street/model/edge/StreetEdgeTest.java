@@ -11,12 +11,10 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.intersec
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdgeBuilder;
 
-import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -29,7 +27,6 @@ import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
@@ -39,7 +36,6 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.state.StateData;
 
 public class StreetEdgeTest {
 
@@ -387,28 +383,15 @@ public class StreetEdgeTest {
   @EnumSource(value = TraverseMode.class, names = { "BICYCLE", "SCOOTER" })
   void testBikeSpeed(TraverseMode mode) {
     StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, ALL).withCarSpeed(8.0f).buildAndConnect();
-    assertEquals(
-      5.0,
-      e1.calculateSpeed(
-        RoutingPreferences.DEFAULT.copyOf()
-          .withBike(bike -> bike.withSpeed(5.0f))
-          .withScooter(scooter -> scooter.withSpeed(5.0f))
-          .build(),
-        mode,
-        false
-      )
-    );
-    assertEquals(
-      8.0,
-      e1.calculateSpeed(
-        RoutingPreferences.DEFAULT.copyOf()
-          .withBike(bike -> bike.withSpeed(10.0f))
-          .withScooter(scooter -> scooter.withSpeed(10.0f))
-          .build(),
-        mode,
-        false
-      )
-    );
+    assertEquals(5.0, e1.calculateSpeed(getPreferencesForBikeAndScooterSpeed(5.0f), mode, false));
+    assertEquals(8.0, e1.calculateSpeed(getPreferencesForBikeAndScooterSpeed(10.0f), mode, false));
+  }
+
+  private static RoutingPreferences getPreferencesForBikeAndScooterSpeed(float speed) {
+    return RoutingPreferences.DEFAULT.copyOf()
+      .withBike(bike -> bike.withSpeed(speed))
+      .withScooter(scooter -> scooter.withSpeed(speed))
+      .build();
   }
 
   @ParameterizedTest
@@ -432,28 +415,8 @@ public class StreetEdgeTest {
         )
       )
       .buildAndConnect();
-    assertEquals(
-      9.0,
-      e1.calculateSpeed(
-        RoutingPreferences.DEFAULT.copyOf()
-          .withBike(bike -> bike.withSpeed(9.0f))
-          .withScooter(scooter -> scooter.withSpeed(9.0f))
-          .build(),
-        mode,
-        false
-      )
-    );
-    assertEquals(
-      9.6,
-      e1.calculateSpeed(
-        RoutingPreferences.DEFAULT.copyOf()
-          .withBike(bike -> bike.withSpeed(10.0f))
-          .withScooter(scooter -> scooter.withSpeed(10.0f))
-          .build(),
-        mode,
-        false
-      )
-    );
+    assertEquals(9.0, e1.calculateSpeed(getPreferencesForBikeAndScooterSpeed(9.0f), mode, false));
+    assertEquals(9.6, e1.calculateSpeed(getPreferencesForBikeAndScooterSpeed(10.0f), mode, false));
   }
 
   @Test
