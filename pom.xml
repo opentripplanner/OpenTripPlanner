@@ -199,6 +199,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
+                    <excludedGroups>integration</excludedGroups>
                     <!-- we have to fork the JVM during tests so that the argLine is passed along -->
                     <forkCount>3</forkCount>
                     <!-- enable the restricted reflection under Java 11 so that the ObjectDiffer works

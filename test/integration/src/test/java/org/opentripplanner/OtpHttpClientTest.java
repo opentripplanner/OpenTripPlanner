@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.framework.io.OtpHttpClient;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
  * This integration test makes sure that Apache HTTP client still works with important hosts and
  * HTTP servers.
  */
+@Tag("integration")
 class OtpHttpClientTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(OtpHttpClientTest.class);
