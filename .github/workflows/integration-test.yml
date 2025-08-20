@@ -25,4 +25,4 @@ jobs:
 
 
       - name: Run integration tests
-        run: mvn test -Dgroups=integration -PprettierSkip
+        run: mvn test -Pintegration-tests
