@@ -1,6 +1,5 @@
 package org.opentripplanner.osm.wayproperty;
 
-import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
@@ -15,11 +14,11 @@ public class MixinDirectionalPropertiesBuilder {
   private StreetTraversalPermission removedPermission = StreetTraversalPermission.NONE;
 
   public static MixinDirectionalPropertiesBuilder ofWalkSafety(double safety) {
-    return new MixinDirectionalPropertiesBuilder().walkSafety(safety);
+    return new MixinDirectionalPropertiesBuilder().withWalkSafety(safety);
   }
 
   public static MixinDirectionalPropertiesBuilder ofBicycleSafety(double safety) {
-    return new MixinDirectionalPropertiesBuilder().bicycleSafety(safety);
+    return new MixinDirectionalPropertiesBuilder().withBicycleSafety(safety);
   }
 
   /**
@@ -28,7 +27,7 @@ public class MixinDirectionalPropertiesBuilder {
    * Note that the safeties here will be adjusted such that the safest street has a safety value of
    * 1, with all others scaled proportionately.
    */
-  public MixinDirectionalPropertiesBuilder bicycleSafety(double value) {
+  public MixinDirectionalPropertiesBuilder withBicycleSafety(double value) {
     this.bicycleSafety = value;
     return this;
   }
@@ -39,7 +38,7 @@ public class MixinDirectionalPropertiesBuilder {
    * Note that the safeties here will be adjusted such that the safest street has a safety value of
    * 1, with all others scaled proportionately.
    */
-  public MixinDirectionalPropertiesBuilder walkSafety(double walkSafety) {
+  public MixinDirectionalPropertiesBuilder withWalkSafety(double walkSafety) {
     this.walkSafety = walkSafety;
     return this;
   }

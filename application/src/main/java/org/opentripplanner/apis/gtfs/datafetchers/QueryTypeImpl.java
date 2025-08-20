@@ -34,8 +34,8 @@ import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapp
 import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
-import org.opentripplanner.ext.fares.impl.GtfsFaresService;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.gtfs.GtfsFaresService;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
@@ -155,7 +155,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         .getVehicleRentalPlaces()
         .stream()
         .filter(vehicleRentalStation ->
-          vehicleRentalStation.getStationId().equals(args.getGraphQLId())
+          vehicleRentalStation.stationId().equals(args.getGraphQLId())
         )
         .findAny()
         .orElse(null);
@@ -180,7 +180,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             .stream()
             .collect(
               Multimaps.toMultimap(
-                VehicleRentalPlace::getStationId,
+                VehicleRentalPlace::stationId,
                 station -> station,
                 ArrayListMultimap::create
               )
@@ -531,7 +531,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         .getVehicleRentalVehicles()
         .stream()
         .filter(vehicleRentalVehicle ->
-          vehicleRentalVehicle.getId().toString().equals(args.getGraphQLId())
+          vehicleRentalVehicle.id().toString().equals(args.getGraphQLId())
         )
         .findAny()
         .orElse(null);
@@ -554,7 +554,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             .stream()
             .collect(
               Multimaps.toMultimap(
-                vehicle -> vehicle.getId().toString(),
+                vehicle -> vehicle.id().toString(),
                 vehicle -> vehicle,
                 ArrayListMultimap::create
               )
@@ -573,8 +573,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         return vehicleRentalStationService
           .getVehicleRentalVehicles()
           .stream()
-          .filter(v -> v.vehicleType != null)
-          .filter(v -> requiredFormFactors.contains(v.vehicleType.formFactor))
+          .filter(v -> v.vehicleType() != null)
+          .filter(v -> requiredFormFactors.contains(v.vehicleType().formFactor()))
           .toList();
       }
 
@@ -913,7 +913,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             .stream()
             .collect(
               Multimaps.toMultimap(
-                station -> station.getId().toString(),
+                station -> station.id().toString(),
                 station -> station,
                 ArrayListMultimap::create
               )
@@ -957,7 +957,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
    * This matches station's feedScopedId to the given string.
    */
   private boolean stationIdMatches(VehicleRentalStation station, String feedScopedId) {
-    return station.getId().toString().equals(feedScopedId);
+    return station.id().toString().equals(feedScopedId);
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

@@ -81,8 +81,16 @@ public class OsmMapperDocTest {
       propTable.addRow(
         "`%s`".formatted(prop.specifier().toDocString()),
         "`%s`".formatted(prop.properties().getPermission()),
-        tableValues(prop.properties().bicycleSafety()),
-        tableValues(prop.properties().walkSafety())
+        tableValues(
+          prop.properties().bicycleSafety(),
+          prop.forwardProperties().bicycleSafety(),
+          prop.backwardProperties().bicycleSafety()
+        ),
+        tableValues(
+          prop.properties().walkSafety(),
+          prop.forwardProperties().walkSafety(),
+          prop.backwardProperties().walkSafety()
+        )
       );
     }
     return propTable.build();
@@ -102,22 +110,22 @@ public class OsmMapperDocTest {
       propTable.addRow(
         "`%s`".formatted(prop.specifier().toDocString()),
         tableValues(
-          prop.defaultProperties().addedPermission(),
+          prop.directionlessProperties().addedPermission(),
           prop.forwardProperties().addedPermission(),
           prop.backwardProperties().addedPermission()
         ),
         tableValues(
-          prop.defaultProperties().removedPermission(),
+          prop.directionlessProperties().removedPermission(),
           prop.forwardProperties().removedPermission(),
           prop.backwardProperties().removedPermission()
         ),
         tableValues(
-          prop.defaultProperties().bicycleSafety(),
+          prop.directionlessProperties().bicycleSafety(),
           prop.forwardProperties().bicycleSafety(),
           prop.backwardProperties().bicycleSafety()
         ),
         tableValues(
-          prop.defaultProperties().walkSafety(),
+          prop.directionlessProperties().walkSafety(),
           prop.forwardProperties().walkSafety(),
           prop.backwardProperties().walkSafety()
         )

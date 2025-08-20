@@ -630,24 +630,17 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
         "fare" : { },
         "legProducts" : [
           {
-            "legIndices" : [
-              1
-            ],
-            "products" : [
-              {
-                "amount" : {
-                  "cents" : 200,
-                  "currency" : {
-                    "currency" : "USD",
-                    "currencyCode" : "USD",
-                    "defaultFractionDigits" : 2,
-                    "symbol" : "$"
-                  }
-                },
-                "id" : "prt:8",
-                "name" : "regular"
+            "amount" : {
+              "cents" : 200,
+              "currency" : {
+                "currency" : "USD",
+                "currencyCode" : "USD",
+                "defaultFractionDigits" : 2,
+                "symbol" : "$"
               }
-            ]
+            },
+            "id" : "prt:8",
+            "name" : "regular"
           }
         ]
       },
@@ -999,24 +992,17 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
         "fare" : { },
         "legProducts" : [
           {
-            "legIndices" : [
-              1
-            ],
-            "products" : [
-              {
-                "amount" : {
-                  "cents" : 200,
-                  "currency" : {
-                    "currency" : "USD",
-                    "currencyCode" : "USD",
-                    "defaultFractionDigits" : 2,
-                    "symbol" : "$"
-                  }
-                },
-                "id" : "prt:8",
-                "name" : "regular"
+            "amount" : {
+              "cents" : 200,
+              "currency" : {
+                "currency" : "USD",
+                "currencyCode" : "USD",
+                "defaultFractionDigits" : 2,
+                "symbol" : "$"
               }
-            ]
+            },
+            "id" : "prt:8",
+            "name" : "regular"
           }
         ]
       },
@@ -1394,24 +1380,17 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
         "fare" : { },
         "legProducts" : [
           {
-            "legIndices" : [
-              1
-            ],
-            "products" : [
-              {
-                "amount" : {
-                  "cents" : 200,
-                  "currency" : {
-                    "currency" : "USD",
-                    "currencyCode" : "USD",
-                    "defaultFractionDigits" : 2,
-                    "symbol" : "$"
-                  }
-                },
-                "id" : "prt:8",
-                "name" : "regular"
+            "amount" : {
+              "cents" : 200,
+              "currency" : {
+                "currency" : "USD",
+                "currencyCode" : "USD",
+                "defaultFractionDigits" : 2,
+                "symbol" : "$"
               }
-            ]
+            },
+            "id" : "prt:8",
+            "name" : "regular"
           }
         ]
       },
@@ -1789,24 +1768,17 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
         "fare" : { },
         "legProducts" : [
           {
-            "legIndices" : [
-              1
-            ],
-            "products" : [
-              {
-                "amount" : {
-                  "cents" : 200,
-                  "currency" : {
-                    "currency" : "USD",
-                    "currencyCode" : "USD",
-                    "defaultFractionDigits" : 2,
-                    "symbol" : "$"
-                  }
-                },
-                "id" : "prt:8",
-                "name" : "regular"
+            "amount" : {
+              "cents" : 200,
+              "currency" : {
+                "currency" : "USD",
+                "currencyCode" : "USD",
+                "defaultFractionDigits" : 2,
+                "symbol" : "$"
               }
-            ]
+            },
+            "id" : "prt:8",
+            "name" : "regular"
           }
         ]
       },
@@ -2236,24 +2208,17 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
         "fare" : { },
         "legProducts" : [
           {
-            "legIndices" : [
-              1
-            ],
-            "products" : [
-              {
-                "amount" : {
-                  "cents" : 200,
-                  "currency" : {
-                    "currency" : "USD",
-                    "currencyCode" : "USD",
-                    "defaultFractionDigits" : 2,
-                    "symbol" : "$"
-                  }
-                },
-                "id" : "prt:8",
-                "name" : "regular"
+            "amount" : {
+              "cents" : 200,
+              "currency" : {
+                "currency" : "USD",
+                "currencyCode" : "USD",
+                "defaultFractionDigits" : 2,
+                "symbol" : "$"
               }
-            ]
+            },
+            "id" : "prt:8",
+            "name" : "regular"
           }
         ]
       },
@@ -2605,24 +2570,17 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
         "fare" : { },
         "legProducts" : [
           {
-            "legIndices" : [
-              1
-            ],
-            "products" : [
-              {
-                "amount" : {
-                  "cents" : 200,
-                  "currency" : {
-                    "currency" : "USD",
-                    "currencyCode" : "USD",
-                    "defaultFractionDigits" : 2,
-                    "symbol" : "$"
-                  }
-                },
-                "id" : "prt:8",
-                "name" : "regular"
+            "amount" : {
+              "cents" : 200,
+              "currency" : {
+                "currency" : "USD",
+                "currencyCode" : "USD",
+                "defaultFractionDigits" : 2,
+                "symbol" : "$"
               }
-            ]
+            },
+            "id" : "prt:8",
+            "name" : "regular"
           }
         ]
       },

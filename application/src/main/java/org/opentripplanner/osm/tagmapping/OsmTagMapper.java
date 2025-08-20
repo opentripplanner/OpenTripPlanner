@@ -11,8 +11,8 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
@@ -161,7 +161,7 @@ public class OsmTagMapper {
       ),
       new MixinPropertiesBuilder()
         .directional(TraverseDirection.BACKWARD, builder ->
-          builder.bicycleSafety(0.87).addPermission(BICYCLE)
+          builder.withBicycleSafety(0.87).addPermission(BICYCLE)
         )
     );
 
@@ -182,7 +182,7 @@ public class OsmTagMapper {
       ),
       new MixinPropertiesBuilder()
         .directional(TraverseDirection.BACKWARD, builder ->
-          builder.bicycleSafety(0.75).addPermission(BICYCLE)
+          builder.withBicycleSafety(0.75).addPermission(BICYCLE)
         )
     );
 
@@ -203,7 +203,7 @@ public class OsmTagMapper {
       ),
       new MixinPropertiesBuilder()
         .directional(TraverseDirection.BACKWARD, builder ->
-          builder.bicycleSafety(1.4).addPermission(BICYCLE)
+          builder.withBicycleSafety(1.4).addPermission(BICYCLE)
         )
     );
 
@@ -514,7 +514,7 @@ public class OsmTagMapper {
     );
   }
 
-  public float getCarSpeedForWay(OsmEntity way, @Nullable TraverseDirection direction) {
+  public float getCarSpeedForWay(OsmEntity way, TraverseDirection direction) {
     return way.getOsmProvider().getWayPropertySet().getCarSpeedForWay(way, direction);
   }
 

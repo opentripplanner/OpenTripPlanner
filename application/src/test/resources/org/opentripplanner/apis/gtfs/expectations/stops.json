@@ -14,7 +14,25 @@
             "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange": []
+        "routesWithinRange": [],
+        "alerts": [
+          {
+            "alertHeaderText": "",
+            "alertDescriptionText": ""
+          },
+          {
+            "alertHeaderText": "Second string",
+            "alertDescriptionText": "Second string"
+          },
+          {
+            "alertHeaderText": "A header",
+            "alertDescriptionText": "A description"
+          },
+          {
+            "alertHeaderText": "First string",
+            "alertDescriptionText": "First string"
+          }
+        ]
       },
       {
         "gtfsId": "F:B",
@@ -29,7 +47,8 @@
             "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange": []
+        "routesWithinRange": [],
+        "alerts": []
       },
       {
         "gtfsId": "F:C",
@@ -44,7 +63,13 @@
             "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange": []
+        "routesWithinRange": [],
+        "alerts": [
+          {
+            "alertHeaderText": "Station closed",
+            "alertDescriptionText": "This station is currently closed"
+          }
+        ]
       },
       {
         "gtfsId": "F:D",
@@ -59,7 +84,8 @@
             "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange": []
+        "routesWithinRange": [],
+        "alerts": []
       },
       {
         "gtfsId": "F:E",
@@ -74,7 +100,8 @@
             "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange": []
+        "routesWithinRange": [],
+        "alerts": []
       },
       {
         "gtfsId": "F:F",
@@ -89,7 +116,8 @@
             "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange": []
+        "routesWithinRange": [],
+        "alerts": []
       },
       {
         "gtfsId": "F:G",
@@ -104,7 +132,8 @@
             "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange": []
+        "routesWithinRange": [],
+        "alerts": []
       },
       {
         "gtfsId": "F:H",
@@ -119,7 +148,8 @@
             "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange": []
+        "routesWithinRange": [],
+        "alerts": []
       }
     ]
   }

@@ -18,7 +18,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.wayproperty.WayPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
@@ -100,7 +99,7 @@ class OsmTagMapperTest {
   @Test
   void testFootway() {
     OsmWay footway = WayTestData.footway();
-    assertEquals(PEDESTRIAN, wps.getDataForEntity(footway, null).getPermission());
+    assertEquals(PEDESTRIAN, wps.getDataForEntity(footway).getPermission());
     assertEquals(0.8, wps.getDataForWay(footway).forward().walkSafety());
 
     footway.addTag("sidewalk", "both");
@@ -111,49 +110,43 @@ class OsmTagMapperTest {
   void testFootwaySharedWithBicycle() {
     assertEquals(
       PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.footwaySharedWithBicycle(), null).getPermission()
+      wps.getDataForEntity(WayTestData.footwaySharedWithBicycle()).getPermission()
     );
   }
 
   @Test
   void testCycleway() {
-    assertEquals(BICYCLE, wps.getDataForEntity(WayTestData.cycleway(), null).getPermission());
+    assertEquals(BICYCLE, wps.getDataForEntity(WayTestData.cycleway()).getPermission());
   }
 
   @Test
   void testCyclewaySharedWithFoot() {
     assertEquals(
       PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.cyclewaySharedWithFoot(), null).getPermission()
+      wps.getDataForEntity(WayTestData.cyclewaySharedWithFoot()).getPermission()
     );
   }
 
   @Test
   void testPedestrian() {
-    assertEquals(
-      PEDESTRIAN,
-      wps.getDataForEntity(WayTestData.pedestrianArea(), null).getPermission()
-    );
+    assertEquals(PEDESTRIAN, wps.getDataForEntity(WayTestData.pedestrianArea()).getPermission());
   }
 
   @Test
   void testBridleway() {
-    assertEquals(NONE, wps.getDataForEntity(WayTestData.bridleway(), null).getPermission());
+    assertEquals(NONE, wps.getDataForEntity(WayTestData.bridleway()).getPermission());
   }
 
   @Test
   void testPath() {
-    assertEquals(
-      PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.path(), null).getPermission()
-    );
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForEntity(WayTestData.path()).getPermission());
   }
 
   @Test
   void testBridlewaySharedWithFootAndBicycle() {
     assertEquals(
       PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.bridlewaySharedWithFootAndBicycle(), null).getPermission()
+      wps.getDataForEntity(WayTestData.bridlewaySharedWithFootAndBicycle()).getPermission()
     );
   }
 
@@ -179,20 +172,20 @@ class OsmTagMapperTest {
   void testPrimaryMotorroad() {
     assertEquals(
       CAR,
-      wps.getDataForEntity(WayTestData.highwayPrimaryWithMotorroad(), null).getPermission()
+      wps.getDataForEntity(WayTestData.highwayPrimaryWithMotorroad()).getPermission()
     );
   }
 
   @Test
   void testTrunk() {
-    assertEquals(ALL, wps.getDataForEntity(WayTestData.highwayTrunk(), null).getPermission());
+    assertEquals(ALL, wps.getDataForEntity(WayTestData.highwayTrunk()).getPermission());
   }
 
   @Test
   void testTrunkMotorroad() {
     assertEquals(
       CAR,
-      wps.getDataForEntity(WayTestData.highwayTrunkWithMotorroad(), null).getPermission()
+      wps.getDataForEntity(WayTestData.highwayTrunkWithMotorroad()).getPermission()
     );
   }
 
@@ -219,7 +212,7 @@ class OsmTagMapperTest {
 
   @Test
   void testTertiary() {
-    assertEquals(ALL, wps.getDataForEntity(WayTestData.highwayTertiary(), null).getPermission());
+    assertEquals(ALL, wps.getDataForEntity(WayTestData.highwayTertiary()).getPermission());
   }
 
   @Test

@@ -53,23 +53,7 @@ public class TestVehicleRentalStationBuilder {
   }
 
   public TestVehicleRentalStationBuilder withSystem(String id, String url) {
-    this.system = new VehicleRentalSystem(
-      id,
-      null,
-      null,
-      null,
-      null,
-      url,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
+    this.system = VehicleRentalSystem.of().withSystemId(id).withUrl(url).build();
     return this;
   }
 
@@ -109,45 +93,51 @@ public class TestVehicleRentalStationBuilder {
     int numAvailable,
     int numSpaces
   ) {
-    RentalVehicleType vehicleType = new RentalVehicleType(
-      new FeedScopedId(
-        TestVehicleRentalStationBuilder.NETWORK_1,
-        String.format("%s-%s", rentalFormFactor.name(), propulsionType.name())
-      ),
-      rentalFormFactor.name(),
-      rentalFormFactor,
-      propulsionType,
-      100000d
-    );
+    RentalVehicleType vehicleType = RentalVehicleType.of()
+      .withId(
+        new FeedScopedId(
+          TestVehicleRentalStationBuilder.NETWORK_1,
+          String.format("%s-%s", rentalFormFactor.name(), propulsionType.name())
+        )
+      )
+      .withName(rentalFormFactor.name())
+      .withFormFactor(rentalFormFactor)
+      .withPropulsionType(propulsionType)
+      .withMaxRangeMeters(100000d)
+      .build();
     this.vehicleTypesAvailable.put(vehicleType, numAvailable);
     this.vehicleSpacesAvailable.put(vehicleType, numSpaces);
     return this;
   }
 
   public VehicleRentalStation build() {
-    var station = new VehicleRentalStation();
     var stationName = "FooStation";
-    station.id = new FeedScopedId(NETWORK_1, stationName);
-    station.name = new NonLocalizedString(stationName);
-    station.latitude = latitude;
-    station.longitude = longitude;
-    station.vehiclesAvailable = vehicles;
-    station.spacesAvailable = spaces;
 
     // If no vehicle types are specified, use the default type
+    Map<RentalVehicleType, Integer> typesAvailable;
+    Map<RentalVehicleType, Integer> spacesAvailableMap;
     if (vehicleTypesAvailable.isEmpty() || vehicleSpacesAvailable.isEmpty()) {
-      station.vehicleTypesAvailable = Map.of(RentalVehicleType.getDefaultType(NETWORK_1), vehicles);
-      station.vehicleSpacesAvailable = Map.of(RentalVehicleType.getDefaultType(NETWORK_1), spaces);
+      typesAvailable = Map.of(RentalVehicleType.getDefaultType(NETWORK_1), vehicles);
+      spacesAvailableMap = Map.of(RentalVehicleType.getDefaultType(NETWORK_1), spaces);
     } else {
-      station.vehicleTypesAvailable = vehicleTypesAvailable;
-      station.vehicleSpacesAvailable = vehicleSpacesAvailable;
+      typesAvailable = vehicleTypesAvailable;
+      spacesAvailableMap = vehicleSpacesAvailable;
     }
 
-    station.overloadingAllowed = overloadingAllowed;
-    station.isRenting = stationOn;
-    station.isReturning = stationOn;
-    station.realTimeData = true;
-    station.system = system;
-    return station;
+    return VehicleRentalStation.of()
+      .withId(new FeedScopedId(NETWORK_1, stationName))
+      .withName(new NonLocalizedString(stationName))
+      .withLatitude(latitude)
+      .withLongitude(longitude)
+      .withVehiclesAvailable(vehicles)
+      .withSpacesAvailable(spaces)
+      .withVehicleTypesAvailable(typesAvailable)
+      .withVehicleSpacesAvailable(spacesAvailableMap)
+      .withOverloadingAllowed(overloadingAllowed)
+      .withIsRenting(stationOn)
+      .withIsReturning(stationOn)
+      .withRealTimeData(true)
+      .withSystem(system)
+      .build();
   }
 }

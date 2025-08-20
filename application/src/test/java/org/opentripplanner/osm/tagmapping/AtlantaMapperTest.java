@@ -1,11 +1,8 @@
 package org.opentripplanner.osm.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.osm.TraverseDirection.FORWARD;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.osm.TraverseDirection;
-import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -38,10 +35,7 @@ class AtlantaMapperTest {
     peachtreeRd.addTag("surface", "asphalt");
     peachtreeRd.addTag("tiger:county", "Fulton, GA");
 
-    assertEquals(
-      StreetTraversalPermission.ALL,
-      wps.getDataForEntity(peachtreeRd, null).getPermission()
-    );
+    assertEquals(StreetTraversalPermission.ALL, wps.getDataForEntity(peachtreeRd).getPermission());
   }
 
   @Test
@@ -78,9 +72,6 @@ class AtlantaMapperTest {
     tenthSt.addTag("tiger:county", "Fulton, GA");
     tenthSt.addTag("tiger:reviewed", "no");
     // Some other params omitted.
-    assertEquals(
-      StreetTraversalPermission.ALL,
-      wps.getDataForEntity(tenthSt, null).getPermission()
-    );
+    assertEquals(StreetTraversalPermission.ALL, wps.getDataForEntity(tenthSt).getPermission());
   }
 }

@@ -20,9 +20,9 @@ public class UKMapperTest {
 
   @Test
   void indoor() {
-    var corridor = wps.getDataForEntity(WayTestData.indoor("corridor"), null);
+    var corridor = wps.getDataForEntity(WayTestData.indoor("corridor"));
     assertEquals(PEDESTRIAN, corridor.getPermission());
-    var area = wps.getDataForEntity(WayTestData.indoor("area"), null);
+    var area = wps.getDataForEntity(WayTestData.indoor("area"));
     assertEquals(PEDESTRIAN, area.getPermission());
   }
 
@@ -30,7 +30,7 @@ public class UKMapperTest {
   void cycleway() {
     assertEquals(
       PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.cycleway(), null).getPermission()
+      wps.getDataForEntity(WayTestData.cycleway()).getPermission()
     );
   }
 
@@ -38,7 +38,7 @@ public class UKMapperTest {
   void bridleway() {
     assertEquals(
       PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.bridleway(), null).getPermission()
+      wps.getDataForEntity(WayTestData.bridleway()).getPermission()
     );
   }
 

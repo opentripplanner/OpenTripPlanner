@@ -1,7 +1,6 @@
 package org.opentripplanner.osm.wayproperty;
 
-import javax.annotation.Nullable;
-import org.opentripplanner.osm.TraverseDirection;
+import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
 
 /**
@@ -12,16 +11,15 @@ import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
  */
 public record MixinProperties(
   OsmSpecifier specifier,
-  MixinDirectionalProperties defaultProperties,
+  MixinDirectionalProperties directionlessProperties,
   MixinDirectionalProperties forwardProperties,
   MixinDirectionalProperties backwardProperties
 ) {
-  MixinDirectionalProperties getDirectionalProperties(@Nullable TraverseDirection direction) {
-    return direction == null
-      ? defaultProperties
-      : switch (direction) {
-        case FORWARD -> forwardProperties;
-        case BACKWARD -> backwardProperties;
-      };
+  MixinDirectionalProperties getDirectionalProperties(TraverseDirection direction) {
+    return switch (direction) {
+      case DIRECTIONLESS -> directionlessProperties;
+      case FORWARD -> forwardProperties;
+      case BACKWARD -> backwardProperties;
+    };
   }
 }

@@ -1,9 +1,8 @@
 package org.opentripplanner.osm.wayproperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.osm.TraverseDirection.FORWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 import static org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
@@ -12,7 +11,6 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
-import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
@@ -74,7 +72,7 @@ class WayPropertySetTest {
     void pedestrianTunnelSpecificity() {
       var tunnel = WayTestData.pedestrianTunnel();
       WayPropertySet wps = wps();
-      assertEquals(NONE, wps.getDataForEntity(tunnel, null).getPermission());
+      assertEquals(NONE, wps.getDataForEntity(tunnel).getPermission());
     }
 
     @Test

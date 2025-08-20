@@ -1,9 +1,7 @@
 package org.opentripplanner.osm.wayproperty;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
-import javax.annotation.Nullable;
-import org.opentripplanner.osm.TraverseDirection;
+import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
@@ -36,9 +34,9 @@ public class MixinPropertiesBuilder {
    * 1, with all others scaled proportionately.
    */
   public MixinPropertiesBuilder bicycleSafety(double value, double forward, double back) {
-    this.defaultBuilder.bicycleSafety(value);
-    this.forwardBuilder.bicycleSafety(forward);
-    this.backwardBuilder.bicycleSafety(back);
+    this.defaultBuilder.withBicycleSafety(value);
+    this.forwardBuilder.withBicycleSafety(forward);
+    this.backwardBuilder.withBicycleSafety(back);
     return this;
   }
 
@@ -49,9 +47,9 @@ public class MixinPropertiesBuilder {
    * 1, with all others scaled proportionately.
    */
   public MixinPropertiesBuilder walkSafety(double walkSafety) {
-    this.defaultBuilder.walkSafety(walkSafety);
-    this.forwardBuilder.walkSafety(walkSafety);
-    this.backwardBuilder.walkSafety(walkSafety);
+    this.defaultBuilder.withWalkSafety(walkSafety);
+    this.forwardBuilder.withWalkSafety(walkSafety);
+    this.backwardBuilder.withWalkSafety(walkSafety);
     return this;
   }
 
@@ -76,12 +74,12 @@ public class MixinPropertiesBuilder {
   }
 
   public MixinPropertiesBuilder directional(
-    @Nullable TraverseDirection direction,
+    TraverseDirection direction,
     Consumer<MixinDirectionalPropertiesBuilder> action
   ) {
-    var builder = direction == null
-      ? defaultBuilder
-      : switch (direction) {
+    var builder =
+      switch (direction) {
+        case DIRECTIONLESS -> defaultBuilder;
         case FORWARD -> forwardBuilder;
         case BACKWARD -> backwardBuilder;
       };
