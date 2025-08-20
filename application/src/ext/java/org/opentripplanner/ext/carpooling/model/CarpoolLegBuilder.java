@@ -1,13 +1,10 @@
 package org.opentripplanner.ext.carpooling.model;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -18,7 +15,6 @@ public class CarpoolLegBuilder {
   private ZonedDateTime endTime;
   private int generalizedCost;
   private Set<TransitAlert> transitAlerts = new HashSet<>();
-  private List<FareProductUse> fareProducts = new ArrayList<>();
   private Emission emissionPerPerson;
   private Place from;
   private Place to;
@@ -32,7 +28,6 @@ public class CarpoolLegBuilder {
     endTime = original.endTime();
     generalizedCost = original.generalizedCost();
     transitAlerts = original.listTransitAlerts();
-    fareProducts = original.fareProducts();
     emissionPerPerson = original.emissionPerPerson();
     from = original.from();
     to = original.to();
@@ -74,15 +69,6 @@ public class CarpoolLegBuilder {
 
   public Set<TransitAlert> alerts() {
     return transitAlerts;
-  }
-
-  public CarpoolLegBuilder withFareProducts(List<FareProductUse> allUses) {
-    this.fareProducts = List.copyOf(allUses);
-    return this;
-  }
-
-  public List<FareProductUse> fareProducts() {
-    return fareProducts;
   }
 
   public CarpoolLegBuilder withEmissionPerPerson(Emission emissionPerPerson) {
