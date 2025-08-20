@@ -246,6 +246,17 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       .collect(Collectors.toSet());
   }
 
+  public boolean canDropOffFormFactor(
+    RentalFormFactor formFactor,
+    boolean includeRealtimeAvailability
+  ) {
+    if (returnPolicy.equals(ReturnPolicy.ANY_TYPE) && allowDropoffNow()) {
+      return true;
+    } else {
+      return availableDropoffFormFactors(includeRealtimeAvailability).contains(formFactor);
+    }
+  }
+
   @Override
   public boolean isArrivingInRentalVehicleAtDestinationAllowed() {
     return isArrivingInRentalVehicleAtDestinationAllowed;
@@ -264,11 +275,6 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   @Override
   public VehicleRentalSystem vehicleRentalSystem() {
     return system;
-  }
-
-  @Override
-  public boolean returningAnyTypeAllowed() {
-    return returnPolicy.equals(ReturnPolicy.ANY_TYPE);
   }
 
   @Override

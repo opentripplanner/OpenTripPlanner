@@ -138,11 +138,7 @@ public class VehicleRentalEdge extends Edge {
           if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {
             return State.empty();
           }
-          var formFactors = station.availableDropoffFormFactors(realtimeAvailability);
-          if (
-            (realtimeAvailability && !station.allowDropoffNow()) ||
-              !formFactors.contains(formFactor)
-          ) {
+          if (!station.canDropOffFormFactor(formFactor, realtimeAvailability)) {
             return State.empty();
           }
           s1.dropOffRentedVehicleAtStation(formFactor, network, false);
