@@ -75,14 +75,15 @@ public class OsmEntity {
     "vehicle"
   );
   public static final Set<String> NO_ACCESS_TAGS = Set.of("no", "license", "dismount");
-  public static final Map<StreetTraversalPermission, String> OSM_TAGS_FOR_TRAVERSAL_PERMISSION = Map.of(
-    StreetTraversalPermission.CAR,
-    "motorcar",
-    StreetTraversalPermission.BICYCLE,
-    "bicycle",
-    StreetTraversalPermission.PEDESTRIAN,
-    "foot"
-  );
+  public static final Map<StreetTraversalPermission, String> OSM_TAGS_FOR_TRAVERSAL_PERMISSION =
+    Map.of(
+      StreetTraversalPermission.CAR,
+      "motorcar",
+      StreetTraversalPermission.BICYCLE,
+      "bicycle",
+      StreetTraversalPermission.PEDESTRIAN,
+      "foot"
+    );
 
   /* To save memory this is only created when an entity actually has tags. */
   private Map<String, String> tags;
