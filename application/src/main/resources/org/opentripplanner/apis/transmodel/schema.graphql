@@ -1658,6 +1658,7 @@ enum Mode {
   bus
   cableway
   car
+  carpool
   coach
   foot
   funicular
