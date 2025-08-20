@@ -575,7 +575,7 @@ public class TransmodelGraphQLSchema {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("quays")
-          .description("Get all quays")
+          .description("Get quays. Either ids or name must be set.")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(quayType)))
           .argument(
@@ -587,18 +587,25 @@ public class TransmodelGraphQLSchema {
           .argument(GraphQLArgument.newArgument().name("name").type(Scalars.GraphQLString).build())
           .dataFetcher(environment -> {
             if (environment.containsArgument("ids")) {
-              var ids = mapIDsToDomainNullSafe(environment.getArgument("ids"));
-
+              if (environment.getArgument("ids") == null) {
+                throw new IllegalArgumentException("ids argument must be set to a non-null value.");
+              }
               if (environment.getArgument("name") != null) {
                 throw new IllegalArgumentException("Unable to combine other filters with ids");
               }
+
+              var ids = mapIDsToDomainNullSafe(environment.getArgument("ids"));
 
               TransitService transitService = GqlUtil.getTransitService(environment);
               return ids.stream().map(transitService::getStopLocation).toList();
             }
 
+            if (environment.getArgument("name") == null) {
+              throw new IllegalArgumentException("At least one of ids or name must be set.");
+            }
+
             FindStopLocationsRequest request = FindStopLocationsRequest.of()
-              .withName(environment.getArgument("name"))
+              .withName(Objects.requireNonNull(environment.getArgument("name")))
               .build();
 
             return GqlUtil.getTransitService(environment).findStopLocations(request);
