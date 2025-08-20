@@ -88,6 +88,7 @@
         <plugin.prettier.goal>write</plugin.prettier.goal>
         <plugin.prettier.skip>false</plugin.prettier.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
+        <tests.excludedGroups>integration</tests.excludedGroups>
     </properties>
 
     <distributionManagement>
@@ -199,7 +200,8 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <excludedGroups>integration</excludedGroups>
+                    <groups>${tests.includedGroups}</groups>
+                    <excludedGroups>${tests.excludedGroups}</excludedGroups>
                     <!-- we have to fork the JVM during tests so that the argLine is passed along -->
                     <forkCount>3</forkCount>
                     <!-- enable the restricted reflection under Java 11 so that the ObjectDiffer works
@@ -550,6 +552,14 @@
                     <url>https://maven.pkg.github.com/${GITHUB_REPOSITORY}/</url>
                 </repository>
             </distributionManagement>
+        </profile>
+        <profile>
+            <id>integration-tests</id>
+            <properties>
+                <plugin.prettier.skip>true</plugin.prettier.skip>
+                <tests.includedGroups>integration</tests.includedGroups>
+                <tests.exludedGroups>nothing</tests.exludedGroups>
+            </properties>
         </profile>
         <profile>
             <id>release</id>
