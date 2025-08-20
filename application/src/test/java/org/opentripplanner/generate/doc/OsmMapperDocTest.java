@@ -134,14 +134,6 @@ public class OsmMapperDocTest {
     return propTable.build();
   }
 
-  private static String tableValues(double value) {
-    if (value == 1.0) {
-      return "";
-    } else {
-      return Double.toString(value);
-    }
-  }
-
   private static String tableValues(
     StreetTraversalPermission value,
     StreetTraversalPermission forward,
