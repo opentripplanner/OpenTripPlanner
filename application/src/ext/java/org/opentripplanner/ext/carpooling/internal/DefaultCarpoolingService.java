@@ -32,6 +32,7 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
@@ -52,16 +53,19 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final CarpoolingRepository repository;
   private final Graph graph;
+  private final VertexLinker vertexLinker;
 
   public DefaultCarpoolingService(
     StreetLimitationParametersService streetLimitationParametersService,
     CarpoolingRepository repository,
-    Graph graph
+    Graph graph,
+    VertexLinker vertexLinker
   ) {
     KristiansandCarpoolingData.populateRepository(repository, graph);
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.repository = repository;
     this.graph = graph;
+    this.vertexLinker = vertexLinker;
   }
 
   /**
@@ -149,6 +153,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     try {
       temporaryVertices = new TemporaryVerticesContainer(
         graph,
+        vertexLinker,
         request.from(),
         request.to(),
         request.journey().access().mode(),
