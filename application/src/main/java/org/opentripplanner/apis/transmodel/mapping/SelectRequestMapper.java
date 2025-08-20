@@ -1,10 +1,9 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
-import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDsToDomainNullSafe;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -13,23 +12,29 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 class SelectRequestMapper {
 
+  private final FeedScopedIdMapper idMapper;
+
+  SelectRequestMapper(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
+  }
+
   @SuppressWarnings("unchecked")
-  static SelectRequest mapSelectRequest(Map<String, List<?>> input) {
+  SelectRequest mapSelectRequest(Map<String, List<?>> input) {
     var selectRequestBuilder = SelectRequest.of();
 
     if (input.containsKey("lines")) {
       var lines = (List<String>) input.get("lines");
-      selectRequestBuilder.withRoutes(mapIDsToDomainNullSafe(lines));
+      selectRequestBuilder.withRoutes(idMapper.parseListNullSafe(lines));
     }
 
     if (input.containsKey("authorities")) {
       var authorities = (List<String>) input.get("authorities");
-      selectRequestBuilder.withAgencies(mapIDsToDomainNullSafe(authorities));
+      selectRequestBuilder.withAgencies(idMapper.parseListNullSafe(authorities));
     }
 
     if (input.containsKey("groupOfLines")) {
       var groupOfLines = (List<String>) input.get("groupOfLines");
-      selectRequestBuilder.withGroupOfRoutes(mapIDsToDomainNullSafe(groupOfLines));
+      selectRequestBuilder.withGroupOfRoutes(idMapper.parseListNullSafe(groupOfLines));
     }
 
     if (input.containsKey("transportModes")) {

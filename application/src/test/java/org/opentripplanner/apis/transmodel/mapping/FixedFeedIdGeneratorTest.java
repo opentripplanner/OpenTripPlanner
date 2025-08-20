@@ -1,30 +1,28 @@
-package org.opentripplanner.ext.mapping;
+package org.opentripplanner.apis.transmodel.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 
-public class TransmodelMappingUtilTest {
+class FixedFeedIdGeneratorTest {
 
   @Test
   public void resolveFixedFeedIdTest() {
-    assertEquals("UNKNOWN_FEED", TransitIdMapper.setupFixedFeedId(List.of()));
-    assertEquals("F", TransitIdMapper.setupFixedFeedId(List.of(agency("F", 1))));
-    assertEquals("A", TransitIdMapper.setupFixedFeedId(List.of(agency("A", 1), agency("A", 2))));
+    assertEquals("UNKNOWN_FEED", FixedFeedIdGenerator.generate(List.of()));
+    assertEquals("F", FixedFeedIdGenerator.generate(List.of(agency("F", 1))));
+    assertEquals("A", FixedFeedIdGenerator.generate(List.of(agency("A", 1), agency("A", 2))));
     assertEquals(
       "A",
-      TransitIdMapper.setupFixedFeedId(List.of(agency("A", 1), agency("A", 2), agency("B", 1)))
+      FixedFeedIdGenerator.generate(List.of(agency("A", 1), agency("A", 2), agency("B", 1)))
     );
     assertTrue(
       "AB".contains(
-          TransitIdMapper.setupFixedFeedId(
+          FixedFeedIdGenerator.generate(
             List.of(agency("A", 1), agency("A", 2), agency("B", 1), agency("B", 2))
           )
         ),
@@ -38,10 +36,5 @@ public class TransmodelMappingUtilTest {
       .copy()
       .withId(new FeedScopedId(feedScope, Integer.toString(id)))
       .build();
-  }
-
-  @AfterEach
-  public void cleanUp() {
-    TransitIdMapper.clearFixedFeedId();
   }
 }
