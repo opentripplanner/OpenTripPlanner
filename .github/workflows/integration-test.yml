@@ -25,4 +25,5 @@ jobs:
 
 
       - name: Run integration tests
-        run: mvn test -Pintegration-tests
+        run: mvn test -Dtests.includedGroups=integration -Dtests.excludedGroups=""
+
