@@ -30,6 +30,7 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.SchemaTransformer;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1187,7 +1188,9 @@ public class TransmodelGraphQLSchema {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("serviceJourneys")
-          .description("Get all _service journeys_")
+          .description(
+            "Get _service journeys_. At least one of the filter arguments must be non-null."
+          )
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .argument(
@@ -1219,11 +1222,22 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
+            if (
+              Stream.of("lines", "privateCodes", "authorities", "activeDates").noneMatch(
+                key -> environment.getArgument(key) != null
+              )
+            ) {
+              throw new IllegalArgumentException(
+                "At least one of these filter arguments must be non-null: lines, privateCodes, authorities, activeDates"
+              );
+            }
             var tripRequest = TripRequest.of()
               .withIncludeAgencies(mapIDsToDomain(environment.getArgument("authorities")))
               .withIncludeRoutes(mapIDsToDomain(environment.getArgument("lines")))
-              .withIncludeNetexInternalPlanningCodes(environment.getArgument("privateCodes"))
-              .withIncludeServiceDates(environment.getArgument("activeDates"))
+              .withIncludeNetexInternalPlanningCodes(
+                GqlUtil.toStringList(environment.getArgument("privateCodes"))
+              )
+              .withIncludeServiceDates(GqlUtil.toList(environment.getArgument("activeDates")))
               .build();
 
             return GqlUtil.getTransitService(environment).getTrips(tripRequest);

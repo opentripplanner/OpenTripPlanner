@@ -108,4 +108,15 @@ public class GqlUtil {
     }
     return args.stream().filter(Objects::nonNull).toList();
   }
+
+  /**
+   * Null-safe handling of a collection of strings. Returns null if the incoming collection is null.
+   * Null and empty elements are filtered out.
+   */
+  public static @Nullable List<String> toStringList(@Nullable Collection<String> args) {
+    if (args == null) {
+      return null;
+    }
+    return args.stream().filter(Objects::nonNull).filter(s -> !s.isEmpty()).toList();
+  }
 }

@@ -758,7 +758,7 @@ type QueryType {
   serverInfo: ServerInfo! @timingData
   "Get a single service journey based on its id"
   serviceJourney(id: String!): ServiceJourney @timingData
-  "Get all _service journeys_"
+  "Get all _service journeys_. At least one of the filter arguments must be non-null."
   serviceJourneys(
     "Set of _operating days_ to fetch _service journeys_ for."
     activeDates: [Date],
