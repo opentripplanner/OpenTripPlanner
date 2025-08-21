@@ -88,11 +88,10 @@ public class TemporaryPartialStreetEdgeTest {
       edge.getDistanceMeters()
     );
 
-    // this need to be changed when the internal representation changes to north based
-    assertEquals(-135, edge.getInAngle(), 2);
-    assertEquals(-90, edge.getOutAngle(), 2);
-    assertEquals(-135, pEdge.getInAngle(), 2);
-    assertEquals(-90, pEdge.getOutAngle(), 2);
+    assertEquals(45, edge.getInAngle(), 2);
+    assertEquals(90, edge.getOutAngle(), 2);
+    assertEquals(45, pEdge.getInAngle(), 2);
+    assertEquals(90, pEdge.getOutAngle(), 2);
   }
 
   @Test
