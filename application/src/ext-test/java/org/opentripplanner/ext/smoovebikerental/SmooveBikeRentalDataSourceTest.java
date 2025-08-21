@@ -33,47 +33,47 @@ class SmooveBikeRentalDataSourceTest {
     }
 
     VehicleRentalPlace hamn = rentalStations.get(0);
-    assertEquals("Hamn", hamn.getName().toString());
-    assertEquals("A04", hamn.getStationId());
+    assertEquals("Hamn", hamn.name().toString());
+    assertEquals("A04", hamn.stationId());
     // Ignore whitespace in coordinates string
-    assertEquals(24.952269, hamn.getLongitude());
-    assertEquals(60.167913, hamn.getLatitude());
-    assertEquals(11, hamn.getSpacesAvailable());
-    assertEquals(1, hamn.getVehiclesAvailable());
+    assertEquals(24.952269, hamn.longitude());
+    assertEquals(60.167913, hamn.latitude());
+    assertEquals(11, hamn.spacesAvailable());
+    assertEquals(1, hamn.vehiclesAvailable());
     assertTrue(hamn.overloadingAllowed());
     assertTrue(hamn.isAllowDropoff());
     assertTrue(hamn.isAllowPickup());
     assertTrue(hamn.allowDropoffNow());
 
     VehicleRentalPlace fake = rentalStations.get(1);
-    assertEquals("Fake", fake.getName().toString());
-    assertEquals("B05", fake.getStationId());
-    assertEquals(24.0, fake.getLongitude());
-    assertEquals(60.0, fake.getLatitude());
+    assertEquals("Fake", fake.name().toString());
+    assertEquals("B05", fake.stationId());
+    assertEquals(24.0, fake.longitude());
+    assertEquals(60.0, fake.latitude());
     // operative: false overrides available bikes and slots but not capacity
-    assertEquals(0, fake.getSpacesAvailable());
-    assertEquals(0, fake.getVehiclesAvailable());
-    assertEquals(5, fake.getCapacity());
+    assertEquals(0, fake.spacesAvailable());
+    assertEquals(0, fake.vehiclesAvailable());
+    assertEquals(5, fake.capacity());
     assertFalse(fake.isAllowDropoff());
     assertFalse(fake.isAllowPickup());
     assertFalse(fake.allowDropoffNow());
 
     VehicleRentalPlace foo = rentalStations.get(2);
-    assertEquals("Foo", foo.getName().toString());
-    assertEquals("B06", foo.getStationId());
-    assertEquals(25.0, foo.getLongitude());
-    assertEquals(61.0, foo.getLatitude());
-    assertEquals(5, foo.getSpacesAvailable());
-    assertEquals(5, foo.getVehiclesAvailable());
-    assertEquals(5, foo.getCapacity());
+    assertEquals("Foo", foo.name().toString());
+    assertEquals("B06", foo.stationId());
+    assertEquals(25.0, foo.longitude());
+    assertEquals(61.0, foo.latitude());
+    assertEquals(5, foo.spacesAvailable());
+    assertEquals(5, foo.vehiclesAvailable());
+    assertEquals(5, foo.capacity());
     assertTrue(foo.allowDropoffNow());
     // Ignores mismatch with total_slots
 
     VehicleRentalPlace full = rentalStations.get(3);
-    assertEquals("Full", full.getName().toString());
-    assertEquals("B09", full.getStationId());
-    assertEquals(0, full.getSpacesAvailable());
-    assertEquals(12, full.getVehiclesAvailable());
+    assertEquals("Full", full.name().toString());
+    assertEquals("B09", full.stationId());
+    assertEquals(0, full.spacesAvailable());
+    assertEquals(12, full.vehiclesAvailable());
     assertTrue(full.isAllowDropoff());
     assertTrue(full.isAllowPickup());
     assertTrue(full.allowDropoffNow());
@@ -94,18 +94,18 @@ class SmooveBikeRentalDataSourceTest {
     List<VehicleRentalPlace> rentalStations = source.getUpdates();
 
     VehicleRentalPlace hamn = rentalStations.get(0);
-    assertEquals(11, hamn.getSpacesAvailable());
+    assertEquals(11, hamn.spacesAvailable());
     assertFalse(hamn.overloadingAllowed());
     // spaces available and overloading is not allowed
     assertTrue(hamn.allowDropoffNow());
 
     VehicleRentalPlace fake = rentalStations.get(1);
-    assertEquals(0, fake.getSpacesAvailable());
+    assertEquals(0, fake.spacesAvailable());
     // not operative and overloading is not allowed
     assertFalse(fake.allowDropoffNow());
 
     VehicleRentalPlace full = rentalStations.get(3);
-    assertEquals(0, full.getSpacesAvailable());
+    assertEquals(0, full.spacesAvailable());
     // operative but no spaces and overloading is not allowed
     assertFalse(full.allowDropoffNow());
   }

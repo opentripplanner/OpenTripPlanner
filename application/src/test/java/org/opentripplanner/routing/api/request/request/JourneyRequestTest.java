@@ -107,14 +107,14 @@ class JourneyRequestTest {
   void testToString() {
     assertEqualsIgnoreWhitespace(
       """
-      JourneyRequest{
-        transit: TransitRequest{filters: [TransitFilterRequest{select: [SelectRequest{transportModes: [], routes: [F:R:1]}]}]},
-        access: StreetRequest{mode: BIKE_TO_PARK},
-        egress: StreetRequest{mode: SCOOTER_RENTAL},
-        transfer:StreetRequest{mode:BIKE},
-        direct:StreetRequest{mode:CAR},
+      (
+        transit: (filters: [(select: [(transportModes: EMPTY, routes: [F:R:1])])]),
+        access: (mode: BIKE_TO_PARK),
+        egress: (mode: SCOOTER_RENTAL),
+        transfer:(mode:BIKE),
+        direct:(mode:CAR),
         wheelchair
-      }
+      )
       """,
       subject.toString()
     );

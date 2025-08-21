@@ -5,6 +5,9 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
+/**
+ * A temporary edge which links the origin / destination of a street search to the street graph.
+ */
 public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
 
   private TemporaryFreeEdge(TemporaryVertex from, Vertex to) {
@@ -26,6 +29,7 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
   @Override
   public State[] traverse(State s0) {
     StateEditor s1 = s0.edit(this);
+    // a small cost is added to prevent other searches going through this temporary edge
     s1.incrementWeight(1);
     s1.setBackMode(null);
 

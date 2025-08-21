@@ -60,7 +60,8 @@ class GeneralizedCostParametersMapperTest {
   @Test
   public void dealWithEmptyList() {
     var routingRequest = RouteRequest.of()
-      .withJourney(jb -> jb.withTransit(b -> b.withUnpreferredAgencies(List.of(agencyWithNoRoutes)))
+      .withJourney(jb ->
+        jb.withTransit(b -> b.withUnpreferredAgencies(List.of(agencyWithNoRoutes)))
       )
       .buildDefault();
 

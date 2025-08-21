@@ -17,22 +17,23 @@ class RentalPropertyMapper extends PropertyMapper<VehicleRentalPlace> {
   protected Collection<KeyValue> map(VehicleRentalPlace input) {
     var base = List.of(
       kv("class", input.getClass().getSimpleName()),
-      kv("id", input.getId()),
-      kv("network", input.getNetwork()),
-      kv("vehiclesAvailable", input.getVehiclesAvailable()),
-      kv("spacesAvailable", input.getSpacesAvailable())
+      kv("id", input.id()),
+      kv("network", input.network()),
+      kv("vehiclesAvailable", input.vehiclesAvailable()),
+      kv("spacesAvailable", input.spacesAvailable())
     );
 
     if (input instanceof VehicleRentalVehicle vehicle) {
       var props = List.of(
-        kv("isReserved", vehicle.isReserved),
-        kv("isDisabled", vehicle.isDisabled)
+        kv("formFactor", vehicle.vehicleType().formFactor()),
+        kv("isReserved", vehicle.isReserved()),
+        kv("isDisabled", vehicle.isDisabled())
       );
       return ListUtils.combine(base, props);
     } else if (input instanceof VehicleRentalStation station) {
       var props = List.of(
-        kv("isRenting", station.isRenting),
-        kv("isReturning", station.isReturning)
+        kv("isRenting", station.isRenting()),
+        kv("isReturning", station.isReturning())
       );
       return ListUtils.combine(base, props);
     }

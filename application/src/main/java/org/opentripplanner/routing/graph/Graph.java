@@ -18,7 +18,6 @@ import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.linking.Scope;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -70,8 +69,6 @@ public class Graph implements Serializable {
 
   @Nullable
   private final OpeningHoursCalendarService openingHoursCalendarService;
-
-  private final transient VertexLinker linker;
 
   private transient StreetIndex streetIndex;
 
@@ -126,7 +123,6 @@ public class Graph implements Serializable {
   ) {
     this.deduplicator = deduplicator;
     this.openingHoursCalendarService = openingHoursCalendarService;
-    this.linker = new VertexLinker(this);
   }
 
   public Graph(Deduplicator deduplicator) {
@@ -212,6 +208,7 @@ public class Graph implements Serializable {
    */
   @Nullable
   public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
+    requireIndex();
     return streetIndex.findTransitStopVertex(id);
   }
 
@@ -257,6 +254,9 @@ public class Graph implements Serializable {
 
   public void remove(Vertex vertex) {
     vertices.remove(vertex.getLabel());
+    if (streetIndex != null) {
+      streetIndex.remove(vertex);
+    }
   }
 
   public void removeIfUnconnected(Vertex v) {
@@ -286,7 +286,7 @@ public class Graph implements Serializable {
   /**
    * Perform indexing on vertices, edges and create transient data structures. This used to be done
    * in readObject methods upon deserialization, but stand-alone mode now allows passing graphs from
-   * graphbuilder to server in memory, without a round trip through serialization.
+   * graph builder to server in memory, without a round trip through serialization.
    * <p>
    * TODO OTP2 - Indexing the streetIndex is not something that should be delegated outside the
    *           - graph. This allows a module to index the streetIndex BEFORE another module add
@@ -296,6 +296,17 @@ public class Graph implements Serializable {
     LOG.info("Index street model...");
     streetIndex = new StreetIndex(this);
     LOG.info("Index street model complete.");
+  }
+
+  /**
+   * Index this graph if it hasn't been already. If the index already exists, this is a no-op.
+   * <p>
+   * TODO: The indexing process (and the index itself) should be completely hidden from the callers.
+   */
+  public void requestIndex() {
+    if (streetIndex == null) {
+      index();
+    }
   }
 
   @Nullable
@@ -318,6 +329,7 @@ public class Graph implements Serializable {
    * the station centroid if the station is configured to route to centroid.
    */
   public Set<Vertex> findStopVertices(FeedScopedId stopId) {
+    requireIndex();
     return streetIndex.findStopVertices(stopId);
   }
 
@@ -326,14 +338,15 @@ public class Graph implements Serializable {
    */
   public Collection<Edge> findEdges(Envelope env) {
     requireIndex();
-    return streetIndex.getEdgesForEnvelope(env);
+    return streetIndex.findEdges(env);
   }
 
   /**
    * Find all edges with the given scope inside the bounding box defined by {@code env}.
    */
   public Collection<Edge> findEdges(Envelope env, Scope scope) {
-    return streetIndex.getEdgesForEnvelope(env, scope);
+    requireIndex();
+    return streetIndex.findEdges(env, scope);
   }
 
   /**
@@ -342,24 +355,6 @@ public class Graph implements Serializable {
   public void insert(StreetEdge edge, Scope scope) {
     requireIndex();
     streetIndex.insert(edge, scope);
-  }
-
-  /**
-   * Get VertexLinker, safe to use while routing, but do not use during graph build.
-   * @see #getLinkerSafe()
-   */
-  public VertexLinker getLinker() {
-    requireIndex();
-    return linker;
-  }
-
-  /**
-   * Get VertexLinker during graph build, both OSM street data and transit data must be loaded
-   * before calling this.
-   */
-  public VertexLinker getLinkerSafe() {
-    indexIfNotIndexed();
-    return linker;
   }
 
   /**
@@ -393,12 +388,6 @@ public class Graph implements Serializable {
   public void setDistanceBetweenElevationSamples(double distanceBetweenElevationSamples) {
     this.distanceBetweenElevationSamples = distanceBetweenElevationSamples;
     CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
-  }
-
-  private void indexIfNotIndexed() {
-    if (streetIndex == null) {
-      index();
-    }
   }
 
   private void requireIndex() {

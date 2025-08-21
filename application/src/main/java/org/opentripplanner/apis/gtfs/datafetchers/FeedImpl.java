@@ -35,7 +35,8 @@ public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
           switch (type) {
             case AGENCIES:
               List<Agency> agencies = getAgencies(environment);
-              agencies.forEach(agency -> alerts.addAll(alertService.getAgencyAlerts(agency.getId()))
+              agencies.forEach(agency ->
+                alerts.addAll(alertService.getAgencyAlerts(agency.getId()))
               );
               break;
             case ROUTE_TYPES:

@@ -38,7 +38,8 @@ public class CompositeUtil {
 
     var list = Arrays.stream(children)
       .filter(Objects::nonNull)
-      .flatMap(it -> isComposite.test(it) ? listCompositeChildren.apply(it).stream() : Stream.of(it)
+      .flatMap(it ->
+        isComposite.test(it) ? listCompositeChildren.apply(it).stream() : Stream.of(it)
       )
       .toList();
 

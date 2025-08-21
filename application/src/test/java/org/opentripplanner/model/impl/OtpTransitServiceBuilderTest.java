@@ -4,6 +4,7 @@ import static java.util.Comparator.comparing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -20,7 +21,6 @@ import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.organization.Agency;
 
 public class OtpTransitServiceBuilderTest {
 
@@ -79,10 +79,15 @@ public class OtpTransitServiceBuilderTest {
 
   @Test
   public void testGetAllShapePoints() {
-    Collection<ShapePoint> shapePoints = subject.getShapePoints().values();
+    var shapePoints = subject
+      .getShapePoints()
+      .values()
+      .stream()
+      .flatMap(p -> ImmutableList.copyOf(p).stream())
+      .toList();
 
     assertEquals(9, shapePoints.size());
-    assertEquals("ShapePoint{F:4 #1 (41.0,-75.0)}", first(shapePoints).toString());
+    assertEquals("1 (41.0, -72.0) dist=0.0", first(shapePoints).toString());
   }
 
   /* private methods */
@@ -92,17 +97,12 @@ public class OtpTransitServiceBuilderTest {
       FEED_ID,
       ConstantsForTests.SIMPLE_GTFS
     ).getTransitBuilder();
-    Agency agency = agency(builder);
 
     // Supplement test data with at least one entity in all collections
     builder.getCalendarDates().add(createAServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID));
     builder.getFeedInfos().add(FeedInfo.dummyForTest(FEED_ID));
 
     return builder;
-  }
-
-  private static Agency agency(OtpTransitServiceBuilder builder) {
-    return first(builder.getAgenciesById().values());
   }
 
   private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedScopedId serviceId) {

@@ -138,12 +138,14 @@ public class DurationUtilsTest {
     assertThrows(NullPointerException.class, () -> requireNonNegative(null, D2h, "test"));
 
     // Test max limit
-    var ex = assertThrows(IllegalArgumentException.class, () -> requireNonNegative(D2h, D2h, "test")
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      requireNonNegative(D2h, D2h, "test")
     );
     assertEquals("Duration test can't be longer or equals too 2h: PT2H", ex.getMessage());
 
     // Test non-negative
-    ex = assertThrows(IllegalArgumentException.class, () -> requireNonNegative(NEG_1s, D2h, "test")
+    ex = assertThrows(IllegalArgumentException.class, () ->
+      requireNonNegative(NEG_1s, D2h, "test")
     );
     assertEquals("Duration test can't be negative: PT-1S", ex.getMessage());
   }
