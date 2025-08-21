@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.geometry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -516,6 +517,14 @@ public class GeometryProcessor {
    */
   private Collection<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
     var points = builder.getShapePoints().get(shapeId);
+    if (points == null) {
+      issueStore.add(
+        "InvalidShapeReference",
+        "Trip references shape '%s', which does not exist.",
+        shapeId
+      );
+      return List.of();
+    }
     ArrayList<ShapePoint> filtered = new ArrayList<>();
     ShapePoint last = null;
     int currentSeq = Integer.MIN_VALUE;
