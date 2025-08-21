@@ -122,7 +122,7 @@ class NorwayMapper extends OsmTagMapper {
     );
 
     BiFunction<Float, OsmEntity, Double> cycleSafetyHighway = (speedLimit, way) -> {
-      if (way.isPedestrianExplicitlyDenied()) {
+      if (way.isPedestrianDenied()) {
         return cycleSafetyVeryHighTraffic;
       }
       // 90 km/h or over
@@ -228,7 +228,7 @@ class NorwayMapper extends OsmTagMapper {
         new Condition.OneOfOrAbsent("cycleway"),
         isNormalRoad
       ),
-      ofBicycleSafety(1, 1.15)
+      ofBicycleSafety(1, 1, 1.15)
     );
 
     // Discourage cycling along tram tracks
@@ -245,7 +245,7 @@ class NorwayMapper extends OsmTagMapper {
         new Condition.Equals("tunnel", "yes"),
         isClassifiedOrUnclassifiedRoad
       ),
-      ofBicycleSafety(2.).ofWalkSafety(2.)
+      ofBicycleSafety(2).walkSafety(2)
     );
 
     // Discourage walking on a bridge and other ways without a verge without a sidewalk
