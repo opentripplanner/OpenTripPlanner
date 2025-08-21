@@ -61,6 +61,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add `Leg.stopCalls` with full flex information to GTFS API [#6757](https://github.com/opentripplanner/OpenTripPlanner/pull/6757)
 - Use North-based angle in internal representation [#6780](https://github.com/opentripplanner/OpenTripPlanner/pull/6780)
 - Add support for GTFS-RT platform change, headsign change, NEW and REPLACEMENT trips [#6028](https://github.com/opentripplanner/OpenTripPlanner/pull/6028)
+- Fix outgoing angle for temporary street edge [#6793](https://github.com/opentripplanner/OpenTripPlanner/pull/6793)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
