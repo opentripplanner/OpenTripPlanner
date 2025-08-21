@@ -117,28 +117,6 @@ public class KristiansandCarpoolingData {
         2
       )
     );
-
-    System.out.println(
-      "✅ Populated carpooling repository with " +
-      repository.getCarpoolTrips().size() +
-      " Kristiansand area trips"
-    );
-
-    // Print trip summary for verification
-    repository
-      .getCarpoolTrips()
-      .forEach(trip -> {
-        System.out.printf(
-          "🚗 %s: %s → %s (%s-%s) [%s seats, %s]%n",
-          trip.getId().getId(),
-          formatAreaName(trip.getBoardingArea().getId().getId()),
-          formatAreaName(trip.getAlightingArea().getId().getId()),
-          trip.getStartTime().toLocalTime(),
-          trip.getEndTime().toLocalTime(),
-          trip.getAvailableSeats(),
-          trip.getProvider()
-        );
-      });
   }
 
   private static CarpoolTrip createCarpoolTrip(
