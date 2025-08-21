@@ -48,7 +48,7 @@ public final class VehicleRentalPreferences implements Serializable {
     this.pickupCost = builder.pickupCost;
     this.dropOffTime = Duration.ofSeconds(Units.duration(builder.dropOffTime));
     this.dropOffCost = builder.dropOffCost;
-    this.rentalDuration = Duration.ofSeconds(Units.duration(builder.rentalDuration));
+    this.rentalDuration = builder.rentalDuration;
     this.useAvailabilityInformation = builder.useAvailabilityInformation;
     this.arrivingInRentalVehicleAtDestinationCost =
       builder.arrivingInRentalVehicleAtDestinationCost;
@@ -198,7 +198,7 @@ public final class VehicleRentalPreferences implements Serializable {
     private int pickupTime;
     private Cost pickupCost;
     private int dropOffTime;
-    private int rentalDuration;
+    private Duration rentalDuration;
     private Cost dropOffCost;
     private boolean useAvailabilityInformation;
     private Cost arrivingInRentalVehicleAtDestinationCost;
@@ -212,7 +212,7 @@ public final class VehicleRentalPreferences implements Serializable {
       this.pickupCost = original.pickupCost;
       this.dropOffTime = (int) original.dropOffTime.toSeconds();
       this.dropOffCost = original.dropOffCost;
-      this.rentalDuration = (int) original.rentalDuration.toSeconds();
+      this.rentalDuration = original.rentalDuration;
       this.useAvailabilityInformation = original.useAvailabilityInformation;
       this.arrivingInRentalVehicleAtDestinationCost =
         original.arrivingInRentalVehicleAtDestinationCost;
@@ -257,7 +257,7 @@ public final class VehicleRentalPreferences implements Serializable {
     }
 
     public Builder withRentalDuration(Duration rentalDuration) {
-      this.rentalDuration = (int) rentalDuration.toSeconds();
+      this.rentalDuration = rentalDuration;
       return this;
     }
 
