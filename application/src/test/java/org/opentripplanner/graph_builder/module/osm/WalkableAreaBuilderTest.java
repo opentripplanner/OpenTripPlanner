@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;
@@ -54,7 +55,7 @@ public class WalkableAreaBuilderTest {
       graph,
       osmdb,
       osmInfoRepository,
-      new VertexGenerator(osmdb, graph, Set.of(), false),
+      new VertexGenerator(osmdb, graph, Set.of(), false, DataImportIssueStore.NOOP),
       new DefaultNamer(),
       new SafetyValueNormalizer(graph, DataImportIssueStore.NOOP),
       DataImportIssueStore.NOOP,

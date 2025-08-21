@@ -12,9 +12,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.DifferentLevelsSharingBarrier;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
@@ -46,6 +47,12 @@ class VertexGenerator {
   private final Multimap<OsmNode, OsmWay> nodesInBarrierWays = HashMultimap.create();
 
   /**
+   * The levels of the ways connecting barrier nodes. Used for issue reporting only.
+   */
+  private final Multimap<OsmNode, OsmLevel> levelsConnectingBarriers = HashMultimap.create();
+  private final Set<OsmNode> reportedNodes = new HashSet<>();
+
+  /**
    * The map from node to the split vertex for each routable way connecting it.
    */
   private final Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers = new HashMap<>();
@@ -53,17 +60,20 @@ class VertexGenerator {
   private final Set<String> boardingAreaRefTags;
   private final Boolean includeOsmSubwayEntrances;
   private final VertexFactory vertexFactory;
+  private final DataImportIssueStore issueStore;
 
   public VertexGenerator(
     OsmDatabase osmdb,
     Graph graph,
     Set<String> boardingAreaRefTags,
-    boolean includeOsmSubwayEntrances
+    boolean includeOsmSubwayEntrances,
+    DataImportIssueStore issueStore
   ) {
     this.osmdb = osmdb;
     this.vertexFactory = new VertexFactory(graph);
     this.boardingAreaRefTags = boardingAreaRefTags;
     this.includeOsmSubwayEntrances = includeOsmSubwayEntrances;
+    this.issueStore = issueStore;
   }
 
   /**
@@ -173,6 +183,10 @@ class VertexGenerator {
       intersectionNodes.put(nid, iv);
     }
 
+    if (iv instanceof BarrierVertex) {
+      checkLevelOnBarrier(node, way);
+    }
+
     return iv;
   }
 
@@ -181,17 +195,31 @@ class VertexGenerator {
    *
    * @return a vertex for the given node specific to the given way
    */
-  private IntersectionVertex getSplitVertexOnBarrier(OsmNode node, OsmEntity way) {
-    splitVerticesOnBarriers.putIfAbsent(node, new HashMap<>());
-    var vertices = splitVerticesOnBarriers.get(node);
+  private IntersectionVertex getSplitVertexOnBarrier(OsmNode nodeOnBarrier, OsmEntity way) {
+    checkLevelOnBarrier(nodeOnBarrier, way);
+
+    splitVerticesOnBarriers.putIfAbsent(nodeOnBarrier, new HashMap<>());
+    var vertices = splitVerticesOnBarriers.get(nodeOnBarrier);
     var existing = vertices.get(way);
     if (existing != null) {
       return existing;
     }
 
-    var vertex = vertexFactory.osmOnLinearBarrier(node, way);
+    var vertex = vertexFactory.osmOnLinearBarrier(nodeOnBarrier, way);
     vertices.put(way, vertex);
     return vertex;
+  }
+
+  private void checkLevelOnBarrier(OsmNode nodeOnBarrier, OsmEntity way) {
+    var level = osmdb.getLevelForWay(way);
+    if (!reportedNodes.contains(nodeOnBarrier)) {
+      var existingLevels = levelsConnectingBarriers.get(nodeOnBarrier);
+      if (existingLevels.stream().anyMatch(l -> !Objects.requireNonNull(l).equals(level))) {
+        issueStore.add(new DifferentLevelsSharingBarrier(nodeOnBarrier));
+        reportedNodes.add(nodeOnBarrier);
+      }
+    }
+    levelsConnectingBarriers.put(nodeOnBarrier, level);
   }
 
   /**

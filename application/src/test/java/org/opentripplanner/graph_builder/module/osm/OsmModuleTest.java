@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.graph_builder.module.osm.VertexGeneratorTest.getBarrierLevelIssues;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
@@ -25,6 +26,7 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
@@ -393,8 +395,8 @@ public class OsmModuleTest {
       graph,
       new DefaultOsmInfoGraphBuildRepository(),
       new DefaultVehicleParkingRepository()
-    );
-    subject.build().buildGraph();
+    ).build();
+    subject.buildGraph();
 
     assertEquals(3, graph.getVertices().size());
     var barrierVertices = graph.getVerticesOfType(BarrierVertex.class);
@@ -456,8 +458,8 @@ public class OsmModuleTest {
       graph,
       new DefaultOsmInfoGraphBuildRepository(),
       new DefaultVehicleParkingRepository()
-    );
-    subject.build().buildGraph();
+    ).build();
+    subject.buildGraph();
 
     // the vertex for node 1 has been split, one for the area and one for the crossing of the linear
     // way
@@ -500,6 +502,84 @@ public class OsmModuleTest {
         assertEquals(PEDESTRIAN_AND_BICYCLE, edge.getPermission());
       }
     }
+  }
+
+  @Test
+  void testDifferentLevelsConnectingBarrier() {
+    Graph graph = new Graph();
+
+    var n1 = new OsmNode(0, 0);
+    n1.setId(1);
+    var n2 = new OsmNode(0, 1);
+    n2.setId(2);
+    var n3 = new OsmNode(0, 2);
+    n3.setId(3);
+    var n4 = new OsmNode(0, 3);
+    n4.setId(4);
+    n4.addTag("barrier", "bollard");
+    var n5 = new OsmNode(1, 0);
+    n5.setId(5);
+    var n6 = new OsmNode(-1, 0);
+    n6.setId(6);
+    n6.addTag("barrier", "bollard");
+
+    var chain = new OsmWay();
+    chain.addTag("barrier", "chain");
+    chain.setId(999);
+    chain.addNodeRef(1);
+    chain.addNodeRef(2);
+    chain.addNodeRef(3);
+
+    var w1 = new OsmWay();
+    w1.setId(1);
+    w1.addTag("highway", "path");
+    w1.addTag("level", "0");
+    w1.addNodeRef(4);
+    w1.addNodeRef(5);
+    w1.addNodeRef(1);
+
+    var w2 = new OsmWay();
+    w2.setId(2);
+    w2.addTag("highway", "pedestrian");
+    w2.addTag("level", "1");
+    w2.addTag("area", "yes");
+    w2.addNodeRef(1);
+    w2.addNodeRef(2);
+    w2.addNodeRef(3);
+    w2.addNodeRef(6);
+    w2.addNodeRef(1);
+
+    var w3 = new OsmWay();
+    w3.setId(3);
+    w3.addTag("highway", "path");
+    w3.addTag("level", "1");
+    w3.addNodeRef(4);
+    w3.addNodeRef(6);
+    w3.addNodeRef(1);
+
+    var issueStore = new DefaultDataImportIssueStore();
+    var osmProvider = new TestOsmProvider(
+      List.of(),
+      List.of(w1, w2, w3, chain),
+      List.of(n1, n2, n3, n4, n5, n6)
+    );
+    var osmDb = new OsmDatabase(issueStore);
+    osmProvider.readOsm(osmDb);
+
+    var osmModule = OsmModule.of(
+      osmProvider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    )
+      .withIssueStore(issueStore)
+      .build();
+    osmModule.buildGraph();
+
+    var issues = getBarrierLevelIssues(issueStore);
+    assertEquals(2, issues.length);
+    assertEquals(1, issues[0].node().getId());
+    assertEquals(4, issues[1].node().getId());
   }
 
   private BuildResult buildParkingLots() {
