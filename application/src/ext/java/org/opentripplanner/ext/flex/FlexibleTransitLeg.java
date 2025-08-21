@@ -11,7 +11,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -48,7 +48,7 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   private final Emission emissionPerPerson;
 
-  private final List<FareProductUse> fareProducts;
+  private final List<FareOffer> fareOffers;
 
   FlexibleTransitLeg(FlexibleTransitLegBuilder builder) {
     this.edge = Objects.requireNonNull(builder.flexTripEdge());
@@ -56,7 +56,7 @@ public class FlexibleTransitLeg implements TransitLeg {
     this.endTime = Objects.requireNonNull(builder.endTime());
     this.generalizedCost = builder.generalizedCost();
     this.transitAlerts = Set.copyOf(builder.alerts());
-    this.fareProducts = List.copyOf(builder.fareProducts());
+    this.fareOffers = List.copyOf(builder.fareOffers());
     this.emissionPerPerson = builder.emissionPerPerson();
   }
 
@@ -178,7 +178,7 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
-  public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
+  public TransitLeg decorateWithFareOffers(List<FareOffer> fares) {
     return copyOf().withFareProducts(fares).build();
   }
 
@@ -238,8 +238,8 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
-  public List<FareProductUse> fareProducts() {
-    return fareProducts;
+  public List<FareOffer> fareOffers() {
+    return fareOffers;
   }
 
   /**

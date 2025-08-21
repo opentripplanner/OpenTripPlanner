@@ -1,5 +1,6 @@
 package org.opentripplanner.apis.gtfs.service;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
@@ -10,9 +11,13 @@ import com.google.transit.realtime.GtfsRealtime;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
+import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
@@ -31,6 +36,7 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  */
 class ApiTransitServiceTest implements RealtimeTestConstants {
 
+  private static final ZonedDateTime ANY_TIME = ZonedDateTime.parse("2022-01-01T12:00:00+00:00");
   private final RealtimeTestEnvironmentBuilder envBuilder = RealtimeTestEnvironment.of();
   private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
   private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
@@ -101,6 +107,47 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
 
     var tripIds = calls.stream().map(t -> t.getTrip().getId().getId()).toList();
     assertEquals(List.of(TRIP_1_ID, TRIP_2_ID), tripIds);
+  }
+
+  @Test
+  void transitLegCalls() {
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var service = new ApiTransitService(env.getTransitService());
+
+    var tripTimes = env.getTripTimesForTrip(TRIP_1_ID);
+    var pattern = env.getPatternForTrip(TRIP_1_ID);
+
+    var leg = new ScheduledTransitLegBuilder()
+      .withTripPattern(pattern)
+      .withTripTimes(tripTimes)
+      .withStartTime(ANY_TIME)
+      .withEndTime(ANY_TIME)
+      .withServiceDate(SERVICE_DATE)
+      .withZoneId(TIME_ZONE)
+      .withDistanceMeters(1000)
+      .withBoardStopIndexInPattern(0)
+      .withAlightStopIndexInPattern(2)
+      .build();
+    var calls = service.findStopCalls(leg);
+    assertEquals(
+      "[TripTimeOnDate{trip: Trip{F:TestTrip1 Rroute-1}, index: 0, arrival: 12:00, departure: 12:00, serviceDate: 2024-05-08}, TripTimeOnDate{trip: Trip{F:TestTrip1 Rroute-1}, index: 1, arrival: 12:30, departure: 12:30, serviceDate: 2024-05-08}, TripTimeOnDate{trip: Trip{F:TestTrip1 Rroute-1}, index: 2, arrival: 13:00, departure: 13:00, serviceDate: 2024-05-08}]",
+      calls.toString()
+    );
+  }
+
+  @Test
+  void streetLegCalls() {
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var service = new ApiTransitService(env.getTransitService());
+
+    var leg = StreetLeg.of()
+      .withMode(TraverseMode.WALK)
+      .withStartTime(ANY_TIME)
+      .withEndTime(ANY_TIME)
+      .withDistanceMeters(1000)
+      .build();
+    var calls = service.findStopCalls(leg);
+    assertThat(calls).isEmpty();
   }
 
   private static GtfsRealtime.TripUpdate skipSecondStop(String tripId) {

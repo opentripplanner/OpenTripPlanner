@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.fares;
 
 import java.util.List;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.FareProductAware;
 import org.opentripplanner.model.plan.Itinerary;
@@ -14,9 +14,9 @@ import org.opentripplanner.utils.collection.ListUtils;
 public final class ItineraryFaresDecorator {
 
   private final ItineraryFare fare;
-  private final List<FareProductUse> itineraryFareUses;
+  private final List<FareOffer> itineraryFareUses;
 
-  public ItineraryFaresDecorator(ItineraryFare fare, List<FareProductUse> itineraryFareUses) {
+  public ItineraryFaresDecorator(ItineraryFare fare, List<FareOffer> itineraryFareUses) {
     this.fare = fare;
     this.itineraryFareUses = itineraryFareUses;
   }
@@ -26,13 +26,13 @@ public final class ItineraryFaresDecorator {
     return i.copyOf().withFare(fare).transformTransitLegs(legDecorator::decorateTransitLeg).build();
   }
 
-  private static List<FareProductUse> createItineraryFareUses(Itinerary i, ItineraryFare fare) {
+  private static List<FareOffer> createItineraryFareUses(Itinerary i, ItineraryFare fare) {
     return fare
       .getItineraryProducts()
       .stream()
       .map(fp -> {
-        var instanceId = fp.uniqueInstanceId(i.legs().getFirst().startTime());
-        return new FareProductUse(instanceId, fp);
+        var startTime = i.legs().getFirst().startTime();
+        return FareOffer.of(startTime, fp);
       })
       .toList();
   }
@@ -42,7 +42,7 @@ public final class ItineraryFaresDecorator {
     var allUses = ListUtils.combine(itineraryFareUses, legUses);
 
     return (leg instanceof FareProductAware<TransitLeg> fpa)
-      ? fpa.decorateWithFareProducts(allUses)
+      ? fpa.decorateWithFareOffers(allUses)
       : leg;
   }
 }
