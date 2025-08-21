@@ -17,10 +17,10 @@ public abstract class SiriAzureUpdaterParameters {
   private String feedId;
   private int timeout;
   /**
-   * Maximum time in milliseconds to wait for real-time services during startup.
+   * Maximum time to wait for real-time services during startup.
    * If exceeded, OTP starts without real-time data for graceful degradation.
    */
-  private int startupTimeout = 180_000; // 3 minutes default
+  private Duration startupTimeout = Duration.ofMinutes(5); // 5 minutes default
 
   private boolean fuzzyTripMatching;
   private Duration autoDeleteOnIdle;
@@ -103,7 +103,7 @@ public abstract class SiriAzureUpdaterParameters {
    *
    * @return timeout in milliseconds
    */
-  public int getStartupTimeout() {
+  public Duration getStartupTimeout() {
     return startupTimeout;
   }
 
@@ -112,7 +112,7 @@ public abstract class SiriAzureUpdaterParameters {
    *
    * @param startupTimeout timeout in milliseconds, should be positive
    */
-  public void setStartupTimeout(int startupTimeout) {
+  public void setStartupTimeout(Duration startupTimeout) {
     this.startupTimeout = startupTimeout;
   }
 

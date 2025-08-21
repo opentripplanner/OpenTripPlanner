@@ -64,22 +64,6 @@ public class SiriAzureUpdater implements GraphUpdater {
     void run() throws Exception;
   }
 
-  public enum StartupStep {
-    SETUP_SUBSCRIPTION("Setting up Service Bus subscription to topic"),
-    INITIALIZE_HISTORY("Initializing historical Siri data"),
-    START_PROCESSOR("Starting Service Bus event processor");
-
-    private final String description;
-
-    StartupStep(String description) {
-      this.description = description;
-    }
-
-    public String getDescription() {
-      return description;
-    }
-  }
-
   private static final Set<ServiceBusFailureReason> RETRYABLE_REASONS = Set.of(
     ServiceBusFailureReason.GENERAL_ERROR,
     ServiceBusFailureReason.QUOTA_EXCEEDED,
@@ -120,13 +104,6 @@ public class SiriAzureUpdater implements GraphUpdater {
   private static final int ERROR_RETRY_WAIT_SECONDS = 5;
   private static final int INITIAL_RETRY_DELAY_MS = 1000;
   private static final int MAX_RETRY_DELAY_MS = 60_000;
-  private static final int SHUTDOWN_TIMEOUT_SECONDS = 5;
-  private static final int SHUTDOWN_FORCE_TIMEOUT_SECONDS = 2;
-  private final ExecutorService backgroundRetryExecutor = Executors.newSingleThreadExecutor(r -> {
-    Thread t = new Thread(r, "azure-siri-background-retry");
-    t.setDaemon(true);
-    return t;
-  });
 
   protected final SiriAzureMessageHandler messageHandler;
 
@@ -141,10 +118,7 @@ public class SiriAzureUpdater implements GraphUpdater {
    */
   private final int timeout;
 
-  private final long startupTimeoutMs;
-  private final AtomicReference<Set<StartupStep>> completedSteps = new AtomicReference<>(
-    new HashSet<>()
-  );
+  private final Duration startupTimeout;
   private volatile long startTime;
   private volatile boolean shutdownHookRegistered = false;
 
@@ -165,7 +139,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     this.topicName = Objects.requireNonNull(config.getTopicName(), "topicName must not be null");
     this.updaterType = Objects.requireNonNull(config.getType(), "type must not be null");
     this.timeout = config.getTimeout();
-    this.startupTimeoutMs = config.getStartupTimeout();
+    this.startupTimeout = config.getStartupTimeout();
     this.autoDeleteOnIdle = config.getAutoDeleteOnIdle();
     this.prefetchCount = config.getPrefetchCount();
 
@@ -239,44 +213,28 @@ public class SiriAzureUpdater implements GraphUpdater {
       subscriptionName = "otp-" + UUID.randomUUID();
     }
 
-    try {
-      tryWithBackgroundRetry(this::setupSubscription, StartupStep.SETUP_SUBSCRIPTION);
+    // Try each startup step with timeout, continue on failure for graceful degradation
+    tryStartupStep(this::setupSubscription, "ServiceBusSubscription");
 
-      tryWithBackgroundRetry(
-        () -> {
-          var initialData = fetchInitialSiriData();
-          if (initialData.isEmpty()) {
-            log.info("Got empty response from history endpoint");
-          } else {
-            processInitialSiriData(initialData.get());
-          }
-        },
-        StartupStep.INITIALIZE_HISTORY
-      );
+    tryStartupStep(
+      () -> {
+        var initialData = fetchInitialSiriData();
+        if (initialData.isEmpty()) {
+          log.info("Got empty response from history endpoint");
+        } else {
+          processInitialSiriData(initialData.get());
+        }
+      },
+      "HistoricalSiriData"
+    );
 
-      tryWithBackgroundRetry(this::startEventProcessor, StartupStep.START_PROCESSOR);
+    tryStartupStep(this::startEventProcessor, "ServiceBusEventProcessor");
 
-      // Always set primed so OTP can start, even if real-time setup is incomplete
-      setPrimed();
+    // Set primed so OTP can start
+    setPrimed();
 
-      // Register shutdown hook only once, and only after subscriptionName is set
-      registerShutdownHookIfNeeded();
-    } catch (Exception e) {
-      log.error(
-        "REALTIME_STARTUP_ALERT component=RealtimeSetup status=UNAVAILABLE error=\"{}\"",
-        e.getMessage(),
-        new RuntimeException("Real-time setup failed during startup", e)
-      );
-    } finally {
-      // CRITICAL: Always set primed so OTP can start
-      if (!isPrimed()) {
-        log.warn("Real-time setup incomplete, starting OTP without real-time data");
-        setPrimed();
-      }
-
-      // Ensure shutdown hook is registered even if startup failed
-      registerShutdownHookIfNeeded();
-    }
+    // Register shutdown hook only once, and only after subscriptionName is set
+    registerShutdownHookIfNeeded();
   }
 
   /**
@@ -387,111 +345,55 @@ public class SiriAzureUpdater implements GraphUpdater {
     if (ExceptionUtils.hasCause(e, UnknownHostException.class)) {
       return Optional.of("DNS resolution failure");
     }
-    
+
     if (ExceptionUtils.hasCause(e, SocketTimeoutException.class)) {
       return Optional.of("Socket timeout");
     }
-    
-    // Check for ConnectTimeoutException (from Netty) wrapped in UncheckedIOException
+
+    // Check for ConnectTimeoutException wrapped in UncheckedIOException
     if (ExceptionUtils.hasCause(e, UncheckedIOException.class)) {
       Throwable cause = ExceptionUtils.getRootCause(e);
       if (cause != null && cause.getClass().getSimpleName().contains("ConnectTimeoutException")) {
         return Optional.of("Connection timeout");
       }
     }
-    
+
     return Optional.empty();
   }
 
   /**
-   * Attempts to execute a startup step with immediate timeout, falling back to background retry.
-   * If the step succeeds within the startup timeout, marks it complete and returns.
-   * If timeout occurs, starts background retry and allows OTP startup to continue.
-   *
-   * @param task The task to execute
-   * @param step The startup step being executed
+   * Attempts to execute a startup step with timeout.
+   * Logs errors but continues execution for graceful degradation.
    */
-  private void tryWithBackgroundRetry(CheckedRunnable task, StartupStep step) {
+  private void tryStartupStep(CheckedRunnable task, String stepDescription) {
     try {
-      executeWithRetry(task, step.getDescription(), (int) startupTimeoutMs);
-      markStepCompleted(step);
+      executeWithRetry(task, stepDescription, (int) startupTimeout.toMillis());
+      log.info("{} completed successfully", stepDescription);
     } catch (RuntimeException e) {
-      if (e.getMessage().contains("timed out")) {
+      String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+      if (message.contains("timed out")) {
         log.warn(
-          "REALTIME_STARTUP_ALERT component={} status=RETRYING error=\"{}\"",
-          step.getDescription(),
-          e.getMessage()
+          "REALTIME_STARTUP_ALERT component={} status=TIMEOUT error=\"{}\"",
+          stepDescription,
+          message
         );
-        startBackgroundRetry(task, step);
       } else {
-        throw e;
+        log.warn(
+          "REALTIME_STARTUP_ALERT component={} status=FAILED error=\"{}\"",
+          stepDescription,
+          message
+        );
       }
     } catch (Exception e) {
-      log.error(
-        "REALTIME_STARTUP_ALERT component={} status=UNAVAILABLE error=\"{}\"",
-        step.getDescription(),
-        e.getMessage()
-      );
-      throw new RuntimeException("Non-retryable error in " + step.getDescription(), e);
-    }
-  }
-
-  /**
-   * Starts background retry for a failed startup step.
-   * Retries indefinitely with exponential backoff until success or shutdown.
-   */
-  private void startBackgroundRetry(CheckedRunnable task, StartupStep step) {
-    backgroundRetryExecutor.submit(() -> {
-      try {
-        executeWithRetry(task, step.getDescription() + " (background recovery)", null); // null = indefinite retry
-        markStepCompleted(step);
-        log.info("REALTIME_STARTUP_ALERT component={} status=RESTORED", step.getDescription());
-        checkFullRecovery();
-      } catch (InterruptedException e) {
-        log.info("Background retry interrupted for {}, shutting down", step.getDescription());
-        Thread.currentThread().interrupt();
-      } catch (Exception e) {
-        log.error(
-          "REALTIME_STARTUP_ALERT component={} status=PERMANENT_FAILURE error=\"{}\"",
-          step.getDescription(),
-          e.getMessage()
-        );
-      }
-    });
-  }
-
-  /**
-   * Marks a startup step as completed and tracks progress.
-   */
-  private void markStepCompleted(StartupStep step) {
-    completedSteps.updateAndGet(steps -> {
-      Set<StartupStep> newSteps = new HashSet<>(steps);
-      newSteps.add(step);
-      return newSteps;
-    });
-  }
-
-  /**
-   * Checks if all startup steps have been completed and logs full recovery.
-   * Thread-safe by using immutable set values.
-   */
-  private void checkFullRecovery() {
-    Set<StartupStep> currentSteps = completedSteps.get();
-    Set<StartupStep> allSteps = Set.of(StartupStep.values());
-
-    if (currentSteps.containsAll(allSteps)) {
-      long degradedDuration = System.currentTimeMillis() - startTime;
-      log.info(
-        "REALTIME_STARTUP_ALERT status=FULLY_RESTORED degraded_duration_ms={}",
-        degradedDuration
+      String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+      log.warn(
+        "REALTIME_STARTUP_ALERT component={} status=FAILED error=\"{}\"",
+        stepDescription,
+        message
       );
     }
   }
 
-  /**
-   * Registers shutdown hook safely to avoid race conditions and double registration.
-   * Only registers once and ensures all necessary resources are available.
-   */
   private void registerShutdownHookIfNeeded() {
     if (!shutdownHookRegistered && subscriptionName != null) {
       synchronized (this) {
@@ -512,27 +414,7 @@ public class SiriAzureUpdater implements GraphUpdater {
   private void performShutdown() {
     log.info("Starting shutdown for {} updater", updaterType);
 
-    // 1. Stop accepting new background retry tasks
-    backgroundRetryExecutor.shutdown();
-
-    // 2. Wait briefly for tasks to complete gracefully
-    try {
-      if (!backgroundRetryExecutor.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-        log.warn("Background retry executor did not terminate gracefully, forcing shutdown");
-        backgroundRetryExecutor.shutdownNow();
-
-        // Give interrupted tasks a chance to exit
-        if (!backgroundRetryExecutor.awaitTermination(SHUTDOWN_FORCE_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-          log.error("Background retry executor failed to terminate");
-        }
-      }
-    } catch (InterruptedException e) {
-      log.warn("Shutdown interrupted, forcing immediate termination");
-      backgroundRetryExecutor.shutdownNow();
-      Thread.currentThread().interrupt();
-    }
-
-    // 3. Close event processor
+    // 1. Close event processor
     if (eventProcessor != null) {
       try {
         eventProcessor.close();
@@ -542,7 +424,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       }
     }
 
-    // 4. Delete subscription if we have admin client and subscription name
+    // 2. Delete subscription if we have admin client and subscription name
     if (serviceBusAdmin != null && subscriptionName != null) {
       try {
         serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
