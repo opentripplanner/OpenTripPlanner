@@ -1,10 +1,10 @@
 package org.opentripplanner.ext.carpooling.model;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.model.timetable.Trip;
 
 public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, CarpoolTripBuilder> {
 
@@ -12,19 +12,20 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
   private AreaStop alightingArea;
   private ZonedDateTime startTime;
   private ZonedDateTime endTime;
-  private Trip trip;
   private String provider;
+
+  private Duration deviationBudget = Duration.ofMinutes(15);
   private int availableSeats = 1;
 
   public CarpoolTripBuilder(CarpoolTrip original) {
     super(original);
-    this.boardingArea = original.getBoardingArea();
-    this.alightingArea = original.getAlightingArea();
-    this.startTime = original.getStartTime();
-    this.endTime = original.getEndTime();
-    this.trip = original.getTrip();
-    this.provider = original.getProvider();
-    this.availableSeats = original.getAvailableSeats();
+    this.boardingArea = original.boardingArea();
+    this.alightingArea = original.alightingArea();
+    this.startTime = original.startTime();
+    this.endTime = original.endTime();
+    this.provider = original.provider();
+    this.deviationBudget = original.deviationBudget();
+    this.availableSeats = original.availableSeats();
   }
 
   public CarpoolTripBuilder(FeedScopedId id) {
@@ -51,13 +52,13 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
     return this;
   }
 
-  public CarpoolTripBuilder withTrip(Trip trip) {
-    this.trip = trip;
+  public CarpoolTripBuilder withProvider(String provider) {
+    this.provider = provider;
     return this;
   }
 
-  public CarpoolTripBuilder withProvider(String provider) {
-    this.provider = provider;
+  public CarpoolTripBuilder withDeviationBudget(Duration deviationBudget) {
+    this.deviationBudget = deviationBudget;
     return this;
   }
 
@@ -66,31 +67,31 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
     return this;
   }
 
-  public AreaStop getBoardingArea() {
+  public AreaStop boardingArea() {
     return boardingArea;
   }
 
-  public AreaStop getAlightingArea() {
+  public AreaStop alightingArea() {
     return alightingArea;
   }
 
-  public ZonedDateTime getStartTime() {
+  public ZonedDateTime startTime() {
     return startTime;
   }
 
-  public ZonedDateTime getEndTime() {
+  public ZonedDateTime endTime() {
     return endTime;
   }
 
-  public Trip getTrip() {
-    return trip;
-  }
-
-  public String getProvider() {
+  public String provider() {
     return provider;
   }
 
-  public int getAvailableSeats() {
+  public Duration deviationBudget() {
+    return deviationBudget;
+  }
+
+  public int availableSeats() {
     return availableSeats;
   }
 

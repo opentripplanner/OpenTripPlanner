@@ -91,7 +91,6 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     WorldEnvelopeServiceModule.class,
   }
 )
-
 public interface ConstructApplicationFactory {
   ConfigModel config();
   RaptorConfig<TripSchedule> raptorConfig();

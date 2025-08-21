@@ -17,6 +17,8 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
+import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -193,7 +195,19 @@ public class UpdaterConfigurator {
       updaters.add(SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriETCarpoolingUpdaterParameters()) {
-      updaters.add(new SiriETCarpoolingUpdater(configItem, carpoolingRepository));
+      // Create a default street limitation parameters service for the updater
+      var streetLimitationParametersService = new DefaultStreetLimitationParametersService(
+        new StreetLimitationParameters()
+      );
+      updaters.add(
+        new SiriETCarpoolingUpdater(
+          configItem,
+          carpoolingRepository,
+          graph,
+          linker,
+          streetLimitationParametersService
+        )
+      );
     }
     for (var configItem : updatersParameters.getSiriETLiteUpdaterParameters()) {
       updaters.add(SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriAdapter()));
