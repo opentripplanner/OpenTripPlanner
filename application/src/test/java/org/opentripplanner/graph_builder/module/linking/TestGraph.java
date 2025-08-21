@@ -20,11 +20,14 @@ class TestGraph {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
-  /** Add a regular grid of stops to the graph */
+  /**
+   * Add a regular grid of stops to the graph. Note! Not all of these stops
+   * are within 100m of a street and will not be linked to the street graph.
+   */
   public static void addRegularStopGrid(Graph graph) {
     int count = 0;
-    for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
-      for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
+    for (double lat = 39.91733; lat < 40.02811; lat += 0.005) {
+      for (double lon = -83.09040; lon < -82.88389; lon += 0.005) {
         String id = Integer.toString(count++);
         RegularStop stop = TEST_MODEL.stop(id).withCoordinate(lat, lon).build();
         graph.addVertex(TransitStopVertex.of().withStop(stop).build());
@@ -64,7 +67,7 @@ class TestGraph {
     timetableRepository.index();
     graph.index();
 
-    VertexLinker linker = graph.getLinker();
+    VertexLinker linker = TestVertexLinker.of(graph);
 
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
       linker.linkVertexPermanently(

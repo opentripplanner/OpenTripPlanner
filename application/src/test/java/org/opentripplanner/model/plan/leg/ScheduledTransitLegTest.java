@@ -112,7 +112,7 @@ class ScheduledTransitLegTest {
     // Uninitialized fields
     assertFalse(subject.isRealTimeUpdated());
     assertEquals(Set.of(), subject.listTransitAlerts());
-    assertEquals(List.of(), subject.fareProducts());
+    assertEquals(List.of(), subject.fareOffers());
   }
 
   @Test
@@ -131,7 +131,7 @@ class ScheduledTransitLegTest {
     assertEquals(DELAY, subject.start().estimated().delay());
     assertNotNull(subject.end().estimated());
     assertEquals(EMISSION, subject.emissionPerPerson());
-    assertEquals(FARE_PRODUCTS, subject.fareProducts());
+    assertEquals(FARE_PRODUCTS, subject.fareOffers());
   }
 
   @Test
@@ -150,7 +150,7 @@ class ScheduledTransitLegTest {
     assertEquals(GENERALIZED_COST, copy.generalizedCost());
     assertEquals(ALERTS, copy.listTransitAlerts());
     assertEquals(EMISSION, copy.emissionPerPerson());
-    assertEquals(FARE_PRODUCTS, copy.fareProducts());
+    assertEquals(FARE_PRODUCTS, copy.fareOffers());
 
     // We change something else, not distance and make sure distance is unchanged
     assertEquals(DISTANCE, subject.copyOf().withGeneralizedCost(9).build().distanceMeters());

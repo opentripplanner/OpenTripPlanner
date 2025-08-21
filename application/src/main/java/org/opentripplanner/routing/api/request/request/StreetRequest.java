@@ -38,6 +38,6 @@ public class StreetRequest implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(StreetRequest.class).addEnum("mode", mode, DEFAULT.mode).toString();
+    return ToStringBuilder.ofEmbeddedType().addEnum("mode", mode, DEFAULT.mode).toString();
   }
 }

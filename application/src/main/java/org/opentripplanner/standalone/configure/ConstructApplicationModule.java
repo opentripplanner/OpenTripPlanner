@@ -20,6 +20,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -42,6 +43,7 @@ public class ConstructApplicationModule {
     DebugUiConfig debugUiConfig,
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
+    VertexLinker vertexLinker,
     TransitService transitService,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
@@ -63,6 +65,7 @@ public class ConstructApplicationModule {
 
     var transitRoutingConfig = routerConfig.transitTuningConfig();
     var triasApiParameters = routerConfig.triasApiParameters();
+    var gtfsApiConfig = routerConfig.gtfsApiParameters();
     var vectorTileConfig = routerConfig.vectorTileConfig();
     var flexParameters = routerConfig.flexParameters();
 
@@ -80,9 +83,11 @@ public class ConstructApplicationModule {
       transitRoutingConfig,
       transitService,
       triasApiParameters,
+      gtfsApiConfig,
       vectorTileConfig,
       vehicleParkingService,
       vehicleRentalService,
+      vertexLinker,
       viaTransferResolver,
       worldEnvelopeService,
       // Optional Sandbox services

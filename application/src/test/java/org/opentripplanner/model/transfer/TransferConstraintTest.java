@@ -113,9 +113,9 @@ public class TransferConstraintTest {
 
   @Test
   public void testToString() {
-    assertEquals("{no constraints}", NO_CONSTRAINS.toString());
+    assertEquals("(no constraints)", NO_CONSTRAINS.toString());
     assertEquals(
-      "{priority: PREFERRED, staySeated, guaranteed, maxWaitTime: 1h}",
+      "(priority: PREFERRED, staySeated, guaranteed, maxWaitTime: 1h)",
       EVERYTHING.toString()
     );
   }

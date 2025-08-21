@@ -206,7 +206,7 @@ public class TimetableSnapshot {
    * Returns an updated timetable for the specified pattern if one is available in this snapshot, or
    * the originally scheduled timetable if there are no updates in this snapshot.
    */
-  public Timetable resolve(TripPattern pattern, LocalDate serviceDate) {
+  public Timetable resolve(TripPattern pattern, @Nullable LocalDate serviceDate) {
     SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
 
     if (sortedTimetables != null && serviceDate != null) {

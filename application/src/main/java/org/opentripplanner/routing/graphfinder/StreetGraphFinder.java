@@ -11,6 +11,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
@@ -27,9 +28,11 @@ import org.opentripplanner.transit.service.TransitService;
 public class StreetGraphFinder implements GraphFinder {
 
   private final Graph graph;
+  private final VertexLinker linker;
 
-  public StreetGraphFinder(Graph graph) {
+  public StreetGraphFinder(Graph graph, VertexLinker linker) {
     this.graph = graph;
+    this.linker = linker;
   }
 
   @Override
@@ -97,6 +100,7 @@ public class StreetGraphFinder implements GraphFinder {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
+        linker,
         GenericLocation.fromCoordinate(lat, lon),
         GenericLocation.UNKNOWN,
         StreetMode.WALK,

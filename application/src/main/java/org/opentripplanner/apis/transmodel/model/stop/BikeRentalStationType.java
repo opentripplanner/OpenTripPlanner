@@ -21,9 +21,7 @@ public class BikeRentalStationType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
-          .dataFetcher(environment ->
-            ((VehicleRentalStation) environment.getSource()).getStationId()
-          )
+          .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).stationId())
           .build()
       )
       .field(
@@ -31,7 +29,7 @@ public class BikeRentalStationType {
           .name("name")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
           .dataFetcher(environment ->
-            ((VehicleRentalStation) environment.getSource()).getName().toString()
+            ((VehicleRentalStation) environment.getSource()).name().toString()
           )
           .build()
       )
@@ -45,7 +43,7 @@ public class BikeRentalStationType {
           .name("bikesAvailable")
           .type(Scalars.GraphQLInt)
           .dataFetcher(environment ->
-            ((VehicleRentalStation) environment.getSource()).getVehiclesAvailable()
+            ((VehicleRentalStation) environment.getSource()).vehiclesAvailable()
           )
           .build()
       )
@@ -54,7 +52,7 @@ public class BikeRentalStationType {
           .name("spacesAvailable")
           .type(Scalars.GraphQLInt)
           .dataFetcher(environment ->
-            ((VehicleRentalStation) environment.getSource()).getSpacesAvailable()
+            ((VehicleRentalStation) environment.getSource()).spacesAvailable()
           )
           .build()
       )
@@ -81,7 +79,7 @@ public class BikeRentalStationType {
           .name("networks")
           .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
           .dataFetcher(environment ->
-            List.of(((VehicleRentalStation) environment.getSource()).getNetwork())
+            List.of(((VehicleRentalStation) environment.getSource()).network())
           )
           .build()
       )
@@ -89,17 +87,14 @@ public class BikeRentalStationType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("longitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment ->
-            ((VehicleRentalStation) environment.getSource()).getLongitude()
-          )
+          .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).longitude())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).getLatitude()
-          )
+          .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).latitude())
           .build()
       )
       .build();

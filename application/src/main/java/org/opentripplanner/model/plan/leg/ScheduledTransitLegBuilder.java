@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -40,7 +40,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   // Sandbox fields
   private Float accessibilityScore;
   private Emission emissionPerPerson;
-  private List<FareProductUse> fareProducts = List.of();
+  private List<FareOffer> fareOffers = List.of();
 
   public ScheduledTransitLegBuilder() {}
 
@@ -59,7 +59,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     zoneId = original.zoneId();
     alerts = original.listTransitAlerts();
     distanceMeters = original.distanceMeters();
-    fareProducts = original.fareProducts();
+    fareOffers = original.fareOffers();
 
     // Sandbox fields
     accessibilityScore = original.accessibilityScore();
@@ -210,12 +210,12 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     return instance();
   }
 
-  public List<FareProductUse> fareProducts() {
-    return fareProducts;
+  public List<FareOffer> fareOffers() {
+    return fareOffers;
   }
 
-  public B withFareProducts(List<FareProductUse> fareProducts) {
-    this.fareProducts = Objects.requireNonNull(fareProducts);
+  public B withFareProducts(List<FareOffer> fareProducts) {
+    this.fareOffers = Objects.requireNonNull(fareProducts);
     return instance();
   }
 

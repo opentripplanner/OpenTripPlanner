@@ -258,7 +258,8 @@ public class TransitRouter {
       accessBuilder.withPreferences(p -> {
         p.withBike(b -> b.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
         p.withCar(c -> c.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
-        p.withScooter(s -> s.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false))
+        p.withScooter(s ->
+          s.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false))
         );
       });
     }
@@ -380,6 +381,7 @@ public class TransitRouter {
   ) {
     return new TemporaryVerticesContainer(
       serverContext.graph(),
+      serverContext.vertexLinker(),
       request.from(),
       request.to(),
       request.journey().access().mode(),

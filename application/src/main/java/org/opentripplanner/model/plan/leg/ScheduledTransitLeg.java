@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -15,7 +16,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -50,6 +51,13 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class ScheduledTransitLeg implements TransitLeg {
 
   private static final int ZERO = 0;
+  /**
+   * A leg's fare offers don't really have any particular order, but it's nice if the order remains
+   * the same for two identical collections.
+   */
+  private static final Comparator<FareOffer> FARE_OFFER_COMPARATOR = Comparator.comparing(
+    (FareOffer o) -> o.fareProduct().id().getId()
+  ).thenComparing(FareOffer::uniqueId);
   private final TripTimes tripTimes;
   private final TripPattern tripPattern;
 
@@ -72,7 +80,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   // Sandbox fields
   private final Float accessibilityScore;
   private final Emission emissionPerPerson;
-  private final List<FareProductUse> fareProducts;
+  private final List<FareOffer> fareOffers;
 
   protected ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
     // TODO - Add requireNonNull for trip-times. Some tests fails when this is done, these tests
@@ -94,16 +102,9 @@ public class ScheduledTransitLeg implements TransitLeg {
       "alightStopPosInPattern"
     );
 
-    // TODO - Add requireNonNull for start-time. Some tests fails when this is done, these tests
-    //        should be fixed.
-    this.startTime = builder.startTime();
-    // TODO - Add requireNonNull for end-tTime. Some tests fails when this is done, these tests
-    //        should be fixed.
-    this.endTime = builder.endTime();
-
-    // TODO - Add requireNonNull for service-date. Some tests fails when this is done, these tests
-    //        should be fixed.
-    this.serviceDate = builder.serviceDate();
+    this.startTime = Objects.requireNonNull(builder.startTime());
+    this.endTime = Objects.requireNonNull(builder.endTime());
+    this.serviceDate = Objects.requireNonNull(builder.serviceDate());
     this.zoneId = Objects.requireNonNull(builder.zoneId());
 
     this.tripOnServiceDate = builder.tripOnServiceDate();
@@ -131,7 +132,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     // Sandbox
     this.accessibilityScore = builder.accessibilityScore();
     this.emissionPerPerson = builder.emissionPerPerson();
-    this.fareProducts = List.copyOf(builder.fareProducts());
+    this.fareOffers = builder.fareOffers().stream().sorted(FARE_OFFER_COMPARATOR).toList();
   }
 
   public ScheduledTransitLegBuilder copyOf() {
@@ -333,7 +334,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
+  public TransitLeg decorateWithFareOffers(List<FareOffer> fares) {
     return copyOf().withFareProducts(fares).build();
   }
 
@@ -438,8 +439,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public List<FareProductUse> fareProducts() {
-    return fareProducts;
+  public List<FareOffer> fareOffers() {
+    return fareOffers;
   }
 
   /**
@@ -470,7 +471,7 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObj("transferToNextLeg", transferToNextLeg)
       .addColSize("transitAlerts", transitAlerts)
       .addObj("emissionPerPerson", emissionPerPerson)
-      .addColSize("fareProducts", fareProducts)
+      .addColSize("fareProducts", fareOffers)
       .toString();
   }
 }

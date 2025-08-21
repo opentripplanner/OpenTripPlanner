@@ -85,10 +85,10 @@ interface PlaceInterface {
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
 "Scheduled times for a trip on a service date for a stop location."
-union CallScheduledTime = ArrivalDepartureTime
+union CallScheduledTime = ArrivalDepartureTime | TimeWindow
 
 "Location where a transit vehicle stops at."
-union CallStopLocation = Stop
+union CallStopLocation = Location | LocationGroup | Stop
 
 "Rental place union that represents either a VehicleRentalStation or a RentalVehicle"
 union RentalPlace = RentalVehicle | VehicleRentalStation
@@ -376,17 +376,17 @@ type CarPark implements Node & PlaceInterface {
 "Cluster is a list of stops grouped by name and proximity"
 type Cluster implements Node {
   "ID of the cluster"
-  gtfsId: String!
+  gtfsId: String! @deprecated(reason : "Not implemented")
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
-  id: ID!
+  id: ID! @deprecated(reason : "Not implemented")
   "Latitude of the center of this cluster (i.e. average latitude of stops in this cluster)"
-  lat: Float!
+  lat: Float! @deprecated(reason : "Not implemented")
   "Longitude of the center of this cluster (i.e. average longitude of stops in this cluster)"
-  lon: Float!
+  lon: Float! @deprecated(reason : "Not implemented")
   "Name of the cluster"
-  name: String!
+  name: String! @deprecated(reason : "Not implemented")
   "List of stops in the cluster"
-  stops: [Stop!]
+  stops: [Stop!] @deprecated(reason : "Not implemented")
 }
 
 "Contact information for booking an on-demand or flexible service."
@@ -495,6 +495,31 @@ type DepartureRow implements Node & PlaceInterface {
     "How many seconds ahead to search for departures. Default is one day."
     timeRange: Int = 86400
   ): [Stoptime]
+}
+
+"""
+A (possibly discounted) fare product that requires another fare product to be purchased previously
+in order to be valid.
+
+For example, when taking the train into a city, you might get a discounted "transfer fare" when
+switching to the bus for the second leg.
+"""
+type DependentFareProduct implements FareProduct {
+  "The fare product is _not_ valid without purchasing at least _one_ of"
+  dependencies(filter: DependentFareProductFilter = ALL): [FareProduct!]!
+  id: String!
+  """
+  The 'medium' that this product applies to, for example "Oyster Card" or "Berlin Ticket App".
+    
+  This communicates to riders that a specific way of buying or keeping this product is required.
+  """
+  medium: FareMedium
+  "Human readable name of the product, for example example \"Day pass\" or \"Single ticket\"."
+  name: String!
+  "The price of the product"
+  price: Money!
+  "The category of riders this product applies to, for example students or pensioners."
+  riderCategory: RiderCategory
 }
 
 type Emissions {
@@ -765,18 +790,20 @@ type Leg {
   """
   interlineWithPreviousLeg: Boolean
   "Whether the destination of this leg (field `to`) is one of the intermediate places specified in the query."
-  intermediatePlace: Boolean
-  """
-  For transit legs, intermediate stops between the Place where the leg
-  originates and the Place where the leg ends. For non-transit legs, null.
-  Returns Place type, which has fields for e.g. departure and arrival times
-  """
-  intermediatePlaces: [Place]
+  intermediatePlace: Boolean @deprecated(reason : "Not implemented")
   """
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
   """
-  intermediateStops: [Stop]
+  intermediatePlaces: [Place] @deprecated(reason : "Use `leg.stopCalls` instead")
+  """
+  For transit legs, intermediate stops between the Place where the leg
+  originates and the Place where the leg ends. For non-transit legs, null.
+    
+  The `include` parameter allows filtering of the returned places by stop type. If not provided, the
+  field returns all types. An empty list is not permitted.
+  """
+  intermediateStops(include: [StopType!]): [Stop] @deprecated(reason : "Use `leg.stopCalls` instead")
   "The leg's geometry."
   legGeometry: Geometry
   "The mode (e.g. `WALK`) used when traversing this leg."
@@ -828,7 +855,7 @@ type Leg {
   realTime: Boolean
   "State of real-time data"
   realtimeState: RealtimeState
-  "Whether this leg is traversed with a rented bike."
+  "Whether this leg is traversed with a rented vehicle."
   rentedBike: Boolean
   "Estimate of a hailed ride like Uber."
   rideHailingEstimate: RideHailingEstimate
@@ -842,6 +869,12 @@ type Leg {
   startTime: Long @deprecated(reason : "Use `start.estimated.time` instead which contains timezone information.")
   "The turn-by-turn navigation instructions."
   steps: [step]
+  """
+  All the stop calls (stop times) of this _leg_ (but not trip) including the boarding and alighting one.
+    
+  Non-transit legs return an empty list.
+  """
+  stopCalls: [StopCall!]!
   "The Place where the leg ends."
   to: Place!
   "Whether this leg is a transit leg or not."
@@ -877,6 +910,34 @@ type LocalTimeSpanDate {
   date: String!
   "The time spans for this date."
   timeSpans: [LocalTimeSpan]
+}
+
+"""
+A stop that isn't a fixed point but zone where passengers can board or alight anywhere.
+
+This is mostly used by demand-responsive services.
+"""
+type Location {
+  "The geometry representing the geographic extend of the location."
+  geometry: StopGeometries!
+  "ÌD of the location in format `FeedId:LocationId`"
+  gtfsId: String!
+  "Optional name of the location."
+  name: String
+}
+
+"""
+A group of fixed stops that is visited in an arbitrary order.
+
+This is mostly used by demand-responsive services.
+"""
+type LocationGroup {
+  "ÌD of the location group in format `FeedId:LocationGroupId`"
+  gtfsId: String!
+  "The stops that are part of the group (cannot be stations)."
+  members: [Stop!]!
+  "Optional name of the group."
+  name: String
 }
 
 "An amount of money."
@@ -1275,9 +1336,9 @@ type QueryType {
     ids: [String]
   ): [CarPark] @deprecated(reason : "carParks is deprecated. Use vehicleParkings instead.")
   "Get a single cluster based on its ID, i.e. value of field `gtfsId`"
-  cluster(id: String!): Cluster
+  cluster(id: String!): Cluster @deprecated(reason : "Not implemented")
   "Get all clusters"
-  clusters: [Cluster]
+  clusters: [Cluster] @deprecated(reason : "Not implemented")
   "Get a single departure row based on its ID (ID format is `FeedId:StopId:PatternId`)"
   departureRow(id: String!): DepartureRow
   "Get all available feeds"
@@ -1456,7 +1517,7 @@ type QueryType {
     "When true, real-time updates are ignored during this search. Default value: false"
     ignoreRealtimeUpdates: Boolean,
     "An ordered list of intermediate locations to be visited."
-    intermediatePlaces: [InputCoordinates] @deprecated(reason : "Not implemented in OTP2."),
+    intermediatePlaces: [InputCoordinates] @deprecated(reason : "Not implemented"),
     """
     How easily bad itineraries are filtered from results. Value 0 (default)
     disables filtering. Itineraries are filtered if they are worse than another
@@ -1575,7 +1636,7 @@ type QueryType {
     travel time of the trip (and therefore arguments `time` and `from` must be
     used correctly to get meaningful itineraries).
     """
-    startTransitTripId: String @deprecated(reason : "Not implemented in OTP2"),
+    startTransitTripId: String @deprecated(reason : "Not implemented"),
     "Time of departure or arrival in format hh:mm:ss. Default value: current time"
     time: String,
     """
@@ -2121,7 +2182,7 @@ type Stop implements Node & PlaceInterface {
     types: [StopAlertType]
   ): [Alert]
   "The cluster which this stop is part of"
-  cluster: Cluster
+  cluster: Cluster @deprecated(reason : "Not implemented")
   "Stop code which is visible at the stop"
   code: String
   "Description of the stop, usually a street name"
@@ -2270,7 +2331,12 @@ type Stop implements Node & PlaceInterface {
   zoneId: String
 }
 
-"Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop location."
+"""
+Represents the time or time window when a specific trip on a specific date arrives to and/or departs
+from a specific stop location.
+
+This may contain real-time information, if available.
+"""
 type StopCall {
   "Real-time estimates for arrival and departure times for this stop location."
   realTime: CallRealTime
@@ -2433,6 +2499,12 @@ type TicketType implements Node {
   Corresponds to field `zoneId` in **Stop** type.
   """
   zones: [String!]
+}
+
+"A time window when a vehicle visits a stop, area or group of stops."
+type TimeWindow {
+  end: OffsetDateTime!
+  start: OffsetDateTime!
 }
 
 "Text with language"
@@ -3073,6 +3145,22 @@ enum CyclingOptimizationType {
   `QUICK`.
   """
   SHORTEST_DURATION
+}
+
+"""
+Dependent fare products can lead to many combinations of fares, however it is often not useful
+information to the passenger.
+
+This enum allows filtering of the dependencies.
+
+Since it is recognised that this is not covered well in the specification, it is discussed here:
+https://github.com/google/transit/pull/423
+"""
+enum DependentFareProductFilter {
+  "Show all dependencies"
+  ALL
+  "Show only dependencies where the rider category and medium is the same es the main fare product."
+  MATCH_CATEGORY_AND_MEDIUM
 }
 
 "Entities, which are relevant for a feed and can contain alerts"
@@ -3738,6 +3826,15 @@ enum StopAlertType {
   TRIPS
 }
 
+enum StopType {
+  "An area or zone represented by a polygon. Introduced by the GTFS-Flex spec process."
+  LOCATION
+  "A group of stops. Introduced by the GTFS-Flex spec process."
+  LOCATION_GROUP
+  "A fixed stop represented by a coordinate."
+  STOP
+}
+
 """
 Transit modes include modes that are used within organized transportation networks
 run by public transportation authorities, taxi companies etc.
@@ -4095,14 +4192,14 @@ input InputBanned {
   banned for boarding and disembarking vehicles — it is possible to get an
   itinerary where a vehicle stops at one of these stops
   """
-  stops: String @deprecated(reason : "Not implemented in OTP2.")
+  stops: String @deprecated(reason : "Not implemented")
   """
   A comma-separated list of banned stop ids. Only itineraries where these stops
   are not travelled through are returned, e.g. if a bus route stops at one of
   these stops, that route will not be used in the itinerary, even if the stop is
   not used for boarding or disembarking the vehicle.
   """
-  stopsHard: String @deprecated(reason : "Not implemented in OTP2.")
+  stopsHard: String @deprecated(reason : "Not implemented")
   "A comma-separated list of banned trip ids"
   trips: String
 }

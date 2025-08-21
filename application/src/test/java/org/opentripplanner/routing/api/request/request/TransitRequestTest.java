@@ -125,18 +125,18 @@ class TransitRequestTest {
   void testToString() {
     assertEqualsIgnoreWhitespace(
       """
-      TransitRequest{
-        filters: [TransitFilterRequest{select: [SelectRequest{transportModes: [], agencies: [A:1]}]}],
+      (
+        filters: [(select: [(transportModes: EMPTY, agencies: [A:1])])],
         preferredAgencies: [F:A:1],
         preferredRoutes: [F:R:1],
         bannedTrips: [F:T:1],
-        priorityGroupsByAgency: [TransitGroupSelect{subModeRegexp: [A.*]}],
-        priorityGroupsGlobal: [TransitGroupSelect{subModeRegexp: [G.*]}],
+        priorityGroupsByAgency: [(subModeRegexp: [A.*])],
+        priorityGroupsGlobal: [(subModeRegexp: [G.*])],
         raptorDebugging: DebugRaptor{stops: 1, 2}
-      }
+      )
       """,
       subject.toString()
     );
-    assertEquals("TransitRequest{}", TransitRequest.DEFAULT.toString());
+    assertEquals("()", TransitRequest.DEFAULT.toString());
   }
 }

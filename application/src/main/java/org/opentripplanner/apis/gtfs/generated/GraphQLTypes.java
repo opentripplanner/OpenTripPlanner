@@ -754,6 +754,34 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLDependentFareProductDependenciesArgs {
+
+    private GraphQLDependentFareProductFilter filter;
+
+    public GraphQLDependentFareProductDependenciesArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("filter") instanceof GraphQLDependentFareProductFilter) {
+          this.filter = (GraphQLDependentFareProductFilter) args.get("filter");
+        } else if (args.get("filter") != null) {
+          this.filter = GraphQLDependentFareProductFilter.valueOf((String) args.get("filter"));
+        }
+      }
+    }
+
+    public GraphQLDependentFareProductFilter getGraphQLFilter() {
+      return this.filter;
+    }
+
+    public void setGraphQLFilter(GraphQLDependentFareProductFilter filter) {
+      this.filter = filter;
+    }
+  }
+
+  public enum GraphQLDependentFareProductFilter {
+    ALL,
+    MATCH_CATEGORY_AND_MEDIUM,
+  }
+
   public static class GraphQLDestinationBicyclePolicyInput {
 
     private Boolean allowKeeping;
@@ -1337,6 +1365,32 @@ public class GraphQLTypes {
     LIMIT_TO_SEARCH_WINDOW,
     LIST_ALL,
     OFF,
+  }
+
+  public static class GraphQLLegIntermediateStopsArgs {
+
+    private List<GraphQLStopType> include;
+
+    public GraphQLLegIntermediateStopsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("include") != null) {
+          this.include = ((List<Object>) args.get("include")).stream()
+            .map(item ->
+              item instanceof GraphQLStopType ? item : GraphQLStopType.valueOf((String) item)
+            )
+            .map(GraphQLStopType.class::cast)
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLStopType> getGraphQLInclude() {
+      return this.include;
+    }
+
+    public void setGraphQLInclude(List<GraphQLStopType> include) {
+      this.include = include;
+    }
   }
 
   public static class GraphQLLegNextLegsArgs {
@@ -5001,6 +5055,12 @@ public class GraphQLTypes {
     STOP_ON_ROUTES,
     STOP_ON_TRIPS,
     TRIPS,
+  }
+
+  public enum GraphQLStopType {
+    LOCATION,
+    LOCATION_GROUP,
+    STOP,
   }
 
   public static class GraphQLStoptimeHeadsignArgs {

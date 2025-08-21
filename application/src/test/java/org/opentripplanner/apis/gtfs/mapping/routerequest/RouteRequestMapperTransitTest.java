@@ -96,7 +96,7 @@ class RouteRequestMapperTransitTest {
     assertEquals(maximumAdditionalTransfers, transferPreferences.maxAdditionalTransfers());
     assertEquals(maximumTransfers + 1, transferPreferences.maxTransfers());
     assertEquals(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES}], not: [SelectRequest{transportModes: [], routes: [f:route1]}]}]",
+      "[(select: [(transportModes: ALL)], not: [(transportModes: EMPTY, routes: [f:route1])])]",
       routeRequest.journey().transit().filters().toString()
     );
   }
