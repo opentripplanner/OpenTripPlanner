@@ -1,7 +1,7 @@
 package org.opentripplanner.osm.wayproperty;
 
 import java.util.Objects;
-import java.util.Optional;
+import java.util.OptionalDouble;
 import javax.annotation.Nullable;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
@@ -15,29 +15,29 @@ public class WayProperties {
   private final StreetTraversalPermission permission;
 
   @Nullable
-  private final SafetyFeatures bicycleSafetyFeatures;
+  private final Double bicycleSafety;
 
   @Nullable
-  private final SafetyFeatures walkSafetyFeatures;
+  private final Double walkSafety;
 
   WayProperties(WayPropertiesBuilder wayPropertiesBuilder) {
     permission = Objects.requireNonNull(wayPropertiesBuilder.getPermission());
-    bicycleSafetyFeatures = wayPropertiesBuilder.bicycleSafety();
-    walkSafetyFeatures = wayPropertiesBuilder.walkSafety();
+    bicycleSafety = wayPropertiesBuilder.bicycleSafety();
+    walkSafety = wayPropertiesBuilder.walkSafety();
   }
 
   /**
    * The value for the bicycle safety. If none has been set a default value of 1 is returned.
    */
-  public SafetyFeatures bicycleSafety() {
-    return Objects.requireNonNullElse(bicycleSafetyFeatures, SafetyFeatures.DEFAULT);
+  public double bicycleSafety() {
+    return Objects.requireNonNullElse(bicycleSafety, 1.0);
   }
 
   /**
    * The value for the walk safety. If none has been set a default value of 1 is returned.
    */
-  public SafetyFeatures walkSafety() {
-    return Objects.requireNonNullElse(walkSafetyFeatures, SafetyFeatures.DEFAULT);
+  public double walkSafety() {
+    return Objects.requireNonNullElse(walkSafety, 1.0);
   }
 
   public StreetTraversalPermission getPermission() {
@@ -47,28 +47,28 @@ public class WayProperties {
   /**
    * An optional value for the walk safety. If none has been set an empty Optional is returned.
    */
-  protected Optional<SafetyFeatures> walkSafetyOpt() {
-    return Optional.ofNullable(walkSafetyFeatures);
+  protected OptionalDouble walkSafetyOpt() {
+    return walkSafety == null ? OptionalDouble.empty() : OptionalDouble.of(walkSafety);
   }
 
   /**
    * An optional value for the bicycle safety. If none has been set an empty Optional is returned.
    */
-  protected Optional<SafetyFeatures> bicycleSafetyOpt() {
-    return Optional.ofNullable(bicycleSafetyFeatures);
+  protected OptionalDouble bicycleSafetyOpt() {
+    return bicycleSafety == null ? OptionalDouble.empty() : OptionalDouble.of(bicycleSafety);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(bicycleSafetyFeatures, walkSafetyFeatures, permission);
+    return Objects.hash(bicycleSafety, walkSafety, permission);
   }
 
   @Override
   public boolean equals(Object o) {
     if (o instanceof WayProperties other) {
       return (
-        Objects.equals(bicycleSafetyFeatures, other.bicycleSafetyFeatures) &&
-        Objects.equals(walkSafetyFeatures, other.walkSafetyFeatures) &&
+        Objects.equals(bicycleSafety, other.bicycleSafety) &&
+        Objects.equals(walkSafety, other.walkSafety) &&
         permission == other.permission
       );
     }
