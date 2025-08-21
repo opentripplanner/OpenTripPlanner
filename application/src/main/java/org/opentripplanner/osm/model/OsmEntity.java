@@ -204,10 +204,25 @@ public class OsmEntity {
     return isTag("footway", "sidewalk") && isTag("highway", "footway");
   }
 
+  /**
+   * Check if there is a permission set for the specified OSM access mode.
+   *
+   * @param mode The OSM tag of the access mode, such as "motorcar" or "foot"
+   * @return an optional value if the mode is allowed or denied access through tagging for the mode
+   * or a parent mode, empty if it is not specified.
+   */
   protected Optional<Permission> checkModePermission(String mode) {
     return checkModePermission(mode, DIRECTIONLESS);
   }
 
+  /**
+   * Check if there is a permission set for the specified OSM access mode in the specified
+   * direction.
+   *
+   * @param mode The OSM tag of the access mode, such as "motorcar" or "foot"
+   * @return an optional value if the mode is allowed or denied access through tagging for the mode
+   * or a parent mode, either with a directional suffix or not, empty if it is not specified.
+   */
   protected Optional<Permission> checkModePermission(String mode, TraverseDirection direction) {
     // check if the exact directional tag allows or denies access
     if (direction != DIRECTIONLESS) {
