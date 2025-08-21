@@ -123,7 +123,7 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
-            if (preferences.rentalDuration().isPositive() && station.isCarStation()) {
+            if (preferences.rentalDuration() != null && station.isCarStation()) {
               Instant departureTime = s0.getTime().plus(preferences.pickupTime());
               OffsetDateTime rentalEndTime = OffsetDateTime.ofInstant(
                 departureTime,

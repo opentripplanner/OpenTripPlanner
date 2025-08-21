@@ -35,7 +35,7 @@ public final class VehicleRentalPreferences implements Serializable {
     this.pickupCost = Cost.costOfMinutes(2);
     this.dropOffTime = Duration.ofSeconds(30);
     this.dropOffCost = Cost.costOfSeconds(30);
-    this.rentalDuration = Duration.ofHours(0);
+    this.rentalDuration = null;
     this.useAvailabilityInformation = false;
     this.arrivingInRentalVehicleAtDestinationCost = Cost.costOfSeconds(0);
     this.allowArrivingInRentedVehicleAtDestination = false;
