@@ -92,7 +92,9 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
                 .getEstimatedVehicleJourneies()
                 .forEach(ejv -> {
                   var carpoolTrip = mapper.mapSiriToCarpoolTrip(ejv);
-                  repository.addCarpoolTrip(carpoolTrip);
+                  if (carpoolTrip != null) {
+                    repository.addCarpoolTrip(carpoolTrip);
+                  }
                 });
             }
           }

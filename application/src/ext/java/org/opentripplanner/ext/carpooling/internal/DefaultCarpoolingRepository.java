@@ -58,9 +58,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
     streetVerticesWithinAreaStop(alightingArea).forEach(v -> {
       alightingAreasByVertex.put(v, alightingArea);
     });
-    LOG.info("Added carpooling trip for start time: {}",
-      trip.getStartTime()
-    );
+    LOG.info("Added carpooling trip for start time: {}", trip.getStartTime());
   }
 
   private List<StreetVertex> streetVerticesWithinAreaStop(AreaStop stop) {
