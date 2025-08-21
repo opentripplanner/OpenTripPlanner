@@ -67,7 +67,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
       .withTo(p2)
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 
   /**
@@ -124,7 +124,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
       .buildRequest();
 
     try {
-      expectArriveByToMatchDepartAtAndSnapshot(request);
+      expectRequestResponseToMatchSnapshot(request);
     } catch (CompletionException e) {
       RoutingValidationException.unwrapAndRethrowCompletionException(e);
     }
@@ -148,7 +148,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
       .withTo(p1)
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 
   private void allowArrivalWithRentalVehicle(RouteRequestBuilder builder) {
