@@ -64,6 +64,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add support for GTFS-RT platform change, headsign change, NEW and REPLACEMENT trips [#6028](https://github.com/opentripplanner/OpenTripPlanner/pull/6028)
 - Fix outgoing angle for temporary street edge [#6793](https://github.com/opentripplanner/OpenTripPlanner/pull/6793)
 - Improve worst case performance of GTFS geometry processing [#6748](https://github.com/opentripplanner/OpenTripPlanner/pull/6748)
+- Allow park&ride at places where through traffic is prohibited   [#6786](https://github.com/opentripplanner/OpenTripPlanner/pull/6786)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
