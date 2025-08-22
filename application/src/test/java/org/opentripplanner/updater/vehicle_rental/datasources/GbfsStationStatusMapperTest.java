@@ -1,9 +1,12 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.service.vehiclerental.model.ReturnPolicy.ANY_TYPE;
+import static org.opentripplanner.service.vehiclerental.model.ReturnPolicy.SPECIFIC_TYPES;
 import static org.opentripplanner.street.model.RentalFormFactor.BICYCLE;
 import static org.opentripplanner.street.model.RentalFormFactor.CAR;
 import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
@@ -52,10 +55,12 @@ class GbfsStationStatusMapperTest {
 
     var mapped = mapper.mapStationStatus(STATION);
 
-    assertEquals(new RentalVehicleEntityCounts(3, List.of()), mapped.vehicleSpaceCounts());
+    var spaces = mapped.vehicleSpaceCounts();
+    assertEquals(3, spaces.total());
+    assertThat(spaces.byType()).isEmpty();
 
     assertEquals(Set.of(CAR), mapped.formFactors());
-    assertSame(ReturnPolicy.ANY_TYPE, mapped.returnPolicy());
+    assertSame(ANY_TYPE, mapped.returnPolicy());
 
     assertDropOffForAnyType(mapped);
   }
@@ -83,15 +88,16 @@ class GbfsStationStatusMapperTest {
 
     var mapped = mapper.mapStationStatus(STATION);
 
-    assertEquals(
-      new RentalVehicleEntityCounts(99, List.of(new RentalVehicleTypeCount(TYPE_CAR, 88))),
-      mapped.vehicleSpaceCounts()
-    );
+    var spaces = mapped.vehicleSpaceCounts();
+    assertEquals(99, spaces.total());
+    assertThat(spaces.byType()).containsExactly(new RentalVehicleTypeCount(TYPE_CAR, 88));
     assertEquals(Set.of(CAR), mapped.formFactors());
-    assertSame(ReturnPolicy.SPECIFIC_TYPES, mapped.returnPolicy());
+    assertSame(SPECIFIC_TYPES, mapped.returnPolicy());
 
-    assertFalse(mapped.canDropOffFormFactor(BICYCLE, false));
+    // can drop off car
     assertTrue(mapped.canDropOffFormFactor(CAR, false));
+    // but not the other types
+    assertFalse(mapped.canDropOffFormFactor(BICYCLE, false));
     assertFalse(mapped.canDropOffFormFactor(SCOOTER, false));
   }
 
@@ -113,9 +119,11 @@ class GbfsStationStatusMapperTest {
 
     var mapped = mapper.mapStationStatus(STATION);
 
-    assertEquals(new RentalVehicleEntityCounts(88, List.of()), mapped.vehicleSpaceCounts());
+    var spaces = mapped.vehicleSpaceCounts();
+    assertEquals(88, spaces.total());
+    assertThat(spaces.byType()).isEmpty();
     assertEquals(Set.of(CAR), mapped.formFactors());
-    assertSame(ReturnPolicy.ANY_TYPE, mapped.returnPolicy());
+    assertSame(ANY_TYPE, mapped.returnPolicy());
 
     assertDropOffForAnyType(mapped);
   }
@@ -132,9 +140,12 @@ class GbfsStationStatusMapperTest {
     );
 
     var mapped = mapper.mapStationStatus(STATION);
-    assertEquals(new RentalVehicleEntityCounts(1, List.of()), mapped.vehicleSpaceCounts());
+
+    var spaces = mapped.vehicleSpaceCounts();
+    assertEquals(1, spaces.total());
+    assertThat(spaces.byType()).isEmpty();
     assertEquals(Set.of(BICYCLE), mapped.formFactors());
-    assertSame(ReturnPolicy.ANY_TYPE, mapped.returnPolicy());
+    assertSame(ANY_TYPE, mapped.returnPolicy());
     assertDropOffForAnyType(mapped);
   }
 
