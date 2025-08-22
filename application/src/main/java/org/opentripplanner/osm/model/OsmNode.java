@@ -2,9 +2,7 @@ package org.opentripplanner.osm.model;
 
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 
-import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OsmNode extends OsmEntity {
 

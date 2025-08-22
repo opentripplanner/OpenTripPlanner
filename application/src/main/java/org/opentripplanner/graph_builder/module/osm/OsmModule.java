@@ -2,6 +2,9 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.BARRIER_VERTEX;
 import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
+import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
+import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Iterables;
@@ -29,7 +32,8 @@ import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.wayproperty.WayProperties;
+import org.opentripplanner.osm.model.TraverseDirection;
+import org.opentripplanner.osm.wayproperty.WayPropertiesPair;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -314,12 +318,16 @@ public class OsmModule implements GraphBuilderModule {
     );
 
     WAY: for (OsmWay way : osmdb.getWays()) {
-      WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
+      WayPropertiesPair wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
       setWayName(way);
 
-      var permissions = wayData.getPermission();
+      var forwardPermission = wayData.forward().getPermission();
+      var backwardPermission = wayData.backward().getPermission();
 
-      if (!way.isRoutable() || permissions.allowsNothing()) {
+      if (
+        !way.isRoutable() ||
+        (forwardPermission.allowsNothing() && backwardPermission.allowsNothing())
+      ) {
         continue;
       }
 
@@ -448,7 +456,8 @@ public class OsmModule implements GraphBuilderModule {
             endEndpoint,
             way,
             i,
-            permissions,
+            forwardPermission,
+            backwardPermission,
             geometry
           );
 
@@ -456,7 +465,13 @@ public class OsmModule implements GraphBuilderModule {
 
           StreetEdge street = streets.main();
           StreetEdge backStreet = streets.back();
-          normalizer.applyWayProperties(street, backStreet, wayData, way);
+          normalizer.applyWayProperties(
+            street,
+            backStreet,
+            wayData.forward(),
+            wayData.backward(),
+            way
+          );
 
           platform.ifPresent(plat -> {
             for (var s : streets.asIterable()) {
@@ -585,11 +600,12 @@ public class OsmModule implements GraphBuilderModule {
     IntersectionVertex endEndpoint,
     OsmWay way,
     int index,
-    StreetTraversalPermission permissions,
+    StreetTraversalPermission forwardPermission,
+    StreetTraversalPermission backwardPermission,
     LineString geometry
   ) {
     // No point in returning edges that can't be traversed by anyone.
-    if (permissions.allowsNothing()) {
+    if (forwardPermission.allowsNothing() && backwardPermission.allowsNothing()) {
       return new StreetEdgePair(null, null);
     }
 
@@ -598,32 +614,28 @@ public class OsmModule implements GraphBuilderModule {
     StreetEdge backStreet = null;
     double length = getGeometryLengthMeters(geometry);
 
-    var permissionPair = way.splitPermissions(permissions);
-    var permissionsFront = permissionPair.main();
-    var permissionsBack = permissionPair.back();
-
-    if (permissionsFront.allowsAnything()) {
+    if (forwardPermission.allowsAnything()) {
       street = getEdgeForStreet(
         startEndpoint,
         endEndpoint,
         way,
         index,
         length,
-        permissionsFront,
+        forwardPermission,
         geometry,
-        false
+        FORWARD
       );
     }
-    if (permissionsBack.allowsAnything()) {
+    if (backwardPermission.allowsAnything()) {
       backStreet = getEdgeForStreet(
         endEndpoint,
         startEndpoint,
         way,
         index,
         length,
-        permissionsBack,
+        backwardPermission,
         backGeometry,
-        true
+        BACKWARD
       );
     }
     if (street != null && backStreet != null) {
@@ -640,12 +652,18 @@ public class OsmModule implements GraphBuilderModule {
     double length,
     StreetTraversalPermission permissions,
     LineString geometry,
-    boolean back
+    TraverseDirection direction
   ) {
+    if (direction == DIRECTIONLESS) {
+      throw new IllegalArgumentException(
+        "A direction must be specified when getting an edge for a street."
+      );
+    }
+
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
     I18NString name = params.edgeNamer().getNameForWay(way, label);
-    float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
+    float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, direction);
 
     StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
       .withFromVertex(startEndpoint)
@@ -654,7 +672,7 @@ public class OsmModule implements GraphBuilderModule {
       .withName(name)
       .withMeterLength(length)
       .withPermission(permissions)
-      .withBack(back)
+      .withBack(direction == BACKWARD)
       .withCarSpeed(carSpeed)
       .withLink(way.isLink())
       .withRoundabout(way.isRoundabout())

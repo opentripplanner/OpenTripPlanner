@@ -2,10 +2,8 @@ package org.opentripplanner.service.vehiclerental.model;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -14,20 +12,12 @@ public class VehicleRentalStationBuilder {
   private final VehicleRentalStation original;
   private FeedScopedId id;
   private I18NString name;
-  private String shortName;
+  private I18NString shortName;
   private Double longitude;
   private Double latitude;
-  private String address;
-  private String crossStreet;
-  private String regionId;
-  private String postCode;
-  private Set<String> rentalMethods = Set.of();
-  private Boolean isVirtualStation;
-  private Geometry stationArea;
   private Integer capacity;
   private Map<RentalVehicleType, Integer> vehicleTypeAreaCapacity = Map.of();
   private Map<RentalVehicleType, Integer> vehicleTypeDockCapacity = Map.of();
-  private Boolean isValetStation;
   private VehicleRentalSystem system;
   private VehicleRentalStationUris rentalUris;
   private Integer vehiclesAvailable;
@@ -36,10 +26,8 @@ public class VehicleRentalStationBuilder {
   private Integer spacesAvailable;
   private Integer spacesDisabled;
   private Map<RentalVehicleType, Integer> vehicleSpacesAvailable = Map.of();
-  private Boolean isInstalled;
   private Boolean isRenting;
   private Boolean isReturning;
-  private Instant lastReported;
   private Boolean overloadingAllowed;
   private Boolean isArrivingInRentalVehicleAtDestinationAllowed;
   private Boolean realTimeData;
@@ -48,20 +36,11 @@ public class VehicleRentalStationBuilder {
     this.original = original;
     this.id = original.id();
     this.name = original.name();
-    this.shortName = original.shortName();
     this.longitude = original.longitude();
     this.latitude = original.latitude();
-    this.address = original.address();
-    this.crossStreet = original.crossStreet();
-    this.regionId = original.regionId();
-    this.postCode = original.postCode();
-    this.rentalMethods = original.rentalMethods();
-    this.isVirtualStation = original.isVirtualStation();
-    this.stationArea = original.stationArea();
     this.capacity = original.capacity();
     this.vehicleTypeAreaCapacity = original.vehicleTypeAreaCapacity();
     this.vehicleTypeDockCapacity = original.vehicleTypeDockCapacity();
-    this.isValetStation = original.isValetStation();
     this.system = original.system();
     this.rentalUris = original.rentalUris();
     this.vehiclesAvailable = original.vehiclesAvailable();
@@ -70,10 +49,8 @@ public class VehicleRentalStationBuilder {
     this.spacesAvailable = original.spacesAvailable();
     this.spacesDisabled = original.spacesDisabled();
     this.vehicleSpacesAvailable = original.vehicleSpacesAvailable();
-    this.isInstalled = original.isInstalled();
     this.isRenting = original.isRenting();
     this.isReturning = original.isReturning();
-    this.lastReported = original.lastReported();
     this.overloadingAllowed = original.overloadingAllowed();
     this.isArrivingInRentalVehicleAtDestinationAllowed =
       original.isArrivingInRentalVehicleAtDestinationAllowed();
@@ -88,7 +65,7 @@ public class VehicleRentalStationBuilder {
     return name;
   }
 
-  public String shortName() {
+  public I18NString shortName() {
     return shortName;
   }
 
@@ -98,34 +75,6 @@ public class VehicleRentalStationBuilder {
 
   public double latitude() {
     return latitude;
-  }
-
-  public String address() {
-    return address;
-  }
-
-  public String crossStreet() {
-    return crossStreet;
-  }
-
-  public String regionId() {
-    return regionId;
-  }
-
-  public String postCode() {
-    return postCode;
-  }
-
-  public Set<String> rentalMethods() {
-    return rentalMethods;
-  }
-
-  public boolean isVirtualStation() {
-    return isVirtualStation;
-  }
-
-  public Geometry stationArea() {
-    return stationArea;
   }
 
   public Integer capacity() {
@@ -138,10 +87,6 @@ public class VehicleRentalStationBuilder {
 
   public Map<RentalVehicleType, Integer> vehicleTypeDockCapacity() {
     return vehicleTypeDockCapacity;
-  }
-
-  public boolean isValetStation() {
-    return isValetStation;
   }
 
   public VehicleRentalSystem system() {
@@ -176,20 +121,12 @@ public class VehicleRentalStationBuilder {
     return vehicleSpacesAvailable;
   }
 
-  public boolean isInstalled() {
-    return isInstalled;
-  }
-
   public boolean isRenting() {
     return isRenting;
   }
 
   public boolean isReturning() {
     return isReturning;
-  }
-
-  public Instant lastReported() {
-    return lastReported;
   }
 
   public boolean isOverloadingAllowed() {
@@ -214,7 +151,7 @@ public class VehicleRentalStationBuilder {
     return this;
   }
 
-  public VehicleRentalStationBuilder withShortName(@Nullable String shortName) {
+  public VehicleRentalStationBuilder withShortName(@Nullable I18NString shortName) {
     this.shortName = shortName;
     return this;
   }
@@ -226,41 +163,6 @@ public class VehicleRentalStationBuilder {
 
   public VehicleRentalStationBuilder withLatitude(double latitude) {
     this.latitude = latitude;
-    return this;
-  }
-
-  public VehicleRentalStationBuilder withAddress(@Nullable String address) {
-    this.address = address;
-    return this;
-  }
-
-  public VehicleRentalStationBuilder withCrossStreet(@Nullable String crossStreet) {
-    this.crossStreet = crossStreet;
-    return this;
-  }
-
-  public VehicleRentalStationBuilder withRegionId(@Nullable String regionId) {
-    this.regionId = regionId;
-    return this;
-  }
-
-  public VehicleRentalStationBuilder withPostCode(@Nullable String postCode) {
-    this.postCode = postCode;
-    return this;
-  }
-
-  public VehicleRentalStationBuilder withRentalMethods(@Nullable Set<String> rentalMethods) {
-    this.rentalMethods = rentalMethods;
-    return this;
-  }
-
-  public VehicleRentalStationBuilder withIsVirtualStation(boolean isVirtualStation) {
-    this.isVirtualStation = isVirtualStation;
-    return this;
-  }
-
-  public VehicleRentalStationBuilder withStationArea(@Nullable Geometry stationArea) {
-    this.stationArea = stationArea;
     return this;
   }
 
@@ -280,11 +182,6 @@ public class VehicleRentalStationBuilder {
     @Nullable Map<RentalVehicleType, Integer> vehicleTypeDockCapacity
   ) {
     this.vehicleTypeDockCapacity = vehicleTypeDockCapacity;
-    return this;
-  }
-
-  public VehicleRentalStationBuilder withIsValetStation(boolean isValetStation) {
-    this.isValetStation = isValetStation;
     return this;
   }
 
@@ -333,7 +230,6 @@ public class VehicleRentalStationBuilder {
   }
 
   public VehicleRentalStationBuilder withIsInstalled(boolean isInstalled) {
-    this.isInstalled = isInstalled;
     return this;
   }
 
@@ -348,7 +244,6 @@ public class VehicleRentalStationBuilder {
   }
 
   public VehicleRentalStationBuilder withLastReported(@Nullable Instant lastReported) {
-    this.lastReported = lastReported;
     return this;
   }
 

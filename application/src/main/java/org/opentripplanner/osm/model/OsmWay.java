@@ -3,8 +3,6 @@ package org.opentripplanner.osm.model;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import java.util.Set;
-import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
-import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OsmWay extends OsmEntity {
 
@@ -73,59 +71,6 @@ public class OsmWay extends OsmEntity {
     }
   }
 
-  /**
-   * Is this way a roundabout?
-   */
-  public boolean isRoundabout() {
-    return "roundabout".equals(getTag("junction"));
-  }
-
-  /**
-   * Returns true if this is a one-way street for driving.
-   */
-  public boolean isOneWayForwardDriving() {
-    return isTagTrue("oneway");
-  }
-
-  /**
-   * Returns true if this way is one-way in the opposite direction of its definition.
-   */
-  public boolean isOneWayReverseDriving() {
-    return isTag("oneway", "-1");
-  }
-
-  /**
-   * Returns true if bikes can only go forward.
-   */
-  public boolean isOneWayForwardBicycle() {
-    String oneWayBicycle = getTag("oneway:bicycle");
-    return isTrue(oneWayBicycle) || isTagFalse("bicycle:backwards");
-  }
-
-  /**
-   * Returns true if bikes can only go in the reverse direction.
-   */
-  public boolean isOneWayReverseBicycle() {
-    String oneWayBicycle = getTag("oneway:bicycle");
-    return "-1".equals(oneWayBicycle) || isTagFalse("bicycle:forward");
-  }
-
-  /**
-   * Some cycleways allow contraflow biking.
-   */
-  public boolean isOpposableCycleway() {
-    // any cycleway which is opposite* allows contraflow biking
-    String cycleway = getTag("cycleway");
-    String cyclewayLeft = getTag("cycleway:left");
-    String cyclewayRight = getTag("cycleway:right");
-
-    return (
-      (cycleway != null && cycleway.startsWith("opposite")) ||
-      (cyclewayLeft != null && cyclewayLeft.startsWith("opposite")) ||
-      (cyclewayRight != null && cyclewayRight.startsWith("opposite"))
-    );
-  }
-
   public boolean isEscalator() {
     return (isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS));
   }
@@ -157,45 +102,6 @@ public class OsmWay extends OsmEntity {
 
   public boolean isBarrier() {
     return hasTag("barrier");
-  }
-
-  /**
-   * Given a set of {@code permissions} check if it can really be applied to both directions
-   * of the way and return the permissions for both cases.
-   */
-  public StreetTraversalPermissionPair splitPermissions(StreetTraversalPermission permissions) {
-    StreetTraversalPermission permissionsFront = permissions;
-    StreetTraversalPermission permissionsBack = permissions;
-
-    // Check driving direction restrictions.
-    if (isOneWayForwardDriving() || isRoundabout()) {
-      permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
-    }
-    if (isOneWayReverseDriving()) {
-      permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
-    }
-
-    // Check bike direction restrictions.
-    if (isOneWayForwardBicycle()) {
-      permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
-    }
-    if (isOneWayReverseBicycle()) {
-      permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
-    }
-
-    // TODO(flamholz): figure out what this is for.
-    String oneWayBicycle = getTag("oneway:bicycle");
-    if (isFalse(oneWayBicycle) || isTagTrue("bicycle:backwards")) {
-      if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
-        permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
-        permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
-      }
-    }
-
-    if (isOpposableCycleway()) {
-      permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
-    }
-    return new StreetTraversalPermissionPair(permissionsFront, permissionsBack);
   }
 
   @Override

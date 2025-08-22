@@ -58,11 +58,11 @@
 
 
     <properties>
-        <otp.serialization.version.id>200</otp.serialization.version.id>
+        <otp.serialization.version.id>201</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>33.2</geotools.version>
-        <google.dagger.version>2.56.2</google.dagger.version>
+        <google.dagger.version>2.57</google.dagger.version>
         <jackson.version>2.19.2</jackson.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
