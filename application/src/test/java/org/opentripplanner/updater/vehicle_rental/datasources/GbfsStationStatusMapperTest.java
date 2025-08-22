@@ -134,10 +134,7 @@ class GbfsStationStatusMapperTest {
     gbfsStation.setNumDocksAvailable(1);
     gbfsStation.setNumBikesAvailable(4);
 
-    var mapper = new GbfsStationStatusMapper(
-      Map.of(ID, gbfsStation),
-      Map.of(TYPE_CAR.id().getId(), TYPE_CAR)
-    );
+    var mapper = new GbfsStationStatusMapper(Map.of(ID, gbfsStation), Map.of());
 
     var mapped = mapper.mapStationStatus(STATION);
 
@@ -147,6 +144,31 @@ class GbfsStationStatusMapperTest {
     assertEquals(Set.of(BICYCLE), mapped.formFactors());
     assertSame(ANY_TYPE, mapped.returnPolicy());
     assertDropOffForAnyType(mapped);
+  }
+
+  @Test
+  void noSpaces() {
+    var gbfsStation = station();
+    gbfsStation.setNumDocksAvailable(0);
+    gbfsStation.setNumBikesAvailable(4);
+
+    var mapper = new GbfsStationStatusMapper(Map.of(ID, gbfsStation), Map.of());
+
+    var mapped = mapper.mapStationStatus(STATION);
+
+    var spaces = mapped.vehicleSpaceCounts();
+    assertEquals(0, spaces.total());
+    assertThat(spaces.byType()).isEmpty();
+    assertEquals(Set.of(BICYCLE), mapped.formFactors());
+    assertSame(ANY_TYPE, mapped.returnPolicy());
+
+    assertFalse(mapped.canDropOffFormFactor(BICYCLE, true));
+    assertFalse(mapped.canDropOffFormFactor(CAR, true));
+    assertFalse(mapped.canDropOffFormFactor(SCOOTER, true));
+
+    assertTrue(mapped.canDropOffFormFactor(BICYCLE, false));
+    assertTrue(mapped.canDropOffFormFactor(CAR, false));
+    assertTrue(mapped.canDropOffFormFactor(SCOOTER, false));
   }
 
   private static GBFSStation station() {

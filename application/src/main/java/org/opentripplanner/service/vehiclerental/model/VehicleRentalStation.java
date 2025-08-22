@@ -1,6 +1,7 @@
 package org.opentripplanner.service.vehiclerental.model;
 
 import static java.util.Locale.ROOT;
+import static org.opentripplanner.service.vehiclerental.model.ReturnPolicy.ANY_TYPE;
 
 import java.util.Comparator;
 import java.util.List;
@@ -250,7 +251,9 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     RentalFormFactor formFactor,
     boolean includeRealtimeAvailability
   ) {
-    if (returnPolicy.equals(ReturnPolicy.ANY_TYPE) && allowDropoffNow()) {
+    if (returnPolicy.equals(ANY_TYPE) && includeRealtimeAvailability) {
+      return allowDropoffNow();
+    } else if (returnPolicy.equals(ANY_TYPE)) {
       return true;
     } else {
       return availableDropoffFormFactors(includeRealtimeAvailability).contains(formFactor);
