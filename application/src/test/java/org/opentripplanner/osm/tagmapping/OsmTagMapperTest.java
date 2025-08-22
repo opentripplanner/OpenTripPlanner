@@ -4,7 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE_AND_CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import java.util.List;
 import java.util.Locale;
@@ -12,12 +17,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 class OsmTagMapperTest {
 
   private static final Locale FI = Locale.of("FI");
+  private static final WayPropertySet wps = new WayPropertySet();
+
+  static {
+    var source = new OsmTagMapper();
+    source.populateProperties(wps);
+  }
 
   @Test
   void isMotorThroughTrafficExplicitlyDisallowed() {
@@ -82,6 +94,120 @@ class OsmTagMapperTest {
     assertTrue(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
     assertTrue(osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(tags));
     assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
+  }
+
+  @Test
+  void testFootway() {
+    assertEquals(PEDESTRIAN, wps.getDataForEntity(WayTestData.footway()).getPermission());
+  }
+
+  @Test
+  void testFootwaySharedWithBicycle() {
+    assertEquals(
+      PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForEntity(WayTestData.footwaySharedWithBicycle()).getPermission()
+    );
+  }
+
+  @Test
+  void testCycleway() {
+    assertEquals(BICYCLE, wps.getDataForEntity(WayTestData.cycleway()).getPermission());
+  }
+
+  @Test
+  void testCyclewaySharedWithFoot() {
+    assertEquals(
+      PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForEntity(WayTestData.cyclewaySharedWithFoot()).getPermission()
+    );
+  }
+
+  @Test
+  void testPedestrian() {
+    assertEquals(PEDESTRIAN, wps.getDataForEntity(WayTestData.pedestrianArea()).getPermission());
+  }
+
+  @Test
+  void testBridleway() {
+    assertEquals(NONE, wps.getDataForEntity(WayTestData.bridleway()).getPermission());
+  }
+
+  @Test
+  void testPath() {
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForEntity(WayTestData.path()).getPermission());
+  }
+
+  @Test
+  void testBridlewaySharedWithFootAndBicycle() {
+    assertEquals(
+      PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForEntity(WayTestData.bridlewaySharedWithFootAndBicycle()).getPermission()
+    );
+  }
+
+  @Test
+  void testMotorway() {
+    assertEquals(CAR, wps.getDataForWay(WayTestData.motorway()).forward().getPermission());
+    assertEquals(NONE, wps.getDataForWay(WayTestData.motorway()).backward().getPermission());
+  }
+
+  @Test
+  void testMotorwayWithBicycleAllowed() {
+    assertEquals(
+      BICYCLE_AND_CAR,
+      wps.getDataForWay(WayTestData.motorwayWithBicycleAllowed()).forward().getPermission()
+    );
+    assertEquals(
+      NONE,
+      wps.getDataForWay(WayTestData.motorwayWithBicycleAllowed()).backward().getPermission()
+    );
+  }
+
+  @Test
+  void testPrimaryMotorroad() {
+    assertEquals(
+      CAR,
+      wps.getDataForEntity(WayTestData.highwayPrimaryWithMotorroad()).getPermission()
+    );
+  }
+
+  @Test
+  void testTrunk() {
+    assertEquals(ALL, wps.getDataForEntity(WayTestData.highwayTrunk()).getPermission());
+  }
+
+  @Test
+  void testTrunkMotorroad() {
+    assertEquals(
+      CAR,
+      wps.getDataForEntity(WayTestData.highwayTrunkWithMotorroad()).getPermission()
+    );
+  }
+
+  @Test
+  void testTrunkWalkSafety() {
+    var rawScore = wps.getDataForWay(WayTestData.highwayTrunk()).forward().walkSafety();
+    var scoreWithLane = wps
+      .getDataForWay((OsmWay) WayTestData.highwayTrunk().addTag("sidewalk", "lane"))
+      .forward()
+      .walkSafety();
+    var scoreWithSidewalk = wps
+      .getDataForWay((OsmWay) WayTestData.highwayTrunk().addTag("sidewalk", "both"))
+      .forward()
+      .walkSafety();
+    var scoreWithSeparateSidewalk = wps
+      .getDataForWay((OsmWay) WayTestData.highwayTrunk().addTag("sidewalk", "separate"))
+      .forward()
+      .walkSafety();
+    assertTrue(rawScore > 5);
+    assertTrue(scoreWithLane < rawScore);
+    assertTrue(scoreWithSidewalk < scoreWithLane);
+    assertEquals(rawScore, scoreWithSeparateSidewalk);
+  }
+
+  @Test
+  void testTertiary() {
+    assertEquals(ALL, wps.getDataForEntity(WayTestData.highwayTertiary()).getPermission());
   }
 
   @Test
@@ -174,6 +300,20 @@ class OsmTagMapperTest {
     assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
+  @Test
+  void testOneWay() {
+    var way = WayTestData.highwayTertiary();
+    way.addTag("oneway", "yes");
+    var props = wps.getDataForWay(way);
+    assertEquals(ALL, props.forward().getPermission());
+    assertEquals(PEDESTRIAN, props.backward().getPermission());
+
+    way.addTag("oneway:bicycle", "no");
+    props = wps.getDataForWay(way);
+    assertEquals(ALL, props.forward().getPermission());
+    assertEquals(PEDESTRIAN_AND_BICYCLE, props.backward().getPermission());
+  }
+
   public static List<OsmEntity> roadCases() {
     return List.of(
       WayTestData.carTunnel(),
@@ -186,13 +326,13 @@ class OsmTagMapperTest {
 
   @ParameterizedTest
   @MethodSource("roadCases")
-  void motorroad(OsmEntity way) {
+  void motorroad(OsmWay way) {
     final WayPropertySet wps = wayProperySet();
 
-    assertEquals(ALL, wps.getDataForWay(way).getPermission());
+    assertEquals(ALL, wps.getDataForWay(way).forward().getPermission());
 
     way.addTag("motorroad", "yes");
-    assertEquals(CAR, wps.getDataForWay(way).getPermission());
+    assertEquals(CAR, wps.getDataForWay(way).forward().getPermission());
   }
 
   @Test

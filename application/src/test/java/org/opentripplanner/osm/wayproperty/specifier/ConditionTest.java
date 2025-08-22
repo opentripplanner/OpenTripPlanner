@@ -6,13 +6,13 @@ import static org.opentripplanner.osm.wayproperty.specifier.Condition.MatchResul
 import static org.opentripplanner.osm.wayproperty.specifier.Condition.MatchResult.WILDCARD;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.carTunnel;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.cobblestones;
-import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.cycleway;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.cyclewayBoth;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.cyclewayLaneTrack;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.cyclewayLeft;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.excellentSmoothness;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.fiveLanes;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.highwayTertiary;
+import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.highwayWithCycleLane;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.noSidewalk;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.pedestrianTunnel;
 import static org.opentripplanner.osm.wayproperty.specifier.WayTestData.sidewalkBoth;
@@ -82,19 +82,19 @@ class ConditionTest {
 
   static Stream<Arguments> otherCases() {
     return Stream.of(
-      Arguments.of(cycleway(), cyclewayPresent, WILDCARD),
+      Arguments.of(highwayWithCycleLane(), cyclewayPresent, WILDCARD),
       Arguments.of(carTunnel(), cyclewayPresent, NONE),
       Arguments.of(carTunnel(), cyclewayAbsent, EXACT),
       Arguments.of(cobblestones(), cyclewayAbsent, EXACT),
-      Arguments.of(cycleway(), cyclewayAbsent, NONE),
-      Arguments.of(cycleway(), moreThanFourLanes, NONE),
+      Arguments.of(highwayWithCycleLane(), cyclewayAbsent, NONE),
+      Arguments.of(highwayWithCycleLane(), moreThanFourLanes, NONE),
       Arguments.of(carTunnel(), moreThanFourLanes, NONE),
       Arguments.of(pedestrianTunnel(), moreThanFourLanes, NONE),
       Arguments.of(fiveLanes(), moreThanFourLanes, EXACT),
       Arguments.of(fiveLanes(), lessThanFourLanes, NONE),
       Arguments.of(threeLanes(), lessThanFourLanes, EXACT),
       Arguments.of(carTunnel(), lessThanFourLanes, NONE),
-      Arguments.of(cycleway(), lessThanFourLanes, NONE),
+      Arguments.of(highwayWithCycleLane(), lessThanFourLanes, NONE),
       Arguments.of(fiveLanes(), betweenFiveAndThreeLanes, EXACT),
       Arguments.of(threeLanes(), betweenFiveAndThreeLanes, EXACT),
       Arguments.of(veryBadSmoothness(), smoothnessBadAndWorseThanBad, EXACT),

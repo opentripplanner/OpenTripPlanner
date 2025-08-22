@@ -6,6 +6,7 @@ import java.util.function.Function;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -22,10 +23,11 @@ public interface GraphFinder {
    */
   static GraphFinder getInstance(
     Graph graph,
+    VertexLinker linker,
     Function<Envelope, Collection<RegularStop>> queryNearbyStops
   ) {
     return graph.hasStreets
-      ? new StreetGraphFinder(graph)
+      ? new StreetGraphFinder(graph, linker)
       : new DirectGraphFinder(queryNearbyStops);
   }
 

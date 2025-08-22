@@ -2,6 +2,7 @@ package org.opentripplanner.ext.smoovebikerental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -46,23 +47,10 @@ public class SmooveBikeRentalDataSource
     networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
     vehicleType = RentalVehicleType.getDefaultType(networkName);
     overloadingAllowed = config.overloadingAllowed();
-    system = new VehicleRentalSystem(
-      networkName,
-      "fi",
-      "Helsinki/Espoo",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "Europe/Helsinki",
-      null,
-      null,
-      null
-    );
+    system = VehicleRentalSystem.of()
+      .withSystemId(networkName)
+      .withName(I18NString.of("Helsinki/Espoo"))
+      .build();
   }
 
   /**
@@ -85,34 +73,49 @@ public class SmooveBikeRentalDataSource
    */
   @Override
   protected VehicleRentalStation parseElement(JsonNode node) {
-    VehicleRentalStation station = new VehicleRentalStation();
     String[] nameParts = node.path("name").asText().split("\\s", 2);
-    station.id = new FeedScopedId(networkName, nameParts[0]);
-    station.name = new NonLocalizedString(nameParts[1]);
+    FeedScopedId stationId = new FeedScopedId(networkName, nameParts[0]);
     String[] coordinates = node.path("coordinates").asText().split(",");
+
+    double latitude;
+    double longitude;
+
     try {
-      station.latitude = Double.parseDouble(coordinates[0].trim());
-      station.longitude = Double.parseDouble(coordinates[1].trim());
+      latitude = Double.parseDouble(coordinates[0].trim());
+      longitude = Double.parseDouble(coordinates[1].trim());
     } catch (NumberFormatException e) {
       // E.g. coordinates is empty
-      LOG.warn("Error parsing bike rental station {}", station.id, e);
+      LOG.warn("Error parsing bike rental station {}", stationId, e);
       return null;
     }
+
+    var builder = VehicleRentalStation.of()
+      .withId(stationId)
+      .withName(new NonLocalizedString(nameParts[1]))
+      .withLatitude(latitude)
+      .withLongitude(longitude)
+      .withOverloadingAllowed(overloadingAllowed)
+      .withSystem(system)
+      .withCapacity(node.path("total_slots").asInt());
+
     if (!node.path("style").asText().equals("Station on")) {
-      station.isRenting = false;
-      station.isReturning = false;
-      station.vehiclesAvailable = 0;
-      station.spacesAvailable = 0;
-      station.capacity = node.path("total_slots").asInt();
+      builder
+        .withIsRenting(false)
+        .withIsReturning(false)
+        .withVehiclesAvailable(0)
+        .withSpacesAvailable(0)
+        .withVehicleTypesAvailable(Map.of(vehicleType, 0))
+        .withVehicleSpacesAvailable(Map.of(vehicleType, 0));
     } else {
-      station.vehiclesAvailable = node.path("avl_bikes").asInt();
-      station.spacesAvailable = node.path("free_slots").asInt();
-      station.capacity = node.path("total_slots").asInt();
+      int vehiclesAvailable = node.path("avl_bikes").asInt();
+      int spacesAvailable = node.path("free_slots").asInt();
+      builder
+        .withVehiclesAvailable(vehiclesAvailable)
+        .withSpacesAvailable(spacesAvailable)
+        .withVehicleTypesAvailable(Map.of(vehicleType, vehiclesAvailable))
+        .withVehicleSpacesAvailable(Map.of(vehicleType, spacesAvailable));
     }
-    station.vehicleTypesAvailable = Map.of(vehicleType, station.vehiclesAvailable);
-    station.vehicleSpacesAvailable = Map.of(vehicleType, station.spacesAvailable);
-    station.overloadingAllowed = overloadingAllowed;
-    station.system = system;
-    return station;
+
+    return builder.build();
   }
 }
