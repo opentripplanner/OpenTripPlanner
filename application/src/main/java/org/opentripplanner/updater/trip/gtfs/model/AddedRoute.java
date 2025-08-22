@@ -1,10 +1,9 @@
-package org.opentripplanner.updater.trip.gtfs;
+package org.opentripplanner.updater.trip.gtfs.model;
 
-import com.google.transit.realtime.GtfsRealtime;
 import de.mfdz.MfdzRealtimeExtensions;
 import java.util.Objects;
 
-final class AddedRoute {
+public final class AddedRoute {
 
   //bus
   public static final int FALLBACK_ROUTE_TYPE = 3;
@@ -13,7 +12,7 @@ final class AddedRoute {
   private final Integer routeType;
   private final String routeLongName;
 
-  public AddedRoute(String routeUrl, String agencyId, Integer routeType, String routeLongName) {
+  AddedRoute(String routeUrl, String agencyId, Integer routeType, String routeLongName) {
     this.routeUrl = routeUrl;
     this.agencyId = agencyId;
     this.routeType = routeType;
@@ -39,9 +38,10 @@ final class AddedRoute {
     return routeLongName;
   }
 
-  static AddedRoute ofTripDescriptor(GtfsRealtime.TripDescriptor tripDescriptor) {
-    if (tripDescriptor.hasExtension(MfdzRealtimeExtensions.tripDescriptor)) {
-      var ext = tripDescriptor.getExtension(MfdzRealtimeExtensions.tripDescriptor);
+  public static AddedRoute ofTripDescriptor(TripDescriptor tripDescriptor) {
+    var rawTripDescriptor = tripDescriptor.original();
+    if (rawTripDescriptor.hasExtension(MfdzRealtimeExtensions.tripDescriptor)) {
+      var ext = rawTripDescriptor.getExtension(MfdzRealtimeExtensions.tripDescriptor);
       var url = ext.getRouteUrl();
       var agencyId = ext.getAgencyId();
       var routeType = ext.getRouteType();

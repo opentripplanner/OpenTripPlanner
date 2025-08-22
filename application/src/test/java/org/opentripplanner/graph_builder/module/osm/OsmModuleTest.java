@@ -27,6 +27,7 @@ import org.opentripplanner.osm.wayproperty.CreativeNamer;
 import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertiesBuilder;
+import org.opentripplanner.osm.wayproperty.WayPropertiesPair;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
@@ -175,7 +176,7 @@ public class OsmModuleTest {
 
   @Test
   public void testWayDataSet() {
-    OsmEntity way = new OsmWay();
+    OsmWay way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("surface", "gravel");
@@ -183,12 +184,12 @@ public class OsmModuleTest {
     WayPropertySet wayPropertySet = new WayPropertySet();
 
     // where there are no way specifiers, the default is used
-    WayProperties wayData = wayPropertySet.getDataForWay(way);
-    assertEquals(wayData.getPermission(), ALL);
-    assertEquals(wayData.walkSafety().forward(), 1.0);
-    assertEquals(wayData.walkSafety().back(), 1.0);
-    assertEquals(wayData.bicycleSafety().forward(), 1.0);
-    assertEquals(wayData.bicycleSafety().back(), 1.0);
+    var wayData = wayPropertySet.getDataForWay(way);
+    assertEquals(ALL, wayData.forward().getPermission());
+    assertEquals(1.0, wayData.forward().walkSafety());
+    assertEquals(1.0, wayData.backward().walkSafety());
+    assertEquals(1.0, wayData.forward().bicycleSafety());
+    assertEquals(1.0, wayData.backward().bicycleSafety());
 
     // add two equal matches: lane only...
     OsmSpecifier lane_only = new BestMatchSpecifier("cycleway=lane");
@@ -204,9 +205,10 @@ public class OsmModuleTest {
 
     wayPropertySet.addProperties(footway_only, footways_allow_peds);
 
-    WayProperties dataForWay = wayPropertySet.getDataForWay(way);
+    var dataForWay = wayPropertySet.getDataForWay(way);
     // the first one is found
-    assertEquals(dataForWay, lane_is_safer);
+    assertEquals(lane_is_safer, dataForWay.forward());
+    assertEquals(lane_is_safer, dataForWay.backward());
 
     // add a better match
     OsmSpecifier lane_and_footway = new BestMatchSpecifier("cycleway=lane;highway=footway");
@@ -218,7 +220,7 @@ public class OsmModuleTest {
 
     wayPropertySet.addProperties(lane_and_footway, safer_and_peds);
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(dataForWay, safer_and_peds);
+    assertEquals(new WayPropertiesPair(safer_and_peds, safer_and_peds), dataForWay);
 
     // add a mixin
     BestMatchSpecifier gravel = new BestMatchSpecifier("surface=gravel");
@@ -226,7 +228,7 @@ public class OsmModuleTest {
     wayPropertySet.setMixinProperties(gravel, gravel_is_dangerous);
 
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(dataForWay.bicycleSafety().forward(), 1.5);
+    assertEquals(1.5, dataForWay.forward().bicycleSafety());
 
     // test a left-right distinction
     way = new OsmWay();
@@ -243,9 +245,9 @@ public class OsmModuleTest {
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
     // right (with traffic) comes from track
-    assertEquals(0.25, dataForWay.bicycleSafety().forward());
+    assertEquals(0.25, dataForWay.forward().bicycleSafety());
     // left comes from lane
-    assertEquals(0.75, dataForWay.bicycleSafety().back());
+    assertEquals(0.75, dataForWay.backward().bicycleSafety());
 
     way = new OsmWay();
     way.addTag("highway", "footway");

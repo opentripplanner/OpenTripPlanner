@@ -77,7 +77,8 @@ class SafetyValueNormalizer {
   void applyWayProperties(
     @Nullable StreetEdge street,
     @Nullable StreetEdge backStreet,
-    WayProperties wayData,
+    WayProperties forwardWayData,
+    WayProperties backwardWayData,
     OsmEntity way
   ) {
     OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
@@ -90,12 +91,12 @@ class SafetyValueNormalizer {
     boolean walkNoThrough = tagMapperForWay.isWalkThroughTrafficExplicitlyDisallowed(way);
 
     if (street != null) {
-      double bicycleSafety = wayData.bicycleSafety().forward();
+      double bicycleSafety = forwardWayData.bicycleSafety();
       street.setBicycleSafetyFactor((float) bicycleSafety);
       if (bicycleSafety < bestBikeSafety) {
         bestBikeSafety = (float) bicycleSafety;
       }
-      double walkSafety = wayData.walkSafety().forward();
+      double walkSafety = forwardWayData.walkSafety();
       street.setWalkSafetyFactor((float) walkSafety);
       if (walkSafety < bestWalkSafety) {
         bestWalkSafety = (float) walkSafety;
@@ -111,12 +112,12 @@ class SafetyValueNormalizer {
     }
 
     if (backStreet != null) {
-      double bicycleSafety = wayData.bicycleSafety().back();
+      double bicycleSafety = backwardWayData.bicycleSafety();
       if (bicycleSafety < bestBikeSafety) {
         bestBikeSafety = (float) bicycleSafety;
       }
       backStreet.setBicycleSafetyFactor((float) bicycleSafety);
-      double walkSafety = wayData.walkSafety().back();
+      double walkSafety = backwardWayData.walkSafety();
       if (walkSafety < bestWalkSafety) {
         bestWalkSafety = (float) walkSafety;
       }
