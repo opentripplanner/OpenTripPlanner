@@ -73,11 +73,6 @@ public class GtfsRealTimeTripUpdateAdapter {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealTimeTripUpdateAdapter.class);
 
-  /**
-   * Maximum time in seconds since midnight for arrivals and departures
-   */
-  private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
-
   /** A synchronized cache of trip patterns added to the graph due to GTFS-realtime messages. */
   private final TripPatternCache tripPatternCache = new TripPatternCache();
 
@@ -475,8 +470,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       tripBuilder.withServiceId(serviceIds.iterator().next());
     }
 
-    var tripHeadsign = tripUpdate.tripHeadsign();
-    tripHeadsign.ifPresent(tripBuilder::withHeadsign);
+    tripUpdate.tripHeadsign().ifPresent(tripBuilder::withHeadsign);
     tripUpdate.tripShortName().ifPresent(tripBuilder::withShortName);
 
     Trip trip = tripBuilder.build();
@@ -796,13 +790,8 @@ public class GtfsRealTimeTripUpdateAdapter {
     final FeedScopedId tripId,
     final LocalDate serviceDate
   ) {
-    // Preconditions
     Objects.requireNonNull(tripUpdate);
     Objects.requireNonNull(serviceDate);
-
-    //
-    // Validate modified trip
-    //
 
     // Check whether trip id already exists in graph
     Trip trip = transitEditorService.getTrip(tripId);
