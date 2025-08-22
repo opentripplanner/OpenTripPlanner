@@ -560,7 +560,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "corner of Northwest 22nd Avenue and path",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 129,
+          "generalizedCost" : 130,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 12,

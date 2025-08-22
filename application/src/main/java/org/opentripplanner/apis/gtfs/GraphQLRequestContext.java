@@ -30,7 +30,7 @@ public record GraphQLRequestContext(
       context.vehicleRentalService(),
       context.vehicleParkingService(),
       context.realtimeVehicleService(),
-      context.schema(),
+      context.gtfsSchema(),
       context.graphFinder(),
       context.defaultRouteRequest()
     );

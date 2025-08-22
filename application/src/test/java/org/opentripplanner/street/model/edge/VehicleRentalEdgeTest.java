@@ -17,6 +17,7 @@ import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -224,20 +225,20 @@ class VehicleRentalEdgeTest {
       .withArriveBy(true)
       .build();
 
-    private static final VehicleRentalVehicle RENTAL_PLACE = new VehicleRentalVehicle();
-
-    static {
-      RENTAL_PLACE.latitude = 1;
-      RENTAL_PLACE.longitude = 1;
-      RENTAL_PLACE.id = new FeedScopedId(NETWORK, "123");
-      RENTAL_PLACE.vehicleType = new RentalVehicleType(
-        new FeedScopedId(NETWORK, "scooter"),
-        "scooter",
-        SCOOTER,
-        ELECTRIC,
-        100000d
-      );
-    }
+    private static final VehicleRentalVehicle RENTAL_PLACE = VehicleRentalVehicle.of()
+      .withLatitude(1)
+      .withLongitude(1)
+      .withId(new FeedScopedId(NETWORK, "123"))
+      .withVehicleType(
+        RentalVehicleType.of()
+          .withId(new FeedScopedId(NETWORK, "scooter"))
+          .withName(I18NString.of("scooter"))
+          .withFormFactor(RentalFormFactor.SCOOTER)
+          .withPropulsionType(RentalVehicleType.PropulsionType.ELECTRIC)
+          .withMaxRangeMeters(100000d)
+          .build()
+      )
+      .build();
 
     @Test
     void startedInNoDropOffZone() {
@@ -270,7 +271,7 @@ class VehicleRentalEdgeTest {
 
     private GeofencingZoneExtension noDropOffZone() {
       return new GeofencingZoneExtension(
-        new GeofencingZone(new FeedScopedId(NETWORK, "zone"), null, true, false)
+        new GeofencingZone(new FeedScopedId(NETWORK, "zone"), null, null, true, false)
       );
     }
   }
@@ -321,7 +322,7 @@ class VehicleRentalEdgeTest {
 
     vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, formFactor);
 
-    Set<String> bannedNetworks = banNetwork ? Set.of(station.getNetwork()) : Set.of();
+    Set<String> bannedNetworks = banNetwork ? Set.of(station.network()) : Set.of();
 
     this.request = StreetSearchRequest.of()
       .withMode(mode)
@@ -346,9 +347,7 @@ class VehicleRentalEdgeTest {
 
     vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, formFactor);
 
-    Set<String> bannedNetworks = banNetwork
-      ? Set.of(this.vertex.getStation().getNetwork())
-      : Set.of();
+    Set<String> bannedNetworks = banNetwork ? Set.of(this.vertex.getStation().network()) : Set.of();
 
     this.request = StreetSearchRequest.of()
       .withMode(mode)

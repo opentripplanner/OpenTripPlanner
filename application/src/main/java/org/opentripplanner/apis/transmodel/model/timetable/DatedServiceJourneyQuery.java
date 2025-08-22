@@ -1,7 +1,5 @@
 package org.opentripplanner.apis.transmodel.model.timetable;
 
-import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDsToDomainNullSafe;
-
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
@@ -10,7 +8,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import java.time.LocalDate;
 import java.util.List;
-import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
@@ -25,21 +23,27 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
  */
 public class DatedServiceJourneyQuery {
 
-  public static GraphQLFieldDefinition createGetById(GraphQLOutputType datedServiceJourneyType) {
+  private final FeedScopedIdMapper idMapper;
+
+  public DatedServiceJourneyQuery(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
+  }
+
+  public GraphQLFieldDefinition createGetById(GraphQLOutputType datedServiceJourneyType) {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("datedServiceJourney")
       .type(datedServiceJourneyType)
       .description("Get a single dated service journey based on its id")
       .argument(GraphQLArgument.newArgument().name("id").type(Scalars.GraphQLString))
       .dataFetcher(environment -> {
-        FeedScopedId id = TransitIdMapper.mapIDToDomain(environment.getArgument("id"));
+        FeedScopedId id = idMapper.parseNullSafe(environment.getArgument("id")).orElse(null);
 
         return GqlUtil.getTransitService(environment).getTripOnServiceDate(id);
       })
       .build();
   }
 
-  public static GraphQLFieldDefinition createQuery(GraphQLOutputType datedServiceJourneyType) {
+  public GraphQLFieldDefinition createQuery(GraphQLOutputType datedServiceJourneyType) {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("datedServiceJourneys")
       .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(datedServiceJourneyType))))
@@ -90,19 +94,19 @@ public class DatedServiceJourneyQuery {
         // are pushing this check into the domain request.
         var authorities = FilterValues.ofEmptyIsEverything(
           "authorities",
-          mapIDsToDomainNullSafe(environment.getArgument("authorities"))
+          idMapper.parseListNullSafe(environment.getArgument("authorities"))
         );
         var lines = FilterValues.ofEmptyIsEverything(
           "lines",
-          mapIDsToDomainNullSafe(environment.getArgument("lines"))
+          idMapper.parseListNullSafe(environment.getArgument("lines"))
         );
         var serviceJourneys = FilterValues.ofEmptyIsEverything(
           "serviceJourneys",
-          mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"))
+          idMapper.parseListNullSafe(environment.getArgument("serviceJourneys"))
         );
         var replacementFor = FilterValues.ofEmptyIsEverything(
           "replacementFor",
-          mapIDsToDomainNullSafe(environment.getArgument("replacementFor"))
+          idMapper.parseListNullSafe(environment.getArgument("replacementFor"))
         );
         var privateCodes = FilterValues.ofEmptyIsEverything(
           "privateCodes",
