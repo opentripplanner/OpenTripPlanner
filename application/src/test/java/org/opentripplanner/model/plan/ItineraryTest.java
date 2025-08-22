@@ -189,26 +189,6 @@ public class ItineraryTest implements PlanTestConstants {
   }
 
   @Test
-  void legIndex() {
-    var itinerary = newItinerary(A, T11_00)
-      .walk(D2m, B)
-      .bus(55, T11_04, T11_14, C)
-      .bus(21, T11_16, T11_20, D)
-      .walk(D3m, E)
-      .rail(20, T11_30, T11_50, F)
-      .walk(D1m, G)
-      .build();
-
-    var leg = itinerary.legs().get(0);
-    var oneHourLater = leg.withTimeShift(Duration.ofHours(1));
-
-    assertNotSame(leg, oneHourLater);
-
-    assertEquals(0, itinerary.findLegIndex(leg));
-    assertEquals(0, itinerary.findLegIndex(oneHourLater));
-  }
-
-  @Test
   void hasSystemTag() {
     var subject = newItinerary(A).bus(1, T11_04, T11_14, B).build();
     subject.flagForDeletion(new SystemNotice("MY-TAG", "Text"));

@@ -554,14 +554,15 @@ public class StreetEdge
   }
 
   /**
-   * Return the azimuth of the first segment in this edge in integer degrees clockwise from South.
-   * TODO change everything to clockwise from North
+   * Return the azimuth of the first segment in this edge in integer degrees clockwise from North.
    */
   public int getInAngle() {
     return IntUtils.round((this.inAngle * 180) / 128.0);
   }
 
-  /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
+  /**
+   * Return the azimuth of the last segment in this edge in integer degrees clockwise from North.
+   */
   public int getOutAngle() {
     return IntUtils.round((this.outAngle * 180) / 128.0);
   }
@@ -1230,14 +1231,12 @@ public class StreetEdge
 
     /**
      * Conversion from radians to internal representation as a single signed byte.
-     * We also reorient the angles since OTP seems to use South as a reference
-     * while the azimuth functions use North.
-     * FIXME Use only North as a reference, not a mix of North and South!
+     * <p>
      * Range restriction happens automatically due to Java signed overflow behavior.
      * 180 degrees exists as a negative rather than a positive due to the integer range.
      */
     private static byte convertRadianToByte(double angleRadians) {
-      return (byte) Math.round((angleRadians * 128) / Math.PI + 128);
+      return (byte) Math.round((angleRadians * 128) / Math.PI);
     }
   }
 }

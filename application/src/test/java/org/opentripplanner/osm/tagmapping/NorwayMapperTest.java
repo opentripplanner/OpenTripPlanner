@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.wayproperty.SafetyFeatures;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class NorwayMapperTest {
@@ -167,5 +168,29 @@ public class NorwayMapperTest {
     way2.addTag("motorroad", "yes");
 
     assertEquals(StreetTraversalPermission.CAR, wps.getDataForWay(way2).getPermission());
+  }
+
+  @Test
+  public void testFootway() {
+    assertEquals(
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForWay(WayTestData.footway()).getPermission()
+    );
+  }
+
+  @Test
+  public void testCycleway() {
+    assertEquals(
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForWay(WayTestData.cycleway()).getPermission()
+    );
+  }
+
+  @Test
+  public void testBridleway() {
+    assertEquals(
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForWay(WayTestData.bridleway()).getPermission()
+    );
   }
 }
