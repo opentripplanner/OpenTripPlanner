@@ -253,6 +253,8 @@ type EstimatedCall {
   "Whether vehicle will only stop on request."
   requestStop: Boolean!
   serviceJourney: ServiceJourney!
+  "All estimated calls for the ServiceJourney on this date."
+  serviceJourneyEstimatedCalls: [EstimatedCall!]!
   "Get all relevant situations for this EstimatedCall."
   situations: [PtSituationElement!]! @timingData
   stopPositionInPattern: Int!
