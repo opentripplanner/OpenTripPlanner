@@ -93,8 +93,8 @@ public final class WalkPreferences implements Serializable {
   }
 
   /**
-   * Used on top of reluctance for stairs. If the value is set to 1, walking on stairs is treated
-   * the same as walking on flat ground.
+   * Used on top of {@link #reluctance()} for stairs. If the value is set to 1, walking on stairs is
+   * treated the same as walking on flat ground.
    */
   public double stairsReluctance() {
     return stairsReluctance;

@@ -1,6 +1,8 @@
 package org.opentripplanner.street.model.edge;
 
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
+import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.street.search.TraverseMode;
 
 class StreetEdgeReluctanceCalculator {
@@ -20,9 +22,8 @@ class StreetEdgeReluctanceCalculator {
   ) {
     return switch (traverseMode) {
       case WALK -> walkingBike
-        ? pref.bike().walking().reluctance() *
-        (edgeIsStairs ? pref.bike().walking().stairsReluctance() : 1)
-        : pref.walk().reluctance() * (edgeIsStairs ? pref.walk().stairsReluctance() : 1);
+        ? computeBikeWalkingReluctance(pref.bike().walking(), edgeIsStairs)
+        : computeWalkReluctance(pref.walk(), edgeIsStairs);
       case BICYCLE -> pref.bike().reluctance();
       case CAR -> pref.car().reluctance();
       case SCOOTER -> pref.scooter().reluctance();
@@ -30,6 +31,17 @@ class StreetEdgeReluctanceCalculator {
         "getReluctance(): Invalid mode " + traverseMode
       );
     };
+  }
+
+  private static double computeWalkReluctance(WalkPreferences pref, boolean edgeIsStairs) {
+    return pref.reluctance() * (edgeIsStairs ? pref.stairsReluctance() : 1);
+  }
+
+  private static double computeBikeWalkingReluctance(
+    VehicleWalkingPreferences pref,
+    boolean edgeIsStairs
+  ) {
+    return pref.reluctance() * (edgeIsStairs ? pref.stairsReluctance() : 1);
   }
 
   static double computeWheelchairReluctance(

@@ -842,7 +842,7 @@ public class RouteRequestConfig {
           .of("stairsReluctance")
           .since(V2_0)
           .summary(
-            "A multiplier to specify how bad walking on stairs is, compared to walking on flat ground."
+            "A multiplier to specify how bad walking on stairs is, on top of the reluctance parameter."
           )
           .asDouble(dft.stairsReluctance())
       )

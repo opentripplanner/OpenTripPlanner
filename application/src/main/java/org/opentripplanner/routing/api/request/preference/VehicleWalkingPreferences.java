@@ -28,7 +28,7 @@ public class VehicleWalkingPreferences implements Serializable {
     this.reluctance = 5.0;
     this.mountDismountTime = Duration.ZERO;
     this.mountDismountCost = Cost.ZERO;
-    // multiplicative factor to carry the bike up/down a flight of stairs on top of the base value
+    // multiplicative factor to carry the bike up/down a flight of stairs on top of the walk reluctance
     this.stairsReluctance = 2;
   }
 
