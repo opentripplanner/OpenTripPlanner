@@ -58,7 +58,7 @@ public class GbfsStationStatusMapper {
       ? status.getNumDocksAvailable()
       : Integer.MAX_VALUE;
 
-    var vehicleSpacesAvailable = vehicleSpaces(station, status, spacesAvailable);
+    var vehicleSpacesAvailable = vehicleSpaces(status);
 
     int spacesDisabled = status.getNumDocksDisabled() != null ? status.getNumDocksDisabled() : 0;
 
@@ -82,17 +82,9 @@ public class GbfsStationStatusMapper {
   /**
    * Extract the available parking places from a variety of potentially incomplete information.
    */
-  private Map<RentalVehicleType, Integer> vehicleSpaces(
-    VehicleRentalStation station,
-    GBFSStation status,
-    int spacesAvailable
-  ) {
-    var typesAvailable = status.getVehicleTypesAvailable();
+  private Map<RentalVehicleType, Integer> vehicleSpaces(GBFSStation status) {
     var docksAvailable = status.getVehicleDocksAvailable();
-    if (docksAvailable == null && typesAvailable == null) {
-      // no per-type information available at all, assume it's bicycle
-      return Map.of(RentalVehicleType.getDefaultType(station.network()), spacesAvailable);
-    } else if (docksAvailable != null) {
+    if (docksAvailable != null) {
       return docksAvailable
         .stream()
         .flatMap(available ->

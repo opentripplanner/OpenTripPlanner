@@ -131,11 +131,7 @@ class GbfsStationStatusMapperTest {
     );
 
     var mapped = mapper.mapStationStatus(STATION);
-    var bikeType = RentalVehicleType.getDefaultType("F");
-    assertEquals(
-      new RentalVehicleEntityCounts(1, List.of(new RentalVehicleTypeCount(bikeType, 1))),
-      mapped.vehicleSpaceCounts()
-    );
+    assertEquals(new RentalVehicleEntityCounts(1, List.of()), mapped.vehicleSpaceCounts());
     assertEquals(Set.of(BICYCLE), mapped.formFactors());
     assertSame(ReturnPolicy.ANY_TYPE, mapped.returnPolicy());
     assertDropOffForAnyType(mapped);
