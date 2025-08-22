@@ -12,6 +12,7 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleDocksAvailable;
@@ -145,8 +146,10 @@ class GbfsStationStatusMapperTest {
   }
 
   private static void assertDropOffForAnyType(VehicleRentalStation mapped) {
-    assertTrue(mapped.canDropOffFormFactor(BICYCLE, false));
-    assertTrue(mapped.canDropOffFormFactor(CAR, false));
-    assertTrue(mapped.canDropOffFormFactor(SCOOTER, false));
+    Stream.of(true, false).forEach(realtime -> {
+      assertTrue(mapped.canDropOffFormFactor(BICYCLE, realtime));
+      assertTrue(mapped.canDropOffFormFactor(CAR, realtime));
+      assertTrue(mapped.canDropOffFormFactor(SCOOTER, realtime));
+    });
   }
 }
