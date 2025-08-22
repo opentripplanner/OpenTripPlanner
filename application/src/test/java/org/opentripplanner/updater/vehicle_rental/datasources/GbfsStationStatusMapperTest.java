@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleDocksAvailable;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleTypesAvailable;
@@ -25,6 +27,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
 import org.opentripplanner.service.vehiclerental.model.ReturnPolicy;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.street.model.RentalFormFactor;
 
 class GbfsStationStatusMapperTest {
 
@@ -146,8 +149,9 @@ class GbfsStationStatusMapperTest {
     assertDropOffForAnyType(mapped);
   }
 
-  @Test
-  void noSpaces() {
+  @ParameterizedTest
+  @EnumSource(RentalFormFactor.class)
+  void noSpaces(RentalFormFactor formFactor) {
     var gbfsStation = station();
     gbfsStation.setNumDocksAvailable(0);
     gbfsStation.setNumBikesAvailable(4);
@@ -162,13 +166,8 @@ class GbfsStationStatusMapperTest {
     assertEquals(Set.of(BICYCLE), mapped.formFactors());
     assertSame(ANY_TYPE, mapped.returnPolicy());
 
-    assertFalse(mapped.canDropOffFormFactor(BICYCLE, true));
-    assertFalse(mapped.canDropOffFormFactor(CAR, true));
-    assertFalse(mapped.canDropOffFormFactor(SCOOTER, true));
-
-    assertTrue(mapped.canDropOffFormFactor(BICYCLE, false));
-    assertTrue(mapped.canDropOffFormFactor(CAR, false));
-    assertTrue(mapped.canDropOffFormFactor(SCOOTER, false));
+    assertFalse(mapped.canDropOffFormFactor(formFactor, true));
+    assertTrue(mapped.canDropOffFormFactor(formFactor, false));
   }
 
   private static GBFSStation station() {
