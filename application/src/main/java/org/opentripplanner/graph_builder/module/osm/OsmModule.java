@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.BARRIER_VERTEX;
+import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.NORMAL;
 import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
 import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
 import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
@@ -427,7 +427,7 @@ public class OsmModule implements GraphBuilderModule {
         if (startEndpoint == null) { // first iteration on this way
           // make or get a shared vertex for flat intersections,
           // one vertex per level for multilevel nodes like elevators
-          startEndpoint = vertexGenerator.getVertexForOsmNode(osmStartNode, way, BARRIER_VERTEX);
+          startEndpoint = vertexGenerator.getVertexForOsmNode(osmStartNode, way, NORMAL);
           String ele = segmentStartOsmNode.getTag("ele");
           if (ele != null) {
             Double elevation = ElevationUtils.parseEleTag(ele);
@@ -439,7 +439,7 @@ public class OsmModule implements GraphBuilderModule {
           startEndpoint = endEndpoint;
         }
 
-        endEndpoint = vertexGenerator.getVertexForOsmNode(osmEndNode, way, BARRIER_VERTEX);
+        endEndpoint = vertexGenerator.getVertexForOsmNode(osmEndNode, way, NORMAL);
         String ele = osmEndNode.getTag("ele");
         if (ele != null) {
           Double elevation = ElevationUtils.parseEleTag(ele);

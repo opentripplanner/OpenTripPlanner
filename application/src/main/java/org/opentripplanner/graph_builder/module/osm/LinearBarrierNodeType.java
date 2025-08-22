@@ -7,8 +7,8 @@ enum LinearBarrierNodeType {
    */
   SPLIT,
   /**
-   * Create a barrier vertex for the node on the linear barrier. Used when the barrier cuts through
-   * a linear highway.
+   * Create a normal vertex for the node on the linear barrier with an issue generated.
+   * Used when the barrier cuts through a linear highway.
    */
-  BARRIER_VERTEX,
+  NORMAL,
 }

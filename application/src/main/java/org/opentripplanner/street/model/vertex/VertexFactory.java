@@ -125,7 +125,7 @@ public class VertexFactory {
 
   public OsmVertex osmOnLinearBarrier(OsmNode node, OsmEntity routableWay) {
     return addToGraph(
-      new OsmVertexOnWay(
+      new BarrierPassThroughVertex(
         node.getCoordinate().x,
         node.getCoordinate().y,
         node.getId(),

@@ -4,28 +4,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.BARRIER_VERTEX;
+import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.NORMAL;
 import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.BarrierIntersectingHighway;
 import org.opentripplanner.graph_builder.issues.DifferentLevelsSharingBarrier;
-import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
+import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
-import org.opentripplanner.street.model.vertex.OsmVertexOnWay;
 
 class VertexGeneratorTest {
 
@@ -112,10 +109,10 @@ class VertexGeneratorTest {
     assertNotEquals(vertexForW1OnBarrier, vertexForW2OnBarrier);
     assertEquals(vertexForW1NotOnBarrier, vertexForW2NotOnBarrier);
 
-    assertInstanceOf(OsmVertexOnWay.class, vertexForW2OnBarrier);
-    assertEquals(n3.getId(), ((OsmVertexOnWay) vertexForW2OnBarrier).nodeId);
-    assertEquals(w2.getId(), ((OsmVertexOnWay) vertexForW2OnBarrier).wayId);
-    assertFalse(vertexForW2NotOnBarrier instanceof OsmVertexOnWay);
+    assertInstanceOf(BarrierPassThroughVertex.class, vertexForW2OnBarrier);
+    assertEquals(n3.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).nodeId);
+    assertEquals(w2.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).wayId);
+    assertFalse(vertexForW2NotOnBarrier instanceof BarrierPassThroughVertex);
 
     Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers =
       subject.splitVerticesOnBarriers();
@@ -125,10 +122,18 @@ class VertexGeneratorTest {
       splitVerticesOnBarriers.get(n3)
     );
 
-    var barrierVertexOnBarrier = subject.getVertexForOsmNode(n3, w1, BARRIER_VERTEX);
-    assertInstanceOf(BarrierVertex.class, barrierVertexOnBarrier);
-    assertEquals(PEDESTRIAN, ((BarrierVertex) barrierVertexOnBarrier).getBarrierPermissions());
-    var barrierVertexNotOnBarrier = subject.getVertexForOsmNode(n10, w1, BARRIER_VERTEX);
+    assertEquals(
+      0,
+      issueStore.listIssues().stream().filter(x -> x instanceof BarrierIntersectingHighway).count()
+    );
+    var barrierVertexOnBarrier = subject.getVertexForOsmNode(n3, w1, NORMAL);
+    assertInstanceOf(OsmVertex.class, barrierVertexOnBarrier);
+    assertFalse(barrierVertexOnBarrier instanceof BarrierVertex);
+    assertEquals(
+      1,
+      issueStore.listIssues().stream().filter(x -> x instanceof BarrierIntersectingHighway).count()
+    );
+    var barrierVertexNotOnBarrier = subject.getVertexForOsmNode(n10, w1, NORMAL);
     assertFalse(barrierVertexNotOnBarrier instanceof BarrierVertex);
 
     subject.getVertexForOsmNode(n4, w1, SPLIT);

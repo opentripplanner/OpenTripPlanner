@@ -25,8 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.BarrierIntersectingHighway;
 import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
@@ -52,10 +52,10 @@ import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParking
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
-import org.opentripplanner.street.model.vertex.OsmVertexOnWay;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
@@ -392,20 +392,25 @@ public class OsmModuleTest {
     );
 
     var graph = new Graph();
+    var issueStore = new DefaultDataImportIssueStore();
     var subject = OsmModule.of(
       osmProvider,
       graph,
       new DefaultOsmInfoGraphBuildRepository(),
       new DefaultVehicleParkingRepository()
-    ).build();
+    )
+      .withIssueStore(issueStore)
+      .build();
     subject.buildGraph();
 
     assertEquals(3, graph.getVertices().size());
     var barrierVertices = graph.getVerticesOfType(BarrierVertex.class);
-    assertEquals(1, barrierVertices.size());
-    BarrierVertex barrierVertex = barrierVertices.getFirst();
-    assertEquals(NONE, barrierVertex.getBarrierPermissions());
-    assertEquals(NOT_POSSIBLE, barrierVertex.wheelchairAccessibility());
+    assertEquals(0, barrierVertices.size());
+    var issues = issueStore
+      .listIssues()
+      .stream()
+      .filter(issue -> issue instanceof BarrierIntersectingHighway);
+    assertEquals(1, issues.count());
   }
 
   @Test
@@ -467,8 +472,7 @@ public class OsmModuleTest {
     // way
     Collection<Vertex> vertices = graph.getVertices();
     assertEquals(7, vertices.size());
-    assertEquals(3, graph.getVerticesOfType(OsmVertexOnWay.class).size());
-    assertEquals(1, graph.getVerticesOfType(BarrierVertex.class).size());
+    assertEquals(3, graph.getVerticesOfType(BarrierPassThroughVertex.class).size());
     assertEquals(
       2,
       graph.getVerticesOfType(OsmVertex.class).stream().filter(v -> v.nodeId == 1).toList().size()
@@ -484,16 +488,14 @@ public class OsmModuleTest {
     assertEquals(1, v2.getOutgoing().size());
     // we first reach the barrier crossing on the path at v1
     var v1OnPath = v2.getOutgoingStreetEdges().getFirst().getToVertex();
-    assertInstanceOf(BarrierVertex.class, v1OnPath);
-    assertEquals(1, ((BarrierVertex) v1OnPath).nodeId);
-    assertEquals(PEDESTRIAN, ((BarrierVertex) v1OnPath).getBarrierPermissions());
+    assertInstanceOf(OsmVertex.class, v1OnPath);
     // at that barrier crossing, we can either return to the origin or enter the area
     assertEquals(2, v1OnPath.getOutgoing().size());
     // we then enter the area
     var barrierCrossing = v1OnPath
       .getOutgoingStreetEdges()
       .stream()
-      .filter(e -> e.getToVertex() instanceof OsmVertexOnWay)
+      .filter(e -> e.getToVertex() instanceof BarrierPassThroughVertex)
       .findFirst()
       .orElseThrow();
     assertEquals(PEDESTRIAN, barrierCrossing.getPermission());
@@ -534,11 +536,13 @@ public class OsmModuleTest {
 
     var w1 = new OsmWay();
     w1.setId(1);
-    w1.addTag("highway", "path");
+    w1.addTag("highway", "pedestrian");
     w1.addTag("level", "0");
+    w1.addTag("area", "yes");
     w1.addNodeRef(4);
     w1.addNodeRef(5);
     w1.addNodeRef(1);
+    w1.addNodeRef(4);
 
     var w2 = new OsmWay();
     w2.setId(2);
@@ -553,11 +557,13 @@ public class OsmModuleTest {
 
     var w3 = new OsmWay();
     w3.setId(3);
-    w3.addTag("highway", "path");
+    w3.addTag("highway", "pedestrian");
     w3.addTag("level", "1");
+    w3.addTag("area", "yes");
     w3.addNodeRef(4);
     w3.addNodeRef(6);
     w3.addNodeRef(1);
+    w3.addNodeRef(4);
 
     var issueStore = new DefaultDataImportIssueStore();
     var osmProvider = new TestOsmProvider(

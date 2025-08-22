@@ -1,13 +1,13 @@
 package org.opentripplanner.street.model.vertex;
 
 /**
- * This vertex is created for a node on a particular way
+ * This vertex is created for a node where a barrier runs along the edge of an area.
  */
-public class OsmVertexOnWay extends OsmVertex {
+public class BarrierPassThroughVertex extends OsmVertex {
 
   public final long wayId;
 
-  public OsmVertexOnWay(double x, double y, long nodeId, long wayId) {
+  public BarrierPassThroughVertex(double x, double y, long nodeId, long wayId) {
     super(x, y, nodeId);
     this.wayId = wayId;
   }

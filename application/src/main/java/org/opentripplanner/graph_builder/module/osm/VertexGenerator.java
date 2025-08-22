@@ -15,6 +15,7 @@ import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.BarrierIntersectingHighway;
 import org.opentripplanner.graph_builder.issues.DifferentLevelsSharingBarrier;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
@@ -50,7 +51,8 @@ class VertexGenerator {
    * The levels of the ways connecting barrier nodes. Used for issue reporting only.
    */
   private final Multimap<OsmNode, OsmLevel> levelsConnectingBarriers = HashMultimap.create();
-  private final Set<OsmNode> reportedNodes = new HashSet<>();
+  private final Set<OsmNode> reportedLevelBarrierNodes = new HashSet<>();
+  private final Set<OsmNode> reportedLinearBarrierCrossings = new HashSet<>();
 
   /**
    * The map from node to the split vertex for each routable way connecting it.
@@ -143,36 +145,17 @@ class VertexGenerator {
         );
       }
 
-      if (iv == null && (node.isBarrier() || isNodeOnLinearBarrier)) {
+      if (iv == null && node.isBarrier()) {
         iv = vertexFactory.barrier(nid, coordinate, node.explicitWheelchairAccessibility());
       }
 
       if (iv instanceof BarrierVertex bv) {
-        if (node.isBarrier()) {
-          bv.setBarrierPermissions(
-            node.overridePermissions(BarrierVertex.defaultBarrierPermissions)
-          );
-          if (
-            bv.wheelchairAccessibility() == Accessibility.NO_INFORMATION &&
-            !node.isWheelchairAccessible()
-          ) {
-            bv.setWheelchairAccessibility(Accessibility.NOT_POSSIBLE);
-          }
-        } else if (isNodeOnLinearBarrier) {
-          for (var barrier : nodesInBarrierWays.get(node)) {
-            bv.setBarrierPermissions(
-              Objects.requireNonNull(barrier).overridePermissions(bv.getBarrierPermissions())
-            );
-            if (
-              bv.wheelchairAccessibility() == Accessibility.NO_INFORMATION &&
-              !barrier.isWheelchairAccessible()
-            ) {
-              bv.setWheelchairAccessibility(Accessibility.NOT_POSSIBLE);
-            }
-          }
-          splitVerticesOnBarriers.putIfAbsent(node, new HashMap<>());
-          var vertices = splitVerticesOnBarriers.get(node);
-          vertices.put(null, bv);
+        bv.setBarrierPermissions(node.overridePermissions(BarrierVertex.defaultBarrierPermissions));
+        if (
+          bv.wheelchairAccessibility() == Accessibility.NO_INFORMATION &&
+          !node.isWheelchairAccessible()
+        ) {
+          bv.setWheelchairAccessibility(Accessibility.NOT_POSSIBLE);
         }
       }
 
@@ -185,6 +168,17 @@ class VertexGenerator {
 
     if (iv instanceof BarrierVertex) {
       checkLevelOnBarrier(node, way);
+    }
+
+    if (isNodeOnLinearBarrier && iv instanceof OsmVertex ov) {
+      splitVerticesOnBarriers.putIfAbsent(node, new HashMap<>());
+      var vertices = splitVerticesOnBarriers.get(node);
+      vertices.put(null, ov);
+
+      if (!node.isBarrier() && !reportedLinearBarrierCrossings.contains(node)) {
+        issueStore.add(new BarrierIntersectingHighway(node));
+        reportedLinearBarrierCrossings.add(node);
+      }
     }
 
     return iv;
@@ -212,11 +206,11 @@ class VertexGenerator {
 
   private void checkLevelOnBarrier(OsmNode nodeOnBarrier, OsmEntity way) {
     var level = osmdb.getLevelForWay(way);
-    if (!reportedNodes.contains(nodeOnBarrier)) {
+    if (!reportedLevelBarrierNodes.contains(nodeOnBarrier)) {
       var existingLevels = levelsConnectingBarriers.get(nodeOnBarrier);
       if (existingLevels.stream().anyMatch(l -> !Objects.requireNonNull(l).equals(level))) {
         issueStore.add(new DifferentLevelsSharingBarrier(nodeOnBarrier));
-        reportedNodes.add(nodeOnBarrier);
+        reportedLevelBarrierNodes.add(nodeOnBarrier);
       }
     }
     levelsConnectingBarriers.put(nodeOnBarrier, level);

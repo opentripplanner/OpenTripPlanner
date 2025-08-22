@@ -6,12 +6,12 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.osm.model.OsmNode;
 
-public record DifferentLevelsSharingBarrier(OsmNode node) implements DataImportIssue {
+public record BarrierIntersectingHighway(OsmNode node) implements DataImportIssue {
   private static final String FMT =
-    "Node %d is a barrier node but ways on different layers / levels are connected to it. Please check if the barrier actually blocks traversal, if not, please remove the node from the barrier.";
+    "Node %d is the intersection of a linear barrier and a linear highway but it doesn't have barrier tags on it. According to the OpenStreetMap Wiki, such mapping is ambiguous. Please check if traversal is possible across the barrier and add the appropriate tags on the node.";
 
   private static final String HTMLFMT =
-    "<a href='%s'>Node %d</a> is a barrier node but ways on different layers / levels are connected to it. Please check if the barrier actually blocks traversal, if not, please remove the node from the barrier.";
+    "<a href='%s'>Node %d</a> is the intersection of a linear barrier and a linear highway but it doesn't have barrier tags on it. According to the <a href='https://wiki.openstreetmap.org/wiki/Barriers'>OpenStreetMap Wiki</a>, such mapping is ambiguous. Please check if traversal is possible across the barrier and add the appropriate tags on the node.";
 
   @Override
   public String getHTMLMessage() {
