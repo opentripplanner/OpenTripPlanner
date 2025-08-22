@@ -37,7 +37,7 @@ class StreetEdgeGeofencingTest {
   static String NETWORK_BIRD = "bird-oslo";
   static RentalRestrictionExtension NO_DROP_OFF_TIER = noDropOffRestriction(NETWORK_TIER);
   static RentalRestrictionExtension NO_TRAVERSAL = new GeofencingZoneExtension(
-    new GeofencingZone(new FeedScopedId(NETWORK_TIER, "a-park"), null, false, true)
+    new GeofencingZone(new FeedScopedId(NETWORK_TIER, "a-park"), null, null, false, true)
   );
   StreetVertex V1 = intersectionVertex("V1", 0, 0);
   StreetVertex V2 = intersectionVertex("V2", 1, 1);
@@ -120,7 +120,7 @@ class StreetEdgeGeofencingTest {
       var edge = streetEdge(V1, V2);
       V2.addRentalRestriction(
         new GeofencingZoneExtension(
-          new GeofencingZone(new FeedScopedId(NETWORK_TIER, "a-park"), null, true, true)
+          new GeofencingZone(new FeedScopedId(NETWORK_TIER, "a-park"), null, null, true, true)
         )
       );
       State result = traverseFromV1(edge)[0];
@@ -442,7 +442,7 @@ class StreetEdgeGeofencingTest {
 
   private static GeofencingZoneExtension noDropOffRestriction(String networkTier) {
     return new GeofencingZoneExtension(
-      new GeofencingZone(new FeedScopedId(networkTier, "a-park"), null, true, false)
+      new GeofencingZone(new FeedScopedId(networkTier, "a-park"), null, null, true, false)
     );
   }
 

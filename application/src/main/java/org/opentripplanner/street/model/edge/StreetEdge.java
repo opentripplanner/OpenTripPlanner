@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.locationtech.jts.geom.LineString;
@@ -22,8 +19,6 @@ import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.TurnRestriction;
-import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
@@ -558,14 +553,15 @@ public class StreetEdge
   }
 
   /**
-   * Return the azimuth of the first segment in this edge in integer degrees clockwise from South.
-   * TODO change everything to clockwise from North
+   * Return the azimuth of the first segment in this edge in integer degrees clockwise from North.
    */
   public int getInAngle() {
     return IntUtils.round((this.inAngle * 180) / 128.0);
   }
 
-  /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
+  /**
+   * Return the azimuth of the last segment in this edge in integer degrees clockwise from North.
+   */
   public int getOutAngle() {
     return IntUtils.round((this.outAngle * 180) / 128.0);
   }
@@ -1037,10 +1033,6 @@ public class StreetEdge
         turnDuration = 0;
       }
 
-      if (!traverseMode.isInCar()) {
-        s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
-      }
-
       time_ms += (long) Math.ceil(1000.0 * turnDuration);
       weight += preferences.street().turnReluctance() * turnDuration;
     }
@@ -1231,14 +1223,12 @@ public class StreetEdge
 
     /**
      * Conversion from radians to internal representation as a single signed byte.
-     * We also reorient the angles since OTP seems to use South as a reference
-     * while the azimuth functions use North.
-     * FIXME Use only North as a reference, not a mix of North and South!
+     * <p>
      * Range restriction happens automatically due to Java signed overflow behavior.
      * 180 degrees exists as a negative rather than a positive due to the integer range.
      */
     private static byte convertRadianToByte(double angleRadians) {
-      return (byte) Math.round((angleRadians * 128) / Math.PI + 128);
+      return (byte) Math.round((angleRadians * 128) / Math.PI);
     }
   }
 }

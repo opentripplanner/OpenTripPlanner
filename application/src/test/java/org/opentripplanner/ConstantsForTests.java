@@ -12,13 +12,14 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
-import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
@@ -349,25 +350,27 @@ public class ConstantsForTests {
 
   private static void addPortlandVehicleRentals(Graph graph) {
     try {
-      VertexLinker linker = graph.getLinker();
+      VertexLinker linker = TestVertexLinker.of(graph);
       CsvReader reader = new CsvReader(PORTLAND_BIKE_SHARE_CSV, ',', StandardCharsets.UTF_8);
       reader.readHeaders();
       while (reader.readRecord()) {
-        VehicleRentalStation station = new VehicleRentalStation();
-        station.id = new FeedScopedId(reader.get("network"), reader.get("osm_id"));
-        station.latitude = Double.parseDouble(reader.get("lat"));
-        station.longitude = Double.parseDouble(reader.get("lon"));
-        station.name = new NonLocalizedString(reader.get("osm_id"));
         RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(reader.get("network"));
         Map<RentalVehicleType, Integer> availability = Map.of(vehicleType, 2);
-        station.vehicleTypesAvailable = availability;
-        station.vehicleSpacesAvailable = availability;
-        station.realTimeData = false;
-        station.isArrivingInRentalVehicleAtDestinationAllowed = true;
+
+        VehicleRentalStation station = VehicleRentalStation.of()
+          .withId(new FeedScopedId(reader.get("network"), reader.get("osm_id")))
+          .withLatitude(Double.parseDouble(reader.get("lat")))
+          .withLongitude(Double.parseDouble(reader.get("lon")))
+          .withName(new NonLocalizedString(reader.get("osm_id")))
+          .withVehicleTypesAvailable(availability)
+          .withVehicleSpacesAvailable(availability)
+          .withRealTimeData(false)
+          .withIsArrivingInRentalVehicleAtDestinationAllowed(true)
+          .build();
 
         VehicleRentalPlaceVertex stationVertex = new VehicleRentalPlaceVertex(station);
         graph.addVertex(stationVertex);
-        VehicleRentalEdge.createVehicleRentalEdge(stationVertex, vehicleType.formFactor);
+        VehicleRentalEdge.createVehicleRentalEdge(stationVertex, vehicleType.formFactor());
 
         linker.linkVertexPermanently(
           stationVertex,

@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.timetable.StopRealTimeState;
  * not stop delay propagation, but updates with schedule relationships of SCHEDULED (also the
  * default value if schedule relationship is not provided) or NO_DATA will.
  */
-public class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
+class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
 
   @Override
   public boolean interpolateDelay(RealTimeTripTimesBuilder builder) {

@@ -27,6 +27,7 @@ import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
+import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -413,7 +414,7 @@ class WalkableAreaBuilder {
 
   private WayProperties findAreaProperties(OsmEntity entity) {
     if (!wayPropertiesCache.containsKey(entity)) {
-      var wayData = entity.getOsmProvider().getWayPropertySet().getDataForEntity(entity, null);
+      var wayData = entity.getOsmProvider().getWayPropertySet().getDataForEntity(entity);
       wayPropertiesCache.put(entity, wayData);
       return wayData;
     } else {
@@ -490,7 +491,10 @@ class WalkableAreaBuilder {
       vertex2.getLabel()
     );
 
-    float carSpeed = parent.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(parent, null);
+    float carSpeed = parent
+      .getOsmProvider()
+      .getOsmTagMapper()
+      .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS);
 
     I18NString name = namer.getNameForWay(parent, label);
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()

@@ -5,6 +5,9 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
+import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
+import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
+import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
@@ -21,6 +24,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -68,7 +72,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final LuceneIndex luceneIndex;
 
   @Nullable
-  private final GraphQLSchema schema;
+  private final GraphQLSchema gtfsSchema;
+
+  @Nullable
+  private final GraphQLSchema transmodelSchema;
 
   @Nullable
   private final SorlandsbanenNorwayService sorlandsbanenService;
@@ -82,6 +89,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final TriasApiParameters triasApiParameters;
 
   private final GtfsApiParameters gtfsApiParameters;
+
+  private final TransmodelAPIParameters transmodelAPIParameters;
+
+  private final VertexLinker vertexLinker;
 
   /* Lazy initialized fields */
 
@@ -110,14 +121,17 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VectorTileConfig vectorTileConfig,
     VehicleParkingService vehicleParkingService,
     VehicleRentalService vehicleRentalService,
+    VertexLinker vertexLinker,
     ViaCoordinateTransferFactory viaTransferResolver,
     WorldEnvelopeService worldEnvelopeService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
     @Nullable LuceneIndex luceneIndex,
-    @Nullable GraphQLSchema schema,
+    @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
+    @Nullable @TransmodelSchema GraphQLSchema transmodelSchema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     @Nullable StopConsolidationService stopConsolidationService,
-    @Nullable TraverseVisitor traverseVisitor
+    @Nullable TraverseVisitor traverseVisitor,
+    TransmodelAPIParameters transmodelAPIParameters
   ) {
     this.debugUiConfig = debugUiConfig;
     this.flexParameters = flexParameters;
@@ -131,21 +145,24 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
+    this.transmodelSchema = transmodelSchema;
     this.triasApiParameters = triasApiParameters;
     this.gtfsApiParameters = gtfsApiParameters;
     this.vectorTileConfig = vectorTileConfig;
     this.vehicleParkingService = vehicleParkingService;
     this.vehicleRentalService = vehicleRentalService;
+    this.vertexLinker = vertexLinker;
     this.viaTransferResolver = viaTransferResolver;
     this.worldEnvelopeService = worldEnvelopeService;
 
     // Optional fields
     this.emissionItineraryDecorator = emissionItineraryDecorator;
     this.luceneIndex = luceneIndex;
-    this.schema = schema;
+    this.gtfsSchema = gtfsSchema;
     this.sorlandsbanenService = sorlandsbanenService;
     this.stopConsolidationService = stopConsolidationService;
     this.traverseVisitor = traverseVisitor;
+    this.transmodelAPIParameters = transmodelAPIParameters;
   }
 
   @Override
@@ -215,8 +232,14 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Nullable
   @Override
-  public GraphQLSchema schema() {
-    return schema;
+  public GraphQLSchema gtfsSchema() {
+    return gtfsSchema;
+  }
+
+  @Nullable
+  @Override
+  public GraphQLSchema transmodelSchema() {
+    return transmodelSchema;
   }
 
   @Override
@@ -264,6 +287,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     return gtfsApiParameters;
   }
 
+  @Override
+  public TransmodelAPIParameters transmodelAPIParameters() {
+    return transmodelAPIParameters;
+  }
+
   @Nullable
   @Override
   public LuceneIndex lucenceIndex() {
@@ -283,5 +311,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public FareService fareService() {
     return fareService;
+  }
+
+  @Override
+  public VertexLinker vertexLinker() {
+    return vertexLinker;
   }
 }

@@ -79,8 +79,16 @@ public class OsmMapperDocTest {
       propTable.addRow(
         "`%s`".formatted(prop.specifier().toDocString()),
         "`%s`".formatted(prop.properties().getPermission()),
-        tableValues(prop.properties().bicycleSafety()),
-        tableValues(prop.properties().walkSafety())
+        tableValues(
+          prop.properties().bicycleSafety(),
+          prop.forwardProperties().bicycleSafety(),
+          prop.backwardProperties().bicycleSafety()
+        ),
+        tableValues(
+          prop.properties().walkSafety(),
+          prop.forwardProperties().walkSafety(),
+          prop.backwardProperties().walkSafety()
+        )
       );
     }
     return propTable.build();
@@ -94,26 +102,18 @@ public class OsmMapperDocTest {
       propTable.addRow(
         "`%s`".formatted(prop.specifier().toDocString()),
         tableValues(
-          prop.defaultProperties().bicycleSafety(),
+          prop.directionlessProperties().bicycleSafety(),
           prop.forwardProperties().bicycleSafety(),
           prop.backwardProperties().bicycleSafety()
         ),
         tableValues(
-          prop.defaultProperties().walkSafety(),
+          prop.directionlessProperties().walkSafety(),
           prop.forwardProperties().walkSafety(),
           prop.backwardProperties().walkSafety()
         )
       );
     }
     return propTable.build();
-  }
-
-  private static String tableValues(double value) {
-    if (value == 1.0) {
-      return "";
-    } else {
-      return Double.toString(value);
-    }
   }
 
   private static String tableValues(double value, double forward, double backward) {

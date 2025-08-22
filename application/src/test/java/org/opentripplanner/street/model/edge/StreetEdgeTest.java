@@ -3,7 +3,6 @@ package org.opentripplanner.street.model.edge;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
@@ -11,7 +10,6 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.intersec
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdgeBuilder;
 
-import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -25,7 +23,6 @@ import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
@@ -35,7 +32,6 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.state.StateData;
 
 public class StreetEdgeTest {
 
@@ -68,15 +64,15 @@ public class StreetEdgeTest {
     StreetEdge e1 = streetEdge(v1, v2, 1.0, ALL);
 
     // Edge has same first and last angle.
-    assertEquals(90, e1.getInAngle());
-    assertEquals(90, e1.getOutAngle());
+    assertEquals(-90, e1.getInAngle());
+    assertEquals(-90, e1.getOutAngle());
 
     // 2 new ones
     StreetVertex u = intersectionVertex("test1", 1.0, 2.0);
     StreetVertex v = intersectionVertex("test2", 2.0, 2.0);
 
-    // Second edge, heading straight North
-    StreetEdge e2 = streetEdge(u, v, 1.0, ALL);
+    // Second edge, heading straight South
+    StreetEdge e2 = streetEdge(v, u, 1.0, ALL);
 
     // 180 degrees could be expressed as 180 or -180. Our implementation happens to use -180.
     assertEquals(180, Math.abs(e2.getInAngle()));
@@ -202,6 +198,25 @@ public class StreetEdgeTest {
 
     assertEquals(57, s2.getElapsedTimeSeconds());
     assertEquals(57, s5.getElapsedTimeSeconds());
+  }
+
+  /**
+   * Test that a turn will not add walk distance.
+   */
+  @Test
+  void testTraverseWalkDistance() {
+    var vWithTrafficLight = new LabelledIntersectionVertex("maple_1st", 2.0, 2.0, false, true);
+    StreetEdge e0 = streetEdge(v0, vWithTrafficLight, 50.0, StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge e1 = streetEdge(vWithTrafficLight, v2, 50.0, StreetTraversalPermission.PEDESTRIAN);
+
+    StreetSearchRequestBuilder forward = StreetSearchRequest.copyOf(proto);
+    forward.withPreferences(p -> p.withBike(it -> it.withSpeed(3.0f)));
+
+    State s0 = new State(v0, forward.withMode(StreetMode.WALK).build());
+    State s1 = e0.traverse(s0)[0];
+    State s2 = e1.traverse(s1)[0];
+
+    assertEquals(100.00, s2.getWalkDistance());
   }
 
   /**

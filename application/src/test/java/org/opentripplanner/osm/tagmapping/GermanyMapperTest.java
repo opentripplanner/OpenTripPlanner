@@ -9,9 +9,8 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.osm.TraverseDirection;
-import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
@@ -108,7 +107,7 @@ public class GermanyMapperTest {
     way.addTag("highway", "track");
     way.addTag("tracktype", "grade1");
     assertEquals(
-      wps.getDataForEntity(way, null).getPermission(),
+      wps.getDataForEntity(way).getPermission(),
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
     );
 
@@ -136,7 +135,7 @@ public class GermanyMapperTest {
     way.addTag("width:lanes:forward", "|1.4");
     way.addTag("zone:traffic", "DE:urban");
 
-    assertEquals(ALL, wps.getDataForEntity(way, null).getPermission());
+    assertEquals(ALL, wps.getDataForEntity(way).getPermission());
   }
 
   @Nested
@@ -264,10 +263,7 @@ public class GermanyMapperTest {
     // https://www.openstreetmap.org/way/64359102
     var steps = new OsmWay();
     steps.addTag("highway", "steps");
-    assertEquals(
-      StreetTraversalPermission.PEDESTRIAN,
-      wps.getDataForEntity(steps, null).getPermission()
-    );
+    assertEquals(StreetTraversalPermission.PEDESTRIAN, wps.getDataForEntity(steps).getPermission());
   }
 
   @Test
@@ -303,8 +299,8 @@ public class GermanyMapperTest {
     var way = new OsmWay();
     way.addTag("public_transport", "platform");
     way.addTag("area", "yes");
-    assertEquals(PEDESTRIAN, wps.getDataForEntity(way, null).getPermission());
+    assertEquals(PEDESTRIAN, wps.getDataForEntity(way).getPermission());
     way.addTag("bicycle", "yes");
-    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForEntity(way, null).getPermission());
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForEntity(way).getPermission());
   }
 }

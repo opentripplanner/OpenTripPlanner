@@ -530,29 +530,6 @@ public class Itinerary implements ItinerarySortKey {
     return arrivedAtDestinationWithRentedVehicle;
   }
 
-  /**
-   * Get the index of a leg when you want to reference it in an API response, for example when you
-   * want to say that a fare is valid for legs 2 and 3.
-   * <p>
-   * Return {@link #UNKNOWN} if not found.
-   */
-  public int findLegIndex(Leg leg) {
-    var index = legs.indexOf(leg);
-    // the filter pipeline can also modify the identity of Leg instances. that's why we not only
-    // check that but also the start and end point as a replacement for the identity.
-    if (index > -1) {
-      return index;
-    } else {
-      for (int i = 0; i < legs.size() - 1; i++) {
-        var currentLeg = legs.get(i);
-        if (currentLeg.from().sameLocation(leg.from()) && currentLeg.to().sameLocation(leg.to())) {
-          return i;
-        }
-      }
-      return UNKNOWN;
-    }
-  }
-
   public List<ScheduledTransitLeg> listScheduledTransitLegs() {
     return legs()
       .stream()

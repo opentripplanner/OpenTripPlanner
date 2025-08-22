@@ -4,8 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.osm.TraverseDirection.BACKWARD;
-import static org.opentripplanner.osm.TraverseDirection.FORWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
+import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -123,16 +124,16 @@ public class OsmEntityTest {
   @Test
   void testIsGeneralAccessDenied() {
     OsmEntity o = new OsmEntity();
-    assertFalse(o.isGeneralAccessDenied(null));
+    assertFalse(o.isGeneralAccessDenied());
 
     o.addTag("access", "something");
-    assertFalse(o.isGeneralAccessDenied(null));
+    assertFalse(o.isGeneralAccessDenied());
 
     o.addTag("access", "license");
-    assertTrue(o.isGeneralAccessDenied(null));
+    assertTrue(o.isGeneralAccessDenied());
 
     o.addTag("access", "no");
-    assertTrue(o.isGeneralAccessDenied(null));
+    assertTrue(o.isGeneralAccessDenied());
   }
 
   @Test
@@ -140,9 +141,18 @@ public class OsmEntityTest {
     OsmEntity o = new OsmEntity();
     o.addTag("access", "yes");
     o.addTag("access:backward", "no");
-    assertFalse(o.isGeneralAccessDenied(null));
+    assertFalse(o.isGeneralAccessDenied(DIRECTIONLESS));
+    assertFalse(o.isGeneralAccessDenied());
     assertTrue(o.isGeneralAccessDenied(BACKWARD));
     assertFalse(o.isGeneralAccessDenied(FORWARD));
+
+    OsmEntity p = new OsmEntity();
+    o.addTag("access", "no");
+    o.addTag("access:backward", "yes");
+    assertTrue(o.isGeneralAccessDenied(DIRECTIONLESS));
+    assertTrue(o.isGeneralAccessDenied());
+    assertFalse(o.isGeneralAccessDenied(BACKWARD));
+    assertTrue(o.isGeneralAccessDenied(FORWARD));
   }
 
   @Test

@@ -3,8 +3,8 @@ package org.opentripplanner.osm.wayproperty.specifier;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -37,14 +37,14 @@ public class BestMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public int matchScore(OsmEntity way, @Nullable TraverseDirection direction) {
+  public int matchScore(OsmEntity way, TraverseDirection direction) {
     int score = 0;
     int matches = 0;
 
     for (var test : conditions) {
-      var match = direction == null
-        ? test.match(way)
-        : switch (direction) {
+      var match =
+        switch (direction) {
+          case DIRECTIONLESS -> test.match(way);
           case FORWARD -> test.matchForward(way);
           case BACKWARD -> test.matchBackward(way);
         };

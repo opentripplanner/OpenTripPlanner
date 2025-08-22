@@ -31,9 +31,9 @@ public class MixinPropertiesBuilder {
    * 1, with all others scaled proportionately.
    */
   public MixinPropertiesBuilder bicycleSafety(double value, double forward, double back) {
-    this.defaultBuilder.bicycleSafety(value);
-    this.forwardBuilder.bicycleSafety(forward);
-    this.backwardBuilder.bicycleSafety(back);
+    this.defaultBuilder.withBicycleSafety(value);
+    this.forwardBuilder.withBicycleSafety(forward);
+    this.backwardBuilder.withBicycleSafety(back);
     return this;
   }
 
@@ -44,9 +44,9 @@ public class MixinPropertiesBuilder {
    * 1, with all others scaled proportionately.
    */
   public MixinPropertiesBuilder walkSafety(double walkSafety) {
-    this.defaultBuilder.walkSafety(walkSafety);
-    this.forwardBuilder.walkSafety(walkSafety);
-    this.backwardBuilder.walkSafety(walkSafety);
+    this.defaultBuilder.withWalkSafety(walkSafety);
+    this.forwardBuilder.withWalkSafety(walkSafety);
+    this.backwardBuilder.withWalkSafety(walkSafety);
     return this;
   }
 

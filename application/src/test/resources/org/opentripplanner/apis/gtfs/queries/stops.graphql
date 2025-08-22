@@ -17,5 +17,9 @@
       longName
       shortName
     }
+    alerts {
+      alertHeaderText
+      alertDescriptionText
+    }
   }
 }

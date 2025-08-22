@@ -3,8 +3,8 @@ package org.opentripplanner.osm.tagmapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.TraverseDirection;
 
 public class ConstantSpeedMapperTest {
 

@@ -3,14 +3,13 @@ package org.opentripplanner.osm.wayproperty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.osm.TraverseDirection.BACKWARD;
-import static org.opentripplanner.osm.TraverseDirection.FORWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 import static org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
-import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -228,13 +227,13 @@ public class MapperTest {
 
     var withoutFoo = new OsmEntity();
     withoutFoo.addTag("tag", "imaginary");
-    assertEquals(2, wps.getDataForEntity(withoutFoo, null).bicycleSafety());
+    assertEquals(2, wps.getDataForEntity(withoutFoo).bicycleSafety());
 
     // the mixin for foo=bar reduces the bike safety factor
     var withFoo = new OsmEntity();
     withFoo.addTag("tag", "imaginary");
     withFoo.addTag("foo", "bar");
-    assertEquals(1, wps.getDataForEntity(withFoo, null).bicycleSafety());
+    assertEquals(1, wps.getDataForEntity(withFoo).bicycleSafety());
   }
 
   /**

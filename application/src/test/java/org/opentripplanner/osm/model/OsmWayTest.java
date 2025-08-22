@@ -3,8 +3,8 @@ package org.opentripplanner.osm.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.osm.TraverseDirection.BACKWARD;
-import static org.opentripplanner.osm.TraverseDirection.FORWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
