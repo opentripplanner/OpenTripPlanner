@@ -60,10 +60,7 @@ public class VehicleRentalEdge extends Edge {
           return State.empty();
         }
         case HAVE_RENTED -> {
-          if (
-            (realtimeAvailability && !station.allowDropoffNow()) ||
-            !station.availableDropoffFormFactors(realtimeAvailability).contains(formFactor)
-          ) {
+          if (!station.canDropOffFormFactor(formFactor, realtimeAvailability)) {
             return State.empty();
           }
           s1.dropOffRentedVehicleAtStation(formFactor, network, true);
