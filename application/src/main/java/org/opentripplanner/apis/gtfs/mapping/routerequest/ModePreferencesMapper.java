@@ -18,6 +18,7 @@ import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.utils.collection.CollectionUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class ModePreferencesMapper {
 
@@ -43,14 +44,24 @@ public class ModePreferencesMapper {
       if (
         args.getGraphQLPreferences().getGraphQLStreet() != null &&
         args.getGraphQLPreferences().getGraphQLStreet().getGraphQLCar() != null &&
-        args.getGraphQLPreferences().getGraphQLStreet().getGraphQLCar().getGraphQLRental() != null
-      ) {
-        rentalDuration = args
+        args.getGraphQLPreferences().getGraphQLStreet().getGraphQLCar().getGraphQLRental() !=
+        null &&
+        args
           .getGraphQLPreferences()
           .getGraphQLStreet()
           .getGraphQLCar()
           .getGraphQLRental()
-          .getGraphQLRentalDuration();
+          .getGraphQLRentalDuration() !=
+        null
+      ) {
+        rentalDuration = DurationUtils.requireNonNegative(
+          args
+            .getGraphQLPreferences()
+            .getGraphQLStreet()
+            .getGraphQLCar()
+            .getGraphQLRental()
+            .getGraphQLRentalDuration()
+        );
       }
 
       journey.withDirect(new StreetRequest(getStreetModeForRouting(streetModes), rentalDuration));
