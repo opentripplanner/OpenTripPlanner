@@ -1,12 +1,11 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
-import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDsToDomainNullSafe;
-
 import graphql.schema.DataFetchingEnvironment;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
@@ -19,11 +18,14 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class TransitFilterOldWayMapper {
 
-  /** This is a utility class, only static methods */
-  private TransitFilterOldWayMapper() {}
+  private final FeedScopedIdMapper idMapper;
+
+  TransitFilterOldWayMapper(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
+  }
 
   @SuppressWarnings("unchecked")
-  static void mapFilter(
+  void mapFilter(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
     TransitRequestBuilder transitBuilder
@@ -40,7 +42,7 @@ class TransitFilterOldWayMapper {
 
     var whiteListedAgencies = new ArrayList<FeedScopedId>();
     callWith.argument("whiteListed.authorities", (Collection<String> authorities) ->
-      whiteListedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
+      whiteListedAgencies.addAll(idMapper.parseListNullSafe(authorities))
     );
     if (!whiteListedAgencies.isEmpty()) {
       selectorBuilders.add(SelectRequest.of().withAgencies(whiteListedAgencies));
@@ -48,7 +50,7 @@ class TransitFilterOldWayMapper {
 
     var whiteListedLines = new ArrayList<FeedScopedId>();
     callWith.argument("whiteListed.lines", (List<String> lines) ->
-      whiteListedLines.addAll(mapIDsToDomainNullSafe(lines))
+      whiteListedLines.addAll(idMapper.parseListNullSafe(lines))
     );
     if (!whiteListedLines.isEmpty()) {
       selectorBuilders.add(SelectRequest.of().withRoutes(whiteListedLines));
@@ -70,7 +72,7 @@ class TransitFilterOldWayMapper {
 
       var bannedAgencies = new ArrayList<FeedScopedId>();
       callWith.argument("banned.authorities", (Collection<String> authorities) ->
-        bannedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
+        bannedAgencies.addAll(idMapper.parseListNullSafe(authorities))
       );
       if (!bannedAgencies.isEmpty()) {
         filterBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
@@ -78,7 +80,7 @@ class TransitFilterOldWayMapper {
 
       var bannedLines = new ArrayList<FeedScopedId>();
       callWith.argument("banned.lines", (List<String> lines) ->
-        bannedLines.addAll(mapIDsToDomainNullSafe(lines))
+        bannedLines.addAll(idMapper.parseListNullSafe(lines))
       );
       if (!bannedLines.isEmpty()) {
         filterBuilder.addNot(SelectRequest.of().withRoutes(bannedLines).build());

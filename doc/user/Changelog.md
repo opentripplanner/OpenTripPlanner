@@ -60,6 +60,12 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 -  Add OTP version when updaters are ready log event [#6799](https://github.com/opentripplanner/OpenTripPlanner/pull/6799)
 - Add `Leg.stopCalls` with full flex information to GTFS API [#6757](https://github.com/opentripplanner/OpenTripPlanner/pull/6757)
 - Use North-based angle in internal representation [#6780](https://github.com/opentripplanner/OpenTripPlanner/pull/6780)
+- Add support for handling "vehicle:forward=yes" or "motorcar:backward=yes" format OSM tagging [#6764](https://github.com/opentripplanner/OpenTripPlanner/pull/6764)
+- Add support for GTFS-RT platform change, headsign change, NEW and REPLACEMENT trips [#6028](https://github.com/opentripplanner/OpenTripPlanner/pull/6028)
+- Fix outgoing angle for temporary street edge [#6793](https://github.com/opentripplanner/OpenTripPlanner/pull/6793)
+- Improve worst case performance of GTFS geometry processing [#6748](https://github.com/opentripplanner/OpenTripPlanner/pull/6748)
+- Allow park&ride at places where through traffic is prohibited   [#6786](https://github.com/opentripplanner/OpenTripPlanner/pull/6786)
+- Allow drop off for any form factor if rental station doesn't specifically state them [#6738](https://github.com/opentripplanner/OpenTripPlanner/pull/6738)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)

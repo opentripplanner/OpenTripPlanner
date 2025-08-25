@@ -46,13 +46,13 @@ class PortlandMapper extends OsmTagMapper {
     // https://taginfo.openstreetmap.org/keys/RLIS:bicycle#overview
 
     props.setMixinProperties("RLIS:bicycle=caution_area", ofBicycleSafety(1.45));
-    props.setMixinProperties("RLIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
-    props.setMixinProperties("RLIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));
+    props.setMixinProperties("RLIS:bicycle:right=caution_area", ofBicycleSafety(1, 1.45, 1));
+    props.setMixinProperties("RLIS:bicycle:left=caution_area", ofBicycleSafety(1, 1, 1.45));
 
     // https://taginfo.openstreetmap.org/keys/CCGIS:bicycle#overview
     props.setMixinProperties("CCGIS:bicycle=caution_area", ofBicycleSafety(1.45));
-    props.setMixinProperties("CCGIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
-    props.setMixinProperties("CCGIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));
+    props.setMixinProperties("CCGIS:bicycle:right=caution_area", ofBicycleSafety(1, 1.45, 1));
+    props.setMixinProperties("CCGIS:bicycle:left=caution_area", ofBicycleSafety(1, 1, 1.45));
 
     // Max speed limit in Oregon is 70 mph ~= 113kmh ~= 31.3m/s
     props.maxPossibleCarSpeed = 31.4f;

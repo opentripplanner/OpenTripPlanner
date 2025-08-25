@@ -59,17 +59,7 @@ public class GbfsStationInformationMapper {
       .withLongitude(station.getLon())
       .withLatitude(station.getLat())
       .withName(new NonLocalizedString(station.getName()))
-      .withShortName(station.getShortName())
-      .withAddress(station.getAddress())
-      .withCrossStreet(station.getCrossStreet())
-      .withRegionId(station.getRegionId())
-      .withPostCode(station.getPostCode())
-      .withIsVirtualStation(
-        station.getIsVirtualStation() != null ? station.getIsVirtualStation() : false
-      )
-      .withIsValetStation(station.getIsValetStation() != null ? station.getIsValetStation() : false)
-      // TODO: Convert geometry
-      // .withStationArea(station.getStationArea())
+      .withShortName(NonLocalizedString.ofNullable(station.getShortName()))
       .withCapacity(station.getCapacity() != null ? station.getCapacity().intValue() : null)
       .withIsArrivingInRentalVehicleAtDestinationAllowed(allowKeepingRentedVehicleAtDestination)
       .withOverloadingAllowed(overloadingAllowed);

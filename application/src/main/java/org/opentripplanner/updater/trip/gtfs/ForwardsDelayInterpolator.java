@@ -2,7 +2,7 @@ package org.opentripplanner.updater.trip.gtfs;
 
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 
-public interface ForwardsDelayInterpolator {
+interface ForwardsDelayInterpolator {
   /**
    * Interpolate delays forwards from the first given real-time information
    * @return If propagation is done

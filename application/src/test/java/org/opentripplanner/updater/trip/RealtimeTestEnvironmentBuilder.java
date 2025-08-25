@@ -132,8 +132,12 @@ public class RealtimeTestEnvironmentBuilder {
     return this;
   }
 
-  private static Trip createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
-    var trip = trip(tripInput.id(), tripInput.route());
+  private static void createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
+    var trip = Trip.of(id(tripInput.id()))
+      .withRoute(tripInput.route())
+      .withHeadsign(tripInput.headsign() == null ? null : tripInput.headsign())
+      .withServiceId(SERVICE_ID)
+      .build();
 
     addTripOnServiceDate(timetableRepository, trip);
 
@@ -176,8 +180,6 @@ public class RealtimeTestEnvironmentBuilder {
     } else {
       addNewPattern(tripInput.id(), tripInput.route(), stopPattern, tripTimes, timetableRepository);
     }
-
-    return trip;
   }
 
   private static Trip createFlexTrip(

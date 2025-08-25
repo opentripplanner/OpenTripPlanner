@@ -6,13 +6,19 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
+import java.util.Optional;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 
 public class QuayAtDistanceType {
 
-  public static GraphQLObjectType createQD(GraphQLOutputType quayType, Relay relay) {
+  private final FeedScopedIdMapper idMapper;
+
+  public QuayAtDistanceType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
+  }
+
+  public GraphQLObjectType createQD(GraphQLOutputType quayType, Relay relay) {
     return GraphQLObjectType.newObject()
       .name("QuayAtDistance")
       .field(
@@ -22,11 +28,12 @@ public class QuayAtDistanceType {
           .dataFetcher(environment ->
             relay.toGlobalId(
               "QAD",
-              ((NearbyStop) environment.getSource()).distance +
-              ";" +
-              TransitIdMapper.mapEntityIDToApi(
-                (AbstractTransitEntity) ((NearbyStop) environment.getSource()).stop
-              )
+              Optional.ofNullable((NearbyStop) environment.getSource())
+                .map(
+                  nearbyStop ->
+                    nearbyStop.distance + ";" + idMapper.mapToApi(nearbyStop.stop.getId())
+                )
+                .orElse(null)
             )
           )
           .build()

@@ -21,6 +21,7 @@ public class SchemaModule {
   @Provides
   @Singleton
   @Nullable
+  @GtfsSchema
   public GraphQLSchema provideSchema(RouteRequest defaultRouteRequest) {
     return OTPFeature.GtfsGraphQlApi.isOn()
       ? SchemaFactory.createSchemaWithDefaultInjection(defaultRouteRequest)

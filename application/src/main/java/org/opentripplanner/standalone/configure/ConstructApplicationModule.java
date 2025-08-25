@@ -7,6 +7,8 @@ import io.micrometer.core.instrument.Metrics;
 import jakarta.inject.Singleton;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
+import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
@@ -55,7 +57,8 @@ public class ConstructApplicationModule {
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
     @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
-    @Nullable GraphQLSchema schema,
+    @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
+    @Nullable @TransmodelSchema GraphQLSchema transmodelSchema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
     @Nullable LuceneIndex luceneIndex,
@@ -68,6 +71,7 @@ public class ConstructApplicationModule {
     var gtfsApiConfig = routerConfig.gtfsApiParameters();
     var vectorTileConfig = routerConfig.vectorTileConfig();
     var flexParameters = routerConfig.flexParameters();
+    var transmodelAPIParameters = routerConfig.transmodelApi();
 
     return new DefaultServerRequestContext(
       debugUiConfig,
@@ -93,10 +97,12 @@ public class ConstructApplicationModule {
       // Optional Sandbox services
       emissionItineraryDecorator,
       luceneIndex,
-      schema,
+      gtfsSchema,
+      transmodelSchema,
       sorlandsbanenService,
       stopConsolidationService,
-      traverseVisitor
+      traverseVisitor,
+      transmodelAPIParameters
     );
   }
 

@@ -10,26 +10,29 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 
 class TransitFilterNewWayMapperTest {
 
+  private static final TransitFilterNewWayMapper MAPPER = new TransitFilterNewWayMapper(
+    new DefaultFeedIdMapper()
+  );
+
   @Test
   void mapEmptyFilter() {
-    var result = TransitFilterNewWayMapper.mapFilter(List.of());
+    var result = MAPPER.mapFilter(List.of());
     assertEquals("[]", result.toString());
   }
 
   @Test
   void mapIncludeLineFilter() {
-    var result = TransitFilterNewWayMapper.mapFilter(
-      list(map("select", list(map("lines", list("F:Line:1")))))
-    );
+    var result = MAPPER.mapFilter(list(map("select", list(map("lines", list("F:Line:1"))))));
     assertEquals("[(select: [(transportModes: EMPTY, routes: [F:Line:1])])]", result.toString());
   }
 
   @Test
   void mapFilterWithModes() {
-    var result = TransitFilterNewWayMapper.mapFilter(
+    var result = MAPPER.mapFilter(
       list(map("select", list(map(entry("transportModes", list(map("transportMode", BUS)))))))
     );
 
@@ -38,9 +41,7 @@ class TransitFilterNewWayMapperTest {
 
   @Test
   void mapExcludeLineFilter() {
-    var result = TransitFilterNewWayMapper.mapFilter(
-      list(map("not", list(map("lines", list("F:Line:1")))))
-    );
+    var result = MAPPER.mapFilter(list(map("not", list(map("lines", list("F:Line:1"))))));
     assertEquals("[(not: [(transportModes: EMPTY, routes: [F:Line:1])])]", result.toString());
   }
 

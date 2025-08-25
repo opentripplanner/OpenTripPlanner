@@ -12,12 +12,17 @@ import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 
 class SelectRequestMapperTest {
 
+  private static final SelectRequestMapper MAPPER = new SelectRequestMapper(
+    new DefaultFeedIdMapper()
+  );
+
   @Test
   void mapFullSelectRequest() throws JsonProcessingException {
-    var result = SelectRequestMapper.mapSelectRequest(
+    var result = MAPPER.mapSelectRequest(
       map(
         entry("lines", list("F:Line:1", "F:Line:2")),
         entry("authorities", list("F:Auth:1", "F:Auth:1")),
@@ -42,7 +47,7 @@ class SelectRequestMapperTest {
 
   @Test
   void mapEmptySelectRequest() throws JsonProcessingException {
-    var result = SelectRequestMapper.mapSelectRequest(map());
+    var result = MAPPER.mapSelectRequest(map());
     assertEquals("(transportModes: EMPTY)", result.toString());
   }
 }

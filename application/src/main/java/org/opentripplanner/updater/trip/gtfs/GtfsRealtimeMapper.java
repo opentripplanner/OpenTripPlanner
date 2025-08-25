@@ -4,7 +4,7 @@ import com.google.transit.realtime.GtfsRealtime;
 import java.util.Optional;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
-public class GtfsRealtimeMapper {
+class GtfsRealtimeMapper {
 
   public static Optional<Accessibility> mapWheelchairAccessible(
     GtfsRealtime.VehicleDescriptor.WheelchairAccessible wheelchairAccessible

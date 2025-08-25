@@ -39,6 +39,7 @@ class GeofencingVertexUpdaterTest {
   static GeometryFactory fac = GeometryUtils.getGeometryFactory();
   final GeofencingZone zone = new GeofencingZone(
     id("frogner-park"),
+    null,
     Polygons.OSLO_FROGNER_PARK,
     true,
     false
@@ -47,6 +48,7 @@ class GeofencingVertexUpdaterTest {
   MultiPolygon osloMultiPolygon = fac.createMultiPolygon(new Polygon[] { Polygons.OSLO });
   final GeofencingZone businessArea = new GeofencingZone(
     id("oslo"),
+    null,
     osloMultiPolygon,
     false,
     false

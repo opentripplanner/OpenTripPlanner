@@ -201,6 +201,25 @@ public class StreetEdgeTest {
   }
 
   /**
+   * Test that a turn will not add walk distance.
+   */
+  @Test
+  void testTraverseWalkDistance() {
+    var vWithTrafficLight = new LabelledIntersectionVertex("maple_1st", 2.0, 2.0, false, true);
+    StreetEdge e0 = streetEdge(v0, vWithTrafficLight, 50.0, StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge e1 = streetEdge(vWithTrafficLight, v2, 50.0, StreetTraversalPermission.PEDESTRIAN);
+
+    StreetSearchRequestBuilder forward = StreetSearchRequest.copyOf(proto);
+    forward.withPreferences(p -> p.withBike(it -> it.withSpeed(3.0f)));
+
+    State s0 = new State(v0, forward.withMode(StreetMode.WALK).build());
+    State s1 = e0.traverse(s0)[0];
+    State s2 = e1.traverse(s1)[0];
+
+    assertEquals(100.00, s2.getWalkDistance());
+  }
+
+  /**
    * Test the bike switching penalty feature, both its cost penalty and its separate time penalty.
    */
   @Test

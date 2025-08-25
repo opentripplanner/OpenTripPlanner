@@ -5,14 +5,20 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
 public class BikeParkType {
 
+  private final FeedScopedIdMapper idMapper;
+
   public static final String NAME = "BikePark";
 
-  public static GraphQLObjectType createB(GraphQLInterfaceType placeInterface) {
+  public BikeParkType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
+  }
+
+  public GraphQLObjectType createB(GraphQLInterfaceType placeInterface) {
     return GraphQLObjectType.newObject()
       .name(NAME)
       .withInterface(placeInterface)
@@ -21,7 +27,7 @@ public class BikeParkType {
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(environment ->
-            TransitIdMapper.mapIDToApi(((VehicleParking) environment.getSource()).getId())
+            idMapper.mapToApi(((VehicleParking) environment.getSource()).getId())
           )
           .build()
       )

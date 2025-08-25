@@ -13,6 +13,7 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 public class StateEditorTest {
@@ -96,6 +97,27 @@ public class StateEditorTest {
       secondEditor.leaveNoRentalDropOffArea();
       var secondState = secondEditor.makeState();
       assertFalse(secondState.isInsideNoRentalDropOffArea());
+    }
+  }
+
+  @Nested
+  class ParkAndRide {
+
+    StreetVertex v1 = StreetModelForTest.intersectionVertex(0, 0);
+    StreetVertex v2 = StreetModelForTest.intersectionVertex(1, 1);
+    StreetEdge edge1 = StreetModelForTest.streetEdge(v1, v2);
+
+    @Test
+    void resetNoThroughAfterParkAndRide() {
+      var editor = new StateEditor(v1, StreetSearchRequest.of().withMode(StreetMode.CAR).build());
+      editor.setEnteredNoThroughTrafficArea();
+      var state = editor.makeState();
+      assertTrue(state.hasEnteredNoThruTrafficArea());
+
+      var secondEditor = state.edit(edge1);
+      secondEditor.setVehicleParked(true, TraverseMode.WALK);
+      var secondState = secondEditor.makeState();
+      assertFalse(secondState.hasEnteredNoThruTrafficArea());
     }
   }
 }
