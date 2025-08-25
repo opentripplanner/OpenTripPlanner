@@ -1,5 +1,6 @@
 package org.opentripplanner.street.search.request;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Consumer;
 import org.opentripplanner.model.GenericLocation;
@@ -16,6 +17,7 @@ public class StreetSearchRequestBuilder {
   boolean wheelchair;
   GenericLocation from;
   GenericLocation to;
+  Duration rentalDuration;
 
   StreetSearchRequestBuilder(StreetSearchRequest original) {
     this.startTime = original.startTime();
@@ -25,6 +27,7 @@ public class StreetSearchRequestBuilder {
     this.wheelchair = original.wheelchair();
     this.from = original.from();
     this.to = original.to();
+    this.rentalDuration = original.rentalDuration();
   }
 
   public StreetSearchRequestBuilder withStartTime(Instant startTime) {
@@ -63,6 +66,11 @@ public class StreetSearchRequestBuilder {
 
   public StreetSearchRequestBuilder withTo(GenericLocation to) {
     this.to = to;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withRentalDuration(Duration rentalDuration) {
+    this.rentalDuration = rentalDuration;
     return this;
   }
 

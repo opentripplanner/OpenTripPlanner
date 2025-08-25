@@ -1,5 +1,6 @@
 package org.opentripplanner.street.search.request;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
@@ -44,6 +45,8 @@ public class StreetSearchRequest implements AStarRequest {
   private final GenericLocation to;
   private final Envelope toEnvelope;
 
+  private final Duration rentalDuration;
+
   private IntersectionTraversalCalculator intersectionTraversalCalculator =
     IntersectionTraversalCalculator.DEFAULT;
 
@@ -53,6 +56,7 @@ public class StreetSearchRequest implements AStarRequest {
    * Constructor only used for creating a default instance.
    */
   private StreetSearchRequest() {
+    this.rentalDuration = null;
     this.startTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
     this.preferences = RoutingPreferences.DEFAULT;
     this.mode = StreetMode.WALK;
@@ -71,6 +75,7 @@ public class StreetSearchRequest implements AStarRequest {
     this.arriveBy = builder.arriveBy;
     this.wheelchair = builder.wheelchair;
     this.from = builder.from;
+    this.rentalDuration = builder.rentalDuration;
     this.fromEnvelope = createEnvelope(from);
     this.to = builder.to;
     this.toEnvelope = createEnvelope(to);
@@ -115,6 +120,10 @@ public class StreetSearchRequest implements AStarRequest {
 
   public GenericLocation to() {
     return to;
+  }
+
+  public Duration rentalDuration() {
+    return rentalDuration;
   }
 
   public IntersectionTraversalCalculator intersectionTraversalCalculator() {

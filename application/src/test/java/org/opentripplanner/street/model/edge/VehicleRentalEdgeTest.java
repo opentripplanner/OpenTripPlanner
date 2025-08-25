@@ -393,11 +393,7 @@ class VehicleRentalEdgeTest {
 
     this.request = StreetSearchRequest.of()
       .withMode(StreetMode.CAR_RENTAL)
-      .withPreferences(preferences ->
-        preferences
-          .withCar(car -> car.withRental(rental -> rental.withRentalDuration(rentalDuration)))
-          .build()
-      )
+      .withRentalDuration(rentalDuration)
       .build();
   }
 
