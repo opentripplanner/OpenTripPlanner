@@ -4,7 +4,6 @@ import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -47,7 +46,6 @@ class RouteRequestMapperCarTest {
     var carArgs = testCtx.basicRequest();
     var allowed = Set.of("foo", "bar");
     var banned = Set.of("not");
-    var rentalDuration = Duration.ofHours(1);
     carArgs.put(
       "preferences",
       Map.ofEntries(
@@ -61,8 +59,7 @@ class RouteRequestMapperCarTest {
                   "rental",
                   Map.ofEntries(
                     entry("allowedNetworks", allowed.stream().toList()),
-                    entry("bannedNetworks", banned.stream().toList()),
-                    entry("rentalDuration", rentalDuration)
+                    entry("bannedNetworks", banned.stream().toList())
                   )
                 )
               )
@@ -76,7 +73,6 @@ class RouteRequestMapperCarTest {
     var carRentalPreferences = routeRequest.preferences().car().rental();
     assertEquals(allowed, carRentalPreferences.allowedNetworks());
     assertEquals(banned, carRentalPreferences.bannedNetworks());
-    assertEquals(rentalDuration, carRentalPreferences.rentalDuration());
   }
 
   @Test

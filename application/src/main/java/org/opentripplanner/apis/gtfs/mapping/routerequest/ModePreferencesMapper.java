@@ -5,6 +5,7 @@ import static org.opentripplanner.apis.gtfs.mapping.routerequest.StreetModeMappe
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.StreetModeMapper.validateStreetModes;
 
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
@@ -37,7 +38,22 @@ public class ModePreferencesMapper {
         throw new IllegalArgumentException("Direct modes must not be empty.");
       }
       var streetModes = direct.stream().map(DirectModeMapper::map).toList();
-      journey.withDirect(new StreetRequest(getStreetModeForRouting(streetModes)));
+
+      Duration rentalDuration = null;
+      if (
+        args.getGraphQLPreferences().getGraphQLStreet() != null &&
+        args.getGraphQLPreferences().getGraphQLStreet().getGraphQLCar() != null &&
+        args.getGraphQLPreferences().getGraphQLStreet().getGraphQLCar().getGraphQLRental() != null
+      ) {
+        rentalDuration = args
+          .getGraphQLPreferences()
+          .getGraphQLStreet()
+          .getGraphQLCar()
+          .getGraphQLRental()
+          .getGraphQLRentalDuration();
+      }
+
+      journey.withDirect(new StreetRequest(getStreetModeForRouting(streetModes), rentalDuration));
     }
 
     var transit = modesInput.getGraphQLTransit();

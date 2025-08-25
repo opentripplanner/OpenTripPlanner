@@ -389,6 +389,13 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
   }
 
+  /**
+   * A (possibly discounted) fare product that requires another fare product to be purchased previously
+   * in order to be valid.
+   *
+   * For example, when taking the train into a city, you might get a discounted "transfer fare" when
+   * switching to the bus for the second leg.
+   */
   public interface GraphQLDependentFareProduct {
     public DataFetcher<Iterable<FareOffer>> dependencies();
 

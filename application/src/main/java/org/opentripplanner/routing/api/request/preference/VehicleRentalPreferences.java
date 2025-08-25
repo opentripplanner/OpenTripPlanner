@@ -21,7 +21,6 @@ public final class VehicleRentalPreferences implements Serializable {
   private final Cost pickupCost;
   private final Duration dropOffTime;
   private final Cost dropOffCost;
-  private final Duration rentalDuration;
 
   private final boolean useAvailabilityInformation;
   private final Cost arrivingInRentalVehicleAtDestinationCost;
@@ -35,7 +34,6 @@ public final class VehicleRentalPreferences implements Serializable {
     this.pickupCost = Cost.costOfMinutes(2);
     this.dropOffTime = Duration.ofSeconds(30);
     this.dropOffCost = Cost.costOfSeconds(30);
-    this.rentalDuration = null;
     this.useAvailabilityInformation = false;
     this.arrivingInRentalVehicleAtDestinationCost = Cost.costOfSeconds(0);
     this.allowArrivingInRentedVehicleAtDestination = false;
@@ -48,7 +46,6 @@ public final class VehicleRentalPreferences implements Serializable {
     this.pickupCost = builder.pickupCost;
     this.dropOffTime = Duration.ofSeconds(Units.duration(builder.dropOffTime));
     this.dropOffCost = builder.dropOffCost;
-    this.rentalDuration = builder.rentalDuration;
     this.useAvailabilityInformation = builder.useAvailabilityInformation;
     this.arrivingInRentalVehicleAtDestinationCost =
       builder.arrivingInRentalVehicleAtDestinationCost;
@@ -87,13 +84,6 @@ public final class VehicleRentalPreferences implements Serializable {
   /** Cost of dropping-off a rented vehicle */
   public Cost dropOffCost() {
     return dropOffCost;
-  }
-
-  /**
-   * An assumed duration of the rental trip, to make sure the vehicle is available during this time
-   */
-  public Duration rentalDuration() {
-    return rentalDuration;
   }
 
   /**
@@ -141,7 +131,6 @@ public final class VehicleRentalPreferences implements Serializable {
       Objects.equals(pickupCost, that.pickupCost) &&
       Objects.equals(dropOffTime, that.dropOffTime) &&
       Objects.equals(dropOffCost, that.dropOffCost) &&
-      Objects.equals(rentalDuration, that.rentalDuration) &&
       useAvailabilityInformation == that.useAvailabilityInformation &&
       Objects.equals(
         that.arrivingInRentalVehicleAtDestinationCost,
@@ -160,7 +149,6 @@ public final class VehicleRentalPreferences implements Serializable {
       pickupCost,
       dropOffTime,
       dropOffCost,
-      rentalDuration,
       useAvailabilityInformation,
       arrivingInRentalVehicleAtDestinationCost,
       allowArrivingInRentedVehicleAtDestination,
@@ -176,7 +164,6 @@ public final class VehicleRentalPreferences implements Serializable {
       .addObj("pickupCost", pickupCost, DEFAULT.pickupCost)
       .addDuration("dropOffTime", dropOffTime, DEFAULT.dropOffTime)
       .addObj("dropOffCost", dropOffCost, DEFAULT.dropOffCost)
-      .addObj("rentalDuration", rentalDuration, DEFAULT.rentalDuration)
       .addBoolIfTrue("useAvailabilityInformation", useAvailabilityInformation)
       .addObj(
         "arrivingInRentalVehicleAtDestinationCost",
@@ -198,7 +185,6 @@ public final class VehicleRentalPreferences implements Serializable {
     private int pickupTime;
     private Cost pickupCost;
     private int dropOffTime;
-    private Duration rentalDuration;
     private Cost dropOffCost;
     private boolean useAvailabilityInformation;
     private Cost arrivingInRentalVehicleAtDestinationCost;
@@ -212,7 +198,6 @@ public final class VehicleRentalPreferences implements Serializable {
       this.pickupCost = original.pickupCost;
       this.dropOffTime = (int) original.dropOffTime.toSeconds();
       this.dropOffCost = original.dropOffCost;
-      this.rentalDuration = original.rentalDuration;
       this.useAvailabilityInformation = original.useAvailabilityInformation;
       this.arrivingInRentalVehicleAtDestinationCost =
         original.arrivingInRentalVehicleAtDestinationCost;
@@ -253,11 +238,6 @@ public final class VehicleRentalPreferences implements Serializable {
 
     public Builder withDropOffCost(int dropOffCost) {
       this.dropOffCost = Cost.costOfSeconds(dropOffCost);
-      return this;
-    }
-
-    public Builder withRentalDuration(Duration rentalDuration) {
-      this.rentalDuration = rentalDuration;
       return this;
     }
 
