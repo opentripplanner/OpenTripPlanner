@@ -27,6 +27,7 @@ public class TranslatedString implements I18NString, Serializable {
   private static final HashMap<Map<String, String>, I18NString> translationCache = new HashMap<>();
 
   private final Map<String, String> translations = new HashMap<>();
+  private final int hashCode;
 
   private TranslatedString(Map<String, String> translations) {
     for (Map.Entry<String, String> i : translations.entrySet()) {
@@ -36,6 +37,7 @@ public class TranslatedString implements I18NString, Serializable {
         this.translations.put(i.getKey().toLowerCase(), i.getValue());
       }
     }
+    this.hashCode = Objects.hash(translations);
   }
 
   public static I18NString getI18NString(String untranslated, String... translations) {
@@ -98,7 +100,7 @@ public class TranslatedString implements I18NString, Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(translations);
+    return hashCode;
   }
 
   @Override

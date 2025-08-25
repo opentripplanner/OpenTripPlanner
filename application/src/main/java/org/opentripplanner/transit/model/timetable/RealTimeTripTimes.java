@@ -38,6 +38,7 @@ public final class RealTimeTripTimes implements TripTimes {
   private final I18NString[] stopHeadsigns;
   private final OccupancyStatus[] occupancyStatus;
   private final Accessibility wheelchairAccessibility;
+  private final int hash;
 
   RealTimeTripTimes(RealTimeTripTimesBuilder builder) {
     scheduledTripTimes = builder.scheduledTripTimes();
@@ -50,6 +51,7 @@ public final class RealTimeTripTimes implements TripTimes {
     occupancyStatus = builder.occupancyStatus();
     wheelchairAccessibility = builder.wheelchairAccessibility();
     validateNonIncreasingTimes();
+    hash = hash();
   }
 
   /**
@@ -65,6 +67,7 @@ public final class RealTimeTripTimes implements TripTimes {
     this.stopHeadsigns = original.stopHeadsigns;
     this.occupancyStatus = original.occupancyStatus;
     this.wheelchairAccessibility = original.wheelchairAccessibility;
+    hash = hash();
   }
 
   /**
@@ -83,6 +86,7 @@ public final class RealTimeTripTimes implements TripTimes {
     this.stopHeadsigns = original.stopHeadsigns;
     this.occupancyStatus = original.occupancyStatus;
     this.wheelchairAccessibility = original.wheelchairAccessibility;
+    hash = hash();
   }
 
   ScheduledTripTimes scheduledTripTimes() {
@@ -370,6 +374,10 @@ public final class RealTimeTripTimes implements TripTimes {
 
   @Override
   public int hashCode() {
+    return hash;
+  }
+
+  public int hash() {
     return Objects.hash(
       scheduledTripTimes,
       Arrays.hashCode(arrivalTimes),

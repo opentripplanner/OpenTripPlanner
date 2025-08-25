@@ -53,6 +53,7 @@ public final class ScheduledTripTimes implements TripTimes {
   private final Trip trip;
   private final List<BookingInfo> dropOffBookingInfos;
   private final List<BookingInfo> pickupBookingInfos;
+  private final int hash;
 
   /**
    * Any number of array elements may point to the same I18NString instance if the headsign remains
@@ -86,6 +87,7 @@ public final class ScheduledTripTimes implements TripTimes {
     this.headsignVias = builder.headsignVias();
     this.gtfsSequenceOfStopIndex = builder.gtfsSequenceOfStopIndex();
     validate();
+    this.hash = hash();
   }
 
   /**
@@ -343,6 +345,10 @@ public final class ScheduledTripTimes implements TripTimes {
 
   @Override
   public int hashCode() {
+    return hash;
+  }
+
+  private int hash() {
     return Objects.hash(
       timeShift,
       serviceCode,
