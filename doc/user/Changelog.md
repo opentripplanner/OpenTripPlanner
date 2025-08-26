@@ -66,6 +66,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Improve worst case performance of GTFS geometry processing [#6748](https://github.com/opentripplanner/OpenTripPlanner/pull/6748)
 - Allow park&ride at places where through traffic is prohibited   [#6786](https://github.com/opentripplanner/OpenTripPlanner/pull/6786)
 - Allow drop off for any form factor if rental station doesn't specifically state them [#6738](https://github.com/opentripplanner/OpenTripPlanner/pull/6738)
+- Limit bike speed to car speed [#6770](https://github.com/opentripplanner/OpenTripPlanner/pull/6770)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
