@@ -618,6 +618,7 @@ class NorwayMapper extends OsmTagMapper {
 
     props.setCarSpeed("highway=living_street", 1.94f); // 7 km/h
     props.setCarSpeed("highway=pedestrian", 1.94f); // 7 km/h
+    props.setCarSpeed("highway=footway", 1.94f); // 7 km/h
 
     props.defaultCarSpeed = 22.22f; // 80 km/h
     props.maxPossibleCarSpeed = 30.56f; // 110 km/h

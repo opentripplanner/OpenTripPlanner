@@ -212,9 +212,9 @@ public class StreetEdge
         case WALK -> walkingBike
           ? preferences.bike().walking().speed()
           : preferences.walk().speed();
-        case BICYCLE -> preferences.bike().speed();
+        case BICYCLE -> Math.min(preferences.bike().speed(), getCyclingSpeedLimit());
         case CAR -> getCarSpeed();
-        case SCOOTER -> preferences.scooter().speed();
+        case SCOOTER -> Math.min(preferences.scooter().speed(), getCyclingSpeedLimit());
         case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
       };
 
@@ -546,6 +546,17 @@ public class StreetEdge
 
   public float getCarSpeed() {
     return carSpeed;
+  }
+
+  /**
+   * Gets cycling speed limit which is based on the car speed limit. The effective speed limit can
+   * differ from the actual speed limit if the effective cycling distance has been adjusted due to
+   * elevation changes.
+   */
+  private double getCyclingSpeedLimit() {
+    return hasElevationExtension()
+      ? getCarSpeed() * (elevationExtension.getEffectiveBikeDistance() / getDistanceMeters())
+      : getCarSpeed();
   }
 
   public boolean isSlopeOverride() {

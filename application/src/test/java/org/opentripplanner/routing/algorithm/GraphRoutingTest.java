@@ -151,6 +151,16 @@ public abstract class GraphRoutingTest {
       return streetBuilder(from, to, length, permissions).buildAndConnect();
     }
 
+    public StreetEdge street(
+      StreetVertex from,
+      StreetVertex to,
+      int length,
+      StreetTraversalPermission permissions,
+      float carSpeed
+    ) {
+      return streetBuilder(from, to, length, permissions).withCarSpeed(carSpeed).buildAndConnect();
+    }
+
     public List<StreetEdge> street(
       StreetVertex from,
       StreetVertex to,
