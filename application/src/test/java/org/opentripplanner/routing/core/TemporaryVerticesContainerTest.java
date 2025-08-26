@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
@@ -59,7 +58,7 @@ public class TemporaryVerticesContainerTest {
     subject = new TemporaryVerticesContainer(
       g,
       TestVertexLinker.of(g),
-      id -> Set.of(),
+      id -> List.of(),
       from,
       to,
       StreetMode.WALK,
