@@ -39,7 +39,7 @@ public class SeptaSmokeTest {
     var modes = Set.of(TRANSIT, WALK);
     var plan = SmokeTest.basicRouteTest(
       new SmokeTestRequest(airport, stPetersCemetary, modes),
-      List.of("WALK", "RAIL", "WALK", "SUBWAY", "WALK")
+      List.of("WALK", "BUS", "WALK", "SUBWAY", "WALK", "SUBWAY", "WALK")
     );
     var products = plan
       .itineraries()
