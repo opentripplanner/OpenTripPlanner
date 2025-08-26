@@ -164,6 +164,10 @@ public class ConstructApplication {
     return graphBuilderDataSources.getOutputGraph();
   }
 
+  public GraphBuilderDataSources graphBuilderDataSources() {
+    return graphBuilderDataSources;
+  }
+
   private Application createApplication() {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer();

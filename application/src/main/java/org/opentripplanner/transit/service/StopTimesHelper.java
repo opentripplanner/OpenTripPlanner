@@ -261,13 +261,13 @@ class StopTimesHelper {
       var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
 
       List<StopLocation> stops = pattern.getStops();
-      for (int stopIndex = 0; stopIndex < stops.size(); stopIndex++) {
-        StopLocation currStop = stops.get(stopIndex);
+      for (int stopPos = 0; stopPos < stops.size(); stopPos++) {
+        StopLocation currStop = stops.get(stopPos);
         if (currStop == stop) {
-          if (skipByPickUpDropOff(pattern, arrivalDeparture, stopIndex)) {
+          if (skipByPickUpDropOff(pattern, arrivalDeparture, stopPos)) {
             continue;
           }
-          if (skipByStopCancellation(pattern, includeCancellations, stopIndex)) {
+          if (skipByStopCancellation(pattern, includeCancellations, stopPos)) {
             continue;
           }
 
@@ -286,12 +286,12 @@ class StopTimesHelper {
             }
 
             boolean departureTimeInRange =
-              tripTimes.getDepartureTime(stopIndex) >= secondsSinceMidnight &&
-              tripTimes.getDepartureTime(stopIndex) <= secondsSinceMidnight + timeRangeSeconds;
+              tripTimes.getDepartureTime(stopPos) >= secondsSinceMidnight &&
+              tripTimes.getDepartureTime(stopPos) <= secondsSinceMidnight + timeRangeSeconds;
 
             boolean arrivalTimeInRange =
-              tripTimes.getArrivalTime(stopIndex) >= secondsSinceMidnight &&
-              tripTimes.getArrivalTime(stopIndex) <= secondsSinceMidnight + timeRangeSeconds;
+              tripTimes.getArrivalTime(stopPos) >= secondsSinceMidnight &&
+              tripTimes.getArrivalTime(stopPos) <= secondsSinceMidnight + timeRangeSeconds;
 
             // ARRIVAL: Arrival time has to be within range
             // DEPARTURES: Departure time has to be within range
@@ -301,7 +301,7 @@ class StopTimesHelper {
               (arrivalDeparture != DEPARTURES && arrivalTimeInRange)
             ) {
               pq.add(
-                new TripTimeOnDate(tripTimes, stopIndex, pattern, serviceDate, midnight.toInstant())
+                new TripTimeOnDate(tripTimes, stopPos, pattern, serviceDate, midnight.toInstant())
               );
             }
           }
@@ -328,10 +328,10 @@ class StopTimesHelper {
   private static boolean skipByPickUpDropOff(
     TripPattern pattern,
     ArrivalDeparture arrivalDeparture,
-    int stopIndex
+    int stopPos
   ) {
-    boolean noPickup = pattern.getBoardType(stopIndex).is(PickDrop.NONE);
-    boolean noDropoff = pattern.getAlightType(stopIndex).is(PickDrop.NONE);
+    boolean noPickup = pattern.getBoardType(stopPos).is(PickDrop.NONE);
+    boolean noDropoff = pattern.getAlightType(stopPos).is(PickDrop.NONE);
 
     if (noPickup && noDropoff) {
       return true;
@@ -348,10 +348,10 @@ class StopTimesHelper {
   private static boolean skipByStopCancellation(
     TripPattern pattern,
     boolean includeCancelled,
-    int stopIndex
+    int stopPos
   ) {
-    boolean pickupCancelled = pattern.getBoardType(stopIndex).is(PickDrop.CANCELLED);
-    boolean dropOffCancelled = pattern.getAlightType(stopIndex).is(PickDrop.CANCELLED);
+    boolean pickupCancelled = pattern.getBoardType(stopPos).is(PickDrop.CANCELLED);
+    boolean dropOffCancelled = pattern.getAlightType(stopPos).is(PickDrop.CANCELLED);
 
     return (pickupCancelled || dropOffCancelled) && !includeCancelled;
   }

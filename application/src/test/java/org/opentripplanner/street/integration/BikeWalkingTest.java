@@ -319,11 +319,11 @@ public class BikeWalkingTest extends GraphRoutingTest {
           elevator(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, D, Q);
 
           biLink(A, S1);
-          AB = street(A, B, 100, StreetTraversalPermission.PEDESTRIAN);
-          BC = street(B, C, 100, StreetTraversalPermission.PEDESTRIAN);
-          CD = street(C, D, 100, StreetTraversalPermission.ALL);
-          DE = street(D, E, 100, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-          EF = street(E, F, 100, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+          AB = street(A, B, 100, StreetTraversalPermission.PEDESTRIAN, 40);
+          BC = street(B, C, 100, StreetTraversalPermission.PEDESTRIAN, 40);
+          CD = street(C, D, 100, StreetTraversalPermission.ALL, 40);
+          DE = street(D, E, 100, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 40);
+          EF = street(E, F, 100, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 40);
           biLink(F, E1);
           pathway(E1, S2, 60, 100);
         }
