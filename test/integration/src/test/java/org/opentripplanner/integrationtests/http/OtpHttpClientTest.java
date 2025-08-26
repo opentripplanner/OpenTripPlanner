@@ -1,4 +1,4 @@
-package org.opentripplanner.integrationtests;
+package org.opentripplanner.integrationtests.http;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
