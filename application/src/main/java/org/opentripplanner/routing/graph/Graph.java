@@ -224,7 +224,7 @@ public class Graph implements Serializable {
   }
 
   /**
-   * If the {@code id} is a station id and it is configured to route to its center,
+   * If the {@code stopId} is a station id and it is configured to route to its center,
    * return the corresponding vertex, otherwise return an empty optional.
    */
   public Optional<StationCentroidVertex> findStationCentroidVertex(FeedScopedId stopId) {
