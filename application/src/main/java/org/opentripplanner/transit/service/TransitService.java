@@ -168,11 +168,8 @@ public interface TransitService {
    * are returned. If the id matches a regular stop, area stop or stop group, then a list with one
    * item is returned.
    */
-  default Set<FeedScopedId> findStopOrChildIds(FeedScopedId id) {
-    return findStopOrChildStops(id)
-      .stream()
-      .map(StopLocation::getId)
-      .collect(Collectors.toUnmodifiableSet());
+  default List<FeedScopedId> findStopOrChildIds(FeedScopedId id) {
+    return findStopOrChildStops(id).stream().map(StopLocation::getId).distinct().toList();
   }
 
   Collection<StopLocationsGroup> listStopLocationGroups();

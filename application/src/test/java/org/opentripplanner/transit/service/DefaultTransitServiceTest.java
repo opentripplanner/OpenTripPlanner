@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.service;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -337,24 +338,24 @@ class DefaultTransitServiceTest {
   @Test
   void stopOrChildId() {
     var res = service.findStopOrChildIds(STOP_A.getId());
-    assertEquals(Set.of(STOP_A.getId()), res);
+    assertThat(res).containsExactly(STOP_A.getId());
   }
 
   @Test
   void stationChildIds() {
     var res = service.findStopOrChildIds(STATION.getId());
-    assertEquals(Set.of(STOP_A.getId(), STOP_B.getId()), res);
+    assertThat(res).containsExactly(STOP_A.getId(), STOP_B.getId());
   }
 
   @Test
   void multiModalStationChildIds() {
     var res = service.findStopOrChildIds(MM_STATION.getId());
-    assertEquals(Set.of(STOP_A.getId(), STOP_B.getId()), res);
+    assertThat(res).containsExactly(STOP_A.getId(), STOP_B.getId());
   }
 
   @Test
   void groupOfStationsChildIds() {
     var res = service.findStopOrChildIds(GO_STATIONS.getId());
-    assertEquals(Set.of(STOP_A.getId(), STOP_B.getId()), res);
+    assertThat(res).containsExactly(STOP_A.getId(), STOP_B.getId());
   }
 }
