@@ -68,6 +68,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Allow drop off for any form factor if rental station doesn't specifically state them [#6738](https://github.com/opentripplanner/OpenTripPlanner/pull/6738)
 - Limit bike speed to car speed [#6770](https://github.com/opentripplanner/OpenTripPlanner/pull/6770)
 - Close all data sources after graph build, not before [#6794](https://github.com/opentripplanner/OpenTripPlanner/pull/6794)
+- Collect timing data from certain queries and fields in the GTFS GraphQL API [#6721](https://github.com/opentripplanner/OpenTripPlanner/pull/6721)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
