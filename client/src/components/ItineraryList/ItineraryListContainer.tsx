@@ -7,6 +7,8 @@ import { ItineraryDetails } from './ItineraryDetails.tsx';
 import { ItineraryPaginationControl } from './ItineraryPaginationControl.tsx';
 import { useContext } from 'react';
 import { TimeZoneContext } from '../../hooks/TimeZoneContext.ts';
+import { ErrorDisplay } from './ErrorDisplay.tsx';
+import { NoResultsDisplay } from './NoResultsDisplay.tsx';
 
 export function ItineraryListContainer({
   tripQueryResult,
@@ -14,21 +16,28 @@ export function ItineraryListContainer({
   setSelectedTripPatternIndex,
   pageResults,
   loading,
+  error,
 }: {
   tripQueryResult: TripQuery | null;
   selectedTripPatternIndex: number;
   setSelectedTripPatternIndex: (selectedTripPatterIndex: number) => void;
   pageResults: (cursor: string) => void;
   loading: boolean;
+  error?: unknown;
 }) {
   const [earliestStartTime, latestEndTime] = useEarliestAndLatestTimes(tripQueryResult);
   const { containerRef, containerWidth } = useContainerWidth();
   const timeZone = useContext(TimeZoneContext);
 
+  const hasNoResults = Boolean(tripQueryResult && tripQueryResult.trip.tripPatterns.length === 0);
+  const hasSearched = tripQueryResult !== null;
+
   return (
     <section className="left-pane-container below-content" ref={containerRef}>
       <>
         <div className="panel-header">Itinerary results</div>
+        <ErrorDisplay error={error} />
+        <NoResultsDisplay hasSearched={hasSearched && !error && hasNoResults} tripQueryResult={tripQueryResult} />
         <div className="pagination-controls">
           <ItineraryPaginationControl
             onPagination={pageResults}

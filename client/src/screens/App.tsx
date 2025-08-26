@@ -16,8 +16,9 @@ import { getApiUrl } from '../util/getApiUrl.ts';
 export function App() {
   const serverInfo = useServerInfo();
   const { tripQueryVariables, setTripQueryVariables } = useTripQueryVariables();
-  const [tripQueryResult, loading, callback] = useTripQuery(tripQueryVariables);
+  const [tripQueryResult, loading, callback, error] = useTripQuery(tripQueryVariables);
   const [selectedTripPatternIndex, setSelectedTripPatternIndex] = useState<number>(0);
+  const [expandedArguments, setExpandedArguments] = useState<Record<string, boolean>>({});
   const timeZone = serverInfo?.internalTransitModelTimeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   return (
@@ -43,16 +44,20 @@ export function App() {
                 setSelectedTripPatternIndex={setSelectedTripPatternIndex}
                 pageResults={callback}
                 loading={loading}
+                error={error}
               ></ItineraryListContainer>
               <TripSchemaProvider endpoint={getApiUrl()}>
                 <TripQueryArguments
                   tripQueryVariables={tripQueryVariables}
                   setTripQueryVariables={setTripQueryVariables}
+                  expandedArguments={expandedArguments}
+                  setExpandedArguments={setExpandedArguments}
                 ></TripQueryArguments>
               </TripSchemaProvider>
               <ViewArgumentsRaw
                 tripQueryVariables={tripQueryVariables}
                 setTripQueryVariables={setTripQueryVariables}
+                setExpandedArguments={setExpandedArguments}
               ></ViewArgumentsRaw>
             </Sidebar>
           </div>

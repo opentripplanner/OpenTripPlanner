@@ -10,11 +10,12 @@ import { query } from '../static/query/tripQuery.tsx';
 
 type TripQueryHook = (
   variables?: TripQueryVariables,
-) => [TripQuery | null, boolean, (pageCursor?: string) => Promise<void>];
+) => [TripQuery | null, boolean, (pageCursor?: string) => Promise<void>, unknown];
 
 export const useTripQuery: TripQueryHook = (variables) => {
   const [data, setData] = useState<TripQuery | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<unknown>(null);
   const callback = useCallback(
     async (pageCursor?: string) => {
       if (loading) {
@@ -22,6 +23,7 @@ export const useTripQuery: TripQueryHook = (variables) => {
       } else {
         if (variables) {
           setLoading(true);
+          setError(null);
           try {
             if (pageCursor) {
               setData((await request(getApiUrl(), query, { ...variables, pageCursor })) as TripQuery);
@@ -30,6 +32,8 @@ export const useTripQuery: TripQueryHook = (variables) => {
             }
           } catch (e) {
             console.error('Error at useTripQuery', e);
+            setError(e);
+            setData(null);
           }
           setLoading(false);
         } else {
@@ -46,7 +50,7 @@ export const useTripQuery: TripQueryHook = (variables) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variables?.from, variables?.to]);
-  return [data, loading, callback];
+  return [data, loading, callback, error];
 };
 
 function validLocation(location: Location | undefined) {
