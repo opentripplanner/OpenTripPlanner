@@ -9,7 +9,8 @@ public class SiriETMqttUpdaterConfig {
   public static MqttSiriETUpdaterParameters create(String configRef, NodeAdapter siriMqttRoot) {
     String feedId = siriMqttRoot.of("feedId").since(OtpVersion.V2_8).asString();
 
-    String url = siriMqttRoot.of("url").since(OtpVersion.V2_8).asString();
+    String host = siriMqttRoot.of("host").since(OtpVersion.V2_8).asString();
+    int port = siriMqttRoot.of("port").since(OtpVersion.V2_8).asInt();
     String user = siriMqttRoot.of("user").since(OtpVersion.V2_8).asString(null);
     String password = siriMqttRoot.of("password").since(OtpVersion.V2_8).asString(null);
 
@@ -25,7 +26,8 @@ public class SiriETMqttUpdaterConfig {
     return new MqttSiriETUpdaterParameters(
       configRef,
       feedId,
-      url,
+      host,
+      port,
       user,
       password,
       topic,

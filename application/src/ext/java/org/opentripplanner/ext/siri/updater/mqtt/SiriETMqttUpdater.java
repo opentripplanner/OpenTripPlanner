@@ -25,7 +25,7 @@ public class SiriETMqttUpdater implements GraphUpdater {
     SiriRealTimeTripUpdateAdapter updateAdapter
   ) {
     configRef = parameters.configRef();
-    asyncEstimatedTimetableSource = new MqttEstimatedTimetableSource(parameters);
+    asyncEstimatedTimetableSource = new MqttEstimatedTimetableSourceHiveMQ(parameters);
     estimatedTimetableHandler = new EstimatedTimetableHandler(
       updateAdapter,
       parameters.fuzzyTripMatching(),

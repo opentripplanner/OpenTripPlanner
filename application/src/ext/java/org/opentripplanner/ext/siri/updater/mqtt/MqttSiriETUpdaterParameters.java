@@ -6,7 +6,8 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
 
   private final String configRef;
   private final String feedId;
-  private final String url;
+  private final String host;
+  private final int port;
   private final String user;
   private final String password;
   private final String topic;
@@ -16,7 +17,8 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
   public MqttSiriETUpdaterParameters(
     String configRef,
     String feedId,
-    String url,
+    String host,
+    int port,
     String user,
     String password,
     String topic,
@@ -25,7 +27,8 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
   ) {
     this.configRef = configRef;
     this.feedId = feedId;
-    this.url = url;
+    this.host = host;
+    this.port = port;
     this.user = user;
     this.password = password;
     this.topic = topic;
@@ -35,7 +38,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
 
   @Override
   public String url() {
-    return url;
+    return host + ":" + port;
   }
 
   @Override
@@ -66,5 +69,13 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
 
   public String password() {
     return password;
+  }
+
+  public int port() {
+    return port;
+  }
+
+  public String host() {
+    return host;
   }
 }
