@@ -23,7 +23,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
-import org.opentripplanner.graph_builder.issues.MissingShapeGeometry;
 import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
@@ -122,7 +121,12 @@ public class GeometryProcessor {
     if (shapeLineString == null) {
       // this trip has a shape_id, but no such shape exists, and no shape_dist in stop_times
       // create straight line segments between stops for each hop
-      issueStore.add(new MissingShapeGeometry(stopTimes.get(0).getTrip().getId(), shapeId));
+      issueStore.add(
+        "InvalidShapeReference",
+        "Trip '%s' refers to unknown shape geometry '%s'",
+        stopTimes.get(0).getTrip().getId(),
+        shapeId
+      );
       return createStraightLineHopGeometries(stopTimes);
     }
 
@@ -515,7 +519,7 @@ public class GeometryProcessor {
    * indexed line to return a segment location of NaN, which we do not want.
    */
   private Collection<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
-    var points = builder.getShapePoints().get(shapeId);
+    var points = builder.getShapePoints().getOrDefault(shapeId, List.of());
     ArrayList<ShapePoint> filtered = new ArrayList<>();
     ShapePoint last = null;
     int currentSeq = Integer.MIN_VALUE;
