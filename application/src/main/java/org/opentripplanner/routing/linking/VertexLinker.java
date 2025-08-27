@@ -753,8 +753,8 @@ public class VertexLinker {
       .withName(hit.getName())
       .withMeterLength(length)
       .withPermission(hit.getPermission())
-      .withBicycleSafetyFactor(hit.getBicycleSafety())
-      .withWalkSafetyFactor(hit.getWalkSafety())
+      .withBicycleSafetyFactor((float) hit.getBicycleSafety())
+      .withWalkSafetyFactor((float) hit.getWalkSafety())
       .withBack(false)
       .withArea(ag);
     for (TraverseMode tm : outgoingNoThruModes) {
@@ -772,8 +772,8 @@ public class VertexLinker {
       .withName(hit.getName())
       .withMeterLength(length)
       .withPermission(hit.getPermission())
-      .withBicycleSafetyFactor(hit.getBicycleSafety())
-      .withWalkSafetyFactor(hit.getWalkSafety())
+      .withBicycleSafetyFactor((float) hit.getBicycleSafety())
+      .withWalkSafetyFactor((float) hit.getWalkSafety())
       .withBack(true)
       .withArea(ag);
     for (TraverseMode tm : incomingNoThruModes) {
