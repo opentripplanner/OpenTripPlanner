@@ -5,6 +5,7 @@ import static org.opentripplanner.routing.api.response.InputField.INTERMEDIATE_P
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.routing.api.request.ViaLocationDeprecated;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -13,10 +14,16 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 @Deprecated
 class ViaLocationDeprecatedMapper {
 
-  static ViaLocationDeprecated mapViaLocation(Map<String, Object> viaLocation) {
+  private final GenericLocationMapper genericLocationMapper;
+
+  ViaLocationDeprecatedMapper(FeedScopedIdMapper idMapper) {
+    this.genericLocationMapper = new GenericLocationMapper(idMapper);
+  }
+
+  ViaLocationDeprecated mapViaLocation(Map<String, Object> viaLocation) {
     try {
       return new ViaLocationDeprecated(
-        GenericLocationMapper.toGenericLocation(viaLocation),
+        genericLocationMapper.toGenericLocation(viaLocation),
         false,
         (Duration) viaLocation.get("minSlack"),
         (Duration) viaLocation.get("maxSlack")

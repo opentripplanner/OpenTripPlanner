@@ -76,7 +76,7 @@ public interface TransitService {
   /**
    * @return empty if the trip doesn't run on the date specified
    */
-  Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate);
+  Optional<List<TripTimeOnDate>> findTripTimesOnDate(Trip trip, LocalDate serviceDate);
 
   Collection<String> listFeedIds();
 

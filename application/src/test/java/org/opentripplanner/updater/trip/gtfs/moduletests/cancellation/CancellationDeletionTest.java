@@ -87,9 +87,9 @@ class CancellationDeletionTest implements RealtimeTestConstants {
       ScheduleRelationship.ADDED,
       TIME_ZONE
     )
-      .addStopTime(STOP_A_ID, 30)
-      .addStopTime(STOP_B_ID, 40)
-      .addStopTime(STOP_C_ID, 55)
+      .addStopTime(STOP_A_ID, "00:30")
+      .addStopTime(STOP_B_ID, "00:40")
+      .addStopTime(STOP_C_ID, "00:55")
       .build();
 
     assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));

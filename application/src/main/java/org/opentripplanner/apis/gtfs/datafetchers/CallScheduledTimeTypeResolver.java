@@ -4,18 +4,24 @@ import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
-import org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime;
+import org.opentripplanner.apis.gtfs.model.CallScheduledTime;
 
 public class CallScheduledTimeTypeResolver implements TypeResolver {
 
   @Override
   public GraphQLObjectType getType(TypeResolutionEnvironment environment) {
-    Object o = environment.getObject();
+    CallScheduledTime o = environment.getObject();
     GraphQLSchema schema = environment.getSchema();
 
-    if (o instanceof ArrivalDepartureTime) {
-      return schema.getObjectType("ArrivalDepartureTime");
+    if (o == null) {
+      return null;
     }
-    return null;
+
+    return switch (o) {
+      case CallScheduledTime.ArrivalDepartureTime adt -> schema.getObjectType(
+        "ArrivalDepartureTime"
+      );
+      case CallScheduledTime.TimeWindow tw -> schema.getObjectType("TimeWindow");
+    };
   }
 }

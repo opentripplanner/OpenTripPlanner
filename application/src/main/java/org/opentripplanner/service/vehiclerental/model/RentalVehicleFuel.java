@@ -1,7 +1,6 @@
 package org.opentripplanner.service.vehiclerental.model;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Ratio;
@@ -37,11 +36,6 @@ public final class RentalVehicleFuel {
   private RentalVehicleFuel(Builder builder) {
     this.percent = builder.percent;
     this.range = builder.range;
-  }
-
-  public RentalVehicleFuel(@Nullable Ratio fuelPercent, @Nullable Distance range) {
-    this.percent = fuelPercent;
-    this.range = range;
   }
 
   public static Builder of() {
@@ -102,11 +96,6 @@ public final class RentalVehicleFuel {
 
     public Builder withRange(@Nullable Distance range) {
       this.range = range;
-      return this;
-    }
-
-    public Builder apply(Consumer<Builder> body) {
-      body.accept(this);
       return this;
     }
 

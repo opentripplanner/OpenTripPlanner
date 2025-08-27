@@ -10,13 +10,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nullable;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
-import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -48,11 +50,16 @@ public class GqlUtil {
     return ((TransmodelRequestContext) environment.getContext()).getServerContext().graphFinder();
   }
 
-  public static GraphQLFieldDefinition newTransitIdField() {
+  public static GraphQLFieldDefinition newTransitIdField(FeedScopedIdMapper idMapper) {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("id")
       .type(new GraphQLNonNull(Scalars.GraphQLID))
-      .dataFetcher(env -> TransitIdMapper.mapEntityIDToApi(env.getSource()))
+      .dataFetcher(env ->
+        Optional.ofNullable((AbstractTransitEntity<?, ?>) env.getSource())
+          .map(AbstractTransitEntity::getId)
+          .map(idMapper::mapToApi)
+          .orElse("")
+      )
       .build();
   }
 

@@ -34,6 +34,8 @@ import org.opentripplanner.apis.gtfs.datafetchers.GeometryImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.ItineraryImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.LegImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.LegTimeImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.LocationGroupImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.LocationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.MoneyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.NodeTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.OpeningHoursImpl;
@@ -167,6 +169,8 @@ public class SchemaFactory {
         .type(typeWiring.build(serviceTimeRangeImpl.class))
         .type(typeWiring.build(stepImpl.class))
         .type(typeWiring.build(StopImpl.class))
+        .type(typeWiring.build(LocationImpl.class))
+        .type(typeWiring.build(LocationGroupImpl.class))
         .type(typeWiring.build(stopAtDistanceImpl.class))
         .type(typeWiring.build(StoptimeImpl.class))
         .type(typeWiring.build(StoptimesInPatternImpl.class))

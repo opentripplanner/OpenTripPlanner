@@ -54,7 +54,7 @@ class RentalRestrictionExtensionTest {
     var edge = streetEdge(V1, V2);
     V2.addRentalRestriction(
       new GeofencingZoneExtension(
-        new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, true)
+        new GeofencingZone(new FeedScopedId(network, "a-park"), null, null, true, true)
       )
     );
     var result = traverse(edge)[0];
@@ -73,7 +73,7 @@ class RentalRestrictionExtensionTest {
     editor.beginFloatingVehicleRenting(RentalFormFactor.SCOOTER, network, false);
     restrictedEdge.addRentalRestriction(
       new GeofencingZoneExtension(
-        new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
+        new GeofencingZone(new FeedScopedId(network, "a-park"), null, null, true, false)
       )
     );
 
@@ -100,7 +100,7 @@ class RentalRestrictionExtensionTest {
   public void dontFinishInNoDropOffZone() {
     var edge = streetEdge(V1, V2);
     var ext = new GeofencingZoneExtension(
-      new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
+      new GeofencingZone(new FeedScopedId(network, "a-park"), null, null, true, false)
     );
     V2.addRentalRestriction(ext);
     edge.addRentalRestriction(ext);
@@ -179,7 +179,7 @@ class RentalRestrictionExtensionTest {
     RentalRestrictionExtension a = new BusinessAreaBorder("a");
     RentalRestrictionExtension b = new BusinessAreaBorder("b");
     RentalRestrictionExtension c = new GeofencingZoneExtension(
-      new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
+      new GeofencingZone(new FeedScopedId(network, "a-park"), null, null, true, false)
     );
 
     @Test

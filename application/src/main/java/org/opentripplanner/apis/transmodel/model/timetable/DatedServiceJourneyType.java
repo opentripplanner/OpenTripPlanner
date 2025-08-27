@@ -13,6 +13,7 @@ import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.List;
 import java.util.Optional;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
@@ -30,7 +31,13 @@ public class DatedServiceJourneyType {
   private static final String NAME = "DatedServiceJourney";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  public static GraphQLObjectType create(
+  private final FeedScopedIdMapper idMapper;
+
+  public DatedServiceJourneyType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
+  }
+
+  public GraphQLObjectType create(
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType journeyPatternType,
     GraphQLType estimatedCallType,
@@ -39,7 +46,7 @@ public class DatedServiceJourneyType {
     return GraphQLObjectType.newObject()
       .name(NAME)
       .description("A planned journey on a specific day")
-      .field(GqlUtil.newTransitIdField())
+      .field(GqlUtil.newTransitIdField(idMapper))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("operatingDay")
@@ -141,7 +148,7 @@ public class DatedServiceJourneyType {
           .dataFetcher(environment -> {
             TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);
             return GqlUtil.getTransitService(environment)
-              .getTripTimeOnDates(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
+              .findTripTimesOnDate(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
               .orElse(List.of());
           })
           .build()

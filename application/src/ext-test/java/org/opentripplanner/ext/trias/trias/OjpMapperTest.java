@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.trias.id.UseFeedIdResolver;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.ext.trias.mapping.StopEventResponseMapper;
 import org.opentripplanner.ext.trias.service.CallAtStop;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -27,7 +27,6 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
@@ -81,7 +80,7 @@ class OjpMapperTest {
     var mapper = new StopEventResponseMapper(
       Set.of(),
       ZoneIds.BERLIN,
-      new UseFeedIdResolver(),
+      new DefaultFeedIdMapper(),
       RESOLVE_FEED_LANG
     );
 
@@ -106,7 +105,7 @@ class OjpMapperTest {
     var mapper = new StopEventResponseMapper(
       Set.of(),
       ZoneIds.BERLIN,
-      new UseFeedIdResolver(),
+      new DefaultFeedIdMapper(),
       RESOLVE_FEED_LANG
     );
     var ojp = mapper.mapCalls(List.of(new CallAtStop(TRIP_TIMES_ON_DATE, WALK_TIME)), timestamp);

@@ -71,7 +71,7 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
   }
 
   /**
-   * Have the inbound angle of  their parent.
+   * Have the inbound angle of their parent.
    */
   @Override
   public int getInAngle() {
@@ -79,10 +79,10 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
   }
 
   /**
-   * Have the outbound angle of  their parent.
+   * Have the outbound angle of their parent.
    */
   @Override
   public int getOutAngle() {
-    return parentEdge.getInAngle();
+    return parentEdge.getOutAngle();
   }
 }

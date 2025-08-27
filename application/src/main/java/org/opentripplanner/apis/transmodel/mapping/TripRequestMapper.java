@@ -1,13 +1,12 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
-import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDsToDomainNullSafe;
-
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
@@ -16,10 +15,24 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 
 public class TripRequestMapper {
 
+  private final TripViaLocationMapper tripViaLocationMapper;
+  private final GenericLocationMapper genericLocationMapper;
+  private final TransitFilterNewWayMapper transitFilterNewWayMapper;
+  private final TransitFilterOldWayMapper transitFilterOldWayMapper;
+  private final FeedScopedIdMapper idMapper;
+
+  public TripRequestMapper(FeedScopedIdMapper idMapper) {
+    this.tripViaLocationMapper = new TripViaLocationMapper(idMapper);
+    this.genericLocationMapper = new GenericLocationMapper(idMapper);
+    this.transitFilterNewWayMapper = new TransitFilterNewWayMapper(idMapper);
+    this.transitFilterOldWayMapper = new TransitFilterOldWayMapper(idMapper);
+    this.idMapper = idMapper;
+  }
+
   /**
    * Create a RouteRequest from the input fields of the trip query arguments.
    */
-  public static RouteRequest createRequest(DataFetchingEnvironment environment) {
+  public RouteRequest createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
     var serverContext = context.getServerContext();
     var requestBuilder = serverContext.defaultRouteRequest().copyOf();
@@ -27,16 +40,16 @@ public class TripRequestMapper {
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
     callWith.argument("from", (Map<String, Object> v) ->
-      requestBuilder.withFrom(GenericLocationMapper.toGenericLocation(v))
+      requestBuilder.withFrom(genericLocationMapper.toGenericLocation(v))
     );
     callWith.argument("to", (Map<String, Object> v) ->
-      requestBuilder.withTo(GenericLocationMapper.toGenericLocation(v))
+      requestBuilder.withTo(genericLocationMapper.toGenericLocation(v))
     );
     callWith.argument("passThroughPoints", (List<Map<String, Object>> v) -> {
-      requestBuilder.withViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
+      requestBuilder.withViaLocations(tripViaLocationMapper.toLegacyPassThroughLocations(v));
     });
     callWith.argument(TripQuery.TRIP_VIA_PARAMETER, (List<Map<String, Object>> v) -> {
-      requestBuilder.withViaLocations(TripViaLocationMapper.mapToViaLocations(v));
+      requestBuilder.withViaLocations(tripViaLocationMapper.mapToViaLocations(v));
     });
 
     callWith.argument("dateTime", millisSinceEpoch ->
@@ -60,28 +73,28 @@ public class TripRequestMapper {
 
       journeyBuilder.withTransit(transitBuilder -> {
         callWith.argument("preferred.authorities", (Collection<String> authorities) ->
-          transitBuilder.withPreferredAgencies(mapIDsToDomainNullSafe(authorities))
+          transitBuilder.withPreferredAgencies(idMapper.parseListNullSafe(authorities))
         );
         callWith.argument("unpreferred.authorities", (Collection<String> authorities) ->
-          transitBuilder.withUnpreferredAgencies(mapIDsToDomainNullSafe(authorities))
+          transitBuilder.withUnpreferredAgencies(idMapper.parseListNullSafe(authorities))
         );
 
         callWith.argument("preferred.lines", (List<String> lines) ->
-          transitBuilder.withPreferredRoutes(mapIDsToDomainNullSafe(lines))
+          transitBuilder.withPreferredRoutes(idMapper.parseListNullSafe(lines))
         );
         callWith.argument("unpreferred.lines", (List<String> lines) ->
-          transitBuilder.withUnpreferredRoutes(mapIDsToDomainNullSafe(lines))
+          transitBuilder.withUnpreferredRoutes(idMapper.parseListNullSafe(lines))
         );
         callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) ->
-          transitBuilder.withBannedTrips(mapIDsToDomainNullSafe(serviceJourneys))
+          transitBuilder.withBannedTrips(idMapper.parseListNullSafe(serviceJourneys))
         );
 
         if (GqlUtil.hasArgument(environment, "filters")) {
           transitBuilder.setFilters(
-            TransitFilterNewWayMapper.mapFilter(environment.getArgument("filters"))
+            transitFilterNewWayMapper.mapFilter(environment.getArgument("filters"))
           );
         } else {
-          TransitFilterOldWayMapper.mapFilter(environment, callWith, transitBuilder);
+          transitFilterOldWayMapper.mapFilter(environment, callWith, transitBuilder);
         }
       });
 

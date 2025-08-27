@@ -34,7 +34,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
-import org.opentripplanner.ext.trias.id.IdResolver;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.ext.trias.service.CallAtStop;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
@@ -49,7 +49,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public class StopEventResponseMapper {
 
   private final Function<String, Optional<String>> resolveFeedLanguage;
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idMapper;
 
   public enum OptionalFeature {
     PREVIOUS_CALLS,
@@ -64,12 +64,12 @@ public class StopEventResponseMapper {
   public StopEventResponseMapper(
     Set<OptionalFeature> optionalFeatures,
     ZoneId zoneId,
-    IdResolver idResolver,
+    FeedScopedIdMapper idMapper,
     Function<String, Optional<String>> resolveFeedLanguage
   ) {
     this.optionalFeatures = optionalFeatures;
     this.zoneId = zoneId;
-    this.idResolver = idResolver;
+    this.idMapper = idMapper;
     this.resolveFeedLanguage = resolveFeedLanguage;
   }
 
@@ -130,16 +130,16 @@ public class StopEventResponseMapper {
     var lastStop = tripTimeOnDate.pattern().getStops().getLast();
     return new DatedJourneyStructure()
       .withJourneyRef(
-        new JourneyRefStructure().withValue(idResolver.toString(tripTimeOnDate.getTrip().getId()))
+        new JourneyRefStructure().withValue(idMapper.mapToApi(tripTimeOnDate.getTrip().getId()))
       )
       .withOperatingDayRef(
         new OperatingDayRefStructure().withValue(tripTimeOnDate.getServiceDay().toString())
       )
-      .withLineRef(new LineRefStructure().withValue(idResolver.toString(route.getId())))
+      .withLineRef(new LineRefStructure().withValue(idMapper.mapToApi(route.getId())))
       .withMode(new ModeStructure().withPtMode(PtModeMapper.map(route.getMode())))
       .withPublishedServiceName(internationalText(route.getName(), lang(tripTimeOnDate)))
       .withOperatorRef(
-        new OperatorRefStructure().withValue(idResolver.toString(route.getAgency().getId()))
+        new OperatorRefStructure().withValue(idMapper.mapToApi(route.getAgency().getId()))
       )
       .withOriginStopPointRef(stopPointRef(firstStop))
       .withOriginText(internationalText(firstStop.getName(), lang(tripTimeOnDate)))
@@ -207,7 +207,7 @@ public class StopEventResponseMapper {
   }
 
   private StopPointRefStructure stopPointRef(StopLocation stop) {
-    return new StopPointRefStructure().withValue(idResolver.toString(stop.getId()));
+    return new StopPointRefStructure().withValue(idMapper.mapToApi(stop.getId()));
   }
 
   private static InternationalTextStructure internationalText(I18NString string, String lang) {

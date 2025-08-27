@@ -10,6 +10,7 @@ import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSFeature;
 import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.UnsupportedGeometryException;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.lang.StringUtils;
@@ -60,6 +61,7 @@ class GbfsGeofencingZoneMapper {
     var passThroughBanned = !f.getProperties().getRules().get(0).getRideThroughAllowed();
     return new GeofencingZone(
       new FeedScopedId(systemId, name),
+      I18NString.of(name),
       g,
       dropOffBanned,
       passThroughBanned

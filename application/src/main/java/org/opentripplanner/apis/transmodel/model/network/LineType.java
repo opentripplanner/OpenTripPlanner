@@ -9,11 +9,13 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 
@@ -22,7 +24,13 @@ public class LineType {
   private static final String NAME = "Line";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  public static GraphQLObjectType create(
+  private final FeedScopedIdMapper idMapper;
+
+  public LineType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
+  }
+
+  public GraphQLObjectType create(
     GraphQLOutputType bookingArrangementType,
     GraphQLOutputType authorityType,
     GraphQLOutputType operatorType,
@@ -44,7 +52,12 @@ public class LineType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
-          .dataFetcher(environment -> TransitIdMapper.mapEntityIDToApi(getSource(environment)))
+          .dataFetcher(environment ->
+            Optional.ofNullable((AbstractTransitEntity<?, ?>) environment.getSource())
+              .map(AbstractTransitEntity::getId)
+              .map(idMapper::mapToApi)
+              .orElse(null)
+          )
           .build()
       )
       .field(

@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.ext.trias.id.IdResolver;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.ext.trias.mapping.PtModeMapper;
 import org.opentripplanner.ext.trias.mapping.StopEventResponseMapper;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -44,12 +44,12 @@ public class OjpServiceMapper {
   public static final int DEFAULT_NUM_DEPARTURES = 1;
   private static final Duration DEFAULT_TIME_WINDOW = Duration.ofHours(2);
   private final OjpService vdvService;
-  private final IdResolver idResolver;
+  private final FeedScopedIdMapper idMapper;
   private final ZoneId zoneId;
 
-  public OjpServiceMapper(OjpService vdvService, IdResolver idResolver, ZoneId zoneId) {
+  public OjpServiceMapper(OjpService vdvService, FeedScopedIdMapper idMapper, ZoneId zoneId) {
     this.vdvService = vdvService;
-    this.idResolver = idResolver;
+    this.idMapper = idMapper;
     this.zoneId = zoneId;
   }
 
@@ -69,7 +69,7 @@ public class OjpServiceMapper {
     var mapper = new StopEventResponseMapper(
       optional,
       zoneId,
-      idResolver,
+      idMapper,
       vdvService::resolveLanguage
     );
     return mapper.mapCalls(callsAtStop, ZonedDateTime.now());
@@ -150,7 +150,7 @@ public class OjpServiceMapper {
       .map(o -> o.getOperatorRef())
       .stream()
       .flatMap(r -> r.stream().map(ref -> ref.getValue()))
-      .map(idResolver::parse)
+      .map(idMapper::parse)
       .collect(Collectors.toSet());
   }
 
@@ -164,7 +164,7 @@ public class OjpServiceMapper {
       .map(o -> o.getLine())
       .stream()
       .flatMap(r -> r.stream().map(l -> l.getLineRef().getValue()))
-      .map(idResolver::parse)
+      .map(idMapper::parse)
       .collect(Collectors.toSet());
   }
 
@@ -176,7 +176,7 @@ public class OjpServiceMapper {
     return placeRefStructure(ser)
       .map(PlaceRefStructure::getStopPointRef)
       .map(StopPointRefStructure::getValue)
-      .map(idResolver::parse);
+      .map(idMapper::parse);
   }
 
   private Optional<WgsCoordinate> coordinate(OJPStopEventRequestStructure ser) {

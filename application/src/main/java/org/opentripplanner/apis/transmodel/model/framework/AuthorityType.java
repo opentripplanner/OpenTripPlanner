@@ -10,12 +10,19 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.transit.model.organization.Agency;
 
 public class AuthorityType {
 
-  public static GraphQLObjectType create(
+  private final FeedScopedIdMapper idMapper;
+
+  public AuthorityType(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
+  }
+
+  public GraphQLObjectType create(
     GraphQLOutputType lineType,
     GraphQLOutputType ptSituationElementType
   ) {
@@ -24,7 +31,7 @@ public class AuthorityType {
       .description(
         "Authority involved in public transportation. An organisation under which the responsibility of organising the transport service in a certain area is placed."
       )
-      .field(GqlUtil.newTransitIdField())
+      .field(GqlUtil.newTransitIdField(idMapper))
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("name")

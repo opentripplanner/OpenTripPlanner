@@ -2,6 +2,7 @@ package org.opentripplanner.service.vehiclerental.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -100,7 +101,7 @@ public class TestVehicleRentalStationBuilder {
           String.format("%s-%s", rentalFormFactor.name(), propulsionType.name())
         )
       )
-      .withName(rentalFormFactor.name())
+      .withName(I18NString.of(rentalFormFactor.name()))
       .withFormFactor(rentalFormFactor)
       .withPropulsionType(propulsionType)
       .withMaxRangeMeters(100000d)

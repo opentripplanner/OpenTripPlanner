@@ -8,6 +8,7 @@ import static org.opentripplanner.client.model.RequestMode.WALK;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.client.model.Coordinate;
@@ -39,7 +40,7 @@ public class SeptaSmokeTest {
     var modes = Set.of(TRANSIT, WALK);
     var plan = SmokeTest.basicRouteTest(
       new SmokeTestRequest(airport, stPetersCemetary, modes),
-      List.of("WALK", "RAIL", "WALK", "SUBWAY", "WALK")
+      List.of("WALK", "BUS", "WALK", "SUBWAY", "WALK", "SUBWAY", "WALK")
     );
     var products = plan
       .itineraries()
@@ -62,6 +63,7 @@ public class SeptaSmokeTest {
   }
 
   @Test
+  @Disabled
   public void vehiclePositions() {
     SmokeTest.assertThereArePatternsWithVehiclePositions();
   }

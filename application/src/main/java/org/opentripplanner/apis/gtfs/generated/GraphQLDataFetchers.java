@@ -25,6 +25,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorC
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
+import org.opentripplanner.apis.gtfs.model.CallScheduledTime;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
@@ -263,7 +264,7 @@ public class GraphQLDataFetchers {
 
   /** What is scheduled for a trip on a service date for a stop location. */
   public interface GraphQLCallSchedule {
-    public DataFetcher<Object> time();
+    public DataFetcher<CallScheduledTime> time();
   }
 
   /** Scheduled times for a trip on a service date for a stop location. */
@@ -592,6 +593,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<WalkStep>> steps();
 
+    public DataFetcher<Iterable<TripTimeOnDate>> stopCalls();
+
     public DataFetcher<StopArrival> to();
 
     public DataFetcher<Boolean> transitLeg();
@@ -623,6 +626,32 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> date();
 
     public DataFetcher<Iterable<Object>> timeSpans();
+  }
+
+  /**
+   * A stop that isn't a fixed point but zone where passengers can board or alight anywhere.
+   *
+   * This is mostly used by demand-responsive services.
+   */
+  public interface GraphQLLocation {
+    public DataFetcher<Object> geometry();
+
+    public DataFetcher<String> gtfsId();
+
+    public DataFetcher<String> name();
+  }
+
+  /**
+   * A group of fixed stops that are visited in an arbitrary order.
+   *
+   * This is mostly used by demand-responsive services.
+   */
+  public interface GraphQLLocationGroup {
+    public DataFetcher<String> gtfsId();
+
+    public DataFetcher<Iterable<Object>> members();
+
+    public DataFetcher<String> name();
   }
 
   /** An amount of money. */
@@ -1138,7 +1167,12 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> zoneId();
   }
 
-  /** Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop location. */
+  /**
+   * Represents the time or time window when a specific trip on a specific date arrives to and/or departs
+   * from a specific stop location.
+   *
+   * This may contain real-time information, if available.
+   */
   public interface GraphQLStopCall {
     public DataFetcher<CallRealTime> realTime();
 
@@ -1245,6 +1279,13 @@ public class GraphQLDataFetchers {
     public DataFetcher<Double> price();
 
     public DataFetcher<Iterable<String>> zones();
+  }
+
+  /** A time window when a vehicle visit a stop, area or group of stops. */
+  public interface GraphQLTimeWindow {
+    public DataFetcher<java.time.OffsetDateTime> end();
+
+    public DataFetcher<java.time.OffsetDateTime> start();
   }
 
   /** Text with language */

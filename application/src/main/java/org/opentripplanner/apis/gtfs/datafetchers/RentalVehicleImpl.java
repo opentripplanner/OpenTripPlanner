@@ -27,7 +27,7 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
 
   @Override
   public DataFetcher<OffsetDateTime> availableUntil() {
-    return environment -> getSource(environment).getAvailableUntil();
+    return environment -> getSource(environment).availableUntil();
   }
 
   @Override

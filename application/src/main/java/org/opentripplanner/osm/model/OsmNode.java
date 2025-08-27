@@ -1,6 +1,10 @@
 package org.opentripplanner.osm.model;
 
+import static org.opentripplanner.osm.model.Permission.DENY;
+
+import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
@@ -62,11 +66,8 @@ public class OsmNode extends OsmEntity {
   public boolean isBarrier() {
     return (
       isMotorVehicleBarrier() ||
-      isPedestrianExplicitlyDenied() ||
-      isBicycleExplicitlyDenied() ||
-      isMotorcarExplicitlyDenied() ||
-      isMotorVehicleExplicitlyDenied() ||
-      isGeneralAccessDenied()
+      isGeneralAccessDenied() ||
+      CHECKED_MODES.stream().anyMatch(mode -> checkModePermission(mode).equals(Optional.of(DENY)))
     );
   }
 
@@ -83,12 +84,15 @@ public class OsmNode extends OsmEntity {
    * Consider barrier tag in  permissions. Leave the rest for the super class.
    */
   @Override
-  public StreetTraversalPermission overridePermissions(StreetTraversalPermission def) {
+  public StreetTraversalPermission overridePermissions(
+    StreetTraversalPermission def,
+    TraverseDirection direction
+  ) {
     StreetTraversalPermission permission = def;
     if (isMotorVehicleBarrier()) {
       permission = permission.remove(StreetTraversalPermission.CAR);
     }
-    return super.overridePermissions(permission);
+    return super.overridePermissions(permission, direction);
   }
 
   @Override

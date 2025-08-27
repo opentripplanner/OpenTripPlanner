@@ -52,11 +52,15 @@ class UKMapper extends OsmTagMapper {
     );
     props.setProperties(
       "highway=trunk;cycleway=opposite_lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5, 1.5)
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.5)
     );
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06, 1.15)
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.15)
     );
     props.setProperties(
       "highway=trunk;cycleway=track",
@@ -68,11 +72,15 @@ class UKMapper extends OsmTagMapper {
     );
     props.setProperties(
       "highway=trunk;cycleway=opposite_track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5, 0.95)
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(0.95)
     );
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5, 0.85)
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(0.85)
     );
     props.setProperties(
       "highway=trunk;bicycle=designated",

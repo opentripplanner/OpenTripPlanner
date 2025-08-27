@@ -17,6 +17,7 @@ import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -231,7 +232,7 @@ class VehicleRentalEdgeTest {
       .withVehicleType(
         RentalVehicleType.of()
           .withId(new FeedScopedId(NETWORK, "scooter"))
-          .withName("scooter")
+          .withName(I18NString.of("scooter"))
           .withFormFactor(RentalFormFactor.SCOOTER)
           .withPropulsionType(RentalVehicleType.PropulsionType.ELECTRIC)
           .withMaxRangeMeters(100000d)
@@ -270,7 +271,7 @@ class VehicleRentalEdgeTest {
 
     private GeofencingZoneExtension noDropOffZone() {
       return new GeofencingZoneExtension(
-        new GeofencingZone(new FeedScopedId(NETWORK, "zone"), null, true, false)
+        new GeofencingZone(new FeedScopedId(NETWORK, "zone"), null, null, true, false)
       );
     }
   }
