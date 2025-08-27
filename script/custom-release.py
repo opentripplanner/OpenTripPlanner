@@ -36,6 +36,7 @@ class Config:
         self.ext_branches = None
         self.include_prs_label = None
         self.ser_ver_id_prefix = None
+        self.otp_production_url = None
 
     def release_path(self, branch):
         return f'{self.release_remote}/{branch}'
@@ -50,7 +51,8 @@ class Config:
                 f"release_branch: '{self.release_branch}', "
                 f"ext_branches: {self.ext_branches}, "
                 f"include_prs_label: '{self.include_prs_label}', "
-                f"ser_ver_id_prefix: '{self.ser_ver_id_prefix}'>")
+                f"ser_ver_id_prefix: '{self.ser_ver_id_prefix}'"
+                f"otp_production_url: '{self.otp_production_url}'>")
 
 
 # CLI Arguments and Options
@@ -116,6 +118,8 @@ class ScriptState:
         self.prs_bump_ser_ver_id = False
         self.goto_step = False
         self.step = None
+        self.production_version = None
+        self.production_ser_ver_id = None
 
     def latest_version_tag(self):
         return f'v{self.latest_version}'
@@ -128,6 +132,9 @@ class ScriptState:
 
     def next_version_description(self):
         return f'Version {self.next_version} ({self.next_ser_ver_id})'
+
+    def production_version_tag(self):
+        return f'v{self.production_version}'
 
     def is_ser_ver_id_next(self):
         return self.next_ser_ver_id != self.latest_ser_ver_id
@@ -211,6 +218,7 @@ def setup_and_verify():
         read_pull_request_info_from_github()
         check_if_prs_exist_in_latest_release()
         resolve_next_ser_ver_id()
+        resolve_production_versions()
     print_setup()
 
 
@@ -322,8 +330,10 @@ def print_summary():
 ## Version
 
   - New version/git tag: `{state.next_version}` 
+  - Production version/git tag : `{state.production_version}` 
   - New serialization version: `{state.next_ser_ver_id}` 
   - Old serialization version: `{state.latest_ser_ver_id}`
+  - Prod serialization version: `{state.production_ser_ver_id}`
 
 """
     with open(SUMMARY_FILE, mode="w", encoding="UTF-8") as f:
@@ -333,6 +343,15 @@ def print_summary():
             print(f"These PRs are tagged with {config.include_prs_label}.\n", file=f)
         for pr in pullRequests:
             print(f"  -  {pr.description_link()}", file=f)
+
+        if state.production_version:
+            p = execute(
+                "./script/changelog-diff.py",
+                state.production_version_tag(),
+                state.latest_version_tag()
+            )
+            print(p.stdout, file=f)
+
         p = execute(
             "./script/changelog-diff.py",
             state.latest_version_tag(),
@@ -413,6 +432,7 @@ def load_config():
         config.ext_branches = doc['ext_branches']
         config.include_prs_label = doc['include_prs_label']
         config.ser_ver_id_prefix = doc['ser_ver_id_prefix']
+        config.otp_production_url = doc['otp_production_url']
         debug(f'Config loaded: {config}')
 
     if len(config.ser_ver_id_prefix) > 2:
@@ -608,6 +628,25 @@ def resolve_next_ser_ver_id():
             state.next_ser_ver_id = read_ser_ver_id_from_pom_file(latest_version_tag)
 
 
+def resolve_production_versions():
+    url = config.otp_production_url
+    if not url:
+        info("The 'otp_production_url' config parameter is not set. Summary diff is skipped.")
+        return
+
+    p = (execute('curl', url, error_msg=f'Unable to connect to: {url}', quiet_err=False))
+    text = p.stdout
+
+    # "version":"2.8.0-entur-160"
+    match = re.search(r"\"version\":\"([-\w\.]+)\"", text)
+    if match:
+        state.production_version = match.group(1)
+
+    # "otpSerializationVersionId":"EN-0111"
+    match = re.search(r"\"otpSerializationVersionId\":\"([-\w\.]+)\"", text)
+    if match:
+        state.production_ser_ver_id = match.group(1)
+
 # Find the serialization-version-id for the upstream git project using the git log starting
 # with the given revision (abort if not found in previous 20 commits)
 def find_upstream_ser_ver_id_in_history(revision: str):
@@ -638,6 +677,7 @@ Config
   - Release branch .............. : {config.release_branch}
   - Configuration branches ...... : {config.ext_branches}
   - Ser.ver.id prefix ........... : {config.ser_ver_id_prefix}
+  - Otp production url .......... : {config.otp_production_url}  
 ''')
     if config.include_prs_label:
         info(f'PRs to merge')
@@ -648,8 +688,10 @@ Release info
   - Project major version ....... : {state.major_version}
   - Latest version .............. : {state.latest_version}
   - Next version ................ : {state.next_version}
+  - Prod version ................ : {state.production_version}
   - Latest ser.ver.id ........... : {state.latest_ser_ver_id}
   - Next ser.ver.id ............. : {state.next_ser_ver_id}
+  - Prod ser.ver.id ............. : {state.production_ser_ver_id}
 ''')
 
 
