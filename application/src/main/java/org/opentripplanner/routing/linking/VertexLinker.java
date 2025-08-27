@@ -743,8 +743,9 @@ public class VertexLinker {
     double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
     // apply consistent NoThru restrictions
     // if all joining edges are nothru, then the new edge should be as well
+    // 'from' is the new vertex to be connected, so check the 'to' vertex connections
     var incomingNoThruModes = getNoThruModes(to.getIncoming());
-    var outgoingNoThruModes = getNoThruModes(to.getIncoming());
+    var outgoingNoThruModes = getNoThruModes(to.getOutgoing());
     AreaEdgeBuilder areaEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(from)
       .withToVertex(to)
