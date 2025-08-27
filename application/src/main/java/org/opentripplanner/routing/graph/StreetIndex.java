@@ -30,9 +30,8 @@ import org.slf4j.LoggerFactory;
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods
  * used during network linking and trip planning.
  * <p>
- * Creates a TemporaryStreetLocation representing a location on a street that's not at an
- * intersection, based on input latitude and longitude. Instantiating this class is expensive,
- * because it creates a spatial index of all the intersections in the graph.
+ * Instantiating this class is expensive, because it creates a spatial index of all the intersections
+ * in the graph.
  */
 class StreetIndex {
 
