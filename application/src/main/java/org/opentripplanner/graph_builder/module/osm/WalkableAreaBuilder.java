@@ -553,7 +553,7 @@ class WalkableAreaBuilder {
 
       double walkSafety = wayData.walkSafety();
       namedArea.setWalkSafety(walkSafety);
-      namedArea.setOriginalEdges(intersection);
+      namedArea.setGeometry(intersection);
       namedArea.setPermission(wayData.getPermission());
       areaGroup.addArea(namedArea);
 

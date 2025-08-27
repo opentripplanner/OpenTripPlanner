@@ -29,7 +29,7 @@ public final class Area implements Serializable {
     return geometry;
   }
 
-  public void setOriginalEdges(Geometry geometry) {
+  public void setGeometry(Geometry geometry) {
     this.geometry = geometry;
   }
 

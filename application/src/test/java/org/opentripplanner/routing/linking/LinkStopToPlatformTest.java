@@ -75,7 +75,7 @@ public class LinkStopToPlatformTest {
     Area area = new Area();
     area.setName(new LocalizedString("test platform"));
     area.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-    area.setOriginalEdges(polygon);
+    area.setGeometry(polygon);
     areaGroup.addArea(area);
 
     for (int i = 0; i < platform.length; i++) {
