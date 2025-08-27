@@ -4,6 +4,7 @@ import json
 import os
 import re
 import subprocess
+
 import sys
 
 ## ------------------------------------------------------------------------------------ ##
@@ -206,6 +207,7 @@ def setup_and_verify():
         verify_no_local_git_changes()
         resolve_version_number()
         resolve_next_version()
+        resolve_latest_ser_ver_id()
         read_pull_request_info_from_github()
         check_if_prs_exist_in_latest_release()
         resolve_next_ser_ver_id()
@@ -470,6 +472,21 @@ def resolve_next_version():
     state.next_version = prefix + str(1 + max_tag_version)
 
 
+def resolve_latest_ser_ver_id():
+    info('Resolve last ser.ver.id ...')
+    p = git('tag', '--list', '--sort=-v:refname', error_msg='Fetch git tags failed!')
+    all_tags = p.stdout.splitlines()
+    prefix = f'{state.major_version}-{config.release_remote}-\\d+'
+    pattern = re.compile('v' + prefix.replace('.', r'\.') + r'\d+')
+    tags = [item for item in all_tags if re.search(pattern, item)]
+    tags = tags[:60]
+    maxSId = ' '
+    for tag in tags:
+        maxSId = max(maxSId, read_ser_ver_id_from_pom_file(tag))
+
+    state.latest_ser_ver_id = maxSId
+
+
 def read_pull_request_info_from_github():
     if options.skip_prs or (not config.include_prs_label):
         info('Skip merging in GitHub PRs.')
@@ -542,25 +559,25 @@ def check_if_prs_exist_in_latest_release():
             return
 
 
-# The script will resolve what the next serialization version id (SID) should be. This is a complex task.
-# Here is an overview:
+# The script will resolve what the next serialization version id (SID) should be. This is a complex
+# task. The `latest_ser_ver_id` is allready resolved - to the highest existing id for all
+# matching git tags. Here is an overview:
+
 #  1. If the --serVerId option exist, then the latest SID is bumped and used.
 #  2. If the --release option exist, then the current pom.xml SID is validated, if ok it is used,
 #     if not the script exit.
 #  3. All merged in PRs are checked. If a PR is labeled with 'bump serialization id' and the the
 #     HEAD commit is not in the latest release, then the last release SID is bumped and used.
-#  4. Finally, the script look at the upstream SID for the last release and the base. If the SID
-#     is not the same the SID of the last release is bumped. To find the *upstream* SIDs the script
+#  4. Finally, the script look at the upstream Git Repo SIDs for both this release(base) and the
+#     last release. If the SIDs are diffrnt the SID is bumped. To find the *upstream* SIDs we
 #     look at the git history/log NOT matching the project serialization version id prefix - this
-#     is assumed to be the latest SID for the upstream project.
+#     is assumed to be the latest SID upstream.
 #
 # Tip! If the '--release' option is used, then the serialization version id is NOT updated. Use the
 # '--serVerId' option together with the '--release' to force update the serialization version id.
 #
 def resolve_next_ser_ver_id():
     info('Resolve the next serialization version id ...')
-    latest_release_hash = state.latest_version_git_hash()
-    state.latest_ser_ver_id = read_ser_ver_id_from_pom_file(latest_release_hash)
 
     if options.bump_ser_ver_id:
         state.next_ser_ver_id = bump_release_ser_ver_id(state.latest_ser_ver_id)
@@ -573,10 +590,11 @@ def resolve_next_ser_ver_id():
     elif state.prs_bump_ser_ver_id:
         state.next_ser_ver_id = bump_release_ser_ver_id(state.latest_ser_ver_id)
     else:
+        latest_version_tag = state.latest_version_tag()
         info('  - Find upstream serialization version id for latest release ...')
-        latest_upstream_ser_id = find_upstream_ser_ver_id_in_history(latest_release_hash)
+        latest_upstream_ser_id = find_upstream_ser_ver_id_in_history(latest_version_tag)
 
-        info(f'  - Find base serialization version id ...')
+        info(f'  - Find upstream serialization version id for base ...')
         base_hash = options.release_base_git_hash()
         base_upstream_ser_id = find_upstream_ser_ver_id_in_history(base_hash)
 
@@ -587,7 +605,7 @@ def resolve_next_ser_ver_id():
                  'The serialization.ver.id is bumped.')
             state.next_ser_ver_id = bump_release_ser_ver_id(state.latest_ser_ver_id)
         else:
-            state.next_ser_ver_id = state.latest_ser_ver_id
+            state.next_ser_ver_id = read_ser_ver_id_from_pom_file(latest_version_tag)
 
 
 # Find the serialization-version-id for the upstream git project using the git log starting
