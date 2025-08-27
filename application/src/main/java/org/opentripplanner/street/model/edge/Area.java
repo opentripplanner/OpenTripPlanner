@@ -13,8 +13,8 @@ public final class Area implements Serializable {
 
   private Geometry geometry;
   private I18NString name;
-  private double bicycleSafetyMultiplier;
-  private double walkSafetyMultiplier;
+  private double bicycleSafety;
+  private double walkSafety;
   private StreetTraversalPermission permission;
 
   public I18NString getName() {
@@ -33,20 +33,20 @@ public final class Area implements Serializable {
     this.geometry = geometry;
   }
 
-  public double getBicycleSafetyMultiplier() {
-    return bicycleSafetyMultiplier;
+  public double getBicycleSafety() {
+    return bicycleSafety;
   }
 
-  public void setBicycleSafetyMultiplier(double bicycleSafetyMultiplier) {
-    this.bicycleSafetyMultiplier = bicycleSafetyMultiplier;
+  public void setBicycleSafety(double bicycleSafety) {
+    this.bicycleSafety = bicycleSafety;
   }
 
-  public double getWalkSafetyMultiplier() {
-    return walkSafetyMultiplier;
+  public double getWalkSafety() {
+    return walkSafety;
   }
 
-  public void setWalkSafetyMultiplier(double walkSafetyMultiplier) {
-    this.walkSafetyMultiplier = walkSafetyMultiplier;
+  public void setWalkSafety(double walkSafety) {
+    this.walkSafety = walkSafety;
   }
 
   public StreetTraversalPermission getPermission() {

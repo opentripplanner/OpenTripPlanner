@@ -549,10 +549,10 @@ class WalkableAreaBuilder {
 
       WayProperties wayData = findAreaProperties(areaEntity);
       double bicycleSafety = wayData.bicycleSafety();
-      namedArea.setBicycleSafetyMultiplier(bicycleSafety);
+      namedArea.setBicycleSafety(bicycleSafety);
 
       double walkSafety = wayData.walkSafety();
-      namedArea.setWalkSafetyMultiplier(walkSafety);
+      namedArea.setWalkSafety(walkSafety);
       namedArea.setOriginalEdges(intersection);
       namedArea.setPermission(wayData.getPermission());
       areaGroup.addArea(namedArea);

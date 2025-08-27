@@ -62,8 +62,8 @@ class SafetyValueNormalizer {
           if (seenAreas.contains(areaGroup)) continue;
           seenAreas.add(areaGroup);
           for (Area area : areaGroup.getAreas()) {
-            area.setBicycleSafetyMultiplier(area.getBicycleSafetyMultiplier() / bestBikeSafety);
-            area.setWalkSafetyMultiplier(area.getWalkSafetyMultiplier() / bestWalkSafety);
+            area.setBicycleSafety(area.getBicycleSafety() / bestBikeSafety);
+            area.setWalkSafety(area.getWalkSafety() / bestWalkSafety);
           }
         }
         applyFactors(seenEdges, e);
