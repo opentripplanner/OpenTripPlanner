@@ -589,7 +589,7 @@ def check_if_prs_exist_in_latest_release():
 #  3. All merged in PRs are checked. If a PR is labeled with 'bump serialization id' and the the
 #     HEAD commit is not in the latest release, then the last release SID is bumped and used.
 #  4. Finally, the script look at the upstream Git Repo SIDs for both this release(base) and the
-#     last release. If the SIDs are diffrnt the SID is bumped. To find the *upstream* SIDs we
+#     last release. If the SIDs are differnt the SID is bumped. To find the *upstream* SIDs we
 #     look at the git history/log NOT matching the project serialization version id prefix - this
 #     is assumed to be the latest SID upstream.
 #
