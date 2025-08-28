@@ -18,10 +18,27 @@ export function ItineraryFilterDebugSelect({
         size="sm"
         className="input-medium"
         onChange={(e) => {
-          setTripQueryVariables({
-            ...tripQueryVariables,
-            itineraryFilters: { debug: e.target.value as ItineraryFilterDebugProfile },
-          });
+          if (e.target.value === 'not_selected') {
+            // Remove the debug filter entirely when "Not selected" is chosen
+            const updatedFilters = { ...tripQueryVariables.itineraryFilters };
+            delete updatedFilters.debug;
+            
+            // If itineraryFilters becomes empty, remove it entirely
+            const hasOtherFilters = Object.keys(updatedFilters).length > 0;
+            
+            setTripQueryVariables({
+              ...tripQueryVariables,
+              itineraryFilters: hasOtherFilters ? updatedFilters : undefined,
+            });
+          } else {
+            setTripQueryVariables({
+              ...tripQueryVariables,
+              itineraryFilters: { 
+                ...tripQueryVariables.itineraryFilters,
+                debug: e.target.value as ItineraryFilterDebugProfile 
+              },
+            });
+          }
         }}
         value={tripQueryVariables.itineraryFilters?.debug || 'not_selected'}
       >

@@ -328,88 +328,41 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
               )}
 
               {type.type === 'Enum' && enumValues && isList && (
-                <span>
-                  <select
-                    id={path}
-                    multiple
-                    value={(() => {
-                      const currentValue = getNestedValue(tripQueryVariables, path);
-                      return Array.isArray(currentValue) ? currentValue : [];
-                    })()}
-                    onChange={(e) => {
-                      const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
-                      handleInputChange(path, selectedOptions);
-                    }}
-                  >
-                    {enumValues.map((enumValue) => (
-                      <option key={enumValue} value={enumValue}>
-                        {enumValue}
-                      </option>
-                    ))}
-                  </select>
-                  {(() => {
+                <select
+                  id={path}
+                  multiple
+                  value={(() => {
                     const currentValue = getNestedValue(tripQueryVariables, path);
-                    const hasValue = Array.isArray(currentValue) && currentValue.length > 0;
-                    return hasValue && (
-                      <button
-                        onClick={() => handleRemoveArgument(path)}
-                        className="remove-argument"
-                        style={{
-                          fontSize: '10px',
-                          paddingTop: '2px',
-                          marginLeft: '8px',
-                          marginBottom: '0px',
-                          marginTop: '-5px',
-                          height: '14px',
-                          width: '45px',
-                          verticalAlign: 'middle',
-                        }}
-                      >
-                        Clear
-                      </button>
-                    );
+                    return Array.isArray(currentValue) ? currentValue : [];
                   })()}
-                </span>
+                  onChange={(e) => {
+                    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
+                    handleInputChange(path, selectedOptions);
+                  }}
+                >
+                  {enumValues.map((enumValue) => (
+                    <option key={enumValue} value={enumValue}>
+                      {enumValue}
+                    </option>
+                  ))}
+                </select>
               )}
 
               {type.type === 'Enum' && enumValues && !isList && (
-                <span>
-                  <select
-                    id={path}
-                    value={(getNestedValue(tripQueryVariables, path) as string) ?? 'Not selected'}
-                    onChange={(e) => {
-                      handleInputChange(path, e.target.value || undefined);
-                    }}
-                  >
-                    {enumValues.map((enumValue) => (
-                      <option key={enumValue} value={enumValue}>
-                        {enumValue}
-                      </option>
-                    ))}
-                  </select>
-                  {(() => {
-                    const currentValue = getNestedValue(tripQueryVariables, path) as string;
-                    const hasValue = currentValue !== undefined && currentValue !== 'Not selected';
-                    return hasValue && (
-                      <button
-                        onClick={() => handleRemoveArgument(path)}
-                        className="remove-argument"
-                        style={{
-                          fontSize: '10px',
-                          paddingTop: '2px',
-                          marginLeft: '8px',
-                          marginBottom: '0px',
-                          marginTop: '-5px',
-                          height: '14px',
-                          width: '45px',
-                          verticalAlign: 'middle',
-                        }}
-                      >
-                        Clear
-                      </button>
-                    );
-                  })()}
-                </span>
+                <select
+                  id={path}
+                  value={(getNestedValue(tripQueryVariables, path) as string) ?? 'Not selected'}
+                  onChange={(e) => {
+                    const selectedValue = e.target.value === 'Not selected' ? undefined : e.target.value;
+                    handleInputChange(path, selectedValue);
+                  }}
+                >
+                  {enumValues.map((enumValue) => (
+                    <option key={enumValue} value={enumValue}>
+                      {enumValue}
+                    </option>
+                  ))}
+                </select>
               )}
             </div>
           )}
@@ -421,8 +374,8 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
   return (
     <div className="left-pane-container below-content">
       <div className="panel-header" style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-        <button className="collapse-all-button" onClick={collapseAll} style={{ fontSize: '12px', padding: '4px 8px' }}>
-          Collapse All
+        <button className="collapse-all-button" onClick={collapseAll} style={{ padding: '4px 8px' }}>
+          Collapse all
         </button>
         <span
           style={{

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { request } from 'graphql-request';
 import { Location, TripQuery, TripQueryVariables } from '../gql/graphql.ts';
 import { getApiUrl } from '../util/getApiUrl.ts';
-import { query } from '../static/query/tripQuery.tsx';
 import { createPrunedQuery, createPrunedVariables } from '../util/queryPruning.ts';
 
 /**
@@ -30,7 +29,7 @@ export const useTripQuery: TripQueryHook = (variables) => {
             const baseVariables = pageCursor ? { ...variables, pageCursor } : variables;
             const prunedVariables = createPrunedVariables(baseVariables);
             const prunedQuery = createPrunedQuery(baseVariables);
-            
+
             setData((await request(getApiUrl(), prunedQuery, prunedVariables)) as TripQuery);
           } catch (e) {
             console.error('Error at useTripQuery', e);
