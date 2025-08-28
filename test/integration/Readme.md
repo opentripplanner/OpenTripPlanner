@@ -1,7 +1,7 @@
 ### Integration tests
 
-To execute the tests, run
+To execute them, run
 
 ```
-mvn test -Dtests.includedGroups=integration -Dtests.excludedGroups=""
+mvn test -P integration-test
 ```

@@ -554,8 +554,25 @@
                 </repository>
             </distributionManagement>
         </profile>
+        
         <profile>
-            <id>release</id>
+            <id>integration-test</id>
+            <activation>
+                <property>
+                    <!-- shortcut to activate with -Pit -->
+                    <name>it</name>
+                    <value/>
+                </property>
+            </activation>
+            <properties>
+                <tests.includedGroups>integration</tests.includedGroups>
+                <tests.excludedGroups></tests.excludedGroups>
+                <plugin.prettier.skip>true</plugin.prettier.skip>
+            </properties>
+        </profile>
+
+        <profile>
+        <id>release</id>
             <properties>
                 <skip-source-and-javadoc>false</skip-source-and-javadoc>
             </properties>
