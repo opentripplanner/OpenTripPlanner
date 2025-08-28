@@ -1,8 +1,6 @@
 package org.opentripplanner.service.vehiclerental.model;
 
-import java.time.Instant;
 import java.util.Map;
-import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -31,6 +29,7 @@ public class VehicleRentalStationBuilder {
   private Boolean overloadingAllowed;
   private Boolean isArrivingInRentalVehicleAtDestinationAllowed;
   private Boolean realTimeData;
+  private ReturnPolicy returnPolicy;
 
   VehicleRentalStationBuilder(VehicleRentalStation original) {
     this.original = original;
@@ -55,6 +54,7 @@ public class VehicleRentalStationBuilder {
     this.isArrivingInRentalVehicleAtDestinationAllowed =
       original.isArrivingInRentalVehicleAtDestinationAllowed();
     this.realTimeData = original.isRealTimeData();
+    this.returnPolicy = original.returnPolicy();
   }
 
   public FeedScopedId id() {
@@ -229,10 +229,6 @@ public class VehicleRentalStationBuilder {
     return this;
   }
 
-  public VehicleRentalStationBuilder withIsInstalled(boolean isInstalled) {
-    return this;
-  }
-
   public VehicleRentalStationBuilder withIsRenting(boolean isRenting) {
     this.isRenting = isRenting;
     return this;
@@ -240,10 +236,6 @@ public class VehicleRentalStationBuilder {
 
   public VehicleRentalStationBuilder withIsReturning(boolean isReturning) {
     this.isReturning = isReturning;
-    return this;
-  }
-
-  public VehicleRentalStationBuilder withLastReported(@Nullable Instant lastReported) {
     return this;
   }
 
@@ -265,8 +257,12 @@ public class VehicleRentalStationBuilder {
     return this;
   }
 
-  public VehicleRentalStationBuilder apply(Consumer<VehicleRentalStationBuilder> body) {
-    body.accept(this);
+  public ReturnPolicy returnPolicy() {
+    return this.returnPolicy;
+  }
+
+  public VehicleRentalStationBuilder withReturnPolicy(ReturnPolicy returnPolicy) {
+    this.returnPolicy = returnPolicy;
     return this;
   }
 

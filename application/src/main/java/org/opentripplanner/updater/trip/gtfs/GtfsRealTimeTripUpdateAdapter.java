@@ -158,7 +158,6 @@ public class GtfsRealTimeTripUpdateAdapter {
 
       tripDescriptor
         .tripId()
-        .filter(StringUtils::hasValue)
         .map(id -> new FeedScopedId(feedId, id))
         .ifPresentOrElse(
           tripId -> {

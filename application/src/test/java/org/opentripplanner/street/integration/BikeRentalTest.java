@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -184,7 +185,10 @@ public class BikeRentalTest extends GraphRoutingTest {
   public void testNoSpacesAvailable() {
     // Replace B2 with a station that has no spaces available
     var stationWithNoSpaces =
-      ((VehicleRentalStation) B2.getStation()).copyOf().withSpacesAvailable(0).build();
+      ((VehicleRentalStation) B2.getStation()).copyOf()
+        .withSpacesAvailable(0)
+        .withVehicleSpacesAvailable(Map.of())
+        .build();
     B2.setStation(stationWithNoSpaces);
 
     assertPath(

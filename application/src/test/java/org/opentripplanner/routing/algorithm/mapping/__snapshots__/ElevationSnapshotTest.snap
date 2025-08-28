@@ -2,7 +2,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
   [
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 718,
+      "duration" : 720,
       "elevationGained" : 18.9,
       "elevationLost" : 30.64,
       "endTime" : "2009-10-21T23:10:00.000+00:00",
@@ -10,7 +10,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 1692,
+      "generalizedCost" : 1710,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -19,13 +19,13 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
           "distance" : 2635.31,
           "endTime" : "2009-10-21T23:10:00.000+00:00",
           "from" : {
-            "departure" : "2009-10-21T22:58:02.000+00:00",
+            "departure" : "2009-10-21T22:58:00.000+00:00",
             "lat" : 45.52832,
             "lon" : -122.70059,
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1692,
+          "generalizedCost" : 1710,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1032,60.2,1190,55.5,1430,55.5,1506,40.4,1849,40.4,1919,37.3,1931,37.3,2078,55.5,2503,55.5,2503,NaN,2635,NaN",
           "legGeometry" : {
@@ -37,7 +37,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
           "realTime" : false,
           "rentedBike" : false,
           "route" : "",
-          "startTime" : "2009-10-21T22:58:02.000+00:00",
+          "startTime" : "2009-10-21T22:58:00.000+00:00",
           "steps" : [
             {
               "absoluteDirection" : "NORTH",
@@ -116,14 +116,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
           "walkingBike" : false
         }
       ],
-      "startTime" : "2009-10-21T22:58:02.000+00:00",
+      "startTime" : "2009-10-21T22:58:00.000+00:00",
       "tooSloped" : false,
       "transfers" : 0,
       "transitTime" : 0,
       "waitingTime" : 0,
       "walkDistance" : 2635.31,
       "walkLimitExceeded" : false,
-      "walkTime" : 718
+      "walkTime" : 720
     }
   ]
 ]

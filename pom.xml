@@ -62,11 +62,11 @@
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>33.2</geotools.version>
-        <google.dagger.version>2.57</google.dagger.version>
+        <google.dagger.version>2.57.1</google.dagger.version>
         <jackson.version>2.19.2</jackson.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
-        <junit.version>5.13.3</junit.version>
+        <junit.version>5.13.4</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.18</logback.version>
@@ -482,7 +482,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.18.0</version>
+                <version>5.19.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.origin-energy</groupId>
