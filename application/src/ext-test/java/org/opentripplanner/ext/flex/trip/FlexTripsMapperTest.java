@@ -31,7 +31,7 @@ class FlexTripsMapperTest {
   }
 
   /**
-   * Checks that a flex trip with a single stop time is not mapped to a flex trip and an issue is reported.
+   * Checks that a trip with a single stop time is not mapped to a flex trip and an issue is reported.
    */
   @Test
   void tooFewStopTimes() {
