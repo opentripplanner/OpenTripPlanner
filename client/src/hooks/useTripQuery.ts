@@ -3,6 +3,7 @@ import { request } from 'graphql-request';
 import { Location, TripQuery, TripQueryVariables } from '../gql/graphql.ts';
 import { getApiUrl } from '../util/getApiUrl.ts';
 import { query } from '../static/query/tripQuery.tsx';
+import { createPrunedQuery, createPrunedVariables } from '../util/queryPruning.ts';
 
 /**
   General purpose trip query document for debugging trip searches
@@ -25,11 +26,12 @@ export const useTripQuery: TripQueryHook = (variables) => {
           setLoading(true);
           setError(null);
           try {
-            if (pageCursor) {
-              setData((await request(getApiUrl(), query, { ...variables, pageCursor })) as TripQuery);
-            } else {
-              setData((await request(getApiUrl(), query, variables)) as TripQuery);
-            }
+            // Create pruned variables and query for the API call
+            const baseVariables = pageCursor ? { ...variables, pageCursor } : variables;
+            const prunedVariables = createPrunedVariables(baseVariables);
+            const prunedQuery = createPrunedQuery(baseVariables);
+            
+            setData((await request(getApiUrl(), prunedQuery, prunedVariables)) as TripQuery);
           } catch (e) {
             console.error('Error at useTripQuery', e);
             setError(e);

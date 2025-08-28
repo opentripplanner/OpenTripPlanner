@@ -15,11 +15,11 @@ interface TripQueryArgumentsProps {
   setExpandedArguments: (expandedArguments: Record<string, boolean>) => void;
 }
 
-const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ 
-  tripQueryVariables, 
-  setTripQueryVariables, 
-  expandedArguments, 
-  setExpandedArguments 
+const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
+  tripQueryVariables,
+  setTripQueryVariables,
+  expandedArguments,
+  setExpandedArguments,
 }) => {
   const [argumentsList, setArgumentsList] = useState<ProcessedArgument[]>([]);
   const [searchText] = useState('');
@@ -71,6 +71,15 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
     return typeof value === 'object' && value !== null && !Array.isArray(value);
   }
 
+  function isEmptyValue(value: unknown): boolean {
+    if (value === undefined || value === null) return true;
+    if (Array.isArray(value)) return value.length === 0;
+    if (isPlainObject(value)) {
+      return Object.values(value).every(isEmptyValue);
+    }
+    return false;
+  }
+
   /**
    * Recursively removes empty arrays/objects from `variables` based on a path.
    * Returns the updated variables.
@@ -79,23 +88,10 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
     if (!path.includes('.')) {
       const topValue = getNestedValue(variables, path);
 
-      if (Array.isArray(topValue) && topValue.length === 0) {
+      if (isEmptyValue(topValue)) {
         const copy = { ...variables } as Record<string, unknown>;
         delete copy[path];
         return copy as TripQueryVariables;
-      }
-
-      if (isPlainObject(topValue)) {
-        const allKeysEmpty = Object.keys(topValue).every((key) => {
-          const childVal = (topValue as Record<string, unknown>)[key];
-          return childVal === undefined || childVal === null || (Array.isArray(childVal) && childVal.length === 0);
-        });
-
-        if (allKeysEmpty) {
-          const copy = { ...variables } as Record<string, unknown>;
-          delete copy[path];
-          return copy as TripQueryVariables;
-        }
       }
 
       return variables;
@@ -106,26 +102,8 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
       const parentPath = pathParts.slice(0, i).join('.');
       const parentValue = getNestedValue(variables, parentPath);
 
-      if (parentValue == null) {
-        continue;
-      }
-
-      if (Array.isArray(parentValue)) {
-        if (parentValue.length === 0) {
-          variables = setNestedValue(variables, parentPath, undefined) as TripQueryVariables;
-        }
-      } else if (isPlainObject(parentValue)) {
-        const allKeysEmpty = Object.keys(parentValue).every((key) => {
-          const childPath = `${parentPath}.${key}`;
-          const childValue = getNestedValue(variables, childPath);
-          return (
-            childValue === undefined || childValue === null || (Array.isArray(childValue) && childValue.length === 0)
-          );
-        });
-
-        if (allKeysEmpty) {
-          variables = setNestedValue(variables, parentPath, undefined) as TripQueryVariables;
-        }
+      if (isEmptyValue(parentValue)) {
+        variables = setNestedValue(variables, parentPath, undefined) as TripQueryVariables;
       }
     }
 
@@ -264,9 +242,22 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
                         onChange={(e) => handleInputChange(path, e.target.checked)}
                       />
                       {isInUse && (
-                        <a onClick={() => handleRemoveArgument(path)} className="remove-argument">
-                          x
-                        </a>
+                        <button
+                          onClick={() => handleRemoveArgument(path)}
+                          className="remove-argument"
+                          style={{
+                            fontSize: '10px',
+                            paddingTop: '2px',
+                            marginLeft: '8px',
+                            marginBottom: '0px',
+                            marginTop: '-5px',
+                            height: '14px',
+                            width: '45px',
+                            verticalAlign: 'middle',
+                          }}
+                        >
+                          Clear
+                        </button>
                       )}
                     </span>
                   );
@@ -337,40 +328,88 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
               )}
 
               {type.type === 'Enum' && enumValues && isList && (
-                <select
-                  id={path}
-                  multiple
-                  value={(() => {
+                <span>
+                  <select
+                    id={path}
+                    multiple
+                    value={(() => {
+                      const currentValue = getNestedValue(tripQueryVariables, path);
+                      return Array.isArray(currentValue) ? currentValue : [];
+                    })()}
+                    onChange={(e) => {
+                      const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
+                      handleInputChange(path, selectedOptions);
+                    }}
+                  >
+                    {enumValues.map((enumValue) => (
+                      <option key={enumValue} value={enumValue}>
+                        {enumValue}
+                      </option>
+                    ))}
+                  </select>
+                  {(() => {
                     const currentValue = getNestedValue(tripQueryVariables, path);
-                    return Array.isArray(currentValue) ? currentValue : [];
+                    const hasValue = Array.isArray(currentValue) && currentValue.length > 0;
+                    return hasValue && (
+                      <button
+                        onClick={() => handleRemoveArgument(path)}
+                        className="remove-argument"
+                        style={{
+                          fontSize: '10px',
+                          paddingTop: '2px',
+                          marginLeft: '8px',
+                          marginBottom: '0px',
+                          marginTop: '-5px',
+                          height: '14px',
+                          width: '45px',
+                          verticalAlign: 'middle',
+                        }}
+                      >
+                        Clear
+                      </button>
+                    );
                   })()}
-                  onChange={(e) => {
-                    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
-                    handleInputChange(path, selectedOptions);
-                  }}
-                >
-                  {enumValues.map((enumValue) => (
-                    <option key={enumValue} value={enumValue}>
-                      {enumValue}
-                    </option>
-                  ))}
-                </select>
+                </span>
               )}
 
               {type.type === 'Enum' && enumValues && !isList && (
-                <select
-                  id={path}
-                  value={(getNestedValue(tripQueryVariables, path) as string) ?? 'Not selected'}
-                  onChange={(e) => {
-                    handleInputChange(path, e.target.value || undefined);
-                  }}
-                >
-                  {enumValues.map((enumValue) => (
-                    <option key={enumValue} value={enumValue}>
-                      {enumValue}
-                    </option>
-                  ))}
-                </select>
+                <span>
+                  <select
+                    id={path}
+                    value={(getNestedValue(tripQueryVariables, path) as string) ?? 'Not selected'}
+                    onChange={(e) => {
+                      handleInputChange(path, e.target.value || undefined);
+                    }}
+                  >
+                    {enumValues.map((enumValue) => (
+                      <option key={enumValue} value={enumValue}>
+                        {enumValue}
+                      </option>
+                    ))}
+                  </select>
+                  {(() => {
+                    const currentValue = getNestedValue(tripQueryVariables, path) as string;
+                    const hasValue = currentValue !== undefined && currentValue !== 'Not selected';
+                    return hasValue && (
+                      <button
+                        onClick={() => handleRemoveArgument(path)}
+                        className="remove-argument"
+                        style={{
+                          fontSize: '10px',
+                          paddingTop: '2px',
+                          marginLeft: '8px',
+                          marginBottom: '0px',
+                          marginTop: '-5px',
+                          height: '14px',
+                          width: '45px',
+                          verticalAlign: 'middle',
+                        }}
+                      >
+                        Clear
+                      </button>
+                    );
+                  })()}
+                </span>
               )}
             </div>
           )}
@@ -382,25 +421,23 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
   return (
     <div className="left-pane-container below-content">
       <div className="panel-header" style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-        <button 
-          className="collapse-all-button" 
-          onClick={collapseAll}
-          style={{ fontSize: '12px', padding: '4px 8px' }}
-        >
+        <button className="collapse-all-button" onClick={collapseAll} style={{ fontSize: '12px', padding: '4px 8px' }}>
           Collapse All
         </button>
-        <span style={{ 
-          position: 'absolute', 
-          left: '50%', 
-          transform: 'translateX(-50%)',
-          fontWeight: 'normal'
-        }}>
+        <span
+          style={{
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontWeight: 'normal',
+          }}
+        >
           Request
         </span>
         <div style={{ marginLeft: 'auto' }}>
-          <ResetButton 
-            tripQueryVariables={tripQueryVariables} 
-            setTripQueryVariables={setTripQueryVariables} 
+          <ResetButton
+            tripQueryVariables={tripQueryVariables}
+            setTripQueryVariables={setTripQueryVariables}
             setExpandedArguments={setExpandedArguments}
           />
         </div>

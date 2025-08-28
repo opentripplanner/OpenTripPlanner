@@ -31,6 +31,7 @@ export function ItineraryListContainer({
 
   const hasNoResults = Boolean(tripQueryResult && tripQueryResult.trip.tripPatterns.length === 0);
   const hasSearched = tripQueryResult !== null;
+  const showErrorOrNoResults = error || (hasSearched && !error && hasNoResults);
 
   return (
     <section className="left-pane-container below-content" ref={containerRef}>
@@ -38,14 +39,16 @@ export function ItineraryListContainer({
         <div className="panel-header">Itinerary results</div>
         <ErrorDisplay error={error} />
         <NoResultsDisplay hasSearched={hasSearched && !error && hasNoResults} tripQueryResult={tripQueryResult} />
-        <div className="pagination-controls">
-          <ItineraryPaginationControl
-            onPagination={pageResults}
-            previousPageCursor={tripQueryResult?.trip.previousPageCursor}
-            nextPageCursor={tripQueryResult?.trip.nextPageCursor}
-            loading={loading}
-          />
-        </div>
+        {!showErrorOrNoResults && (
+          <div className="pagination-controls">
+            <ItineraryPaginationControl
+              onPagination={pageResults}
+              previousPageCursor={tripQueryResult?.trip.previousPageCursor}
+              nextPageCursor={tripQueryResult?.trip.nextPageCursor}
+              loading={loading}
+            />
+          </div>
+        )}
         <Accordion
           activeKey={`${selectedTripPatternIndex}`}
           onSelect={(eventKey) => setSelectedTripPatternIndex(parseInt(eventKey as string))}
