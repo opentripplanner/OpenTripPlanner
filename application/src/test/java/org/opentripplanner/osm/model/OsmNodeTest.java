@@ -26,7 +26,7 @@ public class OsmNodeTest {
 
     node = new OsmNode();
     node.addTag("barrier", "unknown");
-    assertFalse(node.isBarrier());
+    assertTrue(node.isBarrier());
 
     node = new OsmNode();
     node.addTag("barrier", "bollard");

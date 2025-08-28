@@ -163,22 +163,29 @@ class VertexGenerator {
         iv = vertexFactory.osm(node);
       }
 
+      if (isNodeOnLinearBarrier && iv instanceof OsmVertex ov) {
+        splitVerticesOnBarriers.putIfAbsent(node, new HashMap<>());
+        var vertices = splitVerticesOnBarriers.get(node);
+        vertices.put(null, ov);
+
+        // some barrier values, such as barrier=gate, which do not block traversal will return
+        // false for node.isBarrier(), therefore we need to check the explicit absence of the
+        // barrier tag as well for the issue.
+        if (
+          !node.isBarrier() &&
+          !node.hasTag("barrier") &&
+          !reportedLinearBarrierCrossings.contains(node)
+        ) {
+          issueStore.add(new BarrierIntersectingHighway(node));
+          reportedLinearBarrierCrossings.add(node);
+        }
+      }
+
       intersectionNodes.put(nid, iv);
     }
 
     if (iv instanceof BarrierVertex) {
       checkLevelOnBarrier(node, way);
-    }
-
-    if (isNodeOnLinearBarrier && iv instanceof OsmVertex ov) {
-      splitVerticesOnBarriers.putIfAbsent(node, new HashMap<>());
-      var vertices = splitVerticesOnBarriers.get(node);
-      vertices.put(null, ov);
-
-      if (!node.isBarrier() && !reportedLinearBarrierCrossings.contains(node)) {
-        issueStore.add(new BarrierIntersectingHighway(node));
-        reportedLinearBarrierCrossings.add(node);
-      }
     }
 
     return iv;
