@@ -70,6 +70,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Close all data sources after graph build, not before [#6794](https://github.com/opentripplanner/OpenTripPlanner/pull/6794)
 - Collect timing data from certain queries and fields in the GTFS GraphQL API [#6721](https://github.com/opentripplanner/OpenTripPlanner/pull/6721)
 - Restore handling of invalid GTFS shape references [#6807](https://github.com/opentripplanner/OpenTripPlanner/pull/6807)
+- Fix bug when resolving ser.ver.id in custom-release script [#6827](https://github.com/opentripplanner/OpenTripPlanner/pull/6827)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
