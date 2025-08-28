@@ -206,16 +206,8 @@ public final class StopTime implements Comparable<StopTime> {
     return getAvailableTime(getFlexWindowEnd(), getArrivalTime());
   }
 
-  public PickDrop getFlexContinuousPickup() {
-    return flexContinuousPickup;
-  }
-
   public void setFlexContinuousPickup(PickDrop flexContinuousPickup) {
     this.flexContinuousPickup = flexContinuousPickup;
-  }
-
-  public PickDrop getFlexContinuousDropOff() {
-    return flexContinuousDropOff;
   }
 
   public void setFlexContinuousDropOff(PickDrop flexContinuousDropOff) {
