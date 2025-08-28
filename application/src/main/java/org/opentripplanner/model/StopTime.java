@@ -5,6 +5,8 @@ import static org.opentripplanner.model.PickDrop.NONE;
 
 import java.util.List;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -248,11 +250,6 @@ public final class StopTime implements Comparable<StopTime> {
     return this.getStopSequence() - o.getStopSequence();
   }
 
-  public void cancel() {
-    pickupType = PickDrop.CANCELLED;
-    dropOffType = PickDrop.CANCELLED;
-  }
-
   @Override
   public String toString() {
     return (
@@ -297,5 +294,12 @@ public final class StopTime implements Comparable<StopTime> {
 
   public boolean hasContinuousStopping() {
     return this.flexContinuousPickup != NONE || flexContinuousDropOff != NONE;
+  }
+
+  /**
+   * Does this stop time define either an area stop or a group of stops?
+   */
+  public boolean hasFlexibleStop() {
+    return stop instanceof AreaStop || stop instanceof GroupStop;
   }
 }

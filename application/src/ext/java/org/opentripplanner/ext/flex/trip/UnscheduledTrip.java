@@ -36,7 +36,7 @@ import org.opentripplanner.utils.time.DurationUtils;
  */
 public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBuilder> {
 
-  private static final Set<Integer> N_STOPS = Set.of(1, 2);
+  private static final Set<Integer> N_STOPS = Set.of(2);
 
   private final StopTimeWindow[] stopTimes;
 
@@ -79,7 +79,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
    *  - One or more stop times with a flexible time window but no fixed stop in between them
    */
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
-    if (stopTimes.isEmpty()) {
+    if (stopTimes.size() < 2) {
       return false;
     } else if (stopTimes.stream().anyMatch(StopTime::combinesContinuousStoppingWithFlexWindow)) {
       return false;

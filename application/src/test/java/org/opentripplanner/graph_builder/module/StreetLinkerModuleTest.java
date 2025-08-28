@@ -83,7 +83,8 @@ class StreetLinkerModuleTest {
   void linkFlexStop() {
     OTPFeature.FlexRouting.testOn(() -> {
       var model = new TestModel();
-      var flexTrip = TimetableRepositoryForTest.of().unscheduledTrip("flex", model.stop());
+      var flexTrip = TimetableRepositoryForTest.of()
+        .unscheduledTrip("flex", model.stop(), model.stop());
       model.withFlexTrip(flexTrip);
 
       var module = model.streetLinkerModule();
@@ -112,7 +113,8 @@ class StreetLinkerModuleTest {
   void linkFlexStopWithBoardingLocation() {
     OTPFeature.FlexRouting.testOn(() -> {
       var model = new TestModel().withStopLinkedToBoardingLocation();
-      var flexTrip = TimetableRepositoryForTest.of().unscheduledTrip("flex", model.stop());
+      var flexTrip = TimetableRepositoryForTest.of()
+        .unscheduledTrip("flex", model.stop(), model.stop());
       model.withFlexTrip(flexTrip);
 
       var module = model.streetLinkerModule();
