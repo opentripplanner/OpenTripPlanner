@@ -556,7 +556,7 @@
         </profile>
         
         <profile>
-            <id>integration-test</id>
+            <id>integrationTests</id>
             <activation>
                 <property>
                     <!-- shortcut to activate with -Pit -->

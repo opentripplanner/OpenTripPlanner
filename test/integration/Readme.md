@@ -3,5 +3,5 @@
 To execute them, run
 
 ```
-mvn test -P integration-test
+mvn test -P integrationTests
 ```
