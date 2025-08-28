@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.routing.linking.VertexLinker.getNoThruModes;
+
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -10,6 +12,7 @@ import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.OsmVertex;
+import org.opentripplanner.street.search.TraverseMode;
 
 public class BarrierEdgeBuilder {
 
@@ -53,7 +56,7 @@ public class BarrierEdgeBuilder {
         if (i != j) {
           var from = vs[i];
           var to = vs[j];
-
+          
           StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
             .withFromVertex(from)
             .withToVertex(to)
@@ -66,6 +69,16 @@ public class BarrierEdgeBuilder {
             .withPermission(permission)
             .withWheelchairAccessible(wheelchairAccessible)
             .withBogusName(name == null);
+
+          var incomingNoThru = getNoThruModes(from.getIncoming());
+          var outgoingNoThru = getNoThruModes(to.getOutgoing());
+          
+          for (var mode : incomingNoThru) {
+            seb.withNoThruTrafficTraverseMode(mode);
+          }
+          for (var mode : outgoingNoThru) {
+            seb.withNoThruTrafficTraverseMode(mode);
+          }
 
           seb.buildAndConnect();
         }

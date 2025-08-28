@@ -667,7 +667,7 @@ public class VertexLinker {
     return true;
   }
 
-  private static Set<TraverseMode> getNoThruModes(Collection<Edge> edges) {
+  public static Set<TraverseMode> getNoThruModes(Collection<Edge> edges) {
     var modes = new HashSet<>(NO_THRU_MODES);
     for (Edge e : edges) {
       if (e instanceof StreetEdge se) {
