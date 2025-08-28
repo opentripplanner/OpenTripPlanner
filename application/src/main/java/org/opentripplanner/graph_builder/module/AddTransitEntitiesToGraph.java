@@ -241,8 +241,8 @@ public class AddTransitEntitiesToGraph {
 
   /**
    * Create elevator edges from pathways. As pathway based elevators are not vertices, but edges in
-   * the pathway model, we have to model each possible movement as an onboard-offboard pair, instead
-   * of having only one set of vertices per level and edges between them.
+   * the pathway model, we have to model each possible movement as an ElevatorVertex-StationElementVertex pair,
+   * instead of having only one set of vertices per level and edges between them.
    */
   private void createElevatorEdgesAndAddThemToGraph(
     Pathway pathway,
