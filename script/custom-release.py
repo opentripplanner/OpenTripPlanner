@@ -348,14 +348,16 @@ def print_summary():
             p = execute(
                 "./script/changelog-diff.py",
                 state.production_version_tag(),
-                state.latest_version_tag()
+                state.latest_version_tag(),
+                "Changelog production 🦋"
             )
             print(p.stdout, file=f)
 
         p = execute(
             "./script/changelog-diff.py",
             state.latest_version_tag(),
-            state.next_version_tag()
+            state.next_version_tag(),
+            "Changelog previous release 🐛"
         )
         print(p.stdout, file=f)
 
