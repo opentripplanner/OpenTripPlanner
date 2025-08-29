@@ -3,12 +3,20 @@ package org.opentripplanner.ext.fares.impl.gtfs;
 import com.google.common.collect.Multimap;
 import java.io.Serial;
 import java.util.Objects;
+import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.fares.FareService;
 
+/**
+ * A combined fare service that combines the results of the GTFS V1 and V2 fares services.
+ * <p>
+ * The import process makes sure that only those feeds which do not V2 are importing
+ * fares V2.
+ * @see org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper#shouldImportFaresV1(GtfsRelationalDao)
+ */
 public final class GtfsFaresService implements FareService {
 
   private final DefaultFareService faresV1;
