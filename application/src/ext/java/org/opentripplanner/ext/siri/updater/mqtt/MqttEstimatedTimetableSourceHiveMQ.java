@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri.updater.mqtt;
 
+import com.hivemq.client.mqtt.MqttGlobalPublishFilter;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.lifecycle.MqttClientDisconnectedContext;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
@@ -52,6 +53,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
   private static final int SECONDS_SINCE_LAST_HISTORIC_DELIVERY = 10;
   private volatile Instant timestampOfLastHistoricDelivery;
   private final AtomicInteger primedMessageCounter = new AtomicInteger();
+  private final AtomicInteger retainedMessageCounter = new AtomicInteger();
   private final AtomicLong totalMessageSize = new AtomicLong();
 
   public MqttEstimatedTimetableSourceHiveMQ(MqttSiriETUpdaterParameters parameters) {
@@ -158,6 +160,9 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
   }
 
   private void onMessage(Mqtt5Publish message) {
+    if (message.isRetain()) {
+      retainedMessageCounter.incrementAndGet();
+    }
     int numberOfMessages = primedMessageCounter.incrementAndGet();
     long sizeBytes = totalMessageSize.addAndGet(message.getPayloadAsBytes().length);
     boolean offer = messageQueue.offer(message.getPayloadAsBytes());
@@ -167,7 +172,8 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
     if (!primed && numberOfMessages % 1000 == 0) {
       double sizeMB = sizeBytes / 1024. / 1024.;
       double meanMessageSizeKB = (double) sizeBytes / numberOfMessages / 1024.;
-      LOG.info("Received {} messages ({} MB) during priming. Mean message size: {} kB", numberOfMessages, sizeMB, meanMessageSizeKB);
+      LOG.info("Received {} messages ({} MB, {} retained) during priming. Mean message size: {} kB",
+        numberOfMessages, sizeMB, retainedMessageCounter.get(), meanMessageSizeKB);
       LOG.info("Queue size: {}", messageQueue.size());
     }
   }
