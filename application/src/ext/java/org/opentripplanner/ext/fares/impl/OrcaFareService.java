@@ -56,7 +56,6 @@ public class OrcaFareService extends DefaultFareService {
     "cash"
   );
 
-
   private static final LocalDate SEPT_FARE_CHANGE_DATE = LocalDate.of(2025, 9, 1);
 
   private static final LocalDate KITSAP_FAST_FERRY_CHANGE_DATE = LocalDate.of(2025, 10, 1);
