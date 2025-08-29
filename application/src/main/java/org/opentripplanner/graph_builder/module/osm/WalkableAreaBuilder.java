@@ -186,9 +186,10 @@ class WalkableAreaBuilder {
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
       HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
       GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-      OsmEntity areaEntity = group.getSomeOsmObject();
 
       for (OsmArea area : group.areas) {
+        OsmEntity areaEntity = area.parent;
+
         // test if area is inside the current ring
         if (!group.isSimpleAreaGroup()) {
           if (!polygon.contains(area.jtsMultiPolygon)) {
