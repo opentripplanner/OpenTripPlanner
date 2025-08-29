@@ -564,6 +564,13 @@
                     <value/>
                 </property>
             </activation>
+            <!--
+                The documentation of the surefire plugin says that setting excludedGroups and includedGroups
+                should work directly, but I cannot get it to work.
+                For that reason we need the detour via the maven properties.
+                From my understanding, setting excludedGroups should not be necessary, but it is.
+                If you are an expert of the surefire plugin, feel free to correct this.
+            -->
             <properties>
                 <tests.includedGroups>integration</tests.includedGroups>
                 <tests.excludedGroups></tests.excludedGroups>

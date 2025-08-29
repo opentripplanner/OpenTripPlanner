@@ -25,10 +25,5 @@ jobs:
 
 
       - name: Run integration tests
-        # the documentation of the surefire plugin says that the excludedGroups and includedGroups
-        # should work directly from the command line, but i cannot get it to work.
-        # for that reason i need the detour via the maven properties.
-        # from my understanding setting excludedGroups should not be necessary, but it is. ¯\_(ツ)_/¯
-        # if you are an expert of the surefire plugin, feel free to correct this.
         run: mvn test -P integrationTests
 
