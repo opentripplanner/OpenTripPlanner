@@ -75,8 +75,8 @@ public class LinkStopToPlatformTest {
     // AreaGroup must include a valid Area which defines area attributes
     Area area = new Area();
     area.setName(new LocalizedString("test platform"));
-    area.setWalkSafety(0.5);
-    area.setBicycleSafety(0.5);
+    area.setWalkSafety(0.5f);
+    area.setBicycleSafety(0.5f);
     area.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
     area.setGeometry(polygon);
     areaGroup.addArea(area);
