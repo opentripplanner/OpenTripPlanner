@@ -187,9 +187,15 @@ public class GTFSToOtpTransitServiceMapper {
     builder.getFlexTimePenalty().putAll(tripMapper.flexSafeTimePenalties());
     builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
 
-    fareRulesBuilder.fareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
-    fareRulesBuilder.fareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
+    // Fares v1
+    if (shouldImportFaresV1(data)) {
+      fareRulesBuilder
+        .fareAttributes()
+        .addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
+      fareRulesBuilder.fareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
+    }
 
+    // Fares V2
     // we don't want to store the list of fare products if they are not required by a fare rule
     // or a fare transfer rule, that's why this is not added to the builder
     fareProductMapper.map(data.getAllFareProducts());
@@ -243,5 +249,17 @@ public class GTFSToOtpTransitServiceMapper {
     var result = transferMapper.map(data.getAllTransfers());
     builder.getTransfers().addAll(result.constrainedTransfers());
     builder.getStaySeatedNotAllowed().addAll(result.staySeatedNotAllowed());
+  }
+
+  /**
+   * Fares V2 takes precedence over V1, so if both are in the feed and V2 is enabled, we skip
+   * the import of V1.
+   */
+  private static boolean shouldImportFaresV1(GtfsRelationalDao dao) {
+    if (OTPFeature.FaresV2.isOn()) {
+      return !dao.hasFaresV2();
+    } else {
+      return true;
+    }
   }
 }
