@@ -6,6 +6,10 @@ import { createPrunedQuery, createPrunedVariables } from '../../util/queryPrunin
 const graphiQLUrl = import.meta.env.VITE_GRAPHIQL_URL;
 
 function GraphiQLRouteButton({ tripQueryVariables }: { tripQueryVariables: TripQueryVariables }) {
+  if (!graphiQLUrl) {
+    return null;
+  }
+
   const prunedVariables = createPrunedVariables(tripQueryVariables);
   const formattedVariables = encodeURIComponent(JSON.stringify(prunedVariables));
   const prunedQuery = createPrunedQuery(tripQueryVariables);
