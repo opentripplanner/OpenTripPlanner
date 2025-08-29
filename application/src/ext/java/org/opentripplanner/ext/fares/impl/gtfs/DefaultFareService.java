@@ -179,7 +179,7 @@ public class DefaultFareService implements FareService {
   ) {
     FareSearch r = performSearch(fareType, legs, fareRules);
 
-    Multimap<Leg, FareOffer> fareProductUses = LinkedHashMultimap.create();
+    Multimap<Leg, FareOffer> fareOffers = LinkedHashMultimap.create();
     int start = 0;
     int end = legs.size() - 1;
     while (start <= end) {
@@ -218,14 +218,14 @@ public class DefaultFareService implements FareService {
 
       if (!applicableLegs.isEmpty()) {
         var offer = FareOffer.of(applicableLegs.getFirst().startTime(), product);
-        applicableLegs.forEach(leg -> fareProductUses.put(leg, offer));
+        applicableLegs.forEach(leg -> fareOffers.put(leg, offer));
       }
 
       start = via + 1;
     }
 
     var fare = ItineraryFare.empty();
-    fare.addFareProductUses(fareProductUses);
+    fare.addFareOffers(fareOffers);
     return fare;
   }
 
