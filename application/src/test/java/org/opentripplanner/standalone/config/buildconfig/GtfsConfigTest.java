@@ -30,7 +30,6 @@ class GtfsConfigTest {
 
     var subject = GtfsConfig.mapGtfsDefaultParameters(nodeAdapter, "gtfsDefaults");
 
-    assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
     assertTrue(subject.discardMinTransferTimes());
     assertFalse(subject.blockBasedInterlining());
@@ -48,7 +47,6 @@ class GtfsConfigTest {
 
     var subject = GtfsConfig.mapGtfsDefaultParameters(nodeAdapter, "gtfsDefaults");
 
-    assertTrue(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.ALLOWED, subject.stationTransferPreference());
     assertFalse(subject.discardMinTransferTimes());
     assertTrue(subject.blockBasedInterlining());
@@ -86,7 +84,6 @@ class GtfsConfigTest {
 
     assertEquals("https://foo.bar/gtfs.zip", subject.source().toASCIIString());
     assertEquals("test", subject.feedId());
-    assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
     assertTrue(subject.discardMinTransferTimes());
     assertFalse(subject.blockBasedInterlining());
@@ -129,7 +126,6 @@ class GtfsConfigTest {
 
     assertEquals("https://foo.bar/gtfs.zip", subject.source().toASCIIString());
     assertEquals("test", subject.feedId());
-    assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
     assertFalse(subject.discardMinTransferTimes());
     assertFalse(subject.blockBasedInterlining());
@@ -165,7 +161,6 @@ class GtfsConfigTest {
 
     assertEquals("https://foo.bar/gtfs.zip", subject.source().toASCIIString());
     assertEquals("test", subject.feedId());
-    assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
     assertTrue(subject.discardMinTransferTimes());
     assertFalse(subject.blockBasedInterlining());

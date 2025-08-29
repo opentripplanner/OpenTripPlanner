@@ -19,16 +19,11 @@ class GtfsParametersTest {
   private final boolean BLOCK_BASED_INTERLINEING = !DEFAULT.blockBasedInterlining();
   private final boolean DISCARD_MIN_TRANSFERTIMES = !DEFAULT.discardMinTransferTimes();
   private final StopTransferPriority STATION_TRANSFER_PREFERENCE = DISCOURAGED;
-  private final boolean REMOVE_REPEATED_STOPS = !DEFAULT.removeRepeatedStops();
   private final int MAX_INTERLINE_DISTANCE = DEFAULT.maxInterlineDistance() + 100;
   private final String FEED = "FEED";
   private final URI SOURCE;
 
   private final String EXPECTED_BODY_STRING =
-    "" +
-    "removeRepeatedStops: " +
-    REMOVE_REPEATED_STOPS +
-    ", " +
     "stationTransferPreference: " +
     STATION_TRANSFER_PREFERENCE +
     ", " +
