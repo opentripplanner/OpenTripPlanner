@@ -10,7 +10,6 @@ export function DepartureArrivalSelect({
 }) {
   const onChange = (arriveBy: boolean | undefined) => {
     if (arriveBy === undefined) {
-      // Remove arriveBy from variables when "Depart after" is selected
       const updatedVariables = { ...tripQueryVariables };
       delete updatedVariables.arriveBy;
       setTripQueryVariables(updatedVariables);
@@ -25,10 +24,11 @@ export function DepartureArrivalSelect({
   return (
     <Form.Group>
       <Form.Label column="sm" htmlFor="departureArrivalSelect">
-        Departure/Arrival
+        Depart/Arrive
       </Form.Label>
       <Form.Select
         size="sm"
+        className="input-small"
         onChange={(e) => (e.target.value === 'arrival' ? onChange(true) : onChange(undefined))}
         value={tripQueryVariables.arriveBy ? 'arrival' : 'departure'}
         style={{ verticalAlign: 'bottom' }}

@@ -1,6 +1,6 @@
 import { MapView } from '../components/MapView/MapView.tsx';
 import { ItineraryListContainer } from '../components/ItineraryList/ItineraryListContainer.tsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTripQuery } from '../hooks/useTripQuery.ts';
 import { useServerInfo } from '../hooks/useServerInfo.ts';
 import { useTripQueryVariables } from '../hooks/useTripQueryVariables.ts';
@@ -17,9 +17,15 @@ export function App() {
   const serverInfo = useServerInfo();
   const { tripQueryVariables, setTripQueryVariables } = useTripQueryVariables();
   const [tripQueryResult, loading, callback, error] = useTripQuery(tripQueryVariables);
-  const [selectedTripPatternIndex, setSelectedTripPatternIndex] = useState<number>(0);
+  const [selectedTripPatternIndexes, setSelectedTripPatternIndexes] = useState<number[]>([0]);
   const [expandedArguments, setExpandedArguments] = useState<Record<string, boolean>>({});
   const timeZone = serverInfo?.internalTransitModelTimeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  useEffect(() => {
+    if (tripQueryResult?.trip.tripPatterns.length) {
+      setSelectedTripPatternIndexes([0]);
+    }
+  }, [tripQueryResult]);
 
   return (
     <div className="app">
@@ -40,8 +46,8 @@ export function App() {
             <Sidebar>
               <ItineraryListContainer
                 tripQueryResult={tripQueryResult}
-                selectedTripPatternIndex={selectedTripPatternIndex}
-                setSelectedTripPatternIndex={setSelectedTripPatternIndex}
+                selectedTripPatternIndexes={selectedTripPatternIndexes}
+                setSelectedTripPatternIndexes={setSelectedTripPatternIndexes}
                 pageResults={callback}
                 loading={loading}
                 error={error}
@@ -66,7 +72,7 @@ export function App() {
               tripQueryResult={tripQueryResult}
               tripQueryVariables={tripQueryVariables}
               setTripQueryVariables={setTripQueryVariables}
-              selectedTripPatternIndex={selectedTripPatternIndex}
+              selectedTripPatternIndexes={selectedTripPatternIndexes}
               loading={loading}
             />
           </div>

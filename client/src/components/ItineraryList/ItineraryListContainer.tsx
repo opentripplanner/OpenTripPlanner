@@ -5,22 +5,22 @@ import { ItineraryHeaderContent } from './ItineraryHeaderContent.tsx';
 import { useEarliestAndLatestTimes } from './useEarliestAndLatestTimes.ts';
 import { ItineraryDetails } from './ItineraryDetails.tsx';
 import { ItineraryPaginationControl } from './ItineraryPaginationControl.tsx';
-import { useContext } from 'react';
+import { useContext, Dispatch, SetStateAction } from 'react';
 import { TimeZoneContext } from '../../hooks/TimeZoneContext.ts';
 import { ErrorDisplay } from './ErrorDisplay.tsx';
 import { NoResultsDisplay } from './NoResultsDisplay.tsx';
 
 export function ItineraryListContainer({
   tripQueryResult,
-  selectedTripPatternIndex,
-  setSelectedTripPatternIndex,
+  selectedTripPatternIndexes,
+  setSelectedTripPatternIndexes,
   pageResults,
   loading,
   error,
 }: {
   tripQueryResult: TripQuery | null;
-  selectedTripPatternIndex: number;
-  setSelectedTripPatternIndex: (selectedTripPatterIndex: number) => void;
+  selectedTripPatternIndexes: number[];
+  setSelectedTripPatternIndexes: Dispatch<SetStateAction<number[]>>;
   pageResults: (cursor: string) => void;
   loading: boolean;
   error?: unknown;
@@ -50,8 +50,18 @@ export function ItineraryListContainer({
           </div>
         )}
         <Accordion
-          activeKey={`${selectedTripPatternIndex}`}
-          onSelect={(eventKey) => setSelectedTripPatternIndex(parseInt(eventKey as string))}
+          activeKey={selectedTripPatternIndexes.map(String)}
+          onSelect={(eventKey) => {
+            const index = parseInt(eventKey as string);
+            setSelectedTripPatternIndexes((prev: number[]) => {
+              if (prev.includes(index)) {
+                return prev.filter((i: number) => i !== index);
+              } else {
+                const newArray = [...prev, index];
+                return newArray.length > 2 ? newArray.slice(-2) : newArray;
+              }
+            });
+          }}
         >
           {tripQueryResult &&
             tripQueryResult.trip.tripPatterns.map((tripPattern, itineraryIndex) => (
