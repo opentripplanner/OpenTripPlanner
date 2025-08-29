@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.utils.lang.StringUtils;
 
@@ -46,7 +45,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    */
   @Nullable
   public static FeedScopedId parse(@Nullable String value) throws IllegalArgumentException {
-    if (value == null || value.isEmpty()) {
+    if (StringUtils.hasNoValue(value)) {
       return null;
     }
     int index = value.indexOf(ID_SEPARATOR);

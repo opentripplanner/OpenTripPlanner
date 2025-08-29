@@ -13,32 +13,32 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public interface VehicleRentalPlace {
   /** Get the id for the place, which is globally unique */
-  FeedScopedId getId();
+  FeedScopedId id();
 
   /** Get the system-internal id for the place */
-  String getStationId();
+  String stationId();
 
   /** Get the id of the vehicle rental system */
-  String getNetwork();
+  String network();
 
   /** Get the name of the place */
-  I18NString getName();
+  I18NString name();
 
-  double getLongitude();
+  double longitude();
 
-  double getLatitude();
+  double latitude();
 
   /** How many vehicles are currently available for rental at the station */
-  int getVehiclesAvailable();
+  int vehiclesAvailable();
 
   /**
    * How many parking spaces are currently available for dropping off a vehicle at the station, 0
    * for floating vehicles
    */
-  int getSpacesAvailable();
+  int spacesAvailable();
 
   /** Number of total docking points installed at this station, both available and unavailable. */
-  Integer getCapacity();
+  Integer capacity();
 
   /** Does the place allow dropping off vehicles */
   boolean isAllowDropoff();
@@ -62,10 +62,17 @@ public interface VehicleRentalPlace {
   boolean isCarStation();
 
   /** What form factors are currently available for pick up */
-  Set<RentalFormFactor> getAvailablePickupFormFactors(boolean includeRealtimeAvailability);
+  Set<RentalFormFactor> availablePickupFormFactors(boolean includeRealtimeAvailability);
 
   /** What form factors are currently available for drop off */
-  Set<RentalFormFactor> getAvailableDropoffFormFactors(boolean includeRealtimeAvailability);
+  Set<RentalFormFactor> availableDropoffFormFactors(boolean includeRealtimeAvailability);
+
+  default boolean canDropOffFormFactor(
+    RentalFormFactor formFactor,
+    boolean includeRealtimeAvailability
+  ) {
+    return false;
+  }
 
   /** Is it possible to arrive at the destination with a rented bicycle, without dropping it off */
   boolean isArrivingInRentalVehicleAtDestinationAllowed();
@@ -78,20 +85,20 @@ public interface VehicleRentalPlace {
   boolean isRealTimeData();
 
   /** Deep links for this rental station or individual vehicle */
-  VehicleRentalStationUris getRentalUris();
+  VehicleRentalStationUris rentalUris();
 
   /** System information for the vehicle rental provider */
-  VehicleRentalSystem getVehicleRentalSystem();
+  VehicleRentalSystem vehicleRentalSystem();
 
   default boolean networkIsNotAllowed(VehicleRentalPreferences preferences) {
     if (
-      getNetwork() == null &&
+      network() == null &&
       (!preferences.allowedNetworks().isEmpty() || !preferences.bannedNetworks().isEmpty())
     ) {
       return false;
     }
 
-    if (preferences.bannedNetworks().contains(getNetwork())) {
+    if (preferences.bannedNetworks().contains(network())) {
       return true;
     }
 
@@ -99,6 +106,6 @@ public interface VehicleRentalPlace {
       return false;
     }
 
-    return !preferences.allowedNetworks().contains(getNetwork());
+    return !preferences.allowedNetworks().contains(network());
   }
 }

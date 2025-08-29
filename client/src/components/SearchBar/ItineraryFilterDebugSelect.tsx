@@ -16,7 +16,7 @@ export function ItineraryFilterDebugSelect({
       <Form.Select
         id="itineraryDebugFilterSelect"
         size="sm"
-        className="input-medium"
+        className="input-small"
         onChange={(e) => {
           if (e.target.value === 'not_selected') {
             // Remove the debug filter entirely when "Not selected" is chosen

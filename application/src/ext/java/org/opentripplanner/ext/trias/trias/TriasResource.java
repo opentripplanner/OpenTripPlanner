@@ -21,9 +21,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.xml.transform.TransformerException;
-import org.opentripplanner.ext.trias.id.HideFeedIdResolver;
-import org.opentripplanner.ext.trias.id.IdResolver;
-import org.opentripplanner.ext.trias.id.UseFeedIdResolver;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.api.model.transit.HideFeedIdMapper;
 import org.opentripplanner.ext.trias.mapping.ErrorMapper;
 import org.opentripplanner.ext.trias.parameters.TriasApiParameters;
 import org.opentripplanner.ext.trias.service.OjpService;
@@ -50,15 +50,15 @@ public class TriasResource {
     var zoneId = context.triasApiParameters().timeZone().orElse(transitService.getTimeZone());
     var vdvService = new OjpService(context.transitService(), context.graphFinder());
 
-    IdResolver idResolver = idResolver(context.triasApiParameters());
-    this.ojpService = new OjpServiceMapper(vdvService, idResolver, zoneId);
+    FeedScopedIdMapper idMapper = idMapper(context.triasApiParameters());
+    this.ojpService = new OjpServiceMapper(vdvService, idMapper, zoneId);
   }
 
-  private IdResolver idResolver(TriasApiParameters triasApiConfig) {
+  private FeedScopedIdMapper idMapper(TriasApiParameters triasApiConfig) {
     if (triasApiConfig.hideFeedId()) {
-      return new HideFeedIdResolver(triasApiConfig.hardcodedInputFeedId());
+      return new HideFeedIdMapper(triasApiConfig.hardcodedInputFeedId());
     } else {
-      return new UseFeedIdResolver();
+      return new DefaultFeedIdMapper();
     }
   }
 

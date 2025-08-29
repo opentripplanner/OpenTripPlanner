@@ -89,6 +89,7 @@ nav:
     - "Debug UI": 'DebugUiConfiguration.md'
     - "Migrating between versions/builds": 'Migrating-Configuration.md'
 - Features explained:
+    - "Feed ID": 'features-explained/Feed-ID.md'
     - "Routing modes": 'RoutingModes.md'
     - "In-station navigation": 'In-Station-Navigation.md'
     - "Boarding Locations": 'BoardingLocations.md'

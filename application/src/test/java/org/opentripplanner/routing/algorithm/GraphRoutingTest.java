@@ -151,6 +151,16 @@ public abstract class GraphRoutingTest {
       return streetBuilder(from, to, length, permissions).buildAndConnect();
     }
 
+    public StreetEdge street(
+      StreetVertex from,
+      StreetVertex to,
+      int length,
+      StreetTraversalPermission permissions,
+      float carSpeed
+    ) {
+      return streetBuilder(from, to, length, permissions).withCarSpeed(carSpeed).buildAndConnect();
+    }
+
     public List<StreetEdge> street(
       StreetVertex from,
       StreetVertex to,
@@ -372,18 +382,18 @@ public abstract class GraphRoutingTest {
       double longitude,
       String network
     ) {
-      var vehicleRentalStation = new VehicleRentalStation();
-      vehicleRentalStation.id = new FeedScopedId(network, id);
-      vehicleRentalStation.name = new NonLocalizedString(id);
-      vehicleRentalStation.longitude = longitude;
-      vehicleRentalStation.latitude = latitude;
-      vehicleRentalStation.vehiclesAvailable = 2;
-      vehicleRentalStation.spacesAvailable = 2;
       final RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(network);
-      vehicleRentalStation.vehicleTypesAvailable = Map.of(vehicleType, 2);
-      vehicleRentalStation.vehicleSpacesAvailable = Map.of(vehicleType, 2);
-      vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed = false;
-      return vehicleRentalStation;
+      return VehicleRentalStation.of()
+        .withId(new FeedScopedId(network, id))
+        .withName(new NonLocalizedString(id))
+        .withLongitude(longitude)
+        .withLatitude(latitude)
+        .withVehiclesAvailable(2)
+        .withSpacesAvailable(2)
+        .withVehicleTypesAvailable(Map.of(vehicleType, 2))
+        .withVehicleSpacesAvailable(Map.of(vehicleType, 2))
+        .withIsArrivingInRentalVehicleAtDestinationAllowed(false)
+        .build();
     }
 
     public VehicleRentalPlaceVertex vehicleRentalStation(
@@ -397,7 +407,7 @@ public abstract class GraphRoutingTest {
       );
       VehicleRentalEdge.createVehicleRentalEdge(
         vertex,
-        RentalVehicleType.getDefaultType(network).formFactor
+        RentalVehicleType.getDefaultType(network).formFactor()
       );
       return vertex;
     }

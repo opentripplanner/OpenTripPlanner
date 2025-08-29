@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.geometry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +23,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
-import org.opentripplanner.graph_builder.issues.MissingShapeGeometry;
 import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
@@ -45,7 +44,7 @@ public class GeometryProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(GeometryProcessor.class);
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-  private final OtpTransitServiceBuilder transitService;
+  private final OtpTransitServiceBuilder builder;
   // this is a thread-safe implementation
   private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey =
     new ConcurrentHashMap<>();
@@ -57,13 +56,11 @@ public class GeometryProcessor {
   private final DataImportIssueStore issueStore;
 
   public GeometryProcessor(
-    // TODO OTP2 - Operate on the builder, not the transit service and move the execution of
-    //           - this to where the builder is in context.
-    OtpTransitServiceBuilder transitService,
+    OtpTransitServiceBuilder builder,
     double maxStopToShapeSnapDistance,
     DataImportIssueStore issueStore
   ) {
-    this.transitService = transitService;
+    this.builder = builder;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance > 0
       ? maxStopToShapeSnapDistance
       : 150;
@@ -88,7 +85,7 @@ public class GeometryProcessor {
     }
 
     return Arrays.asList(
-      createGeometry(trip.getShapeId(), transitService.getStopTimesSortedByTrip().get(trip))
+      createGeometry(trip.getShapeId(), builder.getStopTimesSortedByTrip().get(trip))
     );
   }
 
@@ -124,7 +121,12 @@ public class GeometryProcessor {
     if (shapeLineString == null) {
       // this trip has a shape_id, but no such shape exists, and no shape_dist in stop_times
       // create straight line segments between stops for each hop
-      issueStore.add(new MissingShapeGeometry(stopTimes.get(0).getTrip().getId(), shapeId));
+      issueStore.add(
+        "InvalidShapeReference",
+        "Trip '%s' refers to unknown shape geometry '%s'",
+        stopTimes.get(0).getTrip().getId(),
+        shapeId
+      );
       return createStraightLineHopGeometries(stopTimes);
     }
 
@@ -249,7 +251,6 @@ public class GeometryProcessor {
         minSegmentIndex = bestSegment.index;
       } else {
         minSegmentIndex = minSegmentIndexForThisStop;
-        stopSegments.sort(new IndexedLineSegmentComparator(coord));
       }
 
       for (int j = i - 1; j >= 0; j--) {
@@ -266,7 +267,7 @@ public class GeometryProcessor {
       possibleSegmentsForStop.add(stopSegments);
     }
 
-    return getStopLocations(possibleSegmentsForStop, stopTimes, 0, -1);
+    return getStopLocations(possibleSegmentsForStop, stopTimes);
   }
 
   private LineString[] createStraightLineHopGeometries(List<StopTime> stopTimes) {
@@ -304,37 +305,89 @@ public class GeometryProcessor {
    */
   private List<LinearLocation> getStopLocations(
     List<List<IndexedLineSegment>> possibleSegmentsForStop,
-    List<StopTime> stopTimes,
-    int index,
-    int prevSegmentIndex
+    List<StopTime> stopTimes
   ) {
-    if (index == stopTimes.size()) {
-      return new LinkedList<>();
-    }
+    IndexedLineSegment prevSegment = null;
+    var prevSegmentFraction = 0.0;
+    List<LinearLocation> locations = new ArrayList<>(stopTimes.size());
+    for (
+      var stopPositionInPattern = 0;
+      stopPositionInPattern < stopTimes.size();
+      ++stopPositionInPattern
+    ) {
+      StopTime st = stopTimes.get(stopPositionInPattern);
+      StopLocation stop = st.getStop();
+      Coordinate stopCoord = stop.getCoordinate().asJtsCoordinate();
 
-    StopTime st = stopTimes.get(index);
-    StopLocation stop = st.getStop();
-    Coordinate stopCoord = stop.getCoordinate().asJtsCoordinate();
-
-    for (IndexedLineSegment segment : possibleSegmentsForStop.get(index)) {
-      if (segment.index < prevSegmentIndex) {
+      // Arrange segments into list of continuous segments
+      // we assume that the first time a shape passes through within 150 m of the stop, it will match
+      // the stop. Therefore, we choose the best segment within the first list of continuous
+      // segments, rather than trying from the best segment globally.
+      // This is to avoid exponential complexity for routes with multiple double-backs with multiple
+      // stops within the double-backs.
+      //
+      // An exception is that, if the discontinuity appears before the minimum possible segment
+      // for the next stop, the discontinuity is joined together. This is avoid a simple edge case
+      // of a bus first passing within 150 m of a stop, exit the 150 m radius to a turning circle,
+      // then call at the stop at the opposite side of the road.
+      List<List<IndexedLineSegment>> continuousSegments = new LinkedList<>();
+      for (IndexedLineSegment segment : possibleSegmentsForStop.get(stopPositionInPattern)) {
         //can't go backwards along line
-        continue;
+        if (prevSegment == null || segment.index >= prevSegment.index) {
+          // can't go backwards in the same segment
+          if (prevSegment != null && segment.index == prevSegment.index) {
+            var splitX = segment.start.x + (segment.end.x - segment.start.x) * prevSegmentFraction;
+            var splitY = segment.start.y + (segment.end.y - segment.start.y) * prevSegmentFraction;
+            var splitZ = segment.start.z + (segment.end.z - segment.start.z) * prevSegmentFraction;
+            segment = new IndexedLineSegment(
+              segment.index,
+              new Coordinate(splitX, splitY, splitZ),
+              segment.end
+            );
+          }
+          boolean shouldStartNewSegment;
+          if (continuousSegments.isEmpty()) {
+            shouldStartNewSegment = true;
+          } else if (stopPositionInPattern + 1 == stopTimes.size()) {
+            shouldStartNewSegment = false;
+          } else {
+            var lastSegment = continuousSegments.getLast().getLast();
+            var segmentsForNextStop = possibleSegmentsForStop.get(stopPositionInPattern + 1);
+            var s = segment;
+            shouldStartNewSegment = segmentsForNextStop
+              .stream()
+              .anyMatch(item -> item.index > lastSegment.index && item.index < s.index);
+          }
+          if (shouldStartNewSegment) {
+            // start a new continuous segment
+            continuousSegments.add(new LinkedList<>());
+          }
+          continuousSegments.getLast().add(segment);
+        }
       }
-      List<LinearLocation> locations = getStopLocations(
-        possibleSegmentsForStop,
-        stopTimes,
-        index + 1,
-        segment.index
-      );
-      if (locations != null) {
-        LinearLocation location = new LinearLocation(0, segment.index, segment.fraction(stopCoord));
-        locations.add(0, location);
-        return locations; //we found one!
+      // choose the best match from the first list
+      if (continuousSegments.isEmpty()) {
+        return null;
       }
+      List<IndexedLineSegment> firstContinuousSegments = continuousSegments.getFirst();
+      var bestMatch = firstContinuousSegments.getFirst();
+      for (var segment : firstContinuousSegments) {
+        if (segment.distance(stopCoord) < bestMatch.distance(stopCoord)) {
+          bestMatch = segment;
+        }
+      }
+      // we found one!
+      // best match may be the split segment with the previous stop, in this case we need to load the full segment
+      IndexedLineSegment matchedSegment = prevSegment != null &&
+        bestMatch.index == prevSegment.index
+        ? prevSegment
+        : bestMatch;
+      prevSegmentFraction = matchedSegment.fraction(stopCoord);
+      LinearLocation location = new LinearLocation(0, bestMatch.index, prevSegmentFraction);
+      locations.add(location);
+      prevSegment = matchedSegment;
     }
-
-    return null;
+    return locations;
   }
 
   private LineString getHopGeometryViaShapeDistTraveled(
@@ -465,27 +518,32 @@ public class GeometryProcessor {
    * they are unnecessary, and 2) they define 0-length line segments which cause JTS location
    * indexed line to return a segment location of NaN, which we do not want.
    */
-  private List<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
-    List<ShapePoint> points = new ArrayList<>(transitService.getShapePoints().get(shapeId));
-    Collections.sort(points);
-    ArrayList<ShapePoint> filtered = new ArrayList<>(points.size());
+  private Collection<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
+    var points = builder.getShapePoints().getOrDefault(shapeId, List.of());
+    ArrayList<ShapePoint> filtered = new ArrayList<>();
     ShapePoint last = null;
+    int currentSeq = Integer.MIN_VALUE;
     for (ShapePoint sp : points) {
-      if (last == null || last.getSequence() != sp.getSequence()) {
-        if (last != null && last.getLat() == sp.getLat() && last.getLon() == sp.getLon()) {
+      if (sp.sequence() < currentSeq) {
+        // this should never happen, because the GTFS import should make sure they are already in order.
+        // therefore this just a safety check to detect a programmer error.
+        throw new IllegalStateException(
+          "Shape %s is not sorted in order of sequence. This indicates a bug in OTP.".formatted(
+              shapeId
+            )
+        );
+      }
+      if (last == null || last.sequence() != sp.sequence()) {
+        if (last != null && last.sameCoordinates(sp)) {
           LOG.trace("pair of identical shape points (skipping): {} {}", last, sp);
         } else {
           filtered.add(sp);
         }
       }
       last = sp;
+      currentSeq = sp.sequence();
     }
-    if (filtered.size() != points.size()) {
-      filtered.trimToSize();
-      return filtered;
-    } else {
-      return points;
-    }
+    return filtered;
   }
 
   private LineString getLineStringForShapeId(FeedScopedId shapeId) {
@@ -495,7 +553,7 @@ public class GeometryProcessor {
       return geometry;
     }
 
-    List<ShapePoint> points = getUniqueShapePointsForShapeId(shapeId);
+    var points = getUniqueShapePointsForShapeId(shapeId);
     if (points.size() < 2) {
       return null;
     }
@@ -506,8 +564,8 @@ public class GeometryProcessor {
 
     int i = 0;
     for (ShapePoint point : points) {
-      coordinates[i] = new Coordinate(point.getLon(), point.getLat());
-      distances[i] = point.getDistTraveled();
+      coordinates[i] = point.coordinate();
+      distances[i] = point.distTraveled();
       if (!point.isDistTraveledSet()) hasAllDistances = false;
       i++;
     }

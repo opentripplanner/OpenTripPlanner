@@ -99,6 +99,15 @@ class FinlandMapper extends OsmTagMapper {
     props.setProperties("highway=footway", withModes(PEDESTRIAN));
     props.setProperties("footway=sidewalk;highway=footway", withModes(PEDESTRIAN));
 
+    // biking is allowed on pedestrian areas
+    props.setProperties("highway=pedestrian", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1));
+
+    // Walking is allowed on cycleways
+    props.setProperties(
+      "highway=cycleway",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.6).walkSafety(2.0)
+    );
+
     // Walking on segregated ways is safer than when cycling and walking happens on the same lane
     props.setProperties(
       "highway=cycleway;segregated=yes",
@@ -208,6 +217,7 @@ class FinlandMapper extends OsmTagMapper {
     props.setCarSpeed("highway=living_street", 5.55f);
     // ~= 16 kph
     props.setCarSpeed("highway=track", 4.5f);
+    props.setCarSpeed("highway=pedestrian", 4.5f);
 
     super.populateProperties(props);
   }

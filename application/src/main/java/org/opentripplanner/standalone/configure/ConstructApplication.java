@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.configure;
 
 import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.transmodel.TransmodelAPI;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
@@ -18,6 +17,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -164,6 +164,10 @@ public class ConstructApplication {
     return graphBuilderDataSources.getOutputGraph();
   }
 
+  public GraphBuilderDataSources graphBuilderDataSources() {
+    return graphBuilderDataSources;
+  }
+
   private Application createApplication() {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer();
@@ -179,6 +183,7 @@ public class ConstructApplication {
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(
       graph(),
+      vertexLinker(),
       realtimeVehicleRepository(),
       vehicleRentalRepository(),
       vehicleParkingRepository(),
@@ -190,16 +195,6 @@ public class ConstructApplication {
     initEllipsoidToGeoidDifference();
 
     initializeTransferCache(routerConfig().transitTuningConfig(), timetableRepository());
-
-    if (OTPFeature.TransmodelGraphQlApi.isOn()) {
-      TransmodelAPI.setUp(
-        routerConfig().transmodelApi(),
-        timetableRepository(),
-        routerConfig().routingRequestDefaults(),
-        routerConfig().server().apiDocumentationProfile(),
-        routerConfig().transitTuningConfig()
-      );
-    }
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Initializing geocoder");
@@ -302,6 +297,10 @@ public class ConstructApplication {
 
   public Graph graph() {
     return factory.graph();
+  }
+
+  public VertexLinker vertexLinker() {
+    return factory.vertexLinker();
   }
 
   public WorldEnvelopeRepository worldEnvelopeRepository() {
