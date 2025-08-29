@@ -187,7 +187,7 @@ public class GTFSToOtpTransitServiceMapper {
     builder.getFlexTimePenalty().putAll(tripMapper.flexSafeTimePenalties());
     builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
 
-    // Fares v1
+    // Fares V1
     if (shouldImportFaresV1(data)) {
       fareRulesBuilder
         .fareAttributes()
