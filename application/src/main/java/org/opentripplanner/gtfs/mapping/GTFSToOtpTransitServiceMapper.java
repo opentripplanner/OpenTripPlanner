@@ -234,7 +234,7 @@ public class GTFSToOtpTransitServiceMapper {
   }
 
   /**
-   * Note! Trip-pattens must be added BEFORE mapping transfers
+   * Note! Trip patterns must be added BEFORE mapping transfers
    */
   public void mapAndAddTransfersToBuilder(GtfsDao data) {
     TransferMapper transferMapper = new TransferMapper(
