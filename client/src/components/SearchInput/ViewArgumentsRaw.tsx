@@ -8,14 +8,18 @@ interface ViewArgumentsRawProps {
   setExpandedArguments?: (expandedArguments: Record<string, boolean>) => void;
 }
 
-const ViewArgumentsRaw: React.FC<ViewArgumentsRawProps> = ({ tripQueryVariables, setTripQueryVariables, setExpandedArguments }) => {
+const ViewArgumentsRaw: React.FC<ViewArgumentsRawProps> = ({
+  tripQueryVariables,
+  setTripQueryVariables,
+  setExpandedArguments,
+}) => {
   return (
     <div className={'left-pane-container below-content'} style={{ fontSize: '14px' }}>
       <div className="panel-header">
         Request raw
-        <ResetButton 
-          tripQueryVariables={tripQueryVariables} 
-          setTripQueryVariables={setTripQueryVariables} 
+        <ResetButton
+          tripQueryVariables={tripQueryVariables}
+          setTripQueryVariables={setTripQueryVariables}
           setExpandedArguments={setExpandedArguments}
         />
       </div>

@@ -27,13 +27,15 @@ export function NoResultsDisplay({ hasSearched, tripQueryResult }: NoResultsDisp
             No matching trips were found for your search criteria.
           </div>
           <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Raw Response:</div>
-          <pre style={{ 
-            fontSize: '12px', 
-            margin: 0,
-            whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
-            width: '100%'
-          }}>
+          <pre
+            style={{
+              fontSize: '12px',
+              margin: 0,
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              width: '100%',
+            }}
+          >
             {JSON.stringify(tripQueryResult, null, 2)}
           </pre>
         </div>

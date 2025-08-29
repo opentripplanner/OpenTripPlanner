@@ -29,10 +29,10 @@ export function TransitModeSelect({
         // Remove transportModes entirely when empty
         const updatedModes = { ...tripQueryVariables.modes };
         delete updatedModes.transportModes;
-        
+
         // Check if modes object has any other properties
         const hasOtherModes = updatedModes.directMode || updatedModes.accessMode || updatedModes.egressMode;
-        
+
         setTripQueryVariables({
           ...tripQueryVariables,
           modes: hasOtherModes ? updatedModes : undefined,

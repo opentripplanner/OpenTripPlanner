@@ -61,7 +61,7 @@ ${variableDeclarations}
 export function createPrunedVariables(variables: TripQueryVariables): TripQueryVariables {
   // Create a new object with only the defined variables
   const prunedVariables: Partial<TripQueryVariables> = {};
-  
+
   Object.keys(variables).forEach((key) => {
     const value = variables[key as keyof TripQueryVariables];
     if (value !== undefined) {

@@ -1,4 +1,3 @@
-
 interface ErrorDisplayProps {
   error: unknown;
   onDismiss?: () => void;
@@ -119,13 +118,15 @@ export function ErrorDisplay({ error, onDismiss }: ErrorDisplayProps) {
           {showRaw && (
             <>
               <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Technical Details:</div>
-              <pre style={{ 
-                fontSize: '12px', 
-                margin: 0,
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-                width: '100%'
-              }}>
+              <pre
+                style={{
+                  fontSize: '12px',
+                  margin: 0,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  width: '100%',
+                }}
+              >
                 {rawContent}
               </pre>
             </>

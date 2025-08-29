@@ -9,7 +9,11 @@ interface ResetButtonProps {
   setExpandedArguments?: (expandedArguments: Record<string, boolean>) => void;
 }
 
-const ResetButton: React.FC<ResetButtonProps> = ({ tripQueryVariables, setTripQueryVariables, setExpandedArguments }) => {
+const ResetButton: React.FC<ResetButtonProps> = ({
+  tripQueryVariables,
+  setTripQueryVariables,
+  setExpandedArguments,
+}) => {
   function handleReset(): void {
     // Start with an empty object (or partially typed)
     let newVars: TripQueryVariables = {} as TripQueryVariables;
@@ -23,7 +27,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({ tripQueryVariables, setTripQu
     });
 
     setTripQueryVariables(newVars);
-    
+
     // Also reset the expansion state when reset button is pressed
     if (setExpandedArguments) {
       setExpandedArguments({});
