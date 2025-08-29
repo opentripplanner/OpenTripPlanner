@@ -160,10 +160,7 @@ public class GtfsModule implements GraphBuilderModule {
           builder.getFlexTripsById().addAll(FlexTripsMapper.createFlexTrips(builder, issueStore));
         }
 
-        validateAndInterpolateStopTimesForEachTrip(
-          builder.getStopTimesSortedByTrip(),
-          issueStore
-        );
+        validateAndInterpolateStopTimesForEachTrip(builder.getStopTimesSortedByTrip(), issueStore);
 
         // We need to run this after the cleaning of the data, as stop indices might have changed
         mapper.mapAndAddTransfersToBuilder(gtfsDao);
@@ -254,11 +251,7 @@ public class GtfsModule implements GraphBuilderModule {
     TripStopTimes stopTimesByTrip,
     DataImportIssueStore issueStore
   ) {
-    new ValidateAndInterpolateStopTimesForEachTrip(
-      stopTimesByTrip,
-      true,
-      issueStore
-    ).run();
+    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, true, issueStore).run();
   }
 
   /**

@@ -18,7 +18,6 @@ class GtfsConfigTest {
       """
       {
         gtfsDefaults: {
-         'removeRepeatedStops': false,
          'stationTransferPreference' : 'preferred',
          'discardMinTransferTimes': true,
          'blockBasedInterlining': false,
@@ -59,7 +58,6 @@ class GtfsConfigTest {
       """
       {
         gtfsDefaults: {
-         'removeRepeatedStops': false,
          'stationTransferPreference' : 'preferred',
          'discardMinTransferTimes': true,
          'blockBasedInterlining': false,
@@ -96,7 +94,6 @@ class GtfsConfigTest {
       """
       {
         gtfsDefaults: {
-         'removeRepeatedStops': true,
          'stationTransferPreference' : 'allowed',
          'discardMinTransferTimes': true,
          'blockBasedInterlining': true,
@@ -113,7 +110,6 @@ class GtfsConfigTest {
       {
          'source': 'https://foo.bar/gtfs.zip',
          'feedId': 'test',
-         'removeRepeatedStops': false,
          'stationTransferPreference' : 'preferred',
          'discardMinTransferTimes': false,
          'blockBasedInterlining': false,
@@ -148,7 +144,6 @@ class GtfsConfigTest {
       {
          'source': 'https://foo.bar/gtfs.zip',
          'feedId': 'test',
-         'removeRepeatedStops': 'false',
          'stationTransferPreference' : 'preferred',
          'discardMinTransferTimes': true,
          'blockBasedInterlining': false,

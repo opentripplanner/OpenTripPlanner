@@ -68,19 +68,12 @@ class GtfsParametersTest {
       .withBlockBasedInterlining(BLOCK_BASED_INTERLINEING)
       .withDiscardMinTransferTimes(DISCARD_MIN_TRANSFERTIMES)
       .withMaxInterlineDistance(MAX_INTERLINE_DISTANCE)
-      .withRemoveRepeatedStops(REMOVE_REPEATED_STOPS)
       .withStationTransferPreference(STATION_TRANSFER_PREFERENCE)
       .build();
 
     SUBJECT_FEED = SUBJECT_DEFAULT.withFeedInfo().withFeedId(FEED).withSource(SOURCE).build();
 
     SUBJECT_FEED_WITHOUT_FEED_ID = SUBJECT_DEFAULT.withFeedInfo().withSource(SOURCE).build();
-  }
-
-  @Test
-  void removeRepeatedStops() {
-    assertEquals(REMOVE_REPEATED_STOPS, SUBJECT_DEFAULT.removeRepeatedStops());
-    assertEquals(REMOVE_REPEATED_STOPS, SUBJECT_FEED.removeRepeatedStops());
   }
 
   @Test
