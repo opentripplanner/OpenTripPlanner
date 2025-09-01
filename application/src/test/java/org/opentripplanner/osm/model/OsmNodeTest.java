@@ -37,6 +37,7 @@ public class OsmNodeTest {
     assertTrue(node.isBarrier());
   }
 
+  @Test
   public void isTaggedBarrierCrossing() {
     OsmNode node = new OsmNode();
     assertFalse(node.isTaggedBarrierCrossing());
@@ -59,6 +60,10 @@ public class OsmNodeTest {
 
     node = new OsmNode();
     node.addTag("access", "no");
+    assertTrue(node.isTaggedBarrierCrossing());
+
+    node = new OsmNode();
+    node.addTag("entrance", "main");
     assertTrue(node.isTaggedBarrierCrossing());
   }
 }

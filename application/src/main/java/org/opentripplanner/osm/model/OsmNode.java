@@ -77,6 +77,7 @@ public class OsmNode extends OsmEntity {
     return (
       hasTag("barrier") ||
       hasTag("access") ||
+      hasTag("entrance") ||
       overridePermissions(ALL) != ALL ||
       overridePermissions(NONE) != NONE
     );
