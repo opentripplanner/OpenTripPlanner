@@ -28,6 +28,7 @@ public class WalkStepBuilder {
   private ElevationProfile elevationProfile;
   private String exit;
   private Entrance entrance;
+  private VerticalTransportationUse verticalTransportationUse;
   private boolean stayOn = false;
   /**
    * Distance used for appending elevation profiles
@@ -79,6 +80,13 @@ public class WalkStepBuilder {
 
   public WalkStepBuilder withEntrance(@Nullable Entrance entrance) {
     this.entrance = entrance;
+    return this;
+  }
+
+  public WalkStepBuilder withVerticalTransportationUse(
+    @Nullable VerticalTransportationUse verticalTransportationUse
+  ) {
+    this.verticalTransportationUse = verticalTransportationUse;
     return this;
   }
 
@@ -143,6 +151,10 @@ public class WalkStepBuilder {
     return entrance != null;
   }
 
+  public boolean hasVerticalTransportationUse() {
+    return verticalTransportationUse != null;
+  }
+
   public WalkStepBuilder addStreetNotes(Set<StreetNote> notes) {
     this.streetNotes.addAll(notes);
     return this;
@@ -172,6 +184,7 @@ public class WalkStepBuilder {
       streetNotes,
       exit,
       entrance,
+      verticalTransportationUse,
       elevationProfile,
       nameIsDerived,
       walkingBike,

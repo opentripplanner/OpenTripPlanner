@@ -47,6 +47,7 @@ public final class WalkStep {
 
   private final String highwayExit;
   private final Entrance entrance;
+  private final VerticalTransportationUse verticalTransportationUse;
   private final ElevationProfile elevationProfile;
   private final boolean stayOn;
 
@@ -60,6 +61,7 @@ public final class WalkStep {
     Set<StreetNote> streetNotes,
     String highwayExit,
     Entrance entrance,
+    VerticalTransportationUse verticalTransportationUse,
     ElevationProfile elevationProfile,
     boolean nameIsDerived,
     boolean walkingBike,
@@ -81,6 +83,7 @@ public final class WalkStep {
     this.area = area;
     this.highwayExit = highwayExit;
     this.entrance = entrance;
+    this.verticalTransportationUse = verticalTransportationUse;
     this.elevationProfile = elevationProfile;
     this.stayOn = stayOn;
     this.edges = List.copyOf(Objects.requireNonNull(edges));
@@ -140,6 +143,13 @@ public final class WalkStep {
    */
   public Optional<Entrance> entrance() {
     return Optional.ofNullable(entrance);
+  }
+
+  /**
+   * Get information about vertical transportation equipment used.
+   */
+  public Optional<VerticalTransportationUse> verticalTransportationUse() {
+    return Optional.ofNullable(verticalTransportationUse);
   }
 
   /**
