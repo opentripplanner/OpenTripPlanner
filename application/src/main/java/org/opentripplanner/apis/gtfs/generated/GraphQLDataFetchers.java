@@ -389,6 +389,13 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
   }
 
+  /**
+   * A (possibly discounted) fare product that requires another fare product to be purchased previously
+   * in order to be valid.
+   *
+   * For example, when taking the train into a city, you might get a discounted "transfer fare" when
+   * switching to the bus for the second leg.
+   */
   public interface GraphQLDependentFareProduct {
     public DataFetcher<Iterable<FareOffer>> dependencies();
 
@@ -642,7 +649,7 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * A group of fixed stops that are visited in an arbitrary order.
+   * A group of fixed stops that is visited in an arbitrary order.
    *
    * This is mostly used by demand-responsive services.
    */
@@ -1281,7 +1288,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<String>> zones();
   }
 
-  /** A time window when a vehicle visit a stop, area or group of stops. */
+  /** A time window when a vehicle visits a stop, area or group of stops. */
   public interface GraphQLTimeWindow {
     public DataFetcher<java.time.OffsetDateTime> end();
 
@@ -1525,6 +1532,24 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> ios();
 
     public DataFetcher<String> web();
+  }
+
+  /**
+   * A single use of a specified type of vertical transportation with a start and end point,
+   * originating from OSM or GTFS data.
+   */
+  public interface GraphQLVerticalTransportationUse {
+    public DataFetcher<Double> fromLevel();
+
+    public DataFetcher<String> id();
+
+    public DataFetcher<String> name();
+
+    public DataFetcher<Double> toLevel();
+
+    public DataFetcher<
+      org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLVerticalTransportationType
+    > type();
   }
 
   public interface GraphQLDebugOutput {
