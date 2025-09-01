@@ -144,10 +144,10 @@ public class OsmModule implements GraphBuilderModule {
     streetLimitationParameters.initMaxAreaNodes(maxAreaNodes);
     float bestBikeSafety = normalizer.getBestBikeSafety();
     LOG.info("Best bike safety: {}", bestBikeSafety);
-    streetLimitationParameters.setBestBikeSafety(bestBikeSafety);
+    streetLimitationParameters.initBestBikeSafety(bestBikeSafety);
     float bestWalkSafety = normalizer.getBestWalkSafety();
     LOG.info("Best walk safety: {}", bestWalkSafety);
-    streetLimitationParameters.setBestWalkSafety(bestWalkSafety);
+    streetLimitationParameters.initBestWalkSafety(bestWalkSafety);
   }
 
   @Override
