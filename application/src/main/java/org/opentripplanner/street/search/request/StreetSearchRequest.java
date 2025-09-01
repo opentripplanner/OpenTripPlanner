@@ -45,6 +45,10 @@ public class StreetSearchRequest implements AStarRequest {
   private final GenericLocation to;
   private final Envelope toEnvelope;
 
+  /**
+   * The rentalDuration only apply to direct search, support for transit search is not implemented.
+   */
+  @Nullable
   private final Duration rentalDuration;
 
   private IntersectionTraversalCalculator intersectionTraversalCalculator =

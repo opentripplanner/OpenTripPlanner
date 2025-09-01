@@ -4145,7 +4145,10 @@ input CarRentalPreferencesInput {
   allowedNetworks: [String!]
   "Rental networks which cannot be used as part of an itinerary."
   bannedNetworks: [String!]
-  "An assumed duration of the rental trip, to make sure the vehicle is available during this time."
+  """
+  An assumed duration of the car rental trip, to make sure the vehicle is available during this time.
+  The rentalDuration only apply to direct search, support for transit search is not implemented.
+  """
   rentalDuration: Duration
 }
 

@@ -13,6 +13,9 @@ public class StreetRequest implements Serializable {
 
   private final StreetMode mode;
 
+  /***
+   * The rentalDuration only apply to direct search, support for transit search is not implemented.
+   */
   @Nullable
   private final Duration rentalDuration;
 
