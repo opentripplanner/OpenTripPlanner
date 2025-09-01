@@ -111,27 +111,19 @@ public class VertexFactory {
     );
   }
 
-  public OsmVertex osm(OsmNode node) {
+  public OsmVertex osm(
+    Coordinate coordinate,
+    long nid,
+    boolean highwayTrafficLight,
+    boolean crossingTrafficLight
+  ) {
     return addToGraph(
-      new OsmVertex(
-        node.getCoordinate().x,
-        node.getCoordinate().y,
-        node.getId(),
-        node.hasHighwayTrafficLight(),
-        node.hasCrossingTrafficLight()
-      )
+      new OsmVertex(coordinate.x, coordinate.y, nid, highwayTrafficLight, crossingTrafficLight)
     );
   }
 
-  public OsmVertex osmOnLinearBarrier(OsmNode node, OsmEntity routableWay) {
-    return addToGraph(
-      new BarrierPassThroughVertex(
-        node.getCoordinate().x,
-        node.getCoordinate().y,
-        node.getId(),
-        routableWay.getId()
-      )
-    );
+  public OsmVertex osmOnLinearBarrier(Coordinate coordinate, long nid, long routableWayId) {
+    return addToGraph(new BarrierPassThroughVertex(coordinate.x, coordinate.y, nid, routableWayId));
   }
 
   public TransitStopVertex transitStop(TransitStopVertexBuilder transitStopVertexBuilder) {

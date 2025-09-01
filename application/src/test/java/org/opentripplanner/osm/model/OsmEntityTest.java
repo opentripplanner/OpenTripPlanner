@@ -288,6 +288,13 @@ public class OsmEntityTest {
     assertFalse(WayTestData.zooPlatform().isRoutable());
     assertTrue(WayTestData.indoor("area").isRoutable());
     assertFalse(WayTestData.indoor("room").isRoutable());
+
+    var highway = WayTestData.highwayWithCycleLane();
+    assertTrue(highway.isRoutable());
+    highway.addTag("access", "no");
+    assertFalse(highway.isRoutable());
+    highway.addTag("bicycle", "yes");
+    assertTrue(highway.isRoutable());
   }
 
   @Test

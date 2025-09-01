@@ -857,6 +857,7 @@ public class OsmEntity {
             }
           }
         }
+        return false;
       }
       return true;
     }

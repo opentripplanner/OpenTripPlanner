@@ -1,6 +1,7 @@
 package org.opentripplanner.osm.model;
 
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
 import org.locationtech.jts.geom.Coordinate;
 
@@ -64,5 +65,20 @@ public class OsmNode extends OsmEntity {
   @Override
   public String url() {
     return String.format("https://www.openstreetmap.org/node/%d", getId());
+  }
+
+  /**
+   * Check if this node represents a tagged barrier crossing if placed on an intersection
+   * of a highway and a barrier way.
+   *
+   * @return true if it has a barrier tag, or if it explicitly overrides permissions.
+   */
+  public boolean isTaggedBarrierCrossing() {
+    return (
+      hasTag("barrier") ||
+      hasTag("access") ||
+      overridePermissions(ALL) != ALL ||
+      overridePermissions(NONE) != NONE
+    );
   }
 }

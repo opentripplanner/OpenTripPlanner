@@ -160,7 +160,12 @@ class VertexGenerator {
       }
 
       if (iv == null) {
-        iv = vertexFactory.osm(node);
+        iv = vertexFactory.osm(
+          coordinate,
+          node.getId(),
+          node.hasHighwayTrafficLight(),
+          node.hasCrossingTrafficLight()
+        );
       }
 
       if (isNodeOnLinearBarrier && iv instanceof OsmVertex ov) {
@@ -168,14 +173,7 @@ class VertexGenerator {
         var vertices = splitVerticesOnBarriers.get(node);
         vertices.put(null, ov);
 
-        // some barrier values, such as barrier=gate, which do not block traversal will return
-        // false for node.isBarrier(), therefore we need to check the explicit absence of the
-        // barrier tag as well for the issue.
-        if (
-          !node.isBarrier() &&
-          !node.hasTag("barrier") &&
-          !reportedLinearBarrierCrossings.contains(node)
-        ) {
+        if (!node.isTaggedBarrierCrossing() && !reportedLinearBarrierCrossings.contains(node)) {
           issueStore.add(new BarrierIntersectingHighway(node));
           reportedLinearBarrierCrossings.add(node);
         }
@@ -206,7 +204,11 @@ class VertexGenerator {
       return existing;
     }
 
-    var vertex = vertexFactory.osmOnLinearBarrier(nodeOnBarrier, way);
+    var vertex = vertexFactory.osmOnLinearBarrier(
+      nodeOnBarrier.getCoordinate(),
+      nodeOnBarrier.getId(),
+      way.getId()
+    );
     vertices.put(way, vertex);
     return vertex;
   }

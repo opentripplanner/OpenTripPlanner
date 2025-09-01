@@ -108,4 +108,13 @@ public class OsmWay extends OsmEntity {
   public String url() {
     return String.format("https://www.openstreetmap.org/way/%d", getId());
   }
+
+  /**
+   * Returns true if this way is relevant for routing.
+   *
+   * @return if it is either a routable way, a P&R way or a boarding location.
+   */
+  public boolean isRelevantForRouting() {
+    return isRoutable() || isParkAndRide() || isBikeParking() || isBoardingLocation();
+  }
 }
