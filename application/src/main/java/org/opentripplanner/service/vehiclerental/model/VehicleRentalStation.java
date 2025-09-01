@@ -1,6 +1,7 @@
 package org.opentripplanner.service.vehiclerental.model;
 
 import static java.util.Locale.ROOT;
+import static org.opentripplanner.service.vehiclerental.model.ReturnPolicy.ANY_TYPE;
 
 import java.util.Comparator;
 import java.util.List;
@@ -49,6 +50,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   private final boolean overloadingAllowed;
   private final boolean isArrivingInRentalVehicleAtDestinationAllowed;
   private final boolean realTimeData;
+  private final ReturnPolicy returnPolicy;
 
   public VehicleRentalStation() {
     this.id = null;
@@ -71,6 +73,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     this.overloadingAllowed = false;
     this.isArrivingInRentalVehicleAtDestinationAllowed = false;
     this.realTimeData = true;
+    this.returnPolicy = ReturnPolicy.SPECIFIC_TYPES;
   }
 
   VehicleRentalStation(VehicleRentalStationBuilder builder) {
@@ -95,6 +98,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     this.isArrivingInRentalVehicleAtDestinationAllowed =
       builder.isArrivingInRentalVehicleAtDestinationAllowed();
     this.realTimeData = builder.isRealTimeData();
+    this.returnPolicy = builder.returnPolicy();
   }
 
   public static VehicleRentalStationBuilder of() {
@@ -243,6 +247,19 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       .collect(Collectors.toSet());
   }
 
+  public boolean canDropOffFormFactor(
+    RentalFormFactor formFactor,
+    boolean includeRealtimeAvailability
+  ) {
+    if (returnPolicy.equals(ANY_TYPE) && includeRealtimeAvailability) {
+      return allowDropoffNow();
+    } else if (returnPolicy.equals(ANY_TYPE)) {
+      return true;
+    } else {
+      return availableDropoffFormFactors(includeRealtimeAvailability).contains(formFactor);
+    }
+  }
+
   @Override
   public boolean isArrivingInRentalVehicleAtDestinationAllowed() {
     return isArrivingInRentalVehicleAtDestinationAllowed;
@@ -297,6 +314,10 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       spacesAvailable,
       vehicleRentalTypeMapToList(vehicleSpacesAvailable)
     );
+  }
+
+  public ReturnPolicy returnPolicy() {
+    return returnPolicy;
   }
 
   private List<RentalVehicleTypeCount> vehicleRentalTypeMapToList(

@@ -206,10 +206,6 @@ public class GtfsModule implements GraphBuilderModule {
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
-    } finally {
-      // Note the close method of each bundle should NOT throw an exception, so this
-      // code should be safe without the try/catch block.
-      gtfsBundles.forEach(GtfsBundle::close);
     }
 
     timetableRepository.validateTimeZones();

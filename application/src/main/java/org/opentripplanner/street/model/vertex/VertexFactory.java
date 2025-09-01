@@ -37,20 +37,8 @@ public class VertexFactory {
     return addToGraph(new TransitBoardingAreaVertex(boardingArea));
   }
 
-  public ElevatorOnboardVertex elevatorOnboard(
-    Vertex sourceVertex,
-    String label,
-    String levelName
-  ) {
-    return addToGraph(new ElevatorOnboardVertex(sourceVertex, label, levelName));
-  }
-
-  public ElevatorOffboardVertex elevatorOffboard(
-    Vertex sourceVertex,
-    String label,
-    String levelName
-  ) {
-    return addToGraph(new ElevatorOffboardVertex(sourceVertex, label, levelName));
+  public ElevatorVertex elevator(Vertex sourceVertex, String label, String levelName) {
+    return addToGraph(new ElevatorVertex(sourceVertex, label, levelName));
   }
 
   public IntersectionVertex intersection(Coordinate edgeCoordinate) {

@@ -1,12 +1,14 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleTypesAvailable;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.ReturnPolicy;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,11 @@ import org.slf4j.LoggerFactory;
 public class GbfsStationStatusMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsStationStatusMapper.class);
+  private static final Collector<
+    VehicleTypeCount,
+    ?,
+    Map<RentalVehicleType, Integer>
+  > TYPE_MAP_COLLECTOR = Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count);
 
   private final Map<String, GBFSStation> statusLookup;
   private final Map<String, RentalVehicleType> vehicleTypes;
@@ -51,29 +58,12 @@ public class GbfsStationStatusMapper {
       ? status.getNumDocksAvailable()
       : Integer.MAX_VALUE;
 
-    Map<RentalVehicleType, Integer> vehicleSpacesAvailable = status.getVehicleDocksAvailable() !=
-      null
-      ? status
-        .getVehicleDocksAvailable()
-        .stream()
-        .flatMap(available ->
-          available
-            .getVehicleTypeIds()
-            .stream()
-            .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount()))
-        )
-        .collect(Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count))
-      : Map.of(RentalVehicleType.getDefaultType(station.network()), spacesAvailable);
+    var vehicleSpacesAvailable = vehicleSpaces(status);
 
     int spacesDisabled = status.getNumDocksDisabled() != null ? status.getNumDocksDisabled() : 0;
 
-    boolean isInstalled = status.getIsInstalled() != null ? status.getIsInstalled() : true;
-    boolean isRenting = status.getIsRenting() != null ? status.getIsRenting() : true;
-    boolean isReturning = status.getIsReturning() != null ? status.getIsReturning() : true;
-
-    Instant lastReported = status.getLastReported() != null
-      ? Instant.ofEpochSecond(status.getLastReported().longValue())
-      : null;
+    boolean isRenting = toBoolean(status.getIsRenting());
+    boolean isReturning = toBoolean(status.getIsReturning());
 
     return station
       .copyOf()
@@ -83,11 +73,42 @@ public class GbfsStationStatusMapper {
       .withSpacesAvailable(spacesAvailable)
       .withVehicleSpacesAvailable(vehicleSpacesAvailable)
       .withSpacesDisabled(spacesDisabled)
-      .withIsInstalled(isInstalled)
       .withIsRenting(isRenting)
       .withIsReturning(isReturning)
-      .withLastReported(lastReported)
+      .withReturnPolicy(returnPolicy(status))
       .build();
+  }
+
+  /**
+   * Extract the available parking places from a variety of potentially incomplete information.
+   */
+  private Map<RentalVehicleType, Integer> vehicleSpaces(GBFSStation status) {
+    var docksAvailable = status.getVehicleDocksAvailable();
+    if (docksAvailable != null) {
+      return docksAvailable
+        .stream()
+        .flatMap(available ->
+          available
+            .getVehicleTypeIds()
+            .stream()
+            .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount()))
+        )
+        .collect(TYPE_MAP_COLLECTOR);
+    } else {
+      return Map.of();
+    }
+  }
+
+  private static ReturnPolicy returnPolicy(GBFSStation station) {
+    if (station.getVehicleDocksAvailable() == null) {
+      return ReturnPolicy.ANY_TYPE;
+    } else {
+      return ReturnPolicy.SPECIFIC_TYPES;
+    }
+  }
+
+  private static boolean toBoolean(@Nullable Boolean status) {
+    return Boolean.TRUE.equals(status);
   }
 
   private boolean containsVehicleType(

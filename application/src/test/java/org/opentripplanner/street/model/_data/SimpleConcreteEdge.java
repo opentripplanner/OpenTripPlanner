@@ -28,12 +28,13 @@ public class SimpleConcreteEdge extends Edge {
     TraverseMode mode = s0.currentMode();
     RoutingPreferences preferences = s0.getPreferences();
     double t = d / preferences.getSpeed(mode, false);
-    double reluctance = switch (mode) {
-      case WALK -> preferences.walk().reluctance();
-      case BICYCLE -> preferences.bike().reluctance();
-      case SCOOTER -> preferences.scooter().reluctance();
-      default -> 1;
-    };
+    double reluctance =
+      switch (mode) {
+        case WALK -> preferences.walk().reluctance();
+        case BICYCLE -> preferences.bike().reluctance();
+        case SCOOTER -> preferences.scooter().reluctance();
+        default -> 1;
+      };
     double w = t * reluctance;
     StateEditor s1 = s0.edit(this);
     s1.incrementTimeInMilliseconds((int) (t * 1000));
