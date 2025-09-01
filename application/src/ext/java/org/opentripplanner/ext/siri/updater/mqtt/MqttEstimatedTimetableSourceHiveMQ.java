@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.siri.updater.mqtt;
 
-import com.hivemq.client.mqtt.MqttGlobalPublishFilter;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.lifecycle.MqttClientDisconnectedContext;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
@@ -11,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -49,9 +49,8 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
 
   private volatile boolean primed = false;
 
-  private static final Duration THRESHOLD_HISTORIC_DATA = Duration.ofMinutes(5);
-  private static final int SECONDS_SINCE_LAST_HISTORIC_DELIVERY = 10;
   private volatile Instant timestampOfLastHistoricDelivery;
+  private Instant connectedAt;
   private final AtomicInteger primedMessageCounter = new AtomicInteger();
   private final AtomicInteger retainedMessageCounter = new AtomicInteger();
   private final AtomicLong totalMessageSize = new AtomicLong();
@@ -69,6 +68,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
     for (int i = 0; i < NUM_CLIENTS; i++) {
       clients.add(connectAndSubscribeToClient(i));
     }
+    connectedAt = Instant.now();
 
     timestampOfLastHistoricDelivery = Instant.now().plusSeconds(30);
     List<CompletableFuture<Void>> primingFutures = new ArrayList<>();
@@ -170,16 +170,27 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
       LOG.warn("Failed to offer to message queue");
     }
     if (!primed && numberOfMessages % 1000 == 0) {
+      long totalMillis = connectedAt.until(Instant.now(), ChronoUnit.MILLIS);
+      double messageRate = (double) numberOfMessages / totalMillis * 1000;
       double sizeMB = sizeBytes / 1024. / 1024.;
       double meanMessageSizeKB = (double) sizeBytes / numberOfMessages / 1024.;
-      LOG.info("Received {} messages ({} MB, {} retained) during priming. Mean message size: {} kB",
-        numberOfMessages, sizeMB, retainedMessageCounter.get(), meanMessageSizeKB);
+      LOG.info("Received {} messages ({} MB, {} retained) during priming." +
+          " Mean message rate: {} per second. Mean message size: {} kB",
+        numberOfMessages,
+        String.format("%.2f", sizeMB),
+        retainedMessageCounter.get(),
+        String.format("%.2f", messageRate),
+        String.format("%.2f", meanMessageSizeKB)
+      );
       LOG.info("Queue size: {}", messageQueue.size());
     }
   }
 
 
   private class PrimeRunner implements Runnable {
+
+    private static final Duration THRESHOLD_HISTORIC_DATA = Duration.ofMinutes(5);
+    private static final int SECONDS_SINCE_LAST_HISTORIC_DELIVERY = 10;
 
     @Override
     public void run() {
@@ -191,12 +202,30 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
             return;
           }
           ServiceDelivery serviceDelivery = optionalServiceDelivery.get();
-          if (serviceDelivery.getResponseTimestamp().plus(THRESHOLD_HISTORIC_DATA).isBefore(ZonedDateTime.now())) {
+          if (
+            serviceDelivery.getResponseTimestamp()
+              .plus(THRESHOLD_HISTORIC_DATA)
+              .isBefore(ZonedDateTime.now())
+          ) {
             timestampOfLastHistoricDelivery = Instant.now();
           }
           serviceDeliveryConsumer.apply(serviceDelivery);
-          if (timestampOfLastHistoricDelivery.plusSeconds(SECONDS_SINCE_LAST_HISTORIC_DELIVERY).isBefore(Instant.now())) {
-            LOG.info("Initial service delivery processing of {} messages complete", primedMessageCounter.get());
+          if (
+            timestampOfLastHistoricDelivery
+              .plusSeconds(SECONDS_SINCE_LAST_HISTORIC_DELIVERY)
+              .isBefore(Instant.now())
+          ) {
+            double sizeMB = totalMessageSize.get() / 1024. / 1024.;
+            double meanMessageSizeKB = sizeMB / primedMessageCounter.get() * 1024.;
+            long totalMillis = connectedAt.until(Instant.now(), ChronoUnit.MILLIS);
+            double messageRate = (double) primedMessageCounter.get() / totalMillis * 1000;
+            LOG.info("Initial service delivery processing of {} messages complete. " +
+                "Total size: {} MB, mean message size: {} kB, mean message rate: {} per second.",
+              primedMessageCounter.get(),
+              String.format("%.2f", sizeMB),
+              String.format("%.2f", meanMessageSizeKB),
+              String.format("%.2f", messageRate)
+            );
             primed = true;
           }
         }
