@@ -68,13 +68,21 @@ class SafetyValueNormalizer {
       street.setBicycleSafetyFactor(bicycleSafety);
       if (bicycleSafety < bestBikeSafety) {
         bestBikeSafety = bicycleSafety;
-        LOG.info("bike safety reduced to {} for street {} forward", bestBikeSafety, street);
+        LOG.debug(
+          "minimum bike safety reduced to {} for street {} forward",
+          bestBikeSafety,
+          street
+        );
       }
       float walkSafety = (float) forwardWayData.walkSafety();
       street.setWalkSafetyFactor(walkSafety);
       if (walkSafety < bestWalkSafety) {
         bestWalkSafety = walkSafety;
-        LOG.info("walk safety reduced to {} for street {} forward", bestWalkSafety, street);
+        LOG.debug(
+          "minimum walk safety reduced to {} for street {} forward",
+          bestWalkSafety,
+          street
+        );
       }
       if (notes != null) {
         for (var it : notes) {
@@ -90,13 +98,21 @@ class SafetyValueNormalizer {
       float bicycleSafety = (float) backwardWayData.bicycleSafety();
       if (bicycleSafety < bestBikeSafety) {
         bestBikeSafety = bicycleSafety;
-        LOG.info("bike safety reduced to {} for street {} backward", bestBikeSafety, backStreet);
+        LOG.debug(
+          "minimum bike safety reduced to {} for street {} backward",
+          bestBikeSafety,
+          backStreet
+        );
       }
       backStreet.setBicycleSafetyFactor(bicycleSafety);
       float walkSafety = (float) backwardWayData.walkSafety();
       if (walkSafety < bestWalkSafety) {
         bestWalkSafety = walkSafety;
-        LOG.info("walk safety reduced to {} for street {} backward", bestWalkSafety, backStreet);
+        LOG.debug(
+          "minimum walk safety reduced to {} for street {} backward",
+          bestWalkSafety,
+          backStreet
+        );
       }
       backStreet.setWalkSafetyFactor((float) walkSafety);
       if (notes != null) {

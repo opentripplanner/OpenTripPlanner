@@ -2,8 +2,8 @@ package org.opentripplanner.osm.wayproperty.specifier;
 
 import java.util.Arrays;
 import javax.annotation.Nullable;
-import org.opentripplanner.osm.TraverseDirection;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.TraverseDirection;
 
 /**
  * An interface for assigning match scores for OSM entities (mostly ways). The higher the score the
@@ -34,7 +34,7 @@ public interface OsmSpecifier {
    *
    * @param way an OSM tagged object to compare to this specifier
    */
-  int matchScore(OsmEntity way, @Nullable TraverseDirection direction);
+  int matchScore(OsmEntity way, TraverseDirection direction);
 
   /**
    * Convert this specifier to a human-readable identifier that represents this in (generated)

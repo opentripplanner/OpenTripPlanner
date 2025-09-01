@@ -187,19 +187,19 @@ class FinlandMapperTest {
     var way = new OsmWay();
     way.addTag("highway", "unclassified");
     way.addTag("seasonal", "winter");
-    wayData = wps.getDataForEntity(way, null);
+    wayData = wps.getDataForEntity(way);
     assertEquals(wayData.getPermission(), NONE);
 
     way = new OsmWay();
     way.addTag("highway", "trunk");
     way.addTag("ice_road", "yes");
-    wayData = wps.getDataForEntity(way, null);
+    wayData = wps.getDataForEntity(way);
     assertEquals(wayData.getPermission(), NONE);
 
     way = new OsmWay();
     way.addTag("highway", "track");
     way.addTag("winter_road", "yes");
-    wayData = wps.getDataForEntity(way, null);
+    wayData = wps.getDataForEntity(way);
     assertEquals(wayData.getPermission(), NONE);
   }
 
@@ -207,7 +207,7 @@ class FinlandMapperTest {
   void testWalkingAllowedOnCycleway() {
     assertEquals(
       PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.cycleway(), null).getPermission()
+      wps.getDataForEntity(WayTestData.cycleway()).getPermission()
     );
   }
 
@@ -215,7 +215,7 @@ class FinlandMapperTest {
   void testCyclingAllowedOnPedestrianAreas() {
     assertEquals(
       PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.pedestrianArea(), null).getPermission()
+      wps.getDataForEntity(WayTestData.pedestrianArea()).getPermission()
     );
   }
 
@@ -229,16 +229,16 @@ class FinlandMapperTest {
     var way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("area", "yes");
-    wayData = wps.getDataForEntity(way, null);
+    wayData = wps.getDataForEntity(way);
     assertEquals(PEDESTRIAN, wayData.getPermission());
 
     way = new OsmWay();
     way.addTag("public_transport", "platform");
     way.addTag("area", "yes");
-    wayData = wps.getDataForEntity(way, null);
+    wayData = wps.getDataForEntity(way);
     assertEquals(PEDESTRIAN, wayData.getPermission());
     way.addTag("bicycle", "yes");
-    wayData = wps.getDataForEntity(way, null);
+    wayData = wps.getDataForEntity(way);
     assertEquals(PEDESTRIAN_AND_BICYCLE, wayData.getPermission());
   }
 

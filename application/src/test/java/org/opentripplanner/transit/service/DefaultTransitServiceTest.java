@@ -271,13 +271,13 @@ class DefaultTransitServiceTest {
           new TripTimeOnDate(REALTIME_TRIP_TIMES, 1, REAL_TIME_PATTERN, SERVICE_DATE, midnight)
         )
       ),
-      service.getTripTimeOnDates(TRIP, SERVICE_DATE)
+      service.findTripTimesOnDate(TRIP, SERVICE_DATE)
     );
   }
 
   @Test
   void getTripTimesOnNoServiceDay() {
-    assertEquals(Optional.empty(), service.getTripTimeOnDates(TRIP, NO_SERVICE_DATE));
+    assertEquals(Optional.empty(), service.findTripTimesOnDate(TRIP, NO_SERVICE_DATE));
   }
 
   @Test
@@ -299,13 +299,13 @@ class DefaultTransitServiceTest {
           new TripTimeOnDate(ADDED_TRIP_TIMES, 1, REAL_TIME_PATTERN, SERVICE_DATE, midnight)
         )
       ),
-      service.getTripTimeOnDates(ADDED_TRIP, SERVICE_DATE)
+      service.findTripTimesOnDate(ADDED_TRIP, SERVICE_DATE)
     );
   }
 
   @Test
   void getRealtimeTripTimesForAddedTripOnNoServiceDay() {
-    assertEquals(Optional.empty(), service.getTripTimeOnDates(ADDED_TRIP, NO_SERVICE_DATE));
+    assertEquals(Optional.empty(), service.findTripTimesOnDate(ADDED_TRIP, NO_SERVICE_DATE));
   }
 
   @Test

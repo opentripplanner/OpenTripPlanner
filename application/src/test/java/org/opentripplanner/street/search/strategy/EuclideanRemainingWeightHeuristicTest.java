@@ -10,7 +10,6 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
@@ -22,12 +21,12 @@ class EuclideanRemainingWeightHeuristicTest {
 
   public static Stream<Arguments> testCases() {
     var safeStreets = new StreetLimitationParameters();
-    safeStreets.setBestBikeSafety(0.6f);
-    safeStreets.setBestWalkSafety(0.8f);
+    safeStreets.initBestBikeSafety(0.6f);
+    safeStreets.initBestWalkSafety(0.8f);
 
     var unsafeStreets = new StreetLimitationParameters();
-    unsafeStreets.setBestWalkSafety(2);
-    unsafeStreets.setBestBikeSafety(2);
+    unsafeStreets.initBestWalkSafety(2);
+    unsafeStreets.initBestBikeSafety(2);
 
     var slowCar = new StreetLimitationParameters();
     slowCar.initMaxCarSpeed(1);
@@ -79,6 +78,15 @@ class EuclideanRemainingWeightHeuristicTest {
         40
       ),
       Arguments.argumentSet(
+        "partial walk safety",
+        safeStreets,
+        StreetMode.WALK,
+        RoutingPreferences.of()
+          .withWalk(w -> w.withSpeed(1).withReluctance(0.5).withSafetyFactor(0.2))
+          .build(),
+        48
+      ),
+      Arguments.argumentSet(
         "slow preferred unsafe walk",
         unsafeStreets,
         StreetMode.WALK,
@@ -92,6 +100,19 @@ class EuclideanRemainingWeightHeuristicTest {
         StreetMode.BIKE,
         RoutingPreferences.DEFAULT,
         24
+      ),
+      Arguments.argumentSet(
+        "bike triangle",
+        safeStreets,
+        StreetMode.BIKE,
+        RoutingPreferences.of()
+          .withBike(b ->
+            b
+              .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
+              .withOptimizeTriangle(t -> t.withSafety(0.75).withTime(0.25))
+          )
+          .build(),
+        28
       ),
       // safest bike
       Arguments.argumentSet(

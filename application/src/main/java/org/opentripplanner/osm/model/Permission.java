@@ -1,6 +1,6 @@
 package org.opentripplanner.osm.model;
 
-public enum Permission {
+enum Permission {
   ALLOW,
   DENY,
 }

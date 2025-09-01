@@ -2,6 +2,8 @@ package org.opentripplanner.street.model;
 
 import jakarta.inject.Inject;
 import java.io.Serializable;
+import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Holds limits of the street graph.
@@ -13,8 +15,11 @@ public class StreetLimitationParameters implements Serializable {
   private float maxCarSpeed = StreetConstants.DEFAULT_MAX_CAR_SPEED;
   private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
 
-  private float bestBikeSafety = 1;
-  private float bestWalkSafety = 1;
+  @Nullable
+  private Float bestBikeSafety = null;
+
+  @Nullable
+  private Float bestWalkSafety = null;
 
   @Inject
   public StreetLimitationParameters() {}
@@ -49,18 +54,24 @@ public class StreetLimitationParameters implements Serializable {
   }
 
   public float bestBikeSafety() {
-    return bestBikeSafety;
+    return Objects.requireNonNullElse(bestBikeSafety, 1.0f);
   }
 
-  public void setBestBikeSafety(float bestBikeSafety) {
+  public void initBestBikeSafety(float bestBikeSafety) {
+    if (this.bestBikeSafety != null) {
+      throw new IllegalStateException("bestBikeSafety has already been initialized.");
+    }
     this.bestBikeSafety = bestBikeSafety;
   }
 
   public float bestWalkSafety() {
-    return bestWalkSafety;
+    return Objects.requireNonNullElse(bestWalkSafety, 1.0f);
   }
 
-  public void setBestWalkSafety(float bestWalkSafety) {
+  public void initBestWalkSafety(float bestWalkSafety) {
+    if (this.bestWalkSafety != null) {
+      throw new IllegalStateException("bestWalkSafety has already been initialized.");
+    }
     this.bestWalkSafety = bestWalkSafety;
   }
 }

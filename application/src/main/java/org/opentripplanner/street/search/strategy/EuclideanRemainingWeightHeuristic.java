@@ -3,13 +3,17 @@ package org.opentripplanner.street.search.strategy;
 import static org.opentripplanner.street.model.edge.StreetEdgeReluctanceCalculator.getSafetyForSafestStreet;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
+import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.FreeEdge;
@@ -51,7 +55,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
   ) {
     Vertex target = toVertices.iterator().next();
     minimumCostPerDistance = getMinimumCostPerDistance(preferences, streetMode);
-    walkingCostPerDistance = getWalkingCostPerDistance(preferences);
+    walkingCostPerDistance = getWalkingCostPerDistance(preferences.walk());
     this.arriveBy = arriveBy;
 
     if (target.getDegreeIn() == 1) {
@@ -65,7 +69,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     lon = target.getLon();
   }
 
-  private double scaleSafety(double safety, double safetyFactor) {
+  private static double scaleSafety(double safety, double safetyFactor) {
     return 1 + (safety - 1) * safetyFactor;
   }
 
@@ -79,7 +83,13 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
       case SAFE_STREETS -> safety;
       case FLAT_STREETS -> 1.0;
       case SAFEST_STREETS -> getSafetyForSafestStreet(safety);
-      case TRIANGLE -> scaleSafety(safety, triangle.safety());
+      case TRIANGLE -> scaleSafety(
+        safety,
+        Objects.requireNonNull(
+          triangle,
+          "triangle must not be null if vehicleRoutingOptimizeType is TRIANGLE."
+        ).safety()
+      );
     };
   }
 
@@ -92,40 +102,57 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
       : Double.MAX_VALUE;
     double bestBikeSafety = streetLimitationParametersService.getBestBikeSafety();
     double cyclingPace = streetMode.includesBiking()
-      ? (1.0 / preferences.bike().speed()) *
-      preferences.bike().reluctance() *
-      getEffectiveSafetyForOptimization(
-        preferences.bike().optimizeType(),
-        preferences.bike().optimizeTriangle(),
-        bestBikeSafety
-      )
+      ? getCyclingCostPerDistance(preferences.bike())
       : Double.MAX_VALUE;
     double scooterPace = streetMode.includesScooter()
-      ? (1.0 / preferences.scooter().speed()) *
-      preferences.scooter().reluctance() *
-      getEffectiveSafetyForOptimization(
-        preferences.scooter().optimizeType(),
-        preferences.scooter().optimizeTriangle(),
-        bestBikeSafety
-      )
+      ? getScooterCostPerDistance(preferences.scooter())
       : Double.MAX_VALUE;
     double walkingPace = streetMode.includesWalking()
-      ? getWalkingCostPerDistance(preferences)
+      ? getWalkingCostPerDistance(preferences.walk())
       : Double.MAX_VALUE;
     return Stream.of(drivingPace, cyclingPace, scooterPace, walkingPace)
       .min(Comparator.comparingDouble(x -> x))
       .orElseThrow();
   }
 
-  private double getWalkingCostPerDistance(RoutingPreferences preferences) {
-    return (
-      (1.0 / preferences.walk().speed()) *
-      preferences.walk().reluctance() *
-      scaleSafety(
-        streetLimitationParametersService.getBestWalkSafety(),
-        preferences.walk().safetyFactor()
+  private double getWalkingCostPerDistance(WalkPreferences preferences) {
+    return getCostPerDistance(
+      preferences.speed(),
+      preferences.reluctance(),
+      scaleSafety(streetLimitationParametersService.getBestWalkSafety(), preferences.safetyFactor())
+    );
+  }
+
+  private double getCyclingCostPerDistance(BikePreferences preferences) {
+    return getCostPerDistance(
+      preferences.speed(),
+      preferences.reluctance(),
+      getEffectiveSafetyForOptimization(
+        preferences.optimizeType(),
+        preferences.optimizeTriangle(),
+        streetLimitationParametersService.getBestBikeSafety()
       )
     );
+  }
+
+  private double getScooterCostPerDistance(ScooterPreferences preferences) {
+    return getCostPerDistance(
+      preferences.speed(),
+      preferences.reluctance(),
+      getEffectiveSafetyForOptimization(
+        preferences.optimizeType(),
+        preferences.optimizeTriangle(),
+        streetLimitationParametersService.getBestBikeSafety()
+      )
+    );
+  }
+
+  private static double getCostPerDistance(
+    double speed,
+    double reluctance,
+    double effectiveMinimumSafety
+  ) {
+    return (1.0 / speed) * reluctance * effectiveMinimumSafety;
   }
 
   /**
