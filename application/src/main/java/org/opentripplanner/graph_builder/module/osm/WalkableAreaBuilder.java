@@ -186,9 +186,10 @@ class WalkableAreaBuilder {
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
       HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
       GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-      OsmEntity areaEntity = group.getSomeOsmObject();
 
       for (OsmArea area : group.areas) {
+        OsmEntity areaEntity = area.parent;
+
         // test if area is inside the current ring
         if (!group.isSimpleAreaGroup()) {
           if (!polygon.contains(area.jtsMultiPolygon)) {
@@ -548,12 +549,9 @@ class WalkableAreaBuilder {
       namedArea.setName(name);
 
       WayProperties wayData = findAreaProperties(areaEntity);
-      double bicycleSafety = wayData.bicycleSafety();
-      namedArea.setBicycleSafetyMultiplier(bicycleSafety);
-
-      double walkSafety = wayData.walkSafety();
-      namedArea.setWalkSafetyMultiplier(walkSafety);
-      namedArea.setOriginalEdges(intersection);
+      namedArea.setBicycleSafety((float) wayData.bicycleSafety());
+      namedArea.setWalkSafety((float) wayData.walkSafety());
+      namedArea.setGeometry(intersection);
       namedArea.setPermission(wayData.getPermission());
       areaGroup.addArea(namedArea);
 

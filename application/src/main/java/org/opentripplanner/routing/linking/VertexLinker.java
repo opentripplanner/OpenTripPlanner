@@ -743,8 +743,9 @@ public class VertexLinker {
     double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
     // apply consistent NoThru restrictions
     // if all joining edges are nothru, then the new edge should be as well
+    // 'from' is the new vertex to be connected, so check the 'to' vertex connections
     var incomingNoThruModes = getNoThruModes(to.getIncoming());
-    var outgoingNoThruModes = getNoThruModes(to.getIncoming());
+    var outgoingNoThruModes = getNoThruModes(to.getOutgoing());
     AreaEdgeBuilder areaEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(from)
       .withToVertex(to)
@@ -752,6 +753,8 @@ public class VertexLinker {
       .withName(hit.getName())
       .withMeterLength(length)
       .withPermission(hit.getPermission())
+      .withBicycleSafetyFactor(hit.getBicycleSafety())
+      .withWalkSafetyFactor(hit.getWalkSafety())
       .withBack(false)
       .withArea(ag);
     for (TraverseMode tm : outgoingNoThruModes) {
@@ -769,6 +772,8 @@ public class VertexLinker {
       .withName(hit.getName())
       .withMeterLength(length)
       .withPermission(hit.getPermission())
+      .withBicycleSafetyFactor(hit.getBicycleSafety())
+      .withWalkSafetyFactor(hit.getWalkSafety())
       .withBack(true)
       .withArea(ag);
     for (TraverseMode tm : incomingNoThruModes) {
