@@ -1,6 +1,5 @@
 package org.opentripplanner.service.vehiclerental.street;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import javax.annotation.Nullable;
@@ -84,6 +83,22 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
+
+            if (
+                s0.getRequest().rentalDuration() != null &&
+                station.isCarStation()
+            ) {
+              OffsetDateTime searchStartTime = OffsetDateTime.ofInstant(
+                s0.getRequest().startTime(),
+                ZoneId.systemDefault()
+              );
+              VehicleRentalVehicle vehicleRentalVehicle = (VehicleRentalVehicle) station;
+              OffsetDateTime availableUntil = vehicleRentalVehicle.getAvailableUntil();
+              if (availableUntil != null && availableUntil.isBefore(searchStartTime)) {
+                return State.empty();
+              }
+            }
+
             s1.beginFloatingVehicleRenting(formFactor, network, true);
             pickedUp = true;
           } else {
