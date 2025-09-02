@@ -1541,13 +1541,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLVerticalTransportationUse {
     public DataFetcher<Double> fromLevel();
 
-    public DataFetcher<String> name();
-
     public DataFetcher<Double> toLevel();
-
-    public DataFetcher<
-      org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLVerticalTransportationType
-    > type();
   }
 
   public interface GraphQLDebugOutput {

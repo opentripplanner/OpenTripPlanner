@@ -15,7 +15,6 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
-import org.opentripplanner.model.plan.walkstep.VerticalTransportationType;
 import org.opentripplanner.model.plan.walkstep.VerticalTransportationUse;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
@@ -519,9 +518,7 @@ public class StatesToWalkStepsMapper {
     double fromLevel = 0.0;
     VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
       toLevel,
-      edge.getName(),
-      fromLevel,
-      VerticalTransportationType.ESCALATOR
+      fromLevel
     );
     var step = createWalkStep(forwardState, backState);
 
@@ -537,9 +534,7 @@ public class StatesToWalkStepsMapper {
     double fromLevel = 0.0;
     VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
       toLevel,
-      edge.getName(),
-      fromLevel,
-      VerticalTransportationType.ELEVATOR
+      fromLevel
     );
     // don't care what came before or comes after
     var step = createWalkStep(forwardState, backState);
@@ -564,9 +559,7 @@ public class StatesToWalkStepsMapper {
     double fromLevel = 0.0;
     VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
       toLevel,
-      edge.getName(),
-      fromLevel,
-      VerticalTransportationType.STAIRS
+      fromLevel
     );
     var step = createWalkStep(forwardState, backState);
 

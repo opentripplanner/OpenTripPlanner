@@ -5694,12 +5694,6 @@ public class GraphQLTypes {
     TRANSIT,
   }
 
-  public enum GraphQLVerticalTransportationType {
-    ELEVATOR,
-    ESCALATOR,
-    STAIRS,
-  }
-
   public static class GraphQLWalkPreferencesInput {
 
     private org.opentripplanner.framework.model.Cost boardCost;
