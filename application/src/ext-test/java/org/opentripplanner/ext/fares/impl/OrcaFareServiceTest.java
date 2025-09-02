@@ -57,8 +57,8 @@ public class OrcaFareServiceTest {
   private static final Money TWO_DOLLARS = usDollars(2);
   private static final Money HALF_FERRY_FARE = usDollars(1.75f);
   private static final Money ORCA_SPECIAL_FARE = usDollars(1.00f);
-  public static final Money VASHON_WATER_TAXI_CASH_FARE = usDollars(6.75f);
-  public static final Money WEST_SEATTLE_WATER_TAXI_CASH_FARE = usDollars(5.75f);
+  public static final Money VASHON_WATER_TAXI_CASH_FARE = usDollars(7.00f);
+  public static final Money WEST_SEATTLE_WATER_TAXI_CASH_FARE = usDollars(6.25f);
   private static final String FEED_ID = "A";
   private static TestOrcaFareService orcaFareService;
   public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(3.49f);
@@ -366,8 +366,8 @@ public class OrcaFareServiceTest {
     calculateFare(rides, regular, WEST_SEATTLE_WATER_TAXI_CASH_FARE);
     calculateFare(rides, FareType.senior, usDollars(2.50f));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, usDollars(3.75f));
-    calculateFare(rides, FareType.electronicRegular, usDollars(5f));
+    calculateFare(rides, FareType.electronicSpecial, usDollars(1.00f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(5.25f));
     calculateFare(rides, FareType.electronicSenior, usDollars(2.50f));
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
 
@@ -376,8 +376,8 @@ public class OrcaFareServiceTest {
     calculateFare(rides, regular, VASHON_WATER_TAXI_CASH_FARE);
     calculateFare(rides, FareType.senior, usDollars(3f));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, usDollars(4.50f));
-    calculateFare(rides, FareType.electronicRegular, usDollars(5.75f));
+    calculateFare(rides, FareType.electronicSpecial, usDollars(1.00f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(6.00f));
     calculateFare(rides, FareType.electronicSenior, usDollars(3f));
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
   }
@@ -443,11 +443,11 @@ public class OrcaFareServiceTest {
       getLeg(KC_METRO_AGENCY_ID, "973", 100), // higher fare, extends transfer
       getLeg(KC_METRO_AGENCY_ID, 219) // extended transfer due to middle leg
     );
-    calculateFare(rides, regular, usDollars(12.73f));
+    calculateFare(rides, regular, usDollars(13.23f));
     calculateFare(rides, FareType.senior, usDollars(4.50f));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, usDollars(3.75f));
-    calculateFare(rides, FareType.electronicRegular, usDollars(5f)); // transfer extended on second leg
+    calculateFare(rides, FareType.electronicSpecial, usDollars(2.00f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(5.25f)); // transfer extended on second leg
     calculateFare(rides, FareType.electronicSenior, usDollars(2.50f));
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
   }

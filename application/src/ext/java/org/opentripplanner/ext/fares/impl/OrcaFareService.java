@@ -56,8 +56,6 @@ public class OrcaFareService extends DefaultFareService {
     "cash"
   );
 
-  private static final LocalDate SEPT_FARE_CHANGE_DATE = LocalDate.of(2025, 9, 1);
-
   private static final LocalDate KITSAP_FAST_FERRY_CHANGE_DATE = LocalDate.of(2025, 10, 1);
 
   protected enum TransferType {
@@ -293,20 +291,10 @@ public class OrcaFareService extends DefaultFareService {
       return defaultFare;
     }
     return switch (rideType) {
-      case KC_WATER_TAXI_VASHON_ISLAND -> leg
-          .startTime()
-          .isBefore(SEPT_FARE_CHANGE_DATE.atStartOfDay(leg.startTime().getZone()))
-        ? usesOrca(fareType) ? optionalUSD(5.75f) : optionalUSD(6.75f)
-        : usesOrca(fareType) ? optionalUSD(6.00f) : optionalUSD(7.00f);
-      case KC_WATER_TAXI_WEST_SEATTLE -> leg
-          .startTime()
-          .isBefore(SEPT_FARE_CHANGE_DATE.atStartOfDay(leg.startTime().getZone()))
-        ? usesOrca(fareType)
-          ? optionalUSD(5.00f) // before change orca
-          : optionalUSD(5.75f) // before change cash
-        : usesOrca(fareType)
-          ? optionalUSD(5.25f) // after change orca
-          : optionalUSD(6.25f); // after change cash
+      case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType) ? optionalUSD(6.00f) : optionalUSD(7.00f);
+      case KC_WATER_TAXI_WEST_SEATTLE -> usesOrca(fareType)
+          ? optionalUSD(5.25f)
+          : optionalUSD(6.25f);
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> optionalUSD(2f);
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> leg
           .startTime()
@@ -337,16 +325,7 @@ public class OrcaFareService extends DefaultFareService {
     }
     return switch (rideType) {
       case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
-      case KC_WATER_TAXI_VASHON_ISLAND -> leg
-          .startTime()
-          .isBefore(SEPT_FARE_CHANGE_DATE.atStartOfDay(leg.startTime().getZone()))
-        ? optionalUSD(4.50f)
-        : optionalUSD(1.00f);
-      case KC_WATER_TAXI_WEST_SEATTLE -> leg
-          .startTime()
-          .isBefore(SEPT_FARE_CHANGE_DATE.atStartOfDay(leg.startTime().getZone()))
-        ? optionalUSD(3.75f)
-        : optionalUSD(1.00f);
+      case KC_WATER_TAXI_VASHON_ISLAND, KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(1.00f);
       case KC_METRO,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
