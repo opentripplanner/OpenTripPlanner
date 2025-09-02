@@ -291,10 +291,12 @@ public class OrcaFareService extends DefaultFareService {
       return defaultFare;
     }
     return switch (rideType) {
-      case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType) ? optionalUSD(6.00f) : optionalUSD(7.00f);
+      case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType)
+        ? optionalUSD(6.00f)
+        : optionalUSD(7.00f);
       case KC_WATER_TAXI_WEST_SEATTLE -> usesOrca(fareType)
-          ? optionalUSD(5.25f)
-          : optionalUSD(6.25f);
+        ? optionalUSD(5.25f)
+        : optionalUSD(6.25f);
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> optionalUSD(2f);
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> leg
           .startTime()
