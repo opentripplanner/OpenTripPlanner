@@ -2880,11 +2880,6 @@ originating from OSM or GTFS data.
 type VerticalTransportationUse {
   "The level the use ends at. Levels can sometimes contain half levels (e.g. 1.5)."
   toLevel: Float
-  """
-  ID of the vertical transportation equipment in the format of `FeedId:EquipmentId`.
-  If the `FeedId` is `osm`, the vertical transportation equipment originates from OSM data.
-  """
-  id: String!
   "Name of the vertical transportation equipment."
   name: String
   "The level the use begins at. Levels can sometimes contain half levels (e.g. 1.5)."

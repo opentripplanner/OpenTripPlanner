@@ -18,14 +18,6 @@ public class VerticalTransportationUseImpl
   }
 
   @Override
-  public DataFetcher<String> id() {
-    return environment -> {
-      VerticalTransportationUse verticalTransportationUse = environment.getSource();
-      return verticalTransportationUse.id().toString();
-    };
-  }
-
-  @Override
   public DataFetcher<String> name() {
     return environment -> {
       VerticalTransportationUse verticalTransportationUse = environment.getSource();

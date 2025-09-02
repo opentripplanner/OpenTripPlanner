@@ -1541,8 +1541,6 @@ public class GraphQLDataFetchers {
   public interface GraphQLVerticalTransportationUse {
     public DataFetcher<Double> fromLevel();
 
-    public DataFetcher<String> id();
-
     public DataFetcher<String> name();
 
     public DataFetcher<Double> toLevel();
