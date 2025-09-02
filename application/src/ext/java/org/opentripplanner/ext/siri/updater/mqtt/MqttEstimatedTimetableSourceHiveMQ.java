@@ -4,6 +4,7 @@ import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.lifecycle.MqttClientDisconnectedContext;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
+import com.hivemq.client.mqtt.mqtt5.message.auth.Mqtt5SimpleAuth;
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish;
 import jakarta.xml.bind.JAXBException;
 import java.nio.charset.StandardCharsets;
@@ -99,14 +100,21 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
   }
 
   private Mqtt5AsyncClient connectAndSubscribeToClient(int clientIndex) {
+    Mqtt5SimpleAuth auth;
+    if (parameters.user() == null || parameters.user().isBlank()
+      || parameters.password() == null || parameters.password().isBlank()) {
+      auth = null;
+    } else {
+      auth = Mqtt5SimpleAuth.builder()
+        .username(parameters.user())
+        .password(parameters.password().getBytes(StandardCharsets.UTF_8))
+        .build();
+    }
     Mqtt5AsyncClient client = Mqtt5Client.builder()
       .identifier("OpenTripPlanner-" + clientIndex + "-" + UUID.randomUUID())
       .serverHost(parameters.host())
       .serverPort(parameters.port())
-//      .simpleAuth()
-//      .username(parameters.user())
-//      .password(parameters.password().getBytes(StandardCharsets.UTF_8))
-//      .applySimpleAuth()
+      .simpleAuth(auth)
       .automaticReconnectWithDefaultConfig()
       .addConnectedListener(ctx -> onConnect(clientIndex))
       .addDisconnectedListener(ctx -> onDisconnect(clientIndex, ctx))
