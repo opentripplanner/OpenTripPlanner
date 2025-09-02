@@ -15,12 +15,15 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
+import org.opentripplanner.model.plan.walkstep.VerticalTransportationType;
+import org.opentripplanner.model.plan.walkstep.VerticalTransportationUse;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
+import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -174,6 +177,10 @@ public class StatesToWalkStepsMapper {
     if (edge instanceof ElevatorAlightEdge) {
       addStep(createElevatorWalkStep(backState, forwardState, edge));
       return;
+    } else if (edge instanceof EscalatorEdge) {
+      addStep(createEscalatorWalkStep(backState, forwardState, edge));
+    } else if (edge instanceof StreetEdge streetEdge && streetEdge.isStairs()) {
+      addStep(createStairsWalkStep(backState, forwardState, edge));
     } else if (backState.getVertex() instanceof StationEntranceVertex stationEntranceVertex) {
       addStep(createStationEntranceWalkStep(backState, forwardState, stationEntranceVertex));
       return;
@@ -506,7 +513,34 @@ public class StatesToWalkStepsMapper {
     steps.add(current);
   }
 
+  private WalkStepBuilder createEscalatorWalkStep(State backState, State forwardState, Edge edge) {
+    // TODO calculate level
+    double toLevel = 0.0;
+    double fromLevel = 0.0;
+    VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
+      toLevel,
+      edge.getName(),
+      fromLevel,
+      VerticalTransportationType.ELEVATOR
+    );
+    var step = createWalkStep(forwardState, backState);
+
+    step.withRelativeDirection(RelativeDirection.ESCALATOR);
+    step.withVerticalTransportationUse(verticalTransportationUse);
+
+    return step;
+  }
+
   private WalkStepBuilder createElevatorWalkStep(State backState, State forwardState, Edge edge) {
+    // TODO calculate level
+    double toLevel = 0.0;
+    double fromLevel = 0.0;
+    VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
+      toLevel,
+      edge.getName(),
+      fromLevel,
+      VerticalTransportationType.ELEVATOR
+    );
     // don't care what came before or comes after
     var step = createWalkStep(forwardState, backState);
 
@@ -516,9 +550,28 @@ public class StatesToWalkStepsMapper {
     // exit != null and uses to <exit>
     // the floor name is the AlightEdge name
     // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-    step.withDirectionText(edge.getName());
+    // createWalkStep sets step.withDirectionText(edge.getName());
 
     step.withRelativeDirection(RelativeDirection.ELEVATOR);
+    step.withVerticalTransportationUse(verticalTransportationUse);
+
+    return step;
+  }
+
+  private WalkStepBuilder createStairsWalkStep(State backState, State forwardState, Edge edge) {
+    // TODO calculate level
+    double toLevel = 0.0;
+    double fromLevel = 0.0;
+    VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
+      toLevel,
+      edge.getName(),
+      fromLevel,
+      VerticalTransportationType.ELEVATOR
+    );
+    var step = createWalkStep(forwardState, backState);
+
+    step.withRelativeDirection(RelativeDirection.STAIRS);
+    step.withVerticalTransportationUse(verticalTransportationUse);
 
     return step;
   }
