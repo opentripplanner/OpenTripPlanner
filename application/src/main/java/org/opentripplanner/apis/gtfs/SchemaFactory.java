@@ -74,6 +74,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.VehicleParkingImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehiclePositionImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalNetworkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalStationImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.VerticalTransportationUseImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.debugOutputImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.elevationProfileComponentImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.placeAtDistanceImpl;
@@ -208,6 +209,7 @@ public class SchemaFactory {
         .type(typeWiring.build(EstimatedTimeImpl.class))
         .type(typeWiring.build(EntranceImpl.class))
         .type(typeWiring.build(RentalVehicleFuelImpl.class))
+        .type(typeWiring.build(VerticalTransportationUseImpl.class))
         .build();
 
       SchemaGenerator schemaGenerator = new SchemaGenerator();
