@@ -521,7 +521,7 @@ public class StatesToWalkStepsMapper {
       toLevel,
       edge.getName(),
       fromLevel,
-      VerticalTransportationType.ELEVATOR
+      VerticalTransportationType.ESCALATOR
     );
     var step = createWalkStep(forwardState, backState);
 
