@@ -205,8 +205,6 @@ public class SiriAzureUpdater implements GraphUpdater {
 
   @Override
   public void run() {
-    startTime = System.currentTimeMillis();
-
     // In Kubernetes this should be the POD identifier
     subscriptionName = System.getenv("HOSTNAME");
     if (subscriptionName == null || subscriptionName.isBlank()) {
@@ -253,11 +251,11 @@ public class SiriAzureUpdater implements GraphUpdater {
    * @param task The task to execute
    * @param description A description for logging
    * @param timeoutMs Timeout in milliseconds, or null for indefinite retries
+   * @return true if task completed successfully, false if timeout was exceeded
    * @throws InterruptedException If interrupted
-   * @throws RuntimeException If timeout is exceeded (only when timeoutMs is specified)
    * @throws Exception Any non-retryable exception from the task
    */
-  void executeWithRetry(CheckedRunnable task, String description, Integer timeoutMs)
+  boolean executeWithRetry(CheckedRunnable task, String description, Long timeoutMs)
     throws Exception {
     int sleepPeriod = INITIAL_RETRY_DELAY_MS;
     int attemptCounter = 1;
@@ -270,7 +268,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       try {
         task.run();
         log.info("{} succeeded after {} attempts.", description, attemptCounter);
-        return;
+        return true;
       } catch (InterruptedException ie) {
         log.warn("{} was interrupted.", description);
         Thread.currentThread().interrupt();
@@ -298,9 +296,10 @@ public class SiriAzureUpdater implements GraphUpdater {
       }
     }
 
-    // Only reachable if timeout was specified and exceeded
+    // Timeout exceeded (only reachable when timeoutMs is specified)
     if (timeoutMs != null) {
-      throw new RuntimeException(description + " timed out after " + timeoutMs + "ms");
+      log.warn("{} timed out after {} ms", description, timeoutMs);
+      return false;
     }
 
     // Thread was interrupted during indefinite retry
@@ -367,23 +366,23 @@ public class SiriAzureUpdater implements GraphUpdater {
    */
   private void tryStartupStep(CheckedRunnable task, String stepDescription) {
     try {
-      executeWithRetry(task, stepDescription, (int) startupTimeout.toMillis());
-      log.info("{} completed successfully", stepDescription);
-    } catch (RuntimeException e) {
-      String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-      if (message.contains("timed out")) {
-        log.warn(
-          "REALTIME_STARTUP_ALERT component={} status=TIMEOUT error=\"{}\"",
-          stepDescription,
-          message
-        );
+      boolean success = executeWithRetry(task, stepDescription, startupTimeout.toMillis());
+      if (success) {
+        log.info("{} completed successfully", stepDescription);
       } else {
         log.warn(
-          "REALTIME_STARTUP_ALERT component={} status=FAILED error=\"{}\"",
+          "REALTIME_STARTUP_ALERT component={} status=TIMEOUT error=\"{} timed out after {} ms\"",
           stepDescription,
-          message
+          stepDescription,
+          startupTimeout.toMillis()
         );
       }
+    } catch (InterruptedException e) {
+      log.warn(
+        "REALTIME_STARTUP_ALERT component={} status=INTERRUPTED error=\"Thread was interrupted\"",
+        stepDescription
+      );
+      Thread.currentThread().interrupt(); // Preserve interrupt status
     } catch (Exception e) {
       String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
       log.warn(
