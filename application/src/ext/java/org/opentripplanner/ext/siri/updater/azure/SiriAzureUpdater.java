@@ -261,10 +261,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     int attemptCounter = 1;
     long startTime = System.currentTimeMillis();
 
-    while (
-      (timeoutMs == null && !Thread.currentThread().isInterrupted()) ||
-      (timeoutMs != null && System.currentTimeMillis() - startTime < timeoutMs)
-    ) {
+    while (timeoutMs == null || System.currentTimeMillis() - startTime < timeoutMs) {
       try {
         task.run();
         log.info("{} succeeded after {} attempts.", description, attemptCounter);
@@ -296,14 +293,9 @@ public class SiriAzureUpdater implements GraphUpdater {
       }
     }
 
-    // Timeout exceeded (only reachable when timeoutMs is specified)
-    if (timeoutMs != null) {
-      log.warn("{} timed out after {} ms", description, timeoutMs);
-      return false;
-    }
-
-    // Thread was interrupted during indefinite retry
-    throw new InterruptedException(description + " was interrupted");
+    // Timeout exceeded (only reachable when timeoutMs is specified and exceeded)
+    log.warn("{} timed out after {} ms", description, timeoutMs);
+    return false;
   }
 
   boolean shouldRetry(Exception e) {
@@ -395,15 +387,11 @@ public class SiriAzureUpdater implements GraphUpdater {
 
   private void registerShutdownHookIfNeeded() {
     if (!shutdownHookRegistered && subscriptionName != null) {
-      synchronized (this) {
-        if (!shutdownHookRegistered && subscriptionName != null) {
-          ApplicationShutdownSupport.addShutdownHook(
-            "azure-siri-updater-shutdown-" + updaterType,
-            this::performShutdown
-          );
-          shutdownHookRegistered = true;
-        }
-      }
+      ApplicationShutdownSupport.addShutdownHook(
+        "azure-siri-updater-shutdown-" + updaterType,
+        this::performShutdown
+      );
+      shutdownHookRegistered = true;
     }
   }
 
