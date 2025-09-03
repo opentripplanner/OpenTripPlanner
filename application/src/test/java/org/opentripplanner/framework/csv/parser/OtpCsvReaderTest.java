@@ -52,10 +52,8 @@ class OtpCsvReaderTest {
       .read();
     assertEquals(expected, list);
 
-    assertThat(log.toString())
-      .contains("Read OtpCsvReaderTest progress tracking started.");
-    assertThat(log.toString())
-      .contains("Read OtpCsvReaderTest progress tracking complete.");
+    assertThat(log.toString()).contains("Read OtpCsvReaderTest progress tracking started.");
+    assertThat(log.toString()).contains("Read OtpCsvReaderTest progress tracking complete.");
   }
 
   static class Parser extends AbstractCsvParser<AType> {

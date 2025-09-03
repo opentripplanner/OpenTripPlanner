@@ -1,10 +1,11 @@
 package org.opentripplanner.ext.emission.internal.csvdata.route;
 
-import com.csvreader.CsvReader;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.framework.csv.OtpCsvReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -24,27 +25,24 @@ public class RouteDataReader {
     this.issueStore = issueStore;
   }
 
-  public Map<FeedScopedId, Emission> read(String resolvedFeedId, Runnable logStepCallback) {
-    if (!emissionDataSource.exists()) {
-      return Map.of();
-    }
+  public Map<FeedScopedId, Emission> read(
+    String resolvedFeedId,
+    @Nullable Consumer<String> progressLogger
+  ) {
     var emissionData = new HashMap<FeedScopedId, Emission>();
-    var reader = new CsvReader(emissionDataSource.asInputStream(), StandardCharsets.UTF_8);
-    var parser = new RouteCsvParser(issueStore, reader);
 
-    if (!parser.headersMatch()) {
-      return Map.of();
-    }
-
-    while (parser.hasNext()) {
-      logStepCallback.run();
-      var value = parser.next();
-      emissionData.put(
-        new FeedScopedId(resolvedFeedId, value.routeId()),
-        Emission.of(value.calculatePassengerCo2PerMeter())
-      );
-      dataProcessed = true;
-    }
+    OtpCsvReader.<RouteRow>of()
+      .withDataSource(emissionDataSource)
+      .withProgressLogger(progressLogger)
+      .withParserFactory(r -> new RouteCsvParser(issueStore, r))
+      .withRowHandler(row -> {
+        emissionData.put(
+          new FeedScopedId(resolvedFeedId, row.routeId()),
+          Emission.of(row.calculatePassengerCo2PerMeter())
+        );
+        dataProcessed = true;
+      })
+      .read();
     return emissionData;
   }
 

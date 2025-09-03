@@ -33,6 +33,7 @@ public class OtpCsvReader<T> {
   private DataSource dataSource;
   private Function<CsvReader, AbstractCsvParser<T>> parserFactory;
   private Consumer<T> rowHandler;
+
   @Nullable
   private Consumer<String> progressLogger;
 
