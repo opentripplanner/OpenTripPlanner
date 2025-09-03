@@ -4,16 +4,21 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.GoogleStorageDSRepository;
 import org.opentripplanner.datastore.api.OtpBaseDirectory;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
+import org.opentripplanner.datastore.base.ByteArrayDataSource;
 import org.opentripplanner.datastore.base.DataSourceRepository;
+import org.opentripplanner.datastore.base.ListCompositeDataSource;
 import org.opentripplanner.datastore.file.FileDataSourceRepository;
 import org.opentripplanner.datastore.https.HttpsDataSourceRepository;
 
@@ -41,6 +46,36 @@ public abstract class DataStoreModule {
    */
   public static CompositeDataSource compositeSource(File file, FileType type) {
     return FileDataSourceRepository.compositeSource(file, type);
+  }
+
+  /**
+   * For test only.
+   * <p>
+   * Use this to get a composite data source. Pass in all child data sources.
+   */
+  public static CompositeDataSource compositeSource(
+    String name,
+    FileType type,
+    DataSource... children
+  ) {
+    return new ListCompositeDataSource(name, type, Arrays.asList(children));
+  }
+
+  /**
+   * For test only.
+   * <p>
+   * Use this to create a read-only data source backed by the given {@code content} string.
+   */
+  public static DataSource dataSource(String name, FileType type, String content) {
+    var buf = content.getBytes(StandardCharsets.UTF_8);
+    return new ByteArrayDataSource(
+      "",
+      name,
+      type,
+      buf.length,
+      System.currentTimeMillis(),
+      false
+    ).withBytes(buf);
   }
 
   /**

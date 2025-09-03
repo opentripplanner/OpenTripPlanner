@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 
@@ -42,18 +41,6 @@ public class ByteArrayDataSource implements DataSource {
     this.size = size;
     this.lastModified = lastModified;
     this.writable = writable;
-  }
-
-  public static ByteArrayDataSource testInput(String name, FileType type, String content) {
-    var buf = content.getBytes(StandardCharsets.UTF_8);
-    return new ByteArrayDataSource(
-      "",
-      name,
-      type,
-      buf.length,
-      System.currentTimeMillis(),
-      false
-    ).withBytes(buf);
   }
 
   @Override

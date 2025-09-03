@@ -2,25 +2,29 @@ package org.opentripplanner.datastore.base;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.configure.DataStoreModule;
 
 class ListCompositeDataSourceTest {
 
   private static final String LEAF_NAME = "leaf";
-  private static final ByteArrayDataSource LEAF = ByteArrayDataSource.testInput(
+  private static final DataSource LEAF = DataStoreModule.dataSource(
     LEAF_NAME,
     FileType.GTFS,
     "Test"
   );
 
-  private final ListCompositeDataSource subjectEmpty = new ListCompositeDataSource(
+  private final CompositeDataSource subjectEmpty = new ListCompositeDataSource(
     "empty",
     FileType.GTFS,
     List.of()
   );
-  private final ListCompositeDataSource subjectOne = new ListCompositeDataSource(
+  private final CompositeDataSource subjectOne = new ListCompositeDataSource(
     "one",
     FileType.GTFS,
     List.of(LEAF)
@@ -39,7 +43,7 @@ class ListCompositeDataSourceTest {
   }
 
   @Test
-  void close() {
+  void close() throws IOException {
     // Nothing happens (exceptions not thrown)
     subjectEmpty.close();
     subjectOne.close();
@@ -53,20 +57,14 @@ class ListCompositeDataSourceTest {
 
   @Test
   void path() {
-    assertEquals("ListCompositeReadOnlyDataSource/NNN", replaceHash(subjectEmpty.path()));
-    assertEquals("ListCompositeReadOnlyDataSource/NNN", replaceHash(subjectOne.path()));
+    assertEquals("ListCompositeDataSource/NNN", replaceHash(subjectEmpty.path()));
+    assertEquals("ListCompositeDataSource/NNN", replaceHash(subjectOne.path()));
   }
 
   @Test
   void uri() {
-    assertEquals(
-      "ListCompositeReadOnlyDataSource/NNN/empty",
-      replaceHash(subjectEmpty.uri().toString())
-    );
-    assertEquals(
-      "ListCompositeReadOnlyDataSource/NNN/one",
-      replaceHash(subjectOne.uri().toString())
-    );
+    assertEquals("ListCompositeDataSource/NNN/empty", replaceHash(subjectEmpty.uri().toString()));
+    assertEquals("ListCompositeDataSource/NNN/one", replaceHash(subjectOne.uri().toString()));
   }
 
   @Test

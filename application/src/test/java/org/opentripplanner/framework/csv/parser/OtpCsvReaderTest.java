@@ -4,7 +4,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.csvreader.CsvReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -27,7 +26,8 @@ class OtpCsvReaderTest {
       1, "Cat", 1
       2, "Boot", 0
       """
-    );    var expected = List.of(new AType(1, "Cat", true), new AType(2, "Boot", false));
+    );
+    var expected = List.of(new AType(1, "Cat", true), new AType(2, "Boot", false));
 
     var list = new ArrayList<AType>();
 
