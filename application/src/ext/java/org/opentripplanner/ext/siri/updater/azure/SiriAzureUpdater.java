@@ -245,23 +245,23 @@ public class SiriAzureUpdater implements GraphUpdater {
   }
 
   /**
-   * Executes a task with retry logic, optionally with timeout constraint.
+   * Executes a task with retry logic with timeout constraint.
    * Retries for retryable exceptions with exponential backoff.
    *
    * @param task The task to execute
    * @param description A description for logging
-   * @param timeoutMs Timeout in milliseconds, or null for indefinite retries
+   * @param timeoutMs Timeout in milliseconds
    * @return true if task completed successfully, false if timeout was exceeded
    * @throws InterruptedException If interrupted
    * @throws Exception Any non-retryable exception from the task
    */
-  boolean executeWithRetry(CheckedRunnable task, String description, Long timeoutMs)
+  boolean executeWithRetry(CheckedRunnable task, String description, long timeoutMs)
     throws Exception {
     int sleepPeriod = INITIAL_RETRY_DELAY_MS;
     int attemptCounter = 1;
     long startTime = System.currentTimeMillis();
 
-    while (timeoutMs == null || System.currentTimeMillis() - startTime < timeoutMs) {
+    while (System.currentTimeMillis() - startTime < timeoutMs) {
       try {
         task.run();
         log.info("{} succeeded after {} attempts.", description, attemptCounter);
@@ -293,7 +293,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       }
     }
 
-    // Timeout exceeded (only reachable when timeoutMs is specified and exceeded)
+    // Timeout exceeded
     log.warn("{} timed out after {} ms", description, timeoutMs);
     return false;
   }
