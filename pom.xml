@@ -489,7 +489,12 @@
                 <artifactId>java-snapshot-testing-junit5</artifactId>
                 <version>2.3.0</version>
             </dependency>
-
+            <dependency>
+                <groupId>io.github.nchaugen</groupId>
+                <artifactId>tabletest-junit</artifactId>
+                <version>0.5.1</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
