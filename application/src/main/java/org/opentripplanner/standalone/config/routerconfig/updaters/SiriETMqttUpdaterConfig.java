@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
+import java.time.Duration;
 import org.opentripplanner.ext.siri.updater.mqtt.MqttSiriETUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
@@ -27,6 +28,10 @@ public class SiriETMqttUpdaterConfig {
       .since(OtpVersion.V2_8)
       .asInt(1);
 
+    Duration historicMessageAgeThreshold = siriMqttRoot.of("historicMessageAgeThreshold")
+      .since(OtpVersion.V2_8)
+      .asDuration(Duration.ofSeconds(5));
+
     return new MqttSiriETUpdaterParameters(
       configRef,
       feedId,
@@ -37,7 +42,8 @@ public class SiriETMqttUpdaterConfig {
       topic,
       qos,
       fuzzyTripMatching,
-      numberOfPrimingWorkers
+      numberOfPrimingWorkers,
+      historicMessageAgeThreshold
     );
   }
 }

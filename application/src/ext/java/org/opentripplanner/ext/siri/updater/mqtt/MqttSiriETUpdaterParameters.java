@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri.updater.mqtt;
 
+import java.time.Duration;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
@@ -14,6 +15,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
   private final int qos;
   private final boolean fuzzyTripMatching;
   private final int numberOfPrimingWorkers;
+  private final Duration historicMessageAgeThreshold;
 
   public MqttSiriETUpdaterParameters(
     String configRef,
@@ -25,7 +27,8 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
     String topic,
     int qos,
     boolean fuzzyTripMatching,
-    int numberOfPrimingWorkers
+    int numberOfPrimingWorkers,
+    Duration historicMessageAgeThreshold
   ) {
     this.configRef = configRef;
     this.feedId = feedId;
@@ -37,6 +40,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
     this.qos = qos;
     this.fuzzyTripMatching = fuzzyTripMatching;
     this.numberOfPrimingWorkers = numberOfPrimingWorkers;
+    this.historicMessageAgeThreshold = historicMessageAgeThreshold;
   }
 
   @Override
@@ -84,5 +88,9 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
 
   public int numberOfPrimingWorkers() {
     return numberOfPrimingWorkers;
+  }
+
+  public Duration historicMessageAgeThreshold() {
+    return historicMessageAgeThreshold;
   }
 }

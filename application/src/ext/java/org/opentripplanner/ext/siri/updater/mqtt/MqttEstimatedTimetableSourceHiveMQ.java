@@ -150,7 +150,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
 
   @Override
   public boolean isPrimed() {
-    return true;
+    return true;  // ToDo: when done optimizing, set to primed
   }
 
   @Override
@@ -201,7 +201,6 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
 
     public static final Duration MAX_PRIMING_IDLE = Duration.ofSeconds(5);
     private static final Duration THRESHOLD_HISTORIC_DATA = Duration.ofMinutes(5);
-    private static final int SECONDS_SINCE_LAST_HISTORIC_DELIVERY = 3;
 
     private final int workerId;
 
@@ -235,7 +234,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
           }
 
           if (
-            timestampOfLastHistoricDelivery.plusSeconds(SECONDS_SINCE_LAST_HISTORIC_DELIVERY)
+            timestampOfLastHistoricDelivery.plus(parameters.historicMessageAgeThreshold())
               .isBefore(Instant.now())
               || timestampOfLastDelivery.plus(MAX_PRIMING_IDLE).isBefore(Instant.now())
           ) {
