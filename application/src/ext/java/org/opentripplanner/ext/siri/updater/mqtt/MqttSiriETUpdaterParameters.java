@@ -13,6 +13,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
   private final String topic;
   private final int qos;
   private final boolean fuzzyTripMatching;
+  private final int numberOfPrimingWorkers;
 
   public MqttSiriETUpdaterParameters(
     String configRef,
@@ -23,7 +24,8 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
     String password,
     String topic,
     int qos,
-    boolean fuzzyTripMatching
+    boolean fuzzyTripMatching,
+    int numberOfPrimingWorkers
   ) {
     this.configRef = configRef;
     this.feedId = feedId;
@@ -34,6 +36,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
     this.topic = topic;
     this.qos = qos;
     this.fuzzyTripMatching = fuzzyTripMatching;
+    this.numberOfPrimingWorkers = numberOfPrimingWorkers;
   }
 
   @Override
@@ -77,5 +80,9 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
 
   public String host() {
     return host;
+  }
+
+  public int numberOfPrimingWorkers() {
+    return numberOfPrimingWorkers;
   }
 }

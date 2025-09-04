@@ -23,6 +23,10 @@ public class SiriETMqttUpdaterConfig {
       .since(OtpVersion.V2_8)
       .asBoolean();
 
+    int numberOfPrimingWorkers = siriMqttRoot.of("numberOfPrimingWorkers")
+      .since(OtpVersion.V2_8)
+      .asInt(1);
+
     return new MqttSiriETUpdaterParameters(
       configRef,
       feedId,
@@ -32,7 +36,8 @@ public class SiriETMqttUpdaterConfig {
       password,
       topic,
       qos,
-      fuzzyTripMatching
+      fuzzyTripMatching,
+      numberOfPrimingWorkers
     );
   }
 }
