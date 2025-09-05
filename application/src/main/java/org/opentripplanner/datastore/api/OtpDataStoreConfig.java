@@ -57,6 +57,11 @@ public interface OtpDataStoreConfig {
   List<URI> emissionFiles();
 
   /**
+   * List of URIs to Empirical Delay composite data sources.
+   */
+  List<URI> empiricalDelayFiles();
+
+  /**
    * The URI to the graph object file to load and/or save.
    */
   URI graph();

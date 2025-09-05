@@ -103,6 +103,7 @@ public enum OTPFeature {
     "If this is not enabled, the updaters will finish after submitting the task to update the graph."
   ),
   Emission(false, true, "Enable the emission sandbox module."),
+  EmpiricalDelay(false, true, "Enable empirical delay sandbox module."),
   DataOverlay(
     false,
     true,

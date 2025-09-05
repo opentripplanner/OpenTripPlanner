@@ -24,6 +24,8 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.datastore.gs.config.GsConfig;
 import org.opentripplanner.ext.emission.config.EmissionConfig;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
+import org.opentripplanner.ext.empiricaldelay.config.EmpiricalDelayConfig;
+import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameters;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.module.TransferParameters;
@@ -172,6 +174,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
   public final EmissionParameters emission;
+  public final EmpiricalDelayParameters empiricalDelay;
   public final TransitFeeds transitFeeds;
   public final boolean staticParkAndRide;
   public final boolean staticBikeParkAndRide;
@@ -594,7 +597,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
     emission = EmissionConfig.mapEmissionsConfig("emission", root);
-
+    empiricalDelay = EmpiricalDelayConfig.mapEmissionsConfig("empiricalDelay", root);
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
     transitFeeds = TransitFeedConfig.mapTransitFeeds(
@@ -651,6 +654,11 @@ public class BuildConfig implements OtpDataStoreConfig {
   @Override
   public List<URI> emissionFiles() {
     return emission.emissionFiles();
+  }
+
+  @Override
+  public List<URI> empiricalDelayFiles() {
+    return empiricalDelay.listFiles();
   }
 
   @Override
