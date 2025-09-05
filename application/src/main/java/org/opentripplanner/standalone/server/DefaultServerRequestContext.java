@@ -9,6 +9,7 @@ import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
@@ -69,6 +70,9 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final ItineraryDecorator emissionItineraryDecorator;
 
   @Nullable
+  private final EmpiricalDelayService empiricalDelayService;
+
+  @Nullable
   private final LuceneIndex luceneIndex;
 
   @Nullable
@@ -125,6 +129,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     ViaCoordinateTransferFactory viaTransferResolver,
     WorldEnvelopeService worldEnvelopeService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
+    @Nullable EmpiricalDelayService empiricalDelayService,
     @Nullable LuceneIndex luceneIndex,
     @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
     @Nullable @TransmodelSchema GraphQLSchema transmodelSchema,
@@ -157,6 +162,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
     // Optional fields
     this.emissionItineraryDecorator = emissionItineraryDecorator;
+    this.empiricalDelayService = empiricalDelayService;
     this.luceneIndex = luceneIndex;
     this.gtfsSchema = gtfsSchema;
     this.sorlandsbanenService = sorlandsbanenService;
@@ -301,6 +307,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public ItineraryDecorator emissionItineraryDecorator() {
     return emissionItineraryDecorator;
+  }
+
+  @Override
+  public EmpiricalDelayService empiricalDelayService() {
+    return empiricalDelayService;
   }
 
   @Nullable

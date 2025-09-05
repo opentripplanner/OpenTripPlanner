@@ -230,6 +230,7 @@ public class GraphSerializationTest {
       DataImportIssueSummary.empty(),
       emissionRepository,
       null,
+      null,
       streetLimitationParameters,
       new DefaultFareServiceFactory()
     );

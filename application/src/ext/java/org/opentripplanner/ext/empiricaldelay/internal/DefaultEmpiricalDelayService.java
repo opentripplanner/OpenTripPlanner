@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.empiricaldelay.internal;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
@@ -12,7 +13,7 @@ public class DefaultEmpiricalDelayService implements EmpiricalDelayService {
   private final EmpiricalDelayRepository repository;
 
   public DefaultEmpiricalDelayService(EmpiricalDelayRepository repository) {
-    this.repository = repository;
+    this.repository = Objects.requireNonNull(repository);
   }
 
   @Override
