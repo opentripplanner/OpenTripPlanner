@@ -15,7 +15,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
   private final int qos;
   private final boolean fuzzyTripMatching;
   private final int numberOfPrimingWorkers;
-  private final Duration historicMessageAgeThreshold;
+  private final Duration maxPrimingIdleTime;
 
   public MqttSiriETUpdaterParameters(
     String configRef,
@@ -28,7 +28,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
     int qos,
     boolean fuzzyTripMatching,
     int numberOfPrimingWorkers,
-    Duration historicMessageAgeThreshold
+    Duration maxPrimingIdleTime
   ) {
     this.configRef = configRef;
     this.feedId = feedId;
@@ -40,7 +40,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
     this.qos = qos;
     this.fuzzyTripMatching = fuzzyTripMatching;
     this.numberOfPrimingWorkers = numberOfPrimingWorkers;
-    this.historicMessageAgeThreshold = historicMessageAgeThreshold;
+    this.maxPrimingIdleTime = maxPrimingIdleTime;
   }
 
   @Override
@@ -90,7 +90,7 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
     return numberOfPrimingWorkers;
   }
 
-  public Duration historicMessageAgeThreshold() {
-    return historicMessageAgeThreshold;
+  public Duration maxPrimingIdleTime() {
+    return maxPrimingIdleTime;
   }
 }

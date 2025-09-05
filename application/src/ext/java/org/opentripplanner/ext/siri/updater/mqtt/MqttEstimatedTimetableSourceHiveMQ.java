@@ -8,9 +8,7 @@ import com.hivemq.client.mqtt.mqtt5.message.auth.Mqtt5SimpleAuth;
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish;
 import jakarta.xml.bind.JAXBException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -42,20 +41,18 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
   private Mqtt5AsyncClient client;
   private Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer;
 
-  private final BlockingQueue<byte[]> messageQueue = new LinkedBlockingQueue<>();
+  private final BlockingQueue<byte[]> liveMessageQueue = new LinkedBlockingQueue<>();
+  private final BlockingQueue<byte[]> primingMessageQueue = new LinkedBlockingQueue<>();
   private final ExecutorService primingExecutor;
   private final ExecutorService liveExecutor;
 
   private volatile boolean primed = false;
 
-  private volatile Instant timestampOfLastHistoricDelivery;
-  private volatile Instant timestampOfLastDelivery;
-
   private Instant connectedAt;
-  private final AtomicInteger receivedMessageCounter = new AtomicInteger();
-  private final AtomicInteger processedMessageCounter = new AtomicInteger();
-  private final AtomicLong receivedMessageSize = new AtomicLong();
-  private final AtomicLong processedMessageSize = new AtomicLong();
+  private final AtomicInteger liveMessageCounter = new AtomicInteger();
+  private final AtomicInteger retainedMessageCounter = new AtomicInteger();
+  private final AtomicLong liveMessageSize = new AtomicLong();
+  private final AtomicLong retainedMessageSize = new AtomicLong();
 
   public MqttEstimatedTimetableSourceHiveMQ(MqttSiriETUpdaterParameters parameters) {
     this.parameters = parameters;
@@ -70,17 +67,17 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
     client = connectAndSubscribeToClient();
     connectedAt = Instant.now();
 
-    timestampOfLastHistoricDelivery = Instant.now().plusSeconds(30);
     List<CompletableFuture<Void>> primingFutures = new ArrayList<>();
 
     for (int i = 0; i < parameters.numberOfPrimingWorkers(); i++) {
       CompletableFuture<Void> f = CompletableFuture.runAsync(
-        new PrimeRunner(i),
+        new RetainRunner(i),
         primingExecutor
       );
       primingFutures.add(f);
     }
     LOG.info("Started {} priming workers", parameters.numberOfPrimingWorkers());
+    liveExecutor.submit(new LiveRunner());
 
     // Wait for priming workers to finish
     CompletableFuture<Void> allPriming = CompletableFuture.allOf(
@@ -89,11 +86,9 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
 
     // when all are done, switch to live
     allPriming.thenRunAsync(() -> {
-      logMessages(processedMessageSize.get(),  processedMessageCounter.get(), "Processed in total");
-      LOG.info("All priming workers done after {} seconds, starting live worker",
-        connectedAt.until(Instant.now(), ChronoUnit.SECONDS));
-      liveExecutor.submit(new LiveRunner());
+      logPrimingSummary();
       primingExecutor.shutdown();
+      primed = true;
     }).exceptionally(ex -> {
       LOG.error("Priming failed", ex);
       return null;
@@ -124,7 +119,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
 
     client.connectWith()
       .keepAlive(30)
-      .cleanStart(true)
+      .cleanStart(false)
       .send()
       .join();
 
@@ -170,26 +165,68 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
   }
 
   private void onMessage(Mqtt5Publish message) {
-    timestampOfLastDelivery = Instant.now();
-    int numberOfMessages = receivedMessageCounter.incrementAndGet();
-    long sizeBytes = receivedMessageSize.addAndGet(message.getPayloadAsBytes().length);
-    boolean offer = messageQueue.offer(message.getPayloadAsBytes());
+    boolean offer;
+    if (message.isRetain() && !primed) {
+      offer = primingMessageQueue.offer(message.getPayloadAsBytes());
+      retainedMessageCounter.incrementAndGet();
+      retainedMessageSize.addAndGet(message.getPayloadAsBytes().length);
+    } else {
+      offer = liveMessageQueue.offer(message.getPayloadAsBytes());
+      liveMessageCounter.incrementAndGet();
+      liveMessageSize.addAndGet(message.getPayloadAsBytes().length);
+    }
+
     if (!offer) {
       LOG.warn("Failed to offer to message queue");
     }
-    if (!primed && numberOfMessages % 1000 == 0) {
-      logMessages(sizeBytes, numberOfMessages, "Received");
-      LOG.info("Queue size: {}", messageQueue.size());
+
+    if (!primed && (retainedMessageCounter.get() + liveMessageCounter.get()) % 1000 == 0) {
+      logMessageRates();  // ToDo: Better as metric and not log
+      LOG.info("Retained message queue size: {}, live message queue size: {}",
+        primingMessageQueue.size(), liveMessageQueue.size());
     }
   }
 
-  private void logMessages(long totalMessageSize, int messageCount, String prefix) {
+  private void logMessageRates() {
+    long totalMillis = connectedAt.until(Instant.now(), ChronoUnit.MILLIS);
+
+    int receivedLiveMessageCount = liveMessageCounter.get();
+    int processedLiveMessageCount = receivedLiveMessageCount - liveMessageQueue.size();
+    double receivedLiveMessageRate = (double) receivedLiveMessageCount / totalMillis * 1000;
+    double processedLiveMessageRate = (double) processedLiveMessageCount / totalMillis * 1000;
+    LOG.info(
+      "Siri Messages: Processed/Received {}/{} live messages ({} /s received, {} /s processed",
+      processedLiveMessageCount,
+      receivedLiveMessageCount,
+      String.format("%.2f", receivedLiveMessageRate),
+      String.format("%.2f", processedLiveMessageRate)
+    );
+
+    int receivedRetainedMessageCount = retainedMessageCounter.get();
+    int processedRetainedMessageCount = receivedRetainedMessageCount - primingMessageQueue.size();
+    double receivedRetainedMessageRate = (double) receivedRetainedMessageCount / totalMillis * 1000;
+    double processedRetainedMessageRate = (double) processedRetainedMessageCount / totalMillis * 1000;
+    LOG.info(
+      "Siri Messages: Processed/Received {}/{} retained messages ({} /s received, {} /s processed",
+      processedRetainedMessageCount,
+      receivedRetainedMessageCount,
+      String.format("%.2f", receivedRetainedMessageRate),
+      String.format("%.2f", processedRetainedMessageRate)
+    );
+  }
+
+
+  private void logPrimingSummary() {
+    LOG.info("All priming workers done after {} seconds",
+      connectedAt.until(Instant.now(), ChronoUnit.SECONDS));
+
+    int messageCount = retainedMessageCounter.get();
+    long totalMessageSize = retainedMessageSize.get();
     double sizeMb = totalMessageSize / 1024. / 1024.;
     double meanMessageSizeKB = totalMessageSize / (double) messageCount / 1024.;
     long totalMillis = connectedAt.until(Instant.now(), ChronoUnit.MILLIS);
     double messageRate = (double) messageCount / totalMillis * 1000;
-    LOG.info("{} {} messages. Total size: {} MB, mean message size: {} kB, mean message rate: {} per second.",
-      prefix,
+    LOG.info("Processed retained {} messages. Total size: {} MB, mean message size: {} kB, mean message rate: {} per second.",
       messageCount,
       String.format("%.2f", sizeMb),
       String.format("%.2f", meanMessageSizeKB),
@@ -197,53 +234,38 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
     );
   }
 
-  private class PrimeRunner implements Runnable {
-
-    public static final Duration MAX_PRIMING_IDLE = Duration.ofSeconds(5);
-    private static final Duration THRESHOLD_HISTORIC_DATA = Duration.ofMinutes(5);
+  private class RetainRunner implements Runnable {
 
     private final int workerId;
 
-    private PrimeRunner(int workerId) {
+    private final AtomicInteger runnerMessageCounter = new AtomicInteger(0);
+
+    public RetainRunner(int workerId) {
       this.workerId = workerId;
     }
 
     @Override
     public void run() {
       try {
-        while (!primed && !Thread.currentThread().isInterrupted()) {
-          byte[] payload = messageQueue.take();
+        while (!Thread.currentThread().isInterrupted()) {
+          byte[] payload = primingMessageQueue.poll(parameters.maxPrimingIdleTime().toSeconds(), TimeUnit.SECONDS);
+          if (payload == null) {
+            LOG.info(
+              "RetainRunner-{} was idle for {} seconds and shut down after processing {} messages.",
+              workerId, parameters.maxPrimingIdleTime().toSeconds(), runnerMessageCounter.get()
+            );
+            break;
+          }
+          runnerMessageCounter.incrementAndGet();
           var optionalServiceDelivery = serviceDelivery(payload);
           if (optionalServiceDelivery.isEmpty()) {
-            return;
+            continue;
           }
           var serviceDelivery = optionalServiceDelivery.get();
           serviceDeliveryConsumer.apply(serviceDelivery);
-          if (
-            serviceDelivery.getResponseTimestamp()
-              .plus(THRESHOLD_HISTORIC_DATA)
-              .isBefore(ZonedDateTime.now())
-          ) {
-            timestampOfLastHistoricDelivery = Instant.now();
-          }
-          int messageCount = processedMessageCounter.incrementAndGet();
-          long totalMessageSize = processedMessageSize.addAndGet(payload.length);
-
-          if (messageCount % 1000 == 0) {
-            logMessages(totalMessageSize, messageCount, "Processed");
-          }
-
-          if (
-            timestampOfLastHistoricDelivery.plus(parameters.historicMessageAgeThreshold())
-              .isBefore(Instant.now())
-              || timestampOfLastDelivery.plus(MAX_PRIMING_IDLE).isBefore(Instant.now())
-          ) {
-            primed = true;
-          }
         }
-        LOG.info("Priming worker {} done",  workerId);
       } catch (InterruptedException e) {
-        throw new RuntimeException(e);
+        Thread.currentThread().interrupt();
       }
     }
   }
@@ -253,7 +275,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
     public void run() {
       try {
         while (!Thread.currentThread().isInterrupted()) {
-          byte[] payload = messageQueue.take();
+          byte[] payload = liveMessageQueue.take();
           serviceDelivery(payload).ifPresent(serviceDeliveryConsumer::apply);
         }
       } catch (InterruptedException e) {

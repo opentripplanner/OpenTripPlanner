@@ -28,9 +28,10 @@ public class SiriETMqttUpdaterConfig {
       .since(OtpVersion.V2_8)
       .asInt(1);
 
-    Duration historicMessageAgeThreshold = siriMqttRoot.of("historicMessageAgeThreshold")
+    Duration maxPrimingIdleTime = siriMqttRoot.of("maxPrimingIdleTime")
       .since(OtpVersion.V2_8)
-      .asDuration(Duration.ofSeconds(5));
+      .asDuration(Duration.ofMinutes(1));
+
 
     return new MqttSiriETUpdaterParameters(
       configRef,
@@ -43,7 +44,7 @@ public class SiriETMqttUpdaterConfig {
       qos,
       fuzzyTripMatching,
       numberOfPrimingWorkers,
-      historicMessageAgeThreshold
+      maxPrimingIdleTime
     );
   }
 }
