@@ -172,8 +172,8 @@
     {
       "groupName": "Jackson non-patch",
       "matchPackageNames": [
-        "com.fasterxml.jackson:{/,}**",
-        "com.fasterxml.jackson.datatype::{/,}**",
+        "com.fasterxml.jackson.core:{/,}**",
+        "com.fasterxml.jackson.datatype:{/,}**",
       ],
       "matchUpdateTypes": ["major", "minor"],
       "minimumReleaseAge": "1 week"

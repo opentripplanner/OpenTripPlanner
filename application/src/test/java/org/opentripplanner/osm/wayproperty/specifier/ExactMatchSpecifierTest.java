@@ -1,7 +1,10 @@
 package org.opentripplanner.osm.wayproperty.specifier;
 
+import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
+
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.TraverseDirection;
 
 class ExactMatchSpecifierTest extends SpecifierTest {
 
@@ -17,15 +20,15 @@ class ExactMatchSpecifierTest extends SpecifierTest {
   @Test
   public void carTunnel() {
     var tunnel = WayTestData.carTunnel();
-    assertScore(200, highwayPrimarySpec, tunnel);
-    assertScore(0, pedestrianUndergroundIndoorTunnelSpec, tunnel);
+    assertScore(200, highwayPrimarySpec, tunnel, DIRECTIONLESS);
+    assertScore(0, pedestrianUndergroundIndoorTunnelSpec, tunnel, DIRECTIONLESS);
   }
 
   @Test
   public void pedestrianTunnelSpecificity() {
     OsmEntity tunnel = WayTestData.pedestrianTunnel();
-    assertScore(0, highwayPrimarySpec, tunnel);
-    assertScore(600, pedestrianUndergroundTunnelSpec, tunnel);
-    assertScore(800, pedestrianUndergroundIndoorTunnelSpec, tunnel);
+    assertScore(0, highwayPrimarySpec, tunnel, DIRECTIONLESS);
+    assertScore(600, pedestrianUndergroundTunnelSpec, tunnel, DIRECTIONLESS);
+    assertScore(800, pedestrianUndergroundIndoorTunnelSpec, tunnel, DIRECTIONLESS);
   }
 }

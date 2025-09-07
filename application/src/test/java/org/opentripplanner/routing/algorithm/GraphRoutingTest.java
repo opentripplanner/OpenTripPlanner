@@ -27,7 +27,6 @@ import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
-import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
@@ -36,7 +35,7 @@ import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
-import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
+import org.opentripplanner.street.model.vertex.ElevatorVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -151,6 +150,16 @@ public abstract class GraphRoutingTest {
       return streetBuilder(from, to, length, permissions).buildAndConnect();
     }
 
+    public StreetEdge street(
+      StreetVertex from,
+      StreetVertex to,
+      int length,
+      StreetTraversalPermission permissions,
+      float carSpeed
+    ) {
+      return streetBuilder(from, to, length, permissions).withCarSpeed(carSpeed).buildAndConnect();
+    }
+
     public List<StreetEdge> street(
       StreetVertex from,
       StreetVertex to,
@@ -186,26 +195,16 @@ public abstract class GraphRoutingTest {
 
     public List<ElevatorEdge> elevator(StreetTraversalPermission permission, Vertex... vertices) {
       List<ElevatorEdge> edges = new ArrayList<>();
-      List<ElevatorOnboardVertex> onboardVertices = new ArrayList<>();
+      List<ElevatorVertex> onboardVertices = new ArrayList<>();
 
       for (Vertex v : vertices) {
         var level = String.format("L-%s", v.getDefaultName());
-        var boardLabel = String.format("%s-onboard", level);
-        var alightLabel = String.format("%s-offboard", level);
 
-        var onboard = vertexFactory.elevatorOnboard(v, v.getLabelString(), boardLabel);
-        var offboard = vertexFactory.elevatorOffboard(v, v.getLabelString(), alightLabel);
+        var onboard = vertexFactory.elevator(v, v.getLabelString(), level);
 
-        FreeEdge.createFreeEdge(v, offboard);
-        FreeEdge.createFreeEdge(offboard, v);
-
-        edges.add(ElevatorBoardEdge.createElevatorBoardEdge(offboard, onboard));
+        edges.add(ElevatorBoardEdge.createElevatorBoardEdge(v, onboard));
         edges.add(
-          ElevatorAlightEdge.createElevatorAlightEdge(
-            onboard,
-            offboard,
-            new NonLocalizedString(level)
-          )
+          ElevatorAlightEdge.createElevatorAlightEdge(onboard, v, new NonLocalizedString(level))
         );
 
         onboardVertices.add(onboard);
@@ -372,18 +371,18 @@ public abstract class GraphRoutingTest {
       double longitude,
       String network
     ) {
-      var vehicleRentalStation = new VehicleRentalStation();
-      vehicleRentalStation.id = new FeedScopedId(network, id);
-      vehicleRentalStation.name = new NonLocalizedString(id);
-      vehicleRentalStation.longitude = longitude;
-      vehicleRentalStation.latitude = latitude;
-      vehicleRentalStation.vehiclesAvailable = 2;
-      vehicleRentalStation.spacesAvailable = 2;
       final RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(network);
-      vehicleRentalStation.vehicleTypesAvailable = Map.of(vehicleType, 2);
-      vehicleRentalStation.vehicleSpacesAvailable = Map.of(vehicleType, 2);
-      vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed = false;
-      return vehicleRentalStation;
+      return VehicleRentalStation.of()
+        .withId(new FeedScopedId(network, id))
+        .withName(new NonLocalizedString(id))
+        .withLongitude(longitude)
+        .withLatitude(latitude)
+        .withVehiclesAvailable(2)
+        .withSpacesAvailable(2)
+        .withVehicleTypesAvailable(Map.of(vehicleType, 2))
+        .withVehicleSpacesAvailable(Map.of(vehicleType, 2))
+        .withIsArrivingInRentalVehicleAtDestinationAllowed(false)
+        .build();
     }
 
     public VehicleRentalPlaceVertex vehicleRentalStation(
@@ -397,7 +396,7 @@ public abstract class GraphRoutingTest {
       );
       VehicleRentalEdge.createVehicleRentalEdge(
         vertex,
-        RentalVehicleType.getDefaultType(network).formFactor
+        RentalVehicleType.getDefaultType(network).formFactor()
       );
       return vertex;
     }

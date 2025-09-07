@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
+import org.opentripplanner.ext.fares.model.FareTransferRuleBuilder;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -35,14 +36,14 @@ class FareTransferRuleMapper {
     if (rhs.getDurationLimit() != MISSING_VALUE) {
       duration = Duration.ofSeconds(rhs.getDurationLimit());
     }
-    return new FareTransferRule(
-      idFactory.createId(rhs.getId(), "fare transfer rule"),
-      idFactory.createNullableId(rhs.getFromLegGroupId()),
-      idFactory.createNullableId(rhs.getToLegGroupId()),
-      rhs.getTransferCount(),
-      duration,
-      products
-    );
+    return FareTransferRule.of()
+      .withId(idFactory.createId(rhs.getId(), "fare transfer rule"))
+      .withFromLegGroup(idFactory.createNullableId(rhs.getFromLegGroupId()))
+      .withToLegGroup(idFactory.createNullableId(rhs.getToLegGroupId()))
+      .withTransferCount(rhs.getTransferCount())
+      .withTimeLimit(duration)
+      .withFareProducts(products)
+      .build();
   }
 
   private Collection<FareProduct> findFareProducts(

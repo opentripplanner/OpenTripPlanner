@@ -1,5 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -44,7 +45,7 @@ public class VehicleRentalEdge extends Edge {
 
     VehicleRentalPlaceVertex stationVertex = (VehicleRentalPlaceVertex) tov;
     VehicleRentalPlace station = stationVertex.getStation();
-    String network = station.getNetwork();
+    String network = station.network();
     var preferences = s0.getPreferences().rental(formFactor.traverseMode);
     boolean realtimeAvailability = preferences.useAvailabilityInformation();
 
@@ -59,10 +60,7 @@ public class VehicleRentalEdge extends Edge {
           return State.empty();
         }
         case HAVE_RENTED -> {
-          if (
-            (realtimeAvailability && !station.allowDropoffNow()) ||
-            !station.getAvailableDropoffFormFactors(realtimeAvailability).contains(formFactor)
-          ) {
+          if (!station.canDropOffFormFactor(formFactor, realtimeAvailability)) {
             return State.empty();
           }
           s1.dropOffRentedVehicleAtStation(formFactor, network, true);
@@ -77,7 +75,7 @@ public class VehicleRentalEdge extends Edge {
           // traversing from renting to walking.
           if (
             s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.contains(network) ||
-            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
+            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -91,7 +89,7 @@ public class VehicleRentalEdge extends Edge {
         case RENTING_FROM_STATION -> {
           if (
             (realtimeAvailability && !station.allowPickupNow()) ||
-            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
+            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -116,7 +114,7 @@ public class VehicleRentalEdge extends Edge {
         case BEFORE_RENTING -> {
           if (
             (realtimeAvailability && !station.allowPickupNow()) ||
-            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
+            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -137,11 +135,7 @@ public class VehicleRentalEdge extends Edge {
           if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {
             return State.empty();
           }
-          var formFactors = station.getAvailableDropoffFormFactors(realtimeAvailability);
-          if (
-            (realtimeAvailability && !station.allowDropoffNow()) ||
-            !formFactors.contains(formFactor)
-          ) {
+          if (!station.canDropOffFormFactor(formFactor, realtimeAvailability)) {
             return State.empty();
           }
           s1.dropOffRentedVehicleAtStation(formFactor, network, false);
@@ -171,7 +165,7 @@ public class VehicleRentalEdge extends Edge {
    * @param rentedNetwork  The networks of the station we rented the bike from.
    * @return true if the bike can be dropped off here, false if not.
    */
-  private boolean hasCompatibleNetworks(String stationNetwork, String rentedNetwork) {
+  private boolean hasCompatibleNetworks(String stationNetwork, @Nullable String rentedNetwork) {
     /*
      * Special case for "null" networks ("catch-all" network defined).
      */

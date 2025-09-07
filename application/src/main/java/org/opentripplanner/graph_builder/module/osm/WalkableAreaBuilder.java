@@ -27,6 +27,7 @@ import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
+import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -185,9 +186,10 @@ class WalkableAreaBuilder {
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
       HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
       GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-      OsmEntity areaEntity = group.getSomeOsmObject();
 
       for (OsmArea area : group.areas) {
+        OsmEntity areaEntity = area.parent;
+
         // test if area is inside the current ring
         if (!group.isSimpleAreaGroup()) {
           if (!polygon.contains(area.jtsMultiPolygon)) {
@@ -413,7 +415,7 @@ class WalkableAreaBuilder {
 
   private WayProperties findAreaProperties(OsmEntity entity) {
     if (!wayPropertiesCache.containsKey(entity)) {
-      var wayData = entity.getOsmProvider().getWayPropertySet().getDataForWay(entity);
+      var wayData = entity.getOsmProvider().getWayPropertySet().getDataForEntity(entity);
       wayPropertiesCache.put(entity, wayData);
       return wayData;
     } else {
@@ -490,7 +492,10 @@ class WalkableAreaBuilder {
       vertex2.getLabel()
     );
 
-    float carSpeed = parent.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(parent, false);
+    float carSpeed = parent
+      .getOsmProvider()
+      .getOsmTagMapper()
+      .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS);
 
     I18NString name = namer.getNameForWay(parent, label);
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
@@ -525,7 +530,7 @@ class WalkableAreaBuilder {
 
     AreaEdge street = streetEdgeBuilder.buildAndConnect();
     AreaEdge backStreet = backStreetEdgeBuilder.buildAndConnect();
-    normalizer.applyWayProperties(street, backStreet, wayData, parent);
+    normalizer.applyWayProperties(street, backStreet, wayData, wayData, parent);
     return Set.of(street, backStreet);
   }
 
@@ -544,12 +549,9 @@ class WalkableAreaBuilder {
       namedArea.setName(name);
 
       WayProperties wayData = findAreaProperties(areaEntity);
-      double bicycleSafety = wayData.bicycleSafety().forward();
-      namedArea.setBicycleSafetyMultiplier(bicycleSafety);
-
-      double walkSafety = wayData.walkSafety().forward();
-      namedArea.setWalkSafetyMultiplier(walkSafety);
-      namedArea.setOriginalEdges(intersection);
+      namedArea.setBicycleSafety((float) wayData.bicycleSafety());
+      namedArea.setWalkSafety((float) wayData.walkSafety());
+      namedArea.setGeometry(intersection);
       namedArea.setPermission(wayData.getPermission());
       areaGroup.addArea(namedArea);
 
