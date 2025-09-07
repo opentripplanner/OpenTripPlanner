@@ -216,6 +216,14 @@ type Emission {
   co2: Float
 }
 
+"The empirical delay indicate how late a service journey is based on historic data."
+type EmpiricalDelay {
+  "The median/50% percentile. This value is in the middle of the distribution."
+  p50: Duration
+  "The 90% percentile. 90% of the values is better and 10% have is more delayed."
+  p90: Duration
+}
+
 "List of visits to quays as part of vehicle journeys. Updated with real time information where available"
 type EstimatedCall {
   "Actual time of arrival at quay. Updated from real time information if available."
@@ -234,6 +242,8 @@ type EstimatedCall {
   date: Date!
   datedServiceJourney: DatedServiceJourney
   destinationDisplay: DestinationDisplay
+  "The typical delay for this trip on this day for this stop based on historical data."
+  empiricalDelay: EmpiricalDelay
   "Expected time of arrival at quay. Updated with real time information if available. Will be null if an actualArrivalTime exists"
   expectedArrivalTime: DateTime!
   "Expected time of departure from quay. Updated with real time information if available. Will be null if an actualDepartureTime exists"
