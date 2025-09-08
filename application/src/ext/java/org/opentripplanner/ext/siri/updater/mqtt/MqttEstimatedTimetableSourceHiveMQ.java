@@ -6,11 +6,15 @@ import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
 import com.hivemq.client.mqtt.mqtt5.message.auth.Mqtt5SimpleAuth;
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish;
+import io.micrometer.core.instrument.FunctionCounter;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.Metrics;
 import jakarta.xml.bind.JAXBException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,15 +53,46 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
   private volatile boolean primed = false;
 
   private Instant connectedAt;
-  private final AtomicInteger liveMessageCounter = new AtomicInteger();
-  private final AtomicInteger retainedMessageCounter = new AtomicInteger();
+  private final AtomicLong liveMessageCounter = new AtomicLong();
+  private final AtomicLong primingMessageCounter = new AtomicLong();
   private final AtomicLong liveMessageSize = new AtomicLong();
-  private final AtomicLong retainedMessageSize = new AtomicLong();
+  private final AtomicLong primingMessageSize = new AtomicLong();
 
   public MqttEstimatedTimetableSourceHiveMQ(MqttSiriETUpdaterParameters parameters) {
     this.parameters = parameters;
     this.primingExecutor = Executors.newFixedThreadPool(parameters.numberOfPrimingWorkers());
     this.liveExecutor = Executors.newSingleThreadExecutor();
+
+    registerMetrics();
+
+  }
+
+  private void registerMetrics() {
+    FunctionCounter
+      .builder("mqtt_siri_received_size", liveMessageSize, AtomicLong::get)
+      .tags("type", "live")
+      .register(Metrics.globalRegistry);
+    FunctionCounter
+      .builder("mqtt_siri_received_size", primingMessageSize, AtomicLong::get)
+      .tags("type", "priming")
+      .register(Metrics.globalRegistry);
+    FunctionCounter
+      .builder("mqtt_siri_received_messages", liveMessageCounter, AtomicLong::get)
+      .tags("type", "live")
+      .register(Metrics.globalRegistry);
+    FunctionCounter
+      .builder("mqtt_siri_received_messages", primingMessageCounter, AtomicLong::get)
+      .tags("type", "priming")
+      .register(Metrics.globalRegistry);
+
+    Gauge
+      .builder("mqtt_siri_queue_size", primingMessageQueue, Collection::size)
+      .tags("type", "priming")
+      .register(Metrics.globalRegistry);
+    Gauge
+      .builder("mqtt_siri_queue_size", liveMessageQueue, Collection::size)
+      .tags("type", "live")
+      .register(Metrics.globalRegistry);
   }
 
   @Override
@@ -145,7 +180,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
 
   @Override
   public boolean isPrimed() {
-    return true;  // ToDo: when done optimizing, set to primed
+    return primed;
   }
 
   @Override
@@ -168,8 +203,8 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
     boolean offer;
     if (message.isRetain() && !primed) {
       offer = primingMessageQueue.offer(message.getPayloadAsBytes());
-      retainedMessageCounter.incrementAndGet();
-      retainedMessageSize.addAndGet(message.getPayloadAsBytes().length);
+      primingMessageCounter.incrementAndGet();
+      primingMessageSize.addAndGet(message.getPayloadAsBytes().length);
     } else {
       offer = liveMessageQueue.offer(message.getPayloadAsBytes());
       liveMessageCounter.incrementAndGet();
@@ -180,7 +215,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
       LOG.warn("Failed to offer to message queue");
     }
 
-    if (!primed && (retainedMessageCounter.get() + liveMessageCounter.get()) % 1000 == 0) {
+    if (!primed && (primingMessageCounter.get() + liveMessageCounter.get()) % 1000 == 0) {
       logMessageRates();  // ToDo: Better as metric and not log
       LOG.info("Retained message queue size: {}, live message queue size: {}",
         primingMessageQueue.size(), liveMessageQueue.size());
@@ -190,8 +225,8 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
   private void logMessageRates() {
     long totalMillis = connectedAt.until(Instant.now(), ChronoUnit.MILLIS);
 
-    int receivedLiveMessageCount = liveMessageCounter.get();
-    int processedLiveMessageCount = receivedLiveMessageCount - liveMessageQueue.size();
+    long receivedLiveMessageCount = liveMessageCounter.get();
+    long processedLiveMessageCount = receivedLiveMessageCount - liveMessageQueue.size();
     double receivedLiveMessageRate = (double) receivedLiveMessageCount / totalMillis * 1000;
     double processedLiveMessageRate = (double) processedLiveMessageCount / totalMillis * 1000;
     LOG.info(
@@ -202,16 +237,16 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
       String.format("%.2f", processedLiveMessageRate)
     );
 
-    int receivedRetainedMessageCount = retainedMessageCounter.get();
-    int processedRetainedMessageCount = receivedRetainedMessageCount - primingMessageQueue.size();
-    double receivedRetainedMessageRate = (double) receivedRetainedMessageCount / totalMillis * 1000;
-    double processedRetainedMessageRate = (double) processedRetainedMessageCount / totalMillis * 1000;
+    long receivedPrimingMessageCount = primingMessageCounter.get();
+    long processedPrimingMessageCount = receivedPrimingMessageCount - primingMessageQueue.size();
+    double receivedPrimingMessageRate = (double) receivedPrimingMessageCount / totalMillis * 1000;
+    double processedPrimingMessageRate = (double) processedPrimingMessageCount / totalMillis * 1000;
     LOG.info(
       "Siri Messages: Processed/Received {}/{} retained messages ({} /s received, {} /s processed",
-      processedRetainedMessageCount,
-      receivedRetainedMessageCount,
-      String.format("%.2f", receivedRetainedMessageRate),
-      String.format("%.2f", processedRetainedMessageRate)
+      processedPrimingMessageCount,
+      receivedPrimingMessageCount,
+      String.format("%.2f", receivedPrimingMessageRate),
+      String.format("%.2f", processedPrimingMessageRate)
     );
   }
 
@@ -220,8 +255,8 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
     LOG.info("All priming workers done after {} seconds",
       connectedAt.until(Instant.now(), ChronoUnit.SECONDS));
 
-    int messageCount = retainedMessageCounter.get();
-    long totalMessageSize = retainedMessageSize.get();
+    long messageCount = primingMessageCounter.get();
+    long totalMessageSize = primingMessageSize.get();
     double sizeMb = totalMessageSize / 1024. / 1024.;
     double meanMessageSizeKB = totalMessageSize / (double) messageCount / 1024.;
     long totalMillis = connectedAt.until(Instant.now(), ChronoUnit.MILLIS);
