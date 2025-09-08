@@ -18,7 +18,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +72,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
     for (int i = 0; i < parameters.numberOfPrimingWorkers(); i++) {
       CompletableFuture<Void> f = CompletableFuture.runAsync(
         new RetainRunner(i),
-        ForkJoinPool.commonPool()
+        primingExecutor
       );
       primingFutures.add(f);
     }
@@ -258,14 +257,12 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
             break;
           }
           runnerMessageCounter.incrementAndGet();
-          ForkJoinPool.commonPool().execute(() -> {
-            var optionalServiceDelivery = serviceDelivery(payload);
-            if (optionalServiceDelivery.isEmpty()) {
-              return;
-            }
-            var serviceDelivery = optionalServiceDelivery.get();
-            serviceDeliveryConsumer.apply(serviceDelivery);
-          });
+          var optionalServiceDelivery = serviceDelivery(payload);
+          if (optionalServiceDelivery.isEmpty()) {
+            continue;
+          }
+          var serviceDelivery = optionalServiceDelivery.get();
+          serviceDeliveryConsumer.apply(serviceDelivery);
         }
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
