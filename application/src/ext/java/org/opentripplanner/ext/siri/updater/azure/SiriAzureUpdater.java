@@ -368,11 +368,12 @@ public class SiriAzureUpdater implements GraphUpdater {
         );
       }
     } catch (InterruptedException e) {
+      // We don't support aborting startup on interruption - always complete graceful startup
+      // This prioritizes OTP reliability over interrupt responsiveness
       log.warn(
         "REALTIME_STARTUP_ALERT component={} status=INTERRUPTED error=\"Thread was interrupted\"",
         stepDescription
       );
-      Thread.currentThread().interrupt(); // Preserve interrupt status
     } catch (Exception e) {
       String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
       log.warn(
