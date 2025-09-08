@@ -203,34 +203,40 @@ public class SiriAzureUpdater implements GraphUpdater {
 
   @Override
   public void run() {
-    // In Kubernetes this should be the POD identifier
-    subscriptionName = System.getenv("HOSTNAME");
-    if (subscriptionName == null || subscriptionName.isBlank()) {
-      subscriptionName = "otp-" + UUID.randomUUID();
+    try {
+      // In Kubernetes this should be the POD identifier
+      subscriptionName = System.getenv("HOSTNAME");
+      if (subscriptionName == null || subscriptionName.isBlank()) {
+        subscriptionName = "otp-" + UUID.randomUUID();
+      }
+
+      // Try each startup step with timeout, continue on failure for graceful degradation
+      tryStartupStep(this::setupSubscription, "ServiceBusSubscription");
+
+      tryStartupStep(
+        () -> {
+          var initialData = fetchInitialSiriData();
+          if (initialData.isEmpty()) {
+            log.info("Got empty response from history endpoint");
+          } else {
+            processInitialSiriData(initialData.get());
+          }
+        },
+        "HistoricalSiriData"
+      );
+
+      tryStartupStep(this::startEventProcessor, "ServiceBusEventProcessor");
+
+      // Set primed so OTP can start
+      setPrimed();
+
+      // Register shutdown hook only once, and only after subscriptionName is set
+      registerShutdownHook();
+    } catch (InterruptedException e) {
+      log.info("Startup interrupted, aborting updater initialization");
+      Thread.currentThread().interrupt(); // Preserve interrupt status
+      // Don't set primed, don't register shutdown hook - just exit
     }
-
-    // Try each startup step with timeout, continue on failure for graceful degradation
-    tryStartupStep(this::setupSubscription, "ServiceBusSubscription");
-
-    tryStartupStep(
-      () -> {
-        var initialData = fetchInitialSiriData();
-        if (initialData.isEmpty()) {
-          log.info("Got empty response from history endpoint");
-        } else {
-          processInitialSiriData(initialData.get());
-        }
-      },
-      "HistoricalSiriData"
-    );
-
-    tryStartupStep(this::startEventProcessor, "ServiceBusEventProcessor");
-
-    // Set primed so OTP can start
-    setPrimed();
-
-    // Register shutdown hook only once, and only after subscriptionName is set
-    registerShutdownHook();
   }
 
   /**
@@ -353,8 +359,10 @@ public class SiriAzureUpdater implements GraphUpdater {
   /**
    * Attempts to execute a startup step with timeout.
    * Logs errors but continues execution for graceful degradation.
+   * Rethrows InterruptedException to abort startup process.
    */
-  private void tryStartupStep(CheckedRunnable task, String stepDescription) {
+  private void tryStartupStep(CheckedRunnable task, String stepDescription)
+    throws InterruptedException {
     try {
       boolean success = executeWithRetry(task, stepDescription, startupTimeout.toMillis());
       if (success) {
@@ -368,12 +376,13 @@ public class SiriAzureUpdater implements GraphUpdater {
         );
       }
     } catch (InterruptedException e) {
-      // We don't support aborting startup on interruption - always complete graceful startup
-      // This prioritizes OTP reliability over interrupt responsiveness
+      // Rethrow to abort startup process and avoid blocking JVM shutdown
       log.warn(
-        "REALTIME_STARTUP_ALERT component={} status=INTERRUPTED error=\"Thread was interrupted\"",
+        "REALTIME_STARTUP_ALERT component={} status=INTERRUPTED error=\"Aborting startup due to interrupt\"",
         stepDescription
       );
+      Thread.currentThread().interrupt(); // Preserve interrupt status
+      throw e;
     } catch (Exception e) {
       String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
       log.warn(
