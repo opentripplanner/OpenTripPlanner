@@ -57,6 +57,8 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
   private final AtomicLong primingMessageCounter = new AtomicLong();
   private final AtomicLong liveMessageSize = new AtomicLong();
   private final AtomicLong primingMessageSize = new AtomicLong();
+  private final AtomicLong processedLiveMessageCounter = new AtomicLong();
+  private final AtomicLong processedPrimingMessageCounter = new AtomicLong();
 
   public MqttEstimatedTimetableSourceHiveMQ(MqttSiriETUpdaterParameters parameters) {
     this.parameters = parameters;
@@ -69,20 +71,28 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
 
   private void registerMetrics() {
     FunctionCounter
-      .builder("mqtt_siri_received_size", liveMessageSize, AtomicLong::get)
-      .tags("type", "live")
+      .builder("mqtt_siri_message_size", liveMessageSize, AtomicLong::get)
+      .tags("type", "live", "stage", "received")
       .register(Metrics.globalRegistry);
     FunctionCounter
-      .builder("mqtt_siri_received_size", primingMessageSize, AtomicLong::get)
-      .tags("type", "priming")
+      .builder("mqtt_siri_message_size", primingMessageSize, AtomicLong::get)
+      .tags("type", "priming", "stage", "received")
       .register(Metrics.globalRegistry);
     FunctionCounter
-      .builder("mqtt_siri_received_messages", liveMessageCounter, AtomicLong::get)
-      .tags("type", "live")
+      .builder("mqtt_siri_messages", liveMessageCounter, AtomicLong::get)
+      .tags("type", "live", "stage", "received")
       .register(Metrics.globalRegistry);
     FunctionCounter
-      .builder("mqtt_siri_received_messages", primingMessageCounter, AtomicLong::get)
-      .tags("type", "priming")
+      .builder("mqtt_siri_messages", primingMessageCounter, AtomicLong::get)
+      .tags("type", "priming", "stage", "received")
+      .register(Metrics.globalRegistry);
+    FunctionCounter
+      .builder("mqtt_siri_messages", processedLiveMessageCounter, AtomicLong::get)
+      .tags("type", "live", "stage", "processed")
+      .register(Metrics.globalRegistry);
+    FunctionCounter
+      .builder("mqtt_siri_messages", processedPrimingMessageCounter, AtomicLong::get)
+      .tags("type", "priming", "stage", "processed")
       .register(Metrics.globalRegistry);
 
     Gauge
@@ -226,7 +236,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
     long totalMillis = connectedAt.until(Instant.now(), ChronoUnit.MILLIS);
 
     long receivedLiveMessageCount = liveMessageCounter.get();
-    long processedLiveMessageCount = receivedLiveMessageCount - liveMessageQueue.size();
+    long processedLiveMessageCount = processedLiveMessageCounter.get();
     double receivedLiveMessageRate = (double) receivedLiveMessageCount / totalMillis * 1000;
     double processedLiveMessageRate = (double) processedLiveMessageCount / totalMillis * 1000;
     LOG.info(
@@ -238,7 +248,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
     );
 
     long receivedPrimingMessageCount = primingMessageCounter.get();
-    long processedPrimingMessageCount = receivedPrimingMessageCount - primingMessageQueue.size();
+    long processedPrimingMessageCount = processedPrimingMessageCounter.get();
     double receivedPrimingMessageRate = (double) receivedPrimingMessageCount / totalMillis * 1000;
     double processedPrimingMessageRate = (double) processedPrimingMessageCount / totalMillis * 1000;
     LOG.info(
@@ -291,6 +301,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
             );
             break;
           }
+          processedPrimingMessageCounter.incrementAndGet();
           runnerMessageCounter.incrementAndGet();
           var optionalServiceDelivery = serviceDelivery(payload);
           if (optionalServiceDelivery.isEmpty()) {
@@ -311,6 +322,7 @@ public class MqttEstimatedTimetableSourceHiveMQ implements AsyncEstimatedTimetab
       try {
         while (!Thread.currentThread().isInterrupted()) {
           byte[] payload = liveMessageQueue.take();
+          processedLiveMessageCounter.incrementAndGet();
           serviceDelivery(payload).ifPresent(serviceDeliveryConsumer::apply);
         }
       } catch (InterruptedException e) {
