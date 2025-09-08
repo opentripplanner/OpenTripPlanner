@@ -119,8 +119,6 @@ public class SiriAzureUpdater implements GraphUpdater {
   private final int timeout;
 
   private final Duration startupTimeout;
-  private volatile long startTime;
-  private volatile boolean shutdownHookRegistered = false;
 
   SiriAzureUpdater(SiriAzureUpdaterParameters config, SiriAzureMessageHandler messageHandler) {
     this.messageHandler = Objects.requireNonNull(messageHandler);
@@ -232,7 +230,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     setPrimed();
 
     // Register shutdown hook only once, and only after subscriptionName is set
-    registerShutdownHookIfNeeded();
+    registerShutdownHook();
   }
 
   /**
@@ -385,14 +383,11 @@ public class SiriAzureUpdater implements GraphUpdater {
     }
   }
 
-  private void registerShutdownHookIfNeeded() {
-    if (!shutdownHookRegistered && subscriptionName != null) {
-      ApplicationShutdownSupport.addShutdownHook(
-        "azure-siri-updater-shutdown-" + updaterType,
-        this::performShutdown
-      );
-      shutdownHookRegistered = true;
-    }
+  private void registerShutdownHook() {
+    ApplicationShutdownSupport.addShutdownHook(
+      "azure-siri-updater-shutdown-" + updaterType,
+      this::performShutdown
+    );
   }
 
   /**
