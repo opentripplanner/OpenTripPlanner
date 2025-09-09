@@ -45,8 +45,8 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   public void addCarpoolTrip(CarpoolTrip trip) {
     trips.put(trip.getId(), trip);
 
-    var boardingArea = trip.getBoardingArea();
-    var alightingArea = trip.getAlightingArea();
+    var boardingArea = trip.boardingArea();
+    var alightingArea = trip.alightingArea();
 
     boardingAreas.put(boardingArea, trip);
     alightingAreas.put(alightingArea, trip);
@@ -58,7 +58,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
     streetVerticesWithinAreaStop(alightingArea).forEach(v -> {
       alightingAreasByVertex.put(v, alightingArea);
     });
-    LOG.info("Added carpooling trip for start time: {}", trip.getStartTime());
+    LOG.info("Added carpooling trip for start time: {}", trip.startTime());
   }
 
   private List<StreetVertex> streetVerticesWithinAreaStop(AreaStop stop) {

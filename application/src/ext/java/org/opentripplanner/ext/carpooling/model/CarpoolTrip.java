@@ -1,12 +1,12 @@
 package org.opentripplanner.ext.carpooling.model;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * A carpool trip is defined by two area stops and a start time, in addition to all the other fields
@@ -21,46 +21,49 @@ public class CarpoolTrip
   private final AreaStop alightingArea;
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
-  private final Trip trip;
   private final String provider;
+
+  // The amount of time the trip can deviate from the scheduled time in order to pick up or drop off
+  // a passenger.
+  private Duration deviationBudget;
   private final int availableSeats;
 
   public CarpoolTrip(CarpoolTripBuilder builder) {
     super(builder.getId());
-    this.boardingArea = builder.getBoardingArea();
-    this.alightingArea = builder.getAlightingArea();
-    this.startTime = builder.getStartTime();
-    this.endTime = builder.getEndTime();
-    this.trip = builder.getTrip();
-    this.provider = builder.getProvider();
-    this.availableSeats = builder.getAvailableSeats();
+    this.boardingArea = builder.boardingArea();
+    this.alightingArea = builder.alightingArea();
+    this.startTime = builder.startTime();
+    this.endTime = builder.endTime();
+    this.provider = builder.provider();
+    this.availableSeats = builder.availableSeats();
+    this.deviationBudget = builder.deviationBudget();
   }
 
-  public AreaStop getBoardingArea() {
+  public AreaStop boardingArea() {
     return boardingArea;
   }
 
-  public AreaStop getAlightingArea() {
+  public AreaStop alightingArea() {
     return alightingArea;
   }
 
-  public ZonedDateTime getStartTime() {
+  public ZonedDateTime startTime() {
     return startTime;
   }
 
-  public ZonedDateTime getEndTime() {
+  public ZonedDateTime endTime() {
     return endTime;
   }
 
-  public Trip getTrip() {
-    return trip;
-  }
-
-  public String getProvider() {
+  public String provider() {
     return provider;
   }
 
-  public int getAvailableSeats() {
+  public Duration deviationBudget() {
+    return deviationBudget;
+  }
+
+  public int availableSeats() {
     return availableSeats;
   }
 

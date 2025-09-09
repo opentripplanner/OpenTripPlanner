@@ -213,7 +213,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       .filter(candidate -> {
         // Only include candidates that leave after first possible arrival at the boarding area
         // AND leave within the next 2 hours
-        var tripStartTime = candidate.trip().getStartTime().toInstant();
+        var tripStartTime = candidate.trip().startTime().toInstant();
         var accessArrivalTime = candidate.boardingStop().state.getTime();
         return (
           tripStartTime.isAfter(accessArrivalTime) &&

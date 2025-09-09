@@ -137,7 +137,6 @@ public class KristiansandCarpoolingData {
       .withAlightingArea(alightingArea)
       .withStartTime(startDateTime)
       .withEndTime(endDateTime)
-      .withTrip(null)
       .withProvider(provider)
       .withAvailableSeats(availableSeats)
       .build();

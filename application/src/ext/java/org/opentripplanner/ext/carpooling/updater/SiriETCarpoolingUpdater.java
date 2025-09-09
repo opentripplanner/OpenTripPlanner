@@ -3,6 +3,9 @@ package org.opentripplanner.ext.carpooling.updater;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -43,7 +46,10 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
 
   public SiriETCarpoolingUpdater(
     SiriETCarpoolingUpdaterParameters config,
-    CarpoolingRepository repository
+    CarpoolingRepository repository,
+    Graph graph,
+    VertexLinker vertexLinker,
+    StreetLimitationParametersService streetLimitationParametersService
   ) {
     super(config);
     this.feedId = config.feedId();
@@ -59,7 +65,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
 
     this.metricsConsumer = TripUpdateMetrics.streaming(config);
 
-    this.mapper = new CarpoolSiriMapper();
+    this.mapper = new CarpoolSiriMapper(graph, vertexLinker, streetLimitationParametersService);
   }
 
   /**
@@ -72,12 +78,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
     do {
       var updates = updateSource.getUpdates();
       if (updates.isPresent()) {
-        var incrementality = updateSource.incrementalityOfLastUpdates();
         ServiceDelivery serviceDelivery = updates.get().getServiceDelivery();
         moreData = Boolean.TRUE.equals(serviceDelivery.isMoreData());
-        // Mark this updater as primed after last page of updates. Copy moreData into a final
-        // primitive, because the object moreData persists across iterations.
-        final boolean markPrimed = !moreData;
         List<EstimatedTimetableDeliveryStructure> etds =
           serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {

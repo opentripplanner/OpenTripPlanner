@@ -45,7 +45,7 @@ public class CarpoolItineraryMapper {
       request.journey().access(),
       candidate.boardingStop(),
       null,
-      candidate.trip().getStartTime(),
+      candidate.trip().startTime(),
       "Walk to pickup"
     );
     if (accessLeg != null) {
@@ -54,7 +54,7 @@ public class CarpoolItineraryMapper {
 
     var drivingEndTime = candidate
       .trip()
-      .getStartTime()
+      .startTime()
       .plus(
         Duration.between(
           carpoolPath.states.getFirst().getTime(),
@@ -64,18 +64,18 @@ public class CarpoolItineraryMapper {
 
     // 2. Carpool transit leg (pickup to dropoff)
     CarpoolLeg carpoolLeg = CarpoolLeg.of()
-      .withStartTime(candidate.trip().getStartTime())
+      .withStartTime(candidate.trip().startTime())
       .withEndTime(drivingEndTime)
       .withFrom(
         createPlaceFromVertex(
           carpoolPath.states.getFirst().getVertex(),
-          "Pickup at " + candidate.trip().getBoardingArea().getName()
+          "Pickup at " + candidate.trip().boardingArea().getName()
         )
       )
       .withTo(
         createPlaceFromVertex(
           carpoolPath.states.getLast().getVertex(),
-          "Dropoff at " + candidate.trip().getAlightingArea().getName()
+          "Dropoff at " + candidate.trip().alightingArea().getName()
         )
       )
       .withGeometry(GeometryUtils.concatenateLineStrings(carpoolPath.edges, Edge::getGeometry))
