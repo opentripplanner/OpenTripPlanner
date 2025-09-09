@@ -31,11 +31,7 @@ export function ItineraryCompareDialog({
   const itinerary2 = tripQueryResult.trip.tripPatterns[selectedIndexes[1]];
 
   const handleLegToggle = (legId: string) => {
-    setSelectedLegIds(prev => 
-      prev.includes(legId) 
-        ? prev.filter(id => id !== legId)
-        : [...prev, legId]
-    );
+    setSelectedLegIds((prev) => (prev.includes(legId) ? prev.filter((id) => id !== legId) : [...prev, legId]));
   };
 
   const getItinerarySummary = (tripPattern: any) => {
@@ -43,13 +39,13 @@ export function ItineraryCompareDialog({
     const endTime = formatTime(tripPattern.expectedEndTime, timeZone, 'short');
     const duration = formatDuration(tripPattern.duration);
     const generalizedCost = tripPattern.generalizedCost;
-    
+
     const walkingDistance = tripPattern.legs
       .filter((leg: any) => leg.mode === Mode.Foot)
       .reduce((sum: number, leg: any) => sum + leg.distance, 0);
-    
+
     const totalLegs = tripPattern.legs.length;
-    
+
     return {
       startTime,
       endTime,
@@ -83,7 +79,9 @@ export function ItineraryCompareDialog({
           </thead>
           <tbody>
             <tr>
-              <td><strong>#{selectedIndexes[0] + 1}</strong></td>
+              <td>
+                <strong>#{selectedIndexes[0] + 1}</strong>
+              </td>
               <td>{summary1.startTime}</td>
               <td>{summary1.endTime}</td>
               <td>{summary1.duration}</td>
@@ -92,7 +90,9 @@ export function ItineraryCompareDialog({
               <td>{summary1.walkingDistance}</td>
             </tr>
             <tr>
-              <td><strong>#{selectedIndexes[1] + 1}</strong></td>
+              <td>
+                <strong>#{selectedIndexes[1] + 1}</strong>
+              </td>
               <td>{summary2.startTime}</td>
               <td>{summary2.endTime}</td>
               <td>{summary2.duration}</td>
@@ -102,7 +102,7 @@ export function ItineraryCompareDialog({
             </tr>
           </tbody>
         </Table>
-        
+
         <div style={{ marginTop: '20px' }}>
           <button
             onClick={() => setShowLegSelection(!showLegSelection)}
@@ -113,53 +113,59 @@ export function ItineraryCompareDialog({
               padding: '8px 12px',
               cursor: 'pointer',
               fontSize: '14px',
-              marginBottom: '10px'
+              marginBottom: '10px',
             }}
           >
             {showLegSelection ? '▼' : '▶'} Select Individual Legs to Compare
           </button>
-          
+
           {showLegSelection && (
             <div style={{ display: 'flex', gap: '20px' }}>
               <div style={{ flex: 1 }}>
                 <h6>Itinerary {selectedIndexes[0] + 1} - Legs</h6>
-              {itinerary1.legs.map((leg: any, i: number) => (
-                <div key={leg.id || `leg1_${i}`} style={{ padding: '4px', border: '1px solid #dee2e6', marginBottom: '2px', borderRadius: '2px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '13px' }}>
-                    <input
-                      type="checkbox"
-                      checked={selectedLegIds.includes(leg.id || `leg1_${i}`)}
-                      onChange={() => handleLegToggle(leg.id || `leg1_${i}`)}
-                      style={{ marginRight: '6px' }}
-                    />
-                    <span>
-                      <strong>{leg.mode}</strong> {leg.line?.publicCode && `(${leg.line.publicCode})`} - 
-                      {formatTime(leg.aimedStartTime, timeZone, 'short')} to {formatTime(leg.aimedEndTime, timeZone, 'short')} 
-                      ({formatDuration(leg.duration)})
-                    </span>
-                  </label>
-                </div>
-              ))}
-            </div>
-            <div style={{ flex: 1 }}>
-              <h6>Itinerary {selectedIndexes[1] + 1} - Legs</h6>
-              {itinerary2.legs.map((leg: any, i: number) => (
-                <div key={leg.id || `leg2_${i}`} style={{ padding: '4px', border: '1px solid #dee2e6', marginBottom: '2px', borderRadius: '2px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '13px' }}>
-                    <input
-                      type="checkbox"
-                      checked={selectedLegIds.includes(leg.id || `leg2_${i}`)}
-                      onChange={() => handleLegToggle(leg.id || `leg2_${i}`)}
-                      style={{ marginRight: '6px' }}
-                    />
-                    <span>
-                      <strong>{leg.mode}</strong> {leg.line?.publicCode && `(${leg.line.publicCode})`} - 
-                      {formatTime(leg.aimedStartTime, timeZone, 'short')} to {formatTime(leg.aimedEndTime, timeZone, 'short')} 
-                      ({formatDuration(leg.duration)})
-                    </span>
-                  </label>
-                </div>
-              ))}
+                {itinerary1.legs.map((leg: any, i: number) => (
+                  <div
+                    key={leg.id || `leg1_${i}`}
+                    style={{ padding: '4px', border: '1px solid #dee2e6', marginBottom: '2px', borderRadius: '2px' }}
+                  >
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '13px' }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedLegIds.includes(leg.id || `leg1_${i}`)}
+                        onChange={() => handleLegToggle(leg.id || `leg1_${i}`)}
+                        style={{ marginRight: '6px' }}
+                      />
+                      <span>
+                        <strong>{leg.mode}</strong> {leg.line?.publicCode && `(${leg.line.publicCode})`} -
+                        {formatTime(leg.aimedStartTime, timeZone, 'short')} to{' '}
+                        {formatTime(leg.aimedEndTime, timeZone, 'short')}({formatDuration(leg.duration)})
+                      </span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+              <div style={{ flex: 1 }}>
+                <h6>Itinerary {selectedIndexes[1] + 1} - Legs</h6>
+                {itinerary2.legs.map((leg: any, i: number) => (
+                  <div
+                    key={leg.id || `leg2_${i}`}
+                    style={{ padding: '4px', border: '1px solid #dee2e6', marginBottom: '2px', borderRadius: '2px' }}
+                  >
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '13px' }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedLegIds.includes(leg.id || `leg2_${i}`)}
+                        onChange={() => handleLegToggle(leg.id || `leg2_${i}`)}
+                        style={{ marginRight: '6px' }}
+                      />
+                      <span>
+                        <strong>{leg.mode}</strong> {leg.line?.publicCode && `(${leg.line.publicCode})`} -
+                        {formatTime(leg.aimedStartTime, timeZone, 'short')} to{' '}
+                        {formatTime(leg.aimedEndTime, timeZone, 'short')}({formatDuration(leg.duration)})
+                      </span>
+                    </label>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -184,10 +190,14 @@ export function ItineraryCompareDialog({
               <tbody>
                 {[itinerary1, itinerary2].map((tripPattern, itineraryIdx) =>
                   tripPattern.legs
-                    .filter((leg: any) => selectedLegIds.includes(leg.id || `leg${itineraryIdx + 1}_${tripPattern.legs.indexOf(leg)}`))
+                    .filter((leg: any) =>
+                      selectedLegIds.includes(leg.id || `leg${itineraryIdx + 1}_${tripPattern.legs.indexOf(leg)}`),
+                    )
                     .map((leg: any, legIdx: number) => (
                       <tr key={`${itineraryIdx}_${legIdx}`}>
-                        <td><strong>#{selectedIndexes[itineraryIdx] + 1}</strong></td>
+                        <td>
+                          <strong>#{selectedIndexes[itineraryIdx] + 1}</strong>
+                        </td>
                         <td>{leg.mode}</td>
                         <td>{leg.line?.publicCode || leg.line?.name || '-'}</td>
                         <td>{formatTime(leg.aimedStartTime, timeZone, 'short')}</td>
@@ -196,7 +206,7 @@ export function ItineraryCompareDialog({
                         <td>{formatDistance(leg.distance)}</td>
                         <td>¢{leg.generalizedCost}</td>
                       </tr>
-                    ))
+                    )),
                 )}
               </tbody>
             </Table>

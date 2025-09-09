@@ -31,11 +31,7 @@ export function ItineraryPaginationControl({
       </Button>
       <div style={{ minWidth: '120px', textAlign: 'center' }}>
         {comparisonSelectedIndexes?.length === 2 && onCompare && (
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={onCompare}
-          >
+          <Button variant="primary" size="sm" onClick={onCompare}>
             Compare Selected
           </Button>
         )}

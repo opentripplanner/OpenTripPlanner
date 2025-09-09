@@ -43,9 +43,9 @@ export function ItineraryHeaderContent({
 
   const handleComparisonToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!setComparisonSelectedIndexes || !comparisonSelectedIndexes) return;
-    
+
     if (comparisonSelectedIndexes.includes(itineraryIndex)) {
-      setComparisonSelectedIndexes(comparisonSelectedIndexes.filter(i => i !== itineraryIndex));
+      setComparisonSelectedIndexes(comparisonSelectedIndexes.filter((i) => i !== itineraryIndex));
     } else if (comparisonSelectedIndexes.length < 2) {
       setComparisonSelectedIndexes([...comparisonSelectedIndexes, itineraryIndex]);
     }
@@ -58,11 +58,11 @@ export function ItineraryHeaderContent({
       {comparisonSelectedIndexes && setComparisonSelectedIndexes && (
         <div
           onClick={(e) => e.stopPropagation()}
-          style={{ 
+          style={{
             position: 'absolute',
             top: '4px',
             right: '8px',
-            zIndex: 10
+            zIndex: 10,
           }}
         >
           <input
