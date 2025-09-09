@@ -67,18 +67,14 @@ export function ErrorDisplay({ error, onDismiss }: ErrorDisplayProps) {
           showRaw: true,
         };
       }
-
-      // Default case
-      return {
-        userMessage: 'An unexpected error occurred. Please try again.',
-        showRaw: true,
-      };
     } catch (_) {
-      return {
-        userMessage: 'An unexpected error occurred. Please try again.',
-        showRaw: true,
-      };
+      //Do nothing
     }
+
+    return {
+      userMessage: 'An unexpected error occurred. Please try again.',
+      showRaw: true,
+    };
   };
 
   const { userMessage, showRaw } = getErrorInfo(error);
@@ -111,13 +107,13 @@ export function ErrorDisplay({ error, onDismiss }: ErrorDisplayProps) {
         fontSize: '14px',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Search Error</div>
-          <div style={{ marginBottom: '12px', color: '#721c24', lineHeight: '1.4' }}>{userMessage}</div>
+      <div className="flex-space-between">
+        <div className="flex-1">
+          <div className="error-title">Search Error</div>
+          <div className="error-message">{userMessage}</div>
           {showRaw && (
             <>
-              <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Technical Details:</div>
+              <div className="error-title">Technical Details:</div>
               <pre
                 style={{
                   fontSize: '12px',

@@ -444,3 +444,42 @@ input.comma-separated-input[type='number'] {
 .panel-header button:hover {
   background-color: #0056b3; /* Darker on hover */
 }
+
+/* Pagination Controls */
+.pagination-controls-container {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+/* Flexible layouts */
+.flex-space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/* Error and info displays */
+.error-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.error-message {
+  margin-bottom: 12px;
+  color: #721c24;
+  line-height: 1.4;
+}
+
+.info-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.info-message {
+  margin-bottom: 12px;
+  color: #6c757d;
+}

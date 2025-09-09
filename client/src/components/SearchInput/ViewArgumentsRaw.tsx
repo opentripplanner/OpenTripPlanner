@@ -15,13 +15,15 @@ const ViewArgumentsRaw: React.FC<ViewArgumentsRawProps> = ({
 }) => {
   return (
     <div className={'left-pane-container below-content'} style={{ fontSize: '14px' }}>
-      <div className="panel-header">
-        Request raw
-        <ResetButton
-          tripQueryVariables={tripQueryVariables}
-          setTripQueryVariables={setTripQueryVariables}
-          setExpandedArguments={setExpandedArguments}
-        />
+      <div className="panel-header" style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+        <span>Request raw</span>
+        <div style={{ marginLeft: 'auto' }}>
+          <ResetButton
+            tripQueryVariables={tripQueryVariables}
+            setTripQueryVariables={setTripQueryVariables}
+            setExpandedArguments={setExpandedArguments}
+          />
+        </div>
       </div>
 
       <pre>{JSON.stringify(tripQueryVariables, null, 2)}</pre>

@@ -20,13 +20,13 @@ export function NoResultsDisplay({ hasSearched, tripQueryResult }: NoResultsDisp
         fontSize: '14px',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>No Results Found</div>
-          <div style={{ marginBottom: '12px', color: '#6c757d' }}>
+      <div className="flex-space-between">
+        <div className="flex-1">
+          <div className="info-title">No Results Found</div>
+          <div className="info-message">
             No matching trips were found for your search criteria.
           </div>
-          <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Raw Response:</div>
+          <div className="info-title">Raw Response:</div>
           <pre
             style={{
               fontSize: '12px',

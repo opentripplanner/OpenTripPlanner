@@ -28,12 +28,12 @@ export function DepartureArrivalSelect({
       </Form.Label>
       <Form.Select
         size="sm"
-        className="input-small"
+        className="input-medium"
         onChange={(e) => (e.target.value === 'arrival' ? onChange(true) : onChange(undefined))}
         value={tripQueryVariables.arriveBy ? 'arrival' : 'departure'}
         style={{ verticalAlign: 'bottom' }}
       >
-        <option value="arrival">Arrive before</option>
+        <option value="arrival">Arrive by</option>
         <option value="departure">Depart after</option>
       </Form.Select>
     </Form.Group>
