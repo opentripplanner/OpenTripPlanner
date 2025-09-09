@@ -17,6 +17,11 @@ import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
+/**
+ * Tests that stops can be SKIPPED for a trip which repeats times for consecutive stops.
+ *
+ * @link <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/6848">issue</a>
+ */
 class SkippedWithRepeatedTimesTest implements RealtimeTestConstants {
 
   private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
