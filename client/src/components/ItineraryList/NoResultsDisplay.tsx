@@ -23,9 +23,7 @@ export function NoResultsDisplay({ hasSearched, tripQueryResult }: NoResultsDisp
       <div className="flex-space-between">
         <div className="flex-1">
           <div className="info-title">No Results Found</div>
-          <div className="info-message">
-            No matching trips were found for your search criteria.
-          </div>
+          <div className="info-message">No matching trips were found for your search criteria.</div>
           <div className="info-title">Raw Response:</div>
           <pre
             style={{
