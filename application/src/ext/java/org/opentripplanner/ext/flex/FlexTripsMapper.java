@@ -58,7 +58,7 @@ public class FlexTripsMapper {
       ) {
         store.add(
           "InvalidFlexTrip",
-          "Trip %s defines only a single flex stop time, which is invalid: https://gtfs.org/documentation/schedule/examples/flex/",
+          "Trip %s defines only a single stop time, which is invalid: https://gtfs.org/documentation/schedule/examples/flex/",
           trip.getId()
         );
       }
