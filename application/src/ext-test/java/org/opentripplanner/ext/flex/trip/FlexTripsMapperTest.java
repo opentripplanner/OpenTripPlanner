@@ -41,7 +41,7 @@ class FlexTripsMapperTest {
     var trips = FlexTripsMapper.createFlexTrips(builder, issueStore);
     assertEquals(0, trips.size());
     assertEquals(
-      "[Issue{type: 'InvalidFlexTrip', message: 'Trip F:flex defines only a single flex stop time, which is invalid: https://gtfs.org/documentation/schedule/examples/flex/'}]",
+      "[Issue{type: 'InvalidFlexTrip', message: 'Trip F:flex defines only a single stop time, which is invalid: https://gtfs.org/documentation/schedule/examples/flex/'}]",
       issueStore.listIssues().toString()
     );
   }
