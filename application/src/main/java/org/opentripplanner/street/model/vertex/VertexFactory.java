@@ -75,8 +75,12 @@ public class VertexFactory {
     return addToGraph(new SplitterVertex(uniqueSplitLabel, x, y, originalEdge.getName()));
   }
 
-  public BarrierVertex barrier(long nid, Coordinate coordinate) {
-    return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid));
+  public BarrierVertex barrier(
+    long nid,
+    Coordinate coordinate,
+    Accessibility wheelchairAccessibility
+  ) {
+    return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid, wheelchairAccessibility));
   }
 
   public ExitVertex exit(long nid, Coordinate coordinate, String exitName) {
@@ -96,19 +100,17 @@ public class VertexFactory {
 
   public OsmVertex osm(
     Coordinate coordinate,
-    OsmNode node,
+    long nid,
     boolean highwayTrafficLight,
     boolean crossingTrafficLight
   ) {
     return addToGraph(
-      new OsmVertex(
-        coordinate.x,
-        coordinate.y,
-        node.getId(),
-        highwayTrafficLight,
-        crossingTrafficLight
-      )
+      new OsmVertex(coordinate.x, coordinate.y, nid, highwayTrafficLight, crossingTrafficLight)
     );
+  }
+
+  public OsmVertex osmOnLinearBarrier(Coordinate coordinate, long nid, long routableWayId) {
+    return addToGraph(new BarrierPassThroughVertex(coordinate.x, coordinate.y, nid, routableWayId));
   }
 
   public TransitStopVertex transitStop(TransitStopVertexBuilder transitStopVertexBuilder) {

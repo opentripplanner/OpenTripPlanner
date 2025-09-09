@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.common.collect.ImmutableMultimap;
 import java.io.File;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -18,6 +19,7 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;
@@ -53,7 +55,7 @@ public class WalkableAreaBuilderTest {
       graph,
       osmdb,
       osmInfoRepository,
-      new VertexGenerator(osmdb, graph, Set.of(), false),
+      new VertexGenerator(osmdb, graph, Set.of(), false, DataImportIssueStore.NOOP),
       new DefaultNamer(),
       new SafetyValueNormalizer(graph, DataImportIssueStore.NOOP),
       DataImportIssueStore.NOOP,
@@ -66,7 +68,10 @@ public class WalkableAreaBuilderTest {
       .getWalkableAreas()
       .stream()
       .collect(toMap(a -> a, a -> osmdb.getLevelForWay(a.parent)));
-    final List<OsmAreaGroup> areaGroups = OsmAreaGroup.groupAreas(areasLevels);
+    final List<OsmAreaGroup> areaGroups = OsmAreaGroup.groupAreas(
+      areasLevels,
+      ImmutableMultimap.of()
+    );
 
     final Consumer<OsmAreaGroup> build = visibility
       ? walkableAreaBuilder::buildWithVisibility
