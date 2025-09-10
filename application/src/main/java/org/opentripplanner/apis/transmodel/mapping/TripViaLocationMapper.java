@@ -82,10 +82,12 @@ class TripViaLocationMapper {
     return c == null ? List.of() : idMapper.parseList(c);
   }
 
-  private static List<WgsCoordinate> mapCoordinate(Map<String, Object> map) {
-    return CoordinateInputType.mapToWgsCoordinate(ViaLocationInputType.FIELD_COORDINATE, map)
-      .map(List::of)
-      .orElseGet(List::of);
+  @Nullable
+  private static WgsCoordinate mapCoordinate(Map<String, Object> map) {
+    return CoordinateInputType.mapToWgsCoordinate(
+      ViaLocationInputType.FIELD_COORDINATE,
+      map
+    ).orElse(null);
   }
 
   /**

@@ -18,15 +18,18 @@ import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.ext.flex.FlexIntegrationTestData;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -167,16 +170,28 @@ class ScheduledDeviatedTripIntegrationTest {
 
     var transitStartOfTime = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     var additionalSearchDays = AdditionalSearchDays.defaults(dateTime);
-    var result = TransitRouter.route(
-      request,
-      serverContext,
-      TransitGroupPriorityService.empty(),
-      transitStartOfTime,
-      additionalSearchDays,
-      new DebugTimingAggregator()
-    );
 
-    return result.getItineraries();
+    try (
+      var temporaryVerticesContainer = TemporaryVerticesContainer.of(
+        serverContext.graph(),
+        TestVertexLinker.of(graph)
+      )
+        .withFrom(from, StreetMode.WALK)
+        .withTo(to, StreetMode.WALK)
+        .build()
+    ) {
+      var result = TransitRouter.route(
+        request,
+        serverContext,
+        TransitGroupPriorityService.empty(),
+        transitStartOfTime,
+        additionalSearchDays,
+        new DebugTimingAggregator(),
+        temporaryVerticesContainer.createFromToViaVertexRequest()
+      );
+
+      return result.getItineraries();
+    }
   }
 
   private static FlexTrip<?, ?> getFlexTrip() {

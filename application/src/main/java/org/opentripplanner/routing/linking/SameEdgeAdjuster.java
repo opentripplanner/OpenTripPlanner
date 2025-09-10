@@ -22,7 +22,7 @@ public class SameEdgeAdjuster {
   private SameEdgeAdjuster() {}
 
   /**
-   * Utility class. If the from and to vertices are generated and lie along some of the same edges,
+   * Utility class. If the from, to or via vertices are generated and lie along some of the same edges,
    * we need to wire them up along those edges so that we don't get odd circuitous routes for really
    * short trips.
    */

@@ -2,6 +2,7 @@ package org.opentripplanner.routing;
 
 import static com.google.common.collect.Iterables.filter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -564,25 +565,20 @@ public class TestHalfEdges {
       .buildRequest();
 
     try (
-      var container = new TemporaryVerticesContainer(
-        graph,
-        TestVertexLinker.of(graph),
-        walking.from(),
-        walking.to(),
-        StreetMode.WALK,
-        StreetMode.WALK
-      )
+      var container = TemporaryVerticesContainer.of(graph, TestVertexLinker.of(graph))
+        .withFrom(walking.from(), StreetMode.WALK)
+        .withTo(walking.to(), StreetMode.WALK)
+        .build();
     ) {
-      assertNotNull(container.getFromVertices());
-      assertNotNull(container.getToVertices());
+      assertFalse(container.fromVertices().isEmpty());
+      assertFalse(container.toVertices().isEmpty());
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
         .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(walking)
-        .setVerticesContainer(container)
+        .setFrom(container.fromVertices())
+        .setTo(container.toVertices())
         .getShortestPathTree();
-      GraphPath<State, Edge, Vertex> path = spt.getPath(
-        container.getToVertices().iterator().next()
-      );
+      GraphPath<State, Edge, Vertex> path = spt.getPath(container.toVertices().iterator().next());
       for (State s : path.states) {
         assertNotSame(s.getBackEdge(), top);
       }

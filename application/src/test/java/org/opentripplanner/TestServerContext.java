@@ -167,11 +167,6 @@ public class TestServerContext {
     Graph graph,
     TransitService transitService
   ) {
-    return new DefaultViaCoordinateTransferFactory(
-      graph,
-      TestVertexLinker.of(graph),
-      transitService,
-      Duration.ofMinutes(30)
-    );
+    return new DefaultViaCoordinateTransferFactory(graph, transitService, Duration.ofMinutes(30));
   }
 }

@@ -85,16 +85,18 @@ public class BicycleRoutingTest {
       })
       .buildRequest();
 
-    var temporaryVertices = new TemporaryVerticesContainer(
+    var temporaryVerticesContainer = TemporaryVerticesContainer.of(
       graph,
-      TestVertexLinker.of(graph),
-      request.from(),
-      request.to(),
-      request.journey().direct().mode(),
-      request.journey().direct().mode()
-    );
+      TestVertexLinker.of(graph)
+    )
+      .withFrom(from, StreetMode.BIKE)
+      .withTo(to, StreetMode.BIKE)
+      .build();
     var gpf = new GraphPathFinder(null);
-    var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
+    var paths = gpf.graphPathFinderEntryPoint(
+      request,
+      temporaryVerticesContainer.createFromToViaVertexRequest()
+    );
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneIds.BERLIN,
@@ -103,7 +105,7 @@ public class BicycleRoutingTest {
     );
 
     var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
-    temporaryVertices.close();
+    temporaryVerticesContainer.close();
 
     // make sure that we only get BICYCLE legs
     itineraries.forEach(i ->

@@ -293,14 +293,14 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     );
     assertEquals(
       "[PassThroughViaLocation{label: a label, stopLocationIds: [F:stop1]}]",
-      routeRequest.getViaLocations().toString()
+      routeRequest.listViaLocations().toString()
     );
 
     var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(
       executionContext(decorateWithRequiredParams(Map.of())),
       context
     );
-    assertEquals(List.of(), noParamsReq.getViaLocations());
+    assertEquals(List.of(), noParamsReq.listViaLocations());
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
