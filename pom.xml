@@ -88,6 +88,8 @@
         <plugin.prettier.goal>write</plugin.prettier.goal>
         <plugin.prettier.skip>false</plugin.prettier.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
+        <tests.excludedGroups>integration</tests.excludedGroups>
+        <tests.includedGroups></tests.includedGroups>
     </properties>
 
     <distributionManagement>
@@ -104,6 +106,7 @@
         <module>gtfs-realtime-protobuf</module>
         <module>application</module>
         <module>otp-shaded</module>
+        <module>test/integration</module>
     </modules>
 
 
@@ -252,6 +255,8 @@
                         <printStderrOnSuccess>false</printStderrOnSuccess>
                         <theme>UNICODE</theme>
                     </statelessTestsetInfoReporter>
+                    <groups>${tests.includedGroups}</groups>
+                    <excludedGroups>${tests.excludedGroups}</excludedGroups>
                 </configuration>
             </plugin>
             <!-- code coverage report -->
@@ -549,8 +554,32 @@
                 </repository>
             </distributionManagement>
         </profile>
+        
         <profile>
-            <id>release</id>
+            <id>integrationTests</id>
+            <activation>
+                <property>
+                    <!-- shortcut to activate with -Pit -->
+                    <name>it</name>
+                    <value/>
+                </property>
+            </activation>
+            <!--
+                The documentation of the surefire plugin says that setting excludedGroups and includedGroups
+                should work directly, but I cannot get it to work.
+                For that reason we need the detour via the maven properties.
+                From my understanding, setting excludedGroups should not be necessary, but it is.
+                If you are an expert of the surefire plugin, feel free to correct this.
+            -->
+            <properties>
+                <tests.includedGroups>integration</tests.includedGroups>
+                <tests.excludedGroups></tests.excludedGroups>
+                <plugin.prettier.skip>true</plugin.prettier.skip>
+            </properties>
+        </profile>
+
+        <profile>
+        <id>release</id>
             <properties>
                 <skip-source-and-javadoc>false</skip-source-and-javadoc>
             </properties>
