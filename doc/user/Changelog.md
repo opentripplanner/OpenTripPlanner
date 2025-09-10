@@ -3,6 +3,11 @@
 The changelog lists most feature changes between each release. The list is automatically created
 based on merged pull requests. Search GitHub issues and pull requests for smaller issues.
 
+## 2.9.0-SNAPSHOT (in progress)
+
+
+[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
+
 ## 2.8.0 (2025-09-10)
 
 ### Notable Changes
@@ -65,7 +70,6 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Restore handling of invalid GTFS shape references [#6807](https://github.com/opentripplanner/OpenTripPlanner/pull/6807)
 - Minor improvements in vertex to area linking [#6826](https://github.com/opentripplanner/OpenTripPlanner/pull/6826)
 - Extend support for more kinds of barriers, including node and ways, and blocking pedestrians / bicycles in addition to motor vehicles [#6774](https://github.com/opentripplanner/OpenTripPlanner/pull/6774)
-[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
 
