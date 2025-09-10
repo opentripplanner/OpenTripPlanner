@@ -63,7 +63,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       if (OTPFeature.FlexRouting.isOff()) {
         stopTimes.removeIf(st -> !(st.getStop() instanceof RegularStop));
       }
-      // Stop times frequently contain duplicate, missing, or incorrect entries. Repair them.
+      // Stop times frequently contain missing, or incorrect entries. Repair them.
       if (!filterStopTimes(stopTimes)) {
         stopTimesByTrip.replace(trip, List.of());
       } else if (interpolate) {
