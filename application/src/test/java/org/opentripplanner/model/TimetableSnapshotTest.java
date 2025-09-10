@@ -22,6 +22,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -35,7 +36,8 @@ import org.opentripplanner.transit.service.TimetableRepository;
 public class TimetableSnapshotTest {
 
   private static final ZoneId timeZone = ZoneIds.GMT;
-  public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
+  private static final StopTime STOP_TIME = TimetableRepositoryForTest.of().stopTime("A");
   private static Map<FeedScopedId, TripPattern> patternIndex;
   static String feedId;
 
@@ -70,7 +72,7 @@ public class TimetableSnapshotTest {
 
     TripTimes updatedTriptimes = TripTimesFactory.tripTimes(
       trip,
-      List.of(new StopTime()),
+      List.of(STOP_TIME, STOP_TIME),
       new Deduplicator()
     );
     RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(
@@ -159,7 +161,7 @@ public class TimetableSnapshotTest {
     );
     TripTimes updatedTriptimes = TripTimesFactory.tripTimes(
       trip,
-      List.of(new StopTime()),
+      List.of(STOP_TIME, STOP_TIME),
       new Deduplicator()
     );
     RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(

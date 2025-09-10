@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalInt;
-import java.util.function.IntUnaryOperator;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -207,10 +206,6 @@ public final class RealTimeTripTimes implements TripTimes {
     return this.occupancyStatus[stop];
   }
 
-  OccupancyStatus[] copyOccupancyStatus() {
-    return occupancyStatus.clone();
-  }
-
   @Override
   public BookingInfo getDropOffBookingInfo(int stop) {
     return scheduledTripTimes.getDropOffBookingInfo(stop);
@@ -330,10 +325,6 @@ public final class RealTimeTripTimes implements TripTimes {
   @Override
   public Trip getTrip() {
     return scheduledTripTimes.getTrip();
-  }
-
-  StopRealTimeState[] copyStopRealTimeStates() {
-    return stopRealTimeStates.clone();
   }
 
   /**

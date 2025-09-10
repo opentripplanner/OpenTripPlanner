@@ -4,7 +4,9 @@ package org.opentripplanner.model;
 import static org.opentripplanner.model.PickDrop.NONE;
 
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -248,11 +250,6 @@ public final class StopTime implements Comparable<StopTime> {
     return this.getStopSequence() - o.getStopSequence();
   }
 
-  public void cancel() {
-    pickupType = PickDrop.CANCELLED;
-    dropOffType = PickDrop.CANCELLED;
-  }
-
   @Override
   public String toString() {
     return (
@@ -268,6 +265,14 @@ public final class StopTime implements Comparable<StopTime> {
       TimeUtils.timeToStrLong(getDepartureTime()) +
       ")"
     );
+  }
+
+  /**
+   * Does this stop time uses a non-fixed stop?
+   */
+  public boolean hasFlexStop() {
+    Objects.requireNonNull(stop);
+    return !(stop instanceof RegularStop);
   }
 
   private static int getAvailableTime(int... times) {

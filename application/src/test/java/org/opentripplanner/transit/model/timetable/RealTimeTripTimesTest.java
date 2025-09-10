@@ -61,16 +61,14 @@ class RealTimeTripTimesTest {
   @Nested
   class Headsign {
 
-    private static final NonLocalizedString STOP_TEST_DIRECTION = new NonLocalizedString(
-      "STOP TEST DIRECTION"
-    );
+    private static final I18NString STOP_TEST_DIRECTION = I18NString.of("STOP TEST DIRECTION");
     private static final NonLocalizedString DIRECTION = new NonLocalizedString("DIRECTION");
-    private static final StopTime EMPTY_STOPPOINT = new StopTime();
+    private static final StopTime EMPTY_STOPTIME = TEST_MODEL.stopTime("empty");
 
     @Test
     void shouldHandleBothNullScenario() {
       Trip trip = TimetableRepositoryForTest.trip("TRIP").build();
-      List<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
+      List<StopTime> stopTimes = List.of(EMPTY_STOPTIME, EMPTY_STOPTIME, EMPTY_STOPTIME);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
@@ -81,7 +79,7 @@ class RealTimeTripTimesTest {
     @Test
     void shouldHandleTripOnlyHeadSignScenario() {
       Trip trip = TimetableRepositoryForTest.trip("TRIP").withHeadsign(DIRECTION).build();
-      List<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
+      List<StopTime> stopTimes = List.of(EMPTY_STOPTIME, EMPTY_STOPTIME, EMPTY_STOPTIME);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
@@ -92,9 +90,8 @@ class RealTimeTripTimesTest {
     @Test
     void shouldHandleStopsOnlyHeadSignScenario() {
       Trip trip = TimetableRepositoryForTest.trip("TRIP").build();
-      StopTime stopWithHeadsign = new StopTime();
-      stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
-      List<StopTime> stopTimes = List.of(stopWithHeadsign, stopWithHeadsign, stopWithHeadsign);
+      var stopTime = stopTime(STOP_TEST_DIRECTION);
+      List<StopTime> stopTimes = List.of(stopTime, stopTime, stopTime);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
@@ -105,8 +102,7 @@ class RealTimeTripTimesTest {
     @Test
     void shouldHandleStopsEqualToTripHeadSignScenario() {
       Trip trip = TimetableRepositoryForTest.trip("TRIP").withHeadsign(DIRECTION).build();
-      StopTime stopWithHeadsign = new StopTime();
-      stopWithHeadsign.setStopHeadsign(DIRECTION);
+      StopTime stopWithHeadsign = stopTime(DIRECTION);
       List<StopTime> stopTimes = List.of(stopWithHeadsign, stopWithHeadsign, stopWithHeadsign);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
@@ -118,9 +114,8 @@ class RealTimeTripTimesTest {
     @Test
     void shouldHandleDifferingTripAndStopHeadSignScenario() {
       Trip trip = TimetableRepositoryForTest.trip("TRIP").withHeadsign(DIRECTION).build();
-      StopTime stopWithHeadsign = new StopTime();
-      stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
-      List<StopTime> stopTimes = List.of(stopWithHeadsign, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
+      StopTime stopWithHeadsign = stopTime(STOP_TEST_DIRECTION);
+      List<StopTime> stopTimes = List.of(stopWithHeadsign, EMPTY_STOPTIME, EMPTY_STOPTIME);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
@@ -129,6 +124,12 @@ class RealTimeTripTimesTest {
 
       I18NString headsignSecondStop = tripTimes.getHeadsign(1);
       assertEquals(DIRECTION, headsignSecondStop);
+    }
+
+    private StopTime stopTime(I18NString stopHeadsign) {
+      StopTime stopWithHeadsign = TEST_MODEL.stopTime("A");
+      stopWithHeadsign.setStopHeadsign(stopHeadsign);
+      return stopWithHeadsign;
     }
   }
 

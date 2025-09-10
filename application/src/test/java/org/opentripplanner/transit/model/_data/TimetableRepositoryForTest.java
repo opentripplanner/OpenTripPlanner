@@ -87,6 +87,8 @@ public class TimetableRepositoryForTest {
     .withTimezone(TIME_ZONE_ID)
     .withUrl("https:/www.otherfeedagency.com")
     .build();
+  public static final LocalTime TEN_AM = LocalTime.of(10, 0);
+  public static final LocalTime SIX_PM = LocalTime.of(18, 0);
 
   private final SiteRepositoryBuilder siteRepositoryBuilder;
 
@@ -217,6 +219,15 @@ public class TimetableRepositoryForTest {
     return stopTime;
   }
 
+  public StopTime stopTime(String id) {
+    var stop = stop(id).build();
+    var st = new StopTime();
+    st.setStop(stop);
+    st.setArrivalTime(TEN_AM.toSecondOfDay());
+    st.setDepartureTime(TEN_AM.toSecondOfDay());
+    return st;
+  }
+
   public Place place(String name, Consumer<RegularStopBuilder> stopBuilder) {
     var stop = stop(name);
     stopBuilder.accept(stop);
@@ -278,8 +289,8 @@ public class TimetableRepositoryForTest {
       .map(s -> {
         var st = new StopTime();
         st.setStop(s);
-        st.setFlexWindowStart(LocalTime.of(10, 0).toSecondOfDay());
-        st.setFlexWindowEnd(LocalTime.of(18, 0).toSecondOfDay());
+        st.setFlexWindowStart(TEN_AM.toSecondOfDay());
+        st.setFlexWindowEnd(SIX_PM.toSecondOfDay());
 
         return st;
       })
