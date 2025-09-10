@@ -39,7 +39,7 @@ public class DigitransitStationPropertyMapperTest {
     assertEquals("F:a-station", map.get("gtfsId"));
     assertEquals("A station", map.get("name"));
     assertEquals("", map.get("type"));
-    assertEquals("[{\"mode\":\"RAIL\",\"shortName\":\"R1\"}]", map.get("routes"));
+    assertEquals("[{\"mode\":\"RAIL\",\"gtfsType\":100,\"shortName\":\"R1\"}]", map.get("routes"));
     assertEquals("[\"F:stop-1\"]", map.get("stops"));
   }
 }

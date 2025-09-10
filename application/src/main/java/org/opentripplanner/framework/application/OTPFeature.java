@@ -18,7 +18,7 @@ public enum OTPFeature {
   AlertMetrics(
     false,
     false,
-    "Starts a background thread to continuously publish metrics about alerts. Needs to be enabled together with `ActuactorAPI`."
+    "Starts a background thread to continuously publish metrics about alerts. Needs to be enabled together with `ActuatorAPI`."
   ),
   APIServerInfo(true, false, "Enable the server info endpoint."),
   APIUpdaterStatus(true, false, "Enable endpoint for graph updaters status."),
@@ -44,7 +44,7 @@ public enum OTPFeature {
     """
     Enable the debug GraphQL client and web UI and located at the root of the web server as well as the debug map tiles it uses.
     Be aware that the map tiles are not a stable API and can change without notice.
-    Use the [vector tiles feature if](sandbox/MapboxVectorTilesApi.md) you want a stable map tiles API.
+    Use the [vector tiles feature](sandbox/MapboxVectorTilesApi.md) if you want a stable map tiles API.
     """
   ),
   ExtraTransferLegOnSameStop(

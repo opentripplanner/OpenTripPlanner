@@ -9,11 +9,10 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * A station entrance extracted from OSM and therefore not (yet) associated with the transit
  * entity {@link org.opentripplanner.transit.model.site.Station}.
  */
-public class StationEntranceVertex extends OsmVertex {
+public class StationEntranceVertex extends BarrierVertex {
 
   private static final String FEED_ID = "osm";
   private final String code;
-  private final Accessibility wheelchairAccessibility;
 
   public StationEntranceVertex(
     double lat,
@@ -22,9 +21,8 @@ public class StationEntranceVertex extends OsmVertex {
     String code,
     Accessibility wheelchairAccessibility
   ) {
-    super(lat, lon, nodeId);
+    super(lat, lon, nodeId, wheelchairAccessibility);
     this.code = code;
-    this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
   /**
@@ -41,10 +39,6 @@ public class StationEntranceVertex extends OsmVertex {
   @Nullable
   public String code() {
     return code;
-  }
-
-  public Accessibility wheelchairAccessibility() {
-    return wheelchairAccessibility;
   }
 
   @Override

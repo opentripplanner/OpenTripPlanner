@@ -2712,22 +2712,22 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
   [
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 3375,
+      "duration" : 3376,
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
-      "endTime" : "2009-11-17T18:56:15.000+00:00",
+      "endTime" : "2009-11-17T18:56:16.000+00:00",
       "fare" : {
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 6716,
+      "generalizedCost" : 6717,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
           "distance" : 4442.91,
-          "endTime" : "2009-11-17T18:56:15.000+00:00",
+          "endTime" : "2009-11-17T18:56:16.000+00:00",
           "from" : {
             "departure" : "2009-11-17T18:00:00.000+00:00",
             "lat" : 45.52337,
@@ -2738,7 +2738,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 6716,
+          "generalizedCost" : 6717,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 208,
@@ -2807,7 +2807,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection" : "NORTH",
               "area" : false,
               "bogusName" : false,
-              "distance" : 460.64,
+              "distance" : 460.65,
               "elevation" : "",
               "lat" : 45.5231776,
               "lon" : -122.6733895,
@@ -2883,7 +2883,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             }
           ],
           "to" : {
-            "arrival" : "2009-11-17T18:56:15.000+00:00",
+            "arrival" : "2009-11-17T18:56:16.000+00:00",
             "lat" : 45.531,
             "lon" : -122.70029,
             "name" : "NW Northrup St. & NW 24th Ave. (P3)",
@@ -2900,7 +2900,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "waitingTime" : 0,
       "walkDistance" : 4442.91,
       "walkLimitExceeded" : false,
-      "walkTime" : 3375
+      "walkTime" : 3376
     },
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
@@ -5634,22 +5634,22 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
   [
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 3716,
+      "duration" : 3717,
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
-      "endTime" : "2009-11-17T19:01:56.000+00:00",
+      "endTime" : "2009-11-17T19:01:57.000+00:00",
       "fare" : {
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 7383,
+      "generalizedCost" : 7384,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
           "distance" : 4875.79,
-          "endTime" : "2009-11-17T19:01:56.000+00:00",
+          "endTime" : "2009-11-17T19:01:57.000+00:00",
           "from" : {
             "departure" : "2009-11-17T18:00:00.000+00:00",
             "lat" : 45.51932,
@@ -5657,7 +5657,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Stark    St. & SE 17th Ave. (P0)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 7383,
+          "generalizedCost" : 7384,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 252,
@@ -5791,7 +5791,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection" : "NORTH",
               "area" : false,
               "bogusName" : false,
-              "distance" : 460.64,
+              "distance" : 460.65,
               "elevation" : "",
               "lat" : 45.5231776,
               "lon" : -122.6733895,
@@ -5867,7 +5867,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             }
           ],
           "to" : {
-            "arrival" : "2009-11-17T19:01:56.000+00:00",
+            "arrival" : "2009-11-17T19:01:57.000+00:00",
             "lat" : 45.53122,
             "lon" : -122.69659,
             "name" : "NW Northrup St. & NW 22nd Ave. (P2)",
@@ -5884,7 +5884,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "waitingTime" : 0,
       "walkDistance" : 4875.79,
       "walkLimitExceeded" : false,
-      "walkTime" : 3716
+      "walkTime" : 3717
     }
   ]
 ]
@@ -5894,22 +5894,22 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
   [
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 3157,
+      "duration" : 3159,
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
-      "endTime" : "2009-11-17T18:52:37.000+00:00",
+      "endTime" : "2009-11-17T18:52:39.000+00:00",
       "fare" : {
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 6282,
+      "generalizedCost" : 6283,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
           "distance" : 4154.15,
-          "endTime" : "2009-11-17T18:52:37.000+00:00",
+          "endTime" : "2009-11-17T18:52:39.000+00:00",
           "from" : {
             "departure" : "2009-11-17T18:00:00.000+00:00",
             "lat" : 45.52337,
@@ -5920,7 +5920,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 6282,
+          "generalizedCost" : 6283,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 202,
@@ -5989,7 +5989,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection" : "NORTH",
               "area" : false,
               "bogusName" : false,
-              "distance" : 460.64,
+              "distance" : 460.65,
               "elevation" : "",
               "lat" : 45.5231776,
               "lon" : -122.6733895,
@@ -6065,7 +6065,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             }
           ],
           "to" : {
-            "arrival" : "2009-11-17T18:52:37.000+00:00",
+            "arrival" : "2009-11-17T18:52:39.000+00:00",
             "lat" : 45.53122,
             "lon" : -122.69659,
             "name" : "NW Northrup St. & NW 22nd Ave. (P2)",
@@ -6082,7 +6082,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "waitingTime" : 0,
       "walkDistance" : 4154.15,
       "walkLimitExceeded" : false,
-      "walkTime" : 3157
+      "walkTime" : 3159
     }
   ]
 ]

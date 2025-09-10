@@ -123,7 +123,8 @@ Add the `script/custom-release-env.json` file to your branch. The content of the
   "release_branch": "<release branch>",
   "ser_ver_id_prefix": "<organization abbrivation, max 2 characters>",
   "include_prs_label": "<organization name> Test",
-  "ext_branches" : [ "<release config branch>"]
+  "ext_branches" : [ "<release config branch>"],
+  "otp_production_url" : "<URL to OTP server endpoint>"
 }
 ```
 If you organization is _Curium_, then the file would look like this:
@@ -134,12 +135,16 @@ If you organization is _Curium_, then the file would look like this:
   "release_branch": "main",
   "ser_ver_id_prefix": "CU",
   "include_prs_label": "Curium Test",
-  "ext_branches" : [ "main_config"]
+  "ext_branches" : [ "main_config"],
+  "otp_production_url" : "https://otp.curium.org/otp"
 }
 ```
 
 The `<organization name>` must match the GitHub organization name (repository owner) in your local
 Git clone. Use `git remote -v` to list all remote repos. 
+
+The `otp_production_url` is optional. If provided, the release script will include a changelog diff 
+in the release summary between the production and built version.
 
 ```
 # git remote -v 

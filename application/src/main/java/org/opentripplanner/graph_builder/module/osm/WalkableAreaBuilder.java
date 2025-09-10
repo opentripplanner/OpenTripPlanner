@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -186,9 +188,10 @@ class WalkableAreaBuilder {
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
       HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
       GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-      OsmEntity areaEntity = group.getSomeOsmObject();
 
       for (OsmArea area : group.areas) {
+        OsmEntity areaEntity = area.parent;
+
         // test if area is inside the current ring
         if (!group.isSimpleAreaGroup()) {
           if (!polygon.contains(area.jtsMultiPolygon)) {
@@ -200,7 +203,7 @@ class WalkableAreaBuilder {
         // which otherwise would be pruned as unconnected island
         Collection<OsmNode> entrances = osmdb.getStopsInArea(area.parent);
         for (OsmNode node : entrances) {
-          var vertex = vertexBuilder.getVertexForOsmNode(node, areaEntity);
+          var vertex = vertexBuilder.getVertexForOsmNode(node, areaEntity, SPLIT);
           platformLinkingVertices.add(vertex);
           visibilityVertices.add(vertex);
           startingVertices.add(vertex);
@@ -245,10 +248,10 @@ class WalkableAreaBuilder {
               outerRing.isNodeConvex(i) ||
               (linkPointsAdded && (i == 0 || i == outerRing.nodes.size() / 2))
             ) {
-              visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity));
+              visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity, SPLIT));
             }
             if (isStartingNode(node, osmWayIds)) {
-              var v = vertexBuilder.getVertexForOsmNode(node, areaEntity);
+              var v = vertexBuilder.getVertexForOsmNode(node, areaEntity, SPLIT);
               startingVertices.add(v);
               visibilityVertices.add(v);
             }
@@ -269,10 +272,10 @@ class WalkableAreaBuilder {
               // area or a convex point, i.e. the angle is over 180 degrees.
               // For holes, we must swap the convexity condition
               if (!innerRing.isNodeConvex(j)) {
-                visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity));
+                visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity, SPLIT));
               }
               if (isStartingNode(node, osmWayIds)) {
-                var v = vertexBuilder.getVertexForOsmNode(node, areaEntity);
+                var v = vertexBuilder.getVertexForOsmNode(node, areaEntity, SPLIT);
                 startingVertices.add(v);
                 visibilityVertices.add(v);
               }
@@ -431,8 +434,8 @@ class WalkableAreaBuilder {
   ) {
     OsmNode node = ring.nodes.get(i);
     OsmNode nextNode = ring.nodes.get((i + 1) % ring.nodes.size());
-    IntersectionVertex v1 = vertexBuilder.getVertexForOsmNode(node, area.parent);
-    IntersectionVertex v2 = vertexBuilder.getVertexForOsmNode(nextNode, area.parent);
+    IntersectionVertex v1 = vertexBuilder.getVertexForOsmNode(node, area.parent, SPLIT);
+    IntersectionVertex v2 = vertexBuilder.getVertexForOsmNode(nextNode, area.parent, SPLIT);
 
     if (shouldSkipEdge(v1, v2, alreadyAddedEdges)) {
       return Set.of();
@@ -548,12 +551,9 @@ class WalkableAreaBuilder {
       namedArea.setName(name);
 
       WayProperties wayData = findAreaProperties(areaEntity);
-      double bicycleSafety = wayData.bicycleSafety();
-      namedArea.setBicycleSafetyMultiplier(bicycleSafety);
-
-      double walkSafety = wayData.walkSafety();
-      namedArea.setWalkSafetyMultiplier(walkSafety);
-      namedArea.setOriginalEdges(intersection);
+      namedArea.setBicycleSafety((float) wayData.bicycleSafety());
+      namedArea.setWalkSafety((float) wayData.walkSafety());
+      namedArea.setGeometry(intersection);
       namedArea.setPermission(wayData.getPermission());
       areaGroup.addArea(namedArea);
 
