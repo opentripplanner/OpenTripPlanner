@@ -90,10 +90,7 @@ public class CarpoolSiriMapper {
     var scheduledDuration = Duration.between(startTime, endTime);
 
     // Calculate estimated drive time between stops for deviation budget
-    var estimatedDriveTime = calculateDriveTimeWithRouting(
-      boardingArea,
-      alightingArea
-    );
+    var estimatedDriveTime = calculateDriveTimeWithRouting(boardingArea, alightingArea);
 
     var deviationBudget = scheduledDuration.minus(estimatedDriveTime);
 
@@ -118,10 +115,7 @@ public class CarpoolSiriMapper {
    * @param alightingArea the alighting area stop
    * @return the estimated drive time as a Duration
    */
-  private Duration calculateDriveTimeWithRouting(
-    AreaStop boardingArea,
-    AreaStop alightingArea
-  ) {
+  private Duration calculateDriveTimeWithRouting(AreaStop boardingArea, AreaStop alightingArea) {
     try {
       var tempVertices = new TemporaryVerticesContainer(
         graph,
@@ -157,10 +151,7 @@ public class CarpoolSiriMapper {
    * Returns the routing result with distance, time, and geometry.
    */
   @Nullable
-  private GraphPath<State, Edge, Vertex> performCarpoolRouting(
-    Set<Vertex> from,
-    Set<Vertex> to
-  ) {
+  private GraphPath<State, Edge, Vertex> performCarpoolRouting(Set<Vertex> from, Set<Vertex> to) {
     try {
       // Create a basic route request for car routing
       RouteRequest request = RouteRequest.defaultValue();

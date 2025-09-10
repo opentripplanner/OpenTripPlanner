@@ -27,10 +27,7 @@ public class CarpoolItineraryMapper {
       candidate.pickupRoute().states.getLast().getTime()
     );
 
-    var driverPickupTime = candidate
-      .trip()
-      .startTime()
-      .plus(pickupDuration);
+    var driverPickupTime = candidate.trip().startTime().plus(pickupDuration);
 
     // Main carpool leg (passenger origin to destination via shared route)
     // Start time is max of request dateTime and driverPickupTime
