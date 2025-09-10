@@ -25,7 +25,7 @@ public class CarpoolTrip
 
   // The amount of time the trip can deviate from the scheduled time in order to pick up or drop off
   // a passenger.
-  private Duration deviationBudget;
+  private final Duration deviationBudget;
   private final int availableSeats;
 
   public CarpoolTrip(CarpoolTripBuilder builder) {
@@ -65,6 +65,12 @@ public class CarpoolTrip
 
   public int availableSeats() {
     return availableSeats;
+  }
+
+  public Duration tripDuration() {
+    // Since the endTime is set by the driver at creation, we subtract the deviationBudget to get the
+    // actual trip duration.
+    return Duration.between(startTime, endTime).minus(deviationBudget);
   }
 
   @Nullable

@@ -100,7 +100,6 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
                 });
             }
           }
-          LOG.info("Received {} estimated timetable deliveries", etds.size());
         }
       }
     } while (moreData);

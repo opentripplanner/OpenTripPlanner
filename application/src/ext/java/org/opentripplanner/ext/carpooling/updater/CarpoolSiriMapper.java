@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.carpooling.updater;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
@@ -88,14 +87,12 @@ public class CarpoolSiriMapper {
       ? alightingCall.getExpectedArrivalTime()
       : alightingCall.getAimedArrivalTime();
 
-
     var scheduledDuration = Duration.between(startTime, endTime);
 
     // Calculate estimated drive time between stops for deviation budget
     var estimatedDriveTime = calculateDriveTimeWithRouting(
       boardingArea,
-      alightingArea,
-      startTime.toInstant()
+      alightingArea
     );
 
     var deviationBudget = scheduledDuration.minus(estimatedDriveTime);
@@ -119,13 +116,11 @@ public class CarpoolSiriMapper {
    *
    * @param boardingArea the boarding area stop
    * @param alightingArea the alighting area stop
-   * @param departureTime the departure time for the trip
    * @return the estimated drive time as a Duration
    */
   private Duration calculateDriveTimeWithRouting(
     AreaStop boardingArea,
-    AreaStop alightingArea,
-    Instant departureTime
+    AreaStop alightingArea
   ) {
     try {
       var tempVertices = new TemporaryVerticesContainer(
@@ -140,8 +135,7 @@ public class CarpoolSiriMapper {
       // Perform A* routing
       GraphPath<State, Edge, Vertex> path = performCarpoolRouting(
         tempVertices.getFromVertices(),
-        tempVertices.getToVertices(),
-        departureTime
+        tempVertices.getToVertices()
       );
 
       if (path != null) {
@@ -165,15 +159,11 @@ public class CarpoolSiriMapper {
   @Nullable
   private GraphPath<State, Edge, Vertex> performCarpoolRouting(
     Set<Vertex> from,
-    Set<Vertex> to,
-    Instant departureTime
+    Set<Vertex> to
   ) {
     try {
       // Create a basic route request for car routing
-      RouteRequest request = RouteRequest.of()
-        .withDateTime(departureTime)
-        .withArriveBy(false)
-        .buildDefault();
+      RouteRequest request = RouteRequest.defaultValue();
 
       // Set up street request for CAR mode
       StreetRequest streetRequest = new StreetRequest(StreetMode.CAR);

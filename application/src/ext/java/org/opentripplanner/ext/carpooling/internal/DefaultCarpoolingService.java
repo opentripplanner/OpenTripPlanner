@@ -1,17 +1,12 @@
 package org.opentripplanner.ext.carpooling.internal;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
@@ -19,8 +14,8 @@ import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.data.KristiansandCarpoolingData;
-import org.opentripplanner.ext.carpooling.model.CarpoolItineraryCandidate;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -31,11 +26,8 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
@@ -43,7 +35,6 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transit.model.site.AreaStop;
 
 public class DefaultCarpoolingService implements CarpoolingService {
 
@@ -69,34 +60,30 @@ public class DefaultCarpoolingService implements CarpoolingService {
   }
 
   /**
-   * TERMINOLOGY
-   * - Boarding and alighting area stops
-   *
-   *
-   * ALGORITHM OUTLINE
+   * VIA-SEARCH ALGORITHM FOR CARPOOLING INTEGRATION
    *
    * <pre>
-   *   DIRECT_DISTANCE = SphericalDistanceLibrary.fastDistance(fromLocation, toLocation)
-   *   // 3000m is about 45 minutes of walking
-   *   MAX_WALK_DISTANCE = max(DIRECT_DISTANCE, 3000m)
-   *   MAX_COST = MAX_WALK_DISTANCE * walkReluctance + DIRECT_DISTANCE - MAX_WALK_DISTANCE
+   * The core challenge of carpooling integration is matching passengers with drivers
+   * based on route compatibility. This is fundamentally a via-point routing problem
+   * where we need to determine if a driver's journey from A→B can accommodate a
+   * passenger's journey from C→D within the driver's stated deviation tolerance.
    *
-   * Search for access / egress candidates (AreaStops) using
-   * - accessDistance = SphericalDistanceLibrary.fastDistance(fromLocation, stop.center);
-   * - Drop candidates where accessDistance greater then MAX_WALK_DISTANCE and is not within time constraints
-   * - egressDistance = SphericalDistanceLibrary.fastDistance(toLocation, stop.center);
-   * - Drop candidates where (accessDistance + egressDistance) greater then MAX_WALK_DISTANCE (no time check)
-   * - Sort candidates on estimated cost, where we use direct distance instead of actual distance
+   * Algorithm Overview:
+   * 1. Driver has a baseline route from origin A to destination B
+   * 2. Driver specifies a deviation tolerance (deviationBudget in CarpoolTrip)
+   * 3. Passenger requests travel from origin C to destination D
+   * 4. Algorithm checks if route A→C→D→B stays within constraint:
+   *    total_time ≤ baseline_time + deviation_tolerance
    *
-   * FOR EACH CANDIDATE (C)
-   * - Use AStar to find the actual distance for:
-   *   - access path
-   *   - transit path
-   *   - egress path
-   * - Drop candidates where (access+carpool+egress) cost > MAX_COST
-   * [- Abort when no more optimal results can be obtained (pri2)]
-   *
-   * Create Itineraries for the top 3 results and return
+   * Multi-Stage Processing:
+   * Stage 1: Get all available carpool trips from repository
+   * Stage 2: For each trip, calculate baseline route time (A→B)
+   * Stage 3: Calculate via-route segments:
+   *   - A→C: Driver's detour to pickup point
+   *   - C→D: Shared journey segment
+   *   - D→B: Driver's continuation to final destination
+   * Stage 4: Feasibility check - compare total time vs baseline + deviationBudget
+   * Stage 5: Return viable matches ranked by efficiency
    * </pre>
    */
   public List<Itinerary> route(RouteRequest request) throws RoutingValidationException {
@@ -117,28 +104,51 @@ public class DefaultCarpoolingService implements CarpoolingService {
       );
     }
 
-    List<CarpoolItineraryCandidate> itineraryCandidates = getCarpoolItineraryCandidates(request);
-    if (itineraryCandidates.isEmpty()) {
-      // No relevant carpool trips found within the next 2 hours, return empty list
+    // Get all available carpool trips from repository
+    List<CarpoolTrip> availableTrips = repository
+      .getCarpoolTrips()
+      .stream()
+      .filter(trip -> {
+        // Only include trips that start within the next 2 hours
+        var tripStartTime = trip.startTime().toInstant();
+        var requestTime = request.dateTime();
+        return (
+          // Currently we only include trips that start after the request time
+          // We should also consider trips that start before request time and make it to the
+          // pickup location on time.
+          tripStartTime.isAfter(requestTime) &&
+          tripStartTime.isBefore(requestTime.plus(MAX_BOOKING_WINDOW))
+        );
+      })
+      .toList();
+
+    if (availableTrips.isEmpty()) {
       return Collections.emptyList();
     }
 
-    // Perform A* routing for the top candidates and create itineraries
+    // Evaluate each carpool trip using via-search algorithm
+    List<ViaCarpoolCandidate> viableCandidates = new ArrayList<>();
+
+    for (CarpoolTrip trip : availableTrips) {
+      ViaCarpoolCandidate candidate = evaluateViaRouteForTrip(
+        request,
+        trip
+      );
+      if (candidate != null) {
+        viableCandidates.add(candidate);
+      }
+    }
+
+    // Sort candidates by efficiency (additional time for driver)
+    viableCandidates.sort(Comparator.comparing(ViaCarpoolCandidate::viaDeviation));
+
+    // Create itineraries for top results
     List<Itinerary> itineraries = new ArrayList<>();
-    int maxResults = Math.min(itineraryCandidates.size(), DEFAULT_MAX_CARPOOL_RESULTS);
+    int maxResults = Math.min(viableCandidates.size(), DEFAULT_MAX_CARPOOL_RESULTS);
 
     for (int i = 0; i < maxResults; i++) {
-      CarpoolItineraryCandidate candidate = itineraryCandidates.get(i);
-
-      GraphPath<State, Edge, Vertex> routing = carpoolRouting(
-        request,
-        new StreetRequest(StreetMode.CAR),
-        candidate.boardingStop().state.getVertex(),
-        candidate.alightingStop().state.getVertex(),
-        streetLimitationParametersService.getMaxCarSpeed()
-      );
-
-      Itinerary itinerary = CarpoolItineraryMapper.mapToItinerary(request, candidate, routing);
+      ViaCarpoolCandidate candidate = viableCandidates.get(i);
+      Itinerary itinerary = CarpoolItineraryMapper.mapViaRouteToItinerary(request, candidate);
       if (itinerary != null) {
         itineraries.add(itinerary);
       }
@@ -147,151 +157,129 @@ public class DefaultCarpoolingService implements CarpoolingService {
     return itineraries;
   }
 
-  private List<CarpoolItineraryCandidate> getCarpoolItineraryCandidates(RouteRequest request) {
-    TemporaryVerticesContainer temporaryVertices;
+  /**
+   * Evaluate a single carpool trip using the via-search algorithm.
+   * Returns a viable candidate if the route A→C→D→B stays within the deviationBudget.
+   */
+  private ViaCarpoolCandidate evaluateViaRouteForTrip(
+    RouteRequest request,
+    CarpoolTrip trip
+  ) {
 
+    TemporaryVerticesContainer acTempVertices;
     try {
-      temporaryVertices = new TemporaryVerticesContainer(
+      acTempVertices = new TemporaryVerticesContainer(
         graph,
         vertexLinker,
-        request.from(),
-        request.to(),
-        request.journey().access().mode(),
-        request.journey().egress().mode()
+        GenericLocation.fromCoordinate(trip.boardingArea().getLat(), trip.boardingArea().getLon()),
+        GenericLocation.fromCoordinate(request.from().lat, request.from().lng),
+        StreetMode.CAR, // We'll route by car for all segments
+        StreetMode.CAR
       );
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
 
-    // Prepare access/egress
-    Collection<NearbyStop> accessStops = getClosestAreaStopsToVertex(
+    TemporaryVerticesContainer cdTempVertices;
+    try {
+      cdTempVertices = new TemporaryVerticesContainer(
+        graph,
+        vertexLinker,
+        GenericLocation.fromCoordinate(request.from().lat, request.from().lng),
+        GenericLocation.fromCoordinate(request.to().lat, request.to().lng),
+        StreetMode.CAR, // We'll route by car for all segments
+        StreetMode.CAR
+      );
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+    TemporaryVerticesContainer dbTempVertices;
+    try {
+      dbTempVertices = new TemporaryVerticesContainer(
+        graph,
+        vertexLinker,
+        GenericLocation.fromCoordinate(request.to().lat, request.to().lng),
+        GenericLocation.fromCoordinate(trip.alightingArea().getLat(), trip.alightingArea().getLon()),
+        StreetMode.CAR, // We'll route by car for all segments
+        StreetMode.CAR
+      );
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+    // Calculate via-route segments: A→C→D→B
+    GraphPath<State, Edge, Vertex> pickupRoute = performCarRouting(
       request,
-      request.journey().access(),
-      temporaryVertices.getFromVertices(),
-      null,
-      repository.getBoardingAreasForVertex()
+      acTempVertices.getFromVertices(),
+      acTempVertices.getToVertices()
+    );
+    GraphPath<State, Edge, Vertex> sharedRoute = performCarRouting(
+      request,
+      cdTempVertices.getFromVertices(),
+      cdTempVertices.getToVertices()
+    );
+    GraphPath<State, Edge, Vertex> dropoffRoute = performCarRouting(
+      request,
+      dbTempVertices.getFromVertices(),
+      dbTempVertices.getToVertices()
     );
 
-    Collection<NearbyStop> egressStops = getClosestAreaStopsToVertex(
-      request,
-      request.journey().egress(),
-      null,
-      temporaryVertices.getToVertices(),
-      repository.getAlightingAreasForVertex()
+    if (pickupRoute == null || sharedRoute == null || dropoffRoute == null) {
+      return null; // Failed to calculate some segments
+    }
+
+    // Calculate total travel times
+    var viaDuration =
+      routeDuration(pickupRoute)
+        .plus(routeDuration(sharedRoute))
+        .plus(routeDuration(dropoffRoute));
+
+    // Check if within deviation budget
+    var deviationDuration = viaDuration.minus(trip.tripDuration());
+    if (deviationDuration.compareTo(trip.deviationBudget()) > 0) {
+      return null; // Exceeds deviation budget
+    }
+
+    return new ViaCarpoolCandidate(
+      trip,
+      pickupRoute,
+      sharedRoute,
+      deviationDuration,
+      viaDuration,
+      cdTempVertices.getFromVertices(),
+      cdTempVertices.getToVertices()
     );
-
-    Map<CarpoolTrip, NearbyStop> tripToBoardingStop = accessStops
-      .stream()
-      .collect(
-        Collectors.toMap(
-          stop -> repository.getCarpoolTripByBoardingArea((AreaStop) stop.stop),
-          stop -> stop
-        )
-      );
-
-    Map<CarpoolTrip, NearbyStop> tripToAlightingStop = egressStops
-      .stream()
-      .collect(
-        Collectors.toMap(
-          stop -> repository.getCarpoolTripByAlightingArea((AreaStop) stop.stop),
-          stop -> stop
-        )
-      );
-
-    // Find trips that have both boarding and alighting stops
-    List<CarpoolItineraryCandidate> itineraryCandidates = tripToBoardingStop
-      .keySet()
-      .stream()
-      .filter(tripToAlightingStop::containsKey)
-      .map(trip ->
-        new CarpoolItineraryCandidate(
-          trip,
-          tripToBoardingStop.get(trip),
-          tripToAlightingStop.get(trip)
-        )
-      )
-      .filter(candidate -> {
-        // Only include candidates that leave after first possible arrival at the boarding area
-        // AND leave within the next 2 hours
-        var tripStartTime = candidate.trip().startTime().toInstant();
-        var accessArrivalTime = candidate.boardingStop().state.getTime();
-        return (
-          tripStartTime.isAfter(accessArrivalTime) &&
-          tripStartTime.isBefore(accessArrivalTime.plus(MAX_BOOKING_WINDOW))
-        );
-      })
-      .toList();
-    return itineraryCandidates;
   }
 
-  private List<NearbyStop> getClosestAreaStopsToVertex(
+  /**
+   * Performs car routing between two vertices.
+   */
+  private GraphPath<State, Edge, Vertex> performCarRouting(
     RouteRequest request,
-    StreetRequest streetRequest,
-    Set<Vertex> originVertices,
-    Set<Vertex> destinationVertices,
-    Multimap<StreetVertex, AreaStop> destinationAreas
+    Set<Vertex> from,
+    Set<Vertex> to
   ) {
-    var maxAccessEgressDuration = request
-      .preferences()
-      .street()
-      .accessEgress()
-      .maxDuration()
-      .valueOf(streetRequest.mode());
-    var arriveBy = originVertices == null && destinationVertices != null;
-
-    var streetSearch = StreetSearchBuilder.of()
-      .setSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxAccessEgressDuration))
-      .setDominanceFunction(new DominanceFunctions.MinimumWeight())
-      .setRequest(request)
-      .setArriveBy(arriveBy)
-      .setStreetRequest(streetRequest)
-      .setFrom(originVertices)
-      .setTo(destinationVertices);
-
-    var spt = streetSearch.getShortestPathTree();
-
-    if (spt == null) {
-      return Collections.emptyList();
-    }
-
-    // Get the reachable AreaStops from the vertices in the SPT
-    Multimap<AreaStop, State> locationsMap = ArrayListMultimap.create();
-    for (State state : spt.getAllStates()) {
-      Vertex targetVertex = state.getVertex();
-      if (
-        targetVertex instanceof StreetVertex streetVertex &&
-        destinationAreas.containsKey(streetVertex)
-      ) {
-        for (AreaStop areaStop : destinationAreas.get(streetVertex)) {
-          locationsMap.put(areaStop, state);
-        }
-      }
-    }
-
-    // Map the minimum reachable state for each AreaStop and the AreaStop to NearbyStop
-    List<NearbyStop> stopsFound = new ArrayList<>();
-    for (var locationStates : locationsMap.asMap().entrySet()) {
-      AreaStop areaStop = locationStates.getKey();
-      State min = getMinState(locationStates);
-
-      stopsFound.add(NearbyStop.nearbyStopForState(min, areaStop));
-    }
-    return stopsFound;
+    return carpoolRouting(
+      request,
+      new StreetRequest(StreetMode.CAR),
+      from,
+      to,
+      streetLimitationParametersService.getMaxCarSpeed()
+    );
   }
 
-  private static State getMinState(Map.Entry<AreaStop, Collection<State>> locationStates) {
-    Collection<State> states = locationStates.getValue();
-    // Select the vertex from all vertices that are reachable per AreaStop by taking
-    // the minimum walking distance
-    State min = Collections.min(states, Comparator.comparing(State::getWeight));
-
-    // If the best state for this AreaStop is a SplitterVertex, we want to get the
-    // TemporaryStreetLocation instead. This allows us to reach SplitterVertices in both
-    // directions when routing later.
-    if (min.getBackState().getVertex() instanceof TemporaryStreetLocation) {
-      min = min.getBackState();
+  /**
+   * Calculate the travel time in seconds for a given route.
+   */
+  private Duration routeDuration(GraphPath<State, Edge, Vertex> route) {
+    if (route == null || route.states.isEmpty()) {
+      return Duration.ZERO;
     }
-    return min;
+    return Duration.between(
+      route.states.getFirst().getTime(),
+      route.states.getLast().getTime()
+    );
   }
 
   /**
@@ -302,8 +290,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private GraphPath<State, Edge, Vertex> carpoolRouting(
     RouteRequest request,
     StreetRequest streetRequest,
-    Vertex from,
-    Vertex to,
+    Set<Vertex> from,
+    Set<Vertex> to,
     float maxCarSpeed
   ) {
     StreetPreferences preferences = request.preferences().street();
