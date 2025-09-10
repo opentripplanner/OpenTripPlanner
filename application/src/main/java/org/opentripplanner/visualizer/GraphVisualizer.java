@@ -514,22 +514,21 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(
+      var temporaryVerticesContainer = TemporaryVerticesContainer.of(
         graph,
         new VertexLinker(
           graph,
           VisibilityMode.TRAVERSE_AREA_EDGES,
           StreetConstants.DEFAULT_MAX_AREA_NODES
-        ),
-        request.from(),
-        request.to(),
-        request.journey().direct().mode(),
-        request.journey().direct().mode()
+        )
       )
+        .withFrom(request.from(), request.journey().direct().mode())
+        .withTo(request.from(), request.journey().direct().mode())
+        .build()
     ) {
       List<GraphPath<State, Edge, Vertex>> paths = finder.graphPathFinderEntryPoint(
         request,
-        temporaryVertices
+        temporaryVerticesContainer.createFromToViaVertexRequest()
       );
       long dt = System.currentTimeMillis() - t0;
       searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");

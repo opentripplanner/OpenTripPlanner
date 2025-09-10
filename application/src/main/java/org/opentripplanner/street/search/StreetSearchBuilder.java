@@ -46,12 +46,6 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
     return this;
   }
 
-  public StreetSearchBuilder setVerticesContainer(TemporaryVerticesContainer container) {
-    setFrom(container.getFromVertices());
-    setTo(container.getToVertices());
-    return this;
-  }
-
   public StreetSearchBuilder setIntersectionTraversalCalculator(
     IntersectionTraversalCalculator intersectionTraversalCalculator
   ) {

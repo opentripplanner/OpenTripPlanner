@@ -98,21 +98,17 @@ public class StreetGraphFinder implements GraphFinder {
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        graph,
-        linker,
-        GenericLocation.fromCoordinate(lat, lon),
-        GenericLocation.UNKNOWN,
-        StreetMode.WALK,
-        StreetMode.WALK
-      )
+      var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph, linker)
+        .withFrom(GenericLocation.fromCoordinate(lat, lon), StreetMode.WALK)
+        .build()
     ) {
       StreetSearchBuilder.of()
         .setSkipEdgeStrategy(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunctions.LeastWalk())
         .setRequest(request)
-        .setVerticesContainer(temporaryVertices)
+        .setFrom(temporaryVerticesContainer.fromVertices())
+        .setTo(temporaryVerticesContainer.toVertices())
         .getShortestPathTree();
     }
   }
