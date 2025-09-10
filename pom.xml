@@ -92,14 +92,6 @@
         <tests.includedGroups></tests.includedGroups>
     </properties>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>OpenTripPlanner Maven Repository on Github Packages</name>
-            <url>https://maven.pkg.github.com/${GITHUB_REPOSITORY}/</url>
-        </repository>
-    </distributionManagement>
-
     <modules>
         <module>utils</module>
         <module>raptor</module>
