@@ -130,10 +130,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     List<ViaCarpoolCandidate> viableCandidates = new ArrayList<>();
 
     for (CarpoolTrip trip : availableTrips) {
-      ViaCarpoolCandidate candidate = evaluateViaRouteForTrip(
-        request,
-        trip
-      );
+      ViaCarpoolCandidate candidate = evaluateViaRouteForTrip(request, trip);
       if (candidate != null) {
         viableCandidates.add(candidate);
       }
@@ -161,16 +158,13 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * Evaluate a single carpool trip using the via-search algorithm.
    * Returns a viable candidate if the route A→C→D→B stays within the deviationBudget.
    */
-  private ViaCarpoolCandidate evaluateViaRouteForTrip(
-    RouteRequest request,
-    CarpoolTrip trip
-  ) {
-
+  private ViaCarpoolCandidate evaluateViaRouteForTrip(RouteRequest request, CarpoolTrip trip) {
     TemporaryVerticesContainer acTempVertices;
     try {
       acTempVertices = new TemporaryVerticesContainer(
         graph,
         vertexLinker,
+        null,
         GenericLocation.fromCoordinate(trip.boardingArea().getLat(), trip.boardingArea().getLon()),
         GenericLocation.fromCoordinate(request.from().lat, request.from().lng),
         StreetMode.CAR, // We'll route by car for all segments
@@ -185,6 +179,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       cdTempVertices = new TemporaryVerticesContainer(
         graph,
         vertexLinker,
+        null,
         GenericLocation.fromCoordinate(request.from().lat, request.from().lng),
         GenericLocation.fromCoordinate(request.to().lat, request.to().lng),
         StreetMode.CAR, // We'll route by car for all segments
@@ -199,8 +194,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
       dbTempVertices = new TemporaryVerticesContainer(
         graph,
         vertexLinker,
+        null,
         GenericLocation.fromCoordinate(request.to().lat, request.to().lng),
-        GenericLocation.fromCoordinate(trip.alightingArea().getLat(), trip.alightingArea().getLon()),
+        GenericLocation.fromCoordinate(
+          trip.alightingArea().getLat(),
+          trip.alightingArea().getLon()
+        ),
         StreetMode.CAR, // We'll route by car for all segments
         StreetMode.CAR
       );
@@ -230,10 +229,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
     }
 
     // Calculate total travel times
-    var viaDuration =
-      routeDuration(pickupRoute)
-        .plus(routeDuration(sharedRoute))
-        .plus(routeDuration(dropoffRoute));
+    var viaDuration = routeDuration(pickupRoute)
+      .plus(routeDuration(sharedRoute))
+      .plus(routeDuration(dropoffRoute));
 
     // Check if within deviation budget
     var deviationDuration = viaDuration.minus(trip.tripDuration());
@@ -276,10 +274,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     if (route == null || route.states.isEmpty()) {
       return Duration.ZERO;
     }
-    return Duration.between(
-      route.states.getFirst().getTime(),
-      route.states.getLast().getTime()
-    );
+    return Duration.between(route.states.getFirst().getTime(), route.states.getLast().getTime());
   }
 
   /**
