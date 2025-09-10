@@ -20,8 +20,7 @@ import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
-import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
-import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
+import org.opentripplanner.street.model.vertex.ElevatorVertex;
 import org.opentripplanner.street.model.vertex.StationElementVertex;
 import org.opentripplanner.street.model.vertex.TransitBoardingAreaVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
@@ -242,8 +241,8 @@ public class AddTransitEntitiesToGraph {
 
   /**
    * Create elevator edges from pathways. As pathway based elevators are not vertices, but edges in
-   * the pathway model, we have to model each possible movement as an onboard-offboard pair, instead
-   * of having only one set of vertices per level and edges between them.
+   * the pathway model, we have to model each possible movement as an ElevatorVertex-StationElementVertex pair,
+   * instead of having only one set of vertices per level and edges between them.
    */
   private void createElevatorEdgesAndAddThemToGraph(
     Pathway pathway,
@@ -262,33 +261,19 @@ public class AddTransitEntitiesToGraph {
       levels = Math.abs(fromLevel.index() - toLevel.index());
     }
 
-    ElevatorOffboardVertex fromOffboardVertex = vertexFactory.elevatorOffboard(
+    ElevatorVertex fromOnboardVertex = vertexFactory.elevator(
       fromVertex,
       elevatorLabel(fromVertex, pathway),
       fromLevel.name().toString()
     );
-    ElevatorOffboardVertex toOffboardVertex = vertexFactory.elevatorOffboard(
+    ElevatorVertex toOnboardVertex = vertexFactory.elevator(
       toVertex,
       elevatorLabel(toVertex, pathway),
       toLevel.name().toString()
     );
 
-    PathwayEdge.createLowCostPathwayEdge(fromVertex, fromOffboardVertex, PathwayMode.ELEVATOR);
-    PathwayEdge.createLowCostPathwayEdge(toOffboardVertex, toVertex, PathwayMode.ELEVATOR);
-
-    ElevatorOnboardVertex fromOnboardVertex = vertexFactory.elevatorOnboard(
-      fromVertex,
-      elevatorLabel(fromVertex, pathway),
-      fromLevel.name().toString()
-    );
-    ElevatorOnboardVertex toOnboardVertex = vertexFactory.elevatorOnboard(
-      toVertex,
-      elevatorLabel(toVertex, pathway),
-      toLevel.name().toString()
-    );
-
-    ElevatorBoardEdge.createElevatorBoardEdge(fromOffboardVertex, fromOnboardVertex);
-    ElevatorAlightEdge.createElevatorAlightEdge(toOnboardVertex, toOffboardVertex, toLevel.name());
+    ElevatorBoardEdge.createElevatorBoardEdge(fromVertex, fromOnboardVertex);
+    ElevatorAlightEdge.createElevatorAlightEdge(toOnboardVertex, toVertex, toLevel.name());
 
     StreetTraversalPermission permission = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
     ElevatorHopEdge.createElevatorHopEdge(
@@ -301,14 +286,8 @@ public class AddTransitEntitiesToGraph {
     );
 
     if (pathway.isBidirectional()) {
-      PathwayEdge.createLowCostPathwayEdge(fromOffboardVertex, fromVertex, PathwayMode.ELEVATOR);
-      PathwayEdge.createLowCostPathwayEdge(toVertex, toOffboardVertex, PathwayMode.ELEVATOR);
-      ElevatorBoardEdge.createElevatorBoardEdge(toOffboardVertex, toOnboardVertex);
-      ElevatorAlightEdge.createElevatorAlightEdge(
-        fromOnboardVertex,
-        fromOffboardVertex,
-        fromLevel.name()
-      );
+      ElevatorBoardEdge.createElevatorBoardEdge(toVertex, toOnboardVertex);
+      ElevatorAlightEdge.createElevatorAlightEdge(fromOnboardVertex, fromVertex, fromLevel.name());
       ElevatorHopEdge.createElevatorHopEdge(
         toOnboardVertex,
         fromOnboardVertex,

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -247,18 +248,39 @@ public class OsmEntityTest {
     assertTrue(osm3.isWheelchairAccessible());
   }
 
+  private static Stream<Arguments> barrierWheelchairAccessibilityCases() {
+    return Stream.of(
+      Arguments.of(new OsmNode().addTag("barrier", "stile"), false),
+      Arguments.of(new OsmNode().addTag("barrier", "stile").addTag("wheelchair", "yes"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb"), false),
+      // https://wiki.openstreetmap.org/wiki/Key:kerb
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "flush"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "lowered"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "no"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "raised"), false),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "rolled"), false),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "yes"), false)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("barrierWheelchairAccessibilityCases")
+  void isBarrierWheelchairAccessible(OsmEntity osm, boolean expected) {
+    assertEquals(expected, osm.isWheelchairAccessible());
+  }
+
   @Test
   void wheelchairAccessibility() {
     var osm1 = new OsmEntity();
-    assertEquals(Accessibility.NO_INFORMATION, osm1.wheelchairAccessibility());
+    assertEquals(Accessibility.NO_INFORMATION, osm1.explicitWheelchairAccessibility());
 
     var osm2 = new OsmEntity();
     osm2.addTag("wheelchair", "no");
-    assertEquals(Accessibility.NOT_POSSIBLE, osm2.wheelchairAccessibility());
+    assertEquals(Accessibility.NOT_POSSIBLE, osm2.explicitWheelchairAccessibility());
 
     var osm3 = new OsmEntity();
     osm3.addTag("wheelchair", "yes");
-    assertEquals(Accessibility.POSSIBLE, osm3.wheelchairAccessibility());
+    assertEquals(Accessibility.POSSIBLE, osm3.explicitWheelchairAccessibility());
   }
 
   @Test
@@ -266,6 +288,13 @@ public class OsmEntityTest {
     assertFalse(WayTestData.zooPlatform().isRoutable());
     assertTrue(WayTestData.indoor("area").isRoutable());
     assertFalse(WayTestData.indoor("room").isRoutable());
+
+    var highway = WayTestData.highwayWithCycleLane();
+    assertTrue(highway.isRoutable());
+    highway.addTag("access", "no");
+    assertFalse(highway.isRoutable());
+    highway.addTag("bicycle", "yes");
+    assertTrue(highway.isRoutable());
   }
 
   @Test

@@ -4,6 +4,7 @@ import json
 import os
 import re
 import subprocess
+
 import sys
 
 ## ------------------------------------------------------------------------------------ ##
@@ -35,6 +36,7 @@ class Config:
         self.ext_branches = None
         self.include_prs_label = None
         self.ser_ver_id_prefix = None
+        self.otp_production_url = None
 
     def release_path(self, branch):
         return f'{self.release_remote}/{branch}'
@@ -49,7 +51,8 @@ class Config:
                 f"release_branch: '{self.release_branch}', "
                 f"ext_branches: {self.ext_branches}, "
                 f"include_prs_label: '{self.include_prs_label}', "
-                f"ser_ver_id_prefix: '{self.ser_ver_id_prefix}'>")
+                f"ser_ver_id_prefix: '{self.ser_ver_id_prefix}'"
+                f"otp_production_url: '{self.otp_production_url}'>")
 
 
 # CLI Arguments and Options
@@ -115,6 +118,8 @@ class ScriptState:
         self.prs_bump_ser_ver_id = False
         self.goto_step = False
         self.step = None
+        self.production_version = None
+        self.production_ser_ver_id = None
 
     def latest_version_tag(self):
         return f'v{self.latest_version}'
@@ -127,6 +132,9 @@ class ScriptState:
 
     def next_version_description(self):
         return f'Version {self.next_version} ({self.next_ser_ver_id})'
+
+    def production_version_tag(self):
+        return f'v{self.production_version}'
 
     def is_ser_ver_id_next(self):
         return self.next_ser_ver_id != self.latest_ser_ver_id
@@ -206,9 +214,11 @@ def setup_and_verify():
         verify_no_local_git_changes()
         resolve_version_number()
         resolve_next_version()
+        resolve_latest_ser_ver_id()
         read_pull_request_info_from_github()
         check_if_prs_exist_in_latest_release()
         resolve_next_ser_ver_id()
+        resolve_production_versions()
     print_setup()
 
 
@@ -320,8 +330,10 @@ def print_summary():
 ## Version
 
   - New version/git tag: `{state.next_version}` 
+  - Production version/git tag : `{state.production_version}` 
   - New serialization version: `{state.next_ser_ver_id}` 
   - Old serialization version: `{state.latest_ser_ver_id}`
+  - Prod serialization version: `{state.production_ser_ver_id}`
 
 """
     with open(SUMMARY_FILE, mode="w", encoding="UTF-8") as f:
@@ -331,10 +343,21 @@ def print_summary():
             print(f"These PRs are tagged with {config.include_prs_label}.\n", file=f)
         for pr in pullRequests:
             print(f"  -  {pr.description_link()}", file=f)
+
+        if state.production_version:
+            p = execute(
+                "./script/changelog-diff.py",
+                state.production_version_tag(),
+                state.latest_version_tag(),
+                "Changelog production 🦋"
+            )
+            print(p.stdout, file=f)
+
         p = execute(
             "./script/changelog-diff.py",
             state.latest_version_tag(),
-            state.next_version_tag()
+            state.next_version_tag(),
+            "Changelog previous release 🐛"
         )
         print(p.stdout, file=f)
 
@@ -411,6 +434,7 @@ def load_config():
         config.ext_branches = doc['ext_branches']
         config.include_prs_label = doc['include_prs_label']
         config.ser_ver_id_prefix = doc['ser_ver_id_prefix']
+        config.otp_production_url = doc['otp_production_url']
         debug(f'Config loaded: {config}')
 
     if len(config.ser_ver_id_prefix) > 2:
@@ -468,6 +492,21 @@ def resolve_next_version():
     max_tag_version = max((int(m.group(1)) for tag in tags if (m := pattern.match(tag))), default=0)
     state.latest_version = prefix + str(max_tag_version)
     state.next_version = prefix + str(1 + max_tag_version)
+
+
+def resolve_latest_ser_ver_id():
+    info('Resolve last ser.ver.id ...')
+    p = git('tag', '--list', '--sort=-v:refname', error_msg='Fetch git tags failed!')
+    all_tags = p.stdout.splitlines()
+    prefix = f'{state.major_version}-{config.release_remote}-\\d+'
+    pattern = re.compile('v' + prefix.replace('.', r'\.') + r'\d+')
+    tags = [item for item in all_tags if re.search(pattern, item)]
+    tags = tags[:60]
+    maxSId = ' '
+    for tag in tags:
+        maxSId = max(maxSId, read_ser_ver_id_from_pom_file(tag))
+
+    state.latest_ser_ver_id = maxSId
 
 
 def read_pull_request_info_from_github():
@@ -542,25 +581,25 @@ def check_if_prs_exist_in_latest_release():
             return
 
 
-# The script will resolve what the next serialization version id (SID) should be. This is a complex task.
-# Here is an overview:
+# The script will resolve what the next serialization version id (SID) should be. This is a complex
+# task. The `latest_ser_ver_id` is allready resolved - to the highest existing id for all
+# matching git tags. Here is an overview:
+
 #  1. If the --serVerId option exist, then the latest SID is bumped and used.
 #  2. If the --release option exist, then the current pom.xml SID is validated, if ok it is used,
 #     if not the script exit.
 #  3. All merged in PRs are checked. If a PR is labeled with 'bump serialization id' and the the
 #     HEAD commit is not in the latest release, then the last release SID is bumped and used.
-#  4. Finally, the script look at the upstream SID for the last release and the base. If the SID
-#     is not the same the SID of the last release is bumped. To find the *upstream* SIDs the script
+#  4. Finally, the script look at the upstream Git Repo SIDs for both this release(base) and the
+#     last release. If the SIDs are differnt the SID is bumped. To find the *upstream* SIDs we
 #     look at the git history/log NOT matching the project serialization version id prefix - this
-#     is assumed to be the latest SID for the upstream project.
+#     is assumed to be the latest SID upstream.
 #
 # Tip! If the '--release' option is used, then the serialization version id is NOT updated. Use the
 # '--serVerId' option together with the '--release' to force update the serialization version id.
 #
 def resolve_next_ser_ver_id():
     info('Resolve the next serialization version id ...')
-    latest_release_hash = state.latest_version_git_hash()
-    state.latest_ser_ver_id = read_ser_ver_id_from_pom_file(latest_release_hash)
 
     if options.bump_ser_ver_id:
         state.next_ser_ver_id = bump_release_ser_ver_id(state.latest_ser_ver_id)
@@ -573,10 +612,11 @@ def resolve_next_ser_ver_id():
     elif state.prs_bump_ser_ver_id:
         state.next_ser_ver_id = bump_release_ser_ver_id(state.latest_ser_ver_id)
     else:
+        latest_version_tag = state.latest_version_tag()
         info('  - Find upstream serialization version id for latest release ...')
-        latest_upstream_ser_id = find_upstream_ser_ver_id_in_history(latest_release_hash)
+        latest_upstream_ser_id = find_upstream_ser_ver_id_in_history(latest_version_tag)
 
-        info(f'  - Find base serialization version id ...')
+        info(f'  - Find upstream serialization version id for base ...')
         base_hash = options.release_base_git_hash()
         base_upstream_ser_id = find_upstream_ser_ver_id_in_history(base_hash)
 
@@ -587,8 +627,27 @@ def resolve_next_ser_ver_id():
                  'The serialization.ver.id is bumped.')
             state.next_ser_ver_id = bump_release_ser_ver_id(state.latest_ser_ver_id)
         else:
-            state.next_ser_ver_id = state.latest_ser_ver_id
+            state.next_ser_ver_id = read_ser_ver_id_from_pom_file(latest_version_tag)
 
+
+def resolve_production_versions():
+    url = config.otp_production_url
+    if not url:
+        info("The 'otp_production_url' config parameter is not set. Summary diff is skipped.")
+        return
+
+    p = (execute('curl', url, error_msg=f'Unable to connect to: {url}', quiet_err=False))
+    text = p.stdout
+
+    # "version":"2.8.0-entur-160"
+    match = re.search(r"\"version\":\"([-\w\.]+)\"", text)
+    if match:
+        state.production_version = match.group(1)
+
+    # "otpSerializationVersionId":"EN-0111"
+    match = re.search(r"\"otpSerializationVersionId\":\"([-\w\.]+)\"", text)
+    if match:
+        state.production_ser_ver_id = match.group(1)
 
 # Find the serialization-version-id for the upstream git project using the git log starting
 # with the given revision (abort if not found in previous 20 commits)
@@ -620,6 +679,7 @@ Config
   - Release branch .............. : {config.release_branch}
   - Configuration branches ...... : {config.ext_branches}
   - Ser.ver.id prefix ........... : {config.ser_ver_id_prefix}
+  - Otp production url .......... : {config.otp_production_url}  
 ''')
     if config.include_prs_label:
         info(f'PRs to merge')
@@ -630,8 +690,10 @@ Release info
   - Project major version ....... : {state.major_version}
   - Latest version .............. : {state.latest_version}
   - Next version ................ : {state.next_version}
+  - Prod version ................ : {state.production_version}
   - Latest ser.ver.id ........... : {state.latest_ser_ver_id}
   - Next ser.ver.id ............. : {state.next_ser_ver_id}
+  - Prod ser.ver.id ............. : {state.production_ser_ver_id}
 ''')
 
 

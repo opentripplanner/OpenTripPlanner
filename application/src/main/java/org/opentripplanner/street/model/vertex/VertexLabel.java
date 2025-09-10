@@ -60,6 +60,20 @@ public sealed interface VertexLabel {
   }
 
   /**
+   * A vertex label for a split vertex generated for a node on a way.
+   * Must be similar to the parent vertex label so that tests can
+   * be written sensibly.
+   */
+  record NodeOnWayLabel(long nodeId, long wayId) implements VertexLabel {
+    private static final String TEMPLATE = "osm:node:%s:way:%s";
+
+    @Override
+    public String toString() {
+      return TEMPLATE.formatted(nodeId, wayId);
+    }
+  }
+
+  /**
    * A vertex label for an OSM node that also has a level, for example the upper and lower
    * vertices of an elevator edge.
    */

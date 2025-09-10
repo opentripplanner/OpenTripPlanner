@@ -1,10 +1,14 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.NORMAL;
+import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
 import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
 import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
 import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import gnu.trove.iterator.TLongIterator;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -121,7 +125,8 @@ public class OsmModule implements GraphBuilderModule {
       osmdb,
       graph,
       params.boardingAreaRefTags(),
-      params.includeOsmSubwayEntrances()
+      params.includeOsmSubwayEntrances(),
+      issueStore
     );
     for (var provider : providers) {
       LOG.info("Gathering OSM from provider: {}", provider);
@@ -152,10 +157,8 @@ public class OsmModule implements GraphBuilderModule {
   }
 
   private void build(OsmDatabase osmdb, VertexGenerator vertexGenerator) {
-    var parkingProcessor = new ParkingProcessor(
-      graph,
-      issueStore,
-      vertexGenerator::getVertexForOsmNode
+    var parkingProcessor = new ParkingProcessor(graph, issueStore, (node, way) ->
+      vertexGenerator.getVertexForOsmNode(node, way, SPLIT)
     );
 
     var parkingLots = new ArrayList<VehicleParking>();
@@ -183,19 +186,29 @@ public class OsmModule implements GraphBuilderModule {
 
     // figure out which nodes that are actually intersections
     vertexGenerator.initIntersectionNodes();
+    vertexGenerator.initNodesInBarrierWays();
 
     buildBasicGraph(osmdb, vertexGenerator);
     buildWalkableAreas(osmdb, vertexGenerator, !params.areaVisibility());
+    buildBarrierEdges(vertexGenerator);
     validateBarriers();
 
     if (params.staticParkAndRide()) {
-      List<OsmAreaGroup> areaGroups = groupAreas(osmdb, osmdb.getParkAndRideAreas());
+      List<OsmAreaGroup> areaGroups = groupAreas(
+        osmdb,
+        osmdb.getParkAndRideAreas(),
+        ImmutableMultimap.of()
+      );
       var carParkingAreas = parkingProcessor.buildParkAndRideAreas(areaGroups);
       parkingLots.addAll(carParkingAreas);
       LOG.info("Created {} car P+R areas.", carParkingAreas.size());
     }
     if (params.staticBikeParkAndRide()) {
-      List<OsmAreaGroup> areaGroups = groupAreas(osmdb, osmdb.getBikeParkingAreas());
+      List<OsmAreaGroup> areaGroups = groupAreas(
+        osmdb,
+        osmdb.getBikeParkingAreas(),
+        ImmutableMultimap.of()
+      );
       var bikeParkingAreas = parkingProcessor.buildBikeParkAndRideAreas(areaGroups);
       parkingLots.addAll(bikeParkingAreas);
       LOG.info("Created {} bike P+R areas", bikeParkingAreas.size());
@@ -227,12 +240,16 @@ public class OsmModule implements GraphBuilderModule {
     return d;
   }
 
-  private List<OsmAreaGroup> groupAreas(OsmDatabase osmdb, Collection<OsmArea> areas) {
+  private List<OsmAreaGroup> groupAreas(
+    OsmDatabase osmdb,
+    Collection<OsmArea> areas,
+    Multimap<OsmNode, OsmWay> barriers
+  ) {
     Map<OsmArea, OsmLevel> areasLevels = new HashMap<>(areas.size());
     for (OsmArea area : areas) {
       areasLevels.put(area, osmdb.getLevelForWay(area.parent));
     }
-    return OsmAreaGroup.groupAreas(areasLevels);
+    return OsmAreaGroup.groupAreas(areasLevels, barriers);
   }
 
   private void buildWalkableAreas(
@@ -247,7 +264,11 @@ public class OsmModule implements GraphBuilderModule {
     } else {
       LOG.info("Building visibility graphs for walkable areas.");
     }
-    List<OsmAreaGroup> areaGroups = groupAreas(osmdb, osmdb.getWalkableAreas());
+    List<OsmAreaGroup> areaGroups = groupAreas(
+      osmdb,
+      osmdb.getWalkableAreas(),
+      vertexGenerator.nodesInBarrierWays()
+    );
     WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
       graph,
       osmdb,
@@ -389,7 +410,8 @@ public class OsmModule implements GraphBuilderModule {
           nodes.subList(0, i).contains(nodes.get(i)) ||
           osmEndNode.hasTag("ele") ||
           osmEndNode.isBoardingLocation() ||
-          osmEndNode.isBarrier()
+          osmEndNode.isBarrier() ||
+          vertexGenerator.nodesInBarrierWays().containsKey(osmEndNode)
         ) {
           segmentCoordinates.add(osmEndNode.getCoordinate());
 
@@ -405,7 +427,7 @@ public class OsmModule implements GraphBuilderModule {
         if (startEndpoint == null) { // first iteration on this way
           // make or get a shared vertex for flat intersections,
           // one vertex per level for multilevel nodes like elevators
-          startEndpoint = vertexGenerator.getVertexForOsmNode(osmStartNode, way);
+          startEndpoint = vertexGenerator.getVertexForOsmNode(osmStartNode, way, NORMAL);
           String ele = segmentStartOsmNode.getTag("ele");
           if (ele != null) {
             Double elevation = ElevationUtils.parseEleTag(ele);
@@ -417,7 +439,7 @@ public class OsmModule implements GraphBuilderModule {
           startEndpoint = endEndpoint;
         }
 
-        endEndpoint = vertexGenerator.getVertexForOsmNode(osmEndNode, way);
+        endEndpoint = vertexGenerator.getVertexForOsmNode(osmEndNode, way, NORMAL);
         String ele = osmEndNode.getTag("ele");
         if (ele != null) {
           Double elevation = ElevationUtils.parseEleTag(ele);
@@ -469,6 +491,30 @@ public class OsmModule implements GraphBuilderModule {
     } // END loop over OSM ways
 
     LOG.info(progress.completeMessage());
+  }
+
+  private void buildBarrierEdges(VertexGenerator vertexGenerator) {
+    var barrierEdgeBuilder = new BarrierEdgeBuilder(params.edgeNamer());
+    LOG.info("Building edges to pass through linear barriers");
+    var verticesGroups = vertexGenerator.splitVerticesOnBarriers();
+    ProgressTracker progress = ProgressTracker.track(
+      "Build edges through barriers",
+      50,
+      verticesGroups.size()
+    );
+    for (var item : verticesGroups.entrySet()) {
+      barrierEdgeBuilder.build(
+        item.getKey(),
+        item.getValue().values(),
+        vertexGenerator.getLinearBarriersAtNode(item.getKey())
+      );
+
+      //Keep lambda! A method-ref would log incorrect class and line number
+      //noinspection Convert2MethodRef
+      progress.step(m -> LOG.info(m));
+    }
+    LOG.info(progress.completeMessage());
+    LOG.info("Complete building edges through linear barriers");
   }
 
   private Optional<Platform> getPlatform(OsmDatabase osmdb, OsmWay way) {

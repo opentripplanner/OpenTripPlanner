@@ -19,6 +19,7 @@ import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
@@ -797,7 +798,11 @@ public class StreetEdge
     int lengthInMillimeter = builder.hasDefaultLength()
       ? defaultMillimeterLength(builder.geometry())
       : builder.millimeterLength();
-    if (lengthInMillimeter == 0) {
+    if (
+      lengthInMillimeter == 0 &&
+      !(getFromVertex() instanceof BarrierPassThroughVertex ||
+        getToVertex() instanceof BarrierPassThroughVertex)
+    ) {
       LOG.warn(
         "StreetEdge {} from {} to {} has length of 0. This is usually an error.",
         name,

@@ -223,6 +223,32 @@ public class OsmWayTest {
     assertFalse(escalator.isEscalator());
   }
 
+  @Test
+  void isRelevantForRouting() {
+    var way = new OsmWay();
+    way.addTag("highway", "residential");
+    assertTrue(way.isRelevantForRouting());
+    way.addTag("access", "no");
+    assertFalse(way.isRelevantForRouting());
+
+    way = new OsmWay();
+    way.addTag("amenity", "parking");
+    way.addTag("area", "yes");
+    assertFalse(way.isRelevantForRouting());
+    way.addTag("park_ride", "train");
+    assertTrue(way.isRelevantForRouting());
+
+    way = new OsmWay();
+    way.addTag("amenity", "bicycle_parking");
+    way.addTag("area", "yes");
+    assertTrue(way.isRelevantForRouting());
+
+    way = new OsmWay();
+    way.addTag("public_transport", "platform");
+    way.addTag("area", "yes");
+    assertTrue(way.isRelevantForRouting());
+  }
+
   private OsmWay getClosedPolygon() {
     var way = new OsmWay();
     way.addNodeRef(1);

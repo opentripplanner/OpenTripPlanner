@@ -37,20 +37,8 @@ public class VertexFactory {
     return addToGraph(new TransitBoardingAreaVertex(boardingArea));
   }
 
-  public ElevatorOnboardVertex elevatorOnboard(
-    Vertex sourceVertex,
-    String label,
-    String levelName
-  ) {
-    return addToGraph(new ElevatorOnboardVertex(sourceVertex, label, levelName));
-  }
-
-  public ElevatorOffboardVertex elevatorOffboard(
-    Vertex sourceVertex,
-    String label,
-    String levelName
-  ) {
-    return addToGraph(new ElevatorOffboardVertex(sourceVertex, label, levelName));
+  public ElevatorVertex elevator(Vertex sourceVertex, String label, String levelName) {
+    return addToGraph(new ElevatorVertex(sourceVertex, label, levelName));
   }
 
   public IntersectionVertex intersection(Coordinate edgeCoordinate) {
@@ -87,8 +75,12 @@ public class VertexFactory {
     return addToGraph(new SplitterVertex(uniqueSplitLabel, x, y, originalEdge.getName()));
   }
 
-  public BarrierVertex barrier(long nid, Coordinate coordinate) {
-    return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid));
+  public BarrierVertex barrier(
+    long nid,
+    Coordinate coordinate,
+    Accessibility wheelchairAccessibility
+  ) {
+    return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid, wheelchairAccessibility));
   }
 
   public ExitVertex exit(long nid, Coordinate coordinate, String exitName) {
@@ -108,19 +100,17 @@ public class VertexFactory {
 
   public OsmVertex osm(
     Coordinate coordinate,
-    OsmNode node,
+    long nid,
     boolean highwayTrafficLight,
     boolean crossingTrafficLight
   ) {
     return addToGraph(
-      new OsmVertex(
-        coordinate.x,
-        coordinate.y,
-        node.getId(),
-        highwayTrafficLight,
-        crossingTrafficLight
-      )
+      new OsmVertex(coordinate.x, coordinate.y, nid, highwayTrafficLight, crossingTrafficLight)
     );
+  }
+
+  public OsmVertex osmOnLinearBarrier(Coordinate coordinate, long nid, long routableWayId) {
+    return addToGraph(new BarrierPassThroughVertex(coordinate.x, coordinate.y, nid, routableWayId));
   }
 
   public TransitStopVertex transitStop(TransitStopVertexBuilder transitStopVertexBuilder) {
