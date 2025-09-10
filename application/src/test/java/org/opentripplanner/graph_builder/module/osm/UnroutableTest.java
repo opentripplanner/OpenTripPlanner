@@ -12,6 +12,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -44,6 +45,7 @@ class UnroutableTest {
       provider,
       graph,
       new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultOsmStreetDecoratorRepository(),
       new DefaultVehicleParkingRepository()
     )
       .withAreaVisibility(true)

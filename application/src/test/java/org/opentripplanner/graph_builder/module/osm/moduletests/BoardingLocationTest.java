@@ -13,6 +13,7 @@ import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
@@ -31,10 +32,12 @@ class BoardingLocationTest {
 
     var graph = new Graph(new Deduplicator());
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var osmModule = OsmModule.of(
       provider,
       graph,
       osmInfoRepository,
+      osmStreetDecoratorRepository,
       new DefaultVehicleParkingRepository()
     )
       .withBoardingAreaRefTags(Set.of("ref"))
@@ -58,10 +61,12 @@ class BoardingLocationTest {
 
     var graph = new Graph(new Deduplicator());
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var osmModule = OsmModule.of(
       provider,
       graph,
       osmInfoRepository,
+      osmStreetDecoratorRepository,
       new DefaultVehicleParkingRepository()
     )
       .withBoardingAreaRefTags(Set.of("ref"))
@@ -84,10 +89,12 @@ class BoardingLocationTest {
 
     var graph = new Graph(new Deduplicator());
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var osmModule = OsmModule.of(
       provider,
       graph,
       osmInfoRepository,
+      osmStreetDecoratorRepository,
       new DefaultVehicleParkingRepository()
     )
       .withBoardingAreaRefTags(Set.of("ref"))

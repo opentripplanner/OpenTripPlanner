@@ -11,6 +11,7 @@ import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsm
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -28,6 +29,7 @@ class ElevatorTest {
       provider,
       graph,
       new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultOsmStreetDecoratorRepository(),
       new DefaultVehicleParkingRepository()
     ).build();
     osmModule.buildGraph();
@@ -55,6 +57,7 @@ class ElevatorTest {
       provider,
       graph,
       new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultOsmStreetDecoratorRepository(),
       new DefaultVehicleParkingRepository()
     ).build();
     osmModule.buildGraph();

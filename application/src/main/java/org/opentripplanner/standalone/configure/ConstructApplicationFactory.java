@@ -33,6 +33,8 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRepositoryModule;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleServiceModule;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
+import org.opentripplanner.service.streetdecorator.configure.OsmStreetDecoratorServiceModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.configure.VehicleParkingServiceModule;
@@ -67,6 +69,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     EmissionServiceModule.class,
     GeocoderModule.class,
     InteractiveLauncherModule.class,
+    OsmStreetDecoratorServiceModule.class,
     RealtimeVehicleServiceModule.class,
     RealtimeVehicleRepositoryModule.class,
     RideHailingServicesModule.class,
@@ -103,6 +106,9 @@ public interface ConstructApplicationFactory {
 
   @Nullable
   EmissionRepository emissionRepository();
+
+  @Nullable
+  OsmStreetDecoratorRepository osmStreetDecoratorRepository();
 
   @Nullable
   GraphVisualizer graphVisualizer();
@@ -165,6 +171,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder emissionRepository(EmissionRepository emissionRepository);
+
+    @BindsInstance
+    Builder osmStreetDecoratorRepository(OsmStreetDecoratorRepository osmStreetDecoratorRepository);
 
     @BindsInstance
     Builder schema(RouteRequest defaultRouteRequest);

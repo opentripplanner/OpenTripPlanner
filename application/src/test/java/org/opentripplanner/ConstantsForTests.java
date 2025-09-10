@@ -35,6 +35,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
@@ -149,11 +150,13 @@ public class ConstantsForTests {
       {
         var osmProvider = new DefaultOsmProvider(PORTLAND_CENTRAL_OSM, false);
         var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+        var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
         var vehicleParkingRepository = new DefaultVehicleParkingRepository();
         var osmModule = OsmModule.of(
           osmProvider,
           graph,
           osmInfoRepository,
+          osmStreetDecoratorRepository,
           vehicleParkingRepository
         )
           .withStaticParkAndRide(true)
@@ -206,11 +209,13 @@ public class ConstantsForTests {
       // Add street data from OSM
       var osmProvider = new DefaultOsmProvider(osmFile, true);
       var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+      var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
       var vehicleParkingRepository = new DefaultVehicleParkingRepository();
       var osmModule = OsmModule.of(
         osmProvider,
         graph,
         osmInfoRepository,
+        osmStreetDecoratorRepository,
         vehicleParkingRepository
       ).build();
       osmModule.buildGraph();
@@ -266,7 +271,14 @@ public class ConstantsForTests {
       {
         var osmProvider = new DefaultOsmProvider(OSLO_EAST_OSM, false);
         var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-        var osmModule = OsmModule.of(osmProvider, graph, osmInfoRepository, parkingService).build();
+        var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
+        var osmModule = OsmModule.of(
+          osmProvider,
+          graph,
+          osmInfoRepository,
+          osmStreetDecoratorRepository,
+          parkingService
+        ).build();
         osmModule.buildGraph();
       }
       // Add transit data from Netex

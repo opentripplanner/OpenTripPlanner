@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Collection;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
@@ -9,6 +10,7 @@ import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.StreetLimitationParameters;
@@ -22,6 +24,10 @@ public class OsmModuleBuilder {
   private final Graph graph;
   private final VehicleParkingRepository parkingRepository;
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
+
+  @Nullable
+  private final OsmStreetDecoratorRepository osmStreetDecoratorRepository;
+
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
   private EdgeNamer edgeNamer = new DefaultNamer();
@@ -37,11 +43,13 @@ public class OsmModuleBuilder {
     Collection<OsmProvider> providers,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    @Nullable OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     VehicleParkingRepository parkingRepository
   ) {
     this.providers = providers;
     this.graph = graph;
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
+    this.osmStreetDecoratorRepository = osmStreetDecoratorRepository;
     this.parkingRepository = parkingRepository;
   }
 
@@ -100,6 +108,7 @@ public class OsmModuleBuilder {
       providers,
       graph,
       osmInfoGraphBuildRepository,
+      osmStreetDecoratorRepository,
       parkingRepository,
       issueStore,
       streetLimitationParameters,

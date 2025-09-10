@@ -22,6 +22,7 @@ import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -164,12 +165,14 @@ public class LinkingTest {
     File file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
     var provider = new DefaultOsmProvider(file, false);
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var vehicleParkingRepository = new DefaultVehicleParkingRepository();
 
     var osmModule = OsmModule.of(
       provider,
       graph,
       osmInfoRepository,
+      osmStreetDecoratorRepository,
       vehicleParkingRepository
     ).build();
 

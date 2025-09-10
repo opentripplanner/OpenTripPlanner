@@ -643,7 +643,9 @@ public class OsmDatabase {
       /* try to find a level name in tags */
       String levelName = null;
       OsmLevel level = OsmLevel.DEFAULT;
-      if (way.hasTag("level")) { // TODO: floating-point levels &c.
+      if (way.hasTag("level")) {
+        // TODO: floating-point levels &c.
+        // TODO multiple levels on one way
         levelName = way.getTag("level");
         level = OsmLevel.fromString(
           levelName,

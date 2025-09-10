@@ -24,6 +24,7 @@ import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
@@ -101,8 +102,15 @@ class OsmBoardingLocationsModuleTest {
       new NonLocalizedString("bus stop not connected to street network")
     );
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-    var osmModule = OsmModule.of(provider, graph, osmInfoRepository, vehicleParkingRepository)
+    var osmModule = OsmModule.of(
+      provider,
+      graph,
+      osmInfoRepository,
+      osmStreetDecoratorRepository,
+      vehicleParkingRepository
+    )
       .withBoardingAreaRefTags(Set.of("ref", "ref:IFOPT"))
       .withAreaVisibility(areaVisibility)
       .build();
@@ -205,6 +213,7 @@ class OsmBoardingLocationsModuleTest {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var osmModule = OsmModule.of(
       new DefaultOsmProvider(
         ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file("moorgate.osm.pbf"),
@@ -212,6 +221,7 @@ class OsmBoardingLocationsModuleTest {
       ),
       graph,
       osmInfoRepository,
+      osmStreetDecoratorRepository,
       new DefaultVehicleParkingRepository()
     )
       .withBoardingAreaRefTags(Set.of("naptan:AtcoCode"))
