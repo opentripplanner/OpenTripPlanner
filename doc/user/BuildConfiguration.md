@@ -1340,7 +1340,8 @@ the centroid.
     },
     "BIKE" : {
       "maxTransferDuration" : "30m",
-      "carsAllowedStopMaxTransferDuration" : "3h"
+      "carsAllowedStopMaxTransferDuration" : "3h",
+      "bikesAllowedStopMaxTransferDuration" : "1h"
     }
   }
 }
