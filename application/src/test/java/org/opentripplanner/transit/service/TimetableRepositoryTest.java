@@ -23,6 +23,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -165,5 +166,45 @@ class TimetableRepositoryTest {
     repo.addTripPattern(id("TP1"), TP1);
     repo.addTripPattern(id("TP2"), TP2);
     assertEquals(Set.of(S21, S22, S23), repo.getStopLocationsUsedForBikesAllowedTrips());
+  }
+
+  @Test
+  void testGetStopLocationsUsedForCarsAllowedTrips() {
+    var repo = new TimetableRepository();
+    var S11 = TimetableRepositoryForTest.of().stop("S11").build();
+    var S12 = TimetableRepositoryForTest.of().stop("S12").build();
+    var S13 = TimetableRepositoryForTest.of().stop("S13").build();
+    var S21 = TimetableRepositoryForTest.of().stop("S21").build();
+    var S22 = TimetableRepositoryForTest.of().stop("S22").build();
+    var S23 = TimetableRepositoryForTest.of().stop("S23").build();
+    var R1 = route("R1").withMode(TransitMode.RAIL).build();
+    var R2 = route("R2").withMode(TransitMode.RAIL).build();
+    var TP1 = tripPattern("TP1", R1)
+      .withStopPattern(stopPattern(S11, S12, S13))
+      .withScheduledTimeTableBuilder(builder ->
+        builder.addTripTimes(
+          ScheduledTripTimes.of()
+            .withTrip(TimetableRepositoryForTest.trip("T1").build())
+            .withDepartureTimes("00:00 01:00 02:00")
+            .build()
+        )
+      )
+      .build();
+    var TP2 = tripPattern("TP2", R2)
+      .withStopPattern(stopPattern(S21, S22, S23))
+      .withScheduledTimeTableBuilder(builder ->
+        builder.addTripTimes(
+          ScheduledTripTimes.of()
+            .withTrip(
+              TimetableRepositoryForTest.trip("T2").withCarsAllowed(CarAccess.ALLOWED).build()
+            )
+            .withDepartureTimes("00:00 01:00 02:00")
+            .build()
+        )
+      )
+      .build();
+    repo.addTripPattern(id("TP1"), TP1);
+    repo.addTripPattern(id("TP2"), TP2);
+    assertEquals(Set.of(S21, S22, S23), repo.getStopLocationsUsedForCarsAllowedTrips());
   }
 }
