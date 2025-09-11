@@ -54,17 +54,6 @@ public class GtfsConfig {
     var docDefaults = GtfsFeedParameters.DEFAULT;
     return defaults
       .copyOf()
-      .withRemoveRepeatedStops(
-        node
-          .of("removeRepeatedStops")
-          .since(V2_3)
-          .summary(
-            "Should consecutive identical stops be merged into one stop time entry." +
-            documentationAddition
-          )
-          .docDefaultValue(docDefaults.removeRepeatedStops())
-          .asBoolean(defaults.removeRepeatedStops())
-      )
       .withStationTransferPreference(
         node
           .of("stationTransferPreference")

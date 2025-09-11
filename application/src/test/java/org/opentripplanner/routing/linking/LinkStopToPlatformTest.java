@@ -25,6 +25,7 @@ import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.LinkingDirection;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -74,8 +75,10 @@ public class LinkStopToPlatformTest {
     // AreaGroup must include a valid Area which defines area attributes
     Area area = new Area();
     area.setName(new LocalizedString("test platform"));
+    area.setWalkSafety(0.5f);
+    area.setBicycleSafety(0.5f);
     area.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-    area.setOriginalEdges(polygon);
+    area.setGeometry(polygon);
     areaGroup.addArea(area);
 
     for (int i = 0; i < platform.length; i++) {
@@ -250,6 +253,17 @@ public class LinkStopToPlatformTest {
 
     // vertex links to the single visibility point with 2 edges
     assertEquals(10, graph.getEdges().size());
+
+    // check that link edges obey area safety factors
+    var out = v.getOutgoing();
+    assertEquals(out.size(), 1);
+    StreetEdge streetEdge = null;
+    if (out.iterator().next() instanceof StreetEdge se) {
+      streetEdge = se;
+      assertEquals(0.5, se.getWalkSafetyFactor());
+      assertEquals(0.5, se.getBicycleSafetyFactor());
+    }
+    assertNotNull(streetEdge);
   }
 
   /**

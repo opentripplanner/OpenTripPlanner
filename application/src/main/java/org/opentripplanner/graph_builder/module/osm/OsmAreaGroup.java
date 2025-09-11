@@ -1,14 +1,18 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import gnu.trove.list.TLongList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -20,6 +24,7 @@ import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionExcepti
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.osm.model.OsmWay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,29 +91,82 @@ class OsmAreaGroup {
     }
   }
 
-  public static List<OsmAreaGroup> groupAreas(Map<OsmArea, OsmLevel> areasLevels) {
+  /**
+   * @return barriers which has a direct edge from first to second
+   */
+  private static Collection<OsmWay> getBarriers(
+    Multimap<OsmNode, OsmWay> barriers,
+    OsmNode first,
+    OsmNode second
+  ) {
+    return CollectionUtils.intersection(barriers.get(first), barriers.get(second))
+      .stream()
+      .filter(
+        // only return barriers where first and second are consecutive nodes
+        barrier -> {
+          var nodeRefs = Objects.requireNonNull(barrier).getNodeRefs();
+          for (var i = 0; i < nodeRefs.size() - 1; ++i) {
+            if (nodeRefs.get(i) == first.getId() && nodeRefs.get(i + 1) == second.getId()) {
+              return true;
+            }
+            if (nodeRefs.get(i) == second.getId() && nodeRefs.get(i + 1) == first.getId()) {
+              return true;
+            }
+          }
+          return false;
+        }
+      )
+      .toList();
+  }
+
+  public static List<OsmAreaGroup> groupAreas(
+    Map<OsmArea, OsmLevel> areasLevels,
+    Multimap<OsmNode, OsmWay> barriers
+  ) {
     DisjointSet<OsmArea> groups = new DisjointSet<>();
-    Multimap<OsmNode, OsmArea> areasForNode = LinkedListMultimap.create();
+    Multimap<OsmNodePair, OsmArea> areasForNodePair = HashMultimap.create();
+    Map<OsmArea, Map<OsmWay, Set<OsmNodePair>>> barriersForArea = new HashMap<>();
     for (OsmArea area : areasLevels.keySet()) {
       for (Ring ring : area.outermostRings) {
         for (Ring inner : ring.getHoles()) {
-          for (OsmNode node : inner.nodes) {
-            areasForNode.put(node, area);
-          }
+          processRing(area, inner, barriers, areasForNodePair, barriersForArea);
         }
-        for (OsmNode node : ring.nodes) {
-          areasForNode.put(node, area);
-        }
+        processRing(area, ring, barriers, areasForNodePair, barriersForArea);
       }
     }
 
-    // areas that can be joined must share nodes and levels
-    for (OsmNode osmNode : areasForNode.keySet()) {
-      for (OsmArea area1 : areasForNode.get(osmNode)) {
+    // areas that can be joined must share levels and also at least two consecutive nodes,
+    // and these two consecutive nodes must not also be consecutive nodes on a barrier
+    for (var nodePair : areasForNodePair.keySet()) {
+      for (OsmArea area1 : areasForNodePair.get(nodePair)) {
         OsmLevel level1 = areasLevels.get(area1);
-        for (OsmArea area2 : areasForNode.get(osmNode)) {
+        for (OsmArea area2 : areasForNodePair.get(nodePair)) {
           OsmLevel level2 = areasLevels.get(area2);
-          if ((level1 == null && level2 == null) || (level1 != null && level1.equals(level2))) {
+          boolean onSameLevel =
+            (level1 == null && level2 == null) || (level1 != null && level1.equals(level2));
+          var crossablePermissions = Objects.requireNonNull(area1)
+            .getPermission()
+            .intersection(Objects.requireNonNull(area2).getPermission());
+          Collection<OsmWay> sharedBarriers = CollectionUtils.intersection(
+            barriersForArea.getOrDefault(area1, Map.of()).keySet(),
+            barriersForArea.getOrDefault(area2, Map.of()).keySet()
+          )
+            .stream()
+            .filter(barrier -> {
+              boolean blocksTraversal =
+                crossablePermissions.intersection(
+                  Objects.requireNonNull(barrier).getPermission()
+                ) !=
+                crossablePermissions;
+              boolean sharesEdgeWithBothAreas = !CollectionUtils.intersection(
+                barriersForArea.get(area1).get(barrier),
+                barriersForArea.get(area2).get(barrier)
+              ).isEmpty();
+              return blocksTraversal && sharesEdgeWithBothAreas;
+            })
+            .toList();
+          boolean shareBarrier = area1 != area2 && !sharedBarriers.isEmpty();
+          if (onSameLevel && !shareBarrier) {
             groups.union(area1, area2);
           }
         }
@@ -131,6 +189,36 @@ class OsmAreaGroup {
       }
     }
     return out;
+  }
+
+  private static void processRing(
+    OsmArea area,
+    Ring ring,
+    Multimap<OsmNode, OsmWay> barriers,
+    Multimap<OsmNodePair, OsmArea> areasForNodePair,
+    Map<OsmArea, Map<OsmWay, Set<OsmNodePair>>> barriersForArea
+  ) {
+    var nodes = ring.nodes;
+    // the end node of a ring must be the same of the start node
+    for (var i = 0; i < nodes.size() - 1; i++) {
+      OsmNode node = nodes.get(i);
+      OsmNode nextNode = nodes.get(i + 1);
+      var pair = new OsmNodePair(node, nextNode);
+      areasForNodePair.put(pair, area);
+
+      var sharedBarriers = getBarriers(barriers, node, nextNode);
+      for (var barrier : sharedBarriers) {
+        if (!barriersForArea.containsKey(area)) {
+          barriersForArea.put(area, new HashMap<>());
+        }
+        var barrierMap = barriersForArea.get(area);
+        if (!barrierMap.containsKey(barrier)) {
+          barrierMap.put(barrier, new HashSet<>());
+        }
+        var nodesOnBarrier = barrierMap.get(barrier);
+        nodesOnBarrier.add(pair);
+      }
+    }
   }
 
   public OsmEntity getSomeOsmObject() {

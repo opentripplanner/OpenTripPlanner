@@ -1,16 +1,11 @@
 package org.opentripplanner.routing.graph;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -37,8 +32,7 @@ class StreetIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetIndex.class);
 
-  private final Map<FeedScopedId, TransitStopVertex> stopVerticesById;
-  private final ImmutableSetMultimap<FeedScopedId, TransitStopVertex> stopVerticesByParentId;
+  private final Map<FeedScopedId, TransitStopVertex> stopVertices;
 
   /**
    * This list contains transitStationVertices for the stations that are configured to route to centroid
@@ -54,23 +48,30 @@ class StreetIndex {
   StreetIndex(Graph graph) {
     this.edgeIndex = new EdgeSpatialIndex();
     this.vertexIndex = new HashGridSpatialIndex<>();
-    var stopVertices = graph.getVerticesOfType(TransitStopVertex.class);
-    this.stopVerticesById = indexStopIds(stopVertices);
-    this.stopVerticesByParentId = indexStationIds(stopVertices);
+    this.stopVertices = indexStopIds(graph);
 
     this.stationCentroidVertices = indexStationCentroids(graph);
     postSetup(graph.getVertices());
   }
 
-  @Nullable
-  TransitStopVertex findTransitStopVertex(FeedScopedId stopId) {
-    return stopVerticesById.get(stopId);
+  /**
+   * @see Graph#findStopVertex(FeedScopedId) (FeedScopedId)
+   */
+  Optional<TransitStopVertex> findStopVertex(FeedScopedId id) {
+    return Optional.ofNullable(stopVertices.get(id));
+  }
+
+  /**
+   * @see Graph#findStationCentroidVertex(FeedScopedId)
+   */
+  Optional<StationCentroidVertex> findStationCentroidVertex(FeedScopedId id) {
+    return Optional.ofNullable(stationCentroidVertices.get(id));
   }
 
   /**
    * Returns the vertices intersecting with the specified envelope.
    */
-  List<Vertex> getVerticesForEnvelope(Envelope envelope) {
+  List<Vertex> findVertices(Envelope envelope) {
     List<Vertex> vertices = vertexIndex.query(envelope);
     // Here we assume vertices list modifiable
     vertices.removeIf(v -> !envelope.contains(new Coordinate(v.getLon(), v.getLat())));
@@ -78,7 +79,8 @@ class StreetIndex {
   }
 
   /**
-   * Return the edges whose geometry intersect with the specified envelope. Warning: edges disconnected from the graph
+   * Return the edges whose geometry intersect with the specified envelope.
+   * Warning: edges disconnected from the graph
    * will not be indexed.
    */
   Collection<Edge> findEdges(Envelope envelope) {
@@ -90,42 +92,6 @@ class StreetIndex {
           envelope.intersects(edgeGeometryOrStraightLine(e).getEnvelopeInternal())
       )
       .toList();
-  }
-
-  @Override
-  public String toString() {
-    return (
-      getClass().getName() +
-      " -- edgeTree: " +
-      edgeIndex.toString() +
-      " -- verticesTree: " +
-      vertexIndex.toString()
-    );
-  }
-
-  /**
-   * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
-   * @return The associated TransitStopVertex or all underlying TransitStopVertices
-   */
-  Set<TransitStopVertex> getStopOrChildStopsVertices(FeedScopedId id) {
-    if (stopVerticesById.containsKey(id)) {
-      return Set.of(stopVerticesById.get(id));
-    } else if (stopVerticesByParentId.containsKey(id)) {
-      return stopVerticesByParentId.get(id);
-    } else {
-      return Set.of();
-    }
-  }
-
-  /**
-   * @see Graph#findStopVertices(FeedScopedId)
-   */
-  Set<Vertex> findStopVertices(FeedScopedId id) {
-    var stationVertex = stationCentroidVertices.get(id);
-    if (stationVertex != null) {
-      return Set.of(stationVertex);
-    }
-    return Collections.unmodifiableSet(getStopOrChildStopsVertices(id));
   }
 
   Collection<Edge> findEdges(Envelope env, Scope scope) {
@@ -146,6 +112,8 @@ class StreetIndex {
   void remove(Vertex vertex) {
     vertexIndex.remove(new Envelope(vertex.getCoordinate()), vertex);
   }
+
+  // private methods
 
   private static LineString edgeGeometryOrStraightLine(Edge e) {
     LineString geometry = e.getGeometry();
@@ -181,27 +149,13 @@ class StreetIndex {
     LOG.info(progress.completeMessage());
   }
 
-  private static Map<FeedScopedId, TransitStopVertex> indexStopIds(
-    Collection<TransitStopVertex> vertices
-  ) {
+  private static Map<FeedScopedId, TransitStopVertex> indexStopIds(Graph graph) {
+    var vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var map = new HashMap<FeedScopedId, TransitStopVertex>();
     for (TransitStopVertex it : vertices) {
       map.put(it.getStop().getId(), it);
     }
     return Map.copyOf(map);
-  }
-
-  private static ImmutableSetMultimap<FeedScopedId, TransitStopVertex> indexStationIds(
-    Collection<TransitStopVertex> vertices
-  ) {
-    Multimap<FeedScopedId, TransitStopVertex> map = ArrayListMultimap.create();
-    vertices
-      .stream()
-      .filter(v -> v.getStop().isPartOfStation())
-      .forEach(v -> {
-        map.put(v.getStop().getParentStation().getId(), v);
-      });
-    return ImmutableSetMultimap.copyOf(map);
   }
 
   private static Map<FeedScopedId, StationCentroidVertex> indexStationCentroids(Graph graph) {
