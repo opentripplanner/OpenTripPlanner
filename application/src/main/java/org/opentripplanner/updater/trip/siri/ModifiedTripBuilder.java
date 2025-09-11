@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.OccupancyEnumeration;
+import uk.org.siri.siri21.VehicleJourneyRef;
 
 /**
  * A helper class for creating new StopPattern and TripTimes based on a SIRI-ET
@@ -48,6 +50,7 @@ class ModifiedTripBuilder {
   private final OccupancyEnumeration occupancy;
   private final boolean predictionInaccurate;
   private final String dataSource;
+  private final String estimatedJourneyId;
 
   public ModifiedTripBuilder(
     TripTimes existingTripTimes,
@@ -68,6 +71,9 @@ class ModifiedTripBuilder {
     predictionInaccurate = TRUE.equals(journey.isPredictionInaccurate());
     occupancy = journey.getOccupancy();
     dataSource = journey.getDataSource();
+    this.estimatedJourneyId = Optional.ofNullable(journey.getVehicleJourneyRef())
+      .map(VehicleJourneyRef::getValue)
+      .orElse(null);
   }
 
   /**
@@ -95,6 +101,7 @@ class ModifiedTripBuilder {
     this.occupancy = occupancy;
     this.predictionInaccurate = predictionInaccurate;
     this.dataSource = dataSource;
+    this.estimatedJourneyId = null;
   }
 
   /**
@@ -120,8 +127,9 @@ class ModifiedTripBuilder {
     if (result.isFailure()) {
       int invalidStopIndex = result.failureValue().stopIndex();
       LOG.info(
-        "Invalid SIRI-ET data for trip {} - {} at stop index {}",
+        "Invalid SIRI-ET data for trip {} ({}) - {} at stop index {}",
         existingTripTimes.getTrip().getId(),
+        estimatedJourneyId,
         result.failureValue().errorType(),
         invalidStopIndex
       );
@@ -154,8 +162,9 @@ class ModifiedTripBuilder {
     int numStopsInPattern = pattern.numberOfStops();
     if (numStopsInUpdate != numStopsInPattern) {
       LOG.info(
-        "Invalid SIRI-ET data for trip {} - Inconsistent number of updated stops ({}) and stops in pattern ({})",
+        "Invalid SIRI-ET data for trip {} ({}) - Inconsistent number of updated stops ({}) and stops in pattern ({})",
         builder.getTrip().getId(),
+        estimatedJourneyId,
         numStopsInUpdate,
         numStopsInPattern
       );
@@ -215,9 +224,10 @@ class ModifiedTripBuilder {
 
       if (matchingCall == null) {
         throw new IllegalStateException(
-          "The stop at index %d on the trip %s cannot be matched with any call. This implies a bug.".formatted(
+          "The stop at index %d on the trip %s (%s) cannot be matched with any call. This implies a bug.".formatted(
               stopIndex,
-              builder.getTrip().getId()
+              builder.getTrip().getId(),
+              estimatedJourneyId
             )
         );
       }
