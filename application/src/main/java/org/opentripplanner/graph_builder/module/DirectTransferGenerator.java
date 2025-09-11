@@ -139,7 +139,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       .filter(stop -> transitService.findPatterns(stop).isEmpty())
       .toList();
 
-    carsAllowedStops.addAll(emptyStops);
     bikesAllowedStops.addAll(emptyStops);
 
     stops
