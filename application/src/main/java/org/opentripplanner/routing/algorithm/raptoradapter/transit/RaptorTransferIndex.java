@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
@@ -12,7 +13,7 @@ public interface RaptorTransferIndex {
   /**
    * Create an index for a route request configured in router-config.json
    */
-  static RaptorTransferIndex createPreCached(
+  static RaptorTransferIndex createInitialSetup(
     List<List<Transfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {
@@ -22,11 +23,13 @@ public interface RaptorTransferIndex {
   /**
    * Create an index for a route request originated from the client
    */
-  static RaptorTransferIndex createOnDemand(
+  static RaptorTransferIndex createRequestScope(
     List<List<Transfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {
-    return new OnDemandRaptorTransferIndex(transfersByStopIndex, request);
+    return OTPFeature.OnDemandRaptorTransfer.isOn()
+      ? new OnDemandRaptorTransferIndex(transfersByStopIndex, request)
+      : new PreCachedRaptorTransferIndex(transfersByStopIndex, request);
   }
 
   static Collection<DefaultRaptorTransfer> getRaptorTransfers(
