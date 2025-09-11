@@ -5,8 +5,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 ## 2.9.0-SNAPSHOT (in progress)
 
-
-- Remove GTFS  feature [#6846](https://github.com/opentripplanner/OpenTripPlanner/pull/6846)
+- Remove GTFS `removeRepeatedStops` feature [#6846](https://github.com/opentripplanner/OpenTripPlanner/pull/6846)
 - Restore lookup of multi-modal stations and group of stations [#6805](https://github.com/opentripplanner/OpenTripPlanner/pull/6805)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
