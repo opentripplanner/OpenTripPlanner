@@ -14,6 +14,8 @@ import static org.opentripplanner.street.model.RentalFormFactor.CAR;
 import static org.opentripplanner.street.model.RentalFormFactor.MOPED;
 import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -216,6 +218,42 @@ class VehicleRentalEdgeTest {
     assertTrue(State.isEmpty(s1));
   }
 
+  @Test
+  void testWithFreeFloatingVehicleWithoutRequiredAvailability() {
+    OffsetDateTime tenMinutesLater = OffsetDateTime.now().plusMinutes(10);
+    initFreeFloatingEdgeAndRequestForAvailability(tenMinutesLater, Duration.ofMinutes(15), false);
+    var s1 = rent();
+
+    assertTrue(State.isEmpty(s1));
+  }
+
+  @Test
+  void testWithFreeFloatingVehicleAndArrivalWithoutRequiredAvailability() {
+    OffsetDateTime tenMinutesLater = OffsetDateTime.now().minusMinutes(10);
+    initFreeFloatingEdgeAndRequestForAvailability(tenMinutesLater, Duration.ofMinutes(1), true);
+    var s1 = rent();
+
+    assertTrue(State.isEmpty(s1));
+  }
+
+  @Test
+  void testWithFreeFloatingVehicleWithRequiredAvailabilityInformation() {
+    OffsetDateTime tenMinutesLater = OffsetDateTime.now().plusMinutes(10);
+    initFreeFloatingEdgeAndRequestForAvailability(tenMinutesLater, Duration.ofMinutes(5), false);
+    var s1 = rent();
+
+    assertFalse(State.isEmpty(s1));
+  }
+
+  @Test
+  void testWithFreeFloatingVehicleAndArrivalWithRequiredAvailabilityInformation() {
+    OffsetDateTime tenMinutesLater = OffsetDateTime.now().plusMinutes(1);
+    initFreeFloatingEdgeAndRequestForAvailability(tenMinutesLater, Duration.ofMinutes(1), true);
+    var s1 = rent();
+
+    assertFalse(State.isEmpty(s1));
+  }
+
   @Nested
   class StartedReverseSearchInNoGeofencingZone {
 
@@ -360,6 +398,22 @@ class VehicleRentalEdgeTest {
           )
           .build()
       )
+      .build();
+  }
+
+  private void initFreeFloatingEdgeAndRequestForAvailability(
+    OffsetDateTime vehicleAvailableUntil,
+    Duration rentalDuration,
+    boolean arriveBy
+  ) {
+    RentalFormFactor formFactor = RentalFormFactor.CAR;
+    this.vertex = StreetModelForTest.rentalVertex(formFactor, vehicleAvailableUntil);
+    this.vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, formFactor);
+
+    this.request = StreetSearchRequest.of()
+      .withMode(StreetMode.CAR_RENTAL)
+      .withRentalDuration(rentalDuration)
+      .withArriveBy(arriveBy)
       .build();
   }
 
