@@ -148,7 +148,7 @@ public class DebugStyleSpec {
       allSources,
       ListUtils.combine(
         backgroundLayers(extraRasterSources),
-        rental(rental),
+        rental(rental, vertices),
         wheelchair(edges),
         noThruTraffic(edges),
         bicycleSafety(edges),
@@ -243,12 +243,12 @@ public class DebugStyleSpec {
     );
   }
 
-  private static List<StyleBuilder> rental(VectorSourceLayer layer) {
+  private static List<StyleBuilder> rental(VectorSourceLayer rentalLayer, VectorSourceLayer vertices) {
     return List.of(
       StyleBuilder.ofId("rental-vehicle")
         .group(RENTAL_GROUP)
         .typeCircle()
-        .vectorSourceLayer(layer)
+        .vectorSourceLayer(rentalLayer)
         .classFilter(VehicleRentalVehicle.class)
         .circleStroke(BLACK, CIRCLE_STROKE)
         .circleRadius(MEDIUM_CIRCLE_RADIUS)
@@ -259,12 +259,20 @@ public class DebugStyleSpec {
       StyleBuilder.ofId("rental-station")
         .group(RENTAL_GROUP)
         .typeCircle()
-        .vectorSourceLayer(layer)
+        .vectorSourceLayer(rentalLayer)
         .classFilter(VehicleRentalStation.class)
         .circleStroke(BLACK, LARGE_CIRCLE_LINE_WIDTH)
         .circleRadius(LARGE_CIRCLE_RADIUS)
         .circleColor(TURQUOISE)
         .minZoom(13)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("rental-restrictions")
+        .group(RENTAL_GROUP)
+        .typeSymbol()
+        .symbolText("rentalRestrictions")
+        .vectorSourceLayer(vertices)
+        .minZoom(17)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );

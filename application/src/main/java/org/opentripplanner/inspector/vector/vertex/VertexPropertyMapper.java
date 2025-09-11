@@ -39,6 +39,9 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
           kColl("spacesFor", spacesFor(v.getVehicleParking())),
           kColl("traversalPermission", traversalPermissions(v.getParkingEntrance()))
         );
+        case StreetVertex v -> List.of(
+          kColl("rentalRestrictions", v.getParent().rentalRestrictions().toList())
+        );
         default -> List.of();
       };
 
