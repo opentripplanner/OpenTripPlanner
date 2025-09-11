@@ -580,47 +580,7 @@ public class OrcaFareService extends DefaultFareService {
     return fare;
   }
 
-  /**
-   * Adds a leg fare product to the given itinerary fares object
-   *
-   * @param leg              The leg to create a fareproduct for
-   * @param itineraryFare   The itinerary fares to store the fare product in
-   * @param fareType         Fare type (split into container and rider category)
-   * @param totalFare        Total fare paid after transfer
-   * @param transferDiscount Transfer discount applied
-   */
-  private static void addLegFareProduct(
-    Leg leg,
-    ItineraryFare itineraryFare,
-    FareType fareType,
-    Money totalFare,
-    Money transferDiscount
-  ) {
-    var id = new FeedScopedId(FEED_ID, "farePayment");
-    var riderCategory = getRiderCategory(fareType);
-
-    FareMedium medium;
-    if (usesOrca(fareType)) {
-      medium = ELECTRONIC_MEDIUM;
-    } else {
-      medium = CASH_MEDIUM;
-    }
-    var fareProduct = FareProduct.of(id, "rideCost", totalFare)
-      .withCategory(riderCategory)
-      .withMedium(medium)
-      .build();
-    itineraryFare.addFareProduct(leg, FareOffer.of(leg.startTime(), fareProduct));
-    // If a transfer was used, then also add a transfer fare product.
-    if (transferDiscount.isPositive()) {
-      var transferFareProduct = FareProduct.of(id, "transfer", transferDiscount)
-        .withCategory(riderCategory)
-        .withMedium(medium)
-        .build();
-      itineraryFare.addFareProduct(leg, FareOffer.of(leg.startTime(), transferFareProduct));
-    }
-  }
-
-  /**
+    /**
    * In the base class only the rules for a specific feed are selected and then passed to the
    * fare engine, however here we want to explicitly compute fares across feed boundaries.
    */
