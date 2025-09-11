@@ -460,12 +460,12 @@ public class OrcaFareServiceTest {
       getLeg(KC_METRO_AGENCY_ID, 20),
       getLeg(COMM_TRANS_AGENCY_ID, 45),
       getLeg(KC_METRO_AGENCY_ID, 60),
-      getLeg(KC_METRO_AGENCY_ID, 130),
+      getLeg(KC_METRO_AGENCY_ID, 130), // second kcm fare
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 131),
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 132)
     );
-    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(4));
-    calculateFare(rides, FareType.senior, usDollars(4.00f));
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(3));
+    calculateFare(rides, FareType.senior, usDollars(3.00f));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, usDollars(2.00f));
     calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE.times(2));
