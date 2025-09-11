@@ -489,17 +489,13 @@ public class OrcaFareService extends DefaultFareService {
 
       var validFareProducts = purchasedFareProducts
         .stream()
-        .filter(fp -> isValidAt(fp, leg.startTime()))
+        .filter(fp -> isValidAt(fp, leg.startTime()) && fp.fareProduct().medium().equals(ELECTRONIC_MEDIUM))
         .toList();
 
       var transferType = rideType.getTransferType(fareType, leg.startTime());
       if (transferType == TransferType.ORCA_INTERAGENCY_TRANSFER) {
         // Important to get transfer discount before calculating next leg price
-        var validOrcaFareProducts = validFareProducts
-          .stream()
-          .filter(fp -> fp.fareProduct().medium().equals(ELECTRONIC_MEDIUM))
-          .toList();
-        var totalAlreadyPurchased = validOrcaFareProducts
+        var totalAlreadyPurchased = validFareProducts
           .stream()
           .reduce(ZERO_USD, (subtotal, el) -> subtotal.plus(el.fareProduct().price()), Money::plus);
         var additionalFareRequired = legFare.minus(totalAlreadyPurchased);
@@ -507,7 +503,6 @@ public class OrcaFareService extends DefaultFareService {
         // Add existing valid ORCA fare products to this leg
         validFareProducts
           .stream()
-          .filter(fp -> fp.fareProduct().medium().equals(ELECTRONIC_MEDIUM))
           .forEach(fp -> fare.addFareProduct(leg, fp));
 
         if (additionalFareRequired.isPositive()) {
@@ -523,7 +518,7 @@ public class OrcaFareService extends DefaultFareService {
             .withMedium(ELECTRONIC_MEDIUM)
             .build();
 
-          var dependencies = validOrcaFareProducts.stream().map(FareOffer::fareProduct).toList();
+          var dependencies = validFareProducts.stream().map(FareOffer::fareProduct).toList();
           var newFareOffer = FareOffer.of(leg.startTime(), newFareProduct, dependencies);
           fare.addFareProduct(leg, newFareOffer);
           purchasedFareProducts.add(newFareOffer);
