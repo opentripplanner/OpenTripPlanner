@@ -164,6 +164,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       acTempVertices = new TemporaryVerticesContainer(
         graph,
         vertexLinker,
+        null,
         GenericLocation.fromCoordinate(trip.boardingArea().getLat(), trip.boardingArea().getLon()),
         GenericLocation.fromCoordinate(request.from().lat, request.from().lng),
         StreetMode.CAR, // We'll route by car for all segments
@@ -178,6 +179,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       cdTempVertices = new TemporaryVerticesContainer(
         graph,
         vertexLinker,
+        null,
         GenericLocation.fromCoordinate(request.from().lat, request.from().lng),
         GenericLocation.fromCoordinate(request.to().lat, request.to().lng),
         StreetMode.CAR, // We'll route by car for all segments
@@ -192,6 +194,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       dbTempVertices = new TemporaryVerticesContainer(
         graph,
         vertexLinker,
+        null,
         GenericLocation.fromCoordinate(request.to().lat, request.to().lng),
         GenericLocation.fromCoordinate(
           trip.alightingArea().getLat(),

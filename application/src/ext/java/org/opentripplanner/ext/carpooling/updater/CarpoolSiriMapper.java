@@ -120,6 +120,7 @@ public class CarpoolSiriMapper {
       var tempVertices = new TemporaryVerticesContainer(
         graph,
         vertexLinker,
+        null,
         GenericLocation.fromCoordinate(boardingArea.getLat(), boardingArea.getLon()),
         GenericLocation.fromCoordinate(alightingArea.getLat(), alightingArea.getLon()),
         StreetMode.CAR,
