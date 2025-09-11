@@ -197,8 +197,8 @@ public class FlexRouter {
   private class CallbackAdapter implements FlexAccessEgressCallbackAdapter {
 
     @Override
-    public TransitStopVertex getStopVertexForStopId(FeedScopedId stopId) {
-      return graph.getStopVertexForStopId(stopId);
+    public TransitStopVertex getStopVertex(FeedScopedId stopId) {
+      return graph.getStopVertex(stopId);
     }
 
     @Override
