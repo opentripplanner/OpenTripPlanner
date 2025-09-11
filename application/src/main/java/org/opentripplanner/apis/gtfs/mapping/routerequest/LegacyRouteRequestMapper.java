@@ -175,13 +175,6 @@ public class LegacyRouteRequestMapper {
       callWith.argument("wheelchair", journeyBuilder::withWheelchair);
 
       journeyBuilder.withTransit(transitBuilder -> {
-        callWith.argument("preferred.routes", (String v) ->
-          transitBuilder.withPreferredRoutes(FeedScopedId.parseList(v))
-        );
-
-        callWith.argument("preferred.agencies", (String v) ->
-          transitBuilder.withPreferredAgencies(FeedScopedId.parseList(v))
-        );
         callWith.argument("unpreferred.routes", (String v) ->
           transitBuilder.withUnpreferredRoutes(FeedScopedId.parseList(v))
         );

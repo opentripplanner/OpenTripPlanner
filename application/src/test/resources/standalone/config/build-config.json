@@ -39,7 +39,6 @@
   },
   "gtfsDefaults": {
     "stationTransferPreference": "recommended",
-    "removeRepeatedStops": true,
     "discardMinTransferTimes": false,
     "blockBasedInterlining": true,
     "maxInterlineDistance": 200

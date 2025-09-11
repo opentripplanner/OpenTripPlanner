@@ -55,6 +55,20 @@ public abstract sealed class Result<T, E> {
   }
 
   /**
+   * If this instance is a success then the mapper tries to transform its value, unwrapping any failures in the mapper.
+   * If this instance is a failure then a new failed instance with the correct success type is returned.
+   *
+   * @param <N> The success type of the new Result instance.
+   */
+  public <N> Result<N, E> flatMap(Function<T, Result<N, E>> mapper) {
+    if (isSuccess()) {
+      return mapper.apply(successValue());
+    } else {
+      return Result.failure(failureValue());
+    }
+  }
+
+  /**
    * Creates a new instance of this class with a new success type. This is useful if you know
    * that it is a failure and want to return it in a method without having to cast the success type.
    * <p>

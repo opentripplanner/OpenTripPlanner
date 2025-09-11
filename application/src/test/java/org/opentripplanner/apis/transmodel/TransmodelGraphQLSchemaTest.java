@@ -5,10 +5,12 @@ import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 
+import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.SchemaPrinter;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -21,12 +23,15 @@ class TransmodelGraphQLSchemaTest {
 
   @Test
   void testSchemaBuild() {
-    var schema = TransmodelGraphQLSchema.create(
+    var factory = new TransmodelGraphQLSchemaFactory(
       RouteRequest.defaultValue(),
       ZoneIds.OSLO,
-      ApiDocumentationProfile.DEFAULT,
-      TransitTuningParameters.FOR_TEST
+      TransitTuningParameters.FOR_TEST,
+      new DefaultFeedIdMapper(),
+      ApiDocumentationProfile.DEFAULT
     );
+
+    GraphQLSchema schema = factory.create();
     assertNotNull(schema);
 
     String original = readFile(SCHEMA_FILE);

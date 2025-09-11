@@ -78,7 +78,7 @@ public class NonLocalizedString implements I18NString, Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name);
+    return name.hashCode();
   }
 
   @Override

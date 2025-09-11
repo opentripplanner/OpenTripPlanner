@@ -1,0 +1,29 @@
+name: Integration test
+
+on:
+  pull_request:
+    types:
+      - labeled
+      - synchronize
+env:
+  MAVEN_ARGS: "--no-transfer-progress -Dstyle.color=always"
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'opentripplanner' && contains( github.event.pull_request.labels.*.name, 'Integration Test' )
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: maven
+
+
+      - name: Run integration tests
+        run: mvn test -P integrationTests
+

@@ -38,8 +38,6 @@ class TransitRequestTest {
 
   private final TransitRequest subject = TransitRequest.of()
     .setFilters(FILTERS)
-    .withPreferredAgencies(AGENCIES)
-    .withPreferredRoutes(ROUTES)
     .withBannedTrips(BANNED_TRIPS)
     .withPriorityGroupsByAgency(PRIORITY_GROUP_BY_AGENCY)
     .addPriorityGroupsGlobal(PRIORITY_GROUP_GLOBAL)
@@ -58,19 +56,9 @@ class TransitRequestTest {
   }
 
   @Test
-  void preferredAgencies() {
-    assertEquals(AGENCIES, subject.preferredAgencies());
-  }
-
-  @Test
   void unpreferredAgencies() {
     var subject = TransitRequest.of().withUnpreferredAgencies(AGENCIES).build();
     assertEquals(AGENCIES, subject.unpreferredAgencies());
-  }
-
-  @Test
-  void preferredRoutes() {
-    assertEquals(ROUTES, subject.preferredRoutes());
   }
 
   @Test
@@ -127,8 +115,6 @@ class TransitRequestTest {
       """
       (
         filters: [(select: [(transportModes: EMPTY, agencies: [A:1])])],
-        preferredAgencies: [F:A:1],
-        preferredRoutes: [F:R:1],
         bannedTrips: [F:T:1],
         priorityGroupsByAgency: [(subModeRegexp: [A.*])],
         priorityGroupsGlobal: [(subModeRegexp: [G.*])],

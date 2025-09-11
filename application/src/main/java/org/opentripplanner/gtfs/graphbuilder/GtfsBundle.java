@@ -1,7 +1,6 @@
 package org.opentripplanner.gtfs.graphbuilder;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import javax.annotation.Nullable;
 import org.onebusaway.csv_entities.CsvInputSource;
@@ -13,7 +12,7 @@ import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GtfsBundle {
+public final class GtfsBundle {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsBundle.class);
 
@@ -94,19 +93,6 @@ public class GtfsBundle {
       };
     }
     return csvInputSource;
-  }
-
-  public void close() {
-    try {
-      dataSource.close();
-    } catch (IOException e) {
-      LOG.warn(
-        "Failed to close datasource {}, details: {}",
-        dataSource.path(),
-        e.getLocalizedMessage(),
-        e
-      );
-    }
   }
 
   public String feedInfo() {

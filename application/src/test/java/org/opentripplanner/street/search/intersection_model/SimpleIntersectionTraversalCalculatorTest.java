@@ -48,8 +48,8 @@ public class SimpleIntersectionTraversalCalculatorTest {
     edge(v2, v3, 1.0, false);
 
     // Edge has same first and last angle.
-    assertEquals(90, e1.getInAngle());
-    assertEquals(90, e1.getOutAngle());
+    assertEquals(-90, e1.getInAngle());
+    assertEquals(-90, e1.getOutAngle());
 
     // 2 new ones
     IntersectionVertex v4 = vertex("test2", new Coordinate(1.0, 1.0), false, false);
@@ -57,8 +57,8 @@ public class SimpleIntersectionTraversalCalculatorTest {
     // Third edge
     StreetEdge e3 = edge(v2, v4, 1.0, false);
 
-    assertEquals(0, e3.getInAngle());
-    assertEquals(0, e3.getOutAngle());
+    assertEquals(-180, e3.getInAngle());
+    assertEquals(-180, e3.getOutAngle());
 
     // Difference should be about 90.
     int diff = (e1.getOutAngle() - e3.getInAngle());
