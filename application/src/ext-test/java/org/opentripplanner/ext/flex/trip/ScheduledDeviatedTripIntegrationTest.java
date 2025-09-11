@@ -113,13 +113,13 @@ class ScheduledDeviatedTripIntegrationTest {
     assertEquals("yz85", leg.to().stop.getId().getId());
 
     var intermediateStops = leg.listIntermediateStops();
-    assertEquals(1, intermediateStops.size());
+    assertEquals(2, intermediateStops.size());
     assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
 
     EncodedPolyline legGeometry = EncodedPolyline.encode(leg.legGeometry());
     assertThatPolylinesAreEqual(
       legGeometry.points(),
-      "kfsmEjojcOa@eBRKfBfHR|ALjBBhVArMG|OCrEGx@OhAKj@a@tAe@hA]l@MPgAnAgw@nr@cDxCm@t@c@t@c@x@_@~@]pAyAdIoAhG}@lE{AzHWhAtt@t~Aj@tAb@~AXdBHn@FlBC`CKnA_@nC{CjOa@dCOlAEz@E|BRtUCbCQ~CWjD??qBvXBl@kBvWOzAc@dDOx@sHv]aIG?q@@c@ZaB\\mA"
+      "kfsmEjojcOa@eBRKfBfHR|ALjBBhVArMG|OCrEGx@OhAKj@a@tAe@hA]l@MPgAnAgw@nr@cDxCm@t@c@t@c@x@_@~@]pAyAdIoAhG}@lE{AzHWhAtt@t~Aj@tAb@~AXdBHn@FlBC`CKnA_@nC{CjOa@dCOlAEz@E|BRtUCbCQ~CWjD??????qBvXBl@kBvWOzAc@dDOx@sHv]aIG?q@@c@ZaB\\mA"
     );
   }
 
@@ -136,7 +136,7 @@ class ScheduledDeviatedTripIntegrationTest {
     var feedId = timetableRepository.getFeedIds().iterator().next();
     var pattern = timetableRepository.getTripPatternForId(new FeedScopedId(feedId, "090z:0:01"));
 
-    assertEquals(3, pattern.numberOfStops());
+    assertEquals(4, pattern.numberOfStops());
 
     var tripTimes = pattern.getScheduledTimetable().getTripTimes().getFirst();
     var arrivalTime = tripTimes.getArrivalTime(1);

@@ -118,7 +118,6 @@ public class GtfsContextBuilder {
     new ValidateAndInterpolateStopTimesForEachTrip(
       transitBuilder.getStopTimesSortedByTrip(),
       true,
-      true,
       issueStore
     ).run();
   }

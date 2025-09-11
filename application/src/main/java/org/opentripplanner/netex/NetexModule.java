@@ -124,7 +124,7 @@ public class NetexModule implements GraphBuilderModule {
   }
 
   private void validateStopTimesForEachTrip(TripStopTimes stopTimesByTrip) {
-    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, false, false, issueStore).run();
+    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, false, issueStore).run();
   }
 
   @Override
