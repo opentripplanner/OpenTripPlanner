@@ -36,7 +36,7 @@ public class RaptorRequestTransferCache {
 
   public void put(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
     final CacheKey cacheKey = new CacheKey(transfersByStopIndex, request);
-    final RaptorTransferIndex raptorTransferIndex = RaptorTransferIndex.createInitialSetup(
+    final RaptorTransferIndex raptorTransferIndex = RaptorTransferIndex.createPreCached(
       transfersByStopIndex,
       cacheKey.request
     );
@@ -58,10 +58,7 @@ public class RaptorRequestTransferCache {
       @Override
       public RaptorTransferIndex load(CacheKey cacheKey) {
         LOG.info("Adding runtime request to cache: {}", cacheKey.options);
-        return RaptorTransferIndex.createRequestScope(
-          cacheKey.transfersByStopIndex,
-          cacheKey.request
-        );
+        return RaptorTransferIndex.createOnDemand(cacheKey.transfersByStopIndex, cacheKey.request);
       }
     };
   }
