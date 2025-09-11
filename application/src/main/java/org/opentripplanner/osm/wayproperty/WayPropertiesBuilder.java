@@ -25,9 +25,6 @@ public class WayPropertiesBuilder {
 
   /**
    * Sets the same safety value for normal and back edge.
-   *
-   * Note that the safeties here will be adjusted such that the safest street has a safety value of
-   * 1, with all others scaled proportionately.
    */
   public WayPropertiesBuilder bicycleSafety(double bicycleSafety) {
     this.bicycleSafetyFeatures = bicycleSafety;
@@ -36,9 +33,6 @@ public class WayPropertiesBuilder {
 
   /**
    * Sets the same safety value for normal and back edge.
-   *
-   * Note that the safeties here will be adjusted such that the safest street has a safety value of
-   * 1, with all others scaled proportionately.
    */
   public WayPropertiesBuilder walkSafety(double walkSafety) {
     this.walkSafetyFeatures = walkSafety;
