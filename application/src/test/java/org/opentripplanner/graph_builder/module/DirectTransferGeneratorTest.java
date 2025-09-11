@@ -416,7 +416,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   }
 
   @Test
-  public void testBikeRequestWithLimitBikeTransferConsideringPattern() {
+  public void testBikeRequestWithBikesAllowedTransfersWithIncludeEmptyRailStopsInTransfersOn() {
     OTPFeature.IncludeEmptyRailStopsInTransfers.testOn(() -> {
       var transferRequests = List.of(REQUEST_WITH_BIKE_TRANSFER);
 
@@ -440,7 +440,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   }
 
   @Test
-  public void testBikeRequestWithLimitBikeTransferWithoutConsideringPattern() {
+  public void testBikeRequestWithBikesAllowedTransfersWithConsiderPatternsForDirectTransfersOff() {
     OTPFeature.ConsiderPatternsForDirectTransfers.testOff(() -> {
       var transferRequests = List.of(REQUEST_WITH_BIKE_TRANSFER);
 

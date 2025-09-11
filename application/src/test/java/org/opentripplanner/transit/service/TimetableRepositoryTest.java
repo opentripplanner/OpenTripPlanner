@@ -128,7 +128,7 @@ class TimetableRepositoryTest {
   }
 
   @Test
-  void stopsUsedForBike() {
+  void testGetStopLocationsUsedForBikesAllowedTrips() {
     var repo = new TimetableRepository();
     var S11 = TimetableRepositoryForTest.of().stop("S11").build();
     var S12 = TimetableRepositoryForTest.of().stop("S12").build();
