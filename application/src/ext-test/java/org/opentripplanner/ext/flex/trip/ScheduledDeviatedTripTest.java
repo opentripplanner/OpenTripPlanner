@@ -45,7 +45,8 @@ class ScheduledDeviatedTripTest {
         areaWithContinuousStopping("10:40"),
         regularStop("10:50", "11:00")
       ),
-      List.of(regularStop("10:10"), regularStop("10:20"))
+      List.of(regularStop("10:10"), regularStop("10:20")),
+      List.of(area("10:00", "18:00"))
     );
   }
 
