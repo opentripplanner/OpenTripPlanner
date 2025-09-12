@@ -9,7 +9,6 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
-import org.opentripplanner.apis.gtfs.model.CallScheduledTime;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -53,8 +52,8 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         if (flexTrip == null) {
           return null;
         }
-        var startSecs = flexTrip.earliestDepartureTime(tripTime.getStopIndex());
-        var endSecs = flexTrip.latestArrivalTime(tripTime.getStopIndex());
+        var startSecs = flexTrip.earliestDepartureTime(tripTime.getStopPosition());
+        var endSecs = flexTrip.latestArrivalTime(tripTime.getStopPosition());
 
         var serviceDay = tripTime.getServiceDay();
         var timeZone = transitService.getTimeZone();

@@ -130,7 +130,11 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
       .build();
     var calls = service.findStopCalls(leg);
     assertEquals(
-      "[TripTimeOnDate{trip: Trip{F:TestTrip1 Rroute-1}, index: 0, arrival: 12:00, departure: 12:00, serviceDate: 2024-05-08}, TripTimeOnDate{trip: Trip{F:TestTrip1 Rroute-1}, index: 1, arrival: 12:30, departure: 12:30, serviceDate: 2024-05-08}, TripTimeOnDate{trip: Trip{F:TestTrip1 Rroute-1}, index: 2, arrival: 13:00, departure: 13:00, serviceDate: 2024-05-08}]",
+      "[" +
+      "TripTimeOnDate{trip: Trip{F:TestTrip1 Rroute-1}, stopPosition: 0, arrival: 12:00, departure: 12:00, serviceDate: 2024-05-08}, " +
+      "TripTimeOnDate{trip: Trip{F:TestTrip1 Rroute-1}, stopPosition: 1, arrival: 12:30, departure: 12:30, serviceDate: 2024-05-08}, " +
+      "TripTimeOnDate{trip: Trip{F:TestTrip1 Rroute-1}, stopPosition: 2, arrival: 13:00, departure: 13:00, serviceDate: 2024-05-08}" +
+      "]",
       calls.toString()
     );
   }

@@ -7,7 +7,6 @@ import org.opentripplanner.ext.emission.internal.csvdata.route.RouteDataReader;
 import org.opentripplanner.ext.emission.internal.csvdata.trip.TripDataReader;
 import org.opentripplanner.ext.emission.internal.csvdata.trip.TripHopMapper;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,21 +60,17 @@ public class EmissionDataReader {
       return;
     }
 
-    var progress = ProgressTracker.track("Read " + emissionDataSource.name(), 10_000, -1);
     // Assume input CO₂ emission data is Route average data
     var routeReader = new RouteDataReader(emissionDataSource, issueStore);
-    this.emissionRepository.addRouteEmissions(
-        routeReader.read(resolvedFeedId, () -> logProgress(progress))
-      );
+    this.emissionRepository.addRouteEmissions(routeReader.read(resolvedFeedId, m -> LOG.info(m)));
 
     // Assume input CO₂ emission data is per trip hop
     tripHopMapper.setCurrentFeedId(resolvedFeedId);
     var tripReader = new TripDataReader(emissionDataSource, issueStore);
     this.emissionRepository.addTripPatternEmissions(
-        tripHopMapper.map(tripReader.read(() -> logProgress(progress)))
+        tripHopMapper.map(tripReader.read(m -> LOG.info(m)))
       );
 
-    LOG.info(progress.completeMessage());
     if (!(routeReader.isDataProcessed() || tripReader.isDataProcessed())) {
       LOG.error(
         "No emission data read from: " +
@@ -83,11 +78,5 @@ public class EmissionDataReader {
         ". Do the header columns match?"
       );
     }
-  }
-
-  private static void logProgress(ProgressTracker progress) {
-    // Do not convert this to a lambda expression. The logger will not be
-    // able to log the correct source and line number for the caller.
-    progress.step(m -> LOG.info(m));
   }
 }
