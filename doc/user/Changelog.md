@@ -8,6 +8,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove GTFS `removeRepeatedStops` feature [#6846](https://github.com/opentripplanner/OpenTripPlanner/pull/6846)
 - Restore lookup of multi-modal stations and group of stations [#6805](https://github.com/opentripplanner/OpenTripPlanner/pull/6805)
 - Fix stop cancellation in case of repeated scheduled times [#6849](https://github.com/opentripplanner/OpenTripPlanner/pull/6849)
+- Un-deprecate fields in InputPreferred to fix GraphiQL [#6856](https://github.com/opentripplanner/OpenTripPlanner/pull/6856)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.0 (2025-09-10)
