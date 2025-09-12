@@ -4,14 +4,12 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 public class GtfsDefaultParametersBuilder {
 
-  private boolean removeRepeatedStops;
   private StopTransferPriority stationTransferPreference;
   private boolean discardMinTransferTimes;
   private boolean blockBasedInterlining;
   private int maxInterlineDistance;
 
   public GtfsDefaultParametersBuilder(GtfsDefaultParameters original) {
-    this.removeRepeatedStops = original.removeRepeatedStops();
     this.stationTransferPreference = original.stationTransferPreference();
     this.discardMinTransferTimes = original.discardMinTransferTimes();
     this.blockBasedInterlining = original.blockBasedInterlining();
@@ -27,15 +25,6 @@ public class GtfsDefaultParametersBuilder {
 
   StopTransferPriority stationTransferPreference() {
     return stationTransferPreference;
-  }
-
-  public GtfsDefaultParametersBuilder withRemoveRepeatedStops(boolean value) {
-    this.removeRepeatedStops = value;
-    return this;
-  }
-
-  boolean removeRepeatedStops() {
-    return removeRepeatedStops;
   }
 
   public GtfsDefaultParametersBuilder withDiscardMinTransferTimes(boolean value) {

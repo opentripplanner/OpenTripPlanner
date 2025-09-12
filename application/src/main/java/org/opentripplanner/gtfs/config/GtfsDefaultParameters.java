@@ -11,33 +11,28 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
 
-  private static final boolean DEFAULT_REMOVE_REPEATED_STOPS = true;
   private static final boolean DEFAULT_DISCARD_MIN_TRANSFER_TIMES = false;
   private static final boolean DEFAULT_BLOCK_BASED_INTERLINING = true;
   private static final int DEFAULT_MAX_INTERLINE_DISTANCE = 200;
 
   public static final GtfsDefaultParameters DEFAULT = new GtfsDefaultParameters(
-    DEFAULT_REMOVE_REPEATED_STOPS,
     StopTransferPriority.defaultValue(),
     DEFAULT_DISCARD_MIN_TRANSFER_TIMES,
     DEFAULT_BLOCK_BASED_INTERLINING,
     DEFAULT_MAX_INTERLINE_DISTANCE
   );
 
-  private final boolean removeRepeatedStops;
   private final StopTransferPriority stationTransferPreference;
   private final boolean discardMinTransferTimes;
   private final boolean blockBasedInterlining;
   private final int maxInterlineDistance;
 
   protected GtfsDefaultParameters(
-    boolean removeRepeatedStops,
     StopTransferPriority stationTransferPreference,
     boolean discardMinTransferTimes,
     boolean blockBasedInterlining,
     int maxInterlineDistance
   ) {
-    this.removeRepeatedStops = removeRepeatedStops;
     this.stationTransferPreference = Objects.requireNonNull(stationTransferPreference);
     this.discardMinTransferTimes = discardMinTransferTimes;
     this.blockBasedInterlining = blockBasedInterlining;
@@ -46,7 +41,6 @@ public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
 
   GtfsDefaultParameters(GtfsDefaultParametersBuilder builder) {
     this(
-      builder.removeRepeatedStops(),
       builder.stationTransferPreference(),
       builder.discardMinTransferTimes(),
       builder.blockBasedInterlining(),
@@ -63,10 +57,6 @@ public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
 
   public GtfsFeedParametersBuilder withFeedInfo() {
     return new GtfsFeedParametersBuilder(this);
-  }
-
-  public boolean removeRepeatedStops() {
-    return removeRepeatedStops;
   }
 
   public StopTransferPriority stationTransferPreference() {
@@ -106,7 +96,6 @@ public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
 
   protected ToStringBuilder toStringAppend(ToStringBuilder builder) {
     return builder
-      .addBool("removeRepeatedStops", removeRepeatedStops, DEFAULT_REMOVE_REPEATED_STOPS)
       .addEnum(
         "stationTransferPreference",
         stationTransferPreference,

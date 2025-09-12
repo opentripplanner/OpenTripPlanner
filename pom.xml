@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp-root</artifactId>
-    <version>2.8.0-SNAPSHOT</version>
+    <version>2.9.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenTripPlanner - Root</name>
@@ -92,14 +92,6 @@
         <junit.tags.included></junit.tags.included>
         <junit.tags.excluded>smoke-test</junit.tags.excluded>
     </properties>
-
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>OpenTripPlanner Maven Repository on Github Packages</name>
-            <url>https://maven.pkg.github.com/${GITHUB_REPOSITORY}/</url>
-        </repository>
-    </distributionManagement>
 
     <modules>
         <module>utils</module>
@@ -584,15 +576,14 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.7.0</version>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.8.0</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <!-- if someone else other than Leonard deploys to Maven Central this might need to change -->
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
                         </configuration>
                     </plugin>
                 </plugins>
