@@ -37,7 +37,7 @@ public final class VehicleRentalSystem {
   }
 
   private VehicleRentalSystem(Builder builder) {
-    this.systemId = builder.systemId;
+    this.systemId = Objects.requireNonNull(builder.systemId);
     this.name = builder.name;
     this.shortName = builder.shortName;
     this.operator = builder.operator;
@@ -51,7 +51,7 @@ public final class VehicleRentalSystem {
     I18NString operator,
     String url
   ) {
-    this.systemId = systemId;
+    this.systemId = Objects.requireNonNull(systemId);
     this.name = name;
     this.shortName = shortName;
     this.operator = operator;
@@ -66,12 +66,10 @@ public final class VehicleRentalSystem {
     return new Builder(this);
   }
 
-  @Nullable
   public String systemId() {
     return systemId;
   }
 
-  @Nullable
   public I18NString name() {
     return name;
   }
@@ -139,7 +137,7 @@ public final class VehicleRentalSystem {
       this.url = original.url;
     }
 
-    public Builder withSystemId(@Nullable String systemId) {
+    public Builder withSystemId(String systemId) {
       this.systemId = systemId;
       return this;
     }
@@ -148,12 +146,12 @@ public final class VehicleRentalSystem {
       return name;
     }
 
-    public Builder withName(@Nullable I18NString name) {
+    public Builder withName(I18NString name) {
       this.name = name;
       return this;
     }
 
-    public I18NString shortName() {
+    public @Nullable I18NString shortName() {
       return shortName;
     }
 
@@ -162,7 +160,7 @@ public final class VehicleRentalSystem {
       return this;
     }
 
-    public I18NString operator() {
+    public @Nullable I18NString operator() {
       return operator;
     }
 
