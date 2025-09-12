@@ -96,17 +96,7 @@ export function ErrorDisplay({ error, onDismiss }: ErrorDisplayProps) {
   }
 
   return (
-    <div
-      style={{
-        backgroundColor: '#f8d7da',
-        color: '#721c24',
-        border: '1px solid #f5c6cb',
-        borderRadius: '4px',
-        padding: '12px',
-        margin: '8px 0',
-        fontSize: '14px',
-      }}
-    >
+    <div className="error-display-container">
       <div className="flex-space-between">
         <div className="flex-1">
           <div className="error-title">Search Error</div>
@@ -114,15 +104,7 @@ export function ErrorDisplay({ error, onDismiss }: ErrorDisplayProps) {
           {showRaw && (
             <>
               <div className="error-title">Technical Details:</div>
-              <pre
-                style={{
-                  fontSize: '12px',
-                  margin: 0,
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-word',
-                  width: '100%',
-                }}
-              >
+              <pre className="error-details">
                 {rawContent}
               </pre>
             </>
@@ -131,14 +113,7 @@ export function ErrorDisplay({ error, onDismiss }: ErrorDisplayProps) {
         {onDismiss && (
           <button
             onClick={onDismiss}
-            style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '18px',
-              cursor: 'pointer',
-              color: '#721c24',
-              marginLeft: '8px',
-            }}
+            className="error-dismiss-button"
             aria-label="Dismiss error"
           >
             ×
