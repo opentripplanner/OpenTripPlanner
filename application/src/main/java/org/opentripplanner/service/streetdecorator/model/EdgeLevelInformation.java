@@ -19,8 +19,8 @@ public class EdgeLevelInformation implements EdgeInformation {
   }
 
   @Override
-  public Integer getLowerVertexFloorIndex() {
-    return this.lowerVertexInformation.floorIndex();
+  public Float getLowerVertexFloorNumber() {
+    return this.lowerVertexInformation.floorNumber();
   }
 
   @Override
@@ -34,8 +34,8 @@ public class EdgeLevelInformation implements EdgeInformation {
   }
 
   @Override
-  public Integer getUpperVertexFloorIndex() {
-    return this.upperVertexInformation.floorIndex();
+  public Float getUpperVertexFloorNumber() {
+    return this.upperVertexInformation.floorNumber();
   }
 
   @Override

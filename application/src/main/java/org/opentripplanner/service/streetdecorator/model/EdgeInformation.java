@@ -3,7 +3,7 @@ package org.opentripplanner.service.streetdecorator.model;
 public interface EdgeInformation {
   boolean isLowerVertex(long osmVertexId);
 
-  default Integer getLowerVertexFloorIndex() {
+  default Float getLowerVertexFloorNumber() {
     return null;
   }
 
@@ -13,7 +13,7 @@ public interface EdgeInformation {
 
   boolean isUpperVertex(long osmVertexId);
 
-  default Integer getUpperVertexFloorIndex() {
+  default Float getUpperVertexFloorNumber() {
     return null;
   }
 

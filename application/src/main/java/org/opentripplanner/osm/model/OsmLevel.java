@@ -22,7 +22,9 @@ public class OsmLevel implements Comparable<OsmLevel> {
     Source.NONE,
     true
   );
-  public final int floorNumber; // 0-based
+  /** As long as we don't deal with levels going up to 16,777,217, we shouldn't
+   *  have a problem with using a 32-bit float to represent levels. */
+  public final float floorNumber; // 0-based
   public final double altitudeMeters;
   public final String shortName; // localized (potentially 1-based)
   public final String longName; // localized (potentially 1-based)
@@ -30,7 +32,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
   public final boolean reliable;
 
   public OsmLevel(
-    int floorNumber,
+    float floorNumber,
     double altitudeMeters,
     String shortName,
     String longName,
@@ -86,32 +88,32 @@ public class OsmLevel implements Comparable<OsmLevel> {
     }
 
     /* try to parse a floor number out of names */
-    Integer floorNumber = null;
+    Float floorNumber = null;
     try {
-      floorNumber = Integer.parseInt(longName);
+      floorNumber = Float.parseFloat(longName);
       if (incrementNonNegative) {
         if (source == Source.LEVEL_MAP) {
           if (floorNumber >= 1) floorNumber -= 1; // level maps are localized, floor numbers are 0-based
         } else {
-          if (floorNumber >= 0) longName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
+          if (floorNumber >= 0) longName = Float.toString(floorNumber + 1); // level and layer tags are 0-based
         }
       }
     } catch (NumberFormatException e) {}
     try {
       // short name takes precedence over long name for floor numbering
-      floorNumber = Integer.parseInt(shortName);
+      floorNumber = Float.parseFloat(shortName);
       if (incrementNonNegative) {
         if (source == Source.LEVEL_MAP) {
           if (floorNumber >= 1) floorNumber -= 1; // level maps are localized, floor numbers are 0-based
         } else {
-          if (floorNumber >= 0) shortName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
+          if (floorNumber >= 0) shortName = Float.toString(floorNumber + 1); // level and layer tags are 0-based
         }
       }
     } catch (NumberFormatException e) {}
 
     /* fall back on altitude when necessary */
     if (floorNumber == null && altitude != null) {
-      floorNumber = (int) (altitude / METERS_PER_FLOOR);
+      floorNumber = (float) (int) (altitude / METERS_PER_FLOOR);
       issueStore.add(new FloorNumberUnknownGuessedFromAltitude(spec, floorNumber, osmObj));
       reliable = false;
     }
@@ -122,7 +124,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
     }
     /* signal failure to extract any useful level information */
     if (floorNumber == null) {
-      floorNumber = 0;
+      floorNumber = 0.0f;
       issueStore.add(new FloorNumberUnknownAssumedGroundLevel(spec, osmObj));
       reliable = false;
     }
@@ -182,12 +184,12 @@ public class OsmLevel implements Comparable<OsmLevel> {
 
   @Override
   public int compareTo(OsmLevel other) {
-    return this.floorNumber - other.floorNumber;
+    return Float.compare(this.floorNumber, other.floorNumber);
   }
 
   @Override
   public int hashCode() {
-    return this.floorNumber;
+    return Float.hashCode(this.floorNumber);
   }
 
   @Override
