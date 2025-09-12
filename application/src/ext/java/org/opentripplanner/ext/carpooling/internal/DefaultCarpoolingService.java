@@ -305,6 +305,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
     List<GraphPath<State, Edge, Vertex>> paths = streetSearch.getPathsToTarget();
     paths.sort(new PathComparator(request.arriveBy()));
 
+    if (paths.isEmpty()) {
+      return null;
+    }
+
     return paths.getFirst();
   }
 }
