@@ -11,11 +11,17 @@ import { DefaultValue, extractAllArgs, formatArgumentName, ProcessedArgument } f
 interface TripQueryArgumentsProps {
   tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (tripQueryVariables: TripQueryVariables) => void;
+  expandedArguments: Record<string, boolean>;
+  setExpandedArguments: (expandedArguments: Record<string, boolean>) => void;
 }
 
-const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariables, setTripQueryVariables }) => {
+const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
+  tripQueryVariables,
+  setTripQueryVariables,
+  expandedArguments,
+  setExpandedArguments,
+}) => {
   const [argumentsList, setArgumentsList] = useState<ProcessedArgument[]>([]);
-  const [expandedArguments, setExpandedArguments] = useState<Record<string, boolean>>({});
   const [searchText] = useState('');
 
   const { tripArgs, loading, error } = useTripSchema();
@@ -29,7 +35,6 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
   }, [tripArgs, loading, error]);
 
   function normalizePathForList(path: string): string {
-    // Replace numeric segments with `*`
     return path.replace(/\.\d+/g, '.*');
   }
 
@@ -42,14 +47,12 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
       return;
     }
 
-    // Handle comma-separated input for string arrays
     if (
       argumentConfig.type.subtype != null &&
       ['String', 'DoubleFunction', 'ID', 'Duration'].includes(argumentConfig.type.subtype) &&
       argumentConfig.isList
     ) {
       if (typeof value === 'string') {
-        // Convert comma-separated string into an array
         const idsArray = value.split(',').map((id) => id.trim());
 
         let updatedTripQueryVariables = setNestedValue(tripQueryVariables, path, idsArray) as TripQueryVariables;
@@ -59,7 +62,6 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
       }
     }
 
-    // Default handling for other cases
     let updatedTripQueryVariables = setNestedValue(tripQueryVariables, path, value) as TripQueryVariables;
     updatedTripQueryVariables = cleanUpParentIfEmpty(updatedTripQueryVariables, path);
     setTripQueryVariables(updatedTripQueryVariables);
@@ -67,6 +69,15 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
 
   function isPlainObject(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
+  function isEmptyValue(value: unknown): boolean {
+    if (value === undefined || value === null) return true;
+    if (Array.isArray(value)) return value.length === 0;
+    if (isPlainObject(value)) {
+      return Object.values(value).every(isEmptyValue);
+    }
+    return false;
   }
 
   /**
@@ -77,60 +88,22 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
     if (!path.includes('.')) {
       const topValue = getNestedValue(variables, path);
 
-      if (Array.isArray(topValue) && topValue.length === 0) {
-        // Create a shallow copy as a flexible object:
+      if (isEmptyValue(topValue)) {
         const copy = { ...variables } as Record<string, unknown>;
-        // Remove the property:
         delete copy[path];
         return copy as TripQueryVariables;
       }
 
-      // If it's a plain object and all keys are undefined/null or empty, remove it
-      if (isPlainObject(topValue)) {
-        const allKeysEmpty = Object.keys(topValue).every((key) => {
-          const childVal = (topValue as Record<string, unknown>)[key];
-          return childVal === undefined || childVal === null || (Array.isArray(childVal) && childVal.length === 0);
-        });
-
-        if (allKeysEmpty) {
-          const copy = { ...variables } as Record<string, unknown>;
-          delete copy[path];
-          return copy as TripQueryVariables;
-        }
-      }
-
-      return variables; // Otherwise leave it as is
+      return variables;
     }
 
-    // For nested paths
     const pathParts = path.split('.');
     for (let i = pathParts.length - 1; i > 0; i--) {
       const parentPath = pathParts.slice(0, i).join('.');
       const parentValue = getNestedValue(variables, parentPath);
 
-      if (parentValue == null) {
-        // Already null or undefined, nothing to do
-        continue;
-      }
-
-      if (Array.isArray(parentValue)) {
-        // If the parent array is now empty, remove it
-        if (parentValue.length === 0) {
-          variables = setNestedValue(variables, parentPath, undefined) as TripQueryVariables;
-        }
-      } else if (isPlainObject(parentValue)) {
-        // If all child values are null/undefined or empty, remove the parent
-        const allKeysEmpty = Object.keys(parentValue).every((key) => {
-          const childPath = `${parentPath}.${key}`;
-          const childValue = getNestedValue(variables, childPath);
-          return (
-            childValue === undefined || childValue === null || (Array.isArray(childValue) && childValue.length === 0)
-          );
-        });
-
-        if (allKeysEmpty) {
-          variables = setNestedValue(variables, parentPath, undefined) as TripQueryVariables;
-        }
+      if (isEmptyValue(parentValue)) {
+        variables = setNestedValue(variables, parentPath, undefined) as TripQueryVariables;
       }
     }
 
@@ -138,10 +111,14 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
   }
 
   function toggleExpand(path: string): void {
-    setExpandedArguments((prev) => ({
-      ...prev,
-      [path]: !prev[path],
-    }));
+    setExpandedArguments({
+      ...expandedArguments,
+      [path]: !expandedArguments[path],
+    });
+  }
+
+  function collapseAll(): void {
+    setExpandedArguments({});
   }
 
   const filteredArgumentsList = argumentsList
@@ -158,10 +135,8 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
     level: number,
     type: ResolvedType,
   ): React.JSX.Element {
-    // We assume getNestedValue returns unknown; cast to an array if needed
     const arrayVal = (getNestedValue(tripQueryVariables, listPath) ?? []) as unknown[];
 
-    // You can customize this if you have a better naming scheme
     const typeName = type.name;
 
     return (
@@ -169,7 +144,6 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
         {arrayVal.map((_, index) => {
           const itemPath = `${listPath}.${index}`;
 
-          // Replace the `.*` placeholder with the actual index
           const itemNestedArgs = allArgs
             .filter((arg) => arg.path.startsWith(`${listPath}.*.`) && arg.path !== `${listPath}.*`)
             .map((arg) => ({
@@ -237,7 +211,6 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
 
       const nestedLevel = level + 1;
 
-      // Various input renderings depending on subtype
       return (
         <div key={path} style={{ marginLeft: `${level * 15}px`, marginBottom: '10px' }}>
           {isComplex ? (
@@ -269,9 +242,22 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
                         onChange={(e) => handleInputChange(path, e.target.checked)}
                       />
                       {isInUse && (
-                        <a onClick={() => handleRemoveArgument(path)} className="remove-argument">
-                          x
-                        </a>
+                        <button
+                          onClick={() => handleRemoveArgument(path)}
+                          className="remove-argument"
+                          style={{
+                            fontSize: '10px',
+                            paddingTop: '2px',
+                            marginLeft: '8px',
+                            marginBottom: '0px',
+                            marginTop: '-5px',
+                            height: '14px',
+                            width: '45px',
+                            verticalAlign: 'middle',
+                          }}
+                        >
+                          Clear
+                        </button>
                       )}
                     </span>
                   );
@@ -367,7 +353,8 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
                   id={path}
                   value={(getNestedValue(tripQueryVariables, path) as string) ?? 'Not selected'}
                   onChange={(e) => {
-                    handleInputChange(path, e.target.value || undefined);
+                    const selectedValue = e.target.value === 'Not selected' ? undefined : e.target.value;
+                    handleInputChange(path, selectedValue);
                   }}
                 >
                   {enumValues.map((enumValue) => (
@@ -386,9 +373,27 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
 
   return (
     <div className="left-pane-container below-content">
-      <div className="panel-header">
-        Filters
-        <ResetButton tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+      <div className="panel-header" style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+        <button className="collapse-all-button" onClick={collapseAll} style={{ padding: '4px 8px' }}>
+          Collapse all
+        </button>
+        <span
+          style={{
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontWeight: 'normal',
+          }}
+        >
+          Request
+        </span>
+        <div style={{ marginLeft: 'auto' }}>
+          <ResetButton
+            tripQueryVariables={tripQueryVariables}
+            setTripQueryVariables={setTripQueryVariables}
+            setExpandedArguments={setExpandedArguments}
+          />
+        </div>
       </div>
       {filteredArgumentsList.length === 0 ? (
         <p>No arguments found.</p>
