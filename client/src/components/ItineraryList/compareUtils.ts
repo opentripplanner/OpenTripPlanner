@@ -45,7 +45,7 @@ export const getComparisonClass = (
 export const columnComparisons = {
   duration: 'lower' as const, // Lower duration is better
   cost: 'lower' as const, // Lower cost is better
-  legs: 'lower' as const, // Fewer legs is better
+  legs: 'lower' as const, // Fewer transfers is better
   walkingDistance: 'lower' as const, // Less walking is better
 };
 
@@ -59,7 +59,7 @@ export const getItinerarySummary = (tripPattern: TripPatternType, timeZone: stri
     .filter((leg: LegType) => leg.mode === Mode.Foot)
     .reduce((sum: number, leg: LegType) => sum + leg.distance, 0);
 
-  const totalLegs = tripPattern.legs.length;
+  const totalLegs = Math.max(0, tripPattern.legs.length - 1); // Transfers = legs - 1, minimum 0
 
   return {
     startTime,

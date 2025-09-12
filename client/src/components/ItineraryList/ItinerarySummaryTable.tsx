@@ -1,5 +1,11 @@
 import { Table } from 'react-bootstrap';
-import { TripPatternType, ItinerarySummary, getComparisonClass, parseDistanceToMeters, columnComparisons } from './compareUtils.ts';
+import {
+  TripPatternType,
+  ItinerarySummary,
+  getComparisonClass,
+  parseDistanceToMeters,
+  columnComparisons,
+} from './compareUtils.ts';
 
 interface ItinerarySummaryTableProps {
   itinerary1: TripPatternType;
@@ -9,12 +15,12 @@ interface ItinerarySummaryTableProps {
   selectedIndexes: number[];
 }
 
-export function ItinerarySummaryTable({ 
-  itinerary1, 
-  itinerary2, 
-  summary1, 
-  summary2, 
-  selectedIndexes 
+export function ItinerarySummaryTable({
+  itinerary1,
+  itinerary2,
+  summary1,
+  summary2,
+  selectedIndexes,
 }: ItinerarySummaryTableProps) {
   return (
     <Table bordered hover className="compare-summary-table">
@@ -25,7 +31,7 @@ export function ItinerarySummaryTable({
           <th>End Time</th>
           <th>Duration</th>
           <th>Cost</th>
-          <th>Total Legs</th>
+          <th>Transfers</th>
           <th>Walking Distance</th>
         </tr>
       </thead>
@@ -40,11 +46,7 @@ export function ItinerarySummaryTable({
             {summary1.duration}
           </td>
           <td
-            className={getComparisonClass(
-              summary1.generalizedCost,
-              summary2.generalizedCost,
-              columnComparisons.cost,
-            )}
+            className={getComparisonClass(summary1.generalizedCost, summary2.generalizedCost, columnComparisons.cost)}
           >
             ¢{summary1.generalizedCost}
           </td>
@@ -71,11 +73,7 @@ export function ItinerarySummaryTable({
             {summary2.duration}
           </td>
           <td
-            className={getComparisonClass(
-              summary2.generalizedCost,
-              summary1.generalizedCost,
-              columnComparisons.cost,
-            )}
+            className={getComparisonClass(summary2.generalizedCost, summary1.generalizedCost, columnComparisons.cost)}
           >
             ¢{summary2.generalizedCost}
           </td>
