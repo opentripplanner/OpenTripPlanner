@@ -15,9 +15,7 @@ export function NoResultsDisplay({ hasSearched, tripQueryResult }: NoResultsDisp
           <div className="info-title">No Results Found</div>
           <div className="info-message">No matching trips were found for your search criteria.</div>
           <div className="info-title">Raw Response:</div>
-          <pre className="no-results-details">
-            {JSON.stringify(tripQueryResult, null, 2)}
-          </pre>
+          <pre className="no-results-details">{JSON.stringify(tripQueryResult, null, 2)}</pre>
         </div>
       </div>
     </div>

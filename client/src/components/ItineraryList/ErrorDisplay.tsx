@@ -104,18 +104,12 @@ export function ErrorDisplay({ error, onDismiss }: ErrorDisplayProps) {
           {showRaw && (
             <>
               <div className="error-title">Technical Details:</div>
-              <pre className="error-details">
-                {rawContent}
-              </pre>
+              <pre className="error-details">{rawContent}</pre>
             </>
           )}
         </div>
         {onDismiss && (
-          <button
-            onClick={onDismiss}
-            className="error-dismiss-button"
-            aria-label="Dismiss error"
-          >
+          <button onClick={onDismiss} className="error-dismiss-button" aria-label="Dismiss error">
             ×
           </button>
         )}
