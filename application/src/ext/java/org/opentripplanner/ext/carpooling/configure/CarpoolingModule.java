@@ -18,11 +18,11 @@ public class CarpoolingModule {
 
   @Provides
   @Singleton
-  public CarpoolingRepository provideCarpoolingRepository(Graph graph) {
+  public CarpoolingRepository provideCarpoolingRepository() {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    return new DefaultCarpoolingRepository(graph);
+    return new DefaultCarpoolingRepository();
   }
 
   @Provides

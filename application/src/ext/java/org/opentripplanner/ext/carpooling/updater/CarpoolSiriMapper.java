@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling.updater;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,6 +14,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.PathComparator;
+import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
@@ -65,8 +67,10 @@ public class CarpoolSiriMapper {
 
   public CarpoolTrip mapSiriToCarpoolTrip(EstimatedVehicleJourney journey) {
     var calls = journey.getEstimatedCalls().getEstimatedCalls();
-    if (calls.size() != 2) {
-      throw new IllegalArgumentException("Carpool trips must have exactly 2 stops for now.");
+    if (calls.size() < 2) {
+      throw new IllegalArgumentException(
+        "Carpool trips must have at least 2 stops (boarding and alighting)."
+      );
     }
 
     var boardingCall = calls.getFirst();
@@ -96,6 +100,17 @@ public class CarpoolSiriMapper {
 
     String provider = journey.getOperatorRef().getValue();
 
+    // Validate EstimatedCall timing order before processing
+    validateEstimatedCallOrder(calls);
+
+    // Build intermediate stops from EstimatedCalls (excluding first and last)
+    List<CarpoolStop> stops = new ArrayList<>();
+    for (int i = 1; i < calls.size() - 1; i++) {
+      EstimatedCall intermediateCall = calls.get(i);
+      CarpoolStop stop = buildCarpoolStop(intermediateCall, tripId, i - 1); // 0-based sequence
+      stops.add(stop);
+    }
+
     return new CarpoolTripBuilder(new FeedScopedId(FEED_ID, tripId))
       .withBoardingArea(boardingArea)
       .withAlightingArea(alightingArea)
@@ -104,6 +119,7 @@ public class CarpoolSiriMapper {
       .withProvider(provider)
       .withDeviationBudget(deviationBudget)
       .withAvailableSeats(1) // Default value, could be enhanced if data available
+      .withStops(stops)
       .build();
   }
 
@@ -224,6 +240,123 @@ public class CarpoolSiriMapper {
     Coordinate to = new Coordinate(alightingCoord.longitude(), alightingCoord.latitude());
 
     return SphericalDistanceLibrary.distance(from, to);
+  }
+
+  /**
+   * Build a CarpoolStop from an EstimatedCall, using point geometry instead of area geometry.
+   * Determines the stop type and passenger delta from the call data.
+   *
+   * @param call The SIRI EstimatedCall containing stop information
+   * @param tripId The trip ID for generating unique stop IDs
+   * @param sequenceNumber The 0-based sequence number of this stop
+   * @return A CarpoolStop representing the intermediate pickup/drop-off point
+   */
+  private CarpoolStop buildCarpoolStop(EstimatedCall call, String tripId, int sequenceNumber) {
+    var areaStop = buildAreaStop(call, tripId + "_stop_" + sequenceNumber);
+
+    // Extract timing information
+    ZonedDateTime estimatedTime = call.getExpectedArrivalTime() != null
+      ? call.getExpectedArrivalTime()
+      : call.getAimedArrivalTime();
+
+    // Determine stop type and passenger delta from call attributes
+    // In SIRI ET, passenger changes are typically indicated by boarding/alighting counts
+    CarpoolStop.CarpoolStopType stopType = determineCarpoolStopType(call);
+    int passengerDelta = calculatePassengerDelta(call, stopType);
+
+    return new CarpoolStop(areaStop, stopType, passengerDelta, sequenceNumber, estimatedTime);
+  }
+
+  /**
+   * Determine the carpool stop type from the EstimatedCall data.
+   */
+  private CarpoolStop.CarpoolStopType determineCarpoolStopType(EstimatedCall call) {
+    // This is a simplified implementation - adapt based on your SIRI ET data structure
+    // You might have specific fields indicating whether this is pickup, drop-off, or both
+
+    boolean hasArrival =
+      call.getExpectedArrivalTime() != null || call.getAimedArrivalTime() != null;
+    boolean hasDeparture =
+      call.getExpectedDepartureTime() != null || call.getAimedDepartureTime() != null;
+
+    if (hasArrival && hasDeparture) {
+      return CarpoolStop.CarpoolStopType.PICKUP_AND_DROP_OFF;
+    } else if (hasDeparture) {
+      return CarpoolStop.CarpoolStopType.PICKUP_ONLY;
+    } else if (hasArrival) {
+      return CarpoolStop.CarpoolStopType.DROP_OFF_ONLY;
+    } else {
+      // Default fallback
+      return CarpoolStop.CarpoolStopType.PICKUP_AND_DROP_OFF;
+    }
+  }
+
+  /**
+   * Calculate the passenger delta (change in passenger count) from the EstimatedCall.
+   */
+  private int calculatePassengerDelta(EstimatedCall call, CarpoolStop.CarpoolStopType stopType) {
+    // This is a placeholder implementation - adapt based on SIRI ET data structure
+    // SIRI ET may have passenger count changes, boarding/alighting numbers, etc.
+
+    // For now, return a default value of 1 passenger pickup/dropoff
+    if (stopType == CarpoolStop.CarpoolStopType.DROP_OFF_ONLY) {
+      return -1; // Assume 1 passenger drop-off
+    } else if (stopType == CarpoolStop.CarpoolStopType.PICKUP_ONLY) {
+      return 1; // Assume 1 passenger pickup
+    } else {
+      return 0; // No net change for both pickup and drop-off
+    }
+  }
+
+  /**
+   * Validates that the EstimatedCalls are properly ordered in time.
+   * Ensures intermediate stops occur between the first (boarding) and last (alighting) calls.
+   */
+  private void validateEstimatedCallOrder(List<EstimatedCall> calls) {
+    if (calls.size() < 2) {
+      return; // No validation needed for fewer than 2 calls
+    }
+
+    ZonedDateTime firstTime = calls.getFirst().getAimedDepartureTime(); // Use departure time for first call
+    ZonedDateTime lastTime = calls.getLast().getAimedArrivalTime(); // Use arrival time for last call
+
+    if (firstTime == null || lastTime == null) {
+      LOG.warn("Cannot validate call order - missing timing information in first or last call");
+      return;
+    }
+
+    if (firstTime.isAfter(lastTime)) {
+      throw new IllegalArgumentException(
+        String.format(
+          "Invalid call order: first call time (%s) is after last call time (%s)",
+          firstTime,
+          lastTime
+        )
+      );
+    }
+
+    // Validate intermediate calls are between first and last
+    for (int i = 1; i < calls.size() - 1; i++) {
+      EstimatedCall intermediateCall = calls.get(i);
+      ZonedDateTime intermediateTime = intermediateCall.getAimedDepartureTime() != null ? intermediateCall.getAimedDepartureTime() : intermediateCall.getAimedArrivalTime();
+
+      if (intermediateTime == null) {
+        LOG.warn("Intermediate call at index {} has no timing information", i);
+        continue;
+      }
+
+      if (intermediateTime.isBefore(firstTime) || intermediateTime.isAfter(lastTime)) {
+        throw new IllegalArgumentException(
+          String.format(
+            "Invalid call order: intermediate call at index %d (time: %s) is not between first (%s) and last (%s) calls",
+            i,
+            intermediateTime,
+            firstTime,
+            lastTime
+          )
+        );
+      }
+    }
   }
 
   private AreaStop buildAreaStop(EstimatedCall call, String id) {

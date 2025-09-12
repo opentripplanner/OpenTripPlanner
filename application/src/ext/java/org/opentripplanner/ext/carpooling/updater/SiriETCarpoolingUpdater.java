@@ -93,9 +93,13 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
               ejvf
                 .getEstimatedVehicleJourneies()
                 .forEach(ejv -> {
-                  var carpoolTrip = mapper.mapSiriToCarpoolTrip(ejv);
-                  if (carpoolTrip != null) {
-                    repository.addCarpoolTrip(carpoolTrip);
+                  try {
+                    var carpoolTrip = mapper.mapSiriToCarpoolTrip(ejv);
+                    if (carpoolTrip != null) {
+                      repository.upsertCarpoolTrip(carpoolTrip);
+                    }
+                  } catch (Exception e) {
+                    LOG.warn("Failed to process EstimatedVehicleJourney: {}", e.getMessage());
                   }
                 });
             }

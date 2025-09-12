@@ -2,6 +2,8 @@ package org.opentripplanner.ext.carpooling.model;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.LogInfo;
@@ -9,9 +11,9 @@ import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.site.AreaStop;
 
 /**
- * A carpool trip is defined by two area stops and a start time, in addition to all the other fields
- * that are necessary for a valid Trip. It is created from SIRI ET messages that contain the
- * necessary identifiers and trip information.
+ * A carpool trip is defined by boarding and alighting areas, a start time, and a sequence of stops
+ * where passengers can be picked up or dropped off.
+ * It is created from SIRI ET messages that contain the necessary identifiers and trip information.
  */
 public class CarpoolTrip
   extends AbstractTransitEntity<CarpoolTrip, CarpoolTripBuilder>
@@ -28,6 +30,9 @@ public class CarpoolTrip
   private final Duration deviationBudget;
   private final int availableSeats;
 
+  // Ordered list of stops along the carpool route where passengers can be picked up or dropped off
+  private final List<CarpoolStop> stops;
+
   public CarpoolTrip(CarpoolTripBuilder builder) {
     super(builder.getId());
     this.boardingArea = builder.boardingArea();
@@ -37,6 +42,7 @@ public class CarpoolTrip
     this.provider = builder.provider();
     this.availableSeats = builder.availableSeats();
     this.deviationBudget = builder.deviationBudget();
+    this.stops = Collections.unmodifiableList(builder.stops());
   }
 
   public AreaStop boardingArea() {
@@ -67,6 +73,13 @@ public class CarpoolTrip
     return availableSeats;
   }
 
+  /**
+   * @return An immutable list of stops along the carpool route, ordered by sequence
+   */
+  public List<CarpoolStop> stops() {
+    return stops;
+  }
+
   public Duration tripDuration() {
     // Since the endTime is set by the driver at creation, we subtract the deviationBudget to get the
     // actual trip duration.
@@ -86,7 +99,8 @@ public class CarpoolTrip
       boardingArea.equals(other.boardingArea) &&
       alightingArea.equals(other.alightingArea) &&
       startTime.equals(other.startTime) &&
-      endTime.equals(other.endTime)
+      endTime.equals(other.endTime) &&
+      stops.equals(other.stops)
     );
   }
 
