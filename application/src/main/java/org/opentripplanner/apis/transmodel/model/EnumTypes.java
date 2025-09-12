@@ -185,6 +185,7 @@ public class EnumTypes {
     .value("foot", TraverseMode.WALK)
     .value("car", TraverseMode.CAR)
     .value("scooter", TraverseMode.SCOOTER)
+    .value("carpool", TransitMode.CARPOOL)
     .build();
 
   public static final GraphQLEnumType LOCALE = GraphQLEnumType.newEnum()
