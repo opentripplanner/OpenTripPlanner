@@ -309,6 +309,13 @@ input[type='number'] {
   margin-bottom: 5px;
 }
 
+.pagination-controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
 .default-tooltip-icon {
   width: 10px;
   height: 10px;

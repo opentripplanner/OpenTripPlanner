@@ -16,7 +16,7 @@ export function ItineraryPaginationControl({
   onCompare?: () => void;
 }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="pagination-controls-container">
       <Button
         variant="outline-primary"
         size="sm"
@@ -29,10 +29,10 @@ export function ItineraryPaginationControl({
       >
         Previous page
       </Button>
-      <div style={{ minWidth: '120px', textAlign: 'center' }}>
+      <div style={{ textAlign: 'center' }}>
         {comparisonSelectedIndexes?.length === 2 && onCompare && (
           <Button variant="primary" size="sm" onClick={onCompare}>
-            Compare Selected
+            Compare selected
           </Button>
         )}
       </div>

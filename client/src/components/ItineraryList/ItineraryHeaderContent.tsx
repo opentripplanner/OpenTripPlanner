@@ -61,7 +61,7 @@ export function ItineraryHeaderContent({
           style={{
             position: 'absolute',
             top: '4px',
-            right: '8px',
+            right: '4px',
             zIndex: 10,
           }}
         >
