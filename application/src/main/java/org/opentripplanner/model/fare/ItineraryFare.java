@@ -89,8 +89,8 @@ public class ItineraryFare {
     this.legProducts.put(leg, offer);
   }
 
-  public void addFareProductUses(Multimap<Leg, FareOffer> fareProducts) {
-    legProducts.putAll(fareProducts);
+  public void addFareOffers(Multimap<Leg, FareOffer> fareOffers) {
+    legProducts.putAll(fareOffers);
   }
 
   /**
