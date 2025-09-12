@@ -1,61 +1,80 @@
 import { TripQueryVariables } from '../gql/graphql.ts';
 import { queryAsString } from '../static/query/tripQuery.tsx';
+import {
+  parse,
+  print,
+  visit,
+  DocumentNode,
+  OperationDefinitionNode,
+  VariableDefinitionNode,
+  ArgumentNode,
+  VariableNode,
+} from 'graphql';
 
-function parseVariableDeclarations(queryString: string): Record<string, string> {
+function extractVariableDefinitions(document: DocumentNode): Record<string, string> {
   const variableTypes: Record<string, string> = {};
 
-  const queryMatch = queryString.match(/query\s+trip\s*\(([\s\S]*?)\)\s*\{/);
-  if (!queryMatch) return variableTypes;
-
-  const variableSection = queryMatch[1];
-
-  const variableMatches = variableSection.match(/\$(\w+):\s*([^,\n\r]+)/g);
-  if (!variableMatches) return variableTypes;
-
-  variableMatches.forEach((match) => {
-    const parts = match.match(/\$(\w+):\s*(.+)/);
-    if (parts) {
-      const varName = parts[1].trim();
-      variableTypes[varName] = parts[2].trim();
-    }
+  visit(document, {
+    OperationDefinition(node: OperationDefinitionNode) {
+      if (node.operation === 'query' && node.variableDefinitions) {
+        node.variableDefinitions.forEach((varDef: VariableDefinitionNode) => {
+          const varName = varDef.variable.name.value;
+          variableTypes[varName] = print(varDef.type);
+        });
+      }
+    },
   });
 
   return variableTypes;
 }
 
-function extractQueryBody(queryString: string): string {
-  const match = queryString.match(/query\s+trip\s*\([^)]*\)\s*(\{[\s\S]*})/);
-  return match ? match[1] : '{ trip { __typename } }';
-}
-
 export function createPrunedQuery(variables: TripQueryVariables): string {
-  const variableTypes = parseVariableDeclarations(queryAsString);
-  const queryBody = extractQueryBody(queryAsString);
+  const document = parse(queryAsString);
+  const variableTypes = extractVariableDefinitions(document);
 
   const providedVariables = Object.keys(variables).filter(
     (key) => variables[key as keyof TripQueryVariables] !== undefined,
   );
 
-  const variableDeclarations = providedVariables
-    .map((varName) => `  $${varName}: ${variableTypes[varName]}`)
-    .filter((declaration) => !declaration.includes('undefined'))
-    .join('\n');
+  // Create new document with only the variables we need
+  const prunedDocument = visit(document, {
+    OperationDefinition(node: OperationDefinitionNode) {
+      if (node.operation === 'query') {
+        // Filter variable definitions to only include provided variables
+        const filteredVariableDefinitions = node.variableDefinitions?.filter((varDef: VariableDefinitionNode) => {
+          const varName = varDef.variable.name.value;
+          return providedVariables.includes(varName) && variableTypes[varName];
+        });
 
-  const variableUsages = providedVariables
-    .filter((varName) => variableTypes[varName])
-    .map((varName) => `    ${varName}: $${varName}`)
-    .join('\n');
+        return {
+          ...node,
+          variableDefinitions: filteredVariableDefinitions || [],
+        };
+      }
+      return node;
+    },
 
-  const modifiedQueryBody = queryBody.replace(
-    /trip\s*\([^)]*\)/,
-    `trip(
-${variableUsages}
-  )`,
-  );
+    Field(node) {
+      // Update the trip field arguments to only include provided variables
+      if (node.name.value === 'trip' && node.arguments) {
+        const filteredArguments = node.arguments.filter((arg: ArgumentNode) => {
+          if (arg.value.kind === 'Variable') {
+            const varName = (arg.value as VariableNode).name.value;
+            return providedVariables.includes(varName) && variableTypes[varName];
+          }
+          return true;
+        });
 
-  return `query trip(
-${variableDeclarations}
-) ${modifiedQueryBody}`;
+        return {
+          ...node,
+          arguments: filteredArguments,
+        };
+      }
+      return node;
+    },
+  });
+
+  return print(prunedDocument);
 }
 
 export function createPrunedVariables(variables: TripQueryVariables): TripQueryVariables {
