@@ -13,7 +13,6 @@ import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
-import org.opentripplanner.ext.carpooling.data.KristiansandCarpoolingData;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -52,7 +51,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
     Graph graph,
     VertexLinker vertexLinker
   ) {
-    KristiansandCarpoolingData.populateRepository(repository, graph);
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.repository = repository;
     this.graph = graph;
