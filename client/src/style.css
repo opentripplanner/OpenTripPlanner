@@ -444,3 +444,169 @@ input.comma-separated-input[type='number'] {
 .panel-header button:hover {
   background-color: #0056b3; /* Darker on hover */
 }
+
+/* Itinerary Comparison Dialog */
+.compare-section-divider {
+  margin-top: 20px;
+}
+
+/* Removed toggle button - now using always-visible dropdowns */
+
+.compare-legs-container {
+  display: flex;
+  gap: 20px;
+}
+
+.compare-leg-column {
+  flex: 1;
+}
+
+.compare-leg-item {
+  padding: 4px;
+  border: 1px solid #dee2e6;
+  margin-bottom: 2px;
+  border-radius: 2px;
+}
+
+.compare-leg-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.compare-leg-checkbox {
+  margin-right: 6px;
+}
+
+.compare-selected-legs-section {
+  margin-top: 20px;
+}
+
+/* Enhanced visual comparison styles */
+.compare-summary-table {
+  margin-bottom: 30px;
+}
+
+.compare-summary-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px 8px;
+}
+
+.compare-summary-table td {
+  text-align: center;
+  padding: 12px 8px;
+  vertical-align: middle;
+}
+
+.compare-itinerary-number {
+  font-size: 16px;
+  font-weight: bold;
+  color: #0056b3;
+}
+
+.compare-summary-table .compare-value-best {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+  font-weight: 600;
+}
+
+.compare-leg-column h6 {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.compare-leg-item {
+  padding: 8px;
+  border: 1px solid #dee2e6;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.compare-leg-item:hover {
+  background-color: #f8f9fa;
+}
+
+.compare-leg-item.selected {
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.compare-leg-mode {
+  font-weight: 600;
+  color: #495057;
+}
+
+.compare-leg-details {
+  color: #6c757d;
+  font-size: 12px;
+}
+
+.compare-selected-legs-title {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+/* New minimalistic leg selection with react-select */
+.compare-legs-select-container {
+  display: flex;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.compare-leg-select-column {
+  flex: 1;
+}
+
+.compare-leg-select-label {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+/* React-select customization */
+.compare-leg-select .compare-leg-select__control {
+  min-height: 40px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.compare-leg-select .compare-leg-select__control--is-focused {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 1px #0056b3;
+}
+
+.compare-leg-select .compare-leg-select__multi-value {
+  background-color: #e3f2fd;
+  border: 1px solid #2196f3;
+}
+
+.compare-leg-select .compare-leg-select__multi-value__label {
+  color: #1976d2;
+  font-size: 12px;
+}
+
+.compare-leg-select .compare-leg-select__multi-value__remove {
+  color: #1976d2;
+  cursor: pointer;
+}
+
+.compare-leg-select .compare-leg-select__multi-value__remove:hover {
+  background-color: #1976d2;
+  color: white;
+}
+
+.compare-leg-select .compare-leg-select__placeholder {
+  color: #6c757d;
+  font-size: 13px;
+}
