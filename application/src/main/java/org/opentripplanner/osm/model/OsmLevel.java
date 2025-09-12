@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.issues.FloorNumberUnknownAssumedGroundLevel;
 import org.opentripplanner.osm.issues.FloorNumberUnknownGuessedFromAltitude;
@@ -19,6 +20,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
     0.0,
     "default level",
     "default level",
+    "default level",
     Source.NONE,
     true
   );
@@ -28,6 +30,11 @@ public class OsmLevel implements Comparable<OsmLevel> {
   public final double altitudeMeters;
   public final String shortName; // localized (potentially 1-based)
   public final String longName; // localized (potentially 1-based)
+
+  /** level:ref tag from OSM */
+  @Nullable
+  public final String levelRef;
+
   public final Source source;
   public final boolean reliable;
 
@@ -36,6 +43,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
     double altitudeMeters,
     String shortName,
     String longName,
+    String levelRef,
     Source source,
     boolean reliable
   ) {
@@ -43,6 +51,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
     this.altitudeMeters = altitudeMeters;
     this.shortName = shortName;
     this.longName = longName;
+    this.levelRef = levelRef;
     this.source = source;
     this.reliable = reliable;
   }
@@ -128,7 +137,15 @@ public class OsmLevel implements Comparable<OsmLevel> {
       issueStore.add(new FloorNumberUnknownAssumedGroundLevel(spec, osmObj));
       reliable = false;
     }
-    return new OsmLevel(floorNumber, altitude, shortName, longName, source, reliable);
+    return new OsmLevel(
+      floorNumber,
+      altitude,
+      shortName,
+      longName,
+      osmObj.getTag("level:ref"),
+      source,
+      reliable
+    );
   }
 
   public static List<OsmLevel> fromSpecList(
