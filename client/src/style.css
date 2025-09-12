@@ -443,6 +443,26 @@ input.comma-separated-input[type='number'] {
   background-color: #0056b3;
 }
 
+/* No results display container */
+.no-results-display-container {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+/* No results details pre-formatted text */
+.no-results-details {
+  font-size: 12px;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  width: 100%;
+}
+
 /* Pagination Controls */
 .pagination-controls-container {
   display: flex;
