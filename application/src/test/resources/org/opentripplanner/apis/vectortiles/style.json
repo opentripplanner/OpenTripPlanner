@@ -1587,6 +1587,55 @@
       }
     },
     {
+      "id" : "elevator-vertex",
+      "type" : "circle",
+      "source" : "vectorSource",
+      "source-layer" : "vertices",
+      "minzoom" : 15,
+      "maxzoom" : 23,
+      "paint" : {
+        "circle-stroke-color" : "#140d0e",
+        "circle-stroke-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          15,
+          0.2,
+          23,
+          3.0
+        ],
+        "circle-radius" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          15,
+          1.0,
+          23,
+          7.0
+        ],
+        "circle-color" : "#ff8400"
+      },
+      "filter" : [
+        "in",
+        "class",
+        "ElevatorVertex"
+      ],
+      "layout" : {
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Elevators"
+      }
+    },
+    {
       "id" : "vertex",
       "type" : "circle",
       "source" : "vectorSource",
