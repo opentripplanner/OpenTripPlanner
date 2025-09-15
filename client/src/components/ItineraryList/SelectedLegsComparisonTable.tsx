@@ -30,6 +30,8 @@ export function SelectedLegsComparisonTable({
         <thead>
           <tr>
             <th>Itinerary</th>
+            <th>From</th>
+            <th>To</th>
             <th>Mode</th>
             <th>Line</th>
             <th>Start Time</th>
@@ -50,6 +52,8 @@ export function SelectedLegsComparisonTable({
                   <td>
                     <strong>#{selectedIndexes[itineraryIdx] + 1}</strong>
                   </td>
+                  <td>{leg.fromPlace?.name || '-'}</td>
+                  <td>{leg.toPlace?.name || '-'}</td>
                   <td>{leg.mode}</td>
                   <td>{leg.line?.publicCode || leg.line?.name || '-'}</td>
                   <td>{formatTime(leg.aimedStartTime, timeZone, 'short')}</td>
