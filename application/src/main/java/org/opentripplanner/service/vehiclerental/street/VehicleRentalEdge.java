@@ -83,14 +83,14 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
-            if (s0.getRequest().rentalDuration() != null && station.isCarStation()) {
-              OffsetDateTime searchStartTime = OffsetDateTime.ofInstant(
-                s0.getRequest().startTime(),
+            if (s0.getRequest().rentalEndTime() != null && station.isCarStation()) {
+              OffsetDateTime rentalEndTime = OffsetDateTime.ofInstant(
+                s0.getRequest().rentalEndTime(),
                 ZoneId.systemDefault()
               );
               VehicleRentalVehicle vehicleRentalVehicle = (VehicleRentalVehicle) station;
               OffsetDateTime availableUntil = vehicleRentalVehicle.availableUntil();
-              if (availableUntil != null && availableUntil.isBefore(searchStartTime)) {
+              if (availableUntil != null && availableUntil.isBefore(rentalEndTime)) {
                 return State.empty();
               }
             }
@@ -134,11 +134,15 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
-            if (s0.getRequest().rentalDuration() != null && station.isCarStation()) {
+            if (
+              s0.getRequest().rentalStartTime() != null &&
+              s0.getRequest().rentalEndTime() != null &&
+              station.isCarStation()
+            ) {
               OffsetDateTime rentalEndTime = OffsetDateTime.ofInstant(
-                s0.getRequest().startTime(),
+                s0.getRequest().rentalEndTime(),
                 ZoneId.systemDefault()
-              ).plus(s0.getRequest().rentalDuration());
+              );
               VehicleRentalVehicle vehicleRentalVehicle = (VehicleRentalVehicle) station;
               OffsetDateTime availableUntil = vehicleRentalVehicle.availableUntil();
               if (availableUntil != null && availableUntil.isBefore(rentalEndTime)) {

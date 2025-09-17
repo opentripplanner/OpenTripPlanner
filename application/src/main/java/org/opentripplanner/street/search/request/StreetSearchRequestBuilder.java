@@ -18,6 +18,8 @@ public class StreetSearchRequestBuilder {
   GenericLocation from;
   GenericLocation to;
   Duration rentalDuration;
+  public Instant rentalStartTime;
+  public Instant rentalEndTime;
 
   StreetSearchRequestBuilder(StreetSearchRequest original) {
     this.startTime = original.startTime();
@@ -28,6 +30,8 @@ public class StreetSearchRequestBuilder {
     this.from = original.from();
     this.to = original.to();
     this.rentalDuration = original.rentalDuration();
+    this.rentalStartTime = original.rentalStartTime();
+    this.rentalEndTime = original.rentalEndTime();
   }
 
   public StreetSearchRequestBuilder withStartTime(Instant startTime) {
@@ -71,6 +75,16 @@ public class StreetSearchRequestBuilder {
 
   public StreetSearchRequestBuilder withRentalDuration(Duration rentalDuration) {
     this.rentalDuration = rentalDuration;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withRentalEndTime(Instant rentalEndTime) {
+    this.rentalEndTime = rentalEndTime;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withRentalStartTime(Instant rentalStartTime) {
+    this.rentalStartTime = rentalStartTime;
     return this;
   }
 

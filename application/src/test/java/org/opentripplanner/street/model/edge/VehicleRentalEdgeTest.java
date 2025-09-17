@@ -15,6 +15,7 @@ import static org.opentripplanner.street.model.RentalFormFactor.MOPED;
 import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
@@ -31,6 +32,7 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.VehicleRentalState;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -409,12 +411,23 @@ class VehicleRentalEdgeTest {
     RentalFormFactor formFactor = RentalFormFactor.CAR;
     this.vertex = StreetModelForTest.rentalVertex(formFactor, vehicleAvailableUntil);
     this.vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, formFactor);
-
-    this.request = StreetSearchRequest.of()
-      .withMode(StreetMode.CAR_RENTAL)
+    StreetSearchRequestBuilder streetSearchRequestBuilder = StreetSearchRequest.of()
+      .withMode(CAR_RENTAL)
       .withRentalDuration(rentalDuration)
-      .withArriveBy(arriveBy)
-      .build();
+      .withArriveBy(arriveBy);
+
+    if (rentalDuration != null) {
+      Instant now = Instant.now();
+      if (arriveBy) {
+        streetSearchRequestBuilder.withRentalEndTime(now);
+        streetSearchRequestBuilder.withRentalStartTime(now.minus(rentalDuration));
+      } else {
+        streetSearchRequestBuilder.withRentalStartTime(now);
+        streetSearchRequestBuilder.withRentalEndTime(now.plus(rentalDuration));
+      }
+    }
+
+    this.request = streetSearchRequestBuilder.build();
   }
 
   private State[] rent() {
