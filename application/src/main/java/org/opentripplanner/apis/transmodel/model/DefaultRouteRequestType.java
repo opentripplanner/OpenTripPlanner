@@ -117,7 +117,9 @@ public class DefaultRouteRequestType {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("stairsReluctance")
-          .description("Used instead of walkReluctance for stairs.")
+          .description(
+            "A multiplier to specify how bad walking on stairs is, compared to walking on flat ground."
+          )
           .type(Scalars.GraphQLFloat)
           .dataFetcher(env -> preferences.walk().stairsReluctance())
           .build()
