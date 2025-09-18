@@ -18,6 +18,17 @@ clients, finding itineraries that account for disruptions and service changes.
 Note that this branch contains **OpenTripPlanner 2**, the second major version of OTP, which has
 been under development since 2018 and is now the dominant one and the only one being supported.
 
+## Contributing guidelines
+
+See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## Development
+
+OpenTripPlanner is a collaborative project incorporating code, translation, and documentation from
+contributors around the world. We welcome new contributions.
+Further [development guidelines](http://docs.opentripplanner.org/en/latest/Developers-Guide/) can be
+found in the documentation.
+
 ## Performance Test
 
 [📊 Dashboard](https://otp-performance.leonard.io/) 
@@ -37,14 +48,6 @@ code and dependencies to run OpenTripPlanner.
 Additional information and instructions are available in
 the [main documentation](http://docs.opentripplanner.org/en/dev-2.x/), including a
 [quick introduction](http://docs.opentripplanner.org/en/dev-2.x/Basic-Tutorial/).
-
-## Development
-
-
-OpenTripPlanner is a collaborative project incorporating code, translation, and documentation from
-contributors around the world. We welcome new contributions.
-Further [development guidelines](http://docs.opentripplanner.org/en/latest/Developers-Guide/) can be
-found in the documentation.
 
 ### Development history
 
