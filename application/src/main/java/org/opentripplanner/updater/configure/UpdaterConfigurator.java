@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureUpdater;
+import org.opentripplanner.ext.siri.updater.mqtt.SiriETMqttUpdater;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
@@ -222,6 +223,9 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
       updaters.add(SiriAzureUpdater.createSXUpdater(configItem, timetableRepository));
+    }
+    for (var configItem : updatersParameters.getMqttSiriETUpdaterParameters()) {
+      updaters.add(new SiriETMqttUpdater(configItem, provideSiriAdapter()));
     }
 
     return updaters;
