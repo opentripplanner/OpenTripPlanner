@@ -7,7 +7,7 @@ Thank you for your interest in contributing to OpenTripPlanner. Please read the 
 - If you have any questions about problems you are encountering with code, deployment, documentation,
 or development coordination, please don't hesitate to post to the [OpenTripPlanner Gitter chat](https://gitter.im/opentripplanner/OpenTripPlanner).
 - There are twice-weekly developer meetings to discuss and coordinate contributions in more detail. See the [calendar](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com) or [iCal link](https://calendar.google.com/calendar/ical/ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com/public/basic.ics) for our schedule. A Google Meet link can be found in the calendar events.
-- Before starting work on major features, please reach out to the community beforehand to make sure the contribution makes sense and no one else is working on it.
+- Before starting work on a major feature, please reach out to the community beforehand to make sure the contribution makes sense and no one else is working on it.
 - Document and plan features in issues. Issues will not be discussed by the community automatically. If you wish to discuss an issue in the developer meetings, add it to a meeting's agenda thread in Gitter.
 - Small bug fixes and patches do not require prior discussion.
 - There is also a less used Google Group mailing list. It can be accessed as
@@ -35,7 +35,7 @@ times are not suitable for you, please let us know and we will attempt to schedu
 that suits you.
 - The meetings are open to anyone who wants to
 join, even if you simply want to observe the process or ask a few questions.
-- By default, pull requests will only be advanced by the author's participation in the meeting.
+- By default, pull requests will only be advanced by an author's participation in a meeting.
 - If you are unable to participate and want your PR to be advanced, leave a comment on the PR explaining the current state e.g. "This PR doesn't have things to discuss and should be assigned reviewers."
 - Check the specific times
 on [this calendar](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com)
