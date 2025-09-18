@@ -225,7 +225,6 @@ class AddedTripBuilder {
       aimedStopTimes,
       transitService.getDeduplicator()
     ).withServiceCode(transitService.getServiceCode(trip.getServiceId()));
-    tripTimes.validateNonIncreasingTimes();
 
     TripPattern pattern = TripPattern.of(getTripPatternId.apply(trip))
       .withRoute(trip.getRoute())
