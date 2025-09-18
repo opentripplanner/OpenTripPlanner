@@ -1,6 +1,5 @@
 package org.opentripplanner.street.search.request;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
@@ -45,17 +44,8 @@ public class StreetSearchRequest implements AStarRequest {
   private final GenericLocation to;
   private final Envelope toEnvelope;
 
-  /**
-   * The rentalDuration only apply to direct search, support for transit search is not implemented.
-   */
   @Nullable
-  private final Duration rentalDuration;
-
-  @Nullable
-  private final Instant rentalStartTime;
-
-  @Nullable
-  private final Instant rentalEndTime;
+  private final RentalPeriod rentalPeriod;
 
   private IntersectionTraversalCalculator intersectionTraversalCalculator =
     IntersectionTraversalCalculator.DEFAULT;
@@ -66,9 +56,7 @@ public class StreetSearchRequest implements AStarRequest {
    * Constructor only used for creating a default instance.
    */
   private StreetSearchRequest() {
-    this.rentalDuration = null;
-    this.rentalStartTime = null;
-    this.rentalEndTime = null;
+    this.rentalPeriod = null;
     this.startTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
     this.preferences = RoutingPreferences.DEFAULT;
     this.mode = StreetMode.WALK;
@@ -87,9 +75,7 @@ public class StreetSearchRequest implements AStarRequest {
     this.arriveBy = builder.arriveBy;
     this.wheelchair = builder.wheelchair;
     this.from = builder.from;
-    this.rentalDuration = builder.rentalDuration;
-    this.rentalStartTime = builder.rentalStartTime;
-    this.rentalEndTime = builder.rentalEndTime;
+    this.rentalPeriod = builder.rentalPeriod;
     this.fromEnvelope = createEnvelope(from);
     this.to = builder.to;
     this.toEnvelope = createEnvelope(to);
@@ -136,16 +122,8 @@ public class StreetSearchRequest implements AStarRequest {
     return to;
   }
 
-  public Duration rentalDuration() {
-    return rentalDuration;
-  }
-
-  public Instant rentalEndTime() {
-    return rentalEndTime;
-  }
-
-  public Instant rentalStartTime() {
-    return rentalStartTime;
+  public RentalPeriod rentalPeriod() {
+    return rentalPeriod;
   }
 
   public IntersectionTraversalCalculator intersectionTraversalCalculator() {

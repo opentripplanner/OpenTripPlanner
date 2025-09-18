@@ -31,6 +31,7 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model._data.StreetModelForTest;
+import org.opentripplanner.street.search.request.RentalPeriodBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
@@ -413,20 +414,19 @@ class VehicleRentalEdgeTest {
     this.vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, formFactor);
     StreetSearchRequestBuilder streetSearchRequestBuilder = StreetSearchRequest.of()
       .withMode(CAR_RENTAL)
-      .withRentalDuration(rentalDuration)
       .withArriveBy(arriveBy);
-
     if (rentalDuration != null) {
       Instant now = Instant.now();
+      RentalPeriodBuilder rentalPeriodBuilder = new RentalPeriodBuilder();
       if (arriveBy) {
-        streetSearchRequestBuilder.withRentalEndTime(now);
-        streetSearchRequestBuilder.withRentalStartTime(now.minus(rentalDuration));
+        rentalPeriodBuilder.setRentalEndTime(now);
+        rentalPeriodBuilder.setRentalStartTime(now.minus(rentalDuration));
       } else {
-        streetSearchRequestBuilder.withRentalStartTime(now);
-        streetSearchRequestBuilder.withRentalEndTime(now.plus(rentalDuration));
+        rentalPeriodBuilder.setRentalStartTime(now);
+        rentalPeriodBuilder.setRentalEndTime(now.plus(rentalDuration));
       }
+      streetSearchRequestBuilder.withRentalPeriod(rentalPeriodBuilder.build());
     }
-
     this.request = streetSearchRequestBuilder.build();
   }
 

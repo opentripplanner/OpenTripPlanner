@@ -83,9 +83,9 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
-            if (s0.getRequest().rentalEndTime() != null && station.isCarStation()) {
+            if (s0.getRequest().rentalPeriod() != null && station.isCarStation()) {
               OffsetDateTime rentalEndTime = OffsetDateTime.ofInstant(
-                s0.getRequest().rentalEndTime(),
+                s0.getRequest().rentalPeriod().rentalEndTime(),
                 ZoneId.systemDefault()
               );
               VehicleRentalVehicle vehicleRentalVehicle = (VehicleRentalVehicle) station;
@@ -134,13 +134,9 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
-            if (
-              s0.getRequest().rentalStartTime() != null &&
-              s0.getRequest().rentalEndTime() != null &&
-              station.isCarStation()
-            ) {
+            if (s0.getRequest().rentalPeriod() != null && station.isCarStation()) {
               OffsetDateTime rentalEndTime = OffsetDateTime.ofInstant(
-                s0.getRequest().rentalEndTime(),
+                s0.getRequest().rentalPeriod().rentalEndTime(),
                 ZoneId.systemDefault()
               );
               VehicleRentalVehicle vehicleRentalVehicle = (VehicleRentalVehicle) station;

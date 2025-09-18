@@ -13,13 +13,17 @@ public class StreetSearchRequestMapper {
       .withPreferences(request.preferences())
       .withWheelchair(request.journey().wheelchair())
       .withFrom(request.from())
-      .withTo(request.to())
-      .withRentalDuration(request.journey().direct().rentalDuration());
-    if (request.journey().direct().rentalDuration() != null) {
-      Duration rentalDuration = request.journey().direct().rentalDuration();
-      return streetSearchRequestBuilder
-        .withRentalStartTime(request.arriveBy() ? time.minus(rentalDuration) : time)
-        .withRentalEndTime(request.arriveBy() ? time : time.plus(rentalDuration));
+      .withTo(request.to());
+
+    Duration rentalDuration = request.journey().direct().rentalDuration();
+    if (rentalDuration != null) {
+      Instant rentalStart = request.arriveBy() ? time.minus(rentalDuration) : time;
+      Instant rentalEnd = request.arriveBy() ? time : time.plus(rentalDuration);
+      RentalPeriod rentalPeriod = new RentalPeriodBuilder()
+        .setRentalStartTime(rentalStart)
+        .setRentalEndTime(rentalEnd)
+        .build();
+      return streetSearchRequestBuilder.withRentalPeriod(rentalPeriod);
     }
 
     return streetSearchRequestBuilder;
