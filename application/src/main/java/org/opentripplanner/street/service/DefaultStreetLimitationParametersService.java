@@ -18,4 +18,14 @@ public class DefaultStreetLimitationParametersService implements StreetLimitatio
   public float getMaxCarSpeed() {
     return streetLimitationParameters.maxCarSpeed();
   }
+
+  @Override
+  public float getBestWalkSafety() {
+    return streetLimitationParameters.bestWalkSafety();
+  }
+
+  @Override
+  public float getBestBikeSafety() {
+    return streetLimitationParameters.bestBikeSafety();
+  }
 }
