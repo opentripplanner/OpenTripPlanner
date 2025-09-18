@@ -13,18 +13,6 @@ or development coordination, please don't hesitate to post to the [OpenTripPlann
 - There is also a less used Google Group mailing list. It can be accessed as
 [a web forum](https://groups.google.com/g/opentripplanner-users) or as a mailing list: <opentripplanner-users@googlegroups.com>.
 
-## Coding style
-
-See [Codestyle.md](doc/dev/decisionrecords/Codestyle.md)
-
-## Naming conventions
-
-See [NamingConventions.md](doc/dev/decisionrecords/NamingConventions.md)
-
-## GraphQL API design
-
-See [APIGraphQLDesign.md](doc/dev/decisionrecords/APIGraphQLDesign.md)
-
 ## Developer meetings
 
 - OTP development meetings usually occur twice a week.
@@ -44,6 +32,18 @@ calendar are expressed in the Central European time zone by default. There is al
 an [iCal link to import this calendar](https://calendar.google.com/calendar/ical/ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com/public/basic.ics)
 into calendar apps. Check the details of the calendar events for the Google Meet link, which is
 different on different days of the week.
+
+## Coding style
+
+See [Codestyle.md](doc/dev/decisionrecords/Codestyle.md)
+
+## Naming conventions
+
+See [NamingConventions.md](doc/dev/decisionrecords/NamingConventions.md)
+
+## GraphQL API design
+
+See [APIGraphQLDesign.md](doc/dev/decisionrecords/APIGraphQLDesign.md)
 
 ## Contributing Issues and Pull Requests
 
