@@ -68,7 +68,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
       .withTo(p2)
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 
   @Test
@@ -82,7 +82,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
       .withTo(p2)
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 
   @Test
@@ -121,7 +121,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
       .withTo(p3)
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 
   @Test
@@ -133,6 +133,6 @@ public class TransitSnapshotTest extends SnapshotTestBase {
       .withTo(p3)
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 }
