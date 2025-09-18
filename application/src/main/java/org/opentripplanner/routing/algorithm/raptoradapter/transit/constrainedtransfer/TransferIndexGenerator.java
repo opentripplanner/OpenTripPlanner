@@ -42,6 +42,10 @@ public class TransferIndexGenerator {
   private final Map<Route, Set<RoutingTripPattern>> patternsByRoute = new HashMap<>();
   private final Map<Trip, Set<RoutingTripPattern>> patternsByTrip = new HashMap<>();
 
+  private int lastPatternIndex = 0;
+  private TransferForPatternByStopPos[] prevForwardTransfers = {};
+  private TransferForPatternByStopPos[] prevReverseTransfers = {};
+
   public TransferIndexGenerator(
     Collection<ConstrainedTransfer> constrainedTransfers,
     Collection<TripPattern> tripPatterns
@@ -52,8 +56,21 @@ public class TransferIndexGenerator {
 
   public ConstrainedTransfersForPatterns generateTransfers() {
     int nPatterns = RoutingTripPattern.indexCounter();
+
+    // If no new patterns have been added, return the previously generated transfers
+    if (lastPatternIndex == nPatterns - 1) {
+      return new ConstrainedTransfersForPatterns(
+        Arrays.asList(prevForwardTransfers),
+        Arrays.asList(prevReverseTransfers)
+      );
+    }
+
     TransferForPatternByStopPos[] forwardTransfers = new TransferForPatternByStopPos[nPatterns];
     TransferForPatternByStopPos[] reverseTransfers = new TransferForPatternByStopPos[nPatterns];
+
+    // Copy previously generated transfers
+    System.arraycopy(prevForwardTransfers, 0, forwardTransfers, 0, prevForwardTransfers.length);
+    System.arraycopy(prevReverseTransfers, 0, reverseTransfers, 0, prevReverseTransfers.length);
 
     for (ConstrainedTransfer tx : constrainedTransfers) {
       var c = tx.getTransferConstraint();
@@ -65,11 +82,13 @@ public class TransferIndexGenerator {
       }
 
       try {
-        findTPoints(tx.getFrom(), ALIGHT)
+        findTPoints(tx.getFrom(), ALIGHT, false)
           .stream()
           .filter(TPoint::canAlight)
           .forEachOrdered(fromPoint -> {
-            for (var toPoint : findTPoints(tx.getTo(), BOARD)) {
+            boolean alightFromPreviouslySeenPattern =
+              fromPoint.pattern.patternIndex() <= lastPatternIndex;
+            for (var toPoint : findTPoints(tx.getTo(), BOARD, alightFromPreviouslySeenPattern)) {
               if (toPoint.canBoard() && !fromPoint.equals(toPoint)) {
                 fromPoint.addTransferConstraints(tx, toPoint, forwardTransfers, reverseTransfers);
               }
@@ -82,6 +101,11 @@ public class TransferIndexGenerator {
 
     sortTransfers(forwardTransfers);
     sortTransfers(reverseTransfers);
+
+    // Update the last pattern handled index and store the generated transfers
+    lastPatternIndex = nPatterns - 1;
+    prevForwardTransfers = forwardTransfers;
+    prevReverseTransfers = reverseTransfers;
 
     return new ConstrainedTransfersForPatterns(
       Arrays.asList(forwardTransfers),
@@ -132,21 +156,25 @@ public class TransferIndexGenerator {
     }
   }
 
-  private Collection<TPoint> findTPoints(TransferPoint txPoint, boolean boarding) {
+  private Collection<TPoint> findTPoints(
+    TransferPoint txPoint,
+    boolean boarding,
+    boolean onlyNewPatterns
+  ) {
     if (txPoint.isStationTransferPoint()) {
-      return findTPoints(txPoint.asStationTransferPoint());
+      return findTPoints(txPoint.asStationTransferPoint(), onlyNewPatterns);
     } else if (txPoint.isStopTransferPoint()) {
-      return findTPoints(txPoint.asStopTransferPoint());
+      return findTPoints(txPoint.asStopTransferPoint(), onlyNewPatterns);
     } else if (txPoint.isRouteStationTransferPoint()) {
-      return findTPoint(txPoint.asRouteStationTransferPoint(), boarding);
+      return findTPoint(txPoint.asRouteStationTransferPoint(), boarding, onlyNewPatterns);
     } else if (txPoint.isRouteStopTransferPoint()) {
-      return findTPoint(txPoint.asRouteStopTransferPoint(), boarding);
+      return findTPoint(txPoint.asRouteStopTransferPoint(), boarding, onlyNewPatterns);
     } else {
-      return findTPoints(txPoint.asTripTransferPoint());
+      return findTPoints(txPoint.asTripTransferPoint(), onlyNewPatterns);
     }
   }
 
-  private List<TPoint> findTPoints(StationTransferPoint point) {
+  private List<TPoint> findTPoints(StationTransferPoint point, boolean onlyNewPatterns) {
     var station = point.getStation();
     var patterns = patternsByStation.get(station);
 
@@ -158,6 +186,9 @@ public class TransferIndexGenerator {
     var result = new ArrayList<TPoint>();
 
     for (RoutingTripPattern pattern : patterns) {
+      if (onlyNewPatterns && pattern.patternIndex() <= lastPatternIndex) {
+        continue;
+      }
       var tripPattern = pattern.getPattern();
       for (int pos = 0; pos < tripPattern.numberOfStops(); ++pos) {
         if (point.getStation() == tripPattern.getStop(pos).getParentStation()) {
@@ -168,7 +199,7 @@ public class TransferIndexGenerator {
     return result;
   }
 
-  private List<TPoint> findTPoints(StopTransferPoint point) {
+  private List<TPoint> findTPoints(StopTransferPoint point, boolean onlyNewPatterns) {
     var stop = point.asStopTransferPoint().getStop();
     var patterns = patternsByStop.get(stop);
 
@@ -180,6 +211,9 @@ public class TransferIndexGenerator {
     var result = new ArrayList<TPoint>();
 
     for (RoutingTripPattern pattern : patterns) {
+      if (onlyNewPatterns && pattern.patternIndex() <= lastPatternIndex) {
+        continue;
+      }
       var p = pattern.getPattern();
       for (int pos = 0; pos < p.numberOfStops(); ++pos) {
         if (point.getStop() == p.getStop(pos)) {
@@ -190,27 +224,38 @@ public class TransferIndexGenerator {
     return result;
   }
 
-  private List<TPoint> findTPoint(RouteStationTransferPoint point, boolean boarding) {
+  private List<TPoint> findTPoint(
+    RouteStationTransferPoint point,
+    boolean boarding,
+    boolean onlyNewPatterns
+  ) {
     return findTPointForRoute(
       point.getRoute(),
       boarding
         ? p -> p.findBoardingStopPositionInPattern(point.getStation())
-        : p -> p.findAlightStopPositionInPattern(point.getStation())
+        : p -> p.findAlightStopPositionInPattern(point.getStation()),
+      onlyNewPatterns
     );
   }
 
-  private List<TPoint> findTPoint(RouteStopTransferPoint point, boolean boarding) {
+  private List<TPoint> findTPoint(
+    RouteStopTransferPoint point,
+    boolean boarding,
+    boolean onlyNewPatterns
+  ) {
     return findTPointForRoute(
       point.getRoute(),
       boarding
         ? p -> p.findBoardingStopPositionInPattern(point.getStop())
-        : p -> p.findAlightStopPositionInPattern(point.getStop())
+        : p -> p.findAlightStopPositionInPattern(point.getStop()),
+      onlyNewPatterns
     );
   }
 
   private List<TPoint> findTPointForRoute(
     Route route,
-    ToIntFunction<TripPattern> resolveStopPosInPattern
+    ToIntFunction<TripPattern> resolveStopPosInPattern,
+    boolean onlyNewPatterns
   ) {
     var patterns = patternsByRoute.get(route);
 
@@ -222,6 +267,9 @@ public class TransferIndexGenerator {
     var points = new ArrayList<TPoint>();
 
     for (var pattern : patterns) {
+      if (onlyNewPatterns && pattern.patternIndex() <= lastPatternIndex) {
+        continue;
+      }
       int stopPosInPattern = resolveStopPosInPattern.applyAsInt(pattern.getPattern());
       // stopPosInPattern == -1 means stop is not on pattern
       if (stopPosInPattern >= 0) {
@@ -233,7 +281,7 @@ public class TransferIndexGenerator {
     return points;
   }
 
-  private List<TPoint> findTPoints(TripTransferPoint point) {
+  private List<TPoint> findTPoints(TripTransferPoint point, boolean onlyNewPatterns) {
     var trip = point.getTrip();
 
     // All trips have at least one pattern, no need to check for null here
@@ -263,6 +311,9 @@ public class TransferIndexGenerator {
     // Return early if only scheduled pattern exists
     var realtimePatterns = patternsByRealtimeOrScheduled.get(Boolean.TRUE);
     if (realtimePatterns == null || realtimePatterns.isEmpty()) {
+      if (onlyNewPatterns && scheduledPattern.patternIndex() <= lastPatternIndex) {
+        return List.of();
+      }
       return List.of(scheduledPoint);
     }
 
@@ -270,8 +321,13 @@ public class TransferIndexGenerator {
     StopLocation scheduledStop = scheduledPattern.getPattern().getStop(stopPosInPattern);
 
     List<TPoint> res = new ArrayList<>();
-    res.add(scheduledPoint);
+    if (!onlyNewPatterns || scheduledPattern.patternIndex() > lastPatternIndex) {
+      res.add(scheduledPoint);
+    }
     for (RoutingTripPattern pattern : realtimePatterns) {
+      if (onlyNewPatterns && pattern.patternIndex() <= lastPatternIndex) {
+        continue;
+      }
       // Check if the same stop or its sibling is at the same position, if yes, generate a transfer point
       if (stopPosInPattern < pattern.numberOfStopsInPattern()) {
         StopLocation stop = pattern.getPattern().getStop(stopPosInPattern);
