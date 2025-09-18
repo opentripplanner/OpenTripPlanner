@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.edge;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
