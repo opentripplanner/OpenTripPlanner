@@ -155,7 +155,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
           targetVertex instanceof StreetVertex streetVertex &&
           !streetVertex.areaStops().isEmpty()
         ) {
-          for (AreaStop areaStop : ((StreetVertex) targetVertex).areaStops()) {
+          for (AreaStop areaStop : streetVertex.areaStops()) {
             // This is for a simplification, so that we only return one vertex from each
             // stop location. All vertices are added to the multimap, which is filtered
             // below, so that only the closest vertex is added to stopsFound

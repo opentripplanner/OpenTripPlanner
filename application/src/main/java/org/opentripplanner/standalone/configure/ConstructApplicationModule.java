@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
@@ -53,6 +54,7 @@ public class ConstructApplicationModule {
     VehicleParkingService vehicleParkingService,
     List<RideHailingService> rideHailingServices,
     ViaCoordinateTransferFactory viaTransferResolver,
+    @Nullable CarpoolingService carpoolingService,
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
@@ -95,6 +97,7 @@ public class ConstructApplicationModule {
       viaTransferResolver,
       worldEnvelopeService,
       // Optional Sandbox services
+      carpoolingService,
       emissionItineraryDecorator,
       luceneIndex,
       gtfsSchema,
