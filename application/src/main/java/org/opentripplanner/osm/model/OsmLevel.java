@@ -20,7 +20,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
     0.0,
     "default level",
     "default level",
-    "default level",
+    null,
     Source.NONE,
     true
   );
