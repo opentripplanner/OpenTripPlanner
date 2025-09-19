@@ -1,9 +1,7 @@
 package org.opentripplanner.ext.flex;
 
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMultimap;
 import jakarta.inject.Inject;
-import java.util.stream.Stream;
+import java.util.ArrayList;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -39,57 +37,34 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       return;
     }
 
-    ProgressTracker progress = ProgressTracker.track(
-      "Add flex locations to street vertices",
-      1,
-      timetableRepository.getSiteRepository().listAreaStops().size()
-    );
+    var geometryFactory = GeometryUtils.getGeometryFactory();
+    var vertices = graph.getVertices();
 
-    LOG.info(progress.startMessage());
-    var results = timetableRepository
-      .getSiteRepository()
-      .listAreaStops()
+    var areaStops = timetableRepository.getSiteRepository().listAreaStops();
+    var envs = areaStops.stream().map(s -> s.getGeometry().getEnvelopeInternal()).toList();
+
+    var progress = ProgressTracker.track("Adding area stops to vertices", 50_000, vertices.size());
+
+    vertices
       .parallelStream()
-      .flatMap(areaStop -> {
-        var matchedVertices = matchingVerticesForStop(graph, areaStop);
-        // Keep lambda! A method-ref would cause incorrect class and line number to be logged
-        progress.step(m -> LOG.info(m));
-        return matchedVertices;
-      });
-
-    ImmutableMultimap<StreetVertex, AreaStop> mappedResults = results.collect(
-      ImmutableListMultimap.<MatchResult, StreetVertex, AreaStop>flatteningToImmutableListMultimap(
-        MatchResult::vertex,
-        mr -> Stream.of(mr.stop())
-      )
-    );
-
-    mappedResults
-      .keySet()
-      .forEach(vertex -> {
-        vertex.addAreaStops(mappedResults.get(vertex));
-      });
-
-    LOG.info(progress.completeMessage());
-  }
-
-  private static Stream<MatchResult> matchingVerticesForStop(Graph graph, AreaStop areaStop) {
-    return graph
-      .findVertices(areaStop.getGeometry().getEnvelopeInternal())
-      .stream()
       .filter(StreetVertex.class::isInstance)
       .map(StreetVertex.class::cast)
       .filter(StreetVertex::isEligibleForCarPickupDropoff)
-      .filter(vertx -> {
-        // The street index overselects, so need to check for exact geometry inclusion
-        Point p = GeometryUtils.getGeometryFactory().createPoint(vertx.getCoordinate());
-        return areaStop.getGeometry().intersects(p);
-      })
-      .map(vertx -> new MatchResult(vertx, areaStop));
-  }
+      // a very fast check to exclude vertices that are far away from any area stop
+      .filter(s -> envs.stream().anyMatch(env -> env.contains(s.getCoordinate())))
+      .forEach(vertx -> {
+        // slow, precise check if the vertex is within an area stop
+        Point p = geometryFactory.createPoint(vertx.getCoordinate());
+        var toBeAdded = new ArrayList<AreaStop>();
+        for (var areaStop : areaStops) {
+          if (areaStop.getGeometry().intersects(p)) {
+            toBeAdded.add(areaStop);
+          }
+        }
+        vertx.addAreaStops(toBeAdded);
 
-  /**
-   * The result of an area stop being matched with a vertex.
-   */
-  private record MatchResult(StreetVertex vertex, AreaStop stop) {}
+        progress.step(m -> LOG.info(m));
+      });
+    LOG.info(progress.completeMessage());
+  }
 }
