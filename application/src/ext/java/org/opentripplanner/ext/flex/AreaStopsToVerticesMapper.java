@@ -53,7 +53,7 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       // a very fast check to exclude vertices that are far away from any area stop
       .filter(s -> envs.stream().anyMatch(env -> env.contains(s.getCoordinate())))
       .forEach(vertx -> {
-        // The street index overselects, so need to check for exact geometry inclusion
+        // slow, precise check if the vertex is within an area stop
         Point p = geometryFactory.createPoint(vertx.getCoordinate());
         var toBeAdded = new ArrayList<AreaStop>();
         for (var areaStop : areaStops) {
