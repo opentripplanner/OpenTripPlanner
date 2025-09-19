@@ -1,15 +1,12 @@
 package org.opentripplanner.ext.flex;
 
 import jakarta.inject.Inject;
-import java.util.Collection;
-import java.util.List;
-import org.locationtech.jts.geom.Envelope;
+import java.util.ArrayList;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -40,21 +37,13 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       return;
     }
 
-    applyAreaStopToVertices();
-  }
-
-  private void applyAreaStopToVertices() {
     var geometryFactory = GeometryUtils.getGeometryFactory();
     var vertices = graph.getVertices();
 
     var areaStops = timetableRepository.getSiteRepository().listAreaStops();
     var envs = areaStops.stream().map(s -> s.getGeometry().getEnvelopeInternal()).toList();
 
-    var progress = ProgressTracker.track(
-      "Adding area stops to vertices",
-      50_000,
-      vertices.size()
-    );
+    var progress = ProgressTracker.track("Adding area stops to vertices", 50_000, vertices.size());
 
     vertices
       .parallelStream()
@@ -62,14 +51,16 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       .map(StreetVertex.class::cast)
       .filter(StreetVertex::isEligibleForCarPickupDropoff)
       // a very fast check to exclude vertices that are far away from any area stop
-      .filter(s -> envs.stream().anyMatch(env -> env.contains(s.getCoordinate())) )
+      .filter(s -> envs.stream().anyMatch(env -> env.contains(s.getCoordinate())))
       .forEach(vertx -> {
         // The street index overselects, so need to check for exact geometry inclusion
         Point p = geometryFactory.createPoint(vertx.getCoordinate());
-        var toBeAdded = areaStops
-          .stream()
-          .filter(areaStop -> areaStop.getGeometry().intersects(p))
-          .toList();
+        var toBeAdded = new ArrayList<AreaStop>();
+        for (var areaStop : areaStops) {
+          if (areaStop.getGeometry().intersects(p)) {
+            toBeAdded.add(areaStop);
+          }
+        }
         vertx.addAreaStops(toBeAdded);
 
         progress.step(m -> LOG.info(m));
