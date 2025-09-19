@@ -31,8 +31,6 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   private final double levels;
   private final int travelTime;
 
-  private final LineString geometry;
-
   private ElevatorHopEdge(
     Vertex from,
     Vertex to,
@@ -46,11 +44,6 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     this.wheelchairAccessibility = wheelchairAccessibility;
     this.levels = levels;
     this.travelTime = travelTime;
-
-    List<Coordinate> segmentCoordinates = Arrays.asList(from.getCoordinate(), to.getCoordinate());
-
-    geometry = GeometryUtils.getGeometryFactory()
-      .createLineString(segmentCoordinates.toArray(new Coordinate[0]));
   }
 
   private ElevatorHopEdge(
@@ -110,8 +103,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     return permission;
   }
 
+  @Override
   public LineString getGeometry() {
-    return geometry;
+    List<Coordinate> segmentCoordinates = Arrays.asList(fromv.getCoordinate(), tov.getCoordinate());
+    return GeometryUtils.getGeometryFactory()
+      .createLineString(segmentCoordinates.toArray(new Coordinate[0]));
   }
 
   public double getLevels() {
