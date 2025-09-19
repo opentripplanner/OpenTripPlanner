@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
 import java.util.Iterator;
-import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;

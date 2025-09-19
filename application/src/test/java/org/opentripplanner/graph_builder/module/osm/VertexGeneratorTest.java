@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.NORMAL;
 import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
-import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import java.util.Comparator;
 import java.util.Map;
