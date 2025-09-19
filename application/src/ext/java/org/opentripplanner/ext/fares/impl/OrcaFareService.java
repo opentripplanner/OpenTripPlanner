@@ -32,6 +32,35 @@ import org.opentripplanner.transit.model.network.Route;
 
 public class OrcaFareService extends DefaultFareService {
 
+  /***
+   * FareOfferExtended is used to store a FareOffer along with a separate start time that is used for the validity period.
+   * This is intended to allow us to extend the expiry time without affecting the FareOffer's start time, because that would
+   * cause the unique ID to change. The ID needs to stay consistent to indicate that this isn't a new fare product that the user
+   * has to buy.
+   */
+  private static class FareOfferExtended {
+
+    public ZonedDateTime extendedStartTime;
+    public FareOffer fareOffer;
+
+    public FareOfferExtended(FareOffer fareOffer, ZonedDateTime extendedStartTime) {
+      this.extendedStartTime = extendedStartTime;
+      this.fareOffer = fareOffer;
+    }
+
+    public FareOffer fareOffer() {
+      return fareOffer;
+    }
+
+    /**
+     * Check if a FareOffer is valid at a given time based on the transfer window.
+     * For ORCA transfers, fare products are valid for the MAX_TRANSFER_DISCOUNT_DURATION.
+     */
+    public boolean isValidAt(ZonedDateTime checkTime) {
+      return this.extendedStartTime.plus(MAX_TRANSFER_DISCOUNT_DURATION).isAfter(checkTime);
+    }
+  }
+
   private static final Duration MAX_TRANSFER_DISCOUNT_DURATION = Duration.ofHours(2);
   private final Map<String, TransferData> perAgencyTransferDiscount = new HashMap<>();
 
@@ -460,7 +489,7 @@ public class OrcaFareService extends DefaultFareService {
     Collection<FareRuleSet> fareRules
   ) {
     var fare = ItineraryFare.empty();
-    var purchasedFareProducts = new ArrayList<FareOffer>();
+    var purchasedFareProducts = new ArrayList<FareOfferExtended>();
     for (Leg leg : legs) {
       RideType rideType = getRideType(leg);
       Optional<Money> singleLegPrice = getRidePrice(leg, FareType.regular, fareRules);
@@ -489,7 +518,7 @@ public class OrcaFareService extends DefaultFareService {
 
       var validFareProducts = purchasedFareProducts
         .stream()
-        .filter(fp -> isValidAt(fp, leg.startTime()) && fp.fareProduct().medium().equals(ELECTRONIC_MEDIUM))
+        .filter(fp -> fp.isValidAt(leg.startTime()))
         .toList();
 
       var transferType = rideType.getTransferType(fareType, leg.startTime());
@@ -497,32 +526,38 @@ public class OrcaFareService extends DefaultFareService {
         // Important to get transfer discount before calculating next leg price
         var totalAlreadyPurchased = validFareProducts
           .stream()
-          .reduce(ZERO_USD, (subtotal, el) -> subtotal.plus(el.fareProduct().price()), Money::plus);
+          .reduce(
+            ZERO_USD,
+            (subtotal, el) -> subtotal.plus(el.fareOffer.fareProduct().price()),
+            Money::plus
+          );
         var additionalFareRequired = legFare.minus(totalAlreadyPurchased);
 
-        // Add existing valid ORCA fare products to this leg
-        validFareProducts
-          .stream()
-          .forEach(fp -> fare.addFareProduct(leg, fp));
+        // Create a new fare product for the additional amount required
+        var riderCategory = getRiderCategory(fareType);
+        var newFareProduct = FareProduct.of(
+          new FeedScopedId(FEED_ID, "orcaFare"),
+          "ORCA Fare",
+          additionalFareRequired.isPositive() ? additionalFareRequired : Money.ZERO_USD
+        )
+          .withValidity(Duration.ofHours(2))
+          .withCategory(riderCategory)
+          .withMedium(ELECTRONIC_MEDIUM)
+          .build();
 
         if (additionalFareRequired.isPositive()) {
-          // Create a new fare product for the additional amount required
-          var riderCategory = getRiderCategory(fareType);
-          var newFareProduct = FareProduct.of(
-            new FeedScopedId(FEED_ID, "orcaFare"),
-            "ORCA Fare",
-            additionalFareRequired
-          )
-            .withValidity(Duration.ofHours(2))
-            .withCategory(riderCategory)
-            .withMedium(ELECTRONIC_MEDIUM)
-            .build();
-
-          var dependencies = validFareProducts.stream().map(FareOffer::fareProduct).toList();
-          var newFareOffer = FareOffer.of(leg.startTime(), newFareProduct, dependencies);
-          fare.addFareProduct(leg, newFareOffer);
-          purchasedFareProducts.add(newFareOffer);
+          // Extend the validity period of the dependencies
+          validFareProducts.forEach(vfp -> vfp.extendedStartTime = leg.startTime());
         }
+
+        var dependencies = validFareProducts
+          .stream()
+          .map(FareOfferExtended::fareOffer)
+          .map(FareOffer::fareProduct)
+          .toList();
+        var newFareOffer = FareOffer.of(leg.startTime(), newFareProduct, dependencies);
+        fare.addFareProduct(leg, newFareOffer);
+        purchasedFareProducts.add(new FareOfferExtended(newFareOffer, leg.startTime()));
       } else if (transferType == TransferType.SAME_AGENCY_TRANSFER) {
         // Generate medium ID for the agency's cash transfer
         var mediumId = "cash";
@@ -531,11 +566,9 @@ public class OrcaFareService extends DefaultFareService {
         // Look for existing fare products with this medium ID
         var validAgencyFareProducts = validFareProducts
           .stream()
+          .map(FareOfferExtended::fareOffer)
           .filter(fp -> fp.fareProduct().medium().equals(agencyTransferMedium))
           .toList();
-
-        // Add existing valid agency fare products to this leg
-        validAgencyFareProducts.forEach(fp -> fare.addFareProduct(leg, fp));
 
         // Check if we have any valid agency transfer products
         var hasValidTransfer = !validAgencyFareProducts.isEmpty();
@@ -554,7 +587,7 @@ public class OrcaFareService extends DefaultFareService {
 
           var newFareOffer = FareOffer.of(leg.startTime(), newFareProduct);
           fare.addFareProduct(leg, newFareOffer);
-          purchasedFareProducts.add(newFareOffer);
+          purchasedFareProducts.add(new FareOfferExtended(newFareOffer, leg.startTime()));
         }
       } else {
         // Create a generic fare product for this leg
@@ -575,7 +608,7 @@ public class OrcaFareService extends DefaultFareService {
     return fare;
   }
 
-    /**
+  /**
    * In the base class only the rules for a specific feed are selected and then passed to the
    * fare engine, however here we want to explicitly compute fares across feed boundaries.
    */
@@ -605,14 +638,6 @@ public class OrcaFareService extends DefaultFareService {
     if (freeTransferStartTime == null) return false;
     Duration duration = Duration.between(freeTransferStartTime, currentLegStartTime);
     return duration.compareTo(MAX_TRANSFER_DISCOUNT_DURATION) < 0;
-  }
-
-  /**
-   * Check if a FareOffer is valid at a given time based on the transfer window.
-   * For ORCA transfers, fare products are valid for the MAX_TRANSFER_DISCOUNT_DURATION.
-   */
-  private static boolean isValidAt(FareOffer fareOffer, ZonedDateTime checkTime) {
-    return fareOffer.startTime().plus(MAX_TRANSFER_DISCOUNT_DURATION).isAfter(checkTime);
   }
 
   /**
