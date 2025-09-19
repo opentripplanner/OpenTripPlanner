@@ -1,12 +1,15 @@
 package org.opentripplanner.ext.flex;
 
 import jakarta.inject.Inject;
+import java.util.Collection;
 import java.util.List;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -37,44 +40,40 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       return;
     }
 
-    ProgressTracker progress = ProgressTracker.track(
-      "Add flex locations to street vertices",
-      1,
-      timetableRepository.getSiteRepository().listAreaStops().size()
-    );
-
-    LOG.info(progress.startMessage());
-
-    timetableRepository
-      .getSiteRepository()
-      .listAreaStops()
-      .parallelStream()
-      .forEach(areaStop -> {
-        applyAreaStopToVertices(areaStop, graph);
-        // Keep lambda! A method-ref would cause incorrect class and line number to be logged
-        progress.step(m -> LOG.info(m));
-      });
-
-    LOG.info(progress.completeMessage());
+    applyAreaStopToVertices();
   }
 
-  private static void applyAreaStopToVertices(AreaStop areaStop, Graph graph) {
-    var vertices = graph.findVertices(areaStop.getGeometry().getEnvelopeInternal());
-
+  private void applyAreaStopToVertices() {
     var geometryFactory = GeometryUtils.getGeometryFactory();
+    var vertices = graph.getVertices();
+
+    var areaStops = timetableRepository.getSiteRepository().listAreaStops();
+    var envs = areaStops.stream().map(s -> s.getGeometry().getEnvelopeInternal()).toList();
+
+    var progress = ProgressTracker.track(
+      "Adding area stops to vertices",
+      50_000,
+      vertices.size()
+    );
 
     vertices
       .parallelStream()
       .filter(StreetVertex.class::isInstance)
       .map(StreetVertex.class::cast)
       .filter(StreetVertex::isEligibleForCarPickupDropoff)
+      // a very fast check to exclude vertices that are far away from any area stop
+      .filter(s -> envs.stream().anyMatch(env -> env.contains(s.getCoordinate())) )
       .forEach(vertx -> {
         // The street index overselects, so need to check for exact geometry inclusion
         Point p = geometryFactory.createPoint(vertx.getCoordinate());
-        var intersects = areaStop.getGeometry().intersects(p);
-        if (intersects) {
-          vertx.addAreaStops(List.of(areaStop));
-        }
+        var toBeAdded = areaStops
+          .stream()
+          .filter(areaStop -> areaStop.getGeometry().intersects(p))
+          .toList();
+        vertx.addAreaStops(toBeAdded);
+
+        progress.step(m -> LOG.info(m));
       });
+    LOG.info(progress.completeMessage());
   }
 }

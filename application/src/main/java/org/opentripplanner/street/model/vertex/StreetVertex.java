@@ -96,6 +96,9 @@ public abstract class StreetVertex extends Vertex {
    */
   public void addAreaStops(Collection<AreaStop> toBeAdded) {
     Objects.requireNonNull(toBeAdded);
+    if (toBeAdded.isEmpty()) {
+      return;
+    }
     synchronized (this) {
       if (areaStops == EMPTY_SET) {
         areaStops = Set.copyOf(toBeAdded);
