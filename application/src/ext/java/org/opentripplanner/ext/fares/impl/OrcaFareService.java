@@ -10,7 +10,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Currency;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,12 +37,12 @@ public class OrcaFareService extends DefaultFareService {
    * cause the unique ID to change. The ID needs to stay consistent to indicate that this isn't a new fare product that the user
    * has to buy.
    */
-  private static class FareOfferExtended {
+  private static class ExtendedFareOffer {
 
     public ZonedDateTime extendedStartTime;
     public FareOffer fareOffer;
 
-    public FareOfferExtended(FareOffer fareOffer, ZonedDateTime extendedStartTime) {
+    public ExtendedFareOffer(FareOffer fareOffer, ZonedDateTime extendedStartTime) {
       this.extendedStartTime = extendedStartTime;
       this.fareOffer = fareOffer;
     }
@@ -62,7 +61,6 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   private static final Duration MAX_TRANSFER_DISCOUNT_DURATION = Duration.ofHours(2);
-  private final Map<String, TransferData> perAgencyTransferDiscount = new HashMap<>();
 
   public static final String COMM_TRANS_AGENCY_ID = "29";
   public static final String COMM_TRANS_FLEX_AGENCY_ID = "4969";
@@ -489,7 +487,7 @@ public class OrcaFareService extends DefaultFareService {
     Collection<FareRuleSet> fareRules
   ) {
     var fare = ItineraryFare.empty();
-    var purchasedFareProducts = new ArrayList<FareOfferExtended>();
+    var purchasedFareProducts = new ArrayList<ExtendedFareOffer>();
     for (Leg leg : legs) {
       RideType rideType = getRideType(leg);
       Optional<Money> singleLegPrice = getRidePrice(leg, FareType.regular, fareRules);
@@ -552,12 +550,12 @@ public class OrcaFareService extends DefaultFareService {
 
         var dependencies = validFareProducts
           .stream()
-          .map(FareOfferExtended::fareOffer)
+          .map(ExtendedFareOffer::fareOffer)
           .map(FareOffer::fareProduct)
           .toList();
         var newFareOffer = FareOffer.of(leg.startTime(), newFareProduct, dependencies);
         fare.addFareProduct(leg, newFareOffer);
-        purchasedFareProducts.add(new FareOfferExtended(newFareOffer, leg.startTime()));
+        purchasedFareProducts.add(new ExtendedFareOffer(newFareOffer, leg.startTime()));
       } else if (transferType == TransferType.SAME_AGENCY_TRANSFER) {
         // Generate medium ID for the agency's cash transfer
         var mediumId = "cash";
@@ -566,7 +564,7 @@ public class OrcaFareService extends DefaultFareService {
         // Look for existing fare products with this medium ID
         var validAgencyFareProducts = validFareProducts
           .stream()
-          .map(FareOfferExtended::fareOffer)
+          .map(ExtendedFareOffer::fareOffer)
           .filter(fp -> fp.fareProduct().medium().equals(agencyTransferMedium))
           .toList();
 
@@ -587,7 +585,7 @@ public class OrcaFareService extends DefaultFareService {
 
           var newFareOffer = FareOffer.of(leg.startTime(), newFareProduct);
           fare.addFareProduct(leg, newFareOffer);
-          purchasedFareProducts.add(new FareOfferExtended(newFareOffer, leg.startTime()));
+          purchasedFareProducts.add(new ExtendedFareOffer(newFareOffer, leg.startTime()));
         }
       } else {
         // Create a generic fare product for this leg
