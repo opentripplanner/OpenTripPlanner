@@ -8,7 +8,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 
 /**
- * A custom serializer for {@link EnumMap} witch fails to serialize properly with Kryo. A regular
+ * A custom serializer for {@link EnumMap} which fails to serialize properly with Kryo. A regular
  * {@link HashMap} is used, since there are build in functions in Java to convert between the two
  * classes.
  */

@@ -1,6 +1,6 @@
 package org.opentripplanner.framework.csv.parser;
 
-class ValueMissingIssue extends AbstractIssue {
+final class ValueMissingIssue extends AbstractIssue {
 
   public ValueMissingIssue(String columnName, String csvLine, String issueType) {
     super(columnName, csvLine, issueType);

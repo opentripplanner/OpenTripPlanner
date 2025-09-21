@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Use this class to read in a CSV file from a {@link DataSource}. You must provide (requierd):
+ * Use this class to read in a CSV file from a {@link DataSource}. You must provide (required):
  * <ul>
  *   <li>the {@code datasource} - the csv file to read</li>
  *   <li>the {@code logger} - the logger ro write progress tracking events.</li>
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  *   <li>the {@code rowHandler} a handler for each row read. </li>
  * </ul>
  *
- * The class is responsible for processing the CSV file and orcastrating the parsing process.
+ * The class is responsible for processing the CSV file and orchestrating the parsing process.
  * A progress tracker is created and will be used to track the reading of the datasource.
  *
  * @param <T> The row type.
@@ -90,7 +90,10 @@ public class OtpCsvReader<T> {
     var parser = parserFactory.apply(reader);
 
     if (!parser.headersMatch()) {
-      LOG.info("The header does not match the expected format for csv file: {}", dataSource.path());
+      LOG.error(
+        "The header does not match the expected format for csv file: {}",
+        dataSource.path()
+      );
       return;
     }
 
