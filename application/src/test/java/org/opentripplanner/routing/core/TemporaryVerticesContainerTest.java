@@ -30,7 +30,7 @@ public class TemporaryVerticesContainerTest {
 
   // Given:
   // - a graph with 3 intersections/vertexes
-  private final Graph g = new Graph(new Deduplicator());
+  private final Graph g = new Graph();
 
   private final StreetVertex a = StreetModelForTest.intersectionVertex("A", 1.0, 1.0);
   private final StreetVertex b = StreetModelForTest.intersectionVertex("B", 1.0, 0.0);

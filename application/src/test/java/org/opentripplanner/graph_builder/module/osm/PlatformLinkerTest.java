@@ -24,8 +24,7 @@ public class PlatformLinkerTest {
   public void testLinkEntriesToPlatforms() {
     var stairsEndpointLabel = VertexLabel.osm(1028861028);
 
-    var deduplicator = new Deduplicator();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
 
     File file = ResourceLoader.of(this).file("skoyen.osm.pbf");
 

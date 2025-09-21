@@ -73,7 +73,7 @@ class TurnRestrictionsTest {
       .addRelation(turnRestriction)
       .build();
 
-    var graph = new Graph(new Deduplicator());
+    var graph = new Graph();
 
     var issueStore = new DefaultDataImportIssueStore();
 

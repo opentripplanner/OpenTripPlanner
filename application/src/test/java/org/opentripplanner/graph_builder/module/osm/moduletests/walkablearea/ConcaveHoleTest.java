@@ -74,7 +74,7 @@ class ConcaveHoleTest {
       .addRelation(relation)
       .build();
 
-    var graph = new Graph(new Deduplicator());
+    var graph = new Graph();
     var osmModule = OsmModule.of(
       provider,
       graph,

@@ -66,9 +66,6 @@ public class Graph implements Serializable {
   // Ideally we could just get rid of vertex labels, but they're used in tests and graph building.
   private final Map<VertexLabel, Vertex> vertices = new ConcurrentHashMap<>();
 
-  /** Conserve memory by reusing immutable instances of Strings, integer arrays, etc. */
-  public final transient Deduplicator deduplicator;
-
   @Nullable
   private final OpeningHoursCalendarService openingHoursCalendarService;
 
@@ -119,21 +116,13 @@ public class Graph implements Serializable {
   public DataOverlayParameterBindings dataOverlayParameterBindings;
 
   @Inject
-  public Graph(
-    Deduplicator deduplicator,
-    @Nullable OpeningHoursCalendarService openingHoursCalendarService
-  ) {
-    this.deduplicator = deduplicator;
+  public Graph(@Nullable OpeningHoursCalendarService openingHoursCalendarService) {
     this.openingHoursCalendarService = openingHoursCalendarService;
-  }
-
-  public Graph(Deduplicator deduplicator) {
-    this(deduplicator, null);
   }
 
   /** Constructor for deserialization. */
   public Graph() {
-    this(new Deduplicator(), null);
+    this(null);
   }
 
   /** Add the given vertex to the graph. */

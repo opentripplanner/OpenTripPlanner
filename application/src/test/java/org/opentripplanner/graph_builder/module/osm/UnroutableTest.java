@@ -35,8 +35,7 @@ class UnroutableTest {
 
   @BeforeEach
   public void setUp() throws Exception {
-    var deduplicator = new Deduplicator();
-    graph = new Graph(deduplicator);
+    graph = new Graph();
 
     var osmDataFile = ResourceLoader.of(UnroutableTest.class).file("bridge_construction.osm.pbf");
     DefaultOsmProvider provider = new DefaultOsmProvider(osmDataFile, true);

@@ -47,7 +47,7 @@ public class TriangleInequalityTest {
 
   @BeforeAll
   public static void onlyOnce() {
-    graph = new Graph(new Deduplicator());
+    graph = new Graph();
 
     File file = ResourceLoader.of(TriangleInequalityTest.class).file("NYC_small.osm.pbf");
     DefaultOsmProvider provider = new DefaultOsmProvider(file, true);
