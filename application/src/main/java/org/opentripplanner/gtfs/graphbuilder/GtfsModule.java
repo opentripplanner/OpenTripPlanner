@@ -46,6 +46,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.color.Brightness;
@@ -78,7 +79,7 @@ public class GtfsModule implements GraphBuilderModule {
   private final TimetableRepository timetableRepository;
   private final Graph graph;
   private final DataImportIssueStore issueStore;
-  private final Deduplicator deduplicator;
+  private final DeduplicatorService deduplicator;
   private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
   private final double maxStopToShapeSnapDistance;
@@ -88,7 +89,7 @@ public class GtfsModule implements GraphBuilderModule {
     List<GtfsBundle> bundles,
     TimetableRepository timetableRepository,
     Graph graph,
-    Deduplicator deduplicator,
+    DeduplicatorService deduplicator,
     DataImportIssueStore issueStore,
     ServiceDateInterval transitPeriodLimit,
     FareServiceFactory fareServiceFactory,
@@ -263,7 +264,7 @@ public class GtfsModule implements GraphBuilderModule {
    * This method has side effects, the {@code builder} is updated with new TripPatterns.
    */
   private void createTripPatterns(
-    Deduplicator deduplicator,
+    DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
     OtpTransitServiceBuilder builder,
     Set<FeedScopedId> calServiceIds,
