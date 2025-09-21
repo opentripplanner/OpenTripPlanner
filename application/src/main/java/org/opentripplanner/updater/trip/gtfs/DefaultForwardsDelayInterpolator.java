@@ -90,7 +90,10 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
         if (prevDeparture != null) {
           int arrival = Objects.requireNonNull(builder.getArrivalTime(i));
           int prevScheduledDeparture = builder.getScheduledDepartureTime(firstCanceledStop - 1);
-          int scheduledTravelTime = builder.getScheduledArrivalTime(i) - prevScheduledDeparture;
+          int scheduledArrival = builder.getScheduledArrivalTime(i);
+          // Math.max() because it is allowed for the previous departure and arrival to be
+          // the same time
+          int scheduledTravelTime = Math.max(scheduledArrival - prevScheduledDeparture, 1);
           int realTimeTravelTime = arrival - prevDeparture;
           double travelTimeRatio = (double) realTimeTravelTime / scheduledTravelTime;
 

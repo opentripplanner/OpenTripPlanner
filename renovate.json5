@@ -163,11 +163,19 @@
       "description": "give some projects time to publish a changelog before opening the PR",
       "matchPackageNames": [
         "com.google.dagger:{/,}**",
-        "org.apache.httpcomponents.client5:httpclient5"
       ],
       "matchUpdateTypes": ["major", "minor"],
       "minimumReleaseAge": "1 week",
       "schedule": "on the 13th through 14th day of the month"
+    },
+    {
+      "description": "Apache HTTP client",
+      "matchPackageNames": [
+        "org.apache.httpcomponents.client5:httpclient5"
+      ],
+      "minimumReleaseAge": "1 week",
+      "changelogUrl": "https://github.com/apache/httpcomponents-client/blob/master/RELEASE_NOTES.txt",
+      "addLabels": ["Integration Test"]
     },
     {
       "groupName": "Jackson non-patch",
