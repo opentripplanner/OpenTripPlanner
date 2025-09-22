@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.issues.FloorNumberUnknownAssumedGroundLevel;
 import org.opentripplanner.osm.issues.FloorNumberUnknownGuessedFromAltitude;
+import org.opentripplanner.osm.issues.MoreThanTwoLevelsForWay;
 
 public class OsmLevel implements Comparable<OsmLevel> {
 
@@ -153,14 +154,15 @@ public class OsmLevel implements Comparable<OsmLevel> {
     Source source,
     boolean incrementNonNegative,
     DataImportIssueStore issueStore,
-    OsmEntity osmObj
+    OsmEntity osmObj,
+    boolean allowRanges
   ) {
     List<String> levelSpecs = new ArrayList<>();
 
     Matcher m;
     for (String level : specList.split(";")) {
       m = RANGE_PATTERN.matcher(level);
-      if (m.matches()) { // this field specifies a range of levels
+      if (m.matches() && allowRanges) { // this field specifies a range of levels
         String[] range = level.split("-");
         int endOfRange = Integer.parseInt(range[1]);
         for (int i = Integer.parseInt(range[0]); i <= endOfRange; i++) {
@@ -179,6 +181,25 @@ public class OsmLevel implements Comparable<OsmLevel> {
     return levels;
   }
 
+  public static List<OsmLevel> levelListForWayFromSpecList(
+    String specList,
+    Source source,
+    boolean incrementNonNegative,
+    DataImportIssueStore issueStore,
+    OsmEntity osmObj
+  ) {
+    List<OsmLevel> levels = fromSpecList(
+      specList,
+      source,
+      incrementNonNegative,
+      issueStore,
+      osmObj,
+      false
+    );
+    if (levels.size() > 2) issueStore.add(new MoreThanTwoLevelsForWay(specList, osmObj));
+    return levels;
+  }
+
   public static Map<String, OsmLevel> mapFromSpecList(
     String specList,
     Source source,
@@ -192,7 +213,8 @@ public class OsmLevel implements Comparable<OsmLevel> {
       source,
       incrementNonNegative,
       issueStore,
-      osmObj
+      osmObj,
+      true
     )) {
       map.put(level.shortName, level);
     }
