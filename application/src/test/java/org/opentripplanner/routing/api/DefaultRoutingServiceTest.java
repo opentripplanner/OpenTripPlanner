@@ -48,7 +48,7 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     for (Vertex vertex : graph.getVertices()) {
       if (vertex instanceof TransitStopVertex) {
         RegularStop stop = ((TransitStopVertex) vertex).getStop();
-        Vertex index_vertex = graph.getStopVertexForStopId(stop.getId());
+        Vertex index_vertex = graph.getStopVertex(stop.getId());
         assertEquals(index_vertex, vertex);
       }
     }
@@ -104,9 +104,9 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     var stopL = transitService.getRegularStop(idL);
     FeedScopedId idM = new FeedScopedId(feedId, "M");
     var stopM = transitService.getRegularStop(idM);
-    TransitStopVertex stopvJ = graph.getStopVertexForStopId(idJ);
-    TransitStopVertex stopvL = graph.getStopVertexForStopId(idL);
-    TransitStopVertex stopvM = graph.getStopVertexForStopId(idM);
+    TransitStopVertex stopvJ = graph.getStopVertex(idJ);
+    TransitStopVertex stopvL = graph.getStopVertex(idL);
+    TransitStopVertex stopvM = graph.getStopVertex(idM);
     // There are a two other stops within 100 meters of stop J.
     Envelope env = new Envelope(new Coordinate(stopJ.getLon(), stopJ.getLat()));
     env.expandBy(

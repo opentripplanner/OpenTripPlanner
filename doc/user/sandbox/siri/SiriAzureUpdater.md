@@ -33,6 +33,7 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 | fuzzyTripMatching                                          |  `boolean` | Whether to apply fuzzyTripMatching on the updates                | *Optional* | `false`             |  2.2  |
 | prefetchCount                                              |  `integer` | The number of messages to fetch from the subscription at a time. | *Optional* | `10`                |  2.5  |
 | [servicebus-url](#u__11__servicebus_url)                   |  `string`  | Service Bus connection used for authentication.                  | *Optional* |                     |  2.2  |
+| [startupTimeout](#u__11__startupTimeout)                   | `duration` | Maximum time to wait for real-time services during startup.      | *Optional* | `"PT5M"`            |   na  |
 | topic                                                      |  `string`  | Service Bus topic to connect to.                                 | *Required* |                     |  2.2  |
 | history                                                    |  `object`  | Configuration for fetching historical data on startup            | *Optional* |                     |  2.2  |
 |    fromDateTime                                            |  `string`  | Datetime boundary for historical data                            | *Optional* | `"-P1D"`            |  2.2  |
@@ -76,6 +77,15 @@ Has to be present for authenticationMethod FederatedIdentity.
 Service Bus connection used for authentication.
 
 Has to be present for authenticationMethod SharedAccessKey. This should be Primary/Secondary connection string from service bus.
+
+<h4 id="u__11__startupTimeout">startupTimeout</h4>
+
+**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5M"`   
+**Path:** /updaters/[11] 
+
+Maximum time to wait for real-time services during startup.
+
+Maximum time to wait for real-time services during startup. If real-time services are unavailable, OTP will start without real-time data after this timeout.
 
 
 
@@ -121,6 +131,7 @@ Has to be present for authenticationMethod SharedAccessKey. This should be Prima
 | fuzzyTripMatching                                          |  `boolean` | Whether to apply fuzzyTripMatching on the updates                | *Optional* | `false`             |  2.2  |
 | prefetchCount                                              |  `integer` | The number of messages to fetch from the subscription at a time. | *Optional* | `10`                |  2.5  |
 | [servicebus-url](#u__10__servicebus_url)                   |  `string`  | Service Bus connection used for authentication.                  | *Optional* |                     |  2.2  |
+| [startupTimeout](#u__10__startupTimeout)                   | `duration` | Maximum time to wait for real-time services during startup.      | *Optional* | `"PT5M"`            |   na  |
 | topic                                                      |  `string`  | Service Bus topic to connect to.                                 | *Required* |                     |  2.2  |
 | history                                                    |  `object`  | Configuration for fetching historical data on startup            | *Optional* |                     |  2.2  |
 |    fromDateTime                                            |  `string`  | Datetime boundary for historical data.                           | *Optional* | `"-P1D"`            |  2.2  |
@@ -165,6 +176,15 @@ Has to be present for authenticationMethod FederatedIdentity.
 Service Bus connection used for authentication.
 
 Has to be present for authenticationMethod SharedAccessKey. This should be Primary/Secondary connection string from service bus.
+
+<h4 id="u__10__startupTimeout">startupTimeout</h4>
+
+**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5M"`   
+**Path:** /updaters/[10] 
+
+Maximum time to wait for real-time services during startup.
+
+Maximum time to wait for real-time services during startup. If real-time services are unavailable, OTP will start without real-time data after this timeout.
 
 
 

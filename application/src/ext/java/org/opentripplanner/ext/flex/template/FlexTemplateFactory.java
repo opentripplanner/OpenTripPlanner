@@ -99,7 +99,7 @@ class FlexTemplateFactory {
   }
 
   /**
-   * With respect to one journey/itinerary this method retuns {@code true} if a passenger can
+   * With respect to one journey/itinerary this method returns {@code true} if a passenger can
    * board and alight at the same stop in the journey pattern. This is not allowed for regular
    * stops, but it would make sense to allow it for area stops or group stops.
    * <p>

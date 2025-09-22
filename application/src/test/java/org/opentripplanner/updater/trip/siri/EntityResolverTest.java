@@ -12,7 +12,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.updater.trip.siri.EntityResolver;
 
 class EntityResolverTest {
 

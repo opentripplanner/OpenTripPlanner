@@ -10,11 +10,8 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -22,7 +19,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.TemporaryEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
@@ -32,7 +28,6 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TemporaryVerticesContainerTest {
 
-  private final GeometryFactory gf = GeometryUtils.getGeometryFactory();
   // Given:
   // - a graph with 3 intersections/vertexes
   private final Graph g = new Graph(new Deduplicator());
@@ -63,6 +58,7 @@ public class TemporaryVerticesContainerTest {
     subject = new TemporaryVerticesContainer(
       g,
       TestVertexLinker.of(g),
+      id -> List.of(),
       from,
       to,
       StreetMode.WALK,
@@ -144,18 +140,9 @@ public class TemporaryVerticesContainerTest {
   }
 
   private void createStreetEdge(StreetVertex v0, StreetVertex v1, String name) {
-    LineString geom = gf.createLineString(
-      new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() }
-    );
     double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
-    new StreetEdgeBuilder<>()
-      .withFromVertex(v0)
-      .withToVertex(v1)
-      .withGeometry(geom)
-      .withName(name)
-      .withMeterLength(dist)
-      .withPermission(StreetTraversalPermission.ALL)
-      .withBack(false)
+    StreetModelForTest.streetEdgeBuilder(v0, v1, dist, StreetTraversalPermission.ALL)
+      .withName(I18NString.of(name))
       .buildAndConnect();
   }
 

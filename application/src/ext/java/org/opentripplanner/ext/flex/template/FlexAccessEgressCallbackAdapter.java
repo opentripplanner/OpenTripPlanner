@@ -18,7 +18,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
  */
 public interface FlexAccessEgressCallbackAdapter {
   /** Adapter, look at implementing service for documentation.  */
-  TransitStopVertex getStopVertexForStopId(FeedScopedId id);
+  TransitStopVertex getStopVertex(FeedScopedId id);
 
   /** Adapter, look at implementing service for documentation.  */
   Collection<PathTransfer> getTransfersFromStop(StopLocation stop);
