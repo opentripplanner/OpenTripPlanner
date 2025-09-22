@@ -61,7 +61,6 @@ import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.model.AddedRoute;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
-import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;

@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
-import com.google.transit.realtime.GtfsRealtime;
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.util.List;
 import java.util.Objects;

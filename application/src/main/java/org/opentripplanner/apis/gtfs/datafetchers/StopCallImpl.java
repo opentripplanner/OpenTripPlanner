@@ -9,7 +9,6 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
-import org.opentripplanner.apis.gtfs.model.CallScheduledTime;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime.TimeWindow;
 import org.opentripplanner.model.TripTimeOnDate;

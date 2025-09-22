@@ -4,8 +4,6 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
-import java.util.Arrays;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
