@@ -3,8 +3,6 @@ package org.opentripplanner.osm.model;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import java.util.Set;
-import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
-import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OsmWay extends OsmEntity {
 
@@ -55,15 +53,22 @@ public class OsmWay extends OsmEntity {
   }
 
   /**
-   * Returns true if these are steps.
+   * @return true if these are steps.
    */
   public boolean isSteps() {
     return isTag("highway", "steps");
   }
 
   /**
-   * Checks the wheelchair-accessibility of this way. Stairs are by default inaccessible but
-   * can be made accessible if they explicitly set wheelchair=true.
+   * @return true if these are stairs.
+   */
+  public boolean isStairs() {
+    return isTag("highway", "steps") && !isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS);
+  }
+
+  /**
+   * Checks the wheelchair-accessibility of this way. Stairs and escalators are by default
+   * inaccessible but can be made accessible if they explicitly set wheelchair=true.
    */
   public boolean isWheelchairAccessible() {
     if (isSteps()) {
@@ -74,7 +79,7 @@ public class OsmWay extends OsmEntity {
   }
 
   public boolean isEscalator() {
-    return (isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS));
+    return isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS);
   }
 
   public boolean isForwardEscalator() {

@@ -84,6 +84,21 @@ public class OsmWayTest {
   }
 
   @Test
+  void testIsStairs() {
+    OsmWay way = new OsmWay();
+    assertFalse(way.isStairs());
+
+    way.addTag("highway", "primary");
+    assertFalse(way.isStairs());
+
+    way.addTag("highway", "steps");
+    assertTrue(way.isStairs());
+
+    way.addTag("conveying", "yes");
+    assertFalse(way.isStairs());
+  }
+
+  @Test
   void wheelchairAccessibleStairs() {
     var osm1 = new OsmWay();
     osm1.addTag("highway", "steps");
