@@ -83,11 +83,19 @@ public class OsmWay extends OsmEntity {
   }
 
   public boolean isForwardEscalator() {
-    return isEscalator() && "forward".equals(this.getTag("conveying"));
+    return isEscalator() && isTag("conveying", "forward");
   }
 
   public boolean isBackwardEscalator() {
-    return isEscalator() && "backward".equals(this.getTag("conveying"));
+    return isEscalator() && isTag("conveying", "backward");
+  }
+
+  public boolean isInclineUp() {
+    return isTag("incline", "up");
+  }
+
+  public boolean isInclineDown() {
+    return isTag("incline", "down");
   }
 
   /**

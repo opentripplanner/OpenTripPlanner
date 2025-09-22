@@ -423,7 +423,7 @@ public class OsmEntity {
   }
 
   /**
-   * Checks is a tag contains the specified value.
+   * Checks if a tag contains the specified value.
    */
   public boolean isTag(String tag, String value) {
     tag = tag.toLowerCase();
