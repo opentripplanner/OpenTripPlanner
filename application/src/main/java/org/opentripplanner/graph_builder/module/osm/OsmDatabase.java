@@ -112,7 +112,8 @@ public class OsmDatabase {
    * Only ways with multiple levels have an entry in this map.
    * The ordering is important, e.g. for building escalators.
    */
-  private final ArrayListMultimap<OsmEntity, OsmLevel> wayMultiLevelMap = ArrayListMultimap.create();
+  private final ArrayListMultimap<OsmEntity, OsmLevel> wayMultiLevelMap =
+    ArrayListMultimap.create();
 
   /* Set of turn restrictions for each turn "from" way ID */
   private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay =
