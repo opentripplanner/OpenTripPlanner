@@ -377,16 +377,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
         <button className="collapse-all-button" onClick={collapseAll} style={{ padding: '4px 8px' }}>
           Collapse all
         </button>
-        <span
-          style={{
-            position: 'absolute',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            fontWeight: 'normal',
-          }}
-        >
-          Request
-        </span>
+        <span className="panel-header-title-with-left-button">Arguments</span>
         <div style={{ marginLeft: 'auto' }}>
           <ResetButton
             tripQueryVariables={tripQueryVariables}

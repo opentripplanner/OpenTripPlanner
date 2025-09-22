@@ -14,7 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
   const getIconForIndex = (index: number) => {
     switch (index) {
       case 0:
-        return <img src={tripIcon} alt="Itineray list" title="Itineray" />;
+        return <img src={tripIcon} alt="Itinerary results" title="Itinerary results" />;
       case 1:
         return <img src={filterIcon} alt="Arguments" title="Arguments" />;
       case 2:

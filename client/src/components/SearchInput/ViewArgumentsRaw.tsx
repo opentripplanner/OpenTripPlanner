@@ -16,7 +16,7 @@ const ViewArgumentsRaw: React.FC<ViewArgumentsRawProps> = ({
   return (
     <div className={'left-pane-container below-content'} style={{ fontSize: '14px' }}>
       <div className="panel-header" style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-        <span>Request raw</span>
+        <span className="panel-header-title-simple">Arguments raw</span>
         <div style={{ marginLeft: 'auto' }}>
           <ResetButton
             tripQueryVariables={tripQueryVariables}

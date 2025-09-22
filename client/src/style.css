@@ -369,6 +369,20 @@ input[type='number'] {
   margin-bottom: 10px;
 }
 
+.panel-header-title-with-left-button {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: normal;
+}
+
+.panel-header-title-simple {
+  flex: 1;
+  text-align: center;
+  font-weight: normal;
+}
+
 .argument-list {
   font-size: 12px;
   line-height: 1;
