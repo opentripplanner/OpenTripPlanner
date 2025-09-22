@@ -28,7 +28,7 @@ public final class GtfsFaresV2Service implements Serializable {
 
   public FareResult calculateFares(Itinerary itinerary) {
     var legOffers = new LegOfferContainer();
-    var scheduledTransitLegs = itinerary.listScheduledTransitLegs();
+    var scheduledTransitLegs = itinerary.listTransitLegs();
     // individual legs
     scheduledTransitLegs.forEach(leg -> {
       var products = lookup
