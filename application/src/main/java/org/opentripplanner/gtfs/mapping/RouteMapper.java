@@ -87,9 +87,9 @@ class RouteMapper {
     lhs.withColor(rhs.getColor());
     lhs.withTextColor(rhs.getTextColor());
     lhs.withBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
-    var nid = networkIds(rhs);
-    var nidFromAssignment = routeNetworkAssignmentMapper.findNetworks(lhs.getId());
-    ListUtils.combine(nid, nidFromAssignment).forEach(networkId -> {
+    var nIds = networkId(rhs);
+    var nIdsFromAssignment = routeNetworkAssignmentMapper.findNetworks(lhs.getId());
+    ListUtils.combine(nIds, nIdsFromAssignment).forEach(networkId -> {
       var gor = GroupOfRoutes.of(networkId).build();
       lhs.getGroupsOfRoutes().add(gor);
     });
@@ -97,7 +97,7 @@ class RouteMapper {
     return lhs.build();
   }
 
-  private Collection<FeedScopedId> networkIds(org.onebusaway.gtfs.model.Route rhs) {
+  private Collection<FeedScopedId> networkId(org.onebusaway.gtfs.model.Route rhs) {
     if (rhs.getNetworkId() == null) {
       return List.of();
     } else {
