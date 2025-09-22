@@ -122,10 +122,11 @@ public class DebugStyleSpec {
     VectorSourceLayer groupStops,
     VectorSourceLayer edges,
     VectorSourceLayer vertices,
+    VectorSourceLayer geofencingZones,
     VectorSourceLayer rental,
     List<BackgroundTileLayer> extraLayers
   ) {
-    List<TileSource> vectorSources = Stream.of(regularStops, edges, vertices, rental)
+    List<TileSource> vectorSources = Stream.of(regularStops, edges, vertices, geofencingZones, rental)
       .map(VectorSourceLayer::vectorSource)
       .map(TileSource.class::cast)
       .toList();
@@ -148,7 +149,7 @@ public class DebugStyleSpec {
       allSources,
       ListUtils.combine(
         backgroundLayers(extraRasterSources),
-        rental(rental, vertices),
+        rental(rental, geofencingZones),
         wheelchair(edges),
         noThruTraffic(edges),
         bicycleSafety(edges),
@@ -243,7 +244,7 @@ public class DebugStyleSpec {
     );
   }
 
-  private static List<StyleBuilder> rental(VectorSourceLayer rentalLayer, VectorSourceLayer vertices) {
+  private static List<StyleBuilder> rental(VectorSourceLayer rentalLayer, VectorSourceLayer geofencingZones) {
     return List.of(
       StyleBuilder.ofId("rental-vehicle")
         .group(RENTAL_GROUP)
@@ -267,12 +268,37 @@ public class DebugStyleSpec {
         .minZoom(13)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
-      StyleBuilder.ofId("rental-restrictions")
+      StyleBuilder.ofId("geofencing-zones-no-drop-off")
         .group(RENTAL_GROUP)
-        .typeSymbol()
-        .symbolText("rentalRestrictions")
-        .vectorSourceLayer(vertices)
-        .minZoom(17)
+        .typeFill()
+        .vectorSourceLayer(geofencingZones)
+        .filterValueInProperty("type", "no-drop-off")
+        .fillColor("#ff6b6b")
+        .fillOpacity(0.3f)
+        .fillOutlineColor("#cc0000")
+        .minZoom(10)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("geofencing-zones-no-traversal")
+        .group(RENTAL_GROUP)
+        .typeFill()
+        .vectorSourceLayer(geofencingZones)
+        .filterValueInProperty("type", "no-traversal")
+        .fillColor("#ffa500")
+        .fillOpacity(0.3f)
+        .fillOutlineColor("#ff8c00")
+        .minZoom(10)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("geofencing-zones-business-area")
+        .group(RENTAL_GROUP)
+        .typeFill()
+        .vectorSourceLayer(geofencingZones)
+        .filterValueInProperty("type", "business-area")
+        .fillColor("#4a9eff")
+        .fillOpacity(0.2f)
+        .fillOutlineColor("#0066cc")
+        .minZoom(10)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );
