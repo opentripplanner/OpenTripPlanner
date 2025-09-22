@@ -27,9 +27,6 @@ public class GeofencingZonesPropertyMapper extends PropertyMapper<GeofencingZone
       properties.add(new KeyValue("type", "no-drop-off"));
     }
 
-    properties.add(new KeyValue("traversalBanned", String.valueOf(zone.traversalBanned())));
-    properties.add(new KeyValue("dropOffBanned", String.valueOf(zone.dropOffBanned())));
-
     return properties;
   }
 }
