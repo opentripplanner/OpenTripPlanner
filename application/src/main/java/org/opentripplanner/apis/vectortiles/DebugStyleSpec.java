@@ -1,6 +1,10 @@
 package org.opentripplanner.apis.vectortiles;
 
 import static org.opentripplanner.inspector.vector.edge.EdgePropertyMapper.streetPermissionAsString;
+import static org.opentripplanner.inspector.vector.geofencing.GeofencingZonesPropertyMapper.GEOFENCING_ZONE_TYPE;
+import static org.opentripplanner.inspector.vector.geofencing.GeofencingZonesPropertyMapper.GEOFENCING_ZONE_TYPE_BUSINESS_AREA;
+import static org.opentripplanner.inspector.vector.geofencing.GeofencingZonesPropertyMapper.GEOFENCING_ZONE_TYPE_NO_DROP_OFF;
+import static org.opentripplanner.inspector.vector.geofencing.GeofencingZonesPropertyMapper.GEOFENCING_ZONE_TYPE_NO_TRAVERSAL;
 
 import java.util.Arrays;
 import java.util.List;
@@ -287,7 +291,7 @@ public class DebugStyleSpec {
         .group(RENTAL_GROUP)
         .typeFill()
         .vectorSourceLayer(geofencingZones)
-        .filterValueInProperty("type", "no-drop-off")
+        .filterValueInProperty(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_NO_DROP_OFF)
         .fillColor(LIGHT_RED)
         .fillOpacity(0.3f)
         .fillOutlineColor(DARK_RED)
@@ -298,7 +302,7 @@ public class DebugStyleSpec {
         .group(RENTAL_GROUP)
         .typeFill()
         .vectorSourceLayer(geofencingZones)
-        .filterValueInProperty("type", "no-traversal")
+        .filterValueInProperty(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_NO_TRAVERSAL)
         .fillColor(ORANGE)
         .fillOpacity(0.3f)
         .fillOutlineColor(DARK_ORANGE)
@@ -309,7 +313,7 @@ public class DebugStyleSpec {
         .group(RENTAL_GROUP)
         .typeFill()
         .vectorSourceLayer(geofencingZones)
-        .filterValueInProperty("type", "business-area")
+        .filterValueInProperty(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_BUSINESS_AREA)
         .fillColor(LIGHT_BLUE)
         .fillOpacity(0.2f)
         .fillOutlineColor(DARK_BLUE)

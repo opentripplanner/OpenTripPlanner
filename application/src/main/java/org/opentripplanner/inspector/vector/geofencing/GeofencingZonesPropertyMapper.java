@@ -13,20 +13,28 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
  */
 public class GeofencingZonesPropertyMapper extends PropertyMapper<GeofencingZone> {
 
+  public static final String GEOFENCING_ZONE_TYPE_BUSINESS_AREA = "business-area";
+  public static final String GEOFENCING_ZONE_TYPE_NO_TRAVERSAL = "no-traversal";
+  public static final String GEOFENCING_ZONE_TYPE_NO_DROP_OFF = "no-drop-off";
+  public static final String GEOFENCING_ZONE_TYPE = "type";
+  public static final String GEOFENCING_ZONE_ID = "id";
+  public static final String GEOFENCING_ZONE_NAME = "name";
+  public static final String GEOFENCING_ZONE_NETWORK = "network";
+
   @Override
   protected Collection<KeyValue> map(GeofencingZone zone) {
     var properties = new ArrayList<KeyValue>();
 
-    properties.add(kv("id", zone.id()));
-    properties.add(kv("name", zone.name()));
-    properties.add(kv("network", zone.id().getFeedId()));
+    properties.add(kv(GEOFENCING_ZONE_ID, zone.id()));
+    properties.add(kv(GEOFENCING_ZONE_NAME, zone.name()));
+    properties.add(kv(GEOFENCING_ZONE_NETWORK, zone.id().getFeedId()));
 
     if (zone.isBusinessArea()) {
-      properties.add(kv("type", "business-area"));
+      properties.add(kv(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_BUSINESS_AREA));
     } else if (zone.traversalBanned()) {
-      properties.add(kv("type", "no-traversal"));
+      properties.add(kv(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_NO_TRAVERSAL));
     } else if (zone.dropOffBanned()) {
-      properties.add(kv("type", "no-drop-off"));
+      properties.add(kv(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_NO_DROP_OFF));
     }
 
     return properties;
