@@ -5,7 +5,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 
-public class GbfsSystemInformationMapperV23 {
+class GbfsSystemInformationMapper {
 
   public VehicleRentalSystem mapSystemInformation(GBFSData systemInformation, String network) {
     String systemId = network != null ? network : systemInformation.getSystemId();

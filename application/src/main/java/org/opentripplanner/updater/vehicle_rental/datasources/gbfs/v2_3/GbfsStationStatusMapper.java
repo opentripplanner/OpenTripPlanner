@@ -13,9 +13,9 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GbfsStationStatusMapperV23 {
+class GbfsStationStatusMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsStationStatusMapperV23.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsStationStatusMapper.class);
   private static final Collector<
     VehicleTypeCount,
     ?,
@@ -25,7 +25,7 @@ public class GbfsStationStatusMapperV23 {
   private final Map<String, GBFSStation> statusLookup;
   private final Map<String, RentalVehicleType> vehicleTypes;
 
-  public GbfsStationStatusMapperV23(
+  public GbfsStationStatusMapper(
     Map<String, GBFSStation> statusLookup,
     Map<String, RentalVehicleType> vehicleTypes
   ) {

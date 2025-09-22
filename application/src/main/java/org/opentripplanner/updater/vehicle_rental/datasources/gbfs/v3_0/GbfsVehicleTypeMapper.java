@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0;
 
-import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedMapperV30.optionalLocalizedString;
+import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedMapper.optionalLocalizedString;
 
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSName;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
@@ -8,11 +8,11 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class GbfsVehicleTypeMapperV30 {
+class GbfsVehicleTypeMapper {
 
   private final String systemId;
 
-  public GbfsVehicleTypeMapperV30(String systemId) {
+  public GbfsVehicleTypeMapper(String systemId) {
     this.systemId = systemId;
   }
 

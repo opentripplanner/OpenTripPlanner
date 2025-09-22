@@ -18,9 +18,9 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPicku
 import org.slf4j.LoggerFactory;
 
 /**
- * This tests the mapping between data coming from a {@link GbfsFeedLoaderV23} to OTP station models.
+ * This tests the mapping between data coming from a {@link GbfsFeedLoader} to OTP station models.
  */
-class GbfsFeedMapperV23Test {
+class GbfsFeedMapperTest {
 
   @Test
   void makeStationFromV22() {
@@ -35,14 +35,14 @@ class GbfsFeedMapperV23Test {
       RentalPickupType.ALL
     );
     var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperV23Test.class));
-    var loader = new GbfsFeedLoaderV23(
+      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var loader = new GbfsFeedLoader(
       params.url(),
       params.httpHeaders(),
       params.language(),
       otpHttpClient
     );
-    var mapper = new GbfsFeedMapperV23(loader, params);
+    var mapper = new GbfsFeedMapper(loader, params);
 
     assertTrue(loader.update());
 
@@ -84,8 +84,8 @@ class GbfsFeedMapperV23Test {
 
   @Test
   void getEmptyListOfVehicleTypes() {
-    GbfsVehicleTypeMapperV23 vehicleTypeMapper = new GbfsVehicleTypeMapperV23("systemID");
-    Map<String, RentalVehicleType> vehicleTypes = GbfsFeedMapperV23.mapVehicleTypes(
+    GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper("systemID");
+    Map<String, RentalVehicleType> vehicleTypes = GbfsFeedMapper.mapVehicleTypes(
       vehicleTypeMapper,
       Collections.emptyList()
     );
@@ -94,22 +94,22 @@ class GbfsFeedMapperV23Test {
 
   @Test
   void duplicatedVehicleTypesDoNotThrowException() {
-    GbfsVehicleTypeMapperV23 vehicleTypeMapper = new GbfsVehicleTypeMapperV23("systemID");
+    GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper("systemID");
 
     List<GBFSVehicleType> vehicleTypes = getDuplicatedGbfsVehicleTypes();
 
     assertDoesNotThrow(() -> {
-      GbfsFeedMapperV23.mapVehicleTypes(vehicleTypeMapper, vehicleTypes);
+      GbfsFeedMapper.mapVehicleTypes(vehicleTypeMapper, vehicleTypes);
     });
   }
 
   @Test
   void getOneVehicleTypeOfDuplicatedVehicleTypes() {
-    GbfsVehicleTypeMapperV23 vehicleTypeMapper = new GbfsVehicleTypeMapperV23("systemID");
+    GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper("systemID");
 
     List<GBFSVehicleType> duplicatedVehicleTypes = getDuplicatedGbfsVehicleTypes();
 
-    Map<String, RentalVehicleType> vehicleTypes = GbfsFeedMapperV23.mapVehicleTypes(
+    Map<String, RentalVehicleType> vehicleTypes = GbfsFeedMapper.mapVehicleTypes(
       vehicleTypeMapper,
       duplicatedVehicleTypes
     );
@@ -173,14 +173,14 @@ class GbfsFeedMapperV23Test {
       RentalPickupType.ALL
     );
     var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperV23Test.class));
-    var loader = new GbfsFeedLoaderV23(
+      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var loader = new GbfsFeedLoader(
       params.url(),
       params.httpHeaders(),
       params.language(),
       otpHttpClient
     );
-    var mapper = new GbfsFeedMapperV23(loader, params);
+    var mapper = new GbfsFeedMapper(loader, params);
 
     assertTrue(loader.update());
 

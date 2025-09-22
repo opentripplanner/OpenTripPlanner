@@ -6,11 +6,11 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class GbfsVehicleTypeMapperV23 {
+class GbfsVehicleTypeMapper {
 
   private final String systemId;
 
-  public GbfsVehicleTypeMapperV23(String systemId) {
+  public GbfsVehicleTypeMapper(String systemId) {
     this.systemId = systemId;
   }
 

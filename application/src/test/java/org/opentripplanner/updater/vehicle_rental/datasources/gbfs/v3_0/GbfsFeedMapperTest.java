@@ -13,14 +13,12 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.street.model.RentalFormFactor;
-import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsVehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
@@ -28,10 +26,10 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPicku
 import org.slf4j.LoggerFactory;
 
 /**
- * This tests the mapping between data coming from a {@link GbfsFeedLoaderV30} to OTP station
+ * This tests the mapping between data coming from a {@link GbfsFeedLoader} to OTP station
  * models.
  */
-class GbfsFeedMapperV30Test {
+class GbfsFeedMapperTest {
 
   @Test
   void makeStationFromV30() {
@@ -46,9 +44,9 @@ class GbfsFeedMapperV30Test {
       RentalPickupType.ALL
     );
     var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperV30Test.class));
-    var loader = new GbfsFeedLoaderV30(params.url(), params.httpHeaders(), otpHttpClient);
-    var mapper = new GbfsFeedMapperV30(loader, params);
+      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var loader = new GbfsFeedLoader(params.url(), params.httpHeaders(), otpHttpClient);
+    var mapper = new GbfsFeedMapper(loader, params);
 
     assertTrue(loader.update());
 
@@ -108,8 +106,8 @@ class GbfsFeedMapperV30Test {
 
   @Test
   void getEmptyListOfVehicleTypes() {
-    GbfsVehicleTypeMapperV30 vehicleTypeMapper = new GbfsVehicleTypeMapperV30("systemID");
-    Map<String, RentalVehicleType> vehicleTypes = GbfsFeedMapperV30.mapVehicleTypes(
+    GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper("systemID");
+    Map<String, RentalVehicleType> vehicleTypes = GbfsFeedMapper.mapVehicleTypes(
       vehicleTypeMapper,
       Collections.emptyList()
     );
@@ -118,22 +116,22 @@ class GbfsFeedMapperV30Test {
 
   @Test
   void duplicatedVehicleTypesDoNotThrowException() {
-    GbfsVehicleTypeMapperV30 vehicleTypeMapper = new GbfsVehicleTypeMapperV30("systemID");
+    GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper("systemID");
 
     List<GBFSVehicleType> vehicleTypes = getDuplicatedGbfsVehicleTypes();
 
     assertDoesNotThrow(() -> {
-      GbfsFeedMapperV30.mapVehicleTypes(vehicleTypeMapper, vehicleTypes);
+      GbfsFeedMapper.mapVehicleTypes(vehicleTypeMapper, vehicleTypes);
     });
   }
 
   @Test
   void getOneVehicleTypeOfDuplicatedVehicleTypes() {
-    GbfsVehicleTypeMapperV30 vehicleTypeMapper = new GbfsVehicleTypeMapperV30("systemID");
+    GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper("systemID");
 
     List<GBFSVehicleType> duplicatedVehicleTypes = getDuplicatedGbfsVehicleTypes();
 
-    Map<String, RentalVehicleType> vehicleTypes = GbfsFeedMapperV30.mapVehicleTypes(
+    Map<String, RentalVehicleType> vehicleTypes = GbfsFeedMapper.mapVehicleTypes(
       vehicleTypeMapper,
       duplicatedVehicleTypes
     );

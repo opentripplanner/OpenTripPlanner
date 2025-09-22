@@ -24,22 +24,22 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
-import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsFeedMapper;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GbfsFeedMapperV30 implements GbfsFeedMapper {
+public class GbfsFeedMapper
+  implements org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsFeedMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedMapperV30.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedMapper.class);
 
-  private final GbfsFeedLoaderV30 loader;
+  private final GbfsFeedLoader loader;
   private final GbfsVehicleRentalDataSourceParameters params;
   private List<GeofencingZone> geofencingZones = List.of();
   private boolean logGeofencingZonesDoesNotExistWarning = true;
 
-  public GbfsFeedMapperV30(GbfsFeedLoaderV30 loader, GbfsVehicleRentalDataSourceParameters params) {
+  public GbfsFeedMapper(GbfsFeedLoader loader, GbfsVehicleRentalDataSourceParameters params) {
     this.loader = loader;
     this.params = params;
   }
@@ -48,7 +48,7 @@ public class GbfsFeedMapperV30 implements GbfsFeedMapper {
   public List<VehicleRentalPlace> getUpdates() {
     // Get system information
     GBFSSystemInformation systemInformation = loader.getFeed(GBFSSystemInformation.class);
-    GbfsSystemInformationMapperV30 systemInformationMapper = new GbfsSystemInformationMapperV30();
+    GbfsSystemInformationMapper systemInformationMapper = new GbfsSystemInformationMapper();
     VehicleRentalSystem system = systemInformationMapper.mapSystemInformation(
       systemInformation.getData(),
       params.network()
@@ -69,17 +69,16 @@ public class GbfsFeedMapperV30 implements GbfsFeedMapper {
           .getStations()
           .stream()
           .collect(Collectors.toMap(GBFSStation::getStationId, Function.identity()));
-        GbfsStationStatusMapperV30 stationStatusMapper = new GbfsStationStatusMapperV30(
+        GbfsStationStatusMapper stationStatusMapper = new GbfsStationStatusMapper(
           statusLookup,
           vehicleTypes
         );
-        GbfsStationInformationMapperV30 stationInformationMapper =
-          new GbfsStationInformationMapperV30(
-            system,
-            vehicleTypes,
-            params.allowKeepingRentedVehicleAtDestination(),
-            params.overloadingAllowed()
-          );
+        GbfsStationInformationMapper stationInformationMapper = new GbfsStationInformationMapper(
+          system,
+          vehicleTypes,
+          params.allowKeepingRentedVehicleAtDestination(),
+          params.overloadingAllowed()
+        );
 
         // Iterate over all known stations, and if we have any status information add it to those station objects.
         stations.addAll(
@@ -99,7 +98,7 @@ public class GbfsFeedMapperV30 implements GbfsFeedMapper {
     if (OTPFeature.FloatingBike.isOn() && params.allowRentalType(RentalPickupType.FREE_FLOATING)) {
       var freeBikeStatus = loader.getFeed(GBFSVehicleStatus.class);
       if (freeBikeStatus != null) {
-        GbfsVehicleStatusMapperV30 freeVehicleStatusMapper = new GbfsVehicleStatusMapperV30(
+        GbfsVehicleStatusMapper freeVehicleStatusMapper = new GbfsVehicleStatusMapper(
           system,
           vehicleTypes
         );
@@ -118,7 +117,7 @@ public class GbfsFeedMapperV30 implements GbfsFeedMapper {
     if (params.geofencingZones()) {
       var zones = loader.getFeed(GBFSGeofencingZones.class);
       if (zones != null) {
-        var mapper = new GbfsGeofencingZoneMapperV30(system.systemId());
+        var mapper = new GbfsGeofencingZoneMapper(system.systemId());
         this.geofencingZones = mapper.mapGeofencingZone(zones);
       } else {
         if (logGeofencingZonesDoesNotExistWarning) {
@@ -139,7 +138,7 @@ public class GbfsFeedMapperV30 implements GbfsFeedMapper {
   }
 
   public static Map<String, RentalVehicleType> mapVehicleTypes(
-    GbfsVehicleTypeMapperV30 vehicleTypeMapper,
+    GbfsVehicleTypeMapper vehicleTypeMapper,
     List<GBFSVehicleType> gbfsVehicleTypes
   ) {
     return gbfsVehicleTypes
@@ -152,7 +151,7 @@ public class GbfsFeedMapperV30 implements GbfsFeedMapper {
   private Map<String, RentalVehicleType> getVehicleTypes(VehicleRentalSystem system) {
     var rawVehicleTypes = loader.getFeed(GBFSVehicleTypes.class);
     if (rawVehicleTypes != null) {
-      GbfsVehicleTypeMapperV30 vehicleTypeMapper = new GbfsVehicleTypeMapperV30(system.systemId());
+      GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper(system.systemId());
       List<GBFSVehicleType> gbfsVehicleTypes = rawVehicleTypes.getData().getVehicleTypes();
       return mapVehicleTypes(vehicleTypeMapper, gbfsVehicleTypes);
     }

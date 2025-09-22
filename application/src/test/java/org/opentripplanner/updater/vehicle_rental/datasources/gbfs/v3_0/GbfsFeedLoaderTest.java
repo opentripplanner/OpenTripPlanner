@@ -2,14 +2,10 @@ package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSGeofencingZones;
-import org.mobilitydata.gbfs.v3_0.station_information.GBFSStation;
 import org.mobilitydata.gbfs.v3_0.station_information.GBFSStationInformation;
-import org.mobilitydata.gbfs.v3_0.station_status.GBFSStationStatus;
 import org.mobilitydata.gbfs.v3_0.system_information.GBFSSystemInformation;
-import org.mobilitydata.gbfs.v3_0.system_pricing_plans.GBFSSystemPricingPlans;
 import org.mobilitydata.gbfs.v3_0.system_regions.GBFSSystemRegions;
 import org.mobilitydata.gbfs.v3_0.vehicle_status.GBFSVehicleStatus;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
@@ -20,18 +16,18 @@ import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.LoggerFactory;
 
 /**
- * This tests that {@link GbfsFeedLoaderV30} handles loading of different versions of GBFS
+ * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS
  * correctly, that the optional language parameter works correctly, and that the different files in
  * a GBFS bundle are all included, with all information in them.
  */
-class GbfsFeedLoaderV30Test {
+class GbfsFeedLoaderTest {
 
   private static final OtpHttpClient otpHttpClient = new OtpHttpClientFactory()
-    .create(LoggerFactory.getLogger(GbfsFeedLoaderV30Test.class));
+    .create(LoggerFactory.getLogger(GbfsFeedLoaderTest.class));
 
   @Test
   void getV30Feed() {
-    GbfsFeedLoaderV30 loader = new GbfsFeedLoaderV30(
+    GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/ridecheck/almere/gbfs.json",
       HttpHeaders.empty(),
       otpHttpClient

@@ -13,16 +13,16 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GbfsStationInformationMapperV23 {
+class GbfsStationInformationMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsStationInformationMapperV23.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsStationInformationMapper.class);
 
   private final VehicleRentalSystem system;
   private final Map<String, RentalVehicleType> vehicleTypes;
   private final boolean allowKeepingRentedVehicleAtDestination;
   private final boolean overloadingAllowed;
 
-  public GbfsStationInformationMapperV23(
+  public GbfsStationInformationMapper(
     VehicleRentalSystem system,
     Map<String, RentalVehicleType> vehicleTypes,
     boolean allowKeepingRentedVehicleAtDestination,

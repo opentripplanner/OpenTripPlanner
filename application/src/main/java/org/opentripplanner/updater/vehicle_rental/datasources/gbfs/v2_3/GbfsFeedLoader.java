@@ -19,12 +19,12 @@ import org.slf4j.LoggerFactory;
  * Class for managing the state and loading of complete GBFS version 2.2 and 2.3 datasets, and updating them according
  * to individual feed's TTL rules.
  */
-public class GbfsFeedLoaderV23
-  extends GbfsFeedLoaderImpl<GBFSFeedName, GbfsFeedLoaderV23.GBFSFeedV23Details> {
+public class GbfsFeedLoader
+  extends GbfsFeedLoaderImpl<GBFSFeedName, GbfsFeedLoader.GBFSFeedV23Details> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoaderV23.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoader.class);
 
-  public GbfsFeedLoaderV23(
+  public GbfsFeedLoader(
     String url,
     HttpHeaders httpHeaders,
     String languageCode,

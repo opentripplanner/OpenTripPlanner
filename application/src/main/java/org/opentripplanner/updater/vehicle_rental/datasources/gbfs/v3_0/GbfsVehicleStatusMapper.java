@@ -15,16 +15,16 @@ import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GbfsVehicleStatusMapperV30 {
+class GbfsVehicleStatusMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleStatusMapperV30.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleStatusMapper.class);
   private static final Throttle LOG_THROTTLE = Throttle.ofOneMinute();
 
   private final VehicleRentalSystem system;
 
   private final Map<String, RentalVehicleType> vehicleTypes;
 
-  public GbfsVehicleStatusMapperV30(
+  public GbfsVehicleStatusMapper(
     VehicleRentalSystem system,
     @Nullable Map<String, RentalVehicleType> vehicleTypes
   ) {

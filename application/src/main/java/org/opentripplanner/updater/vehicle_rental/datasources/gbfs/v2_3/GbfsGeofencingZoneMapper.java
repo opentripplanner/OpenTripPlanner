@@ -8,14 +8,16 @@ import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
-import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsGeofencingZoneMapper;
 
 /**
  * A mapper from the raw GBFS type into the internal model of the geofencing zones.
  */
-public class GbfsGeofencingZoneMapperV23 extends GbfsGeofencingZoneMapper<GBFSFeature> {
+class GbfsGeofencingZoneMapper
+  extends org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsGeofencingZoneMapper<
+    GBFSFeature
+  > {
 
-  public GbfsGeofencingZoneMapperV23(String systemId) {
+  public GbfsGeofencingZoneMapper(String systemId) {
     super(systemId);
   }
 

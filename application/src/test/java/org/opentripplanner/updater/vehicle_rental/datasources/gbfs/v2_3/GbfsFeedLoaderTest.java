@@ -34,20 +34,20 @@ import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.LoggerFactory;
 
 /**
- * This tests that {@link GbfsFeedLoaderV23} handles loading of different versions of GBFS correctly,
+ * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS correctly,
  * that the optional language parameter works correctly, and that the different files in a GBFS
  * bundle are all included, with all information in them.
  */
-class GbfsFeedLoaderV23Test {
+class GbfsFeedLoaderTest {
 
   public static final String LANGUAGE_NB = "nb";
   public static final String LANGUAGE_EN = "en";
   private static final OtpHttpClient otpHttpClient = new OtpHttpClientFactory()
-    .create(LoggerFactory.getLogger(GbfsFeedLoaderV23Test.class));
+    .create(LoggerFactory.getLogger(GbfsFeedLoaderTest.class));
 
   @Test
   void getV22FeedWithExplicitLanguage() {
-    GbfsFeedLoaderV23 loader = new GbfsFeedLoaderV23(
+    GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
       HttpHeaders.empty(),
       LANGUAGE_NB,
@@ -59,7 +59,7 @@ class GbfsFeedLoaderV23Test {
 
   @Test
   void getV22FeedWithNoLanguage() {
-    GbfsFeedLoaderV23 loader = new GbfsFeedLoaderV23(
+    GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
       HttpHeaders.empty(),
       null,
@@ -72,7 +72,7 @@ class GbfsFeedLoaderV23Test {
   @Test
   void getV22FeedWithWrongLanguage() {
     assertThrows(RuntimeException.class, () ->
-      new GbfsFeedLoaderV23(
+      new GbfsFeedLoader(
         "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
         HttpHeaders.empty(),
         LANGUAGE_EN,
@@ -83,7 +83,7 @@ class GbfsFeedLoaderV23Test {
 
   @Test
   void getV10FeedWithExplicitLanguage() {
-    GbfsFeedLoaderV23 loader = new GbfsFeedLoaderV23(
+    GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/helsinki/gbfs.json",
       HttpHeaders.empty(),
       LANGUAGE_EN,
@@ -106,7 +106,7 @@ class GbfsFeedLoaderV23Test {
         while (reader.readRecord()) {
           try {
             String url = reader.get("Auto-Discovery URL");
-            new GbfsFeedLoaderV23(url, HttpHeaders.empty(), null, otpHttpClient).update();
+            new GbfsFeedLoader(url, HttpHeaders.empty(), null, otpHttpClient).update();
           } catch (Exception e) {
             cvsExceptions.add(e);
           }
@@ -125,7 +125,7 @@ class GbfsFeedLoaderV23Test {
   @Test
   @Disabled
   void testSpin() {
-    new GbfsFeedLoaderV23(
+    new GbfsFeedLoader(
       "https://gbfs.spin.pm/api/gbfs/v2_2/edmonton/gbfs",
       HttpHeaders.empty(),
       null,
@@ -135,7 +135,7 @@ class GbfsFeedLoaderV23Test {
 
   @Test
   void geofencingZones() {
-    GbfsFeedLoaderV23 loader = new GbfsFeedLoaderV23(
+    GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/tieroslo/gbfs.json",
       HttpHeaders.empty(),
       LANGUAGE_EN,
@@ -149,7 +149,7 @@ class GbfsFeedLoaderV23Test {
     assertNotNull(f);
   }
 
-  private void validateV22Feed(GbfsFeedLoaderV23 loader) {
+  private void validateV22Feed(GbfsFeedLoader loader) {
     assertTrue(loader.update());
 
     GBFSSystemInformation systemInformation = loader.getFeed(GBFSSystemInformation.class);
@@ -201,7 +201,7 @@ class GbfsFeedLoaderV23Test {
     assertNull(loader.getFeed(GBFSGeofencingZones.class));
   }
 
-  private void validateV10Feed(GbfsFeedLoaderV23 loader) {
+  private void validateV10Feed(GbfsFeedLoader loader) {
     assertTrue(loader.update());
 
     GBFSSystemInformation systemInformation = loader.getFeed(GBFSSystemInformation.class);

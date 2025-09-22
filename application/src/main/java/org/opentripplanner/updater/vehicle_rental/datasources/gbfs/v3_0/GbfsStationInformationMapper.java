@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0;
 
-import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedMapperV30.localizedString;
-import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedMapperV30.optionalLocalizedString;
+import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedMapper.localizedString;
+import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedMapper.optionalLocalizedString;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,16 +14,16 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GbfsStationInformationMapperV30 {
+class GbfsStationInformationMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsStationInformationMapperV30.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsStationInformationMapper.class);
 
   private final VehicleRentalSystem system;
   private final Map<String, RentalVehicleType> vehicleTypes;
   private final boolean allowKeepingRentedVehicleAtDestination;
   private final boolean overloadingAllowed;
 
-  public GbfsStationInformationMapperV30(
+  public GbfsStationInformationMapper(
     VehicleRentalSystem system,
     Map<String, RentalVehicleType> vehicleTypes,
     boolean allowKeepingRentedVehicleAtDestination,
