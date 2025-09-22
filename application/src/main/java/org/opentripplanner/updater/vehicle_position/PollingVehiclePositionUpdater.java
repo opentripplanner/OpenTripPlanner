@@ -3,7 +3,6 @@ package org.opentripplanner.updater.vehicle_position;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;

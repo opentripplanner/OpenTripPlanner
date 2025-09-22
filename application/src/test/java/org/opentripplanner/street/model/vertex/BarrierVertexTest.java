@@ -16,6 +16,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
  * Created by mabu on 17.8.2015.
@@ -25,11 +26,15 @@ public class BarrierVertexTest {
   @Test
   public void testBarrierPermissions() {
     OsmNode simpleBarrier = new OsmNode();
-    assertFalse(simpleBarrier.isMotorVehicleBarrier());
+    assertFalse(simpleBarrier.isBarrier());
     simpleBarrier.addTag("barrier", "bollard");
-    assertTrue(simpleBarrier.isMotorVehicleBarrier());
-    String label = "simpleBarrier";
-    BarrierVertex bv = new BarrierVertex(simpleBarrier.lon, simpleBarrier.lat, 0);
+    assertTrue(simpleBarrier.isBarrier());
+    BarrierVertex bv = new BarrierVertex(
+      simpleBarrier.lon,
+      simpleBarrier.lat,
+      0,
+      Accessibility.NO_INFORMATION
+    );
     bv.setBarrierPermissions(
       simpleBarrier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
     );
@@ -94,7 +99,7 @@ public class BarrierVertexTest {
   @Test
   public void testStreetsWithBollard() {
     Graph graph = new Graph();
-    BarrierVertex bv = new BarrierVertex(2.0, 2.0, 0);
+    BarrierVertex bv = new BarrierVertex(2.0, 2.0, 0, Accessibility.NO_INFORMATION);
     bv.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
     StreetVertex endVertex = StreetModelForTest.intersectionVertex("end_vertex", 1.0, 2.0);
@@ -140,7 +145,7 @@ public class BarrierVertexTest {
     assertTrue(endVertex_to_bv_forward.canTraverse(TraverseMode.WALK));
 
     //tests bollard which allows only walking
-    BarrierVertex onlyWalkBollard = new BarrierVertex(1.5, 1, 0);
+    BarrierVertex onlyWalkBollard = new BarrierVertex(1.5, 1, 0, Accessibility.NO_INFORMATION);
     onlyWalkBollard.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN);
     StreetEdge edge = edge(onlyWalkBollard, endVertex, 100, false);
 

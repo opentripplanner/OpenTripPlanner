@@ -3,11 +3,8 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 import static org.opentripplanner.utils.collection.CollectionUtils.requireNullOrNonEmpty;
 
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitFilterSelectInput;
-import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.collection.CollectionUtils;
 

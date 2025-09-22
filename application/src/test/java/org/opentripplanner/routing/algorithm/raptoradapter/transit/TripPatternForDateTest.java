@@ -20,7 +20,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class TripPatternForDateTest {
