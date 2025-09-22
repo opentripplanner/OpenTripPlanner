@@ -216,39 +216,6 @@
       }
     },
     {
-      "id" : "geofencing-zones-no-go",
-      "type" : "fill",
-      "source" : "vectorSource",
-      "source-layer" : "geofencingZones",
-      "minzoom" : 10,
-      "maxzoom" : 23,
-      "paint" : {
-        "fill-color" : "#8b0000",
-        "fill-opacity" : 0.4,
-        "fill-outline-color" : "#660000"
-      },
-      "filter" : [
-        "any",
-        [
-          "in",
-          "no-go-zone",
-          [
-            "string",
-            [
-              "get",
-              "type"
-            ]
-          ]
-        ]
-      ],
-      "layout" : {
-        "visibility" : "none"
-      },
-      "metadata" : {
-        "group" : "Rental"
-      }
-    },
-    {
       "id" : "geofencing-zones-business-area",
       "type" : "fill",
       "source" : "vectorSource",
