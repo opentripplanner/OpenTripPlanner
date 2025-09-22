@@ -66,6 +66,12 @@ public class DebugStyleSpec {
   private static final String RED = "#fc0f2a";
   private static final String PURPLE = "#BC55F2";
   private static final String BLACK = "#140d0e";
+  private static final String LIGHT_RED = "#ff6b6b";
+  private static final String DARK_RED = "#cc0000";
+  private static final String ORANGE = "#ffa500";
+  private static final String DARK_ORANGE = "#ff8c00";
+  private static final String LIGHT_BLUE = "#4a9eff";
+  private static final String DARK_BLUE = "#0066cc";
 
   private static final int MAX_ZOOM = 23;
   private static final ZoomDependentNumber LARGE_CIRCLE_LINE_WIDTH = new ZoomDependentNumber(
@@ -282,9 +288,9 @@ public class DebugStyleSpec {
         .typeFill()
         .vectorSourceLayer(geofencingZones)
         .filterValueInProperty("type", "no-drop-off")
-        .fillColor("#ff6b6b")
+        .fillColor(LIGHT_RED)
         .fillOpacity(0.3f)
-        .fillOutlineColor("#cc0000")
+        .fillOutlineColor(DARK_RED)
         .minZoom(10)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
@@ -293,9 +299,9 @@ public class DebugStyleSpec {
         .typeFill()
         .vectorSourceLayer(geofencingZones)
         .filterValueInProperty("type", "no-traversal")
-        .fillColor("#ffa500")
+        .fillColor(ORANGE)
         .fillOpacity(0.3f)
-        .fillOutlineColor("#ff8c00")
+        .fillOutlineColor(DARK_ORANGE)
         .minZoom(10)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
@@ -304,9 +310,9 @@ public class DebugStyleSpec {
         .typeFill()
         .vectorSourceLayer(geofencingZones)
         .filterValueInProperty("type", "business-area")
-        .fillColor("#4a9eff")
+        .fillColor(LIGHT_BLUE)
         .fillOpacity(0.2f)
-        .fillOutlineColor("#0066cc")
+        .fillOutlineColor(DARK_BLUE)
         .minZoom(10)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
