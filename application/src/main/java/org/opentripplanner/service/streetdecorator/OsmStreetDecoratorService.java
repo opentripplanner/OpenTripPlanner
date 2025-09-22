@@ -1,7 +1,7 @@
 package org.opentripplanner.service.streetdecorator;
 
 import java.util.Optional;
-import org.opentripplanner.service.streetdecorator.model.EdgeInformation;
+import org.opentripplanner.service.streetdecorator.model.EdgeLevelInfo;
 import org.opentripplanner.street.model.edge.Edge;
 
 /**
@@ -14,5 +14,5 @@ public interface OsmStreetDecoratorService {
   /**
    * Find level or incline information for a given edge.
    */
-  Optional<EdgeInformation> findEdgeInformation(Edge edge);
+  Optional<EdgeLevelInfo> findEdgeInformation(Edge edge);
 }

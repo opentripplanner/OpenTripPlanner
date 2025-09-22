@@ -6,19 +6,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
-import org.opentripplanner.service.streetdecorator.model.EdgeInclineInformation;
-import org.opentripplanner.service.streetdecorator.model.EdgeInformation;
-import org.opentripplanner.service.streetdecorator.model.EdgeLevelInformation;
-import org.opentripplanner.service.streetdecorator.model.VertexLevelInformation;
+import org.opentripplanner.service.streetdecorator.model.EdgeLevelInfo;
+import org.opentripplanner.service.streetdecorator.model.VertexLevelInfo;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class DefaultOsmStreetDecoratorRepository
   implements OsmStreetDecoratorRepository, Serializable {
 
-  private final Map<Edge, EdgeInformation> edgeInformation = new HashMap<>();
+  private final Map<Edge, EdgeLevelInfo> edgeInformation = new HashMap<>();
 
   @Inject
   public DefaultOsmStreetDecoratorRepository() {}
@@ -26,39 +23,17 @@ public class DefaultOsmStreetDecoratorRepository
   @Override
   public void addEdgeLevelInformation(
     Edge edge,
-    OsmLevel lowerVertex,
-    long lowerVertexOsmId,
-    OsmLevel upperVertex,
-    long upperVertexOsmId
+    VertexLevelInfo lowerVertexInfo,
+    VertexLevelInfo upperVertexInfo
   ) {
     Objects.requireNonNull(edge);
-    Objects.requireNonNull(lowerVertex);
-    Objects.requireNonNull(upperVertex);
-    this.edgeInformation.put(
-        edge,
-        new EdgeLevelInformation(
-          new VertexLevelInformation(
-            lowerVertex.floorNumber,
-            lowerVertex.shortName,
-            lowerVertexOsmId
-          ),
-          new VertexLevelInformation(
-            upperVertex.floorNumber,
-            upperVertex.shortName,
-            upperVertexOsmId
-          )
-        )
-      );
+    Objects.requireNonNull(lowerVertexInfo);
+    Objects.requireNonNull(upperVertexInfo);
+    this.edgeInformation.put(edge, new EdgeLevelInfo(lowerVertexInfo, upperVertexInfo));
   }
 
   @Override
-  public void addEdgeInclineInformation(Edge edge, long lowerVertexOsmId, long upperVertexOsmId) {
-    Objects.requireNonNull(edge);
-    this.edgeInformation.put(edge, new EdgeInclineInformation(lowerVertexOsmId, upperVertexOsmId));
-  }
-
-  @Override
-  public Optional<EdgeInformation> findEdgeInformation(Edge edge) {
+  public Optional<EdgeLevelInfo> findEdgeInformation(Edge edge) {
     return Optional.ofNullable(edgeInformation.get(edge));
   }
 

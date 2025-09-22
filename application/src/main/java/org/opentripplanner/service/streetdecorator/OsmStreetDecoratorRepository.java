@@ -2,8 +2,8 @@ package org.opentripplanner.service.streetdecorator;
 
 import java.io.Serializable;
 import java.util.Optional;
-import org.opentripplanner.osm.model.OsmLevel;
-import org.opentripplanner.service.streetdecorator.model.EdgeInformation;
+import org.opentripplanner.service.streetdecorator.model.EdgeLevelInfo;
+import org.opentripplanner.service.streetdecorator.model.VertexLevelInfo;
 import org.opentripplanner.street.model.edge.Edge;
 
 /**
@@ -17,19 +17,12 @@ public interface OsmStreetDecoratorRepository extends Serializable {
    */
   void addEdgeLevelInformation(
     Edge edge,
-    OsmLevel lowerVertex,
-    long lowerVertexOsmId,
-    OsmLevel upperVertex,
-    long upperVertexOsmId
+    VertexLevelInfo lowerVertexInfo,
+    VertexLevelInfo upperVertexInfo
   );
-
-  /**
-   * Associate the edge with incline information.
-   */
-  void addEdgeInclineInformation(Edge edge, long lowerVertexOsmId, long upperVertexOsmId);
 
   /**
    * Find level or incline information for a given edge.
    */
-  Optional<EdgeInformation> findEdgeInformation(Edge edge);
+  Optional<EdgeLevelInfo> findEdgeInformation(Edge edge);
 }

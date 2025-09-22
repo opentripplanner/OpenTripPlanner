@@ -4,7 +4,7 @@ import jakarta.inject.Inject;
 import java.util.Optional;
 import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
 import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorService;
-import org.opentripplanner.service.streetdecorator.model.EdgeInformation;
+import org.opentripplanner.service.streetdecorator.model.EdgeLevelInfo;
 import org.opentripplanner.street.model.edge.Edge;
 
 public class DefaultOsmStreetDecoratorService implements OsmStreetDecoratorService {
@@ -17,7 +17,7 @@ public class DefaultOsmStreetDecoratorService implements OsmStreetDecoratorServi
   }
 
   @Override
-  public Optional<EdgeInformation> findEdgeInformation(Edge edge) {
+  public Optional<EdgeLevelInfo> findEdgeInformation(Edge edge) {
     return repository.findEdgeInformation(edge);
   }
 
