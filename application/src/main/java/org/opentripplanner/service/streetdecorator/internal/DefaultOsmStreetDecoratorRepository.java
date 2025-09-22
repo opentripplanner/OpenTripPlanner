@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Optional;
 import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
 import org.opentripplanner.service.streetdecorator.model.EdgeLevelInfo;
-import org.opentripplanner.service.streetdecorator.model.VertexLevelInfo;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -21,15 +20,11 @@ public class DefaultOsmStreetDecoratorRepository
   public DefaultOsmStreetDecoratorRepository() {}
 
   @Override
-  public void addEdgeLevelInformation(
-    Edge edge,
-    VertexLevelInfo lowerVertexInfo,
-    VertexLevelInfo upperVertexInfo
-  ) {
+  public void addEdgeLevelInformation(Edge edge, EdgeLevelInfo edgeLevelInfo) {
     Objects.requireNonNull(edge);
-    Objects.requireNonNull(lowerVertexInfo);
-    Objects.requireNonNull(upperVertexInfo);
-    this.edgeInformation.put(edge, new EdgeLevelInfo(lowerVertexInfo, upperVertexInfo));
+    Objects.requireNonNull(edgeLevelInfo.lowerVertexInfo());
+    Objects.requireNonNull(edgeLevelInfo.upperVertexInfo());
+    this.edgeInformation.put(edge, edgeLevelInfo);
   }
 
   @Override
