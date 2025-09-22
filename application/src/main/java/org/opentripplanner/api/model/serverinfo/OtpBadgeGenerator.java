@@ -40,8 +40,8 @@ public class OtpBadgeGenerator {
    * @return A string containing the svg xml document.
    */
   public static String generateOtpBadgeSvg(String label, String labelBgColor, String body) {
-    int labelLength = fontWith(label);
-    int versionLength = fontWith(body);
+    int labelLength = fontWidth(label);
+    int versionLength = fontWidth(body);
     int totalWidth = 4 * MARGIN + labelLength + versionLength;
 
     return TEMPLATE.replace("{{body}}", body)
@@ -61,7 +61,7 @@ public class OtpBadgeGenerator {
    * This method estimates the width needed for the given {@code text}. It is not accurate,
    * but the text will be stretched/compressed to match the width.
    */
-  private static int fontWith(String text) {
+  private static int fontWidth(String text) {
     int length = text.length();
     int small = text.replaceAll("[^ .il1\\()\\[\\]{}!,:;]", "").length();
     int big = length - small;
