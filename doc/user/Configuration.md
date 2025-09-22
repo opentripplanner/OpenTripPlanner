@@ -176,7 +176,7 @@ text inserted is valid JSON object (starts with `{` and ends with `}`) or valid 
 Variable substitution is performed on configuration file after the include file directive; Hence
 variable substitution is also performed on the text in the injected file.
 
-Here is an example including variable substitution, assuming version 1.8.1 of OTP:
+Here is an example including variable substitution, assuming version 2.8.0 of OTP:
 
 ```JSON
 // build-config.json
@@ -200,7 +200,7 @@ The result will look like this:
 {
       "transitFeeds": [
         {
-          "source": "netex-v1.8.1.obj"
+          "source": "netex-v2.8.0.obj"
         }
       ]
 } 
