@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.graph.Graph;
@@ -13,8 +12,6 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
 import org.opentripplanner.service.vehiclerental.street.NoRestriction;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.model.site.AreaStop;
 
 /**
  * A vector tile layer containing all {@link GeofencingZone}s inside the vector tile bounds.
@@ -55,7 +52,10 @@ public class GeofencingZonesLayerBuilder extends LayerBuilder<GeofencingZone> {
       .toList();
   }
 
-  private void extractGeofencingZones(RentalRestrictionExtension extension, Map<String, GeofencingZone> uniqueZones) {
+  private void extractGeofencingZones(
+    RentalRestrictionExtension extension,
+    Map<String, GeofencingZone> uniqueZones
+  ) {
     for (RentalRestrictionExtension ext : extension.toList()) {
       if (ext instanceof GeofencingZoneExtension zoneExt) {
         GeofencingZone zone = zoneExt.zone();

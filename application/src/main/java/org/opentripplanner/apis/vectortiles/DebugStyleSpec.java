@@ -126,7 +126,13 @@ public class DebugStyleSpec {
     VectorSourceLayer rental,
     List<BackgroundTileLayer> extraLayers
   ) {
-    List<TileSource> vectorSources = Stream.of(regularStops, edges, vertices, geofencingZones, rental)
+    List<TileSource> vectorSources = Stream.of(
+      regularStops,
+      edges,
+      vertices,
+      geofencingZones,
+      rental
+    )
       .map(VectorSourceLayer::vectorSource)
       .map(TileSource.class::cast)
       .toList();
@@ -244,7 +250,10 @@ public class DebugStyleSpec {
     );
   }
 
-  private static List<StyleBuilder> rental(VectorSourceLayer rentalLayer, VectorSourceLayer geofencingZones) {
+  private static List<StyleBuilder> rental(
+    VectorSourceLayer rentalLayer,
+    VectorSourceLayer geofencingZones
+  ) {
     return List.of(
       StyleBuilder.ofId("rental-vehicle")
         .group(RENTAL_GROUP)
