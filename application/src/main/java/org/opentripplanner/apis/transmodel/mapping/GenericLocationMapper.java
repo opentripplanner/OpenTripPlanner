@@ -1,15 +1,22 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
 import java.util.Map;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GenericLocationMapper {
 
+  private final FeedScopedIdMapper idMapper;
+
+  GenericLocationMapper(FeedScopedIdMapper idMapper) {
+    this.idMapper = idMapper;
+  }
+
   /**
    * Maps a GraphQL Location input type to a GenericLocation
    */
-  static GenericLocation toGenericLocation(Map<String, Object> m) {
+  GenericLocation toGenericLocation(Map<String, Object> m) {
     Map<String, Object> coordinates = (Map<String, Object>) m.get("coordinates");
     Double lat = null;
     Double lon = null;
@@ -19,7 +26,7 @@ class GenericLocationMapper {
     }
 
     String placeRef = (String) m.get("place");
-    FeedScopedId stopId = placeRef == null ? null : TransitIdMapper.mapIDToDomain(placeRef);
+    FeedScopedId stopId = idMapper.parseNullSafe(placeRef).orElse(null);
     String name = (String) m.get("name");
     name = name == null ? "" : name;
 

@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -18,10 +19,20 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
  */
 public class ViaRequestMapper {
 
+  private final ViaLocationDeprecatedMapper viaLocationDeprecatedMapper;
+  private final GenericLocationMapper genericLocationMapper;
+  private final ViaSegmentMapper viaSegmentMapper;
+
+  public ViaRequestMapper(FeedScopedIdMapper idMapper) {
+    viaLocationDeprecatedMapper = new ViaLocationDeprecatedMapper(idMapper);
+    genericLocationMapper = new GenericLocationMapper(idMapper);
+    viaSegmentMapper = new ViaSegmentMapper(idMapper);
+  }
+
   /**
    * Create a RouteViaRequest from the input fields of the viaTrip query arguments.
    */
-  public static RouteViaRequest createRouteViaRequest(DataFetchingEnvironment environment) {
+  public RouteViaRequest createRouteViaRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
     OtpServerRequestContext serverContext = context.getServerContext();
     RouteRequest request = serverContext.defaultRouteRequest();
@@ -29,7 +40,7 @@ public class ViaRequestMapper {
     List<Map<String, Object>> viaInput = environment.getArgument("via");
     List<ViaLocationDeprecated> vias = viaInput
       .stream()
-      .map(ViaLocationDeprecatedMapper::mapViaLocation)
+      .map(viaLocationDeprecatedMapper::mapViaLocation)
       .toList();
 
     List<JourneyRequest> requests;
@@ -37,7 +48,7 @@ public class ViaRequestMapper {
       List<Map<String, Object>> segments = environment.getArgument("segments");
       requests = segments
         .stream()
-        .map(viaRequest -> ViaSegmentMapper.mapViaSegment(request, viaRequest))
+        .map(viaRequest -> viaSegmentMapper.mapViaSegment(request, viaRequest))
         .toList();
     } else {
       requests = Collections.nCopies(vias.size() + 1, request.journey());
@@ -50,8 +61,8 @@ public class ViaRequestMapper {
         )
       )
       .withSearchWindow(environment.getArgumentOrDefault("searchWindow", request.searchWindow()))
-      .withFrom(GenericLocationMapper.toGenericLocation(environment.getArgument("from")))
-      .withTo(GenericLocationMapper.toGenericLocation(environment.getArgument("to")))
+      .withFrom(genericLocationMapper.toGenericLocation(environment.getArgument("from")))
+      .withTo(genericLocationMapper.toGenericLocation(environment.getArgument("to")))
       .withNumItineraries(
         environment.getArgumentOrDefault("numTripPatterns", request.numItineraries())
       )

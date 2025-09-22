@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.TraverseDirection;
 
 /**
  * This specifier allows you to specify a very precise match. It will only result in a positive when
@@ -39,20 +40,8 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public Scores matchScores(OsmEntity way) {
-    return new Scores(
-      allForwardTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE,
-      allBackwardTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE
-    );
-  }
-
-  @Override
-  public int matchScore(OsmEntity way) {
-    if (allTagsMatch(way)) {
-      return bestMatchScore;
-    } else {
-      return NO_MATCH_SCORE;
-    }
+  public int matchScore(OsmEntity way, TraverseDirection direction) {
+    return allTagsMatch(way, direction) ? bestMatchScore : NO_MATCH_SCORE;
   }
 
   @Override
@@ -70,6 +59,14 @@ public class ExactMatchSpecifier implements OsmSpecifier {
 
   public boolean allForwardTagsMatch(OsmEntity way) {
     return conditions.stream().allMatch(c -> c.isForwardMatch(way));
+  }
+
+  private boolean allTagsMatch(OsmEntity way, TraverseDirection direction) {
+    return switch (direction) {
+      case DIRECTIONLESS -> allTagsMatch(way);
+      case FORWARD -> allForwardTagsMatch(way);
+      case BACKWARD -> allBackwardTagsMatch(way);
+    };
   }
 
   public static ExactMatchSpecifier exact(String spec) {

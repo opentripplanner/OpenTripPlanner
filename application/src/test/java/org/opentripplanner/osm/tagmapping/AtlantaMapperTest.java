@@ -3,7 +3,7 @@ package org.opentripplanner.osm.tagmapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
@@ -27,7 +27,7 @@ class AtlantaMapperTest {
   public void peachtreeRoad() {
     // Peachtree Rd in Atlanta has sidewalks, and bikes are allowed.
     // https://www.openstreetmap.org/way/144429544
-    OsmEntity peachtreeRd = new OsmEntity();
+    OsmWay peachtreeRd = new OsmWay();
     peachtreeRd.addTag("highway", "trunk");
     peachtreeRd.addTag("lanes", "6");
     peachtreeRd.addTag("name", "Peachtree Road");
@@ -35,14 +35,14 @@ class AtlantaMapperTest {
     peachtreeRd.addTag("surface", "asphalt");
     peachtreeRd.addTag("tiger:county", "Fulton, GA");
 
-    assertEquals(StreetTraversalPermission.ALL, wps.getDataForWay(peachtreeRd).getPermission());
+    assertEquals(StreetTraversalPermission.ALL, wps.getDataForEntity(peachtreeRd).getPermission());
   }
 
   @Test
   public void deKalbAvenue() {
     // "Outer" ramps from DeKalb Ave onto Moreland Ave in Atlanta have sidewalks, and bikes are allowed.
     // https://www.openstreetmap.org/way/9164434
-    OsmEntity morelandRamp = new OsmEntity();
+    OsmWay morelandRamp = new OsmWay();
     morelandRamp.addTag("highway", "trunk_link");
     morelandRamp.addTag("lanes", "1");
     morelandRamp.addTag("oneway", "yes");
@@ -50,14 +50,17 @@ class AtlantaMapperTest {
     morelandRamp.addTag("tiger:county", "DeKalb, GA");
     morelandRamp.addTag("tiger:reviewed", "no");
 
-    assertEquals(StreetTraversalPermission.ALL, wps.getDataForWay(morelandRamp).getPermission());
+    assertEquals(
+      StreetTraversalPermission.ALL,
+      wps.getDataForWay(morelandRamp).forward().getPermission()
+    );
   }
 
   @Test
   public void tenthStreetNE() {
     // For sanity check, secondary roads (e.g. 10th Street) should remain allowed for all modes.
     // https://www.openstreetmap.org/way/505912700
-    OsmEntity tenthSt = new OsmEntity();
+    OsmWay tenthSt = new OsmWay();
     tenthSt.addTag("highway", "secondary");
     tenthSt.addTag("lanes", "4");
     tenthSt.addTag("maxspeed", "30 mph");
@@ -69,6 +72,6 @@ class AtlantaMapperTest {
     tenthSt.addTag("tiger:county", "Fulton, GA");
     tenthSt.addTag("tiger:reviewed", "no");
     // Some other params omitted.
-    assertEquals(StreetTraversalPermission.ALL, wps.getDataForWay(tenthSt).getPermission());
+    assertEquals(StreetTraversalPermission.ALL, wps.getDataForEntity(tenthSt).getPermission());
   }
 }

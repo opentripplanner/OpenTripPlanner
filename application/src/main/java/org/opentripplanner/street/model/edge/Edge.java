@@ -183,26 +183,10 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     return 0;
   }
 
-  /**
-   * This is the transfer time(duration) spent NOT moving like time in in elevators, escalators and
-   * waiting on read light when crossing a street. This is used together with {@link
-   * #getEffectiveWalkDistance()} to calculate the actual-transfer-time.
-   * <p>
-   * Unit: seconds. Default: 0.
-   */
-  public int getDistanceIndependentTime() {
-    return 0;
-  }
-
   public void remove() {
-    for (Edge edge : this.fromv.getIncoming()) {
-      edge.removeTurnRestrictionsTo(this);
-    }
     this.fromv.removeOutgoing(this);
     this.tov.removeIncoming(this);
   }
-
-  public void removeTurnRestrictionsTo(Edge origin) {}
 
   /**
    * Connect the edge to the graph by adding it to the list of outgoing edges of the origin vertex

@@ -326,7 +326,11 @@ public class RoutingWorker {
       toModes.add(directMode);
       viaModes.add(directMode);
     }
-    return TemporaryVerticesContainer.of(serverContext.graph(), serverContext.vertexLinker())
+    return TemporaryVerticesContainer.of(
+      serverContext.graph(),
+      serverContext.vertexLinker(),
+      serverContext.transitService()::findStopOrChildIds
+    )
       .withFrom(request.from(), fromModes)
       .withTo(request.to(), toModes)
       .withVia(request.listVisitViaLocations(), viaModes)

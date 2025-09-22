@@ -2,14 +2,20 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.graph_builder.module.osm.VertexGeneratorTest.getBarrierLevelIssues;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+import static org.opentripplanner.transit.model.basic.Accessibility.NOT_POSSIBLE;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -19,14 +25,20 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.BarrierIntersectingHighway;
+import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.CreativeNamer;
 import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertiesBuilder;
+import org.opentripplanner.osm.wayproperty.WayPropertiesPair;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
@@ -37,20 +49,26 @@ import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepo
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
+import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OsmModuleTest {
 
   private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(OsmModuleTest.class);
+  private static final Logger log = LoggerFactory.getLogger(OsmModuleTest.class);
 
   @Test
   public void testGraphBuilder() {
@@ -175,7 +193,7 @@ public class OsmModuleTest {
 
   @Test
   public void testWayDataSet() {
-    OsmEntity way = new OsmWay();
+    OsmWay way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("surface", "gravel");
@@ -183,12 +201,12 @@ public class OsmModuleTest {
     WayPropertySet wayPropertySet = new WayPropertySet();
 
     // where there are no way specifiers, the default is used
-    WayProperties wayData = wayPropertySet.getDataForWay(way);
-    assertEquals(wayData.getPermission(), ALL);
-    assertEquals(wayData.walkSafety().forward(), 1.0);
-    assertEquals(wayData.walkSafety().back(), 1.0);
-    assertEquals(wayData.bicycleSafety().forward(), 1.0);
-    assertEquals(wayData.bicycleSafety().back(), 1.0);
+    var wayData = wayPropertySet.getDataForWay(way);
+    assertEquals(ALL, wayData.forward().getPermission());
+    assertEquals(1.0, wayData.forward().walkSafety());
+    assertEquals(1.0, wayData.backward().walkSafety());
+    assertEquals(1.0, wayData.forward().bicycleSafety());
+    assertEquals(1.0, wayData.backward().bicycleSafety());
 
     // add two equal matches: lane only...
     OsmSpecifier lane_only = new BestMatchSpecifier("cycleway=lane");
@@ -204,9 +222,10 @@ public class OsmModuleTest {
 
     wayPropertySet.addProperties(footway_only, footways_allow_peds);
 
-    WayProperties dataForWay = wayPropertySet.getDataForWay(way);
+    var dataForWay = wayPropertySet.getDataForWay(way);
     // the first one is found
-    assertEquals(dataForWay, lane_is_safer);
+    assertEquals(lane_is_safer, dataForWay.forward());
+    assertEquals(lane_is_safer, dataForWay.backward());
 
     // add a better match
     OsmSpecifier lane_and_footway = new BestMatchSpecifier("cycleway=lane;highway=footway");
@@ -218,7 +237,7 @@ public class OsmModuleTest {
 
     wayPropertySet.addProperties(lane_and_footway, safer_and_peds);
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(dataForWay, safer_and_peds);
+    assertEquals(new WayPropertiesPair(safer_and_peds, safer_and_peds), dataForWay);
 
     // add a mixin
     BestMatchSpecifier gravel = new BestMatchSpecifier("surface=gravel");
@@ -226,7 +245,7 @@ public class OsmModuleTest {
     wayPropertySet.setMixinProperties(gravel, gravel_is_dangerous);
 
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(dataForWay.bicycleSafety().forward(), 1.5);
+    assertEquals(1.5, dataForWay.forward().bicycleSafety());
 
     // test a left-right distinction
     way = new OsmWay();
@@ -243,9 +262,9 @@ public class OsmModuleTest {
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
     // right (with traffic) comes from track
-    assertEquals(0.25, dataForWay.bicycleSafety().forward());
+    assertEquals(0.25, dataForWay.forward().bicycleSafety());
     // left comes from lane
-    assertEquals(0.75, dataForWay.bicycleSafety().back());
+    assertEquals(0.75, dataForWay.backward().bicycleSafety());
 
     way = new OsmWay();
     way.addTag("highway", "footway");
@@ -340,6 +359,235 @@ public class OsmModuleTest {
 
     // assert that pruning removed traversal restrictions
     assertEquals(barrier.getBarrierPermissions(), ALL);
+  }
+
+  @Test
+  void testLinearCrossingNonIntersection() {
+    var way = new OsmWay();
+    way.addTag("highway", "path");
+    way.addNodeRef(1);
+    way.addNodeRef(2);
+    way.addNodeRef(3);
+    way.addNodeRef(4);
+    way.setId(1);
+
+    var barrier = new OsmWay();
+    barrier.addTag("barrier", "fence");
+    barrier.addNodeRef(99);
+    barrier.addNodeRef(2);
+    barrier.addNodeRef(98);
+    barrier.setId(2);
+
+    var osmProvider = new TestOsmProvider(
+      List.of(),
+      List.of(way, barrier),
+      Set.of(1, 2, 3, 4, 98, 99)
+        .stream()
+        .map(id -> {
+          var node = new OsmNode((double) id / 1000, 0);
+          node.setId(id);
+          return node;
+        })
+        .toList()
+    );
+
+    var graph = new Graph();
+    var issueStore = new DefaultDataImportIssueStore();
+    var subject = OsmModule.of(
+      osmProvider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    )
+      .withIssueStore(issueStore)
+      .build();
+    subject.buildGraph();
+
+    assertEquals(3, graph.getVertices().size());
+    var barrierVertices = graph.getVerticesOfType(BarrierVertex.class);
+    assertEquals(0, barrierVertices.size());
+    var issues = issueStore
+      .listIssues()
+      .stream()
+      .filter(issue -> issue instanceof BarrierIntersectingHighway);
+    assertEquals(1, issues.count());
+  }
+
+  @Test
+  void testHighwayReachingBarrierOnArea() {
+    var n1 = new OsmNode(0, 0);
+    n1.setId(1);
+    var n2 = new OsmNode(0.001, 0);
+    n2.setId(2);
+    var n3 = new OsmNode(0, -0.001);
+    n3.setId(3);
+    var n4 = new OsmNode(0, 0.001);
+    n4.setId(4);
+    var n5 = new OsmNode(-0.001, 0.001);
+    n5.setId(5);
+    var n6 = new OsmNode(-0.001, -0.001);
+    n6.setId(6);
+
+    var path = new OsmWay();
+    path.addTag("highway", "path");
+    path.addNodeRef(1);
+    path.addNodeRef(2);
+    path.setId(1);
+
+    var chain = new OsmWay();
+    chain.addTag("barrier", "chain");
+    chain.addNodeRef(3);
+    chain.addNodeRef(1);
+    chain.addNodeRef(4);
+    chain.setId(2);
+
+    var barrier = new OsmWay();
+    barrier.addTag("highway", "pedestrian");
+    barrier.addTag("bicycle", "yes");
+    barrier.addTag("area", "yes");
+    barrier.addNodeRef(1);
+    barrier.addNodeRef(4);
+    barrier.addNodeRef(5);
+    barrier.addNodeRef(6);
+    barrier.addNodeRef(3);
+    barrier.addNodeRef(1);
+
+    var osmProvider = new TestOsmProvider(
+      List.of(),
+      List.of(path, chain, barrier),
+      List.of(n1, n2, n3, n4, n5, n6)
+    );
+    new OsmTagMapper().populateProperties(osmProvider.getWayPropertySet());
+
+    var graph = new Graph();
+    var subject = OsmModule.of(
+      osmProvider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    ).build();
+    subject.buildGraph();
+
+    // the vertex for node 1 has been split, one for the area and one for the crossing of the linear
+    // way
+    Collection<Vertex> vertices = graph.getVertices();
+    assertEquals(7, vertices.size());
+    assertEquals(3, graph.getVerticesOfType(BarrierPassThroughVertex.class).size());
+    assertEquals(
+      2,
+      graph.getVerticesOfType(OsmVertex.class).stream().filter(v -> v.nodeId == 1).toList().size()
+    );
+
+    // check traversal permission starting from node 2
+    var v2 = graph
+      .getVerticesOfType(OsmVertex.class)
+      .stream()
+      .filter(v -> v.nodeId == 2)
+      .findFirst()
+      .orElseThrow();
+    assertEquals(1, v2.getOutgoing().size());
+    // we first reach the barrier crossing on the path at v1
+    var v1OnPath = v2.getOutgoingStreetEdges().getFirst().getToVertex();
+    assertInstanceOf(OsmVertex.class, v1OnPath);
+    // at that barrier crossing, we can either return to the origin or enter the area
+    assertEquals(2, v1OnPath.getOutgoing().size());
+    // we then enter the area
+    var barrierCrossing = v1OnPath
+      .getOutgoingStreetEdges()
+      .stream()
+      .filter(e -> e.getToVertex() instanceof BarrierPassThroughVertex)
+      .findFirst()
+      .orElseThrow();
+    assertEquals(PEDESTRIAN, barrierCrossing.getPermission());
+    var v1OnArea = barrierCrossing.getToVertex();
+    for (var edge : v1OnArea.getOutgoingStreetEdges()) {
+      // we check that we can cycle freely within the area, not encumbered by the chain
+      if (edge instanceof AreaEdge) {
+        assertEquals(PEDESTRIAN_AND_BICYCLE, edge.getPermission());
+      }
+    }
+  }
+
+  @Test
+  void testDifferentLevelsConnectingBarrier() {
+    Graph graph = new Graph();
+
+    var n1 = new OsmNode(0, 0);
+    n1.setId(1);
+    var n2 = new OsmNode(0, 1);
+    n2.setId(2);
+    var n3 = new OsmNode(0, 2);
+    n3.setId(3);
+    var n4 = new OsmNode(0, 3);
+    n4.setId(4);
+    n4.addTag("barrier", "bollard");
+    var n5 = new OsmNode(1, 0);
+    n5.setId(5);
+    var n6 = new OsmNode(-1, 0);
+    n6.setId(6);
+    n6.addTag("barrier", "bollard");
+
+    var chain = new OsmWay();
+    chain.addTag("barrier", "chain");
+    chain.setId(999);
+    chain.addNodeRef(1);
+    chain.addNodeRef(2);
+    chain.addNodeRef(3);
+
+    var w1 = new OsmWay();
+    w1.setId(1);
+    w1.addTag("highway", "pedestrian");
+    w1.addTag("level", "0");
+    w1.addTag("area", "yes");
+    w1.addNodeRef(4);
+    w1.addNodeRef(5);
+    w1.addNodeRef(1);
+    w1.addNodeRef(4);
+
+    var w2 = new OsmWay();
+    w2.setId(2);
+    w2.addTag("highway", "pedestrian");
+    w2.addTag("level", "1");
+    w2.addTag("area", "yes");
+    w2.addNodeRef(1);
+    w2.addNodeRef(2);
+    w2.addNodeRef(3);
+    w2.addNodeRef(6);
+    w2.addNodeRef(1);
+
+    var w3 = new OsmWay();
+    w3.setId(3);
+    w3.addTag("highway", "pedestrian");
+    w3.addTag("level", "1");
+    w3.addTag("area", "yes");
+    w3.addNodeRef(4);
+    w3.addNodeRef(6);
+    w3.addNodeRef(1);
+    w3.addNodeRef(4);
+
+    var issueStore = new DefaultDataImportIssueStore();
+    var osmProvider = new TestOsmProvider(
+      List.of(),
+      List.of(w1, w2, w3, chain),
+      List.of(n1, n2, n3, n4, n5, n6)
+    );
+    var osmDb = new OsmDatabase(issueStore);
+    osmProvider.readOsm(osmDb);
+
+    var osmModule = OsmModule.of(
+      osmProvider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    )
+      .withIssueStore(issueStore)
+      .build();
+    osmModule.buildGraph();
+
+    var issues = getBarrierLevelIssues(issueStore);
+    assertEquals(2, issues.length);
+    assertEquals(1, issues[0].node().getId());
+    assertEquals(4, issues[1].node().getId());
   }
 
   private BuildResult buildParkingLots() {

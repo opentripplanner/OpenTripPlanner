@@ -2,6 +2,7 @@ package org.opentripplanner.street.search;
 
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -37,6 +39,7 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +57,7 @@ public class TemporaryVerticesContainerBuilder {
 
   private final Graph graph;
   private final VertexLinker vertexLinker;
+  private final Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds;
   private final List<DisposableEdgeCollection> tempEdges = new ArrayList<>();
   private GenericLocation from = GenericLocation.UNKNOWN;
   private GenericLocation to = GenericLocation.UNKNOWN;
@@ -64,9 +68,14 @@ public class TemporaryVerticesContainerBuilder {
   private Set<TransitStopVertex> fromStopVertices = Set.of();
   private Set<TransitStopVertex> toStopVertices = Set.of();
 
-  TemporaryVerticesContainerBuilder(Graph graph, VertexLinker vertexLinker) {
+  TemporaryVerticesContainerBuilder(
+    Graph graph,
+    VertexLinker vertexLinker,
+    Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds
+  ) {
     this.graph = graph;
     this.vertexLinker = vertexLinker;
+    this.resolveSiteIds = resolveSiteIds;
   }
 
   public TemporaryVerticesContainerBuilder withFrom(GenericLocation location, StreetMode mode) {
@@ -80,7 +89,7 @@ public class TemporaryVerticesContainerBuilder {
     this.from = location;
     this.fromVertices = getStreetVerticesForLocation(location, modes, LocationType.FROM);
     if (location.stopId != null) {
-      this.fromStopVertices = graph.findStopOrChildStopsVertices(location.stopId);
+      this.fromStopVertices = findStopOrChildStopVertices(location.stopId);
     }
     return this;
   }
@@ -104,7 +113,7 @@ public class TemporaryVerticesContainerBuilder {
     this.to = location;
     this.toVertices = getStreetVerticesForLocation(to, modes, LocationType.TO);
     if (location.stopId != null) {
-      this.toStopVertices = graph.findStopOrChildStopsVertices(location.stopId);
+      this.toStopVertices = findStopOrChildStopVertices(location.stopId);
     }
     return this;
   }
@@ -225,20 +234,14 @@ public class TemporaryVerticesContainerBuilder {
       .toList();
 
     var results = new HashSet<Vertex>();
-    if (!modes.stream().allMatch(TraverseMode::isInCar)) {
-      // Check if Stop/StopCollection is found by FeedScopeId
-      if (location.stopId != null) {
-        var streetVertices = graph.findStopVertices(location.stopId);
-        if (!streetVertices.isEmpty()) {
-          results.addAll(streetVertices);
-        }
-      }
+    if (!modes.stream().allMatch(TraverseMode::isInCar) && location.stopId != null) {
+      results.addAll(getStreetVerticesForStop(location));
     }
 
     if (modes.stream().anyMatch(TraverseMode::isInCar)) {
       // Fetch coordinate from stop, if not given in request
       if (location.stopId != null && location.getCoordinate() == null) {
-        var stopVertex = graph.getStopVertexForStopId(location.stopId);
+        var stopVertex = graph.getStopVertex(location.stopId);
         if (stopVertex != null) {
           var c = stopVertex.getStop().getCoordinate();
           location = new GenericLocation(
@@ -259,6 +262,27 @@ public class TemporaryVerticesContainerBuilder {
     }
 
     return results;
+  }
+
+  private Set<Vertex> getStreetVerticesForStop(GenericLocation location) {
+    // check if there is a stop by the given id
+    var stopVertex = graph.findStopVertex(location.stopId);
+    if (stopVertex.isPresent()) {
+      return Set.of(stopVertex.get());
+    }
+
+    // station centroids may be used instead of child stop vertices for stations
+    var centroidVertex = graph.findStationCentroidVertex(location.stopId);
+    if (centroidVertex.isPresent()) {
+      return Set.of(centroidVertex.get());
+    }
+
+    // in the regular case you want to resolve a (multi-modal) station into its child stops
+    var childVertices = findStopOrChildStopVertices(location.stopId);
+    if (!childVertices.isEmpty()) {
+      return childVertices.stream().map(Vertex.class::cast).collect(Collectors.toUnmodifiableSet());
+    }
+    return Set.of();
   }
 
   private TraverseMode getTraverseModeForLinker(StreetMode streetMode, LocationType type) {
@@ -402,6 +426,14 @@ public class TemporaryVerticesContainerBuilder {
         TemporaryFreeEdge.createTemporaryFreeEdge(streetVertex, location)
       );
     };
+  }
+
+  private Set<TransitStopVertex> findStopOrChildStopVertices(FeedScopedId stopId) {
+    return resolveSiteIds
+      .apply(stopId)
+      .stream()
+      .flatMap(id -> graph.findStopVertex(id).stream())
+      .collect(Collectors.toUnmodifiableSet());
   }
 
   private enum LocationType {
