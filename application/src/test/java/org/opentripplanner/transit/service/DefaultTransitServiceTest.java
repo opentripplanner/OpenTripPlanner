@@ -1,8 +1,10 @@
 package org.opentripplanner.transit.service;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
@@ -16,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.RealTimeTripUpdate;
@@ -27,6 +30,8 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.GroupOfStations;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -52,6 +57,18 @@ class DefaultTransitServiceTest {
   private static final RegularStop STOP_ONE = TEST_MODEL.stop("Stop_1")
     .withVehicleType(TRAM)
     .build();
+
+  private static final MultiModalStation MM_STATION = MultiModalStation.of(id("mm_s"))
+    .withChildStations(List.of(STATION))
+    .withCoordinate(WgsCoordinate.GREENWICH)
+    .withName(I18NString.of("MM1"))
+    .build();
+  private static final GroupOfStations GO_STATIONS = GroupOfStations.of(id("gos"))
+    .addChildStation(MM_STATION)
+    .withCoordinate(WgsCoordinate.GREENWICH)
+    .withName(I18NString.of("GOS"))
+    .build();
+
   private static final FeedScopedId SERVICE_ID = new FeedScopedId("FEED", "SERVICE");
   private static final int SERVICE_CODE = 0;
   private static final TripPattern FERRY_PATTERN = TEST_MODEL.pattern(FERRY).build();
@@ -66,7 +83,7 @@ class DefaultTransitServiceTest {
     .withCreatedByRealtimeUpdater(true)
     .build();
 
-  static FeedScopedId CALENDAR_ID = TimetableRepositoryForTest.id("CAL_1");
+  static FeedScopedId CALENDAR_ID = id("CAL_1");
   static Trip TRIP = TimetableRepositoryForTest.trip("123")
     .withHeadsign(I18NString.of("Trip Headsign"))
     .withServiceId(CALENDAR_ID)
@@ -94,7 +111,7 @@ class DefaultTransitServiceTest {
     .withServiceCode(SERVICE_CODE)
     .build();
 
-  static FeedScopedId CALENDAR_ID_TWO = TimetableRepositoryForTest.id("CAL_2");
+  static FeedScopedId CALENDAR_ID_TWO = id("CAL_2");
   static Trip TRIP_TODAY = TimetableRepositoryForTest.trip("12345")
     .withHeadsign(I18NString.of("Trip Headsign"))
     .withServiceId(CALENDAR_ID_TWO)
@@ -130,6 +147,8 @@ class DefaultTransitServiceTest {
       .withRegularStop(STOP_C)
       .withRegularStop(STOP_ONE)
       .withStation(STATION)
+      .withMultiModalStation(MM_STATION)
+      .withGroupOfStation(GO_STATIONS)
       .build();
 
     var deduplicator = new Deduplicator();
@@ -314,5 +333,29 @@ class DefaultTransitServiceTest {
     assertTrue(service.hasScheduledServicesAfter(LocalDate.of(2025, 7, 2), STOP_ONE));
     assertFalse(service.hasScheduledServicesAfter(LocalDate.of(2025, 7, 3), STOP_ONE));
     assertFalse(service.hasScheduledServicesAfter(LocalDate.of(2025, 7, 1), STOP_C));
+  }
+
+  @Test
+  void stopOrChildId() {
+    var res = service.findStopOrChildIds(STOP_A.getId());
+    assertThat(res).containsExactly(STOP_A.getId());
+  }
+
+  @Test
+  void stationChildIds() {
+    var res = service.findStopOrChildIds(STATION.getId());
+    assertThat(res).containsExactly(STOP_A.getId(), STOP_B.getId());
+  }
+
+  @Test
+  void multiModalStationChildIds() {
+    var res = service.findStopOrChildIds(MM_STATION.getId());
+    assertThat(res).containsExactly(STOP_A.getId(), STOP_B.getId());
+  }
+
+  @Test
+  void groupOfStationsChildIds() {
+    var res = service.findStopOrChildIds(GO_STATIONS.getId());
+    assertThat(res).containsExactly(STOP_A.getId(), STOP_B.getId());
   }
 }

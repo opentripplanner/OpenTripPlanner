@@ -2,13 +2,10 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
-import org.opentripplanner.utils.collection.ListUtils;
 
 public class LocationGroupImpl implements GraphQLDataFetchers.GraphQLLocationGroup {
 

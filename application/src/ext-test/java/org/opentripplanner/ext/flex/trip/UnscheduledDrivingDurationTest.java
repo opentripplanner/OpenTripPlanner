@@ -27,7 +27,7 @@ class UnscheduledDrivingDurationTest {
 
   @Test
   void noPenalty() {
-    var trip = UnscheduledTrip.of(id("1")).withStopTimes(List.of(STOP_TIME)).build();
+    var trip = UnscheduledTrip.of(id("1")).withStopTimes(List.of(STOP_TIME, STOP_TIME)).build();
 
     var calculator = trip.decorateFlexPathCalculator(STATIC_CALCULATOR);
     var path = calculator.calculateFlexPath(V1, V2, 0, 0);
@@ -37,7 +37,7 @@ class UnscheduledDrivingDurationTest {
   @Test
   void withPenalty() {
     var trip = UnscheduledTrip.of(id("1"))
-      .withStopTimes(List.of(STOP_TIME))
+      .withStopTimes(List.of(STOP_TIME, STOP_TIME))
       .withTimePenalty(TimePenalty.of(Duration.ofMinutes(2), 1.5f))
       .build();
 

@@ -567,6 +567,7 @@ public class TestHalfEdges {
       var container = new TemporaryVerticesContainer(
         graph,
         TestVertexLinker.of(graph),
+        id -> Set.of(),
         walking.from(),
         walking.to(),
         StreetMode.WALK,

@@ -36,7 +36,7 @@ for building all bundles, while a bundle is responsible for importing a Netex bu
 zip-file with a Netex data set. You may start OTP with as many bundles as you like, and you may mix
 GTFS and NeTEx bundles in the same build.
 
-![Design overview](images/DegignOverview.png)
+![Design overview](images/DesignOverview.png)
 
 The Netex files are _xml-files_ and one data set can be more than 5 GB in size. There is no fixed
 relationship between file names and content like it is in GTFS, where for example `stops.txt`
@@ -88,7 +88,7 @@ doing the validation in a separate step ensure all entities is available when do
 If an entity or a required relation is missing the validator should remove the invalid entity. This
 make the mapping easier, because the mapper can assume all required data and entities exist.
 
-![Collaboration diagram](images/Colaboration.png)
+![Collaboration diagram](images/Collaboration.png)
 
 Here is an outline of the process including the file-hierarchy traversal and the steps at each
 level:

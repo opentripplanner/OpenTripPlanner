@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.flex;
 
-import static org.opentripplanner.model.PickDrop.NONE;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -54,6 +52,15 @@ public class FlexTripsMapper {
           trip.getId()
         );
         // result.add(new ContinuousPickupDropOffTrip(trip, stopTimes));
+      } else if (
+        stopTimes.size() < 2 &&
+        stopTimes.stream().anyMatch(st -> st.hasFlexWindow() || st.hasFlexibleStop())
+      ) {
+        store.add(
+          "InvalidFlexTrip",
+          "Trip %s defines only a single stop time, which is invalid: https://gtfs.org/documentation/schedule/examples/flex/",
+          trip.getId()
+        );
       }
 
       //Keep lambda! A method-ref would cause incorrect class and line number to be logged
@@ -63,13 +70,5 @@ public class FlexTripsMapper {
     LOG.info(progress.completeMessage());
     LOG.info("Done creating flex trips. Created a total of {} trips.", result.size());
     return result;
-  }
-
-  private static boolean hasContinuousStops(List<StopTime> stopTimes) {
-    return stopTimes
-      .stream()
-      .anyMatch(
-        st -> st.getFlexContinuousPickup() != NONE || st.getFlexContinuousDropOff() != NONE
-      );
   }
 }

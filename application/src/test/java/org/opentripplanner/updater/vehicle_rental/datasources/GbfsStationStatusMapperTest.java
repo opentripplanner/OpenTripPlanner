@@ -22,10 +22,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleDocksAvailable;
 import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleTypesAvailable;
-import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
-import org.opentripplanner.service.vehiclerental.model.ReturnPolicy;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.street.model.RentalFormFactor;
 

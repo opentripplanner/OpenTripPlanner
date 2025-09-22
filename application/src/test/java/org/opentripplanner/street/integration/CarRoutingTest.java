@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -136,6 +137,7 @@ public class CarRoutingTest {
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
       TestVertexLinker.of(graph),
+      id -> List.of(),
       from,
       to,
       StreetMode.CAR,
