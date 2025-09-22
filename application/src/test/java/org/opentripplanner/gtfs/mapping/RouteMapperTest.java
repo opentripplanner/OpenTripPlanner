@@ -55,6 +55,7 @@ class RouteMapperTest {
   private final RouteMapper subject = new RouteMapper(
     ID_FACTORY,
     new AgencyMapper(ID_FACTORY),
+    new RouteNetworkAssignmentMapper(ID_FACTORY),
     DataImportIssueStore.NOOP,
     new TranslationHelper()
   );
