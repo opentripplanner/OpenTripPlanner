@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -234,28 +235,17 @@ public class TemporaryVerticesContainerBuilder {
       .toList();
 
     var results = new HashSet<Vertex>();
-    if (!modes.stream().allMatch(TraverseMode::isInCar) && location.stopId != null) {
-      results.addAll(getStreetVerticesForStop(location));
-    }
-
-    if (modes.stream().anyMatch(TraverseMode::isInCar)) {
-      // Fetch coordinate from stop, if not given in request
-      if (location.stopId != null && location.getCoordinate() == null) {
-        var stopVertex = graph.getStopVertex(location.stopId);
-        if (stopVertex != null) {
-          var c = stopVertex.getStop().getCoordinate();
-          location = new GenericLocation(
-            location.label,
-            location.stopId,
-            c.latitude(),
-            c.longitude()
-          );
-        }
+    if (location.stopId != null) {
+      if (!modes.stream().allMatch(TraverseMode::isInCar)) {
+        results.addAll(getStreetVerticesForStop(location));
       }
-    }
-
-    // Check if coordinate is provided and connect it to graph
-    if (location.getCoordinate() != null) {
+      if (modes.stream().anyMatch(TraverseMode::isInCar)) {
+        // Ensure that there is a car routable vertex (that can originate from stop's coordinate).
+        var carRoutableVertex = getCarRoutableStreetVertex(location, type);
+        carRoutableVertex.ifPresent(results::add);
+      }
+    } else if (location.getCoordinate() != null) {
+      // Connect a temporary vertex from coordinate to graph
       results.add(
         createVertexFromCoordinate(location.getCoordinate(), location.label, modes, type)
       );
@@ -283,6 +273,36 @@ public class TemporaryVerticesContainerBuilder {
       return childVertices.stream().map(Vertex.class::cast).collect(Collectors.toUnmodifiableSet());
     }
     return Set.of();
+  }
+
+  /**
+   * We need to use coordinates of the stop for cars as an alternative as not all stops are routable
+   * with cars.
+   */
+  private Optional<Vertex> getCarRoutableStreetVertex(GenericLocation location, LocationType type) {
+    // Fetch coordinate from stop, if not given in request
+    if (location.getCoordinate() == null) {
+      var stopVertex = graph.getStopVertex(location.stopId);
+      if (stopVertex != null) {
+        var c = stopVertex.getStop().getCoordinate();
+        location = new GenericLocation(
+          location.label,
+          location.stopId,
+          c.latitude(),
+          c.longitude()
+        );
+      }
+    }
+    return location.getCoordinate() != null
+      ? Optional.of(
+        createVertexFromCoordinate(
+          location.getCoordinate(),
+          location.label,
+          List.of(TraverseMode.CAR),
+          type
+        )
+      )
+      : Optional.empty();
   }
 
   private TraverseMode getTraverseModeForLinker(StreetMode streetMode, LocationType type) {
