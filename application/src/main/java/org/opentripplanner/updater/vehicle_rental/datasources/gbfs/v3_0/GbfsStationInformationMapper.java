@@ -66,8 +66,6 @@ class GbfsStationInformationMapper {
           GBFSShortName::getText
         )
       )
-      // TODO: Convert geometry
-      // .withStationArea(station.getStationArea())
       .withCapacity(station.getCapacity() != null ? station.getCapacity().intValue() : null)
       .withIsArrivingInRentalVehicleAtDestinationAllowed(allowKeepingRentedVehicleAtDestination)
       .withOverloadingAllowed(overloadingAllowed);
