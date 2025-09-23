@@ -199,10 +199,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   public TestItineraryBuilder flex(int start, int end, Place to) {
-    return flex(route("flex").build(), start, end, to);
-  }
-
-  public TestItineraryBuilder flex(Route route, int start, int end, Place to) {
     if (lastPlace == null) {
       throw new IllegalStateException("Trip from place is unknown!");
     }
@@ -217,7 +213,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     toStopTime.setFlexWindowStart(start);
     toStopTime.setFlexWindowEnd(end);
 
-    Trip trip = trip("1", route);
+    Trip trip = trip("1", route("flex").build());
 
     var flexTrip = UnscheduledTrip.of(id("flex-1"))
       .withStopTimes(List.of(fromStopTime, toStopTime))

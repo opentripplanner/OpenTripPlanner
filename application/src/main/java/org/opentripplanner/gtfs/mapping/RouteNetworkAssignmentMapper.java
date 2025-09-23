@@ -28,6 +28,9 @@ class RouteNetworkAssignmentMapper {
     });
   }
 
+  /**
+   * For the route id given in {@code route}, find all networks that are assigned to it.
+   */
   Collection<FeedScopedId> findNetworks(FeedScopedId route) {
     return assignments.get(route);
   }
