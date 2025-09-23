@@ -1,18 +1,24 @@
 package org.opentripplanner.ext.vehiclerentalservicedirectory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.mobilitydata.gbfs.v3_0.manifest.GBFSDataset;
+import org.mobilitydata.gbfs.v3_0.manifest.GBFSManifest;
+import org.mobilitydata.gbfs.v3_0.manifest.GBFSVersion;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.framework.json.JsonUtils;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.updater.spi.GraphUpdater;
@@ -24,8 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Fetches GBFS endpoints from the micromobility aggregation service located at
- * https://github.com/entur/lamassu, which is an API for aggregating GBFS endpoints.
+ * Fetches GBFS endpoints from a GBFS v3 manifest.json file.
+ * The manifest can be loaded from a remote URL or a local file.
  */
 public class VehicleRentalServiceDirectoryFetcher {
 
@@ -33,6 +39,9 @@ public class VehicleRentalServiceDirectoryFetcher {
     VehicleRentalServiceDirectoryFetcher.class
   );
   private static final Duration DEFAULT_FREQUENCY = Duration.ofSeconds(15);
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+    .registerModule(new JavaTimeModule())
+    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
   private final VertexLinker vertexLinker;
   private final VehicleRentalRepository repository;
@@ -53,15 +62,18 @@ public class VehicleRentalServiceDirectoryFetcher {
     VertexLinker vertexLinker,
     VehicleRentalRepository repository
   ) {
-    LOG.info("Fetching list of updaters from {}", parameters.getUrl());
+    LOG.info("Fetching GBFS v3 manifest from {}", parameters.getUrl());
 
-    var sources = listSources(parameters);
+    var manifest = loadManifest(parameters);
 
-    if (sources.isEmpty()) {
+    if (
+      manifest == null || manifest.getData() == null || manifest.getData().getDatasets() == null
+    ) {
+      LOG.warn("No datasets found in manifest from {}", parameters.getUrl());
       return List.of();
     }
 
-    int maxHttpConnections = sources.size();
+    int maxHttpConnections = manifest.getData().getDatasets().size();
     var otpHttpClientFactory = new OtpHttpClientFactory(maxHttpConnections);
 
     var serviceDirectory = new VehicleRentalServiceDirectoryFetcher(
@@ -69,59 +81,74 @@ public class VehicleRentalServiceDirectoryFetcher {
       repository,
       otpHttpClientFactory
     );
-    return serviceDirectory.createUpdatersFromEndpoint(parameters, sources);
+    return serviceDirectory.createUpdatersFromManifest(parameters, manifest);
   }
 
-  public List<GraphUpdater> createUpdatersFromEndpoint(
+  public List<GraphUpdater> createUpdatersFromManifest(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
-    JsonNode sources
+    GBFSManifest manifest
   ) {
     return fetchUpdaterInfoFromDirectoryAndCreateUpdaters(
-      buildListOfNetworksFromConfig(parameters, sources)
+      buildListOfNetworksFromManifest(parameters, manifest)
     );
   }
 
-  private static List<GbfsVehicleRentalDataSourceParameters> buildListOfNetworksFromConfig(
+  private static List<GbfsVehicleRentalDataSourceParameters> buildListOfNetworksFromManifest(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
-    JsonNode sources
+    GBFSManifest manifest
   ) {
     List<GbfsVehicleRentalDataSourceParameters> dataSources = new ArrayList<>();
 
-    for (JsonNode source : sources) {
-      Optional<String> network = JsonUtils.asText(source, parameters.getSourceNetworkName());
-      Optional<String> updaterUrl = JsonUtils.asText(source, parameters.getSourceUrlName());
+    for (GBFSDataset dataset : manifest.getData().getDatasets()) {
+      String networkName = dataset.getSystemId();
+      Optional<String> gbfsUrl = selectBestVersion(dataset);
 
-      if (network.isEmpty() || updaterUrl.isEmpty()) {
-        LOG.warn(
-          "Error reading json from {}. Are json tag names configured properly?",
-          parameters.getUrl()
+      if (gbfsUrl.isEmpty()) {
+        LOG.warn("No suitable GBFS version found for system {}", networkName);
+        continue;
+      }
+
+      var config = parameters.networkParameters(networkName);
+
+      if (config.isPresent()) {
+        var networkParams = config.get();
+        dataSources.add(
+          new GbfsVehicleRentalDataSourceParameters(
+            gbfsUrl.get(),
+            parameters.getLanguage(),
+            networkParams.allowKeepingAtDestination(),
+            parameters.getHeaders(),
+            networkName,
+            networkParams.geofencingZones(),
+            // overloadingAllowed - not part of GBFS, not supported here
+            false,
+            // rentalPickupType not supported
+            RentalPickupType.ALL
+          )
         );
       } else {
-        var networkName = network.get();
-        var config = parameters.networkParameters(networkName);
-
-        if (config.isPresent()) {
-          var networkParams = config.get();
-          dataSources.add(
-            new GbfsVehicleRentalDataSourceParameters(
-              updaterUrl.get(),
-              parameters.getLanguage(),
-              networkParams.allowKeepingAtDestination(),
-              parameters.getHeaders(),
-              networkName,
-              networkParams.geofencingZones(),
-              // overloadingAllowed - not part of GBFS, not supported here
-              false,
-              // rentalPickupType not supported
-              RentalPickupType.ALL
-            )
-          );
-        } else {
-          LOG.warn("Network not configured in OTP: {}", networkName);
-        }
+        LOG.warn("Network not configured in OTP: {}", networkName);
       }
     }
     return dataSources;
+  }
+
+  /**
+   * Selects the best (newest) GBFS version from the available versions for a dataset.
+   * Prefers v3.0 over v2.x versions.
+   */
+  private static Optional<String> selectBestVersion(GBFSDataset dataset) {
+    if (dataset.getVersions() == null || dataset.getVersions().isEmpty()) {
+      return Optional.empty();
+    }
+
+    // Sort versions by version number (descending) to prefer newer versions
+    return dataset
+      .getVersions()
+      .stream()
+      .sorted(Comparator.comparing(GBFSVersion::getVersion).reversed())
+      .map(GBFSVersion::getUrl)
+      .findFirst();
   }
 
   private List<GraphUpdater> fetchUpdaterInfoFromDirectoryAndCreateUpdaters(
@@ -153,31 +180,31 @@ public class VehicleRentalServiceDirectoryFetcher {
     return new VehicleRentalUpdater(vehicleRentalParameters, dataSource, vertexLinker, repository);
   }
 
-  private static JsonNode listSources(VehicleRentalServiceDirectoryFetcherParameters parameters) {
-    JsonNode node;
+  private static GBFSManifest loadManifest(
+    VehicleRentalServiceDirectoryFetcherParameters parameters
+  ) {
     URI url = parameters.getUrl();
-    try {
-      var otpHttpClient = new OtpHttpClientFactory().create(LOG);
-      node = otpHttpClient.getAndMapAsJsonNode(url, Map.of(), new ObjectMapper());
-    } catch (OtpHttpClientException e) {
-      LOG.warn("Error fetching list of vehicle rental endpoints from {}", url, e);
-      return MissingNode.getInstance();
-    }
-    if (node == null) {
-      LOG.warn("Error reading json from {}. Node is null!", url);
-      return MissingNode.getInstance();
-    }
 
-    String sourcesName = parameters.getSourcesName();
-    JsonNode sources = node.get(sourcesName);
-    if (sources == null) {
-      LOG.warn(
-        "Error reading json from {}. No JSON node for sources name '{}' found.",
-        url,
-        sourcesName
-      );
-      return MissingNode.getInstance();
+    try {
+      String manifestContent;
+
+      // Check if URL is a file path
+      if ("file".equals(url.getScheme())) {
+        Path filePath = Path.of(url.getPath());
+        manifestContent = Files.readString(filePath);
+        LOG.info("Loaded GBFS manifest from file: {}", filePath);
+      } else {
+        // Load from remote URL
+        var otpHttpClient = new OtpHttpClientFactory().create(LOG);
+        var jsonNode = otpHttpClient.getAndMapAsJsonNode(url, Map.of(), OBJECT_MAPPER);
+        manifestContent = OBJECT_MAPPER.writeValueAsString(jsonNode);
+        LOG.info("Loaded GBFS manifest from URL: {}", url);
+      }
+
+      return OBJECT_MAPPER.readValue(manifestContent, GBFSManifest.class);
+    } catch (OtpHttpClientException | IOException e) {
+      LOG.error("Error loading GBFS manifest from {}", url, e);
+      return null;
     }
-    return sources;
   }
 }
