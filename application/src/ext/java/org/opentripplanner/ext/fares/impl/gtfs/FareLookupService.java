@@ -22,7 +22,6 @@ import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
-import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -276,15 +275,16 @@ class FareLookupService implements Serializable {
   private boolean matchesDistance(ScheduledTransitLeg leg, FareLegRule rule) {
     // If no valid distance type is given, do not consider distances in fare computation
     FareDistance distance = rule.fareDistance();
-    if (distance instanceof FareDistance.Stops(int min, int max)) {
+    if (distance instanceof FareDistance.Stops stopDistance) {
       var numStops = leg.listIntermediateStops().size();
-      return numStops >= min && max >= numStops;
-    } else if (
-      rule.fareDistance() instanceof FareDistance.LinearDistance(Distance min, Distance max)
-    ) {
+      return numStops >= stopDistance.min() && stopDistance.max() >= numStops;
+    } else if (rule.fareDistance() instanceof FareDistance.LinearDistance linearDistance) {
       var legDistance = leg.directDistanceMeters();
 
-      return legDistance > min.toMeters() && legDistance < max.toMeters();
+      return (
+        legDistance > linearDistance.min().toMeters() &&
+        legDistance < linearDistance.max().toMeters()
+      );
     } else return true;
   }
 
