@@ -181,34 +181,6 @@ public abstract class SnapshotTestBase {
     logDebugInformationOnFailure(request, () -> expectItinerariesToMatchSnapshot(itineraries));
   }
 
-  protected void expectArriveByToMatchDepartAtAndSnapshot(RouteRequest request) {
-    List<Itinerary> departByItineraries = retrieveItineraries(request);
-
-    logDebugInformationOnFailure(request, () -> assertFalse(departByItineraries.isEmpty()));
-
-    logDebugInformationOnFailure(request, () ->
-      expectItinerariesToMatchSnapshot(departByItineraries)
-    );
-
-    RouteRequest arriveBy = request
-      .copyOf()
-      .withArriveBy(true)
-      .withDateTime(departByItineraries.get(0).legs().getLast().endTime().toInstant())
-      .buildRequest();
-
-    List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy);
-
-    var departAtItinerary = departByItineraries.get(0);
-    var arriveByItinerary = arriveByItineraries.get(0);
-
-    logDebugInformationOnFailure(arriveBy, () ->
-      assertEquals(
-        asJsonString(itineraryMapper.mapItinerary(departAtItinerary)),
-        asJsonString(itineraryMapper.mapItinerary(arriveByItinerary))
-      )
-    );
-  }
-
   protected void expectItinerariesToMatchSnapshot(List<Itinerary> itineraries) {
     expect(itineraryMapper.mapItineraries(itineraries))
       .serializer(snapshotSerializer)
