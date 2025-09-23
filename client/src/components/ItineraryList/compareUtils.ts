@@ -75,7 +75,9 @@ export const getItinerarySummary = (tripPattern: TripPatternType, timeZone: stri
 export const createLegOptions = (legs: LegType[], itineraryNumber: number, timeZone: string): LegOption[] => {
   return legs.map((leg, index) => {
     const legId = leg.id || `leg${itineraryNumber}_${index}`;
-    const label = `${leg.mode}${leg.line?.publicCode ? ` (${leg.line.publicCode})` : ''} - ${formatTime(leg.aimedStartTime, timeZone, 'short')} to ${formatTime(leg.aimedEndTime, timeZone, 'short')}`;
+    const fromName = leg.fromPlace?.name || 'Unknown';
+    const toName = leg.toPlace?.name || 'Unknown';
+    const label = `${leg.mode}${leg.line?.publicCode ? ` (${leg.line.publicCode})` : ''} | ${fromName} → ${toName} | ${formatTime(leg.aimedStartTime, timeZone, 'short')} to ${formatTime(leg.aimedEndTime, timeZone, 'short')}`;
     return {
       value: legId,
       label: label,
