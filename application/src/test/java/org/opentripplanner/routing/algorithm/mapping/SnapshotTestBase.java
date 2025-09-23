@@ -2,8 +2,6 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import static au.com.origin.snapshots.SnapshotMatcher.expect;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_TIME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import au.com.origin.snapshots.serializers.SerializerType;
 import au.com.origin.snapshots.serializers.SnapshotSerializer;

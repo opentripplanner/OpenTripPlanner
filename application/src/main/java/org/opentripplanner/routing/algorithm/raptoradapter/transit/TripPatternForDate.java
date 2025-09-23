@@ -168,7 +168,6 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
   /**
    * The natural key of a TripPatternForDate is the pair (routing trip pattern id, service date).
-   * TODO: align equals and hashcode to use only the pair (routing trip pattern id, service date)
    */
   @Override
   public boolean equals(Object o) {
@@ -180,12 +179,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     }
     TripPatternForDate that = (TripPatternForDate) o;
 
-    return (
-      tripPattern.equals(that.tripPattern) &&
-      serviceDate.equals(that.serviceDate) &&
-      Arrays.equals(tripTimes, that.tripTimes) &&
-      Arrays.equals(frequencies, that.frequencies)
-    );
+    return (tripPattern.equals(that.tripPattern) && serviceDate.equals(that.serviceDate));
   }
 
   @Override
