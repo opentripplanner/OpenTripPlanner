@@ -15,7 +15,6 @@ import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
-import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.standalone.config.debuguiconfig.BackgroundTileLayer;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;

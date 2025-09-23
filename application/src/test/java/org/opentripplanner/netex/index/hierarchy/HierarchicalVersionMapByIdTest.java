@@ -17,7 +17,6 @@ import com.google.common.collect.Multimap;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class HierarchicalVersionMapByIdTest {

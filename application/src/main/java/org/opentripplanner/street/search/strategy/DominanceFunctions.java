@@ -76,6 +76,13 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
      *
      * More discussion: https://github.com/opentripplanner/OpenTripPlanner/issues/3393
      *
+     * In addition, the best result may not always be found because, due to the turn cost depending on
+     * where you come from, we may not always visit the node from the edge producing the optimal cost
+     * including turns. As a result of this non-optimality, we no longer guarantee that a depart-from
+     * and an arrive-by search will always return the same result.
+     *
+     * Issue: https://github.com/opentripplanner/OpenTripPlanner/issues/6768
+     *
      * == Bicycles ==
      *
      * We used to allow also loops for bicycles as turn restrictions also apply to them, however

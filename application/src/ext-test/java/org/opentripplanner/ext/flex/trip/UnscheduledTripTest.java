@@ -62,6 +62,7 @@ class UnscheduledTripTest {
     static List<List<StopTime>> notUnscheduled() {
       return List.of(
         List.of(),
+        List.of(UNSCHEDULED_STOP),
         List.of(SCHEDULED_STOP),
         List.of(SCHEDULED_STOP, SCHEDULED_STOP),
         List.of(SCHEDULED_STOP, SCHEDULED_STOP, SCHEDULED_STOP),
@@ -80,7 +81,6 @@ class UnscheduledTripTest {
 
     static List<List<StopTime>> unscheduled() {
       return List.of(
-        List.of(UNSCHEDULED_STOP),
         List.of(UNSCHEDULED_STOP, SCHEDULED_STOP),
         List.of(SCHEDULED_STOP, UNSCHEDULED_STOP),
         List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP),

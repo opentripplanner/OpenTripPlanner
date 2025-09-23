@@ -4,7 +4,6 @@ import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.model.OsmEntity;
-import org.opentripplanner.osm.model.TraverseDirection;
 
 class ExactMatchSpecifierTest extends SpecifierTest {
 

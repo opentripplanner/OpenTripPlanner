@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.utils.collection.ListUtils;
 
 /**
