@@ -17,9 +17,9 @@ public final class Frequency implements Serializable {
 
   private int headwaySecs;
 
-  private int exactTimes = 0;
+  private int exactTimes;
 
-  private int labelOnly = 0;
+  private int labelOnly;
 
   public Trip getTrip() {
     return trip;

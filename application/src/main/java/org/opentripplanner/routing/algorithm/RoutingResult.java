@@ -18,7 +18,7 @@ class RoutingResult {
 
   private final List<Itinerary> itineraries = new ArrayList<>();
   private final Set<RoutingError> errors = new HashSet<>();
-  private boolean removeWalkAllTheWayResults = false;
+  private boolean removeWalkAllTheWayResults;
 
   RoutingResult(
     Collection<Itinerary> itineraries,

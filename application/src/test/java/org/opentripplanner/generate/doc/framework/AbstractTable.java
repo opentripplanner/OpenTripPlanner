@@ -21,7 +21,7 @@ abstract class AbstractTable {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTable.class);
 
   private final SkipNodes skipNodes;
-  private int rootLevel = 0;
+  private int rootLevel;
 
   public AbstractTable(SkipNodes skipNodes) {
     this.skipNodes = skipNodes;

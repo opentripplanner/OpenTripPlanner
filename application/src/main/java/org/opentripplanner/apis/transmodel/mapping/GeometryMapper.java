@@ -32,4 +32,6 @@ public class GeometryMapper {
 
     return stopToStopGeometries;
   }
+
+  private GeometryMapper() {}
 }

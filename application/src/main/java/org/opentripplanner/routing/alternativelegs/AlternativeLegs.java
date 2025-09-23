@@ -295,4 +295,6 @@ public class AlternativeLegs {
     TripPattern tripPattern,
     BoardingAlightingPositions positions
   ) {}
+
+  private AlternativeLegs() {}
 }

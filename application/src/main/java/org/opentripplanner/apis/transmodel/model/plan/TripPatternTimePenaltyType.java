@@ -72,4 +72,6 @@ public class TripPatternTimePenaltyType {
   static TripPlanTimePenaltyDto penalty(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
+
+  private TripPatternTimePenaltyType() {}
 }

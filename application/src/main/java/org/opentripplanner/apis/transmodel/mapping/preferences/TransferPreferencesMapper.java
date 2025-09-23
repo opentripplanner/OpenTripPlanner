@@ -19,4 +19,6 @@ public class TransferPreferencesMapper {
     callWith.argument("maximumTransfers", transfer::withMaxTransfers);
     callWith.argument("maximumAdditionalTransfers", transfer::withMaxAdditionalTransfers);
   }
+
+  private TransferPreferencesMapper() {}
 }

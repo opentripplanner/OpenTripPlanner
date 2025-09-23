@@ -84,7 +84,7 @@ public class TransferMapper {
     var sjId = sjRef.getRef();
     var trip = findTrip(label, "Journey", interchangeId, sjId);
     int stopPos = findStopPosition(interchangeId, label, "Point", sjId, pointRef);
-    return (trip == null || stopPos < 0) ? null : new TripTransferPoint(trip, stopPos);
+    return trip == null || stopPos < 0 ? null : new TripTransferPoint(trip, stopPos);
   }
 
   @Nullable

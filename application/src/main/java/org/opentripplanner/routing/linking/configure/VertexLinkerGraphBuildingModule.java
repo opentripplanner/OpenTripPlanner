@@ -23,4 +23,6 @@ public class VertexLinkerGraphBuildingModule {
     var mode = VisibilityMode.ofBoolean(config.areaVisibility);
     return new VertexLinker(graph, mode, config.maxAreaNodes);
   }
+
+  private VertexLinkerGraphBuildingModule() {}
 }

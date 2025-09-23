@@ -100,4 +100,6 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
         )
       );
   }
+
+  private VehicleRentalServiceDirectoryFetcherConfig() {}
 }

@@ -17,4 +17,6 @@ public class URIUtils {
       throw new RuntimeException(e);
     }
   }
+
+  private URIUtils() {}
 }

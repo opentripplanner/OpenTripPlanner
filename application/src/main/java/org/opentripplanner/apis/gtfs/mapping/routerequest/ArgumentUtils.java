@@ -43,12 +43,10 @@ public class ArgumentUtils {
    */
   @Nullable
   static Map<String, Object> getParking(DataFetchingEnvironment environment, String type) {
-    return (
-      (Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) ((Map<
-                String,
-                Object
-              >) environment.getArgument("preferences")).get("street")).get(type)).get("parking")
-    );
+    return (Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) ((Map<
+              String,
+              Object
+            >) environment.getArgument("preferences")).get("street")).get(type)).get("parking");
   }
 
   /**
@@ -114,4 +112,6 @@ public class ArgumentUtils {
         return tags.stream();
       });
   }
+
+  private ArgumentUtils() {}
 }

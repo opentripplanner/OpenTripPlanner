@@ -32,4 +32,6 @@ public class DataOverlayFactory {
       return null;
     }
   }
+
+  private DataOverlayFactory() {}
 }

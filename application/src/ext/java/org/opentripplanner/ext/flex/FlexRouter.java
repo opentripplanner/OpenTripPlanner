@@ -174,7 +174,7 @@ public class FlexRouter {
     final List<FlexServiceDate> dates = new ArrayList<>();
 
     // TODO - This code id not DRY, the same logic is in RaptorRoutingRequestTransitDataCreator
-    for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
+    for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; d++) {
       LocalDate date = searchDate.plusDays(d);
       dates.add(
         new FlexServiceDate(

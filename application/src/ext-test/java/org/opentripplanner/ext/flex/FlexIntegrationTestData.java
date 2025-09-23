@@ -59,4 +59,6 @@ public final class FlexIntegrationTestData {
     assertTrue(timetableRepository.hasFlexTrips());
     return new TestOtpModel(graph, timetableRepository);
   }
+
+  private FlexIntegrationTestData() {}
 }

@@ -30,4 +30,6 @@ public class RelativeDirectionMapper {
       case ENTER_OR_EXIT_STATION -> RelativeDirection.CONTINUE;
     };
   }
+
+  private RelativeDirectionMapper() {}
 }

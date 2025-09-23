@@ -73,7 +73,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   private final List<SearchContextViaLeg<T>> legs;
 
   /** Lazy initialized */
-  private RaptorCostCalculator<T> costCalculator = null;
+  private RaptorCostCalculator<T> costCalculator;
 
   SearchContext(
     RaptorRequest<T> request,

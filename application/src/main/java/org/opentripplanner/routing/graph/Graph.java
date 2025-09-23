@@ -78,7 +78,7 @@ public class Graph implements Serializable {
   private Geometry convexHull = null;
 
   /** True if OSM data was loaded into this Graph. */
-  public boolean hasStreets = false;
+  public boolean hasStreets;
 
   /**
    * The difference in meters between the WGS84 ellipsoid height and geoid height at the graph's
@@ -87,13 +87,13 @@ public class Graph implements Serializable {
   public Double ellipsoidToGeoidDifference = 0.0;
 
   /** True if this graph contains elevation data. */
-  public boolean hasElevation = false;
+  public boolean hasElevation;
 
   /** If this graph contains elevation data, the minimum elevation value. Otherwise null. */
-  public Double minElevation = null;
+  public Double minElevation;
 
   /** If this graph contains elevation data, the maximum elevation value. Otherwise null. */
-  public Double maxElevation = null;
+  public Double maxElevation;
 
   /**
    * The horizontal distance across the ground between successive elevation samples in
@@ -110,7 +110,7 @@ public class Graph implements Serializable {
    * split per edge. This is going to fail as soon as we load a base OSM graph and build transit on
    * top of it.
    */
-  public long nextSplitNumber = 0;
+  public long nextSplitNumber;
 
   /**
    * DataOverlay Sandbox module parameter bindings configured in the build-config, and needed when

@@ -200,4 +200,6 @@ public class TimetabledPassingTimeType {
       return value;
     }
   }
+
+  private TimetabledPassingTimeType() {}
 }

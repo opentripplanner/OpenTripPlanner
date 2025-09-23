@@ -26,8 +26,8 @@ public class ElevationProfile {
   private static final ElevationProfile EMPTY = new ElevationProfile();
   private final List<Step> steps;
 
-  private Double gained = null;
-  private Double lost = null;
+  private Double gained;
+  private Double lost;
 
   private ElevationProfile() {
     this.steps = List.of();
@@ -112,8 +112,12 @@ public class ElevationProfile {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     ElevationProfile that = (ElevationProfile) o;
     return Objects.equals(steps, that.steps);
   }
@@ -195,8 +199,12 @@ public class ElevationProfile {
 
     @Override
     public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
       var that = (Step) o;
       return that.x == x && that.y == y;
     }
@@ -268,7 +276,7 @@ public class ElevationProfile {
      * Remove repeated values, preserving the first and last value
      */
     private void removeDuplicateSteps() {
-      for (int i = steps.size() - 3; i >= 0; --i) {
+      for (int i = steps.size() - 3; i >= 0; i--) {
         var first = steps.get(i);
         var second = steps.get(i + 1);
         var third = steps.get(i + 2);

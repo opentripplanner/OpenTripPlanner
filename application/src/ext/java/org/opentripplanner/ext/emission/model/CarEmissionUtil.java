@@ -17,4 +17,6 @@ public class CarEmissionUtil {
     Gram carCo2PerMeterPerPerson = carCo2PerKm.dividedBy(1000).dividedBy(carAvgOccupancy);
     return carCo2PerMeterPerPerson;
   }
+
+  private CarEmissionUtil() {}
 }

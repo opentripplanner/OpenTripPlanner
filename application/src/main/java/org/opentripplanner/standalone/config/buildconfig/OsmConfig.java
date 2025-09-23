@@ -95,4 +95,6 @@ public class OsmConfig {
           .asBoolean(defaults.includeOsmSubwayEntrances())
       );
   }
+
+  private OsmConfig() {}
 }

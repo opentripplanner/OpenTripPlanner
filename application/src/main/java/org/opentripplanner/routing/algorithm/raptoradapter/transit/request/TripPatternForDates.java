@@ -99,7 +99,7 @@ public class TripPatternForDates
 
     var tripIndex = createTripTimesForDaysIndex(tripPatternForDates, offsets);
 
-    for (int i = 0; i < tripIndex.size(); ++i) {
+    for (int i = 0; i < tripIndex.size(); i++) {
       int day = tripIndex.day(i);
       int offset = this.offsets[day];
       var tt = tripPatternForDates[day].tripTimes().get(tripIndex.tripIndexForDay(i));

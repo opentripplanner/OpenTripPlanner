@@ -58,4 +58,6 @@ public class DataOverlayConfigMapper {
       c.of("formula").since(NA).summary("TODO").asString()
     );
   }
+
+  private DataOverlayConfigMapper() {}
 }

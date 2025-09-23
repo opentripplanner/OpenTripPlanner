@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 public class TripPatternForDateMapperTest {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2009, 8, 7);
   private static final int SERVICE_CODE = 555;

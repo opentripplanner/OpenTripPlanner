@@ -13,4 +13,6 @@ public class JsonUtils {
     String value = valueNode.asText();
     return value.isEmpty() ? Optional.empty() : Optional.of(value);
   }
+
+  private JsonUtils() {}
 }

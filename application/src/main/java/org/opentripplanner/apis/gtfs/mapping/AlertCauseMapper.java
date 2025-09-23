@@ -31,4 +31,6 @@ public class AlertCauseMapper {
       case MEDICAL_EMERGENCY -> GraphQLAlertCauseType.MEDICAL_EMERGENCY;
     };
   }
+
+  private AlertCauseMapper() {}
 }

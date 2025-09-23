@@ -13,4 +13,6 @@ public class ServiceDeliveryMapper {
       .withResponseTimestamp(new XmlDateTime(timestamp.truncatedTo(ChronoUnit.MILLIS)))
       .withProducerRef(new ParticipantRefStructure().withValue("OpenTripPlanner"));
   }
+
+  private ServiceDeliveryMapper() {}
 }

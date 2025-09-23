@@ -32,4 +32,6 @@ public class GtfsRealtimeAlertsUpdaterConfig {
       HttpHeadersConfig.headers(c, V2_3)
     );
   }
+
+  private GtfsRealtimeAlertsUpdaterConfig() {}
 }

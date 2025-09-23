@@ -57,4 +57,6 @@ class IssueColors {
     // Use modulo to start over if the number of issues is larger then the list of colors
     return BG_COLORS[ASSIGNED_COLOR.size() % BG_COLORS.length];
   }
+
+  private IssueColors() {}
 }

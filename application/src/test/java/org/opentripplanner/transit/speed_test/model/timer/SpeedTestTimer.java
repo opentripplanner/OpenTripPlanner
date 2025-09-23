@@ -40,7 +40,7 @@ public class SpeedTestTimer {
   );
   private final MeterRegistry uploadRegistry = MeterRegistrySetup.getRegistry().orElse(null);
 
-  private boolean groupResultByTestCaseCategory = false;
+  private boolean groupResultByTestCaseCategory;
 
   public static int nanosToMillisecond(long nanos) {
     return (int) (nanos / NANOS_TO_MILLIS);

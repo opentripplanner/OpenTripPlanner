@@ -108,4 +108,6 @@ class MeterRegistrySetup {
       return new CumulativeCounter(id);
     }
   }
+
+  private MeterRegistrySetup() {}
 }

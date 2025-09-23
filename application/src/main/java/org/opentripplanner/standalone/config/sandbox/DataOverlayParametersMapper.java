@@ -21,4 +21,6 @@ public class DataOverlayParametersMapper {
     }
     return builder.build();
   }
+
+  private DataOverlayParametersMapper() {}
 }

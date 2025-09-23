@@ -166,6 +166,8 @@ public class TransitRouter {
       OTPFeature.OptimizeTransfers.isOn() &&
       !transitResponse.containsUnknownPaths() &&
       // TODO VIA - This is temporary, we want pass via info in paths so transfer optimizer can
+      // TODO VIA - This is temporary, we want pass via info in paths so transfer optimizer can
+      //            skip legs containing via points.
       //            skip legs containing via points.
       request.allowTransferOptimization()
     ) {

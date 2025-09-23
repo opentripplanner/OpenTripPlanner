@@ -25,16 +25,16 @@ public class PageCursorFactory {
   private final SortOrder sortOrder;
   private final Duration newSearchWindow;
   private PageType currentPageType;
-  private Instant currentEdt = null;
-  private Instant currentLat = null;
-  private Duration currentSearchWindow = null;
+  private Instant currentEdt;
+  private Instant currentLat;
+  private Duration currentSearchWindow;
   private boolean wholeSearchWindowUsed = true;
-  private ItinerarySortKey itineraryPageCut = null;
-  private PageCursorInput pageCursorInput = null;
-  private Instant firstSearchLatestItineraryDeparture = null;
+  private ItinerarySortKey itineraryPageCut;
+  private PageCursorInput pageCursorInput;
+  private Instant firstSearchLatestItineraryDeparture;
 
-  private PageCursor nextCursor = null;
-  private PageCursor prevCursor = null;
+  private PageCursor nextCursor;
+  private PageCursor prevCursor;
 
   public PageCursorFactory(SortOrder sortOrder, Duration newSearchWindow) {
     this.sortOrder = sortOrder;

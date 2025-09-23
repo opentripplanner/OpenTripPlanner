@@ -18,4 +18,6 @@ class GtfsRealtimeMapper {
       }
     );
   }
+
+  private GtfsRealtimeMapper() {}
 }

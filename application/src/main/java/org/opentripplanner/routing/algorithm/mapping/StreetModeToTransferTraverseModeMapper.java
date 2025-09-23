@@ -18,4 +18,6 @@ public class StreetModeToTransferTraverseModeMapper {
       );
     };
   }
+
+  private StreetModeToTransferTraverseModeMapper() {}
 }

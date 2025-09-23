@@ -19,4 +19,6 @@ public class MultilingualStringMapper {
 
     return value;
   }
+
+  private MultilingualStringMapper() {}
 }

@@ -95,4 +95,6 @@ public class VehicleRentalConfig {
           .asStringSet(dft.bannedNetworks())
       );
   }
+
+  private VehicleRentalConfig() {}
 }

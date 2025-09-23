@@ -23,4 +23,6 @@ class VertexTypeMapper {
         throw new IllegalArgumentException(domain.toString());
     }
   }
+
+  private VertexTypeMapper() {}
 }

@@ -293,7 +293,7 @@ class ModifiedTripBuilder {
       }
     }
     var newStopPattern = builder.build();
-    return (pattern.isModified() && pattern.getStopPattern().equals(newStopPattern))
+    return pattern.isModified() && pattern.getStopPattern().equals(newStopPattern)
       ? Result.success(pattern.getStopPattern())
       : Result.success(newStopPattern);
   }

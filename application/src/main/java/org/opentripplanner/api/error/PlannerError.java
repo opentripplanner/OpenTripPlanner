@@ -9,7 +9,7 @@ public class PlannerError {
   public final int id;
   public final String msg;
   public final Message message;
-  public List<String> missing = null;
+  public List<String> missing;
 
   /** An error where no path has been found, but no points are missing */
   public PlannerError(Message msg) {

@@ -28,10 +28,10 @@ public class CompareIntArrays {
   private String hh = "";
   private String aValues = "";
   private String bValues = "";
-  private int aLess = 0;
-  private int bLess = 0;
-  private int aNotReached = 0;
-  private int bNotReached = 0;
+  private int aLess;
+  private int bLess;
+  private int aNotReached;
+  private int bNotReached;
 
   private CompareIntArrays(
     String label,
@@ -117,7 +117,7 @@ public class CompareIntArrays {
   }
 
   private void compareAll(int[] a, int[] b) {
-    for (int i = 0; i < a.length; ++i) {
+    for (int i = 0; i < a.length; i++) {
       int u = a[i];
       int v = b[i];
 
@@ -136,12 +136,17 @@ public class CompareIntArrays {
   }
 
   private void countDiff(int a, int b) {
-    if (a == unreached) aNotReached++;
-    else if (b == unreached) bNotReached++;
-    else {
+    if (a == unreached) {
+      aNotReached++;
+    } else if (b == unreached) {
+      bNotReached++;
+    } else {
       int c = comparator.compare(a, b);
-      if (c < 0) aLess++;
-      else if (c > 0) bLess++;
+      if (c < 0) {
+        aLess++;
+      } else if (c > 0) {
+        bLess++;
+      }
     }
   }
 

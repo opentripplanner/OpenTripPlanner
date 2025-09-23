@@ -54,4 +54,6 @@ public class PlannerErrorMapper {
 
     return api;
   }
+
+  private PlannerErrorMapper() {}
 }

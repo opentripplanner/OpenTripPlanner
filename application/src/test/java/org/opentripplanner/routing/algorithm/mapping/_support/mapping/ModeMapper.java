@@ -42,4 +42,6 @@ class ModeMapper {
       case TAXI -> "TAXI";
     };
   }
+
+  private ModeMapper() {}
 }

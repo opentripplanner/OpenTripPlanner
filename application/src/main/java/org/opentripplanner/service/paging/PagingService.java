@@ -29,7 +29,7 @@ public class PagingService {
   private final List<Itinerary> itineraries;
 
   // Lazy init
-  private PageCursorFactory pageCursorFactory = null;
+  private PageCursorFactory pageCursorFactory;
 
   public PagingService(
     List<Duration> pagingSearchWindowAdjustments,

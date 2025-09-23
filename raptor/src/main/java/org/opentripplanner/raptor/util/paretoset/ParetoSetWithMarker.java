@@ -8,7 +8,7 @@ package org.opentripplanner.raptor.util.paretoset;
  */
 public class ParetoSetWithMarker<T> extends ParetoSet<T> {
 
-  private int marker = 0;
+  private int marker;
 
   public ParetoSetWithMarker(ParetoComparator<T> comparator) {
     super(comparator);

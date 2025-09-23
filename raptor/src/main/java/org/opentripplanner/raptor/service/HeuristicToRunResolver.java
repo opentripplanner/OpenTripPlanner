@@ -51,4 +51,6 @@ class HeuristicToRunResolver {
       turnRevOn.run();
     }
   }
+
+  private HeuristicToRunResolver() {}
 }

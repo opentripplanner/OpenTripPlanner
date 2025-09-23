@@ -18,4 +18,6 @@ public class ItineraryFilterPreferencesMapper {
     );
     ItineraryFiltersInputType.mapToRequest(environment, callWith, itineraryFilter);
   }
+
+  private ItineraryFilterPreferencesMapper() {}
 }

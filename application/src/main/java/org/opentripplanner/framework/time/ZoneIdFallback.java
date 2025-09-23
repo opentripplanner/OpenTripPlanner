@@ -36,4 +36,6 @@ public class ZoneIdFallback {
       return id;
     }
   }
+
+  private ZoneIdFallback() {}
 }

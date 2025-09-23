@@ -339,7 +339,7 @@ public class OtpHttpClient {
       throw new OtpHttpClientException(e);
     }
     String proto = downloadUrl.getProtocol();
-    if (proto.equals("http") || proto.equals("https")) {
+    if ("http".equals(proto) || "https".equals(proto)) {
       return executeAndMap(request, timeout, headers, contentMapper);
     } else {
       // Local file probably, try standard java

@@ -15,4 +15,6 @@ class SetSupport {
   static <E extends Comparable<E>> List<E> sort(Collection<E> values) {
     return values.stream().sorted().collect(Collectors.toList());
   }
+
+  private SetSupport() {}
 }

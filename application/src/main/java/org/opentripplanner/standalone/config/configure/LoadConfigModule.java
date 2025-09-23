@@ -55,4 +55,6 @@ public class LoadConfigModule {
   static File baseDirectory(CommandLineParameters cli) {
     return cli.getBaseDirectory();
   }
+
+  private LoadConfigModule() {}
 }

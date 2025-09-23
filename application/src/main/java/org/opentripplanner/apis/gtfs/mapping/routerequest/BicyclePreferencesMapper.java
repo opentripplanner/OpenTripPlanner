@@ -163,4 +163,6 @@ public class BicyclePreferencesMapper {
       args.getGraphQLTime() != null
     );
   }
+
+  private BicyclePreferencesMapper() {}
 }

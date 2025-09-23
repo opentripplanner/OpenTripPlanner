@@ -159,4 +159,6 @@ public class TripType {
       )
       .build();
   }
+
+  private TripType() {}
 }

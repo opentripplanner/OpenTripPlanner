@@ -246,7 +246,7 @@ public class PruneIslands implements GraphBuilderModule {
         boolean onlyFerry = island.hasOnlyFerryStops();
         // do not remove real islands which have only ferry stops
         if (!onlyFerry && island.streetSize() < pruningThresholdWithStops * adaptivePruningFactor) {
-          double sizeCoeff = (adaptivePruningFactor > 1.0)
+          double sizeCoeff = adaptivePruningFactor > 1.0
             ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
             adaptivePruningDistance
             : 1.0;
@@ -261,7 +261,7 @@ public class PruneIslands implements GraphBuilderModule {
       } else {
         //for islands without stops
         if (island.streetSize() < pruningThresholdWithoutStops * adaptivePruningFactor) {
-          double sizeCoeff = (adaptivePruningFactor > 1.0)
+          double sizeCoeff = adaptivePruningFactor > 1.0
             ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
             adaptivePruningDistance
             : 1.0;

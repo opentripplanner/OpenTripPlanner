@@ -78,4 +78,6 @@ public class CarPreferencesMapper {
       preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
     }
   }
+
+  private CarPreferencesMapper() {}
 }

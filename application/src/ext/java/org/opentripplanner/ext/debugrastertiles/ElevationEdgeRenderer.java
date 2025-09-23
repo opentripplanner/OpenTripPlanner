@@ -61,7 +61,7 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
 
         var list = new ArrayList<EdgeSegmentColor>();
         var profile = streetEdge.getElevationProfile();
-        for (int i = 0; i < profile.size(); ++i) {
+        for (int i = 0; i < profile.size(); i++) {
           var point = profile.getCoordinate(i);
           if (i != 0) {
             list.add(new EdgeSegmentColor(point.x / edgeLength, color));

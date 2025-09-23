@@ -49,4 +49,6 @@ public class TriasApiConfig {
 
     return new TriasApiParameters(hideFeedId, hardcodedInputFeedId, timeZone);
   }
+
+  private TriasApiConfig() {}
 }

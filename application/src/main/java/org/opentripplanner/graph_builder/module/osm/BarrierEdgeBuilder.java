@@ -54,8 +54,8 @@ public class BarrierEdgeBuilder {
     var vs = vertices.toArray(new OsmVertex[0]);
     var inDegrees = Arrays.stream(vs).map(Vertex::getDegreeIn).toArray(Integer[]::new);
     var outDegrees = Arrays.stream(vs).map(Vertex::getDegreeOut).toArray(Integer[]::new);
-    for (var i = 0; i < vs.length; ++i) {
-      for (var j = 0; j < vs.length; ++j) {
+    for (var i = 0; i < vs.length; i++) {
+      for (var j = 0; j < vs.length; j++) {
         if (i != j) {
           var from = vs[i];
           var to = vs[j];

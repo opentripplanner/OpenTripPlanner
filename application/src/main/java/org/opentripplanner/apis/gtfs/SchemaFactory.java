@@ -217,4 +217,6 @@ public class SchemaFactory {
       return null;
     }
   }
+
+  private SchemaFactory() {}
 }

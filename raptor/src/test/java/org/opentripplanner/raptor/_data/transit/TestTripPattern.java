@@ -96,9 +96,9 @@ public class TestTripPattern implements RaptorTripPattern {
     private final String name;
     private int[] stopIndexes;
     private String restrictions;
-    private int slackIndex = 0;
-    private int patternIndex = 0;
-    private int priorityGroupId = 0;
+    private int slackIndex;
+    private int patternIndex;
+    private int priorityGroupId;
 
     public Builder(String name, int... stopIndexes) {
       this.name = name;

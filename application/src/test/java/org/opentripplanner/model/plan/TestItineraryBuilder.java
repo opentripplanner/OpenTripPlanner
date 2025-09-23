@@ -77,7 +77,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private final List<Leg> legs = new ArrayList<>();
   private Place lastPlace;
   private int lastEndTime;
-  private int c1 = 0;
+  private int c1;
   private boolean isSearchWindowAware = true;
 
   private TestItineraryBuilder(Place origin, int startTime) {
@@ -151,7 +151,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public TestItineraryBuilder rentedBicycle(int startTime, int endTime, Place to) {
     int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
     streetLeg(BICYCLE, startTime, endTime, to, legCost, List.of());
-    var leg = ((StreetLeg) this.legs.get(0));
+    var leg = (StreetLeg) this.legs.get(0);
     var updatedLeg = leg.copyOf().withRentedVehicle(true).build();
     this.legs.add(0, updatedLeg);
     return this;

@@ -83,4 +83,6 @@ public class GeneralizedCostParametersMapper {
     }
     return transitReluctance;
   }
+
+  private GeneralizedCostParametersMapper() {}
 }

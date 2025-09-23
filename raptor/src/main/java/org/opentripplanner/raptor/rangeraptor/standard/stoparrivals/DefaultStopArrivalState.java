@@ -42,7 +42,7 @@ class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArriv
 
   // Transfer
   private int transferFromStop = NOT_SET;
-  private RaptorTransfer transferPath = null;
+  private RaptorTransfer transferPath;
 
   DefaultStopArrivalState() {}
 

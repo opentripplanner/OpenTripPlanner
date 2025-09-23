@@ -113,4 +113,6 @@ public class ServerInfoType {
       )
       .build();
   }
+
+  private ServerInfoType() {}
 }

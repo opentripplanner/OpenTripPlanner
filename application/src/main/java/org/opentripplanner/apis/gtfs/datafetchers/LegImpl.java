@@ -309,19 +309,19 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
         boolean limitToExactOriginStop =
           originModesWithParentStation == null ||
-          !(originModesWithParentStation
-              .stream()
-              .map(GraphQLTypes.GraphQLTransitMode::toString)
-              .toList()
-              .contains(originalLeg.mode().name()));
+          !originModesWithParentStation
+            .stream()
+            .map(GraphQLTypes.GraphQLTransitMode::toString)
+            .toList()
+            .contains(originalLeg.mode().name());
 
         boolean limitToExactDestinationStop =
           destinationModesWithParentStation == null ||
-          !(destinationModesWithParentStation
-              .stream()
-              .map(GraphQLTypes.GraphQLTransitMode::toString)
-              .toList()
-              .contains(originalLeg.mode().name()));
+          !destinationModesWithParentStation
+            .stream()
+            .map(GraphQLTypes.GraphQLTransitMode::toString)
+            .toList()
+            .contains(originalLeg.mode().name());
 
         var res = AlternativeLegs.getAlternativeLegs(
           environment.getSource(),
@@ -336,7 +336,9 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
           .map(Leg.class::cast)
           .toList();
         return res;
-      } else return null;
+      } else {
+        return null;
+      }
     };
   }
 

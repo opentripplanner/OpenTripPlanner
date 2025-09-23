@@ -19,7 +19,7 @@ public class MainView {
   private static final int M_OUT = 2 * M_IN;
   private static final Insets DEFAULT_INSETS = new Insets(M_OUT, M_OUT, M_IN, M_OUT);
   private static final Insets SMALL_INSETS = new Insets(M_OUT, M_OUT, M_IN, M_OUT);
-  private static int Y = 0;
+  private static int Y;
 
   /*
    The application have the following panels:

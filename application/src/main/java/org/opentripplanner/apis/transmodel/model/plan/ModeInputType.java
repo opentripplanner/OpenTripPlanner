@@ -59,4 +59,6 @@ class ModeInputType {
         .build()
     )
     .build();
+
+  private ModeInputType() {}
 }

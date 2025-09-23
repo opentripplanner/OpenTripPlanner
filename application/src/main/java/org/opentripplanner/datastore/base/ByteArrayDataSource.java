@@ -24,7 +24,7 @@ public class ByteArrayDataSource implements DataSource {
   private final long size;
   private final long lastModified;
   private final boolean writable;
-  private ByteArrayOutputStream out = null;
+  private ByteArrayOutputStream out;
   private byte[] buffer;
 
   public ByteArrayDataSource(

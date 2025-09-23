@@ -24,4 +24,6 @@ public class GraphQLResponseSerializer {
       throw new RuntimeException(e);
     }
   }
+
+  private GraphQLResponseSerializer() {}
 }

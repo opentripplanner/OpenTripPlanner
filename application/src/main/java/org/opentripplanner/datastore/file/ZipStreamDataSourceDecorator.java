@@ -43,7 +43,7 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
    * the risk that the source is changed since last tile a resource is accessed. To achieve this we
    * use a boolean flag to indicate if the content is loaded or not.
    */
-  private boolean contentLoaded = false;
+  private boolean contentLoaded;
 
   /**
    * Cache content from first access to this data source is closed.

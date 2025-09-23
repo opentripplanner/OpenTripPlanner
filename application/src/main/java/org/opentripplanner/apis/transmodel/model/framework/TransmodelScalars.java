@@ -27,4 +27,6 @@ public class TransmodelScalars {
     TIME_SCALAR = TimeScalarFactory.createSecondsSinceMidnightAsTimeObject();
     DURATION_SCALAR = DurationScalarFactory.createDurationScalar();
   }
+
+  private TransmodelScalars() {}
 }

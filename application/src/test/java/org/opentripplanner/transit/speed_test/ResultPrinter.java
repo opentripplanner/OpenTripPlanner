@@ -34,7 +34,7 @@ class ResultPrinter {
 
   public static String headerLine(String label) {
     // Make a header width is 100
-    int prefixLen = (100 - label.length() - 4);
+    int prefixLen = 100 - label.length() - 4;
     var buf = new StringBuilder(100);
     buf.append("- ".repeat(prefixLen / 2));
     if (label.length() % 2 == 1) {

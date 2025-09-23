@@ -20,4 +20,6 @@ public class ErrorMapper {
           )
       );
   }
+
+  private ErrorMapper() {}
 }

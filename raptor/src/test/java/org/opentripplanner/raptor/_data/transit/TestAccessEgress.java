@@ -279,10 +279,10 @@ public class TestAccessEgress implements RaptorAccessEgress {
     int c1;
     int numberOfRides = DEFAULT_NUMBER_OF_RIDES;
     boolean stopReachedOnBoard = STOP_REACHED_ON_FOOT;
-    Integer opening = null;
-    Integer closing = null;
-    private boolean free = false;
-    private boolean closed = false;
+    Integer opening;
+    Integer closing;
+    private boolean free;
+    private boolean closed;
     private int timePenalty;
 
     Builder(int stop, int durationInSeconds) {

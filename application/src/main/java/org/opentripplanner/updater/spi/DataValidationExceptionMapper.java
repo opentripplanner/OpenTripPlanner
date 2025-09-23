@@ -43,4 +43,6 @@ public class DataValidationExceptionMapper {
       case MISSING_DEPARTURE_TIME -> UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
     };
   }
+
+  private DataValidationExceptionMapper() {}
 }

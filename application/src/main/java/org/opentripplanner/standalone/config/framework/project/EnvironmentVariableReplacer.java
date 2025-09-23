@@ -99,4 +99,6 @@ public class EnvironmentVariableReplacer {
       "' not found in the system environment variables."
     );
   }
+
+  private EnvironmentVariableReplacer() {}
 }

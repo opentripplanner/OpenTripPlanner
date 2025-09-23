@@ -29,7 +29,7 @@ public class WorldEnvelopeBuilder {
   private double minLonEast = MIN_NOT_SET;
   private double maxLonEast = MAX_NOT_SET;
 
-  private WgsCoordinate transitMedianCenter = null;
+  private WgsCoordinate transitMedianCenter;
 
   public WorldEnvelopeBuilder expandToIncludeStreetEntities(double latitude, double longitude) {
     return this.expandToInclude(latitude, longitude);

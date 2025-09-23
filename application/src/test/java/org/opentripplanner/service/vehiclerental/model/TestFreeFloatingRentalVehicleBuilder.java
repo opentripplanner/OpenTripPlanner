@@ -25,7 +25,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
   private double longitude = DEFAULT_LONGITUDE;
   private Ratio currentFuelPercent = Ratio.of(DEFAULT_CURRENT_FUEL_PERCENT);
   private Double currentRangeMeters = DEFAULT_CURRENT_RANGE_METERS;
-  private VehicleRentalSystem system = null;
+  private VehicleRentalSystem system;
   private String network = NETWORK_1;
   private static final OffsetDateTime DEFAULT_AVAILABLE_UNTIL = OffsetDateTime.of(
     LocalDateTime.of(LocalDate.of(2025, 1, 1), LocalTime.MIN),

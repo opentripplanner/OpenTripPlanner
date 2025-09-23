@@ -186,4 +186,6 @@ public class NetexConfig {
         "the feed_id field in GTFS file feed_info.txt."
       );
   }
+
+  private NetexConfig() {}
 }

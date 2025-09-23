@@ -31,10 +31,10 @@ public class RequestModes {
     StreetMode directMode,
     StreetMode transferMode
   ) {
-    this.accessMode = (accessMode != null && accessMode.accessAllowed()) ? accessMode : NOT_SET;
-    this.egressMode = (egressMode != null && egressMode.egressAllowed()) ? egressMode : NOT_SET;
+    this.accessMode = accessMode != null && accessMode.accessAllowed() ? accessMode : NOT_SET;
+    this.egressMode = egressMode != null && egressMode.egressAllowed() ? egressMode : NOT_SET;
     this.directMode = directMode != null ? directMode : NOT_SET;
-    this.transferMode = (transferMode != null && transferMode.transferAllowed())
+    this.transferMode = transferMode != null && transferMode.transferAllowed()
       ? transferMode
       : NOT_SET;
   }
@@ -72,8 +72,12 @@ public class RequestModes {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     RequestModes that = (RequestModes) o;
 

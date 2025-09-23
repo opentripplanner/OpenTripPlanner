@@ -77,7 +77,7 @@ public class ListUtils {
    * called.
    */
   public static <T> List<T> nullSafeImmutableList(@Nullable Collection<T> c) {
-    return (c == null) ? List.of() : List.copyOf(c);
+    return c == null ? List.of() : List.copyOf(c);
   }
 
   /**
@@ -107,7 +107,7 @@ public class ListUtils {
     for (int i = 0; i < input.size() - 1; i++) {
       T first = input.get(i);
       T second = input.get(i + 1);
-      output.add(new org.opentripplanner.utils.collection.Pair<>(first, second));
+      output.add(new Pair<>(first, second));
     }
     return output;
   }
@@ -135,4 +135,6 @@ public class ListUtils {
     requireAtLeastNElements(list, 2);
     return new Split<>(list.getFirst(), list.subList(1, list.size()));
   }
+
+  private ListUtils() {}
 }

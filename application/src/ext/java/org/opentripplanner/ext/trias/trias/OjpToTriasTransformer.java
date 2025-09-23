@@ -94,4 +94,6 @@ class OjpToTriasTransformer {
       throw new RuntimeException(e);
     }
   }
+
+  private OjpToTriasTransformer() {}
 }

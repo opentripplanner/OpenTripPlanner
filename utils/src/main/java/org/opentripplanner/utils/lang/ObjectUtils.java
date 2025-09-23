@@ -54,7 +54,7 @@ public class ObjectUtils {
     if (oldValue != null) {
       throw new IllegalStateException(
         "Field%s is already set! Old value: %s, new value: %s.".formatted(
-            (name == null ? "" : " " + name),
+            name == null ? "" : " " + name,
             oldValue,
             newValue
           )
@@ -70,4 +70,6 @@ public class ObjectUtils {
   public static String toString(Object object) {
     return object == null ? "" : object.toString();
   }
+
+  private ObjectUtils() {}
 }

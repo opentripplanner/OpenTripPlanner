@@ -37,4 +37,6 @@ public class AccessModeMapper {
       case WALK, CAR_HAILING, NOT_SET -> GraphQLTypes.GraphQLPlanAccessMode.WALK;
     };
   }
+
+  private AccessModeMapper() {}
 }

@@ -308,13 +308,11 @@ public class LegType {
             if (stops == null || stops.isEmpty()) {
               return List.of();
             } else {
-              return (
-                stops
-                  .stream()
-                  .map(stop -> stop.place.stop)
-                  .filter(Objects::nonNull)
-                  .collect(Collectors.toList())
-              );
+              return stops
+                .stream()
+                .map(stop -> stop.place.stop)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
             }
           })
           .build()
@@ -512,4 +510,6 @@ public class LegType {
     }
     throw new IllegalStateException("Unhandled leg type: " + leg);
   }
+
+  private LegType() {}
 }

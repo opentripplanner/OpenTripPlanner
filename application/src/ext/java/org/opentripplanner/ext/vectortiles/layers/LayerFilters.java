@@ -70,4 +70,6 @@ public class LayerFilters {
     NONE,
     SUNDAY_TO_SUNDAY_SERVICE_WEEK,
   }
+
+  private LayerFilters() {}
 }

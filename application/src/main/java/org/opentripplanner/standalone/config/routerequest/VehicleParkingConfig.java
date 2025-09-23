@@ -90,4 +90,6 @@ public class VehicleParkingConfig {
           .asStringSet(List.of())
       );
   }
+
+  private VehicleParkingConfig() {}
 }

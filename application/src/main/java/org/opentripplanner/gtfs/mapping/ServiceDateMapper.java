@@ -19,4 +19,6 @@ class ServiceDateMapper {
   ) {
     return new ServiceDateInterval(mapLocalDate(start), mapLocalDate(end));
   }
+
+  private ServiceDateMapper() {}
 }

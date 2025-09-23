@@ -44,4 +44,6 @@ public class DebugString {
       .addObjOp("Vehicle", estimatedVehicleJourney.getVehicleRef(), VehicleRef::getValue)
       .toString();
   }
+
+  private DebugString() {}
 }

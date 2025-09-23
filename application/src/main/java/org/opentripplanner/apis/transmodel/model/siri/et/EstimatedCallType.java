@@ -416,4 +416,6 @@ public class EstimatedCallType {
       );
     }
   }
+
+  private EstimatedCallType() {}
 }

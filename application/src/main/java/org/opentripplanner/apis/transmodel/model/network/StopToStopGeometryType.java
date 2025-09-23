@@ -42,4 +42,6 @@ public class StopToStopGeometryType {
       )
       .build();
   }
+
+  private StopToStopGeometryType() {}
 }

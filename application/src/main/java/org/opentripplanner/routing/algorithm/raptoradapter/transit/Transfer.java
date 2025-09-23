@@ -57,7 +57,7 @@ public class Transfer {
     }
     for (Edge edge : edges) {
       if (edge.getGeometry() != null) {
-        coordinates.addAll((Arrays.asList(edge.getGeometry().getCoordinates())));
+        coordinates.addAll(Arrays.asList(edge.getGeometry().getCoordinates()));
       }
     }
     return coordinates;

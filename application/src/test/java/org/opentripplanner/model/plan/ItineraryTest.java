@@ -109,7 +109,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(ofMinutes(28), itinerary.totalDuration());
     assertEquals(ofMinutes(20), itinerary.totalTransitDuration());
     assertEquals(ofMinutes(1), itinerary.totalStreetDuration());
-    assertEquals(ofMinutes((2 + 5)), itinerary.totalWaitingDuration());
+    assertEquals(ofMinutes(2 + 5), itinerary.totalWaitingDuration());
     // Cost: walk + wait + board + transit = 2 * 60 + .8 * 420 + 2 * 120 + 1200
     assertEquals(1896, itinerary.generalizedCost());
 

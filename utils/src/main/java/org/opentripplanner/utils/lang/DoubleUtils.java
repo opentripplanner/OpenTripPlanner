@@ -100,4 +100,6 @@ public class DoubleUtils {
     }
     return BigDecimal.valueOf(value).setScale(decimals, RoundingMode.HALF_UP).doubleValue();
   }
+
+  private DoubleUtils() {}
 }

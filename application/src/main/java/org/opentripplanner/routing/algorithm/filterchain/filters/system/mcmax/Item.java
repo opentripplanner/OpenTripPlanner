@@ -13,7 +13,7 @@ class Item {
 
   private final Itinerary item;
   private final int index;
-  private int groupCount = 0;
+  private int groupCount;
 
   Item(Itinerary item, int index) {
     this.item = item;

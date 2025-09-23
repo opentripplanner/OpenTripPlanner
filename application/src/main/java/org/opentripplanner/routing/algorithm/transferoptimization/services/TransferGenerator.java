@@ -246,7 +246,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
   ) {
     int nextLatestArrivalStopPos = 0;
 
-    for (int i = result.size() - 1; i >= 0; --i) {
+    for (int i = result.size() - 1; i >= 0; i--) {
       List<TripToTripTransfer<T>> filteredTransfers = new ArrayList<>();
 
       for (TripToTripTransfer<T> tx : result.get(i)) {

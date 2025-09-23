@@ -153,4 +153,6 @@ public class GraphQLUtils {
     }
     return Optional.ofNullable((Locale) localContext.get("locale"));
   }
+
+  private GraphQLUtils() {}
 }

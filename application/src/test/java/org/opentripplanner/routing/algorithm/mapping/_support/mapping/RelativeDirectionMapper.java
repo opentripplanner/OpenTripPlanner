@@ -29,4 +29,6 @@ class RelativeDirectionMapper {
       case FOLLOW_SIGNS -> ApiRelativeDirection.FOLLOW_SIGNS;
     };
   }
+
+  private RelativeDirectionMapper() {}
 }

@@ -246,4 +246,6 @@ public class TripPatternType {
   public static Itinerary itinerary(DataFetchingEnvironment env) {
     return env.getSource();
   }
+
+  private TripPatternType() {}
 }

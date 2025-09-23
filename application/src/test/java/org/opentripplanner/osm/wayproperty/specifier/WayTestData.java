@@ -320,4 +320,6 @@ public class WayTestData {
     way.addTag("ref", "123");
     return way;
   }
+
+  private WayTestData() {}
 }

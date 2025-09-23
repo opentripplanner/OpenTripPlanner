@@ -20,7 +20,7 @@ public class TestTripSearchTimetable implements TripSearchTimetable<TestTripSche
     int nTrips = route.timetable().numberOfTripSchedules();
     this.trips = new TestTripSchedule[nTrips];
 
-    for (int i = 0; i < nTrips; ++i) {
+    for (int i = 0; i < nTrips; i++) {
       trips[i] = route.getTripSchedule(i);
     }
   }

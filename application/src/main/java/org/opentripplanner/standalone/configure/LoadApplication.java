@@ -31,7 +31,7 @@ public class LoadApplication {
   private final CommandLineParameters cli;
   private final LoadApplicationFactory factory;
 
-  private boolean dataStoreLoaded = false;
+  private boolean dataStoreLoaded;
 
   /**
    * Create a new OTP configuration instance for a given directory.

@@ -247,7 +247,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         .withServiceDate(tripSchedule.getServiceDate())
         .withZoneId(transitSearchTimeZero.getZone().normalized())
         .withTransferFromPreviousLeg(
-          (prevTransitLeg == null ? null : prevTransitLeg.transferToNextLeg())
+          prevTransitLeg == null ? null : prevTransitLeg.transferToNextLeg()
         )
         .withTransferToNextLeg((ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg())
         .withGeneralizedCost(toOtpDomainCost(pathLeg.c1() + lastLegCost))
@@ -269,7 +269,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       .withZoneId(transitSearchTimeZero.getZone().normalized())
       .withTripOnServiceDate(tripOnServiceDate)
       .withTransferFromPreviousLeg(
-        (prevTransitLeg == null ? null : prevTransitLeg.transferToNextLeg())
+        prevTransitLeg == null ? null : prevTransitLeg.transferToNextLeg()
       )
       .withTransferToNextLeg((ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg())
       .withGeneralizedCost(toOtpDomainCost(pathLeg.c1() + lastLegCost))

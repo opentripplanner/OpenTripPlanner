@@ -20,7 +20,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
   @Nullable
   private final Cost generalizedCostMaxLimit;
 
-  private RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult = null;
+  private RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult;
 
   /**
    * Constructs the RemoveTransitIfStreetOnlyIsBetter filter.

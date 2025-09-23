@@ -252,7 +252,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   private JList<State> secondComparePathStates;
   private JList<String> secondStateData;
   private JList<String> firstStateData;
-  protected State lastStateClicked = null;
+  protected State lastStateClicked;
   private JCheckBox longDistanceModeCheckbox;
 
   public GraphVisualizer(Graph graph) {
@@ -956,7 +956,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           String result = JOptionPane.showInputDialog("Enter the location (lat lon)");
-          if (result == null || result.length() == 0) return;
+          if (result == null || result.length() == 0) {
+            return;
+          }
           String[] tokens = result.split("[\\s,]+");
           double lat = Double.parseDouble(tokens[0]);
           double lon = Double.parseDouble(tokens[1]);
@@ -1206,7 +1208,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
         Edge selected = (Edge) edgeList.getSelectedValue();
 
-        boolean outgoing = (edgeList == outgoingEdges);
+        boolean outgoing = edgeList == outgoingEdges;
         reactToEdgeSelection(selected, outgoing);
       }
     };
@@ -1270,7 +1272,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       new ListSelectionListener() {
         @Override
         public void valueChanged(ListSelectionEvent ev) {
-          PathPrinter pp = ((PathPrinter) pathsList.getSelectedValue());
+          PathPrinter pp = (PathPrinter) pathsList.getSelectedValue();
           if (pp == null) {
             return;
           }
@@ -1413,8 +1415,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         gp.getWeight() +
         " dur:" +
         (gp.getDuration() / 60.0)
-        // " walk:" +
-        // gp.getWalkDistance()
       );
     }
   }
@@ -1453,7 +1453,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      PathPrinter pp = ((PathPrinter) pathsList.getSelectedValue());
+      PathPrinter pp = (PathPrinter) pathsList.getSelectedValue();
       if (pp == null) {
         return;
       }

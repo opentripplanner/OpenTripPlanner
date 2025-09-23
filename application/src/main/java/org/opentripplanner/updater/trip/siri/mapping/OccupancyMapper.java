@@ -24,4 +24,6 @@ public class OccupancyMapper {
       case UNDEFINED, UNKNOWN -> OccupancyStatus.NO_DATA_AVAILABLE;
     };
   }
+
+  private OccupancyMapper() {}
 }

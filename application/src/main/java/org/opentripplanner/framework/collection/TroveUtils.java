@@ -14,4 +14,6 @@ public class TroveUtils {
     }
     set.add(value);
   }
+
+  private TroveUtils() {}
 }

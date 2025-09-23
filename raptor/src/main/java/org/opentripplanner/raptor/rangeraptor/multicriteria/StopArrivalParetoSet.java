@@ -37,9 +37,9 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
 
   static class Builder<T extends RaptorTripSchedule> {
 
-    private ParetoSetEventListener<ArrivalView<T>> debugListener = null;
-    private ParetoSetEventListener<ArrivalView<T>> egressListener = null;
-    private ParetoSetEventListener<ArrivalView<T>> nextSearchListener = null;
+    private ParetoSetEventListener<ArrivalView<T>> debugListener;
+    private ParetoSetEventListener<ArrivalView<T>> egressListener;
+    private ParetoSetEventListener<ArrivalView<T>> nextSearchListener;
     private final ParetoComparator<McStopArrival<T>> comparator;
 
     Builder(ParetoComparator<McStopArrival<T>> comparator) {

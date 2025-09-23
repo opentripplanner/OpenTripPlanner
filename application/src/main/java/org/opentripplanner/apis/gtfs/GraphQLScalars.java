@@ -480,4 +480,6 @@ public class GraphQLScalars {
       }
     )
     .build();
+
+  private GraphQLScalars() {}
 }

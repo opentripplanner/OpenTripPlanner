@@ -47,7 +47,7 @@ class BackwardsDelayAlwaysInterpolatorTest {
       new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
     );
     // everything before the first given update should be filled in
-    for (var i = 0; i < firstUpdateIndex; ++i) {
+    for (var i = 0; i < firstUpdateIndex; i++) {
       assertEquals(delay, builder.getArrivalDelay(i));
       assertEquals(delay, builder.getDepartureDelay(i));
     }
@@ -71,7 +71,7 @@ class BackwardsDelayAlwaysInterpolatorTest {
       new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
     );
     // everything before the first given update should be filled in
-    for (var i = 0; i < firstUpdateIndex; ++i) {
+    for (var i = 0; i < firstUpdateIndex; i++) {
       assertEquals(delay, builder.getArrivalDelay(i));
       assertEquals(delay, builder.getDepartureDelay(i));
     }

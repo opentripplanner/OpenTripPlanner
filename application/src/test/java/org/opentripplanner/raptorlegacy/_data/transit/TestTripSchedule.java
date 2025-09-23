@@ -134,7 +134,7 @@ public class TestTripSchedule implements TripSchedule {
     private int[] arrivalTimes;
     private int[] departureTimes;
     private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
-    private int transitReluctanceIndex = 0;
+    private int transitReluctanceIndex;
     private Accessibility wheelchairBoarding = NO_INFORMATION;
     private TripPattern originalPattern;
 

@@ -185,9 +185,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   }
 
   private boolean stopIsIncludedByStationFilter(RegularStop stop) {
-    return (
-      ((filterByStations.isEmpty() || filterByStations.contains(stop.getParentStation().getId())))
-    );
+    return filterByStations.isEmpty() || filterByStations.contains(stop.getParentStation().getId());
   }
 
   private boolean stopIsIncludedByModeFilter(RegularStop stop) {

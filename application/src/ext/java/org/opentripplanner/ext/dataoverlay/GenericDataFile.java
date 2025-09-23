@@ -26,7 +26,7 @@ public class GenericDataFile {
 
   private final String dataSource;
   private OffsetDateTime originDate;
-  private String error = null;
+  private String error;
   private ucar.ma2.Array timeArray;
   private ucar.ma2.Array latitudeArray;
   private Array longitudeArray;

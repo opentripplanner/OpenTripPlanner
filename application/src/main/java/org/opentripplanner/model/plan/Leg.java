@@ -156,8 +156,6 @@ public interface Leg {
    */
   default boolean overlapInTime(Leg other) {
     return (
-      // We convert to epoch seconds to ignore nanos (save CPU),
-      // in favor of using the methods isAfter(...) and isBefore(...)
       startTime().toEpochSecond() < other.endTime().toEpochSecond() &&
       other.startTime().toEpochSecond() < endTime().toEpochSecond()
     );

@@ -93,7 +93,7 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
   }
 
   @ParameterizedTest
-  @MethodSource(value = "testCases")
+  @MethodSource("testCases")
   void testDecodeBackwardsCompatibility(TestCase testCase) {
     allTestCasesFrom(testCase).forEach(s ->
       assertEquals(testCase.expected(), s.decode(testCase.token()).toString())
@@ -101,7 +101,7 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
   }
 
   @ParameterizedTest
-  @MethodSource(value = "testCases")
+  @MethodSource("testCases")
   void testDecodeForwardCompatibility(TestCase testCase) {
     nextTestCase(testCase)
       .map(TestCase::token)

@@ -87,4 +87,6 @@ public class DemConfig {
           .asDouble(defaults.elevationUnitMultiplier())
       );
   }
+
+  private DemConfig() {}
 }

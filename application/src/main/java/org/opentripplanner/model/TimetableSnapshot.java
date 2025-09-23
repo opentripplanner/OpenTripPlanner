@@ -158,7 +158,7 @@ public class TimetableSnapshot {
    * Boolean value indicating that this timetable snapshot contains changes compared to the state of
    * the last commit if true.
    */
-  private boolean dirty = false;
+  private boolean dirty;
 
   public TimetableSnapshot() {
     this(

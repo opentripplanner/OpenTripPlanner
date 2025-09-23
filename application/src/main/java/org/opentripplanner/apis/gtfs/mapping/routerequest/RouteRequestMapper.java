@@ -202,4 +202,6 @@ public class RouteRequestMapper {
   static void mapViaPoints(RouteRequestBuilder request, List<Map<String, Object>> via) {
     request.withViaLocations(ViaLocationMapper.mapToViaLocations(via));
   }
+
+  private RouteRequestMapper() {}
 }

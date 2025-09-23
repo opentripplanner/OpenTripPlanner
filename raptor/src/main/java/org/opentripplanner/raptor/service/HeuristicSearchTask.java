@@ -33,11 +33,11 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
   private final RaptorConfig<T> config;
   private final RaptorTransitDataProvider<T> transitData;
 
-  private boolean run = false;
-  private RaptorRouter<T> search = null;
+  private boolean run;
+  private RaptorRouter<T> search;
   private RaptorRequest<T> originalRequest;
   private RaptorRequest<T> heuristicRequest;
-  private RaptorRouterResult<T> result = null;
+  private RaptorRouterResult<T> result;
 
   public HeuristicSearchTask(
     RaptorRequest<T> request,

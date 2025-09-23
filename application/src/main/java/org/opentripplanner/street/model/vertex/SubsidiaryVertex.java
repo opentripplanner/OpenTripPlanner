@@ -17,7 +17,7 @@ public class SubsidiaryVertex extends IntersectionVertex {
   private final IntersectionVertex parent;
   private final int counter;
 
-  private static int counterSource = 0;
+  private static int counterSource;
 
   public SubsidiaryVertex(IntersectionVertex parent) {
     super(

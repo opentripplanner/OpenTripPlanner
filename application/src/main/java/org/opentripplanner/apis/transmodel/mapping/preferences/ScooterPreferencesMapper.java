@@ -30,4 +30,6 @@ public class ScooterPreferencesMapper {
 
     scooter.withRental(rental -> mapRentalPreferences(rental, callWith));
   }
+
+  private ScooterPreferencesMapper() {}
 }

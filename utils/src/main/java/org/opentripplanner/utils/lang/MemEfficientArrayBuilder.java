@@ -17,7 +17,7 @@ import java.util.Objects;
 public final class MemEfficientArrayBuilder<T> {
 
   private final T[] original;
-  private T[] array = null;
+  private T[] array;
 
   private MemEfficientArrayBuilder(T[] original) {
     this.original = Objects.requireNonNull(original);

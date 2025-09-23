@@ -64,10 +64,12 @@ public final class StopPattern implements Serializable {
   public StopPattern(Collection<StopTime> stopTimes) {
     this(stopTimes.size());
     int size = stopTimes.size();
-    if (size == 0) return;
+    if (size == 0) {
+      return;
+    }
     Iterator<StopTime> stopTimeIterator = stopTimes.iterator();
 
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; i++) {
       StopTime stopTime = stopTimeIterator.next();
       stops[i] = stopTime.getStop();
       // should these just be booleans? anything but 1 means pick/drop is allowed.
@@ -133,7 +135,7 @@ public final class StopPattern implements Serializable {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("StopPattern: ");
-    for (int i = 0, j = stops.length; i < j; ++i) {
+    for (int i = 0, j = stops.length; i < j; i++) {
       sb.append(String.format("%s_%s%s ", stops[i].getCode(), pickups[i], dropoffs[i]));
     }
     return sb.toString();
@@ -155,7 +157,7 @@ public final class StopPattern implements Serializable {
 
   /** Find the given stop position in the sequence, return -1 if not found. */
   int findStopPosition(StopLocation stop) {
-    for (int i = 0; i < stops.length; ++i) {
+    for (int i = 0; i < stops.length; i++) {
       if (stops[i] == stop) {
         return i;
       }
@@ -207,7 +209,7 @@ public final class StopPattern implements Serializable {
    */
   boolean canAlight(StopLocation stop) {
     // We skip the last stop, not allowed for boarding
-    for (int i = 0; i < stops.length - 1; ++i) {
+    for (int i = 0; i < stops.length - 1; i++) {
       if (stop == stops[i] && canAlight(i)) {
         return true;
       }
@@ -226,7 +228,7 @@ public final class StopPattern implements Serializable {
    */
   boolean canBoard(StopLocation stop) {
     // We skip the last stop, not allowed for boarding
-    for (int i = 0; i < stops.length - 1; ++i) {
+    for (int i = 0; i < stops.length - 1; i++) {
       if (stop == stops[i] && canBoard(i)) {
         return true;
       }
@@ -255,7 +257,7 @@ public final class StopPattern implements Serializable {
     final int end,
     final Predicate<StopLocation> match
   ) {
-    for (int i = start; i < end; ++i) {
+    for (int i = start; i < end; i++) {
       if (match.test(stops[i])) {
         return i;
       }

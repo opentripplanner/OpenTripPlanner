@@ -40,7 +40,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   /**
    * Global retry counter used to create a new unique requestorRef after each retry.
    */
-  private int retryCount = 0;
+  private int retryCount;
   private final SiriLoader siriHttpLoader;
   private final OtpRetry retry;
 
@@ -179,14 +179,14 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
       LOG.info(
         "Retryable exception while reading SIRI feed from {} after {} ms",
         url,
-        (System.currentTimeMillis() - t1)
+        System.currentTimeMillis() - t1
       );
       throw e;
     } catch (Exception e) {
       LOG.error(
         "Non-retryable exception while reading SIRI feed from {} after {} ms",
         url,
-        (System.currentTimeMillis() - t1)
+        System.currentTimeMillis() - t1
       );
     }
     return Optional.empty();

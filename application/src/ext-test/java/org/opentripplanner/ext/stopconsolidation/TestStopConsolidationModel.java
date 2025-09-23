@@ -49,4 +49,6 @@ class TestStopConsolidationModel {
     List.of(STOP_A, STOP_B, STOP_C, STOP_D).forEach(siteRepositoryBuilder::withRegularStop);
     return new TimetableRepository(siteRepositoryBuilder.build(), new Deduplicator());
   }
+
+  private TestStopConsolidationModel() {}
 }

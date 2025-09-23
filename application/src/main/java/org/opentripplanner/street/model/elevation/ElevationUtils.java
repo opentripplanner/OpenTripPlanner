@@ -41,4 +41,6 @@ public class ElevationUtils {
     mt.transform(new Position3D(lon, lat, 0), dest);
     return dest.z;
   }
+
+  private ElevationUtils() {}
 }

@@ -176,22 +176,22 @@ class StopAndStationMapperTest {
 
     Station parentStop = stations
       .stream()
-      .filter(s -> s.getId().getId().equals("NSR:StopPlace:1"))
+      .filter(s -> "NSR:StopPlace:1".equals(s.getId().getId()))
       .findFirst()
       .get();
     RegularStop childStop1 = stops
       .stream()
-      .filter(s -> s.getId().getId().equals("NSR:Quay:1"))
+      .filter(s -> "NSR:Quay:1".equals(s.getId().getId()))
       .findFirst()
       .get();
     RegularStop childStop2 = stops
       .stream()
-      .filter(s -> s.getId().getId().equals("NSR:Quay:2"))
+      .filter(s -> "NSR:Quay:2".equals(s.getId().getId()))
       .findFirst()
       .get();
     RegularStop childStop3 = stops
       .stream()
-      .filter(s -> s.getId().getId().equals("NSR:Quay:3"))
+      .filter(s -> "NSR:Quay:3".equals(s.getId().getId()))
       .findFirst()
       .get();
 
@@ -209,7 +209,7 @@ class StopAndStationMapperTest {
   }
 
   @ParameterizedTest
-  @CsvSource(value = { "true", "false" })
+  @CsvSource({ "true", "false" })
   void testMapIsolatedStopPlace(boolean isolated) {
     Collection<StopPlace> stopPlaces = new ArrayList<>();
     StopPlace stopPlace;

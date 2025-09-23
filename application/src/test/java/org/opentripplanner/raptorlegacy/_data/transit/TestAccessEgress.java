@@ -133,4 +133,6 @@ public class TestAccessEgress {
       };
     }
   }
+
+  private TestAccessEgress() {}
 }

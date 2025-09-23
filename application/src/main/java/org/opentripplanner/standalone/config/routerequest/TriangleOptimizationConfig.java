@@ -51,4 +51,6 @@ public class TriangleOptimizationConfig {
           .asDouble(builder.safety())
       );
   }
+
+  private TriangleOptimizationConfig() {}
 }

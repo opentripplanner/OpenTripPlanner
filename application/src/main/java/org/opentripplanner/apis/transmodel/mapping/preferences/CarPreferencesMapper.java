@@ -21,4 +21,6 @@ public class CarPreferencesMapper {
     // callWith.argument("car.pickup.cost", car::withPickupCost);
     // callWith.argument("car.pickup.time", car::withPickupTime);
   }
+
+  private CarPreferencesMapper() {}
 }

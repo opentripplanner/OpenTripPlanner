@@ -39,4 +39,6 @@ public class OffsetDateTimeParser {
       throw new ParseException(e.getParsedString(), e.getErrorIndex());
     }
   }
+
+  private OffsetDateTimeParser() {}
 }

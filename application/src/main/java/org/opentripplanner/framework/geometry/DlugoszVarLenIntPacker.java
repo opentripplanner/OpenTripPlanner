@@ -114,4 +114,6 @@ public class DlugoszVarLenIntPacker {
     }
     return bufret;
   }
+
+  private DlugoszVarLenIntPacker() {}
 }

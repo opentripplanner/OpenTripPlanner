@@ -36,4 +36,6 @@ public class VehicleParkingTestUtil {
       .entrance(entrance)
       .build();
   }
+
+  private VehicleParkingTestUtil() {}
 }

@@ -107,4 +107,6 @@ public class TransitPreferencesMapper {
       }
     }
   }
+
+  private TransitPreferencesMapper() {}
 }

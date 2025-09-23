@@ -43,4 +43,6 @@ public class PtModeMapper {
       default -> throw new IllegalArgumentException("Unknown mode: " + mode);
     };
   }
+
+  private PtModeMapper() {}
 }

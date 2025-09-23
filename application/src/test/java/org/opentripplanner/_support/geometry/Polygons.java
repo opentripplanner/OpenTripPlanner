@@ -75,4 +75,6 @@ public class Polygons {
 
     return ret;
   }
+
+  private Polygons() {}
 }

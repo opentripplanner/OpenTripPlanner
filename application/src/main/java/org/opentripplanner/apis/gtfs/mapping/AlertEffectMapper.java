@@ -30,4 +30,6 @@ public class AlertEffectMapper {
       case ACCESSIBILITY_ISSUE -> GraphQLAlertEffectType.ACCESSIBILITY_ISSUE;
     };
   }
+
+  private AlertEffectMapper() {}
 }

@@ -34,4 +34,6 @@ public class ModeAndSubModeInputType {
         .build()
     )
     .build();
+
+  private ModeAndSubModeInputType() {}
 }

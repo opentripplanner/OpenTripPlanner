@@ -57,4 +57,6 @@ public class VehiclePositionsUpdaterConfig {
     STOP_POSITION,
     OCCUPANCY,
   }
+
+  private VehiclePositionsUpdaterConfig() {}
 }

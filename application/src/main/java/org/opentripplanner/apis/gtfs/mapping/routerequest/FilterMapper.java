@@ -57,4 +57,6 @@ class FilterMapper {
 
     return filterRequests;
   }
+
+  private FilterMapper() {}
 }

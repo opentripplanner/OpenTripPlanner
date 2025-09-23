@@ -27,8 +27,8 @@ public class GtfsContextBuilder {
   private final String feedId;
 
   private final OtpTransitServiceBuilder transitBuilder;
-  private CalendarService calendarService = null;
-  private DataImportIssueStore issueStore = null;
+  private CalendarService calendarService;
+  private DataImportIssueStore issueStore;
   private Deduplicator deduplicator;
 
   public GtfsContextBuilder(String feedId, OtpTransitServiceBuilder transitBuilder) {

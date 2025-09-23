@@ -127,7 +127,7 @@ public class UnknownPathLeg implements Leg {
   }
 
   public String description() {
-    return ("Unknown transit " + nTransfers + "tx " + DurationUtils.durationToStr(duration()));
+    return "Unknown transit " + nTransfers + "tx " + DurationUtils.durationToStr(duration());
   }
 
   @Override

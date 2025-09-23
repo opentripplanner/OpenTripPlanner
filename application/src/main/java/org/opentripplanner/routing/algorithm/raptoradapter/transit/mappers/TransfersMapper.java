@@ -20,7 +20,7 @@ class TransfersMapper {
   ) {
     List<List<Transfer>> transfersByStopIndex = new ArrayList<>();
 
-    for (int i = 0; i < siteRepository.stopIndexSize(); ++i) {
+    for (int i = 0; i < siteRepository.stopIndexSize(); i++) {
       var stop = siteRepository.stopByIndex(i);
 
       if (stop == null) {
@@ -58,4 +58,6 @@ class TransfersMapper {
     // Return an immutable copy
     return List.copyOf(transfersByStopIndex);
   }
+
+  private TransfersMapper() {}
 }

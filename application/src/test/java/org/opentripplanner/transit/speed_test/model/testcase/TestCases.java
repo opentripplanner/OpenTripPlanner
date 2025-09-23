@@ -62,7 +62,7 @@ public class TestCases {
 
     private List<TestCaseDefinition> definitions;
     private Map<String, ExpectedResults> expectedResultsById;
-    private boolean skipCost = false;
+    private boolean skipCost;
     private Collection<String> includeIds = List.of();
     private Collection<String> includeCategories = List.of();
 

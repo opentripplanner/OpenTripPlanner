@@ -21,4 +21,6 @@ public class CoordinateMapper {
       new WgsCoordinate(coordinate.getGraphQLLatitude(), coordinate.getGraphQLLongitude())
     );
   }
+
+  private CoordinateMapper() {}
 }

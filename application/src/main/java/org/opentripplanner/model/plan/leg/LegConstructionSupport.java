@@ -47,4 +47,6 @@ public class LegConstructionSupport {
 
     return transitLegCoordinates;
   }
+
+  private LegConstructionSupport() {}
 }

@@ -38,4 +38,6 @@ class SelectRequestMapper {
 
     return selectRequestBuilder;
   }
+
+  private SelectRequestMapper() {}
 }

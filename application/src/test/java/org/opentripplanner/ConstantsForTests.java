@@ -88,9 +88,9 @@ public class ConstantsForTests {
     FileType.NETEX
   );
 
-  private static ConstantsForTests instance = null;
-  private TestOtpModel portlandGraph = null;
-  private TestOtpModel portlandGraphWithElevation = null;
+  private static ConstantsForTests instance;
+  private TestOtpModel portlandGraph;
+  private TestOtpModel portlandGraphWithElevation;
 
   private ConstantsForTests() {}
 

@@ -72,7 +72,7 @@ public class OsmWay extends OsmEntity {
   }
 
   public boolean isEscalator() {
-    return (isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS));
+    return isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS);
   }
 
   public boolean isForwardEscalator() {

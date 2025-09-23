@@ -18,4 +18,6 @@ public class Coordinates {
   public static Coordinate of(double latitude, double longitude) {
     return new Coordinate(longitude, latitude);
   }
+
+  private Coordinates() {}
 }

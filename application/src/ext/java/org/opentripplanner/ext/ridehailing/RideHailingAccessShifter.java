@@ -142,4 +142,6 @@ public class RideHailingAccessShifter {
     NO_ARRIVAL_FOR_LOCATION,
     TECHNICAL_ERROR,
   }
+
+  private RideHailingAccessShifter() {}
 }

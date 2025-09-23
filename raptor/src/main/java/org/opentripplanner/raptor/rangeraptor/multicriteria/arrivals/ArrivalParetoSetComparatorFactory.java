@@ -66,12 +66,10 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
 
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundCostAndOnBoardArrival() {
-        return (
-          (l, r) ->
-            McStopArrival.compareBase(l, r) ||
-            McStopArrival.compareArrivedOnBoard(l, r) ||
-            c2DominanceFunction.leftDominateRight(l.c2(), r.c2())
-        );
+        return (l, r) ->
+          McStopArrival.compareBase(l, r) ||
+          McStopArrival.compareArrivedOnBoard(l, r) ||
+          c2DominanceFunction.leftDominateRight(l.c2(), r.c2());
       }
     };
   }

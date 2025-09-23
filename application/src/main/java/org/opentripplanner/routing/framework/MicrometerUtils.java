@@ -14,4 +14,6 @@ public class MicrometerUtils {
       .map(t -> Tag.of(t.getCategory().name(), t.getTag()))
       .toList();
   }
+
+  private MicrometerUtils() {}
 }

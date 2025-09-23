@@ -8,7 +8,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TransferTestData {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   static final Station STATION = TEST_MODEL.station("Central Station").build();
 
@@ -52,4 +52,6 @@ public class TransferTestData {
 
   static final TransferPoint TRIP_POINT_11_1 = new TripTransferPoint(TRIP_11, POS_1);
   static final TransferPoint TRIP_POINT_21_3 = new TripTransferPoint(TRIP_21, POS_3);
+
+  private TransferTestData() {}
 }

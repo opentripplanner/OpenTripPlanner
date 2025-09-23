@@ -82,4 +82,6 @@ public class FileUtils {
       );
     }
   }
+
+  private FileUtils() {}
 }

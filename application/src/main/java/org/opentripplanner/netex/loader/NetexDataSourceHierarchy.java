@@ -77,7 +77,7 @@ public class NetexDataSourceHierarchy {
     private final Pattern sharedGroupFilePattern;
     private final Pattern groupFilePattern;
 
-    private String currentGroup = null;
+    private String currentGroup;
 
     private DistributeEntries(
       Pattern ignoreFilePattern,

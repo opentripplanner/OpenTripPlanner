@@ -93,4 +93,6 @@ public class MarkdownFormatter {
   private static String normalizeAnchor(String anchor) {
     return anchor.replaceAll("[-!\"#$%&/.=?+\\[\\]]", "_");
   }
+
+  private MarkdownFormatter() {}
 }

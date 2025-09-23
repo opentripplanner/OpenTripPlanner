@@ -24,4 +24,6 @@ class StopTransferPriorityMapper {
     }
     throw new IllegalArgumentException("Unsupported interchange weight: " + value);
   }
+
+  private StopTransferPriorityMapper() {}
 }

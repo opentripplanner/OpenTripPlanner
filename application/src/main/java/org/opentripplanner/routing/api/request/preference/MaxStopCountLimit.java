@@ -61,12 +61,16 @@ public class MaxStopCountLimit {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     var that = (MaxStopCountLimit) o;
 
-    return (defaultLimit == that.defaultLimit && limitsForModes.equals(that.limitsForModes));
+    return defaultLimit == that.defaultLimit && limitsForModes.equals(that.limitsForModes);
   }
 
   @Override
@@ -86,7 +90,7 @@ public class MaxStopCountLimit {
 
     private final MaxStopCountLimit original;
     private int defaultLimit;
-    private Map<StreetMode, Integer> limitsForModes = null;
+    private Map<StreetMode, Integer> limitsForModes;
 
     Builder(MaxStopCountLimit original) {
       this.original = original;

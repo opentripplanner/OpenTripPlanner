@@ -133,7 +133,7 @@ public class DebugRaptor implements Serializable {
     }
 
     var buf = new StringBuilder();
-    for (int i = 0; i < stops.size(); ++i) {
+    for (int i = 0; i < stops.size(); i++) {
       buf.append(stops.get(i));
       if (i > FIRST_STOP_INDEX && i == fromStopIndex) {
         buf.append("*");

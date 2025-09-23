@@ -43,4 +43,6 @@ public class RoutingErrorType {
       )
       .build();
   }
+
+  private RoutingErrorType() {}
 }

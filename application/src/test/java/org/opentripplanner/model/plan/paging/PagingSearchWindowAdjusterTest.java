@@ -57,7 +57,7 @@ class PagingSearchWindowAdjusterTest {
     var expectedList = new ArrayList<>(LIST_OF_DURATIONS);
     expectedList.add(D0s);
 
-    for (int n = 0; n < expectedList.size(); ++n) {
+    for (int n = 0; n < expectedList.size(); n++) {
       var expected = expectedList.get(n);
       assertEquals(expected, subject.increaseOrKeepSearchWindow(D0s, 20, n), "n=" + n);
       assertEquals(expected.plus(D30m), subject.increaseOrKeepSearchWindow(D30m, 20, n), "n=" + n);

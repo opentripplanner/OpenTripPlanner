@@ -19,4 +19,6 @@ public class I18NStrings {
     "fi",
     "Etkö ole varma, mitä tämä tarkoittaa"
   );
+
+  private I18NStrings() {}
 }

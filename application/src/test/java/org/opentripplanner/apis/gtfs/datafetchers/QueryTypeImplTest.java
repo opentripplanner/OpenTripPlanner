@@ -17,9 +17,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class QueryTypeImplTest {
 
-  private static FeedScopedId ROUTE_ID = new FeedScopedId("test", "foo");
+  private static final FeedScopedId ROUTE_ID = new FeedScopedId("test", "foo");
 
-  private static FeedScopedId STOP_ID = new FeedScopedId("test", "bar");
+  private static final FeedScopedId STOP_ID = new FeedScopedId("test", "bar");
 
   private static List<TransitAlert> alerts;
 

@@ -38,4 +38,6 @@ public class MqttGtfsRealtimeUpdaterConfig {
         .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA)
     );
   }
+
+  private MqttGtfsRealtimeUpdaterConfig() {}
 }

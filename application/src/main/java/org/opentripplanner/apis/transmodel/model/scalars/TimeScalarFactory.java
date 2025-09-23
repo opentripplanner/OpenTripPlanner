@@ -55,9 +55,7 @@ public final class TimeScalarFactory {
           @Override
           public String serialize(Object input) {
             if (input instanceof Integer) {
-              return (LocalTime.ofSecondOfDay(((Integer) input % SECONDS_PER_DAY))).format(
-                  FORMATTER
-                );
+              return LocalTime.ofSecondOfDay((Integer) input % SECONDS_PER_DAY).format(FORMATTER);
             }
             return null;
           }

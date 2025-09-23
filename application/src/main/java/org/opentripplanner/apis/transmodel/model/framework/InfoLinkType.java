@@ -35,4 +35,6 @@ public class InfoLinkType {
       )
       .build();
   }
+
+  private InfoLinkType() {}
 }

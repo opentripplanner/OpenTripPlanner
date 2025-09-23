@@ -44,4 +44,6 @@ public class BookingMethodMapper {
         return null;
     }
   }
+
+  private BookingMethodMapper() {}
 }

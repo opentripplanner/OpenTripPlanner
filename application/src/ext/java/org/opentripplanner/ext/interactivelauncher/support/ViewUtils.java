@@ -50,4 +50,6 @@ public final class ViewUtils {
     c.setPreferredSize(d);
     c.setMaximumSize(d);
   }
+
+  private ViewUtils() {}
 }

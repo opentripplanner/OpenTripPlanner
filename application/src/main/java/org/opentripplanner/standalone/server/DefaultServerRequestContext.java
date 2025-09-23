@@ -96,7 +96,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   /* Lazy initialized fields */
 
-  private RouteRequest defaultRouteRequestWithTimeSet = null;
+  private RouteRequest defaultRouteRequestWithTimeSet;
 
   /**
    * Create a server context valid for one http request only!

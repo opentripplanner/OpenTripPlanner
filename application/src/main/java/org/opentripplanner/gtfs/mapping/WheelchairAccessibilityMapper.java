@@ -14,4 +14,6 @@ class WheelchairAccessibilityMapper {
       );
     };
   }
+
+  private WheelchairAccessibilityMapper() {}
 }

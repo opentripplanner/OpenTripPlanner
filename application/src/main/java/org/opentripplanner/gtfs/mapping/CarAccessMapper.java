@@ -16,4 +16,6 @@ class CarAccessMapper {
       default -> CarAccess.UNKNOWN;
     };
   }
+
+  private CarAccessMapper() {}
 }

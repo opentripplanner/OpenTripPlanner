@@ -147,4 +147,6 @@ public class PenaltyForStreetModeType {
       )
       .build();
   }
+
+  private PenaltyForStreetModeType() {}
 }

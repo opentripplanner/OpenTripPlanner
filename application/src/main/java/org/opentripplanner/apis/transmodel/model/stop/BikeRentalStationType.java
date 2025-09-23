@@ -99,4 +99,6 @@ public class BikeRentalStationType {
       )
       .build();
   }
+
+  private BikeRentalStationType() {}
 }

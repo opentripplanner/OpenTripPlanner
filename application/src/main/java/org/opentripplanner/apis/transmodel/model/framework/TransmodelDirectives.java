@@ -10,4 +10,6 @@ public class TransmodelDirectives {
     .description("Add timing data to prometheus, if Actuator API is enabled")
     .validLocation(Introspection.DirectiveLocation.FIELD_DEFINITION)
     .build();
+
+  private TransmodelDirectives() {}
 }

@@ -371,7 +371,7 @@ public class OrcaFareService extends DefaultFareService {
       case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
         getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
       );
-      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> optionalUSD((1f));
+      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> optionalUSD(1f);
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> leg
           .startTime()
           .isBefore(KITSAP_FAST_FERRY_CHANGE_DATE.atStartOfDay(leg.startTime().getZone()))
@@ -633,7 +633,9 @@ public class OrcaFareService extends DefaultFareService {
     ZonedDateTime currentLegStartTime
   ) {
     // If there is no free transfer, then return false.
-    if (freeTransferStartTime == null) return false;
+    if (freeTransferStartTime == null) {
+      return false;
+    }
     Duration duration = Duration.between(freeTransferStartTime, currentLegStartTime);
     return duration.compareTo(MAX_TRANSFER_DISCOUNT_DURATION) < 0;
   }

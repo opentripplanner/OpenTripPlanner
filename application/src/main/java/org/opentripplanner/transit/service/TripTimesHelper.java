@@ -23,4 +23,6 @@ public class TripTimesHelper {
       !includeCancellations
     );
   }
+
+  private TripTimesHelper() {}
 }

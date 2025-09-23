@@ -23,4 +23,6 @@ public class OtpFileNames {
       DEBUG_UI_CONFIG_FILENAME.equals(filename)
     );
   }
+
+  private OtpFileNames() {}
 }

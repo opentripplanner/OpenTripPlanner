@@ -70,7 +70,7 @@ class PathTailC2Calculator {
     PassThroughPointsIterator ptpIter
   ) {
     var pattern = leg.trip().pattern();
-    for (int pos = leg.toStopPos(); pos >= stopPos; --pos) {
+    for (int pos = leg.toStopPos(); pos >= stopPos; pos--) {
       if (ptpIter.isPassThroughPoint(pattern.stopIndex(pos))) {
         ptpIter.next();
       }

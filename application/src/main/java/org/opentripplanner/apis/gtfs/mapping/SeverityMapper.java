@@ -23,4 +23,6 @@ public class SeverityMapper {
       case UNDEFINED, UNKNOWN_SEVERITY -> GraphQLAlertSeverityLevelType.UNKNOWN_SEVERITY;
     };
   }
+
+  private SeverityMapper() {}
 }

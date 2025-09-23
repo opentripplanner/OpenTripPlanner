@@ -27,4 +27,6 @@ public class WebMercatorTile {
     double n = Math.PI - (2.0 * Math.PI * y) / Math.pow(2.0, z);
     return Math.toDegrees(Math.atan(Math.sinh(n)));
   }
+
+  private WebMercatorTile() {}
 }

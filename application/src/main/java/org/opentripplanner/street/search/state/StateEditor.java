@@ -25,9 +25,9 @@ public class StateEditor {
 
   protected State child;
 
-  private boolean spawned = false;
+  private boolean spawned;
 
-  private boolean defectiveTraversal = false;
+  private boolean defectiveTraversal;
 
   private boolean traversingBackward;
 
@@ -102,7 +102,9 @@ public class StateEditor {
   @Nullable
   public State makeState() {
     // check that this editor has not been used already
-    if (spawned) throw new IllegalStateException("A StateEditor can only be used once.");
+    if (spawned) {
+      throw new IllegalStateException("A StateEditor can only be used once.");
+    }
 
     // if something was flagged incorrect, do not make a new state
     if (defectiveTraversal) {
@@ -185,7 +187,7 @@ public class StateEditor {
       defectiveTraversal = true;
       return;
     }
-    child.time_ms += (traversingBackward ? -milliseconds : milliseconds);
+    child.time_ms += traversingBackward ? -milliseconds : milliseconds;
   }
 
   public void incrementTimeInSeconds(long seconds) {
@@ -240,14 +242,18 @@ public class StateEditor {
   }
 
   public void setBackMode(TraverseMode mode) {
-    if (mode == child.stateData.backMode) return;
+    if (mode == child.stateData.backMode) {
+      return;
+    }
 
     cloneStateDataAsNeeded();
     child.stateData.backMode = mode;
   }
 
   public void setBackWalkingBike(boolean walkingBike) {
-    if (walkingBike == child.stateData.backWalkingBike) return;
+    if (walkingBike == child.stateData.backWalkingBike) {
+      return;
+    }
 
     cloneStateDataAsNeeded();
     child.stateData.backWalkingBike = walkingBike;
@@ -399,7 +405,8 @@ public class StateEditor {
    * older states.
    */
   private void cloneStateDataAsNeeded() {
-    if (child.backState != null && child.stateData == child.backState.stateData) child.stateData =
-      child.stateData.clone();
+    if (child.backState != null && child.stateData == child.backState.stateData) {
+      child.stateData = child.stateData.clone();
+    }
   }
 }

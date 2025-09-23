@@ -168,11 +168,11 @@ public class OsmEntity {
   private OsmProvider osmProvider;
 
   public static boolean isFalse(String tagValue) {
-    return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
+    return "no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue);
   }
 
   public static boolean isTrue(String tagValue) {
-    return ("yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue));
+    return "yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue);
   }
 
   /**
@@ -193,7 +193,9 @@ public class OsmEntity {
    * Adds a tag.
    */
   public void addTag(OsmTag tag) {
-    if (tags == null) tags = new HashMap<>();
+    if (tags == null) {
+      tags = new HashMap<>();
+    }
 
     tags.put(tag.getK().toLowerCase(), tag.getV());
   }
@@ -567,7 +569,9 @@ public class OsmEntity {
       for (Map.Entry<String, String> kv : i18nTags.entrySet()) {
         if (!kv.getKey().equals(defKey)) {
           String lang = kv.getKey().substring(defKey.length() + 1);
-          if (!i18n.containsKey(lang)) i18n.put(lang, new StringBuffer(i18n.get(null)));
+          if (!i18n.containsKey(lang)) {
+            i18n.put(lang, new StringBuffer(i18n.get(null)));
+          }
         }
       }
       // get the simple value (eg: description=...)
@@ -713,7 +717,7 @@ public class OsmEntity {
     return (
       isParking() &&
       ((parkingType != null && parkingType.contains("park_and_ride")) ||
-        (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no")))
+        (parkAndRide != null && !"no".equalsIgnoreCase(parkAndRide)))
     );
   }
 
@@ -874,7 +878,7 @@ public class OsmEntity {
    */
   public boolean isLink() {
     String highway = getTag("highway");
-    return highway != null && highway.endsWith(("_link"));
+    return highway != null && highway.endsWith("_link");
   }
 
   public boolean isElevator() {

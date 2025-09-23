@@ -14,4 +14,6 @@ public class TestVertexLinker {
       StreetConstants.DEFAULT_MAX_AREA_NODES
     );
   }
+
+  private TestVertexLinker() {}
 }

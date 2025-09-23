@@ -16,4 +16,6 @@ class PathwayModeMapper {
       default -> PathwayMode.UNKNOWN;
     };
   }
+
+  private PathwayModeMapper() {}
 }

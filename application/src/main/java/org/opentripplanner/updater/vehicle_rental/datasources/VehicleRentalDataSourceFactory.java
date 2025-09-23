@@ -28,4 +28,6 @@ public class VehicleRentalDataSourceFactory {
       );
     };
   }
+
+  private VehicleRentalDataSourceFactory() {}
 }

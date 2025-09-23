@@ -28,4 +28,6 @@ public class TestStreetLinkerModule {
       DataImportIssueStore.NOOP
     ).buildGraph();
   }
+
+  private TestStreetLinkerModule() {}
 }

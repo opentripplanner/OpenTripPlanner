@@ -64,4 +64,6 @@ public class OneOfInputValidator {
     }
     return field;
   }
+
+  private OneOfInputValidator() {}
 }

@@ -25,11 +25,11 @@ public class OsmModuleBuilder {
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
   private EdgeNamer edgeNamer = new DefaultNamer();
-  private boolean areaVisibility = false;
-  private boolean platformEntriesLinking = false;
-  private boolean staticParkAndRide = false;
-  private boolean staticBikeParkAndRide = false;
-  private boolean includeOsmSubwayEntrances = false;
+  private boolean areaVisibility;
+  private boolean platformEntriesLinking;
+  private boolean staticParkAndRide;
+  private boolean staticBikeParkAndRide;
+  private boolean includeOsmSubwayEntrances;
   private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
   private StreetLimitationParameters streetLimitationParameters = new StreetLimitationParameters();
 

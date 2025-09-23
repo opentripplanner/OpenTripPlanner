@@ -10,7 +10,7 @@ public class FindRegularStopsByBoundingBoxRequestBuilder {
   @Nullable
   private String feedId;
 
-  private boolean filterByInUse = false;
+  private boolean filterByInUse;
 
   FindRegularStopsByBoundingBoxRequestBuilder(Envelope envelope) {
     this.envelope = envelope;

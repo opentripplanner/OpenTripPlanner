@@ -22,4 +22,6 @@ public class StreetSearchRequestMapper {
       .withWheelchair(request.journey().wheelchair())
       .withMode(request.journey().transfer().mode());
   }
+
+  private StreetSearchRequestMapper() {}
 }

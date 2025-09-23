@@ -61,4 +61,6 @@ public class TripTimesStringBuilder {
     }
     return s.toString();
   }
+
+  private TripTimesStringBuilder() {}
 }

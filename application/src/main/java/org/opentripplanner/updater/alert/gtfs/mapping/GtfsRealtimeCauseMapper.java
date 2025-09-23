@@ -45,4 +45,6 @@ public class GtfsRealtimeCauseMapper {
       }
     }
   }
+
+  private GtfsRealtimeCauseMapper() {}
 }

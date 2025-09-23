@@ -30,4 +30,6 @@ public class WalkPreferencesMapper {
       preferences.withBoardCost(boardCost.toSeconds());
     }
   }
+
+  private WalkPreferencesMapper() {}
 }

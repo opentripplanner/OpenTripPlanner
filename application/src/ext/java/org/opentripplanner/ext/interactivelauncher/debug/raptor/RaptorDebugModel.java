@@ -14,8 +14,8 @@ import org.opentripplanner.utils.lang.StringUtils;
 public class RaptorDebugModel implements LauncherRequestDecorator {
 
   private final Set<DebugEventType> eventTypes = EnumSet.noneOf(DebugEventType.class);
-  private String stops = null;
-  private String path = null;
+  private String stops;
+  private String path;
   private Runnable saveCallback;
 
   public RaptorDebugModel() {}

@@ -115,15 +115,15 @@ public class TimetableRepository implements Serializable {
   private final CalendarServiceData calendarServiceData = new CalendarServiceData();
 
   private transient TimetableRepositoryIndex index;
-  private ZoneId timeZone = null;
-  private boolean timeZoneExplicitlySet = false;
+  private ZoneId timeZone;
+  private boolean timeZoneExplicitlySet;
 
-  private transient GraphUpdaterManager updaterManager = null;
+  private transient GraphUpdaterManager updaterManager;
 
-  private boolean hasTransit = false;
+  private boolean hasTransit;
 
-  private boolean hasFrequencyService = false;
-  private boolean hasScheduledService = false;
+  private boolean hasFrequencyService;
+  private boolean hasScheduledService;
 
   private final Map<FeedScopedId, TripPattern> tripPatternForId = new HashMap<>();
   private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = new HashMap<>();

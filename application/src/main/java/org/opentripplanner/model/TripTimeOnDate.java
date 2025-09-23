@@ -78,7 +78,7 @@ public class TripTimeOnDate {
       return null;
     }
     List<TripTimeOnDate> out = new ArrayList<>();
-    for (int i = 0; i < times.getNumStops(); ++i) {
+    for (int i = 0; i < times.getNumStops(); i++) {
       out.add(new TripTimeOnDate(times, i, table.getPattern()));
     }
     return out;
@@ -105,7 +105,7 @@ public class TripTimeOnDate {
       return fromTripTimes(scheduledTimetable, trip);
     }
     List<TripTimeOnDate> out = new ArrayList<>();
-    for (int i = 0; i < times.getNumStops(); ++i) {
+    for (int i = 0; i < times.getNumStops(); i++) {
       out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDate, midnight));
     }
     return out;
@@ -130,7 +130,7 @@ public class TripTimeOnDate {
     // if the trip doesn't run on the date, the scheduled timetable should be given.
     TripTimes times = Objects.requireNonNull(table.getTripTimes(trip));
     List<TripTimeOnDate> out = new ArrayList<>();
-    for (int i = 0; i < times.getNumStops(); ++i) {
+    for (int i = 0; i < times.getNumStops(); i++) {
       out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDate, midnight));
     }
     return out;
@@ -387,7 +387,9 @@ public class TripTimeOnDate {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     TripTimeOnDate that = (TripTimeOnDate) o;
     return (
       stopIndex == that.stopIndex &&

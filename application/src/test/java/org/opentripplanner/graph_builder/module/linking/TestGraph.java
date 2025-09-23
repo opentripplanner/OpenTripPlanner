@@ -88,4 +88,6 @@ class TestGraph {
       );
     }
   }
+
+  private TestGraph() {}
 }

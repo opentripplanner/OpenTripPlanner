@@ -26,8 +26,8 @@ public final class TripScheduleWithOffset implements TripSchedule {
   private final IntUnaryOperator departureTimes;
 
   // Computed when needed later for RaptorPathToItineraryMapper
-  private TripTimes tripTimes = null;
-  private LocalDate serviceDate = null;
+  private TripTimes tripTimes;
+  private LocalDate serviceDate;
   private int secondsOffset;
 
   TripScheduleWithOffset(TripPatternForDates pattern, int tripIndexForDates) {

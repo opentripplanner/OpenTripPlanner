@@ -62,10 +62,10 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
       updateIncrementality = DIFFERENTIAL;
       return siri;
     } catch (OtpHttpClientException e) {
-      LOG.info("Failed after {} ms", (System.currentTimeMillis() - t1));
+      LOG.info("Failed after {} ms", System.currentTimeMillis() - t1);
       LOG.warn("Could not get SIRI-ET data from {}", url, e);
     } catch (Exception e) {
-      LOG.info("Failed after {} ms", (System.currentTimeMillis() - t1));
+      LOG.info("Failed after {} ms", System.currentTimeMillis() - t1);
       LOG.warn("Failed to parse SIRI-ET feed from {}", url, e);
     }
     return Optional.empty();

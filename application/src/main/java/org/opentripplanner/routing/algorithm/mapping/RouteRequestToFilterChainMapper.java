@@ -143,4 +143,6 @@ public class RouteRequestToFilterChainMapper {
     }
     return minBikeParkingDistance;
   }
+
+  private RouteRequestToFilterChainMapper() {}
 }

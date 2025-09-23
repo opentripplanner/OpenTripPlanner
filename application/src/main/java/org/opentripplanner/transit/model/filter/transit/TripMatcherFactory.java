@@ -78,4 +78,6 @@ public class TripMatcherFactory {
         new EqualityMatcher<>("serviceDate", date, (dateToMatch -> dateToMatch))
       );
   }
+
+  private TripMatcherFactory() {}
 }

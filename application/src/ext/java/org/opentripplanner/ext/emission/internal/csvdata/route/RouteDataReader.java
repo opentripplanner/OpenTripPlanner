@@ -17,7 +17,7 @@ public class RouteDataReader {
 
   private final DataSource emissionDataSource;
   private final DataImportIssueStore issueStore;
-  private boolean dataProcessed = false;
+  private boolean dataProcessed;
 
   public RouteDataReader(DataSource emissionDataSource, DataImportIssueStore issueStore) {
     this.emissionDataSource = emissionDataSource;

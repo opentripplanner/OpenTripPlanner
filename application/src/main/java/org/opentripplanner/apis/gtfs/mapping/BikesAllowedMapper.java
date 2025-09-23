@@ -12,4 +12,6 @@ public class BikesAllowedMapper {
       case NOT_ALLOWED -> GraphQLBikesAllowed.NOT_ALLOWED;
     };
   }
+
+  private BikesAllowedMapper() {}
 }

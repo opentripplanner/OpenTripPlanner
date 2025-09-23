@@ -20,4 +20,6 @@ public class PatternByDateFilterUtil {
       trip -> transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId())
     );
   }
+
+  private PatternByDateFilterUtil() {}
 }

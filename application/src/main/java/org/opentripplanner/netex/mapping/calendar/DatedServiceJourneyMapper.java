@@ -54,4 +54,6 @@ public class DatedServiceJourneyMapper {
     OperatingDayRefStructure operatingDayRef = dsj.getOperatingDayRef();
     return operatingDayRef == null ? null : operatingDayById.lookup(operatingDayRef.getRef());
   }
+
+  private DatedServiceJourneyMapper() {}
 }

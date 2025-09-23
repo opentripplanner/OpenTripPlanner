@@ -26,7 +26,7 @@ class StopTimesHelperTest {
   private static FeedScopedId stopId;
   private static TripPattern pattern;
   private static StopTimesHelper stopTimesHelper;
-  private static Comparator<TripTimeOnDate> SORT_ORDER = TripTimeOnDate.compareByDeparture();
+  private static final Comparator<TripTimeOnDate> SORT_ORDER = TripTimeOnDate.compareByDeparture();
 
   @BeforeAll
   public static void setUp() throws Exception {
@@ -88,7 +88,7 @@ class StopTimesHelperTest {
     assertEquals(3, result.stream().mapToLong(s -> s.times.size()).sum());
     var stopTimesForPattern = result
       .stream()
-      .filter(s -> s.pattern.getRoute().getId().getId().equals("5"))
+      .filter(s -> "5".equals(s.pattern.getRoute().getId().getId()))
       .toList();
 
     assertEquals(1, stopTimesForPattern.size());
@@ -177,7 +177,7 @@ class StopTimesHelperTest {
 
     var stopTimesForPattern = result
       .stream()
-      .filter(s -> s.pattern.getRoute().getId().getId().equals("5"))
+      .filter(s -> "5".equals(s.pattern.getRoute().getId().getId()))
       .toList();
 
     assertEquals(1, stopTimesForPattern.size());
@@ -292,7 +292,7 @@ class StopTimesHelperTest {
     assertEquals(5, result.stream().mapToLong(s -> s.times.size()).sum());
     var stopTimesForPattern = result
       .stream()
-      .filter(s -> s.pattern.getRoute().getId().getId().equals("5"))
+      .filter(s -> "5".equals(s.pattern.getRoute().getId().getId()))
       .toList();
 
     assertEquals(1, stopTimesForPattern.size());

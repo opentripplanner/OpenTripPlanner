@@ -25,4 +25,6 @@ public class TripTimesFactory {
   ) {
     return StopTimeToScheduledTripTimesMapper.map(trip, stopTimes, deduplicator);
   }
+
+  private TripTimesFactory() {}
 }

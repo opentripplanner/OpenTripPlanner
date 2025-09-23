@@ -18,4 +18,6 @@ public class ZoneIds {
   public static final ZoneId US_CENTRAL = ZoneId.of("US/Central");
   public static final ZoneId CHICAGO = ZoneId.of("America/Chicago");
   public static final ZoneId LOS_ANGELES = ZoneId.of("America/Los_Angeles");
+
+  private ZoneIds() {}
 }

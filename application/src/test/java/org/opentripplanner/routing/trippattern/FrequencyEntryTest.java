@@ -27,7 +27,7 @@ public class FrequencyEntryTest {
     List<StopTime> stopTimes = new ArrayList<>();
 
     int time = 0;
-    for (int i = 0; i < STOP_NUM; ++i) {
+    for (int i = 0; i < STOP_NUM; i++) {
       FeedScopedId id = TimetableRepositoryForTest.id(i + "");
 
       RegularStop stop = TimetableRepositoryForTest.of().stop(id.getId(), 0.0, 0.0).build();

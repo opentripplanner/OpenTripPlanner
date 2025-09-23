@@ -15,4 +15,6 @@ public class LocalDateRangeUtil {
       !new LocalDateRange(dateRange.getGraphQLStart(), dateRange.getGraphQLEnd()).unlimited()
     );
   }
+
+  private LocalDateRangeUtil() {}
 }

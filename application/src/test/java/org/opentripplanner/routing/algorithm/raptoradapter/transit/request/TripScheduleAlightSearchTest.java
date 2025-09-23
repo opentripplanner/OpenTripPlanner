@@ -142,7 +142,7 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
     List<TestTripSchedule> tripSchedules = new ArrayList<>();
     int arrivalTime = firstArrivalTime;
 
-    for (int i = 0; i < N; ++i, arrivalTime += dT) {
+    for (int i = 0; i < N; i++, arrivalTime += dT) {
       tripSchedules.add(schedule().arrivals(arrivalTime).build());
     }
 
@@ -151,7 +151,7 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
     // Search for a trip that alight before the first trip, expect no trip in return
     searchForTrip(firstArrivalTime - 1, STOP_POS_0).assertNoTripFound();
 
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < N; i++) {
       int tripAlightTime = dT * (i + 1);
 
       // Search and find trip 'i'

@@ -84,7 +84,7 @@ public class NetexMapper {
    * for the Netex entities follow the main index {@link  #currentNetexIndex}, hence sopped by file
    * group.
    */
-  private NetexMapperIndexes currentMapperIndexes = null;
+  private NetexMapperIndexes currentMapperIndexes;
 
   private int level = LEVEL_SHARED;
 

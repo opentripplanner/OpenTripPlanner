@@ -22,4 +22,6 @@ public class GraphBuilderModule {
   ) {
     return new GraphBuilder(baseGraph, timetableRepository, issueStore, closeDataSourcesHandle);
   }
+
+  private GraphBuilderModule() {}
 }

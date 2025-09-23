@@ -20,24 +20,24 @@ public class ApiItinerary {
   /**
    * Time that the trip departs.
    */
-  public Calendar startTime = null;
+  public Calendar startTime;
   /**
    * Time that the trip arrives.
    */
-  public Calendar endTime = null;
+  public Calendar endTime;
 
   /**
    * How much time is spent walking, in seconds.
    */
-  public long walkTime = 0;
+  public long walkTime;
   /**
    * How much time is spent on transit, in seconds.
    */
-  public long transitTime = 0;
+  public long transitTime;
   /**
    * How much time is spent waiting for transit to arrive, in seconds.
    */
-  public long waitingTime = 0;
+  public long waitingTime;
 
   /**
    * How far the user has to walk, in meters.
@@ -47,7 +47,7 @@ public class ApiItinerary {
   /**
    * Indicates that the walk limit distance has been exceeded for this itinerary when true.
    */
-  public boolean walkLimitExceeded = false;
+  public boolean walkLimitExceeded;
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the total cost computed
@@ -91,13 +91,13 @@ public class ApiItinerary {
    * This itinerary has a greater slope than the user requested (but there are no possible
    * itineraries with a good slope).
    */
-  public boolean tooSloped = false;
+  public boolean tooSloped;
 
   /**
    * If {@link RouteRequest#allowArrivingInRentalVehicleAtDestination}
    * is set than it is possible to end a trip without dropping off the rented bicycle.
    */
-  public boolean arrivedAtDestinationWithRentedBicycle = false;
+  public boolean arrivedAtDestinationWithRentedBicycle;
 
   /**
    * A sandbox feature for calculating a numeric score between 0 and 1 which indicates

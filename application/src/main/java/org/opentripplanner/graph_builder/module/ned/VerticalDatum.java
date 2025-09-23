@@ -48,8 +48,8 @@ public class VerticalDatum {
     int nRows = stream.readInt();
     int nColumns = stream.readInt();
     float[][] data = new float[nRows][nColumns];
-    for (int y = 0; y < nRows; ++y) {
-      for (int x = 0; x < nColumns; ++x) {
+    for (int y = 0; y < nRows; y++) {
+      for (int x = 0; x < nColumns; x++) {
         data[y][x] = stream.readFloat();
       }
     }

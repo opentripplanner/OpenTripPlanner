@@ -238,7 +238,7 @@ class OsmBoardingLocationsModuleTest {
        */
       public final VertexLabel endLabel;
 
-      private TransitStopVertex platformVertex = null;
+      private TransitStopVertex platformVertex;
 
       public TestCase(RegularStop platform, VertexLabel beginLabel, VertexLabel endLabel) {
         this.platform = platform;

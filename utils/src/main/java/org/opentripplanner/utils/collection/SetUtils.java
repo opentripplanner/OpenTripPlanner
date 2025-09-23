@@ -33,4 +33,6 @@ public class SetUtils {
         .collect(() -> new HashSet<>(list.getFirst()), Set::retainAll, Set::retainAll);
     }
   }
+
+  private SetUtils() {}
 }

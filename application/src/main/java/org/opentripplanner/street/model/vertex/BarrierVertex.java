@@ -62,6 +62,7 @@ public class BarrierVertex extends OsmVertex {
         out.isEmpty() ||
         in.isEmpty() ||
         // in+out edge pair connects the vertex to a single adjacent vertex -> must be street end point
+        // in+out edge pair connects the vertex to a single adjacent vertex -> must be street end point
         out.iterator().next().getToVertex() ==
         in.iterator().next().getFromVertex()
       ) {

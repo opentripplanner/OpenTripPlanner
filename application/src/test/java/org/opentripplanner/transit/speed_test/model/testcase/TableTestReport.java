@@ -87,4 +87,6 @@ public class TableTestReport {
         .map(Object::toString)
         .collect(Collectors.joining(" "));
   }
+
+  private TableTestReport() {}
 }

@@ -15,7 +15,7 @@ public class FareLegRuleBuilder {
   private FeedScopedId networkId;
   private FeedScopedId fromAreaId;
   private FeedScopedId toAreaId;
-  private FareDistance fareDistance = null;
+  private FareDistance fareDistance;
 
   public FareLegRuleBuilder(FeedScopedId id, Collection<FareProduct> products) {
     this.id = id;

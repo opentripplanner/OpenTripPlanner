@@ -69,7 +69,7 @@ class TurnRestrictionUnifier {
                 }
               }
               case U -> {
-                if ((angleDiff <= 150 || angleDiff > 210)) {
+                if (angleDiff <= 150 || angleDiff > 210) {
                   issueStore.add(
                     new TurnRestrictionBad(
                       restrictionTag.relationOsmID,
@@ -101,4 +101,6 @@ class TurnRestrictionUnifier {
       }
     }
   }
+
+  private TurnRestrictionUnifier() {}
 }

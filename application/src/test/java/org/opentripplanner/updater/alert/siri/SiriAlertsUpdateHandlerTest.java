@@ -1138,7 +1138,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     for (EntitySelector entity : transitAlert.entities()) {
       if (!foundMatch) {
         if (entity.key() instanceof EntityKey.StopAndRoute stopAndRoute) {
-          foundMatch = stopAndRoute.equals((new EntityKey.StopAndRoute(stopId, routeOrTripId)));
+          foundMatch = stopAndRoute.equals(new EntityKey.StopAndRoute(stopId, routeOrTripId));
         } else if (entity instanceof EntitySelector.StopAndTrip stopAndTrip) {
           foundMatch =
             stopAndTrip.key().equals(new EntityKey.StopAndTrip(stopId, routeOrTripId)) &&

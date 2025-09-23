@@ -195,7 +195,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     if (GRAPH_PATTERN.matcher(name).find()) {
       return GRAPH;
     }
-    if (name.equals(BUILD_REPORT_DIR)) {
+    if (BUILD_REPORT_DIR.equals(name)) {
       return REPORT;
     }
     if (OtpFileNames.isConfigFile(name)) {

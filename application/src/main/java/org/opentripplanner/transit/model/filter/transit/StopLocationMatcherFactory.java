@@ -38,4 +38,6 @@ public class StopLocationMatcherFactory {
       new EqualityMatcher<>("name", name, s -> s.getName().toString())
     );
   }
+
+  private StopLocationMatcherFactory() {}
 }

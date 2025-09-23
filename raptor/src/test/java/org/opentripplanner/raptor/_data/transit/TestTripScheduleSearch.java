@@ -48,7 +48,7 @@ class TestTripScheduleSearch
   private RaptorBoardOrAlightEvent<TestTripSchedule> searchForward(int tripIndexLimit) {
     final int end = tripIndexLimit == UNBOUNDED_TRIP_INDEX ? trips.size() - 1 : tripIndexLimit - 1;
 
-    for (int i = 0; i <= end; ++i) {
+    for (int i = 0; i <= end; i++) {
       int departureTime = trips.get(i).departure(stopPositionInPattern);
       if (timeLimit <= departureTime) {
         this.time = departureTime;
@@ -62,7 +62,7 @@ class TestTripScheduleSearch
   private RaptorBoardOrAlightEvent<TestTripSchedule> searchInReverse(int tripIndexLimit) {
     final int end = tripIndexLimit == UNBOUNDED_TRIP_INDEX ? 0 : tripIndexLimit + 1;
 
-    for (int i = trips.size() - 1; i >= end; --i) {
+    for (int i = trips.size() - 1; i >= end; i--) {
       int arrivalTime = trips.get(i).arrival(stopPositionInPattern);
       if (timeLimit >= arrivalTime) {
         this.time = arrivalTime;

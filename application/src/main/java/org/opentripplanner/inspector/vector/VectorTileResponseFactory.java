@@ -80,4 +80,6 @@ public class VectorTileResponseFactory {
       OtpServerRequestContext context
     );
   }
+
+  private VectorTileResponseFactory() {}
 }

@@ -52,4 +52,6 @@ public class ItinerariesHelper {
       .mapToDouble(StreetEdge::getMaxSlope)
       .max();
   }
+
+  private ItinerariesHelper() {}
 }

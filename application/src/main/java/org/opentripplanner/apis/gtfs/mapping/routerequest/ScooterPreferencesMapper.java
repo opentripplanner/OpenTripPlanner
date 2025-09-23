@@ -93,4 +93,6 @@ public class ScooterPreferencesMapper {
       args.getGraphQLTime() != null
     );
   }
+
+  private ScooterPreferencesMapper() {}
 }

@@ -50,12 +50,12 @@ public class RoutingErrorsAttacher {
         it
           .systemNotices()
           .stream()
-          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfStreetOnlyIsBetter.TAG));
+          .anyMatch(notice -> RemoveTransitIfStreetOnlyIsBetter.TAG.equals(notice.tag()));
       Predicate<Itinerary> isWorseThanWalking = it ->
         it
           .systemNotices()
           .stream()
-          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfWalkingIsBetter.TAG));
+          .anyMatch(notice -> RemoveTransitIfWalkingIsBetter.TAG.equals(notice.tag()));
       if (
         filteredItineraries
           .stream()
@@ -78,4 +78,6 @@ public class RoutingErrorsAttacher {
     }
     return routingErrors;
   }
+
+  private RoutingErrorsAttacher() {}
 }

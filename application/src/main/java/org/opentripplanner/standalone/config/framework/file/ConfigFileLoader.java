@@ -35,10 +35,10 @@ public class ConfigFileLoader {
   private final ObjectMapper mapper = new ObjectMapper();
 
   @Nullable
-  private File configDir = null;
+  private File configDir;
 
   @Nullable
-  private String jsonFallback = null;
+  private String jsonFallback;
 
   private ConfigFileLoader() {
     // Configure mapper

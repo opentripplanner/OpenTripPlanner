@@ -20,4 +20,6 @@ public class TimeAndCostPenaltyMapper {
         .asDouble(TimeAndCostPenalty.ZERO.costFactor())
     );
   }
+
+  private TimeAndCostPenaltyMapper() {}
 }

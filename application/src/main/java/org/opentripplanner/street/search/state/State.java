@@ -398,7 +398,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
           );
         }
       } else if (!orig.isRentingVehicle() && orig.getBackState().isRentingVehicle()) {
-        var stationVertex = ((VehicleRentalPlaceVertex) orig.vertex);
+        var stationVertex = (VehicleRentalPlaceVertex) orig.vertex;
         if (orig.getBackState().isRentingVehicleFromStation()) {
           editor.beginVehicleRentingAtStation(
             ((VehicleRentalEdge) edge).formFactor,

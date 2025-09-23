@@ -13,7 +13,7 @@ class TableRowFormatter {
   private static final char ALIGN_CH = ':';
   private final List<Table.Align> alignment;
   private final List<Integer> widths;
-  private boolean includeBoarder = false;
+  private boolean includeBoarder;
   private Function<String, String> escapeTextOp = s -> s;
 
   private TableRowFormatter(
@@ -38,7 +38,7 @@ class TableRowFormatter {
 
   String format(List<?> values) {
     var buf = new StringBuilder();
-    for (int i = 0; i < values.size(); ++i) {
+    for (int i = 0; i < values.size(); i++) {
       if (i != 0) {
         buf.append(AIR).append(SEP).append(AIR);
       } else if (includeBoarder) {
@@ -54,7 +54,7 @@ class TableRowFormatter {
 
   String markdownHeaderLine() {
     var buf = new StringBuilder(SEP);
-    for (int i = 0; i < widths.size(); ++i) {
+    for (int i = 0; i < widths.size(); i++) {
       var align = alignment.get(i);
       addAlignChar(buf, align == Table.Align.Center);
       StringUtils.append(buf, LINE_CH, widths.get(i));

@@ -149,7 +149,7 @@ public class TestRouteData {
 
   public int stopPosition(StopLocation stop) {
     List<StopTime> times = firstTrip().getStopTimes();
-    for (int i = 0; i < times.size(); ++i) {
+    for (int i = 0; i < times.size(); i++) {
       if (stop == times.get(i).getStop()) {
         return i;
       }

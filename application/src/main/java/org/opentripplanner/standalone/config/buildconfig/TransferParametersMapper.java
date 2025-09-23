@@ -64,4 +64,6 @@ public class TransferParametersMapper {
     );
     return builder.build();
   }
+
+  private TransferParametersMapper() {}
 }

@@ -124,4 +124,6 @@ public class VehicleParkingUpdaterConfig {
       .description("Used for converting abstract opening hours into concrete points in time.")
       .asZoneId(null);
   }
+
+  private VehicleParkingUpdaterConfig() {}
 }

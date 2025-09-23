@@ -138,12 +138,10 @@ public class HeuristicsAdapter implements Heuristics {
   }
 
   private int bestGeneralizedCost(int stop) {
-    return (
-      costCalculator.calculateRemainingMinCost(
-        bestTravelDuration(stop),
-        bestNumOfTransfers(stop),
-        stop
-      )
+    return costCalculator.calculateRemainingMinCost(
+      bestTravelDuration(stop),
+      bestNumOfTransfers(stop),
+      stop
     );
   }
 

@@ -43,4 +43,6 @@ public class GtfsRealtimeEffectMapper {
       }
     }
   }
+
+  private GtfsRealtimeEffectMapper() {}
 }

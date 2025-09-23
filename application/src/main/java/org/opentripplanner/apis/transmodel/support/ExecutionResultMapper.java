@@ -63,4 +63,6 @@ public class ExecutionResultMapper {
     var result = ExecutionResult.newExecutionResult().addError(error).build();
     return response(result, OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY);
   }
+
+  private ExecutionResultMapper() {}
 }

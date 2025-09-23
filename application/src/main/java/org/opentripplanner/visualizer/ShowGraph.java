@@ -96,7 +96,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   );
   private final LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<>();
   private final boolean drawEdges = true;
-  private int videoFrameNumber = 0;
+  private int videoFrameNumber;
   Graph graph;
   STRtree vertexIndex;
   STRtree edgeIndex;
@@ -111,10 +111,10 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   private GraphPath highlightedGraphPath;
   protected double mouseModelX;
   protected double mouseModelY;
-  private Point startDrag = null;
+  private Point startDrag;
   private int dragX, dragY;
-  private boolean ctrlPressed = false;
-  boolean drawFast = false;
+  private boolean ctrlPressed;
+  boolean drawFast;
   boolean drawStreetEdges = true;
   boolean drawTransitEdges = true;
   boolean drawLinkEdges = true;
@@ -122,7 +122,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   boolean drawTransitStopVertices = true;
   boolean drawExtraVertices = true;
   private int drawLevel = DRAW_ALL;
-  private int drawOffset = 0;
+  private int drawOffset;
   private boolean drawHighlighted = true;
   public SimpleSPT simpleSPT = new SimpleSPT();
   private LinkedBlockingQueue<SPTNode> sptEdgeQueue;
@@ -229,12 +229,16 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     } else if (drawLevel == DRAW_HIGHLIGHTED) {
       drawHighlighted();
     } else if (drawLevel == DRAW_MINIMAL) {
-      if (!newHighlightedEdges.isEmpty()) handleNewHighlights();
+      if (!newHighlightedEdges.isEmpty()) {
+        handleNewHighlights();
+      }
       drawNewEdges();
       drawCoords();
     }
     drawOffset = 0;
-    if (drawLevel > DRAW_MINIMAL) drawLevel -= 1; // move to next layer
+    if (drawLevel > DRAW_MINIMAL) {
+      drawLevel -= 1; // move to next layer
+    }
   }
 
   public void redraw() {
@@ -291,11 +295,15 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   }
 
   public void keyPressed() {
-    if (key == CODED && keyCode == CONTROL) ctrlPressed = true;
+    if (key == CODED && keyCode == CONTROL) {
+      ctrlPressed = true;
+    }
   }
 
   public void keyReleased() {
-    if (key == CODED && keyCode == CONTROL) ctrlPressed = false;
+    if (key == CODED && keyCode == CONTROL) {
+      ctrlPressed = false;
+    }
   }
 
   public void zoomToDefault() {
@@ -451,7 +459,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       vertices.add(v);
     }
 
-    if (e == null && v == null) return;
+    if (e == null && v == null) {
+      return;
+    }
 
     // make it a little bigger, especially needed for STOP_UNLINKED
     env.expandBy(0.02);
@@ -606,7 +616,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       TraverseMode mode = s.getBackMode();
 
       Edge e = s.getBackEdge();
-      if (e == null) continue;
+      if (e == null) {
+        continue;
+      }
 
       // TODO Add support for crating transit edges on the fly
       //      if (mode != null && mode.isTransit()) {
@@ -646,7 +658,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     if (VIDEO) {
       // freeze on final path for a few frames
-      for (int i = 0; i < 10; i++) saveVideoFrame();
+      for (int i = 0; i < 10; i++) {
+        saveVideoFrame();
+      }
       resetVideoFrameNumber();
     }
   }
@@ -756,7 +770,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   private void drawVertices() {
     /* turn off vertex display when zoomed out */
     final double METERS_PER_DEGREE_LAT = 111111.111111;
-    boolean closeEnough = ((modelBounds.getHeight() * METERS_PER_DEGREE_LAT) / this.width < 5);
+    boolean closeEnough = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT) / this.width < 5;
     /* Draw selected visible vertices */
     for (Vertex v : visibleVertices) {
       if (
@@ -914,8 +928,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     int drawStart = 0;
     int drawCount = 0;
     while (drawStart < DECIMATE && drawStart < visibleStreetEdges.size()) {
-      if (drawFast) drawEdgeFast(visibleStreetEdges.get(drawIndex));
-      else drawEdge(visibleStreetEdges.get(drawIndex));
+      if (drawFast) {
+        drawEdgeFast(visibleStreetEdges.get(drawIndex));
+      } else {
+        drawEdge(visibleStreetEdges.get(drawIndex));
+      }
       drawIndex += DECIMATE;
       drawCount += 1;
       if (drawCount % BLOCK_SIZE == 0 && millis() - startMillis > FRAME_TIME) {
@@ -947,7 +964,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         highlightedEdges.add(de);
       }
     }
-    if (VIDEO) saveVideoFrame();
+    if (VIDEO) {
+      saveVideoFrame();
+    }
   }
 
   private void saveVideoFrame() {

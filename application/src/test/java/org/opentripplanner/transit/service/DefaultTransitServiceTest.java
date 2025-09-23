@@ -132,7 +132,7 @@ class DefaultTransitServiceTest {
 
   private static RealTimeTripTimes getRealTimeTripTimes() {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes();
-    for (var i = 0; i < SCHEDULED_TRIP_TIMES.getNumStops(); ++i) {
+    for (var i = 0; i < SCHEDULED_TRIP_TIMES.getNumStops(); i++) {
       builder.withArrivalDelay(i, DefaultTransitServiceTest.DELAY);
       builder.withDepartureDelay(i, DefaultTransitServiceTest.DELAY);
     }

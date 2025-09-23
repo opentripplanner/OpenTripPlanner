@@ -52,4 +52,6 @@ class OpenGisMapper {
 
     return new CoordinateArrayListSequence(coordinates);
   }
+
+  private OpenGisMapper() {}
 }

@@ -50,4 +50,6 @@ public class WheelChairMapper {
         return Accessibility.NO_INFORMATION;
     }
   }
+
+  private WheelChairMapper() {}
 }

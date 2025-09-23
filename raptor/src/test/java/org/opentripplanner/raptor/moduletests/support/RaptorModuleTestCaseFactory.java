@@ -17,7 +17,7 @@ import org.opentripplanner.utils.time.DurationUtils;
  */
 public class RaptorModuleTestCaseFactory {
 
-  private Consumer<RaptorRequestBuilder<TestTripSchedule>> requestAdditions = null;
+  private Consumer<RaptorRequestBuilder<TestTripSchedule>> requestAdditions;
   private final List<RaptorModuleTestCase.Builder> cases = new ArrayList<>();
 
   public RaptorModuleTestCaseFactory withRequest(

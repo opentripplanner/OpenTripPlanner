@@ -47,4 +47,6 @@ class DebugLoggingSupport {
     var log = context.getLogger(logger);
     log.setLevel(debug ? Level.DEBUG : Level.INFO);
   }
+
+  private DebugLoggingSupport() {}
 }

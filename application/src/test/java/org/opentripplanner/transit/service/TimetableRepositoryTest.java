@@ -63,9 +63,9 @@ class TimetableRepositoryTest {
           new DefaultFareServiceFactory(),
           null
         ),
-      ("The graph contains agencies with different time zones. " +
-        "Please configure the one to be used in the " +
-        BUILD_CONFIG_FILENAME)
+      "The graph contains agencies with different time zones. " +
+      "Please configure the one to be used in the " +
+      BUILD_CONFIG_FILENAME
     );
   }
 

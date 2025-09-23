@@ -50,7 +50,7 @@ public class StatesToWalkStepsMapper {
   private final WalkStep previous;
   private final List<WalkStepBuilder> steps = new ArrayList<>();
 
-  private WalkStepBuilder current = null;
+  private WalkStepBuilder current;
   private double lastAngle = 0;
 
   /**
@@ -61,8 +61,8 @@ public class StatesToWalkStepsMapper {
   /**
    * Track whether we are in a roundabout, and if so the exit number
    */
-  private int roundaboutExit = 0;
-  private String roundaboutPreviousStreet = null;
+  private int roundaboutExit;
+  private String roundaboutPreviousStreet;
 
   /**
    * Converts a list of street edges to a list of turn-by-turn directions.
@@ -128,7 +128,7 @@ public class StatesToWalkStepsMapper {
   }
 
   private static boolean isLink(Edge edge) {
-    return (edge instanceof StreetEdge streetEdge && streetEdge.isLink());
+    return edge instanceof StreetEdge streetEdge && streetEdge.isLink();
   }
 
   private static ElevationProfile encodeElevationProfile(
@@ -200,6 +200,7 @@ public class StatesToWalkStepsMapper {
     } else if (
       modeTransition ||
       !continueOnSameStreet(edge, streetNameNoParens) ||
+      // went on to or off of a roundabout
       // went on to or off of a roundabout
       edge.isRoundabout() !=
       (roundaboutExit > 0) ||
@@ -437,7 +438,7 @@ public class StatesToWalkStepsMapper {
   private boolean continueOnSameStreet(Edge edge, String streetNameNoParens) {
     return !(
       current.directionText().toString() != null &&
-      !(java.util.Objects.equals(current.directionTextNoParens(), streetNameNoParens)) &&
+      !Objects.equals(current.directionTextNoParens(), streetNameNoParens) &&
       (!current.nameIsDerived() || !edge.nameIsDerived())
     );
   }

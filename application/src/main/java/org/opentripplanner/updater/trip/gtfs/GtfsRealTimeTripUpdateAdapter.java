@@ -60,6 +60,7 @@ import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.model.AddedRoute;
+import org.opentripplanner.updater.trip.gtfs.model.TripDescriptor;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,7 +141,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     }
 
     debug(feedId, "message contains {} trip updates", updates.size());
-    for (var i = 0; i < updates.size(); ++i) {
+    for (var i = 0; i < updates.size(); i++) {
       var uIndex = i;
       var rawTripUpdate = updates.get(uIndex);
 
@@ -572,10 +573,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       .mapSuccess(s -> s.addWarnings(warnings));
   }
 
-  private Route createRoute(
-    org.opentripplanner.updater.trip.gtfs.model.TripDescriptor tripDescriptor,
-    FeedScopedId tripId
-  ) {
+  private Route createRoute(TripDescriptor tripDescriptor, FeedScopedId tripId) {
     // the route in this update doesn't already exist, but the update contains the information so it will be created
     var routeId = tripDescriptor.routeId().map(id -> new FeedScopedId(tripId.getFeedId(), id));
     return routeId
@@ -628,10 +626,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       .build();
   }
 
-  private Optional<Route> getRoute(
-    String feedId,
-    org.opentripplanner.updater.trip.gtfs.model.TripDescriptor tripDescriptor
-  ) {
+  private Optional<Route> getRoute(String feedId, TripDescriptor tripDescriptor) {
     return tripDescriptor
       .routeId()
       .flatMap(id ->

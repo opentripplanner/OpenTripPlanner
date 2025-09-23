@@ -51,8 +51,8 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private McRangeRaptorWorkerState<T> state;
   private Heuristics heuristics;
   private McStopArrivals<T> arrivals;
-  private McStopArrivals<T> nextLegArrivals = null;
-  private McStopArrivalFactory<T> stopArrivalFactory = null;
+  private McStopArrivals<T> nextLegArrivals;
+  private McStopArrivalFactory<T> stopArrivalFactory;
 
   public McRangeRaptorConfig(
     SearchContextViaLeg<T> contextLeg,

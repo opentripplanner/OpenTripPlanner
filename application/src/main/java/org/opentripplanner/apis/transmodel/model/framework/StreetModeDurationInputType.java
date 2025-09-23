@@ -110,4 +110,6 @@ public class StreetModeDurationInputType {
       );
     }
   }
+
+  private StreetModeDurationInputType() {}
 }

@@ -20,4 +20,6 @@ public class VertexLinkerRoutingModule {
   static VertexLinker linker(Graph graph, StreetLimitationParameters params) {
     return new VertexLinker(graph, COMPUTE_AREA_VISIBILITY_LINES, params.maxAreaNodes());
   }
+
+  private VertexLinkerRoutingModule() {}
 }

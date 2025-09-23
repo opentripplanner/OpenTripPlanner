@@ -35,4 +35,6 @@ class PreferencesMapper {
     );
     callWith.argument("locale", (String v) -> preferences.withLocale(Locale.forLanguageTag(v)));
   }
+
+  private PreferencesMapper() {}
 }

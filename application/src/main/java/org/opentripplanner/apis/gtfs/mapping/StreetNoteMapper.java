@@ -27,4 +27,6 @@ public class StreetNoteMapper {
     }
     return alert.build();
   }
+
+  private StreetNoteMapper() {}
 }

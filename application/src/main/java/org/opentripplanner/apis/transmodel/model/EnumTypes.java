@@ -535,4 +535,6 @@ public class EnumTypes {
     String apiName,
     DocumentedEnum<E> internal
   ) {}
+
+  private EnumTypes() {}
 }

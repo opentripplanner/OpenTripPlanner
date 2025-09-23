@@ -54,8 +54,8 @@ public class GenerateTripPatternsOperation {
     MultimapBuilder.linkedHashKeys().linkedHashSetValues().build();
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
 
-  private int freqCount = 0;
-  private int scheduledCount = 0;
+  private int freqCount;
+  private int scheduledCount;
 
   public GenerateTripPatternsOperation(
     OtpTransitServiceBuilder builder,

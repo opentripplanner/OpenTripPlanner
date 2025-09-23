@@ -24,4 +24,6 @@ class BikeAccessMapper {
       default -> BikeAccess.UNKNOWN;
     };
   }
+
+  private BikeAccessMapper() {}
 }

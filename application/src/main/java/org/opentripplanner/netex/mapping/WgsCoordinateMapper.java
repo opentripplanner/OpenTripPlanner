@@ -28,4 +28,6 @@ class WgsCoordinateMapper {
     // Location is safe to process
     return new WgsCoordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
   }
+
+  private WgsCoordinateMapper() {}
 }

@@ -16,4 +16,6 @@ class DirectionMapper {
       case ANTICLOCKWISE -> Direction.ANTICLOCKWISE;
     };
   }
+
+  private DirectionMapper() {}
 }

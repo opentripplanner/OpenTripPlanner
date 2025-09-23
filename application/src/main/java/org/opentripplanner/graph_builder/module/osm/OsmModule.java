@@ -234,7 +234,7 @@ public class OsmModule implements GraphBuilderModule {
   private static double getGeometryLengthMeters(Geometry geometry) {
     Coordinate[] coordinates = geometry.getCoordinates();
     double d = 0;
-    for (int i = 1; i < coordinates.length; ++i) {
+    for (int i = 1; i < coordinates.length; i++) {
       d += SphericalDistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
     }
     return d;
@@ -340,7 +340,9 @@ public class OsmModule implements GraphBuilderModule {
       for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext();) {
         long nodeId = iter.next();
         OsmNode node = osmdb.getNode(nodeId);
-        if (node == null) continue WAY;
+        if (node == null) {
+          continue WAY;
+        }
         boolean levelsDiffer = false;
         String level = node.getTag("level");
         if (lastLevel == null) {
@@ -352,9 +354,9 @@ public class OsmModule implements GraphBuilderModule {
             levelsDiffer = true;
           }
         }
-        if (
-          nodeId != last && (node.lat != lastLat || node.lon != lastLon || levelsDiffer)
-        ) nodes.add(nodeId);
+        if (nodeId != last && (node.lat != lastLat || node.lon != lastLon || levelsDiffer)) {
+          nodes.add(nodeId);
+        }
         last = nodeId;
         lastLon = node.lon;
         lastLat = node.lat;

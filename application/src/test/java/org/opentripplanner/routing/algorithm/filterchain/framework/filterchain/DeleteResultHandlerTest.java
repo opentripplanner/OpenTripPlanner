@@ -151,7 +151,7 @@ class DeleteResultHandlerTest {
     @Override
     public String toString() {
       // Include test input, not expected
-      return ("n:" + numItineraries + " tags: na " + tag(i2) + " " + tag(i3));
+      return "n:" + numItineraries + " tags: na " + tag(i2) + " " + tag(i3);
     }
 
     private static void addSystemNotice(Itinerary it, String tag) {

@@ -41,4 +41,6 @@ public class AssertSpeedTestSetup {
       );
     }
   }
+
+  private AssertSpeedTestSetup() {}
 }

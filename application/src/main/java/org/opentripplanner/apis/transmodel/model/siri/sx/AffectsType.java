@@ -257,4 +257,6 @@ public class AffectsType {
       })
       .build();
   }
+
+  private AffectsType() {}
 }

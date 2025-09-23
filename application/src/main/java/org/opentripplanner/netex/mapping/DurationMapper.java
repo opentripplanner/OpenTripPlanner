@@ -10,4 +10,6 @@ class DurationMapper {
   static int mapDurationToSec(Duration duration, int defaultValue) {
     return duration == null ? defaultValue : (int) duration.toSeconds();
   }
+
+  private DurationMapper() {}
 }

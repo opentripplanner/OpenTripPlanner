@@ -370,4 +370,6 @@ public class LegacyRouteRequestMapper {
       call(environment, name, consumer);
     }
   }
+
+  private LegacyRouteRequestMapper() {}
 }

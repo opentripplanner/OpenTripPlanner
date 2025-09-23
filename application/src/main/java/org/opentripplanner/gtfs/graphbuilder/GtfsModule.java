@@ -309,7 +309,9 @@ public class GtfsModule implements GraphBuilderModule {
     reader.setInternStrings(true);
     reader.setDefaultAgencyId(gtfsFeedId);
 
-    if (LOG.isDebugEnabled()) reader.addEntityHandler(counter);
+    if (LOG.isDebugEnabled()) {
+      reader.addEntityHandler(counter);
+    }
 
     for (Class<?> entityClass : reader.getEntityClasses()) {
       if (skipEntityClass(entityClass)) {
@@ -343,7 +345,9 @@ public class GtfsModule implements GraphBuilderModule {
             agency.setId(generatedAgencyId);
             agencyId = generatedAgencyId;
           }
-          if (agencyId != null) agencyIdsSeen.add(gtfsFeedId + agencyId);
+          if (agencyId != null) {
+            agencyIdsSeen.add(gtfsFeedId + agencyId);
+          }
         }
       }
     }
@@ -456,11 +460,15 @@ public class GtfsModule implements GraphBuilderModule {
     @Override
     public void handleEntity(Object bean) {
       int count = incrementCount(bean.getClass());
-      if (count % 1000000 == 0) if (LOG.isDebugEnabled()) {
-        String name = bean.getClass().getName();
-        int index = name.lastIndexOf('.');
-        if (index != -1) name = name.substring(index + 1);
-        LOG.debug("loading {}: {}", name, count);
+      if (count % 1000000 == 0) {
+        if (LOG.isDebugEnabled()) {
+          String name = bean.getClass().getName();
+          int index = name.lastIndexOf('.');
+          if (index != -1) {
+            name = name.substring(index + 1);
+          }
+          LOG.debug("loading {}: {}", name, count);
+        }
       }
     }
 

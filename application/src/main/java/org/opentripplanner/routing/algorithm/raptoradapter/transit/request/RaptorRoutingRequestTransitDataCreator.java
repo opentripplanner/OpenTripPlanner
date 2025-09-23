@@ -217,7 +217,7 @@ class RaptorRoutingRequestTransitDataCreator {
     long start = System.currentTimeMillis();
 
     // This filters trips by the search date as well as additional dates before and after
-    for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
+    for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; d++) {
       tripPatternForDates.addAll(
         filterActiveTripPatterns(raptorTransitData, departureDate.plusDays(d), d == 0, filter)
       );

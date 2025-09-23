@@ -48,7 +48,7 @@ class BackwardsDelayRequiredInterpolatorTest {
       new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)
     );
     // everything before the first given update should be given the scheduled time
-    for (var i = 0; i < firstUpdateIndex; ++i) {
+    for (var i = 0; i < firstUpdateIndex; i++) {
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
       assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(i));
@@ -74,7 +74,7 @@ class BackwardsDelayRequiredInterpolatorTest {
       new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
     );
     // everything before the first given update should be given the scheduled time
-    for (var i = 0; i < firstUpdateIndex; ++i) {
+    for (var i = 0; i < firstUpdateIndex; i++) {
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
       assertEquals(StopRealTimeState.NO_DATA, builder.getStopRealTimeState(i));
@@ -101,7 +101,7 @@ class BackwardsDelayRequiredInterpolatorTest {
     );
     // everything before the first given update should be given the scheduled time and set NO_DATA
     // unless the stop has been canceled
-    for (var i = 0; i < firstUpdateIndex; ++i) {
+    for (var i = 0; i < firstUpdateIndex; i++) {
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
       assertEquals(
@@ -146,7 +146,7 @@ class BackwardsDelayRequiredInterpolatorTest {
       new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
     );
     // everything before the first given update should be given the scheduled time
-    for (var i = 0; i < firstUpdateIndex; ++i) {
+    for (var i = 0; i < firstUpdateIndex; i++) {
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
       assertEquals(StopRealTimeState.NO_DATA, builder.getStopRealTimeState(i));

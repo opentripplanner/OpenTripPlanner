@@ -89,8 +89,12 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     DurationForEnum<?> that = (DurationForEnum<?>) o;
 
@@ -111,7 +115,7 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
 
     private final DurationForEnum<E> original;
     private Duration defaultValue;
-    private EnumMap<E, Duration> valueForEnum = null;
+    private EnumMap<E, Duration> valueForEnum;
 
     Builder(DurationForEnum<E> original) {
       this.original = original;

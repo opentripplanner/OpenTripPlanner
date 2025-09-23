@@ -34,7 +34,7 @@ public class HighestFareInFreeTransferWindowFareServiceFactory extends DefaultFa
   // default to 150 minutes to preserve compatibility with legacy pdx fares
   private Duration freeTransferWindow = Duration.ofMinutes(150);
   // If true, will also analyze more than just the first trip of an interlined transfer and will use the highest fare
-  private boolean analyzeInterlinedTransfers = false;
+  private boolean analyzeInterlinedTransfers;
 
   public FareService makeFareService() {
     return new HighestFareInFreeTransferWindowFareService(

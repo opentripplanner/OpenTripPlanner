@@ -65,4 +65,6 @@ public class SiriSXUpdaterConfig {
       HttpHeadersConfig.headers(c, V2_3)
     );
   }
+
+  private SiriSXUpdaterConfig() {}
 }

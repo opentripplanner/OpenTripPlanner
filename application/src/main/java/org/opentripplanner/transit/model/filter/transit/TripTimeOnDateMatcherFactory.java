@@ -45,4 +45,6 @@ public class TripTimeOnDateMatcherFactory {
   private static Matcher<TripTimeOnDate> mode(TransitMode mode) {
     return new EqualityMatcher<>("mode", mode, t -> t.getTrip().getRoute().getMode());
   }
+
+  private TripTimeOnDateMatcherFactory() {}
 }

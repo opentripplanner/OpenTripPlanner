@@ -11,9 +11,9 @@ import java.util.stream.IntStream;
  */
 public class TableBuilder {
 
-  private List<Table.Align> aligns = null;
-  private List<String> headers = null;
-  private List<Integer> minWidths = null;
+  private List<Table.Align> aligns;
+  private List<String> headers;
+  private List<Integer> minWidths;
   private final List<List<String>> rows = new ArrayList<>();
 
   List<String> headers() {

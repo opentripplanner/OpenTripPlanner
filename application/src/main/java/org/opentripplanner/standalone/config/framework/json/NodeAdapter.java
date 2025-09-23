@@ -58,7 +58,7 @@ public class NodeAdapter {
    */
   private final List<String> warnings = new ArrayList<>();
 
-  private boolean usedAsRaw = false;
+  private boolean usedAsRaw;
 
   private final int level;
 

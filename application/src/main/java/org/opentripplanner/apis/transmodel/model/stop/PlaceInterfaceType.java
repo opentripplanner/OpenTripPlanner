@@ -65,4 +65,6 @@ public class PlaceInterfaceType {
       })
       .build();
   }
+
+  private PlaceInterfaceType() {}
 }

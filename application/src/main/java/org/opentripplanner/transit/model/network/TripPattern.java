@@ -314,7 +314,7 @@ public final class TripPattern
 
   /** Returns whether a given stop is wheelchair-accessible. */
   public boolean wheelchairAccessible(int stopPos) {
-    return (stopPattern.getStop(stopPos).getWheelchairAccessibility() == Accessibility.POSSIBLE);
+    return stopPattern.getStop(stopPos).getWheelchairAccessibility() == Accessibility.POSSIBLE;
   }
 
   public PickDrop getAlightType(int stopPos) {

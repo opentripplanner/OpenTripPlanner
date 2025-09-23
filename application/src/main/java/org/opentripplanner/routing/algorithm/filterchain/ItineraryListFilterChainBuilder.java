@@ -80,8 +80,8 @@ public class ItineraryListFilterChainBuilder {
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
   private Consumer<PageCursorInput> pageCursorInputSubscriber = i -> {};
-  private Instant earliestDepartureTime = null;
-  private Duration searchWindow = null;
+  private Instant earliestDepartureTime;
+  private Duration searchWindow;
   private boolean accessibilityScore;
   private double wheelchairMaxSlope;
   private TransitAlertService transitAlertService;
@@ -90,8 +90,8 @@ public class ItineraryListFilterChainBuilder {
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
   private ItinerarySortKey itineraryPageCut;
-  private Cost generalizedCostMaxLimit = null;
-  private boolean transitGroupPriorityUsed = false;
+  private Cost generalizedCostMaxLimit;
+  private boolean transitGroupPriorityUsed;
   private boolean filterDirectFlexBySearchWindow = true;
 
   /**

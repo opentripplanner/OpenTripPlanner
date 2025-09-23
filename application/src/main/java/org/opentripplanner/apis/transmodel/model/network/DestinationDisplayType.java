@@ -34,4 +34,6 @@ public class DestinationDisplayType {
       )
       .build();
   }
+
+  private DestinationDisplayType() {}
 }

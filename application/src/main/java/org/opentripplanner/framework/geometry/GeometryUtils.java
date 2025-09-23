@@ -89,7 +89,7 @@ public class GeometryUtils {
         .<CoordinateArrayListSequence>collect(
           CoordinateArrayListSequence::new,
           (acc, segment) -> {
-            if ((acc.size() == 0 || !acc.getCoordinate(acc.size() - 1).equals(segment[0]))) {
+            if (acc.size() == 0 || !acc.getCoordinate(acc.size() - 1).equals(segment[0])) {
               acc.extend(segment);
             } else {
               acc.extend(segment, 1);
@@ -294,4 +294,6 @@ public class GeometryUtils {
     }
     return distance;
   }
+
+  private GeometryUtils() {}
 }

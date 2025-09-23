@@ -37,7 +37,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   private final TimeBasedBoardingSupport<T> boardingSupport;
   private final TransitCalculator<T> calculator;
 
-  private int logCount = 0;
+  private int logCount;
   private int onTripIndex;
   private int onTripBoardTime;
   private int onTripBoardStop;

@@ -19,7 +19,7 @@ public final class IntArraySingleCriteriaArrivals implements SingleCriteriaStopA
     IntUnaryOperator mapValue
   ) {
     int[] array = new int[size];
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; i++) {
       array[i] = mapValue.applyAsInt(i);
     }
     return new IntArraySingleCriteriaArrivals(unreached, array);

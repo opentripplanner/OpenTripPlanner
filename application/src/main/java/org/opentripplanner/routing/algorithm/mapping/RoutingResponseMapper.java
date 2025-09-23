@@ -70,4 +70,6 @@ public class RoutingResponseMapper {
     LOG.debug("PageCursor next ... : {}", nextPageCursor);
     LOG.debug("Errors ............ : {}", errors);
   }
+
+  private RoutingResponseMapper() {}
 }

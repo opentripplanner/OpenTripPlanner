@@ -38,4 +38,6 @@ class SetupHelper {
   static void loadOtpFeatures(SpeedTestCmdLineOpts opts) {
     ConfigModel.initializeOtpFeatures(new OtpConfigLoader(opts.rootDir()).loadOtpConfig());
   }
+
+  private SetupHelper() {}
 }

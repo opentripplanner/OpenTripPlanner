@@ -29,4 +29,6 @@ public class PlaceMapper {
       case CAR_PARK -> PlaceType.CAR_PARK;
     };
   }
+
+  private PlaceMapper() {}
 }

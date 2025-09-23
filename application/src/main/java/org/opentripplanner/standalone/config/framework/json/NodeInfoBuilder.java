@@ -18,11 +18,11 @@ class NodeInfoBuilder {
   private ConfigType elementType;
   private OtpVersion since = OtpVersion.NA;
   private String summary = "TODO: Add short summary.";
-  private String description = null;
-  private boolean experimentalFeature = false;
-  private String defaultValue = null;
+  private String description;
+  private boolean experimentalFeature;
+  private String defaultValue;
   private boolean required = true;
-  private boolean skipChildren = false;
+  private boolean skipChildren;
 
   public String name() {
     return name;

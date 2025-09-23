@@ -15,4 +15,6 @@ public class NumberMapper {
       return null;
     }
   }
+
+  private NumberMapper() {}
 }

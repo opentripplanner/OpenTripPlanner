@@ -35,4 +35,6 @@ public class BookingInfoMapper {
       return "other";
     }
   }
+
+  private BookingInfoMapper() {}
 }

@@ -77,4 +77,6 @@ public class TripOnServiceDateMatcherFactory {
   static Matcher<TripOnServiceDate> alteration(TripAlteration alteration) {
     return new EqualityMatcher<>("alteration", alteration, TripOnServiceDate::getTripAlteration);
   }
+
+  private TripOnServiceDateMatcherFactory() {}
 }

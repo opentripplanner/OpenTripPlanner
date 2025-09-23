@@ -33,4 +33,6 @@ public class PassThroughPointInputType {
         .build()
     )
     .build();
+
+  private PassThroughPointInputType() {}
 }

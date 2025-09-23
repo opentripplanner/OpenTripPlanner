@@ -36,8 +36,12 @@ public class TokenDefinition {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     TokenDefinition that = (TokenDefinition) o;
     return version == that.version && listFields().equals(that.listFields());
   }
@@ -65,7 +69,7 @@ public class TokenDefinition {
   }
 
   int index(String name) {
-    for (int i = 0; i < fieldNames.size(); ++i) {
+    for (int i = 0; i < fieldNames.size(); i++) {
       if (fieldNames.get(i).equals(name)) {
         return i;
       }

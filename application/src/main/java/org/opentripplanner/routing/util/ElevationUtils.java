@@ -108,7 +108,7 @@ public class ElevationUtils {
       return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false, 1.0);
     }
     double lengthMultiplier = trueLength / flatLength;
-    for (int i = 0; i < coordinates.length - 1; ++i) {
+    for (int i = 0; i < coordinates.length - 1; i++) {
       double run = coordinates[i + 1].x - coordinates[i].x;
       double rise = coordinates[i + 1].y - coordinates[i].y;
       if (run == 0) {
@@ -476,7 +476,7 @@ public class ElevationUtils {
     double flatLength = 0;
     double lastX = elev.getX(0);
     double lastY = elev.getY(0);
-    for (int i = 1; i < elev.size(); ++i) {
+    for (int i = 1; i < elev.size(); i++) {
       Coordinate c = elev.getCoordinate(i);
       double x = c.x - lastX;
       double y = c.y - lastY;
@@ -487,4 +487,6 @@ public class ElevationUtils {
     }
     return new double[] { trueLength, flatLength };
   }
+
+  private ElevationUtils() {}
 }

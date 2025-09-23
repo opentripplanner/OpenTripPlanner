@@ -39,7 +39,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
   private final List<DestinationArrivalEvent> rejectedArrivals;
 
   private int bestDestinationTime = -1;
-  private DestinationArrivalEvent bestArrival = null;
+  private DestinationArrivalEvent bestArrival;
 
   public EgressArrivalToPathAdapter(
     DestinationArrivalPaths<T> paths,

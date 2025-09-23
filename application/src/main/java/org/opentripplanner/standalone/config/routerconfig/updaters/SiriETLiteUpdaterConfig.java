@@ -36,4 +36,6 @@ public class SiriETLiteUpdaterConfig {
       HttpHeadersConfig.headers(c, V2_7)
     );
   }
+
+  private SiriETLiteUpdaterConfig() {}
 }

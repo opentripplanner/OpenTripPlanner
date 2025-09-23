@@ -15,8 +15,8 @@ public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilde
   private StopTransferPriority priority;
   private I18NString url;
   private ZoneId timezone;
-  private boolean transfersNotAllowed = false;
-  private boolean shouldRouteToCentroid = false;
+  private boolean transfersNotAllowed;
+  private boolean shouldRouteToCentroid;
 
   StationBuilder(FeedScopedId id) {
     super(id);

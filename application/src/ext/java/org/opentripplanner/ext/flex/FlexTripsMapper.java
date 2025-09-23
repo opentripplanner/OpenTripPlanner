@@ -71,4 +71,6 @@ public class FlexTripsMapper {
     LOG.info("Done creating flex trips. Created a total of {} trips.", result.size());
     return result;
   }
+
+  private FlexTripsMapper() {}
 }

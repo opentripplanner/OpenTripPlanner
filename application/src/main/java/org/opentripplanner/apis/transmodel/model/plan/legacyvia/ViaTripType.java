@@ -105,4 +105,6 @@ public class ViaTripType {
       )
       .build();
   }
+
+  private ViaTripType() {}
 }

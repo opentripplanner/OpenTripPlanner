@@ -75,7 +75,7 @@ class OsmAreaGroup {
 
     if (this.union instanceof GeometryCollection coll) {
       GeometryCollection mp = coll;
-      for (int i = 0; i < mp.getNumGeometries(); ++i) {
+      for (int i = 0; i < mp.getNumGeometries(); i++) {
         Geometry geom = mp.getGeometryN(i);
         if (geom instanceof Polygon polygon) {
           outermostRings.add(toRing(polygon, nodeMap));
@@ -104,7 +104,7 @@ class OsmAreaGroup {
         // only return barriers where first and second are consecutive nodes
         barrier -> {
           var nodeRefs = Objects.requireNonNull(barrier).getNodeRefs();
-          for (var i = 0; i < nodeRefs.size() - 1; ++i) {
+          for (var i = 0; i < nodeRefs.size() - 1; i++) {
             if (nodeRefs.get(i) == first.getId() && nodeRefs.get(i + 1) == second.getId()) {
               return true;
             }
@@ -245,7 +245,7 @@ class OsmAreaGroup {
     }
     Ring ring = new Ring(shell);
     // now the holes
-    for (int i = 0; i < polygon.getNumInteriorRing(); ++i) {
+    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
       LineString interior = polygon.getInteriorRingN(i);
       List<OsmNode> hole = new ArrayList<>();
       for (Coordinate coord : interior.getCoordinates()) {

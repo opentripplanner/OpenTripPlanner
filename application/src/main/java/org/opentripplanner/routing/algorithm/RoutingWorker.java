@@ -64,7 +64,7 @@ public class RoutingWorker {
   private final AdditionalSearchDays additionalSearchDays;
   private final TransitGroupPriorityService transitGroupPriorityService;
   private SearchParams raptorSearchParamsUsed = null;
-  private PageCursorInput pageCursorInput = null;
+  private PageCursorInput pageCursorInput;
 
   public RoutingWorker(
     OtpServerRequestContext serverContext,

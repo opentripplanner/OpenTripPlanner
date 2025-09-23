@@ -99,4 +99,6 @@ public class TextVariablesSubstitution {
     }
     return insert(text, PATTERN.matcher(text), variableProvider, errorHandler);
   }
+
+  private TextVariablesSubstitution() {}
 }

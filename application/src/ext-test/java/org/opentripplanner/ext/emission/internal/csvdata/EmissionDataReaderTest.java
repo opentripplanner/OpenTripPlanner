@@ -17,22 +17,22 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 class EmissionDataReaderTest implements EmissionTestData {
 
-  private TimetableRepositoryForTest data = TimetableRepositoryForTest.of();
+  private final TimetableRepositoryForTest data = TimetableRepositoryForTest.of();
   private final EmissionRepository repository = new DefaultEmissionRepository();
-  private DataImportIssueStore issueStore = new DefaultDataImportIssueStore();
+  private final DataImportIssueStore issueStore = new DefaultDataImportIssueStore();
 
-  private StopLocation STOP_A = data.stop("A").build();
-  private StopLocation STOP_B = data.stop("B").build();
-  private StopLocation STOP_C = data.stop("C").build();
+  private final StopLocation STOP_A = data.stop("A").build();
+  private final StopLocation STOP_B = data.stop("B").build();
+  private final StopLocation STOP_C = data.stop("C").build();
 
-  private Map<FeedScopedId, List<StopLocation>> stopsByTripId = Map.of(
+  private final Map<FeedScopedId, List<StopLocation>> stopsByTripId = Map.of(
     new FeedScopedId("em", "T1"),
     List.of(STOP_A, STOP_B, STOP_C),
     new FeedScopedId("em", "T2"),
     List.of(STOP_A, STOP_B, STOP_C)
   );
 
-  private TripHopMapper tripHopMapper = new TripHopMapper(stopsByTripId, issueStore);
+  private final TripHopMapper tripHopMapper = new TripHopMapper(stopsByTripId, issueStore);
 
   private final EmissionDataReader subject = new EmissionDataReader(
     repository,

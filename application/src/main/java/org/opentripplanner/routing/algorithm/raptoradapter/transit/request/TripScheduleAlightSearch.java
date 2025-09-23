@@ -161,7 +161,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
    */
   @Nullable
   private RaptorBoardOrAlightEvent<T> findBoardingSearchForwardInTime(int tripIndexLowerBound) {
-    for (int i = tripIndexLowerBound; i < nTrips; ++i) {
+    for (int i = tripIndexLowerBound; i < nTrips; i++) {
       if (arrivalTimes.applyAsInt(i) <= latestAlightTime) {
         candidateTripIndex = i;
       } else {
@@ -186,7 +186,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
   private RaptorBoardOrAlightEvent<T> findBoardingSearchBackwardsInTime(
     final int tripIndexUpperBound
   ) {
-    for (int i = tripIndexUpperBound - 1; i >= 0; --i) {
+    for (int i = tripIndexUpperBound - 1; i >= 0; i--) {
       if (arrivalTimes.applyAsInt(i) <= latestAlightTime) {
         candidateTrip = timetable.getTripSchedule(i);
         candidateTripIndex = i;

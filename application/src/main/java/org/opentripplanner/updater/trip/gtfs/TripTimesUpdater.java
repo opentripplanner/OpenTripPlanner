@@ -395,4 +395,6 @@ class TripTimesUpdater {
           : Optional.empty()
       );
   }
+
+  private TripTimesUpdater() {}
 }

@@ -44,4 +44,6 @@ public class LocationInputType {
         .build()
     )
     .build();
+
+  private LocationInputType() {}
 }

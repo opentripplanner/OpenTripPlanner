@@ -10,7 +10,7 @@ class TestCaseBuilder {
   final String description;
   int stopIndexA = RaptorConstants.NOT_SET;
   int stopIndexB = RaptorConstants.NOT_SET;
-  boolean txFromAToB = false;
+  boolean txFromAToB;
   final List<RaptorViaLocation> points = new ArrayList<>();
 
   TestCaseBuilder(String description) {

@@ -296,7 +296,7 @@ public class OHCalendarBuilder {
       String offDescription = otherBuilder.getPeriodDescription();
       if (
         (otherStartTime.isBefore(startTime) || otherStartTime.equals(startTime)) &&
-        ((endTime.isBefore(otherEndTime) || endTime.equals(otherEndTime)))
+        (endTime.isBefore(otherEndTime) || endTime.equals(otherEndTime))
       ) {
         off(otherBuilder.getOpeningDays(), offDescription);
         return new OpeningHoursBuilderAndNewBuilders(this, List.of());

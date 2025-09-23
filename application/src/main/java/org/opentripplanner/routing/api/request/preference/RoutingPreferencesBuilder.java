@@ -8,17 +8,17 @@ import java.util.function.Consumer;
 public class RoutingPreferencesBuilder {
 
   private final RoutingPreferences original;
-  private TransitPreferences transit = null;
-  private TransferPreferences transfer = null;
-  private WalkPreferences walk = null;
-  private StreetPreferences street = null;
-  private WheelchairPreferences wheelchair = null;
-  private BikePreferences bike = null;
-  private CarPreferences car = null;
-  private ScooterPreferences scooter = null;
-  private SystemPreferences system = null;
-  private ItineraryFilterPreferences itineraryFilter = null;
-  private Locale locale = null;
+  private TransitPreferences transit;
+  private TransferPreferences transfer;
+  private WalkPreferences walk;
+  private StreetPreferences street;
+  private WheelchairPreferences wheelchair;
+  private BikePreferences bike;
+  private CarPreferences car;
+  private ScooterPreferences scooter;
+  private SystemPreferences system;
+  private ItineraryFilterPreferences itineraryFilter;
+  private Locale locale;
 
   public RoutingPreferencesBuilder(RoutingPreferences original) {
     this.original = original;

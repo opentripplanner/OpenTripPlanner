@@ -36,4 +36,6 @@ public class SeverityMapper {
       }
     }
   }
+
+  private SeverityMapper() {}
 }

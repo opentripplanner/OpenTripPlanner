@@ -159,4 +159,6 @@ class TransferConfig {
       )
       .build();
   }
+
+  private TransferConfig() {}
 }

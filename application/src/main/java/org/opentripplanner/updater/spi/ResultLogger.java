@@ -53,4 +53,6 @@ public class ResultLogger {
         );
       });
   }
+
+  private ResultLogger() {}
 }

@@ -7,7 +7,7 @@ import org.opentripplanner.transit.model.site.Station;
 
 public final class TestTransitCaseData {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   public static final Station STATION_A = TEST_MODEL.station("A")
     .withCoordinate(60.0, 11.1)
@@ -28,4 +28,6 @@ public final class TestTransitCaseData {
   public static final LocalDate DATE = LocalDate.of(2021, 12, 24);
 
   public static final int OFFSET = 0;
+
+  private TestTransitCaseData() {}
 }

@@ -44,7 +44,7 @@ class RealTimeTripTimesTest {
 
     List<StopTime> stopTimes = new LinkedList<>();
 
-    for (int i = 0; i < stopIds.size(); ++i) {
+    for (int i = 0; i < stopIds.size(); i++) {
       StopTime stopTime = new StopTime();
 
       RegularStop stop = TEST_MODEL.stop(stopIds.get(i).getId(), 0.0, 0.0).build();
@@ -174,11 +174,11 @@ class RealTimeTripTimesTest {
   public void testCompleteTimes() {
     var builder = createInitialTripTimes().createRealTimeWithoutScheduledTimes();
     var delay = 30;
-    for (var i = 0; i < builder.numberOfStops(); ++i) {
+    for (var i = 0; i < builder.numberOfStops(); i++) {
       builder.withArrivalDelay(i, delay).withDepartureDelay(i, delay);
     }
     var tripTimes = builder.build();
-    for (var i = 0; i < tripTimes.getNumStops(); ++i) {
+    for (var i = 0; i < tripTimes.getNumStops(); i++) {
       assertEquals(delay, tripTimes.getArrivalDelay(i));
       assertEquals(delay, tripTimes.getDepartureDelay(i));
     }

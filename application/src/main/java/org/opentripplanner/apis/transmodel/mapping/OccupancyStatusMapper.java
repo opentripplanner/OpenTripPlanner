@@ -24,4 +24,6 @@ public class OccupancyStatusMapper {
       case NOT_ACCEPTING_PASSENGERS -> OccupancyStatus.NOT_ACCEPTING_PASSENGERS;
     };
   }
+
+  private OccupancyStatusMapper() {}
 }

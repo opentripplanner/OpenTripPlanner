@@ -500,7 +500,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
       defaultValueForKey.put(
         key,
         ArrayValue.newArrayValue()
-          .values((valueList.stream().map(value -> (Value) new EnumValue(value.name())).toList()))
+          .values(valueList.stream().map(value -> (Value) new EnumValue(value.name())).toList())
           .build()
       );
       return this;

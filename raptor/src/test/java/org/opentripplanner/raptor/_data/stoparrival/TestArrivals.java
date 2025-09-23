@@ -102,4 +102,6 @@ public class TestArrivals {
       previous
     );
   }
+
+  private TestArrivals() {}
 }

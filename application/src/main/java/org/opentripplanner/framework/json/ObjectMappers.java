@@ -22,4 +22,6 @@ public class ObjectMappers {
   public static ObjectMapper geoJson() {
     return new ObjectMapper().registerModule(new JtsModule(GeometryUtils.getGeometryFactory()));
   }
+
+  private ObjectMappers() {}
 }

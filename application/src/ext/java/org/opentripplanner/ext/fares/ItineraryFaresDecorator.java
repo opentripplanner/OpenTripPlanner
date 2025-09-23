@@ -41,7 +41,7 @@ public final class ItineraryFaresDecorator {
     var legUses = fare.getLegProducts().get(leg);
     var allUses = ListUtils.combine(itineraryFareUses, legUses);
 
-    return (leg instanceof FareProductAware<TransitLeg> fpa)
+    return leg instanceof FareProductAware<TransitLeg> fpa
       ? fpa.decorateWithFareOffers(allUses)
       : leg;
   }

@@ -22,11 +22,11 @@ public class TestTripPattern implements DefaultTripPattern {
    * By caching the index, we avoid looking up the pattern during routing, this reduces memory lookups and
    * improves the performance.
    */
-  private int slackIndex = 0;
+  private int slackIndex;
 
-  private int patternIndex = 0;
+  private int patternIndex;
 
-  private int priorityGroupId = 0;
+  private int priorityGroupId;
 
   /**
    * <pre>

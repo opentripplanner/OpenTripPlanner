@@ -55,7 +55,7 @@ public class CharacterEscapeFormatter {
    */
   public String encode(String text) {
     final var buf = new StringBuilder();
-    for (int i = 0; i < text.length(); ++i) {
+    for (int i = 0; i < text.length(); i++) {
       char ch = text.charAt(i);
       if (ch == escapeChar) {
         buf.append(escapeChar).append(escapeChar);
@@ -78,7 +78,7 @@ public class CharacterEscapeFormatter {
     }
     final var buf = new StringBuilder();
     boolean prevEsc = false;
-    for (int i = 0; i < encodedText.length(); ++i) {
+    for (int i = 0; i < encodedText.length(); i++) {
       char ch = encodedText.charAt(i);
       if (prevEsc) {
         if (ch == escapeChar) {

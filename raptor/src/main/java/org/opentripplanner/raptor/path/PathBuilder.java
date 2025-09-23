@@ -60,8 +60,8 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   // Path leg elements as a double linked list. This makes it easy to look at
   // legs before and after in the logic and easy to fork, building alternative
   // paths with the same path tail.
-  private PathBuilderLeg<T> head = null;
-  private PathBuilderLeg<T> tail = null;
+  private PathBuilderLeg<T> head;
+  private PathBuilderLeg<T> tail;
   protected final int iterationDepartureTime;
 
   protected PathBuilder(PathBuilder<T> other) {

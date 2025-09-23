@@ -17,7 +17,7 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
 
   private final int maxLimit;
   private final ListSection cropSection;
-  private NumItinerariesFilterResult numItinerariesFilterResult = null;
+  private NumItinerariesFilterResult numItinerariesFilterResult;
 
   public NumItinerariesFilter(int maxLimit, ListSection cropSection) {
     this.maxLimit = maxLimit;

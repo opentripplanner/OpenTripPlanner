@@ -23,4 +23,6 @@ public class FileSizeToTextConverter {
       return String.format(Locale.ROOT, "%d bytes", n);
     }
   }
+
+  private FileSizeToTextConverter() {}
 }

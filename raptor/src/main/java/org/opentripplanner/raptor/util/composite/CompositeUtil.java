@@ -51,4 +51,6 @@ public class CompositeUtil {
     }
     return compositeFactory.apply(list);
   }
+
+  private CompositeUtil() {}
 }

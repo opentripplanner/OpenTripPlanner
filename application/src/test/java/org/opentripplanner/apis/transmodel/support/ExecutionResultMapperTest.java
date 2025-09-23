@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 
 class ExecutionResultMapperTest {
 
-  private static ExecutionResult OK_RESULT_WITH_DATA_AND_ERROR =
+  private static final ExecutionResult OK_RESULT_WITH_DATA_AND_ERROR =
     ExecutionResult.newExecutionResult()
       .data("Test")
       .addError(GraphQLError.newError().message("Error").build())
       .build();
 
-  private static String RESULT_SERIALIZED = quoteReplace(
+  private static final String RESULT_SERIALIZED = quoteReplace(
     "{" +
     "'errors':[" +
     "{'message':'Error','locations':[],'extensions':{'classification':'DataFetchingException'}}" +
@@ -24,7 +24,7 @@ class ExecutionResultMapperTest {
     "}"
   );
 
-  private static String TIMEOUT_RESPONSE = quoteReplace(
+  private static final String TIMEOUT_RESPONSE = quoteReplace(
     "{" +
     "'errors':[{" +
     "'message':'TIMEOUT! The request is too resource intensive.'," +

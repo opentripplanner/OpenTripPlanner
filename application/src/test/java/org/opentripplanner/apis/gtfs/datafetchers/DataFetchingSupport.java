@@ -45,4 +45,6 @@ class DataFetchingSupport {
       .context(new GraphQLRequestContext(null, service, null, null, null, null, null, null, null))
       .build();
   }
+
+  private DataFetchingSupport() {}
 }

@@ -185,7 +185,7 @@ public class VertexLinker {
     Scope scope,
     BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    DisposableEdgeCollection tempEdges = (scope != Scope.PERMANENT)
+    DisposableEdgeCollection tempEdges = scope != Scope.PERMANENT
       ? new DisposableEdgeCollection(graph, scope)
       : null;
 

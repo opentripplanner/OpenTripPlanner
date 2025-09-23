@@ -38,4 +38,6 @@ public class SystemNoticeType {
       )
       .build();
   }
+
+  private SystemNoticeType() {}
 }

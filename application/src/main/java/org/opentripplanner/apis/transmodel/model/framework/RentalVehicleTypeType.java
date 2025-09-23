@@ -54,4 +54,6 @@ public class RentalVehicleTypeType {
       )
       .build();
   }
+
+  private RentalVehicleTypeType() {}
 }

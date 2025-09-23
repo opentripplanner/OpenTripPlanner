@@ -31,7 +31,7 @@ public final class BitSetUtils {
 
   public static byte set(byte bitset, int index, boolean value) {
     if (value) {
-      bitset |= (1 << index);
+      bitset |= 1 << index;
     } else {
       bitset &= ~(1 << index);
     }
@@ -44,7 +44,7 @@ public final class BitSetUtils {
 
   public static short set(short bitset, int index, boolean value) {
     if (value) {
-      bitset |= (1 << index);
+      bitset |= 1 << index;
     } else {
       bitset &= ~(1 << index);
     }
@@ -57,7 +57,7 @@ public final class BitSetUtils {
 
   public static int set(int bitset, int index, boolean value) {
     if (value) {
-      bitset |= (1 << index);
+      bitset |= 1 << index;
     } else {
       bitset &= ~(1 << index);
     }
@@ -70,10 +70,12 @@ public final class BitSetUtils {
 
   public static long set(long bitset, int index, boolean value) {
     if (value) {
-      bitset |= (1L << index);
+      bitset |= 1L << index;
     } else {
       bitset &= ~(1L << index);
     }
     return bitset;
   }
+
+  private BitSetUtils() {}
 }

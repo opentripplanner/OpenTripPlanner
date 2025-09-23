@@ -106,4 +106,6 @@ public class StreetModeMapper {
       mode.includesParking()
     );
   }
+
+  private StreetModeMapper() {}
 }

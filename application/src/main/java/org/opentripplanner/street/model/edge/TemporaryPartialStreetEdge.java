@@ -37,7 +37,7 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
    */
   @Override
   public boolean isEquivalentTo(Edge e) {
-    return (e == this || e == parentEdge);
+    return e == this || e == parentEdge;
   }
 
   /**

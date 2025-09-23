@@ -125,13 +125,13 @@ class WalkableAreaBuilder {
         }
 
         for (Ring outerRing : area.outermostRings) {
-          for (int i = 0; i < outerRing.nodes.size(); ++i) {
+          for (int i = 0; i < outerRing.nodes.size(); i++) {
             edges.addAll(
               createEdgesForRingSegment(areaGroup, area, outerRing, i, alreadyAddedEdges)
             );
           }
           for (Ring innerRing : outerRing.getHoles()) {
-            for (int j = 0; j < innerRing.nodes.size(); ++j) {
+            for (int j = 0; j < innerRing.nodes.size(); j++) {
               edges.addAll(
                 createEdgesForRingSegment(areaGroup, area, innerRing, j, alreadyAddedEdges)
               );
@@ -228,7 +228,7 @@ class WalkableAreaBuilder {
             }
           }
 
-          for (int i = 0; i < outerRing.nodes.size(); ++i) {
+          for (int i = 0; i < outerRing.nodes.size(); i++) {
             OsmNode node = outerRing.nodes.get(i);
             Set<AreaEdge> newEdges = createEdgesForRingSegment(
               areaGroup,
@@ -257,7 +257,7 @@ class WalkableAreaBuilder {
             }
           }
           for (Ring innerRing : outerRing.getHoles()) {
-            for (int j = 0; j < innerRing.nodes.size(); ++j) {
+            for (int j = 0; j < innerRing.nodes.size(); j++) {
               OsmNode node = innerRing.nodes.get(j);
               var newEdges = createEdgesForRingSegment(
                 areaGroup,
@@ -347,7 +347,7 @@ class WalkableAreaBuilder {
         areaGroup.addVisibilityVertices(
           vertices
             .stream()
-            .sorted((v1, v2) -> Long.compare((v2.getDegreeOut()), v1.getDegreeOut()))
+            .sorted((v1, v2) -> Long.compare(v2.getDegreeOut(), v1.getDegreeOut()))
             .limit(maxAreaNodes)
             .collect(Collectors.toSet())
         );
@@ -366,7 +366,9 @@ class WalkableAreaBuilder {
     Set<Edge> edges,
     Set<Edge> edgesToKeep
   ) {
-    if (edges.isEmpty()) return;
+    if (edges.isEmpty()) {
+      return;
+    }
     StreetMode mode;
     StreetEdge firstEdge = (StreetEdge) edges.iterator().next();
 
@@ -406,6 +408,7 @@ class WalkableAreaBuilder {
   private boolean isStartingNode(OsmNode node, Set<Long> osmWayIds) {
     return (
       osmdb.isNodeBelongsToWay(node.getId()) ||
+      // Do not add if part of same areaGroup
       // Do not add if part of same areaGroup
       !osmdb
         .getAreasForNode(node.getId())

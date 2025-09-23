@@ -12,7 +12,7 @@ import org.slf4j.MDC;
  */
 public class LogMDCSupport {
 
-  private static boolean enabled = false;
+  private static boolean enabled;
 
   /** private constructor to prevent creating new instances */
   private LogMDCSupport() {}

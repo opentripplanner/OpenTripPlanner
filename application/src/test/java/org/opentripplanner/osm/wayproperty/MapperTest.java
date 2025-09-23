@@ -240,7 +240,7 @@ public class MapperTest {
    * Test that two values are within epsilon of each other.
    */
   private boolean within(float val1, float val2, float epsilon) {
-    return (Math.abs(val1 - val2) < epsilon);
+    return Math.abs(val1 - val2) < epsilon;
   }
 
   /**

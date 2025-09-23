@@ -505,4 +505,6 @@ public class DebugStyleSpec {
       case ALL -> "#adb2b0";
     };
   }
+
+  private DebugStyleSpec() {}
 }

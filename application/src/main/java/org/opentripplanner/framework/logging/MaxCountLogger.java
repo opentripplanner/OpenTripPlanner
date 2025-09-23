@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 public class MaxCountLogger extends AbstractFilterLogger {
 
   private static final int MAX_COUNT = 10;
-  private int count = 0;
+  private int count;
 
   private MaxCountLogger(Logger delegate) {
     super(delegate);

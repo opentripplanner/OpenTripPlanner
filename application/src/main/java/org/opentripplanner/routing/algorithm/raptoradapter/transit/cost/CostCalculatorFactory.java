@@ -32,4 +32,6 @@ public class CostCalculatorFactory {
 
     return calculator;
   }
+
+  private CostCalculatorFactory() {}
 }

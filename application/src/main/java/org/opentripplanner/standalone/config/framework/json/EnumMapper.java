@@ -58,4 +58,6 @@ public class EnumMapper {
     }
     return buf.toString();
   }
+
+  private EnumMapper() {}
 }

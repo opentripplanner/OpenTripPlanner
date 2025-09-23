@@ -212,6 +212,9 @@ class FareLookupService implements Serializable {
       leg.agency().getId().getFeedId().equals(rule.feedId()) &&
       matchesNetworkId(leg, rule) &&
       // apply only those fare leg rules which have the correct area ids
+      // apply only those fare leg rules which have the correct area ids
+      // if area id is null, the rule applies to all legs UNLESS there is another rule that
+      // covers this area
       // if area id is null, the rule applies to all legs UNLESS there is another rule that
       // covers this area
       matchesArea(leg.from().stop, rule.fromAreaId(), fromAreasWithRules) &&
@@ -285,7 +288,9 @@ class FareLookupService implements Serializable {
         legDistance > linearDistance.min().toMeters() &&
         legDistance < linearDistance.max().toMeters()
       );
-    } else return true;
+    } else {
+      return true;
+    }
   }
 
   private static Set<FeedScopedId> findAreasWithRules(

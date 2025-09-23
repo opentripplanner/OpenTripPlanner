@@ -52,4 +52,6 @@ public class JsonAssertions {
       throw new RuntimeException(e);
     }
   }
+
+  private JsonAssertions() {}
 }

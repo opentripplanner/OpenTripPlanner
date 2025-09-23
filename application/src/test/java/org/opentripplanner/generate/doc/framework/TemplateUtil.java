@@ -84,4 +84,6 @@ public class TemplateUtil {
   public static String jsonExample(NodeAdapter nodeAdapter, String source) {
     return jsonExample(nodeAdapter.rawNode(), source);
   }
+
+  private TemplateUtil() {}
 }

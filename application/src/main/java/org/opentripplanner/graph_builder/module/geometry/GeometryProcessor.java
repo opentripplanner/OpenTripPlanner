@@ -158,14 +158,14 @@ public class GeometryProcessor {
     LinearLocation endLocation = locationIt.next();
     double distanceSoFar = 0;
     int last = 0;
-    for (int i = 0; i < stopTimes.size() - 1; ++i) {
+    for (int i = 0; i < stopTimes.size() - 1; i++) {
       LinearLocation startLocation = endLocation;
       endLocation = locationIt.next();
 
       //convert from LinearLocation to distance
       //advance distanceSoFar up to start of segment containing startLocation;
       //it does not matter at all if this is accurate so long as it is consistent
-      for (int j = last; j < startLocation.getSegmentIndex(); ++j) {
+      for (int j = last; j < startLocation.getSegmentIndex(); j++) {
         Coordinate from = shape.getCoordinateN(j);
         Coordinate to = shape.getCoordinateN(j + 1);
         double xd = from.x - to.x;
@@ -177,7 +177,7 @@ public class GeometryProcessor {
       double startIndex =
         distanceSoFar + startLocation.getSegmentFraction() * startLocation.getSegmentLength(shape);
       //advance distanceSoFar up to start of segment containing endLocation
-      for (int j = last; j < endLocation.getSegmentIndex(); ++j) {
+      for (int j = last; j < endLocation.getSegmentIndex(); j++) {
         Coordinate from = shape.getCoordinateN(j);
         Coordinate to = shape.getCoordinateN(j + 1);
         double xd = from.x - to.x;
@@ -211,13 +211,13 @@ public class GeometryProcessor {
     var isFlexTrip = FlexTrip.containsFlexStops(stopTimes);
     // This trip does not have shape_dist in stop_times, but does have an associated shape.
     ArrayList<IndexedLineSegment> segments = new ArrayList<>();
-    for (int i = 0; i < shape.getNumPoints() - 1; ++i) {
+    for (int i = 0; i < shape.getNumPoints() - 1; i++) {
       segments.add(new IndexedLineSegment(i, shape.getCoordinateN(i), shape.getCoordinateN(i + 1)));
     }
     // Find possible segment matches for each stop.
     List<List<IndexedLineSegment>> possibleSegmentsForStop = new ArrayList<>();
     int minSegmentIndex = 0;
-    for (int i = 0; i < stopTimes.size(); ++i) {
+    for (int i = 0; i < stopTimes.size(); i++) {
       StopLocation stop = stopTimes.get(i).getStop();
       Coordinate coord = stop.getCoordinate().asJtsCoordinate();
       List<IndexedLineSegment> stopSegments = new ArrayList<>();
@@ -235,7 +235,9 @@ public class GeometryProcessor {
         if (distance < maxStopToShapeSnapDistance || isFlexTrip) {
           stopSegments.add(segment);
           maxSegmentIndex = index;
-          if (minSegmentIndexForThisStop == -1) minSegmentIndexForThisStop = index;
+          if (minSegmentIndexForThisStop == -1) {
+            minSegmentIndexForThisStop = index;
+          }
         } else if (distance < bestDistance) {
           bestDistance = distance;
           bestSegment = segment;
@@ -273,7 +275,7 @@ public class GeometryProcessor {
   private LineString[] createStraightLineHopGeometries(List<StopTime> stopTimes) {
     LineString[] geoms = new LineString[stopTimes.size() - 1];
     StopTime st0;
-    for (int i = 0; i < stopTimes.size() - 1; ++i) {
+    for (int i = 0; i < stopTimes.size() - 1; i++) {
       st0 = stopTimes.get(i);
       StopTime st1 = stopTimes.get(i + 1);
       LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
@@ -288,7 +290,7 @@ public class GeometryProcessor {
   ) {
     LineString[] geoms = new LineString[stopTimes.size() - 1];
     StopTime st0;
-    for (int i = 0; i < stopTimes.size() - 1; ++i) {
+    for (int i = 0; i < stopTimes.size() - 1; i++) {
       st0 = stopTimes.get(i);
       StopTime st1 = stopTimes.get(i + 1);
       geoms[i] = getHopGeometryViaShapeDistTraveled(shapeId, st0, st1);
@@ -313,7 +315,7 @@ public class GeometryProcessor {
     for (
       var stopPositionInPattern = 0;
       stopPositionInPattern < stopTimes.size();
-      ++stopPositionInPattern
+      stopPositionInPattern++
     ) {
       StopTime st = stopTimes.get(stopPositionInPattern);
       StopLocation stop = st.getStop();
@@ -566,7 +568,9 @@ public class GeometryProcessor {
     for (ShapePoint point : points) {
       coordinates[i] = point.coordinate();
       distances[i] = point.distTraveled();
-      if (!point.isDistTraveledSet()) hasAllDistances = false;
+      if (!point.isDistTraveledSet()) {
+        hasAllDistances = false;
+      }
       i++;
     }
 

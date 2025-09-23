@@ -17,4 +17,6 @@ public class HttpHeadersConfig {
         .asStringMap()
     );
   }
+
+  private HttpHeadersConfig() {}
 }

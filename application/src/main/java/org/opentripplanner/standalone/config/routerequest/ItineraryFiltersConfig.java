@@ -321,4 +321,6 @@ public class ItineraryFiltersConfig {
         .asDouble(transitGeneralizedCostLimit.intervalRelaxFactor())
     );
   }
+
+  private ItineraryFiltersConfig() {}
 }

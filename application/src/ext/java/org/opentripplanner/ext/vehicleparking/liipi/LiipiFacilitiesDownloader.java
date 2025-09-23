@@ -9,6 +9,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.function.BiFunction;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
@@ -72,8 +73,8 @@ public class LiipiFacilitiesDownloader {
     }
   }
 
-  private static String convertStreamToString(java.io.InputStream is) {
-    try (java.util.Scanner scanner = new java.util.Scanner(is).useDelimiter("\\A")) {
+  private static String convertStreamToString(InputStream is) {
+    try (Scanner scanner = new Scanner(is).useDelimiter("\\A")) {
       return scanner.hasNext() ? scanner.next() : "";
     }
   }

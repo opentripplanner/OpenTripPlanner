@@ -55,4 +55,6 @@ public class PollingTripUpdaterConfig {
       headers
     );
   }
+
+  private PollingTripUpdaterConfig() {}
 }

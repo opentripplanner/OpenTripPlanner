@@ -32,12 +32,12 @@ public class DefaultOsmProvider implements OsmProvider {
 
   private final ZoneId zoneId;
 
-  private boolean hasWarnedAboutMissingTimeZone = false;
+  private boolean hasWarnedAboutMissingTimeZone;
 
   private final OsmTagMapper osmTagMapper;
 
   private final WayPropertySet wayPropertySet;
-  private byte[] cachedBytes = null;
+  private byte[] cachedBytes;
 
   /** For tests */
   public DefaultOsmProvider(File file, boolean cacheDataInMem) {

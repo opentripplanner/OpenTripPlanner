@@ -10,4 +10,6 @@ public class NodeBuilder {
     node.setId(id);
     return node;
   }
+
+  private NodeBuilder() {}
 }

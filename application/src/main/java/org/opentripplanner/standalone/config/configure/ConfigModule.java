@@ -55,4 +55,6 @@ public class ConfigModule {
     int searchThreadPoolSize = routerConfig.transitTuningConfig().searchThreadPoolSize();
     return RaptorEnvironmentFactory.create(searchThreadPoolSize);
   }
+
+  private ConfigModule() {}
 }

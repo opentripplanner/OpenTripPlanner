@@ -169,4 +169,6 @@ public class ServiceDateUtils {
     }
     return date.toString();
   }
+
+  private ServiceDateUtils() {}
 }

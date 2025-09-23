@@ -55,4 +55,6 @@ public class RaptorValueFormatter {
     }
     return FORMAT_CENTI.format(value / 100.0);
   }
+
+  private RaptorValueFormatter() {}
 }

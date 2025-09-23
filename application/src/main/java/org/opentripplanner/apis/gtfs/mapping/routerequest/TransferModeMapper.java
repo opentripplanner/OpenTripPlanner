@@ -32,4 +32,6 @@ public class TransferModeMapper {
         NOT_SET -> GraphQLTypes.GraphQLPlanTransferMode.WALK;
     };
   }
+
+  private TransferModeMapper() {}
 }

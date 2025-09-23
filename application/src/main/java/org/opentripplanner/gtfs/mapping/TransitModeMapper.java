@@ -86,4 +86,6 @@ public class TransitModeMapper {
       default -> throw new IllegalArgumentException("unknown gtfs route type " + routeType);
     };
   }
+
+  private TransitModeMapper() {}
 }

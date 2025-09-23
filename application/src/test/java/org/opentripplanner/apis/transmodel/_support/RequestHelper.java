@@ -16,4 +16,6 @@ public class RequestHelper {
   public static <T> Map<String, T> map(String key, T value) {
     return Map.of(key, value);
   }
+
+  private RequestHelper() {}
 }

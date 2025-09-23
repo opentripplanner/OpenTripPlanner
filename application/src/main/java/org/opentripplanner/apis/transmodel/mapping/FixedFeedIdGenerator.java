@@ -39,4 +39,6 @@ public class FixedFeedIdGenerator {
     );
     return fixedFeedId;
   }
+
+  private FixedFeedIdGenerator() {}
 }

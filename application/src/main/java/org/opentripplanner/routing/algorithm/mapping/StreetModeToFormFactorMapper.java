@@ -27,4 +27,6 @@ public class StreetModeToFormFactorMapper {
       );
     };
   }
+
+  private StreetModeToFormFactorMapper() {}
 }

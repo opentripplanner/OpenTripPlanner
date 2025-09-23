@@ -9,9 +9,9 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArri
  */
 public class DefaultStopArrivals implements StopArrivals {
 
-  private SingleCriteriaStopArrivals bestOverallArrivalTime = null;
-  private SingleCriteriaStopArrivals bestTransitArrivalTime = null;
-  private SingleCriteriaStopArrivals bestNumberOfTransfers = null;
+  private SingleCriteriaStopArrivals bestOverallArrivalTime;
+  private SingleCriteriaStopArrivals bestTransitArrivalTime;
+  private SingleCriteriaStopArrivals bestNumberOfTransfers;
 
   private final RaptorRouterResult<?> results;
 

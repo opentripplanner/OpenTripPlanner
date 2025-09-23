@@ -92,7 +92,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
       "The list of emissions must be long enough, at least >= alightStopPosInPattern."
     );
 
-    for (int i = rLeg.boardStopPosInPattern(); i < rLeg.alightStopPosInPattern(); ++i) {
+    for (int i = rLeg.boardStopPosInPattern(); i < rLeg.alightStopPosInPattern(); i++) {
       expectedRailEmission = expectedRailEmission.plus(hopEmissions.get(i));
     }
     tripEmissions.put(rLeg.trip().getId(), new TripPatternEmission(hopEmissions));

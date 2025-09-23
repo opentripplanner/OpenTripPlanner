@@ -36,4 +36,6 @@ public class TriangleFactorsInputType {
         .build()
     )
     .build();
+
+  private TriangleFactorsInputType() {}
 }

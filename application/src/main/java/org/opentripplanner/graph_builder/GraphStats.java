@@ -113,9 +113,9 @@ public class GraphStats {
     LOG.info("done loading graph.");
 
     String command = jc.getParsedCommand();
-    if (command.equals("endpoints")) {
+    if ("endpoints".equals(command)) {
       commandEndpoints.run();
-    } else if (command.equals("patternstats")) {
+    } else if ("patternstats".equals(command)) {
       commandPatternStats.run();
     }
     writer.close();
@@ -158,9 +158,13 @@ public class GraphStats {
       List<Vertex> vertices = new ArrayList<>();
       GeodeticCalculator gc = new GeodeticCalculator();
       Class<?> klasse = useStops ? TransitStopVertex.class : StreetVertex.class;
-      for (Vertex v : graph.getVertices()) if (klasse.isInstance(v)) vertices.add(v);
+      for (Vertex v : graph.getVertices()) if (klasse.isInstance(v)) {
+        vertices.add(v);
+      }
       Random random = new Random();
-      if (seed != null) random.setSeed(seed);
+      if (seed != null) {
+        random.setSeed(seed);
+      }
       Collections.shuffle(vertices, random);
       vertices = vertices.subList(0, n);
       try {

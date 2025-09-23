@@ -57,7 +57,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private final PathMapper<T> pathMapper;
   private final DebugHandler<RaptorPath<?>> debugPathHandler;
   private final RaptorStopNameResolver stopNameResolver;
-  private boolean reachedCurrentRound = false;
+  private boolean reachedCurrentRound;
   private int iterationDepartureTime = -1;
 
   public DestinationArrivalPaths(

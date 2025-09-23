@@ -28,8 +28,8 @@ public class TextStroke implements Stroke {
   private final String text;
   private final Font font;
   private final AffineTransform t = new AffineTransform();
-  private boolean stretchToFit = false;
-  private boolean repeat = false;
+  private boolean stretchToFit;
+  private boolean repeat;
 
   public TextStroke(String text, Font font) {
     this(text, font, true, false);
@@ -57,7 +57,9 @@ public class TextStroke implements Stroke {
     int currentChar = 0;
     int length = glyphVector.getNumGlyphs();
 
-    if (length == 0) return result;
+    if (length == 0) {
+      return result;
+    }
 
     float factor = stretchToFit
       ? measurePathLength(shape) / (float) glyphVector.getLogicalBounds().getWidth()
@@ -78,6 +80,7 @@ public class TextStroke implements Stroke {
         case PathIterator.SEG_CLOSE:
           points[0] = moveX;
           points[1] = moveY;
+          break;
         // Fall into....
 
         case PathIterator.SEG_LINETO:
@@ -106,7 +109,9 @@ public class TextStroke implements Stroke {
               result.append(t.createTransformedShape(glyph), false);
               next += (advance + nextAdvance) * factor;
               currentChar++;
-              if (repeat) currentChar %= length;
+              if (repeat) {
+                currentChar %= length;
+              }
             }
           }
           next -= distance;
@@ -139,6 +144,7 @@ public class TextStroke implements Stroke {
         case PathIterator.SEG_CLOSE:
           points[0] = moveX;
           points[1] = moveY;
+          break;
         // Fall into....
 
         case PathIterator.SEG_LINETO:

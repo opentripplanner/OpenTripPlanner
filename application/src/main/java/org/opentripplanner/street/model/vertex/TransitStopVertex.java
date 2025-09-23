@@ -31,7 +31,7 @@ public class TransitStopVertex extends StationElementVertex {
    * For stops that are deep underground, there is a time cost to entering and exiting the stop; all
    * stops are assumed to be at street level unless we have configuration to the contrary
    */
-  private int streetToStopTime = 0;
+  private int streetToStopTime;
 
   /**
    * @param stop  The transit model stop reference. See {@link org.opentripplanner.transit.service.TransitService#getStopVertexForStop()}

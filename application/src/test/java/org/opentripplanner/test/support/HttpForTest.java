@@ -19,4 +19,6 @@ public class HttpForTest {
   public static ContainerRequest containerRequest() {
     return containerRequest("GET");
   }
+
+  private HttpForTest() {}
 }

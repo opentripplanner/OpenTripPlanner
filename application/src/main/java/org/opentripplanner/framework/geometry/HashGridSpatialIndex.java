@@ -51,16 +51,16 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   /* The map of all bins. Please see visit() and xKey/yKey for details on the key. */
   private final TLongObjectHashMap<ArrayList<T>> bins;
 
-  private int nBins = 0;
+  private int nBins;
 
-  private int nObjects = 0;
+  private int nObjects;
 
-  private int nEntries = 0;
+  private int nEntries;
 
   public HashGridSpatialIndex(double xBinSize, double yBinSize) {
-    if (xBinSize <= 0 || yBinSize <= 0) throw new IllegalStateException(
-      "bin size must be positive."
-    );
+    if (xBinSize <= 0 || yBinSize <= 0) {
+      throw new IllegalStateException("bin size must be positive.");
+    }
     this.xBinSize = xBinSize;
     this.yBinSize = yBinSize;
     // For 200m bins, 500x500 = 100x100km = 250000 bins

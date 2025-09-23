@@ -36,7 +36,7 @@ public class CollectionsView<T>
   @Override
   public Iterator<T> iterator() {
     return new Iterator<T>() {
-      int i = 0;
+      int i;
       Iterator<? extends T> it = collections[0].iterator();
 
       @Override

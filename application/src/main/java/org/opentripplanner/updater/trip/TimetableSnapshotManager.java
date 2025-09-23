@@ -46,7 +46,7 @@ public final class TimetableSnapshotManager {
    */
   private final Supplier<LocalDate> localDateNow;
 
-  private LocalDate lastPurgeDate = null;
+  private LocalDate lastPurgeDate;
 
   /**
    *

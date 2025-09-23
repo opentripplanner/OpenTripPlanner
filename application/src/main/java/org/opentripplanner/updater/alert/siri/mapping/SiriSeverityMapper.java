@@ -27,4 +27,6 @@ public class SiriSeverityMapper {
       case NORMAL -> AlertSeverity.WARNING;
     };
   }
+
+  private SiriSeverityMapper() {}
 }

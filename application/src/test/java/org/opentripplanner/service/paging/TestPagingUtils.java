@@ -55,4 +55,6 @@ class TestPagingUtils {
     assertEquals(edt, cleanStr(cursor.earliestDepartureTime()));
     assertEquals(lat, cleanStr(cursor.latestArrivalTime()));
   }
+
+  private TestPagingUtils() {}
 }

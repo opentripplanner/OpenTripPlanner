@@ -263,9 +263,7 @@ public final class ScheduledTripTimes implements TripTimes {
   @Override
   @Nullable
   public I18NString getHeadsign(final int stop) {
-    return (headsigns != null && headsigns[stop] != null)
-      ? headsigns[stop]
-      : getTrip().getHeadsign();
+    return headsigns != null && headsigns[stop] != null ? headsigns[stop] : getTrip().getHeadsign();
   }
 
   @Override
@@ -323,8 +321,12 @@ public final class ScheduledTripTimes implements TripTimes {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     ScheduledTripTimes that = (ScheduledTripTimes) o;
     return (
       timeShift == that.timeShift &&
@@ -401,7 +403,7 @@ public final class ScheduledTripTimes implements TripTimes {
     }
     int prevDep = getDepartureTime(0);
 
-    for (int i = 1; true; ++i) {
+    for (int i = 1; true; i++) {
       final int arr = getArrivalTime(i);
       final int dep = getDepartureTime(i);
 

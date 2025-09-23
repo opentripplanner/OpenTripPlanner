@@ -238,9 +238,7 @@ public sealed interface Condition {
 
     @Override
     public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
-      return (
-        !way.hasTag(exKey) || Arrays.stream(values).anyMatch(value -> way.isTag(exKey, value))
-      );
+      return !way.hasTag(exKey) || Arrays.stream(values).anyMatch(value -> way.isTag(exKey, value));
     }
 
     @Override

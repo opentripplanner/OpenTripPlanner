@@ -61,4 +61,6 @@ public final class TextAssertions {
     }
     return END_OF_TEXT;
   }
+
+  private TextAssertions() {}
 }

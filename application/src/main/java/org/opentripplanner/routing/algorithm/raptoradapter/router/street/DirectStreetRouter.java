@@ -117,4 +117,6 @@ public class DirectStreetRouter {
 
     return distanceLimit;
   }
+
+  private DirectStreetRouter() {}
 }

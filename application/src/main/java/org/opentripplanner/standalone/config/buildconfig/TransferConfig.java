@@ -41,4 +41,6 @@ public class TransferConfig {
       )
       .asEnumMap(StreetMode.class, TransferParametersMapper::map, new EnumMap<>(StreetMode.class));
   }
+
+  private TransferConfig() {}
 }

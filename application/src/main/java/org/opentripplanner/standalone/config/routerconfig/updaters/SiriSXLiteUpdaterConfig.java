@@ -43,4 +43,6 @@ public class SiriSXLiteUpdaterConfig {
       HttpHeadersConfig.headers(c, V2_7)
     );
   }
+
+  private SiriSXLiteUpdaterConfig() {}
 }

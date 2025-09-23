@@ -55,4 +55,6 @@ public final class ModuleTestDebugLogging {
     var dryRun = !(DEBUG || sysDebug || envDebug);
     data.debugToStdErr(requestBuilder, dryRun);
   }
+
+  private ModuleTestDebugLogging() {}
 }

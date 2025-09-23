@@ -143,4 +143,6 @@ public class PlaceAtDistanceType {
       return seen.add(p.place());
     }
   }
+
+  private PlaceAtDistanceType() {}
 }

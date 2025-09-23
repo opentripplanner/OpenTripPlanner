@@ -31,7 +31,7 @@ public class ParetoSet<T> extends AbstractCollection<T> {
   @SuppressWarnings("unchecked")
   private T[] elements = (T[]) new Object[16];
 
-  private int size = 0;
+  private int size;
 
   private T goodElement = null;
 
@@ -92,7 +92,7 @@ public class ParetoSet<T> extends AbstractCollection<T> {
     boolean mutualDominanceExist = false;
     boolean equivalentVectorExist = false;
 
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; i++) {
       T it = elements[i];
 
       boolean leftDominance = leftDominanceExist(newValue, it);
@@ -159,7 +159,7 @@ public class ParetoSet<T> extends AbstractCollection<T> {
     boolean mutualDominanceExist = false;
     boolean equivalentVectorExist = false;
 
-    for (int i = size - 1; i >= 0; --i) {
+    for (int i = size - 1; i >= 0; i--) {
       boolean leftDominance = leftDominanceExist(newValue, elements[i]);
       boolean rightDominance = rightDominanceExist(newValue, elements[i]);
 

@@ -62,7 +62,7 @@ class ScheduledDeviatedTripIntegrationTest {
     var stop = trip
       .getStops()
       .stream()
-      .filter(s -> s.getId().getId().equals("cujv"))
+      .filter(s -> "cujv".equals(s.getId().getId()))
       .findFirst()
       .orElseThrow();
     assertEquals(33.85465, stop.getLat(), delta);
@@ -71,7 +71,7 @@ class ScheduledDeviatedTripIntegrationTest {
     var flexZone = trip
       .getStops()
       .stream()
-      .filter(s -> s.getId().getId().equals("zone_3"))
+      .filter(s -> "zone_3".equals(s.getId().getId()))
       .findFirst()
       .orElseThrow();
     assertEquals(33.825846635310214, flexZone.getLat(), delta);

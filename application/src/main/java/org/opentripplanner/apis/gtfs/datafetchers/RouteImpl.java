@@ -16,6 +16,7 @@ import org.opentripplanner.apis.gtfs.mapping.BikesAllowedMapper;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -165,10 +166,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
   @Override
   public DataFetcher<String> longName() {
     return environment ->
-      org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
-        getSource(environment).getLongName(),
-        environment
-      );
+      GraphQLUtils.getTranslation(getSource(environment).getLongName(), environment);
   }
 
   @Override

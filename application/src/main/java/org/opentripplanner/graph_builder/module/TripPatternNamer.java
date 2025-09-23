@@ -137,7 +137,7 @@ public class TripPatternNamer implements GraphBuilderModule {
         var start = pattern.firstStop();
         sb.append(" from ").append(stopNameAndId(start));
         if (starts.get(start).size() == 1) {
-          pattern.initName((sb.toString()));
+          pattern.initName(sb.toString());
           continue; // only pattern with this first stop
         }
 
@@ -146,18 +146,20 @@ public class TripPatternNamer implements GraphBuilderModule {
         Set<TripPattern> remainingPatterns = new HashSet<>(tripPatterns);
         remainingPatterns.retainAll(ends.get(end)); // set intersection
         if (remainingPatterns.size() == 1) {
-          pattern.initName((sb.toString()));
+          pattern.initName(sb.toString());
           continue;
         }
 
         /* Still not unique; try (end, start, via) for each via. */
         for (var via : pattern.getStops()) {
-          if (via.equals(start) || via.equals(end)) continue;
+          if (via.equals(start) || via.equals(end)) {
+            continue;
+          }
           Set<TripPattern> intersection = new HashSet<>(remainingPatterns);
           intersection.retainAll(vias.get(via));
           if (intersection.size() == 1) {
             sb.append(" via ").append(stopNameAndId(via));
-            pattern.initName((sb.toString()));
+            pattern.initName(sb.toString());
             continue PATTERN;
           }
         }
@@ -174,7 +176,7 @@ public class TripPatternNamer implements GraphBuilderModule {
             .map(TripTimes::getTrip)
             .ifPresent(value -> sb.append(" like trip ").append(value.getId()));
         }
-        pattern.initName((sb.toString()));
+        pattern.initName(sb.toString());
       } // END foreach PATTERN
     } // END foreach ROUTE
 

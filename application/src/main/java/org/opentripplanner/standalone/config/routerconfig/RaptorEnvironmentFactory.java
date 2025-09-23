@@ -38,4 +38,6 @@ public class RaptorEnvironmentFactory {
       }
     };
   }
+
+  private RaptorEnvironmentFactory() {}
 }

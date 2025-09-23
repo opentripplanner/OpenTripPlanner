@@ -126,4 +126,6 @@ public class ViaLocationInputType {
   private static GraphQLInputType optionalListOfNonNullStrings() {
     return new GraphQLList(new GraphQLNonNull(GraphQLString));
   }
+
+  private ViaLocationInputType() {}
 }

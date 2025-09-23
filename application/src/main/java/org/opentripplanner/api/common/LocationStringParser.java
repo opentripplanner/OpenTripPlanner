@@ -71,4 +71,6 @@ public class LocationStringParser {
     }
     return new GenericLocation(label, placeId, lat, lon);
   }
+
+  private LocationStringParser() {}
 }

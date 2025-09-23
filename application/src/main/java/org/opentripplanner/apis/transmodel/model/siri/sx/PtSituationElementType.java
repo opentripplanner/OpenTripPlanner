@@ -344,4 +344,6 @@ public class PtSituationElementType {
       )
       .build();
   }
+
+  private PtSituationElementType() {}
 }

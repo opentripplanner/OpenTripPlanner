@@ -20,7 +20,7 @@ public abstract class AbstractCsvParser<T> {
   private final CsvReader reader;
 
   private T next;
-  private int lineNumber = 0;
+  private int lineNumber;
 
   public AbstractCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
     this.issueStore = issueStore;

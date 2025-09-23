@@ -91,4 +91,6 @@ public class SiriHelper {
 
     return request;
   }
+
+  private SiriHelper() {}
 }

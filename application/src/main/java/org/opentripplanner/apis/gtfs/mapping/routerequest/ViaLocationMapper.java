@@ -52,4 +52,6 @@ class ViaLocationMapper {
     }
     return ids.stream().map(FeedScopedId::parse).toList();
   }
+
+  private ViaLocationMapper() {}
 }

@@ -36,4 +36,6 @@ public class StreetPreferencesMapper {
       )
     );
   }
+
+  private StreetPreferencesMapper() {}
 }

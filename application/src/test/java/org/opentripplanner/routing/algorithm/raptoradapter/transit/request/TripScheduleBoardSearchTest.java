@@ -139,7 +139,7 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
     int departureTime = 1000;
     int latestDepartureTime = -1;
 
-    for (int i = 0; i < N; ++i, departureTime += dT) {
+    for (int i = 0; i < N; i++, departureTime += dT) {
       tripSchedules.add(schedule().departures(departureTime).build());
       latestDepartureTime = departureTime;
     }
@@ -148,7 +148,7 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
     // Search for a trip that board after the last trip, expect no trip in return
     searchForTrip(latestDepartureTime + 1, STOP_POS_0).assertNoTripFound();
 
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < N; i++) {
       int tripBoardTime = dT * (i + 1);
 
       // Search and find trip 'i'

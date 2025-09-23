@@ -55,9 +55,9 @@ class PolylineEncoder {
   private static String encodeSignedNumber(int num) {
     int sgn_num = num << 1;
     if (num < 0) {
-      sgn_num = ~(sgn_num);
+      sgn_num = ~sgn_num;
     }
-    return (encodeNumber(sgn_num));
+    return encodeNumber(sgn_num);
   }
 
   private static String encodeNumber(int num) {
@@ -78,4 +78,6 @@ class PolylineEncoder {
   private static int floor1e5(double coordinate) {
     return (int) Math.floor(coordinate * 1e5);
   }
+
+  private PolylineEncoder() {}
 }

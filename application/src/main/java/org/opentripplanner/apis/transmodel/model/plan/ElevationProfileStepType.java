@@ -57,4 +57,6 @@ public class ElevationProfileStepType {
   protected static List<ElevationProfile.Step> mapElevationProfile(ElevationProfile profile) {
     return Objects.requireNonNullElse(profile, ElevationProfile.empty()).stepsWithoutUnknowns();
   }
+
+  private ElevationProfileStepType() {}
 }

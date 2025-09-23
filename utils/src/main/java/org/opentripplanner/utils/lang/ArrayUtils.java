@@ -11,4 +11,6 @@ public class ArrayUtils {
   public static <T> boolean hasContent(@Nullable T[] array) {
     return array != null && array.length > 0;
   }
+
+  private ArrayUtils() {}
 }

@@ -270,7 +270,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
       final long t2 = System.currentTimeMillis();
       LOG.info(
         "Fetching initial data - finished after {} ms, got {}",
-        (t2 - t1),
+        t2 - t1,
         FileSizeToTextConverter.fileSizeToString(value.size())
       );
       serviceDelivery(value)
@@ -288,7 +288,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
 
       LOG.info(
         "Pubsub updater initialized after {} ms: [messages: {},  updates: {}, total size: {}, time since startup: {}]",
-        (System.currentTimeMillis() - t2),
+        System.currentTimeMillis() - t2,
         MESSAGE_COUNTER.get(),
         UPDATE_COUNTER.get(),
         FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),

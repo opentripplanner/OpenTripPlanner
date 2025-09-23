@@ -17,4 +17,6 @@ public class AvailabilityDataSourceFactory {
       );
     };
   }
+
+  private AvailabilityDataSourceFactory() {}
 }

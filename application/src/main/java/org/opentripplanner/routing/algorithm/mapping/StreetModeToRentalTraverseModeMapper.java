@@ -24,4 +24,6 @@ public class StreetModeToRentalTraverseModeMapper {
         FLEXIBLE -> throw new IllegalArgumentException("%s is not a rental mode.".formatted(mode));
     };
   }
+
+  private StreetModeToRentalTraverseModeMapper() {}
 }

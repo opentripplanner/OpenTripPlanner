@@ -40,7 +40,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
   /**
    * A flag used to prevent fields part of the alias to be modified after the alias is generated.
    */
-  private boolean freezeAliasFields = false;
+  private boolean freezeAliasFields;
 
   public RaptorRequestBuilder() {
     this(RaptorRequest.defaults());

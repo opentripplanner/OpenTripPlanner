@@ -129,10 +129,10 @@ final class TripTimesForDaysIndex {
   }
 
   static List<int[]> applyOffsets(List<int[]> list, int[] offsets) {
-    for (int i = 0; i < list.size(); ++i) {
+    for (int i = 0; i < list.size(); i++) {
       int o = offsets[i];
       int[] a = list.get(i);
-      for (int j = 0; j < a.length; ++j) {
+      for (int j = 0; j < a.length; j++) {
         a[j] = a[j] + o;
       }
     }

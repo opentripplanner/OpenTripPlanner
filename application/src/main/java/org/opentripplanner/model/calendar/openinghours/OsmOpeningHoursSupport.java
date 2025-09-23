@@ -55,4 +55,6 @@ public class OsmOpeningHoursSupport {
       default -> description;
     };
   }
+
+  private OsmOpeningHoursSupport() {}
 }

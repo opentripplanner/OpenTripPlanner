@@ -99,7 +99,7 @@ public class WorldEnvelope implements Serializable {
     double centerLatitude = llLatitude + (urLatitude - llLatitude) / 2.0;
 
     // Split normally at 180 degrees
-    double centerLongitude = (llLongitude < urLongitude)
+    double centerLongitude = llLongitude < urLongitude
       ? llLongitude + (urLongitude - llLongitude) / 2.0
       : llLongitude + (360 - llLongitude + urLongitude) / 2.0;
 

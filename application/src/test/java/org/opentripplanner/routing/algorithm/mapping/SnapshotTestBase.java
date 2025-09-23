@@ -148,9 +148,7 @@ public abstract class SnapshotTestBase {
 
       for (int j = 0; j < itinerary.legs().size(); j++) {
         Leg leg = itinerary.legs().get(j);
-        String mode = (leg instanceof StreetLeg stLeg)
-          ? stLeg.getMode().name().substring(0, 1)
-          : "T";
+        String mode = leg instanceof StreetLeg stLeg ? stLeg.getMode().name().substring(0, 1) : "T";
         System.out.printf(
           " - leg %2d - %52.52s %9s --%s-> %-9s %-52.52s\n",
           j,

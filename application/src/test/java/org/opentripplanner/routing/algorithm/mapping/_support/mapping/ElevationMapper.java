@@ -25,4 +25,6 @@ class ElevationMapper {
     }
     return str.toString();
   }
+
+  private ElevationMapper() {}
 }

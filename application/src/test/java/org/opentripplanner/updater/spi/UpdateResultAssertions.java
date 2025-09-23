@@ -20,4 +20,6 @@ public class UpdateResultAssertions {
     );
     assertTrue(updateResult.successful() > 0);
   }
+
+  private UpdateResultAssertions() {}
 }

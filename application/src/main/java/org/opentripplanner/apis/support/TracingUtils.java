@@ -60,4 +60,6 @@ public final class TracingUtils {
       })
       .toList();
   }
+
+  private TracingUtils() {}
 }

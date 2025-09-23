@@ -45,4 +45,6 @@ class RequestStreetModesMapper {
   private static void ensureValueAndSet(StreetMode streetMode, Consumer<StreetMode> consumer) {
     consumer.accept(streetMode == null ? StreetMode.NOT_SET : streetMode);
   }
+
+  private RequestStreetModesMapper() {}
 }

@@ -36,7 +36,7 @@ class RegularStopMatcherFactoryTest {
   @Test
   void testInUseMatcher() {
     var matcher = RegularStopMatcherFactory.inUseMatcher(stop ->
-      stop.getId().getFeedId().equals("agency")
+      "agency".equals(stop.getId().getFeedId())
     );
     assertTrue(matcher.match(stop1));
     assertFalse(matcher.match(stop2));

@@ -21,4 +21,6 @@ public class NaturalLanguageStringHelper {
     }
     return strings.stream().findFirst().map(NaturalLanguageStringStructure::getValue).orElse("");
   }
+
+  private NaturalLanguageStringHelper() {}
 }

@@ -13,4 +13,6 @@ class FeedScopedIdMapper {
     }
     return arg.getFeedId() + SEPARATOR + arg.getId();
   }
+
+  private FeedScopedIdMapper() {}
 }

@@ -44,4 +44,6 @@ public class BikePreferencesMapper {
 
     bike.withRental(rental -> mapRentalPreferences(rental, callWith));
   }
+
+  private BikePreferencesMapper() {}
 }

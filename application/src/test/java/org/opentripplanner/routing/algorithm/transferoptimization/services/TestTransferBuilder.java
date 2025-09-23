@@ -27,8 +27,8 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
   private int toStopIndex = RaptorConstants.NOT_SET;
 
   // We set the default walk time to zero - it is not relevant for many tests and zero is easy
-  private int walkDurationSec = 0;
-  private TransferConstraint.Builder constraint = null;
+  private int walkDurationSec;
+  private TransferConstraint.Builder constraint;
 
   public static <T extends RaptorTripSchedule> TestTransferBuilder<T> tx(T fromTrip, T toTrip) {
     return new TestTransferBuilder<T>().fromTrip(fromTrip).toTrip(toTrip);

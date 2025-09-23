@@ -140,4 +140,6 @@ public class PathGuidanceType {
       //                        .build())
       .build();
   }
+
+  private PathGuidanceType() {}
 }

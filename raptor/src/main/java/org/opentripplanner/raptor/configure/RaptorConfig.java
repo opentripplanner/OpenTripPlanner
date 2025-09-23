@@ -40,7 +40,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   private final RaptorTuningParameters tuningParameters;
 
   /** The service is not final, because it depends on the request. */
-  private PassThroughPointsService passThroughPointsService = null;
+  private PassThroughPointsService passThroughPointsService;
 
   public RaptorConfig(RaptorTuningParameters tuningParameters, RaptorEnvironment environment) {
     this.tuningParameters = tuningParameters;

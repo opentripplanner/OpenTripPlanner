@@ -65,4 +65,6 @@ public class StopConsolidationParser {
       throw new RuntimeException(e);
     }
   }
+
+  private StopConsolidationParser() {}
 }

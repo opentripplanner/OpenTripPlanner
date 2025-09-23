@@ -28,4 +28,6 @@ public class OTPFeatureTable {
     }
     return String.join(NEW_LINE, table.build().toMarkdownRows()) + NEW_LINE;
   }
+
+  private OTPFeatureTable() {}
 }

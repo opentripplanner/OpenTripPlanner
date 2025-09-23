@@ -24,4 +24,6 @@ public class SiriTransportModeMapper {
       case AIR -> TransitMode.AIRPLANE;
     };
   }
+
+  private SiriTransportModeMapper() {}
 }

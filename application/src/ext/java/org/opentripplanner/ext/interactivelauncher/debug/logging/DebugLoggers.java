@@ -24,4 +24,6 @@ class DebugLoggers {
   }
 
   record Entry(String label, String logger) {}
+
+  private DebugLoggers() {}
 }

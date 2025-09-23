@@ -26,4 +26,6 @@ public class VehicleRentalUpdaterConfig {
       VehicleRentalSourceFactory.create(sourceType, c)
     );
   }
+
+  private VehicleRentalUpdaterConfig() {}
 }

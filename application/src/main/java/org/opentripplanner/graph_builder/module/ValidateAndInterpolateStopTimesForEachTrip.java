@@ -243,7 +243,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
         // figure out how many such stops there are in a row.
         int j;
         StopTime st = null;
-        for (j = i + 1; j < lastStop + 1; ++j) {
+        for (j = i + 1; j < lastStop + 1; j++) {
           st = stopTimes.get(j);
           if (
             (st.isDepartureTimeSet() && st.getDepartureTime() != departureTime) ||
@@ -271,7 +271,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
         if (interpStep < 0) {
           throw new RuntimeException("trip goes backwards for some reason");
         }
-        for (j = i; j < i + numInterpStops; ++j) {
+        for (j = i; j < i + numInterpStops; j++) {
           //System.out.println("interpolating " + j + " between " + prevDepartureTime + " and " + arrivalTime);
           departureTime = prevDepartureTime + interpStep * (j - i + 1);
           st = stopTimes.get(j);

@@ -73,4 +73,6 @@ public class RaptorConstants {
 
   /** Alias for {@link #UNREACHED_HIGH} */
   public static final int N_TRANSFERS_UNREACHED = UNREACHED_HIGH;
+
+  private RaptorConstants() {}
 }

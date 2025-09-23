@@ -88,4 +88,6 @@ public class SiriETGooglePubsubUpdaterConfig {
         .asBoolean(false)
     );
   }
+
+  private SiriETGooglePubsubUpdaterConfig() {}
 }

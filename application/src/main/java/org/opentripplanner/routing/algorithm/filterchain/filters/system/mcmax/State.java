@@ -59,7 +59,7 @@ class State {
    */
   void fillUpTheResultWithMinimumNumberOfItineraries(int minNumItineraries) {
     int end = Math.min(items.size(), minNumItineraries);
-    for (int i = 0; result.size() < end; ++i) {
+    for (int i = 0; result.size() < end; i++) {
       var it = items.get(i);
       if (!result.contains(it)) {
         result.add(it);

@@ -871,4 +871,6 @@ public class RouteRequestConfig {
       )
       .withEscalator(escalator -> mapEscalatorPreferences(c, escalator));
   }
+
+  private RouteRequestConfig() {}
 }

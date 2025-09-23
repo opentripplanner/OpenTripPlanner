@@ -21,4 +21,6 @@ public class EmissionType {
       )
       .build();
   }
+
+  private EmissionType() {}
 }

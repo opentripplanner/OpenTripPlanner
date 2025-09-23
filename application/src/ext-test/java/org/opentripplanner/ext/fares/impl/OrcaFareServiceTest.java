@@ -148,7 +148,7 @@ public class OrcaFareServiceTest {
         return (
           fp.medium().name().equals("electronic") &&
           fp.category().name().equals("regular") &&
-          fpl.startTime().equals(leg.startTime()) // Only count fare products created at this leg's start time
+          fpl.startTime().equals(leg.startTime())
         );
       })
       .mapToInt(fpl -> fpl.fareProduct().price().minorUnitAmount())
@@ -158,7 +158,7 @@ public class OrcaFareServiceTest {
 
     // Check for transfer status - transfers are when this leg has fare products but pays no additional cost
     // (i.e., fare = 0 for this leg because it's covered by a previous fare product)
-    var hasTransfer = (fare == 0 && !legFareProducts.isEmpty());
+    var hasTransfer = fare == 0 && !legFareProducts.isEmpty();
 
     assertEquals(hasXfer, hasTransfer, "Incorrect transfer leg fare product status.");
   }

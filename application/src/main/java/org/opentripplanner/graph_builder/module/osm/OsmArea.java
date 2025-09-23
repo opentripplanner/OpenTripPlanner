@@ -204,7 +204,7 @@ class OsmArea {
       TLongList newRing = new TLongArrayList(ring.size() + nodeRefs.size());
       long newFirstEndpoint;
       if (firstEndpoint == endpoint) {
-        for (int j = nodeRefs.size() - 1; j >= 1; --j) {
+        for (int j = nodeRefs.size() - 1; j >= 1; j--) {
           newRing.add(nodeRefs.get(j));
         }
         newRing.addAll(ring);

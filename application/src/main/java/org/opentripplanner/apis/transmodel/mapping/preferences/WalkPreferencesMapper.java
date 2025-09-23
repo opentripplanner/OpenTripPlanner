@@ -14,4 +14,6 @@ public class WalkPreferencesMapper {
     callWith.argument("walkSpeed", walk::withSpeed);
     callWith.argument("walkReluctance", walk::withReluctance);
   }
+
+  private WalkPreferencesMapper() {}
 }

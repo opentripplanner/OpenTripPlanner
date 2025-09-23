@@ -24,7 +24,7 @@ public class BitSetPassThroughPointsService implements PassThroughPointsService 
 
   private final List<BitSet> passThroughPoints;
   private final int expectedC2ValueAtDestination;
-  private int currentPassThroughPointSeqNo = 0;
+  private int currentPassThroughPointSeqNo;
 
   private BitSetPassThroughPointsService(final List<BitSet> passThroughPoints) {
     this.passThroughPoints = passThroughPoints;
@@ -42,7 +42,7 @@ public class BitSetPassThroughPointsService implements PassThroughPointsService 
 
   @Override
   public boolean isPassThroughPoint(int stop) {
-    for (int i = 0; i < passThroughPoints.size(); ++i) {
+    for (int i = 0; i < passThroughPoints.size(); i++) {
       if (passThroughPoints.get(i).get(stop)) {
         currentPassThroughPointSeqNo = i + 1;
         return true;

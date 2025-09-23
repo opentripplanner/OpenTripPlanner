@@ -27,7 +27,7 @@ public class CalendarServiceBuilder {
   private final FeedScopedIdFactory scopedIdFactory;
   private final Map<Set<LocalDate>, FeedScopedId> serviceCalendar = new ConcurrentHashMap<>();
 
-  private long counter = 0L;
+  private long counter;
 
   public CalendarServiceBuilder(FeedScopedIdFactory scopedIdFactory) {
     this.scopedIdFactory = scopedIdFactory;

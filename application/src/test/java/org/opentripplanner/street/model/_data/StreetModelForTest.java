@@ -300,4 +300,6 @@ public class StreetModelForTest {
     LineString geometry = e.getGeometry();
     return GeometryUtils.splitGeometryAtPoint(geometry, nearestPoint);
   }
+
+  private StreetModelForTest() {}
 }

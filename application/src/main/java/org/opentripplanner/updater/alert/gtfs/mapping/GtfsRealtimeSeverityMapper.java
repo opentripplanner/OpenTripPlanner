@@ -29,4 +29,6 @@ public class GtfsRealtimeSeverityMapper {
       }
     }
   }
+
+  private GtfsRealtimeSeverityMapper() {}
 }

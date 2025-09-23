@@ -183,4 +183,6 @@ public class ItineraryFiltersInputType {
   ) {
     callWith.argument("itineraryFilters." + field, consumer);
   }
+
+  private ItineraryFiltersInputType() {}
 }

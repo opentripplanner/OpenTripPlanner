@@ -23,8 +23,8 @@ public class HeuristicToRunResolverTest {
   public static final boolean WIN = true;
   public static final boolean _x_ = false;
 
-  private boolean forward = false;
-  private boolean reverse = false;
+  private boolean forward;
+  private boolean reverse;
 
   // Request to test
   private RaptorRequest<TestTripSchedule> request;

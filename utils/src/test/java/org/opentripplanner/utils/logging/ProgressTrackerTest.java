@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 public class ProgressTrackerTest {
 
   private String msg;
-  private boolean breakOut = false;
+  private boolean breakOut;
 
   @Test
   public void testStepLessThan100() {

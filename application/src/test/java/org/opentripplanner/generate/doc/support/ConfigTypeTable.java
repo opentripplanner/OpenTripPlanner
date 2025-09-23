@@ -20,4 +20,6 @@ public class ConfigTypeTable {
     var rows = tbl.build().toMarkdownRows();
     return String.join(NEW_LINE, rows) + NEW_LINE;
   }
+
+  private ConfigTypeTable() {}
 }

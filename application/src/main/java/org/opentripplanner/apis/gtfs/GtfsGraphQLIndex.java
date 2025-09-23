@@ -90,4 +90,6 @@ class GtfsGraphQLIndex {
       .entity(GraphQLResponseSerializer.serialize(executionResult))
       .build();
   }
+
+  private GtfsGraphQLIndex() {}
 }

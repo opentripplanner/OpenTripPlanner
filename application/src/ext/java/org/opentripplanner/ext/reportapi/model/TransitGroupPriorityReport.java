@@ -83,4 +83,6 @@ public class TransitGroupPriorityReport {
       return agency + " ~ " + buf.substring(2);
     }
   }
+
+  private TransitGroupPriorityReport() {}
 }

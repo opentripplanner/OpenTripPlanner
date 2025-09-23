@@ -96,7 +96,7 @@ public class SiriAzureUpdater implements GraphUpdater {
 
   private ServiceBusProcessorClient eventProcessor;
   private ServiceBusAdministrationClient serviceBusAdmin;
-  private boolean isPrimed = false;
+  private boolean isPrimed;
   private String subscriptionName;
 
   private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
@@ -579,7 +579,7 @@ public class SiriAzureUpdater implements GraphUpdater {
         SiriXml::parseXml
       );
       var t2 = System.currentTimeMillis();
-      log.info("Fetched initial data in {} ms", (t2 - t1));
+      log.info("Fetched initial data in {} ms", t2 - t1);
 
       if (siriOptional.isEmpty()) {
         log.info("Got status 204 'No Content'.");
@@ -596,7 +596,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       if (f != null) {
         f.get();
       }
-      log.info("{} updater initialized in {} ms.", updaterType, (System.currentTimeMillis() - t1));
+      log.info("{} updater initialized in {} ms.", updaterType, System.currentTimeMillis() - t1);
     } catch (ExecutionException | InterruptedException e) {
       throw new SiriAzureInitializationException("Error applying history", e);
     }

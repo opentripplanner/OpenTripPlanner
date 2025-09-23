@@ -52,4 +52,6 @@ public class SiriETUpdaterConfig {
         .asBoolean(false)
     );
   }
+
+  private SiriETUpdaterConfig() {}
 }

@@ -14,4 +14,6 @@ public final class OptimizationTypeMapper {
       case TRIANGLE -> VehicleRoutingOptimizeType.TRIANGLE;
     };
   }
+
+  private OptimizationTypeMapper() {}
 }

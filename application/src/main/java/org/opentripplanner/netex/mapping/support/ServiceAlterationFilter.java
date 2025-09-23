@@ -11,4 +11,6 @@ public class ServiceAlterationFilter {
         !serviceAlteration.equals(ServiceAlterationEnumeration.REPLACED))
     );
   }
+
+  private ServiceAlterationFilter() {}
 }

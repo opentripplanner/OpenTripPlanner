@@ -122,4 +122,6 @@ class TimetableHelper {
       );
     }
   }
+
+  private TimetableHelper() {}
 }

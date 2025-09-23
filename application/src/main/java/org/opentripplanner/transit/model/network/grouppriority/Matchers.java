@@ -206,4 +206,6 @@ final class Matchers {
       return "(" + arrayToString(AND, matchers) + ')';
     }
   }
+
+  private Matchers() {}
 }

@@ -194,7 +194,7 @@ public class SpeedTest {
     System.err.println("Run Speed Test [" + nSamples + " samples]");
     initProfileStatistics();
 
-    for (int i = 1; i <= nSamples; ++i) {
+    for (int i = 1; i <= nSamples; i++) {
       for (var profile : opts.profiles()) {
         runSampleTest(profile, i, nSamples);
       }

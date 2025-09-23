@@ -140,9 +140,15 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
 
   private String getLabel(StreetTraversalPermission permissions) {
     StringBuilder sb = new StringBuilder();
-    if (permissions.allows(StreetTraversalPermission.PEDESTRIAN)) sb.append("walk,");
-    if (permissions.allows(StreetTraversalPermission.BICYCLE)) sb.append("bike,");
-    if (permissions.allows(StreetTraversalPermission.CAR)) sb.append("car,");
+    if (permissions.allows(StreetTraversalPermission.PEDESTRIAN)) {
+      sb.append("walk,");
+    }
+    if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
+      sb.append("bike,");
+    }
+    if (permissions.allows(StreetTraversalPermission.CAR)) {
+      sb.append("car,");
+    }
     if (sb.length() > 0) {
       sb.setLength(sb.length() - 1); // Remove last comma
     } else {

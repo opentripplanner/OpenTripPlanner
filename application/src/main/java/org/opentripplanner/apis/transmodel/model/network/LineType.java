@@ -71,14 +71,14 @@ public class LineType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("operator")
           .type(operatorType)
-          .dataFetcher(environment -> ((getSource(environment)).getOperator()))
+          .dataFetcher(environment -> (getSource(environment).getOperator()))
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("branding")
           .type(brandingType)
-          .dataFetcher(environment -> (getSource(environment)).getBranding())
+          .dataFetcher(environment -> getSource(environment).getBranding())
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
@@ -87,21 +87,21 @@ public class LineType {
           .description(
             "Publicly announced code for line, differentiating it from other lines for the same operator."
           )
-          .dataFetcher(environment -> ((getSource(environment)).getShortName()))
+          .dataFetcher(environment -> (getSource(environment).getShortName()))
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> (getSource(environment)).getLongName())
+          .dataFetcher(environment -> getSource(environment).getLongName())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("transportMode")
           .type(EnumTypes.TRANSPORT_MODE)
-          .dataFetcher(environment -> (getSource(environment)).getMode())
+          .dataFetcher(environment -> getSource(environment).getMode())
           .build()
       )
       .field(
@@ -109,7 +109,7 @@ public class LineType {
           .name("transportSubmode")
           .type(EnumTypes.TRANSPORT_SUBMODE)
           .dataFetcher(environment ->
-            TransmodelTransportSubmode.fromValue((getSource(environment)).getNetexSubmode())
+            TransmodelTransportSubmode.fromValue(getSource(environment).getNetexSubmode())
           )
           .build()
       )
@@ -117,7 +117,7 @@ public class LineType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> (getSource(environment)).getDescription())
+          .dataFetcher(environment -> getSource(environment).getDescription())
           .build()
       )
       .field(
@@ -192,7 +192,7 @@ public class LineType {
           .dataFetcher(environment ->
             GqlUtil.getTransitService(environment)
               .getTransitAlertService()
-              .getRouteAlerts((getSource(environment)).getId())
+              .getRouteAlerts(getSource(environment).getId())
           )
           .build()
       )
@@ -201,7 +201,7 @@ public class LineType {
           .name("flexibleLineType")
           .description("Type of flexible line, or null if line is not flexible.")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> (getSource(environment)).getFlexibleLineType())
+          .dataFetcher(environment -> getSource(environment).getFlexibleLineType())
           .build()
       )
       .field(
@@ -220,7 +220,7 @@ public class LineType {
           .name("groupOfLines")
           .description("Groups of lines that line is a part of.")
           .type(new GraphQLNonNull(new GraphQLList(groupOfLinesType)))
-          .dataFetcher(environment -> (getSource(environment)).getGroupsOfRoutes())
+          .dataFetcher(environment -> getSource(environment).getGroupsOfRoutes())
           .build()
       )
       .build();

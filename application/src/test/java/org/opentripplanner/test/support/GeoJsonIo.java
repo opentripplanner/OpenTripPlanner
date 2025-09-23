@@ -48,4 +48,6 @@ public class GeoJsonIo {
     var collection = GeometryUtils.getGeometryFactory().createGeometryCollection(geomArray);
     return toUrl(collection);
   }
+
+  private GeoJsonIo() {}
 }

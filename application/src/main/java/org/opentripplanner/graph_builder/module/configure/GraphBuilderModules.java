@@ -389,4 +389,6 @@ public class GraphBuilderModules {
   ) {
     return new GeotiffGridCoverageFactoryImpl(demSource, elevationUnitMultiplier);
   }
+
+  private GraphBuilderModules() {}
 }

@@ -15,7 +15,7 @@ public class TripDataReader {
 
   private final DataSource emissionDataSource;
   private final DataImportIssueStore issueStore;
-  private boolean dataProcessed = false;
+  private boolean dataProcessed;
 
   public TripDataReader(DataSource emissionDataSource, DataImportIssueStore issueStore) {
     this.emissionDataSource = emissionDataSource;

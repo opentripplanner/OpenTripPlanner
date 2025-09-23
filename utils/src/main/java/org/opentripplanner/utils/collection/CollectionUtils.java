@@ -94,4 +94,6 @@ public class CollectionUtils {
       throw new IllegalArgumentException("'%s' must not be empty.".formatted(name));
     }
   }
+
+  private CollectionUtils() {}
 }

@@ -19,4 +19,6 @@ public class OsmUrlGenerator {
         lon
       );
   }
+
+  private OsmUrlGenerator() {}
 }

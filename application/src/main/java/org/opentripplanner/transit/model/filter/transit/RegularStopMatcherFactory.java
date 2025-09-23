@@ -49,4 +49,6 @@ public class RegularStopMatcherFactory {
   static Matcher<RegularStop> inUseMatcher(Predicate<RegularStop> inUseProvider) {
     return new GenericUnaryMatcher<>("inUse", inUseProvider);
   }
+
+  private RegularStopMatcherFactory() {}
 }

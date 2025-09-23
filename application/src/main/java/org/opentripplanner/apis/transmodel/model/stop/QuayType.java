@@ -138,7 +138,7 @@ public class QuayType {
           .description("Whether this quay is suitable for wheelchair boarding.")
           .dataFetcher(env ->
             Objects.requireNonNullElse(
-              (((StopLocation) env.getSource()).getWheelchairAccessibility()),
+              ((StopLocation) env.getSource()).getWheelchairAccessibility(),
               Accessibility.NO_INFORMATION
             )
           )

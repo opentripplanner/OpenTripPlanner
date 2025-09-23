@@ -76,7 +76,7 @@ public class TransfersReport {
     transfers.forEach(t -> {
       var from = pointInfo(t.getFrom(), ALIGHT);
       var to = pointInfo(t.getTo(), BOARD);
-      var dist = (from.coordinate == null || to.coordinate == null)
+      var dist = from.coordinate == null || to.coordinate == null
         ? ""
         : String.format(
           "%.0fm",
@@ -85,7 +85,7 @@ public class TransfersReport {
             to.coordinate.asJtsCoordinate()
           )
         );
-      var duration = (from.time == NOT_SET || to.time == NOT_SET)
+      var duration = from.time == NOT_SET || to.time == NOT_SET
         ? ""
         : durationToStr(to.time - from.time);
       var c = t.getTransferConstraint();
@@ -206,7 +206,7 @@ public class TransfersReport {
     private String loc = "";
     private String trip = "";
     private String route = "";
-    private Integer specificity = null;
+    private Integer specificity;
     private WgsCoordinate coordinate = null;
     private int time = NOT_SET;
 

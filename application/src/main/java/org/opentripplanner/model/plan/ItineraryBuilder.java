@@ -16,19 +16,19 @@ public class ItineraryBuilder {
   /* COST AND PENALTY */
   TimeAndCost accessPenalty = TimeAndCost.ZERO;
   TimeAndCost egressPenalty = TimeAndCost.ZERO;
-  Cost generalizedCost = null;
-  Integer generalizedCost2 = null;
+  Cost generalizedCost;
+  Integer generalizedCost2;
   int transferPriorityCost = Itinerary.UNKNOWN;
   int waitTimeOptimizedCost = Itinerary.UNKNOWN;
 
   /* RENATL */
-  boolean arrivedAtDestinationWithRentedVehicle = false;
+  boolean arrivedAtDestinationWithRentedVehicle;
 
   /* ELEVATION */
   Double elevationGained_m = 0.0;
   Double elevationLost_m = 0.0;
-  Double maxSlope = null;
-  boolean tooSloped = false;
+  Double maxSlope;
+  boolean tooSloped;
 
   /* LEGS */
   List<Leg> legs;

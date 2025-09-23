@@ -45,4 +45,6 @@ public class TransitModeMapper {
       case MONORAIL -> GraphQLTypes.GraphQLTransitMode.MONORAIL;
     };
   }
+
+  private TransitModeMapper() {}
 }

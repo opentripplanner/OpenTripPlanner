@@ -9,7 +9,7 @@ import org.opentripplanner.datastore.api.DataSource;
 public class ConfiguredDataSource<T extends DataSourceConfig> {
 
   private DataSource dataSource;
-  private T config;
+  private final T config;
 
   public ConfiguredDataSource(DataSource dataSource, T config) {
     this.dataSource = Objects.requireNonNull(dataSource, "'dataSource' is required");

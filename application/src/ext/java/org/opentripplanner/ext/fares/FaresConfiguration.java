@@ -78,4 +78,6 @@ public class FaresConfiguration {
       default -> throw new IllegalArgumentException(String.format("Unknown fare type: '%s'", type));
     };
   }
+
+  private FaresConfiguration() {}
 }

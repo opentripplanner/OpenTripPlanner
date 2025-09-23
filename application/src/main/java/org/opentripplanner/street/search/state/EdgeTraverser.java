@@ -34,4 +34,6 @@ public class EdgeTraverser {
     }
     return Optional.ofNullable(state);
   }
+
+  private EdgeTraverser() {}
 }

@@ -27,4 +27,6 @@ public class PresentationType {
       )
       .build();
   }
+
+  private PresentationType() {}
 }

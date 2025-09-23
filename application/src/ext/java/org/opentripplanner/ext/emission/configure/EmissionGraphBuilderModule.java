@@ -37,4 +37,6 @@ public class EmissionGraphBuilderModule {
       issueStore
     );
   }
+
+  private EmissionGraphBuilderModule() {}
 }

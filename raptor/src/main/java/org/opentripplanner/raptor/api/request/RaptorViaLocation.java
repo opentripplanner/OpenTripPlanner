@@ -138,9 +138,9 @@ public final class RaptorViaLocation {
       .toList();
 
     // Compare all pairs to check for duplicates and non-optimal connections
-    for (int i = 0; i < list.size(); ++i) {
+    for (int i = 0; i < list.size(); i++) {
       var a = list.get(i);
-      for (int j = i + 1; j < list.size(); ++j) {
+      for (int j = i + 1; j < list.size(); j++) {
         var b = list.get(j);
         if (a.isBetterOrEqual(b) || b.isBetterOrEqual(a)) {
           throw new IllegalArgumentException(

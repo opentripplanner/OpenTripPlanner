@@ -69,4 +69,6 @@ public class TransitFeedConfig {
     GTFS,
     NETEX,
   }
+
+  private TransitFeedConfig() {}
 }

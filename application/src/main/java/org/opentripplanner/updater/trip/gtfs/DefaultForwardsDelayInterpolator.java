@@ -26,7 +26,7 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
     StopRealTimeState propagatedState = StopRealTimeState.DEFAULT;
     Integer firstCanceledStop = null;
     boolean updated = false;
-    for (var i = 0; i < builder.numberOfStops(); ++i) {
+    for (var i = 0; i < builder.numberOfStops(); i++) {
       boolean noTimeGiven =
         builder.getArrivalTime(i) == null && builder.getDepartureTime(i) == null;
       if (noTimeGiven) {
@@ -131,7 +131,7 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
 
     if (delay != null && firstCanceledStop != null) {
       // there are skipped stops without estimated times at the end of the journey, propagate delay
-      for (int i = firstCanceledStop; i < builder.numberOfStops(); ++i) {
+      for (int i = firstCanceledStop; i < builder.numberOfStops(); i++) {
         builder.withArrivalDelay(i, delay);
         builder.withDepartureDelay(i, delay);
         updated = true;

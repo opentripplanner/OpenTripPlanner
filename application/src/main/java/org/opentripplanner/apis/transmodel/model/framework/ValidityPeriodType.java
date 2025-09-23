@@ -34,4 +34,6 @@ public class ValidityPeriodType {
       )
       .build();
   }
+
+  private ValidityPeriodType() {}
 }

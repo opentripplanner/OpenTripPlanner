@@ -129,4 +129,6 @@ public class ModePreferencesMapper {
       journey.withTransit(b -> b.setFilters(List.of(filter)));
     }
   }
+
+  private ModePreferencesMapper() {}
 }

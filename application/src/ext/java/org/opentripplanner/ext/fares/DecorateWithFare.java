@@ -18,7 +18,7 @@ public class DecorateWithFare implements ItineraryDecorator {
   @Override
   public Itinerary decorate(Itinerary itinerary) {
     var fare = fareService.calculateFares(itinerary);
-    return (fare != null)
+    return fare != null
       ? ItineraryFaresDecorator.decorateItineraryWithFare(itinerary, fare)
       : itinerary;
   }

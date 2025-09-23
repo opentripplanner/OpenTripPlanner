@@ -182,7 +182,7 @@ public class RaptorTransitDataMapper {
     );
     int[] stopBoardAlightTransferCosts = new int[stops.stopIndexSize()];
 
-    for (int i = 0; i < stops.stopIndexSize(); ++i) {
+    for (int i = 0; i < stops.stopIndexSize(); i++) {
       // There can be holes in the stop index, so we need to account for 'null' here.
       var stop = stops.stopByIndex(i);
       if (stop == null) {

@@ -111,4 +111,6 @@ public class GtfsConfig {
       )
       .build();
   }
+
+  private GtfsConfig() {}
 }

@@ -88,4 +88,6 @@ public class RelaxCostType {
     }
     return CostLinearFunction.of(constant, ratio);
   }
+
+  private RelaxCostType() {}
 }

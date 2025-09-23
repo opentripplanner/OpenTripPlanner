@@ -158,4 +158,6 @@ public class WheelchairConfig {
       builder.withUnknownCost(unknownCost).withInaccessibleCost(inaccessibleCost);
     }
   }
+
+  private WheelchairConfig() {}
 }

@@ -46,4 +46,6 @@ public class BannedInputType {
       )
     )
     .build();
+
+  private BannedInputType() {}
 }

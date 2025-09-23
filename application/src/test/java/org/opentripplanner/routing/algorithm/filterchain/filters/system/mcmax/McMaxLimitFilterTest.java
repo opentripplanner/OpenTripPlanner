@@ -144,7 +144,7 @@ class McMaxLimitFilterTest {
     var buf = new StringBuilder();
     char ch = 'A';
     // Check for 5 groups - the test does not use so many, but it does not matter
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 5; i++) {
       int mask = 1 << i;
       if ((groups & mask) != 0) {
         buf.append(ch);

@@ -62,7 +62,7 @@ public class OtpDataStore {
   private DataSource graph;
   private DataSource stopConsolidation;
   private CompositeDataSource buildReportDir;
-  private boolean opened = false;
+  private boolean opened;
 
   /**
    * Use the {@link DataStoreModule} to create a new instance of this class.

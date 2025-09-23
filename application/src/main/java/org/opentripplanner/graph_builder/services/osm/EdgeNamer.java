@@ -68,6 +68,8 @@ public interface EdgeNamer {
         case DEFAULT -> new DefaultNamer();
       };
     }
+
+    private EdgeNamerFactory() {}
   }
 
   enum EdgeNamerType {

@@ -43,4 +43,6 @@ public class TransitPreferencesMapper {
       transit.withRaptor(it -> it.withRelaxGeneralizedCostAtDestination(value))
     );
   }
+
+  private TransitPreferencesMapper() {}
 }

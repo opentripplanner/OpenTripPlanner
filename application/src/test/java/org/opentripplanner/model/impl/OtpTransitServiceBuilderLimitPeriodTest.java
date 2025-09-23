@@ -58,7 +58,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     createStopTime(STOP_2, 300)
   );
   private static final StopPattern STOP_PATTERN = new StopPattern(STOP_TIMES);
-  private static int SEQ_NR = 0;
+  private static int SEQ_NR;
   private final Route route = TimetableRepositoryForTest.route(newId().getId()).build();
   private final Trip tripCSIn = createTrip("TCalIn", SERVICE_C_IN);
   private final Trip tripCSOut = createTrip("TCalOut", SERVICE_C_OUT);

@@ -55,4 +55,6 @@ class IslandPruningUtils {
       throw new RuntimeException(e);
     }
   }
+
+  private IslandPruningUtils() {}
 }

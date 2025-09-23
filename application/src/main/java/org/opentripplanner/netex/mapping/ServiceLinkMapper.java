@@ -64,7 +64,7 @@ class ServiceLinkMapper {
     LineString[] geometries = generateGeometriesFromServiceLinks(journeyPattern, stopPattern);
 
     // Make sure all geometries are generated
-    for (int i = 0; i < stopPattern.getSize() - 1; ++i) {
+    for (int i = 0; i < stopPattern.getSize() - 1; i++) {
       if (geometries[i] == null) {
         geometries[i] = createSimpleGeometry(stopPattern.getStop(i), stopPattern.getStop(i + 1));
       }

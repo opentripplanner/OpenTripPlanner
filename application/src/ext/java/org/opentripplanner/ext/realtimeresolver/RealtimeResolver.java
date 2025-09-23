@@ -44,7 +44,7 @@ public class RealtimeResolver {
     }
 
     // Only ScheduledTransitLeg has leg references atm, so this check is just to be future-proof
-    if (!(leg.isScheduledTransitLeg())) {
+    if (!leg.isScheduledTransitLeg()) {
       return leg;
     }
     var realTimeLeg = ref.getLeg(transitService);

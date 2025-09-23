@@ -33,8 +33,8 @@ public class SpeedTestCmdLineOptsBuilder {
   private final List<String> categories = new ArrayList<>();
   private int nItineraries = -1;
   private int nSamples = -1;
-  private boolean skipCost = false;
-  private boolean replaceExpectedResultsFile = false;
+  private boolean skipCost;
+  private boolean replaceExpectedResultsFile;
   private final List<String> debugStops = new ArrayList<>();
   private final List<String> debugPath = new ArrayList<>();
 

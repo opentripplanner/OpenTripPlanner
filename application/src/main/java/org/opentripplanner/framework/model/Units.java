@@ -80,7 +80,7 @@ public class Units {
    * verify value, see {@link #normalizedFactor(double, double, double)}.
    */
   public static Double normalizedOptionalFactor(Double value, double minValue, double maxValue) {
-    return (value == null) ? null : normalizedFactor(value, minValue, maxValue);
+    return value == null ? null : normalizedFactor(value, minValue, maxValue);
   }
 
   /**

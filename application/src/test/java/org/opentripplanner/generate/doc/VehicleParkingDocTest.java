@@ -40,7 +40,7 @@ public class VehicleParkingDocTest {
     for (String childName : node.listChildrenByName()) {
       var child = node.child(childName);
       var type = child.typeQualifier();
-      if (type.equals("vehicle-parking")) {
+      if ("vehicle-parking".equals(type)) {
         var sourceType = child.sourceTypeQualifier();
         template = replaceSection(template, sourceType, updaterDoc(child));
       }

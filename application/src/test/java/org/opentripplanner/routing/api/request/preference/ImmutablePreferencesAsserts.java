@@ -19,4 +19,6 @@ public class ImmutablePreferencesAsserts {
     assertNotEquals(subject, other);
     assertNotEquals(subject.hashCode(), other.hashCode());
   }
+
+  private ImmutablePreferencesAsserts() {}
 }

@@ -93,7 +93,7 @@ public class RouteRequest implements Serializable {
     this.to = builder.to;
     this.via = builder.via;
 
-    this.dateTime = (!builder.defaultRequest && builder.dateTime == null)
+    this.dateTime = !builder.defaultRequest && builder.dateTime == null
       ? normalizeNow()
       : normalizeDateTime(builder.dateTime);
 

@@ -45,7 +45,7 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements RemoveItinerary
         .sum();
       double totalDuration = itinerary.totalDuration().toSeconds();
 
-      return (carDuration != 0 && (carDuration / totalDuration) <= parkAndRideDurationRatio);
+      return carDuration != 0 && (carDuration / totalDuration) <= parkAndRideDurationRatio;
     };
   }
 

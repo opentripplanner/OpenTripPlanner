@@ -41,7 +41,7 @@ record TestCase(
       if (points.size() > 1) {
         buf.append("at (");
         appendPoint(buf, 0);
-        for (int i = 1; i < points.size(); ++i) {
+        for (int i = 1; i < points.size(); i++) {
           buf.append(") and (");
           appendPoint(buf, i);
         }
@@ -51,7 +51,9 @@ record TestCase(
 
     if (stopIndexA > 0 || stopIndexB > 0) {
       buf
-        .append(". Expects transfer" + (fromAToB ? "" : "s") + " from ")
+        .append(". Expects transfer")
+        .append(fromAToB ? "" : "s")
+        .append(" from ")
         .append(stopIndexToName(stopIndexA))
         .append(fromAToB ? " to " : " and ")
         .append(stopIndexToName(stopIndexB));

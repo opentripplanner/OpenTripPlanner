@@ -97,41 +97,39 @@ class MissingElevationHandler {
   private BinHeap<ElevationRepairState> createPriorityQueue(Map<Vertex, Double> elevations) {
     var pq = new BinHeap<ElevationRepairState>();
 
-    elevations.forEach(
-      ((vertex, elevation) -> {
-          vertex
-            .getIncoming()
-            .forEach(edge -> {
-              if (edge.getDistanceMeters() < maxElevationPropagationMeters) {
-                pq.insert(
-                  new ElevationRepairState(
-                    vertex,
-                    elevation,
-                    edge.getFromVertex(),
-                    edge.getDistanceMeters()
-                  ),
-                  edge.getDistanceMeters()
-                );
-              }
-            });
+    elevations.forEach((vertex, elevation) -> {
+      vertex
+        .getIncoming()
+        .forEach(edge -> {
+          if (edge.getDistanceMeters() < maxElevationPropagationMeters) {
+            pq.insert(
+              new ElevationRepairState(
+                vertex,
+                elevation,
+                edge.getFromVertex(),
+                edge.getDistanceMeters()
+              ),
+              edge.getDistanceMeters()
+            );
+          }
+        });
 
-          vertex
-            .getOutgoing()
-            .forEach(edge -> {
-              if (edge.getDistanceMeters() < maxElevationPropagationMeters) {
-                pq.insert(
-                  new ElevationRepairState(
-                    vertex,
-                    elevation,
-                    edge.getToVertex(),
-                    edge.getDistanceMeters()
-                  ),
-                  edge.getDistanceMeters()
-                );
-              }
-            });
-        })
-    );
+      vertex
+        .getOutgoing()
+        .forEach(edge -> {
+          if (edge.getDistanceMeters() < maxElevationPropagationMeters) {
+            pq.insert(
+              new ElevationRepairState(
+                vertex,
+                elevation,
+                edge.getToVertex(),
+                edge.getDistanceMeters()
+              ),
+              edge.getDistanceMeters()
+            );
+          }
+        });
+    });
 
     return pq;
   }

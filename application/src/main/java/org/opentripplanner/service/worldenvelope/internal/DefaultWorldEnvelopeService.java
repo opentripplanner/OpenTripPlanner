@@ -12,7 +12,7 @@ public class DefaultWorldEnvelopeService implements Serializable, WorldEnvelopeS
   /**
    * The volatile keyword is key to make this propagate to other threads.
    */
-  private WorldEnvelopeRepository repository = null;
+  private WorldEnvelopeRepository repository;
 
   @Inject
   public DefaultWorldEnvelopeService(WorldEnvelopeRepository repository) {

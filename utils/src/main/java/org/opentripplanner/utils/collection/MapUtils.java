@@ -32,4 +32,6 @@ public class MapUtils {
     Arrays.stream(maps).forEach(ret::putAll);
     return Map.copyOf(ret);
   }
+
+  private MapUtils() {}
 }

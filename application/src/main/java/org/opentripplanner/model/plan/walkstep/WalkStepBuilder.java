@@ -19,16 +19,16 @@ public class WalkStepBuilder {
   private final Set<StreetNote> streetNotes = new HashSet<>();
   private I18NString directionText;
   private WgsCoordinate startLocation;
-  private boolean nameIsDerived = false;
+  private boolean nameIsDerived;
   private double angle;
-  private boolean walkingBike = false;
-  private boolean area = false;
+  private boolean walkingBike;
+  private boolean area;
   private AbsoluteDirection absoluteDirection;
   private RelativeDirection relativeDirection;
   private ElevationProfile elevationProfile;
   private String exit;
   private Entrance entrance;
-  private boolean stayOn = false;
+  private boolean stayOn;
   /**
    * Distance used for appending elevation profiles
    */

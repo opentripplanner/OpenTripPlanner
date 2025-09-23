@@ -494,7 +494,9 @@ public class OsmDatabase {
 
             // don't insert the same node twice. This is not always safe; suppose a way crosses over the same node in the parking area twice.
             // but we assume it doesn't (and even if it does, it's not a huge deal, as it is still connected elsewhere on the same way).
-            if (way.getNodeRefs().contains(ringSegment.nA.getId())) continue;
+            if (way.getNodeRefs().contains(ringSegment.nA.getId())) {
+              continue;
+            }
 
             way.addNodeRef(ringSegment.nA.getId(), i + 1);
 
@@ -511,7 +513,9 @@ public class OsmDatabase {
           } else if (checkIntersectionDistance(p, ringSegment.nB, epsilon)) {
             // insert node B into the road, if it's not already there
 
-            if (way.getNodeRefs().contains(ringSegment.nB.getId())) continue;
+            if (way.getNodeRefs().contains(ringSegment.nB.getId())) {
+              continue;
+            }
 
             way.addNodeRef(ringSegment.nB.getId(), i + 1);
 
@@ -838,11 +842,11 @@ public class OsmDatabase {
     long from = -1, to = -1, via = -1;
     for (OsmRelationMember member : relation.getMembers()) {
       String role = member.getRole();
-      if (role.equals("from")) {
+      if ("from".equals(role)) {
         from = member.getRef();
-      } else if (role.equals("to")) {
+      } else if ("to".equals(role)) {
         to = member.getRef();
-      } else if (role.equals("via")) {
+      } else if ("via".equals(role)) {
         via = member.getRef();
       }
     }
@@ -857,9 +861,9 @@ public class OsmDatabase {
     String exceptModes = relation.getTag("except");
     if (exceptModes != null) {
       for (String m : exceptModes.split(";")) {
-        if (m.equals("motorcar")) {
+        if ("motorcar".equals(m)) {
           modes.setCar(false);
-        } else if (m.equals("bicycle")) {
+        } else if ("bicycle".equals(m)) {
           modes.setBicycle(false);
           issueStore.add(new TurnRestrictionException(via, from));
         }

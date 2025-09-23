@@ -61,6 +61,7 @@ class AlternativeLegsTest extends GtfsTest {
       "B ~ BUS 2 0:20 0:30 ~ C [], " +
       "B ~ BUS 1 0:10 0:20 ~ C [], " +
       // Previous day
+      // Previous day
       "B ~ BUS 1 8:20 8:30 ~ C []";
 
     assertEquals(expected, legs);
@@ -93,6 +94,7 @@ class AlternativeLegsTest extends GtfsTest {
     var expected =
       "B ~ BUS 3 1:00 1:10 ~ C [], " +
       "B ~ BUS 1 8:20 8:30 ~ C [], " +
+      // Next day
       // Next day
       "B ~ BUS 1 0:10 0:20 ~ C []";
 

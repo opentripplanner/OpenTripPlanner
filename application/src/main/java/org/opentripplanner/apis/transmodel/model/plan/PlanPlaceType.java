@@ -159,4 +159,6 @@ public class PlanPlaceType {
       //                        .build())
       .build();
   }
+
+  private PlanPlaceType() {}
 }

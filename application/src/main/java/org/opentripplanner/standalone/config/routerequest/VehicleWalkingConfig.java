@@ -79,4 +79,6 @@ public class VehicleWalkingConfig {
           .asDouble(dft.stairsReluctance())
       );
   }
+
+  private VehicleWalkingConfig() {}
 }

@@ -95,4 +95,6 @@ public class FlexStopTimesForTest {
     stopTime.setTrip(TRIP);
     return stopTime;
   }
+
+  private FlexStopTimesForTest() {}
 }

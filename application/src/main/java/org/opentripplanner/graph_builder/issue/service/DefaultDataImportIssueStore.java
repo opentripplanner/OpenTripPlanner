@@ -17,7 +17,7 @@ public class DefaultDataImportIssueStore implements DataImportIssueStore {
   private static final Logger ISSUE_LOG = LoggerFactory.getLogger(ISSUES_LOG_NAME);
 
   private final List<DataImportIssue> issues = new ArrayList<>();
-  private String currentSource = null;
+  private String currentSource;
 
   public DefaultDataImportIssueStore() {}
 

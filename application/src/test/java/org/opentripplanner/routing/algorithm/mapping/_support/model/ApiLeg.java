@@ -15,23 +15,23 @@ public class ApiLeg {
   /**
    * The date and time this leg begins.
    */
-  public Calendar startTime = null;
+  public Calendar startTime;
 
   /**
    * The date and time this leg ends.
    */
-  public Calendar endTime = null;
+  public Calendar endTime;
 
   /**
    * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
    * "scheduled time of departure at boarding stop" = startTime - departureDelay
    */
-  public int departureDelay = 0;
+  public int departureDelay;
   /**
    * For transit leg, the offset from the scheduled arrival-time of the alighting stop in this leg.
    * "scheduled time of arrival at alighting stop" = endTime - arrivalDelay
    */
-  public int arrivalDelay = 0;
+  public int arrivalDelay;
 
   /**
    * Whether there is real-time data about this Leg
@@ -41,19 +41,19 @@ public class ApiLeg {
   /**
    * Is this a frequency-based trip with non-strict departure times?
    */
-  public Boolean isNonExactFrequency = null;
+  public Boolean isNonExactFrequency;
 
   /**
    * The best estimate of the time between two arriving vehicles. This is particularly important for
    * non-strict frequency trips, but could become important for real-time trips, strict frequency
    * trips, and scheduled trips with empirical headways.
    */
-  public Integer headway = null;
+  public Integer headway;
 
   /**
    * The distance traveled while traversing the leg in meters.
    */
-  public Double distance = null;
+  public Double distance;
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the "delta" cost
@@ -93,7 +93,7 @@ public class ApiLeg {
   /**
    * For transit leg, the route's (background) color (if one exists). For non-transit legs, null.
    */
-  public String routeColor = null;
+  public String routeColor;
 
   /**
    * For transit legs, the type of the route. Non transit -1 When 0-7: 0 Tram, 1 Subway, 2 Train, 3
@@ -101,17 +101,17 @@ public class ApiLeg {
    * using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard Also see
    * http://groups.google.com/group/gtfs-changes/msg/ed917a69cf8c5bef
    */
-  public Integer routeType = null;
+  public Integer routeType;
 
   /**
    * For transit legs, the ID of the route. For non-transit legs, null.
    */
-  public String routeId = null;
+  public String routeId;
 
   /**
    * For transit leg, the route's text color (if one exists). For non-transit legs, null.
    */
-  public String routeTextColor = null;
+  public String routeTextColor;
 
   /**
    * For transit legs, if the rider should stay on the vehicle as it changes route names.
@@ -121,28 +121,28 @@ public class ApiLeg {
   /**
    * For transit leg, the trip's short name (if one exists). For non-transit legs, null.
    */
-  public String tripShortName = null;
+  public String tripShortName;
 
   /**
    * For transit leg, the trip's block ID (if one exists). For non-transit legs, null.
    */
-  public String tripBlockId = null;
+  public String tripBlockId;
 
   /**
    * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
    */
-  public String headsign = null;
+  public String headsign;
 
   /**
    * For transit legs, the ID of the transit agency that operates the service used for this leg. For
    * non-transit legs, null.
    */
-  public String agencyId = null;
+  public String agencyId;
 
   /**
    * For transit legs, the ID of the trip. For non-transit legs, null.
    */
-  public String tripId = null;
+  public String tripId;
 
   /**
    * For transit legs, the service date of the trip. For non-transit legs, null.
@@ -152,22 +152,22 @@ public class ApiLeg {
    * for a given trip may happen at service date March 25th and service time 25:00, which in local
    * time would be Mach 26th 01:00.
    */
-  public String serviceDate = null;
+  public String serviceDate;
 
   /**
    * For transit leg, the route's branding URL (if one exists). For non-transit legs, null.
    */
-  public String routeBrandingUrl = null;
+  public String routeBrandingUrl;
 
   /**
    * The Place where the leg originates.
    */
-  public ApiPlace from = null;
+  public ApiPlace from;
 
   /**
    * The Place where the leg begins.
    */
-  public ApiPlace to = null;
+  public ApiPlace to;
 
   /**
    * For transit legs, intermediate stops between the Place where the leg originates and the Place

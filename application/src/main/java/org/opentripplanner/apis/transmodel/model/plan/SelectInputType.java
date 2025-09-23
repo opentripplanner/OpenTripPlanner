@@ -61,4 +61,6 @@ public class SelectInputType {
         .build()
     )
     .build();
+
+  private SelectInputType() {}
 }

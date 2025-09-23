@@ -30,4 +30,6 @@ public class UberConfig {
         .asStringList(List.of())
     );
   }
+
+  private UberConfig() {}
 }

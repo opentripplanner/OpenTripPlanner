@@ -20,7 +20,7 @@ public class PathStringBuilder {
   private final RaptorStopNameResolver stopNameResolver;
   private final StringBuilder buf = new StringBuilder();
 
-  private boolean addPadding = false;
+  private boolean addPadding;
 
   /**
    * @param stopNameResolver Used to translate stopIndexes to stopNames, if {@code null} the index

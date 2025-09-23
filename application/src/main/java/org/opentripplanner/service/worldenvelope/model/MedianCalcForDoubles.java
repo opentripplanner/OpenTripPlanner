@@ -9,7 +9,7 @@ import java.util.Arrays;
 class MedianCalcForDoubles {
 
   private final double[] array;
-  private int index = 0;
+  private int index;
 
   public MedianCalcForDoubles(int size) {
     if (size <= 0) {

@@ -60,4 +60,6 @@ public class PagingServiceFactory {
     }
     return transitSearchStartTime.plusSeconds(searchParamsUsed.latestArrivalTime());
   }
+
+  private PagingServiceFactory() {}
 }

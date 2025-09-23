@@ -14,4 +14,6 @@ public class StopTypeMapper {
       case FLEXIBLE_GROUP -> "flexible_group";
     };
   }
+
+  private StopTypeMapper() {}
 }

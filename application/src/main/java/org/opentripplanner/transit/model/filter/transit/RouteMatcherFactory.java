@@ -93,4 +93,6 @@ public class RouteMatcherFactory {
       )
     );
   }
+
+  private RouteMatcherFactory() {}
 }

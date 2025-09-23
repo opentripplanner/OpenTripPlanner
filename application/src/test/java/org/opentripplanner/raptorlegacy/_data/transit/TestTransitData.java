@@ -197,7 +197,7 @@ public class TestTransitData
     int routeIndex = this.routes.indexOf(route);
     ((TestTripPattern) route.pattern()).withPatternIndex(routeIndex);
     var pattern = route.pattern();
-    for (int i = 0; i < pattern.numberOfStopsInPattern(); ++i) {
+    for (int i = 0; i < pattern.numberOfStopsInPattern(); i++) {
       int stopIndex = pattern.stopIndex(i);
       expandNumOfStops(stopIndex);
       routeIndexesByStopIndex.get(stopIndex).add(routeIndex);
@@ -322,7 +322,7 @@ public class TestTransitData
   }
 
   private void expandNumOfStops(int stopIndex) {
-    for (int i = numberOfStops(); i <= stopIndex; ++i) {
+    for (int i = numberOfStops(); i <= stopIndex; i++) {
       transfersFromStop.add(new ArrayList<>());
       transfersToStop.add(new ArrayList<>());
       routeIndexesByStopIndex.add(new HashSet<>());

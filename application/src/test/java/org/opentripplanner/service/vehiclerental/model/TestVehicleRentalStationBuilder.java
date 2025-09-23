@@ -17,9 +17,9 @@ public class TestVehicleRentalStationBuilder {
   private double longitude = DEFAULT_LONGITUDE;
   private int vehicles = 10;
   private int spaces = 10;
-  private boolean overloadingAllowed = false;
-  private boolean stationOn = false;
-  private VehicleRentalSystem system = null;
+  private boolean overloadingAllowed;
+  private boolean stationOn;
+  private VehicleRentalSystem system;
   private final Map<RentalVehicleType, Integer> vehicleTypesAvailable = new HashMap<>();
   private final Map<RentalVehicleType, Integer> vehicleSpacesAvailable = new HashMap<>();
 

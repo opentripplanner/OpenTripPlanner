@@ -43,7 +43,7 @@ public class GbfsConfigDocTest {
       var child = node.child(childName);
       var type = child.typeQualifier();
 
-      if (type.equals("vehicle-rental")) {
+      if ("vehicle-rental".equals(type)) {
         template = replaceSection(template, type, updaterDoc(child));
       }
     }

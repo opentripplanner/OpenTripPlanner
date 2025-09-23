@@ -73,4 +73,6 @@ public class ViaSegmentInputType {
       )
       .build();
   }
+
+  private ViaSegmentInputType() {}
 }

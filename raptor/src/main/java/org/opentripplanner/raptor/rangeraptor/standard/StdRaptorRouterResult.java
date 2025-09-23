@@ -21,7 +21,7 @@ public class StdRaptorRouterResult<T extends RaptorTripSchedule> implements Rapt
    * Cash paths to avoid constructing hundreds of paths several times. In most cases this is
    * not a problem, but in rare cases there are a lot of paths.
    */
-  private Collection<RaptorPath<T>> paths = null;
+  private Collection<RaptorPath<T>> paths;
 
   public StdRaptorRouterResult(
     BestTimes bestTimes,

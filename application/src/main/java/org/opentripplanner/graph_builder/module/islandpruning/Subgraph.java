@@ -38,7 +38,7 @@ class Subgraph {
   }
 
   boolean contains(Vertex vertex) {
-    return (streetVertexSet.contains(vertex) || stopsVertexSet.contains(vertex));
+    return streetVertexSet.contains(vertex) || stopsVertexSet.contains(vertex);
   }
 
   int streetSize() {

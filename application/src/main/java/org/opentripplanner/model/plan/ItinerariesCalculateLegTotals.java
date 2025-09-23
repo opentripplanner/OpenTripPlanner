@@ -11,7 +11,7 @@ class ItinerariesCalculateLegTotals {
 
   Duration totalDuration = Duration.ZERO;
   Duration transitDuration = Duration.ZERO;
-  int nTransitLegs = 0;
+  int nTransitLegs;
   Duration onStreetDuration = Duration.ZERO;
   double onStreetDistanceMeters = 0.0;
   Duration walkDuration = Duration.ZERO;

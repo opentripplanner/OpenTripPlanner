@@ -12,4 +12,6 @@ public class StreetConstants {
    */
   public static final float DEFAULT_MAX_CAR_SPEED = 40f;
   public static final int DEFAULT_MAX_AREA_NODES = 200;
+
+  private StreetConstants() {}
 }

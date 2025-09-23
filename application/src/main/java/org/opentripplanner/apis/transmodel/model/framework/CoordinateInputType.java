@@ -55,4 +55,6 @@ public class CoordinateInputType {
       Map.entry(LONGITUDE, coordinate.longitude())
     );
   }
+
+  private CoordinateInputType() {}
 }

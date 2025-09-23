@@ -171,14 +171,14 @@ public class ParameterBuilder {
   }
 
   public Set<String> asStringSet(Collection<String> defaultValue) {
-    List<String> dft = (defaultValue instanceof List<String>)
+    List<String> dft = defaultValue instanceof List<String>
       ? (List<String>) defaultValue
       : List.copyOf(defaultValue);
     return Set.copyOf(ofArrayAsList(STRING, dft, JsonNode::asText));
   }
 
   public List<String> asStringList(Collection<String> defaultValue) {
-    List<String> dft = (defaultValue instanceof List<String>)
+    List<String> dft = defaultValue instanceof List<String>
       ? (List<String>) defaultValue
       : List.copyOf(defaultValue);
     return ofArrayAsList(STRING, dft, JsonNode::asText);
@@ -249,7 +249,7 @@ public class ParameterBuilder {
   }
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass, Collection<T> defaultValues) {
-    List<T> dft = (defaultValues instanceof List<T>)
+    List<T> dft = defaultValues instanceof List<T>
       ? (List<T>) defaultValues
       : List.copyOf(defaultValues);
     info.withOptional(dft.toString()).withEnumSet(enumClass);

@@ -31,4 +31,6 @@ class AbsoluteDirectionMapper {
         throw new IllegalArgumentException(domain.toString());
     }
   }
+
+  private AbsoluteDirectionMapper() {}
 }

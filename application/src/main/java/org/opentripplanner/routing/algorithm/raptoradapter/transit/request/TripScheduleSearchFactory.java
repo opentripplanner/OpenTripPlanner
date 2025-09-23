@@ -34,4 +34,6 @@ public class TripScheduleSearchFactory {
       ? new TripScheduleBoardSearch<>(timetable, BINARY_SEARCH_THRESHOLD)
       : new TripScheduleAlightSearch<>(timetable, BINARY_SEARCH_THRESHOLD);
   }
+
+  private TripScheduleSearchFactory() {}
 }

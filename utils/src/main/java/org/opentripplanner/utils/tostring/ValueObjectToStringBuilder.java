@@ -31,7 +31,7 @@ public class ValueObjectToStringBuilder {
   private final OtpNumberFormat numFormat = new OtpNumberFormat();
 
   boolean skipSep = true;
-  boolean skipNull = false;
+  boolean skipNull;
 
   /** Use factory method: {@link #of()}. */
   private ValueObjectToStringBuilder() {}

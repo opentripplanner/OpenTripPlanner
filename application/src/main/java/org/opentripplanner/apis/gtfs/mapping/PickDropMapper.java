@@ -16,4 +16,6 @@ public final class PickDropMapper {
       case CANCELLED -> null;
     };
   }
+
+  private PickDropMapper() {}
 }

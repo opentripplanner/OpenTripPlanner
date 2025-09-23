@@ -8,7 +8,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 class TimetableValidationErrorTest {
 
-  private TimetableValidationError subject = new TimetableValidationError(
+  private final TimetableValidationError subject = new TimetableValidationError(
     TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME,
     3,
     TimetableRepositoryForTest.trip("A").withMode(TransitMode.BUS).withShortName("Line A").build()

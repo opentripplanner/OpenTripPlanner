@@ -146,19 +146,19 @@ public class TestCall implements CallWrapper {
 
   public static class TestCallBuilder {
 
-    private String stopPointRef = null;
-    private Boolean cancellation = null;
-    private Boolean predictionInaccurate = null;
+    private String stopPointRef;
+    private Boolean cancellation;
+    private Boolean predictionInaccurate;
     private OccupancyEnumeration occupancy = null;
-    private List<NaturalLanguageStringStructure> destinationDisplaies = null;
-    private ZonedDateTime aimedArrivalTime = null;
-    private ZonedDateTime expectedArrivalTime = null;
-    private ZonedDateTime actualArrivalTime = null;
+    private List<NaturalLanguageStringStructure> destinationDisplaies;
+    private ZonedDateTime aimedArrivalTime;
+    private ZonedDateTime expectedArrivalTime;
+    private ZonedDateTime actualArrivalTime;
     private CallStatusEnumeration arrivalStatus = null;
     private ArrivalBoardingActivityEnumeration arrivalBoardingActivity = null;
-    private ZonedDateTime aimedDepartureTime = null;
-    private ZonedDateTime expectedDepartureTime = null;
-    private ZonedDateTime actualDepartureTime = null;
+    private ZonedDateTime aimedDepartureTime;
+    private ZonedDateTime expectedDepartureTime;
+    private ZonedDateTime actualDepartureTime;
     private CallStatusEnumeration departureStatus = null;
     private DepartureBoardingActivityEnumeration departureBoardingActivity = null;
 

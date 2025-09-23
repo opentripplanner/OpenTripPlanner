@@ -17,7 +17,9 @@ public class BinHeap<T> {
 
   @SuppressWarnings("unchecked")
   public BinHeap(int capacity) {
-    if (capacity < 10) capacity = 10;
+    if (capacity < 10) {
+      capacity = 10;
+    }
     this.capacity = capacity;
     elem = (T[]) new Object[capacity + 1]; // erasure voodoo
     prio = new double[capacity + 1]; // 1-based indexing
@@ -34,13 +36,19 @@ public class BinHeap<T> {
   }
 
   public double peek_min_key() {
-    if (size > 0) return prio[1];
-    else throw new IllegalStateException("An empty queue does not have a minimum key.");
+    if (size > 0) {
+      return prio[1];
+    } else {
+      throw new IllegalStateException("An empty queue does not have a minimum key.");
+    }
   }
 
   public T peek_min() {
-    if (size > 0) return elem[1];
-    else return null;
+    if (size > 0) {
+      return elem[1];
+    } else {
+      return null;
+    }
   }
 
   public void rekey(T e, double p) {
@@ -48,7 +56,9 @@ public class BinHeap<T> {
     // for an element then change its key by sifting up or down
     int i = 0;
     for (T t : elem) {
-      if (t == e) break;
+      if (t == e) {
+        break;
+      }
       i++;
     }
     if (i > size) {
@@ -60,12 +70,16 @@ public class BinHeap<T> {
       // sift up (as in extract)
       while (i * 2 <= size) {
         int child = i * 2;
-        if (child != size && prio[child + 1] < prio[child]) child++;
+        if (child != size && prio[child + 1] < prio[child]) {
+          child++;
+        }
         if (p > prio[child]) {
           elem[i] = elem[child];
           prio[i] = prio[child];
           i = child;
-        } else break;
+        } else {
+          break;
+        }
       }
     } else {
       // sift down (as in insert)
@@ -87,7 +101,9 @@ public class BinHeap<T> {
   public void insert(T e, double p) {
     int i;
     size += 1;
-    if (size > capacity) resize((int) (capacity * GROW_FACTOR));
+    if (size > capacity) {
+      resize((int) (capacity * GROW_FACTOR));
+    }
     for (i = size; prio[i / 2] > p; i /= 2) {
       elem[i] = elem[i / 2];
       prio[i] = prio[i / 2];
@@ -107,11 +123,15 @@ public class BinHeap<T> {
     size -= 1;
     for (i = 1; i * 2 <= size; i = child) {
       child = i * 2;
-      if (child != size && prio[child + 1] < prio[child]) child++;
+      if (child != size && prio[child + 1] < prio[child]) {
+        child++;
+      }
       if (lastPrio > prio[child]) {
         elem[i] = elem[child];
         prio[i] = prio[child];
-      } else break;
+      } else {
+        break;
+      }
     }
     elem[i] = lastElem;
     prio[i] = lastPrio;
@@ -120,9 +140,9 @@ public class BinHeap<T> {
 
   public void resize(int capacity) {
     // System.out.println("Growing queue to " + capacity);
-    if (capacity < size) throw new IllegalStateException(
-      "BinHeap contains too many elements to fit in new capacity."
-    );
+    if (capacity < size) {
+      throw new IllegalStateException("BinHeap contains too many elements to fit in new capacity.");
+    }
     this.capacity = capacity;
     prio = Arrays.copyOf(prio, capacity + 1);
     elem = Arrays.copyOf(elem, capacity + 1);

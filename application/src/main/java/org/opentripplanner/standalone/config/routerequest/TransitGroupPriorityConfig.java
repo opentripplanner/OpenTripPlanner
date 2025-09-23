@@ -89,4 +89,6 @@ public class TransitGroupPriorityConfig {
       )
       .build();
   }
+
+  private TransitGroupPriorityConfig() {}
 }

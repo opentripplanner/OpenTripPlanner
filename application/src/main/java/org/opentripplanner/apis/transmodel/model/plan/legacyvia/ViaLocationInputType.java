@@ -69,4 +69,6 @@ public class ViaLocationInputType {
       )
       .build();
   }
+
+  private ViaLocationInputType() {}
 }

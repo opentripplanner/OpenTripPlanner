@@ -74,7 +74,7 @@ public class ConcurrentCompositeRaptorRouter<T extends RaptorTripSchedule>
       alternativeResultFuture.cancel(true);
       throw mapInterruptedException.apply(e);
     } catch (ExecutionException e) {
-      throw (e.getCause() instanceof RuntimeException re) ? re : new RuntimeException(e);
+      throw e.getCause() instanceof RuntimeException re ? re : new RuntimeException(e);
     }
   }
 }

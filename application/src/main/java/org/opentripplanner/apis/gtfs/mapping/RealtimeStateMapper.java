@@ -10,7 +10,9 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 public class RealtimeStateMapper {
 
   public static GraphQLTypes.GraphQLRealtimeState map(@Nullable RealTimeState state) {
-    if (state == null) return null;
+    if (state == null) {
+      return null;
+    }
     return switch (state) {
       case SCHEDULED -> GraphQLTypes.GraphQLRealtimeState.SCHEDULED;
       case UPDATED -> GraphQLTypes.GraphQLRealtimeState.UPDATED;
@@ -19,4 +21,6 @@ public class RealtimeStateMapper {
       case MODIFIED -> GraphQLTypes.GraphQLRealtimeState.MODIFIED;
     };
   }
+
+  private RealtimeStateMapper() {}
 }

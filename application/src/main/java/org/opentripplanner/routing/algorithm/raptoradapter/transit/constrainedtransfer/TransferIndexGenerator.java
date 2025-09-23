@@ -159,7 +159,7 @@ public class TransferIndexGenerator {
 
     for (RoutingTripPattern pattern : patterns) {
       var tripPattern = pattern.getPattern();
-      for (int pos = 0; pos < tripPattern.numberOfStops(); ++pos) {
+      for (int pos = 0; pos < tripPattern.numberOfStops(); pos++) {
         if (point.getStation() == tripPattern.getStop(pos).getParentStation()) {
           result.add(new TPoint(pattern, sourcePoint, null, pos));
         }
@@ -181,7 +181,7 @@ public class TransferIndexGenerator {
 
     for (RoutingTripPattern pattern : patterns) {
       var p = pattern.getPattern();
-      for (int pos = 0; pos < p.numberOfStops(); ++pos) {
+      for (int pos = 0; pos < p.numberOfStops(); pos++) {
         if (point.getStop() == p.getStop(pos)) {
           result.add(new TPoint(pattern, sourcePoint, null, pos));
         }

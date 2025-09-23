@@ -24,4 +24,6 @@ public class EmissionRepositoryModule {
     }
     return repository;
   }
+
+  private EmissionRepositoryModule() {}
 }

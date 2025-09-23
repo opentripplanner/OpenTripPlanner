@@ -18,7 +18,7 @@ class RouteMapper {
 
   private final DataImportIssueStore issueStore;
 
-  private TranslationHelper translationHelper;
+  private final TranslationHelper translationHelper;
 
   private final Map<org.onebusaway.gtfs.model.Route, Route> mappedRoutes = new HashMap<>();
 

@@ -10,6 +10,8 @@ public class LocalDateMapper {
    * or <em>unbounded</em> then {@code null} is returned.
    */
   public static String mapToApi(LocalDate date) {
-    return (date == null || ServiceDateUtils.isMinMax(date)) ? null : date.toString();
+    return date == null || ServiceDateUtils.isMinMax(date) ? null : date.toString();
   }
+
+  private LocalDateMapper() {}
 }

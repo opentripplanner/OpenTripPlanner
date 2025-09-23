@@ -60,4 +60,6 @@ public class SearchForOtpConfig {
     }
     return false;
   }
+
+  private SearchForOtpConfig() {}
 }

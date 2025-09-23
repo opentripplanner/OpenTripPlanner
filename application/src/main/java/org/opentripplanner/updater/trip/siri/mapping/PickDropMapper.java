@@ -85,4 +85,6 @@ public class PickDropMapper {
     }
     return TRUE.equals(isCallCancellation) || callStatus == CallStatusEnumeration.CANCELLED;
   }
+
+  private PickDropMapper() {}
 }

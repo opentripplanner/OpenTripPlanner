@@ -34,4 +34,6 @@ public class PointsOnLinkType {
       )
       .build();
   }
+
+  private PointsOnLinkType() {}
 }

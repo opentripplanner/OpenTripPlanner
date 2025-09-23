@@ -76,4 +76,6 @@ public final class KryoBuilder {
     );
     return kryo;
   }
+
+  private KryoBuilder() {}
 }

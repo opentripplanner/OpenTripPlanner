@@ -93,7 +93,7 @@ class EmissionAggregator {
     new SemanticValidation().verify();
 
     var agerageEmissions = new Emission[emissions.length];
-    for (int i = 0; i < emissions.length; ++i) {
+    for (int i = 0; i < emissions.length; i++) {
       agerageEmissions[i] = emissions[i].dividedBy(counts[i]);
     }
 
@@ -158,7 +158,7 @@ class EmissionAggregator {
 
     private void warnOnMissingHopEmissions() {
       var missingHops = WordList.of();
-      for (int i = 0; i < emissions.length; ++i) {
+      for (int i = 0; i < emissions.length; i++) {
         if (emissions[i].isZero()) {
           missingHops.add(Integer.toString(i + 1));
         }

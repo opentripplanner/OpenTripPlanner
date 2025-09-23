@@ -34,4 +34,6 @@ public class FilterInputType {
         .build()
     )
     .build();
+
+  private FilterInputType() {}
 }

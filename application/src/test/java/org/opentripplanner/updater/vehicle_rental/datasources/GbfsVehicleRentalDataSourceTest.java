@@ -48,7 +48,7 @@ class GbfsVehicleRentalDataSourceTest {
     assertTrue(
       stations
         .stream()
-        .anyMatch(vehicleRentalStation -> vehicleRentalStation.name().toString().equals("TORVGATA"))
+        .anyMatch(vehicleRentalStation -> "TORVGATA".equals(vehicleRentalStation.name().toString()))
     );
     assertTrue(
       stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.isAllowDropoff())
@@ -63,7 +63,7 @@ class GbfsVehicleRentalDataSourceTest {
       stations
         .stream()
         .allMatch(vehicleRentalStation ->
-          vehicleRentalStation.network().equals("lillestrombysykkel")
+          "lillestrombysykkel".equals(vehicleRentalStation.network())
         )
     );
     assertTrue(
@@ -141,7 +141,7 @@ class GbfsVehicleRentalDataSourceTest {
 
     var frognerPark = zones
       .stream()
-      .filter(z -> z.id().getId().equals("NP Frogner og vigelandsparken"))
+      .filter(z -> "NP Frogner og vigelandsparken".equals(z.id().getId()))
       .findFirst()
       .get();
 
@@ -183,7 +183,7 @@ class GbfsVehicleRentalDataSourceTest {
       stations
         .stream()
         .anyMatch(vehicleRentalStation ->
-          vehicleRentalStation.name().toString().equals("Viiskulma")
+          "Viiskulma".equals(vehicleRentalStation.name().toString())
         )
     );
     assertTrue(

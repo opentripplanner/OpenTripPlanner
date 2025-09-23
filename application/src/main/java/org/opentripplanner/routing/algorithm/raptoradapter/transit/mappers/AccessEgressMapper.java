@@ -48,4 +48,6 @@ public class AccessEgressMapper {
       accessOrEgress.isEgress() ? nearbyStop.state.reverse() : nearbyStop.state
     );
   }
+
+  private AccessEgressMapper() {}
 }

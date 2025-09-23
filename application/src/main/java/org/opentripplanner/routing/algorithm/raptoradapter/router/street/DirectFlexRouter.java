@@ -73,4 +73,6 @@ public class DirectFlexRouter {
       return new ArrayList<>(flexRouter.createFlexOnlyItineraries(request.arriveBy()));
     }
   }
+
+  private DirectFlexRouter() {}
 }

@@ -52,4 +52,6 @@ public class VehicleOptimizationTypeMapper {
       case TRIANGLE -> null;
     };
   }
+
+  private VehicleOptimizationTypeMapper() {}
 }

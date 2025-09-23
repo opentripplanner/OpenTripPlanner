@@ -47,7 +47,7 @@ public class GraphBuilder implements Runnable {
   private final DataImportIssueStore issueStore;
   private final Closeable closeDataSourcesHandle;
 
-  private boolean hasTransitData = false;
+  private boolean hasTransitData;
 
   public GraphBuilder(
     Graph baseGraph,

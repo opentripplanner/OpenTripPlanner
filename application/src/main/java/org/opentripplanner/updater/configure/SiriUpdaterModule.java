@@ -104,4 +104,6 @@ public class SiriUpdaterModule {
       default -> throw new IllegalArgumentException("Unexpected value: " + params);
     };
   }
+
+  private SiriUpdaterModule() {}
 }

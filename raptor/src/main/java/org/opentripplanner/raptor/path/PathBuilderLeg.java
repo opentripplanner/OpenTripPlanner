@@ -44,8 +44,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   private int toTime = NOT_SET;
   private int c2 = RaptorConstants.NOT_SET;
 
-  private PathBuilderLeg<T> prev = null;
-  private PathBuilderLeg<T> next = null;
+  private PathBuilderLeg<T> prev;
+  private PathBuilderLeg<T> next;
 
   /**
    * Copy-constructor - do a deep copy with the exception of immutable types. Always start with the

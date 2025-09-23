@@ -37,4 +37,6 @@ public class EgressModeMapper {
         NOT_SET -> GraphQLTypes.GraphQLPlanEgressMode.WALK;
     };
   }
+
+  private EgressModeMapper() {}
 }

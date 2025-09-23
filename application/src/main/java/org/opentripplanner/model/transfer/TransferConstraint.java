@@ -295,8 +295,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
   public static class Builder {
 
     private TransferPriority priority = ALLOWED;
-    private boolean staySeated = false;
-    private boolean guaranteed = false;
+    private boolean staySeated;
+    private boolean guaranteed;
     private int maxWaitTime = NOT_SET;
     private int minTransferTime = NOT_SET;
 

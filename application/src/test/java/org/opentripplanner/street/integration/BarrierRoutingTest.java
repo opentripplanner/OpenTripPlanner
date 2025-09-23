@@ -151,7 +151,7 @@ public class BarrierRoutingTest {
               () ->
                 assertEquals(
                   mapMode(streetMode),
-                  (l instanceof StreetLeg s) ? s.getMode() : null,
+                  l instanceof StreetLeg s ? s.getMode() : null,
                   "Allow only " + streetMode + " legs"
                 )
           )

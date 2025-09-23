@@ -101,10 +101,7 @@ class ItineraryResultMapper {
     return buf.toString();
   }
 
-  static Collection<Result> map(
-    final String testCaseId,
-    Collection<org.opentripplanner.model.plan.Itinerary> itineraries
-  ) {
+  static Collection<Result> map(final String testCaseId, Collection<Itinerary> itineraries) {
     var mapper = new ItineraryResultMapper(testCaseId);
     return itineraries.stream().map(mapper::map).collect(Collectors.toList());
   }

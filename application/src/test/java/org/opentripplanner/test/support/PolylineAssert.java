@@ -26,4 +26,6 @@ public class PolylineAssert {
   private static String toBase64(String line) {
     return Base64.getUrlEncoder().encodeToString(line.getBytes(StandardCharsets.UTF_8));
   }
+
+  private PolylineAssert() {}
 }

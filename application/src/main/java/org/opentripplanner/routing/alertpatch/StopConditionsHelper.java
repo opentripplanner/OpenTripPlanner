@@ -48,4 +48,6 @@ public class StopConditionsHelper {
     // Always return true when no StopConditions exist
     return true;
   }
+
+  private StopConditionsHelper() {}
 }

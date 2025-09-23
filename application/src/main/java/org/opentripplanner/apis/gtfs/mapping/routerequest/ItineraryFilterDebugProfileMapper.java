@@ -18,4 +18,6 @@ public class ItineraryFilterDebugProfileMapper {
       case OFF -> ItineraryFilterDebugProfile.OFF;
     };
   }
+
+  private ItineraryFilterDebugProfileMapper() {}
 }

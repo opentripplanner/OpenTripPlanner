@@ -12,43 +12,43 @@ public class ApiPlace {
   /**
    * For transit stops, the name of the stop.  For points of interest, the name of the POI.
    */
-  public String name = null;
+  public String name;
 
   /**
    * The ID of the stop. This is often something that users don't care about.
    */
-  public String stopId = null;
+  public String stopId;
 
   /**
    * The "code" of the stop. Depending on the transit agency, this is often something that users
    * care about.
    */
-  public String stopCode = null;
+  public String stopCode;
 
   /**
    * The code or name identifying the quay/platform the vehicle will arrive at or depart from
    */
-  public String platformCode = null;
+  public String platformCode;
 
   /**
    * The longitude of the place.
    */
-  public Double lon = null;
+  public Double lon;
 
   /**
    * The latitude of the place.
    */
-  public Double lat = null;
+  public Double lat;
 
   /**
    * The time the rider will arrive at the place.
    */
-  public Calendar arrival = null;
+  public Calendar arrival;
 
   /**
    * The time the rider will depart the place.
    */
-  public Calendar departure = null;
+  public Calendar departure;
 
   public String zoneId;
 

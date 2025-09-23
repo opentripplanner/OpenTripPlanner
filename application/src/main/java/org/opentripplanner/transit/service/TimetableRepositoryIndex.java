@@ -58,7 +58,7 @@ class TimetableRepositoryIndex {
   private final Multimap<GroupOfRoutes, Route> routesForGroupOfRoutes = ArrayListMultimap.create();
 
   private final Map<FeedScopedId, GroupOfRoutes> groupOfRoutesForId = new HashMap<>();
-  private FlexIndex flexIndex = null;
+  private FlexIndex flexIndex;
 
   TimetableRepositoryIndex(TimetableRepository timetableRepository) {
     LOG.info("Timetable repository index init...");

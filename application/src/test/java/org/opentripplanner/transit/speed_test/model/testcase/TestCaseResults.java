@@ -25,8 +25,8 @@ class TestCaseResults {
   private final List<Result> actual = new ArrayList<>();
   private final List<DiffEntry<Result>> matchedResults = new ArrayList<>();
   private TestStatus status = TestStatus.NA;
-  private int transitTimeMs = 0;
-  private int totalTimeMs = 0;
+  private int transitTimeMs;
+  private int totalTimeMs;
 
   TestCaseResults(String testCaseId, boolean skipCost, ExpectedResults expected) {
     this.testCaseId = testCaseId;

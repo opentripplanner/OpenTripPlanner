@@ -208,10 +208,10 @@ class OsmParser extends BinaryParser {
   @Override
   public void parse(Osmformat.HeaderBlock block) {
     for (String s : block.getRequiredFeaturesList()) {
-      if (s.equals("OsmSchema-V0.6")) {
+      if ("OsmSchema-V0.6".equals(s)) {
         continue; // We can parse this.
       }
-      if (s.equals("DenseNodes")) {
+      if ("DenseNodes".equals(s)) {
         continue; // We can parse this.
       }
       throw new IllegalStateException("File requires unknown feature: " + s);

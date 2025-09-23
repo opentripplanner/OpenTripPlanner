@@ -77,7 +77,7 @@ public class BoardAlightRestrictions {
   @Override
   public String toString() {
     var buf = new StringBuilder();
-    for (int i = 0; i < restrictions.size(); ++i) {
+    for (int i = 0; i < restrictions.size(); i++) {
       if (isAlightingPossibleAt(i) && isBoardingPossibleAt(i)) {
         buf.append(" *");
       } else if (isAlightingPossibleAt(i)) {

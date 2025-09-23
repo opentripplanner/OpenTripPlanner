@@ -13,8 +13,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class DefaultEmissionRepository implements EmissionRepository {
 
   private Emission carAvgCo2PerMeter = Emission.ZERO;
-  private Map<FeedScopedId, Emission> emissionForRouteId = new HashMap<>();
-  private Map<FeedScopedId, TripPatternEmission> emissionForTripId = new HashMap<>();
+  private final Map<FeedScopedId, Emission> emissionForRouteId = new HashMap<>();
+  private final Map<FeedScopedId, TripPatternEmission> emissionForTripId = new HashMap<>();
 
   public DefaultEmissionRepository() {}
 

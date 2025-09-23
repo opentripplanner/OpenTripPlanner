@@ -14,4 +14,6 @@ public class DocumentedEnumTestHelper {
       assertFalse(it.enumValueDescription().isBlank(), "Documentation for value is missing: " + it);
     }
   }
+
+  private DocumentedEnumTestHelper() {}
 }

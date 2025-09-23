@@ -40,4 +40,6 @@ public final class DirectionMapper {
       case FOLLOW_SIGNS -> GraphQLRelativeDirection.FOLLOW_SIGNS;
     };
   }
+
+  private DirectionMapper() {}
 }

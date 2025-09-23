@@ -25,4 +25,6 @@ public class TransferGeneratorDummy {
       }
     };
   }
+
+  private TransferGeneratorDummy() {}
 }

@@ -9,7 +9,7 @@ public class NetexObjectDecoratorTest {
 
   private static final String OK = "OK";
 
-  private String mapCalled = null;
+  private String mapCalled;
 
   @Test
   public void ifOptionalElementExistThenAssertHandlerIsCalled() {

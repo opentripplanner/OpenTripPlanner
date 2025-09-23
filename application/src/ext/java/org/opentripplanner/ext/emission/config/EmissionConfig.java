@@ -64,4 +64,6 @@ public class EmissionConfig {
       c.of("source").since(V2_8).summary("Specify the feed source url.").asUri()
     );
   }
+
+  private EmissionConfig() {}
 }

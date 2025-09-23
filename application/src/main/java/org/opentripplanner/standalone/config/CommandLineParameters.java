@@ -38,13 +38,13 @@ public class CommandLineParameters {
   public boolean help;
 
   @Parameter(names = { "--version" }, description = "Print the version, and then exit.")
-  public boolean version = false;
+  public boolean version;
 
   @Parameter(
     names = { "--serializationVersionId" },
     description = "Print the OTP serialization-version-id, and then exit."
   )
-  public boolean serializationVersionId = false;
+  public boolean serializationVersionId;
 
   /* Options for graph building and loading. */
 
@@ -52,7 +52,7 @@ public class CommandLineParameters {
     names = { "--build" },
     description = "Build graph from input files or data sources listed in build config."
   )
-  public boolean build = false;
+  public boolean build;
 
   @Parameter(
     names = { "--buildStreet" },
@@ -60,27 +60,27 @@ public class CommandLineParameters {
     "system or data sources listed in build config. The '--save' parameter is " +
     "implied. Outputs 'streetGraph.obj'."
   )
-  public boolean buildStreet = false;
+  public boolean buildStreet;
 
   @Parameter(
     names = { "--load" },
     description = "Load 'graph.obj' and serve it. The '--serve' parameter is implied."
   )
-  public boolean load = false;
+  public boolean load;
 
   @Parameter(
     names = { "--loadStreet" },
     description = "Load 'streetGraph.obj' and build transit data on top of it. The " +
     "'--build' parameter is implied. Can be used with '--save' and '--serve'."
   )
-  public boolean loadStreet = false;
+  public boolean loadStreet;
 
   @Parameter(
     names = { "--save" },
     description = "Save the 'graph.obj' to local disk or data source " +
     "given in the build config file."
   )
-  public boolean save = false;
+  public boolean save;
 
   @Parameter(
     names = { "--cache" },
@@ -92,7 +92,7 @@ public class CommandLineParameters {
   /* Options for the server sub-task. */
 
   @Parameter(names = { "--serve" }, description = "Run an OTP API server.")
-  public boolean serve = false;
+  public boolean serve;
 
   @Parameter(
     names = { "--bindAddress" },
@@ -106,13 +106,13 @@ public class CommandLineParameters {
     validateWith = ReadableDirectory.class,
     description = "Path to directory containing local client files to serve."
   )
-  public File clientDirectory = null;
+  public File clientDirectory;
 
   @Parameter(
     names = { "--disableFileCache" },
     description = "Disable HTTP server static file cache " + "(for development)."
   )
-  public boolean disableFileCache = false;
+  public boolean disableFileCache;
 
   @Parameter(
     names = { "--maxThreads" },
@@ -137,7 +137,7 @@ public class CommandLineParameters {
     names = { "--abortOnUnknownConfig" },
     description = "Abort the startup if configuration files are found to contain unknown parameters."
   )
-  public boolean abortOnUnknownConfig = false;
+  public boolean abortOnUnknownConfig;
 
   /**
    * The remaining single parameter after the switches is the directory with the configuration
@@ -298,7 +298,7 @@ public class CommandLineParameters {
 
   private List<String> listParams(List<String> names, List<Boolean> parms) {
     List<String> cmds = new ArrayList<>();
-    for (int i = 0; i < parms.size(); ++i) {
+    for (int i = 0; i < parms.size(); i++) {
       if (parms.get(i)) {
         cmds.add(names.get(i));
       }

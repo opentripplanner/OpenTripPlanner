@@ -33,7 +33,7 @@ class TripPatternCache {
   private final Map<StopPattern, TripPattern> cache = new HashMap<>();
 
   /** Used for producing sequential integers to ensure each added pattern has a unique name. */
-  private int counter = 0;
+  private int counter;
 
   /**
    * Get cached trip pattern or create one if it doesn't exist yet.

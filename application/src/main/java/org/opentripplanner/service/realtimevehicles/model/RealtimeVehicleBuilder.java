@@ -13,8 +13,8 @@ public class RealtimeVehicleBuilder {
   private FeedScopedId vehicleId;
   private String label;
   private WgsCoordinate coordinates;
-  private Double speed = null;
-  private Double heading = null;
+  private Double speed;
+  private Double heading;
   private Instant time;
   private StopStatus stopStatus = StopStatus.IN_TRANSIT_TO;
   private StopLocation stop;

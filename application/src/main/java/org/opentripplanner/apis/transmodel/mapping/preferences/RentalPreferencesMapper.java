@@ -23,4 +23,6 @@ public class RentalPreferencesMapper {
       rental::withUseAvailabilityInformation
     );
   }
+
+  private RentalPreferencesMapper() {}
 }

@@ -22,4 +22,6 @@ public class PickDropMapper {
     }
     return map(gtfsCode);
   }
+
+  private PickDropMapper() {}
 }

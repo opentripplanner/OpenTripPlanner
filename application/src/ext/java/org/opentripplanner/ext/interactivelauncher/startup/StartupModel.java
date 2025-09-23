@@ -16,13 +16,13 @@ public class StartupModel {
   @JsonIgnore
   private transient Consumer<String> commandLineChange;
 
-  private String rootDirectory = null;
-  private String dataSource = null;
-  private boolean buildStreet = false;
+  private String rootDirectory;
+  private String dataSource;
+  private boolean buildStreet;
   private boolean buildTransit = true;
-  private boolean saveGraph = false;
+  private boolean saveGraph;
   private boolean serveGraph = true;
-  private boolean visualizer = false;
+  private boolean visualizer;
 
   public void subscribeCmdLineUpdates(Consumer<String> commandLineChange) {
     this.commandLineChange = commandLineChange;

@@ -44,4 +44,6 @@ public class PatternTestModel {
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tt))
       .build();
   }
+
+  private PatternTestModel() {}
 }

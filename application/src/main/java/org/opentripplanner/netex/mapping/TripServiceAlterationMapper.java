@@ -16,4 +16,6 @@ public class TripServiceAlterationMapper {
       case EXTRA_JOURNEY -> TripAlteration.EXTRA_JOURNEY;
     };
   }
+
+  private TripServiceAlterationMapper() {}
 }

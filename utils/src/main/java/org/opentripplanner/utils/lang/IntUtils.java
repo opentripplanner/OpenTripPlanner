@@ -61,7 +61,7 @@ public final class IntUtils {
    */
   public static int[] shiftArray(int offset, int[] array) {
     int[] a = Arrays.copyOf(array, array.length);
-    for (int i = 0; i < array.length; ++i) {
+    for (int i = 0; i < array.length; i++) {
       a[i] += offset;
     }
     return a;

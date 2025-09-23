@@ -38,13 +38,13 @@ public class DisjointSetTest {
   public void testRandom() {
     DisjointSet<Integer> set = new DisjointSet<>();
     Random random = new Random(1);
-    for (int i = 0; i < 150; ++i) {
+    for (int i = 0; i < 150; i++) {
       set.union(Math.abs(random.nextInt() % 700), Math.abs(random.nextInt() % 700));
     }
 
     HashMap<Integer, Integer> seen = new HashMap<>();
     int sizeSum = 0;
-    for (int i = 0; i < 700; ++i) {
+    for (int i = 0; i < 700; i++) {
       int key = set.find(i);
       int size = set.size(key);
 

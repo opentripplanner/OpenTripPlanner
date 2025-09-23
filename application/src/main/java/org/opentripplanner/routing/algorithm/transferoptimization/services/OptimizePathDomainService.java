@@ -151,7 +151,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     // Cache accessArrivalTime, any event before the access-arrival-time is safe to ignore
     int accessArrivalTime = originalPath.accessLeg().toTime();
 
-    for (int i = possibleTransfers.size() - 1; i >= 0; --i) {
+    for (int i = possibleTransfers.size() - 1; i >= 0; i--) {
       // Get the list of transfers for the current index
       List<TripToTripTransfer<T>> transfers = possibleTransfers.get(i);
       TransitPathLeg<T> originalFromTransitLeg = originalTransitLegs.get(i);

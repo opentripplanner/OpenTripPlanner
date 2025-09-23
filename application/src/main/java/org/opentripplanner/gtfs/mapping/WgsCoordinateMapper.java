@@ -17,4 +17,6 @@ class WgsCoordinateMapper {
     }
     throw new IllegalArgumentException("Longitude is set, but not latitude for stop: " + stop);
   }
+
+  private WgsCoordinateMapper() {}
 }
