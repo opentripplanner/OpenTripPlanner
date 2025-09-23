@@ -98,6 +98,7 @@ class WalkRoutingTest {
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
         TestVertexLinker.of(graph),
+        id -> List.of(),
         request.from(),
         request.to(),
         request.journey().direct().mode(),

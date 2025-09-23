@@ -38,7 +38,6 @@ public class GtfsFeedParametersBuilder extends GtfsDefaultParametersBuilder {
     return new GtfsFeedParameters(
       feedId,
       source,
-      removeRepeatedStops(),
       stationTransferPreference(),
       discardMinTransferTimes(),
       blockBasedInterlining(),

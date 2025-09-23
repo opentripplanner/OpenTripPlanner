@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -521,6 +522,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
           VisibilityMode.TRAVERSE_AREA_EDGES,
           StreetConstants.DEFAULT_MAX_AREA_NODES
         ),
+        id -> Set.of(),
         request.from(),
         request.to(),
         request.journey().direct().mode(),

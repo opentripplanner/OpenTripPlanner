@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
-import org.opentripplanner.ext.fares.model.FareTransferRuleBuilder;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 

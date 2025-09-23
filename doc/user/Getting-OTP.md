@@ -9,8 +9,8 @@ the [release pages on GitHub](https://github.com/opentripplanner/OpenTripPlanner
 or [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/),
 navigate to the highest version number, and download the jar file `otp-shaded-VERSION.jar`.
 
-Note that version numbers like `v2.1.0-rc1` or `v2.7.0-SNAPSHOT` refer to development builds _
-before_ the release version `v2.7.0`. The existence of a build `vX.Y.Z-SNAPSHOT` does not mean
+Note that version numbers like `v2.1.0-rc1` or `v2.8.1-SNAPSHOT` refer to development builds _
+before_ the release version `v2.8.1`. The existence of a build `vX.Y.Z-SNAPSHOT` does not mean
 that `vX.Y.Z` has been released yet.
 
 We use the [Github Actions CI system](https://github.com/opentripplanner/OpenTripPlanner/actions) to
@@ -87,7 +87,7 @@ For example, you could do the following:
 
 ```bash
 cd OpenTripPlanner
-git checkout v2.7.0
+git checkout v2.8.1
 git clean -df
 mvn clean package -DskipTests
 ```
@@ -107,8 +107,8 @@ file) to the Maven repository, from which it can be automatically included in ot
 
 This repository is machine-readable (by Maven or other build systems) and also provides human
 readable directory listings via HTTP. You can fetch an OTP JAR from this repository by constructing
-the proper URL for the release you want. For example, release 2.7.0 will be found
-at `https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.7.0/otp-shaded-2.7.0-shaded.jar`.
+the proper URL for the release you want. For example, release 2.8.1 will be found
+at `https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.8.1/otp-shaded-2.8.1-shaded.jar`.
 
 To make use of OTP in another Maven project, you must specify it as a dependency in that
 project's `pom.xml`:
@@ -117,6 +117,6 @@ project's `pom.xml`:
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>2.7.0</version>
+  <version>2.8.1</version>
 </dependency>
 ```
