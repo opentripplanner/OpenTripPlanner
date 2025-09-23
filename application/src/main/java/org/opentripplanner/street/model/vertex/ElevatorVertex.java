@@ -15,6 +15,10 @@ public class ElevatorVertex extends StreetVertex {
     this.label = label;
   }
 
+  public String getLevel() {
+    return level;
+  }
+
   @Override
   public VertexLabel getLabel() {
     return VertexLabel.string(LABEL_TEMPLATE.formatted(label, level));
