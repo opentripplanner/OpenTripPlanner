@@ -14,6 +14,7 @@ import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
+import org.opentripplanner.model.plan.walkstep.InclineType;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.model.plan.walkstep.VerticalTransportationUse;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
@@ -517,8 +518,11 @@ public class StatesToWalkStepsMapper {
     double toLevel = 0.0;
     double fromLevel = 0.0;
     VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
+      fromLevel,
+      null,
+      InclineType.UNKNOWN,
       toLevel,
-      fromLevel
+      null
     );
     var step = createWalkStep(forwardState, backState);
 
@@ -533,8 +537,11 @@ public class StatesToWalkStepsMapper {
     double toLevel = 0.0;
     double fromLevel = 0.0;
     VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
+      fromLevel,
+      null,
+      InclineType.UNKNOWN,
       toLevel,
-      fromLevel
+      null
     );
     // don't care what came before or comes after
     var step = createWalkStep(forwardState, backState);
@@ -545,7 +552,7 @@ public class StatesToWalkStepsMapper {
     // exit != null and uses to <exit>
     // the floor name is the AlightEdge name
     // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-    // createWalkStep sets step.withDirectionText(edge.getName());
+    step.withDirectionText(edge.getName());
 
     step.withRelativeDirection(RelativeDirection.ELEVATOR);
     step.withVerticalTransportationUse(verticalTransportationUse);
@@ -558,8 +565,11 @@ public class StatesToWalkStepsMapper {
     double toLevel = 0.0;
     double fromLevel = 0.0;
     VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
+      fromLevel,
+      null,
+      InclineType.UNKNOWN,
       toLevel,
-      fromLevel
+      null
     );
     var step = createWalkStep(forwardState, backState);
 

@@ -2880,8 +2880,20 @@ originating from OSM or GTFS data.
 type VerticalTransportationUse {
   "The level the use begins at. Levels can sometimes contain half levels (e.g. 1.5)."
   fromLevel: Float
+  "Name (if it exists) for fromLevel e.g. 'M' or 'P1'."
+  fromLevelName: String
   "The level the use ends at. Levels can sometimes contain half levels (e.g. 1.5)."
   toLevel: Float
+  "Name (if it exists) for toLevel e.g. 'M' or 'P1'."
+  toLevelName: String
+  inclineType: InclineType!
+}
+
+"The type of incline, e.g. stairs can go up or down depending on the direction."
+enum InclineType {
+  UP
+  DOWN
+  UNKNOWN
 }
 
 type debugOutput {

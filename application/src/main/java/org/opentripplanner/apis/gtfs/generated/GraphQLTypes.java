@@ -904,6 +904,13 @@ public class GraphQLTypes {
     SCOOTER_STANDING,
   }
 
+  /** The type of incline, e.g. stairs can go up or down depending on the direction. */
+  public enum GraphQLInclineType {
+    DOWN,
+    UNKNOWN,
+    UP,
+  }
+
   public static class GraphQLInputBannedInput {
 
     private String agencies;

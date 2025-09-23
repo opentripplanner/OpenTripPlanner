@@ -16,6 +16,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertCauseTyp
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertEffectType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverityLevelType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInclineType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPickupDropoffType;
@@ -1541,7 +1542,13 @@ public class GraphQLDataFetchers {
   public interface GraphQLVerticalTransportationUse {
     public DataFetcher<Double> fromLevel();
 
+    public DataFetcher<String> fromLevelName();
+
+    public DataFetcher<GraphQLInclineType> inclineType();
+
     public DataFetcher<Double> toLevel();
+
+    public DataFetcher<String> toLevelName();
   }
 
   public interface GraphQLDebugOutput {
