@@ -41,7 +41,7 @@ export function ItineraryHeaderContent({
     [tripPattern.expectedEndTime, timeZone],
   );
 
-  const handleComparisonToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleComparisonToggle = () => {
     if (!setComparisonSelectedIndexes || !comparisonSelectedIndexes) return;
 
     if (comparisonSelectedIndexes.includes(itineraryIndex)) {
