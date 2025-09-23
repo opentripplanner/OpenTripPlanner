@@ -264,6 +264,17 @@ public class DebugStyleSpec {
 
   private static List<StyleBuilder> elevators(VectorSourceLayer edges, VectorSourceLayer vertices) {
     return List.of(
+      StyleBuilder.ofId("elevator-hop-edge")
+        .group(ELEVATORS_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .edgeFilter(ElevatorHopEdge.class)
+        .lineColor(ORANGE)
+        .lineWidth(LINE_HALF_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
       StyleBuilder.ofId("elevator-vertex")
         .group(ELEVATORS_GROUP)
         .typeCircle()
@@ -275,17 +286,6 @@ public class DebugStyleSpec {
         )
         .circleColor(ORANGE)
         .minZoom(15)
-        .maxZoom(MAX_ZOOM)
-        .intiallyHidden(),
-      StyleBuilder.ofId("elevator-hop-edge")
-        .group(ELEVATORS_GROUP)
-        .typeLine()
-        .vectorSourceLayer(edges)
-        .edgeFilter(ElevatorHopEdge.class)
-        .lineColor(ORANGE)
-        .lineWidth(LINE_HALF_WIDTH)
-        .lineOffset(LINE_OFFSET)
-        .minZoom(6)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );
