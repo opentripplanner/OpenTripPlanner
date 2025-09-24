@@ -23,7 +23,7 @@ times are not suitable for you, please let us know and we will attempt to schedu
 that suits you.
 - The meetings are open to anyone who wants to
 join, even if you simply want to observe the process or ask a few questions.
-- By default, pull requests will only be advanced by an author's participation in a meeting.
+- By default, pull requests will only be advanced by an author or someone relevant to the PR participating in a meeting.
 - If you are unable to participate and want your PR to be advanced, leave a comment on the PR explaining the current state e.g. "This PR doesn't have things to discuss and should be assigned reviewers."
 - Check the specific times
 on [this calendar](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com)
@@ -33,17 +33,23 @@ an [iCal link to import this calendar](https://calendar.google.com/calendar/ical
 into calendar apps. Check the details of the calendar events for the Google Meet link, which is
 different on different days of the week.
 
-## Coding style
+## Code conventions and architecture
+
+### Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md)
+
+### Coding style
 
 See [Codestyle.md](doc/dev/decisionrecords/Codestyle.md)
 
-## Naming conventions
+### Naming conventions
 
 See [NamingConventions.md](doc/dev/decisionrecords/NamingConventions.md)
 
-## GraphQL API design
+### Development Decision Records
 
-See [APIGraphQLDesign.md](doc/dev/decisionrecords/APIGraphQLDesign.md)
+See [DEVELOPMENT_DECISION_RECORDS.md](DEVELOPMENT_DECISION_RECORDS.md)
 
 ## Contributing Issues and Pull Requests
 
