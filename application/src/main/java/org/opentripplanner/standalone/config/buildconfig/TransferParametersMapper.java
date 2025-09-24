@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_8;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 
 import org.opentripplanner.graph_builder.module.TransferParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -67,7 +67,7 @@ public class TransferParametersMapper {
           can be faster compared to the default transfers.
           """
         )
-        .since(V2_8)
+        .since(V2_9)
         .asDuration(TransferParameters.DEFAULT_BIKES_ALLOWED_STOP_MAX_TRANSFER_DURATION)
     );
     builder.withDisableDefaultTransfers(
