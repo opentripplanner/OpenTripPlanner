@@ -20,6 +20,7 @@ import org.opentripplanner.model.plan.walkstep.VerticalTransportationUse;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorService;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -49,6 +50,9 @@ public class StatesToWalkStepsMapper {
   private final double ellipsoidToGeoidDifference;
   private final StreetNotesService streetNotesService;
 
+  @Nullable
+  private final OsmStreetDecoratorService osmStreetDecoratorService;
+
   private final List<State> states;
   private final WalkStep previous;
   private final List<WalkStepBuilder> steps = new ArrayList<>();
@@ -77,11 +81,13 @@ public class StatesToWalkStepsMapper {
     List<State> states,
     WalkStep previousStep,
     StreetNotesService streetNotesService,
+    @Nullable OsmStreetDecoratorService osmStreetDecoratorService,
     double ellipsoidToGeoidDifference
   ) {
     this.states = states;
     this.previous = previousStep;
     this.streetNotesService = streetNotesService;
+    this.osmStreetDecoratorService = osmStreetDecoratorService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
   }
 

@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
@@ -29,6 +30,7 @@ import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.leg.StreetLegBuilder;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
@@ -54,15 +56,21 @@ public class GraphPathToItineraryMapper {
 
   private final ZoneId timeZone;
   private final StreetNotesService streetNotesService;
+
+  @Nullable
+  private final OsmStreetDecoratorService osmStreetDecoratorService;
+
   private final double ellipsoidToGeoidDifference;
 
   public GraphPathToItineraryMapper(
     ZoneId timeZone,
     StreetNotesService streetNotesService,
+    @Nullable OsmStreetDecoratorService osmStreetDecoratorService,
     double ellipsoidToGeoidDifference
   ) {
     this.timeZone = ZoneIdFallback.zoneId(timeZone);
     this.streetNotesService = streetNotesService;
+    this.osmStreetDecoratorService = osmStreetDecoratorService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
   }
 
@@ -369,6 +377,7 @@ public class GraphPathToItineraryMapper {
       states,
       previousStep,
       streetNotesService,
+      osmStreetDecoratorService,
       ellipsoidToGeoidDifference
     );
     List<WalkStep> walkSteps = statesToWalkStepsMapper.generateWalkSteps();

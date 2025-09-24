@@ -188,7 +188,8 @@ public class TransitRouter {
       serverContext.transitService(),
       raptorTransitData,
       transitSearchTimeZero,
-      request
+      request,
+      serverContext.osmStreetDecoratorService()
     );
 
     List<Itinerary> itineraries = paths.stream().map(itineraryMapper::createItinerary).toList();

@@ -87,7 +87,7 @@ class StatesToWalkStepsMapperTest {
   private static List<WalkStep> buildWalkSteps(TestStateBuilder builder) {
     var result = builder.build();
     var path = new GraphPath<>(result);
-    var mapper = new StatesToWalkStepsMapper(path.states, null, new StreetNotesService(), 0);
+    var mapper = new StatesToWalkStepsMapper(path.states, null, new StreetNotesService(), null, 0);
     return mapper.generateWalkSteps();
   }
 }

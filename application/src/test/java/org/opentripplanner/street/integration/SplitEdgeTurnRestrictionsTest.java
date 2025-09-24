@@ -179,6 +179,7 @@ public class SplitEdgeTurnRestrictionsTest {
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneIds.BERLIN,
       graph.streetNotesService,
+      null,
       graph.ellipsoidToGeoidDifference
     );
 

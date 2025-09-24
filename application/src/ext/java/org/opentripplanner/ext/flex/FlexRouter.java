@@ -25,6 +25,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorService;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -68,7 +69,8 @@ public class FlexRouter {
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     Collection<NearbyStop> streetAccesses,
-    Collection<NearbyStop> egressTransfers
+    Collection<NearbyStop> egressTransfers,
+    @Nullable OsmStreetDecoratorService osmStreetDecoratorService
   ) {
     this.graph = graph;
     this.transitService = transitService;
@@ -84,6 +86,7 @@ public class FlexRouter {
     this.graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       transitService.getTimeZone(),
       graph.streetNotesService,
+      osmStreetDecoratorService,
       graph.ellipsoidToGeoidDifference
     );
 

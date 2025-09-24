@@ -99,6 +99,7 @@ public class BicycleRoutingTest {
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneIds.BERLIN,
       graph.streetNotesService,
+      null,
       graph.ellipsoidToGeoidDifference
     );
 

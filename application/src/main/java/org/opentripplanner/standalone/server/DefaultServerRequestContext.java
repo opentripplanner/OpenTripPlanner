@@ -28,6 +28,7 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
@@ -67,6 +68,9 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Nullable
   private final ItineraryDecorator emissionItineraryDecorator;
+
+  @Nullable
+  private final OsmStreetDecoratorService osmStreetDecoratorService;
 
   @Nullable
   private final LuceneIndex luceneIndex;
@@ -125,6 +129,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     ViaCoordinateTransferFactory viaTransferResolver,
     WorldEnvelopeService worldEnvelopeService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
+    @Nullable OsmStreetDecoratorService osmStreetDecoratorService,
     @Nullable LuceneIndex luceneIndex,
     @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
     @Nullable @TransmodelSchema GraphQLSchema transmodelSchema,
@@ -157,6 +162,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
     // Optional fields
     this.emissionItineraryDecorator = emissionItineraryDecorator;
+    this.osmStreetDecoratorService = osmStreetDecoratorService;
     this.luceneIndex = luceneIndex;
     this.gtfsSchema = gtfsSchema;
     this.sorlandsbanenService = sorlandsbanenService;
@@ -301,6 +307,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public ItineraryDecorator emissionItineraryDecorator() {
     return emissionItineraryDecorator;
+  }
+
+  @Override
+  public OsmStreetDecoratorService osmStreetDecoratorService() {
+    return osmStreetDecoratorService;
   }
 
   @Nullable
