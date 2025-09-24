@@ -5,7 +5,7 @@
   ],
   "prConcurrentLimit": 3,
   "labels": [
-    "skip changelog"
+    "+Skip Changelog"
   ],
   "rebaseWhen": "conflicted",
   "enabledManagers": [
@@ -177,7 +177,7 @@
       ],
       "minimumReleaseAge": "1 week",
       "changelogUrl": "https://github.com/apache/httpcomponents-client/blob/master/RELEASE_NOTES.txt",
-      "addLabels": ["Integration Test"]
+      "addLabels": ["+Integration Test"]
     },
     {
       "groupName": "Jackson non-patch",
@@ -194,7 +194,7 @@
         "org.geotools:{/,}**"
       ],
       "minimumReleaseAge": "1 week",
-      "labels": ["skip changelog", "bump serialization id"]
+      "labels": ["+Skip Changelog", "+Bump Serialization Id"]
     },
     {
       "groupName": "Azure dependencies",

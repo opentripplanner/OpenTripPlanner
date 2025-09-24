@@ -13,7 +13,7 @@ import sys
 
 POM_FILE_NAME = 'pom.xml'
 # GitHub label to indicate that a PR needs to be bumped
-LBL_BUMP_SER_VER_ID = 'bump serialization id'
+LBL_BUMP_SER_VER_ID = '+Bump Serialization Id'
 SER_VER_ID_PROPERTY = 'otp.serialization.version.id'
 SER_VER_ID_PROPERTY_PTN = SER_VER_ID_PROPERTY.replace('.', r'\.')
 SER_VER_ID_PATTERN = re.compile(
@@ -550,7 +550,7 @@ def read_pull_request_info_from_github():
                      error_msg='GitHub GraphQL Query failed!', quiet_err=True)
 
     # Example response
-    #   {"data":{"repository":{"pullRequests":{"nodes":[{"number":2222,"labels":{"nodes":[{"name":"bump serialization id"},{"name":"Entur Test"}]}}]}}}}
+    #   {"data":{"repository":{"pullRequests":{"nodes":[{"number":2222,"labels":{"nodes":[{"name":"+Bump Serialization Id"},{"name":"Entur Test"}]}}]}}}}
     json_doc = json.loads(result.stdout)
     defined_labels = [LBL_BUMP_SER_VER_ID.lower(), config.include_prs_label.lower()]
 
@@ -588,7 +588,7 @@ def check_if_prs_exist_in_latest_release():
 #  1. If the --serVerId option exist, then the latest SID is bumped and used.
 #  2. If the --release option exist, then the current pom.xml SID is validated, if ok it is used,
 #     if not the script exit.
-#  3. All merged in PRs are checked. If a PR is labeled with 'bump serialization id' and the the
+#  3. All merged in PRs are checked. If a PR is labeled with '+Bump Serialization Id' and the the
 #     HEAD commit is not in the latest release, then the last release SID is bumped and used.
 #  4. Finally, the script look at the upstream Git Repo SIDs for both this release(base) and the
 #     last release. If the SIDs are differnt the SID is bumped. To find the *upstream* SIDs we
