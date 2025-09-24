@@ -69,7 +69,7 @@ public abstract class DataStoreModule {
   public static DataSource dataSource(String name, FileType type, String content) {
     var buf = content.getBytes(StandardCharsets.UTF_8);
     return new ByteArrayDataSource(
-      "",
+      name,
       name,
       type,
       buf.length,

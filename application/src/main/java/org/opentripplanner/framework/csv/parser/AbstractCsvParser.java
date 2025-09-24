@@ -18,7 +18,7 @@ import org.opentripplanner.utils.lang.StringUtils;
 
 public abstract class AbstractCsvParser<T> {
 
-  /** This allows both the GTFS Date format YYYYMMDD */
+  /** This allows both the GTFS date format yyyyMMdd and the ISO date format yyyy-MM-dd */
   private static final DateTimeFormatter GTFS_LOCAL_DATE_FORMATER = DateTimeFormatter.ofPattern(
     "yyyyMMdd"
   );

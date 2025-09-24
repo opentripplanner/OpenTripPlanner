@@ -9,8 +9,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.framework.csv.parser.AbstractCsvParser;
 import org.opentripplanner.utils.logging.ProgressTracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Use this class to read in a CSV file from a {@link DataSource}. You must provide (required):
@@ -27,8 +25,6 @@ import org.slf4j.LoggerFactory;
  * @param <T> The row type.
  */
 public class OtpCsvReader<T> {
-
-  private static final Logger LOG = LoggerFactory.getLogger(OtpCsvReader.class);
 
   private DataSource dataSource;
   private Function<CsvReader, AbstractCsvParser<T>> parserFactory;
@@ -69,18 +65,19 @@ public class OtpCsvReader<T> {
     return this;
   }
 
-  public void read() {
+  public void read() throws HeadersDoNotMatch {
     Objects.requireNonNull(dataSource);
     Objects.requireNonNull(parserFactory);
     Objects.requireNonNull(rowHandler);
     read(rowHandler);
   }
 
-  private void read(Consumer<T> rowHandler) {
+  private void read(Consumer<T> rowHandler) throws HeadersDoNotMatch {
     ProgressTracker progress = null;
 
     if (!dataSource.exists()) {
-      return;
+      // The caller should check if the datasource exist before calling this method.
+      throw new IllegalStateException("DataSource is missing: " + dataSource.path());
     }
     if (progressLogger != null) {
       progress = ProgressTracker.track("Read " + dataSource.name(), 10_000, -1);
@@ -90,11 +87,7 @@ public class OtpCsvReader<T> {
     var parser = parserFactory.apply(reader);
 
     if (!parser.headersMatch()) {
-      LOG.error(
-        "The header does not match the expected format for csv file: {}",
-        dataSource.path()
-      );
-      return;
+      throw new HeadersDoNotMatch(dataSource.path());
     }
 
     while (parser.hasNext()) {

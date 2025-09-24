@@ -6,6 +6,7 @@ import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.csvdata.route.RouteDataReader;
 import org.opentripplanner.ext.emission.internal.csvdata.trip.TripDataReader;
 import org.opentripplanner.ext.emission.internal.csvdata.trip.TripHopMapper;
+import org.opentripplanner.framework.csv.HeadersDoNotMatch;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,23 +61,27 @@ public class EmissionDataReader {
       return;
     }
 
-    // Assume input CO₂ emission data is Route average data
-    var routeReader = new RouteDataReader(emissionDataSource, issueStore);
-    this.emissionRepository.addRouteEmissions(routeReader.read(resolvedFeedId, m -> LOG.info(m)));
+    try {
+      // Assume input CO₂ emission data is Route average data
+      var routeReader = new RouteDataReader(emissionDataSource, issueStore);
+      this.emissionRepository.addRouteEmissions(routeReader.read(resolvedFeedId, m -> LOG.info(m)));
+      return;
+    } catch (HeadersDoNotMatch ignore) {}
 
-    // Assume input CO₂ emission data is per trip hop
-    tripHopMapper.setCurrentFeedId(resolvedFeedId);
-    var tripReader = new TripDataReader(emissionDataSource, issueStore);
-    this.emissionRepository.addTripPatternEmissions(
-        tripHopMapper.map(tripReader.read(m -> LOG.info(m)))
-      );
+    try {
+      // Assume input CO₂ emission data is per trip hop
+      tripHopMapper.setCurrentFeedId(resolvedFeedId);
+      var tripReader = new TripDataReader(emissionDataSource, issueStore);
+      this.emissionRepository.addTripPatternEmissions(
+          tripHopMapper.map(tripReader.read(m -> LOG.info(m)))
+        );
+      return;
+    } catch (HeadersDoNotMatch ignore) {}
 
-    if (!(routeReader.isDataProcessed() || tripReader.isDataProcessed())) {
-      LOG.error(
-        "No emission data read from: " +
-        emissionDataSource.detailedInfo() +
-        ". Do the header columns match?"
-      );
-    }
+    LOG.error(
+      "No emission data read from: " +
+      emissionDataSource.detailedInfo() +
+      ". Do the header columns match?"
+    );
   }
 }

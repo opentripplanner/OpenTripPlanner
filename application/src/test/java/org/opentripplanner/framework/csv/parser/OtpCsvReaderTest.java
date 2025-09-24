@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.configure.DataStoreModule;
+import org.opentripplanner.framework.csv.HeadersDoNotMatch;
 import org.opentripplanner.framework.csv.OtpCsvReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.utils.lang.IntRange;
@@ -17,7 +18,7 @@ import org.opentripplanner.utils.lang.IntRange;
 class OtpCsvReaderTest {
 
   @Test
-  void read() {
+  void read() throws HeadersDoNotMatch {
     var ds = DataStoreModule.dataSource(
       "OtpCsvReaderTest",
       FileType.GTFS,
