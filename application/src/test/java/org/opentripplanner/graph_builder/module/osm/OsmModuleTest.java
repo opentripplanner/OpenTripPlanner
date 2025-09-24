@@ -9,10 +9,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.graph_builder.module.osm.VertexGeneratorTest.getBarrierLevelIssues;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
-import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
-import static org.opentripplanner.transit.model.basic.Accessibility.NOT_POSSIBLE;
 
 import java.io.File;
 import java.util.Collection;

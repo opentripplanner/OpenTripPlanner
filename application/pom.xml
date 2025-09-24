@@ -160,7 +160,7 @@
         <dependency>
             <groupId>com.google.truth</groupId>
             <artifactId>truth</artifactId>
-            <version>1.4.4</version>
+            <version>1.4.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -365,7 +365,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.56.0</version>
+            <version>1.56.1</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>

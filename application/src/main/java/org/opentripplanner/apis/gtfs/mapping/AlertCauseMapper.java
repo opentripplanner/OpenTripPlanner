@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertCauseType;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 

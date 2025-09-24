@@ -4265,16 +4265,12 @@ input InputModeWeight {
 }
 
 input InputPreferred {
-  "A comma-separated list of ids of the agencies preferred by the user."
-  agencies: String @deprecated(reason : "Not implemented")
-  """
-  Penalty added for using every route that is not preferred if user set any
-  route as preferred. We return number of seconds that we are willing to wait
-  for preferred route.
-  """
-  otherThanPreferredRoutesPenalty: Int @deprecated(reason : "Not implemented")
-  "A comma-separated list of ids of the routes preferred by the user."
-  routes: String @deprecated(reason : "Not implemented")
+  "Not implemented"
+  agencies: String
+  "Not implemented"
+  otherThanPreferredRoutesPenalty: Int
+  "Not implemented"
+  routes: String
 }
 
 """

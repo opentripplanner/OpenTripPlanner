@@ -8,7 +8,6 @@ import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVeh
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class DefaultVehicleRentalServiceTest {
 
