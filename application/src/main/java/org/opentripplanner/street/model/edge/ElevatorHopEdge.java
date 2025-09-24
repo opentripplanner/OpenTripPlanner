@@ -106,10 +106,12 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   @Override
   public LineString getGeometry() {
     List<Coordinate> segmentCoordinates = Arrays.asList(fromv.getCoordinate(), tov.getCoordinate());
-    return GeometryUtils.getGeometryFactory()
-      .createLineString(segmentCoordinates.toArray(new Coordinate[0]));
+    return GeometryUtils.makeLineString(segmentCoordinates);
   }
 
+  /**
+   * The number of levels that the elevator travels
+   */
   public double getLevels() {
     return levels;
   }
