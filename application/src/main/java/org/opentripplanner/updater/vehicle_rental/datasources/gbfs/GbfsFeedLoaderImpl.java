@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +32,6 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
 
   static {
     objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
-    objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSSX"));
   }
 
   public GbfsFeedLoaderImpl(List<F> feeds, HttpHeaders httpHeaders, OtpHttpClient otpHttpClient) {
