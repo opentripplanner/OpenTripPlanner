@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -27,14 +28,13 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 import org.opentripplanner.utils.time.TimeUtils;
 
 class AddedTest implements RealtimeTestConstants {
 
   private static final String ADDED_TRIP_ID = "added_trip";
-  private final RealtimeTestEnvironment env = RealtimeTestEnvironment.of()
+  private final TransitTestEnvironment env = TransitTestEnvironment.of()
     .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
     .build();
   private final GtfsRtTestHelper gtfsRt = GtfsRtTestHelper.of(env);
@@ -195,13 +195,13 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(TimeUtils.time("09:10"), tripTimes.getArrivalTime(2));
   }
 
-  private static TripPattern assertAddedTrip(String tripId, RealtimeTestEnvironment env) {
+  private static TripPattern assertAddedTrip(String tripId, TransitTestEnvironment env) {
     return assertAddedTrip(tripId, env, RealTimeState.ADDED);
   }
 
   static TripPattern assertAddedTrip(
     String tripId,
-    RealtimeTestEnvironment env,
+    TransitTestEnvironment env,
     RealTimeState realTimeState
   ) {
     var snapshot = env.getTimetableSnapshot();

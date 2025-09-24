@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip;
+package org.opentripplanner.transit.model._data;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -19,7 +19,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.FlexTripInput.FlexStop;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -37,9 +37,8 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.updater.trip.FlexTripInput.FlexStop;
 
-public class RealtimeTestEnvironmentBuilder {
+public class TransitTestEnvironmentBuilder {
 
   private static final WgsCoordinate ANY_COORDINATE = new WgsCoordinate(60.0, 10.0);
   private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory()
@@ -64,7 +63,7 @@ public class RealtimeTestEnvironmentBuilder {
   private final ZoneId timeZone;
   private final LocalDate defaultServiceDate;
 
-  RealtimeTestEnvironmentBuilder(
+  TransitTestEnvironmentBuilder(
     String defaultFeedId,
     ZoneId timeZone,
     LocalDate defaultServiceDate
@@ -75,12 +74,12 @@ public class RealtimeTestEnvironmentBuilder {
     this.defaultServiceDate = defaultServiceDate;
   }
 
-  public RealtimeTestEnvironmentBuilder addTrip(TripInput trip) {
+  public TransitTestEnvironmentBuilder addTrip(TripInput trip) {
     this.tripInputs.add(trip);
     return this;
   }
 
-  public RealtimeTestEnvironment build() {
+  public TransitTestEnvironment build() {
     for (var stop : stops) {
       switch (stop) {
         case RegularStop rs -> siteRepositoryBuilder.withRegularStop(rs);
@@ -133,10 +132,10 @@ public class RealtimeTestEnvironmentBuilder {
     timetableRepository.addScheduledStopPointMapping(scheduledStopPointMapping);
 
     timetableRepository.index();
-    return new RealtimeTestEnvironment(timetableRepository, defaultServiceDate, timeZone);
+    return new TransitTestEnvironment(timetableRepository, defaultServiceDate, timeZone);
   }
 
-  public RealtimeTestEnvironmentBuilder withStops(String... stopIds) {
+  public TransitTestEnvironmentBuilder withStops(String... stopIds) {
     Arrays.stream(stopIds).forEach(this::stop);
     return this;
   }
@@ -182,12 +181,12 @@ public class RealtimeTestEnvironmentBuilder {
     return stop;
   }
 
-  public RealtimeTestEnvironmentBuilder addFlexTrip(FlexTripInput tripInput) {
+  public TransitTestEnvironmentBuilder addFlexTrip(FlexTripInput tripInput) {
     flexTripInputs.add(tripInput);
     return this;
   }
 
-  public RealtimeTestEnvironmentBuilder addScheduledStopPointMapping(
+  public TransitTestEnvironmentBuilder addScheduledStopPointMapping(
     Map<FeedScopedId, RegularStop> mapping
   ) {
     scheduledStopPointMapping.putAll(mapping);

@@ -4,6 +4,7 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET
 
 import com.google.transit.realtime.GtfsRealtime;
 import java.util.List;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.ForwardsDelayPropagationType;
@@ -11,20 +12,20 @@ import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 
 public class GtfsRtTestHelper {
 
-  private final RealtimeTestEnvironment realtimeTestEnvironment;
+  private final TransitTestEnvironment transitTestEnvironment;
   private final GtfsRealTimeTripUpdateAdapter gtfsAdapter;
 
-  GtfsRtTestHelper(RealtimeTestEnvironment realtimeTestEnvironment) {
-    this.realtimeTestEnvironment = realtimeTestEnvironment;
+  GtfsRtTestHelper(TransitTestEnvironment transitTestEnvironment) {
+    this.transitTestEnvironment = transitTestEnvironment;
     this.gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(
-      realtimeTestEnvironment.timetableRepository(),
-      realtimeTestEnvironment.timetableSnapshotManager(),
-      () -> realtimeTestEnvironment.serviceDate()
+      transitTestEnvironment.timetableRepository(),
+      transitTestEnvironment.timetableSnapshotManager(),
+      () -> transitTestEnvironment.serviceDate()
     );
   }
 
-  public static GtfsRtTestHelper of(RealtimeTestEnvironment realtimeTestEnvironment) {
-    return new GtfsRtTestHelper(realtimeTestEnvironment);
+  public static GtfsRtTestHelper of(TransitTestEnvironment transitTestEnvironment) {
+    return new GtfsRtTestHelper(transitTestEnvironment);
   }
 
   public TripUpdateBuilder tripUpdateScheduled(String tripId) {
@@ -37,9 +38,9 @@ public class GtfsRtTestHelper {
   ) {
     return new TripUpdateBuilder(
       tripId,
-      realtimeTestEnvironment.serviceDate(),
+      transitTestEnvironment.serviceDate(),
       scheduleRelationship,
-      realtimeTestEnvironment.timeZone()
+      transitTestEnvironment.timeZone()
     );
   }
 
@@ -64,13 +65,13 @@ public class GtfsRtTestHelper {
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
       incrementality,
       updates,
-      realtimeTestEnvironment.getFeedId()
+      transitTestEnvironment.getFeedId()
     );
     commitTimetableSnapshot();
     return updateResult;
   }
 
   private void commitTimetableSnapshot() {
-    realtimeTestEnvironment.timetableSnapshotManager().purgeAndCommit();
+    transitTestEnvironment.timetableSnapshotManager().purgeAndCommit();
   }
 }

@@ -4,6 +4,7 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL
 
 import java.util.List;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
@@ -13,23 +14,23 @@ import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
 public class SiriTestHelper {
 
-  private final RealtimeTestEnvironment realtimeTestEnvironment;
+  private final TransitTestEnvironment transitTestEnvironment;
   private final SiriRealTimeTripUpdateAdapter siriAdapter;
 
-  SiriTestHelper(RealtimeTestEnvironment realtimeTestEnvironment) {
-    this.realtimeTestEnvironment = realtimeTestEnvironment;
+  SiriTestHelper(TransitTestEnvironment transitTestEnvironment) {
+    this.transitTestEnvironment = transitTestEnvironment;
     this.siriAdapter = new SiriRealTimeTripUpdateAdapter(
-      realtimeTestEnvironment.timetableRepository(),
-      realtimeTestEnvironment.timetableSnapshotManager()
+      transitTestEnvironment.timetableRepository(),
+      transitTestEnvironment.timetableSnapshotManager()
     );
   }
 
-  public static SiriTestHelper of(RealtimeTestEnvironment realtimeTestEnvironment) {
-    return new SiriTestHelper(realtimeTestEnvironment);
+  public static SiriTestHelper of(TransitTestEnvironment transitTestEnvironment) {
+    return new SiriTestHelper(transitTestEnvironment);
   }
 
   public SiriEtBuilder etBuilder() {
-    return new SiriEtBuilder(realtimeTestEnvironment.getDateTimeHelper());
+    return new SiriEtBuilder(transitTestEnvironment.getDateTimeHelper());
   }
 
   public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
@@ -42,8 +43,8 @@ public class SiriTestHelper {
     return applyEstimatedTimetable(updates, false);
   }
 
-  public RealtimeTestEnvironment realtimeTestEnvironment() {
-    return realtimeTestEnvironment;
+  public TransitTestEnvironment realtimeTestEnvironment() {
+    return transitTestEnvironment;
   }
 
   private UpdateResult applyEstimatedTimetable(
@@ -55,8 +56,8 @@ public class SiriTestHelper {
       DIFFERENTIAL,
       new DefaultRealTimeUpdateContext(
         new Graph(),
-        realtimeTestEnvironment.timetableRepository(),
-        realtimeTestEnvironment.timetableSnapshotManager().getTimetableSnapshotBuffer()
+        transitTestEnvironment.timetableRepository(),
+        transitTestEnvironment.timetableSnapshotManager().getTimetableSnapshotBuffer()
       )
     );
     commitTimetableSnapshot();
@@ -67,11 +68,11 @@ public class SiriTestHelper {
     return new EstimatedTimetableHandler(
       siriAdapter,
       fuzzyMatching,
-      realtimeTestEnvironment.getFeedId()
+      transitTestEnvironment.getFeedId()
     );
   }
 
   private void commitTimetableSnapshot() {
-    realtimeTestEnvironment.timetableSnapshotManager().purgeAndCommit();
+    transitTestEnvironment.timetableSnapshotManager().purgeAndCommit();
   }
 }

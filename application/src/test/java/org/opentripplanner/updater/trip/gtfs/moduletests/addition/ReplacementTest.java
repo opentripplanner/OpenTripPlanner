@@ -14,11 +14,11 @@ import static org.opentripplanner.updater.trip.gtfs.moduletests.addition.AddedTe
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.TripInput;
 
 public class ReplacementTest implements RealtimeTestConstants {
 
@@ -29,7 +29,7 @@ public class ReplacementTest implements RealtimeTestConstants {
       .addStop(STOP_B, "8:40:00", "8:40:00")
       .withHeadsign(I18NString.of("Original Headsign"))
       .build();
-    var env = RealtimeTestEnvironment.of()
+    var env = TransitTestEnvironment.of()
       .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
       .addTrip(TRIP_INPUT)
       .build();

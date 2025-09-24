@@ -19,13 +19,13 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
-import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
@@ -41,9 +41,7 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
   private static final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
   private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Paris");
   private static final ZonedDateTime ANY_TIME = ZonedDateTime.parse("2022-01-01T12:00:00+00:00");
-  private final RealtimeTestEnvironmentBuilder envBuilder = RealtimeTestEnvironment.of(
-    SERVICE_DATE
-  );
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
   private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
   private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
   private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);

@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip;
+package org.opentripplanner.transit.model._data;
 
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
@@ -7,7 +7,6 @@ import java.time.ZoneId;
 import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -17,12 +16,12 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
-import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
 /**
- * This class exists so that you can share the data building logic for GTFS and Siri tests.
+ * A helper class for creating and fetching transit entities
  */
-public final class RealtimeTestEnvironment {
+public final class TransitTestEnvironment {
 
   private final TimetableRepository timetableRepository;
   private final TimetableSnapshotManager snapshotManager;
@@ -30,23 +29,23 @@ public final class RealtimeTestEnvironment {
   private final LocalDate serviceDate;
   private final ZoneId timeZone;
 
-  public static RealtimeTestEnvironmentBuilder of() {
-    return new RealtimeTestEnvironmentBuilder(
+  public static TransitTestEnvironmentBuilder of() {
+    return new TransitTestEnvironmentBuilder(
       "F",
       ZoneId.of("Europe/Paris"),
       LocalDate.of(2024, 5, 7)
     );
   }
 
-  public static RealtimeTestEnvironmentBuilder of(LocalDate serviceDate) {
-    return new RealtimeTestEnvironmentBuilder("F", ZoneId.of("Europe/Paris"), serviceDate);
+  public static TransitTestEnvironmentBuilder of(LocalDate serviceDate) {
+    return new TransitTestEnvironmentBuilder("F", ZoneId.of("Europe/Paris"), serviceDate);
   }
 
-  public static RealtimeTestEnvironmentBuilder of(LocalDate serviceDate, ZoneId timeZone) {
-    return new RealtimeTestEnvironmentBuilder("F", timeZone, serviceDate);
+  public static TransitTestEnvironmentBuilder of(LocalDate serviceDate, ZoneId timeZone) {
+    return new TransitTestEnvironmentBuilder("F", timeZone, serviceDate);
   }
 
-  RealtimeTestEnvironment(
+  TransitTestEnvironment(
     TimetableRepository timetableRepository,
     LocalDate defaultServiceDate,
     ZoneId zoneId

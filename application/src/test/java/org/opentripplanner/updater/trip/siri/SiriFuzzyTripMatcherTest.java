@@ -8,18 +8,18 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZ
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
-import org.opentripplanner.updater.trip.TripInput;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 
 class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
 
-  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
   private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
   private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
 
@@ -94,7 +94,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
 
   private static Result<TripAndPattern, UpdateError.UpdateErrorType> match(
     EstimatedVehicleJourney evj,
-    RealtimeTestEnvironment env
+    TransitTestEnvironment env
   ) {
     var transitService = env.getTransitService();
     var fuzzyMatcher = new SiriFuzzyTripMatcher(transitService);
@@ -106,7 +106,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     );
   }
 
-  private EstimatedVehicleJourney estimatedVehicleJourney(RealtimeTestEnvironment env) {
+  private EstimatedVehicleJourney estimatedVehicleJourney(TransitTestEnvironment env) {
     return new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedCalls(builder ->
         builder
