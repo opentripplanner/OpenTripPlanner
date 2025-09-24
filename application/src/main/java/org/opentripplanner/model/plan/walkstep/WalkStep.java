@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
@@ -46,8 +47,13 @@ public final class WalkStep {
   private final boolean walkingBike;
 
   private final String highwayExit;
+
+  @Nullable
   private final Entrance entrance;
+
+  @Nullable
   private final VerticalTransportationUse verticalTransportationUse;
+
   private final ElevationProfile elevationProfile;
   private final boolean stayOn;
 
@@ -60,8 +66,8 @@ public final class WalkStep {
     I18NString directionText,
     Set<StreetNote> streetNotes,
     String highwayExit,
-    Entrance entrance,
-    VerticalTransportationUse verticalTransportationUse,
+    @Nullable Entrance entrance,
+    @Nullable VerticalTransportationUse verticalTransportationUse,
     ElevationProfile elevationProfile,
     boolean nameIsDerived,
     boolean walkingBike,

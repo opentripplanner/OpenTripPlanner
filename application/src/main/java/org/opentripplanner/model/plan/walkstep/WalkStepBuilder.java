@@ -27,8 +27,13 @@ public class WalkStepBuilder {
   private RelativeDirection relativeDirection;
   private ElevationProfile elevationProfile;
   private String exit;
+
+  @Nullable
   private Entrance entrance;
+
+  @Nullable
   private VerticalTransportationUse verticalTransportationUse;
+
   private boolean stayOn = false;
   /**
    * Distance used for appending elevation profiles

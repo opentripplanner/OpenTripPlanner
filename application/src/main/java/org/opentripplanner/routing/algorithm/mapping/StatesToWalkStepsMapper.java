@@ -7,6 +7,7 @@ import static org.opentripplanner.model.plan.walkstep.RelativeDirection.FOLLOW_S
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -21,6 +22,7 @@ import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorService;
+import org.opentripplanner.service.streetdecorator.model.EdgeLevelInfo;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -32,6 +34,7 @@ import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.vertex.ExitVertex;
 import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeLabel;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.Entrance;
@@ -519,35 +522,13 @@ public class StatesToWalkStepsMapper {
     steps.add(current);
   }
 
-  private WalkStepBuilder createEscalatorWalkStep(State backState, State forwardState, Edge edge) {
-    // TODO calculate level
-    double toLevel = 0.0;
-    double fromLevel = 0.0;
-    VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
-      fromLevel,
-      null,
-      InclineType.UNKNOWN,
-      toLevel,
-      null
-    );
-    var step = createWalkStep(forwardState, backState);
-
-    step.withRelativeDirection(RelativeDirection.ESCALATOR);
-    step.withVerticalTransportationUse(verticalTransportationUse);
-
-    return step;
-  }
-
   private WalkStepBuilder createElevatorWalkStep(State backState, State forwardState, Edge edge) {
-    // TODO calculate level
-    double toLevel = 0.0;
-    double fromLevel = 0.0;
     VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
-      fromLevel,
+      null,
       null,
       InclineType.UNKNOWN,
-      toLevel,
-      null
+      null,
+      edge.getName().toString()
     );
     // don't care what came before or comes after
     var step = createWalkStep(forwardState, backState);
@@ -567,22 +548,61 @@ public class StatesToWalkStepsMapper {
   }
 
   private WalkStepBuilder createStairsWalkStep(State backState, State forwardState, Edge edge) {
-    // TODO calculate level
-    double toLevel = 0.0;
-    double fromLevel = 0.0;
-    VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
-      fromLevel,
-      null,
-      InclineType.UNKNOWN,
-      toLevel,
-      null
-    );
     var step = createWalkStep(forwardState, backState);
 
     step.withRelativeDirection(RelativeDirection.STAIRS);
-    step.withVerticalTransportationUse(verticalTransportationUse);
+    step.withVerticalTransportationUse(getVerticalTransportationUse(backState, edge));
 
     return step;
+  }
+
+  private WalkStepBuilder createEscalatorWalkStep(State backState, State forwardState, Edge edge) {
+    var step = createWalkStep(forwardState, backState);
+
+    step.withRelativeDirection(RelativeDirection.ESCALATOR);
+    step.withVerticalTransportationUse(getVerticalTransportationUse(backState, edge));
+
+    return step;
+  }
+
+  private VerticalTransportationUse getVerticalTransportationUse(State backState, Edge edge) {
+    if (osmStreetDecoratorService != null) {
+      Optional<EdgeLevelInfo> edgeLevelInfoOptional = osmStreetDecoratorService.findEdgeInformation(
+        edge
+      );
+      if (edgeLevelInfoOptional.isPresent()) {
+        EdgeLevelInfo edgeLevelInfo = edgeLevelInfoOptional.get();
+        if (
+          backState.getVertex().getLabel() instanceof OsmNodeLabel fromVertexLabel &&
+          fromVertexLabel.nodeId() == edgeLevelInfo.lowerVertexInfo().osmVertexId()
+        ) {
+          return new VerticalTransportationUse(
+            edgeLevelInfo.lowerVertexInfo().floorNumber() != null
+              ? (double) edgeLevelInfo.lowerVertexInfo().floorNumber()
+              : null,
+            edgeLevelInfo.lowerVertexInfo().name(),
+            InclineType.UP,
+            edgeLevelInfo.upperVertexInfo().floorNumber() != null
+              ? (double) edgeLevelInfo.upperVertexInfo().floorNumber()
+              : null,
+            edgeLevelInfo.upperVertexInfo().name()
+          );
+        } else {
+          return new VerticalTransportationUse(
+            edgeLevelInfo.upperVertexInfo().floorNumber() != null
+              ? (double) edgeLevelInfo.upperVertexInfo().floorNumber()
+              : null,
+            edgeLevelInfo.upperVertexInfo().name(),
+            InclineType.DOWN,
+            edgeLevelInfo.lowerVertexInfo().floorNumber() != null
+              ? (double) edgeLevelInfo.lowerVertexInfo().floorNumber()
+              : null,
+            edgeLevelInfo.lowerVertexInfo().name()
+          );
+        }
+      }
+    }
+    return null;
   }
 
   private WalkStepBuilder createStationEntranceWalkStep(
