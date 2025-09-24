@@ -1,15 +1,12 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0;
-
-import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedMapper.optionalLocalizedString;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
 import org.geojson.MultiPolygon;
-import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSFeature;
-import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSGeofencingZones;
-import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSName;
+import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSFeature;
+import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 
 /**
@@ -30,7 +27,6 @@ class GbfsGeofencingZoneMapper
       .getGeofencingZones()
       .getFeatures()
       .stream()
-      .filter(f -> f.getGeometry() != null)
       .map(this::toInternalModel)
       .filter(Objects::nonNull)
       .toList();
@@ -38,7 +34,7 @@ class GbfsGeofencingZoneMapper
 
   @Override
   protected boolean featureBansDropOff(GBFSFeature feature) {
-    return !feature.getProperties().getRules().get(0).getRideEndAllowed();
+    return !feature.getProperties().getRules().get(0).getRideAllowed();
   }
 
   @Override
@@ -52,11 +48,7 @@ class GbfsGeofencingZoneMapper
   }
 
   @Override
-  protected @Nullable I18NString featureName(GBFSFeature feature) {
-    return optionalLocalizedString(
-      feature.getProperties().getName(),
-      GBFSName::getLanguage,
-      GBFSName::getText
-    );
+  protected I18NString featureName(GBFSFeature feature) {
+    return NonLocalizedString.ofNullable(feature.getProperties().getName());
   }
 }

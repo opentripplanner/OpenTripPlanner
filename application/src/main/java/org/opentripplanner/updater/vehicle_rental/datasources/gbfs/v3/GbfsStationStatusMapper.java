@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
 
 import java.util.Map;
 import java.util.Objects;

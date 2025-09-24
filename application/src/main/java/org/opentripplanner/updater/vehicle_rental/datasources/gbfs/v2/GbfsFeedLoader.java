@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2_3;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import java.net.URI;
 import java.net.URISyntaxException;

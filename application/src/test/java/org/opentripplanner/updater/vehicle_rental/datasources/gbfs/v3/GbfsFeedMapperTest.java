@@ -1,16 +1,24 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2_3;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
+import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
+import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsVehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
@@ -18,15 +26,16 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPicku
 import org.slf4j.LoggerFactory;
 
 /**
- * This tests the mapping between data coming from a {@link GbfsFeedLoader} to OTP station models.
+ * This tests the mapping between data coming from a {@link GbfsFeedLoader} to OTP station
+ * models.
  */
 class GbfsFeedMapperTest {
 
   @Test
-  void makeStationFromV22() {
+  void makeStationFromV30() {
     var params = new GbfsVehicleRentalDataSourceParameters(
-      "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
-      "nb",
+      "file:src/test/resources/gbfs/ridecheck/almere/gbfs.json",
+      null,
       false,
       HttpHeaders.empty(),
       null,
@@ -36,38 +45,28 @@ class GbfsFeedMapperTest {
     );
     var otpHttpClient = new OtpHttpClientFactory()
       .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
-    var loader = new GbfsFeedLoader(
-      params.url(),
-      params.httpHeaders(),
-      params.language(),
-      otpHttpClient
-    );
+    var loader = new GbfsFeedLoader(params.url(), params.httpHeaders(), otpHttpClient);
     var mapper = new GbfsFeedMapper(loader, params);
 
     assertTrue(loader.update());
 
     List<VehicleRentalPlace> stations = mapper.getUpdates();
     assertEquals(6, stations.size());
+
     assertTrue(
       stations
         .stream()
-        .anyMatch(vehicleRentalStation -> vehicleRentalStation.name().toString().equals("TORVGATA"))
-    );
-    assertTrue(
-      stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.isAllowDropoff())
-    );
-    assertTrue(
-      stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isFloatingVehicle())
-    );
-    assertTrue(
-      stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isCarStation())
-    );
-    assertTrue(
-      stations
-        .stream()
-        .allMatch(vehicleRentalStation ->
-          vehicleRentalStation.network().equals("lillestrombysykkel")
+        .allMatch(vehicleRentalPlace ->
+          vehicleRentalPlace.availablePickupFormFactors(true).equals(Set.of(RentalFormFactor.MOPED))
         )
+    );
+    assertTrue(stations.stream().allMatch(VehicleRentalPlace::isFloatingVehicle));
+    assertTrue(stations.stream().noneMatch(VehicleRentalPlace::isCarStation));
+    assertTrue(stations.stream().noneMatch(VehicleRentalPlace::overloadingAllowed));
+    assertTrue(
+      stations
+        .stream()
+        .allMatch(vehicleRentalStation -> vehicleRentalStation.network().equals("check_almere"))
     );
     assertTrue(
       stations
@@ -77,9 +76,32 @@ class GbfsFeedMapperTest {
         )
     );
 
+    assertEquals(4, stations.stream().filter(VehicleRentalPlace::allowPickupNow).count());
+    assertEquals(5, stations.stream().filter(VehicleRentalPlace::isAllowPickup).count());
+    assertEquals(0, stations.stream().filter(VehicleRentalPlace::allowDropoffNow).count());
+    assertEquals(0, stations.stream().filter(VehicleRentalPlace::isAllowDropoff).count());
+
     assertTrue(
-      stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.overloadingAllowed())
+      stations
+        .stream()
+        .allMatch(vehicleRentalPlace ->
+          vehicleRentalPlace.name().toString().equals("Default vehicle type")
+        )
     );
+
+    var system = stations.getFirst().vehicleRentalSystem();
+    assertEquals("check_almere", system.systemId());
+    assertEquals(
+      TranslatedString.getI18NString(
+        Map.of("en", "Check Technologies", "nl", "Check Technologies (nl)"),
+        false,
+        false
+      ),
+      system.name()
+    );
+    assertNull(system.shortName());
+    assertNull(system.operator());
+    assertNull(system.url());
   }
 
   @Test
@@ -120,7 +142,7 @@ class GbfsFeedMapperTest {
   void geofencing() {
     var dataSource = new GbfsVehicleRentalDataSource(
       new GbfsVehicleRentalDataSourceParameters(
-        "file:src/test/resources/gbfs/tieroslo/gbfs.json",
+        "file:src/test/resources/gbfs/ridecheck/almere/gbfs.json",
         "en",
         false,
         HttpHeaders.empty(),
@@ -140,85 +162,38 @@ class GbfsFeedMapperTest {
 
     var zones = dataSource.getGeofencingZones();
 
-    assertEquals(2, zones.size());
+    assertEquals(14, zones.size());
 
-    var frognerPark = zones
+    var hubBergnet = zones
       .stream()
-      .filter(z -> z.name().toString().equals("NP Frogner og vigelandsparken"))
+      .filter(z -> z.name().toString().equals("Hub Bergnet"))
       .findFirst()
       .get();
 
-    assertTrue(frognerPark.dropOffBanned());
-    assertFalse(frognerPark.traversalBanned());
+    assertTrue(hubBergnet.dropOffBanned());
+    assertFalse(hubBergnet.traversalBanned());
+
+    var almereHaven = zones
+      .stream()
+      .filter(z -> z.name().toString().equals("Almere Haven"))
+      .findFirst()
+      .get();
+
+    assertFalse(almereHaven.dropOffBanned());
+    assertTrue(almereHaven.traversalBanned());
 
     var businessAreas = zones.stream().filter(GeofencingZone::isBusinessArea).toList();
 
-    assertEquals(1, businessAreas.size());
+    assertEquals(12, businessAreas.size());
+    var almereStad = zones
+      .stream()
+      .filter(z -> z.name().toString().equals("Almere Stad"))
+      .findFirst()
+      .get();
 
-    assertEquals("OSLO Summer 2021", businessAreas.get(0).name().toString());
-    assertEquals("tieroslo:4640262c", businessAreas.get(0).id().toString());
-  }
-
-  @Test
-  void makeStationFromV10() {
-    var network = "helsinki_gbfs";
-    var params = new GbfsVehicleRentalDataSourceParameters(
-      "file:src/test/resources/gbfs/helsinki/gbfs.json",
-      "en",
-      false,
-      HttpHeaders.empty(),
-      network,
-      false,
-      true,
-      RentalPickupType.ALL
-    );
-    var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
-    var loader = new GbfsFeedLoader(
-      params.url(),
-      params.httpHeaders(),
-      params.language(),
-      otpHttpClient
-    );
-    var mapper = new GbfsFeedMapper(loader, params);
-
-    assertTrue(loader.update());
-
-    List<VehicleRentalPlace> stations = mapper.getUpdates();
-    // There are 10 stations in the data but 5 are missing required data
-    assertEquals(5, stations.size());
-    assertTrue(
-      stations
-        .stream()
-        .anyMatch(vehicleRentalStation ->
-          vehicleRentalStation.name().toString().equals("Viiskulma")
-        )
-    );
-    assertTrue(
-      stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.isAllowDropoff())
-    );
-    assertTrue(
-      stations.stream().anyMatch(vehicleRentalStation -> !vehicleRentalStation.isAllowDropoff())
-    );
-    assertTrue(
-      stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isFloatingVehicle())
-    );
-    assertTrue(
-      stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isCarStation())
-    );
-    assertTrue(
-      stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.network() == network)
-    );
-    assertTrue(
-      stations
-        .stream()
-        .noneMatch(vehicleRentalStation ->
-          vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed()
-        )
-    );
-    assertTrue(
-      stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.overloadingAllowed())
-    );
+    assertEquals("Almere Stad", almereStad.name().toString(Locale.forLanguageTag("en")));
+    assertEquals("Almere Stad (nl)", almereStad.name().toString(Locale.forLanguageTag("nl")));
+    assertEquals("check_almere:fb345775", almereStad.id().toString());
   }
 
   private static List<GBFSVehicleType> getDuplicatedGbfsVehicleTypes() {

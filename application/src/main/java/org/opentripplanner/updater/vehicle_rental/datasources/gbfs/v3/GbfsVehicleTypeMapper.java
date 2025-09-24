@@ -1,6 +1,6 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
 
-import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedMapper.optionalLocalizedString;
+import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedMapper.optionalLocalizedString;
 
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSName;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
