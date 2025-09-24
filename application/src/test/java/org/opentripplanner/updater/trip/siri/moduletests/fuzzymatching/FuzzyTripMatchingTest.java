@@ -46,7 +46,7 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withFramedVehicleJourneyRef(builder ->
-        builder.withServiceDate(SERVICE_DATE).withVehicleJourneyRef("XXX")
+        builder.withServiceDate(env.serviceDate()).withVehicleJourneyRef("XXX")
       )
       .withEstimatedCalls(builder ->
         builder

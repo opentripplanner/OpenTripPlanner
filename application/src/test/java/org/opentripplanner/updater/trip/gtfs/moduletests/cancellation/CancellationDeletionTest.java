@@ -20,7 +20,6 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
  * Cancellations and deletions should end up in the internal data model and make trips unavailable
@@ -50,11 +49,11 @@ class CancellationDeletionTest implements RealtimeTestConstants {
     ).build();
     var pattern1 = env.getPatternForTrip(TRIP_1_ID);
 
-    var update = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, relationship, TIME_ZONE).build();
+    var update = env.tripUpdate(TRIP_1_ID, relationship).build();
     assertSuccess(env.applyTripUpdate(update));
 
     var snapshot = env.getTimetableSnapshot();
-    var forToday = snapshot.resolve(pattern1, SERVICE_DATE);
+    var forToday = snapshot.resolve(pattern1, env.serviceDate());
     var schedule = snapshot.resolve(pattern1, null);
     assertNotSame(forToday, schedule);
     assertNotSame(forToday.getTripTimes(id(TRIP_1_ID)), schedule.getTripTimes(id(TRIP_1_ID)));
@@ -81,12 +80,8 @@ class CancellationDeletionTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.build();
     var addedTripId = "added-trip";
     // First add ADDED trip
-    var update = new TripUpdateBuilder(
-      addedTripId,
-      SERVICE_DATE,
-      ScheduleRelationship.ADDED,
-      TIME_ZONE
-    )
+    var update = env
+      .tripUpdate(addedTripId, ScheduleRelationship.ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:40")
       .addStopTime(STOP_C_ID, "00:55")
@@ -95,7 +90,7 @@ class CancellationDeletionTest implements RealtimeTestConstants {
     assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));
 
     // Cancel or delete the added trip
-    update = new TripUpdateBuilder(addedTripId, SERVICE_DATE, relationship, TIME_ZONE).build();
+    update = env.tripUpdate(addedTripId, relationship).build();
     assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));
 
     var snapshot = env.getTimetableSnapshot();
@@ -105,7 +100,7 @@ class CancellationDeletionTest implements RealtimeTestConstants {
     assertNotNull(patternsAtA, "Added trip pattern should be found");
     var tripPattern = patternsAtA.stream().findFirst().get();
 
-    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    var forToday = snapshot.resolve(tripPattern, env.serviceDate());
     var schedule = snapshot.resolve(tripPattern, null);
 
     assertNotSame(forToday, schedule);

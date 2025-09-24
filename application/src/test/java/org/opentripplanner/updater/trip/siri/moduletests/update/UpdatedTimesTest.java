@@ -51,7 +51,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
 
     var updates = updatedJourneyBuilder(env)
       .withFramedVehicleJourneyRef(builder ->
-        builder.withServiceDate(SERVICE_DATE).withVehicleJourneyRef(TRIP_1_ID)
+        builder.withServiceDate(env.serviceDate()).withVehicleJourneyRef(TRIP_1_ID)
       )
       .buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);

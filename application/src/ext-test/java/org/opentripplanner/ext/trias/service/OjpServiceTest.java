@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -31,7 +29,6 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.utils.time.TimeUtils;
 
 class OjpServiceTest implements RealtimeTestConstants {
 
@@ -47,11 +44,9 @@ class OjpServiceTest implements RealtimeTestConstants {
     .addStop(STOP_C, "12:20", "12:21")
     .build();
 
-  public static final OjpService.StopEventRequestParams PARAMS = params(100);
-
-  private static OjpService.StopEventRequestParams params(int departures) {
+  private OjpService.StopEventRequestParams params(RealtimeTestEnvironment env, int departures) {
     return new OjpService.StopEventRequestParams(
-      instant("12:00"),
+      env.getDateTimeHelper().instant("12:00"),
       ArrivalDeparture.BOTH,
       Duration.ofHours(2),
       1000,
@@ -74,7 +69,7 @@ class OjpServiceTest implements RealtimeTestConstants {
   void stopPointRef(FeedScopedId ref) {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
-    var result = service.findCallsAtStop(ref, PARAMS);
+    var result = service.findCallsAtStop(ref, params(env, 100));
     assertThat(result).hasSize(1);
     var stopId = result.getFirst().tripTimeOnDate().getStop().getId();
     assertEquals(STOP_A.getId(), stopId);
@@ -85,7 +80,7 @@ class OjpServiceTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
     assertThrows(EntityNotFoundException.class, () ->
-      service.findCallsAtStop(id("unknown"), PARAMS)
+      service.findCallsAtStop(id("unknown"), params(env, 100))
     );
   }
 
@@ -119,7 +114,7 @@ class OjpServiceTest implements RealtimeTestConstants {
     };
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), finder);
-    var result = service.findCallsAtStop(WgsCoordinate.GREENWICH, PARAMS);
+    var result = service.findCallsAtStop(WgsCoordinate.GREENWICH, params(env, 100));
     assertThat(result).hasSize(1);
     var stopId = result.getFirst().tripTimeOnDate().getStop().getId();
     assertEquals(STOP_A.getId(), stopId);
@@ -130,12 +125,7 @@ class OjpServiceTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
     assertThrows(IllegalArgumentException.class, () ->
-      service.findCallsAtStop(STOP_A.getId(), params(101))
+      service.findCallsAtStop(STOP_A.getId(), params(env, 101))
     );
-  }
-
-  private static Instant instant(String time) {
-    var localTime = LocalTime.ofSecondOfDay(TimeUtils.time(time));
-    return localTime.atDate(SERVICE_DATE).atZone(TIME_ZONE).toInstant();
   }
 }

@@ -22,7 +22,10 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  */
 class InvalidInputTest implements RealtimeTestConstants {
 
-  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2025, 7, 8);
+  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of(
+    SERVICE_DATE
+  );
   private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
   private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
 
@@ -39,7 +42,7 @@ class InvalidInputTest implements RealtimeTestConstants {
       .build();
     var env = ENV_BUILDER.addTrip(tripInput).build();
 
-    var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, TIME_ZONE)
+    var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, env.timeZone())
       .addDelayedStopTime(2, 60, 80)
       .build();
 

@@ -42,9 +42,22 @@ public final class RealtimeTestEnvironment {
   private final GtfsRealTimeTripUpdateAdapter gtfsAdapter;
   private final DateTimeHelper dateTimeHelper;
   private final LocalDate serviceDate;
+  private final ZoneId timeZone;
 
   public static RealtimeTestEnvironmentBuilder of() {
-    return new RealtimeTestEnvironmentBuilder();
+    return new RealtimeTestEnvironmentBuilder(
+      "F",
+      ZoneId.of("Europe/Paris"),
+      LocalDate.of(2024, 5, 7)
+    );
+  }
+
+  public static RealtimeTestEnvironmentBuilder of(LocalDate serviceDate) {
+    return new RealtimeTestEnvironmentBuilder("F", ZoneId.of("Europe/Paris"), serviceDate);
+  }
+
+  public static RealtimeTestEnvironmentBuilder of(LocalDate serviceDate, ZoneId timeZone) {
+    return new RealtimeTestEnvironmentBuilder("F", timeZone, serviceDate);
   }
 
   RealtimeTestEnvironment(
@@ -64,8 +77,17 @@ public final class RealtimeTestEnvironment {
     gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
       defaultServiceDate
     );
-    dateTimeHelper = new DateTimeHelper(zoneId, defaultServiceDate);
+    this.timeZone = zoneId;
     this.serviceDate = defaultServiceDate;
+    this.dateTimeHelper = new DateTimeHelper(zoneId, defaultServiceDate);
+  }
+
+  public LocalDate serviceDate() {
+    return serviceDate;
+  }
+
+  public ZoneId timeZone() {
+    return timeZone;
   }
 
   /**
@@ -162,6 +184,17 @@ public final class RealtimeTestEnvironment {
   }
 
   // GTFS-RT updates
+
+  public TripUpdateBuilder tripUpdateScheduled(String tripId) {
+    return tripUpdate(tripId, GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED);
+  }
+
+  public TripUpdateBuilder tripUpdate(
+    String tripId,
+    GtfsRealtime.TripDescriptor.ScheduleRelationship scheduleRelationship
+  ) {
+    return new TripUpdateBuilder(tripId, serviceDate, scheduleRelationship, timeZone);
+  }
 
   public UpdateResult applyTripUpdate(GtfsRealtime.TripUpdate update) {
     return applyTripUpdates(List.of(update), FULL_DATASET);

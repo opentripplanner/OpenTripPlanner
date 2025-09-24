@@ -12,7 +12,6 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 public class CanceledTripTest implements RealtimeTestConstants {
 
@@ -31,13 +30,13 @@ public class CanceledTripTest implements RealtimeTestConstants {
 
     assertThat(env.getTransitService().listCanceledTrips()).isEmpty();
 
-    var update = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, CANCELED, TIME_ZONE).build();
+    var update = env.tripUpdate(TRIP_1_ID, CANCELED).build();
     assertSuccess(env.applyTripUpdate(update));
 
     var canceled = env.getTransitService().listCanceledTrips();
     assertThat(canceled).hasSize(1);
     var trip = canceled.getFirst();
     assertEquals(id(TRIP_1_ID), trip.getTrip().getId());
-    assertEquals(SERVICE_DATE, trip.getServiceDate());
+    assertEquals(env.serviceDate(), trip.getServiceDate());
   }
 }

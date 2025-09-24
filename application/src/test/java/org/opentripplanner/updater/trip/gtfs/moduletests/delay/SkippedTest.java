@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.delay;
 
-import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,7 +18,6 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
  * A mixture of delayed and skipped stops should result in both delayed and cancelled stops.
@@ -41,7 +39,8 @@ class SkippedTest implements RealtimeTestConstants {
   void scheduledTripWithSkippedAndScheduled() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
-    var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+    var tripUpdate = env
+      .tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -72,7 +71,8 @@ class SkippedTest implements RealtimeTestConstants {
   void scheduledTripWithPreviouslySkipped() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
-    var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+    var tripUpdate = env
+      .tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -81,7 +81,8 @@ class SkippedTest implements RealtimeTestConstants {
     assertSuccess(env.applyTripUpdate(tripUpdate, DIFFERENTIAL));
 
     // Create update to the same trip but now the skipped stop is no longer skipped
-    var scheduledBuilder = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+    var scheduledBuilder = env
+      .tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 50)
       .addDelayedStopTime(2, 90);
@@ -95,7 +96,7 @@ class SkippedTest implements RealtimeTestConstants {
     // stoptime updates have gone through
     var snapshot = env.getTimetableSnapshot();
 
-    assertNull(snapshot.getNewTripPatternForModifiedTrip(id(TRIP_2_ID), SERVICE_DATE));
+    assertNull(snapshot.getNewTripPatternForModifiedTrip(id(TRIP_2_ID), env.serviceDate()));
 
     assertNewTripTimesIsUpdated(env, TRIP_2_ID);
 
@@ -105,7 +106,7 @@ class SkippedTest implements RealtimeTestConstants {
     );
     assertEquals(
       "UPDATED | A 0:01 0:01:01 | B 0:02 0:02:01 | C 0:02:50 0:02:51",
-      env.getRealtimeTimetable(id(TRIP_2_ID), SERVICE_DATE)
+      env.getRealtimeTimetable(id(TRIP_2_ID), env.serviceDate())
     );
   }
 
@@ -118,7 +119,8 @@ class SkippedTest implements RealtimeTestConstants {
 
     String tripId = TRIP_2_ID;
 
-    var tripUpdate = new TripUpdateBuilder(tripId, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+    var tripUpdate = env
+      .tripUpdateScheduled(tripId)
       .addNoDataStop(0)
       .addSkippedStop(1)
       .addNoDataStop(2)
@@ -143,7 +145,7 @@ class SkippedTest implements RealtimeTestConstants {
     var trip = env.getTransitService().getTrip(id(tripId));
     var originalTripPattern = env.getTransitService().findPattern(trip);
     var snapshot = env.getTimetableSnapshot();
-    var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
+    var originalTimetableForToday = snapshot.resolve(originalTripPattern, env.serviceDate());
     var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
     assertNotSame(originalTimetableForToday, originalTimetableScheduled);
@@ -177,7 +179,7 @@ class SkippedTest implements RealtimeTestConstants {
     var trip = env.getTransitService().getTrip(id(tripId));
     var originalTripPattern = env.getTransitService().findPattern(trip);
     var snapshot = env.getTimetableSnapshot();
-    var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
+    var originalTimetableForToday = snapshot.resolve(originalTripPattern, env.serviceDate());
 
     var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 

@@ -39,7 +39,8 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedTrip() {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
+    var tripUpdate = env
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:40")
       .addStopTime(STOP_C_ID, "00:55")
@@ -51,7 +52,8 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedTripWithNewRoute() {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
+    var tripUpdate = env
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
       .addTripExtension()
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
       .addStopTime(STOP_B_ID, "00:40", COORDINATE_WITH_DRIVER)
@@ -85,7 +87,8 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedWithUnknownStop() {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
+    var tripUpdate = env
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
       // add extension to set route name, url, mode
       .addTripExtension()
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
@@ -108,7 +111,8 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void repeatedlyAddedTripWithNewRoute() {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
+    var tripUpdate = env
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
       // add extension to set route name, url, mode
       .addTripExtension()
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
@@ -131,21 +135,15 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithSkippedStop() {
-    var builder = new TripUpdateBuilder(
-      ADDED_TRIP_ID,
-      SERVICE_DATE,
-      ADDED,
-      TIME_ZONE,
-      "A loop",
-      "SW1234"
-    );
-    builder
+    var tripUpdate = env
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
+      .withTripProperties("A loop", "SW1234")
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
       .addSkippedStop(STOP_B_ID, "00:40", DropOffPickupType.COORDINATE_WITH_DRIVER)
       .addSkippedStop(STOP_C_ID, "00:48")
       .addStopTime(STOP_D_ID, "00:55", "A (non-stop)")
-      .addStopTime(STOP_A_ID, "01:00");
-    var tripUpdate = builder.build();
+      .addStopTime(STOP_A_ID, "01:00")
+      .build();
 
     env.applyTripUpdate(tripUpdate);
 
@@ -158,7 +156,7 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(PickDrop.CANCELLED, tripPattern.getBoardType(2));
     assertEquals(PickDrop.SCHEDULED, tripPattern.getAlightType(3));
     var snapshot = env.getTimetableSnapshot();
-    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    var forToday = snapshot.resolve(tripPattern, env.serviceDate());
     var tripTimes = forToday.getTripTimes(id(ADDED_TRIP_ID));
     var trip = env.getTransitService().getTrip(TimetableRepositoryForTest.id(ADDED_TRIP_ID));
     assertEquals(I18NString.of("A loop"), Objects.requireNonNull(trip).getHeadsign());
@@ -172,7 +170,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithDelay() {
-    var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE);
+    var builder = env.tripUpdate(ADDED_TRIP_ID, ADDED);
 
     builder
       .addStopTime(STOP_A_ID, "08:00")
@@ -185,7 +183,7 @@ class AddedTest implements RealtimeTestConstants {
     // THEN
     var tripPattern = assertAddedTrip(ADDED_TRIP_ID, env);
     var snapshot = env.getTimetableSnapshot();
-    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    var forToday = snapshot.resolve(tripPattern, env.serviceDate());
     var tripTimes = forToday.getTripTimes(id(ADDED_TRIP_ID));
     assertEquals(0, tripTimes.getDepartureDelay(0));
     assertEquals(TimeUtils.time("08:00"), tripTimes.getDepartureTime(0));
@@ -220,7 +218,7 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(1, patternsAtA.size());
     var tripPattern = patternsAtA.stream().findFirst().get();
 
-    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    var forToday = snapshot.resolve(tripPattern, env.serviceDate());
     var schedule = snapshot.resolve(tripPattern, null);
 
     assertNotSame(forToday, schedule);

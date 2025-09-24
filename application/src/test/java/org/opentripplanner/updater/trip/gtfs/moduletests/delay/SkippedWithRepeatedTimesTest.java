@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.delay;
 
-import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
@@ -10,7 +9,6 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
  * Tests that stops can be SKIPPED for a trip which repeats times for consecutive stops.
@@ -34,7 +32,8 @@ class SkippedWithRepeatedTimesTest implements RealtimeTestConstants {
   void skippedWithRepeatedTimes() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
-    var tripUpdate = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+    var tripUpdate = env
+      .tripUpdateScheduled(TRIP_1_ID)
       .addStopTime(STOP_A_ID, "10:00:00")
       .addSkippedStop(STOP_B_ID, "10:01:00")
       .addStopTime(STOP_C_ID, "10:01:00")

@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.delay;
 
-import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,7 +15,6 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
  * Delays should be applied to the first trip but should leave the second trip untouched.
@@ -40,7 +38,8 @@ class DelayedTest implements RealtimeTestConstants {
       .build();
     var env = ENV_BUILDER.addTrip(tripInput).build();
 
-    var tripUpdate = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+    var tripUpdate = env
+      .tripUpdateScheduled(TRIP_1_ID)
       .addDelayedStopTime(STOP_SEQUENCE, DELAY)
       .build();
 
@@ -51,7 +50,7 @@ class DelayedTest implements RealtimeTestConstants {
     var pattern1 = env.getPatternForTrip(TRIP_1_ID);
 
     var snapshot = env.getTimetableSnapshot();
-    var trip1Realtime = snapshot.resolve(pattern1, SERVICE_DATE);
+    var trip1Realtime = snapshot.resolve(pattern1, env.serviceDate());
     var trip1Scheduled = snapshot.resolve(pattern1, null);
 
     assertNotSame(trip1Realtime, trip1Scheduled);
@@ -83,7 +82,8 @@ class DelayedTest implements RealtimeTestConstants {
       .build();
     var env = ENV_BUILDER.addTrip(tripInput).build();
 
-    var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+    var tripUpdate = env
+      .tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 60, 80)
       .addDelayedStopTime(2, 90, 90)
@@ -96,7 +96,7 @@ class DelayedTest implements RealtimeTestConstants {
     var trip2 = env.getTransitService().getTrip(id(TRIP_2_ID));
     var originalTripPattern = env.getTransitService().findPattern(trip2);
 
-    var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
+    var originalTimetableForToday = snapshot.resolve(originalTripPattern, env.serviceDate());
     var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
     assertNotSame(originalTimetableForToday, originalTimetableScheduled);
