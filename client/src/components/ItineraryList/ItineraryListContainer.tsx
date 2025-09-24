@@ -14,12 +14,18 @@ export function ItineraryListContainer({
   setSelectedTripPatternIndex,
   pageResults,
   loading,
+  comparisonSelectedIndexes,
+  setComparisonSelectedIndexes,
+  onCompare,
 }: {
   tripQueryResult: TripQuery | null;
   selectedTripPatternIndex: number;
   setSelectedTripPatternIndex: (selectedTripPatterIndex: number) => void;
   pageResults: (cursor: string) => void;
   loading: boolean;
+  comparisonSelectedIndexes: number[];
+  setComparisonSelectedIndexes: (indexes: number[]) => void;
+  onCompare: () => void;
 }) {
   const [earliestStartTime, latestEndTime] = useEarliestAndLatestTimes(tripQueryResult);
   const { containerRef, containerWidth } = useContainerWidth();
@@ -35,6 +41,8 @@ export function ItineraryListContainer({
             previousPageCursor={tripQueryResult?.trip.previousPageCursor}
             nextPageCursor={tripQueryResult?.trip.nextPageCursor}
             loading={loading}
+            comparisonSelectedIndexes={comparisonSelectedIndexes}
+            onCompare={onCompare}
           />
         </div>
         <Accordion
@@ -55,6 +63,8 @@ export function ItineraryListContainer({
                     itineraryIndex={itineraryIndex}
                     earliestStartTime={earliestStartTime}
                     latestEndTime={latestEndTime}
+                    comparisonSelectedIndexes={comparisonSelectedIndexes}
+                    setComparisonSelectedIndexes={setComparisonSelectedIndexes}
                   />
                 </Accordion.Header>
                 <Accordion.Body>
