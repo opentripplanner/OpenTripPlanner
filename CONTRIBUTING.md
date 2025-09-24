@@ -62,7 +62,7 @@ the instructions in your submitted text.
   descriptions must clearly state how your changes work.
 - Break large changes down into a series of smaller logical steps in separate PRs.
 - Tie such series of PRs together with an "epic issue" that explains the overall plan.
-- Use Github issue references ("addresses #12" etc.) to connect PRs and issues together.
+- Use GitHub issue references ("addresses #12" etc.) to connect PRs and issues together.
 - Consider squashing and rebasing to make the PR history easier to understand, eliminating extra "
   noise" commits like accidental changes to organization specific code, abandoned experiments, or
   reverted configuration changes.

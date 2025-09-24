@@ -32,8 +32,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 ### Development history
 
 The OpenTripPlanner project was launched by Portland, Oregon's transport agency
-TriMet (http://trimet.org/) in July of 2009. As of this writing in Q3 2020, it has been in
-development for over ten years. See the main documentation for an overview
+TriMet (http://trimet.org/) in July of 2009. As of this writing in September 2025, it has been in
+development for over 16 years. See the main documentation for an overview
 of [OTP history](http://docs.opentripplanner.org/en/dev-2.x/History/) and a list
 of [cities and regions using OTP](http://docs.opentripplanner.org/en/dev-2.x/Deployments/) around
 the world.
