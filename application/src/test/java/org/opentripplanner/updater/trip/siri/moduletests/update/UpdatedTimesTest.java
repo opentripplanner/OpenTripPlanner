@@ -9,6 +9,7 @@ import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
+import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
@@ -29,11 +30,12 @@ class UpdatedTimesTest implements RealtimeTestConstants {
   @Test
   void testUpdateJourneyWithDatedVehicleJourneyRef() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = updatedJourneyBuilder(env)
+    var updates = updatedJourneyBuilder(siri)
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .buildEstimatedTimetableDeliveries();
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
     assertEquals(1, result.successful());
     assertTripUpdated(env);
     assertEquals(
@@ -48,13 +50,14 @@ class UpdatedTimesTest implements RealtimeTestConstants {
   @Test
   void testUpdateJourneyWithFramedVehicleJourneyRef() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = updatedJourneyBuilder(env)
+    var updates = updatedJourneyBuilder(siri)
       .withFramedVehicleJourneyRef(builder ->
         builder.withServiceDate(env.serviceDate()).withVehicleJourneyRef(TRIP_1_ID)
       )
       .buildEstimatedTimetableDeliveries();
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
     assertEquals(1, result.successful());
     assertTripUpdated(env);
   }
@@ -65,21 +68,24 @@ class UpdatedTimesTest implements RealtimeTestConstants {
   @Test
   void testUpdateJourneyWithoutJourneyRef() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
-    var result = env.applyEstimatedTimetable(updates);
+    var updates = updatedJourneyBuilder(siri).buildEstimatedTimetableDeliveries();
+    var result = siri.applyEstimatedTimetable(updates);
     assertEquals(0, result.successful());
     assertFailure(UpdateError.UpdateErrorType.TRIP_NOT_FOUND, result);
   }
 
-  private SiriEtBuilder updatedJourneyBuilder(RealtimeTestEnvironment env) {
-    return new SiriEtBuilder(env.getDateTimeHelper()).withEstimatedCalls(builder ->
-      builder
-        .call(STOP_A)
-        .departAimedExpected("00:00:11", "00:00:15")
-        .call(STOP_B)
-        .arriveAimedExpected("00:00:20", "00:00:25")
-    );
+  private SiriEtBuilder updatedJourneyBuilder(SiriTestHelper siri) {
+    return siri
+      .etBuilder()
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A)
+          .departAimedExpected("00:00:11", "00:00:15")
+          .call(STOP_B)
+          .arriveAimedExpected("00:00:20", "00:00:25")
+      );
   }
 
   private static void assertTripUpdated(RealtimeTestEnvironment env) {

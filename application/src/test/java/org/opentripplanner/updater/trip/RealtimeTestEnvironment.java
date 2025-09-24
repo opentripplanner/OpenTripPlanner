@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.trip;
 
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
-import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
 import com.google.transit.realtime.GtfsRealtime;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -21,15 +19,11 @@ import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
-import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
-import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableHandler;
-import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
 /**
  * This class exists so that you can share the data building logic for GTFS and Siri tests.
@@ -38,7 +32,6 @@ public final class RealtimeTestEnvironment {
 
   private final TimetableRepository timetableRepository;
   private final TimetableSnapshotManager snapshotManager;
-  private final SiriRealTimeTripUpdateAdapter siriAdapter;
   private final GtfsRealTimeTripUpdateAdapter gtfsAdapter;
   private final DateTimeHelper dateTimeHelper;
   private final LocalDate serviceDate;
@@ -73,7 +66,6 @@ public final class RealtimeTestEnvironment {
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       () -> defaultServiceDate
     );
-    siriAdapter = new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
     gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
       defaultServiceDate
     );
@@ -116,8 +108,12 @@ public final class RealtimeTestEnvironment {
     return Objects.requireNonNull(timetableRepository.getSiteRepository().getRegularStop(id(id)));
   }
 
-  private EstimatedTimetableHandler getEstimatedTimetableHandler(boolean fuzzyMatching) {
-    return new EstimatedTimetableHandler(siriAdapter, fuzzyMatching, getFeedId());
+  public TimetableRepository timetableRepository() {
+    return timetableRepository;
+  }
+
+  public TimetableSnapshotManager timetableSnapshotManager() {
+    return snapshotManager;
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId) {
@@ -171,18 +167,6 @@ public final class RealtimeTestEnvironment {
     return TripTimesStringBuilder.encodeTripTimes(tt, pattern);
   }
 
-  // SIRI updates
-
-  public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
-    List<EstimatedTimetableDeliveryStructure> updates
-  ) {
-    return applyEstimatedTimetable(updates, true);
-  }
-
-  public UpdateResult applyEstimatedTimetable(List<EstimatedTimetableDeliveryStructure> updates) {
-    return applyEstimatedTimetable(updates, false);
-  }
-
   // GTFS-RT updates
 
   public TripUpdateBuilder tripUpdateScheduled(String tripId) {
@@ -218,25 +202,6 @@ public final class RealtimeTestEnvironment {
       incrementality,
       updates,
       getFeedId()
-    );
-    commitTimetableSnapshot();
-    return updateResult;
-  }
-
-  // private methods
-
-  private UpdateResult applyEstimatedTimetable(
-    List<EstimatedTimetableDeliveryStructure> updates,
-    boolean fuzzyMatching
-  ) {
-    UpdateResult updateResult = getEstimatedTimetableHandler(fuzzyMatching).applyUpdate(
-      updates,
-      DIFFERENTIAL,
-      new DefaultRealTimeUpdateContext(
-        new Graph(),
-        timetableRepository,
-        snapshotManager.getTimetableSnapshotBuffer()
-      )
     );
     commitTimetableSnapshot();
     return updateResult;

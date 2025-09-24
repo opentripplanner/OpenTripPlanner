@@ -8,6 +8,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
+import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
@@ -27,10 +28,12 @@ class CancellationTest implements RealtimeTestConstants {
   @Test
   void testCancelTrip() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
     assertEquals(RealTimeState.SCHEDULED, env.getTripTimesForTrip(TRIP_1_ID).getRealTimeState());
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withCancellation(true)
       .withEstimatedCalls(builder ->
@@ -44,7 +47,7 @@ class CancellationTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
     assertEquals(RealTimeState.CANCELED, env.getTripTimesForTrip(TRIP_1_ID).getRealTimeState());
@@ -53,13 +56,17 @@ class CancellationTest implements RealtimeTestConstants {
   @Test
   void testCancelTripWithMissingTimes() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+
     assertEquals(RealTimeState.SCHEDULED, env.getTripTimesForTrip(TRIP_1_ID).getRealTimeState());
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+
+    var updates = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withCancellation(true)
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
     assertEquals(RealTimeState.CANCELED, env.getTripTimesForTrip(TRIP_1_ID).getRealTimeState());
@@ -72,11 +79,13 @@ class CancellationTest implements RealtimeTestConstants {
   @Test
   void testChangeQuayAndCancelScheduledTrip() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
+
     assertEquals(
       "SCHEDULED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.getRealtimeTimetable(TRIP_1_ID)
     );
-    changeQuayAndCancelTrip(env, TRIP_1_ID);
+    changeQuayAndCancelTrip(siri, TRIP_1_ID);
 
     assertEquals(
       "CANCELED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
@@ -91,6 +100,7 @@ class CancellationTest implements RealtimeTestConstants {
   @Test
   void testChangeQuayAndCancelAddedTrip() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
     var creation = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
@@ -107,13 +117,13 @@ class CancellationTest implements RealtimeTestConstants {
           .departAimedExpected("0:00:21", "0:00:21")
       )
       .buildEstimatedTimetableDeliveries();
-    var creationResult = env.applyEstimatedTimetable(creation);
+    var creationResult = siri.applyEstimatedTimetable(creation);
     assertEquals(1, creationResult.successful());
     assertEquals(
       "ADDED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.getRealtimeTimetable(ADDED_TRIP_ID)
     );
-    changeQuayAndCancelTrip(env, ADDED_TRIP_ID);
+    changeQuayAndCancelTrip(siri, ADDED_TRIP_ID);
 
     // the arrival time on first stop is adjusted to the departure time to avoid negative dwell time
     // conversely the departure time on last stop is adjusted to the arrival time
@@ -123,8 +133,9 @@ class CancellationTest implements RealtimeTestConstants {
     );
   }
 
-  private void changeQuayAndCancelTrip(RealtimeTestEnvironment env, String tripId) {
-    var modification = new SiriEtBuilder(env.getDateTimeHelper())
+  private void changeQuayAndCancelTrip(SiriTestHelper siri, String tripId) {
+    var modification = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(tripId)
       .withEstimatedCalls(builder ->
         builder
@@ -136,14 +147,15 @@ class CancellationTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var modificationResult = env.applyEstimatedTimetable(modification);
+    var modificationResult = siri.applyEstimatedTimetable(modification);
     assertEquals(1, modificationResult.successful());
     assertEquals(
       "MODIFIED | A 0:00:15 0:00:15 | D 0:00:25 0:00:25",
-      env.getRealtimeTimetable(tripId)
+      siri.realtimeTestEnvironment().getRealtimeTimetable(tripId)
     );
 
-    var cancellation = new SiriEtBuilder(env.getDateTimeHelper())
+    var cancellation = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(tripId)
       .withCancellation(true)
       .withEstimatedCalls(builder ->
@@ -156,7 +168,7 @@ class CancellationTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var cancellationResult = env.applyEstimatedTimetable(cancellation);
+    var cancellationResult = siri.applyEstimatedTimetable(cancellation);
 
     assertEquals(1, cancellationResult.successful());
   }

@@ -8,8 +8,8 @@ import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
+import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class NegativeTimesTest implements RealtimeTestConstants {
 
@@ -32,8 +32,10 @@ class NegativeTimesTest implements RealtimeTestConstants {
   @Test
   void testNegativeHopTime() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder ->
         builder
@@ -44,7 +46,7 @@ class NegativeTimesTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertFailure(UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME, result);
   }
@@ -52,8 +54,10 @@ class NegativeTimesTest implements RealtimeTestConstants {
   @Test
   void testNegativeDwellTime() {
     var env = ENV_BUILDER.addTrip(TRIP_2_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_2_ID)
       .withRecordedCalls(builder ->
         builder
@@ -67,7 +71,7 @@ class NegativeTimesTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertFailure(UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME, result);
   }

@@ -14,8 +14,8 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
+import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class InvalidCallsTest implements RealtimeTestConstants {
 
@@ -38,8 +38,10 @@ class InvalidCallsTest implements RealtimeTestConstants {
   @Test
   void testTooFewCalls() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
@@ -50,7 +52,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.failed());
     assertEquals(Set.of(TOO_FEW_STOPS), result.failures().keySet());
@@ -59,8 +61,10 @@ class InvalidCallsTest implements RealtimeTestConstants {
   @Test
   void testTooManyCalls() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
@@ -75,7 +79,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.failed());
     assertEquals(Set.of(TOO_MANY_STOPS), result.failures().keySet());
@@ -84,8 +88,10 @@ class InvalidCallsTest implements RealtimeTestConstants {
   @Test
   void testMismatchedStop() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
@@ -98,7 +104,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.failed());
     assertEquals(Set.of(STOP_MISMATCH), result.failures().keySet());
@@ -107,8 +113,10 @@ class InvalidCallsTest implements RealtimeTestConstants {
   @Test
   void testUnknownStop() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
@@ -121,7 +129,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.failed());
     assertEquals(Set.of(UNKNOWN_STOP), result.failures().keySet());

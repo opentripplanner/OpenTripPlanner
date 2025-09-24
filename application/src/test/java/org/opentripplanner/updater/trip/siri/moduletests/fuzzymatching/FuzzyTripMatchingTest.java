@@ -9,8 +9,8 @@ import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
+import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class FuzzyTripMatchingTest implements RealtimeTestConstants {
 
@@ -29,9 +29,19 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
   @Test
   void testUpdateJourneyWithFuzzyMatching() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
-    var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
+    var updates = siri
+      .etBuilder()
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A)
+          .departAimedExpected("00:00:11", "00:00:15")
+          .call(STOP_B)
+          .arriveAimedExpected("00:00:20", "00:00:25")
+      )
+      .buildEstimatedTimetableDeliveries();
+    var result = siri.applyEstimatedTimetableWithFuzzyMatcher(updates);
     assertEquals(1, result.successful());
     assertTripUpdated(env);
   }
@@ -43,8 +53,10 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
   @Test
   void testUpdateJourneyWithFuzzyMatchingAndMissingAimedDepartureTime() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = siri
+      .etBuilder()
       .withFramedVehicleJourneyRef(builder ->
         builder.withServiceDate(env.serviceDate()).withVehicleJourneyRef("XXX")
       )
@@ -57,19 +69,9 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
+    var result = siri.applyEstimatedTimetableWithFuzzyMatcher(updates);
     assertEquals(0, result.successful(), "Should fail gracefully");
     assertFailure(UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH, result);
-  }
-
-  private SiriEtBuilder updatedJourneyBuilder(RealtimeTestEnvironment env) {
-    return new SiriEtBuilder(env.getDateTimeHelper()).withEstimatedCalls(builder ->
-      builder
-        .call(STOP_A)
-        .departAimedExpected("00:00:11", "00:00:15")
-        .call(STOP_B)
-        .arriveAimedExpected("00:00:20", "00:00:25")
-    );
   }
 
   private static void assertTripUpdated(RealtimeTestEnvironment env) {

@@ -64,7 +64,11 @@ public class RealtimeTestEnvironmentBuilder {
   private final ZoneId timeZone;
   private final LocalDate defaultServiceDate;
 
-  RealtimeTestEnvironmentBuilder(String defaultFeedId, ZoneId timeZone, LocalDate defaultServiceDate) {
+  RealtimeTestEnvironmentBuilder(
+    String defaultFeedId,
+    ZoneId timeZone,
+    LocalDate defaultServiceDate
+  ) {
     this.defaultFeedId = defaultFeedId;
     this.timeZone = timeZone;
     this.defaultServiceId = id("CAL_1");

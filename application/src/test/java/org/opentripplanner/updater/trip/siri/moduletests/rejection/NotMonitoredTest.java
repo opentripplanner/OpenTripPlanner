@@ -8,8 +8,8 @@ import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
+import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class NotMonitoredTest implements RealtimeTestConstants {
 
@@ -25,12 +25,11 @@ class NotMonitoredTest implements RealtimeTestConstants {
   @Test
   void testNotMonitored() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withMonitored(false)
-      .buildEstimatedTimetableDeliveries();
+    var updates = siri.etBuilder().withMonitored(false).buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertFailure(UpdateError.UpdateErrorType.NOT_MONITORED, result);
   }
