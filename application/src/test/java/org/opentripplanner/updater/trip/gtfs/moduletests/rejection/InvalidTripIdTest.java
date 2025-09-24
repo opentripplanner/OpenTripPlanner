@@ -8,6 +8,7 @@ import com.google.transit.realtime.GtfsRealtime;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 
 class InvalidTripIdTest {
@@ -23,6 +24,7 @@ class InvalidTripIdTest {
   @MethodSource("invalidCases")
   void invalidTripId(String tripId) {
     var env = RealtimeTestEnvironment.of().build();
+    var rt = GtfsRtTestHelper.of(env);
     var tripDescriptorBuilder = GtfsRealtime.TripDescriptor.newBuilder();
     if (tripId != null) {
       tripDescriptorBuilder.setTripId(tripId);
@@ -33,6 +35,6 @@ class InvalidTripIdTest {
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     var tripUpdate = tripUpdateBuilder.build();
 
-    assertFailure(INVALID_INPUT_STRUCTURE, env.applyTripUpdate(tripUpdate));
+    assertFailure(INVALID_INPUT_STRUCTURE, rt.applyTripUpdate(tripUpdate));
   }
 }

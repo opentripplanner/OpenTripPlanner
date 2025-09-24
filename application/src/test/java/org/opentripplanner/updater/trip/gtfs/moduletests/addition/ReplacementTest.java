@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
@@ -32,7 +33,9 @@ public class ReplacementTest implements RealtimeTestConstants {
       .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
       .addTrip(TRIP_INPUT)
       .build();
-    var tripUpdate = env
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
       .tripUpdate(TRIP_1_ID, REPLACEMENT)
       .withTripProperties(
         "New Headsign",
@@ -43,7 +46,7 @@ public class ReplacementTest implements RealtimeTestConstants {
       .addStopTime(STOP_C_ID, "01:00")
       .build();
 
-    env.applyTripUpdate(tripUpdate);
+    rt.applyTripUpdate(tripUpdate);
 
     // THEN
     var snapshot = env.getTimetableSnapshot();

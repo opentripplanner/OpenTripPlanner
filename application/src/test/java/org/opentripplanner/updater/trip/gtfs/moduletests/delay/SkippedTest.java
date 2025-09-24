@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
@@ -38,15 +39,16 @@ class SkippedTest implements RealtimeTestConstants {
   @Test
   void scheduledTripWithSkippedAndScheduled() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = env
+    var tripUpdate = rt
       .tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
       .build();
 
-    assertSuccess(env.applyTripUpdate(tripUpdate));
+    assertSuccess(rt.applyTripUpdate(tripUpdate));
 
     assertOriginalTripPatternIsDeleted(env, TRIP_2_ID);
 
@@ -70,18 +72,19 @@ class SkippedTest implements RealtimeTestConstants {
   @Test
   void scheduledTripWithPreviouslySkipped() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = env
+    var tripUpdate = rt
       .tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
       .build();
 
-    assertSuccess(env.applyTripUpdate(tripUpdate, DIFFERENTIAL));
+    assertSuccess(rt.applyTripUpdate(tripUpdate, DIFFERENTIAL));
 
     // Create update to the same trip but now the skipped stop is no longer skipped
-    var scheduledBuilder = env
+    var scheduledBuilder = rt
       .tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 50)
@@ -90,7 +93,7 @@ class SkippedTest implements RealtimeTestConstants {
     tripUpdate = scheduledBuilder.build();
 
     // apply the update with the previously skipped stop now scheduled
-    assertSuccess(env.applyTripUpdate(tripUpdate, DIFFERENTIAL));
+    assertSuccess(rt.applyTripUpdate(tripUpdate, DIFFERENTIAL));
 
     // Check that the there is no longer a realtime added trip pattern for the trip and that the
     // stoptime updates have gone through
@@ -116,17 +119,18 @@ class SkippedTest implements RealtimeTestConstants {
   @Test
   void skippedNoData() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var rt = GtfsRtTestHelper.of(env);
 
     String tripId = TRIP_2_ID;
 
-    var tripUpdate = env
+    var tripUpdate = rt
       .tripUpdateScheduled(tripId)
       .addNoDataStop(0)
       .addSkippedStop(1)
       .addNoDataStop(2)
       .build();
 
-    assertSuccess(env.applyTripUpdate(tripUpdate));
+    assertSuccess(rt.applyTripUpdate(tripUpdate));
 
     assertOriginalTripPatternIsDeleted(env, tripId);
 

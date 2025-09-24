@@ -21,6 +21,7 @@ import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
@@ -91,10 +92,12 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
   @Test
   void skipStopInMultipleTripsInPattern() {
     var env = envBuilder.addTrip(TRIP1_INPUT).addTrip(TRIP2_INPUT).build();
-    var res = env.applyTripUpdates(
+    var rt = GtfsRtTestHelper.of(env);
+
+    var res = rt.applyTripUpdates(
       List.of(
-        skipSecondStop(env.tripUpdateScheduled(TRIP_1_ID)),
-        skipSecondStop(env.tripUpdateScheduled(TRIP_2_ID))
+        skipSecondStop(rt.tripUpdateScheduled(TRIP_1_ID)),
+        skipSecondStop(rt.tripUpdateScheduled(TRIP_2_ID))
       ),
       FULL_DATASET
     );

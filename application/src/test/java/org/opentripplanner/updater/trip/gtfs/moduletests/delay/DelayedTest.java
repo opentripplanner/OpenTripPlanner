@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
@@ -37,13 +38,14 @@ class DelayedTest implements RealtimeTestConstants {
       .addStop(STOP_B, "0:00:20", "0:00:21")
       .build();
     var env = ENV_BUILDER.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = env
+    var tripUpdate = rt
       .tripUpdateScheduled(TRIP_1_ID)
       .addDelayedStopTime(STOP_SEQUENCE, DELAY)
       .build();
 
-    var result = env.applyTripUpdate(tripUpdate);
+    var result = rt.applyTripUpdate(tripUpdate);
 
     assertEquals(1, result.successful());
 
@@ -81,15 +83,16 @@ class DelayedTest implements RealtimeTestConstants {
       .addStop(STOP_C, "0:01:20", "0:01:21")
       .build();
     var env = ENV_BUILDER.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = env
+    var tripUpdate = rt
       .tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 60, 80)
       .addDelayedStopTime(2, 90, 90)
       .build();
 
-    assertSuccess(env.applyTripUpdate(tripUpdate));
+    assertSuccess(rt.applyTripUpdate(tripUpdate));
 
     var snapshot = env.getTimetableSnapshot();
 

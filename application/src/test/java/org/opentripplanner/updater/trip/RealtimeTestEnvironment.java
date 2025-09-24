@@ -1,12 +1,9 @@
 package org.opentripplanner.updater.trip;
 
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
-import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
-import com.google.transit.realtime.GtfsRealtime;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -20,9 +17,6 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
-import org.opentripplanner.updater.spi.UpdateResult;
-import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
-import org.opentripplanner.updater.trip.gtfs.ForwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 
 /**
@@ -32,7 +26,6 @@ public final class RealtimeTestEnvironment {
 
   private final TimetableRepository timetableRepository;
   private final TimetableSnapshotManager snapshotManager;
-  private final GtfsRealTimeTripUpdateAdapter gtfsAdapter;
   private final DateTimeHelper dateTimeHelper;
   private final LocalDate serviceDate;
   private final ZoneId timeZone;
@@ -65,9 +58,6 @@ public final class RealtimeTestEnvironment {
       null,
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       () -> defaultServiceDate
-    );
-    gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
-      defaultServiceDate
     );
     this.timeZone = zoneId;
     this.serviceDate = defaultServiceDate;
@@ -165,49 +155,5 @@ public final class RealtimeTestEnvironment {
     var tt = pattern.getScheduledTimetable().getTripTimes(tripId);
 
     return TripTimesStringBuilder.encodeTripTimes(tt, pattern);
-  }
-
-  // GTFS-RT updates
-
-  public TripUpdateBuilder tripUpdateScheduled(String tripId) {
-    return tripUpdate(tripId, GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED);
-  }
-
-  public TripUpdateBuilder tripUpdate(
-    String tripId,
-    GtfsRealtime.TripDescriptor.ScheduleRelationship scheduleRelationship
-  ) {
-    return new TripUpdateBuilder(tripId, serviceDate, scheduleRelationship, timeZone);
-  }
-
-  public UpdateResult applyTripUpdate(GtfsRealtime.TripUpdate update) {
-    return applyTripUpdates(List.of(update), FULL_DATASET);
-  }
-
-  public UpdateResult applyTripUpdate(
-    GtfsRealtime.TripUpdate update,
-    UpdateIncrementality incrementality
-  ) {
-    return applyTripUpdates(List.of(update), incrementality);
-  }
-
-  public UpdateResult applyTripUpdates(
-    List<GtfsRealtime.TripUpdate> updates,
-    UpdateIncrementality incrementality
-  ) {
-    UpdateResult updateResult = gtfsAdapter.applyTripUpdates(
-      null,
-      ForwardsDelayPropagationType.DEFAULT,
-      BackwardsDelayPropagationType.REQUIRED_NO_DATA,
-      incrementality,
-      updates,
-      getFeedId()
-    );
-    commitTimetableSnapshot();
-    return updateResult;
-  }
-
-  private void commitTimetableSnapshot() {
-    snapshotManager.purgeAndCommit();
   }
 }

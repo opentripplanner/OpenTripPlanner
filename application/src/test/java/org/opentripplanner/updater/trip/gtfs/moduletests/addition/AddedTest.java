@@ -25,6 +25,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateSuccess;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
@@ -36,23 +37,24 @@ class AddedTest implements RealtimeTestConstants {
   private final RealtimeTestEnvironment env = RealtimeTestEnvironment.of()
     .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
     .build();
+  private final GtfsRtTestHelper gtfsRt = GtfsRtTestHelper.of(env);
 
   @Test
   void addedTrip() {
-    var tripUpdate = env
+    var tripUpdate = gtfsRt
       .tripUpdate(ADDED_TRIP_ID, ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:40")
       .addStopTime(STOP_C_ID, "00:55")
       .build();
 
-    assertSuccess(env.applyTripUpdate(tripUpdate));
+    assertSuccess(gtfsRt.applyTripUpdate(tripUpdate));
     assertAddedTrip(ADDED_TRIP_ID, env);
   }
 
   @Test
   void addedTripWithNewRoute() {
-    var tripUpdate = env
+    var tripUpdate = gtfsRt
       .tripUpdate(ADDED_TRIP_ID, ADDED)
       .addTripExtension()
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
@@ -60,7 +62,7 @@ class AddedTest implements RealtimeTestConstants {
       .addStopTime(STOP_B_ID, "00:55", DropOffPickupType.NONE)
       .build();
 
-    var result = env.applyTripUpdate(tripUpdate);
+    var result = gtfsRt.applyTripUpdate(tripUpdate);
     assertSuccess(result);
     assertTrue(result.warnings().isEmpty());
 
@@ -87,7 +89,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedWithUnknownStop() {
-    var tripUpdate = env
+    var tripUpdate = gtfsRt
       .tripUpdate(ADDED_TRIP_ID, ADDED)
       // add extension to set route name, url, mode
       .addTripExtension()
@@ -96,7 +98,7 @@ class AddedTest implements RealtimeTestConstants {
       .addStopTime(STOP_C_ID, "00:55", DropOffPickupType.NONE)
       .build();
 
-    var result = env.applyTripUpdate(tripUpdate);
+    var result = gtfsRt.applyTripUpdate(tripUpdate);
     assertSuccess(result);
 
     assertEquals(
@@ -111,7 +113,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void repeatedlyAddedTripWithNewRoute() {
-    var tripUpdate = env
+    var tripUpdate = gtfsRt
       .tripUpdate(ADDED_TRIP_ID, ADDED)
       // add extension to set route name, url, mode
       .addTripExtension()
@@ -120,12 +122,12 @@ class AddedTest implements RealtimeTestConstants {
       .addStopTime(STOP_C_ID, "00:55", DropOffPickupType.NONE)
       .build();
 
-    assertSuccess(env.applyTripUpdate(tripUpdate));
+    assertSuccess(gtfsRt.applyTripUpdate(tripUpdate));
     var pattern = assertAddedTrip(ADDED_TRIP_ID, env);
     var firstRoute = pattern.getRoute();
 
     // apply the update a second time to check that no new route instance is created but the old one is reused
-    env.applyTripUpdate(tripUpdate);
+    gtfsRt.applyTripUpdate(tripUpdate);
     var secondPattern = assertAddedTrip(ADDED_TRIP_ID, env);
     var secondRoute = secondPattern.getRoute();
 
@@ -135,7 +137,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithSkippedStop() {
-    var tripUpdate = env
+    var tripUpdate = gtfsRt
       .tripUpdate(ADDED_TRIP_ID, ADDED)
       .withTripProperties("A loop", "SW1234")
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
@@ -145,7 +147,7 @@ class AddedTest implements RealtimeTestConstants {
       .addStopTime(STOP_A_ID, "01:00")
       .build();
 
-    env.applyTripUpdate(tripUpdate);
+    gtfsRt.applyTripUpdate(tripUpdate);
 
     // THEN
     final TripPattern tripPattern = assertAddedTrip(ADDED_TRIP_ID, env);
@@ -170,7 +172,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithDelay() {
-    var builder = env.tripUpdate(ADDED_TRIP_ID, ADDED);
+    var builder = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED);
 
     builder
       .addStopTime(STOP_A_ID, "08:00")
@@ -178,7 +180,7 @@ class AddedTest implements RealtimeTestConstants {
       .addStopTimeWithScheduled(STOP_C_ID, "09:10", "09:00");
 
     var tripUpdate = builder.build();
-    env.applyTripUpdate(tripUpdate);
+    gtfsRt.applyTripUpdate(tripUpdate);
 
     // THEN
     var tripPattern = assertAddedTrip(ADDED_TRIP_ID, env);

@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
@@ -48,9 +49,10 @@ class CancellationDeletionTest implements RealtimeTestConstants {
         .build()
     ).build();
     var pattern1 = env.getPatternForTrip(TRIP_1_ID);
+    var rt = GtfsRtTestHelper.of(env);
 
-    var update = env.tripUpdate(TRIP_1_ID, relationship).build();
-    assertSuccess(env.applyTripUpdate(update));
+    var update = rt.tripUpdate(TRIP_1_ID, relationship).build();
+    assertSuccess(rt.applyTripUpdate(update));
 
     var snapshot = env.getTimetableSnapshot();
     var forToday = snapshot.resolve(pattern1, env.serviceDate());
@@ -78,20 +80,22 @@ class CancellationDeletionTest implements RealtimeTestConstants {
   @MethodSource("cases")
   void cancelingAddedTrip(ScheduleRelationship relationship, RealTimeState state) {
     var env = ENV_BUILDER.build();
+    var rt = GtfsRtTestHelper.of(env);
+
     var addedTripId = "added-trip";
     // First add ADDED trip
-    var update = env
+    var update = rt
       .tripUpdate(addedTripId, ScheduleRelationship.ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:40")
       .addStopTime(STOP_C_ID, "00:55")
       .build();
 
-    assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));
+    assertSuccess(rt.applyTripUpdate(update, DIFFERENTIAL));
 
     // Cancel or delete the added trip
-    update = env.tripUpdate(addedTripId, relationship).build();
-    assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));
+    update = rt.tripUpdate(addedTripId, relationship).build();
+    assertSuccess(rt.applyTripUpdate(update, DIFFERENTIAL));
 
     var snapshot = env.getTimetableSnapshot();
     // Get the trip pattern of the added trip which goes through stopA

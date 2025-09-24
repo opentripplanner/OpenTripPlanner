@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
@@ -41,12 +42,13 @@ class InvalidInputTest implements RealtimeTestConstants {
       .addStop(STOP_B, "0:00:20", "0:00:21")
       .build();
     var env = ENV_BUILDER.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
 
     var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, env.timeZone())
       .addDelayedStopTime(2, 60, 80)
       .build();
 
-    var result = env.applyTripUpdate(update);
+    var result = rt.applyTripUpdate(update);
 
     var snapshot = env.getTimetableSnapshot();
     assertTrue(snapshot.isEmpty());

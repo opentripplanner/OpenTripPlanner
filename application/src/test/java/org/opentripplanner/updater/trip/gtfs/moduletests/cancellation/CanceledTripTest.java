@@ -8,6 +8,7 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSucce
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
@@ -27,11 +28,12 @@ public class CanceledTripTest implements RealtimeTestConstants {
         .addStop(STOP_B, "0:00:20", "0:00:21")
         .build()
     ).build();
+    var rt = GtfsRtTestHelper.of(env);
 
     assertThat(env.getTransitService().listCanceledTrips()).isEmpty();
 
-    var update = env.tripUpdate(TRIP_1_ID, CANCELED).build();
-    assertSuccess(env.applyTripUpdate(update));
+    var update = rt.tripUpdate(TRIP_1_ID, CANCELED).build();
+    assertSuccess(rt.applyTripUpdate(update));
 
     var canceled = env.getTransitService().listCanceledTrips();
     assertThat(canceled).hasSize(1);

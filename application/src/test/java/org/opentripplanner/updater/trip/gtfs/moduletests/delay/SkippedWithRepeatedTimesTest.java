@@ -5,6 +5,7 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSucce
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
@@ -31,15 +32,16 @@ class SkippedWithRepeatedTimesTest implements RealtimeTestConstants {
   @Test
   void skippedWithRepeatedTimes() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = env
+    var tripUpdate = rt
       .tripUpdateScheduled(TRIP_1_ID)
       .addStopTime(STOP_A_ID, "10:00:00")
       .addSkippedStop(STOP_B_ID, "10:01:00")
       .addStopTime(STOP_C_ID, "10:01:00")
       .build();
 
-    assertSuccess(env.applyTripUpdate(tripUpdate));
+    assertSuccess(rt.applyTripUpdate(tripUpdate));
 
     assertEquals(
       "UPDATED | A 10:00 10:00 | B [C] 10:00 10:00 | C 10:01 10:01",
