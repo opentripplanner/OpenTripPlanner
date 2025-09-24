@@ -93,12 +93,12 @@ Sections follow that describe particular settings in more depth.
 |    timeZone                                                                                 |      `time-zone`     | The timezone used to resolve opening hours in OSM data.                                                                                                        | *Optional* |                                   |  2.2  |
 | [transferParametersForMode](#transferParametersForMode)                                     | `enum map of object` | Configures mode-specific properties for transfer calculations.                                                                                                 | *Optional* |                                   |  2.7  |
 |    BIKE                                                                                     |       `object`       | NA                                                                                                                                                             | *Optional* |                                   |  2.7  |
-|       [bikesAllowedStopMaxTransferDuration](#tpfm_BIKE_bikesAllowedStopMaxTransferDuration) |      `duration`      | This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow bikes.                     | *Optional* |                                   |  2.8  |
+|       [bikesAllowedStopMaxTransferDuration](#tpfm_BIKE_bikesAllowedStopMaxTransferDuration) |      `duration`      | This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow bikes.                     | *Optional* |                                   |  2.9  |
 |       [carsAllowedStopMaxTransferDuration](#tpfm_BIKE_carsAllowedStopMaxTransferDuration)   |      `duration`      | This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow cars.                      | *Optional* |                                   |  2.7  |
 |       [disableDefaultTransfers](#tpfm_BIKE_disableDefaultTransfers)                         |       `boolean`      | This disables default transfer calculations.                                                                                                                   | *Optional* | `false`                           |  2.7  |
 |       maxTransferDuration                                                                   |      `duration`      | This overwrites the default `maxTransferDuration` for the given mode.                                                                                          | *Optional* |                                   |  2.7  |
 |    CAR                                                                                      |       `object`       | NA                                                                                                                                                             | *Optional* |                                   |  2.7  |
-|       [bikesAllowedStopMaxTransferDuration](#tpfm_CAR_bikesAllowedStopMaxTransferDuration)  |      `duration`      | This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow bikes.                     | *Optional* |                                   |  2.8  |
+|       [bikesAllowedStopMaxTransferDuration](#tpfm_CAR_bikesAllowedStopMaxTransferDuration)  |      `duration`      | This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow bikes.                     | *Optional* |                                   |  2.9  |
 |       [carsAllowedStopMaxTransferDuration](#tpfm_CAR_carsAllowedStopMaxTransferDuration)    |      `duration`      | This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow cars.                      | *Optional* |                                   |  2.7  |
 |       [disableDefaultTransfers](#tpfm_CAR_disableDefaultTransfers)                          |       `boolean`      | This disables default transfer calculations.                                                                                                                   | *Optional* | `false`                           |  2.7  |
 |       maxTransferDuration                                                                   |      `duration`      | This overwrites the default `maxTransferDuration` for the given mode.                                                                                          | *Optional* |                                   |  2.7  |
@@ -980,7 +980,7 @@ To configure mode-specific parameters, the modes should also be used in the `tra
 
 <h3 id="tpfm_BIKE_bikesAllowedStopMaxTransferDuration">bikesAllowedStopMaxTransferDuration</h3>
 
-**Since version:** `2.8` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.9` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
 **Path:** /transferParametersForMode/BIKE 
 
 This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow bikes.
@@ -1040,7 +1040,7 @@ For example, when using the `carsAllowedStopMaxTransferDuration` field with cars
 
 <h3 id="tpfm_CAR_bikesAllowedStopMaxTransferDuration">bikesAllowedStopMaxTransferDuration</h3>
 
-**Since version:** `2.8` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.9` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
 **Path:** /transferParametersForMode/CAR 
 
 This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow bikes.
@@ -1323,6 +1323,12 @@ the centroid.
       "wheelchairAccessibility" : {
         "enabled" : true
       }
+    },
+    {
+      "modes" : "BICYCLE"
+    },
+    {
+      "modes" : "CAR"
     }
   ],
   "stopConsolidationFile" : "consolidated-stops.csv",
@@ -1332,6 +1338,7 @@ the centroid.
       "carsAllowedStopMaxTransferDuration" : "3h"
     },
     "BIKE" : {
+      "disableDefaultTransfers" : true,
       "maxTransferDuration" : "30m",
       "carsAllowedStopMaxTransferDuration" : "3h",
       "bikesAllowedStopMaxTransferDuration" : "1h"
