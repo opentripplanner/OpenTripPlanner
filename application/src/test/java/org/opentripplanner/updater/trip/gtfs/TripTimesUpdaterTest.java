@@ -457,6 +457,67 @@ public class TripTimesUpdaterTest {
   }
 
   @Test
+  public void testUpdateWithUnchangedTripAndStopProperties() {
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
+
+    GtfsRealtime.TripUpdate.Builder tripUpdateBuilder = GtfsRealtime.TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    tripUpdateBuilder.getTripPropertiesBuilder().setTripHeadsign("foo");
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(1);
+    stopTimeUpdateBuilder.getArrivalBuilder().setDelay(0);
+    stopTimeUpdateBuilder.getDepartureBuilder().setDelay(0);
+    stopTimeUpdateBuilder.getStopTimePropertiesBuilder().setStopHeadsign("foo");
+    stopTimeUpdateBuilder.getStopTimePropertiesBuilder().setAssignedStopId("A");
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(1);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder
+      .getStopTimePropertiesBuilder()
+      .setPickupType(StopTimeUpdate.StopTimeProperties.DropOffPickupType.REGULAR);
+    stopTimeUpdateBuilder
+      .getStopTimePropertiesBuilder()
+      .setDropOffType(StopTimeUpdate.StopTimeProperties.DropOffPickupType.REGULAR);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(2);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.getArrivalBuilder().setDelay(0);
+    stopTimeUpdateBuilder.getDepartureBuilder().setDelay(0);
+
+    GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
+      timetable,
+      new TripUpdate(tripUpdate),
+      TIME_ZONE,
+      SERVICE_DATE,
+      ForwardsDelayPropagationType.DEFAULT,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+
+    assertTrue(result.isSuccess());
+
+    result.ifSuccess(p -> {
+      assertTrue(p.updatedDropoff().isEmpty(), "dropoffs are not modified");
+      assertTrue(p.updatedPickup().isEmpty(), "pickups are not modified");
+      assertTrue(p.replacedStopIndices().isEmpty(), "stop indices are not modified");
+      assertEquals(
+        "foo",
+        p.tripTimes().getHeadsign(0).toString(),
+        "headsigns [1] are not modified"
+      );
+      assertEquals(
+        "foo",
+        p.tripTimes().getHeadsign(1).toString(),
+        "headsigns [2] are not modified"
+      );
+      assertEquals(
+        "foo",
+        p.tripTimes().getHeadsign(2).toString(),
+        "headsigns [3] are not modified"
+      );
+    });
+  }
+
+  @Test
   public void testUpdateWithTripAndStopProperties() {
     var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
 

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
@@ -132,10 +133,26 @@ class TripTimesUpdater {
       }
 
       if (match) {
-        update.stopHeadsign().ifPresent(x -> builder.withStopHeadsign(index, x));
-        update.pickup().ifPresent(x -> updatedPickups.put(index, x));
-        update.dropoff().ifPresent(x -> updatedDropoffs.put(index, x));
-        update.assignedStopId().ifPresent(x -> replacedStopIndices.put(index, x));
+        var scheduledStopId = timetable.getPattern().getStop(i).getId().getId();
+        var scheduledStopHeadsign = tripTimes.getHeadsign(i);
+        var scheduledPickup = timetable.getPattern().getBoardType(i);
+        var scheduledDropoff = timetable.getPattern().getAlightType(i);
+        update
+          .stopHeadsign()
+          .filter(x -> !Objects.equals(x, scheduledStopHeadsign))
+          .ifPresent(x -> builder.withStopHeadsign(index, x));
+        update
+          .pickup()
+          .filter(x -> x != scheduledPickup)
+          .ifPresent(x -> updatedPickups.put(index, x));
+        update
+          .dropoff()
+          .filter(x -> x != scheduledDropoff)
+          .ifPresent(x -> updatedDropoffs.put(index, x));
+        update
+          .assignedStopId()
+          .filter(x -> !Objects.equals(x, scheduledStopId))
+          .ifPresent(x -> replacedStopIndices.put(index, x));
 
         var scheduleRelationship = update.scheduleRelationship();
         // Handle each schedule relationship case
