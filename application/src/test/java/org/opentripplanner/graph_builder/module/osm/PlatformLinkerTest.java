@@ -12,7 +12,6 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class PlatformLinkerTest {
 

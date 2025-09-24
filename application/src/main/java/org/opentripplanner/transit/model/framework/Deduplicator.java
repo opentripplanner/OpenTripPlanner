@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.model.framework;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -21,7 +20,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * Does the same thing as String.intern, but for several different types. Java's String.intern uses
  * perm gen space and is broken anyway.
  */
-@Singleton
 public class Deduplicator implements DeduplicatorService, Serializable {
 
   private static final String ZERO_COUNT = sizeAndCount(0, 0);

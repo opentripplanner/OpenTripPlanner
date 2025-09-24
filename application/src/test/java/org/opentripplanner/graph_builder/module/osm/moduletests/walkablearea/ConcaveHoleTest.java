@@ -16,7 +16,6 @@ import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParking
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.GeoJsonIo;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 /**
  * Checks that concave areas of inner rings/holes in multipolygons are connected to the outer ring.

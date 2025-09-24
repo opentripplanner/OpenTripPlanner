@@ -14,7 +14,6 @@ import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepo
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.test.support.GeoJsonIo;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 class SimpleAreaTest {
 
