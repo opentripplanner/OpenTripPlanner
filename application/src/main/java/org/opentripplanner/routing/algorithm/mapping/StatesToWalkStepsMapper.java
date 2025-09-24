@@ -32,9 +32,9 @@ import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.vertex.ExitVertex;
+import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeLabel;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.Entrance;
@@ -573,8 +573,8 @@ public class StatesToWalkStepsMapper {
       if (edgeLevelInfoOptional.isPresent()) {
         EdgeLevelInfo edgeLevelInfo = edgeLevelInfoOptional.get();
         if (
-          backState.getVertex().getLabel() instanceof OsmNodeLabel fromVertexLabel &&
-          fromVertexLabel.nodeId() == edgeLevelInfo.lowerVertexInfo().osmVertexId()
+          backState.getVertex() instanceof OsmVertex fromVertex &&
+          fromVertex.nodeId == edgeLevelInfo.lowerVertexInfo().osmVertexId()
         ) {
           return new VerticalTransportationUse(
             edgeLevelInfo.lowerVertexInfo().floorNumber() != null

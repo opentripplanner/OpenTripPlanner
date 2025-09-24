@@ -47,8 +47,8 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeLabel;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -605,9 +605,9 @@ public class OsmModule implements GraphBuilderModule {
       Edge edge = forwardEdge != null ? forwardEdge : backwardEdge;
       if (
         edge != null &&
-        edge.getToVertex().getLabel() instanceof OsmNodeLabel toVertexLabel &&
-        edge.getFromVertex().getLabel() instanceof OsmNodeLabel fromVertexLabel &&
-        edgeLevelInfo.matchesNodes(fromVertexLabel.nodeId(), toVertexLabel.nodeId())
+        edge.getToVertex() instanceof OsmVertex toVertex &&
+        edge.getFromVertex() instanceof OsmVertex fromVertex &&
+        edgeLevelInfo.matchesNodes(fromVertex.nodeId, toVertex.nodeId)
       ) {
         if (forwardEdge != null) {
           osmStreetDecoratorRepository.addEdgeLevelInformation(forwardEdge, edgeLevelInfo);
