@@ -2,14 +2,13 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import static java.util.Objects.requireNonNullElse;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSRentalUris;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
@@ -75,7 +74,7 @@ public class GbfsFreeVehicleStatusMapper {
       var builder = VehicleRentalVehicle.of()
         .withId(new FeedScopedId(system.systemId(), vehicle.getBikeId()))
         .withSystem(system)
-        .withName(new NonLocalizedString(getName(vehicle)))
+        .withName(getName(vehicle))
         .withLongitude(vehicle.getLon())
         .withLatitude(vehicle.getLat())
         .withVehicleType(
@@ -86,13 +85,7 @@ public class GbfsFreeVehicleStatusMapper {
         )
         .withIsReserved(vehicle.getIsReserved() != null ? vehicle.getIsReserved() : false)
         .withIsDisabled(vehicle.getIsDisabled() != null ? vehicle.getIsDisabled() : false)
-        .withLastReported(
-          vehicle.getLastReported() != null
-            ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
-            : null
-        )
-        .withFuel(RentalVehicleFuel.of().withPercent(fuelRatio).withRange(rangeMeters).build())
-        .withPricingPlanId(vehicle.getPricingPlanId());
+        .withFuel(RentalVehicleFuel.of().withPercent(fuelRatio).withRange(rangeMeters).build());
 
       String availableUntil = vehicle.getAvailableUntil();
       if (StringUtils.hasValue(availableUntil)) {
@@ -119,7 +112,7 @@ public class GbfsFreeVehicleStatusMapper {
     }
   }
 
-  private String getName(GBFSBike vehicle) {
+  private I18NString getName(GBFSBike vehicle) {
     var typeId = vehicle.getVehicleTypeId();
     if (typeId != null) {
       var type = vehicleTypes.get(typeId);

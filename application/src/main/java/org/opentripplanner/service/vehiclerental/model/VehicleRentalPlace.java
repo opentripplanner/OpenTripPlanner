@@ -67,6 +67,13 @@ public interface VehicleRentalPlace {
   /** What form factors are currently available for drop off */
   Set<RentalFormFactor> availableDropoffFormFactors(boolean includeRealtimeAvailability);
 
+  default boolean canDropOffFormFactor(
+    RentalFormFactor formFactor,
+    boolean includeRealtimeAvailability
+  ) {
+    return false;
+  }
+
   /** Is it possible to arrive at the destination with a rented bicycle, without dropping it off */
   boolean isArrivingInRentalVehicleAtDestinationAllowed();
 

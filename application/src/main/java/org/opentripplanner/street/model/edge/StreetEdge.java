@@ -19,6 +19,7 @@ import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
@@ -212,9 +213,9 @@ public class StreetEdge
         case WALK -> walkingBike
           ? preferences.bike().walking().speed()
           : preferences.walk().speed();
-        case BICYCLE -> preferences.bike().speed();
+        case BICYCLE -> Math.min(preferences.bike().speed(), getCyclingSpeedLimit());
         case CAR -> getCarSpeed();
-        case SCOOTER -> preferences.scooter().speed();
+        case SCOOTER -> Math.min(preferences.scooter().speed(), getCyclingSpeedLimit());
         case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
       };
 
@@ -548,6 +549,17 @@ public class StreetEdge
     return carSpeed;
   }
 
+  /**
+   * Gets cycling speed limit which is based on the car speed limit. The effective speed limit can
+   * differ from the actual speed limit if the effective cycling distance has been adjusted due to
+   * elevation changes.
+   */
+  private double getCyclingSpeedLimit() {
+    return hasElevationExtension()
+      ? getCarSpeed() * (elevationExtension.getEffectiveBikeDistance() / getDistanceMeters())
+      : getCarSpeed();
+  }
+
   public boolean isSlopeOverride() {
     return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
   }
@@ -786,7 +798,11 @@ public class StreetEdge
     int lengthInMillimeter = builder.hasDefaultLength()
       ? defaultMillimeterLength(builder.geometry())
       : builder.millimeterLength();
-    if (lengthInMillimeter == 0) {
+    if (
+      lengthInMillimeter == 0 &&
+      !(getFromVertex() instanceof BarrierPassThroughVertex ||
+        getToVertex() instanceof BarrierPassThroughVertex)
+    ) {
       LOG.warn(
         "StreetEdge {} from {} to {} has length of 0. This is usually an error.",
         name,
@@ -1031,10 +1047,6 @@ public class StreetEdge
         // In case this is a temporary edge not connected to an IntersectionVertex
         LOG.debug("Not computing turn duration for edge {}", this);
         turnDuration = 0;
-      }
-
-      if (!traverseMode.isInCar()) {
-        s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
       }
 
       time_ms += (long) Math.ceil(1000.0 * turnDuration);

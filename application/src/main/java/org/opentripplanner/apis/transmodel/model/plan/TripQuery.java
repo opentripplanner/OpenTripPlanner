@@ -12,6 +12,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
+import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLPlanner;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
@@ -36,7 +37,13 @@ public class TripQuery {
     visited in the order they are listed.
     """;
 
-  public static GraphQLFieldDefinition create(
+  private final TransmodelGraphQLPlanner graphQLPlanner;
+
+  public TripQuery(FeedScopedIdMapper idMapper) {
+    this.graphQLPlanner = new TransmodelGraphQLPlanner(idMapper);
+  }
+
+  public GraphQLFieldDefinition create(
     DefaultRouteRequestType routing,
     TransitTuningParameters transitTuningParameters,
     GraphQLOutputType tripType,
@@ -584,7 +591,7 @@ public class TripQuery {
           )
           .build()
       )
-      .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))
+      .dataFetcher(graphQLPlanner::plan)
       .build();
   }
 

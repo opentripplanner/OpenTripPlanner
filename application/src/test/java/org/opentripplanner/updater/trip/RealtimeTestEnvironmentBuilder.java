@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -38,6 +39,7 @@ public class RealtimeTestEnvironmentBuilder {
   private final HashMap<String, Station> stations = new HashMap<>();
   private final List<TripInput> tripInputs = new ArrayList<>();
   private final List<FlexTripInput> flexTripInputs = new ArrayList<>();
+  private final Map<FeedScopedId, RegularStop> scheduledStopPointMapping = new HashMap<>();
 
   RealtimeTestEnvironmentBuilder() {}
 
@@ -96,6 +98,8 @@ public class RealtimeTestEnvironmentBuilder {
         pattern.getScheduledTimetable().setServiceCodes(timetableRepository.getServiceCodes());
       });
 
+    timetableRepository.addScheduledStopPointMapping(scheduledStopPointMapping);
+
     timetableRepository.index();
     return new RealtimeTestEnvironment(timetableRepository, SERVICE_DATE, TIME_ZONE);
   }
@@ -132,8 +136,19 @@ public class RealtimeTestEnvironmentBuilder {
     return this;
   }
 
-  private static Trip createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
-    var trip = trip(tripInput.id(), tripInput.route());
+  public RealtimeTestEnvironmentBuilder addScheduledStopPointMapping(
+    Map<FeedScopedId, RegularStop> mapping
+  ) {
+    scheduledStopPointMapping.putAll(mapping);
+    return this;
+  }
+
+  private static void createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
+    var trip = Trip.of(id(tripInput.id()))
+      .withRoute(tripInput.route())
+      .withHeadsign(tripInput.headsign() == null ? null : tripInput.headsign())
+      .withServiceId(SERVICE_ID)
+      .build();
 
     addTripOnServiceDate(timetableRepository, trip);
 
@@ -176,8 +191,6 @@ public class RealtimeTestEnvironmentBuilder {
     } else {
       addNewPattern(tripInput.id(), tripInput.route(), stopPattern, tripTimes, timetableRepository);
     }
-
-    return trip;
   }
 
   private static Trip createFlexTrip(
