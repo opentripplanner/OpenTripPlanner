@@ -2,7 +2,7 @@ package org.opentripplanner.framework.csv.parser;
 
 import java.util.Objects;
 
-class ValueOutsideRangeIssue extends AbstractIssue {
+final class ValueOutsideRangeIssue extends AbstractIssue {
 
   private final Number value;
   private final String valueType;
