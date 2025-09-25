@@ -108,20 +108,20 @@ public record ScheduledTransitLegReference(
       return null;
     }
 
-    OptionalInt updatedFromStopPositionInPattern = findStopPositionInPattern(
+    OptionalInt optionalUpdatedFromStopPositionInPattern = findStopPositionInPattern(
       tripPattern,
       fromStopPositionInPattern,
       fromStopId,
       transitService
     );
-    OptionalInt updatedToStopPositionInPattern = findStopPositionInPattern(
+    OptionalInt optionalUpdatedToStopPositionInPattern = findStopPositionInPattern(
       tripPattern,
       toStopPositionInPattern,
       toStopId,
       transitService
     );
 
-    if (updatedFromStopPositionInPattern.isEmpty()) {
+    if (optionalUpdatedFromStopPositionInPattern.isEmpty()) {
       LOG.info(
         "Invalid transit leg reference:" +
         " The referenced from stop at position {} with id '{}' cannot be found" +
@@ -134,7 +134,7 @@ public record ScheduledTransitLegReference(
       return null;
     }
 
-    if (updatedToStopPositionInPattern.isEmpty()) {
+    if (optionalUpdatedToStopPositionInPattern.isEmpty()) {
       LOG.info(
         "Invalid transit leg reference:" +
         " The referenced to stop at position {} with id '{}' cannot be found" +
@@ -147,10 +147,10 @@ public record ScheduledTransitLegReference(
       return null;
     }
 
-    var fromStopPositionInPattern = updatedFromStopPositionInPattern.getAsInt();
-    var toStopPositionInPattern = updatedToStopPositionInPattern.getAsInt();
+    var updatedFromStopPositionInPattern = optionalUpdatedFromStopPositionInPattern.getAsInt();
+    var updatedToStopPositionInPattern = optionalUpdatedToStopPositionInPattern.getAsInt();
 
-    if (fromStopPositionInPattern >= toStopPositionInPattern) {
+    if (updatedFromStopPositionInPattern >= updatedToStopPositionInPattern) {
       LOG.info(
         "Invalid transit leg reference:" +
         " The calling order for stops with id '{}' and '{}' is reversed" +
@@ -187,14 +187,14 @@ public record ScheduledTransitLegReference(
     // TODO: What should we have here
     ZoneId timeZone = transitService.getTimeZone();
 
-    int boardingTime = tripTimes.getDepartureTime(fromStopPositionInPattern);
-    int alightingTime = tripTimes.getArrivalTime(toStopPositionInPattern);
+    int boardingTime = tripTimes.getDepartureTime(updatedFromStopPositionInPattern);
+    int alightingTime = tripTimes.getArrivalTime(updatedToStopPositionInPattern);
 
     ScheduledTransitLeg leg = new ScheduledTransitLegBuilder<>()
       .withTripTimes(tripTimes)
       .withTripPattern(tripPattern)
-      .withBoardStopIndexInPattern(fromStopPositionInPattern)
-      .withAlightStopIndexInPattern(toStopPositionInPattern)
+      .withBoardStopIndexInPattern(updatedFromStopPositionInPattern)
+      .withAlightStopIndexInPattern(updatedToStopPositionInPattern)
       .withStartTime(ServiceDateUtils.toZonedDateTime(serviceDate, timeZone, boardingTime))
       .withEndTime(ServiceDateUtils.toZonedDateTime(serviceDate, timeZone, alightingTime))
       .withServiceDate(serviceDate)
@@ -203,8 +203,8 @@ public record ScheduledTransitLegReference(
       .withDistanceMeters(
         LegConstructionSupport.computeDistanceMeters(
           tripPattern,
-          fromStopPositionInPattern,
-          toStopPositionInPattern
+          updatedFromStopPositionInPattern,
+          updatedToStopPositionInPattern
         )
       )
       // TODO: What should we have here
