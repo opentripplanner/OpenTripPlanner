@@ -6,6 +6,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 ## 2.9.0-SNAPSHOT (in progress)
 
 - Debug client UI upgrades and fixes [#6832](https://github.com/opentripplanner/OpenTripPlanner/pull/6832)
+- Experimental GBFS 3.0 support [#6735](https://github.com/opentripplanner/OpenTripPlanner/pull/6735)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
