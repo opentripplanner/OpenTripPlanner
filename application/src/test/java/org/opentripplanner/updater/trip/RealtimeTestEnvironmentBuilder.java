@@ -69,7 +69,8 @@ public class RealtimeTestEnvironmentBuilder {
 
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     for (TripInput tripInput : tripInputs) {
-      createTrip(tripInput, timetableRepository, calendarServiceData);
+      var t = createTrip(tripInput, timetableRepository);
+      calendarServiceData.putServiceDatesForServiceId(t.getServiceId(), tripInput.serviceDates());
     }
     for (FlexTripInput tripInput : flexTripInputs) {
       createFlexTrip(tripInput, timetableRepository);
@@ -78,13 +79,11 @@ public class RealtimeTestEnvironmentBuilder {
     timetableRepository.initTimeZone(TIME_ZONE);
     timetableRepository.addAgency(TimetableRepositoryForTest.AGENCY);
 
-    if (!tripInputs.isEmpty()) {
-      timetableRepository.updateCalendarServiceData(
-        true,
-        calendarServiceData,
-        DataImportIssueStore.NOOP
-      );
-    }
+    timetableRepository.updateCalendarServiceData(
+      true,
+      calendarServiceData,
+      DataImportIssueStore.NOOP
+    );
     timetableRepository
       .getAllTripPatterns()
       .forEach(pattern -> {
@@ -142,11 +141,7 @@ public class RealtimeTestEnvironmentBuilder {
     return this;
   }
 
-  private void createTrip(
-    TripInput tripInput,
-    TimetableRepository timetableRepository,
-    CalendarServiceData calendarServiceData
-  ) {
+  private Trip createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
     var serviceId = generateServiceId(timetableRepository, tripInput.serviceDates());
     var trip = Trip.of(id(tripInput.id()))
       .withRoute(tripInput.route())
@@ -195,7 +190,8 @@ public class RealtimeTestEnvironmentBuilder {
     } else {
       addNewPattern(tripInput.id(), tripInput.route(), stopPattern, tripTimes, timetableRepository);
     }
-    calendarServiceData.putServiceDatesForServiceId(serviceId, tripInput.serviceDates());
+
+    return trip;
   }
 
   private FeedScopedId generateServiceId(

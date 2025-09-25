@@ -447,7 +447,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     // TODO: which Agency ID to use? Currently use feed id.
     var tripBuilder = Trip.of(tripId).withRoute(route);
 
-    // Find or service ID running on this service date
+    // get service ID running only on this service date
     var serviceId = transitEditorService.getOrCreateServiceIdForDate(serviceDate);
     if (serviceId == null) {
       return UpdateError.result(tripId, OUTSIDE_SCHEDULE_PERIOD);

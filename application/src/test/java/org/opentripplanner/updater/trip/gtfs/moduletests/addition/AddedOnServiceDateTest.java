@@ -9,8 +9,7 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailu
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import java.time.LocalDate;
-import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
+import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -43,8 +42,8 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
     )
     .build();
 
-  private static Stream<LocalDate> serviceDates() {
-    return Stream.of(START_DATE, ADDED_DATE, END_DATE);
+  private static List<LocalDate> serviceDates() {
+    return List.of(START_DATE, ADDED_DATE, END_DATE);
   }
 
   @ParameterizedTest
@@ -67,10 +66,14 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
     assertThat(dates).containsExactly(date);
   }
 
-  @Test
-  void rejectOutsideSchedulePeriod() {
-    var farFutureDate = SERVICE_DATE.plusYears(1);
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, farFutureDate, ADDED, TIME_ZONE)
+  private static List<LocalDate> outsidePeriod() {
+    return List.of(START_DATE.minusYears(1), END_DATE.plusYears(1));
+  }
+
+  @ParameterizedTest
+  @MethodSource("outsidePeriod")
+  void rejectOutsideSchedulePeriod(LocalDate date) {
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, date, ADDED, TIME_ZONE)
       .addStopTime(STOP_A_ID, "10:30")
       .addStopTime(STOP_B_ID, "10:40")
       .addStopTime(STOP_C_ID, "10:55")
