@@ -1,8 +1,8 @@
-# Streamlining the development process
+# Development Process Conventions
 
 | Date       | People attending   | Status  |
 |------------|--------------------|---------|
-| 28.09.2025 | developer workshop | decided |
+| 18.09.2025 | developer workshop | decided |
 
 
 We need guidelines for the development process in general and the dev meeting in particular that enable us to better keep up with the increasing amount or pull requests. This list was agreed upon by the developers attending the OTP Summit in Helsinki in September 2025.
@@ -44,8 +44,6 @@ To avoid clutter in our Gitter channel, always use threads. Messages not abiding
 All PRs made by non-core developers lead to the core developers having to spend resources on reviewing the code and potentially having to provide guidance to the author. We need to decide early, if the PR will be beneficial to enough contributors that investing these resources is worth it. This is especially important for PRs that will touch the core.
 
 Product Owners should have the ultimate decision in this. That way the core developers will have the official backing of their employers and have fewer conflicts investing their time.
-
-*ToDo: talk to Markus about communicating this need to the POs*
 
 #### 6. Issues not made by regular contributors will have to be categorized by adding a label
 
