@@ -1,4 +1,4 @@
-package org.opentripplanner.osm.issues;
+package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.osm.model.OsmEntity;

@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.issues.FloorNumberUnknownAssumedGroundLevel;
 import org.opentripplanner.osm.issues.FloorNumberUnknownGuessedFromAltitude;
-import org.opentripplanner.osm.issues.MoreThanTwoLevelsForWay;
 
 public class OsmLevel implements Comparable<OsmLevel> {
 
@@ -200,7 +199,6 @@ public class OsmLevel implements Comparable<OsmLevel> {
       osmObj,
       false
     );
-    if (levels.size() > 2) issueStore.add(new MoreThanTwoLevelsForWay(specList, osmObj));
     return levels;
   }
 

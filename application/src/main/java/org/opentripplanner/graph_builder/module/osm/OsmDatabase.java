@@ -32,6 +32,8 @@ import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
 import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
+import org.opentripplanner.graph_builder.issues.MoreThanTwoLevelsForWay;
+import org.opentripplanner.graph_builder.issues.MultiLevelInfoForNonStepWay;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
@@ -271,7 +273,7 @@ public class OsmDatabase {
       return;
     }
 
-    applyLevelsForWay(way);
+    applyLevelsForEntity(way);
 
     if (way.isRoutableArea()) {
       // this is an area that's a simple polygon. So we can just add it straight
@@ -312,7 +314,7 @@ public class OsmDatabase {
       for (OsmRelationMember member : relation.getMembers()) {
         areaWayIds.add(member.getRef());
       }
-      applyLevelsForWay(relation);
+      applyLevelsForEntity(relation);
     } else if (
       !relation.isRestriction() &&
       !relation.isRoadRoute() &&
@@ -656,50 +658,58 @@ public class OsmDatabase {
   }
 
   /**
-   * Determine OSM level for each way, if it was not already set.
+   * Determine a single level from OSM for OSM relations or ways, if it was not already set.
    * For multi-level ways, store multi-level info separately.
    */
-  private void applyLevelsForWay(OsmEntity way) {
+  private void applyLevelsForEntity(OsmEntity osmEntity) {
     // The level tag can contain multi-level or single-level info.
-    if (way.hasTag("level")) {
-      String levelName = way.getTag("level");
+    if (osmEntity.hasTag("level")) {
+      String levelName = osmEntity.getTag("level");
       List<OsmLevel> levels = OsmLevel.levelListForWayFromSpecList(
         levelName,
         OsmLevel.Source.LEVEL_TAG,
         noZeroLevels,
         issueStore,
-        way
+        osmEntity
       );
 
       OsmLevel singleLevel = OsmLevel.DEFAULT;
       if (levels.stream().anyMatch(level -> !level.reliable)) {
-        issueStore.add(new LevelAmbiguous(levelName, way));
+        issueStore.add(new LevelAmbiguous(levelName, osmEntity));
       } else if (levels.size() == 1) {
         singleLevel = levels.get(0);
+      } else if (
+        !(osmEntity instanceof OsmWay) || (osmEntity instanceof OsmWay way && !way.isSteps())
+      ) {
+        issueStore.add(new MultiLevelInfoForNonStepWay(levelName, osmEntity));
       } else if (levels.size() == 2) {
-        levels.forEach(level -> wayMultiLevelMap.put(way, level));
+        levels.forEach(level -> wayMultiLevelMap.put(osmEntity, level));
+      } else if (levels.size() > 2) {
+        issueStore.add(new MoreThanTwoLevelsForWay(levelName, osmEntity));
+      } else {
+        issueStore.add(new LevelAmbiguous(levelName, osmEntity));
       }
-      if (!waySingleLevelMap.containsKey(way)) {
+      if (!waySingleLevelMap.containsKey(osmEntity)) {
         // if this way is not a key in the wayLevels map, a level map was not
         // already applied in processRelations
-        waySingleLevelMap.put(way, singleLevel);
+        waySingleLevelMap.put(osmEntity, singleLevel);
       }
-    } else if (way.hasTag("layer") && !waySingleLevelMap.containsKey(way)) {
+    } else if (osmEntity.hasTag("layer") && !waySingleLevelMap.containsKey(osmEntity)) {
       // if this way is not a key in the wayLevels map, a level map was not
       // already applied in processRelations
-      String levelName = way.getTag("layer");
+      String levelName = osmEntity.getTag("layer");
       OsmLevel level = OsmLevel.fromString(
         levelName,
         OsmLevel.Source.LAYER_TAG,
         noZeroLevels,
         issueStore,
-        way
+        osmEntity
       );
       if (!level.reliable) {
-        issueStore.add(new LevelAmbiguous(levelName, way));
+        issueStore.add(new LevelAmbiguous(levelName, osmEntity));
         level = OsmLevel.DEFAULT;
       }
-      waySingleLevelMap.put(way, level);
+      waySingleLevelMap.put(osmEntity, level);
     }
   }
 
