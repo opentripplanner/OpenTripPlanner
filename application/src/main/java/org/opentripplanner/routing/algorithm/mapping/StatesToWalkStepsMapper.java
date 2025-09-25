@@ -187,13 +187,15 @@ public class StatesToWalkStepsMapper {
       addStep(createElevatorWalkStep(backState, forwardState, edge));
       return;
     } else if (edge instanceof EscalatorEdge) {
-      addStep(createEscalatorWalkStep(backState, forwardState, edge));
+      addStep(createEscalatorWalkStep(backState, forwardState, edge, geom));
       return;
     } else if (edge instanceof StreetEdge streetEdge && streetEdge.isStairs()) {
-      addStep(createStairsWalkStep(backState, forwardState, edge));
+      addStep(createStairsWalkStep(backState, forwardState, edge, geom));
       return;
     } else if (backState.getVertex() instanceof StationEntranceVertex stationEntranceVertex) {
-      addStep(createStationEntranceWalkStep(backState, forwardState, stationEntranceVertex));
+      addStep(
+        createStationEntranceWalkStep(backState, forwardState, edge, stationEntranceVertex, geom)
+      );
       return;
     } else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
       createAndSaveStep(
@@ -538,46 +540,57 @@ public class StatesToWalkStepsMapper {
   }
 
   private WalkStepBuilder createElevatorWalkStep(State backState, State forwardState, Edge edge) {
-    VerticalTransportationUse verticalTransportationUse = new VerticalTransportationUse(
-      null,
-      null,
-      InclineType.UNKNOWN,
-      null,
-      edge.getName().toString()
-    );
     // don't care what came before or comes after
-    var step = createWalkStep(forwardState, backState);
-
-    // tell the user where to get off the elevator using the exit notation, so the
-    // i18n interface will say 'Elevator to <exit>'
-    // what happens is that the webapp sees name == null and ignores that, and it sees
-    // exit != null and uses to <exit>
-    // the floor name is the AlightEdge name
-    // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-    step.withDirectionText(edge.getName());
-
-    step.withRelativeDirection(RelativeDirection.ELEVATOR);
-    step.withVerticalTransportationUse(verticalTransportationUse);
-
-    return step;
+    return createWalkStep(forwardState, backState)
+      // tell the user where to get off the elevator using the exit notation, so the
+      // i18n interface will say 'Elevator to <exit>'
+      // what happens is that the webapp sees name == null and ignores that, and it sees
+      // exit != null and uses to <exit>
+      // the floor name is the AlightEdge name
+      // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
+      .withDirectionText(edge.getName())
+      .withRelativeDirection(RelativeDirection.ELEVATOR)
+      .withVerticalTransportationUse(
+        new VerticalTransportationUse(
+          null,
+          null,
+          InclineType.UNKNOWN,
+          null,
+          edge.getName().toString()
+        )
+      );
   }
 
-  private WalkStepBuilder createStairsWalkStep(State backState, State forwardState, Edge edge) {
-    var step = createWalkStep(forwardState, backState);
+  private WalkStepBuilder createStairsWalkStep(
+    State backState,
+    State forwardState,
+    Edge edge,
+    Geometry geom
+  ) {
+    distance = edge.getDistanceMeters();
+    lastAngle = DirectionUtils.getLastAngle(geom);
 
-    step.withRelativeDirection(RelativeDirection.STAIRS);
-    step.withVerticalTransportationUse(getVerticalTransportationUse(backState, edge));
-
-    return step;
+    return createWalkStep(forwardState, backState)
+      .withRelativeDirection(RelativeDirection.STAIRS)
+      .withAbsoluteDirection(DirectionUtils.getFirstAngle(geom))
+      .addDistance(edge.getDistanceMeters())
+      .withVerticalTransportationUse(getVerticalTransportationUse(backState, edge));
   }
 
-  private WalkStepBuilder createEscalatorWalkStep(State backState, State forwardState, Edge edge) {
-    var step = createWalkStep(forwardState, backState);
+  private WalkStepBuilder createEscalatorWalkStep(
+    State backState,
+    State forwardState,
+    Edge edge,
+    Geometry geom
+  ) {
+    distance = edge.getDistanceMeters();
+    lastAngle = DirectionUtils.getLastAngle(geom);
 
-    step.withRelativeDirection(RelativeDirection.ESCALATOR);
-    step.withVerticalTransportationUse(getVerticalTransportationUse(backState, edge));
-
-    return step;
+    return createWalkStep(forwardState, backState)
+      .withRelativeDirection(RelativeDirection.ESCALATOR)
+      .withAbsoluteDirection(DirectionUtils.getFirstAngle(geom))
+      .addDistance(edge.getDistanceMeters())
+      .withVerticalTransportationUse(getVerticalTransportationUse(backState, edge));
   }
 
   private VerticalTransportationUse getVerticalTransportationUse(State backState, Edge edge) {
@@ -623,13 +636,19 @@ public class StatesToWalkStepsMapper {
   private WalkStepBuilder createStationEntranceWalkStep(
     State backState,
     State forwardState,
-    StationEntranceVertex vertex
+    Edge edge,
+    StationEntranceVertex vertex,
+    Geometry geom
   ) {
+    distance = edge.getDistanceMeters();
+    lastAngle = DirectionUtils.getLastAngle(geom);
     // don't care what came before or comes after
     return createWalkStep(forwardState, backState)
       // There is not a way to definitively determine if a user is entering or exiting the station,
       // since the doors might be between or inside stations.
       .withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
+      .withAbsoluteDirection(DirectionUtils.getFirstAngle(geom))
+      .addDistance(edge.getDistanceMeters())
       .withEntrance(getEntrance(vertex));
   }
 

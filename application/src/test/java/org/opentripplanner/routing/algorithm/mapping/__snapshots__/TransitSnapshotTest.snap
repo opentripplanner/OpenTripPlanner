@@ -6178,7 +6178,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "elevation" : "",
               "lat" : 45.5329128,
               "lon" : -122.6719792,
-              "relativeDirection" : "LEFT",
+              "relativeDirection" : "STAIRS",
               "stayOn" : false,
               "streetName" : "steps",
               "walkingBike" : false

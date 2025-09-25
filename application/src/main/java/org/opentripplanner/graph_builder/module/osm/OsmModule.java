@@ -534,63 +534,62 @@ public class OsmModule implements GraphBuilderModule {
   private Optional<EdgeLevelInfo> getEdgeLevelInfo(OsmDatabase osmdb, OsmWay way) {
     List<OsmLevel> levels = osmdb.getLevelsForWay(way);
     var nodeRefs = way.getNodeRefs();
-    long firstNodeRef = nodeRefs.get(0);
-    long lastNodeRef = nodeRefs.get(nodeRefs.size() - 1);
-
-    if (levels.size() == 2) {
-      OsmLevel firstVertexOsmLevel = levels.get(0);
-      OsmLevel lastVertexOsmLevel = levels.get(1);
-      if (firstVertexOsmLevel.floorNumber < lastVertexOsmLevel.floorNumber) {
-        return Optional.of(
-          new EdgeLevelInfo(
-            new VertexLevelInfo(
-              firstVertexOsmLevel.floorNumber,
-              firstVertexOsmLevel.levelRef,
-              firstNodeRef
-            ),
-            new VertexLevelInfo(
-              lastVertexOsmLevel.floorNumber,
-              lastVertexOsmLevel.levelRef,
-              lastNodeRef
+    if (nodeRefs.size() > 1) {
+      long firstNodeRef = nodeRefs.get(0);
+      long lastNodeRef = nodeRefs.get(nodeRefs.size() - 1);
+      if (levels.size() == 2) {
+        OsmLevel firstVertexOsmLevel = levels.get(0);
+        OsmLevel lastVertexOsmLevel = levels.get(1);
+        if (firstVertexOsmLevel.floorNumber < lastVertexOsmLevel.floorNumber) {
+          return Optional.of(
+            new EdgeLevelInfo(
+              new VertexLevelInfo(
+                firstVertexOsmLevel.floorNumber,
+                firstVertexOsmLevel.levelRef,
+                firstNodeRef
+              ),
+              new VertexLevelInfo(
+                lastVertexOsmLevel.floorNumber,
+                lastVertexOsmLevel.levelRef,
+                lastNodeRef
+              )
             )
-          )
-        );
-      } else if (firstVertexOsmLevel.floorNumber > lastVertexOsmLevel.floorNumber) {
-        return Optional.of(
-          new EdgeLevelInfo(
-            new VertexLevelInfo(
-              lastVertexOsmLevel.floorNumber,
-              lastVertexOsmLevel.levelRef,
-              lastNodeRef
-            ),
-            new VertexLevelInfo(
-              firstVertexOsmLevel.floorNumber,
-              firstVertexOsmLevel.levelRef,
-              firstNodeRef
+          );
+        } else if (firstVertexOsmLevel.floorNumber > lastVertexOsmLevel.floorNumber) {
+          return Optional.of(
+            new EdgeLevelInfo(
+              new VertexLevelInfo(
+                lastVertexOsmLevel.floorNumber,
+                lastVertexOsmLevel.levelRef,
+                lastNodeRef
+              ),
+              new VertexLevelInfo(
+                firstVertexOsmLevel.floorNumber,
+                firstVertexOsmLevel.levelRef,
+                firstNodeRef
+              )
             )
-          )
-        );
+          );
+        }
+      }
+      if (way.hasTag("incline")) {
+        if (way.isInclineUp()) {
+          return Optional.of(
+            new EdgeLevelInfo(
+              new VertexLevelInfo(null, null, firstNodeRef),
+              new VertexLevelInfo(null, null, lastNodeRef)
+            )
+          );
+        } else if (way.isInclineDown()) {
+          return Optional.of(
+            new EdgeLevelInfo(
+              new VertexLevelInfo(null, null, lastNodeRef),
+              new VertexLevelInfo(null, null, firstNodeRef)
+            )
+          );
+        }
       }
     }
-
-    if (way.hasTag("incline")) {
-      if (way.isInclineUp()) {
-        return Optional.of(
-          new EdgeLevelInfo(
-            new VertexLevelInfo(null, null, firstNodeRef),
-            new VertexLevelInfo(null, null, lastNodeRef)
-          )
-        );
-      } else if (way.isInclineDown()) {
-        return Optional.of(
-          new EdgeLevelInfo(
-            new VertexLevelInfo(null, null, lastNodeRef),
-            new VertexLevelInfo(null, null, firstNodeRef)
-          )
-        );
-      }
-    }
-
     return Optional.empty();
   }
 

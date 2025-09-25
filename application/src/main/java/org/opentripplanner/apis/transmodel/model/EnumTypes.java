@@ -269,6 +269,8 @@ public class EnumTypes {
     .value("circleClockwise", RelativeDirection.CIRCLE_CLOCKWISE)
     .value("circleCounterclockwise", RelativeDirection.CIRCLE_COUNTERCLOCKWISE)
     .value("elevator", RelativeDirection.ELEVATOR)
+    .value("escalator", RelativeDirection.ESCALATOR)
+    .value("stairs", RelativeDirection.STAIRS)
     .value("uturnLeft", RelativeDirection.UTURN_LEFT)
     .value("uturnRight", RelativeDirection.UTURN_RIGHT)
     .value("enterStation", RelativeDirection.ENTER_STATION)

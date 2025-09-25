@@ -2882,18 +2882,11 @@ type VerticalTransportationUse {
   fromLevel: Float
   "Name (if it exists) for fromLevel e.g. 'M' or 'P1'."
   fromLevelName: String
+  inclineType: InclineType!
   "The level the use ends at. Levels can sometimes contain half levels (e.g. 1.5)."
   toLevel: Float
   "Name (if it exists) for toLevel e.g. 'M' or 'P1'."
   toLevelName: String
-  inclineType: InclineType!
-}
-
-"The type of incline, e.g. stairs can go up or down depending on the direction."
-enum InclineType {
-  UP
-  DOWN
-  UNKNOWN
 }
 
 type debugOutput {
@@ -3241,6 +3234,13 @@ enum FormFactor {
   SCOOTER_SEATED
   "A kick scooter that the rider stands on"
   SCOOTER_STANDING
+}
+
+"The type of incline, e.g. stairs can go up or down depending on the direction."
+enum InclineType {
+  DOWN
+  UNKNOWN
+  UP
 }
 
 enum InputField {
