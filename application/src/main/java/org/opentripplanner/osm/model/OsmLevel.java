@@ -25,8 +25,12 @@ public class OsmLevel implements Comparable<OsmLevel> {
     Source.NONE,
     true
   );
-  /** As long as we don't deal with levels going up to 16,777,217, we shouldn't
-   *  have a problem with using a 32-bit float to represent levels. */
+  /**
+   * The first integer that a float is unable to represent exactly is 16,777,217.
+   * For example, the Burj Khalifa has 163 floors.
+   * Using a 32-bit floating point number to represent a level seems incorrect,
+   * but shouldn't cause problems with proper input from OSM.
+   */
   public final float floorNumber; // 0-based
   public final double altitudeMeters;
   public final String shortName; // localized (potentially 1-based)
