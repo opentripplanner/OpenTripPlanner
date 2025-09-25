@@ -14,11 +14,11 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
   const getIconForIndex = (index: number) => {
     switch (index) {
       case 0:
-        return <img src={tripIcon} alt="Itineray list" title="Itineray" />;
+        return <img src={tripIcon} alt="Itinerary results" title="Itinerary results" />;
       case 1:
-        return <img src={filterIcon} alt="Filters" title="Filters" />;
+        return <img src={filterIcon} alt="Arguments" title="Arguments" />;
       case 2:
-        return <img width="25" height="25" src={jsonIcon} alt="Filters" title="Filters" />;
+        return <img width="25" height="25" src={jsonIcon} alt="Arguments raw" title="Arguments raw" />;
       default:
         return null;
     }

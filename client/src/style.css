@@ -369,6 +369,20 @@ input[type='number'] {
   margin-bottom: 10px;
 }
 
+.panel-header-title-with-left-button {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: normal;
+}
+
+.panel-header-title-simple {
+  flex: 1;
+  text-align: center;
+  font-weight: normal;
+}
+
 .argument-list {
   font-size: 12px;
   line-height: 1;
@@ -426,8 +440,6 @@ input.comma-separated-input[type='number'] {
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  /* The transform ensures the button is vertically centered
-     if your header has a fixed height or if text is multiline. */
 }
 
 .panel-header button {
@@ -442,5 +454,94 @@ input.comma-separated-input[type='number'] {
 }
 
 .panel-header button:hover {
-  background-color: #0056b3; /* Darker on hover */
+  background-color: #0056b3;
+}
+
+/* No results display container */
+.no-results-display-container {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+/* No results details pre-formatted text */
+.no-results-details {
+  font-size: 12px;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  width: 100%;
+}
+
+/* Pagination Controls */
+.pagination-controls-container {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+/* Flexible layouts */
+.flex-space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/* Error and info displays */
+.error-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.error-message {
+  margin-bottom: 12px;
+  color: #721c24;
+  line-height: 1.4;
+}
+
+.info-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.info-message {
+  margin-bottom: 12px;
+  color: #6c757d;
+}
+
+/* Error display container */
+.error-display-container {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+/* Error details pre-formatted text */
+.error-details {
+  font-size: 12px;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  width: 100%;
+}
+
+/* Error dismiss button */
+.error-dismiss-button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #721c24;
+  margin-left: 8px;
 }
