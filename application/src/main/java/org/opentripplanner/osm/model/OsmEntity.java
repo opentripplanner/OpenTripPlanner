@@ -397,8 +397,11 @@ public class OsmEntity {
     int colonCount = (int) duration.chars().filter(ch -> ch == ':').count();
     if (colonCount <= 2) {
       try {
-        int i, j;
-        long hours, minutes, seconds;
+        int i;
+        int j;
+        long hours;
+        long minutes;
+        long seconds;
         // The first :-separated element can be any width, and has no maximum. It still has
         // to be non-negative. The following elements must be 2 characters wide, non-negative,
         // and less than 60.
@@ -560,7 +563,9 @@ public class OsmEntity {
     int lastEnd = 0;
     while (matcher.find()) {
       // add the stuff before the match
-      for (StringBuffer sb : i18n.values()) sb.append(pattern, lastEnd, matcher.start());
+      for (StringBuffer sb : i18n.values()) {
+        sb.append(pattern, lastEnd, matcher.start());
+      }
       lastEnd = matcher.end();
       // and then the value for the match
       String defKey = matcher.group(1);
@@ -585,12 +590,13 @@ public class OsmEntity {
         i18n.get(lang).append(i18nTag != null ? i18nTag : (defTag != null ? defTag : ""));
       }
     }
-    for (StringBuffer sb : i18n.values()) sb.append(pattern, lastEnd, pattern.length());
+    for (StringBuffer sb : i18n.values()) {
+      sb.append(pattern, lastEnd, pattern.length());
+    }
     Map<String, String> out = new HashMap<>(i18n.size());
-    for (Map.Entry<String, StringBuffer> kv : i18n.entrySet()) out.put(
-      kv.getKey(),
-      kv.getValue().toString()
-    );
+    for (Map.Entry<String, StringBuffer> kv : i18n.entrySet()) {
+      out.put(kv.getKey(), kv.getValue().toString());
+    }
     return out;
   }
 

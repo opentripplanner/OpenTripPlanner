@@ -1137,7 +1137,8 @@ public class StreetEdge
     boolean walkingBike,
     boolean wheelchair
   ) {
-    double time, weight;
+    double time;
+    double weight;
     if (wheelchair) {
       time = getEffectiveWalkDistance() / speed;
       weight =

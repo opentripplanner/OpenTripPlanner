@@ -46,7 +46,8 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   private static final double DEFAULT_X_BIN_SIZE = 0.0035; // ~500m
 
   /* Size of bin in X and Y direction, in coordinates units. */
-  private final double xBinSize, yBinSize;
+  private final double xBinSize;
+  private final double yBinSize;
 
   /* The map of all bins. Please see visit() and xKey/yKey for details on the key. */
   private final TLongObjectHashMap<ArrayList<T>> bins;

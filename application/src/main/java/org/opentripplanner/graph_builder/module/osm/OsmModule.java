@@ -182,7 +182,9 @@ public class OsmModule implements GraphBuilderModule {
       osmdb.getWalkableAreas(),
       osmdb.getParkAndRideAreas(),
       osmdb.getBikeParkingAreas()
-    )) setWayName(area.parent);
+    )) {
+      setWayName(area.parent);
+    }
 
     // figure out which nodes that are actually intersections
     vertexGenerator.initIntersectionNodes();
@@ -335,7 +337,8 @@ public class OsmModule implements GraphBuilderModule {
       // this is a workaround for crappy OSM data quality
       ArrayList<Long> nodes = new ArrayList<>(way.getNodeRefs().size());
       long last = -1;
-      double lastLat = -1, lastLon = -1;
+      double lastLat = -1;
+      double lastLon = -1;
       String lastLevel = null;
       for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext();) {
         long nodeId = iter.next();

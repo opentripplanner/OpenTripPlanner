@@ -113,7 +113,8 @@ public class BinHeap<T> {
   }
 
   public T extract_min() {
-    int i, child;
+    int i;
+    int child;
     T minElem = elem[1];
     T lastElem = elem[size];
     double lastPrio = prio[size];

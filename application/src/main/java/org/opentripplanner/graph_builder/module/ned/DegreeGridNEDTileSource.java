@@ -72,7 +72,8 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
   }
 
   private String formatLatLon(int x, int y) {
-    String northSouth, eastWest;
+    String northSouth;
+    String eastWest;
     if (y < 0) {
       northSouth = "s";
       y = -y;

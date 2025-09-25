@@ -208,7 +208,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
    * @return a better upper bound index (exclusive)
    */
   private int binarySearchForTripIndex() {
-    int lower = 0, upper = nTrips;
+    int lower = 0;
+    int upper = nTrips;
 
     // Do a binary search to find where to start the search.
     while (upper - lower > binarySearchThreshold) {

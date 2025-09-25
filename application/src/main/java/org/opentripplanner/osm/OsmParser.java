@@ -105,7 +105,9 @@ class OsmParser extends BinaryParser {
 
   @Override
   protected void parseDense(Osmformat.DenseNodes nodes) {
-    long lastId = 0, lastLat = 0, lastLon = 0;
+    long lastId = 0;
+    long lastLat = 0;
+    long lastLon = 0;
     int j = 0; // Index into the keysvals array.
 
     if (parsePhase != OsmParserPhase.Nodes) {
@@ -121,7 +123,8 @@ class OsmParser extends BinaryParser {
       lastLon = lon;
       long id = nodes.getId(i) + lastId;
       lastId = id;
-      double latf = parseLat(lat), lonf = parseLon(lon);
+      double latf = parseLat(lat);
+      double lonf = parseLon(lon);
 
       tmp.setId(id);
       tmp.setOsmProvider(provider);
