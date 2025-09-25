@@ -49,10 +49,13 @@ Product Owners should have the ultimate decision in this. That way the core deve
 
 #### 6. Issues not made by regular contributors will have to be categorized
 
-*ToDo: Talk with Markus about this at the next dev-meeting*
-
-To be able to deal with issues efficiently, issues will have to be categorized. Possible categories:
-- bug
-- feature request
-- ...
+To be able to deal with issues efficiently, issues will have to be categorized. Markus will go through new issues:
+1. Close it if it is not a requested change to OTP
+2. Assign one of the following labels:
+ - `Bug`
+ - `Documentation`
+ - `Improvement`
+ - `New Feature`
+ - `Optimization`
+ - `Technical Debt`
 
