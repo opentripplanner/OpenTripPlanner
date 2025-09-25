@@ -1,10 +1,11 @@
-package org.opentripplanner.updater.vehicle_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
+
+import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedMapper.localizedString;
+import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedMapper.optionalLocalizedString;
 
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.mobilitydata.gbfs.v2_3.station_information.GBFSRentalUris;
-import org.mobilitydata.gbfs.v2_3.station_information.GBFSStation;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.mobilitydata.gbfs.v3_0.station_information.*;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
@@ -13,7 +14,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GbfsStationInformationMapper {
+class GbfsStationInformationMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsStationInformationMapper.class);
 
@@ -39,7 +40,7 @@ public class GbfsStationInformationMapper {
       station.getStationId() == null ||
       station.getStationId().isBlank() ||
       station.getName() == null ||
-      station.getName().isBlank() ||
+      station.getName().isEmpty() ||
       station.getLon() == null ||
       station.getLat() == null
     ) {
@@ -52,41 +53,40 @@ public class GbfsStationInformationMapper {
       );
       return null;
     }
-
     var builder = VehicleRentalStation.of()
       .withId(new FeedScopedId(system.systemId(), station.getStationId()))
       .withSystem(system)
       .withLongitude(station.getLon())
       .withLatitude(station.getLat())
-      .withName(new NonLocalizedString(station.getName()))
-      .withShortName(NonLocalizedString.ofNullable(station.getShortName()))
+      .withName(localizedString(station.getName(), GBFSName::getLanguage, GBFSName::getText))
+      .withShortName(
+        optionalLocalizedString(
+          station.getShortName(),
+          GBFSShortName::getLanguage,
+          GBFSShortName::getText
+        )
+      )
       .withCapacity(station.getCapacity() != null ? station.getCapacity().intValue() : null)
       .withIsArrivingInRentalVehicleAtDestinationAllowed(allowKeepingRentedVehicleAtDestination)
       .withOverloadingAllowed(overloadingAllowed);
 
-    if (station.getVehicleCapacity() != null && vehicleTypes != null) {
+    if (station.getVehicleTypesCapacity() != null && vehicleTypes != null) {
       builder.withVehicleTypeAreaCapacity(
         station
-          .getVehicleCapacity()
-          .getAdditionalProperties()
-          .entrySet()
+          .getVehicleTypesCapacity()
           .stream()
-          .collect(
-            Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue())
-          )
+          .flatMap(e -> e.getVehicleTypeIds().stream().map(t -> Map.entry(t, e.getCount())))
+          .collect(Collectors.toMap(e -> vehicleTypes.get(e.getKey()), Map.Entry::getValue))
       );
     }
 
-    if (station.getVehicleTypeCapacity() != null && vehicleTypes != null) {
+    if (station.getVehicleDocksCapacity() != null && vehicleTypes != null) {
       builder.withVehicleTypeDockCapacity(
         station
-          .getVehicleTypeCapacity()
-          .getAdditionalProperties()
-          .entrySet()
+          .getVehicleDocksCapacity()
           .stream()
-          .collect(
-            Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue())
-          )
+          .flatMap(e -> e.getVehicleTypeIds().stream().map(t -> Map.entry(t, e.getCount())))
+          .collect(Collectors.toMap(e -> vehicleTypes.get(e.getKey()), Map.Entry::getValue))
       );
     }
 

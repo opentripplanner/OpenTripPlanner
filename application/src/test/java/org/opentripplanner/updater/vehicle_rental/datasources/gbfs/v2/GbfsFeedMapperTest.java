@@ -1,9 +1,6 @@
-package org.opentripplanner.updater.vehicle_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,35 +12,41 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsVehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
+import org.slf4j.LoggerFactory;
 
 /**
  * This tests the mapping between data coming from a {@link GbfsFeedLoader} to OTP station models.
  */
-class GbfsVehicleRentalDataSourceTest {
+class GbfsFeedMapperTest {
 
   @Test
   void makeStationFromV22() {
-    var dataSource = new GbfsVehicleRentalDataSource(
-      new GbfsVehicleRentalDataSourceParameters(
-        "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
-        "nb",
-        false,
-        HttpHeaders.empty(),
-        null,
-        false,
-        false,
-        RentalPickupType.ALL
-      ),
-      new OtpHttpClientFactory()
+    var params = new GbfsVehicleRentalDataSourceParameters(
+      "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
+      "nb",
+      false,
+      HttpHeaders.empty(),
+      null,
+      false,
+      false,
+      RentalPickupType.ALL
     );
+    var otpHttpClient = new OtpHttpClientFactory()
+      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var loader = new GbfsFeedLoader(
+      params.url(),
+      params.httpHeaders(),
+      params.language(),
+      otpHttpClient
+    );
+    var mapper = new GbfsFeedMapper(loader, params);
 
-    dataSource.setup();
+    assertTrue(loader.update());
 
-    assertTrue(dataSource.update());
-
-    List<VehicleRentalPlace> stations = dataSource.getUpdates();
+    List<VehicleRentalPlace> stations = mapper.getUpdates();
     assertEquals(6, stations.size());
     assertTrue(
       stations
@@ -82,7 +85,7 @@ class GbfsVehicleRentalDataSourceTest {
   @Test
   void getEmptyListOfVehicleTypes() {
     GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper("systemID");
-    Map<String, RentalVehicleType> vehicleTypes = GbfsVehicleRentalDataSource.mapVehicleTypes(
+    Map<String, RentalVehicleType> vehicleTypes = GbfsFeedMapper.mapVehicleTypes(
       vehicleTypeMapper,
       Collections.emptyList()
     );
@@ -96,7 +99,7 @@ class GbfsVehicleRentalDataSourceTest {
     List<GBFSVehicleType> vehicleTypes = getDuplicatedGbfsVehicleTypes();
 
     assertDoesNotThrow(() -> {
-      GbfsVehicleRentalDataSource.mapVehicleTypes(vehicleTypeMapper, vehicleTypes);
+      GbfsFeedMapper.mapVehicleTypes(vehicleTypeMapper, vehicleTypes);
     });
   }
 
@@ -106,7 +109,7 @@ class GbfsVehicleRentalDataSourceTest {
 
     List<GBFSVehicleType> duplicatedVehicleTypes = getDuplicatedGbfsVehicleTypes();
 
-    Map<String, RentalVehicleType> vehicleTypes = GbfsVehicleRentalDataSource.mapVehicleTypes(
+    Map<String, RentalVehicleType> vehicleTypes = GbfsFeedMapper.mapVehicleTypes(
       vehicleTypeMapper,
       duplicatedVehicleTypes
     );
@@ -141,7 +144,7 @@ class GbfsVehicleRentalDataSourceTest {
 
     var frognerPark = zones
       .stream()
-      .filter(z -> z.id().getId().equals("NP Frogner og vigelandsparken"))
+      .filter(z -> z.name().toString().equals("NP Frogner og vigelandsparken"))
       .findFirst()
       .get();
 
@@ -152,31 +155,36 @@ class GbfsVehicleRentalDataSourceTest {
 
     assertEquals(1, businessAreas.size());
 
-    assertEquals("tieroslo:OSLO Summer 2021", businessAreas.get(0).id().toString());
+    assertEquals("OSLO Summer 2021", businessAreas.get(0).name().toString());
+    assertEquals("tieroslo:4640262c", businessAreas.get(0).id().toString());
   }
 
   @Test
   void makeStationFromV10() {
     var network = "helsinki_gbfs";
-    var dataSource = new GbfsVehicleRentalDataSource(
-      new GbfsVehicleRentalDataSourceParameters(
-        "file:src/test/resources/gbfs/helsinki/gbfs.json",
-        "en",
-        false,
-        HttpHeaders.empty(),
-        network,
-        false,
-        true,
-        RentalPickupType.ALL
-      ),
-      new OtpHttpClientFactory()
+    var params = new GbfsVehicleRentalDataSourceParameters(
+      "file:src/test/resources/gbfs/helsinki/gbfs.json",
+      "en",
+      false,
+      HttpHeaders.empty(),
+      network,
+      false,
+      true,
+      RentalPickupType.ALL
     );
+    var otpHttpClient = new OtpHttpClientFactory()
+      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var loader = new GbfsFeedLoader(
+      params.url(),
+      params.httpHeaders(),
+      params.language(),
+      otpHttpClient
+    );
+    var mapper = new GbfsFeedMapper(loader, params);
 
-    dataSource.setup();
+    assertTrue(loader.update());
 
-    assertTrue(dataSource.update());
-
-    List<VehicleRentalPlace> stations = dataSource.getUpdates();
+    List<VehicleRentalPlace> stations = mapper.getUpdates();
     // There are 10 stations in the data but 5 are missing required data
     assertEquals(5, stations.size());
     assertTrue(

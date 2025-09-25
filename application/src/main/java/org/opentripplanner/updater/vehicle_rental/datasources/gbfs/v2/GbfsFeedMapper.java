@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,15 +15,12 @@ import org.mobilitydata.gbfs.v2_3.system_information.GBFSSystemInformation;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.io.OtpHttpClient;
-import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
-import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,31 +32,19 @@ import org.slf4j.LoggerFactory;
  * VehicleRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be
  * used.
  */
-class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
+public class GbfsFeedMapper
+  implements org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsFeedMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleRentalDataSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedMapper.class);
 
+  private final GbfsFeedLoader loader;
   private final GbfsVehicleRentalDataSourceParameters params;
-
-  private final OtpHttpClient otpHttpClient;
-  private GbfsFeedLoader loader;
   private List<GeofencingZone> geofencingZones = List.of();
   private boolean logGeofencingZonesDoesNotExistWarning = true;
 
-  public GbfsVehicleRentalDataSource(
-    GbfsVehicleRentalDataSourceParameters parameters,
-    OtpHttpClientFactory otpHttpClientFactory
-  ) {
-    this.params = parameters;
-    this.otpHttpClient = otpHttpClientFactory.create(LOG);
-  }
-
-  @Override
-  public boolean update() {
-    if (loader == null) {
-      return false;
-    }
-    return loader.update();
+  public GbfsFeedMapper(GbfsFeedLoader loader, GbfsVehicleRentalDataSourceParameters params) {
+    this.loader = loader;
+    this.params = params;
   }
 
   @Override
@@ -151,33 +136,11 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
   }
 
   @Override
-  public void setup() {
-    loader = new GbfsFeedLoader(
-      params.url(),
-      params.httpHeaders(),
-      params.language(),
-      otpHttpClient
-    );
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder.of(GbfsVehicleRentalDataSource.class)
-      .addStr("url", params.url())
-      .addStr("language", params.language())
-      .addBoolIfTrue(
-        "allowKeepingRentedVehicleAtDestination",
-        params.allowKeepingRentedVehicleAtDestination()
-      )
-      .toString();
-  }
-
-  @Override
   public List<GeofencingZone> getGeofencingZones() {
     return this.geofencingZones;
   }
 
-  protected static Map<String, RentalVehicleType> mapVehicleTypes(
+  public static Map<String, RentalVehicleType> mapVehicleTypes(
     GbfsVehicleTypeMapper vehicleTypeMapper,
     List<GBFSVehicleType> gbfsVehicleTypes
   ) {

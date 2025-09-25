@@ -1,19 +1,19 @@
-package org.opentripplanner.updater.vehicle_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
-import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleTypesAvailable;
+import org.mobilitydata.gbfs.v3_0.station_status.GBFSStation;
+import org.mobilitydata.gbfs.v3_0.station_status.GBFSVehicleTypesAvailable;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.ReturnPolicy;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GbfsStationStatusMapper {
+class GbfsStationStatusMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsStationStatusMapper.class);
   private static final Collector<
@@ -39,8 +39,8 @@ public class GbfsStationStatusMapper {
     }
     GBFSStation status = statusLookup.get(station.stationId());
 
-    int vehiclesAvailable = status.getNumBikesAvailable() != null
-      ? status.getNumBikesAvailable()
+    int vehiclesAvailable = status.getNumVehiclesAvailable() != null
+      ? status.getNumVehiclesAvailable()
       : 0;
 
     Map<RentalVehicleType, Integer> vehicleTypesAvailable = status.getVehicleTypesAvailable() !=
@@ -52,7 +52,9 @@ public class GbfsStationStatusMapper {
         .collect(Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> e.getCount()))
       : Map.of(RentalVehicleType.getDefaultType(station.network()), vehiclesAvailable);
 
-    int vehiclesDisabled = status.getNumBikesDisabled() != null ? status.getNumBikesDisabled() : 0;
+    int vehiclesDisabled = status.getNumVehiclesDisabled() != null
+      ? status.getNumVehiclesDisabled()
+      : 0;
 
     int spacesAvailable = status.getNumDocksAvailable() != null
       ? status.getNumDocksAvailable()

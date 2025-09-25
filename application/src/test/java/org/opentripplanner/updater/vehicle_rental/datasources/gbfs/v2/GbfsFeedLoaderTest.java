@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,26 +28,30 @@ import org.mobilitydata.gbfs.v2_3.system_pricing_plans.GBFSSystemPricingPlans;
 import org.mobilitydata.gbfs.v2_3.system_regions.GBFSSystemRegions;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.LoggerFactory;
 
 /**
  * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS correctly,
- * that the optional language paraameter works correctly, and that the different files in a GBFS
+ * that the optional language parameter works correctly, and that the different files in a GBFS
  * bundle are all included, with all information in them.
  */
 class GbfsFeedLoaderTest {
 
   public static final String LANGUAGE_NB = "nb";
   public static final String LANGUAGE_EN = "en";
+  private static final OtpHttpClient otpHttpClient = new OtpHttpClientFactory()
+    .create(LoggerFactory.getLogger(GbfsFeedLoaderTest.class));
 
   @Test
   void getV22FeedWithExplicitLanguage() {
     GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
       HttpHeaders.empty(),
-      LANGUAGE_NB
+      LANGUAGE_NB,
+      otpHttpClient
     );
 
     validateV22Feed(loader);
@@ -58,7 +62,8 @@ class GbfsFeedLoaderTest {
     GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
       HttpHeaders.empty(),
-      null
+      null,
+      otpHttpClient
     );
 
     validateV22Feed(loader);
@@ -70,7 +75,8 @@ class GbfsFeedLoaderTest {
       new GbfsFeedLoader(
         "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
         HttpHeaders.empty(),
-        LANGUAGE_EN
+        LANGUAGE_EN,
+        otpHttpClient
       )
     );
   }
@@ -80,7 +86,8 @@ class GbfsFeedLoaderTest {
     GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/helsinki/gbfs.json",
       HttpHeaders.empty(),
-      LANGUAGE_EN
+      LANGUAGE_EN,
+      otpHttpClient
     );
 
     validateV10Feed(loader);
@@ -89,35 +96,30 @@ class GbfsFeedLoaderTest {
   @Test
   @Disabled
   void fetchAllPublicFeeds() {
-    try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
-      var otpHttpClient = otpHttpClientFactory.create(
-        LoggerFactory.getLogger(GbfsFeedLoaderTest.class)
-      );
-      List<Exception> exceptions = otpHttpClient.getAndMap(
-        URI.create("https://raw.githubusercontent.com/NABSA/gbfs/master/systems.csv"),
-        Map.of(),
-        is -> {
-          List<Exception> cvsExceptions = new ArrayList<>();
-          CsvReader reader = new CsvReader(is, StandardCharsets.UTF_8);
-          reader.readHeaders();
-          while (reader.readRecord()) {
-            try {
-              String url = reader.get("Auto-Discovery URL");
-              new GbfsFeedLoader(url, HttpHeaders.empty(), null).update();
-            } catch (Exception e) {
-              cvsExceptions.add(e);
-            }
+    List<Exception> exceptions = otpHttpClient.getAndMap(
+      URI.create("https://raw.githubusercontent.com/NABSA/gbfs/master/systems.csv"),
+      Map.of(),
+      is -> {
+        List<Exception> cvsExceptions = new ArrayList<>();
+        CsvReader reader = new CsvReader(is, StandardCharsets.UTF_8);
+        reader.readHeaders();
+        while (reader.readRecord()) {
+          try {
+            String url = reader.get("Auto-Discovery URL");
+            new GbfsFeedLoader(url, HttpHeaders.empty(), null, otpHttpClient).update();
+          } catch (Exception e) {
+            cvsExceptions.add(e);
           }
-
-          return cvsExceptions;
         }
-      );
 
-      assertTrue(
-        exceptions.isEmpty(),
-        exceptions.stream().map(Exception::getMessage).collect(Collectors.joining("\n"))
-      );
-    }
+        return cvsExceptions;
+      }
+    );
+
+    assertTrue(
+      exceptions.isEmpty(),
+      exceptions.stream().map(Exception::getMessage).collect(Collectors.joining("\n"))
+    );
   }
 
   @Test
@@ -126,7 +128,8 @@ class GbfsFeedLoaderTest {
     new GbfsFeedLoader(
       "https://gbfs.spin.pm/api/gbfs/v2_2/edmonton/gbfs",
       HttpHeaders.empty(),
-      null
+      null,
+      otpHttpClient
     ).update();
   }
 
@@ -135,7 +138,8 @@ class GbfsFeedLoaderTest {
     GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/tieroslo/gbfs.json",
       HttpHeaders.empty(),
-      LANGUAGE_EN
+      LANGUAGE_EN,
+      otpHttpClient
     );
 
     loader.update();

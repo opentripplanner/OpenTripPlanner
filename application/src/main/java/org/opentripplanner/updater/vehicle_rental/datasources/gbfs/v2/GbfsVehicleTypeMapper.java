@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -6,7 +6,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class GbfsVehicleTypeMapper {
+class GbfsVehicleTypeMapper {
 
   private final String systemId;
 
@@ -19,9 +19,24 @@ public class GbfsVehicleTypeMapper {
       new FeedScopedId(systemId, vehicleType.getVehicleTypeId()),
       NonLocalizedString.ofNullable(vehicleType.getName()),
       fromGbfs(vehicleType.getFormFactor()),
-      RentalVehicleType.PropulsionType.fromGbfs(vehicleType.getPropulsionType()),
+      fromGbfs(vehicleType.getPropulsionType()),
       vehicleType.getMaxRangeMeters()
     );
+  }
+
+  public static RentalVehicleType.PropulsionType fromGbfs(
+    GBFSVehicleType.PropulsionType propulsionType
+  ) {
+    return switch (propulsionType) {
+      case HUMAN -> RentalVehicleType.PropulsionType.HUMAN;
+      case ELECTRIC_ASSIST -> RentalVehicleType.PropulsionType.ELECTRIC_ASSIST;
+      case ELECTRIC -> RentalVehicleType.PropulsionType.ELECTRIC;
+      case COMBUSTION -> RentalVehicleType.PropulsionType.COMBUSTION;
+      case COMBUSTION_DIESEL -> RentalVehicleType.PropulsionType.COMBUSTION_DIESEL;
+      case HYBRID -> RentalVehicleType.PropulsionType.HYBRID;
+      case PLUG_IN_HYBRID -> RentalVehicleType.PropulsionType.PLUG_IN_HYBRID;
+      case HYDROGEN_FUEL_CELL -> RentalVehicleType.PropulsionType.HYDROGEN_FUEL_CELL;
+    };
   }
 
   private static RentalFormFactor fromGbfs(GBFSVehicleType.FormFactor formFactor) {

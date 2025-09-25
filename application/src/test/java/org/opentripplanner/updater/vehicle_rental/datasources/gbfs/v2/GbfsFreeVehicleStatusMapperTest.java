@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

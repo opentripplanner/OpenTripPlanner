@@ -1,0 +1,63 @@
+{
+  "data": {
+    "vehicles": [
+      {
+        "current_range_meters": 32400,
+        "is_disabled": false,
+        "is_reserved": false,
+        "lat": 52.40078,
+        "lon": 5.29054,
+        "vehicle_id": "d44a73a8-d9b1-483d-a90f-4ab6617e6d82",
+        "vehicle_type_id": "check_moped_almere_60"
+      },
+      {
+        "current_range_meters": 39600,
+        "is_disabled": false,
+        "is_reserved": false,
+        "lat": 52.35587,
+        "lon": 5.14813,
+        "vehicle_id": "3b2134cd-b5ca-4552-9469-98db6bad4c67",
+        "vehicle_type_id": "check_moped_almere_60"
+      },
+      {
+        "current_range_meters": 10200,
+        "is_disabled": false,
+        "is_reserved": false,
+        "lat": 52.36154,
+        "lon": 5.2467,
+        "vehicle_id": "ce1c5047-882e-43f5-9a4c-98e3d8d702b4",
+        "vehicle_type_id": "check_moped_almere_60"
+      },
+      {
+        "current_range_meters": 55200,
+        "is_disabled": false,
+        "is_reserved": false,
+        "lat": 52.35059,
+        "lon": 5.14265,
+        "vehicle_id": "c1ff3dc8-ac8a-4b7a-9424-37d396724dd7",
+        "vehicle_type_id": "check_moped_almere_60"
+      },
+      {
+        "current_range_meters": 34800,
+        "is_disabled": false,
+        "is_reserved": true,
+        "lat": 52.38493,
+        "lon": 5.2024,
+        "vehicle_id": "d0a4bf4e-81b4-479c-a9f6-712ee44564f3",
+        "vehicle_type_id": "check_moped_almere_60"
+      },
+      {
+        "current_range_meters": 31800,
+        "is_disabled": true,
+        "is_reserved": false,
+        "lat": 52.36547,
+        "lon": 5.18985,
+        "vehicle_id": "526774a3-6243-40b6-b632-a9e0e16745c6",
+        "vehicle_type_id": "check_moped_almere_60"
+      }
+    ]
+  },
+  "last_updated": "2025-05-21T07:48:04.229881+00:00",
+  "ttl": 600,
+  "version": "3.0"
+}
