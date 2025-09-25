@@ -188,8 +188,10 @@ public class StatesToWalkStepsMapper {
       return;
     } else if (edge instanceof EscalatorEdge) {
       addStep(createEscalatorWalkStep(backState, forwardState, edge));
+      return;
     } else if (edge instanceof StreetEdge streetEdge && streetEdge.isStairs()) {
       addStep(createStairsWalkStep(backState, forwardState, edge));
+      return;
     } else if (backState.getVertex() instanceof StationEntranceVertex stationEntranceVertex) {
       addStep(createStationEntranceWalkStep(backState, forwardState, stationEntranceVertex));
       return;
@@ -291,11 +293,15 @@ public class StatesToWalkStepsMapper {
         boolean isOnSameStreet = lastStep
           .directionTextNoParens()
           .equals(threeBack.directionTextNoParens());
-        if (twoBack.distance() < MAX_ZAG_DISTANCE && isOnSameStreet && !twoBack.hasEntrance()) {
+        if (
+          twoBack.distance() < MAX_ZAG_DISTANCE &&
+          isOnSameStreet &&
+          checkStepForValidZagRemoval(twoBack)
+        ) {
           if (isUTurn(twoBack, lastStep)) {
             steps.remove(lastIndex - 1);
             processUTurn(lastStep, twoBack);
-          } else if (!lastStep.hasEntrance()) {
+          } else if (checkStepForValidZagRemoval(lastStep)) {
             // total hack to remove zags.
             steps.remove(lastIndex);
             steps.remove(lastIndex - 1);
@@ -364,6 +370,15 @@ public class StatesToWalkStepsMapper {
         current.addElevation(twoBack.elevationProfile().transformX(current.distance()));
       }
     }
+  }
+
+  private boolean checkStepForValidZagRemoval(WalkStepBuilder walkStepBuilder) {
+    return (
+      !walkStepBuilder.hasEntrance() &&
+      walkStepBuilder.relativeDirection() != RelativeDirection.ESCALATOR &&
+      walkStepBuilder.relativeDirection() != RelativeDirection.STAIRS &&
+      walkStepBuilder.relativeDirection() != RelativeDirection.ELEVATOR
+    );
   }
 
   private void processUTurn(WalkStepBuilder lastStep, WalkStepBuilder twoBack) {
@@ -610,18 +625,20 @@ public class StatesToWalkStepsMapper {
     State forwardState,
     StationEntranceVertex vertex
   ) {
-    Entrance entrance = Entrance.of(vertex.id())
-      .withCode(vertex.code())
-      .withCoordinate(new WgsCoordinate(vertex.getCoordinate()))
-      .withWheelchairAccessibility(vertex.wheelchairAccessibility())
-      .build();
-
     // don't care what came before or comes after
     return createWalkStep(forwardState, backState)
       // There is not a way to definitively determine if a user is entering or exiting the station,
       // since the doors might be between or inside stations.
       .withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
-      .withEntrance(entrance);
+      .withEntrance(getEntrance(vertex));
+  }
+
+  private Entrance getEntrance(StationEntranceVertex vertex) {
+    return Entrance.of(vertex.id())
+      .withCode(vertex.code())
+      .withCoordinate(new WgsCoordinate(vertex.getCoordinate()))
+      .withWheelchairAccessibility(vertex.wheelchairAccessibility())
+      .build();
   }
 
   private void createAndSaveStep(
