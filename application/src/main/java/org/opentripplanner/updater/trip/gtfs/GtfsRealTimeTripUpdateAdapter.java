@@ -6,7 +6,7 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_IM
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_TRIP_FOR_CANCELLATION_FOUND;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_UPDATES;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.OUTSIDE_SCHEDULE_PERIOD;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.OUTSIDE_SERVICE_PERIOD;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
@@ -450,7 +450,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     // get service ID running only on this service date
     var serviceId = transitEditorService.getOrCreateServiceIdForDate(serviceDate);
     if (serviceId == null) {
-      return UpdateError.result(tripId, OUTSIDE_SCHEDULE_PERIOD);
+      return UpdateError.result(tripId, OUTSIDE_SERVICE_PERIOD);
     }
     tripBuilder.withServiceId(serviceId);
 

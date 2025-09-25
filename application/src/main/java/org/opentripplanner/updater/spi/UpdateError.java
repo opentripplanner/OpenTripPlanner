@@ -58,7 +58,7 @@ public record UpdateError(
     STOP_MISMATCH,
     NO_SERVICE_ON_DATE,
     // an extra/added trip has a service date which is before or after any schedule data
-    OUTSIDE_SCHEDULE_PERIOD,
+    OUTSIDE_SERVICE_PERIOD,
     INVALID_ARRIVAL_TIME,
     INVALID_DEPARTURE_TIME,
     NEGATIVE_DWELL_TIME,

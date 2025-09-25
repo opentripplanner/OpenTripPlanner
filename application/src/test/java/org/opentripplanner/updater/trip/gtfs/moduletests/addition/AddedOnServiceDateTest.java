@@ -4,7 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.NEW;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.OUTSIDE_SCHEDULE_PERIOD;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.OUTSIDE_SERVICE_PERIOD;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
@@ -79,6 +79,6 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
       .addStopTime(STOP_C_ID, "10:55")
       .build();
 
-    assertFailure(OUTSIDE_SCHEDULE_PERIOD, env.applyTripUpdate(tripUpdate));
+    assertFailure(OUTSIDE_SERVICE_PERIOD, env.applyTripUpdate(tripUpdate));
   }
 }
