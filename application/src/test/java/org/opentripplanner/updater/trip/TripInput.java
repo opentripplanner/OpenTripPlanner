@@ -76,6 +76,10 @@ public record TripInput(
       return this;
     }
 
+    public TripInputBuilder addStop(RegularStop stopId, String arrivalAndDeparture) {
+      return addStop(stopId, arrivalAndDeparture, arrivalAndDeparture);
+    }
+
     public TripInput build() {
       return new TripInput(id, route, stops, serviceDates, headsign);
     }

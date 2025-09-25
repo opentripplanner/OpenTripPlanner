@@ -4,10 +4,13 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.OUTSIDE_SCHEDULE_PERIOD;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -31,10 +34,11 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
   private final RealtimeTestEnvironment env = envBuilder
     .addTrip(
       TripInput.of(TRIP_1_ID)
+        // on either side of added date, but not on it
         .withServiceDates(START_DATE, END_DATE)
-        .addStop(STOP_A, "12:00", "12:01")
-        .addStop(STOP_B, "12:10", "12:11")
-        .addStop(STOP_C, "12:20", "12:21")
+        .addStop(STOP_A, "12:00")
+        .addStop(STOP_B, "12:10")
+        .addStop(STOP_C, "12:20")
         .build()
     )
     .build();
@@ -61,5 +65,17 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
       .getCalendarService()
       .getServiceDatesForServiceId(trip.getServiceId());
     assertThat(dates).containsExactly(date);
+  }
+
+  @Test
+  void rejectOutsideSchedulePeriod() {
+    var farFutureDate = SERVICE_DATE.plusYears(1);
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, farFutureDate, ADDED, TIME_ZONE)
+      .addStopTime(STOP_A_ID, "10:30")
+      .addStopTime(STOP_B_ID, "10:40")
+      .addStopTime(STOP_C_ID, "10:55")
+      .build();
+
+    assertFailure(OUTSIDE_SCHEDULE_PERIOD, env.applyTripUpdate(tripUpdate));
   }
 }
