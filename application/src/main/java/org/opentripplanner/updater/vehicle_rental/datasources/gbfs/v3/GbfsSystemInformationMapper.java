@@ -1,7 +1,7 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
 
-import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedMapper.localizedString;
-import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedMapper.optionalLocalizedString;
+import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedMapper.localizedString;
+import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedMapper.optionalLocalizedString;
 
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v3_0.system_information.GBFSData;

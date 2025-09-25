@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2_3;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import org.mobilitydata.gbfs.v2_3.system_information.GBFSData;
 import org.opentripplanner.framework.i18n.I18NString;

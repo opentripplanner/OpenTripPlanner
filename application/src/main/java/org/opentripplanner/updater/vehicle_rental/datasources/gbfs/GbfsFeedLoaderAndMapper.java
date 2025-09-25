@@ -43,47 +43,44 @@ public class GbfsFeedLoaderAndMapper {
     switch (gbfsFeedVersion) {
       case "3.0" -> {
         var loaderv30 =
-          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedLoader(
+          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedLoader(
             params.url(),
             params.httpHeaders(),
             client
           );
         loader = loaderv30;
-        mapper =
-          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0.GbfsFeedMapper(
-            loaderv30,
-            params
-          );
+        mapper = new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedMapper(
+          loaderv30,
+          params
+        );
       }
       case "2.2", "2.3" -> {
         var loaderv23 =
-          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2_3.GbfsFeedLoader(
+          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2.GbfsFeedLoader(
             params.url(),
             params.httpHeaders(),
             params.language(),
             client
           );
         loader = loaderv23;
-        mapper =
-          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2_3.GbfsFeedMapper(
-            loaderv23,
-            params
-          );
+        mapper = new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2.GbfsFeedMapper(
+          loaderv23,
+          params
+        );
       }
       case null -> {
         var loaderv23 =
-          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2_3.GbfsFeedLoader(
+          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2.GbfsFeedLoader(
             params.url(),
             params.httpHeaders(),
             params.language(),
             client
           );
         loader = loaderv23;
-        mapper =
-          new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2_3.GbfsFeedMapper(
-            loaderv23,
-            params
-          );
+        mapper = new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2.GbfsFeedMapper(
+          loaderv23,
+          params
+        );
       }
       default -> throw new UnsupportedOperationException(
         "Unsupported GBFS version " + gbfsFeedVersion + " for url " + params.url()

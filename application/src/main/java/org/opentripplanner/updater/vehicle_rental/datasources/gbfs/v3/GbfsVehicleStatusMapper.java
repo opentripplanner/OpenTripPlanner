@@ -1,37 +1,30 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2_3;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
 
 import static java.util.Objects.requireNonNullElse;
 
-import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
-import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSRentalUris;
+import org.mobilitydata.gbfs.v3_0.vehicle_status.GBFSVehicle;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
-import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.service.vehiclerental.model.*;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Ratio;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class GbfsFreeVehicleStatusMapper {
+class GbfsVehicleStatusMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GbfsFreeVehicleStatusMapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleStatusMapper.class);
   private static final Throttle LOG_THROTTLE = Throttle.ofOneMinute();
 
   private final VehicleRentalSystem system;
 
   private final Map<String, RentalVehicleType> vehicleTypes;
 
-  public GbfsFreeVehicleStatusMapper(
+  public GbfsVehicleStatusMapper(
     VehicleRentalSystem system,
     @Nullable Map<String, RentalVehicleType> vehicleTypes
   ) {
@@ -39,7 +32,7 @@ class GbfsFreeVehicleStatusMapper {
     this.vehicleTypes = new HashMap<>(requireNonNullElse(vehicleTypes, Map.of()));
   }
 
-  public VehicleRentalVehicle mapFreeVehicleStatus(GBFSBike vehicle) {
+  public VehicleRentalVehicle mapVehicleStatus(GBFSVehicle vehicle) {
     if (
       (vehicle.getStationId() == null || vehicle.getStationId().isBlank()) &&
       vehicle.getLon() != null &&
@@ -59,7 +52,6 @@ class GbfsFreeVehicleStatusMapper {
           )
         );
       }).orElse(null);
-
       // if the propulsion type has an engine current_range_meters is required
       if (
         vehicle.getVehicleTypeId() != null &&
@@ -72,7 +64,7 @@ class GbfsFreeVehicleStatusMapper {
       }
 
       var builder = VehicleRentalVehicle.of()
-        .withId(new FeedScopedId(system.systemId(), vehicle.getBikeId()))
+        .withId(new FeedScopedId(system.systemId(), vehicle.getVehicleId()))
         .withSystem(system)
         .withName(getName(vehicle))
         .withLongitude(vehicle.getLon())
@@ -87,32 +79,13 @@ class GbfsFreeVehicleStatusMapper {
         .withIsDisabled(vehicle.getIsDisabled() != null ? vehicle.getIsDisabled() : false)
         .withFuel(RentalVehicleFuel.of().withPercent(fuelRatio).withRange(rangeMeters).build());
 
-      String availableUntil = vehicle.getAvailableUntil();
-      if (StringUtils.hasValue(availableUntil)) {
-        builder.withAvailableUntil(OffsetDateTime.parse(availableUntil));
-      }
-
-      GBFSRentalUris rentalUris = vehicle.getRentalUris();
-      if (rentalUris != null) {
-        String androidUri = rentalUris.getAndroid();
-        String iosUri = rentalUris.getIos();
-        String webUri = rentalUris.getWeb();
-        builder.withRentalUris(
-          VehicleRentalStationUris.of()
-            .withAndroid(androidUri)
-            .withIos(iosUri)
-            .withWeb(webUri)
-            .build()
-        );
-      }
-
       return builder.build();
     } else {
       return null;
     }
   }
 
-  private I18NString getName(GBFSBike vehicle) {
+  private I18NString getName(GBFSVehicle vehicle) {
     var typeId = vehicle.getVehicleTypeId();
     if (typeId != null) {
       var type = vehicleTypes.get(typeId);

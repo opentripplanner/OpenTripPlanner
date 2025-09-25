@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -38,6 +39,7 @@ public class RealtimeTestEnvironmentBuilder {
   private final HashMap<String, Station> stations = new HashMap<>();
   private final List<TripInput> tripInputs = new ArrayList<>();
   private final List<FlexTripInput> flexTripInputs = new ArrayList<>();
+  private final Map<FeedScopedId, RegularStop> scheduledStopPointMapping = new HashMap<>();
 
   RealtimeTestEnvironmentBuilder() {}
 
@@ -96,6 +98,8 @@ public class RealtimeTestEnvironmentBuilder {
         pattern.getScheduledTimetable().setServiceCodes(timetableRepository.getServiceCodes());
       });
 
+    timetableRepository.addScheduledStopPointMapping(scheduledStopPointMapping);
+
     timetableRepository.index();
     return new RealtimeTestEnvironment(timetableRepository, SERVICE_DATE, TIME_ZONE);
   }
@@ -129,6 +133,13 @@ public class RealtimeTestEnvironmentBuilder {
 
   public RealtimeTestEnvironmentBuilder addFlexTrip(FlexTripInput tripInput) {
     flexTripInputs.add(tripInput);
+    return this;
+  }
+
+  public RealtimeTestEnvironmentBuilder addScheduledStopPointMapping(
+    Map<FeedScopedId, RegularStop> mapping
+  ) {
+    scheduledStopPointMapping.putAll(mapping);
     return this;
   }
 

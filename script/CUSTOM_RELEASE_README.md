@@ -38,7 +38,7 @@ based on the `base revision` - a branch, tag or commit, for example `otp/dev-2.x
 6. Then the script update the _otp-serialization-version-id_ and the OTP _version_ in the pom.xml 
    file. Each release is given a unique version number specific to your fork, like 
    `v2.7.0-MY_ORG-1`. The release script uses both the git history and the GitHub GraphQL API 
-   (PRs labeled `bump serialization id`) to resolve the serialization version number. 
+   (PRs labeled `+Bump Serialization Id`) to resolve the serialization version number. 
 7. Finally the release is tagged and pushed to the remote Git repository. The repository is 
    configured in the `custom-release-env.json` file.
 

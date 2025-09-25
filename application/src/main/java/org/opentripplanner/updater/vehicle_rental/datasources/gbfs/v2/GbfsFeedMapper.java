@@ -1,6 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3_0;
-
-import static java.util.stream.Collectors.toMap;
+package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,18 +6,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSGeofencingZones;
-import org.mobilitydata.gbfs.v3_0.station_information.GBFSStationInformation;
-import org.mobilitydata.gbfs.v3_0.station_status.GBFSStation;
-import org.mobilitydata.gbfs.v3_0.station_status.GBFSStationStatus;
-import org.mobilitydata.gbfs.v3_0.system_information.GBFSSystemInformation;
-import org.mobilitydata.gbfs.v3_0.vehicle_status.GBFSVehicleStatus;
-import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
-import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleTypes;
+import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSFreeBikeStatus;
+import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
+import org.mobilitydata.gbfs.v2_3.station_information.GBFSStationInformation;
+import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
+import org.mobilitydata.gbfs.v2_3.station_status.GBFSStationStatus;
+import org.mobilitydata.gbfs.v2_3.system_information.GBFSSystemInformation;
+import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
+import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -29,6 +24,14 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPicku
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Created by demory on 2017-03-14.
+ * <p>
+ * Leaving OTPFeature.FloatingBike turned off both prevents floating bike updaters added to
+ * router-config.json from being used, but more importantly, floating bikes added by a
+ * VehicleRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be
+ * used.
+ */
 public class GbfsFeedMapper
   implements org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsFeedMapper {
 
@@ -60,8 +63,8 @@ public class GbfsFeedMapper
     List<VehicleRentalPlace> stations = new LinkedList<>();
     if (params.allowRentalType(RentalPickupType.STATION)) {
       // Both station information and status are required for all systems using stations
-      var stationInformation = loader.getFeed(GBFSStationInformation.class);
-      var stationStatus = loader.getFeed(GBFSStationStatus.class);
+      GBFSStationInformation stationInformation = loader.getFeed(GBFSStationInformation.class);
+      GBFSStationStatus stationStatus = loader.getFeed(GBFSStationStatus.class);
       if (stationInformation != null && stationStatus != null) {
         // Index all the station status entries on their station ID.
         Map<String, GBFSStation> statusLookup = stationStatus
@@ -96,18 +99,18 @@ public class GbfsFeedMapper
 
     // Append the floating bike stations.
     if (OTPFeature.FloatingBike.isOn() && params.allowRentalType(RentalPickupType.FREE_FLOATING)) {
-      var freeBikeStatus = loader.getFeed(GBFSVehicleStatus.class);
+      GBFSFreeBikeStatus freeBikeStatus = loader.getFeed(GBFSFreeBikeStatus.class);
       if (freeBikeStatus != null) {
-        GbfsVehicleStatusMapper freeVehicleStatusMapper = new GbfsVehicleStatusMapper(
+        GbfsFreeVehicleStatusMapper freeVehicleStatusMapper = new GbfsFreeVehicleStatusMapper(
           system,
           vehicleTypes
         );
         stations.addAll(
           freeBikeStatus
             .getData()
-            .getVehicles()
+            .getBikes()
             .stream()
-            .map(freeVehicleStatusMapper::mapVehicleStatus)
+            .map(freeVehicleStatusMapper::mapFreeVehicleStatus)
             .filter(Objects::nonNull)
             .toList()
         );
@@ -149,42 +152,12 @@ public class GbfsFeedMapper
   }
 
   private Map<String, RentalVehicleType> getVehicleTypes(VehicleRentalSystem system) {
-    var rawVehicleTypes = loader.getFeed(GBFSVehicleTypes.class);
+    GBFSVehicleTypes rawVehicleTypes = loader.getFeed(GBFSVehicleTypes.class);
     if (rawVehicleTypes != null) {
       GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper(system.systemId());
       List<GBFSVehicleType> gbfsVehicleTypes = rawVehicleTypes.getData().getVehicleTypes();
       return mapVehicleTypes(vehicleTypeMapper, gbfsVehicleTypes);
     }
     return Map.of();
-  }
-
-  static <X> @Nullable I18NString optionalLocalizedString(
-    @Nullable List<X> name,
-    Function<X, String> language,
-    Function<X, String> text
-  ) {
-    if (name == null || name.isEmpty()) {
-      return null;
-    }
-
-    return TranslatedString.getI18NString(
-      name.stream().collect(toMap(language, text)),
-      true,
-      false
-    );
-  }
-
-  static <X> I18NString localizedString(
-    List<X> name,
-    Function<X, String> language,
-    Function<X, String> text
-  ) {
-    var converted = optionalLocalizedString(name, language, text);
-
-    if (converted == null) {
-      throw new IllegalArgumentException("Empty localized field");
-    }
-
-    return converted;
   }
 }
