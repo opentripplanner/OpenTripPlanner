@@ -57,6 +57,8 @@ public record UpdateError(
     // since they do not belong to the same station.
     STOP_MISMATCH,
     NO_SERVICE_ON_DATE,
+    // an extra/added trip has a service that is not covered by scheduled data
+    OUTSIDE_SCHEDULE_PERIOD,
     INVALID_ARRIVAL_TIME,
     INVALID_DEPARTURE_TIME,
     NEGATIVE_DWELL_TIME,

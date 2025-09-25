@@ -33,7 +33,6 @@ import org.opentripplanner.updater.trip.FlexTripInput.FlexStop;
 
 public class RealtimeTestEnvironmentBuilder {
 
-  private static final FeedScopedId SERVICE_ID = id("CAL_1");
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
   private final List<StopLocation> stops = new ArrayList<>();
   private final HashMap<String, Station> stations = new HashMap<>();
@@ -64,8 +63,9 @@ public class RealtimeTestEnvironmentBuilder {
       new Deduplicator()
     );
 
+    CalendarServiceData calendarServiceData = new CalendarServiceData();
     for (TripInput tripInput : tripInputs) {
-      createTrip(tripInput, timetableRepository);
+      createTrip(tripInput, timetableRepository, calendarServiceData);
     }
     for (FlexTripInput tripInput : flexTripInputs) {
       createFlexTrip(tripInput, timetableRepository);
@@ -74,18 +74,13 @@ public class RealtimeTestEnvironmentBuilder {
     timetableRepository.initTimeZone(TIME_ZONE);
     timetableRepository.addAgency(TimetableRepositoryForTest.AGENCY);
 
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
-    calendarServiceData.putServiceDatesForServiceId(
-      SERVICE_ID,
-      List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
-    );
-
-    timetableRepository.getServiceCodes().put(SERVICE_ID, 0);
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
+    if (!tripInputs.isEmpty()) {
+      timetableRepository.updateCalendarServiceData(
+        true,
+        calendarServiceData,
+        DataImportIssueStore.NOOP
+      );
+    }
     timetableRepository
       .getAllTripPatterns()
       .forEach(pattern -> {
@@ -143,11 +138,16 @@ public class RealtimeTestEnvironmentBuilder {
     return this;
   }
 
-  private static void createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
+  private static void createTrip(
+    TripInput tripInput,
+    TimetableRepository timetableRepository,
+    CalendarServiceData calendarServiceData
+  ) {
+    var serviceId = id(tripInput.serviceDates().toString());
     var trip = Trip.of(id(tripInput.id()))
       .withRoute(tripInput.route())
       .withHeadsign(tripInput.headsign() == null ? null : tripInput.headsign())
-      .withServiceId(SERVICE_ID)
+      .withServiceId(serviceId)
       .build();
 
     addTripOnServiceDate(timetableRepository, trip);
@@ -191,6 +191,9 @@ public class RealtimeTestEnvironmentBuilder {
     } else {
       addNewPattern(tripInput.id(), tripInput.route(), stopPattern, tripTimes, timetableRepository);
     }
+    calendarServiceData.putServiceDatesForServiceId(serviceId, tripInput.serviceDates());
+
+    timetableRepository.getServiceCodes().put(serviceId, 0);
   }
 
   private static Trip createFlexTrip(
@@ -238,7 +241,7 @@ public class RealtimeTestEnvironmentBuilder {
     return Trip.of(id(tripInput))
       .withRoute(tripInput1)
       .withHeadsign(I18NString.of("Headsign of %s".formatted(tripInput)))
-      .withServiceId(SERVICE_ID)
+      .withServiceId(id("serviceId"))
       .build();
   }
 
