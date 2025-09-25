@@ -238,6 +238,21 @@ class ScheduledTransitLegReferenceTest {
   }
 
   @Test
+  void legReferenceMustContainEitherTripOrTripOnServiceDate() {
+    assertThrows(IllegalArgumentException.class, () ->
+      new ScheduledTransitLegReference(
+        null,
+        SERVICE_DATE,
+        0,
+        NUMBER_OF_STOPS,
+        stopIdAtPosition0,
+        stopIdAtPosition1,
+        null
+      )
+    );
+  }
+
+  @Test
   void legReferenceCannotReferToInconsistentServiceDateAndTripOnServiceDate() {
     ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
       null,

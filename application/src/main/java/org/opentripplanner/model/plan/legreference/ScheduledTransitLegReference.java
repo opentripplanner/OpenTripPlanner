@@ -24,25 +24,22 @@ import org.slf4j.LoggerFactory;
  * {@link org.opentripplanner.routing.api.RoutingService}
  */
 public record ScheduledTransitLegReference(
-  FeedScopedId tripId,
+  @Nullable FeedScopedId tripId,
   LocalDate serviceDate,
   int fromStopPositionInPattern,
   int toStopPositionInPattern,
   FeedScopedId fromStopId,
 
   FeedScopedId toStopId,
-  FeedScopedId tripOnServiceDateId
+  @Nullable FeedScopedId tripOnServiceDateId
 )
   implements LegReference {
   private static final Logger LOG = LoggerFactory.getLogger(ScheduledTransitLegReference.class);
 
   public ScheduledTransitLegReference {
-    if (tripId != null && tripOnServiceDateId != null) {
+    if ((tripId == null) == (tripOnServiceDateId == null)) {
       throw new IllegalArgumentException(
-        "ScheduledTransitLegReference cannot refer to both a Trip id " +
-        tripId +
-        " and a TripOnServiceDate id " +
-        tripOnServiceDateId
+        "ScheduledTransitLegReference must contain either a Trip id or a TripOnServiceDate id but not both"
       );
     }
   }
@@ -196,12 +193,6 @@ public record ScheduledTransitLegReference(
     FeedScopedId stopId,
     TransitService transitService
   ) {
-    if (stopId == null) {
-      // this is a legacy reference, skip validation
-      // TODO: remove backward-compatible logic after OTP release 2.5
-      return true;
-    }
-
     StopLocation stopLocationInPattern = tripPattern.getStops().get(stopPosition);
     if (stopId.equals(stopLocationInPattern.getId())) {
       return true;
