@@ -47,7 +47,7 @@ Product Owners should have the ultimate decision in this. That way the core deve
 
 *ToDo: talk to Markus about communicating this need to the POs*
 
-#### 6. Issues not made by regular contributors will have to be categorized
+#### 6. Issues not made by regular contributors will have to be categorized by adding a label
 
 To be able to deal with issues efficiently, issues will have to be categorized. Markus will go through new issues:
 1. Close it if it is not a requested change to OTP
