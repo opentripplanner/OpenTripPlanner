@@ -56,11 +56,7 @@ public record TripInput(
       )
       .build();
 
-    private List<LocalDate> serviceDates = List.of(
-      SERVICE_DATE.minusDays(1),
-      SERVICE_DATE,
-      SERVICE_DATE.plusDays(1)
-    );
+    private List<LocalDate> serviceDates = List.of(SERVICE_DATE);
 
     @Nullable
     private I18NString headsign;

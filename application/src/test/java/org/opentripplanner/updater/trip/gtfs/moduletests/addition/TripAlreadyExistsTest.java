@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.addition;
 
-import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.NEW;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
@@ -24,7 +24,7 @@ class TripAlreadyExistsTest implements RealtimeTestConstants {
 
   @Test
   void scheduledTripAlreadyExists() {
-    var tripUpdate = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, ADDED, TIME_ZONE)
+    var tripUpdate = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, NEW, TIME_ZONE)
       .addStopTime(STOP_A_ID, "10:30")
       .addStopTime(STOP_B_ID, "10:40")
       .build();

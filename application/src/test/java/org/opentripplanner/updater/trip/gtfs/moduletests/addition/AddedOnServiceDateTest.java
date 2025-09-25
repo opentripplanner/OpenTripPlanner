@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.addition;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.NEW;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.OUTSIDE_SCHEDULE_PERIOD;
@@ -49,7 +49,7 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
   @ParameterizedTest
   @MethodSource("serviceDates")
   void addedTrip(LocalDate date) {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, date, ADDED, TIME_ZONE)
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, date, NEW, TIME_ZONE)
       .addStopTime(STOP_A_ID, "10:30")
       .addStopTime(STOP_B_ID, "10:40")
       .addStopTime(STOP_C_ID, "10:55")
@@ -73,7 +73,7 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
   @ParameterizedTest
   @MethodSource("outsidePeriod")
   void rejectOutsideSchedulePeriod(LocalDate date) {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, date, ADDED, TIME_ZONE)
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, date, NEW, TIME_ZONE)
       .addStopTime(STOP_A_ID, "10:30")
       .addStopTime(STOP_B_ID, "10:40")
       .addStopTime(STOP_C_ID, "10:55")
