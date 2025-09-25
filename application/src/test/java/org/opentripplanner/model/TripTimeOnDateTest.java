@@ -150,7 +150,7 @@ class TripTimeOnDateTest {
       assertNull(tripTimeOnDate.getServiceDay());
       assertEquals(tripTimeOnDate.getServiceDayMidnight(), TripTimeOnDate.UNDEFINED);
       assertEquals(tripTimeOnDate.getTripTimes(), tripTimes);
-      assertEquals(tripTimeOnDate.getStopIndex(), i);
+      assertEquals(tripTimeOnDate.getStopPosition(), i);
       i++;
     }
   }

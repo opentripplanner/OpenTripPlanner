@@ -57,7 +57,7 @@ public class ViaRequestMapper {
     return RouteViaRequest.of(vias, requests)
       .withDateTime(
         Instant.ofEpochMilli(
-          environment.getArgumentOrDefault("dateTime", request.dateTime().toEpochMilli())
+          environment.getArgumentOrDefault("dateTime", Instant.now().toEpochMilli())
         )
       )
       .withSearchWindow(environment.getArgumentOrDefault("searchWindow", request.searchWindow()))

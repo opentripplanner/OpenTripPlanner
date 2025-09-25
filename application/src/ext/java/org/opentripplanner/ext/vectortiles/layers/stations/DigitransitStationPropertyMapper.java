@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vectortiles.layers.stations;
 
+import static org.opentripplanner.inspector.vector.KeyValue.kv;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
@@ -38,7 +40,8 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
     try {
       var childStops = station.getChildStops();
       return List.of(
-        new KeyValue("gtfsId", station.getId().toString()),
+        kv("gtfsId", station.getId()),
+        kv("code", station.getCode()),
         new KeyValue("name", i18NStringMapper.mapNonnullToApi(station.getName())),
         new KeyValue(
           "type",

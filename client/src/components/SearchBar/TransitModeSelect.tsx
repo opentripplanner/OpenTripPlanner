@@ -19,19 +19,23 @@ export function TransitModeSelect({
 
   const onChange = useCallback(
     (values: (TransportMode | null | undefined)[]) => {
-      const newTransportModes = values.map((v) => ({
-        transportMode: v,
-      }));
+      const newTransportModes = values
+        .filter((v) => v != null)
+        .map((v) => ({
+          transportMode: v,
+        }));
 
       if (newTransportModes.length === 0) {
+        // Remove transportModes entirely when empty
+        const updatedModes = { ...tripQueryVariables.modes };
+        delete updatedModes.transportModes;
+
+        // Check if modes object has any other properties
+        const hasOtherModes = updatedModes.directMode || updatedModes.accessMode || updatedModes.egressMode;
+
         setTripQueryVariables({
           ...tripQueryVariables,
-          modes:
-            tripQueryVariables.modes?.directMode ||
-            tripQueryVariables.modes?.accessMode ||
-            tripQueryVariables.modes?.egressMode
-              ? { ...tripQueryVariables.modes }
-              : undefined,
+          modes: hasOtherModes ? updatedModes : undefined,
         });
       } else {
         const accessMode = tripQueryVariables.modes?.accessMode || StreetMode.Foot;
@@ -40,7 +44,7 @@ export function TransitModeSelect({
           ...tripQueryVariables,
           modes: {
             ...tripQueryVariables.modes,
-            transportModes: newTransportModes.length > 0 ? newTransportModes : undefined,
+            transportModes: newTransportModes,
             accessMode: accessMode,
             egressMode: egressMode,
           },

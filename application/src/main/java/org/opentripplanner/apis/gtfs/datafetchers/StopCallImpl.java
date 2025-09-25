@@ -52,8 +52,8 @@ public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
         if (flexTrip == null) {
           return null;
         }
-        var startSecs = flexTrip.earliestDepartureTime(tripTime.getStopIndex());
-        var endSecs = flexTrip.latestArrivalTime(tripTime.getStopIndex());
+        var startSecs = flexTrip.earliestDepartureTime(tripTime.getStopPosition());
+        var endSecs = flexTrip.latestArrivalTime(tripTime.getStopPosition());
 
         var serviceDay = tripTime.getServiceDay();
         var timeZone = transitService.getTimeZone();

@@ -1,15 +1,17 @@
 package org.opentripplanner.ext.emission.internal.csvdata.route;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileNotFoundException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.emission.EmissionTestData;
+import org.opentripplanner.framework.csv.HeadersDoNotMatch;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.utils.lang.IntBox;
 
 class RouteDataReaderTest implements EmissionTestData {
 
@@ -25,15 +27,13 @@ class RouteDataReaderTest implements EmissionTestData {
   private final DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
 
   @Test
-  void testCo2EmissionsFromGtfsDataSource() throws FileNotFoundException {
-    var lineCounter = new IntBox(0);
+  void testCo2EmissionsFromGtfsDataSource() throws FileNotFoundException, HeadersDoNotMatch {
     var subject = new RouteDataReader(gtfsWithEmissionFile(), issueStore);
 
-    var emissions = subject.read(FEED_ID, lineCounter::inc);
+    var emissions = subject.read(FEED_ID, null);
 
     assertEquals(0.006, emissions.get(ROUTE_D_1001).co2().asDouble(), 0.0001);
     assertEquals(3, emissions.size());
-    assertEquals(3, lineCounter.get());
     var issues = issueStore.listIssues();
 
     var expected = List.of(
@@ -50,37 +50,29 @@ class RouteDataReaderTest implements EmissionTestData {
   }
 
   @Test
-  void testCo2EmissionsFromFeedDataSource() throws FileNotFoundException {
-    var lineCounter = new IntBox(0);
+  void testCo2EmissionsFromFeedDataSource() throws FileNotFoundException, HeadersDoNotMatch {
     var subject = new RouteDataReader(emissionOnRoutes(), issueStore);
 
-    var emissions = subject.read(FEED_ID, lineCounter::inc);
+    var emissions = subject.read(FEED_ID, null);
 
     assertEquals(0.006, emissions.get(ROUTE_F_R1).co2().asDouble(), 0.0001);
     assertTrue(issueStore.listIssues().isEmpty(), () -> issueStore.toString());
     assertEquals(2, emissions.size());
-    assertEquals(2, lineCounter.get());
   }
 
   @Test
-  void handleMissingDataSource() {
-    var lineCounter = new IntBox(0);
+  void handleMissingDataSource() throws HeadersDoNotMatch {
     var subject = new RouteDataReader(emissionMissingFile(), issueStore);
-
-    var emissions = subject.read(FEED_ID, lineCounter::inc);
-
-    assertTrue(emissions.isEmpty());
-    assertEquals(0, lineCounter.get());
+    var ex = assertThrows(IllegalStateException.class, () -> subject.read(FEED_ID, null));
+    assertThat(ex.getMessage()).containsMatch("DataSource is missing:.*file-does-not-exist\\.txt");
   }
 
   @Test
-  void ignoreDataSourceIfHeadersDoNotMatch() {
-    var lineCounter = new IntBox(0);
+  void ignoreDataSourceIfHeadersDoNotMatch() throws HeadersDoNotMatch {
     var subject = new RouteDataReader(emissionOnTripHops(), issueStore);
-
-    var emissions = subject.read(FEED_ID, lineCounter::inc);
-
-    assertTrue(emissions.isEmpty());
-    assertEquals(0, lineCounter.get());
+    var ex = assertThrows(HeadersDoNotMatch.class, () -> subject.read(FEED_ID, null));
+    assertThat(ex.getMessage()).containsMatch(
+      "The header does not match the expected values for csv file:.*em-on-trip-hops\\.txt"
+    );
   }
 }

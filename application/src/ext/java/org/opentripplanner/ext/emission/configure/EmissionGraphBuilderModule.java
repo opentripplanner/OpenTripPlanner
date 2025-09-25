@@ -17,7 +17,7 @@ public class EmissionGraphBuilderModule {
   @Provides
   @Singleton
   @Nullable
-  static EmissionGraphBuilder provideEmissionModule(
+  static EmissionGraphBuilder provideEmissionGraphBuilder(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     @Nullable EmissionRepository emissionRepository,
