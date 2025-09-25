@@ -6,40 +6,37 @@
 <module name="Checker">
     <module name="TreeWalker">
         <module name="AvoidStarImport">
-            <property name="severity" value="warning" />
+            <property name="severity" value="error" />
         </module>
         <module name="RedundantImport">
-            <property name="severity" value="warning" />
+            <property name="severity" value="error" />
         </module>
         <module name="UnusedImports">
-            <property name="severity" value="warning" />
+            <property name="severity" value="error" />
         </module>
         <module name="UnusedLocalVariable">
-            <property name="severity" value="warning" />
-        </module>
-        <module name="FinalClass">
-            <property name="severity" value="warning" />
+            <property name="severity" value="error" />
         </module>
         <module name="OneStatementPerLine">
-            <property name="severity" value="warning" />
+            <property name="severity" value="error" />
         </module>
         <module name="MultipleVariableDeclarations">
-            <property name="severity" value="warning" />
-        </module>
-        <module name="OverloadMethodsDeclarationOrder">
-            <property name="severity" value="warning" />
-        </module>
-        <module name="EqualsHashCode">
-            <property name="severity" value="warning" />
+            <property name="severity" value="error" />
         </module>
         <module name="StringLiteralEquality">
-            <property name="severity" value="warning" />
+            <property name="severity" value="error" />
         </module>
         <module name="SimplifyBooleanExpression">
-            <property name="severity" value="warning" />
+            <property name="severity" value="error" />
         </module>
         <module name="NeedBraces">
-            <property name="severity" value="warning" />
+            <property name="severity" value="error" />
         </module>
+        <!-- <module name="FinalClass">
+            <property name="severity" value="error" />
+        </module> -->
+        <!-- <module name="EqualsHashCode">
+            <property name="severity" value="warning" />
+        </module> -->
     </module>
 </module>
