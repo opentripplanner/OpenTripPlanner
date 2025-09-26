@@ -19,46 +19,50 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateSuccess;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 import org.opentripplanner.utils.time.TimeUtils;
 
 class AddedTest implements RealtimeTestConstants {
 
   private static final String ADDED_TRIP_ID = "added_trip";
-  private final RealtimeTestEnvironment env = RealtimeTestEnvironment.of()
+  private final TransitTestEnvironment env = TransitTestEnvironment.of()
     .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
     .build();
+  private final GtfsRtTestHelper gtfsRt = GtfsRtTestHelper.of(env);
 
   @Test
   void addedTrip() {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:40")
       .addStopTime(STOP_C_ID, "00:55")
       .build();
 
-    assertSuccess(env.applyTripUpdate(tripUpdate));
+    assertSuccess(gtfsRt.applyTripUpdate(tripUpdate));
     assertAddedTrip(ADDED_TRIP_ID, env);
   }
 
   @Test
   void addedTripWithNewRoute() {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
       .addTripExtension()
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
       .addStopTime(STOP_B_ID, "00:40", COORDINATE_WITH_DRIVER)
       .addStopTime(STOP_B_ID, "00:55", DropOffPickupType.NONE)
       .build();
 
-    var result = env.applyTripUpdate(tripUpdate);
+    var result = gtfsRt.applyTripUpdate(tripUpdate);
     assertSuccess(result);
     assertTrue(result.warnings().isEmpty());
 
@@ -85,7 +89,8 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedWithUnknownStop() {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
       // add extension to set route name, url, mode
       .addTripExtension()
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
@@ -93,7 +98,7 @@ class AddedTest implements RealtimeTestConstants {
       .addStopTime(STOP_C_ID, "00:55", DropOffPickupType.NONE)
       .build();
 
-    var result = env.applyTripUpdate(tripUpdate);
+    var result = gtfsRt.applyTripUpdate(tripUpdate);
     assertSuccess(result);
 
     assertEquals(
@@ -108,7 +113,8 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void repeatedlyAddedTripWithNewRoute() {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
       // add extension to set route name, url, mode
       .addTripExtension()
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
@@ -116,12 +122,12 @@ class AddedTest implements RealtimeTestConstants {
       .addStopTime(STOP_C_ID, "00:55", DropOffPickupType.NONE)
       .build();
 
-    assertSuccess(env.applyTripUpdate(tripUpdate));
+    assertSuccess(gtfsRt.applyTripUpdate(tripUpdate));
     var pattern = assertAddedTrip(ADDED_TRIP_ID, env);
     var firstRoute = pattern.getRoute();
 
     // apply the update a second time to check that no new route instance is created but the old one is reused
-    env.applyTripUpdate(tripUpdate);
+    gtfsRt.applyTripUpdate(tripUpdate);
     var secondPattern = assertAddedTrip(ADDED_TRIP_ID, env);
     var secondRoute = secondPattern.getRoute();
 
@@ -131,23 +137,17 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithSkippedStop() {
-    var builder = new TripUpdateBuilder(
-      ADDED_TRIP_ID,
-      SERVICE_DATE,
-      ADDED,
-      TIME_ZONE,
-      "A loop",
-      "SW1234"
-    );
-    builder
+    var tripUpdate = gtfsRt
+      .tripUpdate(ADDED_TRIP_ID, ADDED)
+      .withTripProperties("A loop", "SW1234")
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
       .addSkippedStop(STOP_B_ID, "00:40", DropOffPickupType.COORDINATE_WITH_DRIVER)
       .addSkippedStop(STOP_C_ID, "00:48")
       .addStopTime(STOP_D_ID, "00:55", "A (non-stop)")
-      .addStopTime(STOP_A_ID, "01:00");
-    var tripUpdate = builder.build();
+      .addStopTime(STOP_A_ID, "01:00")
+      .build();
 
-    env.applyTripUpdate(tripUpdate);
+    gtfsRt.applyTripUpdate(tripUpdate);
 
     // THEN
     final TripPattern tripPattern = assertAddedTrip(ADDED_TRIP_ID, env);
@@ -158,7 +158,7 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(PickDrop.CANCELLED, tripPattern.getBoardType(2));
     assertEquals(PickDrop.SCHEDULED, tripPattern.getAlightType(3));
     var snapshot = env.getTimetableSnapshot();
-    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    var forToday = snapshot.resolve(tripPattern, env.serviceDate());
     var tripTimes = forToday.getTripTimes(id(ADDED_TRIP_ID));
     var trip = env.getTransitService().getTrip(TimetableRepositoryForTest.id(ADDED_TRIP_ID));
     assertEquals(I18NString.of("A loop"), Objects.requireNonNull(trip).getHeadsign());
@@ -172,7 +172,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithDelay() {
-    var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE);
+    var builder = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED);
 
     builder
       .addStopTime(STOP_A_ID, "08:00")
@@ -180,12 +180,12 @@ class AddedTest implements RealtimeTestConstants {
       .addStopTimeWithScheduled(STOP_C_ID, "09:10", "09:00");
 
     var tripUpdate = builder.build();
-    env.applyTripUpdate(tripUpdate);
+    gtfsRt.applyTripUpdate(tripUpdate);
 
     // THEN
     var tripPattern = assertAddedTrip(ADDED_TRIP_ID, env);
     var snapshot = env.getTimetableSnapshot();
-    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    var forToday = snapshot.resolve(tripPattern, env.serviceDate());
     var tripTimes = forToday.getTripTimes(id(ADDED_TRIP_ID));
     assertEquals(0, tripTimes.getDepartureDelay(0));
     assertEquals(TimeUtils.time("08:00"), tripTimes.getDepartureTime(0));
@@ -195,13 +195,13 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(TimeUtils.time("09:10"), tripTimes.getArrivalTime(2));
   }
 
-  private static TripPattern assertAddedTrip(String tripId, RealtimeTestEnvironment env) {
+  private static TripPattern assertAddedTrip(String tripId, TransitTestEnvironment env) {
     return assertAddedTrip(tripId, env, RealTimeState.ADDED);
   }
 
   static TripPattern assertAddedTrip(
     String tripId,
-    RealtimeTestEnvironment env,
+    TransitTestEnvironment env,
     RealTimeState realTimeState
   ) {
     var snapshot = env.getTimetableSnapshot();
@@ -220,7 +220,7 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(1, patternsAtA.size());
     var tripPattern = patternsAtA.stream().findFirst().get();
 
-    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    var forToday = snapshot.resolve(tripPattern, env.serviceDate());
     var schedule = snapshot.resolve(tripPattern, null);
 
     assertNotSame(forToday, schedule);

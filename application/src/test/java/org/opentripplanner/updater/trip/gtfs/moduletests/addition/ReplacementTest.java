@@ -14,11 +14,11 @@ import static org.opentripplanner.updater.trip.gtfs.moduletests.addition.AddedTe
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 public class ReplacementTest implements RealtimeTestConstants {
 
@@ -29,26 +29,24 @@ public class ReplacementTest implements RealtimeTestConstants {
       .addStop(STOP_B, "8:40:00", "8:40:00")
       .withHeadsign(I18NString.of("Original Headsign"))
       .build();
-    var env = RealtimeTestEnvironment.of()
+    var env = TransitTestEnvironment.of()
       .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
       .addTrip(TRIP_INPUT)
       .build();
-    var builder = new TripUpdateBuilder(
-      TRIP_1_ID,
-      SERVICE_DATE,
-      REPLACEMENT,
-      TIME_ZONE,
-      "New Headsign",
-      "SW1234" // we can't change trip short name at real-time yet
-    );
-    builder
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt
+      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+      .withTripProperties(
+        "New Headsign",
+        "SW1234" // we can't change trip short name at real-time yet
+      )
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:45", "Changed Headsign")
-      .addStopTime(STOP_C_ID, "01:00");
+      .addStopTime(STOP_C_ID, "01:00")
+      .build();
 
-    var tripUpdate = builder.build();
-
-    env.applyTripUpdate(tripUpdate);
+    rt.applyTripUpdate(tripUpdate);
 
     // THEN
     var snapshot = env.getTimetableSnapshot();
@@ -62,7 +60,7 @@ public class ReplacementTest implements RealtimeTestConstants {
       assertNotNull(trip);
       var originalTripPattern = transitService.findPattern(trip);
 
-      var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
+      var originalTimetableForToday = snapshot.resolve(originalTripPattern, env.serviceDate());
       var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
       assertNotSame(originalTimetableForToday, originalTimetableScheduled);
@@ -103,10 +101,10 @@ public class ReplacementTest implements RealtimeTestConstants {
     // New trip pattern
     {
       assertAddedTrip(TRIP_1_ID, env, RealTimeState.MODIFIED);
-      var newTripPattern = snapshot.getNewTripPatternForModifiedTrip(tripId, SERVICE_DATE);
+      var newTripPattern = snapshot.getNewTripPatternForModifiedTrip(tripId, env.serviceDate());
       assertNotNull(newTripPattern, "New trip pattern should be found");
 
-      var newTimetableForToday = snapshot.resolve(newTripPattern, SERVICE_DATE);
+      var newTimetableForToday = snapshot.resolve(newTripPattern, env.serviceDate());
       var newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);

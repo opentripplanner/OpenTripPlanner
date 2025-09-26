@@ -1,8 +1,7 @@
-package org.opentripplanner.updater.trip;
+package org.opentripplanner.transit.model._data;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.time.TimeUtils;

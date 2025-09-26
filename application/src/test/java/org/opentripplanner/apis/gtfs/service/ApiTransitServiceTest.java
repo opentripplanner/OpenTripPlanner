@@ -1,7 +1,6 @@
 package org.opentripplanner.apis.gtfs.service;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
@@ -10,7 +9,9 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET
 import com.google.transit.realtime.GtfsRealtime;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -18,12 +19,13 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
-import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
@@ -36,8 +38,10 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  */
 class ApiTransitServiceTest implements RealtimeTestConstants {
 
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
+  private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Paris");
   private static final ZonedDateTime ANY_TIME = ZonedDateTime.parse("2022-01-01T12:00:00+00:00");
-  private final RealtimeTestEnvironmentBuilder envBuilder = RealtimeTestEnvironment.of();
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
   private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
   private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
   private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
@@ -86,8 +90,13 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
   @Test
   void skipStopInMultipleTripsInPattern() {
     var env = envBuilder.addTrip(TRIP1_INPUT).addTrip(TRIP2_INPUT).build();
-    var res = env.applyTripUpdates(
-      List.of(skipSecondStop(TRIP_1_ID), skipSecondStop(TRIP_2_ID)),
+    var rt = GtfsRtTestHelper.of(env);
+
+    var res = rt.applyTripUpdates(
+      List.of(
+        skipSecondStop(rt.tripUpdateScheduled(TRIP_1_ID)),
+        skipSecondStop(rt.tripUpdateScheduled(TRIP_2_ID))
+      ),
       FULL_DATASET
     );
     assertSuccess(res);
@@ -123,7 +132,7 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
       .withStartTime(ANY_TIME)
       .withEndTime(ANY_TIME)
       .withServiceDate(SERVICE_DATE)
-      .withZoneId(TIME_ZONE)
+      .withZoneId(env.timeZone())
       .withDistanceMeters(1000)
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(2)
@@ -154,9 +163,7 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
     assertThat(calls).isEmpty();
   }
 
-  private static GtfsRealtime.TripUpdate skipSecondStop(String tripId) {
-    return new TripUpdateBuilder(tripId, SERVICE_DATE, SCHEDULED, TIME_ZONE)
-      .addSkippedStop(1)
-      .build();
+  private static GtfsRealtime.TripUpdate skipSecondStop(TripUpdateBuilder builder) {
+    return builder.addSkippedStop(1).build();
   }
 }
