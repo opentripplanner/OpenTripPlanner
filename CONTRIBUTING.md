@@ -147,20 +147,3 @@ more resources. The goal of mainline OTP is not to be everything to everyone, bu
 the most solid code relied upon daily by the primary OTP contributor organizations (as well as
 Sandbox features that have been cleanly isolated from the core system). So in a sense it's
 encouraged for people to work on special-purpose forks.
-
-## OTP2 versus OTP1
-
-The vast majority of the work done by the core development team is now on OTP2 (the `dev-2.x`
-branch) as opposed to OTP1 (the `dev-1.x` branch). Please
-see http://docs.opentripplanner.org/en/latest/Version-Comparison/ for a discussion of the difference
-between these two branches. At this point, OTP1 is essentially a legacy product that will receive
-bug and stability fixes to the extent that they can be readily backported from OTP2 or that the
-author of such patches can invest the effort to join a meeting and answer any questions about the
-impact and design of their code.
-
-There is a large base of existing deployments of OTP1, in both trip planning and academic research
-use. OTP2 is different in many ways from OTP1, and some features that were research prototypes or
-not actively maintained have been removed. We want to ensure long-term users can continue to rely on
-these OTP1-specific if needed. Therefore we cannot apply changes to OTP1 which pose any significant
-risk of introducing new bugs or behavior changes, as this will create additional maintenance or
-documentation work for which there is no budgeted developer time.

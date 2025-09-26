@@ -83,11 +83,6 @@ leadership committee members. The reviewers should be from two different organiz
 have validation rules ensuring that the code compiles and all tests pass before pull requests can 
 be merged.
 
-The `dev-1.x` branch exists for patching OTP version 1.x, but with few people to do the reviews, very few
-PRs are accepted. We recommend getting in touch with the community before you spend time on making 
-a PR.
-
-
 ### Issues
 
 If no ticket exists for the feature or bug your
