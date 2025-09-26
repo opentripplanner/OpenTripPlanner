@@ -185,14 +185,16 @@ public class FlexDirectPathFactory {
   protected boolean isRouteable(FlexAccessTemplate accessTemplate, Vertex flexVertex) {
     if (accessTemplate.accessEgress.state.getVertex() == flexVertex) {
       return false;
-    } else return (
-      accessTemplate.calculator.calculateFlexPath(
-        accessTemplate.accessEgress.state.getVertex(),
-        flexVertex,
-        accessTemplate.boardStopPosition,
-        accessTemplate.alightStopPosition
-      ) !=
-      null
-    );
+    } else {
+      return (
+        accessTemplate.calculator.calculateFlexPath(
+          accessTemplate.accessEgress.state.getVertex(),
+          flexVertex,
+          accessTemplate.boardStopPosition,
+          accessTemplate.alightStopPosition
+        ) !=
+        null
+      );
+    }
   }
 }

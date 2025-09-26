@@ -253,7 +253,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   private JList<String> secondStateData;
   private JList<String> firstStateData;
   protected State lastStateClicked = null;
-  private JCheckBox longDistanceModeCheckbox;
 
   public GraphVisualizer(Graph graph) {
     super();
@@ -956,7 +955,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           String result = JOptionPane.showInputDialog("Enter the location (lat lon)");
-          if (result == null || result.length() == 0) return;
+          if (result == null || result.length() == 0) {
+            return;
+          }
           String[] tokens = result.split("[\\s,]+");
           double lat = Double.parseDouble(tokens[0]);
           double lon = Double.parseDouble(tokens[1]);

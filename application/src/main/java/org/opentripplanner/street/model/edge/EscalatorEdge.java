@@ -39,7 +39,9 @@ public class EscalatorEdge extends Edge {
       s1.incrementTimeInSeconds((long) time);
       s1.incrementWalkDistance(getDistanceMeters());
       return s1.makeStateArray();
-    } else return State.empty();
+    } else {
+      return State.empty();
+    }
   }
 
   @Override

@@ -19,7 +19,8 @@ public class RouteDialog extends JDialog {
   private final JTextField toField;
   private final JButton goButton;
 
-  public String from, to;
+  public String from;
+  public String to;
 
   public RouteDialog(JFrame owner, String initialFrom) {
     super(owner, true);

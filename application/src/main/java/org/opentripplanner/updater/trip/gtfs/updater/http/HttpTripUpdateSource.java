@@ -68,7 +68,9 @@ class HttpTripUpdateSource {
       // Create List of TripUpdates
       updates = new ArrayList<>(feedEntityList.size());
       for (FeedEntity feedEntity : feedEntityList) {
-        if (feedEntity.hasTripUpdate()) updates.add(feedEntity.getTripUpdate());
+        if (feedEntity.hasTripUpdate()) {
+          updates.add(feedEntity.getTripUpdate());
+        }
       }
     } catch (Exception e) {
       LOG.error("Failed to process GTFS-RT TripUpdates feed from {}", url, e);

@@ -206,8 +206,12 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     VehicleRentalVehicle that = (VehicleRentalVehicle) o;
     return (
       Double.compare(that.longitude, longitude) == 0 &&

@@ -24,13 +24,17 @@ class NoticeParser {
   private final Collection<NoticeAssignment> noticeAssignments = new ArrayList<>();
 
   void parseNotices(NoticesInFrame_RelStructure notices) {
-    if (notices == null) return;
+    if (notices == null) {
+      return;
+    }
 
     this.notices.addAll(notices.getNotice());
   }
 
   void parseNoticeAssignments(NoticeAssignmentsInFrame_RelStructure na) {
-    if (na == null) return;
+    if (na == null) {
+      return;
+    }
 
     for (JAXBElement<? extends DataManagedObjectStructure> it : na.getNoticeAssignment_()) {
       NoticeAssignment noticeAssignment = (NoticeAssignment) it.getValue();

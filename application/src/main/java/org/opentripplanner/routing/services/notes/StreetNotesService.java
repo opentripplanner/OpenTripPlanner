@@ -94,7 +94,9 @@ public class StreetNotesService implements Serializable {
 
     for (StreetNoteModel source : sources) {
       Set<StreetNoteAndMatcher> maas2 = source.getNotes(edge);
-      if (maas2 != null) maas.addAll(maas2);
+      if (maas2 != null) {
+        maas.addAll(maas2);
+      }
     }
     if (maas == null || maas.isEmpty()) {
       return Set.of();

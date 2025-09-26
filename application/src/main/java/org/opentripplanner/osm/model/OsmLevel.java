@@ -91,9 +91,13 @@ public class OsmLevel implements Comparable<OsmLevel> {
       floorNumber = Integer.parseInt(longName);
       if (incrementNonNegative) {
         if (source == Source.LEVEL_MAP) {
-          if (floorNumber >= 1) floorNumber -= 1; // level maps are localized, floor numbers are 0-based
+          if (floorNumber >= 1) {
+            floorNumber -= 1; // level maps are localized, floor numbers are 0-based
+          }
         } else {
-          if (floorNumber >= 0) longName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
+          if (floorNumber >= 0) {
+            longName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
+          }
         }
       }
     } catch (NumberFormatException e) {}
@@ -102,9 +106,13 @@ public class OsmLevel implements Comparable<OsmLevel> {
       floorNumber = Integer.parseInt(shortName);
       if (incrementNonNegative) {
         if (source == Source.LEVEL_MAP) {
-          if (floorNumber >= 1) floorNumber -= 1; // level maps are localized, floor numbers are 0-based
+          if (floorNumber >= 1) {
+            floorNumber -= 1; // level maps are localized, floor numbers are 0-based
+          }
         } else {
-          if (floorNumber >= 0) shortName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
+          if (floorNumber >= 0) {
+            shortName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
+          }
         }
       }
     } catch (NumberFormatException e) {}
