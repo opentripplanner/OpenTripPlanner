@@ -97,18 +97,8 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   }
 
   private Mqtt5AsyncClient connectAndSubscribeToClient() throws URISyntaxException {
-    Mqtt5SimpleAuth auth;
-
     URI parsedUrl = new URI(url);
-    if (parsedUrl.getUserInfo() != null) {
-      String[] userinfo = parsedUrl.getUserInfo().split(":");
-      auth = Mqtt5SimpleAuth.builder()
-        .username(userinfo[0])
-        .password(userinfo[1].getBytes(StandardCharsets.UTF_8))
-        .build();
-    } else {
-      auth = null;
-    }
+    Mqtt5SimpleAuth auth = createAuthFromUrl(parsedUrl);
 
     Mqtt5AsyncClient asyncClient = Mqtt5Client.builder()
       .identifier("OpenTripPlanner-" + UUID.randomUUID())
@@ -120,7 +110,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
       .addDisconnectedListener(this::onDisconnect)
       .buildAsync();
 
-    asyncClient.connectWith().keepAlive(30).cleanStart(false).send().join();
+    asyncClient.connectWith().keepAlive(30).cleanStart(true).send().join();
 
     asyncClient
       .subscribeWith()
@@ -131,6 +121,17 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
       .join();
 
     return asyncClient;
+  }
+
+  private Mqtt5SimpleAuth createAuthFromUrl(URI parsedUrl) {
+    if (parsedUrl.getUserInfo() != null) {
+      String[] userinfo = parsedUrl.getUserInfo().split(":");
+      return Mqtt5SimpleAuth.builder()
+        .username(userinfo[0])
+        .password(userinfo[1].getBytes(StandardCharsets.UTF_8))
+        .build();
+    }
+    return null;
   }
 
   private void onDisconnect(MqttClientDisconnectedContext ctx) {
