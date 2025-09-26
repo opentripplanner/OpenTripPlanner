@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -29,6 +30,7 @@ import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.test.support.ResourceLoader;
 
 public class TurnRestrictionModuleTest {
 
@@ -327,5 +329,15 @@ public class TurnRestrictionModuleTest {
     assertEquals(states.get(2).getVertex(), C);
     assertEquals(states.get(3).getVertex(), D);
     assertEquals(states.get(4).getVertex(), F);
+  }
+
+  @Test
+  void avoidDuplicatingEdges() {
+    var graph = ConstantsForTests.buildOsmGraph(
+      ResourceLoader.of(TurnRestrictionModuleTest.class).file("nl-heemserveen-jachthuisweg.osm.pbf")
+    ).graph();
+
+    assertEquals(139, graph.countEdges());
+    assertEquals(64, graph.countVertices());
   }
 }
