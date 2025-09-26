@@ -104,6 +104,7 @@ import org.opentripplanner.apis.transmodel.model.stop.TariffZoneType;
 import org.opentripplanner.apis.transmodel.model.timetable.BookingArrangementType;
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyQuery;
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyType;
+import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.model.timetable.InterchangeType;
 import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.TimetabledPassingTimeType;
@@ -292,7 +293,8 @@ public class TransmodelGraphQLSchemaFactory {
       DatedServiceJourneyType.REF
     );
 
-    // Timetable
+    /* Timetable */
+
     GraphQLNamedOutputType ptSituationElementType = PtSituationElementType.create(
       authorityType,
       quayType,
@@ -315,6 +317,7 @@ public class TransmodelGraphQLSchemaFactory {
       stopToStopGeometryType,
       ptSituationElementType
     );
+    GraphQLOutputType empiricalDealy = EmpiricalDelayType.create();
     GraphQLOutputType estimatedCallType = EstimatedCallType.create(
       bookingArrangementType,
       noticeType,
@@ -323,6 +326,7 @@ public class TransmodelGraphQLSchemaFactory {
       ptSituationElementType,
       ServiceJourneyType.REF,
       DatedServiceJourneyType.REF,
+      empiricalDealy,
       dateTimeScalar
     );
 

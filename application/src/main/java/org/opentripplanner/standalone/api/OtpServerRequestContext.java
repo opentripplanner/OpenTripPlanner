@@ -8,6 +8,7 @@ import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
@@ -153,6 +154,9 @@ public interface OtpServerRequestContext {
 
   @Nullable
   ItineraryDecorator emissionItineraryDecorator();
+
+  @Nullable
+  EmpiricalDelayService empiricalDelayService();
 
   @Nullable
   LuceneIndex lucenceIndex();

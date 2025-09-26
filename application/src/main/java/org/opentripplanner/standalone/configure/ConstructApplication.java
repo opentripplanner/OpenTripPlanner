@@ -4,6 +4,7 @@ import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
+import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -85,6 +86,7 @@ public class ConstructApplication {
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
     EmissionRepository emissionRepository,
+    @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters,
@@ -107,6 +109,7 @@ public class ConstructApplication {
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
       .emissionRepository(emissionRepository)
+      .empiricalDelayRepository(empiricalDelayRepository)
       .dataImportIssueSummary(issueSummary)
       .stopConsolidationRepository(stopConsolidationRepository)
       .streetLimitationParameters(streetLimitationParameters)
@@ -146,6 +149,7 @@ public class ConstructApplication {
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
       factory.emissionRepository(),
+      factory.empiricalDelayRepository(),
       factory.stopConsolidationRepository(),
       factory.streetLimitationParameters(),
       cli.doLoadStreetGraph(),
@@ -347,6 +351,11 @@ public class ConstructApplication {
 
   public EmissionRepository emissionRepository() {
     return factory.emissionRepository();
+  }
+
+  @Nullable
+  public EmpiricalDelayRepository empiricalDelayRepository() {
+    return factory.empiricalDelayRepository();
   }
 
   public StreetLimitationParameters streetLimitationParameters() {
