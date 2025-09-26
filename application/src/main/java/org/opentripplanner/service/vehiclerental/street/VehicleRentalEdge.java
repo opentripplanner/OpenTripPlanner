@@ -1,10 +1,13 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
@@ -80,6 +83,18 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
+            if (s0.getRequest().rentalPeriod() != null && station.isCarStation()) {
+              OffsetDateTime rentalEndTime = OffsetDateTime.ofInstant(
+                s0.getRequest().rentalPeriod().rentalEndTime(),
+                ZoneId.systemDefault()
+              );
+              VehicleRentalVehicle vehicleRentalVehicle = (VehicleRentalVehicle) station;
+              OffsetDateTime availableUntil = vehicleRentalVehicle.availableUntil();
+              if (availableUntil != null && availableUntil.isBefore(rentalEndTime)) {
+                return State.empty();
+              }
+            }
+
             s1.beginFloatingVehicleRenting(formFactor, network, true);
             pickedUp = true;
           } else {
@@ -119,6 +134,17 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
+            if (s0.getRequest().rentalPeriod() != null && station.isCarStation()) {
+              OffsetDateTime rentalEndTime = OffsetDateTime.ofInstant(
+                s0.getRequest().rentalPeriod().rentalEndTime(),
+                ZoneId.systemDefault()
+              );
+              VehicleRentalVehicle vehicleRentalVehicle = (VehicleRentalVehicle) station;
+              OffsetDateTime availableUntil = vehicleRentalVehicle.availableUntil();
+              if (availableUntil != null && availableUntil.isBefore(rentalEndTime)) {
+                return State.empty();
+              }
+            }
             s1.beginFloatingVehicleRenting(formFactor, network, false);
           } else {
             boolean mayKeep =
