@@ -2,6 +2,8 @@ package org.opentripplanner.graph_builder.module;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -364,7 +366,86 @@ public class TurnRestrictionModuleTest {
       ResourceLoader.of(TurnRestrictionModuleTest.class).file("nl-heemserveen-jachthuisweg.osm.pbf")
     ).graph();
 
-    assertEquals(139, graph.countEdges());
-    assertEquals(64, graph.countVertices());
+    assertEquals(79, graph.countEdges());
+    assertEquals(44, graph.countVertices());
+  }
+
+  @Test
+  public void multipleNoTurnRestrictions() {
+    //
+    //      E
+    //      |
+    //  B - C - D
+    //      |
+    //      A
+    //
+    // A-C-B and A-C-D is forbidden by a turn restriction
+    var graph = new Graph();
+    var osmInfoGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
+    var A = vertex(graph, 1, 0.0, 0.0);
+    var B = vertex(graph, 2, 1.0, -1.0);
+    var C = vertex(graph, 3, 1.0, 0.0);
+    var D = vertex(graph, 4, 1.0, 1.0);
+    var E = vertex(graph, 5, 2.0, 0.0);
+    var AC = edges(A, C, 1.0);
+    var CB = edges(C, B, 1.0);
+    var CD = edges(C, D, 1.0);
+    var CE = edges(C, E, 1.0);
+    osmInfoGraphBuildRepository.addTurnRestriction(
+      turnRestriction(
+        AC[0],
+        CB[0],
+        new TraverseModeSet(TraverseMode.CAR),
+        TurnRestrictionType.NO_TURN
+      )
+    );
+    osmInfoGraphBuildRepository.addTurnRestriction(
+      turnRestriction(
+        AC[0],
+        CD[0],
+        new TraverseModeSet(TraverseMode.CAR),
+        TurnRestrictionType.NO_TURN
+      )
+    );
+
+    assertEquals(5, graph.countVertices());
+    assertEquals(8, graph.countEdges());
+
+    var module = new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
+    module.buildGraph();
+
+    assertEquals(6, graph.countVertices());
+    assertEquals(11, graph.countEdges());
+
+    var streetRequest = new StreetRequest(StreetMode.CAR);
+    var request = RouteRequest.of().withJourney(j -> j.withDirect(streetRequest)).buildDefault();
+
+    assertNull(
+      StreetSearchBuilder.of()
+        .setRequest(request)
+        .setStreetRequest(streetRequest)
+        .setFrom(A)
+        .setTo(B)
+        .getShortestPathTree()
+        .getPath(B)
+    );
+    assertNull(
+      StreetSearchBuilder.of()
+        .setRequest(request)
+        .setStreetRequest(streetRequest)
+        .setFrom(A)
+        .setTo(C)
+        .getShortestPathTree()
+        .getPath(C)
+    );
+    assertNotNull(
+      StreetSearchBuilder.of()
+        .setRequest(request)
+        .setStreetRequest(streetRequest)
+        .setFrom(A)
+        .setTo(E)
+        .getShortestPathTree()
+        .getPath(E)
+    );
   }
 }
