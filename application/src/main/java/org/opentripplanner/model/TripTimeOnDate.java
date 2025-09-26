@@ -34,7 +34,7 @@ public class TripTimeOnDate {
   public static final int UNDEFINED = -1;
 
   private final TripTimes tripTimes;
-  private final int stopIndex;
+  private final int stopPosition;
   // This is only needed because TripTimes has no reference to TripPattern
   private final TripPattern tripPattern;
 
@@ -43,9 +43,9 @@ public class TripTimeOnDate {
 
   private final long midnight;
 
-  public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern) {
+  public TripTimeOnDate(TripTimes tripTimes, int stopPosition, TripPattern tripPattern) {
     this.tripTimes = tripTimes;
-    this.stopIndex = stopIndex;
+    this.stopPosition = stopPosition;
     this.tripPattern = tripPattern;
     this.serviceDate = null;
     this.midnight = UNDEFINED;
@@ -53,13 +53,13 @@ public class TripTimeOnDate {
 
   public TripTimeOnDate(
     TripTimes tripTimes,
-    int stopIndex,
+    int stopPosition,
     TripPattern tripPattern,
     @Nullable LocalDate serviceDate,
     @Nullable Instant midnight
   ) {
     this.tripTimes = tripTimes;
-    this.stopIndex = stopIndex;
+    this.stopPosition = stopPosition;
     this.tripPattern = tripPattern;
     this.serviceDate = serviceDate;
     this.midnight = midnight != null ? midnight.getEpochSecond() : UNDEFINED;
@@ -183,11 +183,11 @@ public class TripTimeOnDate {
   }
 
   public StopLocation getStop() {
-    return tripPattern.getStop(stopIndex);
+    return tripPattern.getStop(stopPosition);
   }
 
-  public int getStopIndex() {
-    return stopIndex;
+  public int getStopPosition() {
+    return stopPosition;
   }
 
   public TripTimes getTripTimes() {
@@ -200,13 +200,13 @@ public class TripTimeOnDate {
    */
   public boolean hasScheduledTimes() {
     return (
-      tripTimes.getScheduledArrivalTime(stopIndex) != StopTime.MISSING_VALUE &&
-      tripTimes.getScheduledDepartureTime(stopIndex) != StopTime.MISSING_VALUE
+      tripTimes.getScheduledArrivalTime(stopPosition) != StopTime.MISSING_VALUE &&
+      tripTimes.getScheduledDepartureTime(stopPosition) != StopTime.MISSING_VALUE
     );
   }
 
   public int getScheduledArrival() {
-    return tripTimes.getScheduledArrivalTime(stopIndex);
+    return tripTimes.getScheduledArrivalTime(stopPosition);
   }
 
   /**
@@ -220,11 +220,11 @@ public class TripTimeOnDate {
    * @return The GTFS stop sequence of the stop time.
    */
   public int getGtfsSequence() {
-    return tripTimes.gtfsSequenceOfStopIndex(stopIndex);
+    return tripTimes.gtfsSequenceOfStopIndex(stopPosition);
   }
 
   public int getScheduledDeparture() {
-    return tripTimes.getScheduledDepartureTime(stopIndex);
+    return tripTimes.getScheduledDepartureTime(stopPosition);
   }
 
   /**
@@ -236,40 +236,40 @@ public class TripTimeOnDate {
 
   public int getRealtimeArrival() {
     return isCancelledStop() || isNoDataStop()
-      ? tripTimes.getScheduledArrivalTime(stopIndex)
-      : tripTimes.getArrivalTime(stopIndex);
+      ? tripTimes.getScheduledArrivalTime(stopPosition)
+      : tripTimes.getArrivalTime(stopPosition);
   }
 
   public int getRealtimeDeparture() {
     return isCancelledStop() || isNoDataStop()
-      ? tripTimes.getScheduledDepartureTime(stopIndex)
-      : tripTimes.getDepartureTime(stopIndex);
+      ? tripTimes.getScheduledDepartureTime(stopPosition)
+      : tripTimes.getDepartureTime(stopPosition);
   }
 
   /**
    * Returns the actual arrival time if available. Otherwise -1 is returned.
    */
   public int getActualArrival() {
-    return isRecordedStop() ? tripTimes.getArrivalTime(stopIndex) : UNDEFINED;
+    return isRecordedStop() ? tripTimes.getArrivalTime(stopPosition) : UNDEFINED;
   }
 
   /**
    * Returns the actual departure time if available. Otherwise -1 is returned.
    */
   public int getActualDeparture() {
-    return isRecordedStop() ? tripTimes.getDepartureTime(stopIndex) : UNDEFINED;
+    return isRecordedStop() ? tripTimes.getDepartureTime(stopPosition) : UNDEFINED;
   }
 
   public int getArrivalDelay() {
-    return isCancelledStop() || isNoDataStop() ? 0 : tripTimes.getArrivalDelay(stopIndex);
+    return isCancelledStop() || isNoDataStop() ? 0 : tripTimes.getArrivalDelay(stopPosition);
   }
 
   public int getDepartureDelay() {
-    return isCancelledStop() || isNoDataStop() ? 0 : tripTimes.getDepartureDelay(stopIndex);
+    return isCancelledStop() || isNoDataStop() ? 0 : tripTimes.getDepartureDelay(stopPosition);
   }
 
   public boolean isTimepoint() {
-    return tripTimes.isTimepoint(stopIndex);
+    return tripTimes.isTimepoint(stopPosition);
   }
 
   public boolean isRealtime() {
@@ -278,13 +278,13 @@ public class TripTimeOnDate {
 
   public boolean isCancelledStop() {
     return (
-      tripTimes.isCancelledStop(stopIndex) ||
-      tripPattern.isBoardAndAlightAt(stopIndex, PickDrop.CANCELLED)
+      tripTimes.isCancelledStop(stopPosition) ||
+      tripPattern.isBoardAndAlightAt(stopPosition, PickDrop.CANCELLED)
     );
   }
 
   public boolean isPredictionInaccurate() {
-    return tripTimes.isPredictionInaccurate(stopIndex);
+    return tripTimes.isPredictionInaccurate(stopPosition);
   }
 
   /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
@@ -297,7 +297,7 @@ public class TripTimeOnDate {
   }
 
   public boolean isNoDataStop() {
-    return tripTimes.isNoDataStop(stopIndex);
+    return tripTimes.isNoDataStop(stopPosition);
   }
 
   /**
@@ -305,17 +305,17 @@ public class TripTimeOnDate {
    * This information is currently only available from SIRI feeds.
    */
   public boolean isRecordedStop() {
-    return tripTimes.isRecordedStop(stopIndex);
+    return tripTimes.isRecordedStop(stopPosition);
   }
 
   public RealTimeState getRealTimeState() {
-    return tripTimes.isNoDataStop(stopIndex)
+    return tripTimes.isNoDataStop(stopPosition)
       ? RealTimeState.SCHEDULED
       : tripTimes.getRealTimeState();
   }
 
   public OccupancyStatus getOccupancyStatus() {
-    return tripTimes.getOccupancyStatus(stopIndex);
+    return tripTimes.getOccupancyStatus(stopPosition);
   }
 
   public long getServiceDayMidnight() {
@@ -331,12 +331,12 @@ public class TripTimeOnDate {
   }
 
   public I18NString getHeadsign() {
-    return tripTimes.getHeadsign(stopIndex);
+    return tripTimes.getHeadsign(stopPosition);
   }
 
   /** @return a list of via names visible at this stop, or an empty list if there are no vias. */
   public List<String> getHeadsignVias() {
-    return tripTimes.getHeadsignVias(stopIndex);
+    return tripTimes.getHeadsignVias(stopPosition);
   }
 
   public PickDrop getPickupType() {
@@ -348,12 +348,12 @@ public class TripTimeOnDate {
         serviceDate
       );
 
-      return tripPattern.getBoardType(stopIndex);
+      return tripPattern.getBoardType(stopPosition);
     }
 
-    return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
+    return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopPosition)
       ? PickDrop.CANCELLED
-      : tripPattern.getBoardType(stopIndex);
+      : tripPattern.getBoardType(stopPosition);
   }
 
   public PickDrop getDropoffType() {
@@ -365,24 +365,24 @@ public class TripTimeOnDate {
         serviceDate
       );
 
-      return tripPattern.getAlightType(stopIndex);
+      return tripPattern.getAlightType(stopPosition);
     }
 
-    return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
+    return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopPosition)
       ? PickDrop.CANCELLED
-      : tripPattern.getAlightType(stopIndex);
+      : tripPattern.getAlightType(stopPosition);
   }
 
   public StopTimeKey getStopTimeKey() {
-    return StopTimeKey.of(tripTimes.getTrip().getId(), stopIndex).build();
+    return StopTimeKey.of(tripTimes.getTrip().getId(), stopPosition).build();
   }
 
   public BookingInfo getPickupBookingInfo() {
-    return tripTimes.getPickupBookingInfo(stopIndex);
+    return tripTimes.getPickupBookingInfo(stopPosition);
   }
 
   public BookingInfo getDropOffBookingInfo() {
-    return tripTimes.getDropOffBookingInfo(stopIndex);
+    return tripTimes.getDropOffBookingInfo(stopPosition);
   }
 
   @Override
@@ -390,7 +390,7 @@ public class TripTimeOnDate {
     if (o == null || getClass() != o.getClass()) return false;
     TripTimeOnDate that = (TripTimeOnDate) o;
     return (
-      stopIndex == that.stopIndex &&
+      stopPosition == that.stopPosition &&
       midnight == that.midnight &&
       Objects.equals(tripTimes, that.tripTimes) &&
       Objects.equals(tripPattern, that.tripPattern) &&
@@ -400,7 +400,7 @@ public class TripTimeOnDate {
 
   @Override
   public int hashCode() {
-    return Objects.hash(tripTimes, stopIndex, tripPattern, serviceDate, midnight);
+    return Objects.hash(tripTimes, stopPosition, tripPattern, serviceDate, midnight);
   }
 
   public TripPattern pattern() {
@@ -412,11 +412,11 @@ public class TripTimeOnDate {
    * empty list.
    */
   public List<TripTimeOnDate> previousTimes() {
-    if (stopIndex == 0) {
+    if (stopPosition == 0) {
       return List.of();
     } else {
       // IntStream.range is (inclusive, exclusive)
-      return IntStream.range(0, stopIndex).mapToObj(this::atStopIndex).toList();
+      return IntStream.range(0, stopPosition).mapToObj(this::atStopPosition).toList();
     }
   }
 
@@ -424,12 +424,12 @@ public class TripTimeOnDate {
    * Returns the next stop times in the trip. If it's the stop in the trip it returns an empty list.
    */
   public List<TripTimeOnDate> nextTimes() {
-    if (stopIndex == tripTimes.getNumStops() - 1) {
+    if (stopPosition == tripTimes.getNumStops() - 1) {
       return List.of();
     } else {
       // IntStream.range is (inclusive, exclusive)
-      return IntStream.range(stopIndex + 1, tripTimes.getNumStops())
-        .mapToObj(this::atStopIndex)
+      return IntStream.range(stopPosition + 1, tripTimes.getNumStops())
+        .mapToObj(this::atStopPosition)
         .toList();
     }
   }
@@ -448,11 +448,11 @@ public class TripTimeOnDate {
     return optionalInstant(getRealtimeDeparture());
   }
 
-  private TripTimeOnDate atStopIndex(int stopIndex) {
-    IntUtils.requireInRange(stopIndex, 0, tripTimes.getNumStops() - 1, "stopIndex");
+  private TripTimeOnDate atStopPosition(int stopPosition) {
+    IntUtils.requireInRange(stopPosition, 0, tripTimes.getNumStops() - 1, "stopPosition");
     return new TripTimeOnDate(
       tripTimes,
-      stopIndex,
+      stopPosition,
       tripPattern,
       serviceDate,
       Instant.ofEpochSecond(midnight)
@@ -479,7 +479,7 @@ public class TripTimeOnDate {
   public String toString() {
     return ToStringBuilder.of(TripTimeOnDate.class)
       .addObj("trip", tripTimes.getTrip())
-      .addNum("index", stopIndex)
+      .addNum("stopPosition", stopPosition)
       .addServiceTime("arrival", getScheduledArrival())
       .addServiceTime("departure", getScheduledArrival())
       .addDate("serviceDate", serviceDate)

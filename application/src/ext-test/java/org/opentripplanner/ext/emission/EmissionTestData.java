@@ -33,11 +33,32 @@ public interface EmissionTestData {
   }
 
   default DataSource emissionOnRoutes() {
-    return resource().dataSource("em-on-routes.txt", FileType.EMISSION);
+    return DataStoreModule.dataSource(
+      "em-on-routes.txt",
+      FileType.EMISSION,
+      """
+      route_id,avg_co2_per_vehicle_per_km,avg_passenger_count
+      R1,12.0,2.0
+      R2,123,3
+      """
+    );
   }
 
   default DataSource emissionOnTripHops() {
-    return resource().dataSource("em-on-trip-hops.txt", FileType.EMISSION);
+    return DataStoreModule.dataSource(
+      "em-on-trip-hops.txt",
+      FileType.EMISSION,
+      """
+      trip_id,from_stop_id,from_stop_sequence,ignore_this_value,co2
+      T1,A,1,ignore,5.0
+      T1,B,2,999,7.0
+      T2,A,1,xyz,15.0
+      T2,B,2,xyz,17.0
+      E1,A,-1,xyz,25.0
+      E2,B,1,xyz,-1000001
+      E3,B,1,xyz,1000000001
+      """
+    );
   }
 
   /**

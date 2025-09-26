@@ -1,10 +1,12 @@
 package org.opentripplanner.ext.emission.internal.csvdata.trip;
 
-import com.csvreader.CsvReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.framework.csv.HeadersDoNotMatch;
+import org.opentripplanner.framework.csv.OtpCsvReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 /**
@@ -15,34 +17,21 @@ public class TripDataReader {
 
   private final DataSource emissionDataSource;
   private final DataImportIssueStore issueStore;
-  private boolean dataProcessed = false;
 
   public TripDataReader(DataSource emissionDataSource, DataImportIssueStore issueStore) {
     this.emissionDataSource = emissionDataSource;
     this.issueStore = issueStore;
   }
 
-  public List<TripHopsRow> read(Runnable logStepCallback) {
-    if (!emissionDataSource.exists()) {
-      return List.of();
-    }
+  public List<TripHopsRow> read(@Nullable Consumer<String> progressLogger)
+    throws HeadersDoNotMatch {
     var emissionData = new ArrayList<TripHopsRow>();
-    var reader = new CsvReader(emissionDataSource.asInputStream(), StandardCharsets.UTF_8);
-    var parser = new TripHopsCsvParser(issueStore, reader);
-
-    if (!parser.headersMatch()) {
-      return List.of();
-    }
-
-    while (parser.hasNext()) {
-      logStepCallback.run();
-      emissionData.add(parser.next());
-      dataProcessed = true;
-    }
+    OtpCsvReader.<TripHopsRow>of()
+      .withProgressLogger(progressLogger)
+      .withDataSource(emissionDataSource)
+      .withParserFactory(r -> new TripHopsCsvParser(issueStore, r))
+      .withRowHandler(emissionData::add)
+      .read();
     return emissionData;
-  }
-
-  public boolean isDataProcessed() {
-    return dataProcessed;
   }
 }

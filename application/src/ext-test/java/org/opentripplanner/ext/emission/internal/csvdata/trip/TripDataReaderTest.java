@@ -1,26 +1,24 @@
 package org.opentripplanner.ext.emission.internal.csvdata.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.FileNotFoundException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.emission.EmissionTestData;
+import org.opentripplanner.framework.csv.HeadersDoNotMatch;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.opentripplanner.utils.lang.IntBox;
 
 class TripDataReaderTest implements EmissionTestData {
 
   private final DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
 
   @Test
-  void testCo2EmissionsFromGtfsDataSource() throws FileNotFoundException {
-    var stepCounter = new IntBox(0);
+  void testCo2EmissionsFromGtfsDataSource() throws FileNotFoundException, HeadersDoNotMatch {
     var subject = new TripDataReader(emissionOnTripHops(), issueStore);
 
-    var emissions = subject.read(stepCounter::inc);
+    var emissions = subject.read(null);
 
     assertEquals(
       "TripHopsRow[tripId=T1, fromStopId=A, fromStopSequence=1, co2=5g]",
@@ -30,9 +28,7 @@ class TripDataReaderTest implements EmissionTestData {
       "TripHopsRow[tripId=T2, fromStopId=B, fromStopSequence=2, co2=17g]",
       emissions.getLast().toString()
     );
-    assertTrue(subject.isDataProcessed());
     assertEquals(4, emissions.size());
-    assertEquals(4, stepCounter.get());
 
     var issues = issueStore.listIssues();
 
@@ -48,25 +44,20 @@ class TripDataReaderTest implements EmissionTestData {
   }
 
   @Test
-  void handleMissingDataSource() {
-    var stepCounter = new IntBox(0);
+  void handleMissingDataSource() throws HeadersDoNotMatch {
     var subject = new TripDataReader(emissionMissingFile(), issueStore);
-
-    var emissions = subject.read(stepCounter::inc);
-    assertFalse(subject.isDataProcessed());
-    assertTrue(emissions.isEmpty());
-    assertEquals(0, stepCounter.get());
+    var ex = assertThrows(IllegalStateException.class, () -> subject.read(null));
+    assertEquals("DataSource is missing: file-does-not-exist.txt", ex.getMessage());
   }
 
   @Test
   void ignoreDataSourceIfHeadersDoNotMatch() {
-    var stepCounter = new IntBox(0);
     var subject = new TripDataReader(emissionOnRoutes(), issueStore);
 
-    var emissions = subject.read(stepCounter::inc);
-
-    assertFalse(subject.isDataProcessed());
-    assertTrue(emissions.isEmpty());
-    assertEquals(0, stepCounter.get());
+    var ex = assertThrows(HeadersDoNotMatch.class, () -> subject.read(null));
+    assertEquals(
+      "The header does not match the expected values for csv file: em-on-routes.txt",
+      ex.getMessage()
+    );
   }
 }

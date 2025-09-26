@@ -158,16 +158,18 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     return serviceDate.compareTo(other.serviceDate);
   }
 
+  /**
+   * The natural key of a TripPatternForDate is the pair (routing trip pattern id, service date).
+   */
   @Override
   public int hashCode() {
-    return Objects.hash(
-      tripPattern,
-      serviceDate,
-      Arrays.hashCode(tripTimes),
-      Arrays.hashCode(frequencies)
-    );
+    return Objects.hash(tripPattern, serviceDate);
   }
 
+  /**
+   * The natural key of a TripPatternForDate is the pair (routing trip pattern id, service date).
+   * TODO: align equals and hashcode to use only the pair (routing trip pattern id, service date)
+   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {

@@ -64,7 +64,7 @@
         <geotools.version>33.2</geotools.version>
         <google.dagger.version>2.57</google.dagger.version>
         <jackson.version>2.19.2</jackson.version>
-        <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
+        <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
         <junit.version>5.13.4</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
@@ -108,7 +108,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.hubspot.maven.plugins</groupId>
@@ -126,7 +126,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>3.14.1</version>
                 <configuration>
                     <!-- Target Java version -->
                     <release>21</release>
