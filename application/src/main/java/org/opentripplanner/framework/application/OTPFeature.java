@@ -87,6 +87,17 @@ public enum OTPFeature {
     true,
     "Enable the [Transmodel (NeTEx) GraphQL API](apis/TransmodelApi.md)."
   ),
+  OnDemandRaptorTransfer(
+    false,
+    false,
+    """
+    Calculate transfers only when accessed by Raptor, instead of calculating and caching all transfers for the whole graph,
+    for runtime requests which are not pre-cached in `transferCacheRequests` in router-config.json.
+    This may help performance when doing local journey planning in a large graph.
+
+    Requests which are specified in `transferCacheRequests` in router-config.json are not affected and are always pre-cached for the whole graph.
+    """
+  ),
 
   /* Sandbox extension features - Must be turned OFF by default */
 
