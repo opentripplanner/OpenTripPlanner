@@ -120,7 +120,7 @@ public class GenerateTripPatternsOperation {
    */
   private void collectFrequencyByTrip() {
     for (Frequency freq : transitServiceBuilder.getFrequencies()) {
-      frequenciesForTrip.put(freq.getTrip(), freq);
+      frequenciesForTrip.put(freq.trip(), freq);
     }
   }
 
