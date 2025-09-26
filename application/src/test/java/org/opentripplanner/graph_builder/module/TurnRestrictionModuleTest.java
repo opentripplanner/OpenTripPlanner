@@ -116,8 +116,15 @@ public class TurnRestrictionModuleTest {
     osmInfoGraphBuildRepository.addTurnRestriction(
       new TurnRestriction(AB[0], BE[0], TurnRestrictionType.NO_TURN, TraverseModeSet.allModes())
     );
+
+    assertEquals(5, graph.countVertices());
+    assertEquals(8, graph.countEdges());
+
     var module = new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
     module.buildGraph();
+
+    assertEquals(6, graph.countVertices());
+    assertEquals(11, graph.countEdges());
 
     var newB = graph
       .getVertices()
@@ -175,9 +182,16 @@ public class TurnRestrictionModuleTest {
         useTurnRestrictions.add(turnRestrictions.get(0));
         break;
     }
+
+    assertEquals(8, graph.countVertices());
+    assertEquals(14, graph.countEdges());
+
     for (var turnRestriction : useTurnRestrictions) {
       module.processRestriction(turnRestriction);
     }
+
+    assertEquals(10, graph.countVertices());
+    assertEquals(20, graph.countEdges());
 
     var newB = graph
       .getVertices()
@@ -251,9 +265,16 @@ public class TurnRestrictionModuleTest {
     turnRestrictions.remove(order % 2);
     order /= 2;
     useTurnRestrictions.add(turnRestrictions.get(0));
+
+    assertEquals(7, graph.countVertices());
+    assertEquals(12, graph.countEdges());
+
     for (var turnRestriction : useTurnRestrictions) {
       module.processRestriction(turnRestriction);
     }
+
+    assertEquals(10, graph.countVertices());
+    assertEquals(15, graph.countEdges());
 
     var Bs = graph.getVertices().stream().filter(v -> v.sameLocation(B) && v != B).toList();
     var newE = graph
@@ -308,8 +329,14 @@ public class TurnRestrictionModuleTest {
       turnRestriction(BD[0], DF[0], new TraverseModeSet(TraverseMode.CAR))
     );
 
+    assertEquals(6, graph.countVertices());
+    assertEquals(12, graph.countEdges());
+
     var module = new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
     module.buildGraph();
+
+    assertEquals(7, graph.countVertices());
+    assertEquals(16, graph.countEdges());
 
     var streetRequest = new StreetRequest(StreetMode.CAR);
 

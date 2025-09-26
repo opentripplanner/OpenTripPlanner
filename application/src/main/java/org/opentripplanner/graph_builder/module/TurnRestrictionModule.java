@@ -17,6 +17,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SubsidiaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,17 +125,17 @@ public class TurnRestrictionModule implements GraphBuilderModule {
       } else {
         fromEdge.setPermission(oldPermission);
       }
-      for (var toEdge : vertex.getOutgoingStreetEdges()) {
-        if (turnRestriction.type == TurnRestrictionType.NO_TURN) {
-          if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
-            toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
-            addedEdges++;
-          }
-        } else {
-          if (isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
-            toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
-            addedEdges++;
-          }
+    }
+    for (var toEdge : vertex.getOutgoingStreetEdges()) {
+      if (turnRestriction.type == TurnRestrictionType.NO_TURN) {
+        if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
+          toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
+          addedEdges++;
+        }
+      } else {
+        if (isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
+          toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
+          addedEdges++;
         }
       }
     }
@@ -171,18 +172,25 @@ public class TurnRestrictionModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    LOG.info("Applying turn restrictions to graph");
+    var turnRestrictions = osmInfoGraphBuildRepository.listTurnRestrictions();
+    var progressTracker = ProgressTracker.track(
+      "Applying turn restrictions to graph",
+      1_000,
+      turnRestrictions.size()
+    );
+    LOG.info(progressTracker.startMessage());
 
-    int turnRestrictionCount = 0;
     addedVertices = 0;
     addedEdges = 0;
-    for (var turnRestriction : osmInfoGraphBuildRepository.listTurnRestrictions()) {
+    for (var turnRestriction : turnRestrictions) {
       processRestriction(turnRestriction);
-      turnRestrictionCount++;
+      //noinspection Convert2MethodRef
+      progressTracker.step(msg -> LOG.info(msg));
     }
+
     LOG.info(
-      "Applied {} turn restrictions, added {} vertices and {} edges",
-      turnRestrictionCount,
+      "{} Added {} vertices and {} edges.",
+      progressTracker.completeMessage(),
       addedVertices,
       addedEdges
     );
