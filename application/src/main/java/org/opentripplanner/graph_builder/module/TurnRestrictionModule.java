@@ -139,15 +139,28 @@ public class TurnRestrictionModule implements GraphBuilderModule {
         }
       }
     }
+    if (splitVertex.getIncoming().isEmpty()) {
+      removeVertexWithOutgoingOnly(mainVertex, splitVertex);
+    }
     if (hasRemovedInputEdges) {
       if (vertex.getIncoming().isEmpty()) {
-        for (var toEdge : vertex.getOutgoing()) {
-          toEdge.remove();
-          addedEdges--;
-        }
-        graph.remove(vertex);
-        addedVertices--;
+        removeVertexWithOutgoingOnly(mainVertex, vertex);
       }
+    }
+  }
+
+  private void removeVertexWithOutgoingOnly(
+    IntersectionVertex mainVertex,
+    IntersectionVertex vertex
+  ) {
+    for (var toEdge : vertex.getOutgoing()) {
+      toEdge.remove();
+      addedEdges--;
+    }
+    graph.remove(vertex);
+    addedVertices--;
+    if (vertex instanceof SubsidiaryVertex) {
+      subsidiaryVertices.get(mainVertex).remove(vertex);
     }
   }
 
