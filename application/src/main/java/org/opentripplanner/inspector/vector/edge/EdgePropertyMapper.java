@@ -10,6 +10,7 @@ import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.utils.collection.ListUtils;
@@ -25,6 +26,12 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
         case EscalatorEdge e -> List.of(
           kv("distance", e.getDistanceMeters()),
           kv("duration", e.getDuration().map(d -> d.toString()).orElse(null))
+        );
+        case ElevatorHopEdge e -> List.of(
+          kv("permission", e.getPermission()),
+          kv("levels", e.getLevels()),
+          kv("wheelchairAccessible", e.isWheelchairAccessible()),
+          kv("travelTime", e.getTravelTime())
         );
         default -> List.of();
       };

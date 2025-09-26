@@ -21,6 +21,7 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
+import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -166,6 +167,10 @@ public class StatesToWalkStepsMapper {
     }
     Geometry geom = edge.getGeometry();
     if (geom == null) {
+      return;
+    }
+
+    if (edge instanceof ElevatorHopEdge) {
       return;
     }
 
