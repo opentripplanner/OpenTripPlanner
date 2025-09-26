@@ -183,17 +183,16 @@ public class BarrierRoutingTest {
 
     options.accept(builder);
 
-    var temporaryVertices = new TemporaryVerticesContainer(
+    var temporaryVerticesContainer = TemporaryVerticesContainer.of(
       graph,
-      TestVertexLinker.of(graph),
-      id -> List.of(),
-      from,
-      to,
-      streetMode,
-      streetMode
-    );
+      TestVertexLinker.of(graph)
+    )
+      .withFrom(from, streetMode)
+      .withTo(to, streetMode)
+      .build();
     var gpf = new GraphPathFinder(null);
-    var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), temporaryVertices);
+    var fromToViaVertexRequest = temporaryVerticesContainer.createFromToViaVertexRequest();
+    var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), fromToViaVertexRequest);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneIds.BERLIN,
@@ -206,7 +205,7 @@ public class BarrierRoutingTest {
     assertAll(assertions.apply(itineraries));
 
     Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
-    temporaryVertices.close();
+    temporaryVerticesContainer.close();
 
     return EncodedPolyline.encode(legGeometry).points();
   }

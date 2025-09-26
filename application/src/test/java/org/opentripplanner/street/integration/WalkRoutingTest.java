@@ -15,6 +15,7 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.model.edge.Edge;
@@ -93,20 +94,20 @@ class WalkRoutingTest {
       .withTo(to)
       .withArriveBy(arriveBy)
       .buildRequest();
-
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(
+      var temporaryVerticesContainer = TemporaryVerticesContainer.of(
         graph,
-        TestVertexLinker.of(graph),
-        id -> List.of(),
-        request.from(),
-        request.to(),
-        request.journey().direct().mode(),
-        request.journey().direct().mode()
+        TestVertexLinker.of(graph)
       )
+        .withFrom(from, StreetMode.WALK)
+        .withTo(to, StreetMode.WALK)
+        .build()
     ) {
       var gpf = new GraphPathFinder(null);
-      return gpf.graphPathFinderEntryPoint(request, temporaryVertices);
+      return gpf.graphPathFinderEntryPoint(
+        request,
+        temporaryVerticesContainer.createFromToViaVertexRequest()
+      );
     }
   }
 }

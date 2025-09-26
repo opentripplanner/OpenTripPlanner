@@ -6,7 +6,6 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
@@ -166,17 +165,18 @@ public class SplitEdgeTurnRestrictionsTest {
       .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
       .buildRequest();
 
-    var temporaryVertices = new TemporaryVerticesContainer(
+    var temporaryVerticesContainer = TemporaryVerticesContainer.of(
       graph,
-      TestVertexLinker.of(graph),
-      id -> List.of(),
-      from,
-      to,
-      StreetMode.CAR,
-      StreetMode.CAR
-    );
+      TestVertexLinker.of(graph)
+    )
+      .withFrom(from, StreetMode.CAR)
+      .withTo(to, StreetMode.CAR)
+      .build();
     var gpf = new GraphPathFinder(null);
-    var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
+    var paths = gpf.graphPathFinderEntryPoint(
+      request,
+      temporaryVerticesContainer.createFromToViaVertexRequest()
+    );
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneIds.BERLIN,
@@ -185,7 +185,7 @@ public class SplitEdgeTurnRestrictionsTest {
     );
 
     var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
-    temporaryVertices.close();
+    temporaryVerticesContainer.close();
 
     // make sure that we only get CAR legs
     itineraries.forEach(i ->

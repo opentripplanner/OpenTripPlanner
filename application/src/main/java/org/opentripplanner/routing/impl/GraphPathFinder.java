@@ -17,7 +17,7 @@ import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.search.request.FromToViaVertexRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
@@ -121,12 +121,12 @@ public class GraphPathFinder {
    */
   public List<GraphPath<State, Edge, Vertex>> graphPathFinderEntryPoint(
     RouteRequest request,
-    TemporaryVerticesContainer vertexContainer
+    FromToViaVertexRequest fromToViaVertexRequest
   ) {
     return graphPathFinderEntryPoint(
       request,
-      vertexContainer.getFromVertices(),
-      vertexContainer.getToVertices()
+      fromToViaVertexRequest.findVertices(request.from()),
+      fromToViaVertexRequest.findVertices(request.to())
     );
   }
 
