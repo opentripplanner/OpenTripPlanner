@@ -54,7 +54,14 @@ public class GbfsFeedLoaderAndMapper {
           params
         );
       }
-      case "2.2", "2.3" -> {
+      case "1.1", "2.0", "2.1", "2.2", "2.3" -> {
+        if (gbfsFeedVersion.startsWith("1")) {
+          LOG.warn(
+            "GBFS feed {} is of deprecated version {}. Support for this version will be removed soon.",
+            params.url(),
+            gbfsFeedVersion
+          );
+        }
         var loaderv23 =
           new org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2.GbfsFeedLoader(
             params.url(),
