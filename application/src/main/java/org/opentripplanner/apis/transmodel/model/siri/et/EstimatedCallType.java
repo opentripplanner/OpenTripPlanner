@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.opentripplanner.apis.transmodel.mapping.OccupancyStatusMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
@@ -257,6 +258,21 @@ public class EstimatedCallType {
           .type(new GraphQLNonNull(TransmodelScalars.DATE_SCALAR))
           .description("The date the estimated call is valid for.")
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getServiceDay())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("serviceJourneyEstimatedCalls")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(REF))))
+          .description("All estimated calls for the ServiceJourney on this date.")
+          .dataFetcher(environment -> {
+            return GqlUtil.getTransitService(environment)
+              .findTripTimesOnDate(
+                environment.<TripTimeOnDate>getSource().getTrip(),
+                environment.<TripTimeOnDate>getSource().getServiceDay()
+              )
+              .orElse(List.of());
+          })
           .build()
       )
       .field(
