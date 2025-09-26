@@ -43,16 +43,37 @@ public class TurnRestrictionModuleTest {
   }
 
   private StreetEdge streetEdge(StreetVertex a, StreetVertex b, double length) {
+    return streetEdge(a, b, length, StreetTraversalPermission.ALL);
+  }
+
+  private StreetEdge streetEdge(
+    StreetVertex a,
+    StreetVertex b,
+    double length,
+    StreetTraversalPermission streetTraversalPermission
+  ) {
     return new StreetEdgeBuilder<>()
       .withFromVertex(a)
       .withToVertex(b)
       .withMeterLength(length)
-      .withPermission(StreetTraversalPermission.ALL)
+      .withPermission(streetTraversalPermission)
       .buildAndConnect();
   }
 
   private StreetEdge[] edges(StreetVertex a, StreetVertex b, double length) {
     return new StreetEdge[] { streetEdge(a, b, length), streetEdge(b, a, length) };
+  }
+
+  private StreetEdge[] edges(
+    StreetVertex a,
+    StreetVertex b,
+    double length,
+    StreetTraversalPermission streetTraversalPermission
+  ) {
+    return new StreetEdge[] {
+      streetEdge(a, b, length, streetTraversalPermission),
+      streetEdge(b, a, length, streetTraversalPermission),
+    };
   }
 
   private TurnRestriction turnRestriction(
@@ -438,14 +459,66 @@ public class TurnRestrictionModuleTest {
         .getShortestPathTree()
         .getPath(C)
     );
-    assertNotNull(
-      StreetSearchBuilder.of()
-        .setRequest(request)
-        .setStreetRequest(streetRequest)
-        .setFrom(A)
-        .setTo(E)
-        .getShortestPathTree()
-        .getPath(E)
+    GraphPath<State, Edge, Vertex> path = StreetSearchBuilder.of()
+      .setRequest(request)
+      .setStreetRequest(streetRequest)
+      .setFrom(A)
+      .setTo(E)
+      .getShortestPathTree()
+      .getPath(E);
+    assertNotNull(path);
+
+    for (Edge edge : path.edges) {
+      assertEquals(StreetTraversalPermission.CAR, ((StreetEdge) edge).getPermission());
+    }
+  }
+
+  @Test
+  public void unusedUTurnRestriction() {
+    var graph = new Graph();
+    var osmInfoGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
+    var A = vertex(graph, 1, 0.0, 0.0);
+    var B = vertex(graph, 3, 2.0, 0.0);
+    var AB = edges(A, B, 1.0, StreetTraversalPermission.ALL);
+    osmInfoGraphBuildRepository.addTurnRestriction(
+      turnRestriction(AB[0], AB[1], new TraverseModeSet(TraverseMode.CAR))
     );
+
+    assertEquals(2, graph.countVertices());
+    assertEquals(2, graph.countEdges());
+
+    var module = new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
+    module.buildGraph();
+
+    assertEquals(2, graph.countVertices());
+    assertEquals(2, graph.countEdges());
+
+    assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, AB[0].getPermission());
+    assertEquals(StreetTraversalPermission.ALL, AB[1].getPermission());
+  }
+
+  @Test
+  public void unusedOnlyTurnRestriction() {
+    var graph = new Graph();
+    var osmInfoGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
+    var A = vertex(graph, 1, 0.0, 0.0);
+    var B = vertex(graph, 3, 2.0, 0.0);
+    var AB = streetEdge(A, B, 1.0, StreetTraversalPermission.ALL);
+    var BA = streetEdge(A, B, 1.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    osmInfoGraphBuildRepository.addTurnRestriction(
+      turnRestriction(AB, BA, new TraverseModeSet(TraverseMode.CAR), TurnRestrictionType.ONLY_TURN)
+    );
+
+    assertEquals(2, graph.countVertices());
+    assertEquals(2, graph.countEdges());
+
+    var module = new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
+    module.buildGraph();
+
+    assertEquals(2, graph.countVertices());
+    assertEquals(2, graph.countEdges());
+
+    assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, AB.getPermission());
+    assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, BA.getPermission());
   }
 }

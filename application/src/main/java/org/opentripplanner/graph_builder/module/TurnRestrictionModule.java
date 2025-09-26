@@ -98,6 +98,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     if (fromEdges.isEmpty()) {
       return;
     }
+    var restrictionPermission = streetTraversalPermission(turnRestriction.modes);
     var mainVertex = (IntersectionVertex) turnRestriction.from.getToVertex();
     var splitVertex = new SubsidiaryVertex(mainVertex);
     graph.addVertex(splitVertex);
@@ -107,7 +108,6 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     boolean hasRemovedInputEdges = false;
     for (var fromEdge : fromEdges) {
       var fromPermission = fromEdge.getPermission();
-      var restrictionPermission = streetTraversalPermission(turnRestriction.modes);
       var oldPermission = fromPermission.remove(restrictionPermission);
       var newPermission = fromPermission.intersection(restrictionPermission);
       if (newPermission.allowsAnything()) {
@@ -126,35 +126,59 @@ public class TurnRestrictionModule implements GraphBuilderModule {
         fromEdge.setPermission(oldPermission);
       }
     }
-    for (var toEdge : vertex.getOutgoingStreetEdges()) {
-      if (turnRestriction.type == TurnRestrictionType.NO_TURN) {
-        if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
-          toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
-          addedEdges++;
-        }
-      } else {
-        if (isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
-          toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
-          addedEdges++;
+    if (!removeVertexWithOutgoingOnly(mainVertex, splitVertex)) {
+      for (var toEdge : vertex.getOutgoingStreetEdges()) {
+        var toPermission = toEdge.getPermission();
+        var newPermission = toPermission.intersection(restrictionPermission);
+        if (newPermission.allowsAnything()) {
+          if (turnRestriction.type == TurnRestrictionType.NO_TURN) {
+            if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
+              toEdge
+                .toBuilder()
+                .withFromVertex(splitVertex)
+                .withPermission(newPermission)
+                .buildAndConnect();
+              addedEdges++;
+            }
+          } else {
+            if (isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
+              toEdge
+                .toBuilder()
+                .withFromVertex(splitVertex)
+                .withPermission(newPermission)
+                .buildAndConnect();
+              addedEdges++;
+            }
+          }
         }
       }
-    }
-    if (splitVertex.getIncoming().isEmpty()) {
-      removeVertexWithOutgoingOnly(mainVertex, splitVertex);
+      if (splitVertex.getOutgoing().isEmpty()) {
+        removeVertex(mainVertex, splitVertex);
+      }
     }
     if (hasRemovedInputEdges) {
-      if (vertex.getIncoming().isEmpty()) {
-        removeVertexWithOutgoingOnly(mainVertex, vertex);
-      }
+      removeVertexWithOutgoingOnly(mainVertex, vertex);
     }
   }
 
-  private void removeVertexWithOutgoingOnly(
+  private boolean removeVertexWithOutgoingOnly(
     IntersectionVertex mainVertex,
     IntersectionVertex vertex
   ) {
-    for (var toEdge : vertex.getOutgoing()) {
-      toEdge.remove();
+    if (!vertex.getIncoming().isEmpty()) {
+      return false;
+    }
+    removeVertex(mainVertex, vertex);
+    return true;
+  }
+
+  private void removeVertex(IntersectionVertex mainVertex, IntersectionVertex vertex) {
+    for (var incomingEdge : vertex.getIncoming()) {
+      incomingEdge.remove();
+      addedEdges--;
+    }
+    for (var outgoingEdge : vertex.getOutgoing()) {
+      outgoingEdge.remove();
       addedEdges--;
     }
     graph.remove(vertex);
