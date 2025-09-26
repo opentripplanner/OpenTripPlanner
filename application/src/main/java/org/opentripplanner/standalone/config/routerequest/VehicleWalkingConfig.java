@@ -74,7 +74,7 @@ public class VehicleWalkingConfig {
           .of("stairsReluctance")
           .since(V2_3)
           .summary(
-            "How bad is it to walk the vehicle up/down a flight of stairs compared to taking a detour."
+            "How bad is it to walk the vehicle up/down a flight of stairs, on top of the reluctance parameter."
           )
           .asDouble(dft.stairsReluctance())
       );
