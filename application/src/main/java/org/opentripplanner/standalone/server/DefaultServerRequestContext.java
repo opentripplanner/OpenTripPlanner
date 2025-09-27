@@ -94,10 +94,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   private final VertexLinker vertexLinker;
 
-  /* Lazy initialized fields */
-
-  private RouteRequest defaultRouteRequestWithTimeSet = null;
-
   /**
    * Create a server context valid for one http request only!
    * Make sure all mutable components are copied/cloned before calling this constructor.

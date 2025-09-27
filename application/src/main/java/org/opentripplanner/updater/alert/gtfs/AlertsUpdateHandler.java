@@ -63,7 +63,9 @@ public class AlertsUpdateHandler {
   }
 
   public void setFeedId(String feedId) {
-    if (feedId != null) this.feedId = feedId.intern();
+    if (feedId != null) {
+      this.feedId = feedId.intern();
+    }
   }
 
   public void setTransitAlertService(TransitAlertService transitAlertService) {

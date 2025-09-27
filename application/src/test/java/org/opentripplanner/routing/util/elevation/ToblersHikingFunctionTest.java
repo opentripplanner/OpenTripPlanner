@@ -43,7 +43,10 @@ public class ToblersHikingFunctionTest {
 
   static class TestCase {
 
-    final double slopeAnglePercentage, dx, dh, expected;
+    final double slopeAnglePercentage;
+    final double dx;
+    final double dh;
+    final double expected;
 
     TestCase(double slopeAnglePercentage, double expected) {
       this.slopeAnglePercentage = slopeAnglePercentage;

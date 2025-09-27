@@ -14,7 +14,11 @@ public class BicycleParkAndRideTest extends ParkAndRideTest {
    * <-------> B --------> C --------> D ---------> E | Bike Park
    */
 
-  private StreetVertex A, B, C, D, E;
+  private StreetVertex A;
+  private StreetVertex B;
+  private StreetVertex C;
+  private StreetVertex D;
+  private StreetVertex E;
 
   @BeforeEach
   public void setUp() throws Exception {

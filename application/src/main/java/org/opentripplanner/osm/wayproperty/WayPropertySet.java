@@ -243,9 +243,9 @@ public class WayPropertySet {
       }
     }
 
-    if (way.hasTag("maxspeed") && speed == null) speed = getMetersSecondFromSpeed(
-      way.getTag("maxspeed")
-    );
+    if (way.hasTag("maxspeed") && speed == null) {
+      speed = getMetersSecondFromSpeed(way.getTag("maxspeed"));
+    }
 
     if (speed != null) {
       // Too low (less than 5 km/h) or too high speed limit indicates an error in the data,
@@ -394,7 +394,9 @@ public class WayPropertySet {
     }
 
     String units = m.group(2);
-    if (units == null || units.isEmpty()) units = "kmh";
+    if (units == null || units.isEmpty()) {
+      units = "kmh";
+    }
 
     // we'll be doing quite a few string comparisons here
     units = units.intern();

@@ -34,7 +34,6 @@ public class NetexFeedParameters implements DataSourceConfig {
   private static final Set<IgnorableFeature> IGNORED_FEATURES = Set.of(PARKING);
 
   private static final Set<String> FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE = Collections.emptySet();
-  private static final Set<String> ROUTE_TO_CENTROID_STATION_IDS = Collections.emptySet();
 
   public static final NetexFeedParameters DEFAULT = new NetexFeedParameters();
 
@@ -139,8 +138,12 @@ public class NetexFeedParameters implements DataSourceConfig {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     NetexFeedParameters that = (NetexFeedParameters) o;
     return (
       Objects.equals(source, that.source) &&

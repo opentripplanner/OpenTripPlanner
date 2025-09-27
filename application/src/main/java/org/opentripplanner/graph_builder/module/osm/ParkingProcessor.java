@@ -321,7 +321,9 @@ class ParkingProcessor {
     I18NString creativeName,
     List<VehicleParking.VehicleParkingEntranceCreator> entrances
   ) {
-    OptionalInt bicycleCapacity, carCapacity, wheelchairAccessibleCarCapacity;
+    OptionalInt bicycleCapacity;
+    OptionalInt carCapacity;
+    OptionalInt wheelchairAccessibleCarCapacity;
     if (isCarParkAndRide) {
       carCapacity = parseCapacity(entity);
       bicycleCapacity = parseCapacity(entity, "capacity:bike");

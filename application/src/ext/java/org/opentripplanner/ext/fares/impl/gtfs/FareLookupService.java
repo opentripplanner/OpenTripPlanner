@@ -285,7 +285,9 @@ class FareLookupService implements Serializable {
       var legDistance = leg.directDistanceMeters();
 
       return legDistance > min.toMeters() && legDistance < max.toMeters();
-    } else return true;
+    } else {
+      return true;
+    }
   }
 
   private static Set<FeedScopedId> findAreasWithRules(

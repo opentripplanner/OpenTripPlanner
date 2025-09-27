@@ -137,12 +137,16 @@ public class NetexTestDataSample {
         .withOrder(BigInteger.valueOf(i + 1))
         .withScheduledStopPointRef(createScheduledStopPointRef(stopPointId));
 
-      if (i == 0) stopPoint.setDestinationDisplayRef(
-        createDestinationDisplayRef(destinationBergen.getId()).getValue()
-      );
-      if (i == 2) stopPoint.setDestinationDisplayRef(
-        createDestinationDisplayRef(destinationStavanger.getId()).getValue()
-      );
+      if (i == 0) {
+        stopPoint.setDestinationDisplayRef(
+          createDestinationDisplayRef(destinationBergen.getId()).getValue()
+        );
+      }
+      if (i == 2) {
+        stopPoint.setDestinationDisplayRef(
+          createDestinationDisplayRef(destinationStavanger.getId()).getValue()
+        );
+      }
 
       pointsInLink.add(stopPoint);
       timetabledPassingTimes.get(i).setPointInJourneyPatternRef(createStopPointRef(stopPointId));

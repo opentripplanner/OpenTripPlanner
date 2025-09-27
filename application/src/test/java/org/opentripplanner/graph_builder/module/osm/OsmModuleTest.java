@@ -60,13 +60,10 @@ import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OsmModuleTest {
 
   private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(OsmModuleTest.class);
-  private static final Logger log = LoggerFactory.getLogger(OsmModuleTest.class);
 
   @Test
   public void testGraphBuilder() {
@@ -105,7 +102,9 @@ public class OsmModuleTest {
     assertNotNull(v3);
     assertNotNull(v4);
 
-    Edge e1 = null, e2 = null, e3 = null;
+    Edge e1 = null;
+    Edge e2 = null;
+    Edge e3 = null;
     for (Edge e : v2.getOutgoing()) {
       if (e.getToVertex() == v1) {
         e1 = e;
