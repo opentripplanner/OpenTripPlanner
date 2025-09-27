@@ -62,7 +62,7 @@ public class TestHalfEdges {
   @BeforeEach
   public void setUp() {
     var deduplicator = new Deduplicator();
-    graph = new Graph(deduplicator);
+    graph = new Graph();
     var siteRepositoryBuilder = testModel.siteRepositoryBuilder();
     var factory = new VertexFactory(graph);
     // a 0.1 degree x 0.1 degree square

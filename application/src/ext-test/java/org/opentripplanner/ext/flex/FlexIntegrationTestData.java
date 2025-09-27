@@ -42,7 +42,7 @@ public final class FlexIntegrationTestData {
 
   private static TestOtpModel buildFlexGraph(File file) {
     var deduplicator = new Deduplicator();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     GtfsBundle gtfsBundle = GtfsBundle.forTest(file);
     GtfsModule module = GtfsModule.forTest(

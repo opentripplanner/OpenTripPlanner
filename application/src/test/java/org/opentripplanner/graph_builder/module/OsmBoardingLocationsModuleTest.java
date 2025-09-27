@@ -86,7 +86,7 @@ class OsmBoardingLocationsModuleTest {
     RegularStop floatingBusStop = testModel.stop("floating-bus-stop", 48.59417, 8.86464).build();
 
     var deduplicator = new Deduplicator();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     var factory = new VertexFactory(graph);
 
@@ -202,8 +202,7 @@ class OsmBoardingLocationsModuleTest {
    */
   @Test
   void testLinearPlatforms() {
-    var deduplicator = new Deduplicator();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var osmModule = OsmModule.of(
       new DefaultOsmProvider(

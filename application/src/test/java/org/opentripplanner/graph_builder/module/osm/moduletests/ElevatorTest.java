@@ -13,7 +13,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 class ElevatorTest {
 
@@ -23,7 +22,7 @@ class ElevatorTest {
     way.addTag("duration", "00:01:02");
     way.addTag("highway", "elevator");
     var provider = TestOsmProvider.of().addWay(way).build();
-    var graph = new Graph(new Deduplicator());
+    var graph = new Graph();
     var osmModule = OsmModule.of(
       provider,
       graph,
@@ -50,7 +49,7 @@ class ElevatorTest {
       .addWayFromNodes(way -> way.addTag("level", "1"), node0, node)
       .addWayFromNodes(way -> way.addTag("level", "2"), node1, node)
       .build();
-    var graph = new Graph(new Deduplicator());
+    var graph = new Graph();
     var osmModule = OsmModule.of(
       provider,
       graph,

@@ -20,7 +20,7 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.ImmutableEntityById;
@@ -84,7 +84,7 @@ class TripPatternMapper {
 
   private final ServiceLinkMapper serviceLinkMapper;
 
-  private final Deduplicator deduplicator;
+  private final DeduplicatorService deduplicator;
 
   TripPatternMapper(
     DataImportIssueStore issueStore,
@@ -106,7 +106,7 @@ class TripPatternMapper {
     ReadOnlyHierarchicalMapById<DatedServiceJourney> datedServiceJourneyById,
     Multimap<String, DatedServiceJourney> datedServiceJourneysBySJId,
     Map<String, FeedScopedId> serviceIds,
-    Deduplicator deduplicator,
+    DeduplicatorService deduplicator,
     double maxStopToShapeSnapDistance
   ) {
     this.issueStore = issueStore;

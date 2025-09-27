@@ -158,7 +158,7 @@ public class LinkingTest {
   public static TestOtpModel buildGraphNoTransit() {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
 
     File file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
