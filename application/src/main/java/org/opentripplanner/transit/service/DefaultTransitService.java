@@ -609,6 +609,7 @@ public class DefaultTransitService implements TransitEditorService {
    * this when doing the issue #3030.
    */
   @Override
+  @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     return timetableRepository.getOrCreateServiceIdForDate(serviceDate);
   }
