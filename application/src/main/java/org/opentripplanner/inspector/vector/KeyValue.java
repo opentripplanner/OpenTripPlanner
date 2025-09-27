@@ -3,6 +3,7 @@ package org.opentripplanner.inspector.vector;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -25,7 +26,9 @@ public record KeyValue(String key, Object value) {
   public static KeyValue kv(String key, @Nullable Object value) {
     if (value == null) {
       return new KeyValue(key, null);
-    } else if (value instanceof FeedScopedId || value instanceof Enum<?>) {
+    } else if (
+      value instanceof FeedScopedId || value instanceof Enum<?> || value instanceof I18NString
+    ) {
       return new KeyValue(key, value.toString());
     } else {
       return new KeyValue(key, value);
