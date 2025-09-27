@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 
 /**
@@ -21,12 +22,12 @@ class LegOfferContainer {
   /**
    * Take all offers from {@code from} and apply them to {@code targets}.
    */
-  public void transferProducts(ScheduledTransitLeg from, List<ScheduledTransitLeg> targets) {
+  public void transferProducts(TransitLeg from, List<TransitLeg> targets) {
     var previousLegsProducts = multimap.get(from);
     targets.forEach(leg -> addToLeg(leg, previousLegsProducts));
   }
 
-  void addToLeg(ScheduledTransitLeg leg, Collection<FareOffer> products) {
+  void addToLeg(TransitLeg leg, Collection<FareOffer> products) {
     products.forEach(p -> addToLeg(leg, p));
   }
 

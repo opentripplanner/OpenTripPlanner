@@ -2,12 +2,15 @@ package org.opentripplanner.gtfs.mapping;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.collection.MapUtils;
 
 /** Responsible for mapping GTFS Route into the OTP model. */
@@ -16,20 +19,23 @@ class RouteMapper {
   private final IdFactory idFactory;
   private final AgencyMapper agencyMapper;
 
+  private final RouteNetworkAssignmentMapper routeNetworkAssignmentMapper;
   private final DataImportIssueStore issueStore;
 
-  private TranslationHelper translationHelper;
+  private final TranslationHelper translationHelper;
 
   private final Map<org.onebusaway.gtfs.model.Route, Route> mappedRoutes = new HashMap<>();
 
   RouteMapper(
     IdFactory idFactory,
     AgencyMapper agencyMapper,
+    RouteNetworkAssignmentMapper routeNetworkAssignmentMapper,
     DataImportIssueStore issueStore,
     TranslationHelper helper
   ) {
     this.idFactory = idFactory;
     this.agencyMapper = agencyMapper;
+    this.routeNetworkAssignmentMapper = routeNetworkAssignmentMapper;
     this.issueStore = issueStore;
     this.translationHelper = helper;
   }
@@ -81,13 +87,21 @@ class RouteMapper {
     lhs.withColor(rhs.getColor());
     lhs.withTextColor(rhs.getTextColor());
     lhs.withBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
-    if (rhs.getNetworkId() != null) {
-      var networkId = GroupOfRoutes.of(
-        idFactory.createId(rhs.getNetworkId(), "route's network")
-      ).build();
-      lhs.getGroupsOfRoutes().add(networkId);
-    }
+    var nIds = networkId(rhs);
+    var nIdsFromAssignment = routeNetworkAssignmentMapper.findNetworks(lhs.getId());
+    ListUtils.combine(nIds, nIdsFromAssignment).forEach(networkId -> {
+      var gor = GroupOfRoutes.of(networkId).build();
+      lhs.getGroupsOfRoutes().add(gor);
+    });
 
     return lhs.build();
+  }
+
+  private Collection<FeedScopedId> networkId(org.onebusaway.gtfs.model.Route rhs) {
+    if (rhs.getNetworkId() == null) {
+      return List.of();
+    } else {
+      return List.of(idFactory.createId(rhs.getNetworkId(), "route's network"));
+    }
   }
 }
