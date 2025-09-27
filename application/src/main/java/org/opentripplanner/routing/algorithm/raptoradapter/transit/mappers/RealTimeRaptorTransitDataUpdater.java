@@ -204,7 +204,8 @@ public class RealTimeRaptorTransitDataUpdater {
               patternsForDate.remove(tripPatternForDate);
             }
           } else {
-            LOG.warn("Could not fetch timetable for {}", pattern);
+            LOG.warn("Could not fetch timetable for {}, removing.", pattern);
+            patternsForDate.remove(tripPatternForDate);
           }
         }
       }
