@@ -1,0 +1,11 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: org.opentripplanner.CodeStyle
+recipeList:
+  - org.openrewrite.java.RemoveUnusedImports
+  - org.openrewrite.staticanalysis.FinalizePrivateFields
+  - org.openrewrite.staticanalysis.MultipleVariableDeclarations
+  - org.openrewrite.staticanalysis.NeedBraces
+  - org.openrewrite.staticanalysis.RemoveUnusedLocalVariables
+  - org.openrewrite.staticanalysis.RemoveUnusedPrivateFields
+  - org.openrewrite.staticanalysis.SimplifyBooleanExpression
+  - org.openrewrite.staticanalysis.TernaryOperatorsShouldNotBeNested
