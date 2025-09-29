@@ -532,7 +532,7 @@
             </properties>
         </profile>
         <profile>
-            <id>formattingSkip</id>
+            <id>prettierSkip</id>
             <activation>
                 <property>
                     <!--
@@ -546,6 +546,22 @@
             </activation>
             <properties>
                 <plugin.prettier.skip>true</plugin.prettier.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>rewriteSkip</id>
+            <activation>
+                <property>
+                    <!--
+                      This works as a short alias to enable this from the command line. To skip
+                      rewrite, set the 'rs' system property with the '-D rs' parameter:
+                      # mvn test -D rs
+                    -->
+                    <name>rs</name>
+                    <value/>
+                </property>
+            </activation>
+            <properties>
                 <plugin.rewrite.skip>true</plugin.rewrite.skip>
             </properties>
         </profile>

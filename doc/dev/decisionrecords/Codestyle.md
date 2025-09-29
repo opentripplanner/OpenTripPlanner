@@ -35,16 +35,28 @@ You can manually run _only_ the prettier formatting process with:
 % mvn prettier:write
 ```
 
-To skip the Prettier and rewrite formating, use the profile `formattingSkip`:
+To skip the Prettier, use the profile `prettierSkip`:
 
 ```shell
-% mvn test -P formattingSkip
+% mvn test -P prettierSkip
 ```
 
 To check for prettier formatting errors, use the profile `prettierCheck`:
 
 ```shell
 % mvn test -P prettierCheck
+```
+
+To skip OpenRewrite, use the profile `rewriteSkip`:
+
+```shell
+% mvn test -P rewriteSkip
+```
+
+To skip both Prettier and OpenRewrite, use the profiles `prettierCheck` and `rewriteSkip`:
+
+```shell
+% mvn test -P prettierSkip,rewriteSkip
 ```
 
 The check is run by the CI server and will fail the build if the code is incorrectly formatted.
