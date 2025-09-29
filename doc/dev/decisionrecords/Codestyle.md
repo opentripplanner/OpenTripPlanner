@@ -23,19 +23,25 @@ test, package, and install phases. So formatting will happen for example when yo
 % mvn test
 ```
 
-You can manually run _only_ the formatting process with:
+You can manually run _only_ the rewrite formatting process with:
+
+```shell
+% mvn rewrite:run
+```
+
+You can manually run _only_ the prettier formatting process with:
 
 ```shell
 % mvn prettier:write
 ```
 
-To skip the Prettier formating, use the profile `prettierSkip`:
+To skip the Prettier and rewrite formating, use the profile `formattingSkip`:
 
 ```shell
-% mvn test -P prettierSkip
+% mvn test -P formattingSkip
 ```
 
-To check for formatting errors, use the profile `prettierCheck`:
+To check for prettier formatting errors, use the profile `prettierCheck`:
 
 ```shell
 % mvn test -P prettierCheck

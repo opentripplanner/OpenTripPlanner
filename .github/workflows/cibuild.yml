@@ -56,7 +56,7 @@ jobs:
               exit 1;
           fi
           mvn jacoco:prepare-agent test jacoco:report -P prettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
-          mvn package -Dmaven.test.skip -P prettierSkip
+          mvn package -Dmaven.test.skip -P formattingSkip
 
       - name: Send coverage data to codecov.io
         if: github.repository_owner == 'opentripplanner'
@@ -77,7 +77,7 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip -P deployGitHub
+        run: mvn deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P formattingSkip -P deployGitHub
 
   build-windows:
     timeout-minutes: 20
@@ -95,7 +95,7 @@ jobs:
       - name: Configure Windows Pagefile
         uses: al-cheb/configure-pagefile-action@v1.4
       - name: Run tests
-        run: mvn test -P prettierSkip
+        run: mvn test -P formattingSkip
 
   docs:
     if: github.repository_owner == 'opentripplanner'
@@ -208,7 +208,7 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Compile Java code
-        run: mvn compile -DskipTests -P prettierSkip
+        run: mvn compile -DskipTests -P formattingSkip
 
   container-image:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
@@ -251,6 +251,6 @@ jobs:
             echo "Maven version ${version_with_snapshot} contains SNAPSHOT, adding date to container image tag"
           fi
           
-          MAVEN_SKIP_ARGS="-P prettierSkip -Dmaven.test.skip=true -Dmaven.source.skip=true"
+          MAVEN_SKIP_ARGS="-P formattingSkip -Dmaven.test.skip=true -Dmaven.source.skip=true"
           
           mvn $MAVEN_SKIP_ARGS package com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,$image_version

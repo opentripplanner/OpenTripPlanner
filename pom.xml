@@ -87,6 +87,7 @@
         <plugin.prettier.version>0.22</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
         <plugin.prettier.skip>false</plugin.prettier.skip>
+        <plugin.rewrite.skip>false</plugin.rewrite.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
         <tests.excludedGroups>integration</tests.excludedGroups>
         <tests.includedGroups></tests.includedGroups>
@@ -300,6 +301,7 @@
                     <runPerSubmodule>true</runPerSubmodule>
                     <sizeThresholdMb>0</sizeThresholdMb>
                     <configLocation>${maven.multiModuleProjectDirectory}/openrewrite.yml</configLocation>
+                    <rewriteSkip>${plugin.rewrite.skip}</rewriteSkip>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -530,7 +532,7 @@
             </properties>
         </profile>
         <profile>
-            <id>prettierSkip</id>
+            <id>formattingSkip</id>
             <activation>
                 <property>
                     <!--
@@ -544,6 +546,7 @@
             </activation>
             <properties>
                 <plugin.prettier.skip>true</plugin.prettier.skip>
+                <plugin.rewrite.skip>true</plugin.rewrite.skip>
             </properties>
         </profile>
         <profile>
@@ -598,6 +601,7 @@
                 <tests.includedGroups>integration</tests.includedGroups>
                 <tests.excludedGroups></tests.excludedGroups>
                 <plugin.prettier.skip>true</plugin.prettier.skip>
+                <plugin.rewrite.skip>true</plugin.rewrite.skip>
             </properties>
         </profile>
 
