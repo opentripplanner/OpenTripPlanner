@@ -139,10 +139,6 @@ public class OsmWay extends OsmEntity {
     );
   }
 
-  public boolean isTransitPlatform() {
-    return isTag("railway", "platform") || isTag("public_transport", "platform");
-  }
-
   @Override
   public String url() {
     return String.format("https://www.openstreetmap.org/way/%d", getId());

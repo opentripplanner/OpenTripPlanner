@@ -319,27 +319,6 @@ class OsmWayTest {
     );
   }
 
-  private static OsmWay createPlatform(String kind) {
-    var way = new OsmWay();
-    way.addTag(kind, "platform");
-    return way;
-  }
-
-  @ParameterizedTest
-  @MethodSource("createTransitPlatformCases")
-  void transitPlatform(OsmWay way, boolean result) {
-    assertEquals(result, way.isTransitPlatform());
-  }
-
-  static Stream<Arguments> createTransitPlatformCases() {
-    return Stream.of(
-      Arguments.of(createGenericHighway(), false),
-      Arguments.of(createGenericFootway(), false),
-      Arguments.of(createPlatform("railway"), true),
-      Arguments.of(createPlatform("public_transport"), true)
-    );
-  }
-
   @Test
   void adjacentTo() {
     final long nodeId1 = 10001L;
