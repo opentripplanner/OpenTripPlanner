@@ -311,7 +311,7 @@ class AbstractCsvParserTest {
     }
 
     @Override
-    protected List<String> headers() {
+    public List<String> headers() {
       return HEADERS;
     }
 

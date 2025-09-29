@@ -87,7 +87,7 @@ public class OtpCsvReader<T> {
     var parser = parserFactory.apply(reader);
 
     if (!parser.headersMatch()) {
-      throw new HeadersDoNotMatch(dataSource.path());
+      throw new HeadersDoNotMatch(dataSource.path(), reader.getRawRecord(), parser.headers());
     }
 
     while (parser.hasNext()) {
