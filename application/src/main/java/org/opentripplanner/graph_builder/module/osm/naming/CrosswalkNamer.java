@@ -51,19 +51,19 @@ public class CrosswalkNamer implements EdgeNamer {
       if (
         osmWay.isFootway() &&
         osmWay.isMarkedCrossing() &&
-          way.hasNoName() &&
-          !way.isExplicitlyUnnamed()
+        way.hasNoName() &&
+        !way.isExplicitlyUnnamed()
       ) {
         pair
           .asIterable()
           .forEach(edge -> unnamedCrosswalks.add(new EdgeOnLevel(osmWay, edge, way.getLevels())));
       }
       // Record named streets, service roads, and slip/turn lanes to a list.
-      else if (!osmWay.isFootway()) {
-        Optional<TraverseDirection> oneWayCar = osmWay.isOneWay("motorcar");
-        if (way.isNamed() || osmWay.isServiceRoad() || oneWayCar.isPresent() && FORWARD.equals(oneWayCar.get())) {
-          streets.add(osmWay);
-        }
+      else if (
+        !osmWay.isFootway() &&
+        (way.isNamed() || osmWay.isServiceRoad() || isTurnLane(osmWay))
+      ) {
+        streets.add(osmWay);
       }
     }
   }
@@ -110,13 +110,12 @@ public class CrosswalkNamer implements EdgeNamer {
 
     if (crossStreetOpt.isPresent()) {
       OsmWay crossStreet = crossStreetOpt.get();
-      Optional<TraverseDirection> isOneWayCar;
       // TODO: i18n
       if (crossStreet.isNamed()) {
         crosswalk.setName(I18NString.of(String.format("crossing over %s", crossStreet.getAssumedName())));
       } else if (crossStreet.isServiceRoad()) {
         crosswalk.setName(I18NString.of("crossing over service road"));
-      } else if ((isOneWayCar = crossStreet.isOneWay("motorcar")).isPresent() && FORWARD.equals(isOneWayCar.get())) {
+      } else if (isTurnLane(crossStreet)) {
         crosswalk.setName(I18NString.of("crossing over turn lane"));
       } else {
         // Default on using the OSM way ID, which should not happen.
@@ -140,6 +139,11 @@ public class CrosswalkNamer implements EdgeNamer {
         .findFirst();
     }
     return Optional.empty();
+  }
+
+  private static boolean isTurnLane(OsmEntity way) {
+    Optional<TraverseDirection> oneWayCar = way.isOneWay("motorcar");
+    return oneWayCar.isPresent() && oneWayCar.get() == FORWARD;
   }
 
   public Collection<EdgeOnLevel> getUnnamedCrosswalks() {
