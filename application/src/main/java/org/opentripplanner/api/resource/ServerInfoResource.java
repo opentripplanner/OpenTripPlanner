@@ -1,6 +1,8 @@
 package org.opentripplanner.api.resource;
 
 import static org.opentripplanner.api.model.serverinfo.OtpBadgeGenerator.generateOtpBadgeSvg;
+import static org.opentripplanner.api.model.serverinfo.OtpBadgeGenerator.isValidColor;
+import static org.opentripplanner.api.model.serverinfo.OtpBadgeGenerator.isValidLabel;
 
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -62,6 +64,16 @@ public class ServerInfoResource {
     @QueryParam("color") @DefaultValue("#E43") String color,
     @QueryParam("label") @DefaultValue("OTP Version") String label
   ) {
+    if (!isValidColor(color)) {
+      return Response.status(Response.Status.BAD_REQUEST)
+        .entity("The 'color' parameter contains unexpected characters...")
+        .build();
+    }
+    if (!isValidLabel(label)) {
+      return Response.status(Response.Status.BAD_REQUEST)
+        .entity("The 'label' parameter contains unexpected characters...")
+        .build();
+    }
     var version =
       "%s (%s)".formatted(SERVER_INFO.version.getVersion(), SERVER_INFO.otpSerializationVersionId);
     var svg = generateOtpBadgeSvg(label, color, version);

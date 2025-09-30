@@ -1,9 +1,32 @@
 package org.opentripplanner.api.model.serverinfo;
 
+import com.google.common.html.HtmlEscapers;
+import java.util.regex.Pattern;
+
 /**
  * This class is used to generate a SVG badge.
  */
 public class OtpBadgeGenerator {
+
+  private static final String NUM = " ?\\d+ ?";
+  private static final String DEC = " ?\\d+(\\.\\d+)? ?";
+
+  /**
+   * Accept formats:
+   * - HEX: #112233
+   * - RGB: rgb(0,255,0)
+   * - RGBA: rgba(0,255,0,0.5)
+   * - Named colors (\w{3, 20}) 'tan' to 'lightgoldenrodyellow'
+   */
+  private static final Pattern COLOR_PATTERN = Pattern.compile(
+    "(#[\\dA-Fa-f]{6}|rgba?\\(N,N,N(,D)?\\)|[\\w]{3,30})".replace("N", NUM).replace("D", DEC)
+  );
+
+  private static final String WHITE_SPACE_EX_SPACE = "\\t\\n\\x0B\\f\\r\\x85\\u2028\\u2029";
+  private static final String CONTROL_CHARS = "\\p{Cntrl}";
+  private static final Pattern LABEL_PATTERN = Pattern.compile(
+    "[^" + WHITE_SPACE_EX_SPACE + CONTROL_CHARS + "]*"
+  );
 
   private static final int MARGIN = 50;
   private static final int TEXT_INSET = 5;
@@ -33,6 +56,28 @@ public class OtpBadgeGenerator {
     """;
 
   /**
+   * A color is valid if it is a:
+   * <ol>
+   *   <li>Named color: tan, lightgoldenrodyellow</li>
+   *   <li>Hex color : #00FF80</li>
+   *   <li>RGB color : rgb(255, 0, 255)</li>
+   *   <li>RGBA color : rgba(255, 0, 255, 0.5)</li>
+   * </ol>
+   */
+  public static boolean isValidColor(String color) {
+    return COLOR_PATTERN.matcher(color).matches();
+  }
+
+  /**
+   * Has length less than 120 characters and does not contain control characters and whitespace.
+   * Space is allowed. This does not prevent Reflected XSS, but in combination with escaping the
+   * label it should.
+   */
+  public static boolean isValidLabel(String label) {
+    return (label.length() <= 120 && LABEL_PATTERN.matcher(label).matches());
+  }
+
+  /**
    *
    * @param label The label in the
    * @param labelBgColor The background color for the label using a valid SVG color format.
@@ -43,6 +88,9 @@ public class OtpBadgeGenerator {
     int labelLength = fontWidth(label);
     int versionLength = fontWidth(body);
     int totalWidth = 4 * MARGIN + labelLength + versionLength;
+
+    // Prevent Reflected XSS attacks by escaping
+    label = HtmlEscapers.htmlEscaper().escape(label);
 
     return TEMPLATE.replace("{{body}}", body)
       .replace("{{labelBgColor}}", labelBgColor)
