@@ -7,6 +7,7 @@ import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 @Module
@@ -16,10 +17,17 @@ public class GraphBuilderModule {
   @Singleton
   static GraphBuilder provideGraphBuilder(
     Graph baseGraph,
+    DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
     GraphBuilderDataSources closeDataSourcesHandle
   ) {
-    return new GraphBuilder(baseGraph, timetableRepository, issueStore, closeDataSourcesHandle);
+    return new GraphBuilder(
+      baseGraph,
+      deduplicator,
+      timetableRepository,
+      issueStore,
+      closeDataSourcesHandle
+    );
   }
 }
