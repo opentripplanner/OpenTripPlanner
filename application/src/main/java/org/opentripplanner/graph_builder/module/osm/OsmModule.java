@@ -618,8 +618,8 @@ public class OsmModule implements GraphBuilderModule {
         issueStore.add(
           Issue.issue(
             "CouldNotApplyMultiLevelInfoToWay",
-            "Multi-level info for way {} can not be used because node references did not match." +
-            "This is probably caused by more than 2 intersection nodes in the way." +
+            "Multi-level info for way {} can not be used because node references did not match. " +
+            "This is probably caused by more than 2 intersection nodes in the way. " +
             "The way has {} nodes in total.",
             way.url(),
             way.getNodeRefs().size()

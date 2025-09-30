@@ -664,9 +664,11 @@ public class OsmDatabase {
   private void applyLevelsForEntity(OsmEntity osmEntity) {
     // The level tag can contain multi-level or single-level info.
     if (osmEntity.hasTag("level")) {
-      String levelName = osmEntity.getTag("level");
+      String levelTag = osmEntity.getTag("level");
+      String levelRefTag = osmEntity.getTag("level:ref");
       List<OsmLevel> levels = OsmLevel.levelListForWayFromSpecList(
-        levelName,
+        levelTag,
+        levelRefTag,
         OsmLevel.Source.LEVEL_TAG,
         noZeroLevels,
         issueStore,
@@ -675,19 +677,19 @@ public class OsmDatabase {
 
       OsmLevel singleLevel = OsmLevel.DEFAULT;
       if (levels.stream().anyMatch(level -> !level.reliable)) {
-        issueStore.add(new LevelAmbiguous(levelName, osmEntity));
+        issueStore.add(new LevelAmbiguous(levelTag, osmEntity));
       } else if (levels.size() == 1) {
         singleLevel = levels.get(0);
       } else if (
         !(osmEntity instanceof OsmWay) || (osmEntity instanceof OsmWay way && !way.isSteps())
       ) {
-        issueStore.add(new MultiLevelInfoForNonStepWay(levelName, osmEntity));
+        issueStore.add(new MultiLevelInfoForNonStepWay(levelTag, osmEntity));
       } else if (levels.size() == 2) {
         levels.forEach(level -> wayMultiLevelMap.put(osmEntity, level));
       } else if (levels.size() > 2) {
-        issueStore.add(new MoreThanTwoLevelsForWay(levelName, osmEntity));
+        issueStore.add(new MoreThanTwoLevelsForWay(levelTag, osmEntity));
       } else {
-        issueStore.add(new LevelAmbiguous(levelName, osmEntity));
+        issueStore.add(new LevelAmbiguous(levelTag, osmEntity));
       }
       if (!waySingleLevelMap.containsKey(osmEntity)) {
         // if this way is not a key in the wayLevels map, a level map was not
@@ -697,16 +699,17 @@ public class OsmDatabase {
     } else if (osmEntity.hasTag("layer") && !waySingleLevelMap.containsKey(osmEntity)) {
       // if this way is not a key in the wayLevels map, a level map was not
       // already applied in processRelations
-      String levelName = osmEntity.getTag("layer");
+      String levelTag = osmEntity.getTag("layer");
       OsmLevel level = OsmLevel.fromString(
-        levelName,
+        levelTag,
+        null,
         OsmLevel.Source.LAYER_TAG,
         noZeroLevels,
         issueStore,
         osmEntity
       );
       if (!level.reliable) {
-        issueStore.add(new LevelAmbiguous(levelName, osmEntity));
+        issueStore.add(new LevelAmbiguous(levelTag, osmEntity));
         level = OsmLevel.DEFAULT;
       }
       waySingleLevelMap.put(osmEntity, level);

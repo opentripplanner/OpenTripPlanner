@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.osm.issues.FloorNumberUnknownAssumedGroundLevel;
 import org.opentripplanner.osm.issues.FloorNumberUnknownGuessedFromAltitude;
 
@@ -66,6 +67,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
    */
   public static OsmLevel fromString(
     String spec,
+    @Nullable String ref,
     Source source,
     boolean incrementNonNegative,
     DataImportIssueStore issueStore,
@@ -141,15 +143,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
       issueStore.add(new FloorNumberUnknownAssumedGroundLevel(spec, osmObj));
       reliable = false;
     }
-    return new OsmLevel(
-      floorNumber,
-      altitude,
-      shortName,
-      longName,
-      osmObj.getTag("level:ref"),
-      source,
-      reliable
-    );
+    return new OsmLevel(floorNumber, altitude, shortName, longName, ref, source, reliable);
   }
 
   public static List<OsmLevel> fromSpecList(
@@ -157,15 +151,14 @@ public class OsmLevel implements Comparable<OsmLevel> {
     Source source,
     boolean incrementNonNegative,
     DataImportIssueStore issueStore,
-    OsmEntity osmObj,
-    boolean allowRanges
+    OsmEntity osmObj
   ) {
     List<String> levelSpecs = new ArrayList<>();
 
     Matcher m;
     for (String level : specList.split(";")) {
       m = RANGE_PATTERN.matcher(level);
-      if (m.matches() && allowRanges) { // this field specifies a range of levels
+      if (m.matches()) { // this field specifies a range of levels
         String[] range = level.split("-");
         int endOfRange = Integer.parseInt(range[1]);
         for (int i = Integer.parseInt(range[0]); i <= endOfRange; i++) {
@@ -179,26 +172,54 @@ public class OsmLevel implements Comparable<OsmLevel> {
     /* build an OSMLevel for each level spec in the list */
     List<OsmLevel> levels = new ArrayList<>();
     for (String spec : levelSpecs) {
-      levels.add(fromString(spec, source, incrementNonNegative, issueStore, osmObj));
+      levels.add(fromString(spec, null, source, incrementNonNegative, issueStore, osmObj));
     }
     return levels;
   }
 
   public static List<OsmLevel> levelListForWayFromSpecList(
-    String specList,
+    String levelTag,
+    @Nullable String levelRefTag,
     Source source,
     boolean incrementNonNegative,
     DataImportIssueStore issueStore,
     OsmEntity osmObj
   ) {
-    List<OsmLevel> levels = fromSpecList(
-      specList,
-      source,
-      incrementNonNegative,
-      issueStore,
-      osmObj,
-      false
-    );
+    String[] levelListFromTag = levelTag.split(";");
+    List<OsmLevel> levels = new ArrayList<>();
+    if (levelRefTag != null) {
+      String[] levelRefListFromTag = levelRefTag.split(";");
+      if (levelListFromTag.length == levelRefListFromTag.length) {
+        for (int i = 0; i < levelListFromTag.length; i++) {
+          levels.add(
+            fromString(
+              levelListFromTag[i],
+              levelRefListFromTag[i],
+              source,
+              incrementNonNegative,
+              issueStore,
+              osmObj
+            )
+          );
+        }
+        return levels;
+      } else {
+        issueStore.add(
+          Issue.issue(
+            "LevelAndLevelRefHaveDifferentLevelAmounts",
+            "'level:ref' info for way {} can not be used because " +
+            "the 'level' tag and 'level:ref' tag refer to a different amount of levels. " +
+            "The 'level' tag contains {} levels while 'level:ref' contains {}.",
+            osmObj.url(),
+            levelListFromTag.length,
+            levelRefListFromTag.length
+          )
+        );
+      }
+    }
+    for (String level : levelListFromTag) {
+      levels.add(fromString(level, null, source, incrementNonNegative, issueStore, osmObj));
+    }
     return levels;
   }
 
@@ -215,8 +236,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
       source,
       incrementNonNegative,
       issueStore,
-      osmObj,
-      true
+      osmObj
     )) {
       map.put(level.shortName, level);
     }
