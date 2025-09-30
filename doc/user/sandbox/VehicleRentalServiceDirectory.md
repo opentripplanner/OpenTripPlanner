@@ -18,7 +18,7 @@ like OTP can connect to the directory and get the necessary configuration from i
 - Make json tag names configurable [#3447](https://github.com/opentripplanner/OpenTripPlanner/pull/3447)
 - Enable GBFS geofencing with VehicleRentalServiceDirectory [#5324](https://github.com/opentripplanner/OpenTripPlanner/pull/5324)
 - Enable `allowKeepingVehicleAtDestination` [#5944](https://github.com/opentripplanner/OpenTripPlanner/pull/5944)
-
+- 
 
 ## Configuration
 
@@ -36,13 +36,8 @@ the `router-config.json`
 | [url](#vehicleRentalServiceDirectory_url)                                                                            |      `uri`      | URL or file path to the GBFS v3 manifest.json                                   | *Required* |               |  2.1  |
 | [headers](#vehicleRentalServiceDirectory_headers)                                                                    | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |  2.1  |
 | [networks](#vehicleRentalServiceDirectory_networks)                                                                  |    `object[]`   | List all networks to include. Use "network": "default-network" to set defaults. | *Optional* |               |  2.4  |
-|    { object }                                                                                                        |     `object`    | Nested object in array. The object type is determined by the parameters.        | *Optional* |               |  2.4  |
 |       [allowKeepingVehicleAtDestination](#vehicleRentalServiceDirectory_networks_0_allowKeepingVehicleAtDestination) |    `boolean`    | Enables `allowKeepingVehicleAtDestination` for the given network.               | *Optional* | `false`       |  2.5  |
 |       [geofencingZones](#vehicleRentalServiceDirectory_networks_0_geofencingZones)                                   |    `boolean`    | Enables geofencingZones for the given network                                   | *Optional* | `false`       |  2.4  |
-|       network                                                                                                        |     `string`    | The network name                                                                | *Required* |               |  2.4  |
-|    { object }                                                                                                        |     `object`    | Nested object in array. The object type is determined by the parameters.        | *Optional* |               |  2.4  |
-|       [allowKeepingVehicleAtDestination](#vehicleRentalServiceDirectory_networks_1_allowKeepingVehicleAtDestination) |    `boolean`    | Enables `allowKeepingVehicleAtDestination` for the given network.               | *Optional* | `false`       |  2.5  |
-|       [geofencingZones](#vehicleRentalServiceDirectory_networks_1_geofencingZones)                                   |    `boolean`    | Enables geofencingZones for the given network                                   | *Optional* | `false`       |  2.4  |
 |       network                                                                                                        |     `string`    | The network name                                                                | *Required* |               |  2.4  |
 
 <!-- PARAMETERS-TABLE END -->
@@ -104,28 +99,6 @@ Enables geofencingZones for the given network
 
 See the regular [GBFS documentation](../GBFS-Config.md) for more information.
 
-<h4 id="vehicleRentalServiceDirectory_networks_1_allowKeepingVehicleAtDestination">allowKeepingVehicleAtDestination</h4>
-
-**Since version:** `2.5` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
-**Path:** /vehicleRentalServiceDirectory/networks/[1] 
-
-Enables `allowKeepingVehicleAtDestination` for the given network.
-
-Configures if a vehicle rented from a station must be returned to another one or can
-be kept at the end of the trip.
-
-See the regular [GBFS documentation](../GBFS-Config.md) for more information.
-
-
-<h4 id="vehicleRentalServiceDirectory_networks_1_geofencingZones">geofencingZones</h4>
-
-**Since version:** `2.4` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
-**Path:** /vehicleRentalServiceDirectory/networks/[1] 
-
-Enables geofencingZones for the given network
-
-See the regular [GBFS documentation](../GBFS-Config.md) for more information.
-
 
 <!-- PARAMETERS-DETAILS END -->
 
@@ -147,11 +120,6 @@ See the regular [GBFS documentation](../GBFS-Config.md) for more information.
       {
         "network" : "oslo-by-sykkel",
         "geofencingZones" : true
-      },
-      {
-        "network" : "default-network",
-        "geofencingZones" : false,
-        "allowKeepingVehicleAtDestination" : false
       }
     ]
   }

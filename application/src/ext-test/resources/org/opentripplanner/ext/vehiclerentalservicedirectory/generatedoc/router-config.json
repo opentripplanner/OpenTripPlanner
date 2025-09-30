@@ -8,11 +8,6 @@
       {
         "network": "oslo-by-sykkel",
         "geofencingZones": true
-      },
-      {
-        "network": "default-network",
-        "geofencingZones": false,
-        "allowKeepingVehicleAtDestination": false
       }
     ]
   }
