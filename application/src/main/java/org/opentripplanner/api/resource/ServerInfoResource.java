@@ -20,7 +20,7 @@ import org.opentripplanner.api.model.serverinfo.ApiServerInfo;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 
 @Path("/")
-public class ServerInfo {
+public class ServerInfoResource {
 
   private static final ApiServerInfo SERVER_INFO = createServerInfo();
 
