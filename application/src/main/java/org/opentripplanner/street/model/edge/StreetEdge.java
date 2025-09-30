@@ -1062,7 +1062,7 @@ public class StreetEdge
           case FLEX -> 1;
         };
       time_ms += (long) Math.ceil(1000.0 * turnDuration);
-      weight += preferences.street().turnReluctance() * modeReluctance * turnDuration;
+      weight += modeReluctance * preferences.street().turnReluctance() * turnDuration;
     }
 
     if (!traverseMode.isInCar()) {
