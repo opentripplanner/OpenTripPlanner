@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.graph;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import org.junit.jupiter.api.Test;
