@@ -675,10 +675,7 @@ Used to group requests when monitoring OTP.
     ]
   },
   "vehicleRentalServiceDirectory" : {
-    "url" : "https://entur.no/bikeRentalServiceDirectory",
-    "sourcesName" : "systems",
-    "updaterUrlName" : "url",
-    "updaterNetworkName" : "id",
+    "url" : "https://entur.no/bikeRentalServiceDirectory/manifest.json",
     "headers" : {
       "ET-Client-Name" : "MY_ORG_CLIENT_NAME"
     }
