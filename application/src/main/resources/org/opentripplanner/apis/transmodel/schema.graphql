@@ -1109,7 +1109,7 @@ type RoutingParameters {
   reverseOptimizeOnTheFly: Boolean @deprecated(reason : "NOT IN USE IN OTP2.")
   "Whether the planner should return intermediate stops lists for transit legs."
   showIntermediateStops: Boolean @deprecated(reason : "This parameter is always enabled")
-  "A multiplier to specify how bad walking on stairs is, compared to walking on flat ground."
+  "A multiplier to specify how bad walking on stairs is, compared to walking on flat ground, on top of the walk reluctance."
   stairsReluctance: Float
   "An extra penalty added on transfers (i.e. all boardings except the first one)."
   transferPenalty: Int
