@@ -110,9 +110,9 @@ public class OsmDatabase {
    */
   private final Map<OsmEntity, OsmLevel> waySingleLevelMap = new HashMap<>();
 
-  /* Track which vertical levels OSM ways belong to, e.g. for building elevators.
+  /* Track which vertical levels OSM ways belong to.
    * Only ways with multiple levels have an entry in this map.
-   * The ordering is important, e.g. for building escalators.
+   * The ordering is important because it is used for building stairs and escalators.
    */
   private final ArrayListMultimap<OsmEntity, OsmLevel> wayMultiLevelMap =
     ArrayListMultimap.create();
