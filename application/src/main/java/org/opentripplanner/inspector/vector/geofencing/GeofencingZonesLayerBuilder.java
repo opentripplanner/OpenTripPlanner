@@ -1,8 +1,7 @@
 package org.opentripplanner.inspector.vector.geofencing;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.inspector.vector.LayerBuilder;
@@ -11,7 +10,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
 import org.opentripplanner.service.vehiclerental.street.NoRestriction;
-import org.opentripplanner.street.model.RentalRestrictionExtension;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * A vector tile layer containing all {@link GeofencingZone}s inside the vector tile bounds.
@@ -31,36 +30,28 @@ public class GeofencingZonesLayerBuilder extends LayerBuilder<GeofencingZone> {
 
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
-    Map<String, GeofencingZone> uniqueZones = new HashMap<>();
-
-    graph
+    return graph
       .findVertices(query)
       .stream()
       .filter(v -> !(v.rentalRestrictions() instanceof NoRestriction))
-      .forEach(vertex -> {
-        extractGeofencingZones(vertex.rentalRestrictions(), uniqueZones);
-      });
-
-    return uniqueZones
-      .values()
-      .stream()
-      .map(zone -> {
-        Geometry geometry = zone.geometry();
-        geometry.setUserData(zone);
-        return geometry;
-      })
+      .flatMap(this::extractZones)
+      .distinct()
+      .map(this::createGeometryWithUserData)
       .toList();
   }
 
-  private void extractGeofencingZones(
-    RentalRestrictionExtension extension,
-    Map<String, GeofencingZone> uniqueZones
-  ) {
-    for (RentalRestrictionExtension ext : extension.toList()) {
-      if (ext instanceof GeofencingZoneExtension zoneExt) {
-        GeofencingZone zone = zoneExt.zone();
-        uniqueZones.put(zone.id().toString(), zone);
-      }
-    }
+  private Stream<GeofencingZone> extractZones(Vertex vertex) {
+    return vertex
+      .rentalRestrictions()
+      .toList()
+      .stream()
+      .filter(ext -> ext instanceof GeofencingZoneExtension)
+      .map(ext -> ((GeofencingZoneExtension) ext).zone());
+  }
+
+  private Geometry createGeometryWithUserData(GeofencingZone zone) {
+    Geometry geometry = zone.geometry();
+    geometry.setUserData(zone);
+    return geometry;
   }
 }
