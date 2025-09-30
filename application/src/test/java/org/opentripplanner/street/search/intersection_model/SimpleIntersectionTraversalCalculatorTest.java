@@ -3,9 +3,14 @@ package org.opentripplanner.street.search.intersection_model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.search.intersection_model.AbstractIntersectionTraversalCalculator.calculateTurnAngle;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -48,8 +53,8 @@ public class SimpleIntersectionTraversalCalculatorTest {
     edge(v2, v3, 1.0, false);
 
     // Edge has same first and last angle.
-    assertEquals(90, e1.getInAngle());
-    assertEquals(90, e1.getOutAngle());
+    assertEquals(-90, e1.getInAngle());
+    assertEquals(-90, e1.getOutAngle());
 
     // 2 new ones
     IntersectionVertex v4 = vertex("test2", new Coordinate(1.0, 1.0), false, false);
@@ -57,28 +62,26 @@ public class SimpleIntersectionTraversalCalculatorTest {
     // Third edge
     StreetEdge e3 = edge(v2, v4, 1.0, false);
 
-    assertEquals(0, e3.getInAngle());
-    assertEquals(0, e3.getOutAngle());
+    assertEquals(-180, e3.getInAngle());
+    assertEquals(-180, e3.getOutAngle());
 
     // Difference should be about 90.
     int diff = (e1.getOutAngle() - e3.getInAngle());
     assertEquals(90, diff);
 
-    // calculate the angle for driving on the right hand side
+    int turnAngle = calculateTurnAngle(e1, e3);
+    assertEquals(-90, turnAngle);
 
-    int rightHandDriveAngle = calculator.calculateTurnAngle(e1, e3);
-    assertEquals(270, rightHandDriveAngle);
-    assertTrue(calculator.isTurnAcrossTraffic(rightHandDriveAngle));
-    assertFalse(calculator.isSafeTurn(rightHandDriveAngle));
+    // calculate the angle for driving on the right hand side
+    assertTrue(calculator.isTurnAcrossTraffic(turnAngle));
+    assertFalse(calculator.isSafeTurn(turnAngle));
 
     // and on the left hand side
 
     var leftHandDriveCostModel = new SimpleIntersectionTraversalCalculator(DrivingDirection.LEFT);
-    int leftHandDriveAngle = leftHandDriveCostModel.calculateTurnAngle(e1, e3);
-    assertEquals(270, leftHandDriveAngle);
 
-    assertTrue(leftHandDriveCostModel.isSafeTurn(leftHandDriveAngle));
-    assertFalse(leftHandDriveCostModel.isTurnAcrossTraffic(leftHandDriveAngle));
+    assertTrue(leftHandDriveCostModel.isSafeTurn(turnAngle));
+    assertFalse(leftHandDriveCostModel.isTurnAcrossTraffic(turnAngle));
 
     // on a bike the turn cost for crossing traffic (left turn in left hand driving countries)
     // should be higher than going the opposite direction
@@ -227,10 +230,56 @@ public class SimpleIntersectionTraversalCalculatorTest {
     StreetEdge fromEdge = edge(u, v, 1.0, false);
     StreetEdge toEdge = edge(v, w, 1.0, false);
 
-    int turnAngle = calculator.calculateTurnAngle(fromEdge, toEdge);
+    int turnAngle = calculateTurnAngle(fromEdge, toEdge);
     assertFalse(calculator.isSafeTurn(turnAngle));
     assertFalse(calculator.isTurnAcrossTraffic(turnAngle));
     // AKA is a straight ahead.
+  }
+
+  public static Stream<Arguments> sharpTurnCases() {
+    var vertices = Stream.of(
+      new Coordinate(-0.0009, -0.0001),
+      new Coordinate(-0.0001, -0.0009),
+      new Coordinate(0.0001, -0.0009),
+      new Coordinate(0.0009, -0.0001),
+      new Coordinate(0.0009, 0.0001),
+      new Coordinate(0.0001, 0.0009),
+      new Coordinate(-0.0001, 0.0009),
+      new Coordinate(-0.0009, 0.0001)
+    )
+      .map(x -> vertex("to", x, false, false))
+      .toArray(StreetVertex[]::new);
+    return Stream.of(
+      Arguments.of(vertices[0], false, true),
+      Arguments.of(vertices[1], false, true),
+      Arguments.of(vertices[2], false, true),
+      Arguments.of(vertices[3], false, false),
+      Arguments.of(vertices[4], false, false),
+      Arguments.of(vertices[5], true, false),
+      Arguments.of(vertices[6], true, false),
+      Arguments.of(vertices[7], true, false)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("sharpTurnCases")
+  public void testSharpTurn(
+    StreetVertex to,
+    boolean isRhdSafeTurn,
+    boolean isRhdTurnAcrossTraffic
+  ) {
+    StreetVertex from = vertex("from", new Coordinate(-0.001, 0), false, false);
+    StreetVertex intersection = vertex("intersection", new Coordinate(0, 0), false, false);
+    StreetEdge fromEdge = edge(from, intersection, 1.0, false);
+    StreetEdge toEdge = edge(intersection, to, 1.0, false);
+    var rhd = new SimpleIntersectionTraversalCalculator(DrivingDirection.RIGHT);
+    var lhd = new SimpleIntersectionTraversalCalculator(DrivingDirection.LEFT);
+
+    var turnAngle = calculateTurnAngle(fromEdge, toEdge);
+    assertEquals(isRhdSafeTurn, rhd.isSafeTurn(turnAngle));
+    assertEquals(isRhdTurnAcrossTraffic, rhd.isTurnAcrossTraffic(turnAngle));
+    assertEquals(rhd.isSafeTurn(turnAngle), lhd.isTurnAcrossTraffic(turnAngle));
+    assertEquals(rhd.isTurnAcrossTraffic(turnAngle), lhd.isSafeTurn(turnAngle));
   }
 
   @Test
@@ -359,7 +408,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     // 3rd edge prevents inferral of free-flowingness
     StreetEdge extraEdge = edge(v, u, 1.0, false);
 
-    int turnAngle = calculator.calculateTurnAngle(fromEdge, toEdge);
+    int turnAngle = calculateTurnAngle(fromEdge, toEdge);
     assertTrue(calculator.isSafeTurn(turnAngle));
     assertFalse(calculator.isTurnAcrossTraffic(turnAngle));
 
@@ -399,7 +448,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     // 3rd edge prevents inferral of free-flowingness
     StreetEdge extraEdge = edge(v, u, 1.0, false);
 
-    int turnAngle = calculator.calculateTurnAngle(fromEdge, toEdge);
+    int turnAngle = calculateTurnAngle(fromEdge, toEdge);
     assertFalse(calculator.isSafeTurn(turnAngle));
     assertTrue(calculator.isTurnAcrossTraffic(turnAngle));
 
@@ -424,7 +473,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
    * Private Methods
    ****/
 
-  private IntersectionVertex vertex(
+  private static IntersectionVertex vertex(
     String label,
     Coordinate coord,
     boolean hasHighwayLight,

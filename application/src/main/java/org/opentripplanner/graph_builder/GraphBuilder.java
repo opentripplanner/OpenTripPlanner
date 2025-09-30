@@ -4,7 +4,8 @@ import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 
-import jakarta.inject.Inject;
+import java.io.Closeable;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,18 +45,20 @@ public class GraphBuilder implements Runnable {
   private final Graph graph;
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
+  private final Closeable closeDataSourcesHandle;
 
   private boolean hasTransitData = false;
 
-  @Inject
   public GraphBuilder(
     Graph baseGraph,
     TimetableRepository timetableRepository,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    Closeable closeDataSourcesHandle
   ) {
     this.graph = baseGraph;
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
+    this.closeDataSourcesHandle = closeDataSourcesHandle;
   }
 
   /**
@@ -182,25 +185,29 @@ public class GraphBuilder implements Runnable {
   }
 
   public void run() {
-    // Record how long it takes to build the graph, purely for informational purposes.
-    long startTime = System.currentTimeMillis();
+    try {
+      // Record how long it takes to build the graph, purely for informational purposes.
+      long startTime = System.currentTimeMillis();
 
-    // Check all graph builder inputs, and fail fast to avoid waiting until the build process
-    // advances.
-    for (GraphBuilderModule builder : graphBuilderModules) {
-      builder.checkInputs();
+      // Check all graph builder inputs, and fail fast to avoid waiting until the build process
+      // advances.
+      for (GraphBuilderModule builder : graphBuilderModules) {
+        builder.checkInputs();
+      }
+
+      for (GraphBuilderModule load : graphBuilderModules) {
+        load.buildGraph();
+      }
+
+      new DataImportIssueSummary(issueStore.listIssues()).logSummary();
+
+      // Log before we validate, this way we have more information if the validation fails
+      logGraphBuilderCompleteStatus(startTime, graph, timetableRepository);
+
+      validate();
+    } finally {
+      closeDataSources();
     }
-
-    for (GraphBuilderModule load : graphBuilderModules) {
-      load.buildGraph();
-    }
-
-    new DataImportIssueSummary(issueStore.listIssues()).logSummary();
-
-    // Log before we validate, this way we have more information if the validation fails
-    logGraphBuilderCompleteStatus(startTime, graph, timetableRepository);
-
-    validate();
   }
 
   private void addModuleOptional(@Nullable GraphBuilderModule module, OTPFeature feature) {
@@ -243,6 +250,14 @@ public class GraphBuilder implements Runnable {
         "There is something wrong with your data - see the log above. Another possibility is that the " +
         "'transitServiceStart' and 'transitServiceEnd' are not correctly configured."
       );
+    }
+  }
+
+  private void closeDataSources() {
+    try {
+      closeDataSourcesHandle.close();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 

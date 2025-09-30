@@ -19,7 +19,7 @@ class RentalRestrictionExtensionTest {
   RentalRestrictionExtension a = new BusinessAreaBorder("a");
   RentalRestrictionExtension b = new BusinessAreaBorder("b");
   RentalRestrictionExtension c = new GeofencingZoneExtension(
-    new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, false)
+    new GeofencingZone(new FeedScopedId(network, "a-park"), null, null, true, false)
   );
 
   @Test

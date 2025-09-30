@@ -186,6 +186,7 @@ public class BarrierRoutingTest {
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
       TestVertexLinker.of(graph),
+      id -> List.of(),
       from,
       to,
       streetMode,

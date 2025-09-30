@@ -9,6 +9,7 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -18,6 +19,10 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 class TransitFilterOldWayMapperTest {
 
+  private static final TransitFilterOldWayMapper MAPPER = new TransitFilterOldWayMapper(
+    new DefaultFeedIdMapper()
+  );
+
   private TransitRequestBuilder transitBuilder = TransitRequest.of();
 
   @Test
@@ -25,7 +30,7 @@ class TransitFilterOldWayMapperTest {
     var env = envOf(Map.of());
 
     // If nothing is passed in the mapper will do nothing
-    TransitFilterOldWayMapper.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
+    MAPPER.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
 
     assertEquals("()", transitBuilder.build().toString());
   }
@@ -35,7 +40,7 @@ class TransitFilterOldWayMapperTest {
     // setting one of the old filters will triger the old filter mapping
     var env = envOf(map(entry("whiteListed", Map.of())));
 
-    TransitFilterOldWayMapper.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
+    MAPPER.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
 
     assertEquals(
       "(filters: [(select: [(transportModes: ALL)])])",
@@ -48,7 +53,7 @@ class TransitFilterOldWayMapperTest {
     // setting one of the old filters will triger the old filter mapping
     var env = envOf(map(entry("banned", Map.of())));
 
-    TransitFilterOldWayMapper.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
+    MAPPER.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
 
     assertEquals(
       "(filters: [(select: [(transportModes: ALL)])])",
@@ -62,7 +67,7 @@ class TransitFilterOldWayMapperTest {
       map(entry("whiteListed", map(entry("authorities", list("A:1")), entry("lines", list("L:1")))))
     );
 
-    TransitFilterOldWayMapper.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
+    MAPPER.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
 
     assertEquals(
       "(filters: [(select: [(transportModes: ALL, agencies: [A:1]), (transportModes: ALL, routes: [L:1])])])",
@@ -76,7 +81,7 @@ class TransitFilterOldWayMapperTest {
       map(entry("banned", map(entry("authorities", list("A:1")), entry("lines", list("L:1")))))
     );
 
-    TransitFilterOldWayMapper.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
+    MAPPER.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
 
     assertEquals(
       "(filters: [(select: [(transportModes: ALL)], not: [(transportModes: EMPTY, agencies: [A:1]), (transportModes: EMPTY, routes: [L:1])])])",
@@ -94,7 +99,7 @@ class TransitFilterOldWayMapperTest {
       )
     );
 
-    TransitFilterOldWayMapper.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
+    MAPPER.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
 
     assertEquals(
       "(filters: [(select: [(transportModes: ALL)], not: [(transportModes: EMPTY, routes: [L:1])])])",
@@ -112,7 +117,7 @@ class TransitFilterOldWayMapperTest {
       )
     );
 
-    TransitFilterOldWayMapper.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
+    MAPPER.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
 
     assertEquals("(filters: [ExcludeAllTransitFilter])", transitBuilder.build().toString());
   }
@@ -139,7 +144,7 @@ class TransitFilterOldWayMapperTest {
       )
     );
 
-    TransitFilterOldWayMapper.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
+    MAPPER.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
 
     assertEquals(
       "(filters: [(select: [(transportModes: [AIRPLANE, CABLE_CAR, COACH])])])",
@@ -173,7 +178,7 @@ class TransitFilterOldWayMapperTest {
       )
     );
 
-    TransitFilterOldWayMapper.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
+    MAPPER.mapFilter(env, new DataFetcherDecorator(env), transitBuilder);
 
     assertEquals(
       "(filters: [(select: [(transportModes: [RAIL::local, RAIL::regionalRail])])])",

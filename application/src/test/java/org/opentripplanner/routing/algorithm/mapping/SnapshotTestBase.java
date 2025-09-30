@@ -2,8 +2,6 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import static au.com.origin.snapshots.SnapshotMatcher.expect;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_TIME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import au.com.origin.snapshots.serializers.SerializerType;
 import au.com.origin.snapshots.serializers.SnapshotSerializer;
@@ -179,34 +177,6 @@ public abstract class SnapshotTestBase {
     List<Itinerary> itineraries = retrieveItineraries(request);
 
     logDebugInformationOnFailure(request, () -> expectItinerariesToMatchSnapshot(itineraries));
-  }
-
-  protected void expectArriveByToMatchDepartAtAndSnapshot(RouteRequest request) {
-    List<Itinerary> departByItineraries = retrieveItineraries(request);
-
-    logDebugInformationOnFailure(request, () -> assertFalse(departByItineraries.isEmpty()));
-
-    logDebugInformationOnFailure(request, () ->
-      expectItinerariesToMatchSnapshot(departByItineraries)
-    );
-
-    RouteRequest arriveBy = request
-      .copyOf()
-      .withArriveBy(true)
-      .withDateTime(departByItineraries.get(0).legs().getLast().endTime().toInstant())
-      .buildRequest();
-
-    List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy);
-
-    var departAtItinerary = departByItineraries.get(0);
-    var arriveByItinerary = arriveByItineraries.get(0);
-
-    logDebugInformationOnFailure(arriveBy, () ->
-      assertEquals(
-        asJsonString(itineraryMapper.mapItinerary(departAtItinerary)),
-        asJsonString(itineraryMapper.mapItinerary(arriveByItinerary))
-      )
-    );
   }
 
   protected void expectItinerariesToMatchSnapshot(List<Itinerary> itineraries) {

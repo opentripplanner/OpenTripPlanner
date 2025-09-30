@@ -3,7 +3,6 @@ package org.opentripplanner.model.calendar;
 import java.time.LocalDate;
 import java.util.Set;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.organization.Agency;
 
 public interface CalendarService {
   /**

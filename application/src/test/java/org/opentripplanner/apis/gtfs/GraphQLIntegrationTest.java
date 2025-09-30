@@ -55,7 +55,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareOffer;
-import org.opentripplanner.model.fare.FareOffer.DefaultFareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
@@ -295,14 +294,7 @@ class GraphQLIntegrationTest {
         new RealTimeTripUpdate(
           TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
             .withRoute(t.getRoute())
-            .withStopPattern(
-              TimetableRepositoryForTest.stopPattern(
-                (RegularStop) A.stop,
-                (RegularStop) B.stop,
-                (RegularStop) C.stop,
-                (RegularStop) D.stop
-              )
-            )
+            .withStopPattern(TimetableRepositoryForTest.stopPattern(A.stop, B.stop, C.stop, D.stop))
             .withCreatedByRealtimeUpdater(true)
             .build(),
           realTimeTripTimes,

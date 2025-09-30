@@ -15,7 +15,6 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -151,7 +150,7 @@ class TripTimeOnDateTest {
       assertNull(tripTimeOnDate.getServiceDay());
       assertEquals(tripTimeOnDate.getServiceDayMidnight(), TripTimeOnDate.UNDEFINED);
       assertEquals(tripTimeOnDate.getTripTimes(), tripTimes);
-      assertEquals(tripTimeOnDate.getStopIndex(), i);
+      assertEquals(tripTimeOnDate.getStopPosition(), i);
       i++;
     }
   }

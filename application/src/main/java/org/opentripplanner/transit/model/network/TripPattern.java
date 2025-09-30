@@ -286,14 +286,14 @@ public final class TripPattern
     return stopPattern.findAlightPosition(stop);
   }
 
-  /** Returns whether passengers can alight at a given stop */
-  public boolean canAlight(int stopIndex) {
-    return stopPattern.canAlight(stopIndex);
+  /** Returns whether passengers can alight at a given stop position in the pattern */
+  public boolean canAlight(int stopPos) {
+    return stopPattern.canAlight(stopPos);
   }
 
-  /** Returns whether passengers can board at a given stop */
-  public boolean canBoard(int stopIndex) {
-    return stopPattern.canBoard(stopIndex);
+  /** Returns whether passengers can board at a given stop position in the pattern */
+  public boolean canBoard(int stopPos) {
+    return stopPattern.canBoard(stopPos);
   }
 
   /**
@@ -313,20 +313,20 @@ public final class TripPattern
   }
 
   /** Returns whether a given stop is wheelchair-accessible. */
-  public boolean wheelchairAccessible(int stopIndex) {
-    return (stopPattern.getStop(stopIndex).getWheelchairAccessibility() == Accessibility.POSSIBLE);
+  public boolean wheelchairAccessible(int stopPos) {
+    return (stopPattern.getStop(stopPos).getWheelchairAccessibility() == Accessibility.POSSIBLE);
   }
 
-  public PickDrop getAlightType(int stopIndex) {
-    return stopPattern.getDropoff(stopIndex);
+  public PickDrop getAlightType(int stopPos) {
+    return stopPattern.getDropoff(stopPos);
   }
 
-  public PickDrop getBoardType(int stopIndex) {
-    return stopPattern.getPickup(stopIndex);
+  public PickDrop getBoardType(int stopPos) {
+    return stopPattern.getPickup(stopPos);
   }
 
-  public boolean isBoardAndAlightAt(int stopIndex, PickDrop value) {
-    return getBoardType(stopIndex).is(value) && getAlightType(stopIndex).is(value);
+  public boolean isBoardAndAlightAt(int stopPos, PickDrop value) {
+    return getBoardType(stopPos).is(value) && getAlightType(stopPos).is(value);
   }
 
   /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */

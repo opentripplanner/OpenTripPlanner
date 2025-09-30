@@ -18,9 +18,9 @@ JAR containing all other libraries needed for OTP to work, and is available from
 repository. You will be able to go
 to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/),
 navigate to
-the [directory of releases](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.7.0/),
+the [directory of releases](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.8.1/),
 and download
-the [file with `otp-shaded` artifactId](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.7.0/otp-shaded-2.7.0.jar)
+the [file with `otp-shaded` artifactId](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/2.8.1/otp-shaded-2.8.1.jar)
 .
 
 You may also want to get your own copy of the OTP source code
@@ -129,7 +129,7 @@ below and in other tutorials.
 The simplest way to use OTP is to build a graph in a single step and start a server immediately,
 without saving it to disk. The command to do so is:
 
-    $ java -Xmx2G -jar otp-shaded-2.7.0.jar --build --serve /home/username/otp
+    $ java -Xmx2G -jar otp-shaded-2.8.1.jar --build --serve /home/username/otp
 
 where `/home/username/otp` should be the directory where you put your configuration and input files.
 
@@ -154,13 +154,13 @@ build a graph from street and transit data then save it to a file using the `--b
 command line parameters together. If for example your current working directory (`.`) contains the
 input files and the OTP JAR file, you can use this command:
 
-    $ java -Xmx2G -jar otp-shaded-2.7.0.jar --build --save .
+    $ java -Xmx2G -jar otp-shaded-2.8.1.jar --build --save .
 
 This will produce a file called `graph.obj` in the same directory as the inputs. The server can then
 be started later using the `--load` parameter, and will read this file instead of building the graph
 from scratch:
 
-    $ java -Xmx2G -jar otp-shaded-2.7.0.jar --load .
+    $ java -Xmx2G -jar otp-shaded-2.8.1.jar --load .
 
 Another reason to perform these two phases separately is that the building process loads the entire
 GTFS and OSM data sets into memory, so can require significantly more memory than just running a
@@ -177,16 +177,16 @@ graph once, and then layer transit data on top of the streets to make the final 
 Again assuming the input files and OTP JAR file are in the current working directory, you can build
 a street graph with OSM and elevation data only (ignoring transit input files) with this command:
 
-    $ java -Xmx2G -jar otp-shaded-2.7.0.jar --buildStreet .
+    $ java -Xmx2G -jar otp-shaded-2.8.1.jar --buildStreet .
 
 Then, to build a graph layering transit data on top of the saved street graph (built using the
 previous command):
 
-    $ java -Xmx2G -jar otp-shaded-2.7.0.jar --loadStreet --save .
+    $ java -Xmx2G -jar otp-shaded-2.8.1.jar --loadStreet --save .
 
 Finally, the server can be started using the `--load` parameter:
 
-    $ java -Xmx2G -jar otp-shaded-2.7.0.jar --load .
+    $ java -Xmx2G -jar otp-shaded-2.8.1.jar --load .
 
 ## Command Line Switches
 

@@ -3,8 +3,6 @@ package org.opentripplanner.osm.model;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import java.util.Set;
-import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
-import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OsmWay extends OsmEntity {
 
@@ -102,8 +100,21 @@ public class OsmWay extends OsmEntity {
     );
   }
 
+  public boolean isBarrier() {
+    return hasTag("barrier");
+  }
+
   @Override
   public String url() {
     return String.format("https://www.openstreetmap.org/way/%d", getId());
+  }
+
+  /**
+   * Returns true if this way is relevant for routing.
+   *
+   * @return if it is either a routable way, a P&R way or a boarding location.
+   */
+  public boolean isRelevantForRouting() {
+    return isRoutable() || isParkAndRide() || isBikeParking() || isBoardingLocation();
   }
 }
