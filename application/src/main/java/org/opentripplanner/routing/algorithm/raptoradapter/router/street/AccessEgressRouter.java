@@ -11,7 +11,7 @@ import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFind
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.search.request.FromToViaVertexRequest;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +30,12 @@ public class AccessEgressRouter {
    */
   public static Collection<NearbyStop> findAccessEgresses(
     RouteRequest request,
-    TemporaryVerticesContainer verticesContainer,
     StreetRequest streetRequest,
     @Nullable DataOverlayContext dataOverlayContext,
     AccessEgressType accessOrEgress,
     Duration durationLimit,
-    int maxStopCount
+    int maxStopCount,
+    FromToViaVertexRequest fromToViaVertexRequest
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
@@ -43,10 +43,10 @@ public class AccessEgressRouter {
     // Then we do street search. This is because some stations might use the centroid for street
     // routing, but should still give zero distance access/egresses to its child-stops.
     var zeroDistanceAccessEgress = findAccessEgressWithZeroDistance(
-      verticesContainer,
       request,
       streetRequest,
-      accessOrEgress
+      accessOrEgress,
+      fromToViaVertexRequest
     );
 
     // When looking for street accesses/egresses we ignore the already found direct accesses/egresses
@@ -56,8 +56,8 @@ public class AccessEgressRouter {
       .collect(Collectors.toSet());
 
     var originVertices = accessOrEgress.isAccess()
-      ? verticesContainer.getFromVertices()
-      : verticesContainer.getToVertices();
+      ? fromToViaVertexRequest.findVertices(request.from())
+      : fromToViaVertexRequest.findVertices(request.to());
     var streetAccessEgress = new StreetNearbyStopFinder(
       durationLimit,
       maxStopCount,
@@ -75,14 +75,14 @@ public class AccessEgressRouter {
    * return an empty list if the source/destination is not a stopId.
    */
   private static List<NearbyStop> findAccessEgressWithZeroDistance(
-    TemporaryVerticesContainer verticesContainer,
     RouteRequest routeRequest,
     StreetRequest streetRequest,
-    AccessEgressType accessOrEgress
+    AccessEgressType accessOrEgress,
+    FromToViaVertexRequest fromToViaVertexRequest
   ) {
     var transitStopVertices = accessOrEgress.isAccess()
-      ? verticesContainer.getFromStopVertices()
-      : verticesContainer.getToStopVertices();
+      ? fromToViaVertexRequest.fromStops()
+      : fromToViaVertexRequest.toStops();
 
     return NearbyStop.nearbyStopsForTransitStopVerticesFiltered(
       transitStopVertices,

@@ -4,6 +4,7 @@ import java.util.List;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * This class is a factory for creating {@link ViaCoordinateTransfer}s. It is injected into
@@ -12,7 +13,7 @@ import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 public interface ViaCoordinateTransferFactory {
   List<ViaCoordinateTransfer> createViaTransfers(
     RouteRequest request,
-    String label,
+    Vertex viaVertex,
     WgsCoordinate coordinate
   );
 }

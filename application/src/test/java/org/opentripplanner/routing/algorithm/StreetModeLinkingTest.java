@@ -15,7 +15,6 @@ import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -225,39 +224,29 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     var linker = TestVertexLinker.of(graph);
     for (final StreetMode streetMode : streetModes) {
       try (
-        var temporaryVertices = new TemporaryVerticesContainer(
-          graph,
-          linker,
-          id -> Set.of(),
-          location,
-          ANY_PLACE,
-          streetMode,
-          streetMode
-        )
+        var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph, linker)
+          .withFrom(location, streetMode)
+          .withTo(ANY_PLACE, streetMode)
+          .build()
       ) {
         assertFromLink(
           expectedFromStreetName.name(),
           streetMode,
-          temporaryVertices.getFromVertices().iterator().next()
+          temporaryVerticesContainer.fromVertices().iterator().next()
         );
       }
 
       try (
-        var temporaryVertices = new TemporaryVerticesContainer(
-          graph,
-          linker,
-          id -> Set.of(),
-          ANY_PLACE,
-          location,
-          streetMode,
-          streetMode
-        )
+        var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph, linker)
+          .withFrom(ANY_PLACE, streetMode)
+          .withTo(location, streetMode)
+          .build()
       ) {
         if (expectedToStreetName != null) {
           assertToLink(
             expectedToStreetName.name(),
             streetMode,
-            temporaryVertices.getToVertices().iterator().next()
+            temporaryVerticesContainer.toVertices().iterator().next()
           );
         }
       }

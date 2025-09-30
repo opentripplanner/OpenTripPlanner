@@ -258,24 +258,21 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     var request = requestFromTo(from, to);
 
     try (
-      var verticesContainer = new TemporaryVerticesContainer(
-        graph,
-        TestVertexLinker.of(graph),
-        id -> new DefaultTransitService(timetableRepository).findStopOrChildIds(id),
-        from,
-        to,
-        StreetMode.WALK,
-        StreetMode.WALK
+      var verticesContainer = TemporaryVerticesContainer.of(graph, TestVertexLinker.of(graph), id ->
+        new DefaultTransitService(timetableRepository).findStopOrChildIds(id)
       )
+        .withFrom(from, StreetMode.WALK)
+        .withTo(to, StreetMode.WALK)
+        .build()
     ) {
       return AccessEgressRouter.findAccessEgresses(
         request,
-        verticesContainer,
         StreetRequest.DEFAULT,
         null,
         accessEgress,
         durationLimit,
-        maxStopCount
+        maxStopCount,
+        verticesContainer.createFromToViaVertexRequest()
       );
     }
   }

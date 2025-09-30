@@ -4,7 +4,6 @@ import static java.lang.Integer.min;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
@@ -99,22 +98,17 @@ public class StreetGraphFinder implements GraphFinder {
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        graph,
-        linker,
-        id -> Set.of(),
-        GenericLocation.fromCoordinate(lat, lon),
-        GenericLocation.UNKNOWN,
-        StreetMode.WALK,
-        StreetMode.WALK
-      )
+      var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph, linker)
+        .withFrom(GenericLocation.fromCoordinate(lat, lon), StreetMode.WALK)
+        .build()
     ) {
       StreetSearchBuilder.of()
         .setSkipEdgeStrategy(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunctions.LeastWalk())
         .setRequest(request)
-        .setVerticesContainer(temporaryVertices)
+        .setFrom(temporaryVerticesContainer.fromVertices())
+        .setTo(temporaryVerticesContainer.toVertices())
         .getShortestPathTree();
     }
   }
