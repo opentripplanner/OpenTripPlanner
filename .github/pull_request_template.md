@@ -61,10 +61,10 @@ Write a few words on how the new code is tested.
 
 The [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/doc/user/Changelog.md)
 is generated from the pull-request title, make sure the title describe the feature or issue fixed.
-To exclude the PR from the changelog add the label `skip changelog` to the PR.
+To exclude the PR from the changelog add the label `+Skip Changelog` to the PR.
 
 ### Bumping the serialization version id
 
 If you have made changes to the way the routing graph is serialized, for example by renaming a field
-in one of the edges, then you must add the label `bump serialization id` to the PR. With this label
+in one of the edges, then you must add the label `+Bump Serialization Id` to the PR. With this label
 Github Actions will increase the field `otp.serialization.version.id` in `pom.xml`.

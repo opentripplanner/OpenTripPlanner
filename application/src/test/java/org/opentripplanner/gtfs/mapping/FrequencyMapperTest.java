@@ -1,6 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,11 +24,7 @@ public class FrequencyMapperTest {
 
   private static final int END_TIME = 2300;
 
-  private static final int EXACT_TIMES = 1;
-
   private static final int HEADWAY_SECS = 2;
-
-  private static final int LABEL_ONLY = 1;
 
   public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
 
@@ -52,44 +49,41 @@ public class FrequencyMapperTest {
     FREQUENCY.setId(ID);
     FREQUENCY.setStartTime(START_TIME);
     FREQUENCY.setEndTime(END_TIME);
-    FREQUENCY.setExactTimes(EXACT_TIMES);
+    FREQUENCY.setExactTimes(1);
     FREQUENCY.setHeadwaySecs(HEADWAY_SECS);
-    FREQUENCY.setLabelOnly(LABEL_ONLY);
     FREQUENCY.setTrip(DATA.trip);
   }
 
   @Test
-  public void testMapCollection() throws Exception {
+  public void testMapCollection() {
     assertNull(subject.map((Collection<Frequency>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(FREQUENCY)).size());
   }
 
   @Test
-  public void testMap() throws Exception {
+  public void testMap() {
     org.opentripplanner.model.Frequency result = subject.map(FREQUENCY);
 
-    assertEquals(START_TIME, result.getStartTime());
-    assertEquals(END_TIME, result.getEndTime());
-    assertEquals(EXACT_TIMES, result.getExactTimes());
-    assertEquals(HEADWAY_SECS, result.getHeadwaySecs());
-    assertEquals(LABEL_ONLY, result.getLabelOnly());
-    assertEquals(DATA.trip.getId().getId(), result.getTrip().getId().getId());
+    assertEquals(START_TIME, result.startTime());
+    assertEquals(END_TIME, result.endTime());
+    assertTrue(result.exactTimes());
+    assertEquals(HEADWAY_SECS, result.headwaySecs());
+    assertEquals(DATA.trip.getId().getId(), result.trip().getId().getId());
   }
 
   @Test
-  public void testMapWithNulls() throws Exception {
+  public void testMapWithNulls() {
     org.opentripplanner.model.Frequency result = subject.map(new Frequency());
 
-    assertEquals(0, result.getStartTime());
-    assertEquals(0, result.getEndTime());
-    assertEquals(0, result.getExactTimes());
-    assertEquals(0, result.getHeadwaySecs());
-    assertEquals(0, result.getLabelOnly());
-    assertNull(result.getTrip());
+    assertEquals(0, result.startTime());
+    assertEquals(0, result.endTime());
+    assertFalse(result.exactTimes());
+    assertEquals(0, result.headwaySecs());
+    assertNull(result.trip());
   }
 
-  /** Mapping the same object twice, should return the the same instance. */
+  /** Mapping the same object twice, should return the same instance. */
   @Test
   public void testMapCache() throws Exception {
     org.opentripplanner.model.Frequency result1 = subject.map(FREQUENCY);

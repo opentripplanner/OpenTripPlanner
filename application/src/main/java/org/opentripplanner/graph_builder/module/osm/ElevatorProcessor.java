@@ -103,7 +103,7 @@ class ElevatorProcessor {
         .map(Duration::toSeconds)
         .orElse(-1L);
 
-      var wheelchair = node.wheelchairAccessibility();
+      var wheelchair = node.explicitWheelchairAccessibility();
 
       createElevatorHopEdges(
         onboardVertices,
@@ -149,7 +149,7 @@ class ElevatorProcessor {
         .map(Duration::toSeconds)
         .orElse(-1L);
       int levels = nodes.size();
-      var wheelchair = elevatorWay.wheelchairAccessibility();
+      var wheelchair = elevatorWay.explicitWheelchairAccessibility();
 
       createElevatorHopEdges(
         onboardVertices,
