@@ -48,7 +48,7 @@ public class LinkStopToPlatformTest {
   private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    Graph graph = new Graph(deduplicator);
+    Graph graph = new Graph();
     var vertexFactory = new VertexFactory(graph);
 
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);

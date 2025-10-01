@@ -32,7 +32,7 @@ class TimetableRepositoryTest {
     // First GTFS bundle should be added successfully
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     ConstantsForTests.addGtfsToGraph(
       graph,
@@ -73,7 +73,7 @@ class TimetableRepositoryTest {
   void validateTimeZonesWithExplicitTimeZone() {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
 
     // Whit explicit time zone

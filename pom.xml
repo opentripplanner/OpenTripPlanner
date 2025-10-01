@@ -58,11 +58,11 @@
 
 
     <properties>
-        <otp.serialization.version.id>203</otp.serialization.version.id>
+        <otp.serialization.version.id>205</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>33.2</geotools.version>
-        <google.dagger.version>2.57.1</google.dagger.version>
+        <google.dagger.version>2.57.2</google.dagger.version>
         <jackson.version>2.20.0</jackson.version>
         <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
@@ -306,6 +306,12 @@
                 <configuration>
                     <java>
                         <removeUnusedImports/>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                            <include>src/ext/java/**/*.java</include>
+                            <include>src/ext-test/java/**/*.java</include>
+                        </includes>
                     </java>
                 </configuration>
             </plugin>

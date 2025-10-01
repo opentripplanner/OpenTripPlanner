@@ -83,7 +83,7 @@ public abstract class GraphRoutingTest {
 
     protected Builder() {
       var deduplicator = new Deduplicator();
-      graph = new Graph(deduplicator);
+      graph = new Graph();
       timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
       vertexFactory = new VertexFactory(graph);
       vehicleParkingHelper = new VehicleParkingHelper(graph);

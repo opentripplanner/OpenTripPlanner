@@ -17,8 +17,12 @@ import javax.annotation.Nullable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Does the same thing as String.intern, but for several different types. Java's String.intern uses
- * perm gen space and is broken anyway.
+ * Object deduplicator used to reduce memory footprint.
+ * Deduplication is based on the hashcode/equals method of the target object. Some Java data
+ * structures that do not have proper native equality (int[], ...) are wrapped.
+ * <p>
+ * In older JVMs, this deduplicator used to be more efficient for deduplicating String than
+ * String.intern() (not tested with recent JVMs).
  */
 public class Deduplicator implements DeduplicatorService, Serializable {
 
