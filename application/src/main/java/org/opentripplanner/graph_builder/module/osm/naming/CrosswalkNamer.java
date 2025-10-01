@@ -52,11 +52,7 @@ public class CrosswalkNamer implements EdgeNamer {
   public void recordEdges(OsmEntity way, StreetEdgePair pair) {
     if (way instanceof OsmWay osmWay) {
       // Record unnamed crossings to a list.
-      if (
-        osmWay.isCrossing() &&
-        way.hasNoName() &&
-        !way.isExplicitlyUnnamed()
-      ) {
+      if (osmWay.isCrossing() && way.hasNoName() && !way.isExplicitlyUnnamed()) {
         pair
           .asIterable()
           .forEach(edge -> unnamedCrosswalks.add(new EdgeOnLevel(osmWay, edge, way.getLevels())));

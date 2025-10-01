@@ -316,8 +316,8 @@ public class StatesToWalkStepsMapper {
     return (
       // TODO: i18n
       !lastStepName.startsWith("crossing") &&
-        !twoBackStepName.startsWith("crossing") &&
-        lastStepName.equals(threeBackStepName)
+      !twoBackStepName.startsWith("crossing") &&
+      lastStepName.equals(threeBackStepName)
     );
   }
 
