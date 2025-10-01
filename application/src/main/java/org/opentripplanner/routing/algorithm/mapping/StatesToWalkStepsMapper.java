@@ -23,6 +23,7 @@ import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorService;
 import org.opentripplanner.service.streetdecorator.model.EdgeLevelInfo;
+import org.opentripplanner.service.streetdecorator.model.VertexLevelInfo;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -552,7 +553,7 @@ public class StatesToWalkStepsMapper {
       .withRelativeDirection(RelativeDirection.ELEVATOR)
       .withVerticalTransportationUse(
         new VerticalTransportationUse(
-          null,
+          (Double) null,
           null,
           InclineType.UNKNOWN,
           null,
@@ -600,32 +601,26 @@ public class StatesToWalkStepsMapper {
       );
       if (edgeLevelInfoOptional.isPresent()) {
         EdgeLevelInfo edgeLevelInfo = edgeLevelInfoOptional.get();
+        VertexLevelInfo lowerVertexInfo = edgeLevelInfo.lowerVertexInfo();
+        VertexLevelInfo upperVertexInfo = edgeLevelInfo.upperVertexInfo();
         if (
           backState.getVertex() instanceof OsmVertex fromVertex &&
-          fromVertex.nodeId == edgeLevelInfo.lowerVertexInfo().osmVertexId()
+          fromVertex.nodeId == lowerVertexInfo.osmVertexId()
         ) {
           return new VerticalTransportationUse(
-            edgeLevelInfo.lowerVertexInfo().floorNumber() != null
-              ? (double) edgeLevelInfo.lowerVertexInfo().floorNumber()
-              : null,
-            edgeLevelInfo.lowerVertexInfo().name(),
+            lowerVertexInfo.floorNumber(),
+            lowerVertexInfo.name(),
             InclineType.UP,
-            edgeLevelInfo.upperVertexInfo().floorNumber() != null
-              ? (double) edgeLevelInfo.upperVertexInfo().floorNumber()
-              : null,
-            edgeLevelInfo.upperVertexInfo().name()
+            upperVertexInfo.floorNumber(),
+            upperVertexInfo.name()
           );
         } else {
           return new VerticalTransportationUse(
-            edgeLevelInfo.upperVertexInfo().floorNumber() != null
-              ? (double) edgeLevelInfo.upperVertexInfo().floorNumber()
-              : null,
-            edgeLevelInfo.upperVertexInfo().name(),
+            upperVertexInfo.floorNumber(),
+            upperVertexInfo.name(),
             InclineType.DOWN,
-            edgeLevelInfo.lowerVertexInfo().floorNumber() != null
-              ? (double) edgeLevelInfo.lowerVertexInfo().floorNumber()
-              : null,
-            edgeLevelInfo.lowerVertexInfo().name()
+            lowerVertexInfo.floorNumber(),
+            lowerVertexInfo.name()
           );
         }
       }

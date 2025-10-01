@@ -12,4 +12,24 @@ public record VerticalTransportationUse(
   InclineType inclineType,
   @Nullable Double toLevel,
   @Nullable String toLevelName
-) {}
+) {
+  public VerticalTransportationUse(
+    @Nullable Float fromLevel,
+    @Nullable String fromLevelName,
+    InclineType inclineType,
+    @Nullable Float toLevel,
+    @Nullable String toLevelName
+  ) {
+    this(
+      toNullableDouble(fromLevel),
+      fromLevelName,
+      inclineType,
+      toNullableDouble(toLevel),
+      toLevelName
+    );
+  }
+
+  private static Double toNullableDouble(Float f) {
+    return f != null ? f.doubleValue() : null;
+  }
+}
