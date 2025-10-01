@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>204</otp.serialization.version.id>
+        <otp.serialization.version.id>205</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>33.2</geotools.version>
@@ -306,6 +306,12 @@
                 <configuration>
                     <java>
                         <removeUnusedImports/>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                            <include>src/ext/java/**/*.java</include>
+                            <include>src/ext-test/java/**/*.java</include>
+                        </includes>
                     </java>
                 </configuration>
             </plugin>

@@ -10,6 +10,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix NPE in old deprecated via search (Transmodel API) [#6878](https://github.com/opentripplanner/OpenTripPlanner/pull/6878)
 - Align service id handling of GTFS-RT NEW with SIRI extra calls [#6894](https://github.com/opentripplanner/OpenTripPlanner/pull/6894)
 - Simplify handling for turns [#6779](https://github.com/opentripplanner/OpenTripPlanner/pull/6779)
+- Move deduplicator out of Graph and into Dagger [#6892](https://github.com/opentripplanner/OpenTripPlanner/pull/6892)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
