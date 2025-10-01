@@ -68,13 +68,13 @@ public class FlexRouter {
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     Collection<NearbyStop> streetAccesses,
-    Collection<NearbyStop> egressTransfers
+    Collection<NearbyStop> streetEgresses
   ) {
     this.graph = graph;
     this.transitService = transitService;
     this.flexParameters = flexParameters;
     this.streetAccesses = streetAccesses;
-    this.streetEgresses = egressTransfers;
+    this.streetEgresses = streetEgresses;
     this.flexIndex = transitService.getFlexIndex();
     this.matcher = TripMatcherFactory.of(
       filterRequest,
