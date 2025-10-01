@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.model._data;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -8,6 +10,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
@@ -18,6 +21,8 @@ public record TripInput(
   String id,
   Route route,
   List<StopCall> stops,
+  // Null means that a default service date will be used
+  @Nullable List<LocalDate> serviceDates,
   @Nullable I18NString headsign
 ) {
   public static TripInputBuilder of(String id) {
@@ -50,6 +55,9 @@ public record TripInput(
       .build();
 
     @Nullable
+    private List<LocalDate> serviceDates = null;
+
+    @Nullable
     private I18NString headsign;
 
     TripInputBuilder(String id) {
@@ -63,8 +71,12 @@ public record TripInput(
       return this;
     }
 
+    public TripInputBuilder addStop(RegularStop stopId, String arrivalAndDeparture) {
+      return addStop(stopId, arrivalAndDeparture, arrivalAndDeparture);
+    }
+
     public TripInput build() {
-      return new TripInput(id, route, stops, headsign);
+      return new TripInput(id, route, stops, serviceDates, headsign);
     }
 
     public TripInputBuilder withRoute(Route route) {
@@ -74,6 +86,13 @@ public record TripInput(
 
     public TripInputBuilder withHeadsign(I18NString headsign) {
       this.headsign = headsign;
+      return this;
+    }
+
+    public TripInputBuilder withServiceDates(LocalDate... serviceDates) {
+      var list = Arrays.stream(serviceDates).toList();
+      ListUtils.requireAtLeastNElements(list, 1);
+      this.serviceDates = list;
       return this;
     }
   }

@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
@@ -57,6 +59,7 @@ public class TransitTestEnvironmentBuilder {
   private final List<TripInput> tripInputs = new ArrayList<>();
   private final List<FlexTripInput> flexTripInputs = new ArrayList<>();
   private final Map<FeedScopedId, RegularStop> scheduledStopPointMapping = new HashMap<>();
+  private final AtomicInteger serviceCodeCounter = new AtomicInteger();
 
   private final String defaultFeedId;
   private final FeedScopedId defaultServiceId;
@@ -95,8 +98,10 @@ public class TransitTestEnvironmentBuilder {
       new Deduplicator()
     );
 
+    CalendarServiceData calendarServiceData = new CalendarServiceData();
     for (TripInput tripInput : tripInputs) {
-      createTrip(tripInput, timetableRepository);
+      var t = createTrip(tripInput, timetableRepository);
+      calendarServiceData.putServiceDatesForServiceId(t.getServiceId(), tripInput.serviceDates());
     }
     for (FlexTripInput tripInput : flexTripInputs) {
       createFlexTrip(tripInput, timetableRepository);
@@ -105,13 +110,6 @@ public class TransitTestEnvironmentBuilder {
     timetableRepository.initTimeZone(timeZone);
     timetableRepository.addAgency(TimetableRepositoryForTest.AGENCY);
 
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
-    calendarServiceData.putServiceDatesForServiceId(
-      defaultServiceId,
-      List.of(defaultServiceDate.minusDays(1), defaultServiceDate, defaultServiceDate.plusDays(1))
-    );
-
-    timetableRepository.getServiceCodes().put(defaultServiceId, 0);
     timetableRepository.updateCalendarServiceData(
       true,
       calendarServiceData,
@@ -193,11 +191,12 @@ public class TransitTestEnvironmentBuilder {
     return this;
   }
 
-  private void createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
+  private Trip createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
+    var serviceId = generateServiceId(timetableRepository, tripInput.serviceDates());
     var trip = Trip.of(id(tripInput.id()))
       .withRoute(tripInput.route())
       .withHeadsign(tripInput.headsign() == null ? null : tripInput.headsign())
-      .withServiceId(defaultServiceId)
+      .withServiceId(serviceId)
       .build();
 
     addTripOnServiceDate(timetableRepository, trip);
@@ -241,10 +240,28 @@ public class TransitTestEnvironmentBuilder {
     } else {
       addNewPattern(tripInput.id(), tripInput.route(), stopPattern, tripTimes, timetableRepository);
     }
+
+    return trip;
+  }
+
+  private FeedScopedId generateServiceId(
+    TimetableRepository timetableRepository,
+    List<LocalDate> localDates
+  ) {
+    var serviceId = id(
+      localDates.stream().map(LocalDate::toString).collect(Collectors.joining("|"))
+    );
+    timetableRepository.getServiceCodes().put(serviceId, serviceCodeCounter.getAndIncrement());
+    return serviceId;
   }
 
   private Trip createFlexTrip(FlexTripInput tripInput, TimetableRepository timetableRepository) {
-    final var trip = trip(tripInput.id(), tripInput.route());
+    var serviceId = generateServiceId(timetableRepository, List.of(defaultServiceDate));
+    final var trip = Trip.of(TimetableRepositoryForTest.id(tripInput.id()))
+      .withRoute(tripInput.route())
+      .withHeadsign(I18NString.of("Headsign of %s".formatted(tripInput.id())))
+      .withServiceId(serviceId)
+      .build();
     addTripOnServiceDate(timetableRepository, trip);
 
     var stopTimes = IntStream.range(0, tripInput.stops().size())

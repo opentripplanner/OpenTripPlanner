@@ -13,6 +13,7 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,11 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
@@ -33,8 +37,22 @@ import org.opentripplanner.utils.time.TimeUtils;
 
 class AddedTest implements RealtimeTestConstants {
 
-  private static final String ADDED_TRIP_ID = "added_trip";
-  private final TransitTestEnvironment env = TransitTestEnvironment.of()
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2025, 11, 28);
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
+  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
+  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
+  private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
+
+  private final TransitTestEnvironment env = envBuilder
+    .addTrip(
+      TripInput.of(TRIP_1_ID)
+        // just to set the schedule period
+        .withServiceDates(SERVICE_DATE.minusDays(1), SERVICE_DATE.plusDays(1))
+        .addStop(STOP_A, "12:00", "12:00")
+        .addStop(STOP_B, "12:10", "12:10")
+        .addStop(STOP_C, "12:20", "12:20")
+        .build()
+    )
     .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
     .build();
   private final GtfsRtTestHelper gtfsRt = GtfsRtTestHelper.of(env);

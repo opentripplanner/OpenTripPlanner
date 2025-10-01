@@ -109,12 +109,10 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     return new VehicleRentalStationBuilder(this);
   }
 
-  @Nullable
   public FeedScopedId id() {
     return id;
   }
 
-  @Nullable
   public I18NString name() {
     return name;
   }
