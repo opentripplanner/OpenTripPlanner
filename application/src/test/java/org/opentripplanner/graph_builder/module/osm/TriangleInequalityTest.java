@@ -194,7 +194,7 @@ public class TriangleInequalityTest {
           jb.withModes(modes);
         }
         if (!filters.isEmpty()) {
-          jb.withTransit(b -> b.setFilters(filters));
+          jb.withTransit(b -> b.withFilters(filters));
         }
       })
       .buildDefault();

@@ -130,7 +130,7 @@ public abstract class GtfsTest {
         filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
       }
 
-      journeyBuilder.withTransit(b -> b.setFilters(List.of(filterRequestBuilder.build())));
+      journeyBuilder.withTransit(b -> b.withFilters(List.of(filterRequestBuilder.build())));
     });
 
     // Init preferences

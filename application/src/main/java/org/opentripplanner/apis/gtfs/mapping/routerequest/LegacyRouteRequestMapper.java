@@ -231,7 +231,7 @@ public class LegacyRouteRequestMapper {
           if (transitDisabled) {
             transitBuilder.disable();
           } else {
-            transitBuilder.setFilters(List.of(filterRequestBuilder.build()));
+            transitBuilder.withFilters(List.of(filterRequestBuilder.build()));
           }
         }
       });

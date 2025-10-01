@@ -73,7 +73,7 @@ public class SpeedTestRequest {
       } else {
         var fb = TransitFilterRequest.of()
           .addSelect(SelectRequest.of().withTransportModes(tModes).build());
-        journeyBuilder.withTransit(b -> b.setFilters(List.of(fb.build())));
+        journeyBuilder.withTransit(b -> b.withFilters(List.of(fb.build())));
       }
 
       if (profile.raptorProfile().is(MIN_TRAVEL_DURATION)) {
