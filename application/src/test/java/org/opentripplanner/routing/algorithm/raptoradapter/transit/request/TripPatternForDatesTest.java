@@ -18,6 +18,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class TripPatternForDatesTest {
@@ -83,17 +84,14 @@ class TripPatternForDatesTest {
       .build()
       .getRoutingTripPattern();
 
+    Trip trip = TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build();
     final ScheduledTripTimes tripTimes = TripTimesFactory.tripTimes(
-      TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build(),
+      trip,
       List.of(stopTime1, stopTime2),
       new Deduplicator()
     );
 
-    var frequency = new Frequency();
-    frequency.setStartTime(FREQUENCY_START);
-    frequency.setEndTime(FREQUENCY_END);
-    frequency.setHeadwaySecs(HEADWAY);
-    frequency.setExactTimes(1);
+    var frequency = new Frequency(trip, FREQUENCY_START, FREQUENCY_END, HEADWAY, true);
 
     var boardingAndAlightingPossible = new BitSet(2);
     boardingAndAlightingPossible.set(0);

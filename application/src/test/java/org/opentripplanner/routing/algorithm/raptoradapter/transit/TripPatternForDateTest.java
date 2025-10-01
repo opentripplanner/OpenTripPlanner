@@ -34,9 +34,12 @@ class TripPatternForDateTest {
   );
 
   static Stream<Arguments> testCases() {
-    return Stream.of(List.of(new FrequencyEntry(new Frequency(), tripTimes)), List.of()).map(
-      Arguments::of
-    );
+    return Stream.of(
+      List.of(
+        new FrequencyEntry(new Frequency(tripTimes.getTrip(), 0, 86400, 600, false), tripTimes)
+      ),
+      List.of()
+    ).map(Arguments::of);
   }
 
   @ParameterizedTest(name = "trip with frequencies {0} should be correctly filtered")

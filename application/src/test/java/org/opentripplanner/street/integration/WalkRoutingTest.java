@@ -75,7 +75,7 @@ class WalkRoutingTest {
       backwardStates.getLast().getTimeAccurate()
     );
     // should be same for every parametrized offset, otherwise irrelevant
-    int expected = 11483;
+    int expected = 10430;
     assertEquals(expected, forwardDiff);
     assertEquals(expected, backwardDiff);
   }

@@ -324,7 +324,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>24.2</version>
+            <version>24.3</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -370,7 +370,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.17.14</version>
+            <version>7.17.15</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
