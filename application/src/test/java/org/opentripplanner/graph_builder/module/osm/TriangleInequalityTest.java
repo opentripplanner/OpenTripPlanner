@@ -191,7 +191,7 @@ public class TriangleInequalityTest {
       )
       .withJourney(jb -> {
         if (modes != null) {
-          jb.setModes(modes);
+          jb.withModes(modes);
         }
         if (!filters.isEmpty()) {
           jb.withTransit(b -> b.setFilters(filters));

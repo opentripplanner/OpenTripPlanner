@@ -77,7 +77,7 @@ public class RouteRequestConfig {
     );
 
     requestBuilder.withJourney(b ->
-      b.setModes(
+      b.withModes(
         c
           .of("modes")
           .since(V2_0)

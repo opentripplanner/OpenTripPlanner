@@ -65,7 +65,7 @@ public class SpeedTestRequest {
       builder.withNumItineraries(opts.numOfItineraries());
     }
     builder.withJourney(journeyBuilder -> {
-      journeyBuilder.setModes(input.modes().getRequestModes());
+      journeyBuilder.withModes(input.modes().getRequestModes());
 
       var tModes = input.modes().getTransitModes().stream().map(MainAndSubMode::new).toList();
       if (tModes.isEmpty()) {

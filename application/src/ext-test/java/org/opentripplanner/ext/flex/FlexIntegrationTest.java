@@ -256,7 +256,7 @@ public class FlexIntegrationTest {
           modes.withEgressMode(FLEXIBLE);
         }
 
-        journeyBuilder.setModes(modes.build());
+        journeyBuilder.withModes(modes.build());
       })
       .buildRequest();
 

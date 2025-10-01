@@ -112,7 +112,7 @@ public abstract class GtfsTest {
         .withTransferMode(WALK)
         .withEgressMode(WALK);
 
-      journeyBuilder.setModes(requestModesBuilder.build());
+      journeyBuilder.withModes(requestModesBuilder.build());
 
       var filterRequestBuilder = TransitFilterRequest.of();
       if (preferredMode != null) {

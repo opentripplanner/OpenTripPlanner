@@ -218,7 +218,7 @@ public class LegacyRouteRequestMapper {
               )
               .collect(Collectors.toSet());
 
-            journeyBuilder.setModes(modes.getRequestModes());
+            journeyBuilder.withModes(modes.getRequestModes());
 
             var tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
             if (tModes.isEmpty()) {
