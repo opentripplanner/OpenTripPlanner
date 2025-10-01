@@ -1,5 +1,6 @@
 package org.opentripplanner.osm.tagmapping;
 
+import static org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder.ofWalkSafety;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
@@ -8,6 +9,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
 
 /**
  * OSM way properties for UK roads. The main differences compared to the default property set are:
@@ -34,61 +36,20 @@ class UKMapper extends OsmTagMapper {
     // reduce trunk safety compared to default mapper
     props.setProperties("highway=trunk", withModes(ALL).walkSafety(2.5).bicycleSafety(2.5));
     props.setProperties("highway=trunk_link", withModes(ALL).walkSafety(2.5).bicycleSafety(2.06));
-    props.setProperties(
-      "highway=trunk;cycleway=lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.5)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.15)
-    );
-    props.setProperties(
-      "highway=trunk;cycleway=share_busway",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.75)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=share_busway",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.25)
-    );
-    props.setProperties(
-      "highway=trunk;cycleway=opposite_lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.5)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=opposite_lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.15)
-    );
-    props.setProperties(
-      "highway=trunk;cycleway=track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(0.95)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(0.85)
-    );
-    props.setProperties(
-      "highway=trunk;cycleway=opposite_track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(0.95)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=opposite_track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(0.85)
-    );
-    props.setProperties(
-      "highway=trunk;bicycle=designated",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.75)
-    );
-    props.setProperties(
-      "highway=trunk_link;bicycle=designated",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.75)
+
+    // cancel out the effect of the reduced safety mixin for walking on trunk roads with pavement
+    props.setMixinProperties(
+      new LogicalOrSpecifier(
+        "highway=trunk;sidewalk=yes",
+        "highway=trunk;sidewalk=left",
+        "highway=trunk;sidewalk=right",
+        "highway=trunk;sidewalk=both",
+        "highway=trunk_link;sidewalk=yes",
+        "highway=trunk_link;sidewalk=left",
+        "highway=trunk_link;sidewalk=right",
+        "highway=trunk_link;sidewalk=both"
+      ),
+      ofWalkSafety(2)
     );
 
     props.setMixinProperties(

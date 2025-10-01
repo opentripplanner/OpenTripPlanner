@@ -57,10 +57,7 @@ class GermanyMapper extends OsmTagMapper {
       withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.8)
     );
     // Default was 2.5, we want to favor using mixed footways somewhat
-    props.setProperties(
-      "footway=sidewalk;highway=footway;bicycle=yes",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.2)
-    );
+    props.setMixinProperties("footway=sidewalk;highway=footway;bicycle=yes", ofBicycleSafety(0.6));
 
     props.setMixinProperties("highway=tertiary", ofBicycleSafety(1.2));
     props.setMixinProperties("maxspeed=70", ofBicycleSafety(1.5));

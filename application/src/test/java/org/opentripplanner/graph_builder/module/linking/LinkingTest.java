@@ -151,7 +151,7 @@ public class LinkingTest {
         assertEquals(v1.getLon(), v2.getLon(), 1e-10);
       }
     }
-    assertEquals(153, unlinkedStopsCounter);
+    assertEquals(155, unlinkedStopsCounter);
   }
 
   /** Build a graph in Columbus, OH with no transit */
