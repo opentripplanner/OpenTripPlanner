@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -272,7 +273,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
         request,
         verticesContainer,
         StreetRequest.DEFAULT,
-        null,
+        List.of(),
         accessEgress,
         durationLimit,
         maxStopCount
