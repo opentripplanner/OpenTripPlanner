@@ -60,7 +60,6 @@ class AccessEgressRouterTest extends GraphRoutingTest {
           var noCentroidRoutingStation = stationEntity("NoCentroidRoutingStation", b ->
             b.withCoordinate(D.toWgsCoordinate())
           );
-          var noCentroidRoutingStationVertex = stationCentroid(noCentroidRoutingStation);
 
           // StopForCentroidRoutingStation is a child of centroidRoutingStation
           stopForCentroidRoutingStation = stop(
@@ -79,7 +78,6 @@ class AccessEgressRouterTest extends GraphRoutingTest {
           biLink(A, centroidRoutingStationVertex);
           biLink(B, stopForCentroidRoutingStation);
           biLink(C, stopForNoCentroidRoutingStation);
-          biLink(D, noCentroidRoutingStationVertex);
         }
       }
     );

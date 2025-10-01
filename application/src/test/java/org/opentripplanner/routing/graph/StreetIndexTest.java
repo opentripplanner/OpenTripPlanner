@@ -22,7 +22,10 @@ class StreetIndexTest {
     .station("OMEGA")
     .withShouldRouteToCentroid(true)
     .build();
-  private final StationCentroidVertex centroidVertex = new StationCentroidVertex(station);
+  private final StationCentroidVertex centroidVertex = new StationCentroidVertex(
+    station.getId(),
+    station.getCoordinate()
+  );
 
   @Test
   void stopId() {

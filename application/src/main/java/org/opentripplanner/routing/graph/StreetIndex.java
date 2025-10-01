@@ -162,7 +162,6 @@ class StreetIndex {
     return graph
       .getVerticesOfType(StationCentroidVertex.class)
       .stream()
-      .filter(vertex -> vertex.getStation().shouldRouteToCentroid())
-      .collect(Collectors.toUnmodifiableMap(v -> v.getStation().getId(), v -> v));
+      .collect(Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v));
   }
 }

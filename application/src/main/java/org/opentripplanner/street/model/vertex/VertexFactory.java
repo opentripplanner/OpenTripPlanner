@@ -126,7 +126,14 @@ public class VertexFactory {
   }
 
   public StationCentroidVertex stationCentroid(Station station) {
-    return addToGraph(new StationCentroidVertex(station));
+    if (!station.shouldRouteToCentroid()) {
+      throw new IllegalArgumentException(
+        "Station '%s' must route to centroid in order to create a vertex.".formatted(
+            station.getId()
+          )
+      );
+    }
+    return addToGraph(new StationCentroidVertex(station.getId(), station.getCoordinate()));
   }
 
   public VehicleParkingEntranceVertex vehicleParkingEntrance(VehicleParking vehicleParking) {

@@ -134,15 +134,15 @@ class TemporaryVerticesContainerTest {
     var fromVertices = List.copyOf(container.getFromVertices());
     assertThat(fromVertices).hasSize(1);
 
-    var station = ((StationCentroidVertex) fromVertices.getFirst()).getStation();
-    assertEquals(station, this.stationAlpha);
+    var station = ((StationCentroidVertex) fromVertices.getFirst()).getId();
+    assertEquals(station, this.stationAlpha.getId());
   }
 
   private static Graph buildGraph(Station station, RegularStop... stops) {
     var graph = new Graph();
     var center = StreetModelForTest.intersectionVertex(CENTER.asJtsCoordinate());
     graph.addVertex(center);
-    var centroidVertex = new StationCentroidVertex(station);
+    var centroidVertex = new StationCentroidVertex(station.getId(), station.getCoordinate());
     graph.addVertex(centroidVertex);
     StreetStationCentroidLink.createStreetStationLink(centroidVertex, center);
     Arrays.stream(stops).forEach(s -> {
