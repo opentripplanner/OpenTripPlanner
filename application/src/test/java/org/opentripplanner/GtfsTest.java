@@ -199,7 +199,7 @@ public abstract class GtfsTest {
 
     alertsUpdateHandler = new AlertsUpdateHandler(false);
     var deduplicator = new Deduplicator();
-    graph = new Graph(deduplicator);
+    graph = new Graph();
     timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     timetableRepository.setUpdaterManager(
       new GraphUpdaterManager(

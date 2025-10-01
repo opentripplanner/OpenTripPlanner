@@ -33,7 +33,6 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TriangleInequalityTest {
 
@@ -47,7 +46,7 @@ public class TriangleInequalityTest {
 
   @BeforeAll
   public static void onlyOnce() {
-    graph = new Graph(new Deduplicator());
+    graph = new Graph();
 
     File file = ResourceLoader.of(TriangleInequalityTest.class).file("NYC_small.osm.pbf");
     DefaultOsmProvider provider = new DefaultOsmProvider(file, true);

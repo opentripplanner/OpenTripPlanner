@@ -4,13 +4,12 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
@@ -32,7 +31,7 @@ public class AccessEgressRouter {
     RouteRequest request,
     TemporaryVerticesContainer verticesContainer,
     StreetRequest streetRequest,
-    @Nullable DataOverlayContext dataOverlayContext,
+    Collection<ExtensionRequestContext> extensionRequestContexts,
     AccessEgressType accessOrEgress,
     Duration durationLimit,
     int maxStopCount
@@ -58,12 +57,11 @@ public class AccessEgressRouter {
     var originVertices = accessOrEgress.isAccess()
       ? verticesContainer.getFromVertices()
       : verticesContainer.getToVertices();
-    var streetAccessEgress = new StreetNearbyStopFinder(
-      durationLimit,
-      maxStopCount,
-      dataOverlayContext,
-      ignoreVertices
-    ).findNearbyStops(originVertices, request, streetRequest, accessOrEgress.isEgress());
+    var streetAccessEgress = StreetNearbyStopFinder.of(durationLimit, maxStopCount)
+      .withIgnoreVertices(ignoreVertices)
+      .withExtensionRequestContexts(extensionRequestContexts)
+      .build()
+      .findNearbyStops(originVertices, request, streetRequest, accessOrEgress.isEgress());
 
     var results = ListUtils.combine(zeroDistanceAccessEgress, streetAccessEgress);
     LOG.debug("Found {} {} stops", results.size(), accessOrEgress);

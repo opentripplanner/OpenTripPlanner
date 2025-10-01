@@ -28,6 +28,7 @@ class DebugStyleSpecTest {
     var groupStops = new VectorSourceLayer(vectorSource, "stops");
     var edges = new VectorSourceLayer(vectorSource, "edges");
     var vertices = new VectorSourceLayer(vectorSource, "vertices");
+    var geofencingZones = new VectorSourceLayer(vectorSource, "geofencingZones");
     var rental = new VectorSourceLayer(vectorSource, "rental");
     var spec = DebugStyleSpec.build(
       regularStops,
@@ -35,6 +36,7 @@ class DebugStyleSpecTest {
       groupStops,
       edges,
       vertices,
+      geofencingZones,
       rental,
       List.of()
     );

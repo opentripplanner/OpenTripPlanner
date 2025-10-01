@@ -1,33 +1,30 @@
-package org.opentripplanner.ext.emission.internal.csvdata.csvparser;
+package org.opentripplanner.framework.csv.parser;
 
 import java.util.Objects;
-import org.opentripplanner.framework.error.OtpError;
 
-class ValueOutsideRangeIssue implements OtpError {
+final class ValueOutsideRangeIssue extends AbstractIssue {
 
-  private final String columnName;
   private final Number value;
-  private final String type;
+  private final String valueType;
   private final Object range;
-  private final String csvLine;
 
   public ValueOutsideRangeIssue(
     String columnName,
     Number value,
-    String type,
+    String valueType,
     Object range,
-    String csvLine
+    String csvLine,
+    String issueType
   ) {
-    this.columnName = columnName;
+    super(columnName, csvLine, issueType);
     this.value = value;
-    this.type = type;
+    this.valueType = valueType;
     this.range = range;
-    this.csvLine = csvLine;
   }
 
   @Override
   public String errorCode() {
-    return "EmissionOutsideRange";
+    return issueType() + "OutsideRange";
   }
 
   @Override
@@ -38,11 +35,11 @@ class ValueOutsideRangeIssue implements OtpError {
   @Override
   public Object[] messageArguments() {
     return new Object[] {
-      type,
+      valueType,
       Objects.toString(value),
-      columnName,
+      columnName(),
       Objects.toString(range),
-      csvLine,
+      csvLine(),
     };
   }
 }
