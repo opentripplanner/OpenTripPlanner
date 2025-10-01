@@ -39,10 +39,22 @@ class SafetyValueNormalizer {
     this.graph = graph;
   }
 
+  /**
+   * Get the best bike safety in the whole graph.
+   * 
+   * @return The bike safety of the safest way in the graph, i.e. the way with the lowest bike
+   * safety value.
+   */
   public float getBestBikeSafety() {
     return bestBikeSafety;
   }
 
+  /**
+   * Get the best walk safety in the whole graph.
+   *
+   * @return The walk safety of the safest way in the graph, i.e. the way with the lowest walk
+   * safety value.
+   */
   public float getBestWalkSafety() {
     return bestWalkSafety;
   }
