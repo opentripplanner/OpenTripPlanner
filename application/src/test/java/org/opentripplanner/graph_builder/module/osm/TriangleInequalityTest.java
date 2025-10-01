@@ -161,12 +161,12 @@ public class TriangleInequalityTest {
     Vertex v
   ) {
     return StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setOriginBackEdge(startBackEdge)
-      .setRequest(options)
-      .setFrom(u)
-      .setTo(v)
-      .setIntersectionTraversalCalculator(calculator)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withOriginBackEdge(startBackEdge)
+      .withRequest(options)
+      .withFrom(u)
+      .withTo(v)
+      .withIntersectionTraversalCalculator(calculator)
       .getShortestPathTree()
       .getPath(v);
   }
@@ -200,12 +200,12 @@ public class TriangleInequalityTest {
       .buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-      .setRequest(request)
-      .setFrom(start)
-      .setTo(end)
-      .setIntersectionTraversalCalculator(calculator)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withDominanceFunction(new DominanceFunctions.EarliestArrival())
+      .withRequest(request)
+      .withFrom(start)
+      .withTo(end)
+      .withIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = tree.getPath(end);

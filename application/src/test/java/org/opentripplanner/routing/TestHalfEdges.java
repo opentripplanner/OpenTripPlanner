@@ -211,22 +211,22 @@ public class TestHalfEdges {
     var r = RouteRequest.defaultValue();
 
     ShortestPathTree<State, Edge, Vertex> spt1 = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setStreetRequest(r.journey().direct())
-      .setFrom(br)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withStreetRequest(r.journey().direct())
+      .withFrom(br)
+      .withTo(end)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> pathBr = spt1.getPath(end);
     assertNotNull(pathBr, "There must be a path from br to end");
 
     ShortestPathTree<State, Edge, Vertex> spt2 = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setStreetRequest(r.journey().direct())
-      .setFrom(tr)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withStreetRequest(r.journey().direct())
+      .withFrom(tr)
+      .withTo(end)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> pathTr = spt2.getPath(end);
@@ -237,11 +237,11 @@ public class TestHalfEdges {
     );
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setStreetRequest(r.journey().direct())
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withStreetRequest(r.journey().direct())
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = spt.getPath(end);
@@ -256,11 +256,11 @@ public class TestHalfEdges {
     r = RouteRequest.of().withArriveBy(true).buildDefault();
 
     spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setStreetRequest(r.journey().direct())
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withStreetRequest(r.journey().direct())
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     path = spt.getPath(start);
@@ -304,11 +304,11 @@ public class TestHalfEdges {
       .buildDefault();
 
     spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setStreetRequest(r.journey().direct())
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withStreetRequest(r.journey().direct())
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     path = spt.getPath(start);
@@ -343,10 +343,10 @@ public class TestHalfEdges {
     );
 
     spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     path = spt.getPath(start);
@@ -402,11 +402,11 @@ public class TestHalfEdges {
     var request = RouteRequest.defaultValue();
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(request.journey().direct())
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withStreetRequest(request.journey().direct())
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = spt.getPath(end);
@@ -453,11 +453,11 @@ public class TestHalfEdges {
     var request = RouteRequest.defaultValue();
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(request.journey().direct())
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withStreetRequest(request.journey().direct())
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = spt.getPath(end);
@@ -577,9 +577,9 @@ public class TestHalfEdges {
       assertNotNull(container.getFromVertices());
       assertNotNull(container.getToVertices());
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-        .setHeuristic(new EuclideanRemainingWeightHeuristic())
-        .setRequest(walking)
-        .setVerticesContainer(container)
+        .withHeuristic(new EuclideanRemainingWeightHeuristic())
+        .withRequest(walking)
+        .withVerticesContainer(container)
         .getShortestPathTree();
       GraphPath<State, Edge, Vertex> path = spt.getPath(
         container.getToVertices().iterator().next()
