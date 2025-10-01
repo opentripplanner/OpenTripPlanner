@@ -25,12 +25,12 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 
 class CrosswalkNamerTest {
+
   private static final OsmWay CROSSWALK = new OsmWay();
   private static final OsmWay STREET = new OsmWay();
   private static final OsmWay SERVICE_ROAD = new OsmWay();
   private static final OsmWay TURN_LANE = new OsmWay();
   private static final OsmWay OTHER_STREET = new OsmWay();
-
 
   @BeforeAll
   static void setUp() {
@@ -62,11 +62,17 @@ class CrosswalkNamerTest {
 
   @Test
   void testGetIntersectingStreet() {
-    var intersectingStreet = CrosswalkNamer.getIntersectingStreet(CROSSWALK, List.of(STREET, OTHER_STREET));
+    var intersectingStreet = CrosswalkNamer.getIntersectingStreet(
+      CROSSWALK,
+      List.of(STREET, OTHER_STREET)
+    );
     assertTrue(intersectingStreet.isPresent());
     assertEquals(50001, intersectingStreet.get().getId());
 
-    var intersectingStreet2 = CrosswalkNamer.getIntersectingStreet(CROSSWALK, List.of(OTHER_STREET));
+    var intersectingStreet2 = CrosswalkNamer.getIntersectingStreet(
+      CROSSWALK,
+      List.of(OTHER_STREET)
+    );
     assertFalse(intersectingStreet2.isPresent());
   }
 
@@ -81,7 +87,7 @@ class CrosswalkNamerTest {
     );
     builder.addWay(
       crossStreet,
-      new WgsCoordinate( 33.9528839, -83.9956473),
+      new WgsCoordinate(33.9528839, -83.9956473),
       new WgsCoordinate(33.9526837, -83.9953494)
     );
     builder.addWay(
@@ -114,7 +120,9 @@ class CrosswalkNamerTest {
 
     EdgePair addWay(OsmWay way, WgsCoordinate... coordinates) {
       var edge = edgeBuilder(coordinates)
-        .withPermission(way.isFootway() ? StreetTraversalPermission.PEDESTRIAN : StreetTraversalPermission.CAR)
+        .withPermission(
+          way.isFootway() ? StreetTraversalPermission.PEDESTRIAN : StreetTraversalPermission.CAR
+        )
         .withName(way.isNamed() ? way.getAssumedName() : I18NString.of("path"))
         .withBogusName(!way.isNamed())
         .buildAndConnect();

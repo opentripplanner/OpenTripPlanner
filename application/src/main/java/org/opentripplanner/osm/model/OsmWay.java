@@ -113,7 +113,7 @@ public class OsmWay extends OsmEntity {
     return (
       isTag("footway", "crossing") &&
       ((crossingMarkingsTag != null && !"no".equals(crossingMarkingsTag)) ||
-        isTag("crossing","marked"))
+        isTag("crossing", "marked"))
     );
   }
 

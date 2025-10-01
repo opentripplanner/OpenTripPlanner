@@ -64,8 +64,7 @@ public class CrosswalkNamer implements EdgeNamer {
       }
       // Record named streets, service roads, and slip/turn lanes to a list.
       else if (
-        !osmWay.isFootway() &&
-        (way.isNamed() || osmWay.isServiceRoad() || isTurnLane(osmWay))
+        !osmWay.isFootway() && (way.isNamed() || osmWay.isServiceRoad() || isTurnLane(osmWay))
       ) {
         streets.add(osmWay);
       }
@@ -116,20 +115,26 @@ public class CrosswalkNamer implements EdgeNamer {
       OsmWay crossStreet = crossStreetOpt.get();
       // TODO: i18n
       if (crossStreet.isNamed()) {
-        crosswalk.setName(I18NString.of(String.format("crossing over %s", crossStreet.getAssumedName())));
+        crosswalk.setName(
+          I18NString.of(String.format("crossing over %s", crossStreet.getAssumedName()))
+        );
       } else if (crossStreet.isServiceRoad()) {
         crosswalk.setName(I18NString.of("crossing over service road"));
       } else if (isTurnLane(crossStreet)) {
         crosswalk.setName(I18NString.of("crossing over turn lane"));
       } else {
         // Default on using the OSM way ID, which should not happen.
-        crosswalk.setName(I18NString.of(String.format("crossing %s", crosswalkOnLevel.way.getId())));
+        crosswalk.setName(
+          I18NString.of(String.format("crossing %s", crosswalkOnLevel.way.getId()))
+        );
       }
       namesApplied.incrementAndGet();
     }
   }
 
-  /** Gets the intersecting street, if any, for the given way and candidate streets. */
+  /**
+   * Gets the intersecting street, if any, for the given way and candidate streets.
+   */
   public static Optional<OsmWay> getIntersectingStreet(OsmWay way, Collection<OsmWay> streets) {
     TLongList nodeRefs = way.getNodeRefs();
     if (nodeRefs.size() >= 3) {
