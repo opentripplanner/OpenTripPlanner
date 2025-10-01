@@ -907,7 +907,6 @@ public class GraphQLTypes {
   /** The type of incline, e.g. stairs can go up or down depending on the direction. */
   public enum GraphQLInclineType {
     DOWN,
-    UNKNOWN,
     UP,
   }
 

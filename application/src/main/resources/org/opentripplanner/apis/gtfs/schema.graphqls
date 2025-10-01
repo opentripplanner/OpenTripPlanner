@@ -97,7 +97,7 @@ union CallStopLocation = Location | LocationGroup | Stop
 union RentalPlace = RentalVehicle | VehicleRentalStation
 
 "A feature for a step"
-union StepFeature = Entrance | VerticalTransportationUse
+union StepFeature = ElevatorUse | Entrance | EscalatorUse | StairsUse
 
 union StopPosition = PositionAtStop | PositionBetweenStops
 
@@ -525,6 +525,12 @@ type DependentFareProduct implements FareProduct {
   riderCategory: RiderCategory
 }
 
+"A single use of an elevator."
+type ElevatorUse {
+  "Name of the destination level e.g. 'M' or 'P1'."
+  toLevelName: String
+}
+
 type Emissions {
   "CO₂ emissions in grams."
   co2: Grams
@@ -540,6 +546,19 @@ type Entrance {
   publicCode: String
   "Whether the entrance or exit is accessible by wheelchair"
   wheelchairAccessible: WheelchairBoarding
+}
+
+"A single use of an escalator."
+type EscalatorUse {
+  "The level the use begins at. Levels can sometimes contain half levels (e.g. 1.5)."
+  fromLevel: Float
+  "Name (if it exists) for fromLevel e.g. 'M' or 'P1'."
+  fromLevelName: String
+  inclineType: InclineType!
+  "The level the use ends at. Levels can sometimes contain half levels (e.g. 1.5)."
+  toLevel: Float
+  "Name (if it exists) for toLevel e.g. 'M' or 'P1'."
+  toLevelName: String
 }
 
 "Real-time estimates for an arrival or departure at a certain place."
@@ -2167,6 +2186,19 @@ type RoutingError {
   inputField: InputField
 }
 
+"A single use of a set of stairs."
+type StairsUse {
+  "The level the use begins at. Levels can sometimes contain half levels (e.g. 1.5)."
+  fromLevel: Float
+  "Name (if it exists) for fromLevel e.g. 'M' or 'P1'."
+  fromLevelName: String
+  inclineType: InclineType!
+  "The level the use ends at. Levels can sometimes contain half levels (e.g. 1.5)."
+  toLevel: Float
+  "Name (if it exists) for toLevel e.g. 'M' or 'P1'."
+  toLevelName: String
+}
+
 """
 Stop can represent either a single public transport stop, where passengers can
 board and/or disembark vehicles, or a station, which contains multiple stops.
@@ -2873,22 +2905,6 @@ type VehicleRentalUris {
   web: String
 }
 
-"""
-A single use of a specified type of vertical transportation with a start and end point,
-originating from OSM or GTFS data.
-"""
-type VerticalTransportationUse {
-  "The level the use begins at. Levels can sometimes contain half levels (e.g. 1.5)."
-  fromLevel: Float
-  "Name (if it exists) for fromLevel e.g. 'M' or 'P1'."
-  fromLevelName: String
-  inclineType: InclineType!
-  "The level the use ends at. Levels can sometimes contain half levels (e.g. 1.5)."
-  toLevel: Float
-  "Name (if it exists) for toLevel e.g. 'M' or 'P1'."
-  toLevelName: String
-}
-
 type debugOutput {
   pathCalculationTime: Long
   precalculationTime: Long
@@ -3239,7 +3255,6 @@ enum FormFactor {
 "The type of incline, e.g. stairs can go up or down depending on the direction."
 enum InclineType {
   DOWN
-  UNKNOWN
   UP
 }
 

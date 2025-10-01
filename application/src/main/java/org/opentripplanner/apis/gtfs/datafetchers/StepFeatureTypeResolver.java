@@ -4,7 +4,9 @@ import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
-import org.opentripplanner.model.plan.walkstep.VerticalTransportationUse;
+import org.opentripplanner.model.plan.walkstep.verticaltransportationuse.ElevatorUse;
+import org.opentripplanner.model.plan.walkstep.verticaltransportationuse.EscalatorUse;
+import org.opentripplanner.model.plan.walkstep.verticaltransportationuse.StairsUse;
 import org.opentripplanner.transit.model.site.Entrance;
 
 public class StepFeatureTypeResolver implements TypeResolver {
@@ -16,8 +18,12 @@ public class StepFeatureTypeResolver implements TypeResolver {
 
     if (o instanceof Entrance) {
       return schema.getObjectType("Entrance");
-    } else if (o instanceof VerticalTransportationUse) {
-      return schema.getObjectType("VerticalTransportationUse");
+    } else if (o instanceof ElevatorUse) {
+      return schema.getObjectType("ElevatorUse");
+    } else if (o instanceof EscalatorUse) {
+      return schema.getObjectType("EscalatorUse");
+    } else if (o instanceof StairsUse) {
+      return schema.getObjectType("StairsUse");
     }
     return null;
   }

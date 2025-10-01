@@ -15,11 +15,14 @@ import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
-import org.opentripplanner.model.plan.walkstep.InclineType;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
-import org.opentripplanner.model.plan.walkstep.VerticalTransportationUse;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
+import org.opentripplanner.model.plan.walkstep.verticaltransportationuse.ElevatorUse;
+import org.opentripplanner.model.plan.walkstep.verticaltransportationuse.EscalatorUse;
+import org.opentripplanner.model.plan.walkstep.verticaltransportationuse.InclineType;
+import org.opentripplanner.model.plan.walkstep.verticaltransportationuse.StairsUse;
+import org.opentripplanner.model.plan.walkstep.verticaltransportationuse.VerticalTransportationUse;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorService;
 import org.opentripplanner.service.streetdecorator.model.EdgeLevelInfo;
@@ -551,15 +554,7 @@ public class StatesToWalkStepsMapper {
       // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
       .withDirectionText(edge.getName())
       .withRelativeDirection(RelativeDirection.ELEVATOR)
-      .withVerticalTransportationUse(
-        new VerticalTransportationUse(
-          (Double) null,
-          null,
-          InclineType.UNKNOWN,
-          null,
-          edge.getName().toString()
-        )
-      );
+      .withVerticalTransportationUse(new ElevatorUse(edge.getName().toString()));
   }
 
   private WalkStepBuilder createStairsWalkStep(
@@ -575,7 +570,7 @@ public class StatesToWalkStepsMapper {
       .withRelativeDirection(RelativeDirection.STAIRS)
       .withAbsoluteDirection(DirectionUtils.getFirstAngle(geom))
       .addDistance(edge.getDistanceMeters())
-      .withVerticalTransportationUse(getVerticalTransportationUse(backState, edge));
+      .withVerticalTransportationUse(getInclinedVerticalTransportationUse(backState, edge));
   }
 
   private WalkStepBuilder createEscalatorWalkStep(
@@ -591,36 +586,46 @@ public class StatesToWalkStepsMapper {
       .withRelativeDirection(RelativeDirection.ESCALATOR)
       .withAbsoluteDirection(DirectionUtils.getFirstAngle(geom))
       .addDistance(edge.getDistanceMeters())
-      .withVerticalTransportationUse(getVerticalTransportationUse(backState, edge));
+      .withVerticalTransportationUse(getInclinedVerticalTransportationUse(backState, edge));
   }
 
-  private VerticalTransportationUse getVerticalTransportationUse(State backState, Edge edge) {
+  private VerticalTransportationUse getInclinedVerticalTransportationUse(
+    State backState,
+    Edge edge
+  ) {
     if (osmStreetDecoratorService != null) {
       Optional<EdgeLevelInfo> edgeLevelInfoOptional = osmStreetDecoratorService.findEdgeInformation(
         edge
       );
       if (edgeLevelInfoOptional.isPresent()) {
         EdgeLevelInfo edgeLevelInfo = edgeLevelInfoOptional.get();
-        VertexLevelInfo lowerVertexInfo = edgeLevelInfo.lowerVertexInfo();
-        VertexLevelInfo upperVertexInfo = edgeLevelInfo.upperVertexInfo();
+        VertexLevelInfo fromVertexInfo = edgeLevelInfo.upperVertexInfo();
+        VertexLevelInfo toVertexInfo = edgeLevelInfo.lowerVertexInfo();
+        InclineType inclineType = InclineType.DOWN;
         if (
           backState.getVertex() instanceof OsmVertex fromVertex &&
-          fromVertex.nodeId == lowerVertexInfo.osmVertexId()
+          fromVertex.nodeId == edgeLevelInfo.lowerVertexInfo().osmVertexId()
         ) {
-          return new VerticalTransportationUse(
-            lowerVertexInfo.floorNumber(),
-            lowerVertexInfo.name(),
-            InclineType.UP,
-            upperVertexInfo.floorNumber(),
-            upperVertexInfo.name()
+          inclineType = InclineType.UP;
+          fromVertexInfo = edgeLevelInfo.lowerVertexInfo();
+          toVertexInfo = edgeLevelInfo.upperVertexInfo();
+        }
+
+        if (edge instanceof EscalatorEdge) {
+          return new EscalatorUse(
+            fromVertexInfo.floorNumber(),
+            fromVertexInfo.name(),
+            inclineType,
+            toVertexInfo.floorNumber(),
+            toVertexInfo.name()
           );
         } else {
-          return new VerticalTransportationUse(
-            upperVertexInfo.floorNumber(),
-            upperVertexInfo.name(),
-            InclineType.DOWN,
-            lowerVertexInfo.floorNumber(),
-            lowerVertexInfo.name()
+          return new StairsUse(
+            fromVertexInfo.floorNumber(),
+            fromVertexInfo.name(),
+            inclineType,
+            toVertexInfo.floorNumber(),
+            toVertexInfo.name()
           );
         }
       }

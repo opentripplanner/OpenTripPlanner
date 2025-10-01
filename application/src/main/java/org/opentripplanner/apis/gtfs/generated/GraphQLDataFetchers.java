@@ -411,6 +411,11 @@ public class GraphQLDataFetchers {
     public DataFetcher<RiderCategory> riderCategory();
   }
 
+  /** A single use of an elevator. */
+  public interface GraphQLElevatorUse {
+    public DataFetcher<String> toLevelName();
+  }
+
   public interface GraphQLEmissions {
     public DataFetcher<org.opentripplanner.framework.model.Gram> co2();
   }
@@ -426,6 +431,19 @@ public class GraphQLDataFetchers {
     public DataFetcher<
       org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding
     > wheelchairAccessible();
+  }
+
+  /** A single use of an escalator. */
+  public interface GraphQLEscalatorUse {
+    public DataFetcher<Double> fromLevel();
+
+    public DataFetcher<String> fromLevelName();
+
+    public DataFetcher<GraphQLInclineType> inclineType();
+
+    public DataFetcher<Double> toLevel();
+
+    public DataFetcher<String> toLevelName();
   }
 
   /** Real-time estimates for an arrival or departure at a certain place. */
@@ -1107,6 +1125,19 @@ public class GraphQLDataFetchers {
     public DataFetcher<GraphQLInputField> inputField();
   }
 
+  /** A single use of a set of stairs. */
+  public interface GraphQLStairsUse {
+    public DataFetcher<Double> fromLevel();
+
+    public DataFetcher<String> fromLevelName();
+
+    public DataFetcher<GraphQLInclineType> inclineType();
+
+    public DataFetcher<Double> toLevel();
+
+    public DataFetcher<String> toLevelName();
+  }
+
   /** A feature for a step */
   public interface GraphQLStepFeature extends TypeResolver {}
 
@@ -1533,22 +1564,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> ios();
 
     public DataFetcher<String> web();
-  }
-
-  /**
-   * A single use of a specified type of vertical transportation with a start and end point,
-   * originating from OSM or GTFS data.
-   */
-  public interface GraphQLVerticalTransportationUse {
-    public DataFetcher<Double> fromLevel();
-
-    public DataFetcher<String> fromLevelName();
-
-    public DataFetcher<GraphQLInclineType> inclineType();
-
-    public DataFetcher<Double> toLevel();
-
-    public DataFetcher<String> toLevelName();
   }
 
   public interface GraphQLDebugOutput {
