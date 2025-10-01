@@ -97,7 +97,7 @@ public class GraphPathFinder {
       .setStreetRequest(request.journey().direct())
       .setFrom(from)
       .setTo(to)
-      .withExtensionRequestContexts(extensionRequestContexts);
+      .setExtensionRequestContexts(extensionRequestContexts);
 
     // If the search has a traverseVisitor(GraphVisualizer) attached to it, set it as a callback
     // for the AStar search

@@ -60,7 +60,7 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
     return this;
   }
 
-  public StreetSearchBuilder withExtensionRequestContexts(
+  public StreetSearchBuilder setExtensionRequestContexts(
     Collection<ExtensionRequestContext> extensionRequestContexts
   ) {
     this.extensionRequestContexts = List.copyOf(extensionRequestContexts);

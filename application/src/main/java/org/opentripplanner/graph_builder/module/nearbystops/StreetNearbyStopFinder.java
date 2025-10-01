@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.nearbystops;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
@@ -52,10 +54,10 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     Collection<ExtensionRequestContext> extensionRequestContexts,
     Set<Vertex> ignoreVertices
   ) {
-    this.extensionRequestContexts = extensionRequestContexts;
-    this.durationLimit = durationLimit;
-    this.maxStopCount = maxStopCount;
-    this.ignoreVertices = ignoreVertices;
+    this.durationLimit = requireNonNull(durationLimit);
+    this.maxStopCount = requireNonNull(maxStopCount);
+    this.extensionRequestContexts = requireNonNull(extensionRequestContexts);
+    this.ignoreVertices = requireNonNull(ignoreVertices);
   }
 
   /**
@@ -123,7 +125,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
       .setStreetRequest(streetRequest)
       .setFrom(reverseDirection ? null : originVertices)
       .setTo(reverseDirection ? originVertices : null)
-      .withExtensionRequestContexts(extensionRequestContexts);
+      .setExtensionRequestContexts(extensionRequestContexts);
 
     if (maxStopCount > 0) {
       streetSearch.setTerminationStrategy(
