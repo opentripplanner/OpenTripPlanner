@@ -43,12 +43,10 @@ class GbfsStationInformationMapper {
       station.getLon() == null ||
       station.getLat() == null
     ) {
-      LOG.info(
-        String.format(
-          "GBFS station for %s system has issues with required fields: \n%s",
-          system.systemId(),
-          station
-        )
+      LOG.debug(
+        "GBFS station for {} system has issues with required fields: \n{}",
+        system.systemId(),
+        station
       );
       return null;
     }
