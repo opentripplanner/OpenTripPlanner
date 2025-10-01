@@ -2,9 +2,10 @@ package org.opentripplanner.graph_builder.module;
 
 import static org.opentripplanner.framework.geometry.SphericalDistanceLibrary.distance;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -110,13 +111,12 @@ public class AddTransitEntitiesToGraph {
 
   private void addStopsToGraphAndGenerateStopVertexes(TimetableRepository timetableRepository) {
     // Compute the set of modes for each stop based on all the TripPatterns it is part of
-    Map<StopLocation, Set<TransitMode>> stopModeMap = new HashMap<>();
+    SetMultimap<StopLocation, TransitMode> stopModeMap = HashMultimap.create();
 
     for (TripPattern pattern : otpTransitService.getTripPatterns()) {
       TransitMode mode = pattern.getMode();
       for (var stop : pattern.getStops()) {
-        Set<TransitMode> set = stopModeMap.computeIfAbsent(stop, s -> new HashSet<>());
-        set.add(mode);
+        stopModeMap.put(stop, mode);
       }
     }
 
@@ -126,7 +126,7 @@ public class AddTransitEntitiesToGraph {
       Set<TransitMode> modes = stopModeMap.get(stop);
       TransitStopVertex stopVertex = vertexFactory.transitStop(stop, modes);
 
-      if (modes != null && modes.contains(TransitMode.SUBWAY)) {
+      if (modes.contains(TransitMode.SUBWAY)) {
         stopVertex.setStreetToStopTime(subwayAccessTime);
       }
 

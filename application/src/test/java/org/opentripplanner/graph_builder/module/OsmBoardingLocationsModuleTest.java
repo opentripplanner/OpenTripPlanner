@@ -85,6 +85,11 @@ class OsmBoardingLocationsModuleTest {
     RegularStop busStop = testModel.stop("de:08115:4512:5:C", 48.59434, 8.86452).build();
     RegularStop floatingBusStop = testModel.stop("floating-bus-stop", 48.59417, 8.86464).build();
 
+    var siteRepo = testModel
+      .siteRepositoryBuilder()
+      .withRegularStops(List.of(platform, busStop, floatingBusStop))
+      .build();
+
     var deduplicator = new Deduplicator();
     var graph = new Graph();
     var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
@@ -122,7 +127,7 @@ class OsmBoardingLocationsModuleTest {
     var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
     new OsmBoardingLocationsModule(
       graph,
-      testModel.siteRepositoryBuilder().build(),
+      siteRepo,
       TestVertexLinker.of(graph),
       osmService
     ).buildGraph();
@@ -256,27 +261,21 @@ class OsmBoardingLocationsModuleTest {
       }
     }
 
+    var platform9 = testModel
+      .stop("9100MRGT9")
+      .withName(I18NString.of("Moorgate (Platform 9)"))
+      .withCoordinate(51.51922107872304, -0.08767468698832413)
+      .withPlatformCode("9")
+      .build();
+    var platform7 = testModel
+      .stop("9400ZZLUMGT3")
+      .withName(I18NString.of("Moorgate (Platform 7)"))
+      .withCoordinate(51.51919235051611, -0.08769925990953176)
+      .withPlatformCode("7")
+      .build();
     var testCases = List.of(
-      new TestCase(
-        testModel
-          .stop("9100MRGT9")
-          .withName(I18NString.of("Moorgate (Platform 9)"))
-          .withCoordinate(51.51922107872304, -0.08767468698832413)
-          .withPlatformCode("9")
-          .build(),
-        VertexLabel.osm(12288669589L),
-        VertexLabel.osm(12288675219L)
-      ),
-      new TestCase(
-        testModel
-          .stop("9400ZZLUMGT3")
-          .withName(I18NString.of("Moorgate (Platform 7)"))
-          .withCoordinate(51.51919235051611, -0.08769925990953176)
-          .withPlatformCode("7")
-          .build(),
-        VertexLabel.osm(12288669575L),
-        VertexLabel.osm(12288675230L)
-      )
+      new TestCase(platform9, VertexLabel.osm(12288669589L), VertexLabel.osm(12288675219L)),
+      new TestCase(platform7, VertexLabel.osm(12288669575L), VertexLabel.osm(12288675230L))
     );
 
     for (var testCase : testCases) {
@@ -298,9 +297,13 @@ class OsmBoardingLocationsModuleTest {
       );
     }
 
+    var siteRepo = testModel
+      .siteRepositoryBuilder()
+      .withRegularStops(List.of(platform9, platform7))
+      .build();
     new OsmBoardingLocationsModule(
       graph,
-      testModel.siteRepositoryBuilder().build(),
+      siteRepo,
       TestVertexLinker.of(graph),
       new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();

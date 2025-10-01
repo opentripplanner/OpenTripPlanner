@@ -38,7 +38,7 @@ public class TransitStopVertex extends StationElementVertex {
     Accessibility wheelchairAccessibility,
     Set<TransitMode> modes
   ) {
-    super(id, coordinate.longitude(), coordinate.latitude(), I18NString.of(id.toString()));
+    super(id, coordinate.longitude(), coordinate.latitude(), I18NString.of(id.getId()));
     this.modes = Set.copyOf(modes);
     this.wheelchairAccessibility = Objects.requireNonNull(wheelchairAccessibility);
   }
@@ -76,10 +76,6 @@ public class TransitStopVertex extends StationElementVertex {
 
   public Set<TransitMode> getModes() {
     return modes;
-  }
-
-  public void addMode(TransitMode mode) {
-    modes.add(mode);
   }
 
   @Override

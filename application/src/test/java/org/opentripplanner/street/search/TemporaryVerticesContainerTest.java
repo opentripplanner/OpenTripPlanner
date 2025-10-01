@@ -61,7 +61,10 @@ class TemporaryVerticesContainerTest {
     .build();
   private final Graph graph = buildGraph(stationAlpha, stopA, stopB, stopC, stopD);
 
-  private final SiteRepository siteRepository = testModel.siteRepositoryBuilder().build();
+  private final SiteRepository siteRepository = testModel
+    .siteRepositoryBuilder()
+    .withRegularStops(List.of(stopA, stopB, stopC, stopD))
+    .build();
 
   @Test
   void coordinates() {

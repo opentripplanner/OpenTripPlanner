@@ -106,9 +106,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     Vertex vertex = state.getVertex();
     double distance = state.getWalkDistance();
     if (vertex instanceof TransitStopVertex transitVertex) {
-      RegularStop stop = Objects.requireNonNull(
-        transitService.getRegularStop(transitVertex.getId())
-      );
+      var stop = Objects.requireNonNull(transitService.getRegularStop(transitVertex.getId()));
       handleStop(stop, distance);
       handlePatternsAtStop(stop, distance);
     } else if (vertex instanceof VehicleRentalPlaceVertex rentalVertex) {

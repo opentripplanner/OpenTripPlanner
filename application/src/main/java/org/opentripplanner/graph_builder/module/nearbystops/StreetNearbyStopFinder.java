@@ -44,6 +44,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   private final StopResolver stopResolver;
   private final Collection<ExtensionRequestContext> extensionRequestContexts;
   private final Set<Vertex> ignoreVertices;
+  private final NearbyStopFactory nearbyStopFactory;
 
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
@@ -73,6 +74,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    */
   public static Builder of(Duration durationLimit, int maxStopCount) {
     return new Builder(durationLimit, maxStopCount);
+    this.nearbyStopFactory = new NearbyStopFactory(stopResolver);
   }
 
   /**
@@ -106,9 +108,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
-    List<NearbyStop> stopsFound = new NearbyStopFactory(
-      stopResolver
-    ).nearbyStopsForTransitStopVerticesFiltered(
+    List<NearbyStop> stopsFound = nearbyStopFactory.nearbyStopsForTransitStopVerticesFiltered(
       Sets.difference(originVertices, ignoreVertices),
       reverseDirection,
       request,

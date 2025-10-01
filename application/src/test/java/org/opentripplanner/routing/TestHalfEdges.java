@@ -44,7 +44,6 @@ import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -155,8 +154,6 @@ public class TestHalfEdges {
 
     station1 = factory.transitStop(s1, Set.of());
     station2 = factory.transitStop(s2, Set.of());
-    station1.addMode(TransitMode.RAIL);
-    station2.addMode(TransitMode.RAIL);
 
     //Linkers aren't run otherwise in testNetworkLinker
     graph.hasStreets = true;
