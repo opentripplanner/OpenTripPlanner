@@ -102,7 +102,7 @@ public class LoadApplication {
   private ConstructApplication createAppConstruction(
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
-    @Nullable OsmStreetDecoratorRepository osmStreetDecoratorRepository,
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,

@@ -107,7 +107,6 @@ public interface ConstructApplicationFactory {
   @Nullable
   EmissionRepository emissionRepository();
 
-  @Nullable
   OsmStreetDecoratorRepository osmStreetDecoratorRepository();
 
   @Nullable

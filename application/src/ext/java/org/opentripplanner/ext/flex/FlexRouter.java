@@ -70,7 +70,7 @@ public class FlexRouter {
     int additionalFutureSearchDays,
     Collection<NearbyStop> streetAccesses,
     Collection<NearbyStop> egressTransfers,
-    @Nullable OsmStreetDecoratorService osmStreetDecoratorService
+    OsmStreetDecoratorService osmStreetDecoratorService
   ) {
     this.graph = graph;
     this.transitService = transitService;

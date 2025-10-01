@@ -69,7 +69,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Nullable
   private final ItineraryDecorator emissionItineraryDecorator;
 
-  @Nullable
   private final OsmStreetDecoratorService osmStreetDecoratorService;
 
   @Nullable
@@ -129,7 +128,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     ViaCoordinateTransferFactory viaTransferResolver,
     WorldEnvelopeService worldEnvelopeService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
-    @Nullable OsmStreetDecoratorService osmStreetDecoratorService,
+    OsmStreetDecoratorService osmStreetDecoratorService,
     @Nullable LuceneIndex luceneIndex,
     @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
     @Nullable @TransmodelSchema GraphQLSchema transmodelSchema,

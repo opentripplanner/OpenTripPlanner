@@ -155,7 +155,6 @@ public interface OtpServerRequestContext {
   @Nullable
   ItineraryDecorator emissionItineraryDecorator();
 
-  @Nullable
   OsmStreetDecoratorService osmStreetDecoratorService();
 
   @Nullable

@@ -57,7 +57,6 @@ public class GraphPathToItineraryMapper {
   private final ZoneId timeZone;
   private final StreetNotesService streetNotesService;
 
-  @Nullable
   private final OsmStreetDecoratorService osmStreetDecoratorService;
 
   private final double ellipsoidToGeoidDifference;
@@ -65,7 +64,7 @@ public class GraphPathToItineraryMapper {
   public GraphPathToItineraryMapper(
     ZoneId timeZone,
     StreetNotesService streetNotesService,
-    @Nullable OsmStreetDecoratorService osmStreetDecoratorService,
+    OsmStreetDecoratorService osmStreetDecoratorService,
     double ellipsoidToGeoidDifference
   ) {
     this.timeZone = ZoneIdFallback.zoneId(timeZone);

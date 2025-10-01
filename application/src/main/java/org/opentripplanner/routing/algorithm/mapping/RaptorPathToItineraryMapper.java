@@ -85,7 +85,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     RaptorTransitData raptorTransitData,
     ZonedDateTime transitSearchTimeZero,
     RouteRequest request,
-    @Nullable OsmStreetDecoratorService osmStreetDecoratorService
+    OsmStreetDecoratorService osmStreetDecoratorService
   ) {
     this.raptorTransitData = raptorTransitData;
     this.transitSearchTimeZero = transitSearchTimeZero;

@@ -106,9 +106,7 @@ public interface GraphBuilderFactory {
     Builder osmInfoGraphBuildRepository(OsmInfoGraphBuildRepository osmInfoGraphBuildRepository);
 
     @BindsInstance
-    Builder osmStreetDecoratorRepository(
-      @Nullable OsmStreetDecoratorRepository osmStreetDecoratorRepository
-    );
+    Builder osmStreetDecoratorRepository(OsmStreetDecoratorRepository osmStreetDecoratorRepository);
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);

@@ -64,7 +64,7 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
-    @Nullable OsmStreetDecoratorRepository osmStreetDecoratorRepository,
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     VehicleParkingRepository vehicleParkingRepository,
     DataImportIssueStore issueStore,
     StreetLimitationParameters streetLimitationParameters

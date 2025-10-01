@@ -69,7 +69,6 @@ public class OsmModule implements GraphBuilderModule {
   private final Graph graph;
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
 
-  @Nullable
   private final OsmStreetDecoratorRepository osmStreetDecoratorRepository;
 
   private final VehicleParkingRepository parkingRepository;
@@ -83,7 +82,7 @@ public class OsmModule implements GraphBuilderModule {
     Collection<OsmProvider> providers,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
-    @Nullable OsmStreetDecoratorRepository osmStreetDecoratorRepository,
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueStore issueStore,
     StreetLimitationParameters streetLimitationParameters,
@@ -104,7 +103,7 @@ public class OsmModule implements GraphBuilderModule {
     Collection<OsmProvider> providers,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
-    @Nullable OsmStreetDecoratorRepository osmStreetDecoratorRepository,
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     VehicleParkingRepository vehicleParkingRepository
   ) {
     return new OsmModuleBuilder(
@@ -120,7 +119,7 @@ public class OsmModule implements GraphBuilderModule {
     OsmProvider provider,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
-    @Nullable OsmStreetDecoratorRepository osmStreetDecoratorRepository,
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     VehicleParkingRepository vehicleParkingRepository
   ) {
     return of(
@@ -599,7 +598,8 @@ public class OsmModule implements GraphBuilderModule {
     Optional<EdgeLevelInfo> edgeLevelInfoOptional,
     OsmWay way
   ) {
-    if (osmStreetDecoratorRepository != null && edgeLevelInfoOptional.isPresent()) {
+    // TODO add feature flag check
+    if (true && edgeLevelInfoOptional.isPresent()) {
       EdgeLevelInfo edgeLevelInfo = edgeLevelInfoOptional.get();
       Edge edge = forwardEdge != null ? forwardEdge : backwardEdge;
       if (

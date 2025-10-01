@@ -71,7 +71,7 @@ public class GraphBuilder implements Runnable {
     GraphBuilderDataSources dataSources,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
-    @Nullable OsmStreetDecoratorRepository osmStreetDecoratorRepository,
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     FareServiceFactory fareServiceFactory,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,

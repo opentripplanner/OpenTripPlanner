@@ -57,7 +57,6 @@ public class StatesToWalkStepsMapper {
   private final double ellipsoidToGeoidDifference;
   private final StreetNotesService streetNotesService;
 
-  @Nullable
   private final OsmStreetDecoratorService osmStreetDecoratorService;
 
   private final List<State> states;
@@ -88,7 +87,7 @@ public class StatesToWalkStepsMapper {
     List<State> states,
     WalkStep previousStep,
     StreetNotesService streetNotesService,
-    @Nullable OsmStreetDecoratorService osmStreetDecoratorService,
+    OsmStreetDecoratorService osmStreetDecoratorService,
     double ellipsoidToGeoidDifference
   ) {
     this.states = states;
@@ -593,7 +592,8 @@ public class StatesToWalkStepsMapper {
     State backState,
     Edge edge
   ) {
-    if (osmStreetDecoratorService != null) {
+    // TODO add feature flag check
+    if (true) {
       Optional<EdgeLevelInfo> edgeLevelInfoOptional = osmStreetDecoratorService.findEdgeInformation(
         edge
       );

@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Collection;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
@@ -25,7 +24,6 @@ public class OsmModuleBuilder {
   private final VehicleParkingRepository parkingRepository;
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
 
-  @Nullable
   private final OsmStreetDecoratorRepository osmStreetDecoratorRepository;
 
   private Set<String> boardingAreaRefTags = Set.of();
@@ -43,7 +41,7 @@ public class OsmModuleBuilder {
     Collection<OsmProvider> providers,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
-    @Nullable OsmStreetDecoratorRepository osmStreetDecoratorRepository,
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     VehicleParkingRepository parkingRepository
   ) {
     this.providers = providers;
