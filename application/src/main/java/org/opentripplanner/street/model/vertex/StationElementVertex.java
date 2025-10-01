@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
+import java.util.Objects;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StationElement;
@@ -11,7 +12,7 @@ public abstract class StationElementVertex extends Vertex {
 
   protected StationElementVertex(FeedScopedId id, double x, double y, I18NString name) {
     super(x, y);
-    this.id = id;
+    this.id = Objects.requireNonNull(id);
     this.name = name;
   }
 

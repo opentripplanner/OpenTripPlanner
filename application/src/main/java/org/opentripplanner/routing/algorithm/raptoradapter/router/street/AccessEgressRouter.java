@@ -10,6 +10,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
+import org.opentripplanner.routing.graphfinder.NearbyStopFactory;
+import org.opentripplanner.routing.graphfinder.StopResolver;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
@@ -21,13 +23,18 @@ import org.slf4j.LoggerFactory;
 public class AccessEgressRouter {
 
   private static final Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
+  private final StopResolver stopResolver;
+  private final NearbyStopFactory nearbyStopFactory;
 
-  private AccessEgressRouter() {}
+  public AccessEgressRouter(StopResolver stopResolver) {
+    this.stopResolver = stopResolver;
+    this.nearbyStopFactory = new NearbyStopFactory(stopResolver);
+  }
 
   /**
    * Find accesses or egresses.
    */
-  public static Collection<NearbyStop> findAccessEgresses(
+  public Collection<NearbyStop> findAccessEgresses(
     RouteRequest request,
     TemporaryVerticesContainer verticesContainer,
     StreetRequest streetRequest,
@@ -72,7 +79,7 @@ public class AccessEgressRouter {
    * Return a list of direct accesses/egresses that do not require any street search. This will
    * return an empty list if the source/destination is not a stopId.
    */
-  private static List<NearbyStop> findAccessEgressWithZeroDistance(
+  private List<NearbyStop> findAccessEgressWithZeroDistance(
     TemporaryVerticesContainer verticesContainer,
     RouteRequest routeRequest,
     StreetRequest streetRequest,
@@ -82,7 +89,7 @@ public class AccessEgressRouter {
       ? verticesContainer.getFromStopVertices()
       : verticesContainer.getToStopVertices();
 
-    return NearbyStop.nearbyStopsForTransitStopVerticesFiltered(
+    return nearbyStopFactory.nearbyStopsForTransitStopVerticesFiltered(
       transitStopVertices,
       accessOrEgress.isEgress(),
       routeRequest,

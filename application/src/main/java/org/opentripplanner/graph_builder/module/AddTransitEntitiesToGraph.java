@@ -124,9 +124,7 @@ public class AddTransitEntitiesToGraph {
     // It is now possible for these vertices to not be connected to any edges.
     for (RegularStop stop : otpTransitService.siteRepository().listRegularStops()) {
       Set<TransitMode> modes = stopModeMap.get(stop);
-      TransitStopVertex stopVertex = vertexFactory.transitStop(
-        TransitStopVertex.of().withStop(stop).withModes(modes)
-      );
+      TransitStopVertex stopVertex = vertexFactory.transitStop(stop, modes);
 
       if (modes != null && modes.contains(TransitMode.SUBWAY)) {
         stopVertex.setStreetToStopTime(subwayAccessTime);

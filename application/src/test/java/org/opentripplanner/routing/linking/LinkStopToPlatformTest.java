@@ -115,7 +115,7 @@ public class LinkStopToPlatformTest {
     graph.index();
 
     for (RegularStop s : transitStops) {
-      vertexFactory.transitStop(TransitStopVertex.of().withStop(s));
+      vertexFactory.transitStop(s, Set.of());
     }
 
     return graph;

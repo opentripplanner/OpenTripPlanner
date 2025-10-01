@@ -8,6 +8,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -134,7 +135,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
          * Use map based on the list of edges, so that only distinct transfers are stored. */
         Map<TransferKey, PathTransfer> distinctTransfers = new HashMap<>();
-        RegularStop stop = ts0.getStop();
+        RegularStop stop = Objects.requireNonNull(
+          timetableRepository.getSiteRepository().getRegularStop(ts0.getId())
+        );
 
         if (stop.transfersNotAllowed()) {
           return;
@@ -208,7 +211,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       finder = new StraightLineNearbyStopFinder(transitService, radiusAsDuration);
     } else {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
-      finder = StreetNearbyStopFinder.of(radiusAsDuration, 0).build();
+      finder = StreetNearbyStopFinder.of(
+        transitService::getRegularStop,
+        radiusAsDuration,
+        0).build(
+      );
     }
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {

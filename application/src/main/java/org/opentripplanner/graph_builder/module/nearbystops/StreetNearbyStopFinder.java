@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
@@ -21,6 +22,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.graphfinder.NearbyStopFactory;
+import org.opentripplanner.routing.graphfinder.StopResolver;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -38,6 +41,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
 
   private final Duration durationLimit;
   private final int maxStopCount;
+  private final StopResolver stopResolver;
   private final Collection<ExtensionRequestContext> extensionRequestContexts;
   private final Set<Vertex> ignoreVertices;
 
@@ -49,6 +53,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * @param ignoreVertices   A set of stop vertices to ignore and not return NearbyStops for.
    */
   private StreetNearbyStopFinder(
+    StopResolver stopResolver,
     Duration durationLimit,
     int maxStopCount,
     Collection<ExtensionRequestContext> extensionRequestContexts,
@@ -101,7 +106,9 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
-    List<NearbyStop> stopsFound = NearbyStop.nearbyStopsForTransitStopVerticesFiltered(
+    List<NearbyStop> stopsFound = new NearbyStopFactory(
+      stopResolver
+    ).nearbyStopsForTransitStopVerticesFiltered(
       Sets.difference(originVertices, ignoreVertices),
       reverseDirection,
       request,
@@ -146,14 +153,15 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
           continue;
         }
         if (targetVertex instanceof TransitStopVertex tsv && state.isFinal()) {
-          stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getStop()));
+          var stop = Objects.requireNonNull(stopResolver.getStop(tsv.getId()));
+          stopsFound.add(NearbyStop.nearbyStopForState(state, stop));
         }
         if (
           OTPFeature.FlexRouting.isOn() &&
           targetVertex instanceof StreetVertex streetVertex &&
           !streetVertex.areaStops().isEmpty()
         ) {
-          for (AreaStop areaStop : ((StreetVertex) targetVertex).areaStops()) {
+          for (AreaStop areaStop : targetVertex.areaStops()) {
             // This is for a simplification, so that we only return one vertex from each
             // stop location. All vertices are added to the multimap, which is filtered
             // below, so that only the closest vertex is added to stopsFound

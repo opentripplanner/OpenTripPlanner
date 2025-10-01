@@ -91,13 +91,11 @@ class OsmBoardingLocationsModuleTest {
     var factory = new VertexFactory(graph);
 
     var provider = new DefaultOsmProvider(file, false);
-    var floatingBusVertex = factory.transitStop(
-      TransitStopVertex.of().withStop(floatingBusStop).withModes(Set.of(TransitMode.BUS))
-    );
+    var floatingBusVertex = factory.transitStop(floatingBusStop, Set.of(TransitMode.BUS));
     var floatingBoardingLocation = factory.osmBoardingLocation(
       floatingBusVertex.getCoordinate(),
       "floating-bus-stop",
-      Set.of(floatingBusVertex.getStop().getId().getId()),
+      Set.of(floatingBusVertex.getId().getId()),
       new NonLocalizedString("bus stop not connected to street network")
     );
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
@@ -109,12 +107,8 @@ class OsmBoardingLocationsModuleTest {
 
     osmModule.buildGraph();
 
-    var platformVertex = factory.transitStop(
-      TransitStopVertex.of().withStop(platform).withModes(Set.of(TransitMode.RAIL))
-    );
-    var busVertex = factory.transitStop(
-      TransitStopVertex.of().withStop(busStop).withModes(Set.of(TransitMode.BUS))
-    );
+    var platformVertex = factory.transitStop(platform, Set.of(TransitMode.RAIL));
+    var busVertex = factory.transitStop(busStop, Set.of(TransitMode.BUS));
 
     timetableRepository.index();
     graph.index();
@@ -126,7 +120,12 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getOutgoing().size());
 
     var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
-    new OsmBoardingLocationsModule(graph, TestVertexLinker.of(graph), osmService).buildGraph();
+    new OsmBoardingLocationsModule(
+      graph,
+      testModel.siteRepositoryBuilder().build(),
+      TestVertexLinker.of(graph),
+      osmService
+    ).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module
@@ -251,7 +250,7 @@ class OsmBoardingLocationsModuleTest {
        */
       TransitStopVertex getPlatformVertex() {
         if (platformVertex == null) {
-          platformVertex = factory.transitStop(TransitStopVertex.of().withStop(platform));
+          platformVertex = factory.transitStop(platform, Set.of());
         }
         return platformVertex;
       }
@@ -301,6 +300,7 @@ class OsmBoardingLocationsModuleTest {
 
     new OsmBoardingLocationsModule(
       graph,
+      testModel.siteRepositoryBuilder().build(),
       TestVertexLinker.of(graph),
       new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();

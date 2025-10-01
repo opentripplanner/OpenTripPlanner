@@ -46,8 +46,8 @@ public class DefaultRoutingServiceTest extends GtfsTest {
   public void testIdLookup() {
     /* Graph vertices */
     for (Vertex vertex : graph.getVertices()) {
-      if (vertex instanceof TransitStopVertex) {
-        RegularStop stop = ((TransitStopVertex) vertex).getStop();
+      if (vertex instanceof TransitStopVertex tsv) {
+        RegularStop stop = timetableRepository.getSiteRepository().getRegularStop(tsv.getId());
         Vertex index_vertex = graph.getStopVertex(stop.getId());
         assertEquals(index_vertex, vertex);
       }

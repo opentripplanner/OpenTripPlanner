@@ -14,7 +14,10 @@ class StreetIndexTest {
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
   private final RegularStop stop = testModel.stop("A").build();
-  private final TransitStopVertex stopVertex = TransitStopVertex.of().withStop(stop).build();
+  private final TransitStopVertex stopVertex = TransitStopVertex.of()
+    .withId(stop.getId())
+    .withPoint(stop.getGeometry())
+    .build();
   private final Station station = testModel
     .station("OMEGA")
     .withShouldRouteToCentroid(true)

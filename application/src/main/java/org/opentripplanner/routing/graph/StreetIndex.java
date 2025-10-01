@@ -153,7 +153,7 @@ class StreetIndex {
     var vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var map = new HashMap<FeedScopedId, TransitStopVertex>();
     for (TransitStopVertex it : vertices) {
-      map.put(it.getStop().getId(), it);
+      map.put(it.getId(), it);
     }
     return Map.copyOf(map);
   }

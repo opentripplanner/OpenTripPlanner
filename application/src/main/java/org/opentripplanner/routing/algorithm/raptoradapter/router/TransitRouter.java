@@ -62,6 +62,7 @@ public class TransitRouter {
   private final AdditionalSearchDays additionalSearchDays;
   private final TemporaryVerticesContainer temporaryVerticesContainer;
   private final ViaCoordinateTransferFactory viaTransferResolver;
+  private final AccessEgressRouter accessEgressRouter;
 
   private TransitRouter(
     RouteRequest request,
@@ -79,6 +80,9 @@ public class TransitRouter {
     this.debugTimingAggregator = debugTimingAggregator;
     this.temporaryVerticesContainer = createTemporaryVerticesContainer(request, serverContext);
     this.viaTransferResolver = serverContext.viaTransferResolver();
+    this.accessEgressRouter = new AccessEgressRouter(
+      serverContext.transitService()::getRegularStop
+    );
   }
 
   public static TransitRouterResult route(
@@ -270,7 +274,7 @@ public class TransitRouter {
     Duration durationLimit = accessEgressPreferences.maxDuration().valueOf(mode);
     int stopCountLimit = accessEgressPreferences.maxStopCountLimit().limitForMode(mode);
 
-    var nearbyStops = AccessEgressRouter.findAccessEgresses(
+    var nearbyStops = accessEgressRouter.findAccessEgresses(
       accessRequest,
       temporaryVerticesContainer,
       streetRequest,
@@ -288,6 +292,7 @@ public class TransitRouter {
     if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
       var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
         accessRequest,
+        accessEgressRouter,
         temporaryVerticesContainer,
         serverContext,
         additionalSearchDays,

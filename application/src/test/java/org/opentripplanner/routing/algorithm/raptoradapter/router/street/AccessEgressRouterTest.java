@@ -269,7 +269,9 @@ class AccessEgressRouterTest extends GraphRoutingTest {
         StreetMode.WALK
       )
     ) {
-      return AccessEgressRouter.findAccessEgresses(
+      return new AccessEgressRouter(
+        timetableRepository.getSiteRepository()::getRegularStop
+      ).findAccessEgresses(
         request,
         verticesContainer,
         StreetRequest.DEFAULT,

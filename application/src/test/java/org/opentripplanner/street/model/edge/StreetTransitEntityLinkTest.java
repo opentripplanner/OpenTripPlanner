@@ -89,7 +89,11 @@ class StreetTransitEntityLinkTest {
 
     private State[] traverse(RegularStop stop, boolean onlyAccessible) {
       var from = StreetModelForTest.intersectionVertex("A", 10, 10);
-      var to = TransitStopVertex.of().withStop(stop).withModes(Set.of(TransitMode.RAIL)).build();
+      var to = TransitStopVertex.of()
+        .withId(stop.getId())
+        .withPoint(stop.getGeometry())
+        .withModes(Set.of(TransitMode.RAIL))
+        .build();
 
       var req = StreetSearchRequest.of().withMode(StreetMode.BIKE);
       AccessibilityPreferences feature;
@@ -160,7 +164,10 @@ class StreetTransitEntityLinkTest {
     }
 
     private void testTraversalWithState(State state, boolean canTraverse) {
-      var transitStopVertex = TransitStopVertex.of().withStop(ACCESSIBLE_STOP).build();
+      var transitStopVertex = TransitStopVertex.of()
+        .withId(ACCESSIBLE_STOP.getId())
+        .withPoint(ACCESSIBLE_STOP.getGeometry())
+        .build();
       var edge = StreetTransitStopLink.createStreetTransitStopLink(
         (StreetVertex) state.getVertex(),
         transitStopVertex

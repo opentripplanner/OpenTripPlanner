@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
@@ -285,9 +286,8 @@ public abstract class GraphRoutingTest {
       double longitude,
       @Nullable Station parentStation
     ) {
-      return vertexFactory.transitStop(
-        TransitStopVertex.of().withStop(stopEntity(id, latitude, longitude, parentStation))
-      );
+      var stop = stopEntity(id, latitude, longitude, parentStation);
+      return vertexFactory.transitStop(stop, Set.of());
     }
 
     public TransitEntranceVertex entrance(String id, double latitude, double longitude) {
@@ -501,13 +501,15 @@ public abstract class GraphRoutingTest {
 
     public StopTime st(TransitStopVertex s1) {
       var st = new StopTime();
-      st.setStop(s1.getStop());
+      var stop = timetableRepository.getSiteRepository().getRegularStop(s1.getId());
+      st.setStop(stop);
       return st;
     }
 
     public StopTime st(TransitStopVertex s1, boolean board, boolean alight) {
       var st = new StopTime();
-      st.setStop(s1.getStop());
+      var stop = timetableRepository.getSiteRepository().getRegularStop(s1.getId());
+      st.setStop(stop);
       st.setPickupType(board ? PickDrop.SCHEDULED : PickDrop.NONE);
       st.setDropOffType(alight ? PickDrop.SCHEDULED : PickDrop.NONE);
       return st;

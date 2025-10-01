@@ -153,8 +153,8 @@ public class TestHalfEdges {
     siteRepositoryBuilder.withRegularStop(s1).withRegularStop(s2);
     timetableRepository = new TimetableRepository(siteRepositoryBuilder.build(), deduplicator);
 
-    station1 = factory.transitStop(TransitStopVertex.of().withStop(s1));
-    station2 = factory.transitStop(TransitStopVertex.of().withStop(s2));
+    station1 = factory.transitStop(s1, Set.of());
+    station2 = factory.transitStop(s2, Set.of());
     station1.addMode(TransitMode.RAIL);
     station2.addMode(TransitMode.RAIL);
 
