@@ -138,16 +138,16 @@ public class LegacyRouteRequestMapper {
         callWith.argument("alightSlack", tr::withDefaultAlightSlackSec);
         callWith.argument(
           "preferred.otherThanPreferredRoutesPenalty",
-          tr::setOtherThanPreferredRoutesPenalty
+          tr::withOtherThanPreferredRoutesPenalty
         );
         // This is deprecated, if both are set, the proper one will override this
         callWith.argument("unpreferred.useUnpreferredRoutesPenalty", (Integer v) ->
-          tr.setUnpreferredCost(CostLinearFunction.of(Duration.ofSeconds(v), 0.0))
+          tr.withUnpreferredCost(CostLinearFunction.of(Duration.ofSeconds(v), 0.0))
         );
-        callWith.argument("unpreferred.unpreferredCost", tr::setUnpreferredCostString);
-        callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
+        callWith.argument("unpreferred.unpreferredCost", tr::withUnpreferredCostString);
+        callWith.argument("ignoreRealtimeUpdates", tr::withIgnoreRealtimeUpdates);
         callWith.argument("modeWeight", (Map<String, Object> modeWeights) ->
-          tr.setReluctanceForMode(
+          tr.withReluctanceForMode(
             modeWeights
               .entrySet()
               .stream()
