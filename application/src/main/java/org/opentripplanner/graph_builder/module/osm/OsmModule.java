@@ -141,6 +141,10 @@ public class OsmModule implements GraphBuilderModule {
     LOG.info("Building street graph from OSM");
     build(osmdb, vertexGenerator);
     graph.hasStreets = true;
+    initStreetLimitationParameters();
+  }
+
+  private void initStreetLimitationParameters() {
     float maxCarSpeed = getMaxCarSpeed();
     LOG.info("Maximum car speed in graph: {} m/s", maxCarSpeed);
     streetLimitationParameters.initMaxCarSpeed(maxCarSpeed);
