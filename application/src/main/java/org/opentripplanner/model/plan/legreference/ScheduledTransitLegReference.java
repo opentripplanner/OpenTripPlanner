@@ -17,6 +17,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.lang.ObjectUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public record ScheduledTransitLegReference(
   private static final Logger LOG = LoggerFactory.getLogger(ScheduledTransitLegReference.class);
 
   public ScheduledTransitLegReference {
-    if ((tripId == null) == (tripOnServiceDateId == null)) {
+    if (!ObjectUtils.oneOf(tripId, tripOnServiceDateId)) {
       throw new IllegalArgumentException(
         "ScheduledTransitLegReference must contain either a Trip id or a TripOnServiceDate id but not both."
       );
