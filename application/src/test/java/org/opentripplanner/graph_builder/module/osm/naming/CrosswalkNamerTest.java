@@ -99,7 +99,6 @@ class CrosswalkNamerTest {
     CrosswalkNamer namer = new CrosswalkNamer();
     builder.recordEdges(namer);
     assertEquals(1, namer.getUnnamedCrosswalks().size());
-    assertEquals(2, namer.getStreets().size());
 
     namer.postprocess();
     assertEquals(String.format("crossing over %s", name), crosswalk.edge.getName().toString());

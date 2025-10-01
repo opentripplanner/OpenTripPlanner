@@ -9,6 +9,18 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
+import org.geotools.api.referencing.operation.TransformException;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.operation.buffer.BufferParameters;
+import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
@@ -39,9 +51,11 @@ import org.slf4j.LoggerFactory;
 public class CrosswalkNamer implements EdgeNamer {
 
   private static final Logger LOG = LoggerFactory.getLogger(CrosswalkNamer.class);
+  private static final int BUFFER_METERS = 25;
 
-  private Collection<OsmWay> streets = new ArrayList<>();
+  private HashGridSpatialIndex<EdgeOnLevel> streetEdges = new HashGridSpatialIndex<>();
   private Collection<EdgeOnLevel> unnamedCrosswalks = new ArrayList<>();
+  private PreciseBuffer preciseBuffer;
 
   @Override
   public I18NString name(OsmEntity way) {
@@ -61,7 +75,14 @@ public class CrosswalkNamer implements EdgeNamer {
       else if (
         !osmWay.isFootway() && (way.isNamed() || osmWay.isServiceRoad() || isTurnLane(osmWay))
       ) {
-        streets.add(osmWay);
+        // We generate two edges for each osm way: one there and one back. This spatial index only
+        // needs to contain one item for each road segment with a unique geometry and name, so we
+        // add only one of the two edges.
+        var edge = pair.pickAny();
+        streetEdges.insert(
+          edge.getGeometry().getEnvelopeInternal(),
+          new EdgeOnLevel(osmWay, edge, way.getLevels())
+        );
       }
     }
   }
@@ -73,6 +94,8 @@ public class CrosswalkNamer implements EdgeNamer {
       500,
       unnamedCrosswalks.size()
     );
+
+    this.preciseBuffer = new PreciseBuffer(computeEnvelopeCenter(), BUFFER_METERS);
 
     final AtomicInteger namesApplied = new AtomicInteger(0);
     unnamedCrosswalks
@@ -95,7 +118,7 @@ public class CrosswalkNamer implements EdgeNamer {
     LOG.info(progress.completeMessage());
 
     // Set the indices to null so they can be garbage-collected
-    streets = null;
+    streetEdges = null;
     unnamedCrosswalks = null;
   }
 
@@ -104,7 +127,15 @@ public class CrosswalkNamer implements EdgeNamer {
    */
   private void assignNameToCrosswalk(EdgeOnLevel crosswalkOnLevel, AtomicInteger namesApplied) {
     var crosswalk = crosswalkOnLevel.edge;
-    var crossStreetOpt = getIntersectingStreet(crosswalkOnLevel.way, streets);
+    var buffer = preciseBuffer.preciseBuffer(crosswalk.getGeometry());
+
+    var candidates = streetEdges
+      .query(buffer.getEnvelopeInternal())
+      .stream()
+      .map(e -> e.way)
+      .toList();
+
+    var crossStreetOpt = getIntersectingStreet(crosswalkOnLevel.way, candidates);
 
     if (crossStreetOpt.isPresent()) {
       OsmWay crossStreet = crossStreetOpt.get();
@@ -154,9 +185,62 @@ public class CrosswalkNamer implements EdgeNamer {
     return unnamedCrosswalks;
   }
 
-  public Collection<OsmWay> getStreets() {
-    return streets;
+  /**
+   * Compute the centroid of all sidewalk edges.
+   */
+  private Coordinate computeEnvelopeCenter() {
+    var envelope = new Envelope();
+    unnamedCrosswalks.forEach(e -> {
+      envelope.expandToInclude(e.edge.getFromVertex().getCoordinate());
+      envelope.expandToInclude(e.edge.getToVertex().getCoordinate());
+    });
+    return envelope.centre();
   }
 
   public record EdgeOnLevel(OsmWay way, StreetEdge edge, Set<String> levels) {}
+
+  /**
+   * A class to cache the expensive construction of a Universal Traverse Mercator coordinate
+   * reference system.
+   * Re-using the same CRS for all edges might introduce tiny imprecisions for OTPs use cases
+   * but speeds up the processing enormously and is a price well worth paying.
+   */
+  private static final class PreciseBuffer {
+
+    private final double distanceInMeters;
+    private final MathTransform toTransform;
+    private final MathTransform fromTransform;
+
+    private PreciseBuffer(Coordinate coordinate, double distanceInMeters) {
+      this.distanceInMeters = distanceInMeters;
+      String code = "AUTO:42001,%s,%s".formatted(coordinate.x, coordinate.y);
+      try {
+        CoordinateReferenceSystem auto = CRS.decode(code);
+        this.toTransform = CRS.findMathTransform(DefaultGeographicCRS.WGS84, auto);
+        this.fromTransform = CRS.findMathTransform(auto, DefaultGeographicCRS.WGS84);
+      } catch (FactoryException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    /**
+     * Add a buffer around a geometry that makes sure that the buffer is the same distance (in
+     * meters) anywhere on earth.
+     * <p>
+     * Background: If you call the regular buffer() method on a JTS geometry that uses WGS84 as the
+     * coordinate reference system, the buffer will be accurate at the equator but will become more
+     * and more elongated the farther north/south you go.
+     * <p>
+     * Taken from https://stackoverflow.com/questions/36455020
+     */
+    private Geometry preciseBuffer(Geometry geometry) {
+      try {
+        Geometry pGeom = JTS.transform(geometry, toTransform);
+        Geometry pBufferedGeom = pGeom.buffer(distanceInMeters, 4, BufferParameters.CAP_FLAT);
+        return JTS.transform(pBufferedGeom, fromTransform);
+      } catch (TransformException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
 }
