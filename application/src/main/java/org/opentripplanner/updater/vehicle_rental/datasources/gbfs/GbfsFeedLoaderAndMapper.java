@@ -1,10 +1,12 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.gbfs;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.json.JsonUtils;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
@@ -36,8 +38,15 @@ public class GbfsFeedLoaderAndMapper {
       throw new UpdaterConstructionException("Invalid url " + params.url());
     }
 
+    JsonNode gbfsNode;
     var client = otpHttpClientFactory.create(LOG);
-    var gbfsNode = client.getAndMapAsJsonNode(uri, Map.of(), new ObjectMapper());
+
+    try {
+      gbfsNode = client.getAndMapAsJsonNode(uri, Map.of(), new ObjectMapper());
+    } catch (OtpHttpClientException e) {
+      throw new UpdaterConstructionException(e);
+    }
+
     var gbfsFeedVersion = JsonUtils.asText(gbfsNode, "version").orElse(null);
 
     switch (gbfsFeedVersion) {
