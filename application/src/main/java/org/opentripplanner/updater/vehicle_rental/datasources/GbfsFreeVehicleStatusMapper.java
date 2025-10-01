@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSRentalUris;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -46,22 +47,6 @@ public class GbfsFreeVehicleStatusMapper {
       vehicle.getLon() != null &&
       vehicle.getLat() != null
     ) {
-      VehicleRentalVehicle rentalVehicle = new VehicleRentalVehicle();
-      rentalVehicle.id = new FeedScopedId(system.systemId, vehicle.getBikeId());
-      rentalVehicle.system = system;
-      rentalVehicle.name = new NonLocalizedString(getName(vehicle));
-      rentalVehicle.longitude = vehicle.getLon();
-      rentalVehicle.latitude = vehicle.getLat();
-      rentalVehicle.vehicleType = vehicleTypes.getOrDefault(
-        vehicle.getVehicleTypeId(),
-        RentalVehicleType.getDefaultType(system.systemId)
-      );
-      rentalVehicle.isReserved = vehicle.getIsReserved() != null ? vehicle.getIsReserved() : false;
-      rentalVehicle.isDisabled = vehicle.getIsDisabled() != null ? vehicle.getIsDisabled() : false;
-      rentalVehicle.lastReported = vehicle.getLastReported() != null
-        ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
-        : null;
-
       var fuelRatio = Ratio.ofBoxed(vehicle.getCurrentFuelPercent(), validationErrorMessage ->
         LOG_THROTTLE.throttle(() ->
           LOG.warn("'currentFuelPercent' is not valid. Details: {}", validationErrorMessage)
@@ -76,44 +61,67 @@ public class GbfsFreeVehicleStatusMapper {
           )
         );
       }).orElse(null);
+
       // if the propulsion type has an engine current_range_meters is required
       if (
         vehicle.getVehicleTypeId() != null &&
         vehicleTypes.get(vehicle.getVehicleTypeId()) != null &&
-        vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType !=
+        vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType() !=
         RentalVehicleType.PropulsionType.HUMAN &&
         rangeMeters == null
       ) {
         return null;
       }
-      rentalVehicle.fuel = new RentalVehicleFuel(fuelRatio, rangeMeters);
+
+      var builder = VehicleRentalVehicle.of()
+        .withId(new FeedScopedId(system.systemId(), vehicle.getBikeId()))
+        .withSystem(system)
+        .withName(getName(vehicle))
+        .withLongitude(vehicle.getLon())
+        .withLatitude(vehicle.getLat())
+        .withVehicleType(
+          vehicleTypes.getOrDefault(
+            vehicle.getVehicleTypeId(),
+            RentalVehicleType.getDefaultType(system.systemId())
+          )
+        )
+        .withIsReserved(vehicle.getIsReserved() != null ? vehicle.getIsReserved() : false)
+        .withIsDisabled(vehicle.getIsDisabled() != null ? vehicle.getIsDisabled() : false)
+        .withFuel(RentalVehicleFuel.of().withPercent(fuelRatio).withRange(rangeMeters).build());
+
       String availableUntil = vehicle.getAvailableUntil();
       if (StringUtils.hasValue(availableUntil)) {
-        rentalVehicle.availableUntil = OffsetDateTime.parse(availableUntil);
+        builder.withAvailableUntil(OffsetDateTime.parse(availableUntil));
       }
-      rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
+
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
       if (rentalUris != null) {
         String androidUri = rentalUris.getAndroid();
         String iosUri = rentalUris.getIos();
         String webUri = rentalUris.getWeb();
-        rentalVehicle.rentalUris = new VehicleRentalStationUris(androidUri, iosUri, webUri);
+        builder.withRentalUris(
+          VehicleRentalStationUris.of()
+            .withAndroid(androidUri)
+            .withIos(iosUri)
+            .withWeb(webUri)
+            .build()
+        );
       }
 
-      return rentalVehicle;
+      return builder.build();
     } else {
       return null;
     }
   }
 
-  private String getName(GBFSBike vehicle) {
+  private I18NString getName(GBFSBike vehicle) {
     var typeId = vehicle.getVehicleTypeId();
     if (typeId != null) {
       var type = vehicleTypes.get(typeId);
-      if (type != null && type.name != null) {
-        return type.name;
+      if (type != null && type.name() != null) {
+        return type.name();
       }
     }
-    return RentalVehicleType.getDefaultType(system.systemId).name;
+    return RentalVehicleType.getDefaultType(system.systemId()).name();
   }
 }

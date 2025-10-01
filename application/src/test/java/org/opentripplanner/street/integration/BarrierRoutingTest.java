@@ -20,6 +20,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.leg.StreetLeg;
@@ -182,7 +183,15 @@ public class BarrierRoutingTest {
 
     options.accept(builder);
 
-    var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, streetMode, streetMode);
+    var temporaryVertices = new TemporaryVerticesContainer(
+      graph,
+      TestVertexLinker.of(graph),
+      id -> List.of(),
+      from,
+      to,
+      streetMode,
+      streetMode
+    );
     var gpf = new GraphPathFinder(null);
     var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), temporaryVertices);
 

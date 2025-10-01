@@ -381,6 +381,8 @@ public class TransitRouter {
   ) {
     return new TemporaryVerticesContainer(
       serverContext.graph(),
+      serverContext.vertexLinker(),
+      serverContext.transitService()::findStopOrChildIds,
       request.from(),
       request.to(),
       request.journey().access().mode(),

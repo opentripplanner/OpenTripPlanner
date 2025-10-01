@@ -5,6 +5,8 @@ import static org.opentripplanner.model.PickDrop.NONE;
 
 import java.util.List;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -38,16 +40,11 @@ public final class StopTime implements Comparable<StopTime> {
 
   private List<String> headsignVias;
 
-  private String routeShortName;
-
   private PickDrop pickupType = PickDrop.SCHEDULED;
 
   private PickDrop dropOffType = PickDrop.SCHEDULED;
 
   private double shapeDistTraveled = MISSING_VALUE;
-
-  /** This is a Conveyal extension to the GTFS spec to support Seattle on/off peak fares. */
-  private String farePeriodId;
 
   private int flexWindowStart = MISSING_VALUE;
 
@@ -155,14 +152,6 @@ public final class StopTime implements Comparable<StopTime> {
     this.stopHeadsign = headSign;
   }
 
-  public String getRouteShortName() {
-    return routeShortName;
-  }
-
-  public void setRouteShortName(String routeShortName) {
-    this.routeShortName = routeShortName;
-  }
-
   public PickDrop getPickupType() {
     return pickupType;
   }
@@ -217,16 +206,8 @@ public final class StopTime implements Comparable<StopTime> {
     return getAvailableTime(getFlexWindowEnd(), getArrivalTime());
   }
 
-  public PickDrop getFlexContinuousPickup() {
-    return flexContinuousPickup;
-  }
-
   public void setFlexContinuousPickup(PickDrop flexContinuousPickup) {
     this.flexContinuousPickup = flexContinuousPickup;
-  }
-
-  public PickDrop getFlexContinuousDropOff() {
-    return flexContinuousDropOff;
   }
 
   public void setFlexContinuousDropOff(PickDrop flexContinuousDropOff) {
@@ -259,11 +240,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   public int compareTo(StopTime o) {
     return this.getStopSequence() - o.getStopSequence();
-  }
-
-  public void cancel() {
-    pickupType = PickDrop.CANCELLED;
-    dropOffType = PickDrop.CANCELLED;
   }
 
   @Override
@@ -310,5 +286,12 @@ public final class StopTime implements Comparable<StopTime> {
 
   public boolean hasContinuousStopping() {
     return this.flexContinuousPickup != NONE || flexContinuousDropOff != NONE;
+  }
+
+  /**
+   * Does this stop time define either an area stop or a group of stops?
+   */
+  public boolean hasFlexibleStop() {
+    return stop instanceof AreaStop || stop instanceof GroupStop;
   }
 }

@@ -1,8 +1,12 @@
 package org.opentripplanner.osm.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
@@ -106,40 +110,83 @@ public class OsmWayTest {
 
   @Test
   void testIsOneWayDriving() {
-    OsmWay way = new OsmWay();
-    assertFalse(way.isOneWayForwardDriving());
-    assertFalse(way.isOneWayReverseDriving());
-
-    way.addTag("oneway", "notatagvalue");
-    assertFalse(way.isOneWayForwardDriving());
-    assertFalse(way.isOneWayReverseDriving());
-
-    way.addTag("oneway", "1");
-    assertTrue(way.isOneWayForwardDriving());
-    assertFalse(way.isOneWayReverseDriving());
-
-    way.addTag("oneway", "-1");
-    assertFalse(way.isOneWayForwardDriving());
-    assertTrue(way.isOneWayReverseDriving());
+    assertEquals(Optional.empty(), new OsmWay().isOneWay("motorcar"));
+    assertEquals(
+      Optional.empty(),
+      new OsmWay().addTag("oneway", "notatagvalue").isOneWay("motorcar")
+    );
+    assertEquals(Optional.empty(), new OsmWay().addTag("oneway", "no").isOneWay("motorcar"));
+    assertEquals(Optional.of(FORWARD), new OsmWay().addTag("oneway", "1").isOneWay("motorcar"));
+    assertEquals(Optional.of(FORWARD), new OsmWay().addTag("oneway", "true").isOneWay("motorcar"));
+    assertEquals(Optional.of(BACKWARD), new OsmWay().addTag("oneway", "-1").isOneWay("motorcar"));
+    assertEquals(
+      Optional.of(FORWARD),
+      new OsmWay().addTag("junction", "roundabout").isOneWay("motorcar")
+    );
+    assertEquals(
+      Optional.of(FORWARD),
+      new OsmWay().addTag("highway", "motorway").isOneWay("motorcar")
+    );
   }
 
   @Test
   void testIsOneWayBicycle() {
-    OsmWay way = new OsmWay();
-    assertFalse(way.isOneWayForwardBicycle());
-    assertFalse(way.isOneWayReverseBicycle());
+    assertEquals(Optional.empty(), new OsmWay().isOneWay("bicycle"));
+    assertEquals(
+      Optional.empty(),
+      new OsmWay().addTag("oneway", "notatagvalue").isOneWay("bicycle")
+    );
+    assertEquals(Optional.empty(), new OsmWay().addTag("oneway", "no").isOneWay("bicycle"));
+    assertEquals(Optional.of(FORWARD), new OsmWay().addTag("oneway", "1").isOneWay("bicycle"));
+    assertEquals(Optional.of(FORWARD), new OsmWay().addTag("oneway", "true").isOneWay("bicycle"));
+    assertEquals(Optional.of(BACKWARD), new OsmWay().addTag("oneway", "-1").isOneWay("bicycle"));
+    assertEquals(
+      Optional.of(FORWARD),
+      new OsmWay().addTag("junction", "roundabout").isOneWay("bicycle")
+    );
 
-    way.addTag("oneway:bicycle", "notatagvalue");
-    assertFalse(way.isOneWayForwardBicycle());
-    assertFalse(way.isOneWayReverseBicycle());
+    assertEquals(
+      Optional.empty(),
+      new OsmWay().addTag("oneway", "yes").addTag("oneway:bicycle", "no").isOneWay("bicycle")
+    );
+    assertEquals(
+      Optional.of(FORWARD),
+      new OsmWay().addTag("oneway", "no").addTag("oneway:bicycle", "yes").isOneWay("bicycle")
+    );
+    assertEquals(
+      Optional.empty(),
+      new OsmWay().addTag("oneway", "yes").addTag("bicycle:backward", "yes").isOneWay("bicycle")
+    );
+    assertEquals(
+      Optional.empty(),
+      new OsmWay().addTag("oneway", "yes").addTag("cycleway", "opposite").isOneWay("bicycle")
+    );
+    assertEquals(
+      Optional.empty(),
+      new OsmWay().addTag("oneway", "yes").addTag("cycleway", "opposite_lane").isOneWay("bicycle")
+    );
+  }
 
-    way.addTag("oneway:bicycle", "1");
-    assertTrue(way.isOneWayForwardBicycle());
-    assertFalse(way.isOneWayReverseBicycle());
+  @Test
+  void testIsOneWayFoot() {
+    assertEquals(Optional.empty(), new OsmWay().isOneWay("foot"));
+    assertEquals(Optional.empty(), new OsmWay().addTag("oneway", "notatagvalue").isOneWay("foot"));
+    assertEquals(Optional.empty(), new OsmWay().addTag("oneway", "no").isOneWay("foot"));
+    assertEquals(Optional.empty(), new OsmWay().addTag("oneway", "1").isOneWay("foot"));
+    assertEquals(Optional.empty(), new OsmWay().addTag("oneway", "true").isOneWay("foot"));
+    assertEquals(Optional.empty(), new OsmWay().addTag("oneway", "-1").isOneWay("foot"));
+    assertEquals(Optional.empty(), new OsmWay().addTag("junction", "roundabout").isOneWay("foot"));
 
-    way.addTag("oneway:bicycle", "-1");
-    assertFalse(way.isOneWayForwardBicycle());
-    assertTrue(way.isOneWayReverseBicycle());
+    assertEquals(Optional.of(FORWARD), new OsmWay().addTag("oneway:foot", "yes").isOneWay("foot"));
+    assertEquals(Optional.of(BACKWARD), new OsmWay().addTag("oneway:foot", "-1").isOneWay("foot"));
+    assertEquals(
+      Optional.of(FORWARD),
+      new OsmWay().addTag("highway", "footway").addTag("oneway", "yes").isOneWay("foot")
+    );
+    assertEquals(
+      Optional.of(BACKWARD),
+      new OsmWay().addTag("highway", "footway").addTag("oneway", "-1").isOneWay("foot")
+    );
   }
 
   @Test
@@ -163,7 +210,7 @@ public class OsmWayTest {
 
   @Test
   void escalator() {
-    assertFalse(WayTestData.cycleway().isEscalator());
+    assertFalse(WayTestData.highwayWithCycleLane().isEscalator());
 
     var escalator = new OsmWay();
     escalator.addTag("highway", "steps");
@@ -174,6 +221,32 @@ public class OsmWayTest {
 
     escalator.addTag("conveying", "whoknows?");
     assertFalse(escalator.isEscalator());
+  }
+
+  @Test
+  void isRelevantForRouting() {
+    var way = new OsmWay();
+    way.addTag("highway", "residential");
+    assertTrue(way.isRelevantForRouting());
+    way.addTag("access", "no");
+    assertFalse(way.isRelevantForRouting());
+
+    way = new OsmWay();
+    way.addTag("amenity", "parking");
+    way.addTag("area", "yes");
+    assertFalse(way.isRelevantForRouting());
+    way.addTag("park_ride", "train");
+    assertTrue(way.isRelevantForRouting());
+
+    way = new OsmWay();
+    way.addTag("amenity", "bicycle_parking");
+    way.addTag("area", "yes");
+    assertTrue(way.isRelevantForRouting());
+
+    way = new OsmWay();
+    way.addTag("public_transport", "platform");
+    way.addTag("area", "yes");
+    assertTrue(way.isRelevantForRouting());
   }
 
   private OsmWay getClosedPolygon() {

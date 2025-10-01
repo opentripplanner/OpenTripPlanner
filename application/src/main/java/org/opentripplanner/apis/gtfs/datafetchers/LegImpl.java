@@ -12,11 +12,13 @@ import org.opentripplanner.apis.gtfs.mapping.LocalDateMapper;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
 import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
+import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.filter.StopArrivalByTypeFilter;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.leg.LegCallTime;
@@ -33,6 +35,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.service.TransitService;
 
 public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
@@ -93,8 +96,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<Iterable<FareProductUse>> fareProducts() {
-    return environment -> getSource(environment).fareProducts();
+  public DataFetcher<Iterable<FareOffer>> fareProducts() {
+    return environment -> getSource(environment).fareOffers();
   }
 
   @Override
@@ -247,6 +250,15 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
+  public DataFetcher<Iterable<TripTimeOnDate>> stopCalls() {
+    return env -> {
+      var leg = getSource(env);
+      var service = new ApiTransitService(transitService(env));
+      return service.findStopCalls(leg);
+    };
+  }
+
+  @Override
   public DataFetcher<StopArrival> to() {
     return environment -> {
       Leg source = getSource(environment);
@@ -273,10 +285,6 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<Boolean> walkingBike() {
     return environment -> getSource(environment).walkingBike();
-  }
-
-  private Leg getSource(DataFetchingEnvironment environment) {
-    return environment.getSource();
   }
 
   @Override
@@ -346,5 +354,13 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       }
       return LegReferenceSerializer.encode(ref);
     };
+  }
+
+  private Leg getSource(DataFetchingEnvironment environment) {
+    return environment.getSource();
+  }
+
+  private TransitService transitService(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().transitService();
   }
 }

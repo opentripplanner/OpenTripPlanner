@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -59,15 +60,24 @@ class WalkRoutingTest {
     var end = GenericLocation.fromCoordinate(59.94641, 10.77522);
     var base = dateTime.truncatedTo(ChronoUnit.SECONDS);
     var time = base.plusMillis(offset);
-    var results = route(roundabout, start, end, time, true);
-    assertEquals(1, results.size());
-    var states = results.get(0).states;
-    var diff = ChronoUnit.MILLIS.between(
-      states.getFirst().getTimeAccurate(),
-      states.getLast().getTimeAccurate()
+    var forwardResults = route(roundabout, start, end, time, false);
+    assertEquals(1, forwardResults.size());
+    var forwardStates = forwardResults.getFirst().states;
+    var forwardDiff = ChronoUnit.MILLIS.between(
+      forwardStates.getFirst().getTimeAccurate(),
+      forwardStates.getLast().getTimeAccurate()
+    );
+    var backwardResults = route(roundabout, start, end, time, true);
+    assertEquals(1, backwardResults.size());
+    var backwardStates = forwardResults.getFirst().states;
+    var backwardDiff = ChronoUnit.MILLIS.between(
+      backwardStates.getFirst().getTimeAccurate(),
+      backwardStates.getLast().getTimeAccurate()
     );
     // should be same for every parametrized offset, otherwise irrelevant
-    assertEquals(13926, diff);
+    int expected = 11483;
+    assertEquals(expected, forwardDiff);
+    assertEquals(expected, backwardDiff);
   }
 
   private static List<GraphPath<State, Edge, Vertex>> route(
@@ -87,6 +97,8 @@ class WalkRoutingTest {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
+        TestVertexLinker.of(graph),
+        id -> List.of(),
         request.from(),
         request.to(),
         request.journey().direct().mode(),

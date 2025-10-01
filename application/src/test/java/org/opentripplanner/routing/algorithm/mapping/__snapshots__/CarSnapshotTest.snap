@@ -280,7 +280,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "departure" : "2009-10-21T23:11:27.000+00:00",
             "lat" : 45.5325089,
             "lon" : -122.7048383,
-            "name" : "corner of path and Northwest Pettygrove Street",
+            "name" : "corner of Northwest Pettygrove Street and path",
             "vertexType" : "NORMAL"
           },
           "transitLeg" : false,
@@ -297,7 +297,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "departure" : "2009-10-21T23:11:27.000+00:00",
             "lat" : 45.5325089,
             "lon" : -122.7048383,
-            "name" : "corner of path and Northwest Pettygrove Street",
+            "name" : "corner of Northwest Pettygrove Street and path",
             "vertexType" : "NORMAL"
           },
           "generalizedCost" : 290,
@@ -475,7 +475,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "departure" : "2009-10-21T23:13:20.000+00:00",
             "lat" : 45.5325089,
             "lon" : -122.7048383,
-            "name" : "corner of path and Northwest Pettygrove Street",
+            "name" : "corner of Northwest Pettygrove Street and path",
             "vertexType" : "NORMAL"
           },
           "transitLeg" : false,
@@ -492,7 +492,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "departure" : "2009-10-21T23:13:20.000+00:00",
             "lat" : 45.5325089,
             "lon" : -122.7048383,
-            "name" : "corner of path and Northwest Pettygrove Street",
+            "name" : "corner of Northwest Pettygrove Street and path",
             "vertexType" : "NORMAL"
           },
           "generalizedCost" : 286,

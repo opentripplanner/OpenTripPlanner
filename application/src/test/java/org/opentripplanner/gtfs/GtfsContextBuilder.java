@@ -53,11 +53,10 @@ public class GtfsContextBuilder {
       feedId,
       DataImportIssueStore.NOOP,
       false,
-      gtfsImport.getDao(),
       StopTransferPriority.ALLOWED
     );
-    mapper.mapStopTripAndRouteDataIntoBuilder();
-    mapper.mapAndAddTransfersToBuilder();
+    mapper.mapStopTripAndRouteDataIntoBuilder(gtfsImport.getDao());
+    mapper.mapAndAddTransfersToBuilder(gtfsImport.getDao());
     return new GtfsContextBuilder(feedId, transitBuilder).withDataImportIssueStore(
       DataImportIssueStore.NOOP
     );
@@ -118,7 +117,6 @@ public class GtfsContextBuilder {
   private void repairStopTimesForEachTrip() {
     new ValidateAndInterpolateStopTimesForEachTrip(
       transitBuilder.getStopTimesSortedByTrip(),
-      true,
       true,
       issueStore
     ).run();

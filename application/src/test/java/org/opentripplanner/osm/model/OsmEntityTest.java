@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
+import static org.opentripplanner.osm.model.TraverseDirection.DIRECTIONLESS;
+import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -12,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -106,16 +110,16 @@ public class OsmEntityTest {
   @Test
   void testDoesAllowTagAccess() {
     OsmEntity o = new OsmEntity();
-    assertFalse(o.doesTagAllowAccess("foo"));
+    assertFalse(o.isExplicitlyAllowed("foo"));
 
     o.addTag("foo", "bar");
-    assertFalse(o.doesTagAllowAccess("foo"));
+    assertFalse(o.isExplicitlyAllowed("foo"));
 
     o.addTag("foo", "designated");
-    assertTrue(o.doesTagAllowAccess("foo"));
+    assertTrue(o.isExplicitlyAllowed("foo"));
 
     o.addTag("foo", "official");
-    assertTrue(o.doesTagAllowAccess("foo"));
+    assertTrue(o.isExplicitlyAllowed("foo"));
   }
 
   @Test
@@ -134,19 +138,47 @@ public class OsmEntityTest {
   }
 
   @Test
+  void testIsDirectionalGeneralAccessDenied() {
+    OsmEntity o = new OsmEntity();
+    o.addTag("access", "yes");
+    o.addTag("access:backward", "no");
+    assertFalse(o.isGeneralAccessDenied(DIRECTIONLESS));
+    assertFalse(o.isGeneralAccessDenied());
+    assertTrue(o.isGeneralAccessDenied(BACKWARD));
+    assertFalse(o.isGeneralAccessDenied(FORWARD));
+
+    OsmEntity p = new OsmEntity();
+    o.addTag("access", "no");
+    o.addTag("access:backward", "yes");
+    assertTrue(o.isGeneralAccessDenied(DIRECTIONLESS));
+    assertTrue(o.isGeneralAccessDenied());
+    assertFalse(o.isGeneralAccessDenied(BACKWARD));
+    assertTrue(o.isGeneralAccessDenied(FORWARD));
+  }
+
+  @Test
   void testBicycleDenied() {
     OsmEntity tags = new OsmEntity();
-    assertFalse(tags.isBicycleExplicitlyDenied());
+    assertFalse(tags.isBicycleDenied());
 
     for (var allowedValue : List.of("yes", "unknown", "somevalue")) {
       tags.addTag("bicycle", allowedValue);
-      assertFalse(tags.isBicycleExplicitlyDenied(), "bicycle=" + allowedValue);
+      assertFalse(tags.isBicycleDenied(), "bicycle=" + allowedValue);
     }
 
     for (var deniedValue : List.of("no", "dismount", "license")) {
       tags.addTag("bicycle", deniedValue);
-      assertTrue(tags.isBicycleExplicitlyDenied(), "bicycle=" + deniedValue);
+      assertTrue(tags.isBicycleDenied(), "bicycle=" + deniedValue);
     }
+  }
+
+  @Test
+  void testBicycleDeniedOnVehicleDenied() {
+    OsmEntity noVehicle = new OsmEntity();
+    noVehicle.addTag("vehicle", "no");
+    assertTrue(noVehicle.isBicycleDenied());
+    noVehicle.addTag("bicycle", "yes");
+    assertFalse(noVehicle.isBicycleDenied());
   }
 
   @Test
@@ -216,18 +248,39 @@ public class OsmEntityTest {
     assertTrue(osm3.isWheelchairAccessible());
   }
 
+  private static Stream<Arguments> barrierWheelchairAccessibilityCases() {
+    return Stream.of(
+      Arguments.of(new OsmNode().addTag("barrier", "stile"), false),
+      Arguments.of(new OsmNode().addTag("barrier", "stile").addTag("wheelchair", "yes"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb"), false),
+      // https://wiki.openstreetmap.org/wiki/Key:kerb
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "flush"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "lowered"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "no"), true),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "raised"), false),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "rolled"), false),
+      Arguments.of(new OsmNode().addTag("barrier", "kerb").addTag("kerb", "yes"), false)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("barrierWheelchairAccessibilityCases")
+  void isBarrierWheelchairAccessible(OsmEntity osm, boolean expected) {
+    assertEquals(expected, osm.isWheelchairAccessible());
+  }
+
   @Test
   void wheelchairAccessibility() {
     var osm1 = new OsmEntity();
-    assertEquals(Accessibility.NO_INFORMATION, osm1.wheelchairAccessibility());
+    assertEquals(Accessibility.NO_INFORMATION, osm1.explicitWheelchairAccessibility());
 
     var osm2 = new OsmEntity();
     osm2.addTag("wheelchair", "no");
-    assertEquals(Accessibility.NOT_POSSIBLE, osm2.wheelchairAccessibility());
+    assertEquals(Accessibility.NOT_POSSIBLE, osm2.explicitWheelchairAccessibility());
 
     var osm3 = new OsmEntity();
     osm3.addTag("wheelchair", "yes");
-    assertEquals(Accessibility.POSSIBLE, osm3.wheelchairAccessibility());
+    assertEquals(Accessibility.POSSIBLE, osm3.explicitWheelchairAccessibility());
   }
 
   @Test
@@ -235,6 +288,13 @@ public class OsmEntityTest {
     assertFalse(WayTestData.zooPlatform().isRoutable());
     assertTrue(WayTestData.indoor("area").isRoutable());
     assertFalse(WayTestData.indoor("room").isRoutable());
+
+    var highway = WayTestData.highwayWithCycleLane();
+    assertTrue(highway.isRoutable());
+    highway.addTag("access", "no");
+    assertFalse(highway.isRoutable());
+    highway.addTag("bicycle", "yes");
+    assertTrue(highway.isRoutable());
   }
 
   @Test
@@ -287,7 +347,7 @@ public class OsmEntityTest {
 
   @Test
   void fallbackName() {
-    var nameless = WayTestData.cycleway();
+    var nameless = WayTestData.highwayWithCycleLane();
     assertTrue(nameless.hasNoName());
 
     var namedTunnel = WayTestData.carTunnel();

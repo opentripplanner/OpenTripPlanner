@@ -1,3 +1,5 @@
 trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled,timepoint,continuous_pickup,continuous_drop_off,pickup_booking_rule_id,drop_off_booking_rule_id,start_pickup_drop_off_window,end_pickup_drop_off_window,mean_duration_factor,mean_duration_offset,safe_duration_factor,safe_duration_offset
 t_1289257_b_28352_tn_0,,,area_294,1,,2,2,0,0,1,1,booking_route_17102,booking_route_17102,08:00:00,23:00:00,1,9.00,1,20.00
+t_1289257_b_28352_tn_0,,,area_294,1,,2,2,0,0,1,1,booking_route_17102,booking_route_17102,08:00:00,23:00:00,1,9.00,1,20.00
+t_1289262_b_29084_tn_0,,,area_294,1,,2,2,0,0,1,1,booking_route_17102,booking_route_17102,11:00:00,23:00:00,1,9.00,1,20.00
 t_1289262_b_29084_tn_0,,,area_294,1,,2,2,0,0,1,1,booking_route_17102,booking_route_17102,11:00:00,23:00:00,1,9.00,1,20.00

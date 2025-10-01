@@ -19,9 +19,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
-import org.opentripplanner.street.model.edge.FreeEdge;
-import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
-import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
+import org.opentripplanner.street.model.vertex.ElevatorVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -105,12 +103,12 @@ class ElevatorProcessor {
         .map(Duration::toSeconds)
         .orElse(-1L);
 
-      var wheelchair = node.wheelchairAccessibility();
+      var wheelchair = node.explicitWheelchairAccessibility();
 
       createElevatorHopEdges(
         onboardVertices,
         wheelchair,
-        !node.isBicycleExplicitlyDenied(),
+        !node.isBicycleDenied(),
         levels.length,
         (int) travelTime
       );
@@ -151,12 +149,12 @@ class ElevatorProcessor {
         .map(Duration::toSeconds)
         .orElse(-1L);
       int levels = nodes.size();
-      var wheelchair = elevatorWay.wheelchairAccessibility();
+      var wheelchair = elevatorWay.explicitWheelchairAccessibility();
 
       createElevatorHopEdges(
         onboardVertices,
         wheelchair,
-        !elevatorWay.isBicycleExplicitlyDenied(),
+        !elevatorWay.isBicycleDenied(),
         levels,
         (int) travelTime
       );
@@ -172,21 +170,12 @@ class ElevatorProcessor {
     String levelName
   ) {
     var factory = new VertexFactory(graph);
-    ElevatorOffboardVertex offboardVertex = factory.elevatorOffboard(
-      sourceVertex,
-      label,
-      levelName
-    );
+    ElevatorVertex onboardVertex = factory.elevator(sourceVertex, label, levelName);
 
-    FreeEdge.createFreeEdge(sourceVertex, offboardVertex);
-    FreeEdge.createFreeEdge(offboardVertex, sourceVertex);
-
-    ElevatorOnboardVertex onboardVertex = factory.elevatorOnboard(sourceVertex, label, levelName);
-
-    ElevatorBoardEdge.createElevatorBoardEdge(offboardVertex, onboardVertex);
+    ElevatorBoardEdge.createElevatorBoardEdge(sourceVertex, onboardVertex);
     ElevatorAlightEdge.createElevatorAlightEdge(
       onboardVertex,
-      offboardVertex,
+      sourceVertex,
       new NonLocalizedString(levelName)
     );
 

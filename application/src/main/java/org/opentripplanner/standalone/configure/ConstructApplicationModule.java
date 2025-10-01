@@ -7,6 +7,8 @@ import io.micrometer.core.instrument.Metrics;
 import jakarta.inject.Singleton;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
+import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
@@ -20,6 +22,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -42,6 +45,7 @@ public class ConstructApplicationModule {
     DebugUiConfig debugUiConfig,
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
+    VertexLinker vertexLinker,
     TransitService transitService,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
@@ -53,7 +57,8 @@ public class ConstructApplicationModule {
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
     @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
-    @Nullable GraphQLSchema schema,
+    @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
+    @Nullable @TransmodelSchema GraphQLSchema transmodelSchema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
     @Nullable LuceneIndex luceneIndex,
@@ -66,6 +71,7 @@ public class ConstructApplicationModule {
     var gtfsApiConfig = routerConfig.gtfsApiParameters();
     var vectorTileConfig = routerConfig.vectorTileConfig();
     var flexParameters = routerConfig.flexParameters();
+    var transmodelAPIParameters = routerConfig.transmodelApi();
 
     return new DefaultServerRequestContext(
       debugUiConfig,
@@ -85,15 +91,18 @@ public class ConstructApplicationModule {
       vectorTileConfig,
       vehicleParkingService,
       vehicleRentalService,
+      vertexLinker,
       viaTransferResolver,
       worldEnvelopeService,
       // Optional Sandbox services
       emissionItineraryDecorator,
       luceneIndex,
-      schema,
+      gtfsSchema,
+      transmodelSchema,
       sorlandsbanenService,
       stopConsolidationService,
-      traverseVisitor
+      traverseVisitor,
+      transmodelAPIParameters
     );
   }
 

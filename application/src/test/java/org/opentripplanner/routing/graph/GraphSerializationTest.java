@@ -25,7 +25,7 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
-import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;

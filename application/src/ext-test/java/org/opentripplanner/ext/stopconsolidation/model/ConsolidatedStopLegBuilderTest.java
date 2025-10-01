@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.stopconsolidation.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.FARE_PRODUCT_USE;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.ANY_FARE_OFFER;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.LocalDate;
@@ -11,7 +11,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
@@ -40,7 +40,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
       .withEndTime(TIME)
       .withServiceDate(TIME.toLocalDate())
       .build();
-  private static final List<FareProductUse> FARES = List.of(FARE_PRODUCT_USE);
+  private static final List<FareOffer> FARES = List.of(ANY_FARE_OFFER);
 
   @Test
   void build() {
@@ -69,7 +69,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
     assertEquals(leg.from().stop, copy.from().stop);
     assertEquals(leg.to().stop, copy.to().stop);
     assertEquals(Set.of(ALERTS), copy.listTransitAlerts());
-    assertEquals(FARES, copy.fareProducts());
+    assertEquals(FARES, copy.fareOffers());
     assertEquals(ZoneIds.BERLIN, copy.zoneId());
   }
 
@@ -100,7 +100,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
     assertEquals(C.stop, copy.from().stop);
     assertEquals(G.stop, copy.to().stop);
     assertEquals(Set.of(ALERTS), copy.listTransitAlerts());
-    assertEquals(FARES, copy.fareProducts());
+    assertEquals(FARES, copy.fareOffers());
     assertEquals(ZoneIds.BERLIN, copy.zoneId());
   }
 }

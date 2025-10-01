@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -68,6 +69,9 @@ import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.linking.VisibilityMode;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -513,6 +517,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
+        new VertexLinker(
+          graph,
+          VisibilityMode.TRAVERSE_AREA_EDGES,
+          StreetConstants.DEFAULT_MAX_AREA_NODES
+        ),
+        id -> Set.of(),
         request.from(),
         request.to(),
         request.journey().direct().mode(),

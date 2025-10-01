@@ -13,11 +13,11 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
 import org.locationtech.jts.operation.valid.IsValidOp;
-import org.locationtech.jts.operation.valid.TopologyValidationError;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
  * Stores information about an OSM area needed for visibility graph construction. Algorithm based on
@@ -160,6 +160,10 @@ class OsmArea {
       return centroid;
     }
     return jtsMultiPolygon.getInteriorPoint();
+  }
+
+  public StreetTraversalPermission getPermission() {
+    return parent.getPermission();
   }
 
   private MultiPolygon calculateJTSMultiPolygon() {

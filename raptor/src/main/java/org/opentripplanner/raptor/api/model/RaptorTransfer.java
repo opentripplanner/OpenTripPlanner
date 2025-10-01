@@ -4,6 +4,7 @@ import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * Encapsulate information about a transfer path.
+ * Time dependent transfers are not supported.
  */
 public interface RaptorTransfer {
   /**
@@ -26,11 +27,6 @@ public interface RaptorTransfer {
    * the journey origin, but just stop to stop.
    */
   int durationInSeconds();
-
-  /* TIME-DEPENDENT ACCESS/TRANSFER/EGRESS */
-  // The methods below should be only overridden when a RaptorTransfer is only available at
-  // specific times, such as flexible transit, TNC or shared vehicle schemes with limited opening
-  // hours, not for regular access/transfer/egress.
 
   /** Call this from toString */
   default String asString() {

@@ -15,8 +15,8 @@ class PortlandMapper extends OsmTagMapper {
   public void populateProperties(WayPropertySet props) {
     props.setMixinProperties("footway=sidewalk", ofWalkSafety(1.1));
     props.setMixinProperties(new ExactMatchSpecifier(new Absent("name")), ofWalkSafety(1.2));
-    props.setMixinProperties("highway=trunk", ofWalkSafety(1.2));
-    props.setMixinProperties("highway=trunk_link", ofWalkSafety(1.2));
+    props.setMixinProperties("highway=trunk", ofWalkSafety(1.2 / 7.47));
+    props.setMixinProperties("highway=trunk_link", ofWalkSafety(1.2 / 7.47));
     props.setMixinProperties("highway=primary", ofWalkSafety(1.2));
     props.setMixinProperties("highway=primary_link", ofWalkSafety(1.2));
     props.setMixinProperties("highway=secondary", ofWalkSafety(1.1));
@@ -46,13 +46,13 @@ class PortlandMapper extends OsmTagMapper {
     // https://taginfo.openstreetmap.org/keys/RLIS:bicycle#overview
 
     props.setMixinProperties("RLIS:bicycle=caution_area", ofBicycleSafety(1.45));
-    props.setMixinProperties("RLIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
-    props.setMixinProperties("RLIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));
+    props.setMixinProperties("RLIS:bicycle:right=caution_area", ofBicycleSafety(1, 1.45, 1));
+    props.setMixinProperties("RLIS:bicycle:left=caution_area", ofBicycleSafety(1, 1, 1.45));
 
     // https://taginfo.openstreetmap.org/keys/CCGIS:bicycle#overview
     props.setMixinProperties("CCGIS:bicycle=caution_area", ofBicycleSafety(1.45));
-    props.setMixinProperties("CCGIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
-    props.setMixinProperties("CCGIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));
+    props.setMixinProperties("CCGIS:bicycle:right=caution_area", ofBicycleSafety(1, 1.45, 1));
+    props.setMixinProperties("CCGIS:bicycle:left=caution_area", ofBicycleSafety(1, 1, 1.45));
 
     // Max speed limit in Oregon is 70 mph ~= 113kmh ~= 31.3m/s
     props.maxPossibleCarSpeed = 31.4f;
