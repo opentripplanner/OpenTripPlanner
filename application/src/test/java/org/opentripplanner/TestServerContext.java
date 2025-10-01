@@ -55,18 +55,30 @@ public class TestServerContext {
     TimetableRepository timetableRepository,
     FareService fareService
   ) {
-    return createServerContext(graph, timetableRepository, fareService, null, null);
+    return createServerContext(
+      graph,
+      new StreetLimitationParameters(),
+      timetableRepository,
+      fareService,
+      null,
+      null
+    );
   }
 
   /** Create a context for unit testing */
   public static OtpServerRequestContext createServerContext(
     Graph graph,
+    @Nullable StreetLimitationParameters streetLimitationParameters,
     TimetableRepository timetableRepository,
     FareService fareService,
     @Nullable TimetableSnapshotManager snapshotManager,
     @Nullable RouteRequest request
   ) {
     var routerConfig = RouterConfig.DEFAULT;
+
+    if (streetLimitationParameters == null) {
+      streetLimitationParameters = new StreetLimitationParameters();
+    }
 
     if (request == null) {
       request = routerConfig.routingRequestDefaults();
@@ -104,7 +116,7 @@ public class TestServerContext {
       createRealtimeVehicleService(transitService),
       List.of(),
       request,
-      createStreetLimitationParametersService(),
+      createStreetLimitationParametersService(streetLimitationParameters),
       routerConfig.transitTuningConfig(),
       transitService,
       routerConfig.triasApiParameters(),
@@ -161,6 +173,12 @@ public class TestServerContext {
 
   public static StreetLimitationParametersService createStreetLimitationParametersService() {
     return new DefaultStreetLimitationParametersService(new StreetLimitationParameters());
+  }
+
+  public static StreetLimitationParametersService createStreetLimitationParametersService(
+    StreetLimitationParameters streetLimitationParameters
+  ) {
+    return new DefaultStreetLimitationParametersService(streetLimitationParameters);
   }
 
   public static ViaCoordinateTransferFactory createViaTransferResolver(

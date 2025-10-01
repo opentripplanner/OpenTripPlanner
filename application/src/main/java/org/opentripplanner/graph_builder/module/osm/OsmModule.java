@@ -70,7 +70,7 @@ public class OsmModule implements GraphBuilderModule {
 
   private final DataImportIssueStore issueStore;
   private final OsmProcessingParameters params;
-  private final SafetyValueNormalizer normalizer;
+  private final SafetyValueApplier safetyValueApplier;
   private final StreetLimitationParameters streetLimitationParameters;
 
   OsmModule(
@@ -88,7 +88,7 @@ public class OsmModule implements GraphBuilderModule {
     this.parkingRepository = parkingRepository;
     this.issueStore = issueStore;
     this.params = params;
-    this.normalizer = new SafetyValueNormalizer(graph, issueStore);
+    this.safetyValueApplier = new SafetyValueApplier(graph);
     this.streetLimitationParameters = Objects.requireNonNull(streetLimitationParameters);
   }
 
@@ -141,8 +141,22 @@ public class OsmModule implements GraphBuilderModule {
     LOG.info("Building street graph from OSM");
     build(osmdb, vertexGenerator);
     graph.hasStreets = true;
-    streetLimitationParameters.initMaxCarSpeed(getMaxCarSpeed());
-    streetLimitationParameters.initMaxAreaNodes(params.maxAreaNodes());
+    initStreetLimitationParameters();
+  }
+
+  private void initStreetLimitationParameters() {
+    float maxCarSpeed = getMaxCarSpeed();
+    LOG.info("Maximum car speed in graph: {} m/s", maxCarSpeed);
+    streetLimitationParameters.initMaxCarSpeed(maxCarSpeed);
+    int maxAreaNodes = params.maxAreaNodes();
+    LOG.info("Maximum number of nodes in an area: {}", maxAreaNodes);
+    streetLimitationParameters.initMaxAreaNodes(maxAreaNodes);
+    float bestBikeSafety = safetyValueApplier.getBestBikeSafety();
+    LOG.info("Best bike safety: {}", bestBikeSafety);
+    streetLimitationParameters.initBestBikeSafety(bestBikeSafety);
+    float bestWalkSafety = safetyValueApplier.getBestWalkSafety();
+    LOG.info("Best walk safety: {}", bestWalkSafety);
+    streetLimitationParameters.initBestWalkSafety(bestWalkSafety);
   }
 
   @Override
@@ -224,8 +238,6 @@ public class OsmModule implements GraphBuilderModule {
     TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore, osmInfoGraphBuildRepository);
 
     params.edgeNamer().postprocess();
-
-    normalizer.applySafetyFactors();
   }
 
   /**
@@ -275,7 +287,7 @@ public class OsmModule implements GraphBuilderModule {
       osmInfoGraphBuildRepository,
       vertexGenerator,
       params.edgeNamer(),
-      normalizer,
+      safetyValueApplier,
       issueStore,
       params.maxAreaNodes(),
       params.platformEntriesLinking(),
@@ -465,7 +477,7 @@ public class OsmModule implements GraphBuilderModule {
 
           StreetEdge street = streets.main();
           StreetEdge backStreet = streets.back();
-          normalizer.applyWayProperties(
+          safetyValueApplier.applyWayProperties(
             street,
             backStreet,
             wayData.forward(),
