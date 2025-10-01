@@ -16,7 +16,7 @@ public interface RaptorTransferIndexInterface {
     List<List<Transfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {
-    return new RaptorTransferIndex(transfersByStopIndex, request);
+    return new PreCalculatedRaptorTransferIndex(transfersByStopIndex, request);
   }
 
   /**
