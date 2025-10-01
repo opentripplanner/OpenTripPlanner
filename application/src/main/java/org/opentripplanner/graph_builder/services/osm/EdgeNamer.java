@@ -5,6 +5,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.naming.PortlandCustomNamer;
+import org.opentripplanner.graph_builder.module.osm.naming.SidewalkCrosswalkNamer;
 import org.opentripplanner.graph_builder.module.osm.naming.SidewalkNamer;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -65,6 +66,7 @@ public interface EdgeNamer {
       return switch (type) {
         case PORTLAND -> new PortlandCustomNamer();
         case SIDEWALKS -> new SidewalkNamer();
+        case SIDEWALKS_CROSSWALKS -> new SidewalkCrosswalkNamer();
         case DEFAULT -> new DefaultNamer();
       };
     }
@@ -74,5 +76,6 @@ public interface EdgeNamer {
     DEFAULT,
     PORTLAND,
     SIDEWALKS,
+    SIDEWALKS_CROSSWALKS,
   }
 }
