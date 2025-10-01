@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
@@ -15,7 +16,8 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 
 public class TripTimesOnDateTest implements RealtimeTestConstants {
 
-  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2025, 3, 3);
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
 
   private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
   private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);

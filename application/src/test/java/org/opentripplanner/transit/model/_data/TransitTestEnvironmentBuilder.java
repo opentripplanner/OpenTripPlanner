@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -101,7 +102,10 @@ public class TransitTestEnvironmentBuilder {
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     for (TripInput tripInput : tripInputs) {
       var t = createTrip(tripInput, timetableRepository);
-      calendarServiceData.putServiceDatesForServiceId(t.getServiceId(), tripInput.serviceDates());
+      var serviceDates = Optional.ofNullable(tripInput.serviceDates()).orElseGet(() ->
+        List.of(defaultServiceDate)
+      );
+      calendarServiceData.putServiceDatesForServiceId(t.getServiceId(), serviceDates);
     }
     for (FlexTripInput tripInput : flexTripInputs) {
       createFlexTrip(tripInput, timetableRepository);
@@ -192,7 +196,10 @@ public class TransitTestEnvironmentBuilder {
   }
 
   private Trip createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
-    var serviceId = generateServiceId(timetableRepository, tripInput.serviceDates());
+    var serviceDates = Optional.ofNullable(tripInput.serviceDates()).orElseGet(() ->
+      List.of(defaultServiceDate)
+    );
+    var serviceId = generateServiceId(timetableRepository, serviceDates);
     var trip = Trip.of(id(tripInput.id()))
       .withRoute(tripInput.route())
       .withHeadsign(tripInput.headsign() == null ? null : tripInput.headsign())
