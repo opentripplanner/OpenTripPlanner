@@ -1,10 +1,8 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
 
 import com.google.common.collect.ImmutableMultimap;
 import java.util.List;

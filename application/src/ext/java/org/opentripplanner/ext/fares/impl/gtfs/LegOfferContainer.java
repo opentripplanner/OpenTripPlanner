@@ -8,7 +8,6 @@ import java.util.List;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 
 /**
  * A package-private helper class for making sure that only the "best" fare offers are added for
