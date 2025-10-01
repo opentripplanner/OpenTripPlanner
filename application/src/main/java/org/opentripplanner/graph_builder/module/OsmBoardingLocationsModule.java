@@ -18,6 +18,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graphfinder.StopResolver;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
 import org.opentripplanner.service.osminfo.model.Platform;
@@ -39,7 +40,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
-import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,21 +68,25 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private final Graph graph;
 
-  private final SiteRepository siteRepository;
+  private final StopResolver stopResolver;
   private final OsmInfoGraphBuildService osmInfoGraphBuildService;
   private final VertexFactory vertexFactory;
+  private final VertexLinker linker;
 
-  private VertexLinker linker;
-
+  /**
+   * @param timetableRepository This module requires the timetable repository because at the time
+   *                            of the instantiation the site repository is empty.
+   */
   @Inject
   public OsmBoardingLocationsModule(
     Graph graph,
-    SiteRepository siteRepository,
+    TimetableRepository timetableRepository,
     VertexLinker linker,
     OsmInfoGraphBuildService osmInfoGraphBuildService
   ) {
     this.graph = graph;
-    this.siteRepository = siteRepository;
+    this.stopResolver = id ->
+      Objects.requireNonNull(timetableRepository.getSiteRepository().getRegularStop(id));
     this.osmInfoGraphBuildService = osmInfoGraphBuildService;
     this.vertexFactory = new VertexFactory(graph);
     this.linker = linker;
@@ -107,7 +112,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       if (alreadyLinked) continue;
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
-        var stop = Objects.requireNonNull(siteRepository.getRegularStop(ts.getId()));
+        var stop = stopResolver.getStop(ts.getId());
         if (!connectVertexToStop(ts, stop, graph)) {
           LOG.debug("Could not connect {} at {}", ts.getId(), ts.getCoordinate());
         } else {
@@ -142,7 +147,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * @return if the vertex has been connected
    */
   private boolean connectVertexToArea(TransitStopVertex ts, Graph graph) {
-    RegularStop stop = Objects.requireNonNull(siteRepository.getRegularStop(ts.getId()));
+    var stop = stopResolver.getStop(ts.getId());
     var nearbyAreaGroups = graph
       .findEdges(getEnvelope(ts))
       .stream()
