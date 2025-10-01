@@ -133,7 +133,11 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     if (!graph.hasStreets) {
       return new StraightLineNearbyStopFinder(transitService, radiusAsDuration);
     } else {
-      return StreetNearbyStopFinder.of(transitService::getRegularStop, radiusAsDuration, 0).build();
+      return StreetNearbyStopFinder.of(
+        new TransitServiceResolver(transitService),
+        radiusAsDuration,
+        0
+      ).build();
     }
   }
 

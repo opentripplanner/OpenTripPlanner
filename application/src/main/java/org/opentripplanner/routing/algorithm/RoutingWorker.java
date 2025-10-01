@@ -31,6 +31,7 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.routing.via.service.TransitServiceResolver;
 import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -91,7 +92,7 @@ public class RoutingWorker {
       request.journey().transit().priorityGroupsGlobal()
     );
     this.accessEgressRouter = new AccessEgressRouter(
-      serverContext.transitService()::getRegularStop
+      new TransitServiceResolver(serverContext.transitService())
     );
   }
 

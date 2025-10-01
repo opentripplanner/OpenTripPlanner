@@ -10,6 +10,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -58,11 +59,12 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
         return matchedVertices;
       });
 
-    ImmutableMultimap<StreetVertex, AreaStop> mappedResults = results.collect(
-      ImmutableListMultimap.<MatchResult, StreetVertex, AreaStop>flatteningToImmutableListMultimap(
-        MatchResult::vertex,
-        mr -> Stream.of(mr.stop())
-      )
+    ImmutableMultimap<StreetVertex, FeedScopedId> mappedResults = results.collect(
+      ImmutableListMultimap.<
+          MatchResult,
+          StreetVertex,
+          FeedScopedId
+        >flatteningToImmutableListMultimap(MatchResult::vertex, mr -> Stream.of(mr.stop().getId()))
     );
 
     mappedResults

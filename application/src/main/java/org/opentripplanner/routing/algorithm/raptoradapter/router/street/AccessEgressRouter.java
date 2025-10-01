@@ -5,12 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
+import org.opentripplanner.graph_builder.module.nearbystops.StopResolver;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.NearbyStopFactory;
-import org.opentripplanner.routing.graphfinder.StopResolver;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.utils.collection.ListUtils;
@@ -28,7 +28,7 @@ public class AccessEgressRouter {
 
   public AccessEgressRouter(StopResolver stopResolver) {
     this.stopResolver = stopResolver;
-    this.nearbyStopFactory = new NearbyStopFactory(stopResolver);
+    this.nearbyStopFactory = new NearbyStopFactory(stopResolver::getRegularStop);
   }
 
   /**

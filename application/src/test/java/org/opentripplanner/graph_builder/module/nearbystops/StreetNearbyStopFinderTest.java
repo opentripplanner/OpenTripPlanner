@@ -18,7 +18,6 @@ import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.StopResolver;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -62,7 +61,9 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
         }
       }
     );
-    this.stopResolver = model.timetableRepository().getSiteRepository()::getRegularStop;
+    this.stopResolver = new SiteRespositoryStopResolver(
+      model.timetableRepository().getSiteRepository()
+    );
   }
 
   @Test
@@ -188,7 +189,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
    * Verify that the nearby stop is zero distance and corresponds to the expected vertex
    */
   void assertZeroDistanceStop(TransitStopVertex expected, NearbyStop nearbyStop) {
-    assertEquals(stopResolver.getStop(expected.getId()), nearbyStop.stop);
+    assertEquals(stopResolver.getRegularStop(expected.getId()), nearbyStop.stop);
     assertEquals(0, nearbyStop.distance);
     assertEquals(0, nearbyStop.edges.size());
     assertEquals(expected, nearbyStop.state.getVertex());
@@ -203,7 +204,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     double expectedDistance,
     NearbyStop nearbyStop
   ) {
-    assertEquals(stopResolver.getStop(expected.getId()), nearbyStop.stop);
+    assertEquals(stopResolver.getRegularStop(expected.getId()), nearbyStop.stop);
     assertEquals(expectedDistance, nearbyStop.distance);
     assertEquals(expected, nearbyStop.state.getVertex());
     assertFalse(nearbyStop.edges.isEmpty());

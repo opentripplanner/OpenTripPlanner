@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
@@ -22,7 +23,6 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.NearbyStopFactory;
-import org.opentripplanner.routing.graphfinder.StopResolver;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -34,6 +34,7 @@ import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 
 public class StreetNearbyStopFinder implements NearbyStopFinder {
@@ -64,7 +65,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     this.maxStopCount = requireNonNull(maxStopCount);
     this.extensionRequestContexts = requireNonNull(extensionRequestContexts);
     this.ignoreVertices = requireNonNull(ignoreVertices);
-    this.nearbyStopFactory = new NearbyStopFactory(stopResolver);
+    this.nearbyStopFactory = new NearbyStopFactory(stopResolver::getRegularStop);
   }
 
   /**
@@ -153,7 +154,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
           continue;
         }
         if (targetVertex instanceof TransitStopVertex tsv && state.isFinal()) {
-          var stop = requireNonNull(stopResolver.getStop(tsv.getId()));
+          var stop = requireNonNull(stopResolver.getRegularStop(tsv.getId()));
           stopsFound.add(NearbyStop.nearbyStopForState(state, stop));
         }
         if (
@@ -161,7 +162,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
           targetVertex instanceof StreetVertex streetVertex &&
           !streetVertex.areaStops().isEmpty()
         ) {
-          for (AreaStop areaStop : targetVertex.areaStops()) {
+          for (FeedScopedId id : targetVertex.areaStops()) {
+            AreaStop areaStop = Objects.requireNonNull(stopResolver.getAreaStop(id));
             // This is for a simplification, so that we only return one vertex from each
             // stop location. All vertices are added to the multimap, which is filtered
             // below, so that only the closest vertex is added to stopsFound

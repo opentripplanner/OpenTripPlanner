@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
+import org.opentripplanner.graph_builder.module.nearbystops.SiteRespositoryStopResolver;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -268,7 +269,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       )
     ) {
       return new AccessEgressRouter(
-        timetableRepository.getSiteRepository()::getRegularStop
+        new SiteRespositoryStopResolver(timetableRepository.getSiteRepository())
       ).findAccessEgresses(
         request,
         verticesContainer,

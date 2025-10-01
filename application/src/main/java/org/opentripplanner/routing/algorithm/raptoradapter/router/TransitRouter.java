@@ -43,6 +43,7 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
+import org.opentripplanner.routing.via.service.TransitServiceResolver;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
@@ -81,7 +82,7 @@ public class TransitRouter {
     this.temporaryVerticesContainer = createTemporaryVerticesContainer(request, serverContext);
     this.viaTransferResolver = serverContext.viaTransferResolver();
     this.accessEgressRouter = new AccessEgressRouter(
-      serverContext.transitService()::getRegularStop
+      new TransitServiceResolver(serverContext.transitService())
     );
   }
 
