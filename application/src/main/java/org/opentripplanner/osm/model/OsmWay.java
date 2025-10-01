@@ -108,13 +108,8 @@ public class OsmWay extends OsmEntity {
     return isTag("highway", "footway");
   }
 
-  public boolean isMarkedCrossing() {
-    String crossingMarkingsTag = getTag("crossing:markings");
-    return (
-      isTag("footway", "crossing") &&
-      ((crossingMarkingsTag != null && !"no".equals(crossingMarkingsTag)) ||
-        isTag("crossing", "marked"))
-    );
+  public boolean isCrossing() {
+    return isFootway() && isTag("footway", "crossing");
   }
 
   public boolean isServiceRoad() {

@@ -303,7 +303,7 @@ class OsmWayTest {
   @ParameterizedTest
   @MethodSource("createCrossingCases")
   void markedCrossing(OsmWay way, boolean result) {
-    assertEquals(result, way.isMarkedCrossing());
+    assertEquals(result, way.isCrossing());
   }
 
   static Stream<Arguments> createCrossingCases() {
@@ -311,11 +311,11 @@ class OsmWayTest {
       Arguments.of(createGenericFootway(), false),
       Arguments.of(createFootway("whatever", "unused", "unused"), false),
       Arguments.of(createFootway("crossing", "crossing", "marked"), true),
-      Arguments.of(createFootway("crossing", "crossing", "other"), false),
+      Arguments.of(createFootway("crossing", "crossing", "other"), true),
       Arguments.of(createFootway("crossing", "crossing:markings", "yes"), true),
       Arguments.of(createFootway("crossing", "crossing:markings", "marking-details"), true),
-      Arguments.of(createFootway("crossing", "crossing:markings", null), false),
-      Arguments.of(createFootway("crossing", "crossing:markings", "no"), false)
+      Arguments.of(createFootway("crossing", "crossing:markings", null), true),
+      Arguments.of(createFootway("crossing", "crossing:markings", "no"), true)
     );
   }
 

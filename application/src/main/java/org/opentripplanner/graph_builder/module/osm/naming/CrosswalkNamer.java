@@ -53,8 +53,7 @@ public class CrosswalkNamer implements EdgeNamer {
     if (way instanceof OsmWay osmWay) {
       // Record unnamed crossings to a list.
       if (
-        osmWay.isFootway() &&
-        osmWay.isMarkedCrossing() &&
+        osmWay.isCrossing() &&
         way.hasNoName() &&
         !way.isExplicitlyUnnamed()
       ) {
