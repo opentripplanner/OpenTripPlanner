@@ -284,22 +284,29 @@ public record ScheduledTransitLegReference(
     );
   }
 
+  /**
+   * Find the stop position in pattern for a stop closest to the given stop position matching the
+   * provided matcher
+   */
   private OptionalInt findStopPositionInPattern(
     TripPattern tripPattern,
     int stopPosition,
     Function<StopLocation, Boolean> matcher
   ) {
-    for (var i = 0; i <= stopPosition || stopPosition + i < tripPattern.numberOfStops(); i++) {
-      if (
-        stopPosition + i < tripPattern.numberOfStops() &&
-        matcher.apply(tripPattern.getStops().get(stopPosition + i))
-      ) {
-        return OptionalInt.of(stopPosition + i);
+    var beforeInRange = true;
+    var afterInRange = true;
+    for (var diff = 0; beforeInRange || afterInRange; ++diff) {
+      var stopPositionAfter = stopPosition + diff;
+      afterInRange = stopPositionAfter < tripPattern.numberOfStops();
+      if (afterInRange && matcher.apply(tripPattern.getStops().get(stopPositionAfter))) {
+        return OptionalInt.of(stopPositionAfter);
       }
+      var stopPositionBefore = stopPosition - diff;
+      beforeInRange = stopPositionBefore >= 0;
       if (
-        i != 0 && i <= stopPosition && matcher.apply(tripPattern.getStops().get(stopPosition - i))
+        diff != 0 && beforeInRange && matcher.apply(tripPattern.getStops().get(stopPositionBefore))
       ) {
-        return OptionalInt.of(stopPosition - i);
+        return OptionalInt.of(stopPositionBefore);
       }
     }
     return OptionalInt.empty();
