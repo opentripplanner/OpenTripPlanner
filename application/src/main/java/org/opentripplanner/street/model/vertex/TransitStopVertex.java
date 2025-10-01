@@ -14,7 +14,6 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.StationElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,11 +75,6 @@ public class TransitStopVertex extends StationElementVertex {
 
   public Set<TransitMode> getModes() {
     return modes;
-  }
-
-  @Override
-  public StationElement getStationElement() {
-    return null;
   }
 
   /**

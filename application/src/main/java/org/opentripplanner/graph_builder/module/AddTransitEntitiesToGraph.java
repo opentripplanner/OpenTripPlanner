@@ -302,14 +302,19 @@ public class AddTransitEntitiesToGraph {
   }
 
   private StopLevel getStopLevel(StationElementVertex vertex) {
-    StationElement<?, ?> fromStation = vertex.getStationElement();
-    var level = fromStation.level();
-    return level != null
-      ? new StopLevel(
-        NonLocalizedString.ofNullableOrElse(level.name(), fromStation.getName()),
+    var dfltLevel = new StopLevel(vertex.getName(), null);
+    var stop = otpTransitService.siteRepository().getRegularStop(vertex.getId());
+    if (stop == null) {
+      return dfltLevel;
+    } else if (stop.level() == null) {
+      return dfltLevel;
+    } else {
+      var level = stop.level();
+      return new StopLevel(
+        NonLocalizedString.ofNullableOrElse(level.name(), stop.getName()),
         level.index()
-      )
-      : new StopLevel(fromStation.getName(), null);
+      );
+    }
   }
 
   private void addFeedInfoToGraph(TimetableRepository timetableRepository) {

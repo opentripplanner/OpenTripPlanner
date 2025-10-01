@@ -3,7 +3,6 @@ package org.opentripplanner.street.model.vertex;
 import java.util.Objects;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.StationElement;
 
 public abstract class StationElementVertex extends Vertex {
 
@@ -20,9 +19,6 @@ public abstract class StationElementVertex extends Vertex {
   public final VertexLabel getLabel() {
     return VertexLabel.feedScopedId(id);
   }
-
-  /** Get the corresponding StationElement */
-  public abstract StationElement getStationElement();
 
   @Override
   public I18NString getName() {
