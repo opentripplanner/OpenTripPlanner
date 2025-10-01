@@ -22,15 +22,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A namer that assigns names to crosswalks using the name of the crossed street, if available.
+ * A namer that assigns names to crosswalks using the name or type of the crossed street.
  * <p>
  * The algorithm works as follows:
  *  - For each crosswalk, we find the intersecting street edge that shares a node.
- *  - (To be completed)
- * <p>
- * In North America, it is common for a street to have turn lanes (slip lanes)
- * that are their own OSM ways because they are separate from the main streets they join.
- * The resulting crosswalk name is "Crossing over turn lane" or equivalent in other locales.
+ *  - Apply a name depending on the type of street:
+ *      * For named streets, name the crossing so it reads "crossing over 10th Street".
+ *      * For service roads (e.g. car access to commercial complexes, such as
+ *        <a href="https://www.openstreetmap.org/way/1024601318">...</a>),
+ *        use "crossing over service road".
+ *      * For turn lanes or slip lanes at intersections (shortcuts from a street to another,
+ *        to bypass traffic signals, prevalent in North America,
+ *        e.g. <a href="https://www.openstreetmap.org/way/1139062913">...</a>),
+ *        use "crossing over turn lane".
  */
 public class CrosswalkNamer implements EdgeNamer {
 
