@@ -18,7 +18,7 @@ import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.util.BitSetIterator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndexInterface;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -55,7 +55,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   /**
    * Transfers by stop index
    */
-  private final RaptorTransferIndexInterface transferIndex;
+  private final RaptorTransferIndex transferIndex;
 
   private final ConstrainedTransfersForPatterns constrainedTransfers;
 

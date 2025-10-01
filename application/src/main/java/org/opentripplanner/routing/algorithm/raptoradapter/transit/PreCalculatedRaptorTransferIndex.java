@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
-class PreCalculatedRaptorTransferIndex implements RaptorTransferIndexInterface {
+class PreCalculatedRaptorTransferIndex implements RaptorTransferIndex {
 
   private final List<DefaultRaptorTransfer>[] forwardTransfers;
 
@@ -28,7 +28,7 @@ class PreCalculatedRaptorTransferIndex implements RaptorTransferIndexInterface {
       .parallel()
       .forEach(fromStop -> {
         var transfers = transfersByStopIndex.get(fromStop);
-        var raptorTransfers = RaptorTransferIndexInterface.getRaptorTransfers(request, transfers);
+        var raptorTransfers = RaptorTransferIndex.getRaptorTransfers(request, transfers);
 
         // forwardTransfers is not modified here, and no two threads will access the same element
         // in it, so this is still thread safe.

@@ -8,11 +8,11 @@ import java.util.function.Function;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
-public interface RaptorTransferIndexInterface {
+public interface RaptorTransferIndex {
   /**
    * Create an index for a route request configured in router-config.json
    */
-  static RaptorTransferIndexInterface createPreCached(
+  static RaptorTransferIndex createPreCached(
     List<List<Transfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {
@@ -22,7 +22,7 @@ public interface RaptorTransferIndexInterface {
   /**
    * Create an index for a route request originated from the client
    */
-  static RaptorTransferIndexInterface createOnDemand(
+  static RaptorTransferIndex createOnDemand(
     List<List<Transfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {

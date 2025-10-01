@@ -140,7 +140,7 @@ public class RaptorTransitData {
     return transferService;
   }
 
-  public RaptorTransferIndexInterface getRaptorTransfersForRequest(RouteRequest request) {
+  public RaptorTransferIndex getRaptorTransfersForRequest(RouteRequest request) {
     return transferCache.get(transfersByStopIndex, request);
   }
 

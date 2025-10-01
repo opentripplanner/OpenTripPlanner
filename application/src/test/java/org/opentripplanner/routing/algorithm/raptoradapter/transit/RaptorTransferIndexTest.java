@@ -41,8 +41,8 @@ class RaptorTransferIndexTest {
   void testForwardWalk() {
     var streetSearchRequest = StreetSearchRequest.of().withMode(WALK).build();
     for (var index : List.of(
-      RaptorTransferIndexInterface.createPreCached(data, streetSearchRequest),
-      RaptorTransferIndexInterface.createOnDemand(data, streetSearchRequest)
+      RaptorTransferIndex.createPreCached(data, streetSearchRequest),
+      RaptorTransferIndex.createOnDemand(data, streetSearchRequest)
     )) {
       assertEquals(
         Stream.of(t1, t2)
@@ -63,8 +63,8 @@ class RaptorTransferIndexTest {
   void testForwardBike() {
     var streetSearchRequest = StreetSearchRequest.of().withMode(BIKE).build();
     for (var index : List.of(
-      RaptorTransferIndexInterface.createPreCached(data, streetSearchRequest),
-      RaptorTransferIndexInterface.createOnDemand(data, streetSearchRequest)
+      RaptorTransferIndex.createPreCached(data, streetSearchRequest),
+      RaptorTransferIndex.createOnDemand(data, streetSearchRequest)
     )) {
       assertEquals(
         Stream.of(t2, t5)
@@ -85,8 +85,8 @@ class RaptorTransferIndexTest {
   void testReverseWalk() {
     var streetSearchRequest = StreetSearchRequest.of().withMode(WALK).build();
     for (var index : List.of(
-      RaptorTransferIndexInterface.createPreCached(data, streetSearchRequest),
-      RaptorTransferIndexInterface.createOnDemand(data, streetSearchRequest)
+      RaptorTransferIndex.createPreCached(data, streetSearchRequest),
+      RaptorTransferIndex.createOnDemand(data, streetSearchRequest)
     )) {
       assertEquals(
         t3
@@ -120,8 +120,8 @@ class RaptorTransferIndexTest {
   void testReverseBike() {
     var streetSearchRequest = StreetSearchRequest.of().withMode(BIKE).build();
     for (var index : List.of(
-      RaptorTransferIndexInterface.createPreCached(data, streetSearchRequest),
-      RaptorTransferIndexInterface.createOnDemand(data, streetSearchRequest)
+      RaptorTransferIndex.createPreCached(data, streetSearchRequest),
+      RaptorTransferIndex.createOnDemand(data, streetSearchRequest)
     )) {
       assertEquals(
         t4

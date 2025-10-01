@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
-class CalculateOnDemandRaptorTransferIndex implements RaptorTransferIndexInterface {
+class CalculateOnDemandRaptorTransferIndex implements RaptorTransferIndex {
 
   private final List<List<Transfer>> forwardTransfers;
   private final List<List<TransferWithSource>> reversedTransfers;
@@ -50,7 +50,7 @@ class CalculateOnDemandRaptorTransferIndex implements RaptorTransferIndexInterfa
   @Override
   public Collection<DefaultRaptorTransfer> getForwardTransfers(int stopIndex) {
     if (forwardRaptorTransfers[stopIndex] == null) {
-      forwardRaptorTransfers[stopIndex] = RaptorTransferIndexInterface.getRaptorTransfers(
+      forwardRaptorTransfers[stopIndex] = RaptorTransferIndex.getRaptorTransfers(
         request,
         forwardTransfers.get(stopIndex)
       );
