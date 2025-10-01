@@ -9,9 +9,9 @@ import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFind
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.routing.graphfinder.NearbyStopFactory;
 import org.opentripplanner.routing.graphfinder.StopResolver;
+import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
@@ -64,7 +64,7 @@ public class AccessEgressRouter {
     var originVertices = accessOrEgress.isAccess()
       ? verticesContainer.getFromVertices()
       : verticesContainer.getToVertices();
-    var streetAccessEgress = StreetNearbyStopFinder.of(durationLimit, maxStopCount)
+    var streetAccessEgress = StreetNearbyStopFinder.of(stopResolver, durationLimit, maxStopCount)
       .withIgnoreVertices(ignoreVertices)
       .withExtensionRequestContexts(extensionRequestContexts)
       .build()

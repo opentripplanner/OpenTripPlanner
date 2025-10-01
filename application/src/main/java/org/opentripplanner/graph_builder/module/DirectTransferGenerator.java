@@ -214,8 +214,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       finder = StreetNearbyStopFinder.of(
         transitService::getRegularStop,
         radiusAsDuration,
-        0).build(
-      );
+        0
+      ).build();
     }
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {

@@ -21,7 +21,7 @@ public class NearbyStopFactory {
   private final StopResolver stopResolver;
 
   public NearbyStopFactory(StopResolver stopResolver) {
-    this.stopResolver = stopResolver;
+    this.stopResolver = Objects.requireNonNull(stopResolver);
   }
 
   /**

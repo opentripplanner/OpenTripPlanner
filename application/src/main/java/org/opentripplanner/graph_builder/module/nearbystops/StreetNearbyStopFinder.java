@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
@@ -60,10 +59,12 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     Collection<ExtensionRequestContext> extensionRequestContexts,
     Set<Vertex> ignoreVertices
   ) {
+    this.stopResolver = requireNonNull(stopResolver);
     this.durationLimit = requireNonNull(durationLimit);
     this.maxStopCount = requireNonNull(maxStopCount);
     this.extensionRequestContexts = requireNonNull(extensionRequestContexts);
     this.ignoreVertices = requireNonNull(ignoreVertices);
+    this.nearbyStopFactory = new NearbyStopFactory(stopResolver);
   }
 
   /**
@@ -72,9 +73,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the
    *                     maxStopCount we will always return all the directly connected stops.
    */
-  public static Builder of(Duration durationLimit, int maxStopCount) {
-    return new Builder(durationLimit, maxStopCount);
-    this.nearbyStopFactory = new NearbyStopFactory(stopResolver);
+  public static Builder of(StopResolver stopResolver, Duration durationLimit, int maxStopCount) {
+    return new Builder(stopResolver, durationLimit, maxStopCount);
   }
 
   /**
@@ -153,7 +153,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
           continue;
         }
         if (targetVertex instanceof TransitStopVertex tsv && state.isFinal()) {
-          var stop = Objects.requireNonNull(stopResolver.getStop(tsv.getId()));
+          var stop = requireNonNull(stopResolver.getStop(tsv.getId()));
           stopsFound.add(NearbyStop.nearbyStopForState(state, stop));
         }
         if (
@@ -230,8 +230,10 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     private final int maxStopCount;
     private Collection<ExtensionRequestContext> extensionRequestContexts = List.of();
     private Set<Vertex> ignoreVertices = Set.of();
+    private final StopResolver stopResolver;
 
-    public Builder(Duration durationLimit, int maxStopCount) {
+    public Builder(StopResolver stopResolver, Duration durationLimit, int maxStopCount) {
+      this.stopResolver = stopResolver;
       this.durationLimit = durationLimit;
       this.maxStopCount = maxStopCount;
     }
@@ -259,6 +261,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
 
     public StreetNearbyStopFinder build() {
       return new StreetNearbyStopFinder(
+        stopResolver,
         durationLimit,
         maxStopCount,
         extensionRequestContexts,

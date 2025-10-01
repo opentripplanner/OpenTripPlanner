@@ -140,13 +140,9 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var durationLimit = Duration.ofMinutes(10);
     var maxStopCount = 0;
     Set<Vertex> ignore = Set.of(stopA, stopB);
-    var finder = StreetNearbyStopFinder.of(
-      stopResolver,
-      durationLimit,
-      maxStopCount)
-      .withIgnoreVertices(
-      ignore
-    ).build();
+    var finder = StreetNearbyStopFinder.of(stopResolver, durationLimit, maxStopCount)
+      .withIgnoreVertices(ignore)
+      .build();
 
     var sortedNearbyStops = sort(
       finder.findNearbyStops(
@@ -167,13 +163,9 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var durationLimit = Duration.ofMinutes(10);
     var maxStopCount = 1;
     Set<Vertex> ignore = Set.of(stopA, stopB);
-    var finder = StreetNearbyStopFinder.of(
-      stopResolver,
-      durationLimit,
-      maxStopCount)
-      .withIgnoreVertices(
-      ignore
-    ).build();
+    var finder = StreetNearbyStopFinder.of(stopResolver, durationLimit, maxStopCount)
+      .withIgnoreVertices(ignore)
+      .build();
 
     var sortedNearbyStops = sort(
       finder.findNearbyStops(
