@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
  * Further reading: <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/4442">Issue 4442</a>
  * <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/6775">Issue 6775</a>
  */
-class SafetyValueNormalizer {
+class SafetyValueApplier {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SafetyValueNormalizer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SafetyValueApplier.class);
 
   private final Graph graph;
 
@@ -35,13 +35,13 @@ class SafetyValueNormalizer {
    */
   private float bestWalkSafety = 1.0f;
 
-  SafetyValueNormalizer(Graph graph) {
+  SafetyValueApplier(Graph graph) {
     this.graph = graph;
   }
 
   /**
    * Get the best bike safety in the whole graph.
-   * 
+   *
    * @return The bike safety of the safest way in the graph, i.e. the way with the lowest bike
    * safety value.
    */

@@ -70,7 +70,7 @@ public class OsmModule implements GraphBuilderModule {
 
   private final DataImportIssueStore issueStore;
   private final OsmProcessingParameters params;
-  private final SafetyValueNormalizer normalizer;
+  private final SafetyValueApplier safetyValueApplier;
   private final StreetLimitationParameters streetLimitationParameters;
 
   OsmModule(
@@ -88,7 +88,7 @@ public class OsmModule implements GraphBuilderModule {
     this.parkingRepository = parkingRepository;
     this.issueStore = issueStore;
     this.params = params;
-    this.normalizer = new SafetyValueNormalizer(graph);
+    this.safetyValueApplier = new SafetyValueApplier(graph);
     this.streetLimitationParameters = Objects.requireNonNull(streetLimitationParameters);
   }
 
@@ -147,10 +147,10 @@ public class OsmModule implements GraphBuilderModule {
     int maxAreaNodes = params.maxAreaNodes();
     LOG.info("Maximum number of nodes in an area: {}", maxAreaNodes);
     streetLimitationParameters.initMaxAreaNodes(maxAreaNodes);
-    float bestBikeSafety = normalizer.getBestBikeSafety();
+    float bestBikeSafety = safetyValueApplier.getBestBikeSafety();
     LOG.info("Best bike safety: {}", bestBikeSafety);
     streetLimitationParameters.initBestBikeSafety(bestBikeSafety);
-    float bestWalkSafety = normalizer.getBestWalkSafety();
+    float bestWalkSafety = safetyValueApplier.getBestWalkSafety();
     LOG.info("Best walk safety: {}", bestWalkSafety);
     streetLimitationParameters.initBestWalkSafety(bestWalkSafety);
   }
@@ -283,7 +283,7 @@ public class OsmModule implements GraphBuilderModule {
       osmInfoGraphBuildRepository,
       vertexGenerator,
       params.edgeNamer(),
-      normalizer,
+      safetyValueApplier,
       issueStore,
       params.maxAreaNodes(),
       params.platformEntriesLinking(),
@@ -473,7 +473,7 @@ public class OsmModule implements GraphBuilderModule {
 
           StreetEdge street = streets.main();
           StreetEdge backStreet = streets.back();
-          normalizer.applyWayProperties(
+          safetyValueApplier.applyWayProperties(
             street,
             backStreet,
             wayData.forward(),
