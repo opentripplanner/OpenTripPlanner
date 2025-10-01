@@ -13,7 +13,10 @@ public class TripTimesHelper {
    * <p>
    * Always returns {@code true} if the trip times is deleted.
    */
-  public static boolean skipByTripCancellation(TripTimes tripTimes, boolean includeCancellations) {
+  public static boolean skipByTripCancellationOrDeletion(
+    TripTimes tripTimes,
+    boolean includeCancellations
+  ) {
     if (tripTimes.isDeleted()) {
       return true;
     }
