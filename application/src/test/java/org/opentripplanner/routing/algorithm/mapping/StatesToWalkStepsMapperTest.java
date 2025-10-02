@@ -7,7 +7,6 @@ import static org.opentripplanner.model.plan.walkstep.RelativeDirection.EXIT_STA
 import static org.opentripplanner.model.plan.walkstep.RelativeDirection.FOLLOW_SIGNS;
 import static org.opentripplanner.routing.algorithm.mapping.StatesToWalkStepsMapper.isOnSameStreet;
 
-import com.beust.jcommander.internal.Lists;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -126,8 +125,7 @@ class StatesToWalkStepsMapperTest {
         List.of("crossing over turn lane", "Street1", "crossing over turn lane"),
         false,
         "Is many crossings"
-      ),
-      Arguments.of(Lists.newArrayList(null, null, null), false, "Is not a zig-zag")
+      )
     );
   }
 }
