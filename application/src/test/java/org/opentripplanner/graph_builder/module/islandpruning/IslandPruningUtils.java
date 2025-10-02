@@ -28,15 +28,8 @@ class IslandPruningUtils {
       // Add street data from OSM
       var osmProvider = new DefaultOsmProvider(osmFile, true);
       var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-      var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
       var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-      var osmModule = OsmModule.of(
-        osmProvider,
-        graph,
-        osmInfoRepository,
-        osmStreetDecoratorRepository,
-        vehicleParkingRepository
-      )
+      var osmModule = OsmModule.of(osmProvider, graph, osmInfoRepository, vehicleParkingRepository)
         .withEdgeNamer(new TestNamer())
         .build();
 

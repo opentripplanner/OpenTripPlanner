@@ -84,13 +84,7 @@ public class GraphBuilderModules {
       );
     }
 
-    return OsmModule.of(
-      providers,
-      graph,
-      osmInfoGraphBuildRepository,
-      osmStreetDecoratorRepository,
-      vehicleParkingRepository
-    )
+    return OsmModule.of(providers, graph, osmInfoGraphBuildRepository, vehicleParkingRepository)
       .withEdgeNamer(config.edgeNamer)
       .withAreaVisibility(config.areaVisibility)
       .withPlatformEntriesLinking(config.platformEntriesLinking)

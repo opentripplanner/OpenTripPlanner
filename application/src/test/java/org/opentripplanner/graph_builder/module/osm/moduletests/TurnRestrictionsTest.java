@@ -82,7 +82,6 @@ class TurnRestrictionsTest {
       provider,
       graph,
       new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultOsmStreetDecoratorRepository(),
       new DefaultVehicleParkingRepository()
     )
       .withIssueStore(issueStore)

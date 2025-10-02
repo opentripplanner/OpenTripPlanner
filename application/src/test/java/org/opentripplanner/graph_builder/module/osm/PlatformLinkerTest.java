@@ -36,7 +36,6 @@ public class PlatformLinkerTest {
       provider,
       graph,
       new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultOsmStreetDecoratorRepository(),
       new DefaultVehicleParkingRepository()
     )
       .withPlatformEntriesLinking(true)

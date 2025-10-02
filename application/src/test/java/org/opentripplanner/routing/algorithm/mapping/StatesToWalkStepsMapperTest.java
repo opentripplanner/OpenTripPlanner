@@ -12,6 +12,8 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorService;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -87,7 +89,13 @@ class StatesToWalkStepsMapperTest {
   private static List<WalkStep> buildWalkSteps(TestStateBuilder builder) {
     var result = builder.build();
     var path = new GraphPath<>(result);
-    var mapper = new StatesToWalkStepsMapper(path.states, null, new StreetNotesService(), null, 0);
+    var mapper = new StatesToWalkStepsMapper(
+      path.states,
+      null,
+      new StreetNotesService(),
+      new DefaultOsmStreetDecoratorService(new DefaultOsmStreetDecoratorRepository()),
+      0
+    );
     return mapper.generateWalkSteps();
   }
 }

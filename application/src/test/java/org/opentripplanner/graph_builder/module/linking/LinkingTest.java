@@ -165,14 +165,12 @@ public class LinkingTest {
     File file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
     var provider = new DefaultOsmProvider(file, false);
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var vehicleParkingRepository = new DefaultVehicleParkingRepository();
 
     var osmModule = OsmModule.of(
       provider,
       graph,
       osmInfoRepository,
-      osmStreetDecoratorRepository,
       vehicleParkingRepository
     ).build();
 

@@ -32,12 +32,10 @@ class BoardingLocationTest {
 
     var graph = new Graph(new Deduplicator());
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var osmModule = OsmModule.of(
       provider,
       graph,
       osmInfoRepository,
-      osmStreetDecoratorRepository,
       new DefaultVehicleParkingRepository()
     )
       .withBoardingAreaRefTags(Set.of("ref"))
@@ -61,12 +59,10 @@ class BoardingLocationTest {
 
     var graph = new Graph(new Deduplicator());
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var osmModule = OsmModule.of(
       provider,
       graph,
       osmInfoRepository,
-      osmStreetDecoratorRepository,
       new DefaultVehicleParkingRepository()
     )
       .withBoardingAreaRefTags(Set.of("ref"))
@@ -89,12 +85,10 @@ class BoardingLocationTest {
 
     var graph = new Graph(new Deduplicator());
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var osmModule = OsmModule.of(
       provider,
       graph,
       osmInfoRepository,
-      osmStreetDecoratorRepository,
       new DefaultVehicleParkingRepository()
     )
       .withBoardingAreaRefTags(Set.of("ref"))

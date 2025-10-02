@@ -150,13 +150,11 @@ public class ConstantsForTests {
       {
         var osmProvider = new DefaultOsmProvider(PORTLAND_CENTRAL_OSM, false);
         var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-        var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
         var vehicleParkingRepository = new DefaultVehicleParkingRepository();
         var osmModule = OsmModule.of(
           osmProvider,
           graph,
           osmInfoRepository,
-          osmStreetDecoratorRepository,
           vehicleParkingRepository
         )
           .withStaticParkAndRide(true)
@@ -209,13 +207,11 @@ public class ConstantsForTests {
       // Add street data from OSM
       var osmProvider = new DefaultOsmProvider(osmFile, true);
       var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-      var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
       var vehicleParkingRepository = new DefaultVehicleParkingRepository();
       var osmModule = OsmModule.of(
         osmProvider,
         graph,
         osmInfoRepository,
-        osmStreetDecoratorRepository,
         vehicleParkingRepository
       ).build();
       osmModule.buildGraph();
@@ -271,14 +267,7 @@ public class ConstantsForTests {
       {
         var osmProvider = new DefaultOsmProvider(OSLO_EAST_OSM, false);
         var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-        var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
-        var osmModule = OsmModule.of(
-          osmProvider,
-          graph,
-          osmInfoRepository,
-          osmStreetDecoratorRepository,
-          parkingService
-        ).build();
+        var osmModule = OsmModule.of(osmProvider, graph, osmInfoRepository, parkingService).build();
         osmModule.buildGraph();
       }
       // Add transit data from Netex

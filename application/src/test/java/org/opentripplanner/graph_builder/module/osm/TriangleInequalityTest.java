@@ -56,7 +56,6 @@ public class TriangleInequalityTest {
       provider,
       graph,
       new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultOsmStreetDecoratorRepository(),
       new DefaultVehicleParkingRepository()
     )
       .withAreaVisibility(true)

@@ -10,6 +10,7 @@ import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.StreetLimitationParameters;
@@ -23,8 +24,8 @@ public class OsmModuleBuilder {
   private final Graph graph;
   private final VehicleParkingRepository parkingRepository;
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
-
-  private final OsmStreetDecoratorRepository osmStreetDecoratorRepository;
+  private OsmStreetDecoratorRepository osmStreetDecoratorRepository =
+    new DefaultOsmStreetDecoratorRepository();
 
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
@@ -41,13 +42,11 @@ public class OsmModuleBuilder {
     Collection<OsmProvider> providers,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
-    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     VehicleParkingRepository parkingRepository
   ) {
     this.providers = providers;
     this.graph = graph;
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
-    this.osmStreetDecoratorRepository = osmStreetDecoratorRepository;
     this.parkingRepository = parkingRepository;
   }
 
@@ -98,6 +97,13 @@ public class OsmModuleBuilder {
 
   public OsmModuleBuilder withStreetLimitationParameters(StreetLimitationParameters parameters) {
     this.streetLimitationParameters = parameters;
+    return this;
+  }
+
+  public OsmModuleBuilder withOsmStreetDecoratorRepository(
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository
+  ) {
+    this.osmStreetDecoratorRepository = osmStreetDecoratorRepository;
     return this;
   }
 

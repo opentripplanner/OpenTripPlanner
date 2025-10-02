@@ -168,7 +168,6 @@ public class UnconnectedAreasTest {
       provider,
       graph,
       new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultOsmStreetDecoratorRepository(),
       new DefaultVehicleParkingRepository()
     )
       .withIssueStore(issueStore)

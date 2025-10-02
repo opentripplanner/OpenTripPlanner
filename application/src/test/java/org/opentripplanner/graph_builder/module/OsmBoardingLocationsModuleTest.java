@@ -102,15 +102,8 @@ class OsmBoardingLocationsModuleTest {
       new NonLocalizedString("bus stop not connected to street network")
     );
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-    var osmModule = OsmModule.of(
-      provider,
-      graph,
-      osmInfoRepository,
-      osmStreetDecoratorRepository,
-      vehicleParkingRepository
-    )
+    var osmModule = OsmModule.of(provider, graph, osmInfoRepository, vehicleParkingRepository)
       .withBoardingAreaRefTags(Set.of("ref", "ref:IFOPT"))
       .withAreaVisibility(areaVisibility)
       .build();
@@ -213,7 +206,6 @@ class OsmBoardingLocationsModuleTest {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
     var osmModule = OsmModule.of(
       new DefaultOsmProvider(
         ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file("moorgate.osm.pbf"),
@@ -221,7 +213,6 @@ class OsmBoardingLocationsModuleTest {
       ),
       graph,
       osmInfoRepository,
-      osmStreetDecoratorRepository,
       new DefaultVehicleParkingRepository()
     )
       .withBoardingAreaRefTags(Set.of("naptan:AtcoCode"))
