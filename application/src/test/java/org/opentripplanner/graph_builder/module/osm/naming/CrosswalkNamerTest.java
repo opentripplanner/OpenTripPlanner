@@ -27,6 +27,9 @@ import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 class CrosswalkNamerTest {
 
   private static final OsmWay CROSSWALK = new OsmWay();
+  private static final OsmWay SIDEWALK_TO_CROSSWALK = new OsmWay();
+  private static final OsmWay OTHER_SIDEWALK1_TO_CROSSWALK = new OsmWay();
+  private static final OsmWay OTHER_SIDEWALK2_TO_CROSSWALK = new OsmWay();
   private static final OsmWay STREET = new OsmWay();
   private static final OsmWay SERVICE_ROAD = new OsmWay();
   private static final OsmWay TURN_LANE = new OsmWay();
@@ -38,6 +41,18 @@ class CrosswalkNamerTest {
     CROSSWALK.addTag("footway", "crossing");
     CROSSWALK.addTag("crossing:markings", "yes");
     CROSSWALK.getNodeRefs().add(new long[] { 10001, 10002, 10003, 10004 });
+
+    SIDEWALK_TO_CROSSWALK.addTag("highway", "footway");
+    SIDEWALK_TO_CROSSWALK.addTag("footway", "sidewalk");
+    SIDEWALK_TO_CROSSWALK.getNodeRefs().add(new long[] { 10000, 10001 });
+
+    OTHER_SIDEWALK1_TO_CROSSWALK.addTag("highway", "footway");
+    OTHER_SIDEWALK1_TO_CROSSWALK.addTag("footway", "sidewalk");
+    OTHER_SIDEWALK1_TO_CROSSWALK.getNodeRefs().add(new long[] { 10004, 10005 });
+
+    OTHER_SIDEWALK2_TO_CROSSWALK.addTag("highway", "footway");
+    OTHER_SIDEWALK2_TO_CROSSWALK.addTag("footway", "sidewalk");
+    OTHER_SIDEWALK2_TO_CROSSWALK.getNodeRefs().add(new long[] { 10004, 10006 });
 
     STREET.setId(50001);
     STREET.addTag("highway", "primary");
@@ -85,6 +100,21 @@ class CrosswalkNamerTest {
       new WgsCoordinate(33.9527949, -83.9954059),
       new WgsCoordinate(33.9527436, -83.9954582)
     );
+    var sidewalkToCrosswalk = builder.addWay(
+      SIDEWALK_TO_CROSSWALK,
+      new WgsCoordinate(33.9527949, -83.9954059),
+      new WgsCoordinate(33.9526896, -83.9955389)
+    );
+    var sidewalk1ToCrosswalk = builder.addWay(
+      OTHER_SIDEWALK1_TO_CROSSWALK,
+      new WgsCoordinate(33.9528618, -83.9953530),
+      new WgsCoordinate(33.9527436, -83.9954582)
+    );
+    var sidewalk2ToCrosswalk = builder.addWay(
+      OTHER_SIDEWALK2_TO_CROSSWALK,
+      new WgsCoordinate(33.9528618, -83.9953630),
+      new WgsCoordinate(33.9527436, -83.9954582)
+    );
     builder.addWay(
       crossStreet,
       new WgsCoordinate(33.9528839, -83.9956473),
@@ -103,6 +133,16 @@ class CrosswalkNamerTest {
     namer.postprocess();
     assertEquals(String.format("crossing over %s", name), crosswalk.edge.getName().toString());
     assertFalse(crosswalk.edge.nameIsDerived());
+    assertEquals(
+      String.format("crossing over %s", name),
+      sidewalkToCrosswalk.edge.getName().toString()
+    );
+    assertFalse(crosswalk.edge.nameIsDerived());
+
+    // These sidewalks should not be renamed because they are adjacent
+    // to the same crosswalk on the same side.
+    assertTrue(sidewalk1ToCrosswalk.edge.nameIsDerived());
+    assertTrue(sidewalk2ToCrosswalk.edge.nameIsDerived());
   }
 
   private static Stream<Arguments> streetTypes() {

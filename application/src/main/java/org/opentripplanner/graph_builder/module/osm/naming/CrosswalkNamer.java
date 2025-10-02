@@ -6,6 +6,7 @@ import gnu.trove.list.TLongList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,6 +55,7 @@ public class CrosswalkNamer implements EdgeNamer {
   private static final int BUFFER_METERS = 25;
 
   private HashGridSpatialIndex<EdgeOnLevel> streetEdges = new HashGridSpatialIndex<>();
+  private HashGridSpatialIndex<EdgeOnLevel> sidewalkEdges = new HashGridSpatialIndex<>();
   private Collection<EdgeOnLevel> unnamedCrosswalks = new ArrayList<>();
   private PreciseBuffer preciseBuffer;
 
@@ -71,7 +73,20 @@ public class CrosswalkNamer implements EdgeNamer {
           .asIterable()
           .forEach(edge -> unnamedCrosswalks.add(new EdgeOnLevel(osmWay, edge, way.getLevels())));
       }
-      // Record named streets, service roads, and slip/turn lanes to a list.
+      // Record (short) sidewalks to a geometric index
+      else if (way.isSidewalk()) {
+        // We generate two edges for each osm way: one there and one back. This spatial index only
+        // needs to contain one item for each road segment with a unique geometry and name, so we
+        // add only one of the two edges.
+        var edge = pair.pickAny();
+        if (edge.getDistanceMeters() <= BUFFER_METERS) {
+          sidewalkEdges.insert(
+            edge.getGeometry().getEnvelopeInternal(),
+            new EdgeOnLevel(osmWay, edge, way.getLevels())
+          );
+        }
+      }
+      // Record named streets, service roads, and slip/turn lanes to a geometric index.
       else if (
         !osmWay.isFootway() && (way.isNamed() || osmWay.isServiceRoad() || isTurnLane(osmWay))
       ) {
@@ -119,24 +134,26 @@ public class CrosswalkNamer implements EdgeNamer {
 
     // Set the indices to null so they can be garbage-collected
     streetEdges = null;
+    sidewalkEdges = null;
     unnamedCrosswalks = null;
   }
 
   /**
    * The actual worker method that runs the business logic on an individual sidewalk edge.
+   * This will also name adjacent sidewalks on each end if they are the only adjacent sidewalks.
    */
   private void assignNameToCrosswalk(EdgeOnLevel crosswalkOnLevel, AtomicInteger namesApplied) {
     var crosswalk = crosswalkOnLevel.edge;
     var buffer = preciseBuffer.preciseBuffer(crosswalk.getGeometry());
+    OsmWay way = crosswalkOnLevel.way;
 
-    var candidates = streetEdges
+    var streetCandidates = streetEdges
       .query(buffer.getEnvelopeInternal())
       .stream()
       .map(e -> e.way)
       .toList();
 
-    var crossStreetOpt = getIntersectingStreet(crosswalkOnLevel.way, candidates);
-
+    var crossStreetOpt = getIntersectingStreet(way, streetCandidates);
     if (crossStreetOpt.isPresent()) {
       OsmWay crossStreet = crossStreetOpt.get();
       // TODO: i18n
@@ -150,11 +167,38 @@ public class CrosswalkNamer implements EdgeNamer {
         crosswalk.setName(I18NString.of("crossing over turn lane"));
       } else {
         // Default on using the OSM way ID, which should not happen.
-        crosswalk.setName(
-          I18NString.of(String.format("crossing %s", crosswalkOnLevel.way.getId()))
-        );
+        crosswalk.setName(I18NString.of(String.format("crossing %s", way.getId())));
       }
       namesApplied.incrementAndGet();
+
+      var adjacentSidewalks = sidewalkEdges
+        .query(buffer.getEnvelopeInternal())
+        .stream()
+        .filter(e -> e.way().isAdjacentTo(way))
+        .filter(e -> e.edge.nameIsDerived())
+        .toList();
+
+      // Group sidewalks at each end of the crosswalk.
+      TLongList nodes = way.getNodeRefs();
+      renameAdjacentSidewalk(adjacentSidewalks, crosswalk.getName(), nodes.get(0));
+      renameAdjacentSidewalk(adjacentSidewalks, crosswalk.getName(), nodes.get(nodes.size() - 1));
+    }
+  }
+
+  /**
+   * Rename a sidewalk, among candidates, if it is the only adjacent sidewalk to the given crosswalk.
+   */
+  private void renameAdjacentSidewalk(
+    List<EdgeOnLevel> adjacentSidewalks,
+    I18NString crosswalkName,
+    long nodeId
+  ) {
+    List<EdgeOnLevel> sidewalks = adjacentSidewalks
+      .stream()
+      .filter(e -> e.way.getNodeRefs().contains(nodeId))
+      .toList();
+    if (sidewalks.size() == 1) {
+      sidewalks.getFirst().edge.setName(crosswalkName);
     }
   }
 
