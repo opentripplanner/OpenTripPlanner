@@ -54,10 +54,10 @@ public class SidewalkNamer extends NamerWithGeoBuffer {
   @Override
   public void recordEdges(OsmEntity way, StreetEdgePair pair) {
     // This way is a sidewalk and hasn't been named yet (and is not explicitly unnamed)
-    if (way.isSidewalk() && way.hasNoName() && !way.isExplicitlyUnnamed()) {
+    if (way instanceof OsmWay osmWay && way.isSidewalk() && way.hasNoName() && !way.isExplicitlyUnnamed()) {
       pair
         .asIterable()
-        .forEach(edge -> unnamedSidewalks.add(new EdgeOnLevel((OsmWay)way, edge, way.getLevels())));
+        .forEach(edge -> unnamedSidewalks.add(new EdgeOnLevel(osmWay, edge, way.getLevels())));
     }
     // The way is _not_ a sidewalk and does have a name
     else if (way.isNamed() && !way.isLink()) {
