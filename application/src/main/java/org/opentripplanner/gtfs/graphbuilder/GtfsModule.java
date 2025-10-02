@@ -22,6 +22,7 @@ import org.onebusaway.gtfs.model.FareTransferRule;
 import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.RiderCategory;
 import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.RouteNetworkAssignment;
 import org.onebusaway.gtfs.model.StopAreaElement;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
@@ -56,13 +57,14 @@ import org.slf4j.LoggerFactory;
 public class GtfsModule implements GraphBuilderModule {
 
   public static final Set<Class<?>> FARES_V2_CLASSES = Set.of(
+    Area.class,
     FareProduct.class,
     FareLegRule.class,
+    FareMedium.class,
     FareTransferRule.class,
     RiderCategory.class,
-    FareMedium.class,
-    StopAreaElement.class,
-    Area.class
+    RouteNetworkAssignment.class,
+    StopAreaElement.class
   );
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
