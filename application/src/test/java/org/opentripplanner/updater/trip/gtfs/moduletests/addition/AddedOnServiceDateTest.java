@@ -3,7 +3,6 @@ package org.opentripplanner.updater.trip.gtfs.moduletests.addition;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.NEW;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.OUTSIDE_SERVICE_PERIOD;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
@@ -58,9 +57,10 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
       .build();
 
     assertSuccess(rt.applyTripUpdate(tripUpdate));
-    assertNotNull(env.getPatternForTrip(id(ADDED_TRIP_ID), date));
+    var tripFetcher = env.tripFetcher(ADDED_TRIP_ID, date);
+    assertNotNull(tripFetcher.tripPattern());
 
-    var trip = env.getTripTimesForTrip(id(ADDED_TRIP_ID), date).getTrip();
+    var trip = tripFetcher.trip();
     var dates = env
       .getTransitService()
       .getCalendarService()

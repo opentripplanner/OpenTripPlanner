@@ -52,22 +52,17 @@ class CancellationDeletionTest implements RealtimeTestConstants {
           .build()
       )
       .build();
-    var pattern1 = env.getPatternForTrip(TRIP_1_ID);
     var rt = GtfsRtTestHelper.of(env);
 
     var update = rt.tripUpdate(TRIP_1_ID, relationship).build();
     assertSuccess(rt.applyTripUpdate(update));
 
-    var snapshot = env.getTimetableSnapshot();
-    var forToday = snapshot.resolve(pattern1, env.serviceDate());
-    var schedule = snapshot.resolve(pattern1, null);
+    var forToday = env.tripFetcher(TRIP_1_ID).tripTimes();
+    var schedule = env.tripFetcher(TRIP_1_ID).scheduledTripTimes();
     assertNotSame(forToday, schedule);
-    assertNotSame(forToday.getTripTimes(id(TRIP_1_ID)), schedule.getTripTimes(id(TRIP_1_ID)));
 
-    var tripTimes = forToday.getTripTimes(id(TRIP_1_ID));
-
-    assertEquals(state, tripTimes.getRealTimeState());
-    assertTrue(tripTimes.isCanceledOrDeleted());
+    assertEquals(state, forToday.getRealTimeState());
+    assertTrue(forToday.isCanceledOrDeleted());
   }
 
   /**

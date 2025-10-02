@@ -44,7 +44,7 @@ class QuayChangeTest implements RealtimeTestConstants {
     assertEquals(1, result.successful());
     assertEquals(
       "MODIFIED | A [R] 0:00:15 0:00:15 | C 0:00:33 0:00:33",
-      env.getRealtimeTimetable(TRIP_1_ID)
+      env.tripFetcher(TRIP_1_ID).showTimetable()
     );
   }
 }

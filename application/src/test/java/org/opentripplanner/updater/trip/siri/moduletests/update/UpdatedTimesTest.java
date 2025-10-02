@@ -40,7 +40,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     assertTripUpdated(env);
     assertEquals(
       "UPDATED | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
-      env.getRealtimeTimetable(TRIP_1_ID)
+      env.tripFetcher(TRIP_1_ID).showTimetable()
     );
   }
 
@@ -91,7 +91,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
   private static void assertTripUpdated(TransitTestEnvironment env) {
     assertEquals(
       "UPDATED | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
-      env.getRealtimeTimetable(TRIP_1_ID)
+      env.tripFetcher(TRIP_1_ID).showTimetable()
     );
   }
 }

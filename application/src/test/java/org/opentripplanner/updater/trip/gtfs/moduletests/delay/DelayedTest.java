@@ -4,14 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.GtfsRtTestHelper;
@@ -29,7 +27,6 @@ class DelayedTest implements RealtimeTestConstants {
 
   private static final int DELAY = 1;
   private static final int STOP_SEQUENCE = 1;
-  private static final FeedScopedId TRIP_ID = id(TRIP_1_ID);
 
   @Test
   void singleStopDelay() {
@@ -49,26 +46,24 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertEquals(1, result.successful());
 
-    var pattern1 = env.getPatternForTrip(TRIP_1_ID);
+    var trip = env.tripFetcher(TRIP_1_ID);
 
-    var snapshot = env.getTimetableSnapshot();
-    var trip1Realtime = snapshot.resolve(pattern1, env.serviceDate());
-    var trip1Scheduled = snapshot.resolve(pattern1, null);
+    var trip1Realtime = trip.tripTimes();
+    var trip1Scheduled = trip.scheduledTripTimes();
 
     assertNotSame(trip1Realtime, trip1Scheduled);
-    assertNotSame(trip1Realtime.getTripTimes(TRIP_ID), trip1Scheduled.getTripTimes(TRIP_ID));
-    assertEquals(DELAY, trip1Realtime.getTripTimes(TRIP_ID).getArrivalDelay(STOP_SEQUENCE));
-    assertEquals(DELAY, trip1Realtime.getTripTimes(TRIP_ID).getDepartureDelay(STOP_SEQUENCE));
+    assertEquals(DELAY, trip1Realtime.getArrivalDelay(STOP_SEQUENCE));
+    assertEquals(DELAY, trip1Realtime.getDepartureDelay(STOP_SEQUENCE));
 
-    assertEquals(RealTimeState.SCHEDULED, trip1Scheduled.getTripTimes(TRIP_ID).getRealTimeState());
+    assertEquals(RealTimeState.SCHEDULED, trip1Scheduled.getRealTimeState());
 
     assertEquals(
       "SCHEDULED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
-      env.getScheduledTimetable(TRIP_1_ID)
+      env.tripFetcher(TRIP_1_ID).showScheduledTimetable()
     );
     assertEquals(
       "UPDATED | A [ND] 0:00:10 0:00:11 | B 0:00:21 0:00:22",
-      env.getRealtimeTimetable(TRIP_1_ID)
+      env.tripFetcher(TRIP_1_ID).showTimetable()
     );
   }
 
@@ -94,34 +89,31 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertSuccess(rt.applyTripUpdate(tripUpdate));
 
-    var snapshot = env.getTimetableSnapshot();
+    var trip = env.tripFetcher(TRIP_2_ID);
+    var realtimeTripTimes = trip.tripTimes();
+    var scheduledTripTimes = trip.scheduledTripTimes();
 
-    var trip2 = env.getTransitService().getTrip(id(TRIP_2_ID));
-    var originalTripPattern = env.getTransitService().findPattern(trip2);
+    assertNotSame(realtimeTripTimes, scheduledTripTimes);
 
-    var originalTimetableForToday = snapshot.resolve(originalTripPattern, env.serviceDate());
-    var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
-
-    assertNotSame(originalTimetableForToday, originalTimetableScheduled);
-
-    var tripTimes = originalTimetableScheduled.getTripTimes(id(TRIP_2_ID));
-    assertNotNull(tripTimes, "Original trip should be found in scheduled time table");
+    assertNotNull(scheduledTripTimes, "Original trip should be found in scheduled time table");
     assertFalse(
-      tripTimes.isCanceledOrDeleted(),
+      scheduledTripTimes.isCanceledOrDeleted(),
       "Original trip times should not be canceled in scheduled time table"
     );
-    assertEquals(RealTimeState.SCHEDULED, tripTimes.getRealTimeState());
+    assertEquals(RealTimeState.SCHEDULED, scheduledTripTimes.getRealTimeState());
 
-    var realtimeTt = originalTimetableForToday.getTripTimes(id(TRIP_2_ID));
-    assertNotNull(realtimeTt, "Original trip should be found in time table for service date");
+    assertNotNull(
+      realtimeTripTimes,
+      "Original trip should be found in time table for service date"
+    );
 
     assertEquals(
       "SCHEDULED | A 0:01 0:01:01 | B 0:01:10 0:01:11 | C 0:01:20 0:01:21",
-      env.getScheduledTimetable(TRIP_2_ID)
+      trip.showScheduledTimetable()
     );
     assertEquals(
       "UPDATED | A 0:01 0:01:01 | B 0:02:10 0:02:31 | C 0:02:50 0:02:51",
-      env.getRealtimeTimetable(TRIP_2_ID)
+      trip.showTimetable()
     );
   }
 }

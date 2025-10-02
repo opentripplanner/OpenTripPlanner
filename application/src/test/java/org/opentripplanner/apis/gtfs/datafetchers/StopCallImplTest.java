@@ -54,8 +54,9 @@ class StopCallImplTest implements RealtimeTestConstants {
   @Test
   void fixedTrip() throws Exception {
     var realtimeEnv = envBuilder.addTrip(TRIP_INPUT).build();
-    var tripTimes = realtimeEnv.getTripTimesForTrip(TRIP_1_ID);
-    var pattern = realtimeEnv.getPatternForTrip(TRIP_1_ID);
+    var trip = realtimeEnv.tripFetcher(TRIP_1_ID);
+    var tripTimes = trip.tripTimes();
+    var pattern = trip.tripPattern();
 
     var call = new TripTimeOnDate(tripTimes, 0, pattern, SERVICE_DATE, MIDNIGHT);
 
@@ -74,8 +75,9 @@ class StopCallImplTest implements RealtimeTestConstants {
   void flexTrip() {
     OTPFeature.FlexRouting.testOn(() -> {
       var realtimeEnv = envBuilder.addFlexTrip(FLEX_TRIP_INPUT).build();
-      var tripTimes = realtimeEnv.getTripTimesForTrip(TRIP_1_ID);
-      var pattern = realtimeEnv.getPatternForTrip(TRIP_1_ID);
+      var trip = realtimeEnv.tripFetcher(TRIP_1_ID);
+      var tripTimes = trip.tripTimes();
+      var pattern = trip.tripPattern();
 
       var call = new TripTimeOnDate(tripTimes, 0, pattern, SERVICE_DATE, MIDNIGHT);
 

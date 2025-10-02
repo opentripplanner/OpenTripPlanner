@@ -67,7 +67,7 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(TRIP1_INPUT).addTrip(TRIP2_INPUT).build();
     var service = new ApiTransitService(env.getTransitService());
 
-    var pattern = env.getPatternForTrip(TRIP_1_ID);
+    var pattern = env.tripFetcher(TRIP_1_ID).tripPattern();
     var calls = service.getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
       STOP_A,
       pattern,
@@ -123,8 +123,9 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(TRIP1_INPUT).build();
     var service = new ApiTransitService(env.getTransitService());
 
-    var tripTimes = env.getTripTimesForTrip(TRIP_1_ID);
-    var pattern = env.getPatternForTrip(TRIP_1_ID);
+    var trip = env.tripFetcher(TRIP_1_ID);
+    var tripTimes = trip.tripTimes();
+    var pattern = trip.tripPattern();
 
     var leg = new ScheduledTransitLegBuilder()
       .withTripPattern(pattern)

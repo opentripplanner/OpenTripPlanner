@@ -98,6 +98,7 @@ public class TransitTestEnvironmentBuilder {
       siteRepositoryBuilder.build(),
       new Deduplicator()
     );
+    timetableRepository.initTimeZone(timeZone);
 
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     for (TripInput tripInput : tripInputs) {
@@ -111,7 +112,6 @@ public class TransitTestEnvironmentBuilder {
       createFlexTrip(tripInput, timetableRepository);
     }
 
-    timetableRepository.initTimeZone(timeZone);
     timetableRepository.addAgency(TimetableRepositoryForTest.AGENCY);
 
     timetableRepository.updateCalendarServiceData(
@@ -134,7 +134,7 @@ public class TransitTestEnvironmentBuilder {
     timetableRepository.addScheduledStopPointMapping(scheduledStopPointMapping);
 
     timetableRepository.index();
-    return new TransitTestEnvironment(timetableRepository, defaultServiceDate, timeZone);
+    return new TransitTestEnvironment(timetableRepository, defaultServiceDate);
   }
 
   public TransitTestEnvironmentBuilder withStops(String... stopIds) {

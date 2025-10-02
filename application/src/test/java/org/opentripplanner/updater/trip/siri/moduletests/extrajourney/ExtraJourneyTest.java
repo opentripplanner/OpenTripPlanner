@@ -55,8 +55,14 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals("ADDED | C [R] 0:02 0:02 | D 0:04 0:04", env.getRealtimeTimetable(ADDED_TRIP_ID));
-    assertEquals("SCHEDULED | C 0:01 0:01 | D 0:03 0:03", env.getScheduledTimetable(ADDED_TRIP_ID));
+    assertEquals(
+      "ADDED | C [R] 0:02 0:02 | D 0:04 0:04",
+      env.tripFetcher(ADDED_TRIP_ID).showTimetable()
+    );
+    assertEquals(
+      "SCHEDULED | C 0:01 0:01 | D 0:03 0:03",
+      env.tripFetcher(ADDED_TRIP_ID).showScheduledTimetable()
+    );
     FeedScopedId tripId = id(ADDED_TRIP_ID);
     TransitService transitService = env.getTransitService();
     Trip trip = transitService.getTrip(tripId);
@@ -88,8 +94,14 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals("ADDED | C [R] 0:02 0:02 | D 0:04 0:04", env.getRealtimeTimetable(ADDED_TRIP_ID));
-    assertEquals("SCHEDULED | C 0:01 0:01 | D 0:03 0:03", env.getScheduledTimetable(ADDED_TRIP_ID));
+    assertEquals(
+      "ADDED | C [R] 0:02 0:02 | D 0:04 0:04",
+      env.tripFetcher(ADDED_TRIP_ID).showTimetable()
+    );
+    assertEquals(
+      "SCHEDULED | C 0:01 0:01 | D 0:03 0:03",
+      env.tripFetcher(ADDED_TRIP_ID).showScheduledTimetable()
+    );
     TransitService transitService = env.getTransitService();
     assertEquals(numRoutes + 1, transitService.listRoutes().size());
     FeedScopedId newRouteId = id(newRouteRef);
@@ -164,11 +176,17 @@ class ExtraJourneyTest implements RealtimeTestConstants {
 
     assertEquals(1, result.successful());
 
-    assertEquals("ADDED | A [R] 0:02 0:02 | C 0:04 0:04", env.getRealtimeTimetable(ADDED_TRIP_ID));
-    assertEquals("SCHEDULED | A 0:01 0:01 | C 0:03 0:03", env.getScheduledTimetable(ADDED_TRIP_ID));
+    assertEquals(
+      "ADDED | A [R] 0:02 0:02 | C 0:04 0:04",
+      env.tripFetcher(ADDED_TRIP_ID).showTimetable()
+    );
+    assertEquals(
+      "SCHEDULED | A 0:01 0:01 | C 0:03 0:03",
+      env.tripFetcher(ADDED_TRIP_ID).showScheduledTimetable()
+    );
 
     // Original trip should not get canceled
-    var originalTripTimes = env.getTripTimesForTrip(TRIP_1_ID);
+    var originalTripTimes = env.tripFetcher(TRIP_1_ID).tripTimes();
     assertEquals(RealTimeState.SCHEDULED, originalTripTimes.getRealTimeState());
   }
 

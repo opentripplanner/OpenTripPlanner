@@ -4,14 +4,8 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -27,7 +21,6 @@ public final class TransitTestEnvironment {
   private final TimetableSnapshotManager snapshotManager;
   private final DateTimeHelper dateTimeHelper;
   private final LocalDate serviceDate;
-  private final ZoneId timeZone;
 
   public static TransitTestEnvironmentBuilder of() {
     return new TransitTestEnvironmentBuilder(
@@ -45,11 +38,7 @@ public final class TransitTestEnvironment {
     return new TransitTestEnvironmentBuilder("F", timeZone, serviceDate);
   }
 
-  TransitTestEnvironment(
-    TimetableRepository timetableRepository,
-    LocalDate defaultServiceDate,
-    ZoneId zoneId
-  ) {
+  TransitTestEnvironment(TimetableRepository timetableRepository, LocalDate defaultServiceDate) {
     this.timetableRepository = timetableRepository;
 
     this.timetableRepository.index();
@@ -58,17 +47,19 @@ public final class TransitTestEnvironment {
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       () -> defaultServiceDate
     );
-    this.timeZone = zoneId;
     this.serviceDate = defaultServiceDate;
-    this.dateTimeHelper = new DateTimeHelper(zoneId, defaultServiceDate);
+    this.dateTimeHelper = new DateTimeHelper(timetableRepository.getTimeZone(), defaultServiceDate);
   }
 
   public LocalDate serviceDate() {
     return serviceDate;
   }
 
+  /**
+   * Get the timezone of the timetable repository
+   */
   public ZoneId timeZone() {
-    return timeZone;
+    return timetableRepository.getTimeZone();
   }
 
   /**
@@ -78,23 +69,8 @@ public final class TransitTestEnvironment {
     return new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshot());
   }
 
-  /**
-   * Find the current TripTimes for a trip id on a serviceDate
-   */
-  public TripTimes getTripTimesForTrip(FeedScopedId tripId, LocalDate serviceDate) {
-    var transitService = getTransitService();
-    var trip = transitService.getTripOnServiceDate(tripId).getTrip();
-    var pattern = transitService.findPattern(trip, serviceDate);
-    var timetable = transitService.findTimetable(pattern, serviceDate);
-    return timetable.getTripTimes(trip);
-  }
-
   public String getFeedId() {
     return TimetableRepositoryForTest.FEED_ID;
-  }
-
-  public RegularStop getStop(String id) {
-    return Objects.requireNonNull(timetableRepository.getSiteRepository().getRegularStop(id(id)));
   }
 
   public TimetableRepository timetableRepository() {
@@ -105,27 +81,6 @@ public final class TransitTestEnvironment {
     return snapshotManager;
   }
 
-  public TripPattern getPatternForTrip(FeedScopedId tripId) {
-    return getPatternForTrip(tripId, serviceDate);
-  }
-
-  public TripPattern getPatternForTrip(String id) {
-    return getPatternForTrip(id(id));
-  }
-
-  public TripPattern getPatternForTrip(FeedScopedId tripId, LocalDate serviceDate) {
-    var transitService = getTransitService();
-    var trip = transitService.getTripOnServiceDate(tripId);
-    return transitService.findPattern(trip.getTrip(), serviceDate);
-  }
-
-  /**
-   * Find the current TripTimes for a trip id on the default serviceDate
-   */
-  public TripTimes getTripTimesForTrip(String id) {
-    return getTripTimesForTrip(id(id), serviceDate);
-  }
-
   public DateTimeHelper getDateTimeHelper() {
     return dateTimeHelper;
   }
@@ -134,25 +89,17 @@ public final class TransitTestEnvironment {
     return snapshotManager.getTimetableSnapshot();
   }
 
-  public String getRealtimeTimetable(String tripId) {
-    return getRealtimeTimetable(id(tripId), serviceDate);
+  /**
+   * Get a data fetcher for the given trip id on the default ServiceDate
+   */
+  public TripOnDateDataFetcher tripFetcher(String tripId) {
+    return new TripOnDateDataFetcher(getTransitService(), id(tripId), serviceDate);
   }
 
-  public String getRealtimeTimetable(FeedScopedId tripId, LocalDate serviceDate) {
-    var tt = getTripTimesForTrip(tripId, serviceDate);
-    var pattern = getPatternForTrip(tripId);
-
-    return TripTimesStringBuilder.encodeTripTimes(tt, pattern);
-  }
-
-  public String getScheduledTimetable(String tripId) {
-    return getScheduledTimetable(id(tripId));
-  }
-
-  public String getScheduledTimetable(FeedScopedId tripId) {
-    var pattern = getPatternForTrip(tripId);
-    var tt = pattern.getScheduledTimetable().getTripTimes(tripId);
-
-    return TripTimesStringBuilder.encodeTripTimes(tt, pattern);
+  /**
+   * Get a data fetcher for the given trip id on the default ServiceDate
+   */
+  public TripOnDateDataFetcher tripFetcher(String tripId, LocalDate serviceDate) {
+    return new TripOnDateDataFetcher(getTransitService(), id(tripId), serviceDate);
   }
 }

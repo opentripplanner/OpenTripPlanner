@@ -100,7 +100,7 @@ public class ReplacementTest implements RealtimeTestConstants {
 
     // New trip pattern
     {
-      assertAddedTrip(TRIP_1_ID, env, RealTimeState.MODIFIED);
+      assertAddedTrip(TRIP_1_ID, env, RealTimeState.MODIFIED, STOP_A);
       var newTripPattern = snapshot.getNewTripPatternForModifiedTrip(tripId, env.serviceDate());
       assertNotNull(newTripPattern, "New trip pattern should be found");
 
