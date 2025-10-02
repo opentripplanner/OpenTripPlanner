@@ -1,11 +1,10 @@
 package org.opentripplanner.transit.model._data;
 
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -17,25 +16,23 @@ import org.opentripplanner.updater.trip.TimetableSnapshotManager;
  */
 public final class TransitTestEnvironment {
 
+  private static final String DEFAULT_FEED_ID_FOR_TEST = "F";
+
   private final TimetableRepository timetableRepository;
   private final TimetableSnapshotManager snapshotManager;
   private final DateTimeHelper dateTimeHelper;
-  private final LocalDate serviceDate;
+  private final LocalDate defaultServiceDate;
 
   public static TransitTestEnvironmentBuilder of() {
-    return new TransitTestEnvironmentBuilder(
-      "F",
-      ZoneId.of("Europe/Paris"),
-      LocalDate.of(2024, 5, 7)
-    );
+    return new TransitTestEnvironmentBuilder(ZoneId.of("Europe/Paris"), LocalDate.of(2024, 5, 7));
   }
 
   public static TransitTestEnvironmentBuilder of(LocalDate serviceDate) {
-    return new TransitTestEnvironmentBuilder("F", ZoneId.of("Europe/Paris"), serviceDate);
+    return new TransitTestEnvironmentBuilder(ZoneId.of("Europe/Paris"), serviceDate);
   }
 
   public static TransitTestEnvironmentBuilder of(LocalDate serviceDate, ZoneId timeZone) {
-    return new TransitTestEnvironmentBuilder("F", timeZone, serviceDate);
+    return new TransitTestEnvironmentBuilder(timeZone, serviceDate);
   }
 
   TransitTestEnvironment(TimetableRepository timetableRepository, LocalDate defaultServiceDate) {
@@ -47,12 +44,12 @@ public final class TransitTestEnvironment {
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       () -> defaultServiceDate
     );
-    this.serviceDate = defaultServiceDate;
+    this.defaultServiceDate = defaultServiceDate;
     this.dateTimeHelper = new DateTimeHelper(timetableRepository.getTimeZone(), defaultServiceDate);
   }
 
   public LocalDate serviceDate() {
-    return serviceDate;
+    return defaultServiceDate;
   }
 
   /**
@@ -93,7 +90,7 @@ public final class TransitTestEnvironment {
    * Get a data fetcher for the given trip id on the default ServiceDate
    */
   public TripOnDateDataFetcher tripFetcher(String tripId) {
-    return new TripOnDateDataFetcher(getTransitService(), id(tripId), serviceDate);
+    return new TripOnDateDataFetcher(getTransitService(), id(tripId), defaultServiceDate);
   }
 
   /**
@@ -101,5 +98,12 @@ public final class TransitTestEnvironment {
    */
   public TripOnDateDataFetcher tripFetcher(String tripId, LocalDate serviceDate) {
     return new TripOnDateDataFetcher(getTransitService(), id(tripId), serviceDate);
+  }
+
+  /**
+   * Creates a feedscooped id using the default feed id
+   */
+  public static FeedScopedId id(String id) {
+    return new FeedScopedId(DEFAULT_FEED_ID_FOR_TEST, id);
   }
 }

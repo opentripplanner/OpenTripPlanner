@@ -7,9 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_A;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_B;
-import static org.opentripplanner.updater.trip.gtfs.moduletests.addition.AddedTest.assertAddedTrip;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -24,15 +21,16 @@ public class ReplacementTest implements RealtimeTestConstants {
 
   @Test
   void replacementTrip() {
+    var builder = TransitTestEnvironment.of();
+    var STOP_A = builder.stop(STOP_A_ID);
+    var STOP_B = builder.stop(STOP_B_ID);
+    var STOP_C = builder.stop(STOP_C_ID);
     var TRIP_INPUT = TripInput.of(TRIP_1_ID)
       .addStop(STOP_A, "8:30:00", "8:30:00")
       .addStop(STOP_B, "8:40:00", "8:40:00")
       .withHeadsign(I18NString.of("Original Headsign"))
       .build();
-    var env = TransitTestEnvironment.of()
-      .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
-      .addTrip(TRIP_INPUT)
-      .build();
+    var env = builder.addTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var tripUpdate = rt
@@ -100,16 +98,15 @@ public class ReplacementTest implements RealtimeTestConstants {
 
     // New trip pattern
     {
-      assertAddedTrip(TRIP_1_ID, env, RealTimeState.MODIFIED, STOP_A);
-      var newTripPattern = snapshot.getNewTripPatternForModifiedTrip(tripId, env.serviceDate());
+      var tripFetcher = env.tripFetcher(TRIP_1_ID);
+      assertEquals(RealTimeState.MODIFIED, tripFetcher.getRealTimeState());
+
+      var newTripPattern = tripFetcher.tripPattern();
       assertNotNull(newTripPattern, "New trip pattern should be found");
 
-      var newTimetableForToday = snapshot.resolve(newTripPattern, env.serviceDate());
-      var newTimetableScheduled = snapshot.resolve(newTripPattern, null);
+      var tripTimes = tripFetcher.tripTimes();
+      var newTimetableScheduled = transitService.findTimetable(newTripPattern, null);
 
-      assertNotSame(newTimetableForToday, newTimetableScheduled);
-
-      var tripTimes = newTimetableForToday.getTripTimes(tripId);
       assertNotNull(tripTimes, "New trip should be found in time table for service date");
       assertEquals(RealTimeState.MODIFIED, tripTimes.getRealTimeState());
 

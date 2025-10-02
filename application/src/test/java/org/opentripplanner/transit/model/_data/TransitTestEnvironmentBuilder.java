@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.model._data;
 
+import static org.opentripplanner.transit.model._data.TransitTestEnvironment.id;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -62,17 +64,11 @@ public class TransitTestEnvironmentBuilder {
   private final Map<FeedScopedId, RegularStop> scheduledStopPointMapping = new HashMap<>();
   private final AtomicInteger serviceCodeCounter = new AtomicInteger();
 
-  private final String defaultFeedId;
   private final FeedScopedId defaultServiceId;
   private final ZoneId timeZone;
   private final LocalDate defaultServiceDate;
 
-  TransitTestEnvironmentBuilder(
-    String defaultFeedId,
-    ZoneId timeZone,
-    LocalDate defaultServiceDate
-  ) {
-    this.defaultFeedId = defaultFeedId;
+  TransitTestEnvironmentBuilder(ZoneId timeZone, LocalDate defaultServiceDate) {
     this.timeZone = timeZone;
     this.defaultServiceId = id("CAL_1");
     this.defaultServiceDate = defaultServiceDate;
@@ -367,9 +363,5 @@ public class TransitTestEnvironmentBuilder {
       .withName(new NonLocalizedString(id))
       .withCode(id)
       .withCoordinate(ANY_COORDINATE);
-  }
-
-  private FeedScopedId id(String id) {
-    return new FeedScopedId(defaultFeedId, id);
   }
 }
