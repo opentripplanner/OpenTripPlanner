@@ -592,42 +592,39 @@ public class StatesToWalkStepsMapper {
     State backState,
     Edge edge
   ) {
-    // TODO add feature flag check
-    if (true) {
-      Optional<EdgeLevelInfo> edgeLevelInfoOptional = osmStreetDecoratorService.findEdgeInformation(
-        edge
-      );
-      if (edgeLevelInfoOptional.isPresent()) {
-        EdgeLevelInfo edgeLevelInfo = edgeLevelInfoOptional.get();
-        VertexLevelInfo fromVertexInfo = edgeLevelInfo.upperVertexInfo();
-        VertexLevelInfo toVertexInfo = edgeLevelInfo.lowerVertexInfo();
-        InclineType inclineType = InclineType.DOWN;
-        if (
-          backState.getVertex() instanceof OsmVertex fromVertex &&
-          fromVertex.nodeId == edgeLevelInfo.lowerVertexInfo().osmVertexId()
-        ) {
-          inclineType = InclineType.UP;
-          fromVertexInfo = edgeLevelInfo.lowerVertexInfo();
-          toVertexInfo = edgeLevelInfo.upperVertexInfo();
-        }
+    Optional<EdgeLevelInfo> edgeLevelInfoOptional = osmStreetDecoratorService.findEdgeInformation(
+      edge
+    );
+    if (edgeLevelInfoOptional.isPresent()) {
+      EdgeLevelInfo edgeLevelInfo = edgeLevelInfoOptional.get();
+      VertexLevelInfo fromVertexInfo = edgeLevelInfo.upperVertexInfo();
+      VertexLevelInfo toVertexInfo = edgeLevelInfo.lowerVertexInfo();
+      InclineType inclineType = InclineType.DOWN;
+      if (
+        backState.getVertex() instanceof OsmVertex fromVertex &&
+        fromVertex.nodeId == edgeLevelInfo.lowerVertexInfo().osmVertexId()
+      ) {
+        inclineType = InclineType.UP;
+        fromVertexInfo = edgeLevelInfo.lowerVertexInfo();
+        toVertexInfo = edgeLevelInfo.upperVertexInfo();
+      }
 
-        if (edge instanceof EscalatorEdge) {
-          return new EscalatorUse(
-            fromVertexInfo.floorNumber(),
-            fromVertexInfo.name(),
-            inclineType,
-            toVertexInfo.floorNumber(),
-            toVertexInfo.name()
-          );
-        } else {
-          return new StairsUse(
-            fromVertexInfo.floorNumber(),
-            fromVertexInfo.name(),
-            inclineType,
-            toVertexInfo.floorNumber(),
-            toVertexInfo.name()
-          );
-        }
+      if (edge instanceof EscalatorEdge) {
+        return new EscalatorUse(
+          fromVertexInfo.floorNumber(),
+          fromVertexInfo.name(),
+          inclineType,
+          toVertexInfo.floorNumber(),
+          toVertexInfo.name()
+        );
+      } else {
+        return new StairsUse(
+          fromVertexInfo.floorNumber(),
+          fromVertexInfo.name(),
+          inclineType,
+          toVertexInfo.floorNumber(),
+          toVertexInfo.name()
+        );
       }
     }
     return null;

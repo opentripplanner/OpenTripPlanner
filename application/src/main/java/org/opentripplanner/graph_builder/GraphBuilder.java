@@ -105,8 +105,6 @@ public class GraphBuilder implements Runnable {
       .dataSources(dataSources)
       .timeZoneId(timetableRepository.getTimeZone());
 
-    // TODO add feature flag for OsmStreetDecoratorRepository
-
     var factory = builder.build();
 
     var graphBuilder = factory.graphBuilder();
