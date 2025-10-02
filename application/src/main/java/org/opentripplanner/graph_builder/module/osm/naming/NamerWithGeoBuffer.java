@@ -50,7 +50,10 @@ public abstract class NamerWithGeoBuffer implements EdgeNamer {
     unnamedEdges
       .parallelStream()
       .forEach(edgeOnLevel -> {
-        assignNameToEdge(edgeOnLevel, namesApplied);
+        var buffer = preciseBuffer.preciseBuffer(edgeOnLevel.edge.getGeometry());
+        if (assignNameToEdge(edgeOnLevel, buffer)) {
+          namesApplied.incrementAndGet();
+        }
 
         // Keep lambda! A method-ref would cause incorrect class and line number to be logged
         // noinspection Convert2MethodRef
@@ -75,17 +78,6 @@ public abstract class NamerWithGeoBuffer implements EdgeNamer {
   protected abstract boolean assignNameToEdge(EdgeOnLevel edgeOnLevel, Geometry buffer);
 
   /**
-   * The actual worker method that runs the business logic on an individual edge.
-   */
-  private void assignNameToEdge(EdgeOnLevel edgeOnLevel, AtomicInteger namesApplied) {
-    var edge = edgeOnLevel.edge;
-    var buffer = preciseBuffer.preciseBuffer(edge.getGeometry());
-    if (assignNameToEdge(edgeOnLevel, buffer)) {
-      namesApplied.incrementAndGet();
-    }
-  }
-
-  /**
    * Compute the centroid of all sidewalk edges.
    */
   private Coordinate computeEnvelopeCenter(Collection<EdgeOnLevel> edges) {
@@ -97,21 +89,27 @@ public abstract class NamerWithGeoBuffer implements EdgeNamer {
     return envelope.centre();
   }
 
+  /**
+   * Adds an entry to a geospatial index.
+   */
   protected static void addToSpatialIndex(OsmEntity way, StreetEdgePair pair, HashGridSpatialIndex<EdgeOnLevel> spatialIndex) {
     addToSpatialIndex(way, pair, spatialIndex, Integer.MAX_VALUE);
   }
 
+  /**
+   * Adds an entry to a geospatial index if its length is less than a threshold.
+   */
   protected static void addToSpatialIndex(
     OsmEntity way,
     StreetEdgePair pair,
     HashGridSpatialIndex<EdgeOnLevel> spatialIndex,
-    int lengthLimit
+    int maxLengthMeters
   ) {
     // We generate two edges for each osm way: one there and one back. This spatial index only
     // needs to contain one item for each road segment with a unique geometry and name, so we
     // add only one of the two edges.
     var edge = pair.pickAny();
-    if (edge.getDistanceMeters() <= lengthLimit) {
+    if (edge.getDistanceMeters() <= maxLengthMeters) {
       spatialIndex.insert(
         edge.getGeometry().getEnvelopeInternal(),
         new EdgeOnLevel((OsmWay)way, edge, way.getLevels())
