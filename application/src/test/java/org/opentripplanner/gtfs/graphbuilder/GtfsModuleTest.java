@@ -69,7 +69,7 @@ class GtfsModuleTest {
   private static TestModels buildTestModel() {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     return new TestModels(graph, timetableRepository);
   }

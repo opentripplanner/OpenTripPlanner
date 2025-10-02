@@ -142,7 +142,7 @@ public class ConstantsForTests {
   public static TestOtpModel buildNewPortlandGraph(boolean withElevation) {
     try {
       var deduplicator = new Deduplicator();
-      var graph = new Graph(deduplicator);
+      var graph = new Graph();
       var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
       var fareFactory = new DefaultFareServiceFactory();
       // Add street data from OSM
@@ -201,7 +201,7 @@ public class ConstantsForTests {
     try {
       var deduplicator = new Deduplicator();
       var siteRepository = new SiteRepository();
-      var graph = new Graph(deduplicator);
+      var graph = new Graph();
       var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
       // Add street data from OSM
       var osmProvider = new DefaultOsmProvider(osmFile, true);
@@ -249,7 +249,7 @@ public class ConstantsForTests {
   public static TestOtpModel buildGtfsGraph(File gtfsFile, FareServiceFactory fareServiceFactory) {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     addGtfsToGraph(graph, timetableRepository, gtfsFile, fareServiceFactory, null);
     return new TestOtpModel(graph, timetableRepository, fareServiceFactory);
@@ -260,7 +260,7 @@ public class ConstantsForTests {
       var deduplicator = new Deduplicator();
       var siteRepository = new SiteRepository();
       var parkingService = new DefaultVehicleParkingRepository();
-      var graph = new Graph(deduplicator);
+      var graph = new Graph();
       var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
       // Add street data from OSM
       {
@@ -286,6 +286,7 @@ public class ConstantsForTests {
             timetableRepository,
             parkingService,
             graph,
+            deduplicator,
             DataImportIssueStore.NOOP
           )
           .buildGraph();
@@ -332,6 +333,7 @@ public class ConstantsForTests {
       List.of(bundle),
       timetableRepository,
       graph,
+      new Deduplicator(),
       DataImportIssueStore.NOOP,
       ServiceDateInterval.unbounded(),
       fareServiceFactory,

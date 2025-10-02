@@ -21,7 +21,7 @@ import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -64,14 +64,14 @@ class FareLookupService implements Serializable {
   /**
    * Returns the fare leg rules for a specific leg.
    */
-  Set<FareLegRule> legRules(ScheduledTransitLeg leg) {
+  Set<FareLegRule> legRules(TransitLeg leg) {
     return this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toSet());
   }
 
   /**
    * Find those fare products that match all legs through an unlimited transfer.
    */
-  Set<FareProduct> findTransfersMatchingAllLegs(List<ScheduledTransitLeg> legs) {
+  Set<FareProduct> findTransfersMatchingAllLegs(List<TransitLeg> legs) {
     return this.transferRules.stream()
       .filter(FareTransferRule::unlimitedTransfers)
       .filter(FareTransferRule::isFree)
@@ -81,7 +81,7 @@ class FareLookupService implements Serializable {
       .collect(Collectors.toUnmodifiableSet());
   }
 
-  private boolean appliesToAllLegs(List<ScheduledTransitLeg> legs, TransferMatch transferMatch) {
+  private boolean appliesToAllLegs(List<TransitLeg> legs, TransferMatch transferMatch) {
     return partitionIntoOverlappingPairs(legs)
       .stream()
       .allMatch(
@@ -94,10 +94,7 @@ class FareLookupService implements Serializable {
   /**
    * Find fare offers for a specific pair of legs.
    */
-  Set<FareOffer> findTransferOffersForSubLegs(
-    ScheduledTransitLeg head,
-    List<ScheduledTransitLeg> tail
-  ) {
+  Set<FareOffer> findTransferOffersForSubLegs(TransitLeg head, List<TransitLeg> tail) {
     Set<TransferMatch> rules =
       this.transferRules.stream()
         .flatMap(r -> {
@@ -128,7 +125,7 @@ class FareLookupService implements Serializable {
       .collect(Collectors.toSet());
   }
 
-  boolean hasFreeTransfer(ScheduledTransitLeg head, List<ScheduledTransitLeg> tail) {
+  boolean hasFreeTransfer(TransitLeg head, List<TransitLeg> tail) {
     return this.transferRules.stream()
       .anyMatch(r -> {
         var fromRules = findFareLegRule(r.fromLegGroup());
@@ -148,8 +145,8 @@ class FareLookupService implements Serializable {
   }
 
   private Set<Set<TransferMatch>> findPossibleTransfers(
-    ScheduledTransitLeg head,
-    List<ScheduledTransitLeg> tail,
+    TransitLeg head,
+    List<TransitLeg> tail,
     FareTransferRule r,
     List<FareLegRule> fromRules,
     List<FareLegRule> toRules
@@ -163,8 +160,8 @@ class FareLookupService implements Serializable {
   }
 
   private Stream<TransferMatch> findTransferMatches(
-    ScheduledTransitLeg from,
-    ScheduledTransitLeg to,
+    TransitLeg from,
+    TransitLeg to,
     FareTransferRule r,
     List<FareLegRule> fromRules,
     List<FareLegRule> toRules
@@ -179,7 +176,7 @@ class FareLookupService implements Serializable {
 
   private List<TransferMatch> findTransferMatches(
     FareTransferRule transferRule,
-    List<ScheduledTransitLeg> transitLegs
+    List<TransitLeg> transitLegs
   ) {
     var pairs = partitionIntoOverlappingPairs(transitLegs);
     var fromRules = findFareLegRule(transferRule.fromLegGroup());
@@ -207,7 +204,7 @@ class FareLookupService implements Serializable {
     }
   }
 
-  private boolean legMatchesRule(ScheduledTransitLeg leg, FareLegRule rule) {
+  private boolean legMatchesRule(TransitLeg leg, FareLegRule rule) {
     // make sure that you only get rules for the correct feed
     return (
       leg.agency().getId().getFeedId().equals(rule.feedId()) &&
@@ -257,7 +254,7 @@ class FareLookupService implements Serializable {
    * Get the fare products that match the network_id. If the network id of the product is null it
    * depends on the presence/absence of other rules with that network id.
    */
-  private boolean matchesNetworkId(ScheduledTransitLeg leg, FareLegRule rule) {
+  private boolean matchesNetworkId(TransitLeg leg, FareLegRule rule) {
     var routesNetworkIds = leg
       .route()
       .getGroupsOfRoutes()
@@ -273,7 +270,7 @@ class FareLookupService implements Serializable {
     );
   }
 
-  private boolean matchesDistance(ScheduledTransitLeg leg, FareLegRule rule) {
+  private boolean matchesDistance(TransitLeg leg, FareLegRule rule) {
     // If no valid distance type is given, do not consider distances in fare computation
     FareDistance distance = rule.fareDistance();
     if (distance instanceof FareDistance.Stops(int min, int max)) {
@@ -282,7 +279,7 @@ class FareLookupService implements Serializable {
     } else if (
       rule.fareDistance() instanceof FareDistance.LinearDistance(Distance min, Distance max)
     ) {
-      var legDistance = leg.directDistanceMeters();
+      var legDistance = leg.from().coordinate.distanceTo(leg.to().coordinate);
 
       return legDistance > min.toMeters() && legDistance < max.toMeters();
     } else return true;

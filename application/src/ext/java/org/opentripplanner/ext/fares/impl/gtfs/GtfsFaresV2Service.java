@@ -28,9 +28,9 @@ public final class GtfsFaresV2Service implements Serializable {
 
   public FareResult calculateFares(Itinerary itinerary) {
     var legOffers = new LegOfferContainer();
-    var scheduledTransitLegs = itinerary.listScheduledTransitLegs();
+    var transitLegs = itinerary.listTransitLegs();
     // individual legs
-    scheduledTransitLegs.forEach(leg -> {
+    transitLegs.forEach(leg -> {
       var products = lookup
         .legRules(leg)
         .stream()
@@ -41,8 +41,8 @@ public final class GtfsFaresV2Service implements Serializable {
     });
 
     // add transfers for subsections of the itinerary
-    if (scheduledTransitLegs.size() > 1) {
-      var splits = ListUtils.partitionIntoSplits(scheduledTransitLegs);
+    if (transitLegs.size() > 1) {
+      var splits = ListUtils.partitionIntoSplits(transitLegs);
       splits.forEach(split ->
         split
           .subTails()
@@ -57,7 +57,7 @@ public final class GtfsFaresV2Service implements Serializable {
       );
     }
 
-    var itinProducts = lookup.findTransfersMatchingAllLegs(scheduledTransitLegs);
+    var itinProducts = lookup.findTransfersMatchingAllLegs(transitLegs);
     return new FareResult(itinProducts, legOffers.toMultimap());
   }
 

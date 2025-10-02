@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.street.search.intersection_model.AbstractIntersectionTraversalCalculator.calculateTurnAngle;
+
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -41,15 +43,12 @@ class TurnRestrictionUnifier {
               );
               continue;
             }
-            int angleDiff = from.getOutAngle() - to.getInAngle();
-            if (angleDiff < 0) {
-              angleDiff += 360;
-            }
+            int angleDiff = calculateTurnAngle(from, to);
             // If the angle seems off for the stated restriction direction, add an issue
             // to the issue store, but do not ignore the restriction.
             switch (restrictionTag.direction) {
               case LEFT -> {
-                if (angleDiff >= 160) {
+                if (angleDiff >= -20) {
                   issueStore.add(
                     new TurnRestrictionBad(
                       restrictionTag.relationOsmID,
@@ -59,7 +58,7 @@ class TurnRestrictionUnifier {
                 }
               }
               case RIGHT -> {
-                if (angleDiff <= 200) {
+                if (angleDiff <= 20) {
                   issueStore.add(
                     new TurnRestrictionBad(
                       restrictionTag.relationOsmID,
@@ -69,7 +68,7 @@ class TurnRestrictionUnifier {
                 }
               }
               case U -> {
-                if ((angleDiff <= 150 || angleDiff > 210)) {
+                if (Math.abs(angleDiff) <= 150) {
                   issueStore.add(
                     new TurnRestrictionBad(
                       restrictionTag.relationOsmID,
@@ -79,7 +78,7 @@ class TurnRestrictionUnifier {
                 }
               }
               case STRAIGHT -> {
-                if (angleDiff >= 30 && angleDiff < 330) {
+                if (Math.abs(angleDiff) >= 30) {
                   issueStore.add(
                     new TurnRestrictionBad(
                       restrictionTag.relationOsmID,

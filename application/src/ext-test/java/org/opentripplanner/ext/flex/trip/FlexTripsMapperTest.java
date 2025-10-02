@@ -7,10 +7,8 @@ import static org.opentripplanner.graph_builder.issue.api.DataImportIssueStore.N
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.flex.FlexStopTimesForTest;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.service.SiteRepository;

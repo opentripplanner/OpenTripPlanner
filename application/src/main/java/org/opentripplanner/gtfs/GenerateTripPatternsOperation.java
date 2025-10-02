@@ -18,7 +18,7 @@ import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -44,7 +44,7 @@ public class GenerateTripPatternsOperation {
 
   private final OtpTransitServiceBuilder transitServiceBuilder;
   private final DataImportIssueStore issueStore;
-  private final Deduplicator deduplicator;
+  private final DeduplicatorService deduplicator;
   private final Set<FeedScopedId> calendarServiceIds;
   private final GeometryProcessor geometryProcessor;
 
@@ -60,7 +60,7 @@ public class GenerateTripPatternsOperation {
   public GenerateTripPatternsOperation(
     OtpTransitServiceBuilder builder,
     DataImportIssueStore issueStore,
-    Deduplicator deduplicator,
+    DeduplicatorService deduplicator,
     Set<FeedScopedId> calendarServiceIds,
     GeometryProcessor geometryProcessor
   ) {
@@ -120,7 +120,7 @@ public class GenerateTripPatternsOperation {
    */
   private void collectFrequencyByTrip() {
     for (Frequency freq : transitServiceBuilder.getFrequencies()) {
-      frequenciesForTrip.put(freq.getTrip(), freq);
+      frequenciesForTrip.put(freq.trip(), freq);
     }
   }
 

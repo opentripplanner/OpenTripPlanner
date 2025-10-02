@@ -301,7 +301,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>9.0.1</version>
+            <version>10.0.1</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
@@ -340,7 +340,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.4.4</version>
+            <version>5.5.1</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -376,7 +376,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.17.14</version>
+            <version>7.17.15</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>

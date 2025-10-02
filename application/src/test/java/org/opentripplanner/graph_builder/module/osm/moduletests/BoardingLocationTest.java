@@ -14,7 +14,6 @@ import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 class BoardingLocationTest {
 
@@ -29,7 +28,7 @@ class BoardingLocationTest {
     way.addTag("oneway", "yes");
     var provider = TestOsmProvider.of().addWay(way).build();
 
-    var graph = new Graph(new Deduplicator());
+    var graph = new Graph();
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var osmModule = OsmModule.of(
       provider,
@@ -56,7 +55,7 @@ class BoardingLocationTest {
     way.addTag("public_transport", "platform");
     var provider = TestOsmProvider.of().addWay(way).build();
 
-    var graph = new Graph(new Deduplicator());
+    var graph = new Graph();
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var osmModule = OsmModule.of(
       provider,
@@ -82,7 +81,7 @@ class BoardingLocationTest {
     way.addTag("ref", "1");
     var provider = TestOsmProvider.of().addWay(way).build();
 
-    var graph = new Graph(new Deduplicator());
+    var graph = new Graph();
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var osmModule = OsmModule.of(
       provider,

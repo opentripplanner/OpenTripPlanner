@@ -6,16 +6,17 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
@@ -438,8 +439,15 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return request.intersectionTraversalCalculator();
   }
 
-  public DataOverlayContext dataOverlayContext() {
-    return request.dataOverlayContext();
+  public <T extends ExtensionRequestContext> Optional<T> getExtensionRequestContext(
+    Class<T> ofType
+  ) {
+    for (var it : request.listExtensionRequestContexts()) {
+      if (ofType.isAssignableFrom(it.getClass())) {
+        return Optional.of((T) it);
+      }
+    }
+    return Optional.empty();
   }
 
   public boolean isInsideNoRentalDropOffArea() {
