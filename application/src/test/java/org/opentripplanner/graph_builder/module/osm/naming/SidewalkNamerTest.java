@@ -29,7 +29,7 @@ class SidewalkNamerTest {
   @Test
   void postprocess() {
     var builder = new ModelBuilder();
-    var sidewalk = builder.addUnamedSidewalk(
+    var sidewalk = builder.addUnnamedSidewalk(
       new WgsCoordinate(33.75029, -84.39198),
       new WgsCoordinate(33.74932, -84.39275)
     );
@@ -62,7 +62,7 @@ class SidewalkNamerTest {
 
     private final List<EdgePair> pairs = new ArrayList<>();
 
-    EdgePair addUnamedSidewalk(WgsCoordinate... coordinates) {
+    EdgePair addUnnamedSidewalk(WgsCoordinate... coordinates) {
       var edge = edgeBuilder(coordinates)
         .withName(SIDEWALK)
         .withPermission(StreetTraversalPermission.PEDESTRIAN)
