@@ -195,6 +195,13 @@ public class TransitTestEnvironmentBuilder {
     return this;
   }
 
+  /**
+   * The default service date is used when creating trips without a specified service date
+   */
+  public LocalDate defaultServiceDate() {
+    return defaultServiceDate;
+  }
+
   private Trip createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
     var serviceDates = Optional.ofNullable(tripInput.serviceDates()).orElseGet(() ->
       List.of(defaultServiceDate)

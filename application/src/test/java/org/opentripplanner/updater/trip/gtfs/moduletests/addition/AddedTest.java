@@ -13,7 +13,6 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
@@ -37,8 +36,7 @@ import org.opentripplanner.utils.time.TimeUtils;
 
 class AddedTest implements RealtimeTestConstants {
 
-  private static final LocalDate SERVICE_DATE = LocalDate.of(2025, 11, 28);
-  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
   private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
   private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
   private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
@@ -47,7 +45,10 @@ class AddedTest implements RealtimeTestConstants {
     .addTrip(
       TripInput.of(TRIP_1_ID)
         // just to set the schedule period
-        .withServiceDates(SERVICE_DATE.minusDays(1), SERVICE_DATE.plusDays(1))
+        .withServiceDates(
+          envBuilder.defaultServiceDate().minusDays(1),
+          envBuilder.defaultServiceDate().plusDays(1)
+        )
         .addStop(STOP_A, "12:00", "12:00")
         .addStop(STOP_B, "12:10", "12:10")
         .addStop(STOP_C, "12:20", "12:20")
