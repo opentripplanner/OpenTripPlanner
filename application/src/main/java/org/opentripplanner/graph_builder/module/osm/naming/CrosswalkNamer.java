@@ -8,29 +8,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.geotools.api.referencing.FactoryException;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.api.referencing.operation.MathTransform;
-import org.geotools.api.referencing.operation.TransformException;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
-import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.TraverseDirection;
-import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.utils.lang.DoubleUtils;
-import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +33,7 @@ import org.slf4j.LoggerFactory;
  *        e.g. <a href="https://www.openstreetmap.org/way/1139062913">...</a>),
  *        use "crossing over turn lane".
  */
-public class CrosswalkNamer implements EdgeNamer {
+public class CrosswalkNamer extends NamerWithGeoBuffer {
 
   private static final Logger LOG = LoggerFactory.getLogger(CrosswalkNamer.class);
   private static final int BUFFER_METERS = 25;
@@ -57,12 +41,6 @@ public class CrosswalkNamer implements EdgeNamer {
   private HashGridSpatialIndex<EdgeOnLevel> streetEdges = new HashGridSpatialIndex<>();
   private HashGridSpatialIndex<EdgeOnLevel> sidewalkEdges = new HashGridSpatialIndex<>();
   private Collection<EdgeOnLevel> unnamedCrosswalks = new ArrayList<>();
-  private PreciseBuffer preciseBuffer;
-
-  @Override
-  public I18NString name(OsmEntity way) {
-    return way.getAssumedName();
-  }
 
   @Override
   public void recordEdges(OsmEntity way, StreetEdgePair pair) {
@@ -104,33 +82,7 @@ public class CrosswalkNamer implements EdgeNamer {
 
   @Override
   public void postprocess() {
-    ProgressTracker progress = ProgressTracker.track(
-      "Assigning names to crosswalks",
-      500,
-      unnamedCrosswalks.size()
-    );
-
-    this.preciseBuffer = new PreciseBuffer(computeEnvelopeCenter(), BUFFER_METERS);
-
-    final AtomicInteger namesApplied = new AtomicInteger(0);
-    unnamedCrosswalks
-      .parallelStream()
-      .forEach(crosswalkOnLevel -> {
-        assignNameToCrosswalk(crosswalkOnLevel, namesApplied);
-
-        // Keep lambda! A method-ref would cause incorrect class and line number to be logged
-        // noinspection Convert2MethodRef
-        progress.step(m -> LOG.info(m));
-      });
-
-    LOG.info(
-      "Assigned names to {} of {} of crosswalks ({}%)",
-      namesApplied.get(),
-      unnamedCrosswalks.size(),
-      DoubleUtils.roundTo2Decimals(((double) namesApplied.get() / unnamedCrosswalks.size()) * 100)
-    );
-
-    LOG.info(progress.completeMessage());
+    postprocess(unnamedCrosswalks, BUFFER_METERS, "crosswalks", LOG);
 
     // Set the indices to null so they can be garbage-collected
     streetEdges = null;
@@ -142,15 +94,15 @@ public class CrosswalkNamer implements EdgeNamer {
    * The actual worker method that runs the business logic on an individual sidewalk edge.
    * This will also name adjacent sidewalks on each end if they are the only adjacent sidewalks.
    */
-  private void assignNameToCrosswalk(EdgeOnLevel crosswalkOnLevel, AtomicInteger namesApplied) {
-    var crosswalk = crosswalkOnLevel.edge;
-    var buffer = preciseBuffer.preciseBuffer(crosswalk.getGeometry());
-    OsmWay way = crosswalkOnLevel.way;
+  @Override
+  protected boolean assignNameToEdge(EdgeOnLevel crosswalkOnLevel, Geometry buffer) {
+    var crosswalk = crosswalkOnLevel.edge();
+    OsmWay way = crosswalkOnLevel.way();
 
     var streetCandidates = streetEdges
       .query(buffer.getEnvelopeInternal())
       .stream()
-      .map(e -> e.way)
+      .map(EdgeOnLevel::way)
       .toList();
 
     var crossStreetOpt = getIntersectingStreet(way, streetCandidates);
@@ -169,20 +121,23 @@ public class CrosswalkNamer implements EdgeNamer {
         // Default on using the OSM way ID, which should not happen.
         crosswalk.setName(I18NString.of(String.format("crossing %s", way.getId())));
       }
-      namesApplied.incrementAndGet();
 
       var adjacentSidewalks = sidewalkEdges
         .query(buffer.getEnvelopeInternal())
         .stream()
         .filter(e -> e.way().isAdjacentTo(way))
-        .filter(e -> e.edge.nameIsDerived())
+        .filter(e -> e.edge().nameIsDerived())
         .toList();
 
       // Group sidewalks at each end of the crosswalk.
       TLongList nodes = way.getNodeRefs();
       renameAdjacentSidewalk(adjacentSidewalks, crosswalk.getName(), nodes.get(0));
       renameAdjacentSidewalk(adjacentSidewalks, crosswalk.getName(), nodes.get(nodes.size() - 1));
+
+      return true;
     }
+
+    return false;
   }
 
   /**
@@ -195,10 +150,10 @@ public class CrosswalkNamer implements EdgeNamer {
   ) {
     List<EdgeOnLevel> sidewalks = adjacentSidewalks
       .stream()
-      .filter(e -> e.way.getNodeRefs().contains(nodeId))
+      .filter(e -> e.way().getNodeRefs().contains(nodeId))
       .toList();
     if (sidewalks.size() == 1) {
-      sidewalks.getFirst().edge.setName(crosswalkName);
+      sidewalks.getFirst().edge().setName(crosswalkName);
     }
   }
 
@@ -227,64 +182,5 @@ public class CrosswalkNamer implements EdgeNamer {
 
   public Collection<EdgeOnLevel> getUnnamedCrosswalks() {
     return unnamedCrosswalks;
-  }
-
-  /**
-   * Compute the centroid of all sidewalk edges.
-   */
-  private Coordinate computeEnvelopeCenter() {
-    var envelope = new Envelope();
-    unnamedCrosswalks.forEach(e -> {
-      envelope.expandToInclude(e.edge.getFromVertex().getCoordinate());
-      envelope.expandToInclude(e.edge.getToVertex().getCoordinate());
-    });
-    return envelope.centre();
-  }
-
-  public record EdgeOnLevel(OsmWay way, StreetEdge edge, Set<String> levels) {}
-
-  /**
-   * A class to cache the expensive construction of a Universal Traverse Mercator coordinate
-   * reference system.
-   * Re-using the same CRS for all edges might introduce tiny imprecisions for OTPs use cases
-   * but speeds up the processing enormously and is a price well worth paying.
-   */
-  private static final class PreciseBuffer {
-
-    private final double distanceInMeters;
-    private final MathTransform toTransform;
-    private final MathTransform fromTransform;
-
-    private PreciseBuffer(Coordinate coordinate, double distanceInMeters) {
-      this.distanceInMeters = distanceInMeters;
-      String code = "AUTO:42001,%s,%s".formatted(coordinate.x, coordinate.y);
-      try {
-        CoordinateReferenceSystem auto = CRS.decode(code);
-        this.toTransform = CRS.findMathTransform(DefaultGeographicCRS.WGS84, auto);
-        this.fromTransform = CRS.findMathTransform(auto, DefaultGeographicCRS.WGS84);
-      } catch (FactoryException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    /**
-     * Add a buffer around a geometry that makes sure that the buffer is the same distance (in
-     * meters) anywhere on earth.
-     * <p>
-     * Background: If you call the regular buffer() method on a JTS geometry that uses WGS84 as the
-     * coordinate reference system, the buffer will be accurate at the equator but will become more
-     * and more elongated the farther north/south you go.
-     * <p>
-     * Taken from https://stackoverflow.com/questions/36455020
-     */
-    private Geometry preciseBuffer(Geometry geometry) {
-      try {
-        Geometry pGeom = JTS.transform(geometry, toTransform);
-        Geometry pBufferedGeom = pGeom.buffer(distanceInMeters, 4, BufferParameters.CAP_FLAT);
-        return JTS.transform(pBufferedGeom, fromTransform);
-      } catch (TransformException e) {
-        throw new RuntimeException(e);
-      }
-    }
   }
 }
