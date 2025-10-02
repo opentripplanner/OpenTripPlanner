@@ -37,7 +37,12 @@ public abstract class NamerWithGeoBuffer implements EdgeNamer {
     return way.getAssumedName();
   }
 
-  protected void postprocess(Collection<EdgeOnLevel> unnamedEdges, int bufferMeters, String type, Logger logger) {
+  protected void postprocess(
+    Collection<EdgeOnLevel> unnamedEdges,
+    int bufferMeters,
+    String type,
+    Logger logger
+  ) {
     ProgressTracker progress = ProgressTracker.track(
       String.format("Assigning names to %s", type),
       500,
@@ -92,7 +97,11 @@ public abstract class NamerWithGeoBuffer implements EdgeNamer {
   /**
    * Adds an entry to a geospatial index.
    */
-  protected static void addToSpatialIndex(OsmEntity way, StreetEdgePair pair, HashGridSpatialIndex<EdgeOnLevel> spatialIndex) {
+  protected static void addToSpatialIndex(
+    OsmEntity way,
+    StreetEdgePair pair,
+    HashGridSpatialIndex<EdgeOnLevel> spatialIndex
+  ) {
     addToSpatialIndex(way, pair, spatialIndex, Integer.MAX_VALUE);
   }
 
@@ -112,7 +121,7 @@ public abstract class NamerWithGeoBuffer implements EdgeNamer {
     if (edge.getDistanceMeters() <= maxLengthMeters) {
       spatialIndex.insert(
         edge.getGeometry().getEnvelopeInternal(),
-        new EdgeOnLevel((OsmWay)way, edge, way.getLevels())
+        new EdgeOnLevel((OsmWay) way, edge, way.getLevels())
       );
     }
   }

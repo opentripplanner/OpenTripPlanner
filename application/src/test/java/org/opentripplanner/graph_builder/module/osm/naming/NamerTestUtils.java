@@ -7,6 +7,7 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 
 class NamerTestUtils {
+
   public static StreetEdgeBuilder<?> edgeBuilder(WgsCoordinate... c) {
     var coordinates = Arrays.stream(c).toList();
     var ls = GeometryUtils.makeLineString(c);
@@ -14,9 +15,7 @@ class NamerTestUtils {
       .withFromVertex(
         StreetModelForTest.intersectionVertex(coordinates.getFirst().asJtsCoordinate())
       )
-      .withToVertex(
-        StreetModelForTest.intersectionVertex(coordinates.getLast().asJtsCoordinate())
-      )
+      .withToVertex(StreetModelForTest.intersectionVertex(coordinates.getLast().asJtsCoordinate()))
       .withGeometry(ls);
   }
 }
