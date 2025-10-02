@@ -113,10 +113,6 @@ class UKMapper extends OsmTagMapper {
     props.setCarSpeed("highway=secondary_link", 13.4f); // ~= 30mph
     props.setCarSpeed("highway=tertiary", 15.7f); // ~= 35mph
 
-    WayProperties pedestrianWayProperties = withModes(PEDESTRIAN).build();
-    props.setProperties("indoor=area", pedestrianWayProperties);
-    props.setProperties("indoor=corridor", pedestrianWayProperties);
-
     super.populateProperties(props);
   }
 }
