@@ -53,29 +53,13 @@ public class CrosswalkNamer extends NamerWithGeoBuffer {
       }
       // Record (short) sidewalks to a geometric index
       else if (way.isSidewalk()) {
-        // We generate two edges for each osm way: one there and one back. This spatial index only
-        // needs to contain one item for each road segment with a unique geometry and name, so we
-        // add only one of the two edges.
-        var edge = pair.pickAny();
-        if (edge.getDistanceMeters() <= BUFFER_METERS) {
-          sidewalkEdges.insert(
-            edge.getGeometry().getEnvelopeInternal(),
-            new EdgeOnLevel(osmWay, edge, way.getLevels())
-          );
-        }
+        addToSpatialIndex(way, pair, sidewalkEdges, BUFFER_METERS);
       }
       // Record named streets, service roads, and slip/turn lanes to a geometric index.
       else if (
         !osmWay.isFootway() && (way.isNamed() || osmWay.isServiceRoad() || isTurnLane(osmWay))
       ) {
-        // We generate two edges for each osm way: one there and one back. This spatial index only
-        // needs to contain one item for each road segment with a unique geometry and name, so we
-        // add only one of the two edges.
-        var edge = pair.pickAny();
-        streetEdges.insert(
-          edge.getGeometry().getEnvelopeInternal(),
-          new EdgeOnLevel(osmWay, edge, way.getLevels())
-        );
+        addToSpatialIndex(way, pair, streetEdges);
       }
     }
   }

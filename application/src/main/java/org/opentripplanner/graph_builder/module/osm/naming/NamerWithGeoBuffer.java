@@ -14,7 +14,9 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.operation.buffer.BufferParameters;
+import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
@@ -93,6 +95,28 @@ public abstract class NamerWithGeoBuffer implements EdgeNamer {
       envelope.expandToInclude(e.edge.getToVertex().getCoordinate());
     });
     return envelope.centre();
+  }
+
+  protected static void addToSpatialIndex(OsmEntity way, StreetEdgePair pair, HashGridSpatialIndex<EdgeOnLevel> spatialIndex) {
+    addToSpatialIndex(way, pair, spatialIndex, Integer.MAX_VALUE);
+  }
+
+  protected static void addToSpatialIndex(
+    OsmEntity way,
+    StreetEdgePair pair,
+    HashGridSpatialIndex<EdgeOnLevel> spatialIndex,
+    int lengthLimit
+  ) {
+    // We generate two edges for each osm way: one there and one back. This spatial index only
+    // needs to contain one item for each road segment with a unique geometry and name, so we
+    // add only one of the two edges.
+    var edge = pair.pickAny();
+    if (edge.getDistanceMeters() <= lengthLimit) {
+      spatialIndex.insert(
+        edge.getGeometry().getEnvelopeInternal(),
+        new EdgeOnLevel((OsmWay)way, edge, way.getLevels())
+      );
+    }
   }
 
   public record EdgeOnLevel(OsmWay way, StreetEdge edge, Set<String> levels) {}

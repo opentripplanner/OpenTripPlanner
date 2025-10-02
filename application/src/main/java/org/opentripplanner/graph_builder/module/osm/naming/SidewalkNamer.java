@@ -61,14 +61,7 @@ public class SidewalkNamer extends NamerWithGeoBuffer {
     }
     // The way is _not_ a sidewalk and does have a name
     else if (way.isNamed() && !way.isLink()) {
-      // We generate two edges for each osm way: one there and one back. This spatial index only
-      // needs to contain one item for each road segment with a unique geometry and name, so we
-      // add only one of the two edges.
-      var edge = pair.pickAny();
-      streetEdges.insert(
-        edge.getGeometry().getEnvelopeInternal(),
-        new EdgeOnLevel((OsmWay)way, edge, way.getLevels())
-      );
+      addToSpatialIndex(way, pair, streetEdges);
     }
   }
 
