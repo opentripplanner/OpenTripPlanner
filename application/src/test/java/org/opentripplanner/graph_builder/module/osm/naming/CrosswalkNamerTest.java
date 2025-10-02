@@ -7,6 +7,7 @@ import static org.opentripplanner.graph_builder.module.osm.naming.NamerTestUtils
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -159,7 +160,7 @@ class CrosswalkNamerTest {
         .withPermission(
           way.isFootway() ? StreetTraversalPermission.PEDESTRIAN : StreetTraversalPermission.CAR
         )
-        .withName(way.isNamed() ? way.getAssumedName() : I18NString.of("path"))
+        .withName(Objects.requireNonNullElse(way.getAssumedName(), I18NString.of("path")))
         .withBogusName(!way.isNamed())
         .buildAndConnect();
 
