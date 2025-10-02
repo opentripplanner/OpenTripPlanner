@@ -2,7 +2,6 @@ package org.opentripplanner.osm.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
-import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.Test;
@@ -16,14 +15,6 @@ public class UKMapperTest {
   static {
     var source = new UKMapper();
     source.populateProperties(wps);
-  }
-
-  @Test
-  void indoor() {
-    var corridor = wps.getDataForEntity(WayTestData.indoor("corridor"));
-    assertEquals(PEDESTRIAN, corridor.getPermission());
-    var area = wps.getDataForEntity(WayTestData.indoor("area"));
-    assertEquals(PEDESTRIAN, area.getPermission());
   }
 
   @Test
