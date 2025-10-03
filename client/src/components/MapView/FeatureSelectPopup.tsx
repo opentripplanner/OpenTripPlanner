@@ -14,12 +14,20 @@ export function FeatureSelectPopup({
 }) {
   return (
     <Popup latitude={coordinates.lat} longitude={coordinates.lng} onClose={onClose}>
+      <p style={{ fontWeight: 'bold' }}>Overlapping features</p>
       <Table>
         <tbody>
           {features.map((feature, index) => (
-            <tr key={index}>
+            <tr className="feature-select-item" key={index}>
               <th scope="row">{index}</th>
-              <td onClick={() => setShowPropsPopup({ coordinates, feature })}>{String(feature.properties.class)}</td>
+              <td
+                onClick={() => {
+                  onClose();
+                  setShowPropsPopup({ coordinates, feature });
+                }}
+              >
+                {feature.properties.name || feature.properties.class}
+              </td>
             </tr>
           ))}
         </tbody>
