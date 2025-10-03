@@ -521,7 +521,7 @@ data, and to `false` to read the stream from the source each time.
 
 **Since version:** `1.5` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
 **Path:** /   
-**Enum values:** `default` | `portland` | `sidewalks`
+**Enum values:** `default` | `portland` | `sidewalks` | `sidewalks-crosswalks`
 
 A custom OSM namer to use.
 

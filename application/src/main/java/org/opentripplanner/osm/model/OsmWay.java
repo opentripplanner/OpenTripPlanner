@@ -104,6 +104,36 @@ public class OsmWay extends OsmEntity {
     return hasTag("barrier");
   }
 
+  public boolean isFootway() {
+    return isTag("highway", "footway");
+  }
+
+  public boolean isCrossing() {
+    return isFootway() && isTag("footway", "crossing");
+  }
+
+  public boolean isServiceRoad() {
+    return isTag("highway", "service");
+  }
+
+  /** Whether this way is connected to the given way through their extremities. */
+  public boolean isAdjacentTo(OsmWay way) {
+    if (nodes.isEmpty() || way.nodes.isEmpty()) return false;
+
+    long wayFirstNode = way.nodes.get(0);
+    long wayLastNode = way.nodes.get(way.nodes.size() - 1);
+
+    long firstNode = nodes.get(0);
+    long lastNode = nodes.get(nodes.size() - 1);
+
+    return (
+      (firstNode == wayFirstNode && lastNode != wayLastNode) ||
+      (firstNode == wayLastNode && lastNode != wayFirstNode) ||
+      (lastNode == wayFirstNode && firstNode != wayLastNode) ||
+      (lastNode == wayLastNode && firstNode != wayFirstNode)
+    );
+  }
+
   @Override
   public String url() {
     return String.format("https://www.openstreetmap.org/way/%d", getId());
