@@ -22,7 +22,6 @@ import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFil
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -34,7 +33,6 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TriangleInequalityTest {
 
@@ -48,7 +46,7 @@ public class TriangleInequalityTest {
 
   @BeforeAll
   public static void onlyOnce() {
-    graph = new Graph(new Deduplicator());
+    graph = new Graph();
 
     File file = ResourceLoader.of(TriangleInequalityTest.class).file("NYC_small.osm.pbf");
     DefaultOsmProvider provider = new DefaultOsmProvider(file, true);

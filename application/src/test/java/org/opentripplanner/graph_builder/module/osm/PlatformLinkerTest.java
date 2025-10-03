@@ -7,13 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class PlatformLinkerTest {
 
@@ -25,8 +23,7 @@ public class PlatformLinkerTest {
   public void testLinkEntriesToPlatforms() {
     var stairsEndpointLabel = VertexLabel.osm(1028861028);
 
-    var deduplicator = new Deduplicator();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
 
     File file = ResourceLoader.of(this).file("skoyen.osm.pbf");
 

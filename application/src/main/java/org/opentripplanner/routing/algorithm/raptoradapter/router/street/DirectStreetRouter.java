@@ -36,6 +36,7 @@ public class DirectStreetRouter {
       var temporaryVertices = new TemporaryVerticesContainer(
         serverContext.graph(),
         serverContext.vertexLinker(),
+        serverContext.transitService()::findStopOrChildIds,
         request.from(),
         request.to(),
         request.journey().direct().mode(),
@@ -50,7 +51,7 @@ public class DirectStreetRouter {
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(
         serverContext.traverseVisitor(),
-        serverContext.dataOverlayContext(request),
+        serverContext.listExtensionRequestContexts(request),
         maxCarSpeed
       );
       List<GraphPath<State, Edge, Vertex>> paths = gpFinder.graphPathFinderEntryPoint(

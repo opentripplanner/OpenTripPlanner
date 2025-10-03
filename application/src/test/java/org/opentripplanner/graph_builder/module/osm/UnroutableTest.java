@@ -12,7 +12,6 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -21,7 +20,6 @@ import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 /**
  * Verify that OSM ways that represent proposed or as yet unbuilt roads are not used for routing.
@@ -36,8 +34,7 @@ class UnroutableTest {
 
   @BeforeEach
   public void setUp() throws Exception {
-    var deduplicator = new Deduplicator();
-    graph = new Graph(deduplicator);
+    graph = new Graph();
 
     var osmDataFile = ResourceLoader.of(UnroutableTest.class).file("bridge_construction.osm.pbf");
     DefaultOsmProvider provider = new DefaultOsmProvider(osmDataFile, true);

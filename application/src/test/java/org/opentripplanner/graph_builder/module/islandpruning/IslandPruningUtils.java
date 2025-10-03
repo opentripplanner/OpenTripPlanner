@@ -6,7 +6,6 @@ import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -23,7 +22,7 @@ class IslandPruningUtils {
   ) {
     try {
       var deduplicator = new Deduplicator();
-      var graph = new Graph(deduplicator);
+      var graph = new Graph();
       var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
       // Add street data from OSM
       var osmProvider = new DefaultOsmProvider(osmFile, true);

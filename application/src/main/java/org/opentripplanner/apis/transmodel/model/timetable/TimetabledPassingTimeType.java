@@ -116,7 +116,7 @@ public class TimetabledPassingTimeType {
               return null;
             }
             return missingValueToNull(
-              flexTrip.earliestDepartureTime(tripTimeOnDate.getStopIndex())
+              flexTrip.earliestDepartureTime(tripTimeOnDate.getStopPosition())
             );
           })
           .build()
@@ -134,7 +134,7 @@ public class TimetabledPassingTimeType {
             if (flexTrip == null) {
               return null;
             }
-            return missingValueToNull(flexTrip.latestArrivalTime(tripTimeOnDate.getStopIndex()));
+            return missingValueToNull(flexTrip.latestArrivalTime(tripTimeOnDate.getStopPosition()));
           })
           .build()
       )

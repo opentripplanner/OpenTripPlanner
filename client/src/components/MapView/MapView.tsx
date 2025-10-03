@@ -27,13 +27,13 @@ export function MapView({
   tripQueryVariables,
   setTripQueryVariables,
   tripQueryResult,
-  selectedTripPatternIndex,
+  selectedTripPatternIndexes,
   loading,
 }: {
   tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (variables: TripQueryVariables) => void;
   tripQueryResult: TripQuery | null;
-  selectedTripPatternIndex: number;
+  selectedTripPatternIndexes: number[];
   loading: boolean;
 }) {
   const onMapDoubleClick = useMapDoubleClick({ tripQueryVariables, setTripQueryVariables });
@@ -119,9 +119,13 @@ export function MapView({
         />
 
         <RightMenu position="top-right" setInteractiveLayerIds={setInteractiveLayerIds} mapRef={mapRef?.current} />
-        {tripQueryResult?.trip.tripPatterns.length && (
-          <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
-        )}
+        {tripQueryResult?.trip.tripPatterns.length &&
+          selectedTripPatternIndexes.map((index) => {
+            const tripPattern = tripQueryResult.trip.tripPatterns[index];
+            return tripPattern ? (
+              <LegLines key={`trippattern-${index}`} tripPattern={tripPattern as TripPattern} />
+            ) : null;
+          })}
         {showContextPopup && (
           <ContextMenuPopup
             tripQueryVariables={tripQueryVariables}

@@ -17,9 +17,7 @@ import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsm
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 /**
  * Checks that turn restrictions are processed even if they don't strictly adhere to their
@@ -74,7 +72,7 @@ class TurnRestrictionsTest {
       .addRelation(turnRestriction)
       .build();
 
-    var graph = new Graph(new Deduplicator());
+    var graph = new Graph();
 
     var issueStore = new DefaultDataImportIssueStore();
 

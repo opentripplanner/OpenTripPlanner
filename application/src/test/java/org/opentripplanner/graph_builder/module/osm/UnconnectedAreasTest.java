@@ -14,7 +14,6 @@ import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
@@ -161,7 +160,7 @@ public class UnconnectedAreasTest {
   private Graph buildOsmGraph(String osmFileName, DataImportIssueStore issueStore) {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     DefaultOsmProvider provider = new DefaultOsmProvider(RESOURCE_LOADER.file(osmFileName), false);
     OsmModule loader = OsmModule.of(

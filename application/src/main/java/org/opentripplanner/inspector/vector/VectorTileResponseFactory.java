@@ -7,7 +7,6 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import org.apache.hc.core5.http.ContentType;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.framework.io.HttpUtils;

@@ -28,6 +28,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -47,16 +48,19 @@ public class GraphBuilder implements Runnable {
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
   private final Closeable closeDataSourcesHandle;
+  private final DeduplicatorService deduplicator;
 
   private boolean hasTransitData = false;
 
   public GraphBuilder(
     Graph baseGraph,
+    DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
     Closeable closeDataSourcesHandle
   ) {
     this.graph = baseGraph;
+    this.deduplicator = deduplicator;
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.closeDataSourcesHandle = closeDataSourcesHandle;
@@ -205,7 +209,7 @@ public class GraphBuilder implements Runnable {
       new DataImportIssueSummary(issueStore.listIssues()).logSummary();
 
       // Log before we validate, this way we have more information if the validation fails
-      logGraphBuilderCompleteStatus(startTime, graph, timetableRepository);
+      logGraphBuilderCompleteStatus(startTime, graph, timetableRepository, deduplicator);
 
       validate();
     } finally {
@@ -267,7 +271,8 @@ public class GraphBuilder implements Runnable {
   private static void logGraphBuilderCompleteStatus(
     long startTime,
     Graph graph,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    DeduplicatorService deduplicator
   ) {
     long endTime = System.currentTimeMillis();
     String time = DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime));
@@ -286,5 +291,7 @@ public class GraphBuilder implements Runnable {
       nPatterns,
       nTransfers
     );
+    // Log size info for the deduplicator
+    LOG.info("Memory optimized {}", deduplicator.toString());
   }
 }

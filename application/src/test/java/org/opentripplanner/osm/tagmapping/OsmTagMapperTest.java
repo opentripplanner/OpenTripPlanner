@@ -102,6 +102,14 @@ class OsmTagMapperTest {
   }
 
   @Test
+  void indoor() {
+    var corridor = wps.getDataForEntity(WayTestData.indoor("corridor"));
+    assertEquals(PEDESTRIAN, corridor.getPermission());
+    var area = wps.getDataForEntity(WayTestData.indoor("area"));
+    assertEquals(PEDESTRIAN, area.getPermission());
+  }
+
+  @Test
   void testFootwaySharedWithBicycle() {
     assertEquals(
       PEDESTRIAN_AND_BICYCLE,

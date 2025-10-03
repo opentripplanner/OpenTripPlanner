@@ -49,6 +49,8 @@ import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
@@ -104,6 +106,7 @@ public class GraphBuilderModules {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,
+    DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
     FareServiceFactory fareServiceFactory
@@ -116,6 +119,7 @@ public class GraphBuilderModules {
       gtfsBundles,
       timetableRepository,
       graph,
+      deduplicator,
       issueStore,
       config.getTransitServicePeriod(),
       fareServiceFactory,
@@ -130,6 +134,7 @@ public class GraphBuilderModules {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,
+    DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
     VehicleParkingRepository parkingService,
     DataImportIssueStore issueStore
@@ -139,6 +144,7 @@ public class GraphBuilderModules {
       timetableRepository,
       parkingService,
       graph,
+      deduplicator,
       issueStore
     );
   }
@@ -330,6 +336,12 @@ public class GraphBuilderModules {
     return ids.isEmpty()
       ? null
       : new RouteToCentroidStationIdsValidator(issueStore, ids, timetableRepository);
+  }
+
+  @Provides
+  @Singleton
+  DeduplicatorService provideDeduplicator() {
+    return new Deduplicator();
   }
 
   /* private methods */

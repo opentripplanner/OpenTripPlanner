@@ -2385,8 +2385,8 @@ it('renders without crashing', () => {
   render(
     <ItineraryListContainer
       tripQueryResult={tripQueryResult as unknown as QueryType}
-      selectedTripPatternIndex={0}
-      setSelectedTripPatternIndex={() => {}}
+      selectedTripPatternIndexes={[0]}
+      setSelectedTripPatternIndexes={() => {}}
       pageResults={() => {}}
       loading={false}
     />,

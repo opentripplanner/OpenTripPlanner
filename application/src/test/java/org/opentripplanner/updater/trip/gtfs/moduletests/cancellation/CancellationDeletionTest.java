@@ -28,9 +28,9 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  */
 class CancellationDeletionTest implements RealtimeTestConstants {
 
-  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
-  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+  private final RealtimeTestEnvironmentBuilder envBuilder = RealtimeTestEnvironment.of();
+  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
+  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
 
   static List<Arguments> cases() {
     return List.of(
@@ -42,12 +42,14 @@ class CancellationDeletionTest implements RealtimeTestConstants {
   @ParameterizedTest
   @MethodSource("cases")
   void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
-    var env = ENV_BUILDER.addTrip(
-      TripInput.of(TRIP_1_ID)
-        .addStop(STOP_A, "0:00:10", "0:00:11")
-        .addStop(STOP_B, "0:00:20", "0:00:21")
-        .build()
-    ).build();
+    var env = envBuilder
+      .addTrip(
+        TripInput.of(TRIP_1_ID)
+          .addStop(STOP_A, "0:00:10", "0:00:11")
+          .addStop(STOP_B, "0:00:20", "0:00:21")
+          .build()
+      )
+      .build();
     var pattern1 = env.getPatternForTrip(TRIP_1_ID);
 
     var update = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, relationship, TIME_ZONE).build();
@@ -78,7 +80,16 @@ class CancellationDeletionTest implements RealtimeTestConstants {
   @ParameterizedTest
   @MethodSource("cases")
   void cancelingAddedTrip(ScheduleRelationship relationship, RealTimeState state) {
-    var env = ENV_BUILDER.build();
+    var env = envBuilder
+      .addTrip(
+        TripInput.of(TRIP_1_ID)
+          // just to set the scheduling period
+          .withServiceDates(SERVICE_DATE)
+          .addStop(STOP_A, "0:00:10", "0:00:11")
+          .addStop(STOP_B, "0:00:20", "0:00:21")
+          .build()
+      )
+      .build();
     var addedTripId = "added-trip";
     // First add ADDED trip
     var update = new TripUpdateBuilder(

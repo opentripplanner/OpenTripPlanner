@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
@@ -15,7 +14,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
@@ -55,9 +53,9 @@ public class ScheduledDeviatedTrip
   }
 
   public static boolean isScheduledDeviatedFlexTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> notFixedStop = Predicate.not(st -> st.getStop() instanceof RegularStop);
     return (
-      stopTimes.stream().anyMatch(notFixedStop) &&
+      stopTimes.size() >= 2 &&
+      stopTimes.stream().anyMatch(StopTime::hasFlexibleStop) &&
       stopTimes.stream().noneMatch(StopTime::combinesContinuousStoppingWithFlexWindow)
     );
   }

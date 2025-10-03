@@ -275,7 +275,7 @@ public class TransitRouter {
       accessRequest,
       temporaryVerticesContainer,
       streetRequest,
-      serverContext.dataOverlayContext(accessRequest),
+      serverContext.listExtensionRequestContexts(accessRequest),
       type,
       durationLimit,
       stopCountLimit
@@ -293,7 +293,7 @@ public class TransitRouter {
         serverContext,
         additionalSearchDays,
         serverContext.flexParameters(),
-        serverContext.dataOverlayContext(accessRequest),
+        serverContext.listExtensionRequestContexts(accessRequest),
         type
       );
 
@@ -383,6 +383,7 @@ public class TransitRouter {
     return new TemporaryVerticesContainer(
       serverContext.graph(),
       serverContext.vertexLinker(),
+      serverContext.transitService()::findStopOrChildIds,
       request.from(),
       request.to(),
       request.journey().access().mode(),
