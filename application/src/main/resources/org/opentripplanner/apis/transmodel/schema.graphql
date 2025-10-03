@@ -253,6 +253,8 @@ type EstimatedCall {
   "Whether vehicle will only stop on request."
   requestStop: Boolean!
   serviceJourney: ServiceJourney!
+  "Estimated calls for the ServiceJourney on this date."
+  serviceJourneyEstimatedCalls: SJEstimatedCalls!
   "Get all relevant situations for this EstimatedCall."
   situations: [PtSituationElement!]! @timingData
   stopPositionInPattern: Int!
@@ -1127,6 +1129,24 @@ type RoutingParameters {
   walkSpeed: Float
   "Whether the trip must be wheelchair accessible."
   wheelChairAccessible: Boolean
+}
+
+"List of visits to quays as part of a vehicle journey, relative to the current quay and for a given date. Includes real-time updates"
+type SJEstimatedCalls {
+  "The first call in this service journey"
+  first: EstimatedCall!
+  "The last call in this service journey"
+  last: EstimatedCall!
+  "The list of subsequent calls in this service journey after the current call"
+  next(
+    "Number of subsequent calls to return. The default value (null) returns all subsequent calls"
+    count: Int
+  ): [EstimatedCall!]!
+  "The list of previous calls in this service journey before the current call"
+  previous(
+    "Number of previous calls to return. The default value (null) returns all previous calls"
+    count: Int
+  ): [EstimatedCall!]!
 }
 
 """

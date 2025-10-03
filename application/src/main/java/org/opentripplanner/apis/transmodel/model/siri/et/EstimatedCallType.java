@@ -43,6 +43,7 @@ public class EstimatedCallType {
     GraphQLOutputType destinationDisplayType,
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType serviceJourneyType,
+    GraphQLOutputType sjEstimatedCallType,
     GraphQLOutputType datedServiceJourneyType,
     GraphQLScalarType dateTimeScalar
   ) {
@@ -257,6 +258,14 @@ public class EstimatedCallType {
           .type(new GraphQLNonNull(TransmodelScalars.DATE_SCALAR))
           .description("The date the estimated call is valid for.")
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getServiceDay())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("serviceJourneyEstimatedCalls")
+          .type(new GraphQLNonNull(sjEstimatedCallType))
+          .description("Estimated calls for the ServiceJourney on this date.")
+          .dataFetcher(DataFetchingEnvironment::getSource)
           .build()
       )
       .field(
