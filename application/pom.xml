@@ -469,6 +469,7 @@
                             <sources>
                                 <source>src/test/java</source>
                                 <source>src/ext-test/java</source>
+                                <source>src/test-fixtures/java</source>
                             </sources>
                         </configuration>
                     </execution>

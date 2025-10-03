@@ -7,13 +7,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.DataSourceTestFactory;
 import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.datastore.configure.DataStoreModule;
 
 class ListCompositeDataSourceTest {
 
   private static final String LEAF_NAME = "leaf";
-  private static final DataSource LEAF = DataStoreModule.dataSource(
+  private static final DataSource LEAF = DataSourceTestFactory.dataSource(
     LEAF_NAME,
     FileType.GTFS,
     "Test"
