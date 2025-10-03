@@ -1594,7 +1594,7 @@
       "minzoom" : 6,
       "maxzoom" : 23,
       "paint" : {
-        "line-color" : "#ff8400",
+        "line-color" : "#ffa500",
         "line-width" : [
           "interpolate",
           [
@@ -1670,7 +1670,7 @@
           23,
           7.0
         ],
-        "circle-color" : "#ff8400"
+        "circle-color" : "#ffa500"
       },
       "filter" : [
         "in",
