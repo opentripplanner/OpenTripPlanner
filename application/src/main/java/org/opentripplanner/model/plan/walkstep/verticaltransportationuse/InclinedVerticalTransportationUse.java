@@ -23,21 +23,17 @@ public abstract class InclinedVerticalTransportationUse implements VerticalTrans
   private final String toLevelName;
 
   public InclinedVerticalTransportationUse(
-    @Nullable Float fromLevel,
+    @Nullable Double fromLevel,
     @Nullable String fromLevelName,
     InclineType inclineType,
-    @Nullable Float toLevel,
+    @Nullable Double toLevel,
     @Nullable String toLevelName
   ) {
-    this.fromLevel = toNullableDouble(fromLevel);
+    this.fromLevel = fromLevel;
     this.fromLevelName = fromLevelName;
     this.inclineType = inclineType;
-    this.toLevel = toNullableDouble(toLevel);
+    this.toLevel = toLevel;
     this.toLevelName = toLevelName;
-  }
-
-  private static Double toNullableDouble(Float f) {
-    return f != null ? f.doubleValue() : null;
   }
 
   public Double fromLevel() {

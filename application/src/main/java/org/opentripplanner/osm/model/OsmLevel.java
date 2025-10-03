@@ -26,12 +26,13 @@ public class OsmLevel implements Comparable<OsmLevel> {
     true
   );
   /**
-   * The first integer that a float is unable to represent exactly is 16,777,217.
+   * The first integer that a 32-bit float is unable to represent exactly is 16,777,217.
+   * The first integer that a 64-bit float is unable to represent exactly is 9,007,199,254,740,993.
    * For example, the Burj Khalifa has 163 floors.
-   * Using a 32-bit floating point number to represent a level seems incorrect,
+   * Using a floating point number to represent a level seems incorrect,
    * but shouldn't cause problems with proper input from OSM.
    */
-  public final float floorNumber; // 0-based
+  public final double floorNumber; // 0-based
   public final double altitudeMeters;
   public final String shortName; // localized (potentially 1-based)
   public final String longName; // localized (potentially 1-based)
@@ -44,11 +45,11 @@ public class OsmLevel implements Comparable<OsmLevel> {
   public final boolean reliable;
 
   public OsmLevel(
-    float floorNumber,
+    double floorNumber,
     double altitudeMeters,
     String shortName,
     String longName,
-    String levelRef,
+    @Nullable String levelRef,
     Source source,
     boolean reliable
   ) {
@@ -103,32 +104,32 @@ public class OsmLevel implements Comparable<OsmLevel> {
     }
 
     /* try to parse a floor number out of names */
-    Float floorNumber = null;
+    Double floorNumber = null;
     try {
-      floorNumber = Float.parseFloat(longName);
+      floorNumber = Double.parseDouble(longName);
       if (incrementNonNegative) {
         if (source == Source.LEVEL_MAP) {
           if (floorNumber >= 1) floorNumber -= 1; // level maps are localized, floor numbers are 0-based
         } else {
-          if (floorNumber >= 0) longName = Float.toString(floorNumber + 1); // level and layer tags are 0-based
+          if (floorNumber >= 0) longName = Double.toString(floorNumber + 1); // level and layer tags are 0-based
         }
       }
     } catch (NumberFormatException e) {}
     try {
       // short name takes precedence over long name for floor numbering
-      floorNumber = Float.parseFloat(shortName);
+      floorNumber = Double.parseDouble(shortName);
       if (incrementNonNegative) {
         if (source == Source.LEVEL_MAP) {
           if (floorNumber >= 1) floorNumber -= 1; // level maps are localized, floor numbers are 0-based
         } else {
-          if (floorNumber >= 0) shortName = Float.toString(floorNumber + 1); // level and layer tags are 0-based
+          if (floorNumber >= 0) shortName = Double.toString(floorNumber + 1); // level and layer tags are 0-based
         }
       }
     } catch (NumberFormatException e) {}
 
     /* fall back on altitude when necessary */
     if (floorNumber == null && altitude != null) {
-      floorNumber = (float) (int) (altitude / METERS_PER_FLOOR);
+      floorNumber = (double) (int) (altitude / METERS_PER_FLOOR);
       issueStore.add(new FloorNumberUnknownGuessedFromAltitude(spec, floorNumber, osmObj));
       reliable = false;
     }
@@ -139,7 +140,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
     }
     /* signal failure to extract any useful level information */
     if (floorNumber == null) {
-      floorNumber = 0.0f;
+      floorNumber = 0.0;
       issueStore.add(new FloorNumberUnknownAssumedGroundLevel(spec, osmObj));
       reliable = false;
     }
@@ -245,12 +246,12 @@ public class OsmLevel implements Comparable<OsmLevel> {
 
   @Override
   public int compareTo(OsmLevel other) {
-    return Float.compare(this.floorNumber, other.floorNumber);
+    return Double.compare(this.floorNumber, other.floorNumber);
   }
 
   @Override
   public int hashCode() {
-    return Float.hashCode(this.floorNumber);
+    return Double.hashCode(this.floorNumber);
   }
 
   @Override

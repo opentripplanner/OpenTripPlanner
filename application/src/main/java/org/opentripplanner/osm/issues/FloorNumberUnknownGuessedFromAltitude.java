@@ -5,7 +5,7 @@ import org.opentripplanner.osm.model.OsmEntity;
 
 public record FloorNumberUnknownGuessedFromAltitude(
   String layer,
-  Float floorNumber,
+  Double floorNumber,
   OsmEntity entity
 )
   implements DataImportIssue {
