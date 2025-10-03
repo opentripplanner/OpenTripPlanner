@@ -412,26 +412,37 @@ public class TripTimeOnDate {
    * empty list.
    */
   public List<TripTimeOnDate> previousTimes() {
-    if (stopPosition == 0) {
-      return List.of();
-    } else {
-      // IntStream.range is (inclusive, exclusive)
-      return IntStream.range(0, stopPosition).mapToObj(this::atStopPosition).toList();
-    }
+    return previousTimes(stopPosition);
   }
 
   /**
-   * Returns the next stop times in the trip. If it's the stop in the trip it returns an empty list.
+   * Returns the previous {@code count} stop times in the trip. If it's the first stop in the trip, it returns an
+   * empty list.
+   */
+  public List<TripTimeOnDate> previousTimes(int count) {
+    count = Math.min(count, stopPosition);
+    // IntStream.range is (inclusive, exclusive)
+    return IntStream.range(stopPosition - count, stopPosition)
+      .mapToObj(this::atStopPosition)
+      .toList();
+  }
+
+  /**
+   * Returns the next stop times in the trip. If it's the last stop in the trip it returns an empty list.
    */
   public List<TripTimeOnDate> nextTimes() {
-    if (stopPosition == tripTimes.getNumStops() - 1) {
-      return List.of();
-    } else {
-      // IntStream.range is (inclusive, exclusive)
-      return IntStream.range(stopPosition + 1, tripTimes.getNumStops())
-        .mapToObj(this::atStopPosition)
-        .toList();
-    }
+    return nextTimes(tripTimes.getNumStops() - stopPosition - 1);
+  }
+
+  /**
+   * Returns the next {@code count} stop times in the trip. If it's the last stop in the trip it returns an empty list.
+   */
+  public List<TripTimeOnDate> nextTimes(int count) {
+    count = Math.min(count, tripTimes.getNumStops() - stopPosition - 1);
+    // IntStream.range is (inclusive, exclusive)
+    return IntStream.range(stopPosition + 1, stopPosition + count + 1)
+      .mapToObj(this::atStopPosition)
+      .toList();
   }
 
   /**
