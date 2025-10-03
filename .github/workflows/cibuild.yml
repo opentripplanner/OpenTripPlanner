@@ -50,8 +50,7 @@ jobs:
         # https://github.com/actions/runner-images/issues/1499
         # we set nodePath and npmPath to skip downloading the node binary, which frequently times out
         run: |
-          mvn spotless:check
-          mvn jacoco:prepare-agent test jacoco:report -P prettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
+          mvn jacoco:prepare-agent test jacoco:report -P rewriteCheck,prettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
           mvn package -Dmaven.test.skip -P prettierSkip
 
       - name: Send coverage data to codecov.io
@@ -73,7 +72,7 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip -P deployGitHub
+        run: mvn deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip,deployGitHub
 
   build-windows:
     timeout-minutes: 20

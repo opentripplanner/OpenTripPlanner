@@ -20,9 +20,11 @@ public class GtfsFeedIdResolver {
   /**
    * A counter that will increase for each created feed id.
    */
-  private static AtomicInteger FEED_ID_COUNTER = new AtomicInteger(0);
+  private static final AtomicInteger FEED_ID_COUNTER = new AtomicInteger(0);
 
-  private static Map<Object, String> FEED_ID_MAP = Collections.synchronizedMap(new HashMap<>());
+  private static final Map<Object, String> FEED_ID_MAP = Collections.synchronizedMap(
+    new HashMap<>()
+  );
 
   /**
    * Extracts a feed_id from the passed source for a GTFS feed. If no feedId exists an id is

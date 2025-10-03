@@ -41,7 +41,9 @@ public class StreetEdgeTest {
   private static final double DELTA = 0.00001;
   private static final double SPEED = 6.0;
 
-  private IntersectionVertex v0, v1, v2;
+  private IntersectionVertex v0;
+  private IntersectionVertex v1;
+  private IntersectionVertex v2;
   private StreetSearchRequest proto;
 
   @BeforeEach

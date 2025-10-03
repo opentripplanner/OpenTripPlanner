@@ -68,7 +68,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private final OsmInfoGraphBuildService osmInfoGraphBuildService;
   private final VertexFactory vertexFactory;
 
-  private VertexLinker linker;
+  private final VertexLinker linker;
 
   @Inject
   public OsmBoardingLocationsModule(
@@ -99,7 +99,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           break;
         }
       }
-      if (alreadyLinked) continue;
+      if (alreadyLinked) {
+        continue;
+      }
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
         if (!connectVertexToStop(ts, graph)) {
@@ -113,9 +115,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   private boolean connectVertexToStop(TransitStopVertex ts, Graph index) {
-    if (connectVertexToNode(ts, index)) return true;
+    if (connectVertexToNode(ts, index)) {
+      return true;
+    }
 
-    if (connectVertexToWay(ts, index)) return true;
+    if (connectVertexToWay(ts, index)) {
+      return true;
+    }
 
     return connectVertexToArea(ts, index);
   }

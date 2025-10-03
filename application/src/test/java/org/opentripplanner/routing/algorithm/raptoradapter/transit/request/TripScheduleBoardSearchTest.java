@@ -50,7 +50,6 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
 
   private static final int TRIP_A = 0;
   private static final int TRIP_B = 1;
-  private static final int TRIP_C = 2;
 
   // Route with trip A, B, C.
   private TestRoute route = TestRoute.route(pattern).withTimetable(

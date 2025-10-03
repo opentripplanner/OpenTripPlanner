@@ -282,7 +282,9 @@ class FareLookupService implements Serializable {
       var legDistance = leg.from().coordinate.distanceTo(leg.to().coordinate);
 
       return legDistance > min.toMeters() && legDistance < max.toMeters();
-    } else return true;
+    } else {
+      return true;
+    }
   }
 
   private static Set<FeedScopedId> findAreasWithRules(

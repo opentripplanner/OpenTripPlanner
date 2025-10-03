@@ -6,12 +6,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.routing.util.elevation.ToblersHikingFunction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ElevationUtils {
-
-  private static final Logger log = LoggerFactory.getLogger(ElevationUtils.class);
 
   /*
    * These numbers disagree with everything else I (David Turner) have read about the energy cost
@@ -282,8 +278,19 @@ public class ElevationUtils {
       0.0,
     };
 
-    int i, j, li, lj, lx, ky1, nky1, ly, i1, j1, l2;
-    double f, temp;
+    int i;
+    int j;
+    int li;
+    int lj;
+    int lx;
+    int ky1;
+    int nky1;
+    int ly;
+    int i1;
+    int j1;
+    int l2;
+    double f;
+    double temp;
 
     int kx1 = kx + 1;
     int nkx1 = nx - kx1;

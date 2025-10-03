@@ -76,9 +76,15 @@ public class DirectionUtilsTest {
     double maxError = 0.0;
     for (int i = 0; i < exactAzimuths.length; i++) {
       double error = (exactAzimuths[i] - approxAzimuths[i]); // Degrees
-      if (error > 360) error -= 360;
-      if (error < -360) error += 360;
-      if (error > maxError) maxError = error;
+      if (error > 360) {
+        error -= 360;
+      }
+      if (error < -360) {
+        error += 360;
+      }
+      if (error > maxError) {
+        maxError = error;
+      }
     }
     System.out.println("Max error in azimuth: " + maxError + " degrees.");
     assertTrue(maxError < 0.15);

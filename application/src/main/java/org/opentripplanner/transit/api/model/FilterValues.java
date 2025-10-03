@@ -103,8 +103,12 @@ public abstract class FilterValues<E> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof FilterValues<?> that)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof FilterValues<?> that)) {
+      return false;
+    }
     return Objects.equals(values, that.values) && Objects.equals(name, that.name);
   }
 

@@ -24,7 +24,6 @@ class PagingSearchWindowAdjusterTest {
   private static final Duration D2h = duration("2h");
   private static final Duration D4h = duration("4h");
   private static final Duration D5h = duration("5h");
-  private static final Duration D6h = duration("6h");
   private static final Duration D1d = duration("1d");
   private static final List<Duration> LIST_OF_DURATIONS = List.of(D5h, D1h20m, D30m, D10m);
 

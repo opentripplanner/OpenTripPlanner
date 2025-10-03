@@ -53,8 +53,16 @@ public class TestHalfEdges {
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   private Graph graph;
-  private StreetEdge top, bottom, left, right, leftBack, rightBack;
-  private IntersectionVertex br, tr, bl, tl;
+  private StreetEdge top;
+  private StreetEdge bottom;
+  private StreetEdge left;
+  private StreetEdge right;
+  private StreetEdge leftBack;
+  private StreetEdge rightBack;
+  private IntersectionVertex br;
+  private IntersectionVertex tr;
+  private IntersectionVertex bl;
+  private IntersectionVertex tl;
   private TransitStopVertex station1;
   private TransitStopVertex station2;
   private TimetableRepository timetableRepository;

@@ -12,7 +12,7 @@ import org.rutebanken.netex.model.ContactStructure;
  */
 class OperatorToAgencyMapper {
 
-  private DataImportIssueStore issueStore;
+  private final DataImportIssueStore issueStore;
   private final FeedScopedIdFactory idFactory;
 
   OperatorToAgencyMapper(DataImportIssueStore issueStore, FeedScopedIdFactory idFactory) {

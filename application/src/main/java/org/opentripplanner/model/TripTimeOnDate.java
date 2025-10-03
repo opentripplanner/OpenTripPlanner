@@ -387,7 +387,9 @@ public class TripTimeOnDate {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     TripTimeOnDate that = (TripTimeOnDate) o;
     return (
       stopPosition == that.stopPosition &&

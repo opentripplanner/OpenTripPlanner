@@ -26,7 +26,7 @@ class StopTimesHelperTest {
   private static FeedScopedId stopId;
   private static TripPattern pattern;
   private static StopTimesHelper stopTimesHelper;
-  private static Comparator<TripTimeOnDate> SORT_ORDER = TripTimeOnDate.compareByDeparture();
+  private static final Comparator<TripTimeOnDate> SORT_ORDER = TripTimeOnDate.compareByDeparture();
 
   @BeforeAll
   public static void setUp() throws Exception {

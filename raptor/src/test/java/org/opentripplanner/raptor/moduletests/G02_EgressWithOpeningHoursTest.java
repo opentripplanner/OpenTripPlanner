@@ -43,7 +43,6 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
   private static final int T24_10 = hm2time(24, 10);
   private static final int T25_00 = hm2time(25, 0);
   private static final Duration D15m = Duration.ofMinutes(15);
-  private static final Duration D25h = Duration.ofHours(25);
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =

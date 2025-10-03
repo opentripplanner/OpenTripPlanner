@@ -25,7 +25,7 @@ public class NetexMapperIndexes {
   private final Multimap<String, Station> stationsByMultiModalStationRfs;
   private final Map<String, StopTime> stopTimesByNetexId;
   private final Multimap<String, DatedServiceJourney> datedServiceJourneysBySjId;
-  private NetexMapperIndexes parent;
+  private final NetexMapperIndexes parent;
 
   public NetexMapperIndexes(NetexEntityIndexReadOnlyView index, NetexMapperIndexes parent) {
     this.parent = parent;
