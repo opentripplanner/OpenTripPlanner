@@ -70,4 +70,12 @@ public class ObjectUtils {
   public static String toString(Object object) {
     return object == null ? "" : object.toString();
   }
+
+  /**
+   * Check that exactly one of {@code a} or {@code b} is not {@code null}, and the other is
+   * {@code null}.
+   */
+  public static boolean oneOf(Object a, Object b) {
+    return (a == null) != (b == null);
+  }
 }
