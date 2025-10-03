@@ -52,9 +52,7 @@ export function MapView({
     },
   ) => {
     if (e.features) {
-      // if you click on a cluster of map features it's possible that there are multiple
-      // to select from. we are using the first one instead of presenting a selection UI.
-      // you can always zoom in closer if you want to make a more specific click.
+      // if there are more than one feature, show a selection popup
       if (e.features.length == 1) {
         const feature = e.features[0];
         setShowPropsPopup({ coordinates: e.lngLat, feature: feature });
