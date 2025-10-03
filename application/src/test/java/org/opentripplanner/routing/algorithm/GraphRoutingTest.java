@@ -238,7 +238,8 @@ public abstract class GraphRoutingTest {
       String id,
       double latitude,
       double longitude,
-      @Nullable Station parentStation
+      @Nullable Station parentStation,
+      @Nullable TransitMode vehicleType
     ) {
       var siteRepositoryBuilder = timetableRepository.getSiteRepository().withContext();
       var testModel = new TimetableRepositoryForTest(siteRepositoryBuilder);
@@ -246,6 +247,9 @@ public abstract class GraphRoutingTest {
       var stopBuilder = testModel.stop(id).withCoordinate(latitude, longitude);
       if (parentStation != null) {
         stopBuilder.withParentStation(parentStation);
+      }
+      if (vehicleType != null) {
+        stopBuilder.withVehicleType(vehicleType);
       }
 
       var stop = stopBuilder.build();
@@ -285,8 +289,19 @@ public abstract class GraphRoutingTest {
       double longitude,
       @Nullable Station parentStation
     ) {
+      return stop(id, latitude, longitude, parentStation, null);
+    }
+
+    public TransitStopVertex stop(
+      String id,
+      double latitude,
+      double longitude,
+      @Nullable Station parentStation,
+      @Nullable TransitMode vehicleType
+    ) {
       return vertexFactory.transitStop(
-        TransitStopVertex.of().withStop(stopEntity(id, latitude, longitude, parentStation))
+        TransitStopVertex.of()
+          .withStop(stopEntity(id, latitude, longitude, parentStation, vehicleType))
       );
     }
 
