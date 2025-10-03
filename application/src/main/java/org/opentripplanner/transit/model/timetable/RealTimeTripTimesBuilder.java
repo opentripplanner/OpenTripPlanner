@@ -212,6 +212,11 @@ public class RealTimeTripTimesBuilder {
     return tripHeadsign;
   }
 
+  public RealTimeTripTimesBuilder withTripHeadsign(I18NString headsign) {
+    tripHeadsign = headsign;
+    return this;
+  }
+
   public @Nullable I18NString[] stopHeadsigns() {
     var result = scheduledTripTimes.copyHeadsigns(() ->
       new I18NString[scheduledTripTimes.getNumStops()]

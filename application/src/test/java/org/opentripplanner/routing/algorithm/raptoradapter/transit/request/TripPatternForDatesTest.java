@@ -89,7 +89,13 @@ class TripPatternForDatesTest {
       new Deduplicator()
     );
 
-    var frequency = new Frequency(trip, FREQUENCY_START, FREQUENCY_END, HEADWAY, true);
+    var frequency = new Frequency(
+      tripTimes.getTrip(),
+      FREQUENCY_START,
+      FREQUENCY_END,
+      HEADWAY,
+      true
+    );
 
     var boardingAndAlightingPossible = new BitSet(2);
     boardingAndAlightingPossible.set(0);
