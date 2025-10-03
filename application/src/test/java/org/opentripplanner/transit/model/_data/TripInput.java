@@ -1,6 +1,4 @@
-package org.opentripplanner.updater.trip;
-
-import static org.opentripplanner.updater.trip.RealtimeTestConstants.SERVICE_DATE;
+package org.opentripplanner.transit.model._data;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -8,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -17,14 +14,15 @@ import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
- * A simple data structure that is used by the {@link RealtimeTestEnvironment} to create
+ * A simple data structure that is used by the {@link TransitTestEnvironment} to create
  * trips, trips on date and patterns.
  */
 public record TripInput(
   String id,
   Route route,
   List<StopCall> stops,
-  List<LocalDate> serviceDates,
+  // Null means that a default service date will be used
+  @Nullable List<LocalDate> serviceDates,
   @Nullable I18NString headsign
 ) {
   public static TripInputBuilder of(String id) {
@@ -56,7 +54,8 @@ public record TripInput(
       )
       .build();
 
-    private List<LocalDate> serviceDates = List.of(SERVICE_DATE);
+    @Nullable
+    private List<LocalDate> serviceDates = null;
 
     @Nullable
     private I18NString headsign;

@@ -7,16 +7,16 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
-import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 public class CanceledTripTest implements RealtimeTestConstants {
 
-  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
   private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
   private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
 
@@ -28,16 +28,17 @@ public class CanceledTripTest implements RealtimeTestConstants {
         .addStop(STOP_B, "0:00:20", "0:00:21")
         .build()
     ).build();
+    var rt = GtfsRtTestHelper.of(env);
 
     assertThat(env.getTransitService().listCanceledTrips()).isEmpty();
 
-    var update = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, CANCELED, TIME_ZONE).build();
-    assertSuccess(env.applyTripUpdate(update));
+    var update = rt.tripUpdate(TRIP_1_ID, CANCELED).build();
+    assertSuccess(rt.applyTripUpdate(update));
 
     var canceled = env.getTransitService().listCanceledTrips();
     assertThat(canceled).hasSize(1);
     var trip = canceled.getFirst();
     assertEquals(id(TRIP_1_ID), trip.getTrip().getId());
-    assertEquals(SERVICE_DATE, trip.getServiceDate());
+    assertEquals(env.serviceDate(), trip.getServiceDate());
   }
 }
