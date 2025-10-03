@@ -76,6 +76,13 @@ public enum OTPFeature {
     "OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account."
   ),
 
+  OsmStreetDecorator(
+    false,
+    false,
+    "The OsmStreetDecorator enables storing multi-level data for OSM ways. This data is used " +
+    "for giving level information about the steps of a walk leg."
+  ),
+
   ParallelRouting(false, false, "Enable performing parts of the trip planning in parallel."),
   TransferConstraints(
     true,

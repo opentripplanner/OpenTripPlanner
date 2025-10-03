@@ -63,6 +63,7 @@ public class DirectStreetRouter {
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
         serverContext.transitService().getTimeZone(),
         serverContext.graph().streetNotesService,
+        serverContext.osmStreetDecoratorService(),
         serverContext.graph().ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);

@@ -777,6 +777,15 @@ public class GraphQLTypes {
     }
   }
 
+  /**
+   * Dependent fare products can lead to many combinations of fares, however it is often not useful
+   * information to the passenger.
+   *
+   * This enum allows filtering of the dependencies.
+   *
+   * Since it is recognised that this is not covered well in the specification, it is discussed here:
+   * https://github.com/google/transit/pull/423
+   */
   public enum GraphQLDependentFareProductFilter {
     ALL,
     MATCH_CATEGORY_AND_MEDIUM,
@@ -893,6 +902,12 @@ public class GraphQLTypes {
     SCOOTER,
     SCOOTER_SEATED,
     SCOOTER_STANDING,
+  }
+
+  /** The type of incline, e.g. stairs can go up or down depending on the direction. */
+  public enum GraphQLInclineType {
+    DOWN,
+    UP,
   }
 
   public static class GraphQLInputBannedInput {
@@ -4452,6 +4467,7 @@ public class GraphQLTypes {
     DEPART,
     ELEVATOR,
     ENTER_STATION,
+    ESCALATOR,
     EXIT_STATION,
     FOLLOW_SIGNS,
     HARD_LEFT,
@@ -4460,6 +4476,7 @@ public class GraphQLTypes {
     RIGHT,
     SLIGHTLY_LEFT,
     SLIGHTLY_RIGHT,
+    STAIRS,
     UTURN_LEFT,
     UTURN_RIGHT,
   }

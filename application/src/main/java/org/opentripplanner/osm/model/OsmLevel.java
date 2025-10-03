@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.osm.issues.FloorNumberUnknownAssumedGroundLevel;
 import org.opentripplanner.osm.issues.FloorNumberUnknownGuessedFromAltitude;
 
@@ -19,21 +21,35 @@ public class OsmLevel implements Comparable<OsmLevel> {
     0.0,
     "default level",
     "default level",
+    null,
     Source.NONE,
     true
   );
-  public final int floorNumber; // 0-based
+  /**
+   * The first integer that a 32-bit float is unable to represent exactly is 16,777,217.
+   * The first integer that a 64-bit float is unable to represent exactly is 9,007,199,254,740,993.
+   * For example, the Burj Khalifa has 163 floors.
+   * Using a floating point number to represent a level seems incorrect,
+   * but shouldn't cause problems with proper input from OSM.
+   */
+  public final double floorNumber; // 0-based
   public final double altitudeMeters;
   public final String shortName; // localized (potentially 1-based)
   public final String longName; // localized (potentially 1-based)
+
+  /** level:ref tag from OSM */
+  @Nullable
+  public final String levelRef;
+
   public final Source source;
   public final boolean reliable;
 
   public OsmLevel(
-    int floorNumber,
+    double floorNumber,
     double altitudeMeters,
     String shortName,
     String longName,
+    @Nullable String levelRef,
     Source source,
     boolean reliable
   ) {
@@ -41,6 +57,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
     this.altitudeMeters = altitudeMeters;
     this.shortName = shortName;
     this.longName = longName;
+    this.levelRef = levelRef;
     this.source = source;
     this.reliable = reliable;
   }
@@ -51,6 +68,7 @@ public class OsmLevel implements Comparable<OsmLevel> {
    */
   public static OsmLevel fromString(
     String spec,
+    @Nullable String ref,
     Source source,
     boolean incrementNonNegative,
     DataImportIssueStore issueStore,
@@ -86,32 +104,32 @@ public class OsmLevel implements Comparable<OsmLevel> {
     }
 
     /* try to parse a floor number out of names */
-    Integer floorNumber = null;
+    Double floorNumber = null;
     try {
-      floorNumber = Integer.parseInt(longName);
+      floorNumber = Double.parseDouble(longName);
       if (incrementNonNegative) {
         if (source == Source.LEVEL_MAP) {
           if (floorNumber >= 1) floorNumber -= 1; // level maps are localized, floor numbers are 0-based
         } else {
-          if (floorNumber >= 0) longName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
+          if (floorNumber >= 0) longName = Double.toString(floorNumber + 1); // level and layer tags are 0-based
         }
       }
     } catch (NumberFormatException e) {}
     try {
       // short name takes precedence over long name for floor numbering
-      floorNumber = Integer.parseInt(shortName);
+      floorNumber = Double.parseDouble(shortName);
       if (incrementNonNegative) {
         if (source == Source.LEVEL_MAP) {
           if (floorNumber >= 1) floorNumber -= 1; // level maps are localized, floor numbers are 0-based
         } else {
-          if (floorNumber >= 0) shortName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
+          if (floorNumber >= 0) shortName = Double.toString(floorNumber + 1); // level and layer tags are 0-based
         }
       }
     } catch (NumberFormatException e) {}
 
     /* fall back on altitude when necessary */
     if (floorNumber == null && altitude != null) {
-      floorNumber = (int) (altitude / METERS_PER_FLOOR);
+      floorNumber = (double) (int) (altitude / METERS_PER_FLOOR);
       issueStore.add(new FloorNumberUnknownGuessedFromAltitude(spec, floorNumber, osmObj));
       reliable = false;
     }
@@ -122,11 +140,11 @@ public class OsmLevel implements Comparable<OsmLevel> {
     }
     /* signal failure to extract any useful level information */
     if (floorNumber == null) {
-      floorNumber = 0;
+      floorNumber = 0.0;
       issueStore.add(new FloorNumberUnknownAssumedGroundLevel(spec, osmObj));
       reliable = false;
     }
-    return new OsmLevel(floorNumber, altitude, shortName, longName, source, reliable);
+    return new OsmLevel(floorNumber, altitude, shortName, longName, ref, source, reliable);
   }
 
   public static List<OsmLevel> fromSpecList(
@@ -155,7 +173,53 @@ public class OsmLevel implements Comparable<OsmLevel> {
     /* build an OSMLevel for each level spec in the list */
     List<OsmLevel> levels = new ArrayList<>();
     for (String spec : levelSpecs) {
-      levels.add(fromString(spec, source, incrementNonNegative, issueStore, osmObj));
+      levels.add(fromString(spec, null, source, incrementNonNegative, issueStore, osmObj));
+    }
+    return levels;
+  }
+
+  public static List<OsmLevel> levelListForWayFromSpecList(
+    String levelTag,
+    @Nullable String levelRefTag,
+    Source source,
+    boolean incrementNonNegative,
+    DataImportIssueStore issueStore,
+    OsmEntity osmObj
+  ) {
+    String[] levelListFromTag = levelTag.split(";");
+    List<OsmLevel> levels = new ArrayList<>();
+    if (levelRefTag != null) {
+      String[] levelRefListFromTag = levelRefTag.split(";");
+      if (levelListFromTag.length == levelRefListFromTag.length) {
+        for (int i = 0; i < levelListFromTag.length; i++) {
+          levels.add(
+            fromString(
+              levelListFromTag[i],
+              levelRefListFromTag[i],
+              source,
+              incrementNonNegative,
+              issueStore,
+              osmObj
+            )
+          );
+        }
+        return levels;
+      } else {
+        issueStore.add(
+          Issue.issue(
+            "LevelAndLevelRefHaveDifferentLevelAmounts",
+            "'level:ref' info for way {} can not be used because " +
+            "the 'level' tag and 'level:ref' tag refer to a different amount of levels. " +
+            "The 'level' tag contains {} levels while 'level:ref' contains {}.",
+            osmObj.url(),
+            levelListFromTag.length,
+            levelRefListFromTag.length
+          )
+        );
+      }
+    }
+    for (String level : levelListFromTag) {
+      levels.add(fromString(level, null, source, incrementNonNegative, issueStore, osmObj));
     }
     return levels;
   }
@@ -182,12 +246,12 @@ public class OsmLevel implements Comparable<OsmLevel> {
 
   @Override
   public int compareTo(OsmLevel other) {
-    return this.floorNumber - other.floorNumber;
+    return Double.compare(this.floorNumber, other.floorNumber);
   }
 
   @Override
   public int hashCode() {
-    return this.floorNumber;
+    return Double.hashCode(this.floorNumber);
   }
 
   @Override

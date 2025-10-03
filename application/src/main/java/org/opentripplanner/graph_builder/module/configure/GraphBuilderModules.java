@@ -45,6 +45,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
@@ -65,6 +66,7 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     VehicleParkingRepository vehicleParkingRepository,
     DataImportIssueStore issueStore,
     StreetLimitationParameters streetLimitationParameters

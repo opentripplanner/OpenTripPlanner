@@ -33,6 +33,8 @@ public final class DirectionMapper {
       case CIRCLE_CLOCKWISE -> GraphQLRelativeDirection.CIRCLE_CLOCKWISE;
       case CIRCLE_COUNTERCLOCKWISE -> GraphQLRelativeDirection.CIRCLE_COUNTERCLOCKWISE;
       case ELEVATOR -> GraphQLRelativeDirection.ELEVATOR;
+      case ESCALATOR -> GraphQLRelativeDirection.ESCALATOR;
+      case STAIRS -> GraphQLRelativeDirection.STAIRS;
       case UTURN_LEFT -> GraphQLRelativeDirection.UTURN_LEFT;
       case UTURN_RIGHT -> GraphQLRelativeDirection.UTURN_RIGHT;
       case ENTER_STATION -> GraphQLRelativeDirection.ENTER_STATION;

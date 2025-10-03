@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
@@ -79,6 +80,7 @@ public class ConstructApplication {
     CommandLineParameters cli,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
@@ -102,6 +104,7 @@ public class ConstructApplication {
     this.factory = builder
       .configModel(config)
       .graph(graph)
+      .osmStreetDecoratorRepository(osmStreetDecoratorRepository)
       .timetableRepository(timetableRepository)
       .graphVisualizer(graphVisualizer)
       .worldEnvelopeRepository(worldEnvelopeRepository)
@@ -141,6 +144,7 @@ public class ConstructApplication {
       graphBuilderDataSources,
       graph(),
       osmInfoGraphBuildRepository,
+      factory.osmStreetDecoratorRepository(),
       fareServiceFactory(),
       factory.timetableRepository(),
       factory.worldEnvelopeRepository(),
@@ -347,6 +351,10 @@ public class ConstructApplication {
 
   public EmissionRepository emissionRepository() {
     return factory.emissionRepository();
+  }
+
+  public OsmStreetDecoratorRepository osmStreetDecoratorRepository() {
+    return factory.osmStreetDecoratorRepository();
   }
 
   public StreetLimitationParameters streetLimitationParameters() {

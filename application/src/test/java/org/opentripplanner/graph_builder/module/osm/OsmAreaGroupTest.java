@@ -40,6 +40,7 @@ class OsmAreaGroupTest {
     0,
     "0",
     "0",
+    null,
     OsmLevel.Source.LEVEL_TAG,
     true
   );
@@ -48,6 +49,7 @@ class OsmAreaGroupTest {
     5,
     "1",
     "1",
+    null,
     OsmLevel.Source.LEVEL_TAG,
     true
   );

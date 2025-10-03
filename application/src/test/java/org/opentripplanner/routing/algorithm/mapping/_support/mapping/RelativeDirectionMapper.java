@@ -22,6 +22,8 @@ class RelativeDirectionMapper {
       case CIRCLE_CLOCKWISE -> ApiRelativeDirection.CIRCLE_CLOCKWISE;
       case CIRCLE_COUNTERCLOCKWISE -> ApiRelativeDirection.CIRCLE_COUNTERCLOCKWISE;
       case ELEVATOR -> ApiRelativeDirection.ELEVATOR;
+      case ESCALATOR -> ApiRelativeDirection.ESCALATOR;
+      case STAIRS -> ApiRelativeDirection.STAIRS;
       case UTURN_LEFT -> ApiRelativeDirection.UTURN_LEFT;
       case UTURN_RIGHT -> ApiRelativeDirection.UTURN_RIGHT;
       case ENTER_STATION -> ApiRelativeDirection.ENTER_STATION;

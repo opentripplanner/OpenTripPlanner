@@ -22,6 +22,9 @@ import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.service.DefaultViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorService;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
@@ -116,6 +119,7 @@ public class TestServerContext {
       createViaTransferResolver(graph, transitService),
       createWorldEnvelopeService(),
       createEmissionsItineraryDecorator(),
+      createOsmStreetDecoratorService(),
       null,
       null,
       null,
@@ -157,6 +161,10 @@ public class TestServerContext {
     return new EmissionItineraryDecorator(
       new DefaultEmissionService(new DefaultEmissionRepository())
     );
+  }
+
+  public static OsmStreetDecoratorService createOsmStreetDecoratorService() {
+    return new DefaultOsmStreetDecoratorService(new DefaultOsmStreetDecoratorRepository());
   }
 
   public static StreetLimitationParametersService createStreetLimitationParametersService() {

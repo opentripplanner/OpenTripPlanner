@@ -21,6 +21,8 @@ public class RelativeDirectionMapper {
         CIRCLE_CLOCKWISE,
         CIRCLE_COUNTERCLOCKWISE,
         ELEVATOR,
+        ESCALATOR,
+        STAIRS,
         UTURN_LEFT,
         UTURN_RIGHT,
         ENTER_STATION,

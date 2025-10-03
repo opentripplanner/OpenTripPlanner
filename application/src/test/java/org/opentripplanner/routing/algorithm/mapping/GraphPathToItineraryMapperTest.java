@@ -9,6 +9,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorService;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
@@ -31,7 +33,12 @@ class GraphPathToItineraryMapperTest {
   @ParameterizedTest
   @MethodSource("cases")
   void isSearchWindowAware(State state) {
-    var mapper = new GraphPathToItineraryMapper(ZoneIds.UTC, new StreetNotesService(), 1);
+    var mapper = new GraphPathToItineraryMapper(
+      ZoneIds.UTC,
+      new StreetNotesService(),
+      new DefaultOsmStreetDecoratorService(new DefaultOsmStreetDecoratorRepository()),
+      1
+    );
     var itin = mapper.generateItinerary(new GraphPath<>(state));
     assertFalse(itin.isSearchWindowAware());
   }
