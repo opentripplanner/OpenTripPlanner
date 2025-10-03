@@ -1,8 +1,6 @@
 package org.opentripplanner.gtfs.graphbuilder;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,13 +11,11 @@ import org.onebusaway.gtfs.model.FareLegRule;
 import org.onebusaway.gtfs.model.FareMedium;
 import org.onebusaway.gtfs.model.FareProduct;
 import org.onebusaway.gtfs.model.FareTransferRule;
-import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.RiderCategory;
 import org.onebusaway.gtfs.model.RouteNetworkAssignment;
 import org.onebusaway.gtfs.model.StopAreaElement;
 import org.onebusaway.gtfs.serialization.GtfsReader;
-import org.onebusaway.gtfs.services.GenericMutableDao;
-import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
+import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -130,7 +126,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     try {
       for (GtfsBundle gtfsBundle : gtfsBundles) {
-        GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
+        var gtfsDao = loadBundle(gtfsBundle);
 
         var feedId = gtfsBundle.getFeedId();
         verifyUniqueFeedId(gtfsBundle, feedIdsEncountered, feedId);
@@ -291,21 +287,20 @@ public class GtfsModule implements GraphBuilderModule {
     );
   }
 
-  private GtfsMutableRelationalDao loadBundle(GtfsBundle gtfsBundle) throws IOException {
+  private GtfsRelationalDao loadBundle(GtfsBundle gtfsBundle) throws IOException {
     var dao = new GtfsRelationalDaoImpl();
     dao.setPackShapePoints(true);
-    StoreImpl store = new StoreImpl(dao);
-    store.open();
     LOG.info("reading {}", gtfsBundle.feedInfo());
 
     String gtfsFeedId = gtfsBundle.getFeedId();
 
     GtfsReader reader = new GtfsReader();
     reader.setInputSource(gtfsBundle.getCsvInputSource());
-    reader.setEntityStore(store);
+    reader.setEntityStore(dao);
     reader.setInternStrings(true);
     reader.setDefaultAgencyId(gtfsFeedId);
 
+    dao.open();
     for (Class<?> entityClass : reader.getEntityClasses()) {
       if (skipEntityClass(entityClass)) {
         LOG.info("Skipping entity: {}", entityClass.getName());
@@ -313,11 +308,10 @@ public class GtfsModule implements GraphBuilderModule {
       }
       LOG.info("Reading entity: {}", entityClass.getName());
       reader.readEntities(entityClass);
-      store.flush();
     }
 
-    store.close();
-    return store.dao;
+    dao.close();
+    return dao;
   }
 
   /**
@@ -327,64 +321,5 @@ public class GtfsModule implements GraphBuilderModule {
    */
   private boolean skipEntityClass(Class<?> entityClass) {
     return OTPFeature.FaresV2.isOff() && FARES_V2_CLASSES.contains(entityClass);
-  }
-
-  private static class StoreImpl implements GenericMutableDao {
-
-    private final GtfsMutableRelationalDao dao;
-
-    StoreImpl(GtfsMutableRelationalDao dao) {
-      this.dao = dao;
-    }
-
-    @Override
-    public void open() {
-      dao.open();
-    }
-
-    @Override
-    public void saveEntity(Object entity) {
-      dao.saveEntity(entity);
-    }
-
-    @Override
-    public void updateEntity(Object entity) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void saveOrUpdateEntity(Object entity) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <K extends Serializable, T extends IdentityBean<K>> void removeEntity(T entity) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <T> void clearAllEntitiesForType(Class<T> type) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void flush() {
-      dao.flush();
-    }
-
-    @Override
-    public void close() {
-      dao.close();
-    }
-
-    @Override
-    public <T> Collection<T> getAllEntitiesForType(Class<T> type) {
-      return dao.getAllEntitiesForType(type);
-    }
-
-    @Override
-    public <T> T getEntityForId(Class<T> type, Serializable id) {
-      return dao.getEntityForId(type, id);
-    }
   }
 }
