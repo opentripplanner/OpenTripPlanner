@@ -23,13 +23,7 @@ test, package, and install phases. So formatting will happen for example when yo
 % mvn test
 ```
 
-You can manually run _only_ the rewrite formatting process with:
-
-```shell
-% mvn rewrite:run
-```
-
-You can manually run _only_ the prettier formatting process with:
+You can manually run _only_ the formatting process with:
 
 ```shell
 % mvn prettier:write
@@ -47,16 +41,26 @@ To check for prettier formatting errors, use the profile `prettierCheck`:
 % mvn test -P prettierCheck
 ```
 
-To skip OpenRewrite, use the profile `rewriteSkip`:
+The check is run by the CI server and will fail the build if the code is incorrectly formatted.
+
+### How to Run OpenRewrite with Maven
+
+OpenRewrite is configured to not run by default. You need to enable the profile to run it:
 
 ```shell
-% mvn test -P rewriteSkip
+% mvn test -P rewrite
 ```
 
-To skip both Prettier and OpenRewrite, use the profiles `prettierCheck` and `rewriteSkip`:
+You can manually run _only_ the rewrite formatting process with:
 
 ```shell
-% mvn test -P prettierSkip,rewriteSkip
+% mvn rewrite:run -P rewrite
+```
+
+To check for rewrite errors without automatically fixing them, use the profile `rewriteCheck`:
+
+```shell
+% mvn test -P rewriteCheck
 ```
 
 The check is run by the CI server and will fail the build if the code is incorrectly formatted.

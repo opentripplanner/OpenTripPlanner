@@ -87,7 +87,8 @@
         <plugin.prettier.version>0.22</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
         <plugin.prettier.skip>false</plugin.prettier.skip>
-        <plugin.rewrite.skip>false</plugin.rewrite.skip>
+        <plugin.rewrite.goal>run</plugin.rewrite.goal>
+        <plugin.rewrite.skip>true</plugin.rewrite.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
         <tests.excludedGroups>integration</tests.excludedGroups>
         <tests.includedGroups></tests.includedGroups>
@@ -302,6 +303,7 @@
                     <sizeThresholdMb>0</sizeThresholdMb>
                     <configLocation>${maven.multiModuleProjectDirectory}/openrewrite.yml</configLocation>
                     <rewriteSkip>${plugin.rewrite.skip}</rewriteSkip>
+                    <failOnDryRunResults>true</failOnDryRunResults>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -314,7 +316,7 @@
                     <execution>
                         <phase>validate</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>${plugin.rewrite.goal}</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -549,20 +551,28 @@
             </properties>
         </profile>
         <profile>
-            <id>rewriteSkip</id>
+            <id>rewriteCheck</id>
+            <properties>
+                <!-- In the CI environment we want to validate that code follows rewrite rules -->
+                <plugin.rewrite.goal>dryRun</plugin.rewrite.goal>
+                <plugin.rewrite.skip>false</plugin.rewrite.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>rewrite</id>
             <activation>
                 <property>
                     <!--
                       This works as a short alias to enable this from the command line. To skip
-                      rewrite, set the 'rs' system property with the '-D rs' parameter:
-                      # mvn test -D rs
+                      rewrite, set the 'rw' system property with the '-D rw' parameter:
+                      # mvn test -D rw
                     -->
-                    <name>rs</name>
+                    <name>rw</name>
                     <value/>
                 </property>
             </activation>
             <properties>
-                <plugin.rewrite.skip>true</plugin.rewrite.skip>
+                <plugin.rewrite.skip>false</plugin.rewrite.skip>
             </properties>
         </profile>
         <profile>
