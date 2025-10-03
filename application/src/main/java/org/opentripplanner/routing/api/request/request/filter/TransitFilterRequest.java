@@ -66,7 +66,7 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
     if (select.length != 0) {
       var anyMatch = false;
       for (SelectRequest s : select) {
-        if (s.matches(tripPattern)) {
+        if (s.matchesPatternSelect(tripPattern)) {
           anyMatch = true;
           break;
         }
@@ -77,7 +77,7 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
     }
 
     for (SelectRequest s : not) {
-      if (s.matches(tripPattern)) {
+      if (s.matchesPatternNot(tripPattern)) {
         return false;
       }
     }
