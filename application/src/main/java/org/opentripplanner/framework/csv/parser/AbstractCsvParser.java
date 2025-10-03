@@ -46,7 +46,7 @@ public abstract class AbstractCsvParser<T> {
     this.issueType = issueType;
   }
 
-  protected abstract List<String> headers();
+  public abstract List<String> headers();
 
   @Nullable
   protected abstract T createNextRow() throws HandledCsvParseException;

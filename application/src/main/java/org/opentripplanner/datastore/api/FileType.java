@@ -15,6 +15,7 @@ public enum FileType {
   GTFS("🚌", "GTFS data"),
   NETEX("🚌", "NeTEx data"),
   EMISSION("🌿", "Emission data"),
+  EMPIRICAL_DATA("📊", "Emperical data"),
   GRAPH("🌐", "OTP Graph file"),
   REPORT("📈", "Issue report"),
   UNKNOWN("❓", "Unknown file");
