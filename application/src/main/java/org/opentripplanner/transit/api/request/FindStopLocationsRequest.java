@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
  */
 public class FindStopLocationsRequest {
 
-  private String name;
+  private final String name;
 
   protected FindStopLocationsRequest(String name) {
     this.name = name;

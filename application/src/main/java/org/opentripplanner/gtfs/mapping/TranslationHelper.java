@@ -166,7 +166,9 @@ final class TranslationHelper {
     String fieldName,
     CsvFieldNameConvention fieldNameConvention
   ) {
-    if (fieldNameConvention == CsvFieldNameConvention.CAMEL_CASE) return fieldName;
+    if (fieldNameConvention == CsvFieldNameConvention.CAMEL_CASE) {
+      return fieldName;
+    }
 
     if (fieldNameConvention == CsvFieldNameConvention.CAPITALIZED_CAMEL_CASE) {
       return fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
@@ -178,8 +180,12 @@ final class TranslationHelper {
     for (int i = 0; i < fieldName.length(); i++) {
       char c = fieldName.charAt(i);
       boolean isUpperCase = Character.isUpperCase(c);
-      if (isUpperCase) c = Character.toLowerCase(c);
-      if (isUpperCase && !wasUpperCase) b.append('_');
+      if (isUpperCase) {
+        c = Character.toLowerCase(c);
+      }
+      if (isUpperCase && !wasUpperCase) {
+        b.append('_');
+      }
       b.append(c);
       wasUpperCase = isUpperCase;
     }

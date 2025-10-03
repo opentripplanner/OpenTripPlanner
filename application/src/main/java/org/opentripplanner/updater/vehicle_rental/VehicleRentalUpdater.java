@@ -209,7 +209,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       List<FeedScopedId> toRemove = new ArrayList<>();
       for (Entry<FeedScopedId, VehicleRentalPlaceVertex> entry : verticesByStation.entrySet()) {
         FeedScopedId station = entry.getKey();
-        if (stationSet.contains(station)) continue;
+        if (stationSet.contains(station)) {
+          continue;
+        }
         toRemove.add(station);
         service.removeVehicleRentalStation(station);
       }

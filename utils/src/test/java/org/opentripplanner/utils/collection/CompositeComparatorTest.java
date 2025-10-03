@@ -30,7 +30,8 @@ public class CompositeComparatorTest {
 
   private static class A {
 
-    final int a, b;
+    final int a;
+    final int b;
 
     public A(int a, int b) {
       this.a = a;

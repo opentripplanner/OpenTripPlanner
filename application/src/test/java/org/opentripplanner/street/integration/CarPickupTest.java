@@ -28,7 +28,11 @@ public class CarPickupTest extends GraphRoutingTest {
 
   private TransitStopVertex S1;
   private TransitEntranceVertex E1;
-  private StreetVertex A, B, C, D, E;
+  private StreetVertex A;
+  private StreetVertex B;
+  private StreetVertex C;
+  private StreetVertex D;
+  private StreetVertex E;
 
   @Test
   public void testCarPickupCarOnly() {

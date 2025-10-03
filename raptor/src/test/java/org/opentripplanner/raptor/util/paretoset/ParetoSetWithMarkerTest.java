@@ -153,7 +153,8 @@ public class ParetoSetWithMarkerTest {
 
   private static class Vector {
 
-    final int u, v;
+    final int u;
+    final int v;
 
     Vector(int u, int v) {
       this.u = u;

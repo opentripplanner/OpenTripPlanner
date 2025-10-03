@@ -123,8 +123,12 @@ public final class VehicleRentalPreferences implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     VehicleRentalPreferences that = (VehicleRentalPreferences) o;
     return (
       Objects.equals(pickupTime, that.pickupTime) &&

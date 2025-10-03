@@ -171,8 +171,12 @@ public final class TransitPreferences implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     TransitPreferences that = (TransitPreferences) o;
     return (
       boardSlack.equals(that.boardSlack) &&

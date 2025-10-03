@@ -78,8 +78,12 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     GeneralizedCostRelaxFunction that = (GeneralizedCostRelaxFunction) o;
     return normalizedRatio == that.normalizedRatio && slack == that.slack;
   }

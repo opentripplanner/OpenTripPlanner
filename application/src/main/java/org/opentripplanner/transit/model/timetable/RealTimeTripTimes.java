@@ -351,8 +351,12 @@ public final class RealTimeTripTimes implements TripTimes {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     RealTimeTripTimes that = (RealTimeTripTimes) o;
     return (
       Objects.equals(scheduledTripTimes, that.scheduledTripTimes) &&

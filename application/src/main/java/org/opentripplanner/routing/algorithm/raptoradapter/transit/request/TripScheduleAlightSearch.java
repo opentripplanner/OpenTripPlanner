@@ -206,7 +206,8 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
    * @return a better lower bound index (inclusive)
    */
   private int binarySearchForTripIndex() {
-    int lower = 0, upper = nTrips;
+    int lower = 0;
+    int upper = nTrips;
 
     // Do a binary search to find where to start the search.
     // We IGNORE if the trip schedule is in service.

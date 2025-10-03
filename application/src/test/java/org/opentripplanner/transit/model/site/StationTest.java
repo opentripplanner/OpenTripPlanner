@@ -24,8 +24,6 @@ class StationTest {
   private static final StopTransferPriority PRIORITY = StopTransferPriority.ALLOWED;
   private static final ZoneId TIMEZONE = ZoneId.of(TimetableRepositoryForTest.TIME_ZONE_ID);
   private static final I18NString URL = new NonLocalizedString("url");
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
-  private static final Station PARENT_STATION = TEST_MODEL.station("stationId").build();
 
   private static final Station subject = Station.of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)

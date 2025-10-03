@@ -18,7 +18,7 @@ class MultiModalStationTest {
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final Station STATION_1 = TEST_MODEL.station("1:1").build();
   private static final Station STATION_2 = TEST_MODEL.station("1:2").build();
 

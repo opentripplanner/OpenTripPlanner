@@ -74,8 +74,12 @@ public class VehicleParkingFilter implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     VehicleParkingFilter that = (VehicleParkingFilter) o;
     return (Arrays.equals(not, that.not) && Arrays.equals(select, that.select));
   }

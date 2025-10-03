@@ -13,7 +13,7 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class GroupOfStationsTest {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
