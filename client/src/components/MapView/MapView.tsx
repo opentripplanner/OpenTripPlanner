@@ -6,7 +6,6 @@ import {
   MapMouseEvent,
   NavigationControl,
   MapRef,
-  Popup,
 } from 'react-map-gl/maplibre';
 import maplibregl, { VectorTileSource } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
