@@ -23,7 +23,7 @@ class StopTimeToScheduledTripTimesMapper {
     DeduplicatorService deduplicator,
     Collection<StopTime> stopTimes
   ) {
-    var isFlex = stopTimes.stream().anyMatch(st -> st.hasFlexStop() || st.hasFlexWindow());
+    var isFlex = stopTimes.stream().anyMatch(st -> st.hasFlexibleStop() || st.hasFlexWindow());
     if (isFlex) {
       this.builder = FlexibleTripTimes.of(deduplicator).withTrip(trip);
     } else {

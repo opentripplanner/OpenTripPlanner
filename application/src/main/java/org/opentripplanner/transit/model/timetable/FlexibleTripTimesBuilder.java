@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
-import org.opentripplanner.utils.time.TimeUtils;
 
 public class FlexibleTripTimesBuilder
   extends AbstractTripTimesBuilder<FlexibleTripTimes, FlexibleTripTimesBuilder> {
