@@ -2,8 +2,10 @@ package org.opentripplanner.street.model._data;
 
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -21,6 +23,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
@@ -71,7 +74,8 @@ public class StreetModelForTest {
     StreetVertex vA,
     StreetVertex vB,
     double length,
-    StreetTraversalPermission perm
+    StreetTraversalPermission perm,
+    boolean stairs
   ) {
     var labelA = vA.getLabel();
     var labelB = vB.getLabel();
@@ -87,8 +91,18 @@ public class StreetModelForTest {
       .withGeometry(geom)
       .withName(name)
       .withMeterLength(length)
+      .withStairs(stairs)
       .withPermission(perm)
       .withBack(false);
+  }
+
+  public static StreetEdgeBuilder<?> streetEdgeBuilder(
+    StreetVertex vA,
+    StreetVertex vB,
+    double length,
+    StreetTraversalPermission perm
+  ) {
+    return streetEdgeBuilder(vA, vB, length, perm, false);
   }
 
   public static StreetEdge streetEdge(
@@ -97,7 +111,16 @@ public class StreetModelForTest {
     double length,
     StreetTraversalPermission perm
   ) {
-    return streetEdgeBuilder(vA, vB, length, perm).buildAndConnect();
+    return streetEdgeBuilder(vA, vB, length, perm, false).buildAndConnect();
+  }
+
+  public static EscalatorEdge escalatorEdge(
+    StreetVertex vA,
+    StreetVertex vB,
+    double length,
+    @Nullable Duration duration
+  ) {
+    return EscalatorEdge.createEscalatorEdge(vA, vB, length, null);
   }
 
   public static StreetEdge areaEdge(

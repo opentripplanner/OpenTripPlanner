@@ -37,6 +37,26 @@ class StatesToWalkStepsMapperTest {
   }
 
   @Test
+  void stairs() {
+    var walkSteps = buildWalkSteps(
+      TestStateBuilder.ofWalking().streetEdge().stairsEdge().streetEdge()
+    );
+    assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());
+    assertEquals(RelativeDirection.STAIRS, walkSteps.get(1).getRelativeDirection());
+    assertEquals(RelativeDirection.CONTINUE, walkSteps.get(2).getRelativeDirection());
+  }
+
+  @Test
+  void escalator() {
+    var walkSteps = buildWalkSteps(
+      TestStateBuilder.ofWalking().streetEdge().escalatorEdge().streetEdge()
+    );
+    assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());
+    assertEquals(RelativeDirection.ESCALATOR, walkSteps.get(1).getRelativeDirection());
+    assertEquals(RelativeDirection.CONTINUE, walkSteps.get(2).getRelativeDirection());
+  }
+
+  @Test
   void stationEntrance() {
     var walkSteps = buildWalkSteps(
       TestStateBuilder.ofWalking()
