@@ -115,11 +115,6 @@
                     <artifactId>prettier-maven-plugin</artifactId>
                     <version>${plugin.prettier.version}</version>
                 </plugin>
-                <plugin>
-                    <groupId>com.diffplug.spotless</groupId>
-                    <artifactId>spotless-maven-plugin</artifactId>
-                    <version>2.46.1</version>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -293,27 +288,24 @@
             </plugin>
 
             <plugin>
-                <groupId>com.diffplug.spotless</groupId>
-                <artifactId>spotless-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <configLocation>${maven.multiModuleProjectDirectory}/checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                </configuration>
                 <executions>
                     <execution>
+                        <id>validate</id>
                         <phase>validate</phase>
                         <goals>
-                            <goal>apply</goal>
+                            <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <java>
-                        <removeUnusedImports/>
-                        <includes>
-                            <include>src/main/java/**/*.java</include>
-                            <include>src/test/java/**/*.java</include>
-                            <include>src/ext/java/**/*.java</include>
-                            <include>src/ext-test/java/**/*.java</include>
-                        </includes>
-                    </java>
-                </configuration>
             </plugin>
 
             <plugin>
