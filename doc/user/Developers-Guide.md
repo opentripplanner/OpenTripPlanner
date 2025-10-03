@@ -60,6 +60,9 @@ There are several ways to get involved:
   below).
 
 * [File a bug or new feature request](http://github.com/openplans/OpenTripPlanner/issues/new).
+  If you want a GitHub issue to be addressed, you should also discuss it in
+  [Gitter](https://gitter.im/opentripplanner/OpenTripPlanner) or in the
+  [developer meetings](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CONTRIBUTING.md#developer-meetings).
 
 * Create pull requests citing the relevant issue.
 
@@ -80,11 +83,6 @@ leadership committee members. The reviewers should be from two different organiz
 have validation rules ensuring that the code compiles and all tests pass before pull requests can 
 be merged.
 
-The `dev-1.x` exist for patching OTP version 1.x, but with few people to do the reviews, very few
-PRs are accepted. We recommend getting in touch with the community before you spend time on making 
-a PR.
-
-
 ### Issues
 
 If no ticket exists for the feature or bug your
@@ -93,6 +91,10 @@ should [create a new ticket](http://github.com/openplans/OpenTripPlanner/issues/
 checking in, or ideally even prior to your development work since this provides a place to carry out
 implementation discussions (in the comments). The created issue should be referenced in a pull
 request. For really minor and uncontroversial pull requests, it is ok to not create an issue.
+
+**If you want a GitHub issue to be addressed, you should also discuss it in
+[Gitter](https://gitter.im/opentripplanner/OpenTripPlanner) or in the
+[developer meetings](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CONTRIBUTING.md#developer-meetings).**
 
 ### Unit tests using real OSM data
 
