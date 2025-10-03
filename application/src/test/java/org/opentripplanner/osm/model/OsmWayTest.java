@@ -224,7 +224,7 @@ public class OsmWayTest {
   }
 
   @Test
-  void escalator() {
+  void testIsEscalator() {
     assertFalse(WayTestData.highwayWithCycleLane().isEscalator());
 
     var escalator = new OsmWay();
@@ -236,6 +236,12 @@ public class OsmWayTest {
 
     escalator.addTag("conveying", "whoknows?");
     assertFalse(escalator.isEscalator());
+
+    escalator.addTag("conveying", "forward");
+    assertTrue(escalator.isForwardEscalator());
+
+    escalator.addTag("conveying", "backward");
+    assertTrue(escalator.isBackwardEscalator());
   }
 
   @Test

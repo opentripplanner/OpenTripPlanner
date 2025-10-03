@@ -23,8 +23,6 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
-import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
-import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.OtpStartupInfo;
@@ -137,7 +135,7 @@ public class SpeedTest {
       TestServerContext.createViaTransferResolver(graph, transitService),
       TestServerContext.createWorldEnvelopeService(),
       null,
-      new DefaultOsmStreetDecoratorService(new DefaultOsmStreetDecoratorRepository()),
+      TestServerContext.createOsmStreetDecoratorService(),
       null,
       null,
       null,
