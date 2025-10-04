@@ -219,6 +219,11 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
+  public AreaStop getAreaStop(FeedScopedId id) {
+    return Objects.requireNonNull(this.timetableRepository.getSiteRepository().getAreaStop(id));
+  }
+
+  @Override
   public Route getRoute(FeedScopedId id) {
     if (timetableSnapshot != null) {
       Route realtimeAddedRoute = timetableSnapshot.getRealtimeAddedRoute(id);

@@ -6,6 +6,7 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -30,7 +31,7 @@ class TestGraph {
       for (double lon = -83.09040; lon < -82.88389; lon += 0.005) {
         String id = Integer.toString(count++);
         RegularStop stop = TEST_MODEL.stop(id).withCoordinate(lat, lon).build();
-        graph.addVertex(TransitStopVertex.of().withStop(stop).build());
+        graph.addVertex(stop(stop));
       }
     }
   }
@@ -42,7 +43,7 @@ class TestGraph {
     for (double lat = 40; lat < 40.01; lat += 0.005) {
       String id = "EXTRA_" + count++;
       RegularStop stop = TEST_MODEL.stop(id).withCoordinate(lat, lon).build();
-      graph.addVertex(TransitStopVertex.of().withStop(stop).build());
+      graph.addVertex(stop(stop));
     }
 
     // add some duplicate stops, identical to the regular stop grid
@@ -50,7 +51,7 @@ class TestGraph {
     for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
       String id = "DUPE_" + count++;
       RegularStop stop = TEST_MODEL.stop(id).withCoordinate(lat, lon).build();
-      graph.addVertex(TransitStopVertex.of().withStop(stop).build());
+      graph.addVertex(stop(stop));
     }
 
     // add some almost duplicate stops
@@ -58,7 +59,7 @@ class TestGraph {
     for (double lat = 39.9059; lat < 40.0281; lat += 0.005) {
       String id = "ALMOST_" + count++;
       RegularStop stop = TEST_MODEL.stop(id).withCoordinate(lat, lon).build();
-      graph.addVertex(TransitStopVertex.of().withStop(stop).build());
+      graph.addVertex(stop(stop));
     }
   }
 
@@ -87,5 +88,9 @@ class TestGraph {
           )
       );
     }
+  }
+
+  private static Vertex stop(RegularStop stop) {
+    return TransitStopVertex.of().withId(stop.getId()).withPoint(stop.getGeometry()).build();
   }
 }

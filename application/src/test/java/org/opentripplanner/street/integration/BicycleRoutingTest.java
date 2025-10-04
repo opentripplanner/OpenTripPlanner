@@ -99,6 +99,7 @@ public class BicycleRoutingTest {
     var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+      id -> null,
       ZoneIds.BERLIN,
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference

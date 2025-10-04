@@ -19,6 +19,7 @@ public class DirectFlexRouter {
 
   public static List<Itinerary> route(
     OtpServerRequestContext serverContext,
+    AccessEgressRouter accessEgressRouter,
     RouteRequest request,
     AdditionalSearchDays additionalSearchDays
   ) {
@@ -38,7 +39,7 @@ public class DirectFlexRouter {
       )
     ) {
       // Prepare access/egress transfers
-      Collection<NearbyStop> accessStops = AccessEgressRouter.findAccessEgresses(
+      Collection<NearbyStop> accessStops = accessEgressRouter.findAccessEgresses(
         request,
         temporaryVertices,
         request.journey().direct(),
@@ -47,7 +48,7 @@ public class DirectFlexRouter {
         serverContext.flexParameters().maxAccessWalkDuration(),
         0
       );
-      Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
+      Collection<NearbyStop> egressStops = accessEgressRouter.findAccessEgresses(
         request,
         temporaryVertices,
         request.journey().direct(),

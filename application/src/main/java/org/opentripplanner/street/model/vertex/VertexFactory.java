@@ -12,9 +12,11 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.PathwayNode;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 
 /**
@@ -113,12 +115,25 @@ public class VertexFactory {
     return addToGraph(new BarrierPassThroughVertex(coordinate.x, coordinate.y, nid, routableWayId));
   }
 
-  public TransitStopVertex transitStop(TransitStopVertexBuilder transitStopVertexBuilder) {
-    return addToGraph(transitStopVertexBuilder.build());
+  public TransitStopVertex transitStop(RegularStop stop, Set<TransitMode> modes) {
+    var v = TransitStopVertex.of()
+      .withId(stop.getId())
+      .withPoint(stop.getGeometry())
+      .withWheelchairAccessiblity(stop.getWheelchairAccessibility())
+      .withModes(modes)
+      .build();
+    return addToGraph(v);
   }
 
   public StationCentroidVertex stationCentroid(Station station) {
-    return addToGraph(new StationCentroidVertex(station));
+    if (!station.shouldRouteToCentroid()) {
+      throw new IllegalArgumentException(
+        "Station '%s' must route to centroid in order to create a vertex.".formatted(
+            station.getId()
+          )
+      );
+    }
+    return addToGraph(new StationCentroidVertex(station.getId(), station.getCoordinate()));
   }
 
   public VehicleParkingEntranceVertex vehicleParkingEntrance(VehicleParking vehicleParking) {

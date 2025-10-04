@@ -43,6 +43,7 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
+import org.opentripplanner.routing.via.service.TransitServiceResolver;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
@@ -62,6 +63,7 @@ public class TransitRouter {
   private final AdditionalSearchDays additionalSearchDays;
   private final TemporaryVerticesContainer temporaryVerticesContainer;
   private final ViaCoordinateTransferFactory viaTransferResolver;
+  private final AccessEgressRouter accessEgressRouter;
 
   private TransitRouter(
     RouteRequest request,
@@ -79,6 +81,9 @@ public class TransitRouter {
     this.debugTimingAggregator = debugTimingAggregator;
     this.temporaryVerticesContainer = createTemporaryVerticesContainer(request, serverContext);
     this.viaTransferResolver = serverContext.viaTransferResolver();
+    this.accessEgressRouter = new AccessEgressRouter(
+      new TransitServiceResolver(serverContext.transitService())
+    );
   }
 
   public static TransitRouterResult route(
@@ -270,7 +275,7 @@ public class TransitRouter {
     Duration durationLimit = accessEgressPreferences.maxDuration().valueOf(mode);
     int stopCountLimit = accessEgressPreferences.maxStopCountLimit().limitForMode(mode);
 
-    var nearbyStops = AccessEgressRouter.findAccessEgresses(
+    var nearbyStops = accessEgressRouter.findAccessEgresses(
       accessRequest,
       temporaryVerticesContainer,
       streetRequest,
@@ -288,6 +293,7 @@ public class TransitRouter {
     if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
       var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
         accessRequest,
+        accessEgressRouter,
         temporaryVerticesContainer,
         serverContext,
         additionalSearchDays,

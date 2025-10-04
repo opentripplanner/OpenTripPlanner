@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -163,7 +164,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
       if (location.stopId != null && location.getCoordinate() == null) {
         var stopVertex = graph.getStopVertex(location.stopId);
         if (stopVertex != null) {
-          var c = stopVertex.getStop().getCoordinate();
+          var c = new WgsCoordinate(stopVertex.getCoordinate());
           location = new GenericLocation(
             location.label,
             location.stopId,

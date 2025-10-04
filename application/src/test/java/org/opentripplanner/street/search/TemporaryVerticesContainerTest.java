@@ -24,6 +24,7 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class TemporaryVerticesContainerTest {
 
@@ -59,6 +60,11 @@ class TemporaryVerticesContainerTest {
     .withCoordinate(CENTER.moveNorthMeters(DISTANCE))
     .build();
   private final Graph graph = buildGraph(stationAlpha, stopA, stopB, stopC, stopD);
+
+  private final SiteRepository siteRepository = testModel
+    .siteRepositoryBuilder()
+    .withRegularStops(List.of(stopA, stopB, stopC, stopD))
+    .build();
 
   @Test
   void coordinates() {
@@ -128,19 +134,19 @@ class TemporaryVerticesContainerTest {
     var fromVertices = List.copyOf(container.getFromVertices());
     assertThat(fromVertices).hasSize(1);
 
-    var station = ((StationCentroidVertex) fromVertices.getFirst()).getStation();
-    assertEquals(station, this.stationAlpha);
+    var station = ((StationCentroidVertex) fromVertices.getFirst()).getId();
+    assertEquals(station, this.stationAlpha.getId());
   }
 
   private static Graph buildGraph(Station station, RegularStop... stops) {
     var graph = new Graph();
     var center = StreetModelForTest.intersectionVertex(CENTER.asJtsCoordinate());
     graph.addVertex(center);
-    var centroidVertex = new StationCentroidVertex(station);
+    var centroidVertex = new StationCentroidVertex(station.getId(), station.getCoordinate());
     graph.addVertex(centroidVertex);
     StreetStationCentroidLink.createStreetStationLink(centroidVertex, center);
     Arrays.stream(stops).forEach(s -> {
-      graph.addVertex(TransitStopVertex.of().withStop(s).build());
+      graph.addVertex(TransitStopVertex.of().withId(s.getId()).withPoint(s.getGeometry()).build());
       var vertex = StreetModelForTest.intersectionVertex(s.getCoordinate().asJtsCoordinate());
       StreetModelForTest.streetEdge(vertex, center);
       graph.addVertex(vertex);
@@ -150,15 +156,17 @@ class TemporaryVerticesContainerTest {
     return graph;
   }
 
-  private static RegularStop toStop(Set<? extends Vertex> fromVertices) {
+  private RegularStop toStop(Set<? extends Vertex> fromVertices) {
     assertThat(fromVertices).hasSize(1);
-    return ((TransitStopVertex) List.copyOf(fromVertices).getFirst()).getStop();
+    var id = ((TransitStopVertex) List.copyOf(fromVertices).getFirst()).getId();
+    return siteRepository.getRegularStop(id);
   }
 
-  private static Set<RegularStop> toStops(Set<? extends Vertex> fromVertices) {
+  private Set<RegularStop> toStops(Set<? extends Vertex> fromVertices) {
     return fromVertices
       .stream()
-      .map(v -> ((TransitStopVertex) v).getStop())
+      .map(v -> ((TransitStopVertex) v).getId())
+      .map(siteRepository::getRegularStop)
       .collect(Collectors.toUnmodifiableSet());
   }
 

@@ -125,6 +125,7 @@ public interface OtpServerRequestContext {
     return GraphFinder.getInstance(
       graph(),
       vertexLinker(),
+      transitService()::getRegularStop,
       transitService()::findRegularStopsByBoundingBox
     );
   }

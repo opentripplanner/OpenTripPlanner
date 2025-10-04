@@ -17,7 +17,7 @@ import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -259,9 +259,9 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /**
-   * Returns the (flex) area stops that this vertex is inside.
+   * Returns the ids of (flex) area stops that this vertex is inside of.
    */
-  public Set<AreaStop> areaStops() {
+  public Set<FeedScopedId> areaStops() {
     return Set.of();
   }
 

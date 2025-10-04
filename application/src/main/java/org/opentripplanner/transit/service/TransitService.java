@@ -146,6 +146,11 @@ public interface TransitService {
   @Nullable
   RegularStop getRegularStop(FeedScopedId id);
 
+  /**
+   * Gets the area stop with the given id and throws an exception if it was not found.
+   */
+  AreaStop getAreaStop(FeedScopedId id);
+
   Collection<StopLocation> listStopLocations();
 
   Collection<GroupStop> listGroupStops();

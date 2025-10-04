@@ -22,6 +22,7 @@ import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -30,6 +31,7 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.routing.via.service.TransitServiceResolver;
 import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -63,6 +65,7 @@ public class RoutingWorker {
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private final TransitGroupPriorityService transitGroupPriorityService;
+  private final AccessEgressRouter accessEgressRouter;
   private SearchParams raptorSearchParamsUsed = null;
   private PageCursorInput pageCursorInput = null;
 
@@ -87,6 +90,9 @@ public class RoutingWorker {
       request.preferences().transit().relaxTransitGroupPriority(),
       request.journey().transit().priorityGroupsByAgency(),
       request.journey().transit().priorityGroupsGlobal()
+    );
+    this.accessEgressRouter = new AccessEgressRouter(
+      new TransitServiceResolver(serverContext.transitService())
     );
   }
 
@@ -248,7 +254,9 @@ public class RoutingWorker {
     }
     debugTimingAggregator.startedDirectFlexRouter();
     try {
-      return RoutingResult.ok(DirectFlexRouter.route(serverContext, request, additionalSearchDays));
+      return RoutingResult.ok(
+        DirectFlexRouter.route(serverContext, accessEgressRouter, request, additionalSearchDays)
+      );
     } catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
     } finally {
