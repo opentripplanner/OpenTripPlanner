@@ -44,7 +44,11 @@ public class FrequencyEntryTest {
       stopTimes.add(stopTime);
     }
 
-    tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
+    tripTimes = (ScheduledTripTimes) TripTimesFactory.tripTimes(
+      trip,
+      stopTimes,
+      new Deduplicator()
+    );
   }
 
   @Test

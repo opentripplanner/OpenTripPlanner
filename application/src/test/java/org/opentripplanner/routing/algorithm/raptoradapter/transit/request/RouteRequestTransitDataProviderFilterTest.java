@@ -43,7 +43,6 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
-import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
@@ -931,7 +930,7 @@ class RouteRequestTransitDataProviderFilterTest {
 
     TripTimes tripTimes = TripTimesFactory.tripTimes(
       TimetableRepositoryForTest.trip("1").withRoute(route).build(),
-      List.of(new StopTime()),
+      List.of(stopTime, stopTime),
       new Deduplicator()
     );
 
@@ -974,7 +973,7 @@ class RouteRequestTransitDataProviderFilterTest {
     );
   }
 
-  private ScheduledTripTimes createTestTripTimes(
+  private TripTimes createTestTripTimes(
     FeedScopedId tripId,
     Route route,
     BikeAccess bikeAccess,
@@ -1000,7 +999,7 @@ class RouteRequestTransitDataProviderFilterTest {
     stopTime.setDepartureTime(60);
     stopTime.setStopSequence(0);
 
-    return TripTimesFactory.tripTimes(trip, List.of(stopTime), new Deduplicator());
+    return TripTimesFactory.tripTimes(trip, List.of(stopTime, stopTime), new Deduplicator());
   }
 
   private TripTimes createTestTripTimesWithSubmode(String submode) {

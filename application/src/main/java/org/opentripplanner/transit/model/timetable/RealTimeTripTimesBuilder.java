@@ -258,10 +258,12 @@ public class RealTimeTripTimesBuilder {
   }
 
   public RealTimeTripTimesBuilder withServiceCode(int serviceCode) {
-    this.scheduledTripTimes = scheduledTripTimes
-      .copyOfNoDuplication()
-      .withServiceCode(serviceCode)
-      .build();
+    var tripTimes = scheduledTripTimes.copyOfNoDuplication().withServiceCode(serviceCode).build();
+    if (tripTimes instanceof ScheduledTripTimes tt) {
+      this.scheduledTripTimes = tt;
+    } else {
+      throw new UnsupportedOperationException("Cannot apply real-time updates to flex trips.");
+    }
     return this;
   }
 

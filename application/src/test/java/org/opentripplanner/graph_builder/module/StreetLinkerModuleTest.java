@@ -157,7 +157,7 @@ class StreetLinkerModuleTest {
       .trip("carsAllowedTrip")
       .withCarsAllowed(CarAccess.ALLOWED)
       .build();
-    model.withCarsAllowedTrip(carsAllowedTrip, model.stop());
+    model.withCarsAllowedTrip(carsAllowedTrip, model.stop(), model.stop());
 
     var module = model.streetLinkerModule();
 
@@ -257,7 +257,7 @@ class StreetLinkerModuleTest {
           var stopTime = new StopTime();
           stopTime.setStop(s);
           stopTime.setArrivalTime(30);
-          stopTime.setDepartureTime(60);
+          stopTime.setDepartureTime(30);
           stopTime.setTrip(trip);
           return stopTime;
         })

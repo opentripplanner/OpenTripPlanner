@@ -12,14 +12,25 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 class StopTimeToScheduledTripTimesMapper {
 
-  private final Trip trip;
-  private final ScheduledTripTimesBuilder builder;
-
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
+  private final Trip trip;
+  private final AbstractTripTimesBuilder builder;
 
-  private StopTimeToScheduledTripTimesMapper(Trip trip, DeduplicatorService deduplicator) {
+  private final Collection<StopTime> stopTimes;
+
+  private StopTimeToScheduledTripTimesMapper(
+    Trip trip,
+    DeduplicatorService deduplicator,
+    Collection<StopTime> stopTimes
+  ) {
+    var isFlex = stopTimes.stream().anyMatch(st -> st.hasFlexibleStop() || st.hasFlexWindow());
+    if (isFlex) {
+      this.builder = FlexibleTripTimes.of(deduplicator).withTrip(trip);
+    } else {
+      this.builder = ScheduledTripTimes.of(deduplicator).withTrip(trip);
+    }
     this.trip = trip;
-    this.builder = ScheduledTripTimes.of(deduplicator).withTrip(trip);
+    this.stopTimes = stopTimes;
   }
 
   /**
@@ -27,15 +38,15 @@ class StopTimeToScheduledTripTimesMapper {
    * The non-interpolated stoptimes should already be marked at timepoints by a previous filtering
    * step.
    */
-  public static ScheduledTripTimes map(
+  public static TripTimes map(
     Trip trip,
     Collection<StopTime> stopTimes,
     DeduplicatorService deduplicator
   ) {
-    return new StopTimeToScheduledTripTimesMapper(trip, deduplicator).doMap(stopTimes);
+    return new StopTimeToScheduledTripTimesMapper(trip, deduplicator, stopTimes).doMap();
   }
 
-  private ScheduledTripTimes doMap(Collection<StopTime> stopTimes) {
+  private TripTimes doMap() {
     final int nStops = stopTimes.size();
     final int[] departures = new int[nStops];
     final int[] arrivals = new int[nStops];
@@ -55,17 +66,16 @@ class StopTimeToScheduledTripTimesMapper {
       pickupBookingInfos.add(st.getPickupBookingInfo());
       s++;
     }
-    builder
-      .withDepartureTimes(departures)
+
+    return this.builder.withDepartureTimes(departures)
       .withArrivalTimes(arrivals)
       .withGtfsSequenceOfStopIndex(sequences)
       .withHeadsigns(makeHeadsignsArray(stopTimes))
       .withHeadsignVias(makeHeadsignViasArray(stopTimes))
       .withDropOffBookingInfos(dropOffBookingInfos)
       .withPickupBookingInfos(pickupBookingInfos)
-      .withTimepoints(timepoints);
-
-    return builder.build();
+      .withTimepoints(timepoints)
+      .build();
   }
 
   /**
