@@ -56,6 +56,22 @@ public class TripUpdateBuilder {
     );
   }
 
+  public TripUpdateBuilder addStopTime(int stopSequence, String time) {
+    return addStopTime(
+      null,
+      time,
+      stopSequence,
+      NO_DELAY,
+      NO_DELAY,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
+      null,
+      null,
+      null,
+      null
+    );
+  }
+
   public TripUpdateBuilder addStopTime(String stopId, String time) {
     return addStopTime(
       stopId,
@@ -64,6 +80,7 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
       null,
       null,
       null,
@@ -82,6 +99,7 @@ public class TripUpdateBuilder {
       null,
       null,
       headsign,
+      null,
       null
     );
   }
@@ -94,6 +112,7 @@ public class TripUpdateBuilder {
       delay,
       delay,
       DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
       null,
       null,
       null,
@@ -116,7 +135,8 @@ public class TripUpdateBuilder {
       null,
       null,
       null,
-      scheduledTime
+      scheduledTime,
+      null
     );
   }
 
@@ -129,6 +149,7 @@ public class TripUpdateBuilder {
       NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
       pickDrop,
+      null,
       null,
       null,
       null
@@ -150,6 +171,7 @@ public class TripUpdateBuilder {
       null,
       pickDrop,
       null,
+      null,
       null
     );
   }
@@ -162,6 +184,7 @@ public class TripUpdateBuilder {
       delay,
       delay,
       DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
       null,
       null,
       null,
@@ -184,6 +207,7 @@ public class TripUpdateBuilder {
       null,
       null,
       null,
+      null,
       null
     );
   }
@@ -199,6 +223,7 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       StopTimeUpdate.ScheduleRelationship.NO_DATA,
+      null,
       null,
       null,
       null,
@@ -220,6 +245,7 @@ public class TripUpdateBuilder {
       null,
       null,
       null,
+      null,
       null
     );
   }
@@ -232,6 +258,7 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       StopTimeUpdate.ScheduleRelationship.SKIPPED,
+      null,
       null,
       null,
       null,
@@ -250,7 +277,28 @@ public class TripUpdateBuilder {
       pickDrop,
       null,
       null,
+      null,
       null
+    );
+  }
+
+  public TripUpdateBuilder addAssignedStopTime(
+    int stopSequence,
+    String time,
+    String assignedStopId
+  ) {
+    return addStopTime(
+      null,
+      time,
+      stopSequence,
+      NO_DELAY,
+      NO_DELAY,
+      StopTimeUpdate.ScheduleRelationship.SCHEDULED,
+      null,
+      null,
+      null,
+      null,
+      assignedStopId
     );
   }
 
@@ -273,7 +321,8 @@ public class TripUpdateBuilder {
     @Nullable DropOffPickupType pickDrop,
     @Nullable StopTimeUpdate.StopTimeProperties.DropOffPickupType gtfsPickDrop,
     @Nullable String headsign,
-    @Nullable String scheduledTime
+    @Nullable String scheduledTime,
+    @Nullable String assignedStopId
   ) {
     final StopTimeUpdate.Builder stopTimeUpdateBuilder =
       tripUpdateBuilder.addStopTimeUpdateBuilder();
@@ -287,7 +336,7 @@ public class TripUpdateBuilder {
       stopTimeUpdateBuilder.setStopSequence(stopSequence);
     }
 
-    if (pickDrop != null || gtfsPickDrop != null || headsign != null) {
+    if (pickDrop != null || gtfsPickDrop != null || headsign != null || assignedStopId != null) {
       var stopTimePropsBuilder = stopTimeUpdateBuilder.getStopTimePropertiesBuilder();
 
       if (headsign != null) {
@@ -304,6 +353,10 @@ public class TripUpdateBuilder {
         b.setPickupType(pickDrop);
         var ext = b.build();
         stopTimePropsBuilder.setExtension(MfdzRealtimeExtensions.stopTimeProperties, ext);
+      }
+
+      if (assignedStopId != null) {
+        stopTimePropsBuilder.setAssignedStopId(assignedStopId);
       }
     }
 

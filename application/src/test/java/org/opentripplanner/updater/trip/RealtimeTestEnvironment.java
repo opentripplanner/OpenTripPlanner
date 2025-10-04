@@ -5,17 +5,24 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
 import com.google.transit.realtime.GtfsRealtime;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -55,8 +62,14 @@ public final class RealtimeTestEnvironment {
     this.timetableRepository = timetableRepository;
 
     this.timetableRepository.index();
+    this.timetableRepository.setRaptorTransitData(
+        RaptorTransitDataMapper.map(new TestTransitTuningParameters(), timetableRepository)
+      );
+    this.timetableRepository.setRealtimeRaptorTransitData(
+        new RaptorTransitData(timetableRepository.getRaptorTransitData())
+      );
     this.snapshotManager = new TimetableSnapshotManager(
-      null,
+      new RealTimeRaptorTransitDataUpdater(timetableRepository),
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       () -> defaultServiceDate
     );
@@ -211,5 +224,38 @@ public final class RealtimeTestEnvironment {
 
   private void commitTimetableSnapshot() {
     snapshotManager.purgeAndCommit();
+  }
+
+  private static class TestTransitTuningParameters implements TransitTuningParameters {
+
+    @Override
+    public boolean enableStopTransferPriority() {
+      return false;
+    }
+
+    @Override
+    public Integer stopBoardAlightDuringTransferCost(StopTransferPriority key) {
+      return 0;
+    }
+
+    @Override
+    public int transferCacheMaxSize() {
+      return 0;
+    }
+
+    @Override
+    public Duration maxSearchWindow() {
+      return null;
+    }
+
+    @Override
+    public List<Duration> pagingSearchWindowAdjustments() {
+      return List.of();
+    }
+
+    @Override
+    public List<RouteRequest> transferCacheRequests() {
+      return List.of();
+    }
   }
 }
