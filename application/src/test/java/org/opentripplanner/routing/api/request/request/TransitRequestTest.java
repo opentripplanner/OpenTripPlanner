@@ -37,7 +37,7 @@ class TransitRequestTest {
   );
 
   private final TransitRequest subject = TransitRequest.of()
-    .setFilters(FILTERS)
+    .withFilters(FILTERS)
     .withBannedTrips(BANNED_TRIPS)
     .withPriorityGroupsByAgency(PRIORITY_GROUP_BY_AGENCY)
     .addPriorityGroupsGlobal(PRIORITY_GROUP_GLOBAL)

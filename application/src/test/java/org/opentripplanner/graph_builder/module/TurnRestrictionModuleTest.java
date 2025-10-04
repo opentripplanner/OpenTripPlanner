@@ -314,10 +314,10 @@ public class TurnRestrictionModuleTest {
     var request = RouteRequest.of().withJourney(j -> j.withDirect(streetRequest)).buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-      .setRequest(request)
-      .setStreetRequest(streetRequest)
-      .setFrom(A)
-      .setTo(F)
+      .withRequest(request)
+      .withStreetRequest(streetRequest)
+      .withFrom(A)
+      .withTo(F)
       .getShortestPathTree();
     GraphPath<State, Edge, Vertex> path = spt.getPath(F);
     List<State> states = path.states;

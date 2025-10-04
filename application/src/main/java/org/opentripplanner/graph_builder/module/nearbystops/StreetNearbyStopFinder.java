@@ -118,17 +118,17 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     stopsFound = new ArrayList<>(stopsFound);
 
     var streetSearch = StreetSearchBuilder.of()
-      .setSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(durationLimit))
-      .setDominanceFunction(new DominanceFunctions.MinimumWeight())
-      .setRequest(request)
-      .setArriveBy(reverseDirection)
-      .setStreetRequest(streetRequest)
-      .setFrom(reverseDirection ? null : originVertices)
-      .setTo(reverseDirection ? originVertices : null)
-      .setExtensionRequestContexts(extensionRequestContexts);
+      .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(durationLimit))
+      .withDominanceFunction(new DominanceFunctions.MinimumWeight())
+      .withRequest(request)
+      .withArriveBy(reverseDirection)
+      .withStreetRequest(streetRequest)
+      .withFrom(reverseDirection ? null : originVertices)
+      .withTo(reverseDirection ? originVertices : null)
+      .withExtensionRequestContexts(extensionRequestContexts);
 
     if (maxStopCount > 0) {
-      streetSearch.setTerminationStrategy(
+      streetSearch.withTerminationStrategy(
         new MaxCountTerminationStrategy<>(maxStopCount, this::hasReachedStop)
       );
     }

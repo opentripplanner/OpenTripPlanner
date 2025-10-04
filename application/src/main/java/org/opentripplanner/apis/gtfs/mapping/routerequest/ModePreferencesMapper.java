@@ -118,7 +118,7 @@ public class ModePreferencesMapper {
       .orElse(List.of());
     if (CollectionUtils.hasValue(graphQlFilters)) {
       var filters = FilterMapper.mapFilters(modes, graphQlFilters);
-      journey.withTransit(b -> b.setFilters(filters));
+      journey.withTransit(b -> b.withFilters(filters));
     }
     // if there isn't a transit filter or a mode set, then we can keep the default which is to include
     // everything
@@ -126,7 +126,7 @@ public class ModePreferencesMapper {
       var filter = TransitFilterRequest.of()
         .addSelect(SelectRequest.of().withTransportModes(modes).build())
         .build();
-      journey.withTransit(b -> b.setFilters(List.of(filter)));
+      journey.withTransit(b -> b.withFilters(List.of(filter)));
     }
   }
 }
