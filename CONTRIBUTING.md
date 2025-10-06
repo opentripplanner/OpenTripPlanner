@@ -59,6 +59,10 @@ See [Codestyle.md](doc/dev/decisionrecords/Codestyle.md)
 
 See [NamingConventions.md](doc/dev/decisionrecords/NamingConventions.md)
 
+### Development process conventions
+
+See [DevelopmentProcessConventions.md](doc/dev/decisionrecords/DevelopmentProcessConventions.md)
+
 ### Development Decision Records
 
 See [DEVELOPMENT_DECISION_RECORDS.md](DEVELOPMENT_DECISION_RECORDS.md)
