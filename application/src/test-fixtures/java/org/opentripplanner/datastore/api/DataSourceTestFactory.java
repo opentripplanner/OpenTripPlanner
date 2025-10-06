@@ -32,7 +32,7 @@ public class DataSourceTestFactory {
     ).withBytes(buf);
   }
 
-    /**
+  /**
    * For test only.
    * <p>
    * Use this to get a composite data source. Pass in all child data sources.
@@ -44,5 +44,4 @@ public class DataSourceTestFactory {
   ) {
     return new ListCompositeDataSource(name, type, Arrays.asList(children));
   }
-
 }

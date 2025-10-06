@@ -8,7 +8,7 @@ import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 
 public class GtfsBundleTestFactory {
 
-    public static GtfsBundle forTest(File gtfsFile, @Nullable String feedId) {
+  public static GtfsBundle forTest(File gtfsFile, @Nullable String feedId) {
     var dataSource = DataSourceTestFactory.compositeSource(gtfsFile, FileType.GTFS);
     var parameters = GtfsDefaultParameters.DEFAULT.withFeedInfo()
       .withSource(dataSource.uri())
