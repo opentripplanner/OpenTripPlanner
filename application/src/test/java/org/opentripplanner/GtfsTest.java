@@ -112,7 +112,7 @@ public abstract class GtfsTest {
         .withTransferMode(WALK)
         .withEgressMode(WALK);
 
-      journeyBuilder.setModes(requestModesBuilder.build());
+      journeyBuilder.withModes(requestModesBuilder.build());
 
       var filterRequestBuilder = TransitFilterRequest.of();
       if (preferredMode != null) {
@@ -130,7 +130,7 @@ public abstract class GtfsTest {
         filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
       }
 
-      journeyBuilder.withTransit(b -> b.setFilters(List.of(filterRequestBuilder.build())));
+      journeyBuilder.withTransit(b -> b.withFilters(List.of(filterRequestBuilder.build())));
     });
 
     // Init preferences
@@ -146,7 +146,7 @@ public abstract class GtfsTest {
       // since this makes interlining _worse_ than alighting and re-boarding the same line.
       // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
       preferences.withWalk(w -> w.withBoardCost(30));
-      preferences.withTransit(tr -> tr.setOtherThanPreferredRoutesPenalty(0));
+      preferences.withTransit(tr -> tr.withOtherThanPreferredRoutesPenalty(0));
     });
 
     // Route

@@ -75,7 +75,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_walk_only_stop() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
       .withJourney(jb -> {
-        jb.setAllModes(StreetMode.WALK);
+        jb.withAllModes(StreetMode.WALK);
         jb.withTransit(b -> b.disable());
       })
       .withFrom(ps)
@@ -89,7 +89,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_walk_only_stop_collection() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
       .withJourney(jb -> {
-        jb.setAllModes(StreetMode.WALK);
+        jb.withAllModes(StreetMode.WALK);
         jb.withTransit(b -> b.disable());
       })
       .withFrom(ptc)
@@ -104,7 +104,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_transit() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
       .withJourney(jb -> {
-        jb.setAllModes(StreetMode.WALK);
+        jb.withAllModes(StreetMode.WALK);
       })
       .withFrom(p1)
       .withTo(p2)
@@ -116,7 +116,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   @Test
   public void test_trip_planning_with_transit_stop() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
-      .withJourney(jb -> jb.setAllModes(StreetMode.WALK))
+      .withJourney(jb -> jb.withAllModes(StreetMode.WALK))
       .withFrom(ps)
       .withTo(p3)
       .buildRequest();
@@ -128,7 +128,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   @Disabled
   public void test_trip_planning_with_transit_stop_collection() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
-      .withJourney(jb -> jb.setAllModes(StreetMode.WALK))
+      .withJourney(jb -> jb.withAllModes(StreetMode.WALK))
       .withFrom(ptc)
       .withTo(p3)
       .buildRequest();
