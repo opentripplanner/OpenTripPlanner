@@ -105,7 +105,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     subsidiaryVertices.get(mainVertex).add(splitVertex);
     mainVertices.put(splitVertex, mainVertex);
     addedVertices++;
-    boolean hasRemovedInputEdges = false;
+    boolean vertexHasRemovedInputEdges = false;
     for (var fromEdge : fromEdges) {
       var fromPermission = fromEdge.getPermission();
       var oldPermission = fromPermission.remove(restrictionPermission);
@@ -121,12 +121,12 @@ public class TurnRestrictionModule implements GraphBuilderModule {
       if (oldPermission.allowsNothing()) {
         fromEdge.remove();
         addedEdges--;
-        hasRemovedInputEdges = true;
+        vertexHasRemovedInputEdges = true;
       } else {
         fromEdge.setPermission(oldPermission);
       }
     }
-    if (!removeVertexWithOutgoingOnly(mainVertex, splitVertex)) {
+    if (!removeVertexWithoutIncomingEdges(mainVertex, splitVertex)) {
       for (var toEdge : vertex.getOutgoingStreetEdges()) {
         var toPermission = toEdge.getPermission();
         var newPermission = toPermission.intersection(restrictionPermission);
@@ -156,12 +156,12 @@ public class TurnRestrictionModule implements GraphBuilderModule {
         removeVertex(mainVertex, splitVertex);
       }
     }
-    if (hasRemovedInputEdges) {
-      removeVertexWithOutgoingOnly(mainVertex, vertex);
+    if (vertexHasRemovedInputEdges) {
+      removeVertexWithoutIncomingEdges(mainVertex, vertex);
     }
   }
 
-  private boolean removeVertexWithOutgoingOnly(
+  private boolean removeVertexWithoutIncomingEdges(
     IntersectionVertex mainVertex,
     IntersectionVertex vertex
   ) {
