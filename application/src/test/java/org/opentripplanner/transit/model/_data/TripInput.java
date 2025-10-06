@@ -8,8 +8,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -64,14 +62,14 @@ public record TripInput(
       this.id = id;
     }
 
-    public TripInputBuilder addStop(RegularStop stopId, String arrivalTime, String departureTime) {
+    public TripInputBuilder addStop(String stopId, String arrivalTime, String departureTime) {
       this.stops.add(
           new StopCall(stopId, TimeUtils.time(arrivalTime), TimeUtils.time(departureTime))
         );
       return this;
     }
 
-    public TripInputBuilder addStop(RegularStop stopId, String arrivalAndDeparture) {
+    public TripInputBuilder addStop(String stopId, String arrivalAndDeparture) {
       return addStop(stopId, arrivalAndDeparture, arrivalAndDeparture);
     }
 
@@ -97,5 +95,5 @@ public record TripInput(
     }
   }
 
-  record StopCall(StopLocation stop, int arrivalTime, int departureTime) {}
+  record StopCall(String stopId, int arrivalTime, int departureTime) {}
 }

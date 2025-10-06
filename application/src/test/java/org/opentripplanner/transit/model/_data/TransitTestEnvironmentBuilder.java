@@ -5,60 +5,35 @@ import static org.opentripplanner.transit.model._data.TransitTestEnvironment.id;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.model._data.FlexTripInput.FlexStop;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
-import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.RegularStopBuilder;
-import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TransitTestEnvironmentBuilder {
 
-  private static final WgsCoordinate ANY_COORDINATE = new WgsCoordinate(60.0, 10.0);
-  private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory()
-    .createPolygon(
-      new Coordinate[] {
-        Coordinates.of(61.0, 10.0),
-        Coordinates.of(61.0, 12.0),
-        Coordinates.of(60.0, 11.0),
-        Coordinates.of(61.0, 10.0),
-      }
-    );
-
-  private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
-  private final List<StopLocation> stops = new ArrayList<>();
-  private final HashMap<String, Station> stations = new HashMap<>();
+  private final SiteRepository siteRepository;
   private final List<TripInput> tripInputs = new ArrayList<>();
   private final List<FlexTripInput> flexTripInputs = new ArrayList<>();
   private final Map<FeedScopedId, RegularStop> scheduledStopPointMapping = new HashMap<>();
@@ -67,7 +42,12 @@ public class TransitTestEnvironmentBuilder {
   private final ZoneId timeZone;
   private final LocalDate defaultServiceDate;
 
-  TransitTestEnvironmentBuilder(ZoneId timeZone, LocalDate defaultServiceDate) {
+  TransitTestEnvironmentBuilder(
+    SiteRepository siteRepository,
+    ZoneId timeZone,
+    LocalDate defaultServiceDate
+  ) {
+    this.siteRepository = siteRepository;
     this.timeZone = timeZone;
     this.defaultServiceDate = defaultServiceDate;
   }
@@ -78,20 +58,7 @@ public class TransitTestEnvironmentBuilder {
   }
 
   public TransitTestEnvironment build() {
-    for (var stop : stops) {
-      switch (stop) {
-        case RegularStop rs -> siteRepositoryBuilder.withRegularStop(rs);
-        case AreaStop as -> siteRepositoryBuilder.withAreaStop(as);
-        default -> throw new IllegalStateException("Unexpected value: " + stop);
-      }
-    }
-    for (var station : stations.values()) {
-      siteRepositoryBuilder.withStation(station);
-    }
-    var timetableRepository = new TimetableRepository(
-      siteRepositoryBuilder.build(),
-      new Deduplicator()
-    );
+    var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     timetableRepository.initTimeZone(timeZone);
 
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -131,61 +98,17 @@ public class TransitTestEnvironmentBuilder {
     return new TransitTestEnvironment(timetableRepository, defaultServiceDate);
   }
 
-  public TransitTestEnvironmentBuilder withStops(String... stopIds) {
-    Arrays.stream(stopIds).forEach(this::stop);
-    return this;
-  }
-
-  public RegularStop stop(String id) {
-    var stop = stopBuilder(id).build();
-    stops.add(stop);
-    return stop;
-  }
-
-  /**
-   * Add a stop at a station.  The station will be created if it does not already exist.
-   * @param stopId
-   * @param stationId
-   * @return
-   */
-  public RegularStop stopAtStation(String stopId, String stationId) {
-    var station = stations.get(stationId);
-    if (station == null) {
-      station = Station.of(id(stationId))
-        .withName(new NonLocalizedString(stationId))
-        .withCode(stationId)
-        .withCoordinate(ANY_COORDINATE)
-        .withDescription(new NonLocalizedString("Station " + stationId))
-        .withPriority(StopTransferPriority.ALLOWED)
-        .build();
-    }
-
-    var stop = stopBuilder(stopId).withParentStation(station).build();
-
-    stops.add(stop);
-    stations.put(stationId, station);
-    return stop;
-  }
-
-  public AreaStop areaStop(String id) {
-    var stop = siteRepositoryBuilder
-      .areaStop(id(id))
-      .withName(new NonLocalizedString(id))
-      .withGeometry(ANY_POLYGON)
-      .build();
-    stops.add(stop);
-    return stop;
-  }
-
   public TransitTestEnvironmentBuilder addFlexTrip(FlexTripInput tripInput) {
     flexTripInputs.add(tripInput);
     return this;
   }
 
   public TransitTestEnvironmentBuilder addScheduledStopPointMapping(
-    Map<FeedScopedId, RegularStop> mapping
+    String scheduledStopPointId,
+    String stopId
   ) {
-    scheduledStopPointMapping.putAll(mapping);
+    var stop = Objects.requireNonNull(siteRepository.getRegularStop(id(stopId)));
+    scheduledStopPointMapping.put(id(scheduledStopPointId), stop);
     return this;
   }
 
@@ -216,14 +139,14 @@ public class TransitTestEnvironmentBuilder {
     var stopTimes = IntStream.range(0, tripInput.stops().size())
       .mapToObj(i -> {
         var stop = tripInput.stops().get(i);
-        return fixedStopTime(trip, i, stop.stop(), stop.arrivalTime(), stop.departureTime());
+        return fixedStopTime(trip, i, stop.stopId(), stop.arrivalTime(), stop.departureTime());
       })
       .toList();
 
     TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 
     var stopPattern = TimetableRepositoryForTest.stopPattern(
-      tripInput.stops().stream().map(TripInput.StopCall::stop).toList()
+      tripInput.stops().stream().map(call -> getStop(call.stopId())).toList()
     );
 
     var existingPatterns = timetableRepository
@@ -275,14 +198,14 @@ public class TransitTestEnvironmentBuilder {
     var stopTimes = IntStream.range(0, tripInput.stops().size())
       .mapToObj(i -> {
         var stop = tripInput.stops().get(i);
-        return flexStopTime(trip, i, stop.stop(), stop.windowStart(), stop.windowEnd());
+        return flexStopTime(trip, i, stop.stopId(), stop.windowStart(), stop.windowEnd());
       })
       .toList();
 
     TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 
     var stopPattern = TimetableRepositoryForTest.stopPattern(
-      tripInput.stops().stream().map(FlexStop::stop).toList()
+      tripInput.stops().stream().map(flexStop -> getAreaStop(flexStop.stopId())).toList()
     );
 
     addNewPattern(tripInput.id(), tripInput.route(), stopPattern, tripTimes, timetableRepository);
@@ -315,43 +238,47 @@ public class TransitTestEnvironmentBuilder {
     timetableRepository.addTripOnServiceDate(tripOnServiceDate);
   }
 
-  private static StopTime fixedStopTime(
+  private StopTime fixedStopTime(
     Trip trip,
     int stopSequence,
-    StopLocation stop,
+    String stopId,
     int arrivalTime,
     int departureTime
   ) {
     var st = new StopTime();
     st.setTrip(trip);
     st.setStopSequence(stopSequence);
-    st.setStop(stop);
+    st.setStop(getStop(stopId));
     st.setArrivalTime(arrivalTime);
     st.setDepartureTime(departureTime);
     return st;
   }
 
-  private static StopTime flexStopTime(
+  private StopTime flexStopTime(
     Trip trip,
     int stopSequence,
-    StopLocation stop,
+    String stopId,
     int windowStart,
     int windowEnd
   ) {
     var st = new StopTime();
     st.setTrip(trip);
     st.setStopSequence(stopSequence);
-    st.setStop(stop);
+    st.setStop(getAreaStop(stopId));
     st.setFlexWindowStart(windowStart);
     st.setFlexWindowEnd(windowEnd);
     return st;
   }
 
-  private RegularStopBuilder stopBuilder(String id) {
-    return siteRepositoryBuilder
-      .regularStop(id(id))
-      .withName(new NonLocalizedString(id))
-      .withCode(id)
-      .withCoordinate(ANY_COORDINATE);
+  private StopLocation getStop(String stopId) {
+    var stop = siteRepository.getRegularStop(id(stopId));
+    Objects.requireNonNull(stop, "No stop found for id: " + stopId);
+    return stop;
+  }
+
+  private StopLocation getAreaStop(String stopId) {
+    var stop = siteRepository.getAreaStop(id(stopId));
+    Objects.requireNonNull(stop, "No area stop found for id: " + stopId);
+    return stop;
   }
 }

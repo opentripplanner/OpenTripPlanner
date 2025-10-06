@@ -5,21 +5,23 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_A
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model._data.SiteTestBuilder;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 
 class TripAlreadyExistsTest implements RealtimeTestConstants {
 
-  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
-  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
-  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(
+    SiteTestBuilder.of().withStops(STOP_A_ID, STOP_B_ID).build()
+  );
 
   private final TransitTestEnvironment env = envBuilder
-    .addTrip(TripInput.of(TRIP_1_ID).addStop(STOP_A, "12:00").addStop(STOP_B, "13:00").build())
+    .addTrip(
+      TripInput.of(TRIP_1_ID).addStop(STOP_A_ID, "12:00").addStop(STOP_B_ID, "13:00").build()
+    )
     .build();
   private final GtfsRtTestHelper rt = GtfsRtTestHelper.of(env);
 

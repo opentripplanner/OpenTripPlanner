@@ -19,6 +19,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.street.search.state.TestStateBuilder;
+import org.opentripplanner.transit.model._data.SiteTestBuilder;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
@@ -32,16 +33,19 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 
 class OjpServiceTest implements RealtimeTestConstants {
 
-  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
+  private final SiteTestBuilder siteBuilder = SiteTestBuilder.of();
+  private final RegularStop STOP_A = siteBuilder.stopAtStation(STOP_A_ID, STATION_OMEGA_ID);
+  private final RegularStop STOP_B = siteBuilder.stop(STOP_B_ID);
+  private final RegularStop STOP_C = siteBuilder.stop(STOP_C_ID);
 
-  private final RegularStop STOP_A = envBuilder.stopAtStation(STOP_A_ID, STATION_OMEGA_ID);
-  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
-  private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(
+    siteBuilder.build()
+  );
 
   private final TripInput TRIP_INPUT = TripInput.of("t1")
-    .addStop(STOP_A, "12:00", "12:01")
-    .addStop(STOP_B, "12:10", "12:11")
-    .addStop(STOP_C, "12:20", "12:21")
+    .addStop(STOP_A_ID, "12:00", "12:01")
+    .addStop(STOP_B_ID, "12:10", "12:11")
+    .addStop(STOP_C_ID, "12:20", "12:21")
     .build();
 
   private OjpService.StopEventRequestParams params(TransitTestEnvironment env, int departures) {

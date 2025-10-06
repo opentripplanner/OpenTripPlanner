@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.TransitTestEnvironment.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
@@ -17,13 +17,13 @@ import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.transit.model._data.SiteTestBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateSuccess;
@@ -34,10 +34,9 @@ import org.opentripplanner.utils.time.TimeUtils;
 
 class AddedTest implements RealtimeTestConstants {
 
-  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
-  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
-  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
-  private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(
+    SiteTestBuilder.of().withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID).build()
+  );
 
   private final TransitTestEnvironment env = envBuilder
     .addTrip(
@@ -47,12 +46,11 @@ class AddedTest implements RealtimeTestConstants {
           envBuilder.defaultServiceDate().minusDays(1),
           envBuilder.defaultServiceDate().plusDays(1)
         )
-        .addStop(STOP_A, "12:00", "12:00")
-        .addStop(STOP_B, "12:10", "12:10")
-        .addStop(STOP_C, "12:20", "12:20")
+        .addStop(STOP_A_ID, "12:00", "12:00")
+        .addStop(STOP_B_ID, "12:10", "12:10")
+        .addStop(STOP_C_ID, "12:20", "12:20")
         .build()
     )
-    .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
     .build();
   private final GtfsRtTestHelper gtfsRt = GtfsRtTestHelper.of(env);
 
@@ -209,14 +207,14 @@ class AddedTest implements RealtimeTestConstants {
   }
 
   private TripPattern assertAddedTrip(String tripId, TransitTestEnvironment env) {
-    return assertAddedTrip(tripId, env, RealTimeState.ADDED, STOP_A);
+    return assertAddedTrip(tripId, env, RealTimeState.ADDED, STOP_A_ID);
   }
 
   static TripPattern assertAddedTrip(
     String tripId,
     TransitTestEnvironment env,
     RealTimeState realTimeState,
-    RegularStop stop
+    String stopId
   ) {
     var tripFetcher = env.tripFetcher(tripId);
 
@@ -237,6 +235,7 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(realTimeState, tripFetcher.getRealTimeState());
 
     // Assert that the tripPattern exists at the given stop
+    var stop = transitService.getRegularStop(id(stopId));
     assertTrue(
       env.getTimetableSnapshot().getPatternsForStop(stop).contains(tripFetcher.tripPattern())
     );

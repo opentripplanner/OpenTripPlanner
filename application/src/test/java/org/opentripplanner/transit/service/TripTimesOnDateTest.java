@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
+import org.opentripplanner.transit.model._data.SiteTestBuilder;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
@@ -17,32 +18,37 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2025, 3, 3);
-  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
 
-  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
-  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
-  private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
-  private final RegularStop STOP_D = envBuilder.stop(STOP_D_ID);
-  private final RegularStop STOP_E = envBuilder.stop(STOP_E_ID);
-  private final RegularStop STOP_F = envBuilder.stop(STOP_F_ID);
+  private final SiteTestBuilder siteBuilder = SiteTestBuilder.of();
+  private final RegularStop STOP_A = siteBuilder.stop(STOP_A_ID);
+  private final RegularStop STOP_B = siteBuilder.stop(STOP_B_ID);
+  private final RegularStop STOP_C = siteBuilder.stop(STOP_C_ID);
+  private final RegularStop STOP_D = siteBuilder.stop(STOP_D_ID);
+  private final RegularStop STOP_E = siteBuilder.stop(STOP_E_ID);
+  private final RegularStop STOP_F = siteBuilder.stop(STOP_F_ID);
+
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(
+    siteBuilder.build(),
+    SERVICE_DATE
+  );
 
   private final TripInput TRIP_INPUT1 = TripInput.of("t1")
     .withServiceDates(SERVICE_DATE, SERVICE_DATE.plusDays(1))
-    .addStop(STOP_A, "12:00", "12:01")
-    .addStop(STOP_B, "12:10", "12:11")
-    .addStop(STOP_C, "12:20", "12:21")
+    .addStop(STOP_A_ID, "12:00", "12:01")
+    .addStop(STOP_B_ID, "12:10", "12:11")
+    .addStop(STOP_C_ID, "12:20", "12:21")
     .build();
   private final TripInput TRIP_INPUT2 = TripInput.of("t2")
     .withServiceDates(SERVICE_DATE, SERVICE_DATE.plusDays(1))
-    .addStop(STOP_D, "12:00", "12:01")
-    .addStop(STOP_E, "12:10", "12:11")
-    .addStop(STOP_F, "12:20", "12:21")
+    .addStop(STOP_D_ID, "12:00", "12:01")
+    .addStop(STOP_E_ID, "12:10", "12:11")
+    .addStop(STOP_F_ID, "12:20", "12:21")
     .build();
 
   private final TripInput TRIP_INPUT3 = TripInput.of("t3")
     .withServiceDates(SERVICE_DATE, SERVICE_DATE.plusDays(1))
-    .addStop(STOP_F, "12:15", "12:15")
-    .addStop(STOP_E, "12:20", "12:20")
+    .addStop(STOP_F_ID, "12:15", "12:15")
+    .addStop(STOP_E_ID, "12:20", "12:20")
     .build();
 
   @Test

@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.SiriTestHelper;
 
@@ -22,7 +23,7 @@ class InvalidStopPointRefTest {
   @ParameterizedTest(name = "invalid id of ''{0}'', extraJourney={1}")
   @MethodSource("cases")
   void rejectEmptyStopPointRef(String invalidRef, boolean extraJourney) {
-    var env = TransitTestEnvironment.of().build();
+    var env = TransitTestEnvironment.of(SiteRepository.of().build()).build();
     var siri = SiriTestHelper.of(env);
 
     // journey contains empty stop point ref elements

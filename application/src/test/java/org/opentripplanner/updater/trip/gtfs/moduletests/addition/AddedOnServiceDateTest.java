@@ -11,20 +11,19 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.transit.model._data.SiteTestBuilder;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 class AddedOnServiceDateTest implements RealtimeTestConstants {
 
-  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
-  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
-  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
-  private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(
+    SiteTestBuilder.of().withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID).build()
+  );
 
   private static final LocalDate START_DATE = LocalDate.of(2025, 7, 1);
   private static final LocalDate ADDED_DATE = START_DATE.plusDays(1);
@@ -35,9 +34,9 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
       TripInput.of(TRIP_1_ID)
         // on either side of added date, but not on it
         .withServiceDates(START_DATE, END_DATE)
-        .addStop(STOP_A, "12:00")
-        .addStop(STOP_B, "12:10")
-        .addStop(STOP_C, "12:20")
+        .addStop(STOP_A_ID, "12:00")
+        .addStop(STOP_B_ID, "12:10")
+        .addStop(STOP_C_ID, "12:20")
         .build()
     )
     .build();

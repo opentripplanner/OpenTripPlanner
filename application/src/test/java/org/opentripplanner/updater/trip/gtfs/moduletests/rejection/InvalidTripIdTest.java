@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 
 class InvalidTripIdTest {
@@ -23,7 +24,7 @@ class InvalidTripIdTest {
   @ParameterizedTest(name = "tripId=\"{0}\"")
   @MethodSource("invalidCases")
   void invalidTripId(String tripId) {
-    var env = TransitTestEnvironment.of().build();
+    var env = TransitTestEnvironment.of(SiteRepository.of().build()).build();
     var rt = GtfsRtTestHelper.of(env);
     var tripDescriptorBuilder = GtfsRealtime.TripDescriptor.newBuilder();
     if (tripId != null) {

@@ -3,15 +3,10 @@ package org.opentripplanner.transit.model._data;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.time.TimeUtils;
 
 public record FlexTripInput(String id, List<FlexStop> stops) {
-  public record FlexStop(StopLocation stop, int windowStart, int windowEnd) {
-    public FlexStop(StopLocation stop, String windowStart, String windowEnd) {
-      this(stop, TimeUtils.time(windowStart), TimeUtils.time(windowEnd));
-    }
-  }
+  public record FlexStop(String stopId, int windowStart, int windowEnd) {}
   public Route route() {
     return TimetableRepositoryForTest.route("route-1").build();
   }
@@ -28,8 +23,8 @@ public record FlexTripInput(String id, List<FlexStop> stops) {
       this.id = id;
     }
 
-    public FlexTripInputBuilder addStop(StopLocation stop, String windowStart, String windowEnd) {
-      this.stops.add(new FlexStop(stop, TimeUtils.time(windowStart), TimeUtils.time(windowEnd)));
+    public FlexTripInputBuilder addStop(String stopId, String windowStart, String windowEnd) {
+      this.stops.add(new FlexStop(stopId, TimeUtils.time(windowStart), TimeUtils.time(windowEnd)));
       return this;
     }
 
