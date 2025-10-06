@@ -28,7 +28,6 @@ import org.opentripplanner.framework.collection.TroveUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
 import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
@@ -38,7 +37,6 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
-import org.opentripplanner.osm.model.OsmLevel.Source;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
@@ -48,7 +46,6 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,12 +121,6 @@ public class OsmDatabase {
    * with existing ones.
    */
   private long virtualNodeId = -100000;
-
-  /**
-   * If true, disallow zero floors and add 1 to non-negative numeric floors, as is generally done in
-   * the United States. This does not affect floor names from level maps.
-   */
-  public boolean noZeroLevels = true;
 
   public OsmDatabase(DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
@@ -294,7 +285,6 @@ public class OsmDatabase {
       !relation.isRestriction() &&
       !relation.isRoadRoute() &&
       !(relation.isMultiPolygon() && relation.isRoutable()) &&
-      !relation.isLevelMap() &&
       !relation.isStopArea() &&
       !(relation.isRoadRoute() || relation.isBicycleRoute())
     ) {
@@ -636,39 +626,27 @@ public class OsmDatabase {
   }
 
   private void applyLevelsForWay(OsmEntity way) {
-    /* Determine OSM level for each way, if it was not already set */
-    if (!wayLevels.containsKey(way)) {
-      // if this way is not a key in the wayLevels map, a level map was not
-      // already applied in processRelations
-
-      /* try to find a level name in tags */
-      String levelName = null;
-      OsmLevel level = OsmLevel.DEFAULT;
-      if (way.hasTag("level")) { // TODO: floating-point levels &c.
-        levelName = way.getTag("level");
-        level = OsmLevel.fromString(
-          levelName,
-          OsmLevel.Source.LEVEL_TAG,
-          noZeroLevels,
-          issueStore,
-          way
-        );
-      } else if (way.hasTag("layer")) {
-        levelName = way.getTag("layer");
-        level = OsmLevel.fromString(
-          levelName,
-          OsmLevel.Source.LAYER_TAG,
-          noZeroLevels,
-          issueStore,
-          way
-        );
-      }
-      if (level == null || (!level.reliable)) {
-        issueStore.add(new LevelAmbiguous(levelName, way));
-        level = OsmLevel.DEFAULT;
-      }
-      wayLevels.put(way, level);
+    /* try to find a level name in tags */
+    String levelName = null;
+    OsmLevel level = OsmLevel.DEFAULT;
+    if (way.hasTag("level")) { // TODO: floating-point levels &c.
+      levelName = way.getTag("level");
+      level = OsmLevel.fromString(
+        levelName,
+        way.getTag("level:ref"),
+        OsmLevel.Source.LEVEL_TAG,
+        issueStore,
+        way
+      );
+    } else if (way.hasTag("layer")) {
+      levelName = way.getTag("layer");
+      level = OsmLevel.fromString(levelName, null, OsmLevel.Source.LAYER_TAG, issueStore, way);
     }
+    if (level == null || (!level.reliable)) {
+      issueStore.add(new LevelAmbiguous(levelName, way));
+      level = OsmLevel.DEFAULT;
+    }
+    wayLevels.put(way, level);
   }
 
   private void markNodesForKeeping(Collection<OsmWay> osmWays, TLongSet nodeSet) {
@@ -794,8 +772,6 @@ public class OsmDatabase {
     for (OsmRelation relation : relationsById.valueCollection()) {
       if (relation.isRestriction()) {
         processRestriction(relation);
-      } else if (relation.isLevelMap()) {
-        processLevelMap(relation);
       } else if (relation.isRoute()) {
         processRoute(relation);
       } else if (relation.isPublicTransport()) {
@@ -926,48 +902,6 @@ public class OsmDatabase {
 
     turnRestrictionsByFromWay.put(from, tag);
     turnRestrictionsByToWay.put(to, tag);
-  }
-
-  /**
-   * Process an OSM level map.
-   */
-  private void processLevelMap(OsmRelation relation) {
-    var levelsTag = relation.getTag("levels");
-    if (!StringUtils.hasValue(levelsTag)) {
-      issueStore.add(
-        Issue.issue(
-          "InvalidLevelMap",
-          "Could not parse level map for osm relation %d as it was malformed. Skipped.",
-          relation.getId()
-        )
-      );
-      return;
-    }
-
-    Map<String, OsmLevel> levels = OsmLevel.mapFromSpecList(
-      levelsTag,
-      Source.LEVEL_MAP,
-      true,
-      issueStore,
-      relation
-    );
-    for (OsmRelationMember member : relation.getMembers()) {
-      if (member.hasTypeWay() && waysById.containsKey(member.getRef())) {
-        OsmWay way = waysById.get(member.getRef());
-        if (way != null) {
-          String role = member.getRole();
-          // if the level map relation has a role:xyz tag, this way is something
-          // more complicated than a single level (e.g. ramp/stairway).
-          if (!relation.hasTag("role:" + role)) {
-            if (levels.containsKey(role)) {
-              wayLevels.put(way, levels.get(role));
-            } else {
-              LOG.warn("{} has undefined level {}", member.getRef(), role);
-            }
-          }
-        }
-      }
-    }
   }
 
   /**

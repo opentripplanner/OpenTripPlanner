@@ -316,7 +316,7 @@ class VertexGenerator {
       multiLevelNodes.put(nodeId, vertices);
     }
     if (!vertices.containsKey(level)) {
-      OsmVertex vertex = vertexFactory.levelledOsm(node, level.shortName);
+      OsmVertex vertex = vertexFactory.levelledOsm(node, level.name);
       vertices.put(level, vertex);
 
       return vertex;

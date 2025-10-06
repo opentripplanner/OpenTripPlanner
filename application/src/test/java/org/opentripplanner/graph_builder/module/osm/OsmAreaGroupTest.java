@@ -35,22 +35,8 @@ class OsmAreaGroupTest {
   private static final OsmWay BARRIER_3_1 = new OsmWay();
   private static final OsmWay BOLLARD_1_2_3 = new OsmWay();
 
-  private static final OsmLevel LEVEL_0 = new OsmLevel(
-    0,
-    0,
-    "0",
-    "0",
-    OsmLevel.Source.LEVEL_TAG,
-    true
-  );
-  private static final OsmLevel LEVEL_1 = new OsmLevel(
-    1,
-    5,
-    "1",
-    "1",
-    OsmLevel.Source.LEVEL_TAG,
-    true
-  );
+  private static final OsmLevel LEVEL_0 = new OsmLevel(0.0, "0", OsmLevel.Source.LEVEL_TAG, true);
+  private static final OsmLevel LEVEL_1 = new OsmLevel(1.0, "1", OsmLevel.Source.LEVEL_TAG, true);
 
   private static final TLongObjectHashMap<OsmNode> nodes = new TLongObjectHashMap<>();
 
