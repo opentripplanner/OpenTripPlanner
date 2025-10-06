@@ -1,32 +1,44 @@
 # OpenTripPlanner Contributing Guide
 
-Thank you for your interest in contributing to OpenTripPlanner. Please read the guidelines carefully to make sure you follow our contribution process.
+Thank you for your interest in contributing to OpenTripPlanner.
+Please read the guidelines carefully to make sure you follow our contribution process.
 
 ## Communication
 
-- If you have any questions about problems you are encountering with code, deployment, documentation,
-or development coordination, please don't hesitate to post to the [OpenTripPlanner Gitter chat](https://gitter.im/opentripplanner/OpenTripPlanner).
-- There are twice-weekly developer meetings to discuss and coordinate contributions in more detail. See the [calendar](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com) or [iCal link](https://calendar.google.com/calendar/ical/ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com/public/basic.ics) for our schedule. A Google Meet link can be found in the calendar events.
-- Before starting work on a major feature, please reach out to the community beforehand to make sure the contribution makes sense and no one else is working on it.
-- Document and plan features in issues. Issues will not be discussed by the community automatically. If you wish to discuss an issue in the developer meetings, add it to a meeting's agenda thread in Gitter.
-- Small bug fixes and patches do not require prior discussion.
+- If you have any questions about problems you are encountering with code, deployment,
+documentation, or development coordination, please don't hesitate to post to the
+[OpenTripPlanner Gitter chat](https://gitter.im/opentripplanner/OpenTripPlanner).
+- There are twice-weekly developer meetings to discuss and coordinate contributions in more detail.
+See the [calendar](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com)
+or [iCal link](https://calendar.google.com/calendar/ical/ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com/public/basic.ics)
+for our schedule. A Google Meet link can be found in the calendar events.
+- Before starting work on a major feature, please reach out to the community beforehand
+to make sure the contribution makes sense and no one else is working on it.
+- Document and plan features in issues.
+Issues will not be discussed by the community automatically.
+If you wish to discuss an issue in the developer meetings,
+add it to a meeting's agenda thread in Gitter.
+- Small bug fixes and patches do not require prior discussion in an issue.
 - There is also a less used Google Group mailing list. It can be accessed as
-[a web forum](https://groups.google.com/g/opentripplanner-users) or as a mailing list: <opentripplanner-users@googlegroups.com>.
+[a web forum](https://groups.google.com/g/opentripplanner-users)
+or as a mailing list: <opentripplanner-users@googlegroups.com>.
 
 ## Developer meetings
 
 - OTP development meetings usually occur twice a week.
-- The meeting
-times have been deliberately chosen to allow participation during regular business hours across as
-many time zones as possible, from the eastern Americas through Europe and Africa to Asia. If these
-times are not suitable for you, please let us know and we will attempt to schedule a call at a time
-that suits you.
-- The meetings are open to anyone who wants to
-join, even if you simply want to observe the process or ask a few questions.
-- By default, pull requests will only be advanced by an author or someone relevant to the PR participating in a meeting.
-- If you are unable to participate and want your PR to be advanced, leave a comment on the PR explaining the current state e.g. "This PR doesn't have things to discuss and should be assigned reviewers."
-- Check the specific times
-on [this calendar](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com)
+- The meeting times have been deliberately chosen to allow participation during regular business
+hours across as many time zones as possible, from the eastern Americas through Europe and Africa
+to Asia. If these times are not suitable for you, please let us know and we will attempt to
+schedule a call at a time that suits you.
+- The meetings are open to anyone who wants to join, even if you simply want to observe the
+process or ask a few questions.
+- By default, pull requests will only be advanced by an author or someone relevant to the PR
+participating in a meeting.
+- If you are unable to participate and want your PR to be advanced, leave a comment on the PR
+explaining the current state
+e.g. "This PR doesn't have things to discuss and should be assigned reviewers."
+- Check the specific times on
+[this calendar](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com)
 which will be updated to reflect holidays or changes to meeting times. Note that times on this
 calendar are expressed in the Central European time zone by default. There is also
 an [iCal link to import this calendar](https://calendar.google.com/calendar/ical/ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com/public/basic.ics)
@@ -68,7 +80,8 @@ the instructions in your submitted text.
   descriptions must clearly state how your changes work.
 - Break large changes down into a series of smaller logical steps in separate PRs.
 - Tie such series of PRs together with an "epic issue" that explains the overall plan.
-- Use GitHub issue references ("addresses #12" etc.) to connect PRs and issues together.
+- Use GitHub issue references e.g. "related to #12" or "closes #13" to connect PRs and issues
+together.
 - Consider squashing and rebasing to make the PR history easier to understand, eliminating extra "
   noise" commits like accidental changes to organization specific code, abandoned experiments, or
   reverted configuration changes.
