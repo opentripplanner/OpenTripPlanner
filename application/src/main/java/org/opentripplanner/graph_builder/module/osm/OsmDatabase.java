@@ -30,13 +30,13 @@ import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
-import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
+import org.opentripplanner.osm.model.OsmLevelFactory;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
@@ -54,6 +54,7 @@ public class OsmDatabase {
   private static final Logger LOG = LoggerFactory.getLogger(OsmDatabase.class);
 
   private final DataImportIssueStore issueStore;
+  private final OsmLevelFactory osmLevelFactory;
 
   /* Map of all nodes used in ways/areas keyed by their OSM ID */
   private final TLongObjectMap<OsmNode> nodesById = new TLongObjectHashMap<>();
@@ -124,6 +125,7 @@ public class OsmDatabase {
 
   public OsmDatabase(DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
+    this.osmLevelFactory = new OsmLevelFactory(issueStore);
   }
 
   public OsmNode getNode(Long nodeId) {
@@ -187,7 +189,7 @@ public class OsmDatabase {
   }
 
   public OsmLevel getLevelForWay(OsmEntity way) {
-    return Objects.requireNonNullElse(wayLevels.get(way), OsmLevel.DEFAULT);
+    return Objects.requireNonNullElse(wayLevels.get(way), OsmLevelFactory.DEFAULT);
   }
 
   public Set<OsmWay> getAreasForNode(Long nodeId) {
@@ -280,7 +282,6 @@ public class OsmDatabase {
       for (OsmRelationMember member : relation.getMembers()) {
         areaWayIds.add(member.getRef());
       }
-      applyLevelsForWay(relation);
     } else if (
       !relation.isRestriction() &&
       !relation.isRoadRoute() &&
@@ -626,27 +627,7 @@ public class OsmDatabase {
   }
 
   private void applyLevelsForWay(OsmEntity way) {
-    /* try to find a level name in tags */
-    String levelName = null;
-    OsmLevel level = OsmLevel.DEFAULT;
-    if (way.hasTag("level")) { // TODO: floating-point levels &c.
-      levelName = way.getTag("level");
-      level = OsmLevel.fromString(
-        levelName,
-        way.getTag("level:ref"),
-        OsmLevel.Source.LEVEL_TAG,
-        issueStore,
-        way
-      );
-    } else if (way.hasTag("layer")) {
-      levelName = way.getTag("layer");
-      level = OsmLevel.fromString(levelName, null, OsmLevel.Source.LAYER_TAG, issueStore, way);
-    }
-    if (level == null || (!level.reliable)) {
-      issueStore.add(new LevelAmbiguous(levelName, way));
-      level = OsmLevel.DEFAULT;
-    }
-    wayLevels.put(way, level);
+    wayLevels.put(way, osmLevelFactory.createOsmLevelForWay(way));
   }
 
   private void markNodesForKeeping(Collection<OsmWay> osmWays, TLongSet nodeSet) {
