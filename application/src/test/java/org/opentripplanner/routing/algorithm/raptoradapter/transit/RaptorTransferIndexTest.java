@@ -1,15 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 
+import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -30,7 +28,7 @@ class RaptorTransferIndexTest {
     EnumSet.of(StreetMode.WALK, StreetMode.BIKE)
   );
 
-  static List<List<Transfer>> data = List.of(
+  private static final List<List<Transfer>> data = List.of(
     List.of(t1, t2, t5),
     List.of(t3),
     List.of(),
@@ -40,114 +38,97 @@ class RaptorTransferIndexTest {
   @Test
   void testForwardWalk() {
     var streetSearchRequest = StreetSearchRequest.of().withMode(WALK).build();
-    for (var index : List.of(
-      RaptorTransferIndex.createInitialSetup(data, streetSearchRequest),
-      RaptorTransferIndex.createRequestScope(data, streetSearchRequest)
-    )) {
-      assertEquals(
-        Stream.of(t1, t2)
-          .flatMap(t -> t.asRaptorTransfer(streetSearchRequest).stream())
-          .collect(Collectors.toSet()),
-        new HashSet<>(index.getForwardTransfers(0))
+    performTestOnBothImplementations(streetSearchRequest, index -> {
+      assertThat(index.getForwardTransfers(0)).containsExactlyElementsIn(
+        getForwardRaptorTransfers(streetSearchRequest, t1, t2)
       );
-      assertEquals(
-        t3.asRaptorTransfer(streetSearchRequest).stream().collect(Collectors.toSet()),
-        new HashSet<>(index.getForwardTransfers(1))
+      assertThat(index.getForwardTransfers(1)).containsExactlyElementsIn(
+        getForwardRaptorTransfers(streetSearchRequest, t3)
       );
-      assertEquals(Set.of(), new HashSet<>(index.getForwardTransfers(2)));
-      assertEquals(Set.of(), new HashSet<>(index.getForwardTransfers(3)));
-    }
+      assertThat(index.getForwardTransfers(2)).isEmpty();
+      assertThat(index.getForwardTransfers(3)).isEmpty();
+    });
   }
 
   @Test
   void testForwardBike() {
     var streetSearchRequest = StreetSearchRequest.of().withMode(BIKE).build();
-    for (var index : List.of(
-      RaptorTransferIndex.createInitialSetup(data, streetSearchRequest),
-      RaptorTransferIndex.createRequestScope(data, streetSearchRequest)
-    )) {
-      assertEquals(
-        Stream.of(t2, t5)
-          .flatMap(t -> t.asRaptorTransfer(streetSearchRequest).stream())
-          .collect(Collectors.toSet()),
-        new HashSet<>(index.getForwardTransfers(0))
+    performTestOnBothImplementations(streetSearchRequest, index -> {
+      assertThat(index.getForwardTransfers(0)).containsExactlyElementsIn(
+        getForwardRaptorTransfers(streetSearchRequest, t2, t5)
       );
-      assertEquals(Set.of(), new HashSet<>(index.getForwardTransfers(1)));
-      assertEquals(Set.of(), new HashSet<>(index.getForwardTransfers(2)));
-      assertEquals(
-        t4.asRaptorTransfer(streetSearchRequest).stream().collect(Collectors.toSet()),
-        new HashSet<>(index.getForwardTransfers(3))
+      assertThat(index.getForwardTransfers(1)).isEmpty();
+      assertThat(index.getForwardTransfers(2)).isEmpty();
+      assertThat(index.getForwardTransfers(3)).containsExactlyElementsIn(
+        getForwardRaptorTransfers(streetSearchRequest, t4)
       );
-    }
+    });
   }
 
   @Test
   void testReverseWalk() {
     var streetSearchRequest = StreetSearchRequest.of().withMode(WALK).build();
-    for (var index : List.of(
-      RaptorTransferIndex.createInitialSetup(data, streetSearchRequest),
-      RaptorTransferIndex.createRequestScope(data, streetSearchRequest)
-    )) {
-      assertEquals(
-        t3
-          .asRaptorTransfer(streetSearchRequest)
-          .map(r -> r.reverseOf(1))
-          .stream()
-          .collect(Collectors.toSet()),
-        new HashSet<>(index.getReversedTransfers(0))
+    performTestOnBothImplementations(streetSearchRequest, index -> {
+      assertThat(index.getReversedTransfers(0)).containsExactlyElementsIn(
+        getReversedRaptorTransfers(streetSearchRequest, 1, t3)
       );
-      assertEquals(Set.of(), new HashSet<>(index.getReversedTransfers(1)));
-      assertEquals(
-        t1
-          .asRaptorTransfer(streetSearchRequest)
-          .map(r -> r.reverseOf(0))
-          .stream()
-          .collect(Collectors.toSet()),
-        new HashSet<>(index.getReversedTransfers(2))
+      assertThat(index.getReversedTransfers(1)).isEmpty();
+      assertThat(index.getReversedTransfers(2)).containsExactlyElementsIn(
+        getReversedRaptorTransfers(streetSearchRequest, 0, t1)
       );
-      assertEquals(
-        t2
-          .asRaptorTransfer(streetSearchRequest)
-          .map(r -> r.reverseOf(0))
-          .stream()
-          .collect(Collectors.toSet()),
-        new HashSet<>(index.getReversedTransfers(3))
+      assertThat(index.getReversedTransfers(3)).containsExactlyElementsIn(
+        getReversedRaptorTransfers(streetSearchRequest, 0, t2)
       );
-    }
+    });
   }
 
   @Test
   void testReverseBike() {
     var streetSearchRequest = StreetSearchRequest.of().withMode(BIKE).build();
+    performTestOnBothImplementations(streetSearchRequest, index -> {
+      assertThat(index.getReversedTransfers(0)).containsExactlyElementsIn(
+        getReversedRaptorTransfers(streetSearchRequest, 3, t4)
+      );
+      assertThat(index.getReversedTransfers(1)).isEmpty();
+      assertThat(index.getReversedTransfers(2)).containsExactlyElementsIn(
+        getReversedRaptorTransfers(streetSearchRequest, 0, t5)
+      );
+      assertThat(index.getReversedTransfers(3)).containsExactlyElementsIn(
+        getReversedRaptorTransfers(streetSearchRequest, 0, t2)
+      );
+    });
+  }
+
+  private void performTestOnBothImplementations(
+    StreetSearchRequest streetSearchRequest,
+    Consumer<RaptorTransferIndex> verifier
+  ) {
     for (var index : List.of(
       RaptorTransferIndex.createInitialSetup(data, streetSearchRequest),
       RaptorTransferIndex.createRequestScope(data, streetSearchRequest)
     )) {
-      assertEquals(
-        t4
-          .asRaptorTransfer(streetSearchRequest)
-          .map(r -> r.reverseOf(3))
-          .stream()
-          .collect(Collectors.toSet()),
-        new HashSet<>(index.getReversedTransfers(0))
-      );
-      assertEquals(Set.of(), new HashSet<>(index.getReversedTransfers(1)));
-      assertEquals(
-        t5
-          .asRaptorTransfer(streetSearchRequest)
-          .map(r -> r.reverseOf(0))
-          .stream()
-          .collect(Collectors.toSet()),
-        new HashSet<>(index.getReversedTransfers(2))
-      );
-      assertEquals(
-        t2
-          .asRaptorTransfer(streetSearchRequest)
-          .map(r -> r.reverseOf(0))
-          .stream()
-          .collect(Collectors.toSet()),
-        new HashSet<>(index.getReversedTransfers(3))
-      );
+      verifier.accept(index);
     }
+  }
+
+  private Iterable<DefaultRaptorTransfer> getForwardRaptorTransfers(
+    StreetSearchRequest streetSearchRequest,
+    Transfer... transfers
+  ) {
+    return Arrays.stream(transfers)
+      .flatMap(t -> t.asRaptorTransfer(streetSearchRequest).stream())
+      .toList();
+  }
+
+  private Iterable<DefaultRaptorTransfer> getReversedRaptorTransfers(
+    StreetSearchRequest streetSearchRequest,
+    int fromStopIndex,
+    Transfer... transfers
+  ) {
+    return Arrays.stream(transfers)
+      .flatMap(t ->
+        t.asRaptorTransfer(streetSearchRequest).map(x -> x.reverseOf(fromStopIndex)).stream()
+      )
+      .toList();
   }
 }
