@@ -64,13 +64,11 @@ public class TransitTestEnvironmentBuilder {
   private final Map<FeedScopedId, RegularStop> scheduledStopPointMapping = new HashMap<>();
   private final AtomicInteger serviceCodeCounter = new AtomicInteger();
 
-  private final FeedScopedId defaultServiceId;
   private final ZoneId timeZone;
   private final LocalDate defaultServiceDate;
 
   TransitTestEnvironmentBuilder(ZoneId timeZone, LocalDate defaultServiceDate) {
     this.timeZone = timeZone;
-    this.defaultServiceId = id("CAL_1");
     this.defaultServiceDate = defaultServiceDate;
   }
 
@@ -306,14 +304,6 @@ public class TransitTestEnvironmentBuilder {
       .build();
 
     timetableRepository.addTripPattern(pattern.getId(), pattern);
-  }
-
-  private Trip trip(String tripInput, Route tripInput1) {
-    return Trip.of(id(tripInput))
-      .withRoute(tripInput1)
-      .withHeadsign(I18NString.of("Headsign of %s".formatted(tripInput)))
-      .withServiceId(defaultServiceId)
-      .build();
   }
 
   private void addTripOnServiceDate(TimetableRepository timetableRepository, Trip trip) {
