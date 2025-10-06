@@ -17,6 +17,34 @@ public class FareLegRuleBuilder {
   private FeedScopedId toAreaId;
   private FareDistance fareDistance = null;
 
+  public FeedScopedId id() {
+    return id;
+  }
+
+  public Collection<FareProduct> fareProducts() {
+    return fareProducts;
+  }
+
+  public FeedScopedId legGroupId() {
+    return legGroupId;
+  }
+
+  public FeedScopedId networkId() {
+    return networkId;
+  }
+
+  public FeedScopedId fromAreaId() {
+    return fromAreaId;
+  }
+
+  public FeedScopedId toAreaId() {
+    return toAreaId;
+  }
+
+  public FareDistance fareDistance() {
+    return fareDistance;
+  }
+
   public FareLegRuleBuilder(FeedScopedId id, Collection<FareProduct> products) {
     this.id = id;
     this.fareProducts = products;
@@ -48,14 +76,6 @@ public class FareLegRuleBuilder {
   }
 
   public FareLegRule build() {
-    return new FareLegRule(
-      id,
-      legGroupId,
-      networkId,
-      fromAreaId,
-      toAreaId,
-      fareDistance,
-      fareProducts
-    );
+    return new FareLegRule(this);
   }
 }
