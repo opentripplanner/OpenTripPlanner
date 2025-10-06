@@ -86,31 +86,46 @@ class FareLegRuleMapperTest {
     creditMedium.setName("Credit");
     creditMedium.setFareMediaType(0);
 
-    var productId = new AgencyAndId("1", "1");
-
-    var cashProduct = new FareProduct();
-    cashProduct.setAmount(10);
-    cashProduct.setName("Day pass");
-    cashProduct.setCurrency("EUR");
-    cashProduct.setFareMedium(creditMedium);
-    cashProduct.setFareProductId(productId);
+    final var cashProduct = cashProduct(creditMedium);
     var internalCashProduct = productMapper.map(cashProduct);
 
-    var creditProduct = new FareProduct();
-    creditProduct.setAmount(10);
-    creditProduct.setName("Day pass");
-    creditProduct.setCurrency("EUR");
-    creditProduct.setFareMedium(cashMedium);
-    creditProduct.setFareProductId(productId);
+    final var creditProduct = cashProduct(cashMedium);
     var internalCreditProduct = productMapper.map(creditProduct);
 
     var obaRule = new FareLegRule();
-    obaRule.setFareProductId(productId);
+    obaRule.setFareProductId(cashProduct.getFareProductId());
 
     var mappedRules = List.copyOf(ruleMapper.map(List.of(obaRule)));
     assertEquals(1, mappedRules.size());
 
     var otpRule = mappedRules.get(0);
     assertThat(otpRule.fareProducts()).containsExactly(internalCashProduct, internalCreditProduct);
+  }
+
+  @Test
+  void priority() {
+    var productMapper = new FareProductMapper(ID_FACTORY);
+    var ruleMapper = new FareLegRuleMapper(ID_FACTORY, productMapper, DataImportIssueStore.NOOP);
+    var product = cashProduct(null);
+    productMapper.map(product);
+
+    var obaRule = new FareLegRule();
+    obaRule.setFareProductId(product.getFareProductId());
+    obaRule.setRulePriority(55);
+
+    var mapped = List.copyOf(ruleMapper.map(List.of(obaRule))).getFirst();
+
+    assertThat(mapped.priority()).hasValue(55);
+  }
+
+  private static FareProduct cashProduct(FareMedium creditMedium) {
+    var productId = new AgencyAndId("1", "1");
+    var cashProduct = new FareProduct();
+    cashProduct.setAmount(10);
+    cashProduct.setName("Day pass");
+    cashProduct.setCurrency("EUR");
+    cashProduct.setFareMedium(creditMedium);
+    cashProduct.setFareProductId(productId);
+    return cashProduct;
   }
 }

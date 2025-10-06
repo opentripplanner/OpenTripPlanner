@@ -3,6 +3,7 @@ package org.opentripplanner.ext.fares.model;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -32,7 +33,7 @@ public final class FareLegRule {
   private final FeedScopedId toAreaId;
 
   @Nullable
-  private final Double priority;
+  private final Integer priority;
 
   public FareLegRule(FareLegRuleBuilder builder) {
     if (builder.fareProducts().isEmpty()) {
@@ -88,6 +89,14 @@ public final class FareLegRule {
   @Nullable
   public FareDistance fareDistance() {
     return fareDistance;
+  }
+
+  public OptionalInt priority() {
+    if (priority == null) {
+      return OptionalInt.empty();
+    } else {
+      return OptionalInt.of(priority);
+    }
   }
 
   public Collection<FareProduct> fareProducts() {
