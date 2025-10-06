@@ -57,7 +57,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
       .addScheduledStopPointMapping(Map.of(id(scheduledStopPointId), STOP_B))
       .build();
 
-    var journey = new SiriEtBuilder(env.getDateTimeHelper())
+    var journey = new SiriEtBuilder(env.localTimeParser())
       .withEstimatedCalls(builder ->
         builder
           .call(STOP_A)
@@ -77,7 +77,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
 
     var env = ENV_BUILDER.addTrip(trip1input).build();
 
-    var journey = new SiriEtBuilder(env.getDateTimeHelper())
+    var journey = new SiriEtBuilder(env.localTimeParser())
       .withEstimatedCalls(builder ->
         builder
           .call(STOP_A)
@@ -107,7 +107,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
   }
 
   private EstimatedVehicleJourney estimatedVehicleJourney(TransitTestEnvironment env) {
-    return new SiriEtBuilder(env.getDateTimeHelper())
+    return new SiriEtBuilder(env.localTimeParser())
       .withEstimatedCalls(builder ->
         builder
           .call(STOP_A)

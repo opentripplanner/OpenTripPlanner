@@ -69,7 +69,7 @@ class ExtraCallTest implements RealtimeTestConstants {
     siri.applyEstimatedTimetable(updates);
     var result = siri.applyEstimatedTimetable(updates);
 
-    var cancellation = new SiriEtBuilder(env.getDateTimeHelper())
+    var cancellation = new SiriEtBuilder(env.localTimeParser())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withCancellation(true)
       .buildEstimatedTimetableDeliveries();

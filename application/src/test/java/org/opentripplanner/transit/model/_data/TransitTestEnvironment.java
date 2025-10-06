@@ -81,7 +81,7 @@ public final class TransitTestEnvironment {
     return snapshotManager;
   }
 
-  public LocalTimeParser getDateTimeHelper() {
+  public LocalTimeParser localTimeParser() {
     return localTimeParser;
   }
 

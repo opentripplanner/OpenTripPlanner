@@ -102,7 +102,7 @@ class CancellationTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var creation = new SiriEtBuilder(env.getDateTimeHelper())
+    var creation = new SiriEtBuilder(env.localTimeParser())
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(TRIP_INPUT.operatorId())

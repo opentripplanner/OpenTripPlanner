@@ -46,7 +46,7 @@ class OjpServiceTest implements RealtimeTestConstants {
 
   private OjpService.StopEventRequestParams params(TransitTestEnvironment env, int departures) {
     return new OjpService.StopEventRequestParams(
-      env.getDateTimeHelper().instant("12:00"),
+      env.localTimeParser().instant("12:00"),
       ArrivalDeparture.BOTH,
       Duration.ofHours(2),
       1000,

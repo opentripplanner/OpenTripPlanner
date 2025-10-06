@@ -49,7 +49,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
   void onFirstStop() {
     var env = envBuilder.addTrip(TRIP_INPUT1).addTrip(TRIP_INPUT2).build();
     var transitService = env.getTransitService();
-    var dt = env.getDateTimeHelper();
+    var dt = env.localTimeParser();
 
     var instant = dt.instant("12:00");
     {
@@ -75,7 +75,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
   void nextDay() {
     var env = envBuilder.addTrip(TRIP_INPUT1).addTrip(TRIP_INPUT2).build();
     var transitService = env.getTransitService();
-    var dt = env.getDateTimeHelper();
+    var dt = env.localTimeParser();
 
     var instant = dt.instant("12:00").plus(Duration.ofDays(1));
     var result = transitService.findTripTimesOnDate(
@@ -91,7 +91,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
   void tooLate() {
     var env = envBuilder.addTrip(TRIP_INPUT1).build();
     var transitService = env.getTransitService();
-    var dt = env.getDateTimeHelper();
+    var dt = env.localTimeParser();
 
     var instant = dt.instant("18:00");
     var result = transitService.findTripTimesOnDate(
@@ -104,7 +104,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
   void shortWindow() {
     var env = envBuilder.addTrip(TRIP_INPUT1).build();
     var transitService = env.getTransitService();
-    var dt = env.getDateTimeHelper();
+    var dt = env.localTimeParser();
 
     var instant = dt.instant("11:00");
     var result = transitService.findTripTimesOnDate(
@@ -120,7 +120,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
   void longerWindow() {
     var env = envBuilder.addTrip(TRIP_INPUT1).build();
     var transitService = env.getTransitService();
-    var dt = env.getDateTimeHelper();
+    var dt = env.localTimeParser();
 
     var instant = dt.instant("11:00");
     var result = transitService.findTripTimesOnDate(
@@ -136,7 +136,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
   void several() {
     var env = envBuilder.addTrip(TRIP_INPUT2).addTrip(TRIP_INPUT3).build();
     var transitService = env.getTransitService();
-    var dt = env.getDateTimeHelper();
+    var dt = env.localTimeParser();
 
     var instant = dt.instant("12:10");
     var result = transitService.findTripTimesOnDate(

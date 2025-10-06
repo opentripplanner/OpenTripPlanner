@@ -30,7 +30,7 @@ public class SiriTestHelper {
   }
 
   public SiriEtBuilder etBuilder() {
-    return new SiriEtBuilder(transitTestEnvironment.getDateTimeHelper());
+    return new SiriEtBuilder(transitTestEnvironment.localTimeParser());
   }
 
   public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
