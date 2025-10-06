@@ -191,7 +191,11 @@ public class TransitRouter {
       request
     );
 
-    List<Itinerary> itineraries = paths.stream().map(itineraryMapper::createItinerary).toList();
+    List<Itinerary> itineraries = paths
+      .stream()
+      .map(itineraryMapper::createItinerary)
+      .filter(java.util.Objects::nonNull)
+      .toList();
 
     debugTimingAggregator.finishedItineraryCreation();
 
