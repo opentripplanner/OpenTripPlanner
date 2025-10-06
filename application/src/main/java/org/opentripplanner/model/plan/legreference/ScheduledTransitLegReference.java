@@ -55,20 +55,31 @@ public record ScheduledTransitLegReference(
 
   /**
    * Reconstruct a scheduled transit leg from this scheduled transit leg reference.
-   * Since the transit model could have been modified between the time the reference is created
-   * and the time the transit leg is reconstructed (either because new planned data have been
-   * rolled out, or because a realtime update has modified a trip),
-   * it may not be possible to reconstruct the leg.
-   * In this case the method returns null.
-   * The method checks that the referenced stop positions still refer to the same stop ids.
-   * As an exception, the reference is still considered valid if the referenced stop is different
-   * but belongs to the same parent station: this covers for example the case of a last-minute
-   * platform change in a train station that typically does not affect the validity of the leg.
-   * <p/>
+   * <p>
+   * The method attempts to find a leg which starts and ends in the same station of the given stops.
+   * The transit model could have been modified between the time the reference is created and the
+   * time the transit leg is reconstructed (either because new planned data have been
+   * rolled out, or because a realtime update has modified a trip).
+   * <p>
+   * If there are multiple possibilities, the stop which has the closest stop position in pattern
+   * to the given reference is used. However, if the stop is on a different platform and a call
+   * at the exact stop is immediately before / after it, the exact stop is used.
+   * <p>
+   * As examples, if E1 and E2 are in the same station and the reference for an A(0)-E2(2) leg was
+   * constructed on a trip which now becomes A-B-C-D-E1-F-G-H-E2, it will become an
+   * A(0)-E1(4) leg, however, if it now becomes A-B-C-D-E1-E2, it will become an A(0)-E2(5) leg.
+   * <p>
+   * If it is not possible to reconstruct the leg, which may be because the trip no longer runs
+   * between the stations given, or the trip runs between them in the reverse order, the method
+   * returns null.
+   * <p>
    * If the referenced trip is based on a TripOnServiceDate (i.e. a TransModel dated service
    * journey), the TripOnServiceDate id is stored in the leg reference instead of the Trip id:
    * A TripOnServiceDate id is meant to be more stable than a Trip id across deliveries of planned
    * data, using it gives a better guarantee to reconstruct correctly the original leg.
+   *
+   * @return The reconstructed leg usable in the current transit model, {@code null} if it is not
+   * possible to reconstruct the leg.
    */
   @Override
   @Nullable
