@@ -16,6 +16,12 @@ public class FareLegRuleBuilder {
   private FeedScopedId fromAreaId;
   private FeedScopedId toAreaId;
   private FareDistance fareDistance = null;
+  private Integer priority;
+
+  public FareLegRuleBuilder(FeedScopedId id, Collection<FareProduct> products) {
+    this.id = id;
+    this.fareProducts = products;
+  }
 
   public FeedScopedId id() {
     return id;
@@ -45,9 +51,8 @@ public class FareLegRuleBuilder {
     return fareDistance;
   }
 
-  public FareLegRuleBuilder(FeedScopedId id, Collection<FareProduct> products) {
-    this.id = id;
-    this.fareProducts = products;
+  public Double priority() {
+    return null;
   }
 
   public FareLegRuleBuilder withLegGroupId(FeedScopedId legGroupId) {
@@ -72,6 +77,11 @@ public class FareLegRuleBuilder {
 
   public FareLegRuleBuilder withToAreaId(FeedScopedId toAreaId) {
     this.toAreaId = toAreaId;
+    return this;
+  }
+
+  public FareLegRuleBuilder withPriority(Integer priority) {
+    this.priority = priority;
     return this;
   }
 

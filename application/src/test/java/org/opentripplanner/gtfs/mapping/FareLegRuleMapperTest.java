@@ -1,13 +1,12 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 import java.util.List;
-import java.util.stream.Stream;
-import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareLegRule;
 import org.onebusaway.gtfs.model.FareMedium;
@@ -29,22 +28,25 @@ class FareLegRuleMapperTest {
     FareDistance expectedDistance
   ) {}
 
-  private final List<TestCase> testCases = List.of(
-    new TestCase(0, 1d, 10d, new Stops(1, 10)),
-    new TestCase(
-      1,
-      5000d,
-      10000d,
-      new LinearDistance(
-        Distance.ofKilometersBoxed(5d, ignore -> {}).orElse(null),
-        Distance.ofKilometersBoxed(10d, ignore -> {}).orElse(null)
-      )
-    ),
-    new TestCase(null, null, null, null)
-  );
+  private static List<TestCase> testCases() {
+    return List.of(
+      new TestCase(0, 1d, 10d, new Stops(1, 10)),
+      new TestCase(
+        1,
+        5000d,
+        10000d,
+        new LinearDistance(
+          Distance.ofKilometersBoxed(5d, ignore -> {}).orElse(null),
+          Distance.ofKilometersBoxed(10d, ignore -> {}).orElse(null)
+        )
+      ),
+      new TestCase(null, null, null, null)
+    );
+  }
 
-  @TestFactory
-  Stream<DynamicTest> mapDistance() {
+  @ParameterizedTest
+  @MethodSource("testCases")
+  void mapDistance(TestCase tc) {
     var productMapper = new FareProductMapper(ID_FACTORY);
     var ruleMapper = new FareLegRuleMapper(ID_FACTORY, productMapper, DataImportIssueStore.NOOP);
     var productId = new AgencyAndId("1", "1");
@@ -55,25 +57,18 @@ class FareLegRuleMapperTest {
     fp.setFareProductId(productId);
     var internalProduct = productMapper.map(fp);
 
-    return testCases
-      .stream()
-      .map(tc ->
-        dynamicTest(tc.toString(), () -> {
-          var obaRule = new FareLegRule();
-          obaRule.setFareProductId(fp.getFareProductId());
-          obaRule.setDistanceType(tc.distanceType);
-          obaRule.setMinDistance(tc.minDistance);
-          obaRule.setMaxDistance(tc.maxDistance);
+    var obaRule = new FareLegRule();
+    obaRule.setFareProductId(fp.getFareProductId());
+    obaRule.setDistanceType(tc.distanceType);
+    obaRule.setMinDistance(tc.minDistance);
+    obaRule.setMaxDistance(tc.maxDistance);
 
-          var mappedRules = List.copyOf(ruleMapper.map(List.of(obaRule)));
-          assertEquals(1, mappedRules.size());
+    var mappedRules = List.copyOf(ruleMapper.map(List.of(obaRule)));
+    assertEquals(1, mappedRules.size());
 
-          var otpRule = mappedRules.get(0);
-          assertEquals(otpRule.fareDistance(), tc.expectedDistance);
-          assert (otpRule.fareProducts().size() == 1);
-          assert (otpRule.fareProducts().contains(internalProduct));
-        })
-      );
+    var otpRule = mappedRules.get(0);
+    assertEquals(otpRule.fareDistance(), tc.expectedDistance);
+    assertThat(otpRule.fareProducts()).containsExactly(internalProduct);
   }
 
   @Test
@@ -116,8 +111,6 @@ class FareLegRuleMapperTest {
     assertEquals(1, mappedRules.size());
 
     var otpRule = mappedRules.get(0);
-    assert (otpRule.fareProducts().size() == 2);
-    assert (otpRule.fareProducts().contains(internalCashProduct));
-    assert (otpRule.fareProducts().contains(internalCreditProduct));
+    assertThat(otpRule.fareProducts()).containsExactly(internalCashProduct, internalCreditProduct);
   }
 }

@@ -31,6 +31,9 @@ public final class FareLegRule {
   @Nullable
   private final FeedScopedId toAreaId;
 
+  @Nullable
+  private final Double priority;
+
   public FareLegRule(FareLegRuleBuilder builder) {
     if (builder.fareProducts().isEmpty()) {
       throw new IllegalArgumentException("fareProducts must contain at least one value");
@@ -43,6 +46,7 @@ public final class FareLegRule {
     this.fromAreaId = builder.fromAreaId();
     this.toAreaId = builder.toAreaId();
     this.fareDistance = builder.fareDistance();
+    this.priority = builder.priority();
   }
 
   public String feedId() {

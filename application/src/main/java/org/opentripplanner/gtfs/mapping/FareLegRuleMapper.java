@@ -32,37 +32,34 @@ final class FareLegRuleMapper {
   public Collection<FareLegRule> map(
     Collection<org.onebusaway.gtfs.model.FareLegRule> allFareLegRules
   ) {
-    return allFareLegRules
-      .stream()
-      .map(r -> {
-        var fareProductId = idFactory.createId(
-          r.getFareProductId(),
-          "fare leg rule's fare product id"
-        );
-        var productsForRule = fareProductMapper.findFareProducts(fareProductId);
+    return allFareLegRules.stream().map(this::map).filter(Objects::nonNull).toList();
+  }
 
-        if (!productsForRule.isEmpty()) {
-          FareDistance fareDistance = createFareDistance(r);
-          var ruleId = new FeedScopedId(fareProductId.getFeedId(), r.getId());
-          return FareLegRule.of(ruleId, productsForRule)
-            .withLegGroupId(idFactory.createNullableId(r.getLegGroupId()))
-            .withNetworkId(idFactory.createNullableId(r.getNetworkId()))
-            .withFromAreaId(areaId(r.getFromArea()))
-            .withToAreaId(areaId(r.getToArea()))
-            .withFareDistance(fareDistance)
-            .build();
-        } else {
-          issueStore.add(
-            "UnknownFareProductId",
-            "Fare leg rule %s refers to unknown fare product %s",
-            r.getId(),
-            fareProductId
-          );
-          return null;
-        }
-      })
-      .filter(Objects::nonNull)
-      .toList();
+  @Nullable
+  private FareLegRule map(org.onebusaway.gtfs.model.FareLegRule r) {
+    var fareProductId = idFactory.createId(r.getFareProductId(), "fare leg rule's fare product id");
+    var productsForRule = fareProductMapper.findFareProducts(fareProductId);
+
+    if (!productsForRule.isEmpty()) {
+      FareDistance fareDistance = createFareDistance(r);
+      var ruleId = idFactory.createId(r.getId(), "fare leg rule");
+      var builder = FareLegRule.of(ruleId, productsForRule)
+        .withLegGroupId(idFactory.createNullableId(r.getLegGroupId()))
+        .withNetworkId(idFactory.createNullableId(r.getNetworkId()))
+        .withFromAreaId(areaId(r.getFromArea()))
+        .withToAreaId(areaId(r.getToArea()))
+        .withFareDistance(fareDistance);
+      r.getRulePriorityOption().ifPresent(builder::withPriority);
+      return builder.build();
+    } else {
+      issueStore.add(
+        "UnknownFareProductId",
+        "Fare leg rule %s refers to unknown fare product %s",
+        r.getId(),
+        fareProductId
+      );
+      return null;
+    }
   }
 
   private FeedScopedId areaId(@Nullable org.onebusaway.gtfs.model.Area area) {
