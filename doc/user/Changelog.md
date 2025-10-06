@@ -11,6 +11,10 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Align service id handling of GTFS-RT NEW with SIRI extra calls [#6894](https://github.com/opentripplanner/OpenTripPlanner/pull/6894)
 - Simplify handling for turns [#6779](https://github.com/opentripplanner/OpenTripPlanner/pull/6779)
 - Move deduplicator out of Graph and into Dagger [#6892](https://github.com/opentripplanner/OpenTripPlanner/pull/6892)
+- Show GBFS Geofencing zones in debug UI [#6876](https://github.com/opentripplanner/OpenTripPlanner/pull/6876)
+- Add OTP Badge to ServerInfo [#6865](https://github.com/opentripplanner/OpenTripPlanner/pull/6865)
+- Apply correct traversal permissions to indoor tagged entities [#6923](https://github.com/opentripplanner/OpenTripPlanner/pull/6923)
+- Multiplicative stairs and turn reluctance [#6783](https://github.com/opentripplanner/OpenTripPlanner/pull/6783)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)

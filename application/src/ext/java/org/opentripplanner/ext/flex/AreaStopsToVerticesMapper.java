@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMultimap;
 import jakarta.inject.Inject;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -74,6 +75,7 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
   }
 
   private static Stream<MatchResult> matchingVerticesForStop(Graph graph, AreaStop areaStop) {
+    var geom = PreparedGeometryFactory.prepare(areaStop.getGeometry());
     return graph
       .findVertices(areaStop.getGeometry().getEnvelopeInternal())
       .stream()
@@ -83,7 +85,7 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       .filter(vertx -> {
         // The street index overselects, so need to check for exact geometry inclusion
         Point p = GeometryUtils.getGeometryFactory().createPoint(vertx.getCoordinate());
-        return areaStop.getGeometry().intersects(p);
+        return geom.intersects(p);
       })
       .map(vertx -> new MatchResult(vertx, areaStop));
   }

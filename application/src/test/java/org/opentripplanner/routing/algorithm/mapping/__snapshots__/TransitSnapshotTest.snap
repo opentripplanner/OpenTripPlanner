@@ -10,7 +10,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 7443,
+      "generalizedCost" : 7479,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -25,7 +25,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 7443,
+          "generalizedCost" : 7479,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 207,
@@ -240,7 +240,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4025,
+      "generalizedCost" : 4037,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -255,7 +255,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1543,
+          "generalizedCost" : 1546,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 37,
@@ -450,7 +450,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 80,
+          "generalizedCost" : 81,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 10,
@@ -684,7 +684,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 37,
+          "generalizedCost" : 44,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 7,
@@ -756,7 +756,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4281,
+      "generalizedCost" : 4300,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -771,7 +771,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1398,
+          "generalizedCost" : 1411,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 45,
@@ -1109,7 +1109,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1511,
+          "generalizedCost" : 1518,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 29,
@@ -1207,7 +1207,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 2314,
+      "generalizedCost" : 2318,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -1638,7 +1638,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 405,
+          "generalizedCost" : 409,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 13,
@@ -1736,7 +1736,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4025,
+      "generalizedCost" : 4037,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -1751,7 +1751,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1543,
+          "generalizedCost" : 1546,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 37,
@@ -1946,7 +1946,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 80,
+          "generalizedCost" : 81,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 10,
@@ -2180,7 +2180,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 37,
+          "generalizedCost" : 44,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 7,
@@ -2252,7 +2252,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4295,
+      "generalizedCost" : 4314,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -2267,7 +2267,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1398,
+          "generalizedCost" : 1411,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 45,
@@ -2605,7 +2605,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1511,
+          "generalizedCost" : 1518,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 29,
@@ -2694,7 +2694,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 6707,
+      "generalizedCost" : 6731,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -2712,7 +2712,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 6707,
+          "generalizedCost" : 6731,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 208,
@@ -2914,7 +2914,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 3862,
+      "generalizedCost" : 3876,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -2932,7 +2932,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 136,
+          "generalizedCost" : 139,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 9,
@@ -3127,7 +3127,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "generalizedCost" : 645,
+          "generalizedCost" : 652,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 25,
@@ -3399,7 +3399,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 287,
+          "generalizedCost" : 290,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 7,
@@ -3497,7 +3497,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 2894,
+      "generalizedCost" : 2911,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -3515,7 +3515,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 136,
+          "generalizedCost" : 139,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 9,
@@ -3827,7 +3827,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1389,
+          "generalizedCost" : 1402,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 39,
@@ -3964,7 +3964,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 3703,
+      "generalizedCost" : 3720,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -3982,7 +3982,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 136,
+          "generalizedCost" : 139,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 9,
@@ -4151,7 +4151,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "generalizedCost" : 680,
+          "generalizedCost" : 690,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 32,
@@ -4476,7 +4476,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 691,
+          "generalizedCost" : 694,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 13,
@@ -4561,7 +4561,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 2924,
+      "generalizedCost" : 2941,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -4579,7 +4579,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 136,
+          "generalizedCost" : 139,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 9,
@@ -4891,7 +4891,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1389,
+          "generalizedCost" : 1402,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 39,
@@ -5028,7 +5028,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 3703,
+      "generalizedCost" : 3720,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -5046,7 +5046,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 136,
+          "generalizedCost" : 139,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 9,
@@ -5215,7 +5215,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "generalizedCost" : 680,
+          "generalizedCost" : 690,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 32,
@@ -5540,7 +5540,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 691,
+          "generalizedCost" : 694,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 13,
@@ -5608,22 +5608,22 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
   [
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 3711,
+      "duration" : 3713,
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
-      "endTime" : "2009-11-17T19:01:51.000+00:00",
+      "endTime" : "2009-11-17T19:01:53.000+00:00",
       "fare" : {
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 7373,
+      "generalizedCost" : 7427,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 4869.45,
-          "endTime" : "2009-11-17T19:01:51.000+00:00",
+          "distance" : 4875.79,
+          "endTime" : "2009-11-17T19:01:53.000+00:00",
           "from" : {
             "departure" : "2009-11-17T18:00:00.000+00:00",
             "lat" : 45.51932,
@@ -5631,11 +5631,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name" : "SE Stark    St. & SE 17th Ave. (P0)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 7373,
+          "generalizedCost" : 7427,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
-            "length" : 263,
-            "points" : "unytGpxqkVA??dACpB@P?f@?p@?j@?dAAhE?jE?vD?P?RK?GFCDCFADABADADAF?D?FADCF?B?B?@?D@DADABCBC?A?C?AA??GICAAAA?A?A?AACAC?A@ABABC@CDCBCBC@CBABABCJ?J?@?@MR?hEoC??pDa@TkB@_CAM?QAgB?U??R?t@?n@?z@?T?R?jB?@?r@?R?R?tA?\\?l@?R?T?VAd@?jA?N?N?J?Z?jA?z@?P?Z?J@N?hA@x@Ap@ATETGpJCjEA|CArAAxAAxAAdBEzHClF?@Ax@GTAjBAZ?R@hC@h@Q@cBBM?M?_CDsA@Y?Q@O?K?Q?mBB[?C?W@[?]@E?IDI@]DO@SBM?S@G@A?GDEJQ|@AL?L@nA?j@@L?V?d@@~@@NI?E?W@Q?Q?m@@Q@AF?DAJBzB?V?NANM@K?GBEDEHIJUX_@f@KNQRSVGFCBQPIHGDGBIBK@W@a@?mA@E?C@C@A?CBQTKJEHIJeC~CYZo@v@g@d@IJAFAD?L@vC@hB@p@?X?T@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?J"
+            "length" : 252,
+            "points" : "unytGpxqkVA??dACpB@P?f@?p@?j@?dAAhE?jE?vD?P?RK?GFCDCFADABADADAF?D?FADCF?B?B?@?D@DADABCBC?A?C?AA??GICAAAA?A?A?AACAC?A@ABABC@CDCBCBC@CBABABCJ?J?@?@MR?hE?fEAdB?dB?lE?`A?T?pBA|D?J?x@?r@y@??bBuA?y@AU?{@?O?}@?E?y@?_@Aa@?u@?W??J@N?hA@x@Ap@ATETGpJCjEA|CArAAxAAxAAdBEzHClF?@Ax@GTAjBAZ?R@hC@h@Q@cBBM?M?_CDsA@Y?Q@O?K?Q?mBB[?C?W@[?]@E?IDI@]DO@SBM?S@G@A?GDEJQ|@AL?L@nA?j@@L?V?d@@~@@NI?E?W@Q?Q?m@@Q@AF?DAJBzB?V?NANM@K?GBEDEHIJUX_@f@KNQRSVGFCBQPIHGDGBIBK@W@a@?mA@E?C@C@A?CBQTKJEHIJeC~CYZo@v@g@d@IJAFAD?L@vC@hB@p@?X?T@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?J"
           },
           "mode" : "WALK",
           "pathway" : false,
@@ -5687,7 +5687,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection" : "WEST",
               "area" : false,
               "bogusName" : false,
-              "distance" : 79.26,
+              "distance" : 516.5,
               "elevation" : "",
               "lat" : 45.5200623,
               "lon" : -122.6546522,
@@ -5699,50 +5699,37 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             {
               "absoluteDirection" : "NORTH",
               "area" : false,
-              "bogusName" : false,
-              "distance" : 80.06,
+              "bogusName" : true,
+              "distance" : 70.84,
               "elevation" : "",
-              "lat" : 45.5200657,
-              "lon" : -122.6556695,
+              "lat" : 45.5200842,
+              "lon" : -122.6612814,
               "relativeDirection" : "RIGHT",
               "stayOn" : false,
-              "streetName" : "Southeast 10th Avenue",
+              "streetName" : "parking aisle",
+              "walkingBike" : false
+            },
+            {
+              "absoluteDirection" : "NORTH",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 284.75,
+              "elevation" : "",
+              "lat" : 45.5203736,
+              "lon" : -122.661783,
+              "relativeDirection" : "RIGHT",
+              "stayOn" : false,
+              "streetName" : "Southeast Martin Luther King, Junior Boulevard",
               "walkingBike" : false
             },
             {
               "absoluteDirection" : "WEST",
               "area" : false,
               "bogusName" : false,
-              "distance" : 69.06,
+              "distance" : 243.45,
               "elevation" : "",
-              "lat" : 45.5207857,
-              "lon" : -122.6556649,
-              "relativeDirection" : "LEFT",
-              "stayOn" : false,
-              "streetName" : "Southeast Pine Street",
-              "walkingBike" : false
-            },
-            {
-              "absoluteDirection" : "NORTHWEST",
-              "area" : false,
-              "bogusName" : false,
-              "distance" : 239.15,
-              "elevation" : "",
-              "lat" : 45.520789,
-              "lon" : -122.6565513,
-              "relativeDirection" : "RIGHT",
-              "stayOn" : false,
-              "streetName" : "Southeast 9th Avenue",
-              "walkingBike" : false
-            },
-            {
-              "absoluteDirection" : "WEST",
-              "area" : false,
-              "bogusName" : false,
-              "distance" : 641.63,
-              "elevation" : "",
-              "lat" : 45.5229209,
-              "lon" : -122.6566553,
+              "lat" : 45.5229343,
+              "lon" : -122.6617665,
               "relativeDirection" : "LEFT",
               "stayOn" : false,
               "streetName" : "East Burnside Street",
@@ -5854,7 +5841,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             }
           ],
           "to" : {
-            "arrival" : "2009-11-17T19:01:51.000+00:00",
+            "arrival" : "2009-11-17T19:01:53.000+00:00",
             "lat" : 45.53122,
             "lon" : -122.69659,
             "name" : "NW Northrup St. & NW 22nd Ave. (P2)",
@@ -5869,9 +5856,9 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers" : 0,
       "transitTime" : 0,
       "waitingTime" : 0,
-      "walkDistance" : 4869.45,
+      "walkDistance" : 4875.79,
       "walkLimitExceeded" : false,
-      "walkTime" : 3711
+      "walkTime" : 3713
     }
   ]
 ]
@@ -5889,7 +5876,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 6272,
+      "generalizedCost" : 6297,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -5907,7 +5894,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 6272,
+          "generalizedCost" : 6297,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 202,
@@ -6087,13 +6074,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 4597,
+      "generalizedCost" : 4643,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 2985.43,
+          "distance" : 3052.9,
           "endTime" : "2009-11-17T18:38:41.000+00:00",
           "from" : {
             "departure" : "2009-11-17T18:00:00.000+00:00",
@@ -6105,11 +6092,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "0"
           },
-          "generalizedCost" : 4597,
+          "generalizedCost" : 4643,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
-            "length" : 143,
-            "points" : "_s{tGvpukV??c@tADDFDDDHHYx@Wt@{@lBS^MROZ]h@Y`@[`@k@r@kAtASVEDa@f@EDm@l@s@p@JVA@GOCBzEfKxF`M|AfDJRLPVb@DBBBBBDBB@CRE\\C?A@A@ABAB?DAHATC\\AXAVCZATAPAPATG`AATAPAL?J?F?F?D?F@x@AJ@D@B@DAB?RK@I??TBlBCJ?D?BAFAB?DADABEFCDA@CDC?c@@{@@O?K?eBBM?M@@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?RDbH@xA?D?P?RDpH"
+            "length" : 137,
+            "points" : "_s{tGvpukV??c@tAIIMb@ADIZM\\KZWr@Ud@Ud@IRSb@k@x@_@h@a@f@_AfAYXKQMUIKGGIGKEOCI?I?KBKBQHqAxAONL\\j@rA@R?FVh@~EpKxFzLdA|B^x@BD@@BDHLHJBFBDBF@DBF?J?HAF?HGbAK~AGz@IlAEd@?TAP?L?L@Z?`@?R?T?TBlBCJ?D?BAFAB?DADABEFCDA@CDC?c@@{@@O?K?eBBM?M@@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?RDbH@xA?D?P?RDpH"
           },
           "mode" : "WALK",
           "pathway" : false,
@@ -6132,14 +6119,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "walkingBike" : false
             },
             {
-              "absoluteDirection" : "SOUTHWEST",
+              "absoluteDirection" : "NORTHEAST",
               "area" : false,
               "bogusName" : true,
-              "distance" : 20.61,
+              "distance" : 5.99,
               "elevation" : "",
               "lat" : 45.5304271,
               "lon" : -122.6682216,
-              "relativeDirection" : "LEFT",
+              "relativeDirection" : "RIGHT",
               "stayOn" : false,
               "streetName" : "path",
               "walkingBike" : false
@@ -6148,89 +6135,63 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection" : "NORTHWEST",
               "area" : false,
               "bogusName" : false,
-              "distance" : 410.02,
+              "distance" : 292.26,
               "elevation" : "",
-              "lat" : 45.5302724,
-              "lon" : -122.6683673,
-              "relativeDirection" : "RIGHT",
+              "lat" : 45.5304721,
+              "lon" : -122.6681793,
+              "relativeDirection" : "LEFT",
               "stayOn" : false,
               "streetName" : "North Interstate Avenue",
               "walkingBike" : false
             },
             {
-              "absoluteDirection" : "SOUTHWEST",
+              "absoluteDirection" : "NORTHEAST",
               "area" : false,
-              "bogusName" : true,
-              "distance" : 20.18,
+              "bogusName" : false,
+              "distance" : 160.7,
               "elevation" : "",
-              "lat" : 45.5329128,
-              "lon" : -122.6719792,
-              "relativeDirection" : "LEFT",
-              "stayOn" : false,
-              "streetName" : "steps",
-              "walkingBike" : false
-            },
-            {
-              "absoluteDirection" : "NORTHWEST",
-              "area" : false,
-              "bogusName" : true,
-              "distance" : 2.25,
-              "elevation" : "",
-              "lat" : 45.5329079,
-              "lon" : -122.672028,
+              "lat" : 45.5322204,
+              "lon" : -122.670929,
               "relativeDirection" : "RIGHT",
-              "stayOn" : true,
-              "streetName" : "footbridge",
+              "stayOn" : false,
+              "streetName" : "North Larrabee Avenue",
               "walkingBike" : false
             },
             {
               "absoluteDirection" : "SOUTHWEST",
               "area" : false,
               "bogusName" : false,
-              "distance" : 543.67,
+              "distance" : 55.04,
               "elevation" : "",
-              "lat" : 45.5329251,
-              "lon" : -122.6720431,
+              "lat" : 45.5334329,
+              "lon" : -122.6711531,
               "relativeDirection" : "LEFT",
+              "stayOn" : false,
+              "streetName" : "North Broadway",
+              "walkingBike" : false
+            },
+            {
+              "absoluteDirection" : "WEST",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 584.68,
+              "elevation" : "",
+              "lat" : 45.533143,
+              "lon" : -122.6717257,
+              "relativeDirection" : "SLIGHTLY_RIGHT",
               "stayOn" : false,
               "streetName" : "Broadway Bridge",
               "walkingBike" : false
             },
             {
-              "absoluteDirection" : "SOUTHWEST",
+              "absoluteDirection" : "WEST",
               "area" : false,
               "bogusName" : false,
-              "distance" : 14.16,
+              "distance" : 301.76,
               "elevation" : "",
-              "lat" : 45.5298506,
-              "lon" : -122.6774667,
-              "relativeDirection" : "CONTINUE",
-              "stayOn" : false,
-              "streetName" : "Northwest Broadway",
-              "walkingBike" : false
-            },
-            {
-              "absoluteDirection" : "NORTH",
-              "area" : false,
-              "bogusName" : false,
-              "distance" : 23.67,
-              "elevation" : "",
-              "lat" : 45.5297871,
-              "lon" : -122.6778001,
-              "relativeDirection" : "UTURN_RIGHT",
-              "stayOn" : true,
-              "streetName" : "Northwest Broadway",
-              "walkingBike" : false
-            },
-            {
-              "absoluteDirection" : "NORTHWEST",
-              "area" : false,
-              "bogusName" : false,
-              "distance" : 298.37,
-              "elevation" : "",
-              "lat" : 45.5298172,
-              "lon" : -122.6778163,
-              "relativeDirection" : "SLIGHTLY_LEFT",
+              "lat" : 45.5298997,
+              "lon" : -122.6776005,
+              "relativeDirection" : "SLIGHTLY_RIGHT",
               "stayOn" : false,
               "streetName" : "Northwest Lovejoy Street",
               "walkingBike" : false
@@ -6278,7 +6239,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers" : 0,
       "transitTime" : 0,
       "waitingTime" : 0,
-      "walkDistance" : 2985.43,
+      "walkDistance" : 3052.9,
       "walkLimitExceeded" : false,
       "walkTime" : 2321
     }
