@@ -6139,7 +6139,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "elevation" : "",
               "lat" : 45.5304721,
               "lon" : -122.6681793,
-              "relativeDirection" : "STAIRS",
+              "relativeDirection" : "LEFT",
               "stayOn" : false,
               "streetName" : "North Interstate Avenue",
               "walkingBike" : false
