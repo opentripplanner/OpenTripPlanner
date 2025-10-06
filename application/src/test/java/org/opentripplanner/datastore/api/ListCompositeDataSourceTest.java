@@ -1,14 +1,10 @@
-package org.opentripplanner.datastore.base;
+package org.opentripplanner.datastore.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.datastore.api.CompositeDataSource;
-import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.datastore.api.DataSourceTestFactory;
-import org.opentripplanner.datastore.api.FileType;
 
 class ListCompositeDataSourceTest {
 

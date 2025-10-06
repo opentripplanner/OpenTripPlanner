@@ -1,11 +1,8 @@
-package org.opentripplanner.datastore.base;
+package org.opentripplanner.datastore.api;
 
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.datastore.api.CompositeDataSource;
-import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.datastore.api.FileType;
 
 /**
  * This is a simple {@link CompositeDataSource} using a list of children. It is usefull

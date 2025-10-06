@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.base.ByteArrayDataSource;
-import org.opentripplanner.datastore.base.ListCompositeDataSource;
 import org.opentripplanner.datastore.file.FileDataSourceRepository;
 
 public class DataSourceTestFactory {
