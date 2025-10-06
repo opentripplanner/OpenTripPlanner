@@ -1,10 +1,12 @@
 package org.opentripplanner.ext.emission.internal.csvdata.route;
 
-import com.csvreader.CsvReader;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.framework.csv.HeadersDoNotMatch;
+import org.opentripplanner.framework.csv.OtpCsvReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -17,38 +19,36 @@ public class RouteDataReader {
 
   private final DataSource emissionDataSource;
   private final DataImportIssueStore issueStore;
-  private boolean dataProcessed = false;
 
   public RouteDataReader(DataSource emissionDataSource, DataImportIssueStore issueStore) {
     this.emissionDataSource = emissionDataSource;
     this.issueStore = issueStore;
   }
 
-  public Map<FeedScopedId, Emission> read(String resolvedFeedId, Runnable logStepCallback) {
-    if (!emissionDataSource.exists()) {
-      return Map.of();
-    }
+  /**
+   * Read emission data for routes. The given resolvedFeedId is used to create route ids which map
+   * to the internal OTP Routes entities.
+   * @return a map of emissions for each route id in the data set
+   * @throws HeadersDoNotMatch - if the headers does not match, this can be used to try another
+   *                             reader, mainly to support multiple versions of the data.
+   */
+  public Map<FeedScopedId, Emission> read(
+    String resolvedFeedId,
+    @Nullable Consumer<String> progressLogger
+  ) throws HeadersDoNotMatch {
     var emissionData = new HashMap<FeedScopedId, Emission>();
-    var reader = new CsvReader(emissionDataSource.asInputStream(), StandardCharsets.UTF_8);
-    var parser = new RouteCsvParser(issueStore, reader);
 
-    if (!parser.headersMatch()) {
-      return Map.of();
-    }
-
-    while (parser.hasNext()) {
-      logStepCallback.run();
-      var value = parser.next();
-      emissionData.put(
-        new FeedScopedId(resolvedFeedId, value.routeId()),
-        Emission.of(value.calculatePassengerCo2PerMeter())
-      );
-      dataProcessed = true;
-    }
+    OtpCsvReader.<RouteRow>of()
+      .withDataSource(emissionDataSource)
+      .withProgressLogger(progressLogger)
+      .withParserFactory(r -> new RouteCsvParser(issueStore, r))
+      .withRowHandler(row -> {
+        emissionData.put(
+          new FeedScopedId(resolvedFeedId, row.routeId()),
+          Emission.of(row.calculatePassengerCo2PerMeter())
+        );
+      })
+      .read();
     return emissionData;
-  }
-
-  public boolean isDataProcessed() {
-    return dataProcessed;
   }
 }

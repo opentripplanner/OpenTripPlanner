@@ -51,7 +51,7 @@ public class BicycleRoutingTest {
     var fritzLeharStr = GenericLocation.fromCoordinate(48.59696, 8.85806);
 
     var polyline1 = computePolyline(herrenbergGraph, mozartStr, fritzLeharStr);
-    assertThatPolylinesAreEqual(polyline1, "_srgHutau@h@B|@Jf@B?PdABJT@jA?DSp@_@fFsAT{@DBpC");
+    assertThatPolylinesAreEqual(polyline1, "_srgHutau@h@B|@Jf@BdAG?\\JT@jA?DSp@_@fFsAT{@DBpC");
 
     var polyline2 = computePolyline(herrenbergGraph, fritzLeharStr, mozartStr);
     assertThatPolylinesAreEqual(polyline2, "{qrgH{aau@CqCz@ErAU^gFRq@?EAkAKUeACg@A_AM_AEDQF@H?");

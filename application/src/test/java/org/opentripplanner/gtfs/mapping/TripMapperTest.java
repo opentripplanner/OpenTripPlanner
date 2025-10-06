@@ -48,6 +48,7 @@ public class TripMapperTest {
       new RouteMapper(
         ID_FACTORY,
         new AgencyMapper(ID_FACTORY),
+        new RouteNetworkAssignmentMapper(ID_FACTORY),
         ISSUE_STORE,
         new TranslationHelper()
       ),

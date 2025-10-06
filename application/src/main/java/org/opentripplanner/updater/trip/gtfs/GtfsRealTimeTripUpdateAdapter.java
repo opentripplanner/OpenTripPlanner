@@ -6,6 +6,7 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_IM
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_TRIP_FOR_CANCELLATION_FOUND;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_UPDATES;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.OUTSIDE_SERVICE_PERIOD;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
@@ -61,7 +62,6 @@ import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.model.AddedRoute;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
-import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -87,8 +87,6 @@ public class GtfsRealTimeTripUpdateAdapter {
 
   private final Deduplicator deduplicator;
 
-  private final Map<FeedScopedId, Integer> serviceCodes;
-
   private final TimetableSnapshotManager snapshotManager;
   private final Supplier<LocalDate> localDateNow;
 
@@ -108,7 +106,6 @@ public class GtfsRealTimeTripUpdateAdapter {
       snapshotManager.getTimetableSnapshotBuffer()
     );
     this.deduplicator = timetableRepository.getDeduplicator();
-    this.serviceCodes = timetableRepository.getServiceCodes();
   }
 
   /**
@@ -448,26 +445,14 @@ public class GtfsRealTimeTripUpdateAdapter {
     var route = optionalRoute.orElseGet(() -> createRoute(tripDescriptor, tripId));
 
     // TODO: which Agency ID to use? Currently use feed id.
-    var tripBuilder = Trip.of(tripId);
-    tripBuilder.withRoute(route);
+    var tripBuilder = Trip.of(tripId).withRoute(route);
 
-    // Find service ID running on this service date
-    final Set<FeedScopedId> serviceIds = transitEditorService
-      .getCalendarService()
-      .getServiceIdsOnDate(serviceDate);
-    if (serviceIds.isEmpty()) {
-      // No service id exists: return error for now
-      debug(
-        tripId,
-        serviceDate,
-        "NEW trip has service date {} for which no service id is available, skipping.",
-        serviceDate.toString()
-      );
-      return UpdateError.result(tripId, NO_SERVICE_ON_DATE);
-    } else {
-      // Just use first service id of set
-      tripBuilder.withServiceId(serviceIds.iterator().next());
+    // get service ID running only on this service date
+    var serviceId = transitEditorService.getOrCreateServiceIdForDate(serviceDate);
+    if (serviceId == null) {
+      return UpdateError.result(tripId, OUTSIDE_SERVICE_PERIOD);
     }
+    tripBuilder.withServiceId(serviceId);
 
     tripUpdate.tripHeadsign().ifPresent(tripBuilder::withHeadsign);
     tripUpdate.tripShortName().ifPresent(tripBuilder::withShortName);
@@ -558,7 +543,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       realTimeState,
       tripUpdate.tripHeadsign().orElse(null),
       deduplicator,
-      serviceCodes.get(trip.getServiceId())
+      transitEditorService.getServiceCode(trip.getServiceId())
     );
 
     return result

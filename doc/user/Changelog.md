@@ -5,11 +5,30 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 ## 2.9.0-SNAPSHOT (in progress)
 
+- Debug client UI upgrades and fixes [#6832](https://github.com/opentripplanner/OpenTripPlanner/pull/6832)
+- Experimental GBFS 3.0 support [#6735](https://github.com/opentripplanner/OpenTripPlanner/pull/6735)
+- Fix NPE in old deprecated via search (Transmodel API) [#6878](https://github.com/opentripplanner/OpenTripPlanner/pull/6878)
+- Align service id handling of GTFS-RT NEW with SIRI extra calls [#6894](https://github.com/opentripplanner/OpenTripPlanner/pull/6894)
+- Simplify handling for turns [#6779](https://github.com/opentripplanner/OpenTripPlanner/pull/6779)
+- Move deduplicator out of Graph and into Dagger [#6892](https://github.com/opentripplanner/OpenTripPlanner/pull/6892)
+- Show GBFS Geofencing zones in debug UI [#6876](https://github.com/opentripplanner/OpenTripPlanner/pull/6876)
+- Add OTP Badge to ServerInfo [#6865](https://github.com/opentripplanner/OpenTripPlanner/pull/6865)
+- Apply correct traversal permissions to indoor tagged entities [#6923](https://github.com/opentripplanner/OpenTripPlanner/pull/6923)
+- Multiplicative stairs and turn reluctance [#6783](https://github.com/opentripplanner/OpenTripPlanner/pull/6783)
+[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
+
+## 2.8.1 (2025-09-22)
+
+### Notable Changes
+
+- Un-deprecate fields in InputPreferred to fix ugly GraphiQL error [#6856](https://github.com/opentripplanner/OpenTripPlanner/pull/6856)
+
+### Detailed changes by Pull Request
+
 - Remove GTFS `removeRepeatedStops` feature [#6846](https://github.com/opentripplanner/OpenTripPlanner/pull/6846)
 - Restore lookup of multi-modal stations and group of stations [#6805](https://github.com/opentripplanner/OpenTripPlanner/pull/6805)
 - Fix stop cancellation in case of repeated scheduled times [#6849](https://github.com/opentripplanner/OpenTripPlanner/pull/6849)
-- Un-deprecate fields in InputPreferred to fix GraphiQL [#6856](https://github.com/opentripplanner/OpenTripPlanner/pull/6856)
-[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
+- Enforce flex rule: at least two stop times per trip [#6828](https://github.com/opentripplanner/OpenTripPlanner/pull/6828)
 
 ## 2.8.0 (2025-09-10)
 

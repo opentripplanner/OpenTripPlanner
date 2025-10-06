@@ -164,6 +164,7 @@ public class SplitEdgeTurnRestrictionsTest {
       .withFrom(from)
       .withTo(to)
       .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
+      .withPreferences(p -> p.withStreet(s -> s.withTurnReluctance(0.5)))
       .buildRequest();
 
     var temporaryVertices = new TemporaryVerticesContainer(
