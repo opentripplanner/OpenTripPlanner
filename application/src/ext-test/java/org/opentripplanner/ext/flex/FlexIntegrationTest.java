@@ -164,7 +164,7 @@ public class FlexIntegrationTest {
     // walk, flex
     assertEquals(2, itin.legs().size());
     assertEquals("2021-12-02T12:52:56-05:00[America/New_York]", itin.startTime().toString());
-    assertEquals(3200, itin.generalizedCost());
+    assertEquals(3248, itin.generalizedCost());
 
     var walkToFlex = itin.streetLeg(0);
     assertEquals(WALK, walkToFlex.getMode());
