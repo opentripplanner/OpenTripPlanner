@@ -8,12 +8,15 @@ import java.time.ZonedDateTime;
 import org.opentripplanner.utils.time.DateUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
-public class DateTimeHelper {
+/**
+ * A helper class used in tests for parsing local time strings into absolute times
+ */
+public class LocalTimeParser {
 
   private final ZoneId zone;
   private final LocalDate defaultDate;
 
-  public DateTimeHelper(ZoneId zone, LocalDate defaultDate) {
+  public LocalTimeParser(ZoneId zone, LocalDate defaultDate) {
     this.zone = zone;
     this.defaultDate = defaultDate;
   }

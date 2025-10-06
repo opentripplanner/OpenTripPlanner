@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model._data;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import org.opentripplanner.DateTimeHelper;
+import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -20,7 +20,7 @@ public final class TransitTestEnvironment {
 
   private final TimetableRepository timetableRepository;
   private final TimetableSnapshotManager snapshotManager;
-  private final DateTimeHelper dateTimeHelper;
+  private final LocalTimeParser localTimeParser;
   private final LocalDate defaultServiceDate;
 
   public static TransitTestEnvironmentBuilder of() {
@@ -45,7 +45,10 @@ public final class TransitTestEnvironment {
       () -> defaultServiceDate
     );
     this.defaultServiceDate = defaultServiceDate;
-    this.dateTimeHelper = new DateTimeHelper(timetableRepository.getTimeZone(), defaultServiceDate);
+    this.localTimeParser = new LocalTimeParser(
+      timetableRepository.getTimeZone(),
+      defaultServiceDate
+    );
   }
 
   public LocalDate serviceDate() {
@@ -78,8 +81,8 @@ public final class TransitTestEnvironment {
     return snapshotManager;
   }
 
-  public DateTimeHelper getDateTimeHelper() {
-    return dateTimeHelper;
+  public LocalTimeParser getDateTimeHelper() {
+    return localTimeParser;
   }
 
   public TimetableSnapshot getTimetableSnapshot() {
