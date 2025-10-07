@@ -461,7 +461,7 @@ public class OsmModule implements GraphBuilderModule {
             geometry
           );
 
-          params.edgeNamer().recordEdges(way, streets);
+          params.edgeNamer().recordEdges(way, streets, osmdb);
 
           StreetEdge street = streets.main();
           StreetEdge backStreet = streets.back();

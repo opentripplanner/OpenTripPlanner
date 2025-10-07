@@ -6,10 +6,11 @@ import org.opentripplanner.osm.model.OsmEntity;
 public record FloorNumberUnknownAssumedGroundLevel(String level, OsmEntity entity)
   implements DataImportIssue {
   private static final String FMT =
-    "%s : could not determine floor number for level/layer %s, assumed to be ground-level.";
+    "%s : could not determine level from 'level' or 'layer' tag '%s', assumed to be ground-level.";
 
   private static final String HTMLFMT =
-    "<a href='%s'>'%s'</a> : could not determine floor number for level/layer %s, assumed to be ground-level.";
+    "<a href='%s'>'%s'</a> : could not determine level from 'level' or 'layer' tag '%s', " +
+    "assumed to be ground-level.";
 
   @Override
   public String getMessage() {

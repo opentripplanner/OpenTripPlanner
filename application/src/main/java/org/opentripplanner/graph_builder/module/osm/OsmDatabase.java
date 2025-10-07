@@ -13,11 +13,8 @@ import gnu.trove.set.hash.TLongHashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -101,12 +98,13 @@ public class OsmDatabase {
   private final TLongSet areaNodeIds = new TLongHashSet();
 
   /**
-   * Track which vertical level OSM entities belong to.
+   * Track which vertical levels OSM entities belong to.
    * Level information can be set for ways and relations.
-   * An entity only has an entry if it had a level defined in OSM.
-   * The level is used e.g. for building elevators.
+   * An entity only has an entry if at least one level is defined in OSM.
+   * The ordering is important because in the future it will be used for building stairs
+   * and escalators. At the moment, the level is used e.g. for building elevators.
    */
-  private final Map<OsmEntity, OsmLevel> entityLevels = new HashMap<>();
+  private final ArrayListMultimap<OsmEntity, OsmLevel> entityLevels = ArrayListMultimap.create();
 
   /* Set of turn restrictions for each turn "from" way ID */
   private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay =
@@ -193,8 +191,24 @@ public class OsmDatabase {
     return stopsInAreas.get(areaParent);
   }
 
+  /**
+   * @return If a single level is defined for an entity return that level,
+   * otherwise the default level is returned.
+   */
   public OsmLevel getLevelForEntity(OsmEntity entity) {
-    return Objects.requireNonNullElse(entityLevels.get(entity), OsmLevelFactory.DEFAULT);
+    List<OsmLevel> levels = entityLevels.get(entity);
+    if (levels.size() == 1) {
+      return levels.getFirst();
+    } else {
+      return OsmLevelFactory.DEFAULT;
+    }
+  }
+
+  /**
+   * @return All defined levels for an entity. If no levels are found an empty list is returned.
+   */
+  public List<OsmLevel> getLevelsForEntity(OsmEntity entity) {
+    return entityLevels.get(entity);
   }
 
   public Set<OsmWay> getAreasForNode(Long nodeId) {
@@ -246,7 +260,7 @@ public class OsmDatabase {
       return;
     }
 
-    applyLevelForEntity(way);
+    createLevelsForEntity(way);
 
     if (way.isRoutableArea()) {
       // this is an area that's a simple polygon. So we can just add it straight
@@ -287,7 +301,7 @@ public class OsmDatabase {
       for (OsmRelationMember member : relation.getMembers()) {
         areaWayIds.add(member.getRef());
       }
-      applyLevelForEntity(relation);
+      createLevelsForEntity(relation);
     } else if (
       !relation.isRestriction() &&
       !relation.isRoadRoute() &&
@@ -632,11 +646,8 @@ public class OsmDatabase {
     return node;
   }
 
-  private void applyLevelForEntity(OsmEntity entity) {
-    OsmLevel level = osmLevelFactory.createOsmLevelForEntity(entity);
-    if (level != null) {
-      entityLevels.put(entity, level);
-    }
+  private void createLevelsForEntity(OsmEntity entity) {
+    entityLevels.putAll(entity, osmLevelFactory.createOsmLevelsForEntity(entity));
   }
 
   private void markNodesForKeeping(Collection<OsmWay> osmWays, TLongSet nodeSet) {

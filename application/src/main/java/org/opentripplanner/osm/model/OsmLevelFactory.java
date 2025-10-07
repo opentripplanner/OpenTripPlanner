@@ -1,8 +1,11 @@
 package org.opentripplanner.osm.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.issues.FloorNumberUnknownAssumedGroundLevel;
+import org.opentripplanner.osm.issues.LevelAndLevelRefDifferentSizes;
 
 public class OsmLevelFactory {
 
@@ -15,8 +18,8 @@ public class OsmLevelFactory {
   }
 
   /**
-   * Create an OsmLevel for an entity by parsing the 'level' and 'layer' tags.
-   * If the level is parsed from the 'level' tag, the 'level:ref' tag is used for a name.
+   * Create a list of OsmLevel objects for an entity by parsing the 'level' and 'layer' tags.
+   * If the level is parsed from the 'level' tag, the 'level:ref' tag is used for naming.
    * <p>
    * The 'level' tag is a zero-based floor number of a feature
    * (where 0 is the ground level and -1 is the basement).
@@ -29,35 +32,90 @@ public class OsmLevelFactory {
    * based on the locally used method of indicating a specific floor.
    * See https://wiki.openstreetmap.org/wiki/Key:level:ref.
    */
-  @Nullable
-  public OsmLevel createOsmLevelForEntity(OsmEntity entity) {
+  public List<OsmLevel> createOsmLevelsForEntity(OsmEntity entity) {
     if (entity.hasTag("level")) {
-      return createOsmLevelFromTag(entity.getTag("level"), entity.getTag("level:ref"), entity);
+      return createLevelListFromTag(entity.getTag("level"), entity.getTag("level:ref"), entity);
     } else if (entity.hasTag("layer")) {
-      return createOsmLevelFromTag(entity.getTag("layer"), null, entity);
+      return createLevelListFromTag(entity.getTag("layer"), null, entity);
     }
-    return null;
+    return List.of();
   }
 
-  /**
-   * Create an OsmLevel from a tag with an optional name tag to be used as a name.
-   */
-  @Nullable
-  private OsmLevel createOsmLevelFromTag(
+  public List<OsmLevel> createLevelListFromTag(
     String levelTag,
     @Nullable String nameTag,
     OsmEntity entity
   ) {
-    // Try to parse a level out of the levelTag.
-    try {
-      Double level = Double.parseDouble(levelTag);
-      if (nameTag != null) {
-        return new OsmLevel(level, nameTag);
+    List<OsmLevel> levels;
+
+    String[] levelArray = levelTag.split(";");
+    if (nameTag != null) {
+      String[] nameArray = nameTag.split(";");
+      if (levelArray.length == nameArray.length) {
+        levels = createLevelListFromSubstringArrays(levelArray, nameArray, entity);
       } else {
-        return new OsmLevel(level, levelTag);
+        levels = createLevelListFromSubstringArrays(levelArray, null, entity);
+        issueStore.add(
+          new LevelAndLevelRefDifferentSizes(levelArray.length, nameArray.length, entity)
+        );
+      }
+    } else {
+      levels = createLevelListFromSubstringArrays(levelArray, null, entity);
+    }
+
+    if (levelListIsValid(levels)) {
+      return levels;
+    } else {
+      issueStore.add(new FloorNumberUnknownAssumedGroundLevel(levelTag, entity));
+      return List.of();
+    }
+  }
+
+  private boolean levelListIsValid(List<OsmLevel> levels) {
+    for (OsmLevel level : levels) {
+      if (level == null) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private List<OsmLevel> createLevelListFromSubstringArrays(
+    String[] levelArray,
+    @Nullable String[] nameArray,
+    OsmEntity entity
+  ) {
+    List<OsmLevel> levels = new ArrayList<>();
+    if (nameArray != null) {
+      for (int i = 0; i < levelArray.length; i++) {
+        levels.add(createOsmLevelFromTagSubstrings(levelArray[i], nameArray[i], entity));
+      }
+    } else {
+      for (String level : levelArray) {
+        levels.add(createOsmLevelFromTagSubstrings(level, null, entity));
+      }
+    }
+    return levels;
+  }
+
+  /**
+   * Try to create an OsmLevel from part of a level tag
+   * with an optional name from part of a tag.
+   */
+  @Nullable
+  private OsmLevel createOsmLevelFromTagSubstrings(
+    String levelString,
+    @Nullable String nameString,
+    OsmEntity entity
+  ) {
+    try {
+      Double level = Double.parseDouble(levelString);
+      if (nameString != null) {
+        return new OsmLevel(level, nameString);
+      } else {
+        return new OsmLevel(level, levelString);
       }
     } catch (NumberFormatException e) {
-      issueStore.add(new FloorNumberUnknownAssumedGroundLevel(levelTag, entity));
       return null;
     }
   }

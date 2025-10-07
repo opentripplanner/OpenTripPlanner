@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.services.osm;
 
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.naming.PortlandCustomNamer;
@@ -24,7 +25,7 @@ public interface EdgeNamer {
    * Callback function for each way/edge combination so that more complicated names can be built
    * in the post-processing step.
    */
-  void recordEdges(OsmEntity way, StreetEdgePair edge);
+  void recordEdges(OsmEntity way, StreetEdgePair edge, OsmDatabase osmdb);
 
   /**
    * Called after each edge has been named to build a more complex name out of the relationships
