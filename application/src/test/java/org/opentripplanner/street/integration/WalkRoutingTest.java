@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -94,20 +95,17 @@ class WalkRoutingTest {
       .withTo(to)
       .withArriveBy(arriveBy)
       .buildRequest();
-    try (
-      var temporaryVerticesContainer = TemporaryVerticesContainer.of(
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var linkingContext = LinkingContext.of(
+        temporaryVerticesContainer,
         graph,
         TestVertexLinker.of(graph)
       )
         .withFrom(from, StreetMode.WALK)
         .withTo(to, StreetMode.WALK)
-        .build()
-    ) {
+        .build();
       var gpf = new GraphPathFinder(null);
-      return gpf.graphPathFinderEntryPoint(
-        request,
-        temporaryVerticesContainer.createFromToViaVertexRequest()
-      );
+      return gpf.graphPathFinderEntryPoint(request, linkingContext.createFromToViaVertexRequest());
     }
   }
 }
