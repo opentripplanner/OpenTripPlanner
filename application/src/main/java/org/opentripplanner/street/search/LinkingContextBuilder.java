@@ -50,12 +50,13 @@ import org.slf4j.LoggerFactory;
  * validates that it was possible to link the locations to the graph. The responsibility of cleaning
  * up the temporary vertices and edges is on the {@link TemporaryVerticesContainer}.
  */
-public class TemporaryVerticesContainerBuilder {
+public class LinkingContextBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(
-    TemporaryVerticesContainerBuilder.class
+    LinkingContextBuilder.class
   );
 
+  private final TemporaryVerticesContainer container;
   private final Graph graph;
   private final VertexLinker vertexLinker;
   private final Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds;
@@ -69,22 +70,23 @@ public class TemporaryVerticesContainerBuilder {
   private Set<TransitStopVertex> fromStopVertices = Set.of();
   private Set<TransitStopVertex> toStopVertices = Set.of();
 
-  TemporaryVerticesContainerBuilder(
+  LinkingContextBuilder(
     TemporaryVerticesContainer container,
     Graph graph,
     VertexLinker vertexLinker,
     Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds
   ) {
+    this.container = container;
     this.graph = graph;
     this.vertexLinker = vertexLinker;
     this.resolveSiteIds = resolveSiteIds;
   }
 
-  public TemporaryVerticesContainerBuilder withFrom(GenericLocation location, StreetMode mode) {
+  public LinkingContextBuilder withFrom(GenericLocation location, StreetMode mode) {
     return withFrom(location, EnumSet.of(mode));
   }
 
-  public TemporaryVerticesContainerBuilder withFrom(
+  public LinkingContextBuilder withFrom(
     GenericLocation location,
     EnumSet<StreetMode> modes
   ) {
@@ -104,11 +106,11 @@ public class TemporaryVerticesContainerBuilder {
     return fromStopVertices;
   }
 
-  public TemporaryVerticesContainerBuilder withTo(GenericLocation location, StreetMode mode) {
+  public LinkingContextBuilder withTo(GenericLocation location, StreetMode mode) {
     return withTo(location, EnumSet.of(mode));
   }
 
-  public TemporaryVerticesContainerBuilder withTo(
+  public LinkingContextBuilder withTo(
     GenericLocation location,
     EnumSet<StreetMode> modes
   ) {
@@ -128,7 +130,7 @@ public class TemporaryVerticesContainerBuilder {
     return toStopVertices;
   }
 
-  public TemporaryVerticesContainerBuilder withVia(
+  public LinkingContextBuilder withVia(
     List<VisitViaLocation> visitViaLocations,
     EnumSet<StreetMode> modes
   ) {
@@ -160,18 +162,9 @@ public class TemporaryVerticesContainerBuilder {
     return Collections.unmodifiableMap(verticesByLocation);
   }
 
-  public List<DisposableEdgeCollection> tempEdges() {
-    return tempEdges;
-  }
-
   public LinkingContext build() {
-    try {
-      checkIfVerticesFound();
-      addAdjustedEdges();
-    } catch (Exception e) {
-      this.tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
-      throw e;
-    }
+    checkIfVerticesFound();
+    addAdjustedEdges();
     return new LinkingContext(this);
   }
 
@@ -204,14 +197,8 @@ public class TemporaryVerticesContainerBuilder {
   private void addAdjustedEdgesBetween(Set<Vertex> fromVertices, Set<Vertex> toVertices) {
     for (Vertex fromVertex : fromVertices) {
       for (Vertex toVertex : toVertices) {
-        addEdges(SameEdgeAdjuster.adjust(fromVertex, toVertex, graph));
+        container.addEdgeCollection(SameEdgeAdjuster.adjust(fromVertex, toVertex, graph));
       }
-    }
-  }
-
-  private void addEdges(DisposableEdgeCollection collection) {
-    if (!collection.isEmpty()) {
-      tempEdges.add(collection);
     }
   }
 
@@ -331,7 +318,7 @@ public class TemporaryVerticesContainerBuilder {
 
     var temporaryStreetLocation = new TemporaryStreetLocation(coordinate, name);
 
-    addEdges(
+    container.addEdgeCollection(
       vertexLinker.linkVertexForRequest(
         temporaryStreetLocation,
         new TraverseModeSet(modes),

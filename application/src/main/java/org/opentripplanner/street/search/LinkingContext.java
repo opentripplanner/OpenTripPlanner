@@ -25,7 +25,7 @@ public class LinkingContext {
   private final Set<TransitStopVertex> fromStopVertices;
   private final Set<TransitStopVertex> toStopVertices;
 
-  public LinkingContext(TemporaryVerticesContainerBuilder builder) {
+  public LinkingContext(LinkingContextBuilder builder) {
     this.from = builder.from();
     this.to = builder.to();
     this.fromStopVertices = builder.fromStopVertices();
@@ -36,22 +36,22 @@ public class LinkingContext {
   /**
    * Create builder when stop locations are not used for locations.
    */
-  public static TemporaryVerticesContainerBuilder of(
+  public static LinkingContextBuilder of(
     TemporaryVerticesContainer container,
     Graph graph, VertexLinker linker) {
-    return new TemporaryVerticesContainerBuilder(container, graph, linker, id -> Set.of());
+    return new LinkingContextBuilder(container, graph, linker, id -> Set.of());
   }
 
   /**
    * Create builder when stop locations are potentially used for locations.
    */
-  public static TemporaryVerticesContainerBuilder of(
+  public static LinkingContextBuilder of(
     TemporaryVerticesContainer container,
     Graph graph,
     VertexLinker linker,
     Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds
   ) {
-    return new TemporaryVerticesContainerBuilder(container, graph, linker, resolveSiteIds);
+    return new LinkingContextBuilder(container, graph, linker, resolveSiteIds);
   }
 
   /**

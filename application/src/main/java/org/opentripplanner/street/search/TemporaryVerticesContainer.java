@@ -11,8 +11,13 @@ import org.opentripplanner.routing.linking.DisposableEdgeCollection;
  */
 public class TemporaryVerticesContainer implements AutoCloseable {
 
-  private final List<DisposableEdgeCollection> tempEdges = new ArrayList<>();
+  private final List<DisposableEdgeCollection> tempEdgeCollections = new ArrayList<>();
 
+  void addEdgeCollection(DisposableEdgeCollection collection) {
+    if (!collection.isEmpty()) {
+      this.tempEdgeCollections.add(collection);
+    }
+  }
 
   /**
    * Tear down this container, removing any temporary edges from the "permanent" graph objects. This
@@ -20,6 +25,6 @@ public class TemporaryVerticesContainer implements AutoCloseable {
    */
   @Override
   public void close() {
-    this.tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
+    this.tempEdgeCollections.forEach(DisposableEdgeCollection::disposeEdges);
   }
 }
