@@ -325,6 +325,7 @@
                     <inputGlobs>
                         <inputGlob>src/main/java/**/*.java</inputGlob>
                         <inputGlob>src/test/java/**/*.java</inputGlob>
+                        <inputGlob>src/test-fixtures/java/**/*.java</inputGlob>
                     </inputGlobs>
                 </configuration>
                 <executions>

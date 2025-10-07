@@ -12,9 +12,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
@@ -64,7 +64,7 @@ class TemporaryVerticesContainerTest {
   void coordinates() {
     var container = new TemporaryVerticesContainer(
       graph,
-      TestVertexLinker.of(graph),
+      VertexLinkerTestFactory.of(graph),
       Set::of,
       GenericLocation.fromCoordinate(stopA.getLat(), stopA.getLon()),
       GenericLocation.fromCoordinate(stopD.getLat(), stopD.getLon()),
@@ -82,7 +82,7 @@ class TemporaryVerticesContainerTest {
   void stopId() {
     var container = new TemporaryVerticesContainer(
       graph,
-      TestVertexLinker.of(graph),
+      VertexLinkerTestFactory.of(graph),
       Set::of,
       stopToLocation(stopA),
       stopToLocation(stopB),
@@ -103,7 +103,7 @@ class TemporaryVerticesContainerTest {
       .build();
     var container = new TemporaryVerticesContainer(
       graph,
-      TestVertexLinker.of(graph),
+      VertexLinkerTestFactory.of(graph),
       mapping::get,
       GenericLocation.fromStopId("station", OMEGA_ID.getFeedId(), OMEGA_ID.getId()),
       stopToLocation(stopB),
@@ -118,7 +118,7 @@ class TemporaryVerticesContainerTest {
   void centroid() {
     var container = new TemporaryVerticesContainer(
       graph,
-      TestVertexLinker.of(graph),
+      VertexLinkerTestFactory.of(graph),
       Set::of,
       GenericLocation.fromStopId("station", ALPHA_ID.getFeedId(), ALPHA_ID.getId()),
       stopToLocation(stopB),
