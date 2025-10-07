@@ -23,10 +23,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -222,7 +222,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     LinkingTestCase expectedToStreetName,
     StreetMode... streetModes
   ) {
-    var linker = TestVertexLinker.of(graph);
+    var linker = VertexLinkerTestFactory.of(graph);
     for (final StreetMode streetMode : streetModes) {
       try (
         var temporaryVertices = new TemporaryVerticesContainer(

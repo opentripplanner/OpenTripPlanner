@@ -36,15 +36,15 @@ class TransitPreferencesTest {
   private static final boolean INCLUDE_REALTIME_CANCELLATIONS = true;
 
   private final TransitPreferences subject = TransitPreferences.of()
-    .setReluctanceForMode(RELUCTANCE_FOR_MODE)
-    .setOtherThanPreferredRoutesPenalty(OTHER_THAN_PREFERRED_ROUTES_PENALTY)
-    .setUnpreferredCost(UNPREFERRED_COST)
+    .withReluctanceForMode(RELUCTANCE_FOR_MODE)
+    .withOtherThanPreferredRoutesPenalty(OTHER_THAN_PREFERRED_ROUTES_PENALTY)
+    .withUnpreferredCost(UNPREFERRED_COST)
     .withBoardSlack(b -> b.withDefault(D45s).with(TransitMode.AIRPLANE, D35m))
     .withAlightSlack(b -> b.withDefault(D15s).with(TransitMode.AIRPLANE, D25m))
     .withRelaxTransitGroupPriority(TRANSIT_GROUP_PRIORITY_RELAX)
-    .setIgnoreRealtimeUpdates(IGNORE_REALTIME_UPDATES)
-    .setIncludePlannedCancellations(INCLUDE_PLANNED_CANCELLATIONS)
-    .setIncludeRealtimeCancellations(INCLUDE_REALTIME_CANCELLATIONS)
+    .withIgnoreRealtimeUpdates(IGNORE_REALTIME_UPDATES)
+    .withIncludePlannedCancellations(INCLUDE_PLANNED_CANCELLATIONS)
+    .withIncludeRealtimeCancellations(INCLUDE_REALTIME_CANCELLATIONS)
     .withRaptor(b -> b.withSearchDirection(RAPTOR_SEARCH_DIRECTION))
     .build();
 
@@ -116,8 +116,8 @@ class TransitPreferencesTest {
     assertSame(TransitPreferences.DEFAULT, TransitPreferences.of().build());
 
     // Create a copy, make a change and set it back again to force creating a new object
-    var other = subject.copyOf().setIgnoreRealtimeUpdates(!IGNORE_REALTIME_UPDATES).build();
-    var copy = other.copyOf().setIgnoreRealtimeUpdates(IGNORE_REALTIME_UPDATES).build();
+    var other = subject.copyOf().withIgnoreRealtimeUpdates(!IGNORE_REALTIME_UPDATES).build();
+    var copy = other.copyOf().withIgnoreRealtimeUpdates(IGNORE_REALTIME_UPDATES).build();
     assertEqualsAndHashCode(subject, other, copy);
   }
 

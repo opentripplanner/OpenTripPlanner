@@ -1,11 +1,9 @@
-package org.opentripplanner.graph_builder.module.linking;
+package org.opentripplanner.routing.linking;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.routing.linking.VisibilityMode;
 import org.opentripplanner.street.model.StreetConstants;
 
-public class TestVertexLinker {
+public class VertexLinkerTestFactory {
 
   public static VertexLinker of(Graph graph) {
     return new VertexLinker(

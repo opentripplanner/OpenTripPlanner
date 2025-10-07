@@ -19,7 +19,7 @@ import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.validation.Validator;
-import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
@@ -82,7 +82,7 @@ public class NetexBundle implements Closeable {
 
   /** load the bundle, map it to the OTP transit model and return */
   public OtpTransitServiceBuilder loadBundle(
-    Deduplicator deduplicator,
+    DeduplicatorService deduplicator,
     DataImportIssueStore issueStore
   ) {
     LOG.info("Reading {}", hierarchy.description());
