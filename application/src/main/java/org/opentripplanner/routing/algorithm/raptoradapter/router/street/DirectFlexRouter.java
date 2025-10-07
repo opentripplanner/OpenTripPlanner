@@ -7,6 +7,7 @@ import java.util.List;
 import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.ext.flex.filter.FilterMapper;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
+import org.opentripplanner.graph_builder.module.nearbystops.TransitServiceResolver;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -19,10 +20,12 @@ public class DirectFlexRouter {
 
   public static List<Itinerary> route(
     OtpServerRequestContext serverContext,
-    AccessEgressRouter accessEgressRouter,
     RouteRequest request,
     AdditionalSearchDays additionalSearchDays
   ) {
+    var accessEgressRouter = new AccessEgressRouter(
+      new TransitServiceResolver(serverContext.transitService())
+    );
     if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {
       return Collections.emptyList();
     }

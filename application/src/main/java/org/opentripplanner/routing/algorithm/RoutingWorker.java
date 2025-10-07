@@ -10,7 +10,6 @@ import java.util.concurrent.CompletionException;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.graph_builder.module.nearbystops.TransitServiceResolver;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.grouppriority.TransitGroupPriorityItineraryDecorator;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
@@ -23,7 +22,6 @@ import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -65,7 +63,6 @@ public class RoutingWorker {
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private final TransitGroupPriorityService transitGroupPriorityService;
-  private final AccessEgressRouter accessEgressRouter;
   private SearchParams raptorSearchParamsUsed = null;
   private PageCursorInput pageCursorInput = null;
 
@@ -90,9 +87,6 @@ public class RoutingWorker {
       request.preferences().transit().relaxTransitGroupPriority(),
       request.journey().transit().priorityGroupsByAgency(),
       request.journey().transit().priorityGroupsGlobal()
-    );
-    this.accessEgressRouter = new AccessEgressRouter(
-      new TransitServiceResolver(serverContext.transitService())
     );
   }
 
@@ -254,9 +248,7 @@ public class RoutingWorker {
     }
     debugTimingAggregator.startedDirectFlexRouter();
     try {
-      return RoutingResult.ok(
-        DirectFlexRouter.route(serverContext, accessEgressRouter, request, additionalSearchDays)
-      );
+      return RoutingResult.ok(DirectFlexRouter.route(serverContext, request, additionalSearchDays));
     } catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
     } finally {
