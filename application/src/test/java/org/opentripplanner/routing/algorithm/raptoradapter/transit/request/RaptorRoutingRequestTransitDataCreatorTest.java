@@ -6,7 +6,6 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
