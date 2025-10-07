@@ -30,7 +30,6 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.SameEdgeAdjuster;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.Edge;
@@ -45,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * TODO
  * This class is responsible for linking the RouteRequest origin, destination and visit via
  * locations that contain coordinates to the Graph used in the A-Star search. This builder also
  * validates that it was possible to link the locations to the graph. The responsibility of cleaning
@@ -58,7 +58,6 @@ public class LinkingContextBuilder {
   private final Graph graph;
   private final VertexLinker vertexLinker;
   private final Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds;
-  private final List<DisposableEdgeCollection> tempEdges = new ArrayList<>();
   private GenericLocation from = GenericLocation.UNKNOWN;
   private GenericLocation to = GenericLocation.UNKNOWN;
   private List<GenericLocation> visitViaLocationsWithCoordinates = List.of();
@@ -93,11 +92,11 @@ public class LinkingContextBuilder {
     return this;
   }
 
-  public GenericLocation from() {
+  GenericLocation from() {
     return from;
   }
 
-  public Set<TransitStopVertex> fromStopVertices() {
+  Set<TransitStopVertex> fromStopVertices() {
     return fromStopVertices;
   }
 
@@ -114,11 +113,11 @@ public class LinkingContextBuilder {
     return this;
   }
 
-  public GenericLocation to() {
+  GenericLocation to() {
     return to;
   }
 
-  public Set<TransitStopVertex> toStopVertices() {
+  Set<TransitStopVertex> toStopVertices() {
     return toStopVertices;
   }
 
@@ -146,7 +145,7 @@ public class LinkingContextBuilder {
     return this;
   }
 
-  public Map<GenericLocation, Set<Vertex>> verticesByLocation() {
+  Map<GenericLocation, Set<Vertex>> verticesByLocation() {
     var verticesByLocation = new HashMap<GenericLocation, Set<Vertex>>();
     verticesByLocation.put(from, fromVertices);
     verticesByLocation.put(to, toVertices);
