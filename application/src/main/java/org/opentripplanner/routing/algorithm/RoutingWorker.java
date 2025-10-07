@@ -33,6 +33,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.request.FromToViaVertexRequest;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -100,8 +101,9 @@ public class RoutingWorker {
 
     var result = RoutingResult.empty();
 
-    try (var temporaryVerticesContainer = createTemporaryVerticesContainer()) {
-      var requestVertexService = temporaryVerticesContainer.createFromToViaVertexRequest();
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var linkingContextBuilder = createTemporaryVerticesContainer(temporaryVerticesContainer);
+      var requestVertexService = linkingContextBuilder.createFromToViaVertexRequest();
 
       if (OTPFeature.ParallelRouting.isOn()) {
         // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
@@ -306,7 +308,7 @@ public class RoutingWorker {
     );
   }
 
-  private TemporaryVerticesContainer createTemporaryVerticesContainer() {
+  private LinkingContext createTemporaryVerticesContainer(TemporaryVerticesContainer container) {
     var fromModes = request.journey().transit().enabled()
       ? EnumSet.of(request.journey().access().mode())
       : EnumSet.noneOf(StreetMode.class);
@@ -326,7 +328,8 @@ public class RoutingWorker {
       toModes.add(directMode);
       viaModes.add(directMode);
     }
-    return TemporaryVerticesContainer.of(
+    return LinkingContext.of(
+      container,
       serverContext.graph(),
       serverContext.vertexLinker(),
       serverContext.transitService()::findStopOrChildIds

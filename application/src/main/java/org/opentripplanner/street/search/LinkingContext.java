@@ -36,19 +36,22 @@ public class LinkingContext {
   /**
    * Create builder when stop locations are not used for locations.
    */
-  public static TemporaryVerticesContainerBuilder of(Graph graph, VertexLinker linker) {
-    return new TemporaryVerticesContainerBuilder(graph, linker, id -> Set.of());
+  public static TemporaryVerticesContainerBuilder of(
+    TemporaryVerticesContainer container,
+    Graph graph, VertexLinker linker) {
+    return new TemporaryVerticesContainerBuilder(container, graph, linker, id -> Set.of());
   }
 
   /**
    * Create builder when stop locations are potentially used for locations.
    */
   public static TemporaryVerticesContainerBuilder of(
+    TemporaryVerticesContainer container,
     Graph graph,
     VertexLinker linker,
     Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds
   ) {
-    return new TemporaryVerticesContainerBuilder(graph, linker, resolveSiteIds);
+    return new TemporaryVerticesContainerBuilder(container, graph, linker, resolveSiteIds);
   }
 
   /**
