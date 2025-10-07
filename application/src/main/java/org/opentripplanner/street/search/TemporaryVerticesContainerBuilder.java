@@ -70,6 +70,7 @@ public class TemporaryVerticesContainerBuilder {
   private Set<TransitStopVertex> toStopVertices = Set.of();
 
   TemporaryVerticesContainerBuilder(
+    TemporaryVerticesContainer container,
     Graph graph,
     VertexLinker vertexLinker,
     Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds
@@ -163,7 +164,7 @@ public class TemporaryVerticesContainerBuilder {
     return tempEdges;
   }
 
-  public TemporaryVerticesContainer build() {
+  public LinkingContext build() {
     try {
       checkIfVerticesFound();
       addAdjustedEdges();
@@ -171,7 +172,7 @@ public class TemporaryVerticesContainerBuilder {
       this.tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
       throw e;
     }
-    return new TemporaryVerticesContainer(this);
+    return new LinkingContext(this);
   }
 
   private void addAdjustedEdges() {
