@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.alert.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;

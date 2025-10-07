@@ -44,7 +44,7 @@ class ClosestTripTest {
   private static final FlexAccessEgressCallbackAdapter ADAPTER =
     new FlexAccessEgressCallbackAdapter() {
       @Override
-      public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
+      public TransitStopVertex getStopVertex(FeedScopedId id) {
         return null;
       }
 
@@ -76,7 +76,7 @@ class ClosestTripTest {
 
     var trips = closestTrips(matcher);
     assertThat(trips).hasSize(1);
-    assertEquals(List.copyOf(trips).getFirst().flexTrip(), FLEX_TRIP);
+    assertEquals(FLEX_TRIP, List.copyOf(trips).getFirst().flexTrip());
   }
 
   @Test

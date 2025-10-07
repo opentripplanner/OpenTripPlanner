@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,10 +21,13 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class AccessEgressRouterTest extends GraphRoutingTest {
 
   private Graph graph;
+  private TimetableRepository timetableRepository;
 
   private TransitStopVertex stopForCentroidRoutingStation;
   private TransitStopVertex stopForNoCentroidRoutingStation;
@@ -80,6 +84,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       }
     );
     graph = otpModel.graph();
+    timetableRepository = otpModel.timetableRepository();
   }
 
   @Test
@@ -257,6 +262,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       var verticesContainer = new TemporaryVerticesContainer(
         graph,
         TestVertexLinker.of(graph),
+        id -> new DefaultTransitService(timetableRepository).findStopOrChildIds(id),
         from,
         to,
         StreetMode.WALK,
@@ -267,7 +273,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
         request,
         verticesContainer,
         StreetRequest.DEFAULT,
-        null,
+        List.of(),
         accessEgress,
         durationLimit,
         maxStopCount

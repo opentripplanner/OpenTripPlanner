@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -21,10 +22,10 @@ import org.opentripplanner.routing.linking.Scope;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,9 +64,6 @@ public class Graph implements Serializable {
 
   // Ideally we could just get rid of vertex labels, but they're used in tests and graph building.
   private final Map<VertexLabel, Vertex> vertices = new ConcurrentHashMap<>();
-
-  /** Conserve memory by reusing immutable instances of Strings, integer arrays, etc. */
-  public final transient Deduplicator deduplicator;
 
   @Nullable
   private final OpeningHoursCalendarService openingHoursCalendarService;
@@ -117,21 +115,13 @@ public class Graph implements Serializable {
   public DataOverlayParameterBindings dataOverlayParameterBindings;
 
   @Inject
-  public Graph(
-    Deduplicator deduplicator,
-    @Nullable OpeningHoursCalendarService openingHoursCalendarService
-  ) {
-    this.deduplicator = deduplicator;
+  public Graph(@Nullable OpeningHoursCalendarService openingHoursCalendarService) {
     this.openingHoursCalendarService = openingHoursCalendarService;
-  }
-
-  public Graph(Deduplicator deduplicator) {
-    this(deduplicator, null);
   }
 
   /** Constructor for deserialization. */
   public Graph() {
-    this(new Deduplicator(), null);
+    this(null);
   }
 
   /** Add the given vertex to the graph. */
@@ -207,19 +197,27 @@ public class Graph implements Serializable {
    * Return the vertex corresponding to the stop id, or null.
    */
   @Nullable
-  public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
+  public TransitStopVertex getStopVertex(FeedScopedId id) {
     requireIndex();
-    return streetIndex.findTransitStopVertex(id);
+    return streetIndex.findStopVertex(id).orElse(null);
   }
 
   /**
-   * If the {@code id} is a stop id return a set with a single element.
-   * If it is a station id return a set containing all child stop vertices, or an empty
-   * set otherwise.
+   * If the {@code id} is a stop id return the corresponding vertex, otherwise return an empty
+   * optional.
    */
-  public Set<TransitStopVertex> findStopOrChildStopsVertices(FeedScopedId stopId) {
+  public Optional<TransitStopVertex> findStopVertex(FeedScopedId stopId) {
     requireIndex();
-    return streetIndex.getStopOrChildStopsVertices(stopId);
+    return streetIndex.findStopVertex(stopId);
+  }
+
+  /**
+   * If the {@code stopId} is a station id and it is configured to route to its center,
+   * return the corresponding vertex, otherwise return an empty optional.
+   */
+  public Optional<StationCentroidVertex> findStationCentroidVertex(FeedScopedId stopId) {
+    requireIndex();
+    return streetIndex.findStationCentroidVertex(stopId);
   }
 
   /**
@@ -319,18 +317,7 @@ public class Graph implements Serializable {
    */
   public Collection<Vertex> findVertices(Envelope env) {
     requireIndex();
-    return streetIndex.getVerticesForEnvelope(env);
-  }
-
-  /**
-   * Get the street vertices for an id. If the id corresponds to a regular stop we will return the
-   * coordinate for the stop.
-   * If the id corresponds to a station we will either return the coordinates of the child stops or
-   * the station centroid if the station is configured to route to centroid.
-   */
-  public Set<Vertex> findStopVertices(FeedScopedId stopId) {
-    requireIndex();
-    return streetIndex.findStopVertices(stopId);
+    return streetIndex.findVertices(env);
   }
 
   /**

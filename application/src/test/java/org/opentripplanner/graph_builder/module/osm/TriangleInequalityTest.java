@@ -33,7 +33,6 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TriangleInequalityTest {
 
@@ -47,7 +46,7 @@ public class TriangleInequalityTest {
 
   @BeforeAll
   public static void onlyOnce() {
-    graph = new Graph(new Deduplicator());
+    graph = new Graph();
 
     File file = ResourceLoader.of(TriangleInequalityTest.class).file("NYC_small.osm.pbf");
     DefaultOsmProvider provider = new DefaultOsmProvider(file, true);
@@ -162,12 +161,12 @@ public class TriangleInequalityTest {
     Vertex v
   ) {
     return StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setOriginBackEdge(startBackEdge)
-      .setRequest(options)
-      .setFrom(u)
-      .setTo(v)
-      .setIntersectionTraversalCalculator(calculator)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withOriginBackEdge(startBackEdge)
+      .withRequest(options)
+      .withFrom(u)
+      .withTo(v)
+      .withIntersectionTraversalCalculator(calculator)
       .getShortestPathTree()
       .getPath(v);
   }
@@ -192,21 +191,21 @@ public class TriangleInequalityTest {
       )
       .withJourney(jb -> {
         if (modes != null) {
-          jb.setModes(modes);
+          jb.withModes(modes);
         }
         if (!filters.isEmpty()) {
-          jb.withTransit(b -> b.setFilters(filters));
+          jb.withTransit(b -> b.withFilters(filters));
         }
       })
       .buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-      .setRequest(request)
-      .setFrom(start)
-      .setTo(end)
-      .setIntersectionTraversalCalculator(calculator)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withDominanceFunction(new DominanceFunctions.EarliestArrival())
+      .withRequest(request)
+      .withFrom(start)
+      .withTo(end)
+      .withIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = tree.getPath(end);

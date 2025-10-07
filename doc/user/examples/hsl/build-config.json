@@ -1,0 +1,10 @@
+{
+  "fares": "hsl",
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "source": "https://dev.hsl.fi/gtfs/hsl.zip",
+      "feedId": "hsl"
+    }
+  ]
+}
