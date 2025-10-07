@@ -1,11 +1,14 @@
 package org.opentripplanner.osm.model;
 
+import java.util.Objects;
+
 public class OsmLevel implements Comparable<OsmLevel> {
 
   private final double level;
   private final String name;
 
   public OsmLevel(double level, String name) {
+    Objects.requireNonNull(name);
     this.level = level;
     this.name = name;
   }
@@ -17,21 +20,20 @@ public class OsmLevel implements Comparable<OsmLevel> {
 
   @Override
   public int hashCode() {
-    return Double.hashCode(this.level);
+    return Objects.hash(this.level, this.name);
   }
 
   @Override
-  public boolean equals(Object other) {
-    if (other == null) {
+  public boolean equals(Object object) {
+    if (object instanceof OsmLevel other) {
+      return this.level == other.level && this.name.equals(other.name);
+    } else {
       return false;
     }
-    if (!(other instanceof OsmLevel)) {
-      return false;
-    }
-    return this.level == ((OsmLevel) other).level;
   }
 
-  /** 0-based level.
+  /**
+   * 0-based level that can be negative.
    * See https://wiki.openstreetmap.org/wiki/Key:level
    * and https://wiki.openstreetmap.org/wiki/Key:layer.
    */

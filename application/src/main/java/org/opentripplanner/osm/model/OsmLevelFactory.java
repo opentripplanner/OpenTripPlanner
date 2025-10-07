@@ -19,16 +19,12 @@ public class OsmLevelFactory {
    * If the level is parsed from the 'level' tag, the 'level:ref' tag is used for a name.
    */
   public OsmLevel createOsmLevelForWay(OsmEntity way) {
-    OsmLevel level = DEFAULT;
     if (way.hasTag("level")) {
-      String levelTag = way.getTag("level");
-      String refTag = way.getTag("level:ref");
-      level = createOsmLevelFromTag(levelTag, refTag, way);
+      return createOsmLevelFromTag(way.getTag("level"), way.getTag("level:ref"), way);
     } else if (way.hasTag("layer")) {
-      String levelTag = way.getTag("layer");
-      level = createOsmLevelFromTag(levelTag, null, way);
+      return createOsmLevelFromTag(way.getTag("layer"), null, way);
     }
-    return level;
+    return DEFAULT;
   }
 
   /**
@@ -36,27 +32,20 @@ public class OsmLevelFactory {
    */
   private OsmLevel createOsmLevelFromTag(
     String levelTag,
-    @Nullable String refTag,
+    @Nullable String nameTag,
     OsmEntity osmObj
   ) {
-    String name = levelTag;
-    if (name.startsWith("+")) {
-      name = name.substring(1);
-    }
-
-    // Try to parse a level out of the tag.
-    Double level = null;
+    // Try to parse a level out of the levelTag.
     try {
-      level = Double.parseDouble(name);
-    } catch (NumberFormatException e) {}
-
-    // Signal failure to extract any useful level information.
-    if (level == null) {
+      Double level = Double.parseDouble(levelTag);
+      if (nameTag != null) {
+        return new OsmLevel(level, nameTag);
+      } else {
+        return new OsmLevel(level, levelTag);
+      }
+    } catch (NumberFormatException e) {
       issueStore.add(new FloorNumberUnknownAssumedGroundLevel(levelTag, osmObj));
       return DEFAULT;
     }
-
-    name = refTag != null ? refTag : name;
-    return new OsmLevel(level, name);
   }
 }
