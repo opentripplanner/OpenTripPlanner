@@ -1,5 +1,5 @@
 tcId,nTransfers,duration,cost,walkDistance,startTime,endTime,agencies,modes,routes,stops,details
 1,0,56m29s,0,1458,12:03:50,13:00:19,TriMet,BUS,8,prt:6789|prt:6548,Walk 7m30s ~ NE 15th & Halsey(6789) ~ BUS 8 12:11:20 12:49:19 ~ SW 11th & Gibbs(6548) ~ Walk 11m
-1,2,1h4m12s,0,2817,12:10:47,13:14:59,TriMet,BUS,73|70|9,prt:7106|prt:4056|prt:4055|prt:4536|prt:4538|prt:143,Walk 2m19s ~ NE 21st & Clackamas(7106) ~ BUS 73 12:13:06 12:16:45 ~ NE Multnomah & 9th(4056) ~ Walk 35s ~ NE Multnomah & 9th(4055) ~ BUS 70 12:19:38 12:35 ~ SE Powell & Milwaukie(4536) ~ Walk 1m18s ~ SE Powell & Milwaukie(4538) ~ BUS 9 12:39 12:42:50 ~ SW Arthur & 1st(143) ~ Walk 32m9s
+1,2,1h4m12s,0,2817,12:10:47,13:14:59,TriMet,BUS,73|70|9,prt:7106|prt:4056|prt:4055|prt:4536|prt:4538|prt:143,Walk 2m19s ~ NE 21st & Clackamas(7106) ~ BUS 73 12:13:06 12:16:45 ~ NE Multnomah & 9th(4056) ~ Walk 33s ~ NE Multnomah & 9th(4055) ~ BUS 70 12:19:38 12:35 ~ SE Powell & Milwaukie(4536) ~ Walk 1m18s ~ SE Powell & Milwaukie(4538) ~ BUS 9 12:39 12:42:50 ~ SW Arthur & 1st(143) ~ Walk 32m9s
 1,0,56m29s,0,1458,12:18:50,13:15:19,TriMet,BUS,8,prt:6789|prt:6548,Walk 7m30s ~ NE 15th & Halsey(6789) ~ BUS 8 12:26:20 13:04:19 ~ SW 11th & Gibbs(6548) ~ Walk 11m
-2,0,57m48s,0,1507,12:02:31,13:00:19,TriMet,BUS,8,prt:6779|prt:6548,Walk 8m14s ~ NE 15th & Weidler(6779) ~ BUS 8 12:10:45 12:49:19 ~ SW 11th & Gibbs(6548) ~ Walk 11m
+2,0,57m44s,0,1511,12:02:35,13:00:19,TriMet,BUS,8,prt:6779|prt:6548,Walk 8m10s ~ NE 15th & Weidler(6779) ~ BUS 8 12:10:45 12:49:19 ~ SW 11th & Gibbs(6548) ~ Walk 11m

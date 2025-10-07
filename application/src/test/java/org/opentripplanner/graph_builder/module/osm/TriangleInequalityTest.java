@@ -189,6 +189,7 @@ public class TriangleInequalityTest {
           .withCar(car -> car.withReluctance(1.0))
           .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
           .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
+          .withWalk(walk -> walk.withSafetyFactor(0))
       )
       .withJourney(jb -> {
         if (modes != null) {
