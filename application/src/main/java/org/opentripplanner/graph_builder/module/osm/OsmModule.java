@@ -182,7 +182,7 @@ public class OsmModule implements GraphBuilderModule {
       osmdb.getWalkableAreas(),
       osmdb.getParkAndRideAreas(),
       osmdb.getBikeParkingAreas()
-    )) setWayName(area.parent);
+    )) setEntityName(area.parent);
 
     // figure out which nodes that are actually intersections
     vertexGenerator.initIntersectionNodes();
@@ -247,7 +247,7 @@ public class OsmModule implements GraphBuilderModule {
   ) {
     Map<OsmArea, OsmLevel> areasLevels = new HashMap<>(areas.size());
     for (OsmArea area : areas) {
-      areasLevels.put(area, osmdb.getLevelForWay(area.parent));
+      areasLevels.put(area, osmdb.getLevelForEntity(area.parent));
     }
     return OsmAreaGroup.groupAreas(areasLevels, barriers);
   }
@@ -319,7 +319,7 @@ public class OsmModule implements GraphBuilderModule {
 
     WAY: for (OsmWay way : osmdb.getWays()) {
       WayPropertiesPair wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
-      setWayName(way);
+      setEntityName(way);
 
       var forwardPermission = wayData.forward().getPermission();
       var backwardPermission = wayData.backward().getPermission();
@@ -548,11 +548,14 @@ public class OsmModule implements GraphBuilderModule {
     vertices.forEach(bv -> bv.makeBarrierAtEndReachable());
   }
 
-  private void setWayName(OsmEntity way) {
-    if (!way.hasTag("name")) {
-      I18NString creativeName = way.getOsmProvider().getWayPropertySet().getCreativeNameForWay(way);
+  private void setEntityName(OsmEntity entity) {
+    if (!entity.hasTag("name")) {
+      I18NString creativeName = entity
+        .getOsmProvider()
+        .getWayPropertySet()
+        .getCreativeNameForEntity(entity);
       if (creativeName != null) {
-        way.setCreativeName(creativeName);
+        entity.setCreativeName(creativeName);
       }
     }
   }

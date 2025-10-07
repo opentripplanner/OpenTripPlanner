@@ -48,14 +48,14 @@ class VertexGenerator {
   private final Multimap<OsmNode, OsmWay> nodesInBarrierWays = HashMultimap.create();
 
   /**
-   * The levels of the ways connecting barrier nodes. Used for issue reporting only.
+   * The levels of the entities connecting barrier nodes. Used for issue reporting only.
    */
   private final Multimap<OsmNode, OsmLevel> levelsConnectingBarriers = HashMultimap.create();
   private final Set<OsmNode> reportedLevelBarrierNodes = new HashSet<>();
   private final Set<OsmNode> reportedLinearBarrierCrossings = new HashSet<>();
 
   /**
-   * The map from node to the split vertex for each routable way connecting it.
+   * The map from node to the split vertex for each routable entity connecting it.
    */
   private final Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers = new HashMap<>();
   private final OsmDatabase osmdb;
@@ -81,17 +81,17 @@ class VertexGenerator {
   /**
    * Make or get a shared vertex for flat intersections, or one vertex per level for multilevel
    * nodes like elevators. When there is an elevator or other Z-dimension discontinuity, a single
-   * node can appear in several ways at different levels.
+   * node can appear in several entities at different levels.
    *
    * @param node The node to fetch a label for.
-   * @param way  The way it is connected to (for fetching level information).
+   * @param entity  The entity it is connected to (for fetching level information).
    * @param linearBarrierNodeType How should the node be handled if it is on a linear barrier
    * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
    * {@link OsmBoardingLocationVertex}
    */
   IntersectionVertex getVertexForOsmNode(
     OsmNode node,
-    OsmEntity way,
+    OsmEntity entity,
     LinearBarrierNodeType linearBarrierNodeType
   ) {
     // If the node should be decomposed to multiple levels,
@@ -100,12 +100,12 @@ class VertexGenerator {
     IntersectionVertex iv = null;
     if (node.isMultiLevel()) {
       // make a separate node for every level
-      return recordLevel(node, way);
+      return recordLevel(node, entity);
     }
     // make a separate vertex if the node is on a barrier
     boolean isNodeOnLinearBarrier = nodesInBarrierWays.containsKey(node);
     if (linearBarrierNodeType == SPLIT && isNodeOnLinearBarrier) {
-      return getSplitVertexOnBarrier(node, way);
+      return getSplitVertexOnBarrier(node, entity);
     }
     // single-level case
     long nid = node.getId();
@@ -183,23 +183,23 @@ class VertexGenerator {
     }
 
     if (iv instanceof BarrierVertex) {
-      checkLevelOnBarrier(node, way);
+      checkLevelOnBarrier(node, entity);
     }
 
     return iv;
   }
 
   /**
-   * If a node is on a barrier, a vertex needs to be created for each way using it.
+   * If a node is on a barrier, a vertex needs to be created for each entity using it.
    *
-   * @return a vertex for the given node specific to the given way
+   * @return a vertex for the given node specific to the given entity
    */
-  private IntersectionVertex getSplitVertexOnBarrier(OsmNode nodeOnBarrier, OsmEntity way) {
-    checkLevelOnBarrier(nodeOnBarrier, way);
+  private IntersectionVertex getSplitVertexOnBarrier(OsmNode nodeOnBarrier, OsmEntity entity) {
+    checkLevelOnBarrier(nodeOnBarrier, entity);
 
     splitVerticesOnBarriers.putIfAbsent(nodeOnBarrier, new HashMap<>());
     var vertices = splitVerticesOnBarriers.get(nodeOnBarrier);
-    var existing = vertices.get(way);
+    var existing = vertices.get(entity);
     if (existing != null) {
       return existing;
     }
@@ -207,14 +207,14 @@ class VertexGenerator {
     var vertex = vertexFactory.osmOnLinearBarrier(
       nodeOnBarrier.getCoordinate(),
       nodeOnBarrier.getId(),
-      way.getId()
+      entity.getId()
     );
-    vertices.put(way, vertex);
+    vertices.put(entity, vertex);
     return vertex;
   }
 
-  private void checkLevelOnBarrier(OsmNode nodeOnBarrier, OsmEntity way) {
-    var level = osmdb.getLevelForWay(way);
+  private void checkLevelOnBarrier(OsmNode nodeOnBarrier, OsmEntity entity) {
+    var level = osmdb.getLevelForEntity(entity);
     if (!reportedLevelBarrierNodes.contains(nodeOnBarrier)) {
       var existingLevels = levelsConnectingBarriers.get(nodeOnBarrier);
       if (existingLevels.stream().anyMatch(l -> !Objects.requireNonNull(l).equals(level))) {
@@ -298,15 +298,15 @@ class VertexGenerator {
   }
 
   /**
-   * Record the level of the way for this node, e.g. if the way is at level 5, mark that this node
-   * is active at level 5.
+   * Record the level of the entity for this node, e.g. if the entity is at level 5,
+   * mark that this node is active at level 5.
    *
-   * @param way  the way that has the level
+   * @param entity  the entity that has the level
    * @param node the node to record for
    * @author mattwigway
    */
-  private OsmVertex recordLevel(OsmNode node, OsmEntity way) {
-    OsmLevel level = osmdb.getLevelForWay(way);
+  private OsmVertex recordLevel(OsmNode node, OsmEntity entity) {
+    OsmLevel level = osmdb.getLevelForEntity(entity);
     Map<OsmLevel, OsmVertex> vertices;
     long nodeId = node.getId();
     if (multiLevelNodes.containsKey(nodeId)) {

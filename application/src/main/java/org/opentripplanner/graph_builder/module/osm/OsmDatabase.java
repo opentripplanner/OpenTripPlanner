@@ -100,8 +100,13 @@ public class OsmDatabase {
   /* Set of all node IDs of kept areas. Needed to mark which nodes to keep in stage 3. */
   private final TLongSet areaNodeIds = new TLongHashSet();
 
-  /* Track which vertical level each OSM way belongs to, for building elevators etc. */
-  private final Map<OsmEntity, OsmLevel> wayLevels = new HashMap<>();
+  /**
+   * Track which vertical level OSM entities belong to.
+   * Level information can be set for ways and relations.
+   * An entity only has an entry if it had a level defined in OSM.
+   * The level is used e.g. for building elevators.
+   */
+  private final Map<OsmEntity, OsmLevel> entityLevels = new HashMap<>();
 
   /* Set of turn restrictions for each turn "from" way ID */
   private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay =
@@ -188,8 +193,8 @@ public class OsmDatabase {
     return stopsInAreas.get(areaParent);
   }
 
-  public OsmLevel getLevelForWay(OsmEntity way) {
-    return Objects.requireNonNullElse(wayLevels.get(way), OsmLevelFactory.DEFAULT);
+  public OsmLevel getLevelForEntity(OsmEntity entity) {
+    return Objects.requireNonNullElse(entityLevels.get(entity), OsmLevelFactory.DEFAULT);
   }
 
   public Set<OsmWay> getAreasForNode(Long nodeId) {
@@ -241,7 +246,7 @@ public class OsmDatabase {
       return;
     }
 
-    applyLevelsForWay(way);
+    applyLevelForEntity(way);
 
     if (way.isRoutableArea()) {
       // this is an area that's a simple polygon. So we can just add it straight
@@ -282,6 +287,7 @@ public class OsmDatabase {
       for (OsmRelationMember member : relation.getMembers()) {
         areaWayIds.add(member.getRef());
       }
+      applyLevelForEntity(relation);
     } else if (
       !relation.isRestriction() &&
       !relation.isRoadRoute() &&
@@ -372,7 +378,7 @@ public class OsmDatabase {
     // For each way, intersect with areas
     int nCreatedNodes = 0;
     for (OsmWay way : waysById.valueCollection()) {
-      OsmLevel wayLevel = getLevelForWay(way);
+      OsmLevel wayLevel = getLevelForEntity(way);
 
       // For each segment of the way
       for (int i = 0; i < way.getNodeRefs().size() - 1; i++) {
@@ -403,7 +409,7 @@ public class OsmDatabase {
           }
 
           // Skip if area and way are from "incompatible" levels
-          OsmLevel areaLevel = getLevelForWay(ringSegment.area.parent);
+          OsmLevel areaLevel = getLevelForEntity(ringSegment.area.parent);
           if (!wayLevel.equals(areaLevel)) {
             continue;
           }
@@ -626,8 +632,8 @@ public class OsmDatabase {
     return node;
   }
 
-  private void applyLevelsForWay(OsmEntity way) {
-    wayLevels.put(way, osmLevelFactory.createOsmLevelForWay(way));
+  private void applyLevelForEntity(OsmEntity entity) {
+    entityLevels.put(entity, osmLevelFactory.createOsmLevelForWay(entity));
   }
 
   private void markNodesForKeeping(Collection<OsmWay> osmWays, TLongSet nodeSet) {
@@ -894,7 +900,7 @@ public class OsmDatabase {
         continue;
       }
 
-      OsmEntity way = waysById.get(member.getRef());
+      OsmWay way = waysById.get(member.getRef());
       if (way == null) {
         continue;
       }

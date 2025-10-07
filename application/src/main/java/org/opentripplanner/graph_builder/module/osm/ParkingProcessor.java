@@ -403,7 +403,7 @@ class ParkingProcessor {
       creativeName = osmEntity
         .getOsmProvider()
         .getWayPropertySet()
-        .getCreativeNameForWay(osmEntity);
+        .getCreativeNameForEntity(osmEntity);
     }
     if (creativeName == null) {
       creativeName = new NonLocalizedString(

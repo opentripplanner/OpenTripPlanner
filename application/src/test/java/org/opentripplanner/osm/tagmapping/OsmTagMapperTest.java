@@ -347,18 +347,18 @@ class OsmTagMapperTest {
   void corridorName() {
     final WayPropertySet wps = wayProperySet();
     var way = way("highway", "corridor");
-    assertEquals("corridor", wps.getCreativeNameForWay(way).toString());
-    assertEquals("Korridor", wps.getCreativeNameForWay(way).toString(Locale.GERMANY));
-    assertEquals("käytävä", wps.getCreativeNameForWay(way).toString(FI));
+    assertEquals("corridor", wps.getCreativeNameForEntity(way).toString());
+    assertEquals("Korridor", wps.getCreativeNameForEntity(way).toString(Locale.GERMANY));
+    assertEquals("käytävä", wps.getCreativeNameForEntity(way).toString(FI));
   }
 
   @Test
   void indoorAreaName() {
     var wps = wayProperySet();
     var way = way("indoor", "area");
-    assertEquals("indoor area", wps.getCreativeNameForWay(way).toString());
-    assertEquals("Innenbereich", wps.getCreativeNameForWay(way).toString(Locale.GERMANY));
-    assertEquals("sisätila", wps.getCreativeNameForWay(way).toString(FI));
+    assertEquals("indoor area", wps.getCreativeNameForEntity(way).toString());
+    assertEquals("Innenbereich", wps.getCreativeNameForEntity(way).toString(Locale.GERMANY));
+    assertEquals("sisätila", wps.getCreativeNameForEntity(way).toString(FI));
   }
 
   public OsmEntity way(String key, String value) {

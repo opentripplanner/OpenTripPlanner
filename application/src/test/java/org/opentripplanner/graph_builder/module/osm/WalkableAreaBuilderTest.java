@@ -66,7 +66,7 @@ public class WalkableAreaBuilderTest {
     final Map<OsmArea, OsmLevel> areasLevels = osmdb
       .getWalkableAreas()
       .stream()
-      .collect(toMap(a -> a, a -> osmdb.getLevelForWay(a.parent)));
+      .collect(toMap(a -> a, a -> osmdb.getLevelForEntity(a.parent)));
     final List<OsmAreaGroup> areaGroups = OsmAreaGroup.groupAreas(
       areasLevels,
       ImmutableMultimap.of()
