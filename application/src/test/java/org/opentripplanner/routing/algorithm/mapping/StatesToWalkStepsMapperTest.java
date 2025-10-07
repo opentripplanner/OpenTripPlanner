@@ -12,6 +12,8 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorService;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -32,6 +34,26 @@ class StatesToWalkStepsMapperTest {
     var elevatorStep = walkSteps.get(3);
     assertEquals(RelativeDirection.ELEVATOR, elevatorStep.getRelativeDirection());
     assertTrue(elevatorStep.getAbsoluteDirection().isEmpty());
+  }
+
+  @Test
+  void stairs() {
+    var walkSteps = buildWalkSteps(
+      TestStateBuilder.ofWalking().streetEdge().stairsEdge().streetEdge()
+    );
+    assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());
+    assertEquals(RelativeDirection.STAIRS, walkSteps.get(1).getRelativeDirection());
+    assertEquals(RelativeDirection.CONTINUE, walkSteps.get(2).getRelativeDirection());
+  }
+
+  @Test
+  void escalator() {
+    var walkSteps = buildWalkSteps(
+      TestStateBuilder.ofWalking().streetEdge().escalatorEdge().streetEdge()
+    );
+    assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());
+    assertEquals(RelativeDirection.ESCALATOR, walkSteps.get(1).getRelativeDirection());
+    assertEquals(RelativeDirection.CONTINUE, walkSteps.get(2).getRelativeDirection());
   }
 
   @Test
@@ -87,7 +109,13 @@ class StatesToWalkStepsMapperTest {
   private static List<WalkStep> buildWalkSteps(TestStateBuilder builder) {
     var result = builder.build();
     var path = new GraphPath<>(result);
-    var mapper = new StatesToWalkStepsMapper(path.states, null, new StreetNotesService(), 0);
+    var mapper = new StatesToWalkStepsMapper(
+      path.states,
+      null,
+      new StreetNotesService(),
+      new DefaultOsmStreetDecoratorService(new DefaultOsmStreetDecoratorRepository()),
+      0
+    );
     return mapper.generateWalkSteps();
   }
 }

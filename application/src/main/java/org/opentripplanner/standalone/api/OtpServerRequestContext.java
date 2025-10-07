@@ -29,6 +29,7 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
@@ -159,6 +160,8 @@ public interface OtpServerRequestContext {
 
   @Nullable
   ItineraryDecorator emissionItineraryDecorator();
+
+  OsmStreetDecoratorService osmStreetDecoratorService();
 
   @Nullable
   LuceneIndex lucenceIndex();

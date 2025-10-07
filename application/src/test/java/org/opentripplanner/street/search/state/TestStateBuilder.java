@@ -152,6 +152,46 @@ public class TestStateBuilder {
     return this;
   }
 
+  /**
+   * Traverse a very plain street edge with stairs with no special characteristics.
+   */
+  public TestStateBuilder stairsEdge() {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = StreetModelForTest.intersectionVertex(count, count);
+    var edge = StreetModelForTest.streetEdgeBuilder(
+      from,
+      to,
+      30,
+      StreetTraversalPermission.PEDESTRIAN,
+      true
+    ).buildAndConnect();
+
+    var states = edge.traverse(currentState);
+    if (states.length != 1) {
+      throw new IllegalStateException("Only single state transitions are supported.");
+    }
+    currentState = states[0];
+    return this;
+  }
+
+  /**
+   * Traverse a very plain escalator edge with no special characteristics.
+   */
+  public TestStateBuilder escalatorEdge() {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = StreetModelForTest.intersectionVertex(count, count);
+    var edge = StreetModelForTest.escalatorEdge(from, to, 30, null);
+
+    var states = edge.traverse(currentState);
+    if (states.length != 1) {
+      throw new IllegalStateException("Only single state transitions are supported.");
+    }
+    currentState = states[0];
+    return this;
+  }
+
   public TestStateBuilder areaEdge(String name, int distance) {
     count++;
     var from = (StreetVertex) currentState.vertex;

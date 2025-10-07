@@ -9,6 +9,8 @@ import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.StreetLimitationParameters;
@@ -22,6 +24,9 @@ public class OsmModuleBuilder {
   private final Graph graph;
   private final VehicleParkingRepository parkingRepository;
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
+  private OsmStreetDecoratorRepository osmStreetDecoratorRepository =
+    new DefaultOsmStreetDecoratorRepository();
+
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
   private EdgeNamer edgeNamer = new DefaultNamer();
@@ -95,11 +100,19 @@ public class OsmModuleBuilder {
     return this;
   }
 
+  public OsmModuleBuilder withOsmStreetDecoratorRepository(
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository
+  ) {
+    this.osmStreetDecoratorRepository = osmStreetDecoratorRepository;
+    return this;
+  }
+
   public OsmModule build() {
     return new OsmModule(
       providers,
       graph,
       osmInfoGraphBuildRepository,
+      osmStreetDecoratorRepository,
       parkingRepository,
       issueStore,
       streetLimitationParameters,

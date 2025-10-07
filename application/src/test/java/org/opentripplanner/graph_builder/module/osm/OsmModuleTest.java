@@ -18,9 +18,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
@@ -44,6 +46,9 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdecorator.internal.DefaultOsmStreetDecoratorRepository;
+import org.opentripplanner.service.streetdecorator.model.EdgeLevelInfo;
+import org.opentripplanner.service.streetdecorator.model.VertexLevelInfo;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
@@ -504,8 +509,6 @@ public class OsmModuleTest {
 
   @Test
   void testDifferentLevelsConnectingBarrier() {
-    Graph graph = new Graph();
-
     var n1 = new OsmNode(0, 0);
     n1.setId(1);
     var n2 = new OsmNode(0, 1);
@@ -570,7 +573,7 @@ public class OsmModuleTest {
 
     var osmModule = OsmModule.of(
       osmProvider,
-      graph,
+      new Graph(),
       new DefaultOsmInfoGraphBuildRepository(),
       new DefaultVehicleParkingRepository()
     )
@@ -582,6 +585,75 @@ public class OsmModuleTest {
     assertEquals(2, issues.length);
     assertEquals(1, issues[0].node().getId());
     assertEquals(4, issues[1].node().getId());
+  }
+
+  @Test
+  void testEdgeLevelInfo() {
+    OTPFeature.OsmStreetDecorator.testOn(() -> {
+      var n1 = new OsmNode(0, 0);
+      n1.setId(1);
+      var n2 = new OsmNode(0, 1);
+      n2.setId(2);
+
+      var levelStairs = new OsmWay();
+      levelStairs.setId(1);
+      levelStairs.addTag("highway", "steps");
+      levelStairs.addTag("incline", "up");
+      levelStairs.addTag("level", "1;2");
+      levelStairs.addNodeRef(1);
+      levelStairs.addNodeRef(2);
+
+      var inclineStairs = new OsmWay();
+      inclineStairs.setId(2);
+      inclineStairs.addTag("highway", "steps");
+      inclineStairs.addTag("incline", "up");
+      inclineStairs.addNodeRef(1);
+      inclineStairs.addNodeRef(2);
+
+      var escalator = new OsmWay();
+      escalator.setId(3);
+      escalator.addTag("highway", "steps");
+      escalator.addTag("conveying", "yes");
+      escalator.addTag("level", "1;-1");
+      escalator.addTag("level:ref", "1;P1");
+      escalator.addNodeRef(1);
+      escalator.addNodeRef(2);
+
+      var issueStore = new DefaultDataImportIssueStore();
+      var osmProvider = new TestOsmProvider(
+        List.of(),
+        List.of(levelStairs, inclineStairs, escalator),
+        List.of(n1, n2)
+      );
+      var osmDb = new OsmDatabase(issueStore);
+      osmProvider.readOsm(osmDb);
+      var graph = new Graph();
+      var osmStreetDecoratorRepository = new DefaultOsmStreetDecoratorRepository();
+      var osmModule = OsmModule.of(
+        osmProvider,
+        graph,
+        new DefaultOsmInfoGraphBuildRepository(),
+        new DefaultVehicleParkingRepository()
+      )
+        .withOsmStreetDecoratorRepository(osmStreetDecoratorRepository)
+        .withIssueStore(issueStore)
+        .build();
+      osmModule.buildGraph();
+
+      var edgeLevelInfoSet = Set.of(
+        new EdgeLevelInfo(new VertexLevelInfo(1.0, null, 1), new VertexLevelInfo(2.0, null, 2)),
+        new EdgeLevelInfo(new VertexLevelInfo(null, null, 1), new VertexLevelInfo(null, null, 2)),
+        new EdgeLevelInfo(new VertexLevelInfo(-1.0, "P1", 2), new VertexLevelInfo(1.0, "1", 1))
+      );
+      assertEquals(
+        edgeLevelInfoSet,
+        graph
+          .getEdges()
+          .stream()
+          .map(edge -> osmStreetDecoratorRepository.findEdgeInformation(edge).get())
+          .collect(Collectors.toSet())
+      );
+    });
   }
 
   private BuildResult buildParkingLots() {

@@ -10,6 +10,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -58,6 +59,7 @@ public class LoadApplication {
     return createAppConstruction(
       obj.graph,
       obj.osmInfoGraphBuildRepository,
+      obj.osmStreetDecoratorRepository,
       obj.timetableRepository,
       obj.worldEnvelopeRepository,
       obj.parkingRepository,
@@ -74,6 +76,7 @@ public class LoadApplication {
     return createAppConstruction(
       factory.emptyGraph(),
       factory.emptyOsmInfoGraphBuildRepository(),
+      factory.emptyOsmStreetDecoratorRepository(),
       factory.emptyTimetableRepository(),
       factory.emptyWorldEnvelopeRepository(),
       factory.emptyVehicleParkingRepository(),
@@ -99,6 +102,7 @@ public class LoadApplication {
   private ConstructApplication createAppConstruction(
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
@@ -112,6 +116,7 @@ public class LoadApplication {
       cli,
       graph,
       osmInfoGraphBuildRepository,
+      osmStreetDecoratorRepository,
       timetableRepository,
       worldEnvelopeRepository,
       config(),

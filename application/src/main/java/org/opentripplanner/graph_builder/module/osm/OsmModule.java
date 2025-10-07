@@ -21,10 +21,12 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.osm.OsmProvider;
@@ -38,14 +40,19 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
+import org.opentripplanner.service.streetdecorator.OsmStreetDecoratorRepository;
+import org.opentripplanner.service.streetdecorator.model.EdgeLevelInfo;
+import org.opentripplanner.service.streetdecorator.model.VertexLevelInfo;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -66,6 +73,9 @@ public class OsmModule implements GraphBuilderModule {
   private final List<OsmProvider> providers;
   private final Graph graph;
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
+
+  private final OsmStreetDecoratorRepository osmStreetDecoratorRepository;
+
   private final VehicleParkingRepository parkingRepository;
 
   private final DataImportIssueStore issueStore;
@@ -77,6 +87,7 @@ public class OsmModule implements GraphBuilderModule {
     Collection<OsmProvider> providers,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    OsmStreetDecoratorRepository osmStreetDecoratorRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueStore issueStore,
     StreetLimitationParameters streetLimitationParameters,
@@ -85,6 +96,7 @@ public class OsmModule implements GraphBuilderModule {
     this.providers = List.copyOf(providers);
     this.graph = graph;
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
+    this.osmStreetDecoratorRepository = osmStreetDecoratorRepository;
     this.parkingRepository = parkingRepository;
     this.issueStore = issueStore;
     this.params = params;
@@ -312,10 +324,7 @@ public class OsmModule implements GraphBuilderModule {
     long wayCount = osmdb.getWays().size();
     ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
     LOG.info(progress.startMessage());
-    var escalatorProcessor = new EscalatorProcessor(
-      vertexGenerator.intersectionNodes(),
-      issueStore
-    );
+    var escalatorProcessor = new EscalatorProcessor(issueStore);
 
     WAY: for (OsmWay way : osmdb.getWays()) {
       WayPropertiesPair wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
@@ -361,8 +370,8 @@ public class OsmModule implements GraphBuilderModule {
         lastLevel = level;
       }
 
-      IntersectionVertex startEndpoint = null;
-      IntersectionVertex endEndpoint = null;
+      IntersectionVertex fromVertex = null;
+      IntersectionVertex toVertex = null;
 
       ArrayList<Coordinate> segmentCoordinates = new ArrayList<>();
 
@@ -376,7 +385,8 @@ public class OsmModule implements GraphBuilderModule {
       // where the current edge should start
       OsmNode osmStartNode = null;
 
-      var platform = getPlatform(osmdb, way);
+      var platformOptional = getPlatform(osmdb, way);
+      var edgeLevelInfoOptional = getEdgeLevelInfo(osmdb, way);
 
       for (int i = 0; i < nodes.size() - 1; i++) {
         OsmNode segmentStartOsmNode = osmdb.getNode(nodes.get(i));
@@ -424,36 +434,47 @@ public class OsmModule implements GraphBuilderModule {
         }
 
         /* generate endpoints */
-        if (startEndpoint == null) { // first iteration on this way
+        if (fromVertex == null) { // first iteration on this way
           // make or get a shared vertex for flat intersections,
           // one vertex per level for multilevel nodes like elevators
-          startEndpoint = vertexGenerator.getVertexForOsmNode(osmStartNode, way, NORMAL);
+          fromVertex = vertexGenerator.getVertexForOsmNode(osmStartNode, way, NORMAL);
           String ele = segmentStartOsmNode.getTag("ele");
           if (ele != null) {
             Double elevation = ElevationUtils.parseEleTag(ele);
             if (elevation != null) {
-              elevationData.put(startEndpoint, elevation);
+              elevationData.put(fromVertex, elevation);
             }
           }
         } else { // subsequent iterations
-          startEndpoint = endEndpoint;
+          fromVertex = toVertex;
         }
 
-        endEndpoint = vertexGenerator.getVertexForOsmNode(osmEndNode, way, NORMAL);
+        toVertex = vertexGenerator.getVertexForOsmNode(osmEndNode, way, NORMAL);
         String ele = osmEndNode.getTag("ele");
         if (ele != null) {
           Double elevation = ElevationUtils.parseEleTag(ele);
           if (elevation != null) {
-            elevationData.put(endEndpoint, elevation);
+            elevationData.put(toVertex, elevation);
           }
         }
         if (way.isEscalator()) {
           var length = getGeometryLengthMeters(geometry);
-          escalatorProcessor.buildEscalatorEdge(way, length);
+          EscalatorEdgePair escalatorEdgePair = escalatorProcessor.buildEscalatorEdge(
+            way,
+            length,
+            fromVertex,
+            toVertex
+          );
+          decorateEdgeWithLevelInfo(
+            escalatorEdgePair.main(),
+            escalatorEdgePair.back(),
+            edgeLevelInfoOptional,
+            way
+          );
         } else {
           StreetEdgePair streets = getEdgesForStreet(
-            startEndpoint,
-            endEndpoint,
+            fromVertex,
+            toVertex,
             way,
             i,
             forwardPermission,
@@ -473,11 +494,15 @@ public class OsmModule implements GraphBuilderModule {
             way
           );
 
-          platform.ifPresent(plat -> {
+          platformOptional.ifPresent(plat -> {
             for (var s : streets.asIterable()) {
               osmInfoGraphBuildRepository.addPlatform(s, plat);
             }
           });
+
+          if (way.isStairs()) {
+            decorateEdgeWithLevelInfo(street, backStreet, edgeLevelInfoOptional, way);
+          }
 
           applyEdgesToTurnRestrictions(osmdb, way, startNode, endNode, street, backStreet);
           startNode = endNode;
@@ -543,6 +568,104 @@ public class OsmModule implements GraphBuilderModule {
     }
   }
 
+  private Optional<EdgeLevelInfo> getEdgeLevelInfo(OsmDatabase osmdb, OsmWay way) {
+    List<OsmLevel> levels = osmdb.getLevelsForWay(way);
+    var nodeRefs = way.getNodeRefs();
+    if (nodeRefs.size() > 1) {
+      long firstNodeRef = nodeRefs.get(0);
+      long lastNodeRef = nodeRefs.get(nodeRefs.size() - 1);
+      if (levels.size() == 2) {
+        OsmLevel firstVertexOsmLevel = levels.get(0);
+        OsmLevel lastVertexOsmLevel = levels.get(1);
+        if (firstVertexOsmLevel.floorNumber < lastVertexOsmLevel.floorNumber) {
+          return Optional.of(
+            new EdgeLevelInfo(
+              new VertexLevelInfo(
+                firstVertexOsmLevel.floorNumber,
+                firstVertexOsmLevel.levelRef,
+                firstNodeRef
+              ),
+              new VertexLevelInfo(
+                lastVertexOsmLevel.floorNumber,
+                lastVertexOsmLevel.levelRef,
+                lastNodeRef
+              )
+            )
+          );
+        } else if (firstVertexOsmLevel.floorNumber > lastVertexOsmLevel.floorNumber) {
+          return Optional.of(
+            new EdgeLevelInfo(
+              new VertexLevelInfo(
+                lastVertexOsmLevel.floorNumber,
+                lastVertexOsmLevel.levelRef,
+                lastNodeRef
+              ),
+              new VertexLevelInfo(
+                firstVertexOsmLevel.floorNumber,
+                firstVertexOsmLevel.levelRef,
+                firstNodeRef
+              )
+            )
+          );
+        }
+      }
+      if (way.hasTag("incline")) {
+        if (way.isInclineUp()) {
+          return Optional.of(
+            new EdgeLevelInfo(
+              new VertexLevelInfo(null, null, firstNodeRef),
+              new VertexLevelInfo(null, null, lastNodeRef)
+            )
+          );
+        } else if (way.isInclineDown()) {
+          return Optional.of(
+            new EdgeLevelInfo(
+              new VertexLevelInfo(null, null, lastNodeRef),
+              new VertexLevelInfo(null, null, firstNodeRef)
+            )
+          );
+        }
+      }
+    }
+    return Optional.empty();
+  }
+
+  private void decorateEdgeWithLevelInfo(
+    @Nullable Edge forwardEdge,
+    @Nullable Edge backwardEdge,
+    Optional<EdgeLevelInfo> edgeLevelInfoOptional,
+    OsmWay way
+  ) {
+    if (OTPFeature.OsmStreetDecorator.isOn() && edgeLevelInfoOptional.isPresent()) {
+      EdgeLevelInfo edgeLevelInfo = edgeLevelInfoOptional.get();
+      Edge edge = forwardEdge != null ? forwardEdge : backwardEdge;
+      if (
+        edge != null &&
+        edge.getToVertex() instanceof OsmVertex toVertex &&
+        edge.getFromVertex() instanceof OsmVertex fromVertex &&
+        edgeLevelInfo.matchesNodes(fromVertex.nodeId, toVertex.nodeId)
+      ) {
+        if (forwardEdge != null) {
+          osmStreetDecoratorRepository.addEdgeLevelInformation(forwardEdge, edgeLevelInfo);
+        }
+        if (backwardEdge != null) {
+          osmStreetDecoratorRepository.addEdgeLevelInformation(backwardEdge, edgeLevelInfo);
+        }
+      } else {
+        issueStore.add(
+          Issue.issue(
+            "CouldNotApplyMultiLevelInfoToWay",
+            "Multi-level info for way {} can not be used because node references did not match. " +
+            "This is probably caused by more than 2 intersection nodes in the way. " +
+            "The way has {} nodes in total.",
+            way.url(),
+            way.getNodeRefs().size()
+          )
+        );
+      }
+    }
+  }
+
   private void validateBarriers() {
     List<BarrierVertex> vertices = graph.getVerticesOfType(BarrierVertex.class);
     vertices.forEach(bv -> bv.makeBarrierAtEndReachable());
@@ -596,8 +719,8 @@ public class OsmModule implements GraphBuilderModule {
    * http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway.
    */
   private StreetEdgePair getEdgesForStreet(
-    IntersectionVertex startEndpoint,
-    IntersectionVertex endEndpoint,
+    IntersectionVertex fromVertex,
+    IntersectionVertex toVertex,
     OsmWay way,
     int index,
     StreetTraversalPermission forwardPermission,
@@ -616,8 +739,8 @@ public class OsmModule implements GraphBuilderModule {
 
     if (forwardPermission.allowsAnything()) {
       street = getEdgeForStreet(
-        startEndpoint,
-        endEndpoint,
+        fromVertex,
+        toVertex,
         way,
         index,
         length,
@@ -628,8 +751,8 @@ public class OsmModule implements GraphBuilderModule {
     }
     if (backwardPermission.allowsAnything()) {
       backStreet = getEdgeForStreet(
-        endEndpoint,
-        startEndpoint,
+        toVertex,
+        fromVertex,
         way,
         index,
         length,
@@ -645,8 +768,8 @@ public class OsmModule implements GraphBuilderModule {
   }
 
   private StreetEdge getEdgeForStreet(
-    IntersectionVertex startEndpoint,
-    IntersectionVertex endEndpoint,
+    IntersectionVertex fromVertex,
+    IntersectionVertex toVertex,
     OsmWay way,
     int index,
     double length,
@@ -666,8 +789,8 @@ public class OsmModule implements GraphBuilderModule {
     float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, direction);
 
     StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
-      .withFromVertex(startEndpoint)
-      .withToVertex(endEndpoint)
+      .withFromVertex(fromVertex)
+      .withToVertex(toVertex)
       .withGeometry(geometry)
       .withName(name)
       .withMeterLength(length)
@@ -677,7 +800,7 @@ public class OsmModule implements GraphBuilderModule {
       .withLink(way.isLink())
       .withRoundabout(way.isRoundabout())
       .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
-      .withStairs(way.isSteps())
+      .withStairs(way.isStairs())
       .withWheelchairAccessible(way.isWheelchairAccessible())
       .withBogusName(way.hasNoName());
 

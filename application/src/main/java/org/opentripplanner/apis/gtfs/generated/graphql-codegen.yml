@@ -70,6 +70,7 @@ config:
     Feed: String
     FeedPublisher: org.opentripplanner.apis.gtfs.model.FeedPublisher#FeedPublisher
     Geometry: org.locationtech.jts.geom.Geometry#Geometry
+    InclineType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInclineType#GraphQLInclineType
     InputField: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField#GraphQLInputField
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
