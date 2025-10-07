@@ -52,9 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LinkingContextBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(
-    LinkingContextBuilder.class
-  );
+  private static final Logger LOG = LoggerFactory.getLogger(LinkingContextBuilder.class);
 
   private final TemporaryVerticesContainer container;
   private final Graph graph;
@@ -86,10 +84,7 @@ public class LinkingContextBuilder {
     return withFrom(location, EnumSet.of(mode));
   }
 
-  public LinkingContextBuilder withFrom(
-    GenericLocation location,
-    EnumSet<StreetMode> modes
-  ) {
+  public LinkingContextBuilder withFrom(GenericLocation location, EnumSet<StreetMode> modes) {
     this.from = location;
     this.fromVertices = getStreetVerticesForLocation(location, modes, LocationType.FROM);
     if (location.stopId != null) {
@@ -110,10 +105,7 @@ public class LinkingContextBuilder {
     return withTo(location, EnumSet.of(mode));
   }
 
-  public LinkingContextBuilder withTo(
-    GenericLocation location,
-    EnumSet<StreetMode> modes
-  ) {
+  public LinkingContextBuilder withTo(GenericLocation location, EnumSet<StreetMode> modes) {
     this.to = location;
     this.toVertices = getStreetVerticesForLocation(to, modes, LocationType.TO);
     if (location.stopId != null) {
