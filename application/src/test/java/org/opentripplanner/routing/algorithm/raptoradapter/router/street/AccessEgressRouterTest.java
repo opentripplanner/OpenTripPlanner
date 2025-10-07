@@ -17,6 +17,7 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -257,14 +258,17 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     var durationLimit = Duration.ofMinutes(10);
     var request = requestFromTo(from, to);
 
-    try (
-      var verticesContainer = TemporaryVerticesContainer.of(graph, TestVertexLinker.of(graph), id ->
-        new DefaultTransitService(timetableRepository).findStopOrChildIds(id)
+    try (var verticesContainer2 = new TemporaryVerticesContainer()) {
+      var linkingContext = LinkingContext.of(
+        verticesContainer2,
+        graph,
+        TestVertexLinker.of(graph),
+        id -> new DefaultTransitService(timetableRepository).findStopOrChildIds(id)
       )
         .withFrom(from, StreetMode.WALK)
         .withTo(to, StreetMode.WALK)
-        .build()
-    ) {
+        .build();
+
       return AccessEgressRouter.findAccessEgresses(
         request,
         StreetRequest.DEFAULT,
@@ -272,7 +276,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
         accessEgress,
         durationLimit,
         maxStopCount,
-        verticesContainer.createFromToViaVertexRequest()
+        linkingContext.createFromToViaVertexRequest()
       );
     }
   }
