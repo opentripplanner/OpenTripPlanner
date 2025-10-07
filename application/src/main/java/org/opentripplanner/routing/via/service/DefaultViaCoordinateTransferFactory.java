@@ -9,6 +9,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
+import org.opentripplanner.graph_builder.module.nearbystops.TransitServiceResolver;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;

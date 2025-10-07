@@ -1,11 +1,13 @@
-package org.opentripplanner.routing.via.service;
+package org.opentripplanner.graph_builder.module.nearbystops;
 
-import org.opentripplanner.graph_builder.module.nearbystops.StopResolver;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
+/**
+ * A small adapter for resolving stops by ID from a {@link TransitService}.
+ */
 public class TransitServiceResolver implements StopResolver {
 
   private final TransitService service;

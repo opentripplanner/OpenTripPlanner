@@ -61,9 +61,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
         }
       }
     );
-    this.stopResolver = new SiteRespositoryStopResolver(
-      model.timetableRepository().getSiteRepository()
-    );
+    this.stopResolver = new SiteRepositoryResolver(model.timetableRepository().getSiteRepository());
   }
 
   @Test

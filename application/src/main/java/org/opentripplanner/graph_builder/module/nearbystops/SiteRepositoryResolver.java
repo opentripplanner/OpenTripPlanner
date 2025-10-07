@@ -5,11 +5,14 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
 
-public class SiteRespositoryStopResolver implements StopResolver {
+/**
+ * Adapter class that extracts two methods from the {@link SiteRepository}.
+ */
+public class SiteRepositoryResolver implements StopResolver {
 
   private final SiteRepository siteRepository;
 
-  public SiteRespositoryStopResolver(SiteRepository siteRepository) {
+  public SiteRepositoryResolver(SiteRepository siteRepository) {
     this.siteRepository = siteRepository;
   }
 

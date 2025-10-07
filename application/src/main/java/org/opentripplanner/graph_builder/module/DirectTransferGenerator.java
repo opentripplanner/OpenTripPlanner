@@ -17,7 +17,7 @@ import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.PatternConsideringNearbyStopFinder;
-import org.opentripplanner.graph_builder.module.nearbystops.SiteRespositoryStopResolver;
+import org.opentripplanner.graph_builder.module.nearbystops.SiteRepositoryResolver;
 import org.opentripplanner.graph_builder.module.nearbystops.StopResolver;
 import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
@@ -213,7 +213,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       finder = new StraightLineNearbyStopFinder(transitService, radiusAsDuration);
     } else {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
-      final StopResolver stopResolver = new SiteRespositoryStopResolver(
+      final StopResolver stopResolver = new SiteRepositoryResolver(
         timetableRepository.getSiteRepository()
       );
       finder = StreetNearbyStopFinder.of(stopResolver, radiusAsDuration, 0).build();
