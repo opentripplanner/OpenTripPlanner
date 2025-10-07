@@ -30,6 +30,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 
 /**
@@ -223,30 +224,26 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   ) {
     var linker = TestVertexLinker.of(graph);
     for (final StreetMode streetMode : streetModes) {
-      try (
-        var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph, linker)
+      try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+        var linkingContext = LinkingContext.of(temporaryVerticesContainer, graph, linker)
           .withFrom(location, streetMode)
           .withTo(ANY_PLACE, streetMode)
-          .build()
-      ) {
+          .build();
         assertFromLink(
           expectedFromStreetName.name(),
           streetMode,
-          temporaryVerticesContainer.fromVertices().iterator().next()
+          linkingContext.fromVertices().iterator().next()
         );
-      }
 
-      try (
-        var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph, linker)
+        var linkingContext2 = LinkingContext.of(temporaryVerticesContainer, graph, linker)
           .withFrom(ANY_PLACE, streetMode)
           .withTo(location, streetMode)
-          .build()
-      ) {
+          .build();
         if (expectedToStreetName != null) {
           assertToLink(
             expectedToStreetName.name(),
             streetMode,
-            temporaryVerticesContainer.toVertices().iterator().next()
+            linkingContext2.toVertices().iterator().next()
           );
         }
       }
