@@ -21,6 +21,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -165,41 +166,45 @@ public class SplitEdgeTurnRestrictionsTest {
       .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
       .buildRequest();
 
-    var temporaryVerticesContainer = TemporaryVerticesContainer.of(
-      graph,
-      TestVertexLinker.of(graph)
-    )
-      .withFrom(from, StreetMode.CAR)
-      .withTo(to, StreetMode.CAR)
-      .build();
-    var gpf = new GraphPathFinder(null);
-    var paths = gpf.graphPathFinderEntryPoint(
-      request,
-      temporaryVerticesContainer.createFromToViaVertexRequest()
-    );
+    try(var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
 
-    GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      ZoneIds.BERLIN,
-      graph.streetNotesService,
-      graph.ellipsoidToGeoidDifference
-    );
 
-    var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
-    temporaryVerticesContainer.close();
+      var linkingContext = LinkingContext.of(
+        temporaryVerticesContainer,
+          graph,
+          TestVertexLinker.of(graph)
+        )
+        .withFrom(from, StreetMode.CAR)
+        .withTo(to, StreetMode.CAR)
+        .build();
+      var gpf = new GraphPathFinder(null);
+      var paths = gpf.graphPathFinderEntryPoint(
+        request,
+        linkingContext.createFromToViaVertexRequest()
+      );
 
-    // make sure that we only get CAR legs
-    itineraries.forEach(i ->
-      i
-        .legs()
-        .forEach(l -> {
-          if (l instanceof StreetLeg stLeg) {
-            assertEquals(TraverseMode.CAR, stLeg.getMode());
-          } else {
-            fail("Expected StreetLeg (CAR): " + l);
-          }
-        })
-    );
-    Geometry geometry = itineraries.get(0).legs().get(0).legGeometry();
-    return EncodedPolyline.encode(geometry).points();
+      GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+        ZoneIds.BERLIN,
+        graph.streetNotesService,
+        graph.ellipsoidToGeoidDifference
+      );
+
+      var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
+
+      // make sure that we only get CAR legs
+      itineraries.forEach(i ->
+        i
+          .legs()
+          .forEach(l -> {
+            if (l instanceof StreetLeg stLeg) {
+              assertEquals(TraverseMode.CAR, stLeg.getMode());
+            } else {
+              fail("Expected StreetLeg (CAR): " + l);
+            }
+          })
+      );
+      Geometry geometry = itineraries.get(0).legs().get(0).legGeometry();
+      return EncodedPolyline.encode(geometry).points();
+    }
   }
 }
