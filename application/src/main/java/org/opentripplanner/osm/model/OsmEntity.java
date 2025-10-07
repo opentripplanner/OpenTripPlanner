@@ -34,7 +34,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * A base class for OSM entities containing common methods.
  */
-public class OsmEntity {
+public abstract class OsmEntity {
 
   /**
    * highway=* values that we don't want to even consider when building the graph.
