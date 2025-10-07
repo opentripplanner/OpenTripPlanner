@@ -31,7 +31,12 @@ class GraphPathToItineraryMapperTest {
   @ParameterizedTest
   @MethodSource("cases")
   void isSearchWindowAware(State state) {
-    var mapper = new GraphPathToItineraryMapper(ZoneIds.UTC, new StreetNotesService(), 1);
+    var mapper = new GraphPathToItineraryMapper(
+      id -> null,
+      ZoneIds.UTC,
+      new StreetNotesService(),
+      1
+    );
     var itin = mapper.generateItinerary(new GraphPath<>(state));
     assertFalse(itin.isSearchWindowAware());
   }

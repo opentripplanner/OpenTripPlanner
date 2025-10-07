@@ -213,7 +213,11 @@ class StreetLinkerModuleTest {
 
       timetableRepository = new TimetableRepository(builder.build(), new Deduplicator());
 
-      stopVertex = TransitStopVertex.of().withStop(stop).build();
+      stopVertex = TransitStopVertex.of()
+        .withId(stop.getId())
+        .withPoint(stop.getGeometry())
+        .withWheelchairAccessiblity(stop.getWheelchairAccessibility())
+        .build();
       graph.addVertex(stopVertex);
       graph.hasStreets = true;
 
