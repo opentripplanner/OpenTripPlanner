@@ -329,7 +329,7 @@ public class RoutingWorker {
       viaModes.add(directMode);
     }
     return LinkingContext.of(
-        container,
+      container,
       serverContext.graph(),
       serverContext.vertexLinker(),
       serverContext.transitService()::findStopOrChildIds
