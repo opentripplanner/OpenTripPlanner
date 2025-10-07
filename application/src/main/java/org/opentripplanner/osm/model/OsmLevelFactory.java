@@ -15,21 +15,23 @@ public class OsmLevelFactory {
   }
 
   /**
-   * Get level for a way by parsing the 'level' and 'layer' tags.
+   * Create an OsmLevel for an entity by parsing the 'level' and 'layer' tags.
    * If the level is parsed from the 'level' tag, the 'level:ref' tag is used for a name.
    */
-  public OsmLevel createOsmLevelForWay(OsmEntity way) {
+  @Nullable
+  public OsmLevel createOsmLevelForEntity(OsmEntity way) {
     if (way.hasTag("level")) {
       return createOsmLevelFromTag(way.getTag("level"), way.getTag("level:ref"), way);
     } else if (way.hasTag("layer")) {
       return createOsmLevelFromTag(way.getTag("layer"), null, way);
     }
-    return DEFAULT;
+    return null;
   }
 
   /**
    * Create an OsmLevel from a tag with an optional ref tag to be used as a name.
    */
+  @Nullable
   private OsmLevel createOsmLevelFromTag(
     String levelTag,
     @Nullable String nameTag,
@@ -45,7 +47,7 @@ public class OsmLevelFactory {
       }
     } catch (NumberFormatException e) {
       issueStore.add(new FloorNumberUnknownAssumedGroundLevel(levelTag, osmObj));
-      return DEFAULT;
+      return null;
     }
   }
 }

@@ -633,7 +633,10 @@ public class OsmDatabase {
   }
 
   private void applyLevelForEntity(OsmEntity entity) {
-    entityLevels.put(entity, osmLevelFactory.createOsmLevelForWay(entity));
+    OsmLevel level = osmLevelFactory.createOsmLevelForEntity(entity);
+    if (level != null) {
+      entityLevels.put(entity, level);
+    }
   }
 
   private void markNodesForKeeping(Collection<OsmWay> osmWays, TLongSet nodeSet) {
