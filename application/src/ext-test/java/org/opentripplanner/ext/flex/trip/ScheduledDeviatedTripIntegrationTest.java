@@ -29,6 +29,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -171,15 +172,15 @@ class ScheduledDeviatedTripIntegrationTest {
     var transitStartOfTime = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     var additionalSearchDays = AdditionalSearchDays.defaults(dateTime);
 
-    try (
-      var temporaryVerticesContainer = TemporaryVerticesContainer.of(
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var linkingContext = LinkingContext.of(
+        temporaryVerticesContainer,
         serverContext.graph(),
         TestVertexLinker.of(graph)
       )
         .withFrom(from, StreetMode.WALK)
         .withTo(to, StreetMode.WALK)
-        .build()
-    ) {
+        .build();
       var result = TransitRouter.route(
         request,
         serverContext,
@@ -187,7 +188,7 @@ class ScheduledDeviatedTripIntegrationTest {
         transitStartOfTime,
         additionalSearchDays,
         new DebugTimingAggregator(),
-        temporaryVerticesContainer.createFromToViaVertexRequest()
+        linkingContext.createFromToViaVertexRequest()
       );
 
       return result.getItineraries();
