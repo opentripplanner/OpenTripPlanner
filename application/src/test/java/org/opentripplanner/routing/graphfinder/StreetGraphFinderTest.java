@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -111,7 +111,10 @@ class StreetGraphFinderTest extends GraphRoutingTest {
     );
 
     transitService = new DefaultTransitService(otpModel.timetableRepository());
-    graphFinder = new StreetGraphFinder(otpModel.graph(), TestVertexLinker.of(otpModel.graph()));
+    graphFinder = new StreetGraphFinder(
+      otpModel.graph(),
+      VertexLinkerTestFactory.of(otpModel.graph())
+    );
   }
 
   @Test

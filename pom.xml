@@ -58,19 +58,19 @@
 
 
     <properties>
-        <otp.serialization.version.id>203</otp.serialization.version.id>
+        <otp.serialization.version.id>205</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>33.2</geotools.version>
-        <google.dagger.version>2.57.1</google.dagger.version>
+        <google.dagger.version>2.57.2</google.dagger.version>
         <jackson.version>2.20.0</jackson.version>
-        <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
+        <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
         <junit.version>5.13.4</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.18</logback.version>
-        <lucene.version>10.2.2</lucene.version>
+        <logback.version>1.5.19</logback.version>
+        <lucene.version>10.3.0</lucene.version>
         <micrometer.version>1.15.4</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
@@ -108,12 +108,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.hubspot.maven.plugins</groupId>
                     <artifactId>prettier-maven-plugin</artifactId>
                     <version>${plugin.prettier.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>2.46.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -121,7 +126,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>3.14.1</version>
                 <configuration>
                     <!-- Target Java version -->
                     <release>21</release>
@@ -288,6 +293,30 @@
             </plugin>
 
             <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <java>
+                        <removeUnusedImports/>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                            <include>src/ext/java/**/*.java</include>
+                            <include>src/ext-test/java/**/*.java</include>
+                        </includes>
+                    </java>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>com.hubspot.maven.plugins</groupId>
                 <artifactId>prettier-maven-plugin</artifactId>
                 <configuration>
@@ -296,6 +325,7 @@
                     <inputGlobs>
                         <inputGlob>src/main/java/**/*.java</inputGlob>
                         <inputGlob>src/test/java/**/*.java</inputGlob>
+                        <inputGlob>src/test-fixtures/java/**/*.java</inputGlob>
                     </inputGlobs>
                 </configuration>
                 <executions>
@@ -386,7 +416,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.65.0</version>
+                <version>26.69.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -400,7 +430,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.4.8-jre</version>
+                <version>33.5.0-jre</version>
             </dependency>
 
             <!-- Logging API -->

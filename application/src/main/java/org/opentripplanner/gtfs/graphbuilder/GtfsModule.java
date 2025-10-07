@@ -22,6 +22,7 @@ import org.onebusaway.gtfs.model.FareTransferRule;
 import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.RiderCategory;
 import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.RouteNetworkAssignment;
 import org.onebusaway.gtfs.model.StopAreaElement;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
@@ -45,6 +46,8 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.color.Brightness;
@@ -54,13 +57,14 @@ import org.slf4j.LoggerFactory;
 public class GtfsModule implements GraphBuilderModule {
 
   public static final Set<Class<?>> FARES_V2_CLASSES = Set.of(
+    Area.class,
     FareProduct.class,
     FareLegRule.class,
+    FareMedium.class,
     FareTransferRule.class,
     RiderCategory.class,
-    FareMedium.class,
-    StopAreaElement.class,
-    Area.class
+    RouteNetworkAssignment.class,
+    StopAreaElement.class
   );
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
@@ -77,6 +81,7 @@ public class GtfsModule implements GraphBuilderModule {
   private final TimetableRepository timetableRepository;
   private final Graph graph;
   private final DataImportIssueStore issueStore;
+  private final DeduplicatorService deduplicator;
   private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
   private final double maxStopToShapeSnapDistance;
@@ -86,6 +91,7 @@ public class GtfsModule implements GraphBuilderModule {
     List<GtfsBundle> bundles,
     TimetableRepository timetableRepository,
     Graph graph,
+    DeduplicatorService deduplicator,
     DataImportIssueStore issueStore,
     ServiceDateInterval transitPeriodLimit,
     FareServiceFactory fareServiceFactory,
@@ -95,6 +101,7 @@ public class GtfsModule implements GraphBuilderModule {
     this.gtfsBundles = bundles;
     this.timetableRepository = timetableRepository;
     this.graph = graph;
+    this.deduplicator = deduplicator;
     this.issueStore = issueStore;
     this.transitPeriodLimit = transitPeriodLimit;
     this.fareServiceFactory = fareServiceFactory;
@@ -115,6 +122,7 @@ public class GtfsModule implements GraphBuilderModule {
       bundles,
       timetableRepository,
       graph,
+      new Deduplicator(),
       DataImportIssueStore.NOOP,
       transitPeriodLimit,
       new DefaultFareServiceFactory(),
@@ -173,7 +181,7 @@ public class GtfsModule implements GraphBuilderModule {
 
         // NB! The calls below have side effects - the builder state is updated!
         createTripPatterns(
-          graph,
+          deduplicator,
           timetableRepository,
           builder,
           calendarServiceData.getServiceIds(),
@@ -258,7 +266,7 @@ public class GtfsModule implements GraphBuilderModule {
    * This method has side effects, the {@code builder} is updated with new TripPatterns.
    */
   private void createTripPatterns(
-    Graph graph,
+    DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
     OtpTransitServiceBuilder builder,
     Set<FeedScopedId> calServiceIds,
@@ -268,7 +276,7 @@ public class GtfsModule implements GraphBuilderModule {
     GenerateTripPatternsOperation buildTPOp = new GenerateTripPatternsOperation(
       builder,
       issueStore,
-      graph.deduplicator,
+      deduplicator,
       calServiceIds,
       geometryProcessor
     );

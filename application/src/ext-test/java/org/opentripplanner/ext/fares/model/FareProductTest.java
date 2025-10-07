@@ -2,7 +2,6 @@ package org.opentripplanner.ext.fares.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.stream.Stream;

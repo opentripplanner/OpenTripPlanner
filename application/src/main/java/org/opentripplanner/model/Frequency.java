@@ -1,4 +1,3 @@
-/* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
 import java.io.Serializable;
@@ -9,69 +8,43 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public final class Frequency implements Serializable {
 
-  private Trip trip;
+  private final Trip trip;
+  private final int startTime;
+  private final int endTime;
+  private final int headwaySecs;
+  private final boolean exactTimes;
 
-  private int startTime;
-
-  private int endTime;
-
-  private int headwaySecs;
-
-  private int exactTimes = 0;
-
-  private int labelOnly = 0;
-
-  public Trip getTrip() {
-    return trip;
-  }
-
-  public void setTrip(Trip trip) {
+  public Frequency(Trip trip, int startTime, int endTime, int headwaySecs, boolean exactTimes) {
     this.trip = trip;
-  }
-
-  public int getStartTime() {
-    return startTime;
-  }
-
-  public void setStartTime(int startTime) {
     this.startTime = startTime;
-  }
-
-  public int getEndTime() {
-    return endTime;
-  }
-
-  public void setEndTime(int endTime) {
     this.endTime = endTime;
-  }
-
-  public int getHeadwaySecs() {
-    return headwaySecs;
-  }
-
-  public void setHeadwaySecs(int headwaySecs) {
     this.headwaySecs = headwaySecs;
-  }
-
-  public int getExactTimes() {
-    return exactTimes;
-  }
-
-  public void setExactTimes(int exactTimes) {
     this.exactTimes = exactTimes;
   }
 
-  public int getLabelOnly() {
-    return labelOnly;
+  public Trip trip() {
+    return trip;
   }
 
-  public void setLabelOnly(int labelOnly) {
-    this.labelOnly = labelOnly;
+  public int startTime() {
+    return startTime;
+  }
+
+  public int endTime() {
+    return endTime;
+  }
+
+  public int headwaySecs() {
+    return headwaySecs;
+  }
+
+  public boolean exactTimes() {
+    return exactTimes;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(trip, startTime, endTime, headwaySecs);
+    return Objects.hash(trip, startTime, endTime, headwaySecs, exactTimes);
   }
 
   @Override
@@ -87,6 +60,7 @@ public final class Frequency implements Serializable {
       startTime == frequency.startTime &&
       endTime == frequency.endTime &&
       headwaySecs == frequency.headwaySecs &&
+      exactTimes == frequency.exactTimes &&
       Objects.equals(trip, frequency.trip)
     );
   }

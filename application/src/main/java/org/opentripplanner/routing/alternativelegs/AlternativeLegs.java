@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.alternativelegs;
 
-import static org.opentripplanner.transit.service.TripTimesHelper.skipByTripCancellation;
+import static org.opentripplanner.transit.service.TripTimesHelper.skipByTripCancellationOrDeletion;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -165,7 +165,7 @@ public class AlternativeLegs {
         if (!servicesRunning.contains(tripTimes.getServiceCode())) {
           continue;
         }
-        if (skipByTripCancellation(tripTimes, false)) {
+        if (skipByTripCancellationOrDeletion(tripTimes, false)) {
           continue;
         }
 

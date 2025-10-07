@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripTimesForDaysIndex.applyOffsets;
 
-import com.google.common.base.Splitter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

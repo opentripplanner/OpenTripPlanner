@@ -18,10 +18,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
@@ -86,7 +86,7 @@ class OsmBoardingLocationsModuleTest {
     RegularStop floatingBusStop = testModel.stop("floating-bus-stop", 48.59417, 8.86464).build();
 
     var deduplicator = new Deduplicator();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     var factory = new VertexFactory(graph);
 
@@ -126,7 +126,11 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getOutgoing().size());
 
     var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
-    new OsmBoardingLocationsModule(graph, TestVertexLinker.of(graph), osmService).buildGraph();
+    new OsmBoardingLocationsModule(
+      graph,
+      VertexLinkerTestFactory.of(graph),
+      osmService
+    ).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module
@@ -202,8 +206,7 @@ class OsmBoardingLocationsModuleTest {
    */
   @Test
   void testLinearPlatforms() {
-    var deduplicator = new Deduplicator();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var osmModule = OsmModule.of(
       new DefaultOsmProvider(
@@ -302,7 +305,7 @@ class OsmBoardingLocationsModuleTest {
 
     new OsmBoardingLocationsModule(
       graph,
-      TestVertexLinker.of(graph),
+      VertexLinkerTestFactory.of(graph),
       new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();
 

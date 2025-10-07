@@ -9,10 +9,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.graph_builder.module.osm.VertexGeneratorTest.getBarrierLevelIssues;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
-import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
-import static org.opentripplanner.transit.model.basic.Accessibility.NOT_POSSIBLE;
 
 import java.io.File;
 import java.util.Collection;
@@ -61,7 +59,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,8 +69,7 @@ public class OsmModuleTest {
 
   @Test
   public void testGraphBuilder() {
-    var deduplicator = new Deduplicator();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
 
     File file = RESOURCE_LOADER.file("map.osm.pbf");
 
@@ -137,8 +133,7 @@ public class OsmModuleTest {
    */
   @Test
   public void testBuildGraphDetailed() {
-    var deduplicator = new Deduplicator();
-    var gg = new Graph(deduplicator);
+    var gg = new Graph();
 
     File file = RESOURCE_LOADER.file("NYC_small.osm.pbf");
     var provider = new DefaultOsmProvider(file, true);
@@ -336,8 +331,7 @@ public class OsmModuleTest {
    */
   @Test
   void testBarrierAtEnd() {
-    var deduplicator = new Deduplicator();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
 
     File file = RESOURCE_LOADER.file("accessno-at-end.pbf");
     DefaultOsmProvider provider = new DefaultOsmProvider(file, false);
@@ -617,8 +611,7 @@ public class OsmModuleTest {
    * @param skipVisibility if true visibility calculations are skipped
    */
   private void testBuildingAreas(boolean skipVisibility) {
-    var deduplicator = new Deduplicator();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
 
     File file = RESOURCE_LOADER.file("usf_area.osm.pbf");
     var provider = new DefaultOsmProvider(file, false);

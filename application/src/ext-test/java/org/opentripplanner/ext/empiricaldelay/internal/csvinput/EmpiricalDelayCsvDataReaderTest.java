@@ -8,8 +8,8 @@ import static org.opentripplanner.ext.empiricaldelay.internal.csvinput.Empirical
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.datastore.base.ListCompositeDataSource;
-import org.opentripplanner.datastore.configure.DataStoreModule;
+import org.opentripplanner.datastore.api.DataSourceTestFactory;
+import org.opentripplanner.datastore.api.ListCompositeDataSource;
 import org.opentripplanner.ext.empiricaldelay.internal.model.DelayAtStopDto;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -25,7 +25,7 @@ class EmpiricalDelayCsvDataReaderTest {
 
   @Test
   void read() {
-    var tripTimesDataSource = DataStoreModule.dataSource(
+    var tripTimesDataSource = DataSourceTestFactory.dataSource(
       CALENDAR_FILE_NAME,
       EMPIRICAL_DATA,
       """
@@ -34,7 +34,7 @@ class EmpiricalDelayCsvDataReaderTest {
       Sat-Sun, 0, 0, 0, 0, 0, 1, 1, 2025-01-01, 2030-12-31
       """
     );
-    var calendarDataSource = DataStoreModule.dataSource(
+    var calendarDataSource = DataSourceTestFactory.dataSource(
       TRIP_TIME_DELAY_FILE_NAME,
       EMPIRICAL_DATA,
       """

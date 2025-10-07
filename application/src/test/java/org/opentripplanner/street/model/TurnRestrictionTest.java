@@ -1,9 +1,7 @@
 package org.opentripplanner.street.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import java.util.List;
@@ -104,10 +102,10 @@ public class TurnRestrictionTest {
       .buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setFrom(topRight)
-      .setTo(bottomLeft)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withFrom(topRight)
+      .withTo(bottomLeft)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
@@ -134,10 +132,10 @@ public class TurnRestrictionTest {
       .buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setFrom(topRight)
-      .setTo(bottomLeft)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withFrom(topRight)
+      .withTo(bottomLeft)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
@@ -171,11 +169,11 @@ public class TurnRestrictionTest {
     var request = RouteRequest.defaultValue();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(new StreetRequest(StreetMode.CAR))
-      .setFrom(topRight)
-      .setTo(bottomLeft)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withStreetRequest(new StreetRequest(StreetMode.CAR))
+      .withFrom(topRight)
+      .withTo(bottomLeft)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);

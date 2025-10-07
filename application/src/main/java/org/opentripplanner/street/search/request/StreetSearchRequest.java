@@ -2,16 +2,17 @@ package org.opentripplanner.street.search.request;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.astar.spi.AStarRequest;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.street.search.state.State;
@@ -47,7 +48,7 @@ public class StreetSearchRequest implements AStarRequest {
   private IntersectionTraversalCalculator intersectionTraversalCalculator =
     IntersectionTraversalCalculator.DEFAULT;
 
-  private DataOverlayContext dataOverlayContext;
+  private List<ExtensionRequestContext> extensionRequestContexts;
 
   /**
    * Constructor only used for creating a default instance.
@@ -121,8 +122,12 @@ public class StreetSearchRequest implements AStarRequest {
     return intersectionTraversalCalculator;
   }
 
-  public DataOverlayContext dataOverlayContext() {
-    return dataOverlayContext;
+  public List<ExtensionRequestContext> listExtensionRequestContexts() {
+    return extensionRequestContexts;
+  }
+
+  public void setExtensionRequestContexts(List<ExtensionRequestContext> extensionRequestContexts) {
+    this.extensionRequestContexts = extensionRequestContexts;
   }
 
   public StreetSearchRequestBuilder copyOfReversed(Instant time) {
@@ -133,10 +138,6 @@ public class StreetSearchRequest implements AStarRequest {
     IntersectionTraversalCalculator intersectionTraversalCalculator
   ) {
     this.intersectionTraversalCalculator = intersectionTraversalCalculator;
-  }
-
-  public void setDataOverlayContext(DataOverlayContext dataOverlayContext) {
-    this.dataOverlayContext = dataOverlayContext;
   }
 
   /**
