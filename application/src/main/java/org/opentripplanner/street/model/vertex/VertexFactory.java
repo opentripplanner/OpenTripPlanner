@@ -13,12 +13,10 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.PathwayNode;
-import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
  * This class is the central point where all vertices that are supposed to be permanently part
@@ -116,13 +114,8 @@ public class VertexFactory {
     return addToGraph(new BarrierPassThroughVertex(coordinate.x, coordinate.y, nid, routableWayId));
   }
 
-  public TransitStopVertex transitStop(RegularStop stop, Set<TransitMode> modes) {
-    var v = TransitStopVertex.of()
-      .withId(stop.getId())
-      .withPoint(stop.getGeometry())
-      .withWheelchairAccessiblity(stop.getWheelchairAccessibility())
-      .withModes(modes)
-      .build();
+  public TransitStopVertex transitStop(TransitStopVertexBuilder builder) {
+    var v = builder.build();
     return addToGraph(v);
   }
 

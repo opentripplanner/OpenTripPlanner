@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
@@ -289,7 +289,7 @@ public abstract class GraphRoutingTest {
       @Nullable Station parentStation
     ) {
       var stop = stopEntity(id, latitude, longitude, parentStation);
-      return vertexFactory.transitStop(stop, Set.of());
+      return vertexFactory.transitStop(ofStop(stop));
     }
 
     public TransitEntranceVertex entrance(String id, double latitude, double longitude) {

@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 
 import java.io.File;
 import java.util.List;
@@ -36,7 +37,6 @@ import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -95,7 +95,7 @@ class OsmBoardingLocationsModuleTest {
     var factory = new VertexFactory(graph);
 
     var provider = new DefaultOsmProvider(file, false);
-    var floatingBusVertex = factory.transitStop(floatingBusStop, Set.of(TransitMode.BUS));
+    var floatingBusVertex = factory.transitStop(ofStop(floatingBusStop));
     var floatingBoardingLocation = factory.osmBoardingLocation(
       floatingBusVertex.getCoordinate(),
       "floating-bus-stop",
@@ -111,8 +111,8 @@ class OsmBoardingLocationsModuleTest {
 
     osmModule.buildGraph();
 
-    var platformVertex = factory.transitStop(platform, Set.of(TransitMode.RAIL));
-    var busVertex = factory.transitStop(busStop, Set.of(TransitMode.BUS));
+    var platformVertex = factory.transitStop(ofStop(platform));
+    var busVertex = factory.transitStop(ofStop(busStop));
 
     timetableRepository.index();
     graph.index();
@@ -254,7 +254,7 @@ class OsmBoardingLocationsModuleTest {
        */
       TransitStopVertex getPlatformVertex() {
         if (platformVertex == null) {
-          platformVertex = factory.transitStop(platform, Set.of());
+          platformVertex = factory.transitStop(ofStop(platform));
         }
         return platformVertex;
       }
