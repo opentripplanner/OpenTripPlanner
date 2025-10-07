@@ -77,11 +77,11 @@ class BookingRuleMapper {
   }
 
   private Duration minimumBookingNotice(BookingRule rule) {
-    return Duration.ofSeconds(rule.getPriorNoticeDurationMin());
+    return Duration.ofMinutes(rule.getPriorNoticeDurationMin());
   }
 
   private Duration maximumBookingNotice(BookingRule rule) {
-    return Duration.ofSeconds(rule.getPriorNoticeDurationMax());
+    return Duration.ofMinutes(rule.getPriorNoticeDurationMax());
   }
 
   private String message(BookingRule rule) {
