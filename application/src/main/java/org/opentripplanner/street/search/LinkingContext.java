@@ -38,7 +38,9 @@ public class LinkingContext {
    */
   public static LinkingContextBuilder of(
     TemporaryVerticesContainer container,
-    Graph graph, VertexLinker linker) {
+    Graph graph,
+    VertexLinker linker
+  ) {
     return new LinkingContextBuilder(container, graph, linker, id -> Set.of());
   }
 
