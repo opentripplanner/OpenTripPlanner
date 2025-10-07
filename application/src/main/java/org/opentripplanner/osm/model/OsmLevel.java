@@ -8,9 +8,8 @@ public class OsmLevel implements Comparable<OsmLevel> {
   private final String name;
 
   public OsmLevel(double level, String name) {
-    Objects.requireNonNull(name);
+    this.name = Objects.requireNonNull(name);
     this.level = level;
-    this.name = name;
   }
 
   @Override
