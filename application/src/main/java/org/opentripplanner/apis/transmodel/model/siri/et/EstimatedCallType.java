@@ -50,7 +50,7 @@ public class EstimatedCallType {
     return GraphQLObjectType.newObject()
       .name("EstimatedCall")
       .description(
-        "List of visits to quays as part of vehicle journeys. Updated with real time information where available"
+        "List of calls on quays as part of vehicle journeys. Updated with real time information where available"
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
