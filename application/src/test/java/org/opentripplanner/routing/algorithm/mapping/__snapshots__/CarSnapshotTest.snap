@@ -10,7 +10,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 520,
+      "generalizedCost" : 467,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -144,7 +144,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
             },
             "vertexType" : "BIKEPARK"
           },
-          "generalizedCost" : 338,
+          "generalizedCost" : 285,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 6,
@@ -248,7 +248,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "Chapman Elementary School (P3)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 166,
+          "generalizedCost" : 165,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 10,
@@ -443,7 +443,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name" : "Chapman Elementary School (P3)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 294,
+          "generalizedCost" : 293,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 10,

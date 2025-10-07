@@ -63,7 +63,7 @@ public class GermanyMapperTest {
       way.addTag("zone:traffic", "DE:urban");
       assertEquals(0.9, wps.getDataForWay(way).forward().bicycleSafety(), epsilon);
       // walk safety should be default
-      assertEquals(0.9, wps.getDataForWay(way).forward().walkSafety(), epsilon);
+      assertEquals(1, wps.getDataForWay(way).forward().walkSafety(), epsilon);
     }
 
     @Test

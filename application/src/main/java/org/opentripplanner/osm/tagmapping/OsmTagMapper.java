@@ -62,63 +62,42 @@ public class OsmTagMapper {
     props.setProperties("mtb:scale=4", noneWayProperties);
     props.setProperties("mtb:scale=5", noneWayProperties);
     props.setProperties("mtb:scale=6", noneWayProperties);
-    props.setProperties("highway=bridleway", withModes(NONE).walkSafety(1.3).bicycleSafety(1.3));
+    props.setProperties("highway=bridleway", withModes(NONE).bicycleSafety(1.3));
 
     /* PEDESTRIAN */
-    props.setProperties("highway=corridor", withModes(PEDESTRIAN).walkSafety(0.9));
+    props.setProperties("highway=corridor", withModes(PEDESTRIAN));
     props.setProperties("highway=steps", withModes(PEDESTRIAN));
-    props.setProperties("highway=crossing", withModes(PEDESTRIAN).walkSafety(0.9));
+    props.setProperties("highway=crossing", withModes(PEDESTRIAN));
     props.setProperties("highway=platform", withModes(PEDESTRIAN));
     props.setProperties("public_transport=platform", withModes(PEDESTRIAN));
     props.setProperties("railway=platform", withModes(PEDESTRIAN));
-    props.setProperties(
-      "highway=pedestrian",
-      withModes(PEDESTRIAN).walkSafety(0.8).bicycleSafety(0.9)
-    );
-    props.setProperties(
-      "highway=footway",
-      withModes(PEDESTRIAN).walkSafety(0.8).bicycleSafety(1.1)
-    );
-    props.setProperties("mtb:scale=1", withModes(PEDESTRIAN).walkSafety(1.5).bicycleSafety(1.5));
-    props.setProperties("mtb:scale=2", withModes(PEDESTRIAN).walkSafety(3.0).bicycleSafety(3.0));
+    props.setProperties("highway=pedestrian", withModes(PEDESTRIAN).bicycleSafety(0.9));
+    props.setProperties("highway=footway", withModes(PEDESTRIAN).bicycleSafety(1.1));
+    props.setProperties("mtb:scale=1", withModes(PEDESTRIAN).bicycleSafety(1.5));
+    props.setProperties("mtb:scale=2", withModes(PEDESTRIAN).bicycleSafety(3.0));
 
     /* BICYCLE */
-    props.setProperties("highway=cycleway", withModes(BICYCLE).walkSafety(2.0).bicycleSafety(0.6));
+    props.setProperties("highway=cycleway", withModes(BICYCLE).bicycleSafety(0.6));
 
     /* PEDESTRIAN_AND_BICYCLE */
     props.setProperties("mtb:scale=0", withModes(PEDESTRIAN_AND_BICYCLE));
-    props.setProperties(
-      "highway=path",
-      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(0.85).bicycleSafety(0.75)
-    );
+    props.setProperties("highway=path", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75));
 
     /* ALL */
-    props.setProperties(
-      "highway=living_street",
-      withModes(ALL).walkSafety(0.95).bicycleSafety(0.9)
-    );
+    props.setProperties("highway=living_street", withModes(ALL).bicycleSafety(0.9));
     props.setProperties("highway=unclassified", allWayProperties);
     props.setProperties("highway=road", allWayProperties);
-    props.setProperties("highway=byway", withModes(ALL).walkSafety(1.3).bicycleSafety(1.3));
-    props.setProperties("highway=track", withModes(ALL).walkSafety(1.3).bicycleSafety(1.3));
-    props.setProperties("highway=service", withModes(ALL).walkSafety(1.1).bicycleSafety(1.1));
-    props.setProperties("highway=residential", withModes(ALL).walkSafety(0.98).bicycleSafety(0.98));
-    props.setProperties(
-      "highway=residential_link",
-      withModes(ALL).walkSafety(0.98).bicycleSafety(0.98)
-    );
+    props.setProperties("highway=byway", withModes(ALL).bicycleSafety(1.3));
+    props.setProperties("highway=track", withModes(ALL).bicycleSafety(1.3));
+    props.setProperties("highway=service", withModes(ALL).bicycleSafety(1.1));
+    props.setProperties("highway=residential", withModes(ALL).bicycleSafety(0.98));
+    props.setProperties("highway=residential_link", withModes(ALL).bicycleSafety(0.98));
     props.setProperties("highway=tertiary", allWayProperties);
     props.setProperties("highway=tertiary_link", allWayProperties);
-    props.setProperties("highway=secondary", withModes(ALL).walkSafety(1.5).bicycleSafety(1.5));
-    props.setProperties(
-      "highway=secondary_link",
-      withModes(ALL).walkSafety(1.5).bicycleSafety(1.5)
-    );
-    props.setProperties("highway=primary", withModes(ALL).walkSafety(2.06).bicycleSafety(2.06));
-    props.setProperties(
-      "highway=primary_link",
-      withModes(ALL).walkSafety(2.06).bicycleSafety(2.06)
-    );
+    props.setProperties("highway=secondary", withModes(ALL).bicycleSafety(1.5));
+    props.setProperties("highway=secondary_link", withModes(ALL).bicycleSafety(1.5));
+    props.setProperties("highway=primary", withModes(ALL).bicycleSafety(2.06));
+    props.setProperties("highway=primary_link", withModes(ALL).bicycleSafety(2.06));
     props.setProperties("highway=trunk", withModes(ALL).walkSafety(7.47).bicycleSafety(7.47));
     props.setProperties("highway=trunk_link", withModes(ALL).walkSafety(7.47).bicycleSafety(2.06));
 
@@ -206,17 +185,6 @@ public class OsmTagMapper {
         )
     );
 
-    /* foot=designated */
-    props.setMixinProperties(
-      new ExactMatchSpecifier(
-        new Equals("foot", "designated"),
-        new Not(new Equals("highway", "footway")),
-        new Not(new Equals("highway", "pedestrian")),
-        new Not(new Equals("highway", "path"))
-      ),
-      ofWalkSafety(0.9)
-    );
-
     /* sidewalk and crosswalk */
     props.setMixinProperties("footway=sidewalk", ofBicycleSafety(2.5));
     props.setMixinProperties("footway=crossing", ofBicycleSafety(2.5));
@@ -253,49 +221,19 @@ public class OsmTagMapper {
       ofBicycleSafety(0.7)
     );
 
-    // prefer walking on sidewalks
-    props.setMixinProperties(
-      new LogicalOrSpecifier(
-        new ExactMatchSpecifier(
-          new Equals("sidewalk", "yes"),
-          new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path", "trunk"))
-        ),
-        new ExactMatchSpecifier(
-          new Equals("sidewalk", "left"),
-          new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path", "trunk"))
-        ),
-        new ExactMatchSpecifier(
-          new Equals("sidewalk", "right"),
-          new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path", "trunk"))
-        ),
-        new ExactMatchSpecifier(
-          new Equals("sidewalk", "both"),
-          new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path", "trunk"))
-        )
-      ),
-      ofWalkSafety(0.9)
-    );
-
     props.setMixinProperties(
       new LogicalOrSpecifier(
         "highway=trunk;sidewalk=yes",
         "highway=trunk;sidewalk=left",
         "highway=trunk;sidewalk=right",
-        "highway=trunk;sidewalk=both",
-        "highway=trunk_link;sidewalk=yes",
-        "highway=trunk_link;sidewalk=left",
-        "highway=trunk_link;sidewalk=right",
-        "highway=trunk_link;sidewalk=both"
+        "highway=trunk;sidewalk=both"
       ),
-      ofWalkSafety(0.4)
+      ofWalkSafety(0.25)
     );
 
     props.setMixinProperties(
-      new ExactMatchSpecifier(
-        new Equals("sidewalk", "lane"),
-        new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path"))
-      ),
-      ofWalkSafety(0.95)
+      new ExactMatchSpecifier("highway=trunk;sidewalk=lane"),
+      ofWalkSafety(0.6)
     );
 
     /*

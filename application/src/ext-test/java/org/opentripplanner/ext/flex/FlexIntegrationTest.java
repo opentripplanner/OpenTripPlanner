@@ -239,11 +239,9 @@ public class FlexIntegrationTest {
       .withNumItineraries(10)
       .withSearchWindow(Duration.ofHours(2))
       .withPreferences(p ->
-        p
-          .withStreet(s ->
-            s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
-          )
-          .withWalk(walk -> walk.withSafetyFactor(0))
+        p.withStreet(s ->
+          s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
+        )
       )
       .withJourney(journeyBuilder -> {
         var modes = JourneyRequest.DEFAULT.modes().copyOf();
