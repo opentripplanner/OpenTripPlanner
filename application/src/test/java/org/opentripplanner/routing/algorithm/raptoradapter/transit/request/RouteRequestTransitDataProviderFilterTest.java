@@ -210,7 +210,8 @@ class RouteRequestTransitDataProviderFilterTest {
       filterForMode(TransitMode.BUS)
     );
 
-    boolean valid = filter.getTripFilter(tripPatternForDate.getTripPattern().getPattern()) != null;
+    boolean valid =
+      filter.createTripFilter(tripPatternForDate.getTripPattern().getPattern()) != null;
 
     assertTrue(valid);
   }
@@ -234,7 +235,8 @@ class RouteRequestTransitDataProviderFilterTest {
       )
     );
 
-    boolean valid = filter.getTripFilter(tripPatternForDate.getTripPattern().getPattern()) != null;
+    boolean valid =
+      filter.createTripFilter(tripPatternForDate.getTripPattern().getPattern()) != null;
 
     assertFalse(valid);
   }
@@ -951,7 +953,7 @@ class RouteRequestTransitDataProviderFilterTest {
       filterForModes(allowedModes)
     );
 
-    var timesFilter = filter.getTripFilter(patternAndTimes.pattern());
+    var timesFilter = filter.createTripFilter(patternAndTimes.pattern());
     if (timesFilter == null) {
       return false;
     }
@@ -1128,7 +1130,7 @@ class RouteRequestTransitDataProviderFilterTest {
     RouteRequestTransitDataProviderFilter filter,
     PatternAndTimes patternAndTimes
   ) {
-    var tripTimesFilter = filter.getTripFilter(patternAndTimes.pattern());
+    var tripTimesFilter = filter.createTripFilter(patternAndTimes.pattern());
     if (tripTimesFilter == null) {
       return false;
     }

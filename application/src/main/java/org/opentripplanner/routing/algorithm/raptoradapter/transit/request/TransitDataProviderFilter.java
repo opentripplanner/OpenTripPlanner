@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.BitSet;
-import java.util.Optional;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
@@ -27,7 +26,7 @@ public interface TransitDataProviderFilter {
    * object.
    */
   @Nullable
-  Predicate<TripTimes> getTripFilter(TripPattern tripPattern);
+  Predicate<TripTimes> createTripFilter(TripPattern tripPattern);
 
   /**
    * Check if boarding/alighting is possible at each stop. If the values differ from the default

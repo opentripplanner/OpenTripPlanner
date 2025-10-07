@@ -88,17 +88,17 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
 
   @Override
   @Nullable
-  public Predicate<TripTimes> getTripFilter(TripPattern tripPattern) {
+  public Predicate<TripTimes> createTripFilter(TripPattern tripPattern) {
     for (TransitFilter filter : filters) {
       if (filter.matchTripPattern(tripPattern)) {
-        var withFilters = hasSubModeFilters && tripPattern.getContainsMultipleModes();
-        return tripTimes -> this.tripTimesPredicate(tripTimes, withFilters);
+        var applyTripTimesFilters = hasSubModeFilters && tripPattern.getContainsMultipleModes();
+        return tripTimes -> tripTimesPredicate(tripTimes, applyTripTimesFilters);
       }
     }
     return null;
   }
 
-  private boolean tripTimesPredicate(TripTimes tripTimes, boolean withFilters) {
+  private boolean tripTimesPredicate(TripTimes tripTimes, boolean applyTripTimesFilters) {
     final Trip trip = tripTimes.getTrip();
 
     if (requireBikesAllowed && bikeAccessForTrip(trip) != BikeAccess.ALLOWED) {
@@ -137,7 +137,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     // Trip has to match with at least one predicate in order to be included in search. We only have
     // to this if we have mode specific filters, and not all trips on the pattern have the same
     // mode, since that's the only thing that is trip specific
-    if (withFilters) {
+    if (applyTripTimesFilters) {
       for (TransitFilter f : filters) {
         if (f.matchTripTimes(tripTimes)) {
           return true;

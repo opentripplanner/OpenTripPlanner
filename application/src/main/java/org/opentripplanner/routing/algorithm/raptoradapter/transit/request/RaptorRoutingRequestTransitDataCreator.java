@@ -13,12 +13,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -190,7 +188,7 @@ class RaptorRoutingRequestTransitDataCreator {
     List<TripPatternForDate> result = new ArrayList<>(tripPatternsForDate.size());
     for (TripPatternForDate p : tripPatternsForDate) {
       if (firstDay || p.getStartOfRunningPeriod().equals(date)) {
-        var tripTimesFilter = filter.getTripFilter(p.getTripPattern().getPattern());
+        var tripTimesFilter = filter.createTripFilter(p.getTripPattern().getPattern());
         if (tripTimesFilter == null) {
           continue;
         }
