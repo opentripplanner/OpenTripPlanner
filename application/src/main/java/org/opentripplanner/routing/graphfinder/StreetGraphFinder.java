@@ -13,6 +13,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
@@ -97,18 +98,17 @@ public class StreetGraphFinder implements GraphFinder {
 
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
-    try (
-      var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph, linker)
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var linkerContext = LinkingContext.of(temporaryVerticesContainer, graph, linker)
         .withFrom(GenericLocation.fromCoordinate(lat, lon), StreetMode.WALK)
-        .build()
-    ) {
+        .build();
       StreetSearchBuilder.of()
         .setSkipEdgeStrategy(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunctions.LeastWalk())
         .setRequest(request)
-        .setFrom(temporaryVerticesContainer.fromVertices())
-        .setTo(temporaryVerticesContainer.toVertices())
+        .setFrom(linkerContext.fromVertices())
+        .setTo(linkerContext.toVertices())
         .getShortestPathTree();
     }
   }
