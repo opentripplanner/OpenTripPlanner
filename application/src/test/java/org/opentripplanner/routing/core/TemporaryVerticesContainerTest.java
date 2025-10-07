@@ -36,6 +36,7 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -92,7 +93,8 @@ public class TemporaryVerticesContainerTest {
   @Test
   void createFromToViaVertexRequest() {
     var fromWithStops = new GenericLocation("From with stops", stopId, 1.0, 0.4);
-    var subject = TemporaryVerticesContainer.of(g, TestVertexLinker.of(g), Set::of)
+    var container = new TemporaryVerticesContainer();
+    var subject = LinkingContext.of(container, g, TestVertexLinker.of(g), Set::of)
       .withFrom(fromWithStops, StreetMode.WALK)
       .withTo(to, StreetMode.WALK)
       .withVia(viaLocations, EnumSet.of(StreetMode.WALK))
@@ -125,24 +127,24 @@ public class TemporaryVerticesContainerTest {
   @Test
   void temporaryChangesRemovedOnClose() {
     // When - the container is created
-    var subject = TemporaryVerticesContainer.of(g, TestVertexLinker.of(g))
+    var container = new TemporaryVerticesContainer();
+    var subject = LinkingContext.of(container, g, TestVertexLinker.of(g))
       .withFrom(from, StreetMode.WALK)
       .withTo(to, StreetMode.WALK)
       .build();
 
     // Then:
     originAndDestinationInsertedCorrect(subject, false);
-    cleanUpAndValidate(subject);
+    cleanUpAndValidate(container);
   }
 
   @Test
   void multipleModes() {
-    try (
-      var subject = TemporaryVerticesContainer.of(g, TestVertexLinker.of(g))
+    try (var container = new TemporaryVerticesContainer();) {
+      var subject = LinkingContext.of(container, g, TestVertexLinker.of(g))
         .withFrom(from, EnumSet.of(StreetMode.WALK, StreetMode.CAR_TO_PARK))
         .withTo(to, StreetMode.WALK)
-        .build()
-    ) {
+        .build();
       // When - the container is created
 
       // Then:
@@ -157,7 +159,8 @@ public class TemporaryVerticesContainerTest {
   @Test
   void temporaryChangesRemovedOnCloseWithVia() {
     // When - the container is created
-    var subject = TemporaryVerticesContainer.of(g, TestVertexLinker.of(g))
+    var container = new TemporaryVerticesContainer();
+    var subject = LinkingContext.of(container, g, TestVertexLinker.of(g))
       .withFrom(from, StreetMode.WALK)
       .withTo(to, StreetMode.WALK)
       .withVia(viaLocations, EnumSet.of(StreetMode.WALK))
@@ -165,36 +168,38 @@ public class TemporaryVerticesContainerTest {
 
     // Then:
     locationsInsertedCorrect(subject);
-    cleanUpAndValidate(subject);
+    cleanUpAndValidate(container);
   }
 
   @Test
   void locationNotFoundException() {
     // Stops not found
+    var container = new TemporaryVerticesContainer();
     var fromException = assertThrows(RoutingValidationException.class, () ->
-      TemporaryVerticesContainer.of(g, TestVertexLinker.of(g))
+      LinkingContext.of(container, g, TestVertexLinker.of(g))
         .withFrom(
           new GenericLocation("Stop not found", new FeedScopedId("F", "stop1"), null, null),
           StreetMode.WALK
         )
         .build()
-        .close()
     );
+    container.close();
     assertThat(fromException.getRoutingErrors()).hasSize(1);
     var fromError = fromException.getRoutingErrors().getFirst();
     assertEquals(InputField.FROM_PLACE, fromError.inputField);
     assertEquals(RoutingErrorCode.LOCATION_NOT_FOUND, fromError.code);
 
+    var toContainer = new TemporaryVerticesContainer();
     var toException = assertThrows(RoutingValidationException.class, () ->
-      TemporaryVerticesContainer.of(g, TestVertexLinker.of(g))
+      LinkingContext.of(toContainer, g, TestVertexLinker.of(g))
         .withFrom(from, StreetMode.WALK)
         .withTo(
           new GenericLocation("Stop not found", new FeedScopedId("F", "stop1"), null, null),
           StreetMode.WALK
         )
         .build()
-        .close()
     );
+    toContainer.close();
 
     assertThat(toException.getRoutingErrors()).hasSize(1);
     var toError = toException.getRoutingErrors().getFirst();
@@ -202,8 +207,9 @@ public class TemporaryVerticesContainerTest {
     assertEquals(RoutingErrorCode.LOCATION_NOT_FOUND, toError.code);
 
     // Coordinate not found (but in bounds)
+    var viaContainer = new TemporaryVerticesContainer();
     var viaException = assertThrows(RoutingValidationException.class, () ->
-      TemporaryVerticesContainer.of(g, TestVertexLinker.of(g))
+      LinkingContext.of(viaContainer, g, TestVertexLinker.of(g))
         .withFrom(from, StreetMode.WALK)
         .withTo(to, StreetMode.WALK)
         .withVia(
@@ -211,8 +217,8 @@ public class TemporaryVerticesContainerTest {
           EnumSet.of(StreetMode.WALK)
         )
         .build()
-        .close()
     );
+    viaContainer.close();
     assertThat(viaException.getRoutingErrors()).hasSize(1);
     var viaError = viaException.getRoutingErrors().getFirst();
     assertEquals(InputField.INTERMEDIATE_PLACE, viaError.inputField);
@@ -221,8 +227,9 @@ public class TemporaryVerticesContainerTest {
 
   @Test
   void locationOutsideBoundsException() {
+    var container = new TemporaryVerticesContainer();
     var exception = assertThrows(RoutingValidationException.class, () ->
-      TemporaryVerticesContainer.of(g, TestVertexLinker.of(g))
+      LinkingContext.of(container, g, TestVertexLinker.of(g))
         .withFrom(GenericLocation.fromCoordinate(0, 0.02), StreetMode.WALK)
         .withTo(GenericLocation.fromCoordinate(0, 0.01), StreetMode.WALK)
         .withVia(
@@ -230,8 +237,8 @@ public class TemporaryVerticesContainerTest {
           EnumSet.of(StreetMode.WALK)
         )
         .build()
-        .close()
     );
+    container.close();
 
     assertThat(exception.getRoutingErrors()).hasSize(3);
     var fromError = exception.getRoutingErrors().get(0);
@@ -247,13 +254,14 @@ public class TemporaryVerticesContainerTest {
 
   @Test
   void walkingBetterThanTransitException() {
+    var container = new TemporaryVerticesContainer();
     var exception = assertThrows(RoutingValidationException.class, () ->
-      TemporaryVerticesContainer.of(g, TestVertexLinker.of(g))
+      LinkingContext.of(container, g, TestVertexLinker.of(g))
         .withFrom(from, StreetMode.WALK)
         .withTo(from, StreetMode.WALK)
         .build()
-        .close()
     );
+    container.close();
 
     assertThat(exception.getRoutingErrors()).hasSize(1);
     var fromError = exception.getRoutingErrors().getFirst();
@@ -263,14 +271,15 @@ public class TemporaryVerticesContainerTest {
 
   @Test
   void cleanUpWhenExceptionThrown() {
+    var container = new TemporaryVerticesContainer();
     assertThrows(RoutingValidationException.class, () ->
-      TemporaryVerticesContainer.of(g, TestVertexLinker.of(g))
+      LinkingContext.of(container, g, TestVertexLinker.of(g))
         .withFrom(from, StreetMode.WALK)
         .withTo(from, StreetMode.WALK)
         .withVia(viaLocations, EnumSet.of(StreetMode.WALK))
         .build()
-        .close()
     );
+    container.close();
 
     validateCleanup();
   }
@@ -296,7 +305,7 @@ public class TemporaryVerticesContainerTest {
   }
 
   private void originAndDestinationInsertedCorrect(
-    TemporaryVerticesContainer subject,
+    LinkingContext subject,
     boolean hasViaLocations
   ) {
     // Then - the origin and destination is
@@ -344,7 +353,7 @@ public class TemporaryVerticesContainerTest {
     assertFalse(vertexesReachableFromDestination.contains("C"), msg);
   }
 
-  private void locationsInsertedCorrect(TemporaryVerticesContainer subject) {
+  private void locationsInsertedCorrect(LinkingContext subject) {
     originAndDestinationInsertedCorrect(subject, true);
     // Then - only via locations with coordinates are included
     var verticesByLocation = subject.verticesByLocation();

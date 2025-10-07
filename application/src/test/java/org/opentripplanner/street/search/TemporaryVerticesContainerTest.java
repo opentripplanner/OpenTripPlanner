@@ -62,28 +62,30 @@ class TemporaryVerticesContainerTest {
 
   @Test
   void coordinates() {
-    var container = TemporaryVerticesContainer.of(graph, TestVertexLinker.of(graph))
+    var container = new TemporaryVerticesContainer();
+    var linkingContext = LinkingContext.of(container, graph, TestVertexLinker.of(graph))
       .withFrom(GenericLocation.fromCoordinate(stopA.getLat(), stopA.getLon()), WALK)
       .withTo(GenericLocation.fromCoordinate(stopD.getLat(), stopD.getLon()), WALK)
       .build();
-    assertThat(container.fromVertices()).hasSize(1);
-    assertThat(container.toVertices()).hasSize(1);
+    assertThat(linkingContext.fromVertices()).hasSize(1);
+    assertThat(linkingContext.toVertices()).hasSize(1);
 
-    assertThat(container.fromStopVertices()).isEmpty();
-    assertThat(container.toStopVertices()).isEmpty();
+    assertThat(linkingContext.fromStopVertices()).isEmpty();
+    assertThat(linkingContext.toStopVertices()).isEmpty();
   }
 
   @Test
   void stopId() {
-    var container = TemporaryVerticesContainer.of(graph, TestVertexLinker.of(graph), Set::of)
+    var container = new TemporaryVerticesContainer();
+    var linkingContext = LinkingContext.of(container, graph, TestVertexLinker.of(graph), Set::of)
       .withFrom(stopToLocation(stopA), WALK)
       .withTo(stopToLocation(stopB), WALK)
       .build();
-    assertEquals(stopA, toStop(container.fromVertices()));
-    assertEquals(stopB, toStop(container.toVertices()));
+    assertEquals(stopA, toStop(linkingContext.fromVertices()));
+    assertEquals(stopB, toStop(linkingContext.toVertices()));
 
-    assertEquals(stopA, toStop(container.fromStopVertices()));
-    assertEquals(stopB, toStop(container.toStopVertices()));
+    assertEquals(stopA, toStop(linkingContext.fromStopVertices()));
+    assertEquals(stopB, toStop(linkingContext.toStopVertices()));
   }
 
   @Test
@@ -91,21 +93,28 @@ class TemporaryVerticesContainerTest {
     var mapping = ImmutableMultimap.<FeedScopedId, FeedScopedId>builder()
       .putAll(OMEGA_ID, stopC.getId(), stopD.getId())
       .build();
-    var container = TemporaryVerticesContainer.of(graph, TestVertexLinker.of(graph), mapping::get)
+    var container = new TemporaryVerticesContainer();
+    var linkingContext = LinkingContext.of(
+      container,
+      graph,
+      TestVertexLinker.of(graph),
+      mapping::get
+    )
       .withFrom(GenericLocation.fromStopId("station", OMEGA_ID.getFeedId(), OMEGA_ID.getId()), WALK)
       .withTo(stopToLocation(stopB), WALK)
       .build();
-    assertThat(toStops(container.fromVertices())).containsExactly(stopC, stopD);
-    assertThat(toStops(container.fromStopVertices())).containsExactly(stopC, stopD);
+    assertThat(toStops(linkingContext.fromVertices())).containsExactly(stopC, stopD);
+    assertThat(toStops(linkingContext.fromStopVertices())).containsExactly(stopC, stopD);
   }
 
   @Test
   void centroid() {
-    var container = TemporaryVerticesContainer.of(graph, TestVertexLinker.of(graph))
+    var container = new TemporaryVerticesContainer();
+    var linkingContext = LinkingContext.of(container, graph, TestVertexLinker.of(graph))
       .withFrom(GenericLocation.fromStopId("station", ALPHA_ID.getFeedId(), ALPHA_ID.getId()), WALK)
       .withTo(stopToLocation(stopB), WALK)
       .build();
-    var fromVertices = List.copyOf(container.fromVertices());
+    var fromVertices = List.copyOf(linkingContext.fromVertices());
     assertThat(fromVertices).hasSize(1);
 
     var station = ((StationCentroidVertex) fromVertices.getFirst()).getStation();
