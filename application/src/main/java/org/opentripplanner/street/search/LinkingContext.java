@@ -1,13 +1,11 @@
 package org.opentripplanner.street.search;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -19,9 +17,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * are no longer needed, this class removes the temporary vertices and edges. It implements
  * AutoCloseable and the cleanup is automatically done with a try-with-resources statement.
  */
-public class LinkingContext implements AutoCloseable {
+public class LinkingContext {
 
-  private final List<DisposableEdgeCollection> tempEdges;
   private final GenericLocation from;
   private final GenericLocation to;
   private final Map<GenericLocation, Set<Vertex>> verticesByLocation;
@@ -29,7 +26,6 @@ public class LinkingContext implements AutoCloseable {
   private final Set<TransitStopVertex> toStopVertices;
 
   public LinkingContext(TemporaryVerticesContainerBuilder builder) {
-    this.tempEdges = builder.tempEdges();
     this.from = builder.from();
     this.to = builder.to();
     this.fromStopVertices = builder.fromStopVertices();
@@ -99,14 +95,5 @@ public class LinkingContext implements AutoCloseable {
    */
   public FromToViaVertexRequest createFromToViaVertexRequest() {
     return new FromToViaVertexRequest(fromStopVertices, toStopVertices, verticesByLocation);
-  }
-
-  /**
-   * Tear down this container, removing any temporary edges from the "permanent" graph objects. This
-   * enables all temporary objects for garbage collection.
-   */
-  @Override
-  public void close() {
-    this.tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
   }
 }
