@@ -38,6 +38,7 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -564,12 +565,15 @@ public class TestHalfEdges {
       .withTo(GenericLocation.fromCoordinate(40.008, -74.0))
       .buildRequest();
 
-    try (
-      var container = TemporaryVerticesContainer.of(graph, TestVertexLinker.of(graph))
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var container = LinkingContext.of(
+        temporaryVerticesContainer,
+        graph,
+        TestVertexLinker.of(graph)
+      )
         .withFrom(walking.from(), StreetMode.WALK)
         .withTo(walking.to(), StreetMode.WALK)
         .build();
-    ) {
       assertFalse(container.fromVertices().isEmpty());
       assertFalse(container.toVertices().isEmpty());
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
