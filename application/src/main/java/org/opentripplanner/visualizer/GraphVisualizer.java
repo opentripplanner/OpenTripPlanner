@@ -76,6 +76,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
@@ -513,8 +514,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     var request = builder.buildRequest();
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)
-    try (
-      var temporaryVerticesContainer = TemporaryVerticesContainer.of(
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var linkerContext = LinkingContext.of(
+        temporaryVerticesContainer,
         graph,
         new VertexLinker(
           graph,
@@ -524,11 +526,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       )
         .withFrom(request.from(), request.journey().direct().mode())
         .withTo(request.from(), request.journey().direct().mode())
-        .build()
-    ) {
+        .build();
       List<GraphPath<State, Edge, Vertex>> paths = finder.graphPathFinderEntryPoint(
         request,
-        temporaryVerticesContainer.createFromToViaVertexRequest()
+        linkerContext.createFromToViaVertexRequest()
       );
       long dt = System.currentTimeMillis() - t0;
       searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");
