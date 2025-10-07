@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.model;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -12,7 +13,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * A rule set for matching a leg for fare calculation purposes.
  */
-public final class FareLegRule {
+public final class FareLegRule implements Serializable {
 
   private final FeedScopedId id;
   private final Collection<FareProduct> fareProducts;
@@ -66,7 +67,6 @@ public final class FareLegRule {
     return id;
   }
 
-  @Nullable
   public FeedScopedId legGroupId() {
     return legGroupId;
   }

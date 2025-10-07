@@ -1,13 +1,10 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static org.opentripplanner.utils.collection.ListUtils.partitionIntoOverlappingPairs;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.SetMultimap;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -25,7 +22,6 @@ import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.collection.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +31,10 @@ class FareLookupService implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(FareLookupService.class);
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
-  private final SetMultimap<FeedScopedId, FeedScopedId> stopAreas;
   private final Set<FeedScopedId> networksWithRules;
   private final Set<FeedScopedId> fromAreasWithRules;
   private final Set<FeedScopedId> toAreasWithRules;
-  private List<FareLegRule> fromRules;
+  private final AreaMatcher areaMatcher;
 
   FareLookupService(
     List<FareLegRule> legRules,
@@ -51,7 +46,7 @@ class FareLookupService implements Serializable {
     this.networksWithRules = findNetworksWithRules(legRules);
     this.fromAreasWithRules = findAreasWithRules(legRules, FareLegRule::fromAreaId);
     this.toAreasWithRules = findAreasWithRules(legRules, FareLegRule::toAreaId);
-    this.stopAreas = ImmutableSetMultimap.copyOf(stopAreas);
+    this.areaMatcher = new AreaMatcher(legRules, stopAreas);
   }
 
   /**
@@ -98,7 +93,7 @@ class FareLookupService implements Serializable {
     Set<TransferMatch> rules =
       this.transferRules.stream()
         .flatMap(r -> {
-          fromRules = findFareLegRule(r.fromLegGroup());
+          var fromRules = findFareLegRule(r.fromLegGroup());
           var toRules = findFareLegRule(r.toLegGroup());
           if (fromRules.isEmpty() || toRules.isEmpty()) {
             return Stream.of();
@@ -212,8 +207,8 @@ class FareLookupService implements Serializable {
       // apply only those fare leg rules which have the correct area ids
       // if area id is null, the rule applies to all legs UNLESS there is another rule that
       // covers this area
-      matchesArea(leg.from().stop, rule.fromAreaId(), fromAreasWithRules) &&
-      matchesArea(leg.to().stop, rule.toAreaId(), toAreasWithRules) &&
+      areaMatcher.matchesArea(leg.from().stop, rule.fromAreaId(), fromAreasWithRules) &&
+      areaMatcher.matchesArea(leg.to().stop, rule.toAreaId(), toAreasWithRules) &&
       matchesDistance(leg, rule)
     );
   }
@@ -236,18 +231,6 @@ class FareLookupService implements Serializable {
     } else {
       return true;
     }
-  }
-
-  private boolean matchesArea(
-    StopLocation stop,
-    FeedScopedId areaId,
-    Set<FeedScopedId> areasWithRules
-  ) {
-    var stopAreas = this.stopAreas.get(stop.getId());
-    return (
-      (isNull(areaId) && stopAreas.stream().noneMatch(areasWithRules::contains)) ||
-      (nonNull(areaId) && stopAreas.contains(areaId))
-    );
   }
 
   /**
