@@ -32,6 +32,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -183,7 +184,9 @@ public class BarrierRoutingTest {
 
     options.accept(builder);
 
-    var temporaryVerticesContainer = TemporaryVerticesContainer.of(
+    var temporaryVerticesContainer = new TemporaryVerticesContainer();
+    var linkingContext = LinkingContext.of(
+      temporaryVerticesContainer,
       graph,
       TestVertexLinker.of(graph)
     )
@@ -191,7 +194,7 @@ public class BarrierRoutingTest {
       .withTo(to, streetMode)
       .build();
     var gpf = new GraphPathFinder(null);
-    var fromToViaVertexRequest = temporaryVerticesContainer.createFromToViaVertexRequest();
+    var fromToViaVertexRequest = linkingContext.createFromToViaVertexRequest();
     var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), fromToViaVertexRequest);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
