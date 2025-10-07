@@ -15,6 +15,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add OTP Badge to ServerInfo [#6865](https://github.com/opentripplanner/OpenTripPlanner/pull/6865)
 - Apply correct traversal permissions to indoor tagged entities [#6923](https://github.com/opentripplanner/OpenTripPlanner/pull/6923)
 - Multiplicative stairs and turn reluctance [#6783](https://github.com/opentripplanner/OpenTripPlanner/pull/6783)
+- Update contribution guidelines [#6869](https://github.com/opentripplanner/OpenTripPlanner/pull/6869)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
