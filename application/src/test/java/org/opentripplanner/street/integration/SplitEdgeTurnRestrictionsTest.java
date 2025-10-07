@@ -166,14 +166,12 @@ public class SplitEdgeTurnRestrictionsTest {
       .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
       .buildRequest();
 
-    try(var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
-
-
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var linkingContext = LinkingContext.of(
         temporaryVerticesContainer,
-          graph,
-          TestVertexLinker.of(graph)
-        )
+        graph,
+        TestVertexLinker.of(graph)
+      )
         .withFrom(from, StreetMode.CAR)
         .withTo(to, StreetMode.CAR)
         .build();
