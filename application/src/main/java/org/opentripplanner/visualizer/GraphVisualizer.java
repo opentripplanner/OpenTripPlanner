@@ -517,13 +517,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var linkerContext = LinkingContext.of(
         temporaryVerticesContainer,
+        graph,
+        new VertexLinker(
           graph,
-          new VertexLinker(
-            graph,
-            VisibilityMode.TRAVERSE_AREA_EDGES,
-            StreetConstants.DEFAULT_MAX_AREA_NODES
-          )
+          VisibilityMode.TRAVERSE_AREA_EDGES,
+          StreetConstants.DEFAULT_MAX_AREA_NODES
         )
+      )
         .withFrom(request.from(), request.journey().direct().mode())
         .withTo(request.from(), request.journey().direct().mode())
         .build();
