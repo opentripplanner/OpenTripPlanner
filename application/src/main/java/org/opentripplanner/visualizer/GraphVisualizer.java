@@ -525,7 +525,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         )
       )
         .withFrom(request.from(), request.journey().direct().mode())
-        .withTo(request.from(), request.journey().direct().mode())
+        .withTo(request.to(), request.journey().direct().mode())
         .build();
       List<GraphPath<State, Edge, Vertex>> paths = finder.graphPathFinderEntryPoint(
         request,
