@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -295,7 +297,8 @@ public abstract class GraphRoutingTest {
     }
 
     public StationCentroidVertex stationCentroid(Station station) {
-      return vertexFactory.stationCentroid(station);
+      assertTrue(station.shouldRouteToCentroid());
+      return vertexFactory.stationCentroid(station.getId(), station.getCoordinate());
     }
 
     public StreetTransitEntranceLink link(StreetVertex from, TransitEntranceVertex to) {

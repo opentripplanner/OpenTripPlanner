@@ -469,6 +469,7 @@
                             <sources>
                                 <source>src/test/java</source>
                                 <source>src/ext-test/java</source>
+                                <source>src/test-fixtures/java</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -505,6 +506,7 @@
                         <inputGlob>src/main/java/**/*.java</inputGlob>
                         <inputGlob>src/ext/java/**/*.java</inputGlob>
                         <inputGlob>src/test/java/**/*.java</inputGlob>
+                        <inputGlob>src/test-fixtures/java/**/*.java</inputGlob>
                         <inputGlob>src/ext-test/java/**/*.java</inputGlob>
                         <inputGlob>src/**/*.json</inputGlob>
                         <inputGlob>src/test/resources/org/opentripplanner/apis/**/*.graphql</inputGlob>

@@ -42,22 +42,22 @@ public abstract class AStarBuilder<
     this.builder = builder;
   }
 
-  public Builder setHeuristic(RemainingWeightHeuristic<State> heuristic) {
+  public Builder withHeuristic(RemainingWeightHeuristic<State> heuristic) {
     this.heuristic = heuristic;
     return builder;
   }
 
-  public Builder setSkipEdgeStrategy(SkipEdgeStrategy<State, Edge> skipEdgeStrategy) {
+  public Builder withSkipEdgeStrategy(SkipEdgeStrategy<State, Edge> skipEdgeStrategy) {
     this.skipEdgeStrategy = skipEdgeStrategy;
     return builder;
   }
 
-  public Builder setTraverseVisitor(TraverseVisitor<State, Edge> traverseVisitor) {
+  public Builder withTraverseVisitor(TraverseVisitor<State, Edge> traverseVisitor) {
     this.traverseVisitor = traverseVisitor;
     return builder;
   }
 
-  public Builder setArriveBy(boolean arriveBy) {
+  public Builder withArriveBy(boolean arriveBy) {
     this.arriveBy = arriveBy;
     return builder;
   }
@@ -66,46 +66,41 @@ public abstract class AStarBuilder<
     return arriveBy;
   }
 
-  public Builder setFrom(Set<Vertex> fromVertices) {
+  public Builder withFrom(Set<Vertex> fromVertices) {
     this.fromVertices = fromVertices;
     return builder;
   }
 
-  public Builder setFrom(Vertex fromVertex) {
+  public Builder withFrom(Vertex fromVertex) {
     this.fromVertices = Collections.singleton(fromVertex);
     return builder;
   }
 
-  public Builder setTo(Set<Vertex> toVertices) {
+  public Builder withTo(Set<Vertex> toVertices) {
     this.toVertices = toVertices;
     return builder;
   }
 
-  public Builder setTo(Vertex toVertex) {
+  public Builder withTo(Vertex toVertex) {
     this.toVertices = Collections.singleton(toVertex);
     return builder;
   }
 
-  public Builder setTerminationStrategy(SearchTerminationStrategy<State> terminationStrategy) {
+  public Builder withTerminationStrategy(SearchTerminationStrategy<State> terminationStrategy) {
     this.terminationStrategy = terminationStrategy;
     return builder;
   }
 
   /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
-  public Builder setDominanceFunction(DominanceFunction<State> dominanceFunction) {
+  public Builder withDominanceFunction(DominanceFunction<State> dominanceFunction) {
     this.dominanceFunction = dominanceFunction;
     return builder;
   }
 
   protected abstract Duration streetRoutingTimeout();
 
-  public Builder setOriginBackEdge(Edge originBackEdge) {
+  public Builder withOriginBackEdge(Edge originBackEdge) {
     this.originBackEdge = originBackEdge;
-    return builder;
-  }
-
-  public Builder setInitialStates(Collection<State> initialStates) {
-    this.initialStates = initialStates;
     return builder;
   }
 

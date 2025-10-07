@@ -18,12 +18,12 @@ class ViaSegmentMapper {
     var journey = defaultRequest.journey().copyOf();
     if (viaSegment.containsKey("modes")) {
       Map<String, Object> modesInput = (Map<String, Object>) viaSegment.get("modes");
-      journey.setModes(RequestStreetModesMapper.mapRequestStreetModes(modesInput));
+      journey.withModes(RequestStreetModesMapper.mapRequestStreetModes(modesInput));
     }
     if (viaSegment.containsKey("filters")) {
       journey.withTransit(tb -> {
         List<Map<String, ?>> filters = (List<Map<String, ?>>) viaSegment.get("filters");
-        tb.setFilters(transitFilterNewWayMapper.mapFilter(filters));
+        tb.withFilters(transitFilterNewWayMapper.mapFilter(filters));
       });
     }
     return journey.build();

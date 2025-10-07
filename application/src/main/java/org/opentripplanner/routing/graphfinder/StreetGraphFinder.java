@@ -112,11 +112,11 @@ public class StreetGraphFinder implements GraphFinder {
       )
     ) {
       StreetSearchBuilder.of()
-        .setSkipEdgeStrategy(skipEdgeStrategy)
-        .setTraverseVisitor(visitor)
-        .setDominanceFunction(new DominanceFunctions.LeastWalk())
-        .setRequest(request)
-        .setVerticesContainer(temporaryVertices)
+        .withSkipEdgeStrategy(skipEdgeStrategy)
+        .withTraverseVisitor(visitor)
+        .withDominanceFunction(new DominanceFunctions.LeastWalk())
+        .withRequest(request)
+        .withVerticesContainer(temporaryVertices)
         .getShortestPathTree();
     }
   }

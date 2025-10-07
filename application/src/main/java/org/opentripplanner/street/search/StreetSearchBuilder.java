@@ -36,31 +36,31 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
     setBuilder(this);
   }
 
-  public StreetSearchBuilder setRequest(RouteRequest request) {
+  public StreetSearchBuilder withRequest(RouteRequest request) {
     this.routeRequest = request;
-    setArriveBy(request.arriveBy());
+    withArriveBy(request.arriveBy());
     return this;
   }
 
-  public StreetSearchBuilder setStreetRequest(StreetRequest streetRequest) {
+  public StreetSearchBuilder withStreetRequest(StreetRequest streetRequest) {
     this.streetRequest = streetRequest;
     return this;
   }
 
-  public StreetSearchBuilder setVerticesContainer(TemporaryVerticesContainer container) {
-    setFrom(container.getFromVertices());
-    setTo(container.getToVertices());
+  public StreetSearchBuilder withVerticesContainer(TemporaryVerticesContainer container) {
+    withFrom(container.getFromVertices());
+    withTo(container.getToVertices());
     return this;
   }
 
-  public StreetSearchBuilder setIntersectionTraversalCalculator(
+  public StreetSearchBuilder withIntersectionTraversalCalculator(
     IntersectionTraversalCalculator intersectionTraversalCalculator
   ) {
     this.intersectionTraversalCalculator = intersectionTraversalCalculator;
     return this;
   }
 
-  public StreetSearchBuilder setExtensionRequestContexts(
+  public StreetSearchBuilder withExtensionRequestContexts(
     Collection<ExtensionRequestContext> extensionRequestContexts
   ) {
     this.extensionRequestContexts = List.copyOf(extensionRequestContexts);

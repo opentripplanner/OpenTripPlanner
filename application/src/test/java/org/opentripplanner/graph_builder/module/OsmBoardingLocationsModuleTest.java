@@ -18,10 +18,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
@@ -127,7 +127,7 @@ class OsmBoardingLocationsModuleTest {
     new OsmBoardingLocationsModule(
       graph,
       timetableRepository,
-      TestVertexLinker.of(graph),
+      VertexLinkerTestFactory.of(graph),
       osmService
     ).buildGraph();
 
@@ -303,7 +303,7 @@ class OsmBoardingLocationsModuleTest {
     new OsmBoardingLocationsModule(
       graph,
       new TimetableRepository(siteRepo, new Deduplicator()),
-      TestVertexLinker.of(graph),
+      VertexLinkerTestFactory.of(graph),
       new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();
 

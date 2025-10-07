@@ -70,21 +70,21 @@ public class FareModelForTest implements FareTestConstants {
     .addFareZones(OTHER_FEED_ZONE)
     .build();
   public static final FareAttribute TEN_DOLLARS = FareAttribute.of(id("airport-to-city-center"))
-    .setPrice(Money.usDollars(10))
-    .setTransfers(0)
+    .withPrice(Money.usDollars(10))
+    .withTransfers(0)
     .build();
 
   public static final FareAttribute FREE_TRANSFERS = FareAttribute.of(id("free-transfers"))
-    .setPrice(Money.usDollars(20))
-    .setTransfers(10)
+    .withPrice(Money.usDollars(20))
+    .withTransfers(10)
     .build();
 
   public static final FareAttribute OTHER_FEED_ATTRIBUTE = FareAttribute.of(
     FeedScopedId.ofNullable("F2", "other-feed-attribute")
   )
-    .setPrice(Money.usDollars(10))
-    .setTransfers(1)
-    .setAgency(OTHER_FEED_AGENCY.getId())
+    .withPrice(Money.usDollars(10))
+    .withTransfers(1)
+    .withAgency(OTHER_FEED_AGENCY.getId())
     .build();
   public static final FareOffer ANY_FARE_OFFER = FareOffer.of(
     ZonedDateTime.parse("2025-06-24T12:16:09+02:00"),

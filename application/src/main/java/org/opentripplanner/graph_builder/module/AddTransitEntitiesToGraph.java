@@ -145,7 +145,7 @@ public class AddTransitEntitiesToGraph {
   private void addStationCentroidsToGraph() {
     for (Station station : otpTransitService.siteRepository().listStations()) {
       if (station.shouldRouteToCentroid()) {
-        vertexFactory.stationCentroid(station);
+        vertexFactory.stationCentroid(station.getId(), station.getCoordinate());
       }
     }
   }
