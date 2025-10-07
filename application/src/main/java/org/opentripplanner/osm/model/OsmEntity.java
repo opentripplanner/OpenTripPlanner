@@ -193,7 +193,9 @@ public class OsmEntity {
    * Adds a tag.
    */
   public void addTag(OsmTag tag) {
-    if (tags == null) tags = new HashMap<>();
+    if (tags == null) {
+      tags = new HashMap<>();
+    }
 
     tags.put(tag.getK().toLowerCase(), tag.getV());
   }
@@ -395,8 +397,11 @@ public class OsmEntity {
     int colonCount = (int) duration.chars().filter(ch -> ch == ':').count();
     if (colonCount <= 2) {
       try {
-        int i, j;
-        long hours, minutes, seconds;
+        int i;
+        int j;
+        long hours;
+        long minutes;
+        long seconds;
         // The first :-separated element can be any width, and has no maximum. It still has
         // to be non-negative. The following elements must be 2 characters wide, non-negative,
         // and less than 60.
@@ -567,7 +572,9 @@ public class OsmEntity {
       for (Map.Entry<String, String> kv : i18nTags.entrySet()) {
         if (!kv.getKey().equals(defKey)) {
           String lang = kv.getKey().substring(defKey.length() + 1);
-          if (!i18n.containsKey(lang)) i18n.put(lang, new StringBuffer(i18n.get(null)));
+          if (!i18n.containsKey(lang)) {
+            i18n.put(lang, new StringBuffer(i18n.get(null)));
+          }
         }
       }
       // get the simple value (eg: description=...)

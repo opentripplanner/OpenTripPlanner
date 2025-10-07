@@ -11,7 +11,8 @@ import org.opentripplanner.transit.service.TimetableRepository;
 
 public class VehicleParkingTestGraphData {
 
-  protected IntersectionVertex A, B;
+  protected IntersectionVertex A;
+  protected IntersectionVertex B;
 
   protected Graph graph;
 

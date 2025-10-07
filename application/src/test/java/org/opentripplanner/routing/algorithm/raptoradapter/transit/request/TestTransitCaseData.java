@@ -7,7 +7,7 @@ import org.opentripplanner.transit.model.site.Station;
 
 public final class TestTransitCaseData {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   public static final Station STATION_A = TEST_MODEL.station("A")
     .withCoordinate(60.0, 11.1)

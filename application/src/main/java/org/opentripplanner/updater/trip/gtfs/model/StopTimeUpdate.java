@@ -232,10 +232,11 @@ public final class StopTimeUpdate {
   }
 
   private OptionalInt getDelay(StopTimeEvent stopTimeEvent) {
-    return stopTimeEvent.hasDelay()
-      ? OptionalInt.of(stopTimeEvent.getDelay())
-      : stopTimeEvent.hasTime() && stopTimeEvent.hasScheduledTime()
-        ? OptionalInt.of((int) (stopTimeEvent.getTime() - stopTimeEvent.getScheduledTime()))
-        : OptionalInt.empty();
+    if (stopTimeEvent.hasDelay()) {
+      return OptionalInt.of(stopTimeEvent.getDelay());
+    }
+    return stopTimeEvent.hasTime() && stopTimeEvent.hasScheduledTime()
+      ? OptionalInt.of((int) (stopTimeEvent.getTime() - stopTimeEvent.getScheduledTime()))
+      : OptionalInt.empty();
   }
 }

@@ -23,7 +23,7 @@ class TransitFilterOldWayMapperTest {
     new DefaultFeedIdMapper()
   );
 
-  private TransitRequestBuilder transitBuilder = TransitRequest.of();
+  private final TransitRequestBuilder transitBuilder = TransitRequest.of();
 
   @Test
   void mapEmptyFilter() {

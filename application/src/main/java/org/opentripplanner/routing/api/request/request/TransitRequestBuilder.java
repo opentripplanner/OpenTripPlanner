@@ -19,7 +19,7 @@ public class TransitRequestBuilder {
   private List<TransitGroupSelect> priorityGroupsByAgency;
   private List<TransitGroupSelect> priorityGroupsGlobal;
   private DebugRaptor raptorDebugging;
-  private TransitRequest original;
+  private final TransitRequest original;
 
   public TransitRequestBuilder(TransitRequest original) {
     this.original = original;

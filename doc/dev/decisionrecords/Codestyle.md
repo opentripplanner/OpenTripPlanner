@@ -29,16 +29,38 @@ You can manually run _only_ the formatting process with:
 % mvn prettier:write
 ```
 
-To skip the Prettier formating, use the profile `prettierSkip`:
+To skip the Prettier, use the profile `prettierSkip`:
 
 ```shell
 % mvn test -P prettierSkip
 ```
 
-To check for formatting errors, use the profile `prettierCheck`:
+To check for prettier formatting errors, use the profile `prettierCheck`:
 
 ```shell
 % mvn test -P prettierCheck
+```
+
+The check is run by the CI server and will fail the build if the code is incorrectly formatted.
+
+### How to Run OpenRewrite with Maven
+
+OpenRewrite is configured to not run by default. You need to enable the profile to run it:
+
+```shell
+% mvn test -P rewrite
+```
+
+You can manually run _only_ the rewrite formatting process with:
+
+```shell
+% mvn rewrite:run -P rewrite
+```
+
+To check for rewrite errors without automatically fixing them, use the profile `rewriteCheck`:
+
+```shell
+% mvn test -P rewriteCheck
 ```
 
 The check is run by the CI server and will fail the build if the code is incorrectly formatted.

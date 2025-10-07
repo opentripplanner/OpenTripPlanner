@@ -60,7 +60,9 @@ public class TileRendererManager {
     context.graph = graph;
 
     TileRenderer renderer = renderers.get(layer);
-    if (renderer == null) throw new IllegalArgumentException("Unknown layer: " + layer);
+    if (renderer == null) {
+      throw new IllegalArgumentException("Unknown layer: " + layer);
+    }
 
     // The best place for caching tiles may be here
     BufferedImage image = new BufferedImage(

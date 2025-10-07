@@ -82,9 +82,11 @@ public final class CompactLineStringUtils {
       Math.abs(y0 - c[0].y) > EPS ||
       Math.abs(x1 - c[c.length - 1].x) > EPS ||
       Math.abs(y1 - c[c.length - 1].y) > EPS
-    ) throw new IllegalArgumentException(
-      "CompactLineStringUtils geometry must stick to given end points. If you need to relax this, please read source code."
-    );
+    ) {
+      throw new IllegalArgumentException(
+        "CompactLineStringUtils geometry must stick to given end points. If you need to relax this, please read source code."
+      );
+    }
     int oix = IntUtils.round(x0 * FIXED_FLOAT_MULT);
     int oiy = IntUtils.round(y0 * FIXED_FLOAT_MULT);
     int[] coords = new int[(c.length - 2) * 2];

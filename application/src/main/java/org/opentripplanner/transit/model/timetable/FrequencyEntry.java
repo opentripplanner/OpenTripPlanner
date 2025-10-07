@@ -91,7 +91,9 @@ public class FrequencyEntry implements Serializable {
     int stopOffset = tripTimes.getArrivalTime(stop) - tripTimes.getDepartureTime(0);
     int beg = startTime + stopOffset; // First time a vehicle passes by this stop.
     int end = endTime + stopOffset; // Latest a vehicle can pass by this stop.
-    if (t < beg) return -1;
+    if (t < beg) {
+      return -1;
+    }
     if (exactTimes) {
       // we can't start from end in case end - beg is not a multiple of headway
       int arr;

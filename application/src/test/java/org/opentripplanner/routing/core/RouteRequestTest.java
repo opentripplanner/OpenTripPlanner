@@ -68,7 +68,6 @@ class RouteRequestTest {
     null,
     null
   );
-  private static final boolean WHEELCHAIR = true;
   private static final JourneyRequest JOURNEY = JourneyRequest.of()
     .withAccess(new StreetRequest(StreetMode.BIKE))
     .build();

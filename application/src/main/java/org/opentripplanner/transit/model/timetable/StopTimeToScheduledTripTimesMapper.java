@@ -94,7 +94,9 @@ class StopTimeToScheduledTripTimesMapper {
     for (final StopTime st : stopTimes) {
       final I18NString headsign = st.getStopHeadsign();
       hs[i++] = headsign;
-      if (headsign != null) allNull = false;
+      if (headsign != null) {
+        allNull = false;
+      }
     }
     if (allNull) {
       return null;

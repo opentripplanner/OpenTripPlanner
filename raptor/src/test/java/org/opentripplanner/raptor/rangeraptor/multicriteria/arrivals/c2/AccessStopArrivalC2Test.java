@@ -108,7 +108,8 @@ class AccessStopArrivalC2Test {
   @Test
   public void timeShiftPartiallyAllowed() {
     final int dTime = 60;
-    McStopArrival<RaptorTripSchedule> original, result;
+    McStopArrival<RaptorTripSchedule> original;
+    McStopArrival<RaptorTripSchedule> result;
 
     // Allow time-shift, but only by dTime (a free edge has zero duration)
     RaptorAccessEgress access = TestAccessEgress.free(ALIGHT_STOP).openingHours(

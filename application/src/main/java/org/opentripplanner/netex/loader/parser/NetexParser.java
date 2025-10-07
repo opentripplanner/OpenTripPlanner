@@ -46,10 +46,12 @@ abstract class NetexParser<T> {
    * issue on GitHub.
    */
   static void warnOnMissingMapping(Logger log, Object rel) {
-    if (rel == null) return;
-    if (rel instanceof Collection) throw new IllegalArgumentException(
-      "Do not pass in collections to this method."
-    );
+    if (rel == null) {
+      return;
+    }
+    if (rel instanceof Collection) {
+      throw new IllegalArgumentException("Do not pass in collections to this method.");
+    }
     log.warn("Netex import - Element mapping is missing for {}.", rel.getClass().getName());
   }
 
@@ -60,10 +62,12 @@ abstract class NetexParser<T> {
    * used in transit routing feel free to report an issue OTP GitHub.
    */
   static void informOnElementIntentionallySkipped(Logger log, Object rel) {
-    if (rel == null) return;
-    if (rel instanceof Collection) throw new IllegalArgumentException(
-      "Do not pass in collections to this method."
-    );
+    if (rel == null) {
+      return;
+    }
+    if (rel instanceof Collection) {
+      throw new IllegalArgumentException("Do not pass in collections to this method.");
+    }
     log.info("Netex import - Element skipped: {}", rel.getClass().getName());
   }
 

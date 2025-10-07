@@ -5,7 +5,6 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import java.util.Map;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.utils.text.TextVariablesSubstitution;
@@ -29,13 +28,6 @@ import org.opentripplanner.utils.text.TextVariablesSubstitution;
  * </ul>
  */
 public class EnvironmentVariableReplacer {
-
-  /**
-   * A pattern matching a placeholder like '${VAR_NAME}'. The placeholder must start with '${' and
-   * end with '}'. The environment variable name must consist of only alphanumerical characters(a-z,
-   * A-Z, 0-9), dot `.` and underscore '_'.
-   */
-  private static final Pattern PATTERN = Pattern.compile("\\$\\{([.\\w]+)}");
 
   private static final Map<String, String> PROJECT_INFO = Map.ofEntries(
     entry("maven.version", projectInfo().version.version),

@@ -17,8 +17,8 @@ class GramTest {
   private static final double VALUE = 7.5;
   private static final int VALUE_ONE = 1;
 
-  private Gram one = Gram.of(VALUE_ONE);
-  private Gram subject = Gram.of(VALUE);
+  private final Gram one = Gram.of(VALUE_ONE);
+  private final Gram subject = Gram.of(VALUE);
 
   @Test
   void ofNullable() {

@@ -25,7 +25,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class InterlineProcessorTest implements PlanTestConstants {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   List<TripPattern> patterns = List.of(
     tripPattern("trip-1", "block-1", "service-1"),

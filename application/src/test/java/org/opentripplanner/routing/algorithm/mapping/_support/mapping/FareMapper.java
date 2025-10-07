@@ -72,8 +72,9 @@ class FareMapper {
   }
 
   private List<ApiFareProduct> toApiFareProducts(Collection<FareProduct> product) {
-    if (product.isEmpty()) return null;
-    else {
+    if (product.isEmpty()) {
+      return null;
+    } else {
       return product
         .stream()
         .map(p ->

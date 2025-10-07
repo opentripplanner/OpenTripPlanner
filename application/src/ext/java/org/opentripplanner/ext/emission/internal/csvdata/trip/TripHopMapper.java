@@ -11,8 +11,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public class TripHopMapper {
 
   private String currentFeedId;
-  private Map<FeedScopedId, List<StopLocation>> stopsByTripId;
-  private DataImportIssueStore issueStore;
+  private final Map<FeedScopedId, List<StopLocation>> stopsByTripId;
+  private final DataImportIssueStore issueStore;
 
   public TripHopMapper(
     Map<FeedScopedId, List<StopLocation>> stopsByTripId,

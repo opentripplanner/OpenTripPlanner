@@ -138,7 +138,9 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
   }
 
   private void parseStopAssignments(@Nullable StopAssignmentsInFrame_RelStructure stopAssignments) {
-    if (stopAssignments == null) return;
+    if (stopAssignments == null) {
+      return;
+    }
 
     for (JAXBElement<?> stopAssignment : stopAssignments.getStopAssignment()) {
       if (stopAssignment.getValue() instanceof PassengerStopAssignment assignment) {
@@ -175,7 +177,9 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
   }
 
   private void parseRoutes(@Nullable RoutesInFrame_RelStructure routes) {
-    if (routes == null) return;
+    if (routes == null) {
+      return;
+    }
 
     for (JAXBElement<?> element : routes.getRoute_()) {
       if (element.getValue() instanceof Route route) {
@@ -185,7 +189,9 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
   }
 
   private void parseNetwork(Network network) {
-    if (network == null) return;
+    if (network == null) {
+      return;
+    }
 
     networks.add(network);
 
@@ -222,7 +228,9 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
   }
 
   private void parseLines(LinesInFrame_RelStructure lines) {
-    if (lines == null) return;
+    if (lines == null) {
+      return;
+    }
 
     for (JAXBElement<?> element : lines.getLine_()) {
       if (element.getValue() instanceof Line) {
@@ -236,7 +244,9 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
   }
 
   private void parseJourneyPatterns(JourneyPatternsInFrame_RelStructure journeyPatterns) {
-    if (journeyPatterns == null) return;
+    if (journeyPatterns == null) {
+      return;
+    }
 
     for (JAXBElement<?> pattern : journeyPatterns.getJourneyPattern_OrJourneyPatternView()) {
       if (pattern.getValue() instanceof JourneyPattern_VersionStructure journeyPattern) {
@@ -248,13 +258,17 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
   }
 
   private void parseDestinationDisplays(DestinationDisplaysInFrame_RelStructure destDisplays) {
-    if (destDisplays == null) return;
+    if (destDisplays == null) {
+      return;
+    }
 
     this.destinationDisplays.addAll(destDisplays.getDestinationDisplay());
   }
 
   private void parseServiceLinks(ServiceLinksInFrame_RelStructure serviceLinks) {
-    if (serviceLinks == null) return;
+    if (serviceLinks == null) {
+      return;
+    }
 
     this.serviceLinks.addAll(serviceLinks.getServiceLink());
   }
