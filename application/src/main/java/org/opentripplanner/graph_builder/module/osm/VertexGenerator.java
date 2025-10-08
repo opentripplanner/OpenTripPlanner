@@ -9,8 +9,8 @@ import gnu.trove.list.TLongList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -51,7 +51,6 @@ class VertexGenerator {
    * The levels of the entities connecting barrier nodes. Used for issue reporting only.
    */
   private final Multimap<OsmNode, OsmLevel> levelsConnectingBarriers = HashMultimap.create();
-  private final Set<OsmNode> reportedLevelBarrierNodes = new HashSet<>();
   private final Set<OsmNode> reportedLinearBarrierCrossings = new HashSet<>();
 
   /**
@@ -183,7 +182,7 @@ class VertexGenerator {
     }
 
     if (iv instanceof BarrierVertex) {
-      checkLevelOnBarrier(node, entity);
+      saveBarrierLevels(node, entity);
     }
 
     return iv;
@@ -195,7 +194,7 @@ class VertexGenerator {
    * @return a vertex for the given node specific to the given entity
    */
   private IntersectionVertex getSplitVertexOnBarrier(OsmNode nodeOnBarrier, OsmEntity entity) {
-    checkLevelOnBarrier(nodeOnBarrier, entity);
+    saveBarrierLevels(nodeOnBarrier, entity);
 
     splitVerticesOnBarriers.putIfAbsent(nodeOnBarrier, new HashMap<>());
     var vertices = splitVerticesOnBarriers.get(nodeOnBarrier);
@@ -213,16 +212,30 @@ class VertexGenerator {
     return vertex;
   }
 
-  private void checkLevelOnBarrier(OsmNode nodeOnBarrier, OsmEntity entity) {
-    var level = osmdb.getLevelForEntity(entity);
-    if (!reportedLevelBarrierNodes.contains(nodeOnBarrier)) {
-      var existingLevels = levelsConnectingBarriers.get(nodeOnBarrier);
-      if (existingLevels.stream().anyMatch(l -> !Objects.requireNonNull(l).equals(level))) {
-        issueStore.add(new DifferentLevelsSharingBarrier(nodeOnBarrier));
-        reportedLevelBarrierNodes.add(nodeOnBarrier);
+  private void saveBarrierLevels(OsmNode nodeOnBarrier, OsmEntity entity) {
+    levelsConnectingBarriers.putAll(nodeOnBarrier, getLevelsForNode(nodeOnBarrier, entity));
+  }
+
+  public Multimap<OsmNode, OsmLevel> getLevelsConnectingBarriers() {
+    return this.levelsConnectingBarriers;
+  }
+
+  private List<OsmLevel> getLevelsForNode(OsmNode node, OsmEntity entity) {
+    List<OsmLevel> levels = osmdb.getLevelsForEntity(entity);
+    if (entity instanceof OsmWay way && way.isSteps()) {
+      if (levels.size() == 2) {
+        var nodeRefs = way.getNodeRefs();
+        long firstNodeRef = nodeRefs.get(0);
+        long lastNodeRef = nodeRefs.get(nodeRefs.size() - 1);
+        if (node.getId() == firstNodeRef) {
+          return List.of(levels.getFirst());
+        } else if (node.getId() == lastNodeRef) {
+          return List.of(levels.getLast());
+        }
       }
+      return List.of();
     }
-    levelsConnectingBarriers.put(nodeOnBarrier, level);
+    return levels;
   }
 
   /**
@@ -306,22 +319,24 @@ class VertexGenerator {
    * @author mattwigway
    */
   private OsmVertex recordLevel(OsmNode node, OsmEntity entity) {
-    OsmLevel level = osmdb.getLevelForEntity(entity);
-    Map<OsmLevel, OsmVertex> vertices;
+    Map<OsmLevel, OsmVertex> verticesOnLevel;
     long nodeId = node.getId();
     if (multiLevelNodes.containsKey(nodeId)) {
-      vertices = multiLevelNodes.get(nodeId);
+      verticesOnLevel = multiLevelNodes.get(nodeId);
     } else {
-      vertices = new HashMap<>();
-      multiLevelNodes.put(nodeId, vertices);
+      verticesOnLevel = new HashMap<>();
+      multiLevelNodes.put(nodeId, verticesOnLevel);
     }
-    if (!vertices.containsKey(level)) {
-      OsmVertex vertex = vertexFactory.levelledOsm(node, level.getName());
-      vertices.put(level, vertex);
 
+    // An OsmVertex on a level requires one level to be defined.
+    // If an OsmEntity has multiple levels, default to the DEFAULT level.
+    OsmLevel level = osmdb.findSingleLevelForEntity(entity);
+    if (!verticesOnLevel.containsKey(level)) {
+      OsmVertex vertex = vertexFactory.levelledOsm(node, level.getName());
+      verticesOnLevel.put(level, vertex);
       return vertex;
     }
-    return vertices.get(level);
+    return verticesOnLevel.get(level);
   }
 
   private void intersectAreaRingNodes(Set<Long> possibleIntersectionNodes, Ring outerRing) {
@@ -335,5 +350,15 @@ class VertexGenerator {
     }
 
     outerRing.getHoles().forEach(hole -> intersectAreaRingNodes(possibleIntersectionNodes, hole));
+  }
+
+  public void createDifferentLevelsSharingBarrierIssues() {
+    Multimap<OsmNode, OsmLevel> levelsConnectingBarriers = getLevelsConnectingBarriers();
+    for (OsmNode nodeOnBarrier : levelsConnectingBarriers.keySet()) {
+      var levels = levelsConnectingBarriers.get(nodeOnBarrier);
+      if (levels.size() > 1) {
+        issueStore.add(new DifferentLevelsSharingBarrier(nodeOnBarrier, levels.size()));
+      }
+    }
   }
 }

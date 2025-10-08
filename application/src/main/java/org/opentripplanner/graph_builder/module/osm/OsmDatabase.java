@@ -83,7 +83,6 @@ public class OsmDatabase {
   /* Map of all area OSMWay for a given node */
   private final TLongObjectMap<Set<OsmWay>> areasForNode = new TLongObjectHashMap<>();
 
-  /* Map of all area OSMWay for a given node */
   private final List<OsmWay> singleWayAreas = new ArrayList<>();
 
   private final Set<OsmEntity> processedAreas = new HashSet<>();
@@ -195,7 +194,7 @@ public class OsmDatabase {
    * @return If a single level is defined for an entity return that level,
    * otherwise the default level is returned.
    */
-  public OsmLevel getLevelForEntity(OsmEntity entity) {
+  public OsmLevel findSingleLevelForEntity(OsmEntity entity) {
     List<OsmLevel> levels = entityLevels.get(entity);
     if (levels.size() == 1) {
       return levels.getFirst();
@@ -205,10 +204,15 @@ public class OsmDatabase {
   }
 
   /**
-   * @return All defined levels for an entity. If no levels are found an empty list is returned.
+   * @return All defined levels for an entity. If no levels are found a list with the default
+   * level is returned.
    */
   public List<OsmLevel> getLevelsForEntity(OsmEntity entity) {
-    return entityLevels.get(entity);
+    if (entityLevels.containsKey(entity)) {
+      return entityLevels.get(entity);
+    } else {
+      return List.of(OsmLevelFactory.DEFAULT);
+    }
   }
 
   /**
@@ -405,7 +409,7 @@ public class OsmDatabase {
     // For each way, intersect with areas
     int nCreatedNodes = 0;
     for (OsmWay way : waysById.valueCollection()) {
-      OsmLevel wayLevel = getLevelForEntity(way);
+      List<OsmLevel> wayLevels = getLevelsForEntity(way);
 
       // For each segment of the way
       for (int i = 0; i < way.getNodeRefs().size() - 1; i++) {
@@ -436,8 +440,9 @@ public class OsmDatabase {
           }
 
           // Skip if area and way are from "incompatible" levels
-          OsmLevel areaLevel = getLevelForEntity(ringSegment.area.parent);
-          if (!wayLevel.equals(areaLevel)) {
+          // TODO Should multi-level edges e.g. stairs and escalators be considered as well?
+          Set<OsmLevel> areaLevelSet = getLevelSetForEntity(ringSegment.area.parent);
+          if (wayLevels.size() != 1 || !areaLevelSet.contains(wayLevels.getFirst())) {
             continue;
           }
 

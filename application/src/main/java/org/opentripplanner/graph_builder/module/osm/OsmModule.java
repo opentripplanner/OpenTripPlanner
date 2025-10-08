@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -143,6 +144,7 @@ public class OsmModule implements GraphBuilderModule {
     graph.hasStreets = true;
     streetLimitationParameters.initMaxCarSpeed(getMaxCarSpeed());
     streetLimitationParameters.initMaxAreaNodes(params.maxAreaNodes());
+    vertexGenerator.createDifferentLevelsSharingBarrierIssues();
   }
 
   @Override
@@ -245,9 +247,9 @@ public class OsmModule implements GraphBuilderModule {
     Collection<OsmArea> areas,
     Multimap<OsmNode, OsmWay> barriers
   ) {
-    Map<OsmArea, OsmLevel> areasLevels = new HashMap<>(areas.size());
+    Map<OsmArea, Set<OsmLevel>> areasLevels = new HashMap<>(areas.size());
     for (OsmArea area : areas) {
-      areasLevels.put(area, osmdb.getLevelForEntity(area.parent));
+      areasLevels.put(area, osmdb.getLevelSetForEntity(area.parent));
     }
     return OsmAreaGroup.groupAreas(areasLevels, barriers);
   }
