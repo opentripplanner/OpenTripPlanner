@@ -137,6 +137,13 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       .filter(stop -> transitService.findPatterns(stop).isEmpty())
       .toList();
 
+    /*
+     * Mark all empty stops as bike allowed stops.
+     *
+     * This is needed when trains carrying bikes can change platforms.
+     * TODO: This will not work when a bike-carrying train changes platforms to one which is
+     *  scheduled to be used only by non-bike-carrying trains.
+     */
     bikesAllowedStops.addAll(emptyStops);
 
     stops
