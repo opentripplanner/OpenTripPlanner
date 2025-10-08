@@ -6,10 +6,12 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -29,6 +31,10 @@ public record TripInput(
 ) {
   public static TripInputBuilder of(String id) {
     return new TripInputBuilder(id);
+  }
+
+  public List<StopLocation> stopLocations() {
+    return stops().stream().map(TripInput.StopCall::stop).toList();
   }
 
   public static class TripInputBuilder {
@@ -54,7 +60,7 @@ public record TripInput(
 
     public TripInputBuilder addStop(RegularStop stopId, String arrivalTime, String departureTime) {
       this.stops.add(
-          new StopCall(stopId, TimeUtils.time(arrivalTime), TimeUtils.time(departureTime))
+          new StopCall(stopId, stops.size(), TimeUtils.time(arrivalTime), TimeUtils.time(departureTime))
         );
       return this;
     }
@@ -88,7 +94,18 @@ public record TripInput(
       this.tripOnServiceDateId = tripOnServiceDateId;
       return this;
     }
+
   }
 
-  record StopCall(StopLocation stop, int arrivalTime, int departureTime) {}
+  record StopCall(StopLocation stop, int stopSequence, int arrivalTime, int departureTime) {
+    public StopTime toStopTime(Trip trip) {
+      var st = new StopTime();
+      st.setTrip(trip);
+      st.setStopSequence(stopSequence);
+      st.setStop(stop);
+      st.setArrivalTime(arrivalTime);
+      st.setDepartureTime(departureTime);
+      return st;
+    }
+  }
 }

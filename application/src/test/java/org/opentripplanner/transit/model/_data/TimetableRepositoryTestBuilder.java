@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -23,6 +24,8 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -152,7 +155,7 @@ public class TimetableRepositoryTestBuilder {
 
     var trip = Trip.of(id(tripInput.id()))
       .withRoute(route)
-      .withHeadsign(tripInput.headsign() == null ? null : tripInput.headsign())
+      .withHeadsign(tripInput.headsign())
       .withServiceId(serviceId)
       .build();
 
@@ -163,44 +166,79 @@ public class TimetableRepositoryTestBuilder {
       addTripOnServiceDate(timetableRepository, trip, serviceDates.getFirst(), tripInput.tripOnServiceDateId());
     }
 
-    var stopTimes = IntStream.range(0, tripInput.stops().size())
-      .mapToObj(i -> {
-        var stop = tripInput.stops().get(i);
-        return fixedStopTime(trip, i, stop.stop(), stop.arrivalTime(), stop.departureTime());
-      })
-      .toList();
+    var stopPattern = stopPattern(tripInput.stopLocations());
+    var tripPattern = getOrCreateTripPattern(timetableRepository, stopPattern, route);
 
-    TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
-
-    var stopPattern = TimetableRepositoryForTest.stopPattern(
-      tripInput.stops().stream().map(TripInput.StopCall::stop).toList()
-    );
-
-    var existingPatterns = timetableRepository
-      .getAllTripPatterns()
-      .stream()
-      .filter(p -> p.getStopPattern().equals(stopPattern))
-      .toList();
-
-    if (existingPatterns.size() > 1) {
-      throw new RuntimeException(
-        "Multiple patterns found for stop pattern %s. This indicates an error during test setup.".formatted(
-            stopPattern
-          )
-      );
-    } else if (existingPatterns.size() == 1) {
-      var pattern = existingPatterns.getFirst();
-      var newPattern = pattern
-        .copy()
-        .withScheduledTimeTableBuilder(b -> b.addTripTimes(tripTimes))
-        .build();
-      timetableRepository.addTripPattern(pattern.getId(), newPattern);
-    } else {
-      addNewPattern(tripInput.id(), route, stopPattern, tripTimes, timetableRepository);
-    }
+    var tripTimes = tripTimes(tripInput.stops(), trip);
+    addTripTimesToPattern(timetableRepository, tripPattern, tripTimes);
 
     return trip;
   }
+
+  private Trip createFlexTrip(FlexTripInput tripInput, TimetableRepository timetableRepository
+  ) {
+    var serviceId = createServiceId(timetableRepository, List.of(defaultServiceDate));
+    var route = defaultRoute;
+    final var trip = Trip.of(id(tripInput.id()))
+      .withRoute(route)
+      .withHeadsign(I18NString.of("Headsign of %s".formatted(tripInput.id())))
+      .withServiceId(serviceId)
+      .build();
+
+    var stopTimes = tripInput.stops().stream().map(s -> s.toStopTime(trip)).toList();
+    var tripTimes =  TripTimesFactory.tripTimes(trip, stopTimes, null);
+
+    var stopPattern = stopPattern(tripInput.stopLocations());
+    var tripPattern = getOrCreateTripPattern(timetableRepository, stopPattern, route);
+    addTripTimesToPattern(timetableRepository, tripPattern, tripTimes);
+
+    var flexTrip = UnscheduledTrip.of(trip.getId()).withTrip(trip).withStopTimes(stopTimes).build();
+    timetableRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+
+    return trip;
+  }
+
+  private TripTimes tripTimes(List<TripInput.StopCall> stops, Trip trip) {
+    var stopTimes = stops.stream().map(s -> s.toStopTime(trip)).toList();
+    return TripTimesFactory.tripTimes(trip, stopTimes, null);
+  }
+
+  private void addTripTimesToPattern(TimetableRepository timetableRepository, TripPattern tripPattern, TripTimes tripTimes) {
+    var newPattern = tripPattern
+      .copy()
+      .withScheduledTimeTableBuilder(b -> b.addTripTimes(tripTimes))
+      .build();
+    timetableRepository.addTripPattern(tripPattern.getId(), newPattern);
+  }
+
+  private TripPattern getOrCreateTripPattern(TimetableRepository timetableRepository, StopPattern stopPattern, Route route) {
+    // We use route and stopPattern as key for tripPattern. This isn't enough in general so we
+    // can extend it to more attributes from the trip pattern as needed.
+    var existingPatterns = timetableRepository
+      .getAllTripPatterns()
+      .stream()
+      .filter(p -> p.getStopPattern().equals(stopPattern) && p.getRoute().equals(route))
+      .toList();
+    if (existingPatterns.size() > 1) {
+      throw new RuntimeException(
+        "Multiple patterns found for stop pattern %s. This indicates an error during test setup.".formatted(
+          stopPattern
+        )
+      );
+    }
+    if (existingPatterns.size() == 1) {
+      return existingPatterns.getFirst();
+    }
+
+    var id = "Pattern" + (timetableRepository.getAllTripPatterns().size() + 1);
+    var pattern = TripPattern.of(id(id)).withRoute(route)
+      .withStopPattern(stopPattern)
+      .build();
+
+    timetableRepository.addTripPattern(pattern.getId(), pattern);
+    return pattern;
+  }
+
 
   private FeedScopedId createServiceId(
     TimetableRepository timetableRepository,
@@ -221,50 +259,6 @@ public class TimetableRepositoryTestBuilder {
     return serviceId;
   }
 
-  private Trip createFlexTrip(FlexTripInput tripInput, TimetableRepository timetableRepository
-  ) {
-    var serviceDates = List.of(defaultServiceDate);
-    var serviceId = createServiceId(timetableRepository, serviceDates);
-    final var trip = Trip.of(TimetableRepositoryForTest.id(tripInput.id()))
-      .withRoute(tripInput.route())
-      .withHeadsign(I18NString.of("Headsign of %s".formatted(tripInput.id())))
-      .withServiceId(serviceId)
-      .build();
-
-    var stopTimes = IntStream.range(0, tripInput.stops().size())
-      .mapToObj(i -> {
-        var stop = tripInput.stops().get(i);
-        return flexStopTime(trip, i, stop.stop(), stop.windowStart(), stop.windowEnd());
-      })
-      .toList();
-
-    TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
-
-    var stopPattern = TimetableRepositoryForTest.stopPattern(
-      tripInput.stops().stream().map(FlexTripInput.FlexStop::stop).toList()
-    );
-
-    addNewPattern(tripInput.id(), tripInput.route(), stopPattern, tripTimes, timetableRepository);
-    var flexTrip = UnscheduledTrip.of(trip.getId()).withTrip(trip).withStopTimes(stopTimes).build();
-    timetableRepository.addFlexTrip(flexTrip.getId(), flexTrip);
-    return trip;
-  }
-
-  private static void addNewPattern(
-    String tripInput,
-    Route tripInput1,
-    StopPattern stopPattern,
-    TripTimes tripTimes,
-    TimetableRepository timetableRepository
-  ) {
-    var pattern = TimetableRepositoryForTest.tripPattern(tripInput + "Pattern", tripInput1)
-      .withStopPattern(stopPattern)
-      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
-      .build();
-
-    timetableRepository.addTripPattern(pattern.getId(), pattern);
-  }
-
   private void addTripOnServiceDate(TimetableRepository timetableRepository, Trip trip, LocalDate serviceDate, String id) {
     var tripOnServiceDate = TripOnServiceDate.of(id(id))
       .withTrip(trip)
@@ -273,35 +267,14 @@ public class TimetableRepositoryTestBuilder {
     timetableRepository.addTripOnServiceDate(tripOnServiceDate);
   }
 
-  private static StopTime fixedStopTime(
-    Trip trip,
-    int stopSequence,
-    StopLocation stop,
-    int arrivalTime,
-    int departureTime
-  ) {
-    var st = new StopTime();
-    st.setTrip(trip);
-    st.setStopSequence(stopSequence);
-    st.setStop(stop);
-    st.setArrivalTime(arrivalTime);
-    st.setDepartureTime(departureTime);
-    return st;
+  private static StopPattern stopPattern(List<StopLocation> stops) {
+    var builder = StopPattern.create(stops.size());
+    for (int i = 0; i < stops.size(); i++) {
+      builder.stops.with(i, stops.get(i));
+      builder.pickups.with(i, PickDrop.SCHEDULED);
+      builder.dropoffs.with(i, PickDrop.SCHEDULED);
+    }
+    return builder.build();
   }
 
-  private static StopTime flexStopTime(
-    Trip trip,
-    int stopSequence,
-    StopLocation stop,
-    int windowStart,
-    int windowEnd
-  ) {
-    var st = new StopTime();
-    st.setTrip(trip);
-    st.setStopSequence(stopSequence);
-    st.setStop(stop);
-    st.setFlexWindowStart(windowStart);
-    st.setFlexWindowEnd(windowEnd);
-    return st;
-  }
 }
