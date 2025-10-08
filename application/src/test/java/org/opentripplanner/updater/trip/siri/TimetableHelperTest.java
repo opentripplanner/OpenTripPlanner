@@ -63,6 +63,8 @@ public class TimetableHelperTest {
       .withParentStation(station)
       .build();
     stopTime.setStop(stop);
+    stopTime.setArrivalTime(7200);
+    stopTime.setDepartureTime(7200);
 
     Agency agency = Agency.of(SCOPED_AGENCY_ID).withName(AGENCY_NAME).withTimezone("CET").build();
 
@@ -75,7 +77,7 @@ public class TimetableHelperTest {
     Trip trip = Trip.of(new FeedScopedId(FEED_ID, "TRIP_ID")).withRoute(route).build();
     builder = TripTimesFactory.tripTimes(
       trip,
-      List.of(stopTime),
+      List.of(stopTime, stopTime),
       new Deduplicator()
     ).createRealTimeFromScheduledTimes();
   }

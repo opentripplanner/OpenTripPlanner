@@ -206,10 +206,6 @@ public final class RealTimeTripTimes implements TripTimes {
     return this.occupancyStatus[stop];
   }
 
-  OccupancyStatus[] copyOccupancyStatus() {
-    return occupancyStatus.clone();
-  }
-
   @Override
   public BookingInfo getDropOffBookingInfo(int stop) {
     return scheduledTripTimes.getDropOffBookingInfo(stop);
@@ -329,10 +325,6 @@ public final class RealTimeTripTimes implements TripTimes {
   @Override
   public Trip getTrip() {
     return scheduledTripTimes.getTrip();
-  }
-
-  StopRealTimeState[] copyStopRealTimeStates() {
-    return stopRealTimeStates.clone();
   }
 
   /**
