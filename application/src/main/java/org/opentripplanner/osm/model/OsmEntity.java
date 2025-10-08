@@ -57,9 +57,6 @@ public abstract class OsmEntity {
 
   private static final Set<String> INDOOR_ROUTABLE_VALUES = Set.of("corridor", "area");
 
-  private static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
-  private static final Set<String> DEFAULT_LEVEL = Set.of("0");
-
   protected static final Map<String, StreetTraversalPermission> BARRIER_PERMISSIONS = Map.ofEntries(
     // refer to https://wiki.openstreetmap.org/wiki/Key:barrier for meanings
     // if it is not listed, it is assumed to be ALL
@@ -937,19 +934,6 @@ public abstract class OsmEntity {
    */
   private boolean isExplicitlyDenied(String key) {
     return isOneOfTags(key, NO_ACCESS_TAGS);
-  }
-
-  /**
-   * Returns level tag (i.e. building floor) or layer tag values, defaults to "0"
-   * Some entities can have a semicolon separated list of levels (e.g. elevators)
-   */
-  public Set<String> getLevels() {
-    var levels = getMultiTagValues(LEVEL_TAGS);
-    if (levels.isEmpty()) {
-      // default
-      return DEFAULT_LEVEL;
-    }
-    return levels;
   }
 
   public StreetTraversalPermission getPermission() {

@@ -73,7 +73,7 @@ public class SidewalkNamer implements EdgeNamer {
 
   @Override
   public void recordEdges(OsmEntity way, StreetEdgePair pair, OsmDatabase osmdb) {
-    Set<OsmLevel> levelSet = osmdb.getLevelsForEntity(way).stream().collect(Collectors.toSet());
+    Set<OsmLevel> levelSet = osmdb.getLevelSetForEntity(way);
     // This way is a sidewalk and hasn't been named yet (and is not explicitly unnamed)
     if (way.isSidewalk() && way.hasNoName() && !way.isExplicitlyUnnamed()) {
       pair.asIterable().forEach(edge -> unnamedSidewalks.add(new EdgeOnLevel(edge, levelSet)));
@@ -189,7 +189,7 @@ public class SidewalkNamer implements EdgeNamer {
         var levels = entry
           .getValue()
           .stream()
-          .flatMap(e -> e.levels.stream().map(level -> level.getName()))
+          .flatMap(e -> e.levels.stream())
           .collect(Collectors.toSet());
         return new CandidateGroup(
           entry.getKey(),
@@ -209,7 +209,7 @@ public class SidewalkNamer implements EdgeNamer {
    * A group of edges that are near a sidewalk that have the same name. These groups are used
    * to figure out if the name of the group can be applied to a nearby sidewalk.
    */
-  private record CandidateGroup(I18NString name, List<StreetEdge> edges, Set<String> levels) {
+  private record CandidateGroup(I18NString name, List<StreetEdge> edges, Set<OsmLevel> levels) {
     /**
      * How much of this group intersects with the given geometry, in meters.
      */

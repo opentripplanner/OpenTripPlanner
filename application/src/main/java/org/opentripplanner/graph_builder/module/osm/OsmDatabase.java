@@ -99,7 +99,7 @@ public class OsmDatabase {
 
   /**
    * Track which vertical levels OSM entities belong to.
-   * Level information can be set for ways and relations.
+   * Level information can be set for ways, nodes and relations.
    * An entity only has an entry if at least one level is defined in OSM.
    * The ordering is important because in the future it will be used for building stairs
    * and escalators. At the moment, the level is used e.g. for building elevators.
@@ -211,6 +211,18 @@ public class OsmDatabase {
     return entityLevels.get(entity);
   }
 
+  /**
+   * @return A set of all defined levels for an entity. If no levels are found a set with the
+   * default level is returned.
+   */
+  public Set<OsmLevel> getLevelSetForEntity(OsmEntity entity) {
+    if (entityLevels.containsKey(entity)) {
+      return new HashSet<>(entityLevels.get(entity));
+    } else {
+      return Set.of(OsmLevelFactory.DEFAULT);
+    }
+  }
+
   public Set<OsmWay> getAreasForNode(Long nodeId) {
     Set<OsmWay> areas = areasForNode.get(nodeId);
     if (areas == null) {
@@ -224,6 +236,7 @@ public class OsmDatabase {
   }
 
   public void addNode(OsmNode node) {
+    createLevelsForEntity(node);
     if (node.isBikeParking()) {
       bikeParkingNodes.put(node.getId(), node);
     }
@@ -990,10 +1003,10 @@ public class OsmDatabase {
       // single platform area presumably contains only one level in most cases
       // a node inside it may specify several levels if it is an elevator
       // make sure each node has access to the current platform level
-      final Set<String> filterLevels = area.getLevels();
+      Set<OsmLevel> areaLevelSet = getLevelSetForEntity(area);
       platformNodes
         .stream()
-        .filter(node -> node.getLevels().containsAll(filterLevels))
+        .filter(node -> getLevelSetForEntity(node).containsAll(areaLevelSet))
         .forEach(node -> stopsInAreas.put(area, node));
     }
   }
