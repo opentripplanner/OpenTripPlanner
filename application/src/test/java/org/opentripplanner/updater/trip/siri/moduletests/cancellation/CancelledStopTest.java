@@ -19,6 +19,7 @@ class CancelledStopTest implements RealtimeTestConstants {
   private final RegularStop STOP_D = ENV_BUILDER.stop(STOP_D_ID);
 
   private final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
+    .withWithTripOnServiceDate(TRIP_1_ID)
     .addStop(STOP_A, "0:01:00", "0:01:01")
     .addStop(STOP_B, "0:01:10", "0:01:11")
     .addStop(STOP_D, "0:01:20", "0:01:21")

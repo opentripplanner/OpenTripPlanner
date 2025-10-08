@@ -20,6 +20,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
   private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
 
   private final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
+    .withWithTripOnServiceDate(TRIP_1_ID)
     .addStop(STOP_A, "0:00:10", "0:00:11")
     .addStop(STOP_B, "0:00:20", "0:00:21")
     .build();

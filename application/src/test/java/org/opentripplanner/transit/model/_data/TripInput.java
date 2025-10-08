@@ -23,7 +23,8 @@ public record TripInput(
   List<StopCall> stops,
   // Null means that a default service date will be used
   @Nullable List<LocalDate> serviceDates,
-  @Nullable I18NString headsign
+  @Nullable I18NString headsign,
+  @Nullable String tripOnServiceDateId
 ) {
   public static TripInputBuilder of(String id) {
     return new TripInputBuilder(id);
@@ -60,6 +61,9 @@ public record TripInput(
     @Nullable
     private I18NString headsign;
 
+    @Nullable
+    private String tripOnServiceDateId;
+
     TripInputBuilder(String id) {
       this.id = id;
     }
@@ -76,7 +80,7 @@ public record TripInput(
     }
 
     public TripInput build() {
-      return new TripInput(id, route, stops, serviceDates, headsign);
+      return new TripInput(id, route, stops, serviceDates, headsign, tripOnServiceDateId);
     }
 
     public TripInputBuilder withRoute(Route route) {
@@ -93,6 +97,11 @@ public record TripInput(
       var list = Arrays.stream(serviceDates).toList();
       ListUtils.requireAtLeastNElements(list, 1);
       this.serviceDates = list;
+      return this;
+    }
+
+    public TripInputBuilder withWithTripOnServiceDate(String tripOnServiceDateId) {
+      this.tripOnServiceDateId = tripOnServiceDateId;
       return this;
     }
   }

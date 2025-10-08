@@ -28,6 +28,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
   private final Station STATION_A = STOP_A.getParentStation();
 
   private final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
+    .withWithTripOnServiceDate(TRIP_1_ID)
     .addStop(STOP_A, "0:00:10", "0:00:11")
     .addStop(STOP_B, "0:00:20", "0:00:21")
     .addStop(STOP_C, "0:00:40", "0:00:41")

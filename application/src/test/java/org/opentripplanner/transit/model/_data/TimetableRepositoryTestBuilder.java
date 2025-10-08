@@ -115,7 +115,12 @@ public class TimetableRepositoryTestBuilder {
       .withServiceId(serviceId)
       .build();
 
-    addTripOnServiceDate(timetableRepository, trip);
+    if (tripInput.tripOnServiceDateId() != null) {
+      if (serviceDates.size() != 1) {
+        throw new IllegalArgumentException("Multiple service dates can't be used with TripOnServiceDate");
+      }
+      addTripOnServiceDate(timetableRepository, trip, serviceDates.getFirst(), tripInput.tripOnServiceDateId());
+    }
 
     if (tripInput.route().getOperator() != null) {
       timetableRepository.addOperators(List.of(tripInput.route().getOperator()));
@@ -172,13 +177,13 @@ public class TimetableRepositoryTestBuilder {
   }
 
   private Trip createFlexTrip(FlexTripInput tripInput, TimetableRepository timetableRepository) {
-    var serviceId = generateServiceId(timetableRepository, List.of(defaultServiceDate));
+    var serviceDates = List.of(defaultServiceDate);
+    var serviceId = generateServiceId(timetableRepository, serviceDates);
     final var trip = Trip.of(TimetableRepositoryForTest.id(tripInput.id()))
       .withRoute(tripInput.route())
       .withHeadsign(I18NString.of("Headsign of %s".formatted(tripInput.id())))
       .withServiceId(serviceId)
       .build();
-    addTripOnServiceDate(timetableRepository, trip);
 
     var stopTimes = IntStream.range(0, tripInput.stops().size())
       .mapToObj(i -> {
@@ -214,12 +219,11 @@ public class TimetableRepositoryTestBuilder {
     timetableRepository.addTripPattern(pattern.getId(), pattern);
   }
 
-  private void addTripOnServiceDate(TimetableRepository timetableRepository, Trip trip) {
-    var tripOnServiceDate = TripOnServiceDate.of(trip.getId())
+  private void addTripOnServiceDate(TimetableRepository timetableRepository, Trip trip, LocalDate serviceDate, String id) {
+    var tripOnServiceDate = TripOnServiceDate.of(id(id))
       .withTrip(trip)
-      .withServiceDate(defaultServiceDate)
+      .withServiceDate(serviceDate)
       .build();
-
     timetableRepository.addTripOnServiceDate(tripOnServiceDate);
   }
 
