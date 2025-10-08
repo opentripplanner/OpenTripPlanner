@@ -14,7 +14,8 @@ class PreCachedRaptorTransferIndex implements RaptorTransferIndex {
 
   PreCachedRaptorTransferIndex(
     List<List<Transfer>> transfersByStopIndex,
-    StreetSearchRequest request
+    StreetSearchRequest request,
+    boolean parallel
   ) {
     var forwardTransfers = new ArrayList<List<DefaultRaptorTransfer>>(transfersByStopIndex.size());
     var reversedTransfers = new ArrayList<List<DefaultRaptorTransfer>>(transfersByStopIndex.size());
@@ -24,16 +25,18 @@ class PreCachedRaptorTransferIndex implements RaptorTransferIndex {
       reversedTransfers.add(new ArrayList<>());
     }
 
-    IntStream.range(0, transfersByStopIndex.size())
-      .parallel()
-      .forEach(fromStop -> {
-        var transfers = transfersByStopIndex.get(fromStop);
-        var raptorTransfers = RaptorTransferIndex.getRaptorTransfers(request, transfers);
+    var stopIndices = IntStream.range(0, transfersByStopIndex.size());
+    if (parallel) {
+      stopIndices = stopIndices.parallel();
+    }
+    stopIndices.forEach(fromStop -> {
+      var transfers = transfersByStopIndex.get(fromStop);
+      var raptorTransfers = RaptorTransferIndex.getRaptorTransfers(request, transfers);
 
-        // forwardTransfers is not modified here, and no two threads will access the same element
-        // in it, so this is still thread safe.
-        forwardTransfers.get(fromStop).addAll(raptorTransfers);
-      });
+      // forwardTransfers is not modified here, and no two threads will access the same element
+      // in it, so this is still thread safe.
+      forwardTransfers.get(fromStop).addAll(raptorTransfers);
+    });
 
     for (int fromStop = 0; fromStop < transfersByStopIndex.size(); fromStop++) {
       for (var forwardTransfer : forwardTransfers.get(fromStop)) {

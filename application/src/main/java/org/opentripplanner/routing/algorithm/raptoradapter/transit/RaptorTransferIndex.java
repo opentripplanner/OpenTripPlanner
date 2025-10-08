@@ -17,7 +17,8 @@ public interface RaptorTransferIndex {
     List<List<Transfer>> transfersByStopIndex,
     StreetSearchRequest request
   ) {
-    return new PreCachedRaptorTransferIndex(transfersByStopIndex, request);
+    // We always want to parallelize the generation when OTP is starting up.
+    return new PreCachedRaptorTransferIndex(transfersByStopIndex, request, true);
   }
 
   /**
@@ -29,7 +30,11 @@ public interface RaptorTransferIndex {
   ) {
     return OTPFeature.OnDemandRaptorTransfer.isOn()
       ? new OnDemandRaptorTransferIndex(transfersByStopIndex, request)
-      : new PreCachedRaptorTransferIndex(transfersByStopIndex, request);
+      : new PreCachedRaptorTransferIndex(
+        transfersByStopIndex,
+        request,
+        OTPFeature.ParallelRouting.isOn()
+      );
   }
 
   static Collection<DefaultRaptorTransfer> getRaptorTransfers(
