@@ -12,13 +12,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.collection.SetUtils;
 import org.slf4j.Logger;
@@ -207,7 +205,7 @@ class FareLookupService implements Serializable {
       // covers this area
       areaMatcher.matchesArea(leg.from().stop, rule.fromAreaId(), fromAreasWithRules) &&
       areaMatcher.matchesArea(leg.to().stop, rule.toAreaId(), toAreasWithRules) &&
-      matchesDistance(leg, rule)
+      DistanceMatcher.matchesDistance(leg, rule)
     );
   }
 
@@ -229,21 +227,6 @@ class FareLookupService implements Serializable {
     } else {
       return true;
     }
-  }
-
-  private boolean matchesDistance(TransitLeg leg, FareLegRule rule) {
-    // If no valid distance type is given, do not consider distances in fare computation
-    FareDistance distance = rule.fareDistance();
-    if (distance instanceof FareDistance.Stops(int min, int max)) {
-      var numStops = leg.listIntermediateStops().size();
-      return numStops >= min && max >= numStops;
-    } else if (
-      rule.fareDistance() instanceof FareDistance.LinearDistance(Distance min, Distance max)
-    ) {
-      var legDistance = leg.from().coordinate.distanceTo(leg.to().coordinate);
-
-      return legDistance > min.toMeters() && legDistance < max.toMeters();
-    } else return true;
   }
 
   private static Set<FeedScopedId> findAreasWithRules(

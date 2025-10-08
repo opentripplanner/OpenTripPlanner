@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
@@ -85,12 +86,9 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
     var result = SERVICE.calculateFares(i1);
     var startTime = i1.listTransitLegs().getFirst().startTime();
-    assertEquals(
-      Set.of(
-        FareOffer.of(startTime, ALL_NETWORKS_DAY_PASS),
-        FareOffer.of(startTime, ALL_NETWORKS_SINGLE)
-      ),
-      result.offersForLeg(i1.legs().get(1))
+    assertThat(result.offersForLeg(i1.legs().get(1))).containsExactly(
+      FareOffer.of(startTime, ALL_NETWORKS_DAY_PASS),
+      FareOffer.of(startTime, ALL_NETWORKS_SINGLE)
     );
   }
 
@@ -100,12 +98,9 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
     var result = SERVICE.calculateFares(i1);
     var startTime = i1.listTransitLegs().getFirst().startTime();
-    assertEquals(
-      Set.of(
-        FareOffer.of(startTime, ALL_NETWORKS_DAY_PASS),
-        FareOffer.of(startTime, ALL_NETWORKS_SINGLE)
-      ),
-      result.offersForLeg(i1.legs().get(1))
+    assertThat(result.offersForLeg(i1.legs().get(1))).containsExactly(
+      FareOffer.of(startTime, ALL_NETWORKS_DAY_PASS),
+      FareOffer.of(startTime, ALL_NETWORKS_SINGLE)
     );
   }
 
