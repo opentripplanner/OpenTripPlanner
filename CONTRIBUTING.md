@@ -23,7 +23,7 @@ add it to a meeting's agenda thread in Gitter.
 [a web forum](https://groups.google.com/g/opentripplanner-users)
 or as a mailing list: <opentripplanner-users@googlegroups.com>.
 
-## Developer meetings
+## Developer Meetings
 
 - OTP development meetings usually occur twice a week.
 - The meeting times have been deliberately chosen to allow participation during regular business
@@ -45,21 +45,21 @@ an [iCal link to import this calendar](https://calendar.google.com/calendar/ical
 into calendar apps. Check the details of the calendar events for the Google Meet link, which is
 different on different days of the week.
 
-## Code conventions and architecture
+## Code Conventions and Architecture
 
 ### Architecture
 
 See [ARCHITECTURE.md](ARCHITECTURE.md)
 
-### Coding style
+### Coding Style
 
 See [Codestyle.md](doc/dev/decisionrecords/Codestyle.md)
 
-### Naming conventions
+### Naming Conventions
 
 See [NamingConventions.md](doc/dev/decisionrecords/NamingConventions.md)
 
-### Development process conventions
+### Development Process Conventions
 
 See [DevelopmentProcessConventions.md](doc/dev/decisionrecords/DevelopmentProcessConventions.md)
 
@@ -69,7 +69,7 @@ See [DEVELOPMENT_DECISION_RECORDS.md](DEVELOPMENT_DECISION_RECORDS.md)
 
 ## Contributing Issues and Pull Requests
 
-### Short version
+### Short Version
 
 - When creating
 issues and pull requests, please follow the instructions in the template.
@@ -103,7 +103,7 @@ grind to a halt, the maintainers of the project will:
   features are added.
 
 
-### Long version
+### Long Version
 
 OpenTripPlanner has been in active development and use for well over a decade and is now relied upon
 as infrastructure by large organizations and millions of public transit passengers around the world.
@@ -147,7 +147,7 @@ time you invest in OTP will need to be spent on collaboration, discussion, docum
 you will need to be available for regular meetings. You will need to take this into consideration in
 your budget and timeline.
 
-## Other ways to share development work
+## Other Ways to Share Development Work
 
 We don't want to discourage innovation and experimentation, and want promising new features to be
 visible to other users, so we have also created a Sandbox system for fast-track review and inclusion
