@@ -21,7 +21,7 @@ import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 /**
  * Test helper for buliding site repository entities with default values
  */
-public class SiteTestBuilder {
+public class SiteRepositoryTestBuilder {
 
   private final SiteRepositoryBuilder siteRepositoryBuilder;
 
@@ -36,7 +36,7 @@ public class SiteTestBuilder {
       }
     );
 
-  public SiteTestBuilder(SiteRepositoryBuilder siteRepositoryBuilder) {
+  public SiteRepositoryTestBuilder(SiteRepositoryBuilder siteRepositoryBuilder) {
     this.siteRepositoryBuilder = siteRepositoryBuilder;
   }
 

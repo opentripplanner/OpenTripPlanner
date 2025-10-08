@@ -6,7 +6,6 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
@@ -54,7 +53,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     var trip1input = tripInput(TRIP_1_ID);
 
     var env = ENV_BUILDER.addTrip(trip1input)
-      .addScheduledStopPointMapping(Map.of(id(scheduledStopPointId), STOP_B))
+      .withScheduledStopPointMapping(id(scheduledStopPointId), STOP_B)
       .build();
 
     var journey = new SiriEtBuilder(env.localTimeParser())
