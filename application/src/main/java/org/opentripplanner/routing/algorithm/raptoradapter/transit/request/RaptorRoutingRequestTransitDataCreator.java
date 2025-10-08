@@ -13,12 +13,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -184,24 +182,19 @@ class RaptorRoutingRequestTransitDataCreator {
     // and any previous day, while on subsequent search days we only want to add the
     // TripPatternForDate objects that start on that particular day. This is to prevent duplicates.
     // This was previously a stream, but was unrolled for improved performance.
-
-    Predicate<TripTimes> tripTimesWithSubmodesPredicate = tripTimes ->
-      filter.tripTimesPredicate(tripTimes, filter.hasSubModeFilters());
-    Predicate<TripTimes> tripTimesWithoutSubmodesPredicate = tripTimes ->
-      filter.tripTimesPredicate(tripTimes, false);
     Collection<TripPatternForDate> tripPatternsForDate =
       raptorTransitData.getTripPatternsForRunningDate(date);
+
     List<TripPatternForDate> result = new ArrayList<>(tripPatternsForDate.size());
     for (TripPatternForDate p : tripPatternsForDate) {
       if (firstDay || p.getStartOfRunningPeriod().equals(date)) {
-        if (filter.tripPatternPredicate(p)) {
-          var tripTimesPredicate = p.getTripPattern().getPattern().getContainsMultipleModes()
-            ? tripTimesWithSubmodesPredicate
-            : tripTimesWithoutSubmodesPredicate;
-          TripPatternForDate tripPatternForDate = p.newWithFilteredTripTimes(tripTimesPredicate);
-          if (tripPatternForDate != null) {
-            result.add(tripPatternForDate);
-          }
+        var tripTimesFilter = filter.createTripFilter(p.getTripPattern().getPattern());
+        if (tripTimesFilter == null) {
+          continue;
+        }
+        TripPatternForDate tripPatternForDate = p.newWithFilteredTripTimes(tripTimesFilter);
+        if (tripPatternForDate != null) {
+          result.add(tripPatternForDate);
         }
       }
     }
