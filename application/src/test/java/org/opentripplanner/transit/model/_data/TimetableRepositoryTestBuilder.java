@@ -9,15 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -25,7 +22,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -39,13 +35,16 @@ import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TimetableRepositoryTestBuilder {
 
-  private final List<TripInput> tripInputs = new ArrayList<>();
-  private final List<FlexTripInput> flexTripInputs = new ArrayList<>();
-  private final Map<FeedScopedId, RegularStop> scheduledStopPointMapping = new HashMap<>();
   private final List<Agency> agencies = new ArrayList<>();
   private final List<Operator> operators = new ArrayList<>();
 
-  private final AtomicInteger serviceCodeCounter = new AtomicInteger();
+  private final List<TripOnServiceDate> tripOnServiceDates = new ArrayList<>();
+  private final List<UnscheduledTrip> flexTrips = new ArrayList<>();
+
+  private final Map<TripPatternKey, TripPattern> tripPatterns = new HashMap<>();
+  private final Map<String, ServiceCode> serviceCodes = new HashMap<>();
+
+  private final Map<FeedScopedId, RegularStop> scheduledStopPointMapping = new HashMap<>();
 
   private final LocalDate defaultServiceDate;
   private final ZoneId timeZone;
@@ -65,18 +64,36 @@ public class TimetableRepositoryTestBuilder {
     var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     timetableRepository.initTimeZone(timeZone);
 
-    for (var agency: agencies) {
+    for (var agency : agencies) {
       timetableRepository.addAgency(agency);
     }
 
     timetableRepository.addOperators(operators);
 
-    for (TripInput tripInput : tripInputs) {
-      createTrip(tripInput, timetableRepository);
+    for (TripPattern tripPattern : tripPatterns.values()) {
+      timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
     }
-    for (FlexTripInput tripInput : flexTripInputs) {
-      createFlexTrip(tripInput, timetableRepository);
+
+    for (var flexTrip : flexTrips) {
+      timetableRepository.addFlexTrip(flexTrip.getId(), flexTrip);
     }
+
+    for (TripOnServiceDate tripOnServiceDate : tripOnServiceDates) {
+      timetableRepository.addTripOnServiceDate(tripOnServiceDate);
+    }
+
+    var calendarServiceData = new CalendarServiceData();
+    int serviceCodeCounter = 0;
+    for (var serviceCode : serviceCodes.values()) {
+      calendarServiceData.putServiceDatesForServiceId(serviceCode.id(), serviceCode.serviceDates());
+      timetableRepository.getServiceCodes().put(serviceCode.id(), serviceCodeCounter);
+      serviceCodeCounter += 1;
+    }
+    timetableRepository.updateCalendarServiceData(
+      true,
+      calendarServiceData,
+      DataImportIssueStore.NOOP
+    );
 
     timetableRepository
       .getAllTripPatterns()
@@ -111,7 +128,9 @@ public class TimetableRepositoryTestBuilder {
   }
 
   public Route route(String id, @Nullable Operator operator) {
-    var builder =  Route.of(id(id)).withAgency(defaultAgency).withShortName("R" + id)
+    var builder = Route.of(id(id))
+      .withAgency(defaultAgency)
+      .withShortName("R" + id)
       .withMode(TransitMode.BUS);
     if (operator != null) {
       builder.withOperator(operator);
@@ -126,13 +145,13 @@ public class TimetableRepositoryTestBuilder {
     return operator;
   }
 
-  public TimetableRepositoryTestBuilder withTrip(TripInput trip) {
-    this.tripInputs.add(trip);
+  public TimetableRepositoryTestBuilder withTrip(TripInput tripInput) {
+    trip(tripInput);
     return this;
   }
 
   public TimetableRepositoryTestBuilder withFlexTrip(FlexTripInput tripInput) {
-    flexTripInputs.add(tripInput);
+    flexTrip(tripInput);
     return this;
   }
 
@@ -144,12 +163,12 @@ public class TimetableRepositoryTestBuilder {
     return this;
   }
 
-  private Trip createTrip(TripInput tripInput, TimetableRepository timetableRepository
-  ) {
-    var serviceDates = Optional.ofNullable(tripInput.serviceDates())
-      .orElse(List.of(defaultServiceDate));
+  private Trip trip(TripInput tripInput) {
+    var serviceDates = Optional.ofNullable(tripInput.serviceDates()).orElse(
+      List.of(defaultServiceDate)
+    );
 
-    var serviceId = createServiceId(timetableRepository, serviceDates);
+    var serviceId = getOrCreateServiceId(serviceDates);
 
     var route = Optional.ofNullable(tripInput.route()).orElse(defaultRoute);
 
@@ -161,23 +180,24 @@ public class TimetableRepositoryTestBuilder {
 
     if (tripInput.tripOnServiceDateId() != null) {
       if (serviceDates.size() != 1) {
-        throw new IllegalArgumentException("Multiple service dates can't be used with TripOnServiceDate");
+        throw new IllegalArgumentException(
+          "Multiple service dates can't be used with TripOnServiceDate"
+        );
       }
-      addTripOnServiceDate(timetableRepository, trip, serviceDates.getFirst(), tripInput.tripOnServiceDateId());
+      addTripOnServiceDate(trip, serviceDates.getFirst(), tripInput.tripOnServiceDateId());
     }
 
     var stopPattern = stopPattern(tripInput.stopLocations());
-    var tripPattern = getOrCreateTripPattern(timetableRepository, stopPattern, route);
+    var tripPattern = getOrCreateTripPattern(stopPattern, route);
 
     var tripTimes = tripTimes(tripInput.stops(), trip);
-    addTripTimesToPattern(timetableRepository, tripPattern, tripTimes);
+    addTripTimesToPattern(tripPattern, tripTimes);
 
     return trip;
   }
 
-  private Trip createFlexTrip(FlexTripInput tripInput, TimetableRepository timetableRepository
-  ) {
-    var serviceId = createServiceId(timetableRepository, List.of(defaultServiceDate));
+  private Trip flexTrip(FlexTripInput tripInput) {
+    var serviceId = getOrCreateServiceId(List.of(defaultServiceDate));
     var route = defaultRoute;
     final var trip = Trip.of(id(tripInput.id()))
       .withRoute(route)
@@ -186,14 +206,14 @@ public class TimetableRepositoryTestBuilder {
       .build();
 
     var stopTimes = tripInput.stops().stream().map(s -> s.toStopTime(trip)).toList();
-    var tripTimes =  TripTimesFactory.tripTimes(trip, stopTimes, null);
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 
     var stopPattern = stopPattern(tripInput.stopLocations());
-    var tripPattern = getOrCreateTripPattern(timetableRepository, stopPattern, route);
-    addTripTimesToPattern(timetableRepository, tripPattern, tripTimes);
+    var tripPattern = getOrCreateTripPattern(stopPattern, route);
+    addTripTimesToPattern(tripPattern, tripTimes);
 
     var flexTrip = UnscheduledTrip.of(trip.getId()).withTrip(trip).withStopTimes(stopTimes).build();
-    timetableRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+    flexTrips.add(flexTrip);
 
     return trip;
   }
@@ -203,68 +223,49 @@ public class TimetableRepositoryTestBuilder {
     return TripTimesFactory.tripTimes(trip, stopTimes, null);
   }
 
-  private void addTripTimesToPattern(TimetableRepository timetableRepository, TripPattern tripPattern, TripTimes tripTimes) {
+  private void addTripTimesToPattern(TripPattern tripPattern, TripTimes tripTimes) {
     var newPattern = tripPattern
       .copy()
       .withScheduledTimeTableBuilder(b -> b.addTripTimes(tripTimes))
       .build();
-    timetableRepository.addTripPattern(tripPattern.getId(), newPattern);
+    tripPatterns.put(TripPatternKey.of(newPattern), newPattern);
   }
 
-  private TripPattern getOrCreateTripPattern(TimetableRepository timetableRepository, StopPattern stopPattern, Route route) {
-    // We use route and stopPattern as key for tripPattern. This isn't enough in general so we
-    // can extend it to more attributes from the trip pattern as needed.
-    var existingPatterns = timetableRepository
-      .getAllTripPatterns()
+  private TripPattern getOrCreateTripPattern(StopPattern stopPattern, Route route) {
+    var key = new TripPatternKey(stopPattern, route);
+    var pattern = tripPatterns.get(key);
+    if (pattern != null) {
+      return pattern;
+    }
+
+    var id = "Pattern" + (tripPatterns.size() + 1);
+    var newPattern = TripPattern.of(id(id)).withRoute(route).withStopPattern(stopPattern).build();
+    tripPatterns.put(key, newPattern);
+    return newPattern;
+  }
+
+  private FeedScopedId getOrCreateServiceId(List<LocalDate> serviceDates) {
+    var key = serviceDates
       .stream()
-      .filter(p -> p.getStopPattern().equals(stopPattern) && p.getRoute().equals(route))
-      .toList();
-    if (existingPatterns.size() > 1) {
-      throw new RuntimeException(
-        "Multiple patterns found for stop pattern %s. This indicates an error during test setup.".formatted(
-          stopPattern
-        )
-      );
-    }
-    if (existingPatterns.size() == 1) {
-      return existingPatterns.getFirst();
+      .map(LocalDate::toString)
+      .sorted()
+      .collect(Collectors.joining("|"));
+    var serviceCode = serviceCodes.get(key);
+    if (serviceCode != null) {
+      return serviceCode.id();
     }
 
-    var id = "Pattern" + (timetableRepository.getAllTripPatterns().size() + 1);
-    var pattern = TripPattern.of(id(id)).withRoute(route)
-      .withStopPattern(stopPattern)
-      .build();
-
-    timetableRepository.addTripPattern(pattern.getId(), pattern);
-    return pattern;
+    var newServiceCode = new ServiceCode(serviceDates, id(key));
+    serviceCodes.put(key, newServiceCode);
+    return newServiceCode.id();
   }
 
-
-  private FeedScopedId createServiceId(
-    TimetableRepository timetableRepository,
-    List<LocalDate> serviceDates
-  ) {
-    var serviceId = id(
-      serviceDates.stream().map(LocalDate::toString).collect(Collectors.joining("|"))
-    );
-    timetableRepository.getServiceCodes().put(serviceId, serviceCodeCounter.getAndIncrement());
-
-    var calendarServiceData = new CalendarServiceData();
-    calendarServiceData.putServiceDatesForServiceId(serviceId, serviceDates);
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
-    return serviceId;
-  }
-
-  private void addTripOnServiceDate(TimetableRepository timetableRepository, Trip trip, LocalDate serviceDate, String id) {
+  private void addTripOnServiceDate(Trip trip, LocalDate serviceDate, String id) {
     var tripOnServiceDate = TripOnServiceDate.of(id(id))
       .withTrip(trip)
       .withServiceDate(serviceDate)
       .build();
-    timetableRepository.addTripOnServiceDate(tripOnServiceDate);
+    tripOnServiceDates.add(tripOnServiceDate);
   }
 
   private static StopPattern stopPattern(List<StopLocation> stops) {
@@ -277,4 +278,13 @@ public class TimetableRepositoryTestBuilder {
     return builder.build();
   }
 
+  // We use route and stopPattern as key for tripPattern. This isn't enough in general so we
+  // can extend it to more attributes from the trip pattern as needed.
+  private record TripPatternKey(StopPattern stopPattern, Route route) {
+    public static TripPatternKey of(TripPattern tripPattern) {
+      return new TripPatternKey(tripPattern.getStopPattern(), tripPattern.getRoute());
+    }
+  }
+
+  private record ServiceCode(List<LocalDate> serviceDates, FeedScopedId id) {}
 }

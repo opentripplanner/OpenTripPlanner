@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -60,7 +59,12 @@ public record TripInput(
 
     public TripInputBuilder addStop(RegularStop stopId, String arrivalTime, String departureTime) {
       this.stops.add(
-          new StopCall(stopId, stops.size(), TimeUtils.time(arrivalTime), TimeUtils.time(departureTime))
+          new StopCall(
+            stopId,
+            stops.size(),
+            TimeUtils.time(arrivalTime),
+            TimeUtils.time(departureTime)
+          )
         );
       return this;
     }
@@ -94,7 +98,6 @@ public record TripInput(
       this.tripOnServiceDateId = tripOnServiceDateId;
       return this;
     }
-
   }
 
   record StopCall(StopLocation stop, int stopSequence, int arrivalTime, int departureTime) {
