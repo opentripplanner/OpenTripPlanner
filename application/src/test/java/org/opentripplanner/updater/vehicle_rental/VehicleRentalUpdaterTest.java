@@ -26,18 +26,17 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRent
 
 class VehicleRentalUpdaterTest {
 
-  public static final VehicleRentalUpdaterParameters PARAMS = new VehicleRentalUpdaterParameters("A", Duration.ofMinutes(1), new FakeParams());
+  public static final VehicleRentalUpdaterParameters PARAMS = new VehicleRentalUpdaterParameters(
+    "A",
+    Duration.ofMinutes(1),
+    new FakeParams()
+  );
   public static final DefaultVehicleRentalService SERVICE = new DefaultVehicleRentalService();
 
   @Test
   void failingDataSourceCountsAsPrimed() {
     var source = new FailingDataSource();
-    var updater = new VehicleRentalUpdater(
-      PARAMS,
-      source,
-      null,
-      SERVICE
-    );
+    var updater = new VehicleRentalUpdater(PARAMS, source, null, SERVICE);
 
     assertFalse(updater.isPrimed());
     var manager = new MockManager(updater);
@@ -50,12 +49,7 @@ class VehicleRentalUpdaterTest {
   @Test
   void failingSetup() {
     var source = new FailingSetupDataSource();
-    var updater = new VehicleRentalUpdater(
-      PARAMS,
-      source,
-      null,
-      SERVICE
-    );
+    var updater = new VehicleRentalUpdater(PARAMS, source, null, SERVICE);
 
     assertFalse(updater.isPrimed());
     var manager = new MockManager(updater);

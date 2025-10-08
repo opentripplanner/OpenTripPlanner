@@ -1,17 +1,14 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
-import org.mockito.Mockito;
-import org.opentripplanner.framework.io.OtpHttpClient;
-import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.framework.io.TestHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -123,13 +120,6 @@ class GbfsFeedMapperTest {
 
   @Test
   void testClientExceptionRethrowsAsUpdaterConstructionException() {
-    OtpHttpClientFactory clientFactory = Mockito.mock(OtpHttpClientFactory.class);
-    OtpHttpClient otpHttpClient = Mockito.mock(OtpHttpClient.class);
-    Mockito.when(clientFactory.create(any())).thenReturn(otpHttpClient);
-    Mockito.when(otpHttpClient.getAndMapAsJsonNode(any(), any(), any())).thenThrow(
-      OtpHttpClientException.class
-    );
-
     var dataSource = new GbfsVehicleRentalDataSource(
       new GbfsVehicleRentalDataSourceParameters(
         "file:src/test/resources/gbfs/tieroslo/gbfs.json",
@@ -141,7 +131,7 @@ class GbfsFeedMapperTest {
         false,
         RentalPickupType.ALL
       ),
-      clientFactory
+      TestHttpClientFactory.failingHttpFactory()
     );
 
     assertThrows(UpdaterConstructionException.class, dataSource::setup);
