@@ -5,8 +5,8 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
- * Represent a egress leg in a path. The egress leg is the last leg arriving at the destination. The
- * previous leg must be a transit leg - no other legs are allowed.
+ * Represent an egress leg in a path. The egress leg is the last leg arriving at the destination.
+ * The previous leg must be a transit leg - no other legs are allowed.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -18,7 +18,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
   private final int c1;
 
   public EgressPathLeg(RaptorAccessEgress egress, int fromTime, int toTime, int c1) {
-    this.egress = egress;
+    this.egress = Objects.requireNonNull(egress);
     this.fromTime = fromTime;
     this.toTime = toTime;
     this.c1 = c1;
@@ -30,7 +30,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
   }
 
   /**
-   * The stop index where the leg start, also called the leg departure stop index.
+   * The stop index where the leg starts, also called the leg departure stop index.
    */
   @Override
   public int fromStop() {
@@ -58,7 +58,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
    */
   @Override
   public TransitPathLeg<T> nextLeg() {
-    throw new java.lang.UnsupportedOperationException(
+    throw new UnsupportedOperationException(
       "The egress leg is the last leg in a path. Use isEgressLeg() to identify last leg."
     );
   }

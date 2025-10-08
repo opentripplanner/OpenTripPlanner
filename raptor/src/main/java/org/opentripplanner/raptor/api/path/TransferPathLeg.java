@@ -29,11 +29,11 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
   ) {
     this.fromStop = fromStop;
     this.fromTime = fromTime;
-    this.toStop = transfer.stop();
+    this.toStop = Objects.requireNonNull(transfer).stop();
     this.toTime = toTime;
     this.c1 = c1;
     this.transfer = transfer;
-    this.next = next;
+    this.next = Objects.requireNonNull(next);
   }
 
   public RaptorTransfer transfer() {

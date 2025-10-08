@@ -25,11 +25,11 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     int c1,
     PathLeg<T> next
   ) {
-    this.access = access;
+    this.access = Objects.requireNonNull(access);
     this.fromTime = fromTime;
     this.toTime = toTime;
     this.c1 = c1;
-    this.next = next;
+    this.next = Objects.requireNonNull(next);
   }
 
   @Override
