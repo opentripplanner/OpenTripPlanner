@@ -6,6 +6,7 @@ import java.util.Map;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -82,6 +83,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     var routingRequest = RouteRequest.of().withArriveBy(reverseDirection).buildDefault();
 
     return StreetSearchBuilder.of()
+      .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxFlexTripDuration))
       .withDominanceFunction(new DominanceFunctions.EarliestArrival())
       .withRequest(routingRequest)

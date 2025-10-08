@@ -18,7 +18,6 @@ import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.utils.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +40,7 @@ public class AStar<
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
   private final RemainingWeightHeuristic<State> heuristic;
+  private final Runnable preSearchHook;
   private final SkipEdgeStrategy<State, Edge> skipEdgeStrategy;
   private final SearchTerminationStrategy<State> terminationStrategy;
   private final TraverseVisitor<State, Edge> traverseVisitor;
@@ -55,6 +55,7 @@ public class AStar<
 
   AStar(
     RemainingWeightHeuristic<State> heuristic,
+    Runnable preSearchHook,
     SkipEdgeStrategy<State, Edge> skipEdgeStrategy,
     TraverseVisitor<State, Edge> traverseVisitor,
     boolean arriveBy,
@@ -75,6 +76,7 @@ public class AStar<
     this.timeout = Objects.requireNonNull(timeout);
 
     this.spt = new ShortestPathTree<>(dominanceFunction);
+    this.preSearchHook = preSearchHook;
 
     // Initialized with a reasonable size, see #4445
     this.pq = new BinHeap<>(1000);
@@ -183,7 +185,9 @@ public class AStar<
   }
 
   private void runSearch() {
-    OTPRequestTimeoutException.checkForTimeout();
+    // execute the hook before the search begins so that it can be checked if the request
+    // has already timed out.
+    preSearchHook.run();
     long abortTime = DateUtils.absoluteTimeout(timeout);
 
     /* the core of the A* algorithm */

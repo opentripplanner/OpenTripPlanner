@@ -28,18 +28,18 @@ public class BinHeapTest {
     while (!q.empty()) {
       result.add(q.extract_min());
     }
-    assertEquals(result, expected);
+    assertEquals(expected, result);
     // check behavior when queue is empty
-    assertEquals(q.size(), 0);
+    assertEquals(0, q.size());
     assertNull(q.peek_min());
     assertNull(q.extract_min());
     q.insert(100, 10);
     q.insert(200, 20);
-    assertEquals(q.size(), 2);
+    assertEquals(2, q.size());
     assertNotNull(q.extract_min());
     assertNotNull(q.extract_min());
     assertNull(q.extract_min());
-    assertEquals(q.size(), 0);
+    assertEquals(0, q.size());
     // fill and empty the queue a few times
     int sum = 0;
     for (Integer i : input) q.insert(i, i);
