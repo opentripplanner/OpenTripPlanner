@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.BookingRule;
 import org.opentripplanner.transit.model.organization.ContactInfo;
@@ -50,10 +51,12 @@ class BookingRuleMapper {
     return null;
   }
 
+  @Nullable
   private BookingTime earliestBookingTime(BookingRule rule) {
     return resolveBookingTime(rule.getPriorNoticeStartTime(), rule.getPriorNoticeStartDay());
   }
 
+  @Nullable
   private BookingTime latestBookingTime(BookingRule rule) {
     return resolveBookingTime(rule.getPriorNoticeLastTime(), rule.getPriorNoticeLastDay());
   }
@@ -64,6 +67,7 @@ class BookingRuleMapper {
    *
    * @return null if both timeSeconds and day are 0, otherwise a BookingTime instance
    */
+  @Nullable
   private BookingTime resolveBookingTime(int timeSeconds, int day) {
     if (timeSeconds == 0 && day == 0) {
       return null;
