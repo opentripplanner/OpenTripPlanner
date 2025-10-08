@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.empiricaldelay.config;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_8;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 
 import java.util.List;
 import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayFeedParameters;
@@ -16,14 +16,14 @@ public class EmpiricalDelayConfig {
     String parameterName,
     NodeAdapter root
   ) {
-    var c = root.of(parameterName).since(V2_8).summary("Empirical delay configuration.").asObject();
+    var c = root.of(parameterName).since(V2_9).summary("Empirical delay configuration.").asObject();
     return EmpiricalDelayParameters.of().addFeeds(mapFeeds(c)).build();
   }
 
   private static List<EmpiricalDelayFeedParameters> mapFeeds(NodeAdapter c) {
     return c
       .of("feeds")
-      .since(V2_8)
+      .since(V2_9)
       .summary("List of feeds.")
       .asObjects(List.of(), EmpiricalDelayConfig::mapFeed);
   }
@@ -32,10 +32,10 @@ public class EmpiricalDelayConfig {
     return new EmpiricalDelayFeedParameters(
       c
         .of("feedId")
-        .since(V2_8)
+        .since(V2_9)
         .summary("Specify the feed id to use for matching transit ids in input data.")
         .asString(),
-      c.of("source").since(V2_8).summary("Specify the feed data source url.").asUri()
+      c.of("source").since(V2_9).summary("Specify the feed data source url.").asUri()
     );
   }
 }

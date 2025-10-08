@@ -34,7 +34,7 @@ public class EmpiricalDelayCsvDataReader {
 
   private final DataImportIssueStore issueStore;
   private EmpiricalDelayCalendar calendar;
-  /** The serviceIds is cashed, so we can validate the delay trip time rows more efficient. */
+  /** The serviceIds is cached, so we can validate the delay trip time rows more efficient. */
   private final Set<String> serviceIds = new HashSet<>();
   private final Map<FeedScopedId, TripDelaysAgregator> trips = new HashMap<>();
 

@@ -71,7 +71,7 @@ class TripDelaysMapper {
       map.put(i, value);
       ++i;
     }
-    // Add skiped stops at the end
+    // Add skipped stops at the end
     for (; i < stopIds.size(); ++i) {
       skippedStops.add(stopIds.get(i));
     }

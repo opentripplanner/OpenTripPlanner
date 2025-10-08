@@ -22,7 +22,7 @@ public class EmpiricalDelayType {
       .name(NAME)
       .description(
         """
-        The empirical delay indicate how late a service journey is based on historic data.
+        The empirical delay indicates how late a service journey is based on historic data.
         """
       )
       .field(
@@ -39,7 +39,7 @@ public class EmpiricalDelayType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("p90")
           .description(
-            "The 90% percentile. 90% of the values is better and 10% have is more delayed."
+            "The 90% percentile. 90% of the values in the distribution is better and 10% is more delayed."
           )
           .type(TransmodelScalars.DURATION_SCALAR)
           .dataFetcher(e -> (empiricalDelay(e).p90()))

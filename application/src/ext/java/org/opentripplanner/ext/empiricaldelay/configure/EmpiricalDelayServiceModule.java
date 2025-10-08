@@ -17,7 +17,7 @@ public class EmpiricalDelayServiceModule {
 
   @Provides
   @Nullable
-  public EmpiricalDelayService provideEmpericalDelayService(EmpiricalDelayRepository repository) {
+  public EmpiricalDelayService provideEmpiricalDelayService(EmpiricalDelayRepository repository) {
     // The repository could be null if the feature is turned of after graph serialization
     if (OTPFeature.EmpiricalDelay.isOff() || repository == null) {
       return null;

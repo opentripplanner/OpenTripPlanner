@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * This implementation of a Service Calendar is specific to the emperical dealy.
+ * This implementation of a Service Calendar is specific to the empirical dealy.
  * A feed can only have one {@link EmpiricalDelayCalendar} and the calendar can only
  * contain one service(id) for each day-of-week. Exceptions are not currently
  * supported,but it should be possible to add this with small changes to this class.

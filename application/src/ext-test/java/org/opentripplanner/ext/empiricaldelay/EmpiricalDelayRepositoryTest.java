@@ -2,6 +2,7 @@ package org.opentripplanner.ext.empiricaldelay;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.empiricaldelay.EmpiricalDelayTestData.DATE_INSIDE;
 import static org.opentripplanner.ext.empiricaldelay.EmpiricalDelayTestData.DATE_OUTSIDE;
 import static org.opentripplanner.ext.empiricaldelay.EmpiricalDelayTestData.DELAY_STOP_1;
@@ -18,7 +19,6 @@ import static org.opentripplanner.ext.empiricaldelay.EmpiricalDelayTestData.UNKN
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayRepository;
@@ -68,8 +68,8 @@ class EmpiricalDelayRepositoryTest {
     assertEquals(Optional.empty(), subject.findEmpiricalDelay(UNKNOWN_TRIP_ID, DATE_INSIDE, 1));
 
     // Stop position is out of bounds -> exception
-    Assertions.assertTrue(subject.findEmpiricalDelay(TRIP_ID, DATE_INSIDE, -1).isEmpty());
-    Assertions.assertTrue(subject.findEmpiricalDelay(TRIP_ID, DATE_INSIDE, 3).isEmpty());
+    assertTrue(subject.findEmpiricalDelay(TRIP_ID, DATE_INSIDE, -1).isEmpty());
+    assertTrue(subject.findEmpiricalDelay(TRIP_ID, DATE_INSIDE, 3).isEmpty());
   }
 
   @Test
