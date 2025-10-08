@@ -22,7 +22,7 @@ class TripDelaysDtoTest {
   private static final EmpiricalDelay DELAY_11 = new EmpiricalDelay(12, 120);
   private static final EmpiricalDelay DELAY_12 = new EmpiricalDelay(17, 97);
   private static final EmpiricalDelay DELAY_13 = new EmpiricalDelay(13, 17);
-  private final TripDelaysDto subject = new TripDelaysDto(TRIP_ID);
+  private final TripDelaysAgregator subject = new TripDelaysAgregator(TRIP_ID);
 
   @BeforeEach
   void setup() {

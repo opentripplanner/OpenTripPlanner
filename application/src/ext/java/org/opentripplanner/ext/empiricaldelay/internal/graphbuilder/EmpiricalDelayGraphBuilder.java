@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.empiricaldelay.internal.csvinput.EmpiricalDelayCsvDataReader;
-import org.opentripplanner.ext.empiricaldelay.internal.model.TripDelaysDto;
+import org.opentripplanner.ext.empiricaldelay.internal.model.TripDelaysAgregator;
 import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayFeedParameters;
 import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameters;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -71,7 +71,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
       repository.addEmpiricalDelayServiceCalendar(data.config().feedId(), reader.calendar());
 
       // Validate and add trip delays
-      for (TripDelaysDto trip : reader.trips()) {
+      for (TripDelaysAgregator trip : reader.trips()) {
         mapper.map(trip).ifPresent(it -> repository.addTripDelays(it));
       }
     }

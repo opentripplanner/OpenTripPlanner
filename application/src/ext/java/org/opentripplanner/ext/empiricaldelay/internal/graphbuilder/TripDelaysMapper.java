@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.empiricaldelay.internal.model.DelayAtStopDto;
-import org.opentripplanner.ext.empiricaldelay.internal.model.TripDelaysDto;
+import org.opentripplanner.ext.empiricaldelay.internal.model.TripDelaysAgregator;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 import org.opentripplanner.ext.empiricaldelay.model.TripDelays;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -30,7 +30,7 @@ class TripDelaysMapper {
     this.deduplicator = deduplicator;
   }
 
-  Optional<TripDelays> map(TripDelaysDto trip) {
+  Optional<TripDelays> map(TripDelaysAgregator trip) {
     var builder = TripDelays.of(trip.tripId());
     for (String serviceId : trip.serviceIds()) {
       var delayAtStops = trip.delaysSortedForServiceId(serviceId);

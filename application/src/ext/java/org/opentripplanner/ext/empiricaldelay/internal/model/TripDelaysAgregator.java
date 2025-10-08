@@ -8,12 +8,12 @@ import java.util.Map;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class TripDelaysDto {
+public class TripDelaysAgregator {
 
   private final FeedScopedId tripId;
   private final Map<String, List<DelayAtStopDto>> delaysForServiceId = new HashMap<>();
 
-  public TripDelaysDto(FeedScopedId tripId) {
+  public TripDelaysAgregator(FeedScopedId tripId) {
     this.tripId = tripId;
   }
 

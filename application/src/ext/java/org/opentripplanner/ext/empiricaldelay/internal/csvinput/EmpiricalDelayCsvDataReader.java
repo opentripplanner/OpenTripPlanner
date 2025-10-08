@@ -11,7 +11,7 @@ import org.opentripplanner.ext.empiricaldelay.internal.csvinput.calendar.Calenda
 import org.opentripplanner.ext.empiricaldelay.internal.csvinput.calendar.CalendarRow;
 import org.opentripplanner.ext.empiricaldelay.internal.csvinput.delay.TripTimeDelayCsvParser;
 import org.opentripplanner.ext.empiricaldelay.internal.csvinput.delay.TripTimeDelayRow;
-import org.opentripplanner.ext.empiricaldelay.internal.model.TripDelaysDto;
+import org.opentripplanner.ext.empiricaldelay.internal.model.TripDelaysAgregator;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 import org.opentripplanner.ext.empiricaldelay.model.calendar.EmpiricalDelayCalendar;
 import org.opentripplanner.framework.csv.HeadersDoNotMatch;
@@ -36,7 +36,7 @@ public class EmpiricalDelayCsvDataReader {
   private EmpiricalDelayCalendar calendar;
   /** The serviceIds is cashed, so we can validate the delay trip time rows more efficient. */
   private final Set<String> serviceIds = new HashSet<>();
-  private final Map<FeedScopedId, TripDelaysDto> trips = new HashMap<>();
+  private final Map<FeedScopedId, TripDelaysAgregator> trips = new HashMap<>();
 
   public EmpiricalDelayCsvDataReader(DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
@@ -46,7 +46,7 @@ public class EmpiricalDelayCsvDataReader {
     return calendar;
   }
 
-  public Collection<TripDelaysDto> trips() {
+  public Collection<TripDelaysAgregator> trips() {
     return trips.values();
   }
 
@@ -106,7 +106,7 @@ public class EmpiricalDelayCsvDataReader {
       return;
     }
 
-    var trip = trips.computeIfAbsent(row.tripId(), id -> new TripDelaysDto(id));
+    var trip = trips.computeIfAbsent(row.tripId(), id -> new TripDelaysAgregator(id));
     trip.addDelay(
       row.empiricalDelayServiceId(),
       row.stopSequence(),

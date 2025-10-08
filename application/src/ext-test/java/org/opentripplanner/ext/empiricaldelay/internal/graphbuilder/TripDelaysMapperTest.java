@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.empiricaldelay.internal.model.TripDelaysDto;
+import org.opentripplanner.ext.empiricaldelay.internal.model.TripDelaysAgregator;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
@@ -44,7 +44,7 @@ class TripDelaysMapperTest {
 
   @Test
   void testMap() {
-    var dto = new TripDelaysDto(TRIP_ID_A);
+    var dto = new TripDelaysAgregator(TRIP_ID_A);
     dto.addDelay(WEEKEND, 30, STOP_ID_C, EMPIRICAL_DELAY_C);
     dto.addDelay(WEEKEND, 20, STOP_ID_B, EMPIRICAL_DELAY_B);
     dto.addDelay(WEEKEND, 10, STOP_ID_A, EMPIRICAL_DELAY_A);
@@ -64,7 +64,7 @@ class TripDelaysMapperTest {
 
   @Test
   void testMapAndDeduplicator() {
-    var dto = new TripDelaysDto(TRIP_ID_A);
+    var dto = new TripDelaysAgregator(TRIP_ID_A);
     dto.addDelay(WEEKEND, 11, STOP_ID_A, EMPIRICAL_DELAY_A);
     dto.addDelay(WEEKEND, 22, STOP_ID_B, EMPIRICAL_DELAY_B);
     dto.addDelay(WEEKEND, 23, STOP_ID_C, EMPIRICAL_DELAY_C);
@@ -88,7 +88,7 @@ class TripDelaysMapperTest {
 
   @Test
   void testMapWithSkippedStops() {
-    var dto = new TripDelaysDto(TRIP_ID_A);
+    var dto = new TripDelaysAgregator(TRIP_ID_A);
     dto.addDelay(WEEKEND, 1, STOP_ID_B, EMPIRICAL_DELAY_B);
     dto.addDelay(MON_FRI, 1, STOP_ID_A, EMPIRICAL_DELAY_A);
     dto.addDelay(MON_FRI, 2, STOP_ID_C, EMPIRICAL_DELAY_C);
@@ -114,11 +114,11 @@ class TripDelaysMapperTest {
 
   @Test
   void testMapWithNoneExistingTrip() {
-    var dto = new TripDelaysDto(TRIP_ID_OTHER);
-    dto.addDelay(MON_FRI, 1, STOP_ID_A, EMPIRICAL_DELAY_A);
-    dto.addDelay(MON_FRI, 2, STOP_ID_C, EMPIRICAL_DELAY_C);
+    var agregator = new TripDelaysAgregator(TRIP_ID_OTHER);
+    agregator.addDelay(MON_FRI, 1, STOP_ID_A, EMPIRICAL_DELAY_A);
+    agregator.addDelay(MON_FRI, 2, STOP_ID_C, EMPIRICAL_DELAY_C);
 
-    assertTrue(subject.map(dto).isEmpty());
+    assertTrue(subject.map(agregator).isEmpty());
 
     assertEquals(
       "Trip pattern not found for trip. Trip: F:Trip-OTHER, ServiceId: Mon-Fri.",
@@ -129,12 +129,12 @@ class TripDelaysMapperTest {
 
   @Test
   void testMapWithStopsOutOfOrder() {
-    var dto = new TripDelaysDto(TRIP_ID_A);
+    var agregator = new TripDelaysAgregator(TRIP_ID_A);
     // C then A, is out of order
-    dto.addDelay(WEEKEND, 1, STOP_ID_C, EMPIRICAL_DELAY_C);
-    dto.addDelay(WEEKEND, 2, STOP_ID_A, EMPIRICAL_DELAY_A);
+    agregator.addDelay(WEEKEND, 1, STOP_ID_C, EMPIRICAL_DELAY_C);
+    agregator.addDelay(WEEKEND, 2, STOP_ID_A, EMPIRICAL_DELAY_A);
 
-    assertTrue(subject.map(dto).isEmpty());
+    assertTrue(subject.map(agregator).isEmpty());
 
     assertEquals(
       "The stop sequence is wrong or the stop is not in the trip pattern. TripId: " +
