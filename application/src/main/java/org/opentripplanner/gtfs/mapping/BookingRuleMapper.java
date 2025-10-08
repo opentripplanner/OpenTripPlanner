@@ -51,29 +51,25 @@ class BookingRuleMapper {
   }
 
   private BookingTime earliestBookingTime(BookingRule rule) {
-    int startTimeSeconds = rule.getPriorNoticeStartTime();
-    int startDay = rule.getPriorNoticeStartDay();
-
-    // If GTFS does not specify the earliest booking time/day, the underlying values default to 0.
-    // In that case, do not set earliestBookingTime so that min/max booking notice can apply.
-    if (startTimeSeconds == 0 && startDay == 0) {
-      return null;
-    }
-
-    return new BookingTime(LocalTime.ofSecondOfDay(startTimeSeconds), startDay);
+    return resolveBookingTime(rule.getPriorNoticeStartTime(), rule.getPriorNoticeStartDay());
   }
 
   private BookingTime latestBookingTime(BookingRule rule) {
-    int lastTimeSeconds = rule.getPriorNoticeLastTime();
-    int lastDay = rule.getPriorNoticeLastDay();
+    return resolveBookingTime(rule.getPriorNoticeLastTime(), rule.getPriorNoticeLastDay());
+  }
 
-    // If GTFS does not specify the latest booking time/day, the underlying values default to 0.
-    // In that case, do not set latestBookingTime so that min/max booking notice can apply.
-    if (lastTimeSeconds == 0 && lastDay == 0) {
+  /**
+   * If GTFS does not specify the latest booking time/day, the underlying values default to 0.
+   * In that case, we do not set the booking time so that min/max booking notice can apply.
+   *
+   * @return null if both timeSeconds and day are 0, otherwise a BookingTime instance
+   */
+  private BookingTime resolveBookingTime(int timeSeconds, int day) {
+    if (timeSeconds == 0 && day == 0) {
       return null;
     }
 
-    return new BookingTime(LocalTime.ofSecondOfDay(lastTimeSeconds), lastDay);
+    return new BookingTime(LocalTime.ofSecondOfDay(timeSeconds), day);
   }
 
   private Duration minimumBookingNotice(BookingRule rule) {
