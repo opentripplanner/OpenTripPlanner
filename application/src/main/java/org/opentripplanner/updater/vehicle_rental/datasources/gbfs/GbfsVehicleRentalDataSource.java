@@ -9,8 +9,6 @@ import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataS
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
 /**
- * Created by demory on 2017-03-14.
- * <p>
  * Leaving OTPFeature.FloatingBike turned off both prevents floating bike updaters added to
  * router-config.json from being used, but more importantly, floating bikes added by a
  * VehicleRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be
