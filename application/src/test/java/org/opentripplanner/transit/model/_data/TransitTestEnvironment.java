@@ -6,7 +6,6 @@ import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
@@ -24,31 +23,16 @@ public final class TransitTestEnvironment {
   private final LocalTimeParser localTimeParser;
   private final LocalDate defaultServiceDate;
 
-  public static TransitTestEnvironmentBuilder of(SiteRepository siteRepository) {
-    return new TransitTestEnvironmentBuilder(
-      siteRepository,
-      ZoneId.of("Europe/Paris"),
-      LocalDate.of(2024, 5, 7)
-    );
+  public static TransitTestEnvironmentBuilder of() {
+    return new TransitTestEnvironmentBuilder(ZoneId.of("Europe/Paris"), LocalDate.of(2024, 5, 7));
   }
 
-  public static TransitTestEnvironmentBuilder of(
-    SiteRepository siteRepository,
-    LocalDate serviceDate
-  ) {
-    return new TransitTestEnvironmentBuilder(
-      siteRepository,
-      ZoneId.of("Europe/Paris"),
-      serviceDate
-    );
+  public static TransitTestEnvironmentBuilder of(LocalDate serviceDate) {
+    return new TransitTestEnvironmentBuilder(ZoneId.of("Europe/Paris"), serviceDate);
   }
 
-  public static TransitTestEnvironmentBuilder of(
-    SiteRepository siteRepository,
-    LocalDate serviceDate,
-    ZoneId timeZone
-  ) {
-    return new TransitTestEnvironmentBuilder(siteRepository, timeZone, serviceDate);
+  public static TransitTestEnvironmentBuilder of(LocalDate serviceDate, ZoneId timeZone) {
+    return new TransitTestEnvironmentBuilder(timeZone, serviceDate);
   }
 
   TransitTestEnvironment(TimetableRepository timetableRepository, LocalDate defaultServiceDate) {

@@ -6,7 +6,6 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.SiteTestBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
@@ -14,6 +13,7 @@ import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
@@ -30,14 +30,16 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     .withOperator(Operator.of(id("o2")).withName("o").build())
     .build();
 
-  private final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of(
-    SiteTestBuilder.of().withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID).build()
-  );
+  private final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
+  private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+  private final RegularStop STOP_C = ENV_BUILDER.stop(STOP_C_ID);
+  private final RegularStop STOP_D = ENV_BUILDER.stop(STOP_D_ID);
 
   private final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .withRoute(ROUTE_2)
-    .addStop(STOP_A_ID, "0:00:10", "0:00:11")
-    .addStop(STOP_B_ID, "0:00:20", "0:00:21")
+    .addStop(STOP_A, "0:00:10", "0:00:11")
+    .addStop(STOP_B, "0:00:20", "0:00:21")
     .build();
 
   @Test
@@ -141,9 +143,9 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .withLineRef(TRIP_1_INPUT.routeId())
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A_ID)
+          .call(STOP_A)
           .departAimedExpected("10:58", "10:48")
-          .call(STOP_B_ID)
+          .call(STOP_B)
           .arriveAimedExpected("10:08", "10:58")
       )
       .buildEstimatedTimetableDeliveries();
@@ -166,8 +168,8 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .withVehicleJourneyRef(TRIP_1_ID)
       .withOperatorRef(TRIP_1_INPUT.operatorId())
       .withLineRef(TRIP_1_INPUT.routeId())
-      .withRecordedCalls(builder -> builder.call(STOP_A_ID).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder -> builder.call(STOP_C_ID).arriveAimedExpected("00:03", "00:04"))
+      .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:01", "00:02"))
+      .withEstimatedCalls(builder -> builder.call(STOP_C).arriveAimedExpected("00:03", "00:04"))
       .buildEstimatedTimetableDeliveries();
 
     var result = siri.applyEstimatedTimetable(updates);
@@ -202,9 +204,9 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .withLineRef(TRIP_1_INPUT.routeId())
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A_ID)
+          .call(STOP_A)
           .departAimedExpected("00:01", "00:02")
-          .call(STOP_C_ID)
+          .call(STOP_C)
           .arriveAimedExpected("00:03", "00:04")
       )
       .buildEstimatedTimetableDeliveries();
@@ -222,7 +224,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .withIsExtraJourney(true)
       .withOperatorRef(TRIP_1_INPUT.operatorId())
       .withLineRef(TRIP_1_INPUT.routeId())
-      .withRecordedCalls(builder -> builder.call(STOP_C_ID).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder -> builder.call(STOP_D_ID).arriveAimedExpected("00:03", "00:04"));
+      .withRecordedCalls(builder -> builder.call(STOP_C).departAimedActual("00:01", "00:02"))
+      .withEstimatedCalls(builder -> builder.call(STOP_D).arriveAimedExpected("00:03", "00:04"));
   }
 }

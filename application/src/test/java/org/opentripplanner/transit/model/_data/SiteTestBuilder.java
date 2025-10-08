@@ -2,7 +2,6 @@ package org.opentripplanner.transit.model._data;
 
 import static org.opentripplanner.transit.model._data.TransitTestEnvironment.id;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.locationtech.jts.geom.Coordinate;
@@ -20,11 +19,11 @@ import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 
 /**
- * Test helper for buliding a site repository
+ * Test helper for buliding site repository entities with default values
  */
 public class SiteTestBuilder {
 
-  private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
+  private final SiteRepositoryBuilder siteRepositoryBuilder;
 
   private static final WgsCoordinate ANY_COORDINATE = new WgsCoordinate(60.0, 10.0);
   private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory()
@@ -37,32 +36,12 @@ public class SiteTestBuilder {
       }
     );
 
-  public static SiteTestBuilder of() {
-    return new SiteTestBuilder();
+  public SiteTestBuilder(SiteRepositoryBuilder siteRepositoryBuilder) {
+    this.siteRepositoryBuilder = siteRepositoryBuilder;
   }
 
   public SiteRepository build() {
     return siteRepositoryBuilder.build();
-  }
-
-  public SiteTestBuilder withStops(String... stopIds) {
-    Arrays.stream(stopIds).forEach(this::stop);
-    return this;
-  }
-
-  public SiteTestBuilder withStop(String stopId) {
-    stop(stopId);
-    return this;
-  }
-
-  public SiteTestBuilder withStopAtStation(String stopId, String stationId) {
-    stopAtStation(stopId, stationId);
-    return this;
-  }
-
-  public SiteTestBuilder withAreaStops(String... stopIds) {
-    Arrays.stream(stopIds).forEach(this::areaStop);
-    return this;
   }
 
   public RegularStop stop(String id) {

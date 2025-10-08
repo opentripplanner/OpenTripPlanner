@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.transit.model._data.SiteTestBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TripInput;
@@ -22,12 +21,13 @@ public class ReplacementTest implements RealtimeTestConstants {
 
   @Test
   void replacementTrip() {
-    var builder = TransitTestEnvironment.of(
-      SiteTestBuilder.of().withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID).build()
-    );
+    var builder = TransitTestEnvironment.of();
+    var STOP_A = builder.stop(STOP_A_ID);
+    var STOP_B = builder.stop(STOP_B_ID);
+    var STOP_C = builder.stop(STOP_C_ID);
     var TRIP_INPUT = TripInput.of(TRIP_1_ID)
-      .addStop(STOP_A_ID, "8:30:00", "8:30:00")
-      .addStop(STOP_B_ID, "8:40:00", "8:40:00")
+      .addStop(STOP_A, "8:30:00", "8:30:00")
+      .addStop(STOP_B, "8:40:00", "8:40:00")
       .withHeadsign(I18NString.of("Original Headsign"))
       .build();
     var env = builder.addTrip(TRIP_INPUT).build();

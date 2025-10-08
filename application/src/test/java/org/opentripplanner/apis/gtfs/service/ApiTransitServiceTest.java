@@ -2,7 +2,7 @@ package org.opentripplanner.apis.gtfs.service;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.model._data.TransitTestEnvironment.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
@@ -19,13 +19,11 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model._data.SiteTestBuilder;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
-import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
@@ -43,26 +41,21 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
   private static final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
   private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Paris");
   private static final ZonedDateTime ANY_TIME = ZonedDateTime.parse("2022-01-01T12:00:00+00:00");
-
-  private final SiteRepository site = SiteTestBuilder.of()
-    .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID)
-    .build();
-  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(
-    site,
-    SERVICE_DATE
-  );
-  private final RegularStop STOP_A = site.getRegularStop(id(STOP_A_ID));
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
+  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
+  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
+  private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
 
   private final TripInput TRIP1_INPUT = TripInput.of(TRIP_1_ID)
-    .addStop(STOP_A_ID, "12:00:00", "12:00:00")
-    .addStop(STOP_B_ID, "12:30:00", "12:30:00")
-    .addStop(STOP_C_ID, "13:00:00", "13:00:00")
+    .addStop(STOP_A, "12:00:00", "12:00:00")
+    .addStop(STOP_B, "12:30:00", "12:30:00")
+    .addStop(STOP_C, "13:00:00", "13:00:00")
     .build();
 
   private final TripInput TRIP2_INPUT = TripInput.of(TRIP_2_ID)
-    .addStop(STOP_A_ID, "12:10:00", "12:10:00")
-    .addStop(STOP_B_ID, "12:40:00", "12:40:00")
-    .addStop(STOP_C_ID, "13:10:00", "13:10:00")
+    .addStop(STOP_A, "12:10:00", "12:10:00")
+    .addStop(STOP_B, "12:40:00", "12:40:00")
+    .addStop(STOP_C, "13:10:00", "13:10:00")
     .build();
 
   public final Instant T11_59 = SERVICE_DATE.atTime(LocalTime.NOON.minusMinutes(1))

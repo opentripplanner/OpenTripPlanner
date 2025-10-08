@@ -188,15 +188,11 @@ public class SiriEtBuilder {
     }
 
     public RecordedCallsBuilder call(StopLocation stop) {
-      return call(stop.getId().getId());
-    }
-
-    public RecordedCallsBuilder call(String stopId) {
       var call = new RecordedCall();
       call.setOrder(BigInteger.valueOf(orderOffset + calls.size()));
 
       var ref = new StopPointRefStructure();
-      ref.setValue(stopId);
+      ref.setValue(stop.getId().getId());
       call.setStopPointRef(ref);
 
       calls.add(call);

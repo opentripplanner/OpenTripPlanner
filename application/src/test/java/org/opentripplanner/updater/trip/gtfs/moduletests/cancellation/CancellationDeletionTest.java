@@ -15,12 +15,11 @@ import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.transit.model._data.SiteTestBuilder;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
-import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 
@@ -31,11 +30,9 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 class CancellationDeletionTest implements RealtimeTestConstants {
 
   private final LocalDate SERVICE_DATE = LocalDate.of(2023, 2, 3);
-  private final SiteRepository site = SiteTestBuilder.of().withStops(STOP_A_ID, STOP_B_ID).build();
-  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(
-    site,
-    SERVICE_DATE
-  );
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
+  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
+  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
 
   static List<Arguments> cases() {
     return List.of(
@@ -50,8 +47,8 @@ class CancellationDeletionTest implements RealtimeTestConstants {
     var env = envBuilder
       .addTrip(
         TripInput.of(TRIP_1_ID)
-          .addStop(STOP_A_ID, "0:00:10", "0:00:11")
-          .addStop(STOP_B_ID, "0:00:20", "0:00:21")
+          .addStop(STOP_A, "0:00:10", "0:00:11")
+          .addStop(STOP_B, "0:00:20", "0:00:21")
           .build()
       )
       .build();
@@ -86,8 +83,8 @@ class CancellationDeletionTest implements RealtimeTestConstants {
         TripInput.of(TRIP_1_ID)
           // just to set the scheduling period
           .withServiceDates(SERVICE_DATE)
-          .addStop(STOP_A_ID, "0:00:10", "0:00:11")
-          .addStop(STOP_B_ID, "0:00:20", "0:00:21")
+          .addStop(STOP_A, "0:00:10", "0:00:11")
+          .addStop(STOP_B, "0:00:20", "0:00:21")
           .build()
       )
       .build();
@@ -109,8 +106,7 @@ class CancellationDeletionTest implements RealtimeTestConstants {
 
     var snapshot = env.getTimetableSnapshot();
     // Get the trip pattern of the added trip which goes through stopA
-    var stopA = env.getTransitService().getRegularStop(id(STOP_A_ID));
-    var patternsAtA = snapshot.getPatternsForStop(stopA);
+    var patternsAtA = snapshot.getPatternsForStop(STOP_A);
 
     assertNotNull(patternsAtA, "Added trip pattern should be found");
     var tripPattern = patternsAtA.stream().findFirst().get();
