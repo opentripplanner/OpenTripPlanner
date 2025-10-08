@@ -42,7 +42,7 @@ public class DirectFlexRouter {
         request,
         temporaryVertices,
         request.journey().direct(),
-        serverContext.dataOverlayContext(request),
+        serverContext.listExtensionRequestContexts(request),
         AccessEgressType.ACCESS,
         serverContext.flexParameters().maxAccessWalkDuration(),
         0
@@ -51,7 +51,7 @@ public class DirectFlexRouter {
         request,
         temporaryVertices,
         request.journey().direct(),
-        serverContext.dataOverlayContext(request),
+        serverContext.listExtensionRequestContexts(request),
         AccessEgressType.EGRESS,
         serverContext.flexParameters().maxEgressWalkDuration(),
         0

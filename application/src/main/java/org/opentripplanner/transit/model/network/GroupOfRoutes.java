@@ -7,7 +7,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 
 /**
- * OTP model for NeTEx GroupOfLines. Not used for GTFS at the moment. This is used to categorize
+ * OTP model for NeTEx GroupOfLines or GTFS networks. This is used to categorize
  * lines based on their particular purposes such as fare harmonization or public presentation. For
  * example divide lines into commercial and non-commercial groups.
  */

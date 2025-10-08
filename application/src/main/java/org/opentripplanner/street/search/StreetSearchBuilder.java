@@ -2,15 +2,16 @@ package org.opentripplanner.street.search;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import org.opentripplanner.astar.AStarBuilder;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -24,7 +25,7 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
   private RouteRequest routeRequest;
   private StreetRequest streetRequest = StreetRequest.DEFAULT;
   private IntersectionTraversalCalculator intersectionTraversalCalculator;
-  private DataOverlayContext dataOverlayContext;
+  private List<ExtensionRequestContext> extensionRequestContexts = List.of();
 
   public static StreetSearchBuilder of() {
     return new StreetSearchBuilder();
@@ -59,8 +60,10 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
     return this;
   }
 
-  public StreetSearchBuilder setDataOverlayContext(DataOverlayContext dataOverlayContext) {
-    this.dataOverlayContext = dataOverlayContext;
+  public StreetSearchBuilder setExtensionRequestContexts(
+    Collection<ExtensionRequestContext> extensionRequestContexts
+  ) {
+    this.extensionRequestContexts = List.copyOf(extensionRequestContexts);
     return this;
   }
 
@@ -91,7 +94,7 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
 
     for (var state : initialStates) {
       state.getRequest().setIntersectionTraversalCalculator(intersectionTraversalCalculator);
-      state.getRequest().setDataOverlayContext(dataOverlayContext);
+      state.getRequest().setExtensionRequestContexts(extensionRequestContexts);
     }
   }
 

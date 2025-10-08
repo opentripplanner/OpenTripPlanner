@@ -530,11 +530,11 @@ public class Itinerary implements ItinerarySortKey {
     return arrivedAtDestinationWithRentedVehicle;
   }
 
-  public List<ScheduledTransitLeg> listScheduledTransitLegs() {
+  public List<TransitLeg> listTransitLegs() {
     return legs()
       .stream()
-      .filter(ScheduledTransitLeg.class::isInstance)
-      .map(ScheduledTransitLeg.class::cast)
+      .filter(TransitLeg.class::isInstance)
+      .map(TransitLeg.class::cast)
       .toList();
   }
 

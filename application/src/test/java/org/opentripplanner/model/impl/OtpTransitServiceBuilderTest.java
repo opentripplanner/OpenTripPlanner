@@ -115,15 +115,15 @@ public class OtpTransitServiceBuilderTest {
   private static Comparator<Frequency> frequencyComp() {
     return (l, r) -> {
       int c;
-      c = l.getTrip().getId().toString().compareTo(r.getTrip().getId().toString());
+      c = l.trip().getId().toString().compareTo(r.trip().getId().toString());
       if (c != 0) {
         return c;
       }
-      c = l.getStartTime() - r.getStartTime();
+      c = l.startTime() - r.startTime();
       if (c != 0) {
         return c;
       }
-      return l.getEndTime() - r.getEndTime();
+      return l.endTime() - r.endTime();
     };
   }
 }

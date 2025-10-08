@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
@@ -14,6 +13,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -27,7 +27,7 @@ public class FlexAccessEgressRouter {
     OtpServerRequestContext serverContext,
     AdditionalSearchDays searchDays,
     FlexParameters config,
-    DataOverlayContext dataOverlayContext,
+    Collection<ExtensionRequestContext> extensionRequestContexts,
     AccessEgressType accessOrEgress
   ) {
     OTPRequestTimeoutException.checkForTimeout();
@@ -39,7 +39,7 @@ public class FlexAccessEgressRouter {
         request,
         verticesContainer,
         new StreetRequest(StreetMode.WALK),
-        dataOverlayContext,
+        extensionRequestContexts,
         AccessEgressType.ACCESS,
         serverContext.flexParameters().maxAccessWalkDuration(),
         0
@@ -51,7 +51,7 @@ public class FlexAccessEgressRouter {
         request,
         verticesContainer,
         new StreetRequest(StreetMode.WALK),
-        dataOverlayContext,
+        extensionRequestContexts,
         AccessEgressType.EGRESS,
         serverContext.flexParameters().maxEgressWalkDuration(),
         0

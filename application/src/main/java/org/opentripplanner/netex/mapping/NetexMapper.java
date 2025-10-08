@@ -21,7 +21,7 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMapperIndexes;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -61,7 +61,7 @@ public class NetexMapper {
 
   private final FeedScopedIdFactory idFactory;
   private final OtpTransitServiceBuilder transitBuilder;
-  private final Deduplicator deduplicator;
+  private final DeduplicatorService deduplicator;
   private final DataImportIssueStore issueStore;
   private final CalendarServiceBuilder calendarServiceBuilder;
   private final TripCalendarBuilder tripCalendarBuilder;
@@ -91,7 +91,7 @@ public class NetexMapper {
   public NetexMapper(
     OtpTransitServiceBuilder transitBuilder,
     String feedId,
-    Deduplicator deduplicator,
+    DeduplicatorService deduplicator,
     DataImportIssueStore issueStore,
     Set<String> ferryIdsNotAllowedForBicycle,
     Collection<FeedScopedId> routeToCentroidStopPlaceIds,

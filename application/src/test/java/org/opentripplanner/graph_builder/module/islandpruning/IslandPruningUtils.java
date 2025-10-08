@@ -22,7 +22,7 @@ class IslandPruningUtils {
   ) {
     try {
       var deduplicator = new Deduplicator();
-      var graph = new Graph(deduplicator);
+      var graph = new Graph();
       var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
       // Add street data from OSM
       var osmProvider = new DefaultOsmProvider(osmFile, true);

@@ -28,17 +28,20 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
   private final RegularStop STOP_F = envBuilder.stop(STOP_F_ID);
 
   private final TripInput TRIP_INPUT1 = TripInput.of("t1")
+    .withServiceDates(SERVICE_DATE, SERVICE_DATE.plusDays(1))
     .addStop(STOP_A, "12:00", "12:01")
     .addStop(STOP_B, "12:10", "12:11")
     .addStop(STOP_C, "12:20", "12:21")
     .build();
   private final TripInput TRIP_INPUT2 = TripInput.of("t2")
+    .withServiceDates(SERVICE_DATE, SERVICE_DATE.plusDays(1))
     .addStop(STOP_D, "12:00", "12:01")
     .addStop(STOP_E, "12:10", "12:11")
     .addStop(STOP_F, "12:20", "12:21")
     .build();
 
   private final TripInput TRIP_INPUT3 = TripInput.of("t3")
+    .withServiceDates(SERVICE_DATE, SERVICE_DATE.plusDays(1))
     .addStop(STOP_F, "12:15", "12:15")
     .addStop(STOP_E, "12:20", "12:20")
     .build();

@@ -93,7 +93,13 @@ public class StopTimeMapperTest {
     locationGroupMapper,
     new TripMapper(
       ID_FACTORY,
-      new RouteMapper(ID_FACTORY, new AgencyMapper(ID_FACTORY), ISSUE_STORE, translationHelper),
+      new RouteMapper(
+        ID_FACTORY,
+        new AgencyMapper(ID_FACTORY),
+        new RouteNetworkAssignmentMapper(ID_FACTORY),
+        ISSUE_STORE,
+        translationHelper
+      ),
       new DirectionMapper(ISSUE_STORE),
       translationHelper
     ),

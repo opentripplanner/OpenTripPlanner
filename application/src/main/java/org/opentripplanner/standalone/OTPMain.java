@@ -158,8 +158,6 @@ public class OTPMain {
         app.streetLimitationParameters(),
         app.fareServiceFactory()
       ).save(app.graphOutputDataSource());
-      // Log size info for the deduplicator
-      LOG.info("Memory optimized {}", app.graph().deduplicator.toString());
     }
 
     if (!graphAvailable) {

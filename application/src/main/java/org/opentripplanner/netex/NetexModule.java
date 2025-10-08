@@ -16,6 +16,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
@@ -29,6 +30,7 @@ public class NetexModule implements GraphBuilderModule {
   private final int subwayAccessTime;
 
   private final Graph graph;
+  private final DeduplicatorService deduplicator;
   private final TimetableRepository timetableRepository;
   private final VehicleParkingRepository parkingRepository;
   private final DataImportIssueStore issueStore;
@@ -43,6 +45,7 @@ public class NetexModule implements GraphBuilderModule {
 
   public NetexModule(
     Graph graph,
+    DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueStore issueStore,
@@ -51,6 +54,7 @@ public class NetexModule implements GraphBuilderModule {
     List<NetexBundle> netexBundles
   ) {
     this.graph = graph;
+    this.deduplicator = deduplicator;
     this.timetableRepository = timetableRepository;
     this.parkingRepository = parkingRepository;
     this.issueStore = issueStore;
@@ -68,10 +72,7 @@ public class NetexModule implements GraphBuilderModule {
       for (NetexBundle netexBundle : netexBundles) {
         netexBundle.checkInputs();
 
-        OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(
-          graph.deduplicator,
-          issueStore
-        );
+        OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(deduplicator, issueStore);
         transitBuilder.limitServiceDays(transitPeriodLimit);
         for (var tripOnServiceDate : transitBuilder.getTripOnServiceDates().values()) {
           timetableRepository.addTripOnServiceDate(tripOnServiceDate);

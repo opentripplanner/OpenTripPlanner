@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.RouteNetworkAssignment;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -26,7 +27,8 @@ class RouteMapperTest {
 
   private static final Agency AGENCY = new GtfsTestData().agency;
 
-  private static final AgencyAndId ROUTE_ID = new AgencyAndId(FEED_ID, "1");
+  private static final AgencyAndId ROUTE_ID1 = new AgencyAndId(FEED_ID, "1");
+  private static final AgencyAndId ROUTE_ID2 = new AgencyAndId(FEED_ID, "2");
 
   private static final String SHORT_NAME = "Short Name";
 
@@ -52,15 +54,19 @@ class RouteMapperTest {
 
   private static final Route ROUTE = new Route();
   private static final IdFactory ID_FACTORY = new IdFactory(FEED_ID);
+
+  private final RouteNetworkAssignmentMapper routeNetworkAssignmentMapper =
+    new RouteNetworkAssignmentMapper(ID_FACTORY);
   private final RouteMapper subject = new RouteMapper(
     ID_FACTORY,
     new AgencyMapper(ID_FACTORY),
+    routeNetworkAssignmentMapper,
     DataImportIssueStore.NOOP,
     new TranslationHelper()
   );
 
   static {
-    ROUTE.setId(ROUTE_ID);
+    ROUTE.setId(ROUTE_ID1);
     ROUTE.setAgency(AGENCY);
     ROUTE.setShortName(SHORT_NAME);
     ROUTE.setLongName(LONG_NAME);
@@ -107,7 +113,7 @@ class RouteMapperTest {
     Route input = new Route();
 
     // id, agency, mode and name (short or long) is required.
-    input.setId(ROUTE_ID);
+    input.setId(ROUTE_ID1);
     input.setAgency(AGENCY);
     input.setType(ROUTE_TYPE);
     input.setShortName(SHORT_NAME);
@@ -135,7 +141,7 @@ class RouteMapperTest {
   void mapNetworkId() {
     Route input = new Route();
 
-    input.setId(ROUTE_ID);
+    input.setId(ROUTE_ID1);
     input.setAgency(AGENCY);
     input.setType(ROUTE_TYPE);
     input.setShortName(SHORT_NAME);
@@ -150,10 +156,30 @@ class RouteMapperTest {
   }
 
   @Test
+  void mapNetworkIdFromAssignment() {
+    var input = new Route();
+    input.setId(ROUTE_ID2);
+    input.setAgency(AGENCY);
+    input.setType(ROUTE_TYPE);
+    input.setShortName(SHORT_NAME);
+
+    var a = new RouteNetworkAssignment();
+    a.setRoute(input);
+    a.setNetworkId(NETWORK_ID);
+    routeNetworkAssignmentMapper.map(List.of(a));
+    var result = subject.map(input);
+
+    assertEquals(
+      List.of(new FeedScopedId(FEED_ID, NETWORK_ID)),
+      result.getGroupsOfRoutes().stream().map(AbstractTransitEntity::getId).toList()
+    );
+  }
+
+  @Test
   void carpool() {
     Route input = new Route();
 
-    input.setId(ROUTE_ID);
+    input.setId(ROUTE_ID1);
     input.setAgency(AGENCY);
     input.setType(1551);
     input.setShortName(SHORT_NAME);

@@ -38,6 +38,7 @@ public class FareRuleMapperTest {
     new RouteMapper(
       ID_FACTORY,
       new AgencyMapper(ID_FACTORY),
+      new RouteNetworkAssignmentMapper(ID_FACTORY),
       DataImportIssueStore.NOOP,
       new TranslationHelper()
     ),
