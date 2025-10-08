@@ -36,7 +36,7 @@ class CancellationTest implements RealtimeTestConstants {
 
   @Test
   void testCancelTrip() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     assertEquals(RealTimeState.SCHEDULED, env.tripFetcher(TRIP_1_ID).getRealTimeState());
@@ -64,7 +64,7 @@ class CancellationTest implements RealtimeTestConstants {
 
   @Test
   void testCancelTripWithMissingTimes() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     assertEquals(RealTimeState.SCHEDULED, env.tripFetcher(TRIP_1_ID).getRealTimeState());
@@ -87,7 +87,7 @@ class CancellationTest implements RealtimeTestConstants {
    */
   @Test
   void testChangeQuayAndCancelScheduledTrip() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     assertEquals(
@@ -108,7 +108,7 @@ class CancellationTest implements RealtimeTestConstants {
    */
   @Test
   void testChangeQuayAndCancelAddedTrip() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var creation = new SiriEtBuilder(env.localTimeParser())

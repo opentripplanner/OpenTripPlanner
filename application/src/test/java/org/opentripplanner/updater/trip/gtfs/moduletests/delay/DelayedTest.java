@@ -34,7 +34,7 @@ class DelayedTest implements RealtimeTestConstants {
       .addStop(STOP_A, "0:00:10", "0:00:11")
       .addStop(STOP_B, "0:00:20", "0:00:21")
       .build();
-    var env = ENV_BUILDER.addTrip(tripInput).build();
+    var env = ENV_BUILDER.withTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var tripUpdate = rt
@@ -77,7 +77,7 @@ class DelayedTest implements RealtimeTestConstants {
       .addStop(STOP_B, "0:01:10", "0:01:11")
       .addStop(STOP_C, "0:01:20", "0:01:21")
       .build();
-    var env = ENV_BUILDER.addTrip(tripInput).build();
+    var env = ENV_BUILDER.withTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var tripUpdate = rt

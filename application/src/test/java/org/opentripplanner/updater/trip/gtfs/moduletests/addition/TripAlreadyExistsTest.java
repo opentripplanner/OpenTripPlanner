@@ -19,7 +19,7 @@ class TripAlreadyExistsTest implements RealtimeTestConstants {
   private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
 
   private final TransitTestEnvironment env = envBuilder
-    .addTrip(TripInput.of(TRIP_1_ID).addStop(STOP_A, "12:00").addStop(STOP_B, "13:00").build())
+    .withTrip(TripInput.of(TRIP_1_ID).addStop(STOP_A, "12:00").addStop(STOP_B, "13:00").build())
     .build();
   private final GtfsRtTestHelper rt = GtfsRtTestHelper.of(env);
 

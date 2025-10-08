@@ -1,10 +1,11 @@
 package org.opentripplanner.transit.model._data;
 
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -15,8 +16,6 @@ import org.opentripplanner.updater.trip.TimetableSnapshotManager;
  * A helper class for creating and fetching transit entities
  */
 public final class TransitTestEnvironment {
-
-  private static final String DEFAULT_FEED_ID_FOR_TEST = "F";
 
   private final TimetableRepository timetableRepository;
   private final TimetableSnapshotManager snapshotManager;
@@ -70,7 +69,7 @@ public final class TransitTestEnvironment {
   }
 
   public String getFeedId() {
-    return TimetableRepositoryForTest.FEED_ID;
+    return FeedScopedIdForTestFactory.FEED_ID;
   }
 
   public TimetableRepository timetableRepository() {
@@ -101,12 +100,5 @@ public final class TransitTestEnvironment {
    */
   public TripOnDateDataFetcher tripFetcher(String tripId, LocalDate serviceDate) {
     return new TripOnDateDataFetcher(getTransitService(), id(tripId), serviceDate);
-  }
-
-  /**
-   * Creates a feedscooped id using the default feed id
-   */
-  public static FeedScopedId id(String id) {
-    return new FeedScopedId(DEFAULT_FEED_ID_FOR_TEST, id);
   }
 }

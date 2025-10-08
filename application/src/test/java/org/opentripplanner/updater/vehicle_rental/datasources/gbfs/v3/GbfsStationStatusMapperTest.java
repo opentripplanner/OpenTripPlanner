@@ -9,7 +9,7 @@ import static org.opentripplanner.service.vehiclerental.model.ReturnPolicy.SPECI
 import static org.opentripplanner.street.model.RentalFormFactor.BICYCLE;
 import static org.opentripplanner.street.model.RentalFormFactor.CAR;
 import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 import static shadow.org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;

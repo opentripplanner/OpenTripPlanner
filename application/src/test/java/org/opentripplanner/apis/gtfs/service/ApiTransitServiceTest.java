@@ -64,7 +64,7 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
 
   @Test
   void justScheduledTrips() {
-    var env = envBuilder.addTrip(TRIP1_INPUT).addTrip(TRIP2_INPUT).build();
+    var env = envBuilder.withTrip(TRIP1_INPUT).withTrip(TRIP2_INPUT).build();
     var service = new ApiTransitService(env.getTransitService());
 
     var pattern = env.tripFetcher(TRIP_1_ID).tripPattern();
@@ -89,7 +89,7 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
    */
   @Test
   void skipStopInMultipleTripsInPattern() {
-    var env = envBuilder.addTrip(TRIP1_INPUT).addTrip(TRIP2_INPUT).build();
+    var env = envBuilder.withTrip(TRIP1_INPUT).withTrip(TRIP2_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var res = rt.applyTripUpdates(
@@ -120,7 +120,7 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
 
   @Test
   void transitLegCalls() {
-    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var env = envBuilder.withTrip(TRIP1_INPUT).build();
     var service = new ApiTransitService(env.getTransitService());
 
     var trip = env.tripFetcher(TRIP_1_ID);
@@ -151,7 +151,7 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
 
   @Test
   void streetLegCalls() {
-    var env = envBuilder.addTrip(TRIP1_INPUT).build();
+    var env = envBuilder.withTrip(TRIP1_INPUT).build();
     var service = new ApiTransitService(env.getTransitService());
 
     var leg = StreetLeg.of()

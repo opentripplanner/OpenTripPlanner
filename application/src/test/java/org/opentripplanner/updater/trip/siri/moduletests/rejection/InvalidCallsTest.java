@@ -8,7 +8,6 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOW
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
@@ -34,11 +33,9 @@ class InvalidCallsTest implements RealtimeTestConstants {
     .addStop(STOP_C, "0:00:40", "0:00:41")
     .build();
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
-
   @Test
   void testTooFewCalls() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -61,7 +58,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
 
   @Test
   void testTooManyCalls() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -88,7 +85,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
 
   @Test
   void testMismatchedStop() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -113,7 +110,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
 
   @Test
   void testUnknownStop() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -121,11 +118,11 @@ class InvalidCallsTest implements RealtimeTestConstants {
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A)
+          .call(STOP_A_ID)
           .departAimedExpected("00:00:10", "00:00:11")
-          .call(TEST_MODEL.stop("Unknown stop").withParentStation(STATION_A).build())
+          .call("Unknown stop")
           .departAimedExpected("00:00:21", "00:00:25")
-          .call(STOP_C)
+          .call(STOP_C_ID)
           .departAimedExpected("00:00:40", "00:00:41")
       )
       .buildEstimatedTimetableDeliveries();

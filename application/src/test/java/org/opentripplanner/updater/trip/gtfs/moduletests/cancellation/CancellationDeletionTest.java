@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
@@ -45,7 +45,7 @@ class CancellationDeletionTest implements RealtimeTestConstants {
   @MethodSource("cases")
   void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
     var env = envBuilder
-      .addTrip(
+      .withTrip(
         TripInput.of(TRIP_1_ID)
           .addStop(STOP_A, "0:00:10", "0:00:11")
           .addStop(STOP_B, "0:00:20", "0:00:21")
@@ -79,7 +79,7 @@ class CancellationDeletionTest implements RealtimeTestConstants {
   @MethodSource("cases")
   void cancelingAddedTrip(ScheduleRelationship relationship, RealTimeState state) {
     var env = envBuilder
-      .addTrip(
+      .withTrip(
         TripInput.of(TRIP_1_ID)
           // just to set the scheduling period
           .withServiceDates(SERVICE_DATE)

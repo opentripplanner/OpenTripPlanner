@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
@@ -38,7 +38,7 @@ class SkippedTest implements RealtimeTestConstants {
 
   @Test
   void scheduledTripWithSkippedAndScheduled() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var tripUpdate = rt
@@ -71,7 +71,7 @@ class SkippedTest implements RealtimeTestConstants {
    */
   @Test
   void scheduledTripWithPreviouslySkipped() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var tripUpdate = rt
@@ -118,7 +118,7 @@ class SkippedTest implements RealtimeTestConstants {
    */
   @Test
   void skippedNoData() {
-    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     String tripId = TRIP_2_ID;

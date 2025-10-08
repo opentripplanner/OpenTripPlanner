@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -30,7 +30,7 @@ public class ReplacementTest implements RealtimeTestConstants {
       .addStop(STOP_B, "8:40:00", "8:40:00")
       .withHeadsign(I18NString.of("Original Headsign"))
       .build();
-    var env = builder.addTrip(TRIP_INPUT).build();
+    var env = builder.withTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var tripUpdate = rt
@@ -48,7 +48,7 @@ public class ReplacementTest implements RealtimeTestConstants {
 
     // THEN
     var snapshot = env.getTimetableSnapshot();
-    var tripId = TimetableRepositoryForTest.id(TRIP_1_ID);
+    var tripId = id(TRIP_1_ID);
 
     var transitService = env.getTransitService();
 

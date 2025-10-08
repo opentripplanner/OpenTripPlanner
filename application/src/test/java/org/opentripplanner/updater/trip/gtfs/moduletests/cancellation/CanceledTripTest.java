@@ -3,7 +3,7 @@ package org.opentripplanner.updater.trip.gtfs.moduletests.cancellation;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class CanceledTripTest implements RealtimeTestConstants {
 
   @Test
   void listCanceledTrips() {
-    var env = ENV_BUILDER.addTrip(
+    var env = ENV_BUILDER.withTrip(
       TripInput.of(TRIP_1_ID)
         .addStop(STOP_A, "0:00:10", "0:00:11")
         .addStop(STOP_B, "0:00:20", "0:00:21")

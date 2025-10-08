@@ -47,7 +47,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void onFirstStop() {
-    var env = envBuilder.addTrip(TRIP_INPUT1).addTrip(TRIP_INPUT2).build();
+    var env = envBuilder.withTrip(TRIP_INPUT1).withTrip(TRIP_INPUT2).build();
     var transitService = env.getTransitService();
     var dt = env.localTimeParser();
 
@@ -73,7 +73,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void nextDay() {
-    var env = envBuilder.addTrip(TRIP_INPUT1).addTrip(TRIP_INPUT2).build();
+    var env = envBuilder.withTrip(TRIP_INPUT1).withTrip(TRIP_INPUT2).build();
     var transitService = env.getTransitService();
     var dt = env.localTimeParser();
 
@@ -89,7 +89,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void tooLate() {
-    var env = envBuilder.addTrip(TRIP_INPUT1).build();
+    var env = envBuilder.withTrip(TRIP_INPUT1).build();
     var transitService = env.getTransitService();
     var dt = env.localTimeParser();
 
@@ -102,7 +102,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void shortWindow() {
-    var env = envBuilder.addTrip(TRIP_INPUT1).build();
+    var env = envBuilder.withTrip(TRIP_INPUT1).build();
     var transitService = env.getTransitService();
     var dt = env.localTimeParser();
 
@@ -118,7 +118,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void longerWindow() {
-    var env = envBuilder.addTrip(TRIP_INPUT1).build();
+    var env = envBuilder.withTrip(TRIP_INPUT1).build();
     var transitService = env.getTransitService();
     var dt = env.localTimeParser();
 
@@ -134,7 +134,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void several() {
-    var env = envBuilder.addTrip(TRIP_INPUT2).addTrip(TRIP_INPUT3).build();
+    var env = envBuilder.withTrip(TRIP_INPUT2).withTrip(TRIP_INPUT3).build();
     var transitService = env.getTransitService();
     var dt = env.localTimeParser();
 

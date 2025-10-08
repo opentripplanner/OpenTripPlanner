@@ -81,12 +81,12 @@ public class TransitTestEnvironmentBuilder {
     return timetable.operator(operatorId);
   }
 
-  public TransitTestEnvironmentBuilder addTrip(TripInput trip) {
+  public TransitTestEnvironmentBuilder withTrip(TripInput trip) {
     timetable.withTrip(trip);
     return this;
   }
 
-  public TransitTestEnvironmentBuilder addFlexTrip(FlexTripInput tripInput) {
+  public TransitTestEnvironmentBuilder withFlexTrip(FlexTripInput tripInput) {
     timetable.withFlexTrip(tripInput);
     return this;
   }

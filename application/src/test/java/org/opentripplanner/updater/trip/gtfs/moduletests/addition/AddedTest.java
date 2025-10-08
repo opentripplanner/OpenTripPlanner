@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
@@ -17,7 +17,6 @@ import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
@@ -40,7 +39,7 @@ class AddedTest implements RealtimeTestConstants {
   private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
 
   private final TransitTestEnvironment env = envBuilder
-    .addTrip(
+    .withTrip(
       TripInput.of(TRIP_1_ID)
         // just to set the schedule period
         .withServiceDates(
@@ -175,7 +174,7 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(PickDrop.CANCELLED, tripPattern.getBoardType(2));
     assertEquals(PickDrop.SCHEDULED, tripPattern.getAlightType(3));
     var tripTimes = env.tripFetcher(ADDED_TRIP_ID).tripTimes();
-    var trip = env.getTransitService().getTrip(TimetableRepositoryForTest.id(ADDED_TRIP_ID));
+    var trip = env.getTransitService().getTrip(id(ADDED_TRIP_ID));
     assertEquals(I18NString.of("A loop"), Objects.requireNonNull(trip).getHeadsign());
     assertEquals(I18NString.of("A loop"), tripTimes.getHeadsign(0));
     assertFalse(tripTimes.isCancelledStop(0));
