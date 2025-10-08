@@ -101,5 +101,3 @@ class BookingRuleMapperTest {
     return r;
   }
 }
-
-

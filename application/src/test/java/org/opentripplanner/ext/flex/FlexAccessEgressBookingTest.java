@@ -15,8 +15,6 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
-
-
 class FlexAccessEgressBookingTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
@@ -70,10 +68,7 @@ class FlexAccessEgressBookingTest {
     int T12_00 = LocalTime.of(12, 0).toSecondOfDay();
     int noticeSec = (int) Duration.ofMinutes(30).toSeconds();
 
-    var booking = BookingInfo
-      .of()
-      .withMinimumBookingNotice(Duration.ofSeconds(noticeSec))
-      .build();
+    var booking = BookingInfo.of().withMinimumBookingNotice(Duration.ofSeconds(noticeSec)).build();
 
     var st0 = stopWithWindowAndPickupBooking(T10_00, T12_00, booking);
     var st1 = stopWithWindow(T10_00, T12_00);
@@ -92,10 +87,7 @@ class FlexAccessEgressBookingTest {
 
     int noticeSec = (int) Duration.ofMinutes(45).toSeconds();
 
-    var booking = BookingInfo
-      .of()
-      .withMinimumBookingNotice(Duration.ofSeconds(noticeSec))
-      .build();
+    var booking = BookingInfo.of().withMinimumBookingNotice(Duration.ofSeconds(noticeSec)).build();
 
     var st0 = stopWithWindowAndPickupBooking(T10_00, T11_00, booking);
     var st1 = stopWithWindow(T10_00, T11_00);
@@ -105,7 +97,10 @@ class FlexAccessEgressBookingTest {
 
     // try to arrive at 10:30 (within notice -> should be rejected)
     int arrivalTooEarly = T10_00 + 30 * 60;
-    assertEquals(org.opentripplanner.model.StopTime.MISSING_VALUE, flex.latestArrivalTime(arrivalTooEarly));
+    assertEquals(
+      org.opentripplanner.model.StopTime.MISSING_VALUE,
+      flex.latestArrivalTime(arrivalTooEarly)
+    );
 
     // 10:50 should be allowed (>= 10:45)
     int arrivalOk = T10_00 + 50 * 60;
@@ -120,11 +115,14 @@ class FlexAccessEgressBookingTest {
     var st0 = stopWithWindow(T10_00, T12_00);
     var st1 = stopWithWindow(T10_00, T12_00);
 
-    var flex = buildFlexAccessEgress(List.of(st0, st1), 0, 1, org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo.NOT_SET);
+    var flex = buildFlexAccessEgress(
+      List.of(st0, st1),
+      0,
+      1,
+      org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo.NOT_SET
+    );
 
     int requestedArrival = T11_00;
     assertEquals(requestedArrival, flex.latestArrivalTime(requestedArrival));
   }
 }
-
-
