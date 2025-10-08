@@ -28,13 +28,9 @@ public class GbfsFeedLoaderAndMapper {
   public GbfsFeedLoaderAndMapper(
     GbfsVehicleRentalDataSourceParameters params,
     OtpHttpClientFactory otpHttpClientFactory
-  ) {
-    URI uri;
-    try {
-      uri = new URI(params.url());
-    } catch (URISyntaxException e) {
-      throw new UpdaterConstructionException("Invalid url " + params.url());
-    }
+  ) throws URISyntaxException {
+
+    URI uri = new URI(params.url());
 
     var client = otpHttpClientFactory.create(LOG);
     var gbfsNode = client.getAndMapAsJsonNode(uri, Map.of(), new ObjectMapper());
