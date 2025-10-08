@@ -12,15 +12,19 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -35,19 +39,34 @@ public class TimetableRepositoryTestBuilder {
   private final List<TripInput> tripInputs = new ArrayList<>();
   private final List<FlexTripInput> flexTripInputs = new ArrayList<>();
   private final Map<FeedScopedId, RegularStop> scheduledStopPointMapping = new HashMap<>();
+  private final List<Agency> agencies = new ArrayList<>();
+  private final List<Operator> operators = new ArrayList<>();
+
   private final AtomicInteger serviceCodeCounter = new AtomicInteger();
 
   private final LocalDate defaultServiceDate;
   private final ZoneId timeZone;
 
+  private final Agency defaultAgency;
+  private final Route defaultRoute;
+
   TimetableRepositoryTestBuilder(ZoneId timeZone, LocalDate defaultServiceDate) {
     this.timeZone = timeZone;
     this.defaultServiceDate = defaultServiceDate;
+
+    defaultAgency = agency("Agency1");
+    defaultRoute = route("Route1");
   }
 
   public TimetableRepository build(SiteRepository siteRepository) {
     var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     timetableRepository.initTimeZone(timeZone);
+
+    for (var agency: agencies) {
+      timetableRepository.addAgency(agency);
+    }
+
+    timetableRepository.addOperators(operators);
 
     for (TripInput tripInput : tripInputs) {
       createTrip(tripInput, timetableRepository);
@@ -55,8 +74,6 @@ public class TimetableRepositoryTestBuilder {
     for (FlexTripInput tripInput : flexTripInputs) {
       createFlexTrip(tripInput, timetableRepository);
     }
-
-    timetableRepository.addAgency(TimetableRepositoryForTest.AGENCY);
 
     timetableRepository
       .getAllTripPatterns()
@@ -74,6 +91,36 @@ public class TimetableRepositoryTestBuilder {
 
     timetableRepository.index();
     return timetableRepository;
+  }
+
+  public Agency agency(String id) {
+    var agency = Agency.of(id(id))
+      .withName("Agency Test")
+      .withTimezone(timeZone.getId())
+      .withUrl("https://www." + id + ".com")
+      .build();
+    agencies.add(agency);
+    return agency;
+  }
+
+  public Route route(String id) {
+    return route(id, null);
+  }
+
+  public Route route(String id, @Nullable Operator operator) {
+    var builder =  Route.of(id(id)).withAgency(defaultAgency).withShortName("R" + id)
+      .withMode(TransitMode.BUS);
+    if (operator != null) {
+      builder.withOperator(operator);
+    }
+    // Routes aren't stored explicitly in the timetable repository so we don't have a collection for these
+    return builder.build();
+  }
+
+  public Operator operator(String operatorId) {
+    var operator = Operator.of(id(operatorId)).withName(operatorId + " name").build();
+    operators.add(operator);
+    return operator;
   }
 
   public TimetableRepositoryTestBuilder withTrip(TripInput trip) {
@@ -100,8 +147,11 @@ public class TimetableRepositoryTestBuilder {
       .orElse(List.of(defaultServiceDate));
 
     var serviceId = createServiceId(timetableRepository, serviceDates);
+
+    var route = Optional.ofNullable(tripInput.route()).orElse(defaultRoute);
+
     var trip = Trip.of(id(tripInput.id()))
-      .withRoute(tripInput.route())
+      .withRoute(route)
       .withHeadsign(tripInput.headsign() == null ? null : tripInput.headsign())
       .withServiceId(serviceId)
       .build();
@@ -111,10 +161,6 @@ public class TimetableRepositoryTestBuilder {
         throw new IllegalArgumentException("Multiple service dates can't be used with TripOnServiceDate");
       }
       addTripOnServiceDate(timetableRepository, trip, serviceDates.getFirst(), tripInput.tripOnServiceDateId());
-    }
-
-    if (tripInput.route().getOperator() != null) {
-      timetableRepository.addOperators(List.of(tripInput.route().getOperator()));
     }
 
     var stopTimes = IntStream.range(0, tripInput.stops().size())
@@ -150,7 +196,7 @@ public class TimetableRepositoryTestBuilder {
         .build();
       timetableRepository.addTripPattern(pattern.getId(), newPattern);
     } else {
-      addNewPattern(tripInput.id(), tripInput.route(), stopPattern, tripTimes, timetableRepository);
+      addNewPattern(tripInput.id(), route, stopPattern, tripTimes, timetableRepository);
     }
 
     return trip;

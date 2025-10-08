@@ -19,8 +19,9 @@ import org.opentripplanner.utils.time.TimeUtils;
  */
 public record TripInput(
   String id,
-  Route route,
   List<StopCall> stops,
+  //
+  @Nullable Route route,
   // Null means that a default service date will be used
   @Nullable List<LocalDate> serviceDates,
   @Nullable I18NString headsign,
@@ -30,30 +31,13 @@ public record TripInput(
     return new TripInputBuilder(id);
   }
 
-  /**
-   * The ID of the route without the feed ID prefix.
-   */
-  public String routeId() {
-    return route.getId().getId();
-  }
-
-  /**
-   * The ID of the operator without the feed ID prefix.
-   */
-  public String operatorId() {
-    return route.getOperator().getId().getId();
-  }
-
   public static class TripInputBuilder {
 
     private final String id;
     private final List<StopCall> stops = new ArrayList<>();
-    // can be made configurable if needed
-    private Route route = TimetableRepositoryForTest.route("route-1")
-      .withOperator(
-        Operator.of(TimetableRepositoryForTest.id("operator-1")).withName("Operator 1").build()
-      )
-      .build();
+
+    @Nullable
+    private Route route;
 
     @Nullable
     private List<LocalDate> serviceDates = null;
@@ -80,7 +64,7 @@ public record TripInput(
     }
 
     public TripInput build() {
-      return new TripInput(id, route, stops, serviceDates, headsign, tripOnServiceDateId);
+      return new TripInput(id, stops, route, serviceDates, headsign, tripOnServiceDateId);
     }
 
     public TripInputBuilder withRoute(Route route) {

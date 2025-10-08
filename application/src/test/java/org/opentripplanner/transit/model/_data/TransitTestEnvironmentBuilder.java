@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -65,6 +67,18 @@ public class TransitTestEnvironmentBuilder {
 
   public TimetableRepositoryTestBuilder timetable() {
     return timetable;
+  }
+
+  public Route route(String routeId) {
+    return timetable.route(routeId);
+  }
+
+  public Route route(String routeId, Operator operator) {
+    return timetable.route(routeId, operator);
+  }
+
+  public Operator operator(String operatorId) {
+    return timetable.operator(operatorId);
   }
 
   public TransitTestEnvironmentBuilder addTrip(TripInput trip) {
