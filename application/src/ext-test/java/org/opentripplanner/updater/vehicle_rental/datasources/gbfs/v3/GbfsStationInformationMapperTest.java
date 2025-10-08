@@ -2,6 +2,7 @@ package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -24,8 +25,8 @@ class GbfsStationInformationMapperTest {
 
   @ParameterizedTest
   @MethodSource("provideInvalidStations")
-  void invalidStationsShouldFail(GBFSStation station, String reason) {
-    assertFalse(GbfsStationInformationMapper.isValid(station), reason);
+  void invalidStationsShouldFail(GBFSStation station) {
+    assertFalse(GbfsStationInformationMapper.isValid(station));
   }
 
   private static GBFSStation validStation() {
@@ -38,38 +39,38 @@ class GbfsStationInformationMapperTest {
 
   private static Stream<Arguments> provideInvalidStations() {
     return Stream.of(
-      Arguments.of(validStation().withStationId(null), "Missing station ID"),
-      Arguments.of(validStation().withLat(null), "Missing latitude"),
-      Arguments.of(validStation().withLon(null), "Missing longitude"),
-      Arguments.of(validStation().withName(null), "Missing station name list"),
-      Arguments.of(validStation().withName(List.of()), "Empty station name list"),
-      Arguments.of(
+      argumentSet("Missing station ID", validStation().withStationId(null)),
+      argumentSet("Missing latitude", validStation().withLat(null)),
+      argumentSet("Missing longitude", validStation().withLon(null)),
+      argumentSet("Missing station name list", validStation().withName(null)),
+      argumentSet("Empty station name list", validStation().withName(List.of())),
+      argumentSet(
+        "Station name list contains null name",
         validStation()
           .withName(
             List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withText(null))
-          ),
-        "Station name list contains null name"
+          )
       ),
-      Arguments.of(
+      argumentSet(
+        "Station name list contains empty name",
         validStation()
           .withName(
             List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withText(""))
-          ),
-        "Station name list contains empty name"
+          )
       ),
-      Arguments.of(
+      argumentSet(
+        "Station name list contains null language",
         validStation()
           .withName(
             List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withLanguage(null))
-          ),
-        "Station name list contains null language"
+          )
       ),
-      Arguments.of(
+      argumentSet(
+        "Station name list contains empty language",
         validStation()
           .withName(
             List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withLanguage(""))
-          ),
-        "Station name list contains empty language"
+          )
       )
     );
   }
