@@ -216,7 +216,7 @@ type Emission {
   co2: Float
 }
 
-"List of visits to quays as part of vehicle journeys. Updated with real time information where available"
+"List of calls on quays as part of vehicle journeys. Updated with real time information where available"
 type EstimatedCall {
   "Actual time of arrival at quay. Updated from real time information if available."
   actualArrivalTime: DateTime
