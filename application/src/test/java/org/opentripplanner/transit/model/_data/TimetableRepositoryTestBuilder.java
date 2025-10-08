@@ -49,13 +49,8 @@ public class TimetableRepositoryTestBuilder {
     var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     timetableRepository.initTimeZone(timeZone);
 
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
     for (TripInput tripInput : tripInputs) {
-      var t = createTrip(tripInput, timetableRepository);
-      var serviceDates = Optional.ofNullable(tripInput.serviceDates()).orElseGet(() ->
-        List.of(defaultServiceDate)
-      );
-      calendarServiceData.putServiceDatesForServiceId(t.getServiceId(), serviceDates);
+      createTrip(tripInput, timetableRepository);
     }
     for (FlexTripInput tripInput : flexTripInputs) {
       createFlexTrip(tripInput, timetableRepository);
@@ -63,11 +58,6 @@ public class TimetableRepositoryTestBuilder {
 
     timetableRepository.addAgency(TimetableRepositoryForTest.AGENCY);
 
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
     timetableRepository
       .getAllTripPatterns()
       .forEach(pattern -> {
@@ -104,11 +94,12 @@ public class TimetableRepositoryTestBuilder {
     return this;
   }
 
-  private Trip createTrip(TripInput tripInput, TimetableRepository timetableRepository) {
-    var serviceDates = Optional.ofNullable(tripInput.serviceDates()).orElseGet(() ->
-      List.of(defaultServiceDate)
-    );
-    var serviceId = generateServiceId(timetableRepository, serviceDates);
+  private Trip createTrip(TripInput tripInput, TimetableRepository timetableRepository
+  ) {
+    var serviceDates = Optional.ofNullable(tripInput.serviceDates())
+      .orElse(List.of(defaultServiceDate));
+
+    var serviceId = createServiceId(timetableRepository, serviceDates);
     var trip = Trip.of(id(tripInput.id()))
       .withRoute(tripInput.route())
       .withHeadsign(tripInput.headsign() == null ? null : tripInput.headsign())
@@ -165,20 +156,29 @@ public class TimetableRepositoryTestBuilder {
     return trip;
   }
 
-  private FeedScopedId generateServiceId(
+  private FeedScopedId createServiceId(
     TimetableRepository timetableRepository,
-    List<LocalDate> localDates
+    List<LocalDate> serviceDates
   ) {
     var serviceId = id(
-      localDates.stream().map(LocalDate::toString).collect(Collectors.joining("|"))
+      serviceDates.stream().map(LocalDate::toString).collect(Collectors.joining("|"))
     );
     timetableRepository.getServiceCodes().put(serviceId, serviceCodeCounter.getAndIncrement());
+
+    var calendarServiceData = new CalendarServiceData();
+    calendarServiceData.putServiceDatesForServiceId(serviceId, serviceDates);
+    timetableRepository.updateCalendarServiceData(
+      true,
+      calendarServiceData,
+      DataImportIssueStore.NOOP
+    );
     return serviceId;
   }
 
-  private Trip createFlexTrip(FlexTripInput tripInput, TimetableRepository timetableRepository) {
+  private Trip createFlexTrip(FlexTripInput tripInput, TimetableRepository timetableRepository
+  ) {
     var serviceDates = List.of(defaultServiceDate);
-    var serviceId = generateServiceId(timetableRepository, serviceDates);
+    var serviceId = createServiceId(timetableRepository, serviceDates);
     final var trip = Trip.of(TimetableRepositoryForTest.id(tripInput.id()))
       .withRoute(tripInput.route())
       .withHeadsign(I18NString.of("Headsign of %s".formatted(tripInput.id())))
