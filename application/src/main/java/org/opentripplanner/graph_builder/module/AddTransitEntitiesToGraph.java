@@ -79,14 +79,12 @@ public class AddTransitEntitiesToGraph {
     Graph graph,
     TimetableRepository timetableRepository
   ) {
-    new AddTransitEntitiesToGraph(otpTransitService, subwayAccessTime, graph).applyToGraph(
-      timetableRepository
-    );
+    var adder = new AddTransitEntitiesToGraph(otpTransitService, subwayAccessTime, graph);
+    adder.applyToGraph();
+    adder.applyToTimetableRepository(timetableRepository);
   }
 
-  private void applyToGraph(TimetableRepository timetableRepository) {
-    timetableRepository.mergeSiteRepositories(otpTransitService.siteRepository());
-
+  private void applyToGraph() {
     addStopsToGraphAndGenerateStopVertexes();
     addEntrancesToGraph();
     addStationCentroidsToGraph();
@@ -96,6 +94,11 @@ public class AddTransitEntitiesToGraph {
     // Although pathways are loaded from GTFS they are street data, so we will put them in the
     // street graph.
     createPathwayEdgesAndAddThemToGraph();
+  }
+
+  private void applyToTimetableRepository(TimetableRepository timetableRepository) {
+    timetableRepository.mergeSiteRepositories(otpTransitService.siteRepository());
+
     addFeedInfoToGraph(timetableRepository);
     addAgenciesToGraph(timetableRepository);
     addServicesToTimetableRepository(timetableRepository);
