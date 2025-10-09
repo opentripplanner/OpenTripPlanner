@@ -3,7 +3,6 @@ package org.opentripplanner.graph_builder.module;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -315,10 +314,10 @@ public class TurnRestrictionModuleTest {
     var request = RouteRequest.of().withJourney(j -> j.withDirect(streetRequest)).buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-      .setRequest(request)
-      .setStreetRequest(streetRequest)
-      .setFrom(A)
-      .setTo(F)
+      .withRequest(request)
+      .withStreetRequest(streetRequest)
+      .withFrom(A)
+      .withTo(F)
       .getShortestPathTree();
     GraphPath<State, Edge, Vertex> path = spt.getPath(F);
     List<State> states = path.states;

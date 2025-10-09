@@ -2,11 +2,9 @@ package org.opentripplanner.osm.tagmapping;
 
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
-import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
-import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 
 /**
@@ -52,11 +50,15 @@ class UKMapper extends OsmTagMapper {
     );
     props.setProperties(
       "highway=trunk;cycleway=opposite_lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5, 1.5)
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.5)
     );
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06, 1.15)
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(1.15)
     );
     props.setProperties(
       "highway=trunk;cycleway=track",
@@ -68,11 +70,15 @@ class UKMapper extends OsmTagMapper {
     );
     props.setProperties(
       "highway=trunk;cycleway=opposite_track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5, 0.95)
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(0.95)
     );
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5, 0.85)
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
+      withModes(ALL).walkSafety(2.5).bicycleSafety(0.85)
     );
     props.setProperties(
       "highway=trunk;bicycle=designated",
@@ -104,10 +110,6 @@ class UKMapper extends OsmTagMapper {
     props.setCarSpeed("highway=secondary", 17.9f); // ~= 40mph
     props.setCarSpeed("highway=secondary_link", 13.4f); // ~= 30mph
     props.setCarSpeed("highway=tertiary", 15.7f); // ~= 35mph
-
-    WayProperties pedestrianWayProperties = withModes(PEDESTRIAN).build();
-    props.setProperties("indoor=area", pedestrianWayProperties);
-    props.setProperties("indoor=corridor", pedestrianWayProperties);
 
     super.populateProperties(props);
   }

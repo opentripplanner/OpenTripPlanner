@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.algorithm;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +30,6 @@ import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
-import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
@@ -36,7 +38,7 @@ import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
-import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
+import org.opentripplanner.street.model.vertex.ElevatorVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -84,7 +86,7 @@ public abstract class GraphRoutingTest {
 
     protected Builder() {
       var deduplicator = new Deduplicator();
-      graph = new Graph(deduplicator);
+      graph = new Graph();
       timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
       vertexFactory = new VertexFactory(graph);
       vehicleParkingHelper = new VehicleParkingHelper(graph);
@@ -151,6 +153,16 @@ public abstract class GraphRoutingTest {
       return streetBuilder(from, to, length, permissions).buildAndConnect();
     }
 
+    public StreetEdge street(
+      StreetVertex from,
+      StreetVertex to,
+      int length,
+      StreetTraversalPermission permissions,
+      float carSpeed
+    ) {
+      return streetBuilder(from, to, length, permissions).withCarSpeed(carSpeed).buildAndConnect();
+    }
+
     public List<StreetEdge> street(
       StreetVertex from,
       StreetVertex to,
@@ -186,26 +198,16 @@ public abstract class GraphRoutingTest {
 
     public List<ElevatorEdge> elevator(StreetTraversalPermission permission, Vertex... vertices) {
       List<ElevatorEdge> edges = new ArrayList<>();
-      List<ElevatorOnboardVertex> onboardVertices = new ArrayList<>();
+      List<ElevatorVertex> onboardVertices = new ArrayList<>();
 
       for (Vertex v : vertices) {
         var level = String.format("L-%s", v.getDefaultName());
-        var boardLabel = String.format("%s-onboard", level);
-        var alightLabel = String.format("%s-offboard", level);
 
-        var onboard = vertexFactory.elevatorOnboard(v, v.getLabelString(), boardLabel);
-        var offboard = vertexFactory.elevatorOffboard(v, v.getLabelString(), alightLabel);
+        var onboard = vertexFactory.elevator(v, v.getLabelString(), level);
 
-        FreeEdge.createFreeEdge(v, offboard);
-        FreeEdge.createFreeEdge(offboard, v);
-
-        edges.add(ElevatorBoardEdge.createElevatorBoardEdge(offboard, onboard));
+        edges.add(ElevatorBoardEdge.createElevatorBoardEdge(v, onboard));
         edges.add(
-          ElevatorAlightEdge.createElevatorAlightEdge(
-            onboard,
-            offboard,
-            new NonLocalizedString(level)
-          )
+          ElevatorAlightEdge.createElevatorAlightEdge(onboard, v, new NonLocalizedString(level))
         );
 
         onboardVertices.add(onboard);
@@ -286,9 +288,8 @@ public abstract class GraphRoutingTest {
       double longitude,
       @Nullable Station parentStation
     ) {
-      return vertexFactory.transitStop(
-        TransitStopVertex.of().withStop(stopEntity(id, latitude, longitude, parentStation))
-      );
+      var stop = stopEntity(id, latitude, longitude, parentStation);
+      return vertexFactory.transitStop(ofStop(stop));
     }
 
     public TransitEntranceVertex entrance(String id, double latitude, double longitude) {
@@ -296,7 +297,8 @@ public abstract class GraphRoutingTest {
     }
 
     public StationCentroidVertex stationCentroid(Station station) {
-      return vertexFactory.stationCentroid(station);
+      assertTrue(station.shouldRouteToCentroid());
+      return vertexFactory.stationCentroid(station.getId(), station.getCoordinate());
     }
 
     public StreetTransitEntranceLink link(StreetVertex from, TransitEntranceVertex to) {
@@ -502,13 +504,15 @@ public abstract class GraphRoutingTest {
 
     public StopTime st(TransitStopVertex s1) {
       var st = new StopTime();
-      st.setStop(s1.getStop());
+      var stop = timetableRepository.getSiteRepository().getRegularStop(s1.getId());
+      st.setStop(stop);
       return st;
     }
 
     public StopTime st(TransitStopVertex s1, boolean board, boolean alight) {
       var st = new StopTime();
-      st.setStop(s1.getStop());
+      var stop = timetableRepository.getSiteRepository().getRegularStop(s1.getId());
+      st.setStop(stop);
       st.setPickupType(board ? PickDrop.SCHEDULED : PickDrop.NONE);
       st.setDropOffType(alight ? PickDrop.SCHEDULED : PickDrop.NONE);
       return st;

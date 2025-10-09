@@ -56,6 +56,9 @@ jobs:
           REMOTE_BRANCH: main
           TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
         run: |
+          # throw away changes to package-lock.json
+          git checkout -- client/package-lock.json
+
           # Configure git user
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'

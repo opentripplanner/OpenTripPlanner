@@ -88,6 +88,17 @@ public abstract class SiriAzureUpdaterConfig {
         history.of("timeout").since(NA).summary("Timeout in milliseconds").asInt(300000)
       );
     }
+
+    parameters.setStartupTimeout(
+      c
+        .of("startupTimeout")
+        .summary("Maximum time to wait for real-time services during startup.")
+        .description(
+          "Maximum time to wait for real-time services during startup. " +
+          "If real-time services are unavailable, OTP will start without real-time data after this timeout."
+        )
+        .asDuration(parameters.getStartupTimeout())
+    );
   }
 
   /**

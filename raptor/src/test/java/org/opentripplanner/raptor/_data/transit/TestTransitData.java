@@ -182,15 +182,15 @@ public class TestTransitData
     var debug = request.debug();
 
     if (debug.stops().isEmpty()) {
-      debug.addStops(stopsVisited());
+      debug.withStops(stopsVisited());
     }
     var logger = new SystemErrDebugLogger(true, dryRun);
 
     debug
-      .stopArrivalListener(logger::stopArrivalLister)
-      .patternRideDebugListener(logger::patternRideLister)
-      .pathFilteringListener(logger::pathFilteringListener)
-      .logger(logger);
+      .withStopArrivalListener(logger::stopArrivalLister)
+      .withPatternRideDebugListener(logger::patternRideLister)
+      .withPathFilteringListener(logger::pathFilteringListener)
+      .withLogger(logger);
   }
 
   public TestTransitData withRoute(TestRoute route) {

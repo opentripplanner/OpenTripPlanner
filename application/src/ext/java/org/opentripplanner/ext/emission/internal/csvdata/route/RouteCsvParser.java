@@ -2,8 +2,8 @@ package org.opentripplanner.ext.emission.internal.csvdata.route;
 
 import com.csvreader.CsvReader;
 import java.util.List;
-import org.opentripplanner.ext.emission.internal.csvdata.csvparser.AbstractCsvParser;
-import org.opentripplanner.ext.emission.internal.csvdata.csvparser.EmissionHandledParseException;
+import org.opentripplanner.framework.csv.parser.AbstractCsvParser;
+import org.opentripplanner.framework.csv.parser.HandledCsvParseException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.utils.lang.DoubleRange;
 
@@ -26,7 +26,7 @@ class RouteCsvParser extends AbstractCsvParser<RouteRow> {
   );
 
   public RouteCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
-    super(issueStore, reader);
+    super(issueStore, reader, "RouteEmission");
   }
 
   @Override
@@ -35,7 +35,7 @@ class RouteCsvParser extends AbstractCsvParser<RouteRow> {
   }
 
   @Override
-  protected RouteRow createNextRow() throws EmissionHandledParseException {
+  protected RouteRow createNextRow() throws HandledCsvParseException {
     return new RouteRow(
       getString(ROUTE_ID),
       getDouble(AVG_CO_2_PER_VEHICLE_PER_KM, AVG_CO_2_PER_VEHICLE_PER_KM_RANGE),

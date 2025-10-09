@@ -82,12 +82,12 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     var routingRequest = RouteRequest.of().withArriveBy(reverseDirection).buildDefault();
 
     return StreetSearchBuilder.of()
-      .setSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxFlexTripDuration))
-      .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-      .setRequest(routingRequest)
-      .setStreetRequest(new StreetRequest(StreetMode.CAR))
-      .setFrom(reverseDirection ? null : vertex)
-      .setTo(reverseDirection ? vertex : null)
+      .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxFlexTripDuration))
+      .withDominanceFunction(new DominanceFunctions.EarliestArrival())
+      .withRequest(routingRequest)
+      .withStreetRequest(new StreetRequest(StreetMode.CAR))
+      .withFrom(reverseDirection ? null : vertex)
+      .withTo(reverseDirection ? vertex : null)
       .getShortestPathTree();
   }
 }

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp-root</artifactId>
-    <version>2.8.0-SNAPSHOT</version>
+    <version>2.9.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenTripPlanner - Root</name>
@@ -58,23 +58,23 @@
 
 
     <properties>
-        <otp.serialization.version.id>200</otp.serialization.version.id>
+        <otp.serialization.version.id>206</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>33.2</geotools.version>
-        <google.dagger.version>2.56.2</google.dagger.version>
-        <jackson.version>2.19.2</jackson.version>
-        <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
+        <google.dagger.version>2.57.2</google.dagger.version>
+        <jackson.version>2.20.0</jackson.version>
+        <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
-        <junit.version>5.13.3</junit.version>
+        <junit.version>5.13.4</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.18</logback.version>
-        <lucene.version>10.2.2</lucene.version>
-        <micrometer.version>1.15.3</micrometer.version>
+        <logback.version>1.5.19</logback.version>
+        <lucene.version>10.3.0</lucene.version>
+        <micrometer.version>1.15.4</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.31.1</protobuf.version>
+        <protobuf.version>4.32.1</protobuf.version>
         <siri-java-model.version>2.0.1</siri-java-model.version>
         <slf4j.version>2.0.17</slf4j.version>
         <!-- Other properties -->
@@ -88,15 +88,9 @@
         <plugin.prettier.goal>write</plugin.prettier.goal>
         <plugin.prettier.skip>false</plugin.prettier.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
+        <tests.excludedGroups>integration</tests.excludedGroups>
+        <tests.includedGroups></tests.includedGroups>
     </properties>
-
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>OpenTripPlanner Maven Repository on Github Packages</name>
-            <url>https://maven.pkg.github.com/${GITHUB_REPOSITORY}/</url>
-        </repository>
-    </distributionManagement>
 
     <modules>
         <module>utils</module>
@@ -104,6 +98,7 @@
         <module>gtfs-realtime-protobuf</module>
         <module>application</module>
         <module>otp-shaded</module>
+        <module>test/integration</module>
     </modules>
 
 
@@ -113,12 +108,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.hubspot.maven.plugins</groupId>
                     <artifactId>prettier-maven-plugin</artifactId>
                     <version>${plugin.prettier.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>2.46.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -126,7 +126,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>3.14.1</version>
                 <configuration>
                     <!-- Target Java version -->
                     <release>21</release>
@@ -189,7 +189,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.5.4</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
@@ -252,6 +252,8 @@
                         <printStderrOnSuccess>false</printStderrOnSuccess>
                         <theme>UNICODE</theme>
                     </statelessTestsetInfoReporter>
+                    <groups>${tests.includedGroups}</groups>
+                    <excludedGroups>${tests.excludedGroups}</excludedGroups>
                 </configuration>
             </plugin>
             <!-- code coverage report -->
@@ -291,6 +293,30 @@
             </plugin>
 
             <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <java>
+                        <removeUnusedImports/>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                            <include>src/ext/java/**/*.java</include>
+                            <include>src/ext-test/java/**/*.java</include>
+                        </includes>
+                    </java>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>com.hubspot.maven.plugins</groupId>
                 <artifactId>prettier-maven-plugin</artifactId>
                 <configuration>
@@ -299,6 +325,7 @@
                     <inputGlobs>
                         <inputGlob>src/main/java/**/*.java</inputGlob>
                         <inputGlob>src/test/java/**/*.java</inputGlob>
+                        <inputGlob>src/test-fixtures/java/**/*.java</inputGlob>
                     </inputGlobs>
                 </configuration>
                 <executions>
@@ -389,7 +416,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.65.0</version>
+                <version>26.69.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -403,7 +430,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.4.8-jre</version>
+                <version>33.5.0-jre</version>
             </dependency>
 
             <!-- Logging API -->
@@ -472,7 +499,7 @@
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
-                <version>1.4.4</version>
+                <version>1.4.5</version>
             </dependency>
             <dependency>
                 <groupId>com.tngtech.archunit</groupId>
@@ -482,7 +509,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.18.0</version>
+                <version>5.19.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.origin-energy</groupId>
@@ -549,8 +576,32 @@
                 </repository>
             </distributionManagement>
         </profile>
+        
         <profile>
-            <id>release</id>
+            <id>integrationTests</id>
+            <activation>
+                <property>
+                    <!-- shortcut to activate with -Pit -->
+                    <name>it</name>
+                    <value/>
+                </property>
+            </activation>
+            <!--
+                The documentation of the surefire plugin says that setting excludedGroups and includedGroups
+                should work directly, but I cannot get it to work.
+                For that reason we need the detour via the maven properties.
+                From my understanding, setting excludedGroups should not be necessary, but it is.
+                If you are an expert of the surefire plugin, feel free to correct this.
+            -->
+            <properties>
+                <tests.includedGroups>integration</tests.includedGroups>
+                <tests.excludedGroups></tests.excludedGroups>
+                <plugin.prettier.skip>true</plugin.prettier.skip>
+            </properties>
+        </profile>
+
+        <profile>
+        <id>release</id>
             <properties>
                 <skip-source-and-javadoc>false</skip-source-and-javadoc>
             </properties>
@@ -576,15 +627,14 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.7.0</version>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.8.0</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <!-- if someone else other than Leonard deploys to Maven Central this might need to change -->
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
                         </configuration>
                     </plugin>
                 </plugins>

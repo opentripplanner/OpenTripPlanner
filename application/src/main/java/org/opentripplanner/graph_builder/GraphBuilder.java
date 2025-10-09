@@ -4,7 +4,8 @@ import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 
-import jakarta.inject.Inject;
+import java.io.Closeable;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -44,18 +46,23 @@ public class GraphBuilder implements Runnable {
   private final Graph graph;
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
+  private final Closeable closeDataSourcesHandle;
+  private final DeduplicatorService deduplicator;
 
   private boolean hasTransitData = false;
 
-  @Inject
   public GraphBuilder(
     Graph baseGraph,
+    DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    Closeable closeDataSourcesHandle
   ) {
     this.graph = baseGraph;
+    this.deduplicator = deduplicator;
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
+    this.closeDataSourcesHandle = closeDataSourcesHandle;
   }
 
   /**
@@ -182,25 +189,29 @@ public class GraphBuilder implements Runnable {
   }
 
   public void run() {
-    // Record how long it takes to build the graph, purely for informational purposes.
-    long startTime = System.currentTimeMillis();
+    try {
+      // Record how long it takes to build the graph, purely for informational purposes.
+      long startTime = System.currentTimeMillis();
 
-    // Check all graph builder inputs, and fail fast to avoid waiting until the build process
-    // advances.
-    for (GraphBuilderModule builder : graphBuilderModules) {
-      builder.checkInputs();
+      // Check all graph builder inputs, and fail fast to avoid waiting until the build process
+      // advances.
+      for (GraphBuilderModule builder : graphBuilderModules) {
+        builder.checkInputs();
+      }
+
+      for (GraphBuilderModule load : graphBuilderModules) {
+        load.buildGraph();
+      }
+
+      new DataImportIssueSummary(issueStore.listIssues()).logSummary();
+
+      // Log before we validate, this way we have more information if the validation fails
+      logGraphBuilderCompleteStatus(startTime, graph, timetableRepository, deduplicator);
+
+      validate();
+    } finally {
+      closeDataSources();
     }
-
-    for (GraphBuilderModule load : graphBuilderModules) {
-      load.buildGraph();
-    }
-
-    new DataImportIssueSummary(issueStore.listIssues()).logSummary();
-
-    // Log before we validate, this way we have more information if the validation fails
-    logGraphBuilderCompleteStatus(startTime, graph, timetableRepository);
-
-    validate();
   }
 
   private void addModuleOptional(@Nullable GraphBuilderModule module, OTPFeature feature) {
@@ -246,10 +257,19 @@ public class GraphBuilder implements Runnable {
     }
   }
 
+  private void closeDataSources() {
+    try {
+      closeDataSourcesHandle.close();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private static void logGraphBuilderCompleteStatus(
     long startTime,
     Graph graph,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    DeduplicatorService deduplicator
   ) {
     long endTime = System.currentTimeMillis();
     String time = DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime));
@@ -268,5 +288,7 @@ public class GraphBuilder implements Runnable {
       nPatterns,
       nTransfers
     );
+    // Log size info for the deduplicator
+    LOG.info("Memory optimized {}", deduplicator.toString());
   }
 }

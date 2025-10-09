@@ -53,8 +53,9 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     var scheduledStopPointId = "ssp-1";
     var trip1input = tripInput(TRIP_1_ID);
 
-    var env = ENV_BUILDER.addTrip(trip1input).build();
-    env.timetableRepository.addScheduledStopPointMapping(Map.of(id(scheduledStopPointId), STOP_B));
+    var env = ENV_BUILDER.addTrip(trip1input)
+      .addScheduledStopPointMapping(Map.of(id(scheduledStopPointId), STOP_B))
+      .build();
 
     var journey = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedCalls(builder ->

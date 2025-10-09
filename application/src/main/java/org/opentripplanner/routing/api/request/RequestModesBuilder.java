@@ -1,12 +1,5 @@
 package org.opentripplanner.routing.api.request;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
-import org.opentripplanner.transit.model.basic.SubMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
-
 public class RequestModesBuilder {
 
   private StreetMode accessMode;
