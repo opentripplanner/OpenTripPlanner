@@ -22,6 +22,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToGraph;
+import org.opentripplanner.graph_builder.module.AddTransitEntitiesToTimetable;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
@@ -279,12 +280,8 @@ public class GtfsModule implements GraphBuilderModule {
     TimetableRepository timetableRepository,
     OtpTransitService otpTransitService
   ) {
-    AddTransitEntitiesToGraph.addToGraph(
-      otpTransitService,
-      subwayAccessTime_s,
-      graph,
-      timetableRepository
-    );
+    AddTransitEntitiesToTimetable.addToTimetable(otpTransitService, timetableRepository);
+    AddTransitEntitiesToGraph.addToGraph(otpTransitService, subwayAccessTime_s, graph);
   }
 
   private GtfsRelationalDao loadBundle(GtfsBundle gtfsBundle) throws IOException {

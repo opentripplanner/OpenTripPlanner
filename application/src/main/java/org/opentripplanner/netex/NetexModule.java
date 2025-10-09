@@ -6,6 +6,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToGraph;
+import org.opentripplanner.graph_builder.module.AddTransitEntitiesToTimetable;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
@@ -99,12 +100,8 @@ public class NetexModule implements GraphBuilderModule {
         timetableRepository.addNoticeAssignments(otpService.getNoticeAssignments());
         timetableRepository.addScheduledStopPointMapping(otpService.stopsByScheduledStopPoint());
 
-        AddTransitEntitiesToGraph.addToGraph(
-          otpService,
-          subwayAccessTime,
-          graph,
-          timetableRepository
-        );
+        AddTransitEntitiesToTimetable.addToTimetable(otpService, timetableRepository);
+        AddTransitEntitiesToGraph.addToGraph(otpService, subwayAccessTime, graph);
 
         timetableRepository.validateTimeZones();
 
