@@ -91,10 +91,7 @@ public final class TransitTestEnvironment {
    * TransitService timezone.
    */
   public LocalTimeParser localTimeParser() {
-    return new LocalTimeParser(
-      timetableRepository.getTimeZone(),
-      defaultServiceDate
-    );
+    return new LocalTimeParser(timetableRepository.getTimeZone(), defaultServiceDate);
   }
 
   /**

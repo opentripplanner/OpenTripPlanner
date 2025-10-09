@@ -28,16 +28,15 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.trip.RealtimeTestConstants;
 
 class OjpServiceTest {
 
   private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
 
-  private final static String STOP_A_ID = "A";
-  private final static String STOP_B_ID = "B";
-  private final static String STOP_C_ID = "C";
-  private final static String STATION_OMEGA_ID = "OMEGA";
+  private static final String STOP_A_ID = "A";
+  private static final String STOP_B_ID = "B";
+  private static final String STOP_C_ID = "C";
+  private static final String STATION_OMEGA_ID = "OMEGA";
 
   private final RegularStop STOP_A = envBuilder.stopAtStation(STOP_A_ID, STATION_OMEGA_ID);
   private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);

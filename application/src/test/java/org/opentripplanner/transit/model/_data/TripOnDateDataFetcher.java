@@ -19,6 +19,9 @@ public class TripOnDateDataFetcher {
   private final TransitService transitService;
   private final LocalDate serviceDate;
 
+  // The trip is lazily initialized when needed
+  private Trip trip;
+
   public TripOnDateDataFetcher(
     TransitService transitService,
     FeedScopedId tripId,
@@ -30,7 +33,11 @@ public class TripOnDateDataFetcher {
   }
 
   public Trip trip() {
-    return transitService.getTrip(tripId);
+    if (trip != null) {
+      return trip;
+    }
+    trip = transitService.getTrip(tripId);
+    return trip;
   }
 
   /**

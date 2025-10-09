@@ -9,7 +9,8 @@ import org.opentripplanner.utils.time.DateUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
- * A helper class used in tests for parsing local time strings into absolute times
+ * A helper class used in tests for parsing local time strings into absolute times given a date and
+ * a timezone.
  */
 public class LocalTimeParser {
 

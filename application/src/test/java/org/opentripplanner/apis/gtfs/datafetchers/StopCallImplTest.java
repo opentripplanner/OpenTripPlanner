@@ -19,7 +19,6 @@ import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class StopCallImplTest {
