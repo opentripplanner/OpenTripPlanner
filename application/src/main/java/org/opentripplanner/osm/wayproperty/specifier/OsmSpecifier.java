@@ -1,7 +1,6 @@
 package org.opentripplanner.osm.wayproperty.specifier;
 
 import java.util.Arrays;
-import javax.annotation.Nullable;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.TraverseDirection;
 

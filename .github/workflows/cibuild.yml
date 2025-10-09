@@ -15,9 +15,7 @@ on:
       - dev-1.x
       - dev-2.x
 env:
-  # Since version 3.9.0 of Maven it will automatically understand this environment variable.
-  # However, as of 2024-11 the latest versions of Ubuntu and Debian were on 3.8.8 so it will take some
-  # time until we can remove the $MAVEN_ARGS below.
+  # maven default arguments to make the log quieter and colourful
   MAVEN_ARGS: "--no-transfer-progress -Dstyle.color=always"
 
 jobs:
@@ -52,8 +50,9 @@ jobs:
         # https://github.com/actions/runner-images/issues/1499
         # we set nodePath and npmPath to skip downloading the node binary, which frequently times out
         run: |
-          mvn $MAVEN_ARGS jacoco:prepare-agent test jacoco:report -P prettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
-          mvn $MAVEN_ARGS package -Dmaven.test.skip -P prettierSkip
+          mvn spotless:check
+          mvn jacoco:prepare-agent test jacoco:report -P prettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
+          mvn package -Dmaven.test.skip -P prettierSkip
 
       - name: Send coverage data to codecov.io
         if: github.repository_owner == 'opentripplanner'
@@ -74,7 +73,7 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn $MAVEN_ARGS deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip -P deployGitHub
+        run: mvn deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip -P deployGitHub
 
   build-windows:
     timeout-minutes: 20
@@ -92,7 +91,7 @@ jobs:
       - name: Configure Windows Pagefile
         uses: al-cheb/configure-pagefile-action@v1.4
       - name: Run tests
-        run: mvn $MAVEN_ARGS test -P prettierSkip
+        run: mvn test -P prettierSkip
 
   docs:
     if: github.repository_owner == 'opentripplanner'
@@ -205,7 +204,7 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Compile Java code
-        run: mvn $MAVEN_ARGS compile -DskipTests -P prettierSkip
+        run: mvn compile -DskipTests -P prettierSkip
 
   container-image:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
@@ -250,4 +249,4 @@ jobs:
           
           MAVEN_SKIP_ARGS="-P prettierSkip -Dmaven.test.skip=true -Dmaven.source.skip=true"
           
-          mvn $MAVEN_ARGS $MAVEN_SKIP_ARGS package com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,$image_version
+          mvn $MAVEN_SKIP_ARGS package com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,$image_version

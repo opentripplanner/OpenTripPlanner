@@ -55,6 +55,8 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final PathwayMapper pathwayMapper;
 
+  private final RouteNetworkAssignmentMapper routeNetworkAssignmentMapper;
+
   private final RouteMapper routeMapper;
 
   private final TripMapper tripMapper;
@@ -131,7 +133,14 @@ public class GTFSToOtpTransitServiceMapper {
       pathwayNodeMapper,
       boardingAreaMapper
     );
-    routeMapper = new RouteMapper(idFactory, agencyMapper, issueStore, translationHelper);
+    routeNetworkAssignmentMapper = new RouteNetworkAssignmentMapper(idFactory);
+    routeMapper = new RouteMapper(
+      idFactory,
+      agencyMapper,
+      routeNetworkAssignmentMapper,
+      issueStore,
+      translationHelper
+    );
     directionMapper = new DirectionMapper(issueStore);
     tripMapper = new TripMapper(idFactory, routeMapper, directionMapper, translationHelper);
     bookingRuleMapper = new BookingRuleMapper();
@@ -168,6 +177,7 @@ public class GTFSToOtpTransitServiceMapper {
     builder.getCalendars().addAll(serviceCalendarMapper.map(data.getAllCalendars()));
     builder.getFeedInfos().addAll(feedInfoMapper.map(data.getAllFeedInfos()));
     builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
+    routeNetworkAssignmentMapper.map(data.getAllRouteNetworkAssignments());
     builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
     var shapes = shapePointMapper.map(data.getAllShapePoints());
     builder.getShapePoints().putAll(shapes);

@@ -30,15 +30,17 @@ public class StreetGraphFinder implements GraphFinder {
 
   private final Graph graph;
   private final VertexLinker linker;
+  private StopResolver stopResolver;
 
-  public StreetGraphFinder(Graph graph, VertexLinker linker) {
+  public StreetGraphFinder(Graph graph, VertexLinker linker, StopResolver stopResolver) {
     this.graph = graph;
     this.linker = linker;
+    this.stopResolver = stopResolver;
   }
 
   @Override
   public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
-    StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(radiusMeters);
+    StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(stopResolver, radiusMeters);
     findClosestUsingStreets(
       coordinate.getY(),
       coordinate.getX(),
@@ -110,11 +112,11 @@ public class StreetGraphFinder implements GraphFinder {
       )
     ) {
       StreetSearchBuilder.of()
-        .setSkipEdgeStrategy(skipEdgeStrategy)
-        .setTraverseVisitor(visitor)
-        .setDominanceFunction(new DominanceFunctions.LeastWalk())
-        .setRequest(request)
-        .setVerticesContainer(temporaryVertices)
+        .withSkipEdgeStrategy(skipEdgeStrategy)
+        .withTraverseVisitor(visitor)
+        .withDominanceFunction(new DominanceFunctions.LeastWalk())
+        .withRequest(request)
+        .withVerticesContainer(temporaryVertices)
         .getShortestPathTree();
     }
   }

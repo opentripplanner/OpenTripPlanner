@@ -214,12 +214,12 @@ public class TurnCostTest {
     int expectedDuration
   ) {
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(new StreetRequest(streetMode))
-      .setFrom(from)
-      .setTo(to)
-      .setIntersectionTraversalCalculator(calculator)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withStreetRequest(new StreetRequest(streetMode))
+      .withFrom(from)
+      .withTo(to)
+      .withIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
     GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
     assertNotNull(path);

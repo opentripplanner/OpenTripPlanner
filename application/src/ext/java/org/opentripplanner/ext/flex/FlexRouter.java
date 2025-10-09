@@ -82,6 +82,7 @@ public class FlexRouter {
     );
     this.callbackService = new CallbackAdapter();
     this.graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+      transitService::getRegularStop,
       transitService.getTimeZone(),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference

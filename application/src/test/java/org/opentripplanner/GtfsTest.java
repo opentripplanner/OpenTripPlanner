@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
+import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -112,7 +113,7 @@ public abstract class GtfsTest {
         .withTransferMode(WALK)
         .withEgressMode(WALK);
 
-      journeyBuilder.setModes(requestModesBuilder.build());
+      journeyBuilder.withModes(requestModesBuilder.build());
 
       var filterRequestBuilder = TransitFilterRequest.of();
       if (preferredMode != null) {
@@ -130,7 +131,7 @@ public abstract class GtfsTest {
         filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
       }
 
-      journeyBuilder.withTransit(b -> b.setFilters(List.of(filterRequestBuilder.build())));
+      journeyBuilder.withTransit(b -> b.withFilters(List.of(filterRequestBuilder.build())));
     });
 
     // Init preferences
@@ -146,7 +147,7 @@ public abstract class GtfsTest {
       // since this makes interlining _worse_ than alighting and re-boarding the same line.
       // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
       preferences.withWalk(w -> w.withBoardCost(30));
-      preferences.withTransit(tr -> tr.setOtherThanPreferredRoutesPenalty(0));
+      preferences.withTransit(tr -> tr.withOtherThanPreferredRoutesPenalty(0));
     });
 
     // Route
@@ -194,12 +195,12 @@ public abstract class GtfsTest {
     File gtfs = new File("src/test/resources/" + getFeedName());
     File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
 
-    GtfsBundle gtfsBundle = GtfsBundle.forTest(gtfs, FEED_ID);
+    GtfsBundle gtfsBundle = GtfsBundleTestFactory.forTest(gtfs, FEED_ID);
     List<GtfsBundle> gtfsBundleList = List.of(gtfsBundle);
 
     alertsUpdateHandler = new AlertsUpdateHandler(false);
     var deduplicator = new Deduplicator();
-    graph = new Graph(deduplicator);
+    graph = new Graph();
     timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     timetableRepository.setUpdaterManager(
       new GraphUpdaterManager(

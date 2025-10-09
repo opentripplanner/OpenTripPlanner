@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -146,6 +145,11 @@ public interface TransitService {
 
   @Nullable
   RegularStop getRegularStop(FeedScopedId id);
+
+  /**
+   * Gets the area stop with the given id and throws an exception if it was not found.
+   */
+  AreaStop getAreaStop(FeedScopedId id);
 
   Collection<StopLocation> listStopLocations();
 

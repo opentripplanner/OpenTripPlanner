@@ -75,7 +75,6 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final ZoneId zoneId;
   private final TripOnServiceDate tripOnServiceDate;
   private final double distanceMeters;
-  private final double directDistanceMeters;
 
   // Sandbox fields
   private final Float accessibilityScore;
@@ -123,9 +122,6 @@ public class ScheduledTransitLeg implements TransitLeg {
 
     this.distanceMeters = DoubleUtils.roundTo2Decimals(
       Objects.requireNonNull(builder.distanceMeters(), "distanceMeters")
-    );
-    this.directDistanceMeters = GeometryUtils.sumDistances(
-      List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
     );
     this.transitAlerts = Set.copyOf(builder.alerts());
 
@@ -268,10 +264,6 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Override
   public double distanceMeters() {
     return distanceMeters;
-  }
-
-  public double directDistanceMeters() {
-    return directDistanceMeters;
   }
 
   @Override

@@ -11,7 +11,6 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import javax.annotation.Nullable;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.WayProperties;
@@ -76,6 +75,8 @@ public class OsmTagMapper {
     props.setProperties("highway=footway", withModes(PEDESTRIAN).bicycleSafety(1.1));
     props.setProperties("mtb:scale=1", pedestrianWayProperties);
     props.setProperties("mtb:scale=2", pedestrianWayProperties);
+    props.setProperties("indoor=area", pedestrianWayProperties);
+    props.setProperties("indoor=corridor", pedestrianWayProperties);
 
     /* BICYCLE */
     props.setProperties("highway=cycleway", withModes(BICYCLE).bicycleSafety(0.6));

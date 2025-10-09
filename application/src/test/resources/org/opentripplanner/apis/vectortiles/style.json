@@ -150,6 +150,105 @@
       }
     },
     {
+      "id" : "geofencing-zones-no-drop-off",
+      "type" : "fill",
+      "source" : "vectorSource",
+      "source-layer" : "geofencingZones",
+      "minzoom" : 10,
+      "maxzoom" : 23,
+      "paint" : {
+        "fill-color" : "#ff6b6b",
+        "fill-opacity" : 0.3,
+        "fill-outline-color" : "#cc0000"
+      },
+      "filter" : [
+        "any",
+        [
+          "in",
+          "no-drop-off",
+          [
+            "string",
+            [
+              "get",
+              "type"
+            ]
+          ]
+        ]
+      ],
+      "layout" : {
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Rental"
+      }
+    },
+    {
+      "id" : "geofencing-zones-no-traversal",
+      "type" : "fill",
+      "source" : "vectorSource",
+      "source-layer" : "geofencingZones",
+      "minzoom" : 10,
+      "maxzoom" : 23,
+      "paint" : {
+        "fill-color" : "#ffa500",
+        "fill-opacity" : 0.3,
+        "fill-outline-color" : "#ff8c00"
+      },
+      "filter" : [
+        "any",
+        [
+          "in",
+          "no-traversal",
+          [
+            "string",
+            [
+              "get",
+              "type"
+            ]
+          ]
+        ]
+      ],
+      "layout" : {
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Rental"
+      }
+    },
+    {
+      "id" : "geofencing-zones-business-area",
+      "type" : "fill",
+      "source" : "vectorSource",
+      "source-layer" : "geofencingZones",
+      "minzoom" : 10,
+      "maxzoom" : 23,
+      "paint" : {
+        "fill-color" : "#4a9eff",
+        "fill-opacity" : 0.2,
+        "fill-outline-color" : "#0066cc"
+      },
+      "filter" : [
+        "any",
+        [
+          "in",
+          "business-area",
+          [
+            "string",
+            [
+              "get",
+              "type"
+            ]
+          ]
+        ]
+      ],
+      "layout" : {
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Rental"
+      }
+    },
+    {
       "id" : "wheelchair-accessible",
       "source" : "vectorSource",
       "source-layer" : "edges",

@@ -2,7 +2,6 @@ package org.opentripplanner.transit.model.timetable;
 
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.MISSING_ARRIVAL_TIME;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.MISSING_DEPARTURE_TIME;
-import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
 
 import java.util.Arrays;
 import javax.annotation.Nullable;
