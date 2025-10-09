@@ -49,7 +49,7 @@ If you make any changes to the dependencies in package.json, you must also updat
 file. Any divergence will cause CI to fail. To regenerate the lockfile, run `npm install`, and commit
 any changes.
 
-Hot top: The best way to add or remove dependencies is to use the `npm install --save-exact` or `npm uninstall` commands
+Hot tip: The best way to add or remove dependencies is to use the `npm install --save-exact` or `npm uninstall` commands
 rather than editing the package.json manually. For devDependencies use `--save-dev`.
 
 ## Build for production
