@@ -778,7 +778,7 @@ def read_ser_ver_id_from_pom_file(git_hash):
 
 def run_maven_test():
     if section_w_resume('run_maven_test', 'Run unit tests'):
-        mvn('clean', '-PprettierSkip', 'test')
+        mvn('clean', '-PprettierSkip,checkstyleSkip', 'test')
 
 
 # Get the full git hash for a qualified branch name, tag or hash

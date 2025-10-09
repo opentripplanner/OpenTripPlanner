@@ -59,7 +59,9 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
   }
 
   private void parseServiceCalendar(ServiceCalendar serviceCalendar) {
-    if (serviceCalendar == null) return;
+    if (serviceCalendar == null) {
+      return;
+    }
 
     parseDayTypes(serviceCalendar.getDayTypes());
     parseOperatingPeriods(serviceCalendar.getOperatingPeriods());
@@ -68,14 +70,18 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
 
   //List<JAXBElement<? extends DataManagedObjectStructure>>
   private void parseDayTypes(DayTypesInFrame_RelStructure element) {
-    if (element == null) return;
+    if (element == null) {
+      return;
+    }
     for (JAXBElement<?> dt : element.getDayType_()) {
       parseDayType(dt);
     }
   }
 
   private void parseDayTypes(DayTypes_RelStructure dayTypes) {
-    if (dayTypes == null) return;
+    if (dayTypes == null) {
+      return;
+    }
     for (JAXBElement<?> dt : dayTypes.getDayTypeRefOrDayType_()) {
       parseDayType(dt);
     }

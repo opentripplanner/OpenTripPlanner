@@ -145,7 +145,10 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
   }
 
   private static VehicleParkingState toState(boolean isUnderMaintenance) {
-    if (isUnderMaintenance) return VehicleParkingState.TEMPORARILY_CLOSED;
-    else return OPERATIONAL;
+    if (isUnderMaintenance) {
+      return VehicleParkingState.TEMPORARILY_CLOSED;
+    } else {
+      return OPERATIONAL;
+    }
   }
 }

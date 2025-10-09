@@ -59,7 +59,9 @@ class SafetyValueNormalizer {
       for (Edge e : vertex.getOutgoing()) {
         if (e instanceof AreaEdge) {
           AreaGroup areaGroup = ((AreaEdge) e).getArea();
-          if (seenAreas.contains(areaGroup)) continue;
+          if (seenAreas.contains(areaGroup)) {
+            continue;
+          }
           seenAreas.add(areaGroup);
           for (Area area : areaGroup.getAreas()) {
             area.setBicycleSafety((float) (area.getBicycleSafety() / bestBikeSafety));

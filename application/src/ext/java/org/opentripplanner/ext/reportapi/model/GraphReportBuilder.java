@@ -23,7 +23,9 @@ public class GraphReportBuilder {
         return "guaranteed";
       } else if (transferConstraint.isNotAllowed()) {
         return "notAllowed";
-      } else return "unknown";
+      } else {
+        return "unknown";
+      }
     });
 
     var stopCounts = countValues(

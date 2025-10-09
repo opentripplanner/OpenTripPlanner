@@ -84,9 +84,11 @@
              When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
         -->
         <argLine/>
+        <plugin.checkstyle.skip>false</plugin.checkstyle.skip>
         <plugin.prettier.version>0.22</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
         <plugin.prettier.skip>false</plugin.prettier.skip>
+        <plugin.rewrite.skip>true</plugin.rewrite.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
         <tests.excludedGroups>integration</tests.excludedGroups>
         <tests.includedGroups></tests.includedGroups>
@@ -114,11 +116,6 @@
                     <groupId>com.hubspot.maven.plugins</groupId>
                     <artifactId>prettier-maven-plugin</artifactId>
                     <version>${plugin.prettier.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.diffplug.spotless</groupId>
-                    <artifactId>spotless-maven-plugin</artifactId>
-                    <version>2.46.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -291,29 +288,57 @@
                     </includeOnlyProperties>
                 </configuration>
             </plugin>
-
             <plugin>
-                <groupId>com.diffplug.spotless</groupId>
-                <artifactId>spotless-maven-plugin</artifactId>
+                <groupId>org.openrewrite.maven</groupId>
+                <artifactId>rewrite-maven-plugin</artifactId>
+                <version>6.18.0</version>
+                <configuration>
+                    <exportDatatables>true</exportDatatables>
+                    <activeRecipes>
+                        <recipe>org.opentripplanner.CodeStyle</recipe>
+                    </activeRecipes>
+                    <exclusions>**/package-info-template.java</exclusions>
+                    <runPerSubmodule>true</runPerSubmodule>
+                    <sizeThresholdMb>0</sizeThresholdMb>
+                    <configLocation>${maven.multiModuleProjectDirectory}/openrewrite.yml</configLocation>
+                    <rewriteSkip>${plugin.rewrite.skip}</rewriteSkip>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.openrewrite.recipe</groupId>
+                        <artifactId>rewrite-static-analysis</artifactId>
+                        <version>2.18.0</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <phase>validate</phase>
                         <goals>
-                            <goal>apply</goal>
+                            <goal>run</goal>
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
                 <configuration>
-                    <java>
-                        <removeUnusedImports/>
-                        <includes>
-                            <include>src/main/java/**/*.java</include>
-                            <include>src/test/java/**/*.java</include>
-                            <include>src/ext/java/**/*.java</include>
-                            <include>src/ext-test/java/**/*.java</include>
-                        </includes>
-                    </java>
+                    <configLocation>${maven.multiModuleProjectDirectory}/checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                    <skip>${plugin.checkstyle.skip}</skip>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -522,6 +547,23 @@
 
     <profiles>
         <profile>
+            <id>checkstyleSkip</id>
+            <activation>
+                <property>
+                    <!--
+                      This works as a short alias to enable this from the command line. To skip
+                      prettier, set the 'ps' system property with the '-D cs' parameter:
+                      # mvn test -D cs
+                    -->
+                    <name>cs</name>
+                    <value/>
+                </property>
+            </activation>
+            <properties>
+                <plugin.checkstyle.skip>true</plugin.checkstyle.skip>
+            </properties>
+        </profile>
+        <profile>
             <id>prettierCheck</id>
             <properties>
                 <!-- In the CI environment we want to validate that code is formatted -->
@@ -543,6 +585,24 @@
             </activation>
             <properties>
                 <plugin.prettier.skip>true</plugin.prettier.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>rewrite</id>
+            <activation>
+                <property>
+                    <!--
+                      This works as a short alias to enable this from the command line. To skip
+                      rewrite, set the 'rw' system property with the '-D rw' parameter:
+                      # mvn test -D rw
+                    -->
+                    <name>rw</name>
+                    <value/>
+                </property>
+            </activation>
+            <properties>
+                <plugin.rewrite.skip>false</plugin.rewrite.skip>
+                <plugin.checkstyle.skip>true</plugin.checkstyle.skip>
             </properties>
         </profile>
         <profile>

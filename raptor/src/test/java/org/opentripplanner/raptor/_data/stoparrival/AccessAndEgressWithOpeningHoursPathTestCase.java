@@ -285,7 +285,9 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
     RaptorAccessEgress egressPath,
     String line
   ) {
-    int departureTime, arrivalTime, waitTime;
+    int departureTime;
+    int arrivalTime;
+    int waitTime;
     ArrivalView<TestTripSchedule> prevArrival;
 
     if (LINE_A.equals(line)) {
@@ -331,7 +333,9 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
     RaptorAccessEgress egressPath,
     String line
   ) {
-    int departureTime, arrivalTime, cost;
+    int departureTime;
+    int arrivalTime;
+    int cost;
     ArrivalView<TestTripSchedule> prevArrival;
 
     if (LINE_A.equals(line)) {

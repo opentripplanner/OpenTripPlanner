@@ -64,8 +64,12 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     TimeAndCostPenaltyForEnum<?> that = (TimeAndCostPenaltyForEnum<?>) o;
 

@@ -48,8 +48,8 @@ Document API and configuration parameters.
 
 ## Respect-Codestyle
 
-OTP uses prettier to format code. For more information on code style see the 
-[Codestyle](doc/dev/decisionrecords/Codestyle.md) document.
+OTP uses Prettier to format code and Checkstyle to check for other code style issues.
+For more information on code style see the [Codestyle](doc/dev/decisionrecords/Codestyle.md) document.
 
 
 ## Use-Object-Oriented-Principals

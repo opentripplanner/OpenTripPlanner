@@ -383,7 +383,9 @@ public class PruneIslands implements GraphBuilderModule {
     boolean markIsolated,
     TraverseMode traverseMode
   ) {
-    int nothru = 0, removed = 0, restricted = 0;
+    int nothru = 0;
+    int removed = 0;
+    int restricted = 0;
     //iterate over the street vertex of the subgraph
     for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {
       Vertex v = vIter.next();

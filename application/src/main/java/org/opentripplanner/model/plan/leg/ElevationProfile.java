@@ -112,8 +112,12 @@ public class ElevationProfile {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     ElevationProfile that = (ElevationProfile) o;
     return Objects.equals(steps, that.steps);
   }
@@ -195,8 +199,12 @@ public class ElevationProfile {
 
     @Override
     public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
       var that = (Step) o;
       return that.x == x && that.y == y;
     }
