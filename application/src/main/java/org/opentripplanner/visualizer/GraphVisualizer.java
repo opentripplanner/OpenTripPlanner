@@ -476,7 +476,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     // TODO: This should use the configured defaults, not the code defaults
     RouteRequestBuilder builder = RouteRequest.of();
     QualifiedModeSet qualifiedModeSet = new QualifiedModeSet(modes.toArray(String[]::new));
-    builder.withJourney(b -> b.setModes(qualifiedModeSet.getRequestModes()));
+    builder.withJourney(b -> b.withModes(qualifiedModeSet.getRequestModes()));
 
     builder.withArriveBy(arriveByCheckBox.isSelected());
     builder.withDateTime(when);

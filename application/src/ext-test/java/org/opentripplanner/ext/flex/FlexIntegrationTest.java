@@ -22,7 +22,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
-import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
+import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -191,7 +191,7 @@ public class FlexIntegrationTest {
     List<File> gtfsFiles
   ) {
     // GTFS
-    var gtfsBundles = gtfsFiles.stream().map(GtfsBundle::forTest).toList();
+    var gtfsBundles = gtfsFiles.stream().map(GtfsBundleTestFactory::forTest).toList();
     GtfsModule gtfsModule = GtfsModule.forTest(
       gtfsBundles,
       timetableRepository,
@@ -256,7 +256,7 @@ public class FlexIntegrationTest {
           modes.withEgressMode(FLEXIBLE);
         }
 
-        journeyBuilder.setModes(modes.build());
+        journeyBuilder.withModes(modes.build());
       })
       .buildRequest();
 

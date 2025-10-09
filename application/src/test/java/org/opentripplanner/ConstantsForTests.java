@@ -19,11 +19,10 @@ import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
+import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -34,6 +33,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -327,7 +327,7 @@ public class ConstantsForTests {
     FareServiceFactory fareServiceFactory,
     @Nullable String feedId
   ) {
-    var bundle = GtfsBundle.forTest(file, feedId);
+    var bundle = GtfsBundleTestFactory.forTest(file, feedId);
 
     var module = new GtfsModule(
       List.of(bundle),
@@ -349,7 +349,7 @@ public class ConstantsForTests {
 
   private static void addPortlandVehicleRentals(Graph graph) {
     try {
-      VertexLinker linker = TestVertexLinker.of(graph);
+      VertexLinker linker = VertexLinkerTestFactory.of(graph);
       CsvReader reader = new CsvReader(PORTLAND_BIKE_SHARE_CSV, ',', StandardCharsets.UTF_8);
       reader.readHeaders();
       while (reader.readRecord()) {
