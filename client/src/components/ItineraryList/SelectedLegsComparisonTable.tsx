@@ -4,6 +4,18 @@ import { formatTime } from '../../util/formatTime.ts';
 import { formatDuration } from '../../util/formatDuration.ts';
 import { formatDistance } from '../../util/formatDistance.ts';
 
+// Create a unique, content-based key for each leg
+const createLegKey = (leg: LegType, itineraryIdx: number): string => {
+  // Primary: Use leg ID if available
+  if (leg.id) {
+    return `itinerary_${itineraryIdx}_leg_${leg.id}`;
+  }
+
+  // Fallback: Create key from leg content
+  const legSignature = `${leg.mode}_${leg.aimedStartTime}_${leg.aimedEndTime}_${leg.fromPlace?.name || 'unknown'}_${leg.toPlace?.name || 'unknown'}`;
+  return `itinerary_${itineraryIdx}_leg_${legSignature}`;
+};
+
 interface SelectedLegsComparisonTableProps {
   itinerary1: TripPatternType;
   itinerary2: TripPatternType;
@@ -47,8 +59,8 @@ export function SelectedLegsComparisonTable({
               .filter((leg: LegType) =>
                 selectedLegIds.includes(leg.id || `leg${itineraryIdx + 1}_${tripPattern.legs.indexOf(leg)}`),
               )
-              .map((leg: LegType, legIdx: number) => (
-                <tr key={`${itineraryIdx}_${legIdx}`}>
+              .map((leg: LegType) => (
+                <tr key={createLegKey(leg, itineraryIdx)}>
                   <td>
                     <strong>#{selectedIndexes[itineraryIdx] + 1}</strong>
                   </td>
