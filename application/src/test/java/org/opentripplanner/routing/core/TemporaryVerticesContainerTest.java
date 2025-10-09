@@ -12,10 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
@@ -24,13 +24,12 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TemporaryVerticesContainerTest {
 
   // Given:
   // - a graph with 3 intersections/vertexes
-  private final Graph g = new Graph(new Deduplicator());
+  private final Graph g = new Graph();
 
   private final StreetVertex a = StreetModelForTest.intersectionVertex("A", 1.0, 1.0);
   private final StreetVertex b = StreetModelForTest.intersectionVertex("B", 1.0, 0.0);
@@ -57,7 +56,7 @@ public class TemporaryVerticesContainerTest {
     // When - the container is created
     subject = new TemporaryVerticesContainer(
       g,
-      TestVertexLinker.of(g),
+      VertexLinkerTestFactory.of(g),
       id -> List.of(),
       from,
       to,

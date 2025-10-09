@@ -40,22 +40,22 @@ examples. The Transit model is more complex than the VehiclePosition model.
 Below is a list of documented components in OTP. Not every component is documented at a high level,
 but this is a start and we would like to expand this list in the future.
 
-### [OTP Configuration design](application/src/main/java/org/opentripplanner/standalone/config/package.md)
+### [OTP Configuration Design](application/src/main/java/org/opentripplanner/standalone/config/package.md)
 
 The Configuration module is responsible for loading and parsing OTP configuration files and map them
 into Plan Old Java Objects (POJOs). These POJOs are injected into the other components.
 
-### [GTFS import module](application/src/main/java/org/opentripplanner/gtfs/package.md)
+### [GTFS Import Module](application/src/main/java/org/opentripplanner/gtfs/package.md)
 
 Used to import GTFS transit data files.
 
-### [NeTEx import module](application/src/main/java/org/opentripplanner/netex/package.md)
+### [NeTEx Import Module](application/src/main/java/org/opentripplanner/netex/package.md)
 
 Used to import NeTEx transit data files.
 
 ### Transit Routing
 
-#### [Raptor transit routing](raptor/src/main/java/org/opentripplanner/raptor/package.md)
+#### [Raptor Transit Routing](raptor/src/main/java/org/opentripplanner/raptor/package.md)
 
 This is the OTP2 new transit routing engine implemented using the Raptor algorithm. It explains how
 Raptor works, the important concepts and the design. It might be worth reading even if you are not a
@@ -82,14 +82,14 @@ existing Raptor coded should be tested with the
 [SpeedTest](application/src/test/java/org/opentripplanner/transit/speed_test/package.md) and compared
 with an earlier version of the code to make sure the performance is NOT degraded.
 
-#### [Transfer path optimization](application/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
+#### [Transfer Path Optimization](application/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
 
 Describes the transfer functionality, the design and the implementation. The logic for finding the
 best transfer is distributed to the Raptor and
 the [OptimizeTransferService](application/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/OptimizeTransferService.java)
 .
 
-#### [Itinerary list filter chain](application/src/main/java/org/opentripplanner/routing/algorithm/filterchain/package.md)
+#### [Itinerary List Filter Chain](application/src/main/java/org/opentripplanner/routing/algorithm/filterchain/package.md)
 
 Describes the itinerary list filter chain, used to post-process the itineraries returned from the
 routers in [RoutingWorker](application/src/main/java/org/opentripplanner/routing/algorithm/RoutingWorker.java),
