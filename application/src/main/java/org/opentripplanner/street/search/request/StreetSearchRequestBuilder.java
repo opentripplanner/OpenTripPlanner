@@ -16,6 +16,7 @@ public class StreetSearchRequestBuilder {
   boolean wheelchair;
   GenericLocation from;
   GenericLocation to;
+  RentalPeriod rentalPeriod;
 
   StreetSearchRequestBuilder(StreetSearchRequest original) {
     this.startTime = original.startTime();
@@ -25,6 +26,7 @@ public class StreetSearchRequestBuilder {
     this.wheelchair = original.wheelchair();
     this.from = original.from();
     this.to = original.to();
+    this.rentalPeriod = original.rentalPeriod();
   }
 
   public StreetSearchRequestBuilder withStartTime(Instant startTime) {
@@ -63,6 +65,11 @@ public class StreetSearchRequestBuilder {
 
   public StreetSearchRequestBuilder withTo(GenericLocation to) {
     this.to = to;
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withRentalPeriod(RentalPeriod rentalPeriod) {
+    this.rentalPeriod = rentalPeriod;
     return this;
   }
 
