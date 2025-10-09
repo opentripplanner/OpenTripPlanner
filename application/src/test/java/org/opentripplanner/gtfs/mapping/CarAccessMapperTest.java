@@ -3,7 +3,6 @@ package org.opentripplanner.gtfs.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.transit.model.network.CarAccess;
 

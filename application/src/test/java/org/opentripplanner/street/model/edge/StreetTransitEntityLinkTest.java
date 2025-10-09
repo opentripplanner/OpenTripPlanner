@@ -8,7 +8,6 @@ import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATI
 import static org.opentripplanner.transit.model.basic.Accessibility.POSSIBLE;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,6 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 
@@ -89,7 +87,11 @@ class StreetTransitEntityLinkTest {
 
     private State[] traverse(RegularStop stop, boolean onlyAccessible) {
       var from = StreetModelForTest.intersectionVertex("A", 10, 10);
-      var to = TransitStopVertex.of().withStop(stop).withModes(Set.of(TransitMode.RAIL)).build();
+      var to = TransitStopVertex.of()
+        .withId(stop.getId())
+        .withPoint(stop.getGeometry())
+        .withWheelchairAccessiblity(stop.getWheelchairAccessibility())
+        .build();
 
       var req = StreetSearchRequest.of().withMode(StreetMode.BIKE);
       AccessibilityPreferences feature;
@@ -160,7 +162,11 @@ class StreetTransitEntityLinkTest {
     }
 
     private void testTraversalWithState(State state, boolean canTraverse) {
-      var transitStopVertex = TransitStopVertex.of().withStop(ACCESSIBLE_STOP).build();
+      var transitStopVertex = TransitStopVertex.of()
+        .withId(ACCESSIBLE_STOP.getId())
+        .withPoint(ACCESSIBLE_STOP.getGeometry())
+        .withWheelchairAccessiblity(ACCESSIBLE_STOP.getWheelchairAccessibility())
+        .build();
       var edge = StreetTransitStopLink.createStreetTransitStopLink(
         (StreetVertex) state.getVertex(),
         transitStopVertex

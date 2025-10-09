@@ -20,7 +20,7 @@ public class VehicleParkingTestGraphData {
   public void initGraph() {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    graph = new Graph(deduplicator);
+    graph = new Graph();
     timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     graph.hasStreets = true;
 

@@ -32,7 +32,7 @@ public class TransitRequestBuilder {
     this.raptorDebugging = null;
   }
 
-  public TransitRequestBuilder setFilters(List<TransitFilter> filters) {
+  public TransitRequestBuilder withFilters(List<TransitFilter> filters) {
     this.filters = filters;
     return this;
   }
@@ -40,14 +40,14 @@ public class TransitRequestBuilder {
   public TransitRequestBuilder withFilter(Consumer<TransitFilterRequest.Builder> body) {
     var builder = TransitFilterRequest.of();
     body.accept(builder);
-    return setFilters(List.of(builder.build()));
+    return withFilters(List.of(builder.build()));
   }
 
   /**
    * Disables the transit search for this request, for example when you only want bike routes.
    */
   public TransitRequestBuilder disable() {
-    return setFilters(List.of(ExcludeAllTransitFilter.of()));
+    return withFilters(List.of(ExcludeAllTransitFilter.of()));
   }
 
   public TransitRequestBuilder withUnpreferredAgencies(List<FeedScopedId> unpreferredAgencies) {

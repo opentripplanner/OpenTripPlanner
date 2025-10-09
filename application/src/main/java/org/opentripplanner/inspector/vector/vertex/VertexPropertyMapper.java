@@ -15,11 +15,9 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.utils.collection.ListUtils;
 
 public class VertexPropertyMapper extends PropertyMapper<Vertex> {
@@ -50,9 +48,7 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
     if (input.areaStops().isEmpty()) {
       return List.of();
     } else {
-      return List.of(
-        kv("areaStops", input.areaStops().stream().map(AbstractTransitEntity::getId).toList())
-      );
+      return List.of(kv("areaStops", input.areaStops()));
     }
   }
 

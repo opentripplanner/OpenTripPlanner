@@ -18,10 +18,10 @@ public class FrequencyEntry implements Serializable {
   public final ScheduledTripTimes tripTimes;
 
   public FrequencyEntry(Frequency freq, ScheduledTripTimes tripTimes) {
-    this.startTime = freq.getStartTime();
-    this.endTime = freq.getEndTime();
-    this.headway = freq.getHeadwaySecs();
-    this.exactTimes = freq.getExactTimes() != 0;
+    this.startTime = freq.startTime();
+    this.endTime = freq.endTime();
+    this.headway = freq.headwaySecs();
+    this.exactTimes = freq.exactTimes();
     this.tripTimes = tripTimes;
   }
 

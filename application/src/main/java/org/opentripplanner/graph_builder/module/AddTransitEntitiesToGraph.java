@@ -2,9 +2,10 @@ package org.opentripplanner.graph_builder.module;
 
 import static org.opentripplanner.framework.geometry.SphericalDistanceLibrary.distance;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -86,7 +87,7 @@ public class AddTransitEntitiesToGraph {
   private void applyToGraph(TimetableRepository timetableRepository) {
     timetableRepository.mergeSiteRepositories(otpTransitService.siteRepository());
 
-    addStopsToGraphAndGenerateStopVertexes(timetableRepository);
+    addStopsToGraphAndGenerateStopVertexes();
     addEntrancesToGraph();
     addStationCentroidsToGraph();
     addPathwayNodesToGraph();
@@ -108,15 +109,14 @@ public class AddTransitEntitiesToGraph {
     }
   }
 
-  private void addStopsToGraphAndGenerateStopVertexes(TimetableRepository timetableRepository) {
+  private void addStopsToGraphAndGenerateStopVertexes() {
     // Compute the set of modes for each stop based on all the TripPatterns it is part of
-    Map<StopLocation, Set<TransitMode>> stopModeMap = new HashMap<>();
+    SetMultimap<StopLocation, TransitMode> stopModeMap = HashMultimap.create();
 
     for (TripPattern pattern : otpTransitService.getTripPatterns()) {
       TransitMode mode = pattern.getMode();
       for (var stop : pattern.getStops()) {
-        Set<TransitMode> set = stopModeMap.computeIfAbsent(stop, s -> new HashSet<>());
-        set.add(mode);
+        stopModeMap.put(stop, mode);
       }
     }
 
@@ -124,11 +124,14 @@ public class AddTransitEntitiesToGraph {
     // It is now possible for these vertices to not be connected to any edges.
     for (RegularStop stop : otpTransitService.siteRepository().listRegularStops()) {
       Set<TransitMode> modes = stopModeMap.get(stop);
-      TransitStopVertex stopVertex = vertexFactory.transitStop(
-        TransitStopVertex.of().withStop(stop).withModes(modes)
-      );
+      var b = TransitStopVertex.of()
+        .withId(stop.getId())
+        .withPoint(stop.getGeometry())
+        .withWheelchairAccessiblity(stop.getWheelchairAccessibility())
+        .withModes(modes);
+      TransitStopVertex stopVertex = vertexFactory.transitStop(b);
 
-      if (modes != null && modes.contains(TransitMode.SUBWAY)) {
+      if (modes.contains(TransitMode.SUBWAY)) {
         stopVertex.setStreetToStopTime(subwayAccessTime);
       }
 
@@ -147,7 +150,7 @@ public class AddTransitEntitiesToGraph {
   private void addStationCentroidsToGraph() {
     for (Station station : otpTransitService.siteRepository().listStations()) {
       if (station.shouldRouteToCentroid()) {
-        vertexFactory.stationCentroid(station);
+        vertexFactory.stationCentroid(station.getId(), station.getCoordinate());
       }
     }
   }
@@ -304,14 +307,19 @@ public class AddTransitEntitiesToGraph {
   }
 
   private StopLevel getStopLevel(StationElementVertex vertex) {
-    StationElement<?, ?> fromStation = vertex.getStationElement();
-    var level = fromStation.level();
-    return level != null
-      ? new StopLevel(
-        NonLocalizedString.ofNullableOrElse(level.name(), fromStation.getName()),
+    var dfltLevel = new StopLevel(vertex.getName(), null);
+    var stop = otpTransitService.siteRepository().getRegularStop(vertex.getId());
+    if (stop == null) {
+      return dfltLevel;
+    } else if (stop.level() == null) {
+      return dfltLevel;
+    } else {
+      var level = stop.level();
+      return new StopLevel(
+        NonLocalizedString.ofNullableOrElse(level.name(), stop.getName()),
         level.index()
-      )
-      : new StopLevel(fromStation.getName(), null);
+      );
+    }
   }
 
   private void addFeedInfoToGraph(TimetableRepository timetableRepository) {

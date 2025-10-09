@@ -1,0 +1,30 @@
+{
+  "data": {
+    "feed_contact_email": "emailaddress@email.app",
+    "languages": ["en", "nl"],
+    "manifest_url": "https://api.ridecheck.app/gbfs/v3/manifest.json",
+    "name": [
+      {
+        "language": "en",
+        "text": "Check Technologies"
+      },
+      {
+        "language": "nl",
+        "text": "Check Technologies (nl)"
+      }
+    ],
+    "opening_hours": "Mo,Tu,We,Th,Fr,Sa,Su 00:00-23:59",
+    "system_id": "check_almere",
+    "terms_last_updated": "2024-04-11",
+    "terms_url": [
+      {
+        "language": "en",
+        "text": "https://ridecheck.app"
+      }
+    ],
+    "timezone": "Europe/Amsterdam"
+  },
+  "last_updated": "2025-05-21T07:47:43.238893+00:00",
+  "ttl": 600,
+  "version": "3.0"
+}

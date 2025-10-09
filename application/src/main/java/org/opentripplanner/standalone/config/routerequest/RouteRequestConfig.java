@@ -77,7 +77,7 @@ public class RouteRequestConfig {
     );
 
     requestBuilder.withJourney(b ->
-      b.setModes(
+      b.withModes(
         c
           .of("modes")
           .since(V2_0)
@@ -284,14 +284,14 @@ public class RouteRequestConfig {
               .asEnumMap(TransitMode.class, Duration.class)
           )
       )
-      .setIgnoreRealtimeUpdates(
+      .withIgnoreRealtimeUpdates(
         c
           .of("ignoreRealtimeUpdates")
           .since(V2_0)
           .summary("When true, real-time updates are ignored during this search.")
           .asBoolean(dft.ignoreRealtimeUpdates())
       )
-      .setOtherThanPreferredRoutesPenalty(
+      .withOtherThanPreferredRoutesPenalty(
         c
           .of("otherThanPreferredRoutesPenalty")
           .since(V2_0)
@@ -303,14 +303,14 @@ public class RouteRequestConfig {
           )
           .asInt(dft.otherThanPreferredRoutesPenalty())
       )
-      .setReluctanceForMode(
+      .withReluctanceForMode(
         c
           .of("transitReluctanceForMode")
           .since(V2_1)
           .summary("Transit reluctance for a given transport mode")
           .asEnumMap(TransitMode.class, Double.class)
       )
-      .setUnpreferredCost(
+      .withUnpreferredCost(
         c
           .of("unpreferredCost")
           .since(V2_2)
@@ -841,7 +841,9 @@ public class RouteRequestConfig {
         c
           .of("stairsReluctance")
           .since(V2_0)
-          .summary("Used instead of walkReluctance for stairs.")
+          .summary(
+            "A multiplier to specify how bad walking on stairs is, on top of the reluctance parameter."
+          )
           .asDouble(dft.stairsReluctance())
       )
       .withStairsTimeFactor(

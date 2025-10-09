@@ -1,0 +1,34 @@
+{
+  "routingDefaults": {
+    "wheelchairAccessibility": {
+      "maxSlope": 0.125
+    },
+    "itineraryFilters": {
+      "transitGeneralizedCostLimit": {
+        "costLimitFunction": "600 + 1.5x"
+      }
+    },
+    "unpreferredCost": "600 + 3.0x",
+    "unpreferred": {
+      "routes": [
+        "HSL:2143A",
+        "HSL:2146A",
+        "HSL:2147A"
+      ]
+    }
+  },
+  "updaters": [
+    {
+      "type": "mqtt-gtfs-rt-updater",
+      "url": "tcp://pred.rt.hsl.fi",
+      "topic": "gtfsrt/v2/fi/hsl/tu",
+      "feedId": "hsl",
+      "fuzzyTripMatching": true
+    },
+    {
+      "type" : "vehicle-positions",
+      "url" : "https://realtime.hsl.fi/realtime/vehicle-positions/v2/hsl",
+      "feedId" : "hsl"
+    }
+  ]
+}

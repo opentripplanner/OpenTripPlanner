@@ -13,7 +13,7 @@ import sys
 
 POM_FILE_NAME = 'pom.xml'
 # GitHub label to indicate that a PR needs to be bumped
-LBL_BUMP_SER_VER_ID = 'bump serialization id'
+LBL_BUMP_SER_VER_ID = '+Bump Serialization Id'
 SER_VER_ID_PROPERTY = 'otp.serialization.version.id'
 SER_VER_ID_PROPERTY_PTN = SER_VER_ID_PROPERTY.replace('.', r'\.')
 SER_VER_ID_PATTERN = re.compile(
@@ -95,7 +95,6 @@ class PullRequest:
         self.title = None
         self.commit_hash = None
         self.labels = []
-        self.ser_label_set = False
 
     def description(self):
         return f'{self.title} #{self.number}'
@@ -105,6 +104,10 @@ class PullRequest:
 
     def description_link(self):
         return f"[{self.description()}]({OTP_GITHUB_PULLREQUEST_URL}{self.number}) {self.labels}".replace("'", "`")
+
+    def is_label_bump_ser_id_set(self):
+        return LBL_BUMP_SER_VER_ID in self.labels
+
 
 # The execution state of the script + the CLI arguments
 class ScriptState:
@@ -550,7 +553,7 @@ def read_pull_request_info_from_github():
                      error_msg='GitHub GraphQL Query failed!', quiet_err=True)
 
     # Example response
-    #   {"data":{"repository":{"pullRequests":{"nodes":[{"number":2222,"labels":{"nodes":[{"name":"bump serialization id"},{"name":"Entur Test"}]}}]}}}}
+    #   {"data":{"repository":{"pullRequests":{"nodes":[{"number":2222,"labels":{"nodes":[{"name":"+Bump Serialization Id"},{"name":"Entur Test"}]}}]}}}}
     json_doc = json.loads(result.stdout)
     defined_labels = [LBL_BUMP_SER_VER_ID.lower(), config.include_prs_label.lower()]
 
@@ -575,7 +578,7 @@ def check_if_prs_exist_in_latest_release():
     latest_release_hash = state.latest_version_git_hash()
 
     for pr in pullRequests:
-        if pr.ser_label_set and not git_is_commit_ancestor(pr.commit_hash, latest_release_hash):
+        if pr.is_label_bump_ser_id_set() and not git_is_commit_ancestor(pr.commit_hash, latest_release_hash):
             info(f'  - The top commit does not exist in the latest release. Bumping ser.ver.id. ({pr.description()})')
             state.prs_bump_ser_ver_id = True
             return
@@ -588,7 +591,7 @@ def check_if_prs_exist_in_latest_release():
 #  1. If the --serVerId option exist, then the latest SID is bumped and used.
 #  2. If the --release option exist, then the current pom.xml SID is validated, if ok it is used,
 #     if not the script exit.
-#  3. All merged in PRs are checked. If a PR is labeled with 'bump serialization id' and the the
+#  3. All merged in PRs are checked. If a PR is labeled with '+Bump Serialization Id' and the the
 #     HEAD commit is not in the latest release, then the last release SID is bumped and used.
 #  4. Finally, the script look at the upstream Git Repo SIDs for both this release(base) and the
 #     last release. If the SIDs are differnt the SID is bumped. To find the *upstream* SIDs we
@@ -787,7 +790,7 @@ def git_commit_hash(ref):
 
 
 def git_is_commit_ancestor(childCommit: str, parentCommit : str):
-    p = subprocess.run("git", "merge-base" "--is-ancestor", childCommit, parentCommit, timeout=5)
+    p = subprocess.run(args=('git', 'merge-base', '--is-ancestor', childCommit, parentCommit), timeout=5)
     return p.returncode == 0
 
 
