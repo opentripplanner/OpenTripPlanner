@@ -12,19 +12,18 @@ import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.updater.trip.RealtimeTestConstants;
 
-public class TripTimesOnDateTest implements RealtimeTestConstants {
+public class TripTimesOnDateTest {
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2025, 3, 3);
   private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
 
-  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
-  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
-  private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
-  private final RegularStop STOP_D = envBuilder.stop(STOP_D_ID);
-  private final RegularStop STOP_E = envBuilder.stop(STOP_E_ID);
-  private final RegularStop STOP_F = envBuilder.stop(STOP_F_ID);
+  private final RegularStop STOP_A = envBuilder.stop("A");
+  private final RegularStop STOP_B = envBuilder.stop("B");
+  private final RegularStop STOP_C = envBuilder.stop("C");
+  private final RegularStop STOP_D = envBuilder.stop("D");
+  private final RegularStop STOP_E = envBuilder.stop("E");
+  private final RegularStop STOP_F = envBuilder.stop("F");
 
   private final TripInput TRIP_INPUT1 = TripInput.of("t1")
     .withServiceDates(SERVICE_DATE, SERVICE_DATE.plusDays(1))

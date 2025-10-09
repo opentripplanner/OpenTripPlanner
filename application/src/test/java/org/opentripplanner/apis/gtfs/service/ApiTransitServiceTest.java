@@ -36,15 +36,18 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  * <p>
  * The core problem is that OTP doesn't have a clear internal API for applying real-time updates.
  */
-class ApiTransitServiceTest implements RealtimeTestConstants {
+class ApiTransitServiceTest {
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
   private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Paris");
   private static final ZonedDateTime ANY_TIME = ZonedDateTime.parse("2022-01-01T12:00:00+00:00");
+  private static final String TRIP_1_ID = "TestTrip1";
+  private static final String TRIP_2_ID = "TestTrip2";
+
   private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
-  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
-  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
-  private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
+  private final RegularStop STOP_A = envBuilder.stop("A");
+  private final RegularStop STOP_B = envBuilder.stop("B");
+  private final RegularStop STOP_C = envBuilder.stop("C");
 
   private final TripInput TRIP1_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A, "12:00:00", "12:00:00")

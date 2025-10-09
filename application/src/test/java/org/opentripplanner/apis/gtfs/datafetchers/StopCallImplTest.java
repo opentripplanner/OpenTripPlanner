@@ -22,7 +22,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
-class StopCallImplTest implements RealtimeTestConstants {
+class StopCallImplTest {
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 6, 3);
   private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Paris");
@@ -34,19 +34,19 @@ class StopCallImplTest implements RealtimeTestConstants {
   private static final OffsetDateTime NOON = OffsetDateTime.parse("2023-06-03T12:00+02:00");
   private static final OffsetDateTime TEN_AM = NOON.minusHours(2);
   private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
-  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
-  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
-  private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
-  private final AreaStop STOP_D = envBuilder.areaStop(STOP_D_ID);
-  private final AreaStop STOP_E = envBuilder.areaStop(STOP_E_ID);
+  private final RegularStop STOP_A = envBuilder.stop("A");
+  private final RegularStop STOP_B = envBuilder.stop("B");
+  private final RegularStop STOP_C = envBuilder.stop("C");
+  private final AreaStop STOP_D = envBuilder.areaStop("D");
+  private final AreaStop STOP_E = envBuilder.areaStop("E");
 
-  private final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
+  private final TripInput TRIP_INPUT = TripInput.of("Trip1")
     .addStop(STOP_A, "12:00:00", "12:00:00")
     .addStop(STOP_B, "12:30:00", "12:30:00")
     .addStop(STOP_C, "13:00:00", "13:00:00")
     .build();
 
-  private final FlexTripInput FLEX_TRIP_INPUT = FlexTripInput.of(TRIP_1_ID)
+  private final FlexTripInput FLEX_TRIP_INPUT = FlexTripInput.of("FlexTrip1")
     .addStop(STOP_D, "10:00", "10:30")
     .addStop(STOP_E, "11:00", "11:30")
     .build();
@@ -54,7 +54,7 @@ class StopCallImplTest implements RealtimeTestConstants {
   @Test
   void fixedTrip() throws Exception {
     var realtimeEnv = envBuilder.withTrip(TRIP_INPUT).build();
-    var trip = realtimeEnv.tripFetcher(TRIP_1_ID);
+    var trip = realtimeEnv.tripFetcher("Trip1");
     var tripTimes = trip.tripTimes();
     var pattern = trip.tripPattern();
 
@@ -75,7 +75,7 @@ class StopCallImplTest implements RealtimeTestConstants {
   void flexTrip() {
     OTPFeature.FlexRouting.testOn(() -> {
       var realtimeEnv = envBuilder.withFlexTrip(FLEX_TRIP_INPUT).build();
-      var trip = realtimeEnv.tripFetcher(TRIP_1_ID);
+      var trip = realtimeEnv.tripFetcher("FlexTrip1");
       var tripTimes = trip.tripTimes();
       var pattern = trip.tripPattern();
 
