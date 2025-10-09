@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -121,7 +122,7 @@ public class VehicleRentalLayerTest {
   private static RentalVehicleType vehicleType(RentalFormFactor formFactor) {
     return RentalVehicleType.of()
       .withId(new FeedScopedId("1", formFactor.name()))
-      .withName("bicycle")
+      .withName(I18NString.of("bicycle"))
       .withFormFactor(formFactor)
       .withPropulsionType(RentalVehicleType.PropulsionType.HUMAN)
       .withMaxRangeMeters(1000d)

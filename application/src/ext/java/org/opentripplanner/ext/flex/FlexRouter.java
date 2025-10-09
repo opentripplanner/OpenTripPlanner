@@ -82,6 +82,7 @@ public class FlexRouter {
     );
     this.callbackService = new CallbackAdapter();
     this.graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+      transitService::getRegularStop,
       transitService.getTimeZone(),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
@@ -197,8 +198,8 @@ public class FlexRouter {
   private class CallbackAdapter implements FlexAccessEgressCallbackAdapter {
 
     @Override
-    public TransitStopVertex getStopVertexForStopId(FeedScopedId stopId) {
-      return graph.getStopVertexForStopId(stopId);
+    public TransitStopVertex getStopVertex(FeedScopedId stopId) {
+      return graph.getStopVertex(stopId);
     }
 
     @Override

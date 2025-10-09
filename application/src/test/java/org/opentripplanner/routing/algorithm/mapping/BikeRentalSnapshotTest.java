@@ -60,14 +60,14 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   public void directBikeRental() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
       .withJourney(jb -> {
-        jb.setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
+        jb.withModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
         jb.withTransit(b -> b.disable());
       })
       .withFrom(p1)
       .withTo(p2)
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 
   /**
@@ -83,7 +83,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @Test
   public void directBikeRentalArrivingAtDestinationWithDepartAt() {
     var builder = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
-      jb.setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
+      jb.withModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
       jb.withTransit(b -> b.disable());
     });
     allowArrivalWithRentalVehicle(builder);
@@ -96,7 +96,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @Test
   public void directBikeRentalArrivingAtDestinationWithArriveBy() {
     var builder = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
-      jb.setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
+      jb.withModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
       jb.withTransit(b -> b.disable());
     });
     allowArrivalWithRentalVehicle(builder);
@@ -110,7 +110,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   public void accessBikeRental() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0)
       .withJourney(jb ->
-        jb.setModes(
+        jb.withModes(
           RequestModes.of()
             .withAccessMode(StreetMode.BIKE_RENTAL)
             .withEgressMode(StreetMode.WALK)
@@ -124,7 +124,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
       .buildRequest();
 
     try {
-      expectArriveByToMatchDepartAtAndSnapshot(request);
+      expectRequestResponseToMatchSnapshot(request);
     } catch (CompletionException e) {
       RoutingValidationException.unwrapAndRethrowCompletionException(e);
     }
@@ -135,7 +135,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   public void egressBikeRental() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
       .withJourney(jb ->
-        jb.setModes(
+        jb.withModes(
           RequestModes.of()
             .withAccessMode(StreetMode.WALK)
             .withEgressMode(StreetMode.BIKE_RENTAL)
@@ -148,7 +148,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
       .withTo(p1)
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 
   private void allowArrivalWithRentalVehicle(RouteRequestBuilder builder) {

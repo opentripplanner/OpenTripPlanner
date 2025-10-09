@@ -13,6 +13,7 @@ import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
@@ -39,6 +40,7 @@ public class NetexConfigure {
     TimetableRepository timetableRepository,
     VehicleParkingRepository parkingRepsitory,
     Graph graph,
+    DeduplicatorService deduplicator,
     DataImportIssueStore issueStore
   ) {
     List<NetexBundle> netexBundles = new ArrayList<>();
@@ -53,6 +55,7 @@ public class NetexConfigure {
 
     return new NetexModule(
       graph,
+      deduplicator,
       timetableRepository,
       parkingRepsitory,
       issueStore,

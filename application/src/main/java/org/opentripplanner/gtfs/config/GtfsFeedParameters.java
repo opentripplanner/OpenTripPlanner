@@ -22,14 +22,12 @@ public final class GtfsFeedParameters extends GtfsDefaultParameters implements D
   public GtfsFeedParameters(
     @Nullable String feedId,
     URI source,
-    boolean removeRepeatedStops,
     StopTransferPriority stationTransferPreference,
     boolean discardMinTransferTimes,
     boolean blockBasedInterlining,
     int maxInterlineDistance
   ) {
     super(
-      removeRepeatedStops,
       stationTransferPreference,
       discardMinTransferTimes,
       blockBasedInterlining,

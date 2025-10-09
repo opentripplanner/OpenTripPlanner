@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.timetable.StopRealTimeState;
  * not stop delay propagation, but updates with schedule relationships of SCHEDULED (also the
  * default value if schedule relationship is not provided) or NO_DATA will.
  */
-public class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
+class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
 
   @Override
   public boolean interpolateDelay(RealTimeTripTimesBuilder builder) {
@@ -90,7 +90,10 @@ public class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolat
         if (prevDeparture != null) {
           int arrival = Objects.requireNonNull(builder.getArrivalTime(i));
           int prevScheduledDeparture = builder.getScheduledDepartureTime(firstCanceledStop - 1);
-          int scheduledTravelTime = builder.getScheduledArrivalTime(i) - prevScheduledDeparture;
+          int scheduledArrival = builder.getScheduledArrivalTime(i);
+          // Math.max() because it is allowed for the previous departure and arrival to be
+          // the same time
+          int scheduledTravelTime = Math.max(scheduledArrival - prevScheduledDeparture, 1);
           int realTimeTravelTime = arrival - prevDeparture;
           double travelTimeRatio = (double) realTimeTravelTime / scheduledTravelTime;
 

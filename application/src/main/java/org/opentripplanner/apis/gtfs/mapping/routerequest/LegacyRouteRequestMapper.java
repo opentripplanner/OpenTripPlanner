@@ -138,16 +138,16 @@ public class LegacyRouteRequestMapper {
         callWith.argument("alightSlack", tr::withDefaultAlightSlackSec);
         callWith.argument(
           "preferred.otherThanPreferredRoutesPenalty",
-          tr::setOtherThanPreferredRoutesPenalty
+          tr::withOtherThanPreferredRoutesPenalty
         );
         // This is deprecated, if both are set, the proper one will override this
         callWith.argument("unpreferred.useUnpreferredRoutesPenalty", (Integer v) ->
-          tr.setUnpreferredCost(CostLinearFunction.of(Duration.ofSeconds(v), 0.0))
+          tr.withUnpreferredCost(CostLinearFunction.of(Duration.ofSeconds(v), 0.0))
         );
-        callWith.argument("unpreferred.unpreferredCost", tr::setUnpreferredCostString);
-        callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
+        callWith.argument("unpreferred.unpreferredCost", tr::withUnpreferredCostString);
+        callWith.argument("ignoreRealtimeUpdates", tr::withIgnoreRealtimeUpdates);
         callWith.argument("modeWeight", (Map<String, Object> modeWeights) ->
-          tr.setReluctanceForMode(
+          tr.withReluctanceForMode(
             modeWeights
               .entrySet()
               .stream()
@@ -175,13 +175,6 @@ public class LegacyRouteRequestMapper {
       callWith.argument("wheelchair", journeyBuilder::withWheelchair);
 
       journeyBuilder.withTransit(transitBuilder -> {
-        callWith.argument("preferred.routes", (String v) ->
-          transitBuilder.withPreferredRoutes(FeedScopedId.parseList(v))
-        );
-
-        callWith.argument("preferred.agencies", (String v) ->
-          transitBuilder.withPreferredAgencies(FeedScopedId.parseList(v))
-        );
         callWith.argument("unpreferred.routes", (String v) ->
           transitBuilder.withUnpreferredRoutes(FeedScopedId.parseList(v))
         );
@@ -225,7 +218,7 @@ public class LegacyRouteRequestMapper {
               )
               .collect(Collectors.toSet());
 
-            journeyBuilder.setModes(modes.getRequestModes());
+            journeyBuilder.withModes(modes.getRequestModes());
 
             var tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
             if (tModes.isEmpty()) {
@@ -238,7 +231,7 @@ public class LegacyRouteRequestMapper {
           if (transitDisabled) {
             transitBuilder.disable();
           } else {
-            transitBuilder.setFilters(List.of(filterRequestBuilder.build()));
+            transitBuilder.withFilters(List.of(filterRequestBuilder.build()));
           }
         }
       });

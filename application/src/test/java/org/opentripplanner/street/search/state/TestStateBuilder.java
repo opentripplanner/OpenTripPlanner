@@ -29,8 +29,7 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
-import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
-import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
+import org.opentripplanner.street.model.vertex.ElevatorVertex;
 import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -210,10 +209,10 @@ public class TestStateBuilder {
   public TestStateBuilder elevator() {
     count++;
 
-    var onboard1 = elevatorOnBoard(count, "1");
-    var onboard2 = elevatorOnBoard(count, "2");
-    var offboard1 = elevatorOffBoard(count, "1");
-    var offboard2 = elevatorOffBoard(count, "2");
+    var onboard1 = elevator(count, "1");
+    var onboard2 = elevator(count, "2");
+    var offboard1 = intersection(count);
+    var offboard2 = intersection(count);
 
     var from = (StreetVertex) currentState.vertex;
     var link = StreetModelForTest.streetEdge(from, offboard1);
@@ -328,7 +327,7 @@ public class TestStateBuilder {
 
   private TestStateBuilder arriveAtStop(RegularStop stop) {
     var from = (StreetVertex) currentState.vertex;
-    var to = TransitStopVertex.of().withStop(stop).build();
+    var to = TransitStopVertex.of().withId(stop.getId()).withPoint(stop.getGeometry()).build();
 
     Edge edge;
     if (currentState.getRequest().arriveBy()) {
@@ -344,20 +343,12 @@ public class TestStateBuilder {
     return this;
   }
 
-  private static ElevatorOffboardVertex elevatorOffBoard(int count, String suffix) {
-    return new ElevatorOffboardVertex(
-      StreetModelForTest.intersectionVertex(count, count),
-      suffix,
-      suffix
-    );
+  private static StreetVertex intersection(int count) {
+    return StreetModelForTest.intersectionVertex(count, count);
   }
 
-  private static ElevatorOnboardVertex elevatorOnBoard(int count, String suffix) {
-    return new ElevatorOnboardVertex(
-      StreetModelForTest.intersectionVertex(count, count),
-      suffix,
-      suffix
-    );
+  private static ElevatorVertex elevator(int count, String suffix) {
+    return new ElevatorVertex(StreetModelForTest.intersectionVertex(count, count), suffix, suffix);
   }
 
   private TestStateBuilder pickUpRentalVehicle(

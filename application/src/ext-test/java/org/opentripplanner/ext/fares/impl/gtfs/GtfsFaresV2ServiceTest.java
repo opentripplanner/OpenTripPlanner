@@ -84,7 +84,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).build();
 
     var result = SERVICE.calculateFares(i1);
-    var startTime = i1.listScheduledTransitLegs().getFirst().startTime();
+    var startTime = i1.listTransitLegs().getFirst().startTime();
     assertEquals(
       Set.of(
         FareOffer.of(startTime, ALL_NETWORKS_DAY_PASS),
@@ -99,7 +99,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
 
     var result = SERVICE.calculateFares(i1);
-    var startTime = i1.listScheduledTransitLegs().getFirst().startTime();
+    var startTime = i1.listTransitLegs().getFirst().startTime();
     assertEquals(
       Set.of(
         FareOffer.of(startTime, ALL_NETWORKS_DAY_PASS),
@@ -114,7 +114,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, expressNetwork).build();
 
     var result = SERVICE.calculateFares(i1);
-    var startTime = i1.listScheduledTransitLegs().getFirst().startTime();
+    var startTime = i1.listTransitLegs().getFirst().startTime();
     assertEquals(
       Set.of(FareOffer.of(startTime, EXPRESS_DAY_PASS)),
       result.offersForLeg(i1.legs().get(1))

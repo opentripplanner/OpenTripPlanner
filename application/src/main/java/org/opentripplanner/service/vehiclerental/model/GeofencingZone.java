@@ -1,6 +1,8 @@
 package org.opentripplanner.service.vehiclerental.model;
 
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -9,6 +11,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public record GeofencingZone(
   FeedScopedId id,
+  @Nullable I18NString name,
   Geometry geometry,
   boolean dropOffBanned,
   boolean traversalBanned

@@ -217,6 +217,7 @@ class FinlandMapper extends OsmTagMapper {
     props.setCarSpeed("highway=living_street", 5.55f);
     // ~= 16 kph
     props.setCarSpeed("highway=track", 4.5f);
+    props.setCarSpeed("highway=pedestrian", 4.5f);
 
     super.populateProperties(props);
   }

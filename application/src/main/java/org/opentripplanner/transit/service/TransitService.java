@@ -146,6 +146,11 @@ public interface TransitService {
   @Nullable
   RegularStop getRegularStop(FeedScopedId id);
 
+  /**
+   * Gets the area stop with the given id and throws an exception if it was not found.
+   */
+  AreaStop getAreaStop(FeedScopedId id);
+
   Collection<StopLocation> listStopLocations();
 
   Collection<GroupStop> listGroupStops();
@@ -156,9 +161,20 @@ public interface TransitService {
    * Return all stops associated with the given id. If a Station, a MultiModalStation, or a
    * GroupOfStations matches the id, then all child stops are returned. If the id matches a regular
    * stop, area stop or stop group, then a list with one item is returned.
-   * An empty list is if nothing is found.
+   * An empty collection is returned if nothing is found.
    */
   Collection<StopLocation> findStopOrChildStops(FeedScopedId id);
+
+  /**
+   * Return all stop ids associated with the given id.
+   * <p>
+   * If a Station, a MultiModalStation, or a GroupOfStations matches the id, then all child stops
+   * are returned. If the id matches a regular stop, area stop or stop group, then a list with one
+   * item is returned.
+   */
+  default List<FeedScopedId> findStopOrChildIds(FeedScopedId id) {
+    return findStopOrChildStops(id).stream().map(StopLocation::getId).distinct().toList();
+  }
 
   Collection<StopLocationsGroup> listStopLocationGroups();
 

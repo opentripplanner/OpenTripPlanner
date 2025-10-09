@@ -160,7 +160,7 @@ public class UnconnectedAreasTest {
   private Graph buildOsmGraph(String osmFileName, DataImportIssueStore issueStore) {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     DefaultOsmProvider provider = new DefaultOsmProvider(RESOURCE_LOADER.file(osmFileName), false);
     OsmModule loader = OsmModule.of(

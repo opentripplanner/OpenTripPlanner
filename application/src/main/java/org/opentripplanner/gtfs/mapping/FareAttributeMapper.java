@@ -38,20 +38,20 @@ class FareAttributeMapper {
     FareAttributeBuilder builder = FareAttribute.of(
       idFactory.createId(rhs.getId(), "fare attribute")
     )
-      .setPrice(price)
-      .setPaymentMethod(rhs.getPaymentMethod());
+      .withPrice(price)
+      .withPaymentMethod(rhs.getPaymentMethod());
 
     if (rhs.getId().getAgencyId() != null && rhs.getAgencyId() != null) {
-      builder.setAgency(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getAgencyId()));
+      builder.withAgency(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getAgencyId()));
     }
     if (rhs.isTransfersSet()) {
-      builder.setTransfers(rhs.getTransfers());
+      builder.withTransfers(rhs.getTransfers());
     }
     if (rhs.isTransferDurationSet()) {
-      builder.setTransferDuration(rhs.getTransferDuration());
+      builder.withTransferDuration(rhs.getTransferDuration());
     }
     if (rhs.isJourneyDurationSet()) {
-      builder.setJourneyDuration(rhs.getJourneyDuration());
+      builder.withJourneyDuration(rhs.getJourneyDuration());
     }
 
     return builder.build();
