@@ -89,6 +89,7 @@ import org.opentripplanner.apis.transmodel.model.plan.legacyvia.ViaSegmentInputT
 import org.opentripplanner.apis.transmodel.model.plan.legacyvia.ViaTripQuery;
 import org.opentripplanner.apis.transmodel.model.plan.legacyvia.ViaTripType;
 import org.opentripplanner.apis.transmodel.model.siri.et.EstimatedCallType;
+import org.opentripplanner.apis.transmodel.model.siri.et.SJEstimatedCallsType;
 import org.opentripplanner.apis.transmodel.model.siri.sx.AffectsType;
 import org.opentripplanner.apis.transmodel.model.siri.sx.PtSituationElementType;
 import org.opentripplanner.apis.transmodel.model.stop.BikeParkType;
@@ -318,6 +319,9 @@ public class TransmodelGraphQLSchemaFactory {
       ptSituationElementType
     );
     GraphQLOutputType empiricalDelay = EmpiricalDelayType.create();
+
+    GraphQLOutputType sjEstimatedCallsType = SJEstimatedCallsType.create();
+
     GraphQLOutputType estimatedCallType = EstimatedCallType.create(
       bookingArrangementType,
       noticeType,
@@ -325,6 +329,7 @@ public class TransmodelGraphQLSchemaFactory {
       destinationDisplayType,
       ptSituationElementType,
       ServiceJourneyType.REF,
+      sjEstimatedCallsType,
       DatedServiceJourneyType.REF,
       empiricalDelay,
       dateTimeScalar

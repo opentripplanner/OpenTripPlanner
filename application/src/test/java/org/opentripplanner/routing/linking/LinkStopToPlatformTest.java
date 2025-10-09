@@ -3,6 +3,7 @@ package org.opentripplanner.routing.linking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 import static org.opentripplanner.routing.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
 
 import java.util.ArrayList;
@@ -114,7 +115,7 @@ public class LinkStopToPlatformTest {
     graph.index();
 
     for (RegularStop s : transitStops) {
-      vertexFactory.transitStop(TransitStopVertex.of().withStop(s));
+      vertexFactory.transitStop(ofStop(s));
     }
 
     return graph;

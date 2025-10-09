@@ -23,6 +23,7 @@ public class FlexAccessEgressRouter {
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
     RouteRequest request,
+    AccessEgressRouter accessEgressRouter,
     TemporaryVerticesContainer verticesContainer,
     OtpServerRequestContext serverContext,
     AdditionalSearchDays searchDays,
@@ -35,7 +36,7 @@ public class FlexAccessEgressRouter {
     TransitService transitService = serverContext.transitService();
 
     Collection<NearbyStop> accessStops = accessOrEgress.isAccess()
-      ? AccessEgressRouter.findAccessEgresses(
+      ? accessEgressRouter.findAccessEgresses(
         request,
         verticesContainer,
         new StreetRequest(StreetMode.WALK),
@@ -47,7 +48,7 @@ public class FlexAccessEgressRouter {
       : List.of();
 
     Collection<NearbyStop> egressStops = accessOrEgress.isEgress()
-      ? AccessEgressRouter.findAccessEgresses(
+      ? accessEgressRouter.findAccessEgresses(
         request,
         verticesContainer,
         new StreetRequest(StreetMode.WALK),

@@ -196,6 +196,7 @@ public class BarrierRoutingTest {
     var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+      id -> null,
       ZoneIds.BERLIN,
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
