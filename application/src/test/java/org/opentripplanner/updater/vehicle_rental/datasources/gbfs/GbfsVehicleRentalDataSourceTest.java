@@ -11,8 +11,12 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicle
 
 class GbfsVehicleRentalDataSourceTest {
 
+  /**
+   * Test that a network or HTTP error during setup is correctly rethrown as an
+   * {@link UpdaterConstructionException}, which leds OTP to start up anyway rather than shutting down completely.
+   */
   @Test
-  void test() {
+  void rethrowCorrectExceptionDuringSetup() {
     var p = new GbfsVehicleRentalDataSourceParameters(
       "http://localhost:8080/gbfs.json",
       "en",
