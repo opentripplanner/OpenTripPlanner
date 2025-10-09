@@ -5,6 +5,18 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 ## 2.9.0-SNAPSHOT (in progress)
 
+- Debug client UI upgrades and fixes [#6832](https://github.com/opentripplanner/OpenTripPlanner/pull/6832)
+- Experimental GBFS 3.0 support [#6735](https://github.com/opentripplanner/OpenTripPlanner/pull/6735)
+- Fix NPE in old deprecated via search (Transmodel API) [#6878](https://github.com/opentripplanner/OpenTripPlanner/pull/6878)
+- Align service id handling of GTFS-RT NEW with SIRI extra calls [#6894](https://github.com/opentripplanner/OpenTripPlanner/pull/6894)
+- Simplify handling for turns [#6779](https://github.com/opentripplanner/OpenTripPlanner/pull/6779)
+- Move deduplicator out of Graph and into Dagger [#6892](https://github.com/opentripplanner/OpenTripPlanner/pull/6892)
+- Show GBFS Geofencing zones in debug UI [#6876](https://github.com/opentripplanner/OpenTripPlanner/pull/6876)
+- Add OTP Badge to ServerInfo [#6865](https://github.com/opentripplanner/OpenTripPlanner/pull/6865)
+- Apply correct traversal permissions to indoor tagged entities [#6923](https://github.com/opentripplanner/OpenTripPlanner/pull/6923)
+- Multiplicative stairs and turn reluctance [#6783](https://github.com/opentripplanner/OpenTripPlanner/pull/6783)
+- Update contribution guidelines [#6869](https://github.com/opentripplanner/OpenTripPlanner/pull/6869)
+- Add estimated calls on same service and day in Transmodel API [#6930](https://github.com/opentripplanner/OpenTripPlanner/pull/6930)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)

@@ -3,6 +3,7 @@ package org.opentripplanner.routing.linking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 import static org.opentripplanner.routing.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
 
 import java.util.ArrayList;
@@ -16,7 +17,6 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;
@@ -48,7 +48,7 @@ public class LinkStopToPlatformTest {
   private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    Graph graph = new Graph(deduplicator);
+    Graph graph = new Graph();
     var vertexFactory = new VertexFactory(graph);
 
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
@@ -115,7 +115,7 @@ public class LinkStopToPlatformTest {
     graph.index();
 
     for (RegularStop s : transitStops) {
-      vertexFactory.transitStop(TransitStopVertex.of().withStop(s));
+      vertexFactory.transitStop(ofStop(s));
     }
 
     return graph;
@@ -249,7 +249,7 @@ public class LinkStopToPlatformTest {
 
     var vertexFactory = new VertexFactory(graph);
     var v = vertexFactory.intersection("boardingLocation", 10.00000001, 60.00000001);
-    TestVertexLinker.of(graph).addPermanentAreaVertex(v, ag);
+    VertexLinkerTestFactory.of(graph).addPermanentAreaVertex(v, ag);
 
     // vertex links to the single visibility point with 2 edges
     assertEquals(10, graph.getEdges().size());

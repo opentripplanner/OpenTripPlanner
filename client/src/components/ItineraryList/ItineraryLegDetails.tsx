@@ -13,7 +13,7 @@ import { Leg } from '../../static/query/tripQueryTypes';
  */
 function legName(leg: Leg): string {
   if (leg.line?.publicCode) {
-    return leg.line.publicCode + ' ' + leg.toEstimatedCall?.destinationDisplay?.frontText;
+    return leg.line.publicCode + ' ' + leg.fromEstimatedCall?.destinationDisplay?.frontText;
   } else {
     return leg.line?.name || 'unknown';
   }

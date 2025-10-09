@@ -52,8 +52,8 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
 
   @Override
   public Optional<VertexVisualAttributes> renderVertex(Vertex v) {
-    if (v instanceof TransitStopVertex) {
-      var accessibility = ((TransitStopVertex) v).getStop().getWheelchairAccessibility();
+    if (v instanceof TransitStopVertex tsv) {
+      var accessibility = tsv.getWheelchairAccessibility();
       var color =
         switch (accessibility) {
           case NO_INFORMATION -> NO_WHEELCHAIR_INFORMATION_COLOR;

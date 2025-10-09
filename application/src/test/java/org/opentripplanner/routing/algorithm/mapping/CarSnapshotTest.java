@@ -71,7 +71,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
       .withTo(p2)
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 
   @DisplayName("Direct CAR_PICKUP (with walking both ends)")
@@ -118,6 +118,6 @@ public class CarSnapshotTest extends SnapshotTestBase {
       .withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)))
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 }

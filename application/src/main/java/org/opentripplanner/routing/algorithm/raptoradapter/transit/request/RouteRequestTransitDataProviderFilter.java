@@ -3,8 +3,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
@@ -14,6 +15,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
@@ -76,11 +78,6 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     this.hasSubModeFilters = filters.stream().anyMatch(TransitFilter::isSubModePredicate);
   }
 
-  @Override
-  public boolean hasSubModeFilters() {
-    return hasSubModeFilters;
-  }
-
   public static BikeAccess bikeAccessForTrip(Trip trip) {
     if (trip.getBikesAllowed() != BikeAccess.UNKNOWN) {
       return trip.getBikesAllowed();
@@ -90,17 +87,18 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
   }
 
   @Override
-  public boolean tripPatternPredicate(TripPatternForDate tripPatternForDate) {
+  @Nullable
+  public Predicate<TripTimes> createTripFilter(TripPattern tripPattern) {
     for (TransitFilter filter : filters) {
-      if (filter.matchTripPattern(tripPatternForDate.getTripPattern().getPattern())) {
-        return true;
+      if (filter.matchTripPattern(tripPattern)) {
+        var applyTripTimesFilters = hasSubModeFilters && tripPattern.getContainsMultipleModes();
+        return tripTimes -> tripTimesPredicate(tripTimes, applyTripTimesFilters);
       }
     }
-    return false;
+    return null;
   }
 
-  @Override
-  public boolean tripTimesPredicate(TripTimes tripTimes, boolean withFilters) {
+  private boolean tripTimesPredicate(TripTimes tripTimes, boolean applyTripTimesFilters) {
     final Trip trip = tripTimes.getTrip();
 
     if (requireBikesAllowed && bikeAccessForTrip(trip) != BikeAccess.ALLOWED) {
@@ -139,7 +137,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     // Trip has to match with at least one predicate in order to be included in search. We only have
     // to this if we have mode specific filters, and not all trips on the pattern have the same
     // mode, since that's the only thing that is trip specific
-    if (withFilters) {
+    if (applyTripTimesFilters) {
       for (TransitFilter f : filters) {
         if (f.matchTripTimes(tripTimes)) {
           return true;

@@ -5,7 +5,7 @@
   ],
   "prConcurrentLimit": 3,
   "labels": [
-    "skip changelog"
+    "+Skip Changelog"
   ],
   "rebaseWhen": "conflicted",
   "enabledManagers": [
@@ -77,7 +77,8 @@
         "org.apache.maven.plugins:maven-compiler-plugin",
         "org.apache.maven.plugins:maven-jar-plugin",
         "org.sonatype.plugins:nexus-staging-maven-plugin",
-        "com.diffplug.spotless:spotless-maven-plugin"
+        "com.diffplug.spotless:spotless-maven-plugin",
+        "org.sonatype.central:central-publishing-maven-plugin"
       ],
       "schedule": "on the 23rd day of the month",
       "automerge": true
@@ -176,7 +177,7 @@
       ],
       "minimumReleaseAge": "1 week",
       "changelogUrl": "https://github.com/apache/httpcomponents-client/blob/master/RELEASE_NOTES.txt",
-      "addLabels": ["Integration Test"]
+      "addLabels": ["+Integration Test"]
     },
     {
       "groupName": "Jackson non-patch",
@@ -193,7 +194,7 @@
         "org.geotools:{/,}**"
       ],
       "minimumReleaseAge": "1 week",
-      "labels": ["skip changelog", "bump serialization id"]
+      "labels": ["+Skip Changelog", "+Bump Serialization Id"]
     },
     {
       "groupName": "Azure dependencies",
@@ -203,6 +204,14 @@
       "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 14th day of the month",
       "reviewers": ["habrahamsson-skanetrafiken", "svedbod"]
+    },
+    {
+      "groupName": "Hive MQTT client",
+      "matchPackageNames": [
+        "com.hivemq:hivemq-mqtt-client"
+      ],
+      "schedule": "on the 25th day of the month",
+      "reviewers": ["optionsome", "jessicaKoehnke"]
     }
   ],
   "timezone": "Europe/Berlin"

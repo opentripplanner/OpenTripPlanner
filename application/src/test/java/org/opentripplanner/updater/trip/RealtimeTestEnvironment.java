@@ -36,8 +36,8 @@ import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
  */
 public final class RealtimeTestEnvironment {
 
-  public final TimetableRepository timetableRepository;
-  public final TimetableSnapshotManager snapshotManager;
+  private final TimetableRepository timetableRepository;
+  private final TimetableSnapshotManager snapshotManager;
   private final SiriRealTimeTripUpdateAdapter siriAdapter;
   private final GtfsRealTimeTripUpdateAdapter gtfsAdapter;
   private final DateTimeHelper dateTimeHelper;

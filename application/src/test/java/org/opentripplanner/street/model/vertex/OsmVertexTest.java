@@ -3,18 +3,16 @@ package org.opentripplanner.street.model.vertex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class OsmVertexTest {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
-
-  private static final AreaStop AREA_STOP1 = TEST_MODEL.areaStop("flex-zone-1").build();
-  private static final AreaStop AREA_STOP2 = TEST_MODEL.areaStop("flex-zone-2").build();
+  private static final FeedScopedId AREA_STOP1 = id("flex-zone-1");
+  private static final FeedScopedId AREA_STOP2 = id("flex-zone-2");
 
   @Test
   void areaStops() {

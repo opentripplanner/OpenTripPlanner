@@ -99,12 +99,9 @@ public class FrequencyEntryTest {
   }
 
   private static FrequencyEntry make(int startTime, int endTime, int headwaySecs, boolean exact) {
-    Frequency f = new Frequency();
-    f.setStartTime(startTime);
-    f.setEndTime(endTime);
-    f.setHeadwaySecs(headwaySecs);
-    f.setExactTimes(exact ? 1 : 0);
-
-    return new FrequencyEntry(f, tripTimes);
+    return new FrequencyEntry(
+      new Frequency(tripTimes.getTrip(), startTime, endTime, headwaySecs, exact),
+      tripTimes
+    );
   }
 }
