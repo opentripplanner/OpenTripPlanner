@@ -147,7 +147,9 @@ public interface OtpServerRequestContext {
   /* Sandbox modules */
 
   @Nullable
-<<<<<<< HEAD
+  CarpoolingService carpoolingService();
+
+  @Nullable
   default List<ExtensionRequestContext> listExtensionRequestContexts(RouteRequest request) {
     var list = new ArrayList<ExtensionRequestContext>();
     if (OTPFeature.DataOverlay.isOn()) {
@@ -159,18 +161,6 @@ public interface OtpServerRequestContext {
       );
     }
     return list;
-=======
-  CarpoolingService carpoolingService();
-
-  @Nullable
-  default DataOverlayContext dataOverlayContext(RouteRequest request) {
-    return OTPFeature.DataOverlay.isOnElseNull(() ->
-      new DataOverlayContext(
-        graph().dataOverlayParameterBindings,
-        request.preferences().system().dataOverlay()
-      )
-    );
->>>>>>> 5bec82e6a3 (feat: carpooling skeleton)
   }
 
   @Nullable

@@ -118,7 +118,7 @@ public class CarpoolSiriMapper {
       .withEndTime(endTime)
       .withProvider(provider)
       .withDeviationBudget(deviationBudget)
-      .withAvailableSeats(1) // Default value, could be enhanced if data available
+      .withAvailableSeats(2) // Default value, could be enhanced if data available
       .withStops(stops)
       .build();
   }
@@ -179,13 +179,13 @@ public class CarpoolSiriMapper {
       float maxCarSpeed = streetLimitationParametersService.getMaxCarSpeed();
 
       var streetSearch = StreetSearchBuilder.of()
-        .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
-        .setSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(MAX_ROUTE_DURATION))
-        .setDominanceFunction(new DominanceFunctions.MinimumWeight())
-        .setRequest(request)
-        .setStreetRequest(streetRequest)
-        .setFrom(from)
-        .setTo(to);
+        .withHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
+        .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(MAX_ROUTE_DURATION))
+        .withDominanceFunction(new DominanceFunctions.MinimumWeight())
+        .withRequest(request)
+        .withStreetRequest(streetRequest)
+        .withFrom(from)
+        .withTo(to);
 
       List<GraphPath<State, Edge, Vertex>> paths = streetSearch.getPathsToTarget();
 
@@ -338,7 +338,9 @@ public class CarpoolSiriMapper {
     // Validate intermediate calls are between first and last
     for (int i = 1; i < calls.size() - 1; i++) {
       EstimatedCall intermediateCall = calls.get(i);
-      ZonedDateTime intermediateTime = intermediateCall.getAimedDepartureTime() != null ? intermediateCall.getAimedDepartureTime() : intermediateCall.getAimedArrivalTime();
+      ZonedDateTime intermediateTime = intermediateCall.getAimedDepartureTime() != null
+        ? intermediateCall.getAimedDepartureTime()
+        : intermediateCall.getAimedArrivalTime();
 
       if (intermediateTime == null) {
         LOG.warn("Intermediate call at index {} has no timing information", i);
