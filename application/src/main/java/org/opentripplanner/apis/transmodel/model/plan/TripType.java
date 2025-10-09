@@ -31,7 +31,7 @@ public class TripType {
           .name("dateTime")
           .description("The time and date of travel")
           .type(dateTimeScalar)
-          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.date.toEpochMilli())
+          .dataFetcher(env -> env.<PlanResponse>getSource().date().toEpochMilli())
           .build()
       )
       .field(
@@ -39,7 +39,7 @@ public class TripType {
           .name("metadata")
           .description("The trip request metadata.")
           .type(tripMetadataType)
-          .dataFetcher(env -> ((PlanResponse) env.getSource()).metadata)
+          .dataFetcher(env -> env.<PlanResponse>getSource().metadata())
           .build()
       )
       .field(
@@ -47,7 +47,7 @@ public class TripType {
           .name("fromPlace")
           .description("The origin")
           .type(new GraphQLNonNull(placeType))
-          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.from)
+          .dataFetcher(env -> env.<PlanResponse>getSource().from())
           .build()
       )
       .field(
@@ -55,7 +55,7 @@ public class TripType {
           .name("toPlace")
           .description("The destination")
           .type(new GraphQLNonNull(placeType))
-          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.to)
+          .dataFetcher(env -> env.<PlanResponse>getSource().to())
           .build()
       )
       .field(
@@ -63,7 +63,7 @@ public class TripType {
           .name("tripPatterns")
           .description("A list of possible trip patterns")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(tripPatternType))))
-          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.itineraries)
+          .dataFetcher(env -> env.<PlanResponse>getSource().itineraries())
           .build()
       )
       .field(
@@ -73,7 +73,10 @@ public class TripType {
           .deprecate("Use routingErrors instead")
           .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
           .dataFetcher(env ->
-            ((PlanResponse) env.getSource()).messages.stream()
+            env
+              .<PlanResponse>getSource()
+              .messages()
+              .stream()
               .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
               .map(Enum::name)
               .collect(Collectors.toList())
@@ -90,7 +93,10 @@ public class TripType {
             GraphQLArgument.newArgument().name("language").type(Scalars.GraphQLString).build()
           )
           .dataFetcher(env ->
-            ((PlanResponse) env.getSource()).messages.stream()
+            env
+              .<PlanResponse>getSource()
+              .messages()
+              .stream()
               .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
               .map(message -> message.get(GraphQLUtils.getLocale(env)))
               .collect(Collectors.toList())
@@ -102,7 +108,7 @@ public class TripType {
           .name("routingErrors")
           .description("A list of routing errors, and fields which caused them")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(routingErrorType))))
-          .dataFetcher(env -> ((PlanResponse) env.getSource()).messages)
+          .dataFetcher(env -> env.<PlanResponse>getSource().messages())
           .build()
       )
       .field(
@@ -122,7 +128,7 @@ public class TripType {
                 .build()
             )
           )
-          .dataFetcher(env -> ((PlanResponse) env.getSource()).debugOutput)
+          .dataFetcher(env -> env.<PlanResponse>getSource().debugOutput())
           .build()
       )
       .field(
@@ -136,7 +142,7 @@ public class TripType {
           )
           .type(Scalars.GraphQLString)
           .dataFetcher(env -> {
-            final PageCursor pageCursor = ((PlanResponse) env.getSource()).previousPageCursor;
+            final PageCursor pageCursor = env.<PlanResponse>getSource().previousPageCursor();
             return pageCursor != null ? pageCursor.encode() : null;
           })
           .build()
@@ -152,7 +158,7 @@ public class TripType {
           )
           .type(Scalars.GraphQLString)
           .dataFetcher(env -> {
-            final PageCursor pageCursor = ((PlanResponse) env.getSource()).nextPageCursor;
+            final PageCursor pageCursor = env.<PlanResponse>getSource().nextPageCursor();
             return pageCursor != null ? pageCursor.encode() : null;
           })
           .build()
