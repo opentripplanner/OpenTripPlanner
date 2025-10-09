@@ -84,7 +84,7 @@ jobs:
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         env:
           MAVEN_OPTS: "-Dmaven.repo.local=/home/lenni/.m2/repository/"
-        run: mvn -DskipTests --batch-mode install -P prettierSkip
+        run: mvn -DskipTests --batch-mode install -P prettierSkip,checkstyleSkip
 
       - name: Build graph
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'

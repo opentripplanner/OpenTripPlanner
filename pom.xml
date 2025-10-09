@@ -84,6 +84,7 @@
              When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
         -->
         <argLine/>
+        <plugin.checkstyle.skip>false</plugin.checkstyle.skip>
         <plugin.prettier.version>0.22</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
         <plugin.prettier.skip>false</plugin.prettier.skip>
@@ -296,6 +297,7 @@
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
                     <linkXRef>false</linkXRef>
+                    <skip>${plugin.checkstyle.skip}</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -513,6 +515,23 @@
     </dependencyManagement>
 
     <profiles>
+        <profile>
+            <id>checkstyleSkip</id>
+            <activation>
+                <property>
+                    <!--
+                      This works as a short alias to enable this from the command line. To skip
+                      prettier, set the 'ps' system property with the '-D cs' parameter:
+                      # mvn test -D cs
+                    -->
+                    <name>cs</name>
+                    <value/>
+                </property>
+            </activation>
+            <properties>
+                <plugin.checkstyle.skip>true</plugin.checkstyle.skip>
+            </properties>
+        </profile>
         <profile>
             <id>prettierCheck</id>
             <properties>

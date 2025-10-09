@@ -14,6 +14,29 @@ Maven; it takes a bit of time, but it reformats the entire codebase. Only code y
 should be formatted, since the existing code is already formatted. The second way is to set up
 Prettier and run it manually or hick it into your IDE, so it runs every time a file is changed.
 
+### How to Run Checkstyle with Maven
+
+Checkstyle will check for code style issues in the Maven "validate" phase, which runs before the
+test, package, and install phases. So checkstyle will happen for example when you run:
+
+```shell
+% mvn test
+```
+
+You can manually run _only_ the checkstyle with:
+
+```shell
+% mvn checkstyle:check
+```
+
+To skip Checkstyle, use the profile `checkstyleSkip`:
+
+```shell
+% mvn test -P checkstyleSkip
+```
+
+The check is run by the CI server and will fail the build if the code has code style issues.
+
 ### How to Run Prettier with Maven
 
 Prettier will automatically format all code in the Maven "validate" phase, which runs before the
