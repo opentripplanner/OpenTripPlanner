@@ -35,6 +35,15 @@ To skip Checkstyle, use the profile `checkstyleSkip`:
 % mvn test -P checkstyleSkip
 ```
 
+Openrewrite can be used to fix some of the checkstyle issues automatically. The following command
+run Openrewrite and Prettier (but not checkstyle as there is some execution order problem
+otherwise):
+
+```shell
+% mvn rewrite:run prettier:write -P rewrite
+```
+
+
 The check is run by the CI server and will fail the build if the code has code style issues.
 
 ### How to Run Prettier with Maven

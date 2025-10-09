@@ -88,6 +88,7 @@
         <plugin.prettier.version>0.22</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
         <plugin.prettier.skip>false</plugin.prettier.skip>
+        <plugin.rewrite.skip>true</plugin.rewrite.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
         <tests.excludedGroups>integration</tests.excludedGroups>
         <tests.includedGroups></tests.includedGroups>
@@ -287,7 +288,37 @@
                     </includeOnlyProperties>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.openrewrite.maven</groupId>
+                <artifactId>rewrite-maven-plugin</artifactId>
+                <version>6.18.0</version>
+                <configuration>
+                    <exportDatatables>true</exportDatatables>
+                    <activeRecipes>
+                        <recipe>org.opentripplanner.CodeStyle</recipe>
+                    </activeRecipes>
+                    <exclusions>**/package-info-template.java</exclusions>
+                    <runPerSubmodule>true</runPerSubmodule>
+                    <sizeThresholdMb>0</sizeThresholdMb>
+                    <configLocation>${maven.multiModuleProjectDirectory}/openrewrite.yml</configLocation>
+                    <rewriteSkip>${plugin.rewrite.skip}</rewriteSkip>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.openrewrite.recipe</groupId>
+                        <artifactId>rewrite-static-analysis</artifactId>
+                        <version>2.18.0</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -554,6 +585,24 @@
             </activation>
             <properties>
                 <plugin.prettier.skip>true</plugin.prettier.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>rewrite</id>
+            <activation>
+                <property>
+                    <!--
+                      This works as a short alias to enable this from the command line. To skip
+                      rewrite, set the 'rw' system property with the '-D rw' parameter:
+                      # mvn test -D rw
+                    -->
+                    <name>rw</name>
+                    <value/>
+                </property>
+            </activation>
+            <properties>
+                <plugin.rewrite.skip>false</plugin.rewrite.skip>
+                <plugin.checkstyle.skip>true</plugin.checkstyle.skip>
             </properties>
         </profile>
         <profile>
