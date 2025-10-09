@@ -94,7 +94,7 @@ class ElevatorProcessor {
           onboardVertices,
           sourceVertex,
           sourceVertex.getLabelString(),
-          level.getName()
+          level.name()
         );
       }
       long travelTime = node

@@ -552,10 +552,7 @@ public class OsmModule implements GraphBuilderModule {
 
   private void setEntityName(OsmEntity entity) {
     if (!entity.hasTag("name")) {
-      I18NString creativeName = entity
-        .getOsmProvider()
-        .getWayPropertySet()
-        .getCreativeNameForEntity(entity);
+      I18NString creativeName = entity.getOsmProvider().getWayPropertySet().getCreativeName(entity);
       if (creativeName != null) {
         entity.setCreativeName(creativeName);
       }

@@ -11,7 +11,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
-import org.opentripplanner.osm._data.OsmEntityForTest;
+import org.opentripplanner.osm.OsmEntityForTest;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;

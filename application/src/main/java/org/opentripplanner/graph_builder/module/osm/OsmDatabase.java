@@ -221,7 +221,7 @@ public class OsmDatabase {
    */
   public Set<OsmLevel> getLevelSetForEntity(OsmEntity entity) {
     if (entityLevels.containsKey(entity)) {
-      return new HashSet<>(entityLevels.get(entity));
+      return Set.copyOf(entityLevels.get(entity));
     } else {
       return Set.of(OsmLevelFactory.DEFAULT);
     }

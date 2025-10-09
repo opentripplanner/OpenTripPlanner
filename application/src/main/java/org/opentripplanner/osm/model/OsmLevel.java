@@ -40,14 +40,14 @@ public class OsmLevel implements Comparable<OsmLevel> {
    * See https://wiki.openstreetmap.org/wiki/Key:level
    * and https://wiki.openstreetmap.org/wiki/Key:layer.
    */
-  public double getLevel() {
+  public double level() {
     return this.level;
   }
 
   /**
    * See https://wiki.openstreetmap.org/wiki/Key:level:ref.
    */
-  public String getName() {
+  public String name() {
     return this.name;
   }
 

@@ -8,7 +8,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.osm._data.OsmEntityForTest;
+import org.opentripplanner.osm.OsmEntityForTest;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;

@@ -194,7 +194,7 @@ public class WayPropertySet {
     return result;
   }
 
-  public I18NString getCreativeNameForEntity(OsmEntity entity) {
+  public I18NString getCreativeName(OsmEntity entity) {
     CreativeNamer bestNamer = null;
     int bestScore = 0;
     for (CreativeNamerPicker picker : creativeNamers) {

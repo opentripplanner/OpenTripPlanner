@@ -16,7 +16,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.osm._data.OsmEntityForTest;
+import org.opentripplanner.osm.OsmEntityForTest;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
@@ -348,18 +348,18 @@ class OsmTagMapperTest {
   void corridorName() {
     final WayPropertySet wps = wayProperySet();
     var way = way("highway", "corridor");
-    assertEquals("corridor", wps.getCreativeNameForEntity(way).toString());
-    assertEquals("Korridor", wps.getCreativeNameForEntity(way).toString(Locale.GERMANY));
-    assertEquals("käytävä", wps.getCreativeNameForEntity(way).toString(FI));
+    assertEquals("corridor", wps.getCreativeName(way).toString());
+    assertEquals("Korridor", wps.getCreativeName(way).toString(Locale.GERMANY));
+    assertEquals("käytävä", wps.getCreativeName(way).toString(FI));
   }
 
   @Test
   void indoorAreaName() {
     var wps = wayProperySet();
     var way = way("indoor", "area");
-    assertEquals("indoor area", wps.getCreativeNameForEntity(way).toString());
-    assertEquals("Innenbereich", wps.getCreativeNameForEntity(way).toString(Locale.GERMANY));
-    assertEquals("sisätila", wps.getCreativeNameForEntity(way).toString(FI));
+    assertEquals("indoor area", wps.getCreativeName(way).toString());
+    assertEquals("Innenbereich", wps.getCreativeName(way).toString(Locale.GERMANY));
+    assertEquals("sisätila", wps.getCreativeName(way).toString(FI));
   }
 
   public OsmEntity way(String key, String value) {
