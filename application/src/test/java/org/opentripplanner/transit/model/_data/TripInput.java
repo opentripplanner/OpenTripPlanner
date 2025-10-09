@@ -21,9 +21,9 @@ import org.opentripplanner.utils.time.TimeUtils;
 public record TripInput(
   String id,
   List<StopCall> stops,
-  //
+  // Null means that the default route will be used
   @Nullable Route route,
-  // Null means that a default service date will be used
+  // Null means that the default service date will be used
   @Nullable List<LocalDate> serviceDates,
   @Nullable I18NString headsign,
   @Nullable String tripOnServiceDateId
