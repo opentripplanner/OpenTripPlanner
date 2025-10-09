@@ -1,6 +1,5 @@
 package org.opentripplanner.service.vehiclerental.model;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.Set;
@@ -30,9 +29,6 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
   private final VehicleRentalStationUris rentalUris;
   private final boolean isReserved;
   private final boolean isDisabled;
-  private final Instant lastReported;
-  private final VehicleRentalStation station;
-  private final String pricingPlanId;
   private final RentalVehicleFuel fuel;
   private final OffsetDateTime availableUntil;
 
@@ -46,9 +42,6 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
     this.rentalUris = null;
     this.isReserved = false;
     this.isDisabled = false;
-    this.lastReported = null;
-    this.station = null;
-    this.pricingPlanId = null;
     this.fuel = null;
     this.availableUntil = null;
   }
@@ -63,9 +56,6 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
     this.rentalUris = builder.rentalUris;
     this.isReserved = builder.isReserved;
     this.isDisabled = builder.isDisabled;
-    this.lastReported = builder.lastReported;
-    this.station = builder.station;
-    this.pricingPlanId = builder.pricingPlanId;
     this.fuel = builder.fuel;
     this.availableUntil = builder.availableUntil;
   }
@@ -119,28 +109,8 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
   }
 
   @Nullable
-  public Instant lastReported() {
-    return lastReported;
-  }
-
-  @Nullable
-  public VehicleRentalStation station() {
-    return station;
-  }
-
-  @Nullable
-  public String pricingPlanId() {
-    return pricingPlanId;
-  }
-
-  @Nullable
   public RentalVehicleFuel fuel() {
     return fuel;
-  }
-
-  @Nullable
-  public OffsetDateTime availableUntil() {
-    return availableUntil;
   }
 
   @Override
@@ -230,7 +200,7 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
     return fuel;
   }
 
-  public OffsetDateTime getAvailableUntil() {
+  public OffsetDateTime availableUntil() {
     return availableUntil;
   }
 
@@ -249,9 +219,6 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
       Objects.equals(system, that.system) &&
       Objects.equals(vehicleType, that.vehicleType) &&
       Objects.equals(rentalUris, that.rentalUris) &&
-      Objects.equals(lastReported, that.lastReported) &&
-      Objects.equals(station, that.station) &&
-      Objects.equals(pricingPlanId, that.pricingPlanId) &&
       Objects.equals(fuel, that.fuel) &&
       Objects.equals(availableUntil, that.availableUntil)
     );
@@ -269,9 +236,6 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
       rentalUris,
       isReserved,
       isDisabled,
-      lastReported,
-      station,
-      pricingPlanId,
       fuel,
       availableUntil
     );
@@ -289,9 +253,6 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
       .addObj("rentalUris", rentalUris, DEFAULT.rentalUris)
       .addBoolIfTrue("isReserved", isReserved)
       .addBoolIfTrue("isDisabled", isDisabled)
-      .addObj("lastReported", lastReported, DEFAULT.lastReported)
-      .addObj("station", station, DEFAULT.station)
-      .addStr("pricingPlanId", pricingPlanId, DEFAULT.pricingPlanId)
       .addObj("fuel", fuel, DEFAULT.fuel)
       .addObj("availableUntil", availableUntil, DEFAULT.availableUntil)
       .toString();
@@ -309,9 +270,6 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
     private VehicleRentalStationUris rentalUris;
     private boolean isReserved;
     private boolean isDisabled;
-    private Instant lastReported;
-    private VehicleRentalStation station;
-    private String pricingPlanId;
     private RentalVehicleFuel fuel;
     private OffsetDateTime availableUntil;
 
@@ -326,9 +284,6 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
       this.rentalUris = original.rentalUris;
       this.isReserved = original.isReserved;
       this.isDisabled = original.isDisabled;
-      this.lastReported = original.lastReported;
-      this.station = original.station;
-      this.pricingPlanId = original.pricingPlanId;
       this.fuel = original.fuel;
       this.availableUntil = original.availableUntil;
     }
@@ -375,21 +330,6 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
 
     public Builder withIsDisabled(boolean isDisabled) {
       this.isDisabled = isDisabled;
-      return this;
-    }
-
-    public Builder withLastReported(@Nullable Instant lastReported) {
-      this.lastReported = lastReported;
-      return this;
-    }
-
-    public Builder withStation(@Nullable VehicleRentalStation station) {
-      this.station = station;
-      return this;
-    }
-
-    public Builder withPricingPlanId(@Nullable String pricingPlanId) {
-      this.pricingPlanId = pricingPlanId;
       return this;
     }
 

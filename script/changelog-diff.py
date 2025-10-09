@@ -1,16 +1,25 @@
 #!/usr/bin/env python3
 
 import subprocess
+
 import sys
 
-if len(sys.argv) != 3:
-    print("Expected arguments: <git-ref-A> <git-ref-B>", file=sys.stderr)
+args_len = len(sys.argv)
+
+if (args_len < 3 or args_len > 4):
+    print("Expected arguments: <git-ref-A> <git-ref-B> [title]", file=sys.stderr)
+    print("  - git-ref-A/B : Git tag, branch or commit hash to identify the commit to use.", file=sys.stderr)
+    print("  - title : An optional title to use, default is 'Changelog'.", file=sys.stderr)
     exit(1)
 
-v1 = sys.argv[1]
-v2 = sys.argv[2]
+refA = sys.argv[1]
+refB = sys.argv[2]
+title = "Changelog"
 
-cmd_args = ['git', 'diff', v1, v2, '--no-ext-diff', '-U0', '-a',  '--no-prefix',  '--',  'doc/user/Changelog.md']
+if args_len > 3:
+    title = f"{sys.argv[3]}"
+
+cmd_args = ['git', 'diff', refA, refB, '--no-ext-diff', '-U0', '-a', '--no-prefix', '--', 'doc/user/Changelog.md']
 p = subprocess.run(args=cmd_args, capture_output=True, text=True, timeout=20)
 
 if p.returncode:
@@ -19,7 +28,7 @@ if p.returncode:
     exit(p.returncode)
 
 changes = p.stdout
-print(f"\n## Changelog {v1} vs {v2} \n")
+print(f"\n## {title} _{refA}_ vs _{refB}_\n")
 added = []
 removed = []
 

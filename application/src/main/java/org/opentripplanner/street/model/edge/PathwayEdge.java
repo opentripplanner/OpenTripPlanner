@@ -190,11 +190,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     }
   }
 
-  @Override
-  public int getDistanceIndependentTime() {
-    return traversalTime;
-  }
-
   public int getSteps() {
     return steps;
   }

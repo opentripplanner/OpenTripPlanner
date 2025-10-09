@@ -175,10 +175,10 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       var debugLogger = new SystemErrDebugLogger(true, false);
 
       debug
-        .addStops(raptorDebugging.stops())
-        .setPath(raptorDebugging.path())
-        .debugPathFromStopIndex(raptorDebugging.debugPathFromStopIndex())
-        .logger(debugLogger);
+        .withStops(raptorDebugging.stops())
+        .withPath(raptorDebugging.path())
+        .withDebugPathFromStopIndex(raptorDebugging.debugPathFromStopIndex())
+        .withLogger(debugLogger);
 
       for (var type : raptorDebugging.eventTypes()) {
         addLogListenerForEachEventTypeRequested(debug, type, debugLogger);
@@ -296,9 +296,9 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     SystemErrDebugLogger logger
   ) {
     switch (type) {
-      case STOP_ARRIVALS -> target.stopArrivalListener(logger::stopArrivalLister);
-      case PATTERN_RIDES -> target.patternRideDebugListener(logger::patternRideLister);
-      case DESTINATION_ARRIVALS -> target.pathFilteringListener(logger::pathFilteringListener);
+      case STOP_ARRIVALS -> target.withStopArrivalListener(logger::stopArrivalLister);
+      case PATTERN_RIDES -> target.withPatternRideDebugListener(logger::patternRideLister);
+      case DESTINATION_ARRIVALS -> target.withPathFilteringListener(logger::pathFilteringListener);
     }
   }
 }

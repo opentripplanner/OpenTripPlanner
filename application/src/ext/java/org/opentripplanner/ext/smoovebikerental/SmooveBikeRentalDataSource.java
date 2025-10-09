@@ -2,6 +2,7 @@ package org.opentripplanner.ext.smoovebikerental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -48,9 +49,7 @@ public class SmooveBikeRentalDataSource
     overloadingAllowed = config.overloadingAllowed();
     system = VehicleRentalSystem.of()
       .withSystemId(networkName)
-      .withLanguage("fi")
-      .withName("Helsinki/Espoo")
-      .withTimezone("Europe/Helsinki")
+      .withName(I18NString.of("Helsinki/Espoo"))
       .build();
   }
 

@@ -1,8 +1,8 @@
 package org.opentripplanner.service.vehiclerental.model;
 
 import static java.util.Locale.ROOT;
+import static org.opentripplanner.service.vehiclerental.model.ReturnPolicy.ANY_TYPE;
 
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -28,20 +27,11 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   // GBFS Static information
   private final FeedScopedId id;
   private final I18NString name;
-  private final String shortName;
   private final double longitude;
   private final double latitude;
-  private final String address;
-  private final String crossStreet;
-  private final String regionId;
-  private final String postCode;
-  private final Set<String> rentalMethods;
-  private final boolean isVirtualStation;
-  private final Geometry stationArea;
   private final Integer capacity;
   private final Map<RentalVehicleType, Integer> vehicleTypeAreaCapacity;
   private final Map<RentalVehicleType, Integer> vehicleTypeDockCapacity;
-  private final boolean isValetStation;
   private final VehicleRentalSystem system;
   private final VehicleRentalStationUris rentalUris;
 
@@ -53,33 +43,23 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   private final int spacesDisabled;
   private final Map<RentalVehicleType, Integer> vehicleSpacesAvailable;
 
-  private final boolean isInstalled;
   private final boolean isRenting;
   private final boolean isReturning;
-  private final Instant lastReported;
 
   // OTP internal data
   private final boolean overloadingAllowed;
   private final boolean isArrivingInRentalVehicleAtDestinationAllowed;
   private final boolean realTimeData;
+  private final ReturnPolicy returnPolicy;
 
   public VehicleRentalStation() {
     this.id = null;
     this.name = null;
-    this.shortName = null;
     this.longitude = 0.0;
     this.latitude = 0.0;
-    this.address = null;
-    this.crossStreet = null;
-    this.regionId = null;
-    this.postCode = null;
-    this.rentalMethods = Set.of();
-    this.isVirtualStation = false;
-    this.stationArea = null;
     this.capacity = null;
     this.vehicleTypeAreaCapacity = Map.of();
     this.vehicleTypeDockCapacity = Map.of();
-    this.isValetStation = false;
     this.system = null;
     this.rentalUris = null;
     this.vehiclesAvailable = 0;
@@ -88,32 +68,22 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     this.spacesAvailable = 0;
     this.spacesDisabled = 0;
     this.vehicleSpacesAvailable = Map.of();
-    this.isInstalled = true;
     this.isRenting = true;
     this.isReturning = true;
-    this.lastReported = null;
     this.overloadingAllowed = false;
     this.isArrivingInRentalVehicleAtDestinationAllowed = false;
     this.realTimeData = true;
+    this.returnPolicy = ReturnPolicy.SPECIFIC_TYPES;
   }
 
   VehicleRentalStation(VehicleRentalStationBuilder builder) {
     this.id = builder.id();
     this.name = builder.name();
-    this.shortName = builder.shortName();
     this.longitude = builder.longitude();
     this.latitude = builder.latitude();
-    this.address = builder.address();
-    this.crossStreet = builder.crossStreet();
-    this.regionId = builder.regionId();
-    this.postCode = builder.postCode();
-    this.rentalMethods = Set.copyOf(builder.rentalMethods());
-    this.isVirtualStation = builder.isVirtualStation();
-    this.stationArea = builder.stationArea();
     this.capacity = builder.capacity();
     this.vehicleTypeAreaCapacity = Map.copyOf(builder.vehicleTypeAreaCapacity());
     this.vehicleTypeDockCapacity = Map.copyOf(builder.vehicleTypeDockCapacity());
-    this.isValetStation = builder.isValetStation();
     this.system = builder.system();
     this.rentalUris = builder.rentalUris();
     this.vehiclesAvailable = builder.vehiclesAvailable();
@@ -122,14 +92,13 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     this.spacesAvailable = builder.spacesAvailable();
     this.spacesDisabled = builder.spacesDisabled();
     this.vehicleSpacesAvailable = Map.copyOf(builder.vehicleSpacesAvailable());
-    this.isInstalled = builder.isInstalled();
     this.isRenting = builder.isRenting();
     this.isReturning = builder.isReturning();
-    this.lastReported = builder.lastReported();
     this.overloadingAllowed = builder.isOverloadingAllowed();
     this.isArrivingInRentalVehicleAtDestinationAllowed =
       builder.isArrivingInRentalVehicleAtDestinationAllowed();
     this.realTimeData = builder.isRealTimeData();
+    this.returnPolicy = builder.returnPolicy();
   }
 
   public static VehicleRentalStationBuilder of() {
@@ -140,19 +109,12 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     return new VehicleRentalStationBuilder(this);
   }
 
-  @Nullable
   public FeedScopedId id() {
     return id;
   }
 
-  @Nullable
   public I18NString name() {
     return name;
-  }
-
-  @Nullable
-  public String shortName() {
-    return shortName;
   }
 
   public double longitude() {
@@ -161,39 +123,6 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
 
   public double latitude() {
     return latitude;
-  }
-
-  @Nullable
-  public String address() {
-    return address;
-  }
-
-  @Nullable
-  public String crossStreet() {
-    return crossStreet;
-  }
-
-  @Nullable
-  public String regionId() {
-    return regionId;
-  }
-
-  @Nullable
-  public String postCode() {
-    return postCode;
-  }
-
-  public Set<String> rentalMethods() {
-    return rentalMethods;
-  }
-
-  public boolean isVirtualStation() {
-    return isVirtualStation;
-  }
-
-  @Nullable
-  public Geometry stationArea() {
-    return stationArea;
   }
 
   @Nullable
@@ -207,10 +136,6 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
 
   public Map<RentalVehicleType, Integer> vehicleTypeDockCapacity() {
     return vehicleTypeDockCapacity;
-  }
-
-  public boolean isValetStation() {
-    return isValetStation;
   }
 
   @Nullable
@@ -247,21 +172,12 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     return vehicleSpacesAvailable;
   }
 
-  public boolean isInstalled() {
-    return isInstalled;
-  }
-
   public boolean isRenting() {
     return isRenting;
   }
 
   public boolean isReturning() {
     return isReturning;
-  }
-
-  @Nullable
-  public Instant lastReported() {
-    return lastReported;
   }
 
   public boolean realTimeData() {
@@ -329,6 +245,19 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       .collect(Collectors.toSet());
   }
 
+  public boolean canDropOffFormFactor(
+    RentalFormFactor formFactor,
+    boolean includeRealtimeAvailability
+  ) {
+    if (returnPolicy.equals(ANY_TYPE) && includeRealtimeAvailability) {
+      return allowDropoffNow();
+    } else if (returnPolicy.equals(ANY_TYPE)) {
+      return true;
+    } else {
+      return availableDropoffFormFactors(includeRealtimeAvailability).contains(formFactor);
+    }
+  }
+
   @Override
   public boolean isArrivingInRentalVehicleAtDestinationAllowed() {
     return isArrivingInRentalVehicleAtDestinationAllowed;
@@ -385,6 +314,10 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     );
   }
 
+  public ReturnPolicy returnPolicy() {
+    return returnPolicy;
+  }
+
   private List<RentalVehicleTypeCount> vehicleRentalTypeMapToList(
     Map<RentalVehicleType, Integer> vehicleTypeMap
   ) {
@@ -405,13 +338,10 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     return (
       Double.compare(that.longitude, longitude) == 0 &&
       Double.compare(that.latitude, latitude) == 0 &&
-      isVirtualStation == that.isVirtualStation &&
-      isValetStation == that.isValetStation &&
       vehiclesAvailable == that.vehiclesAvailable &&
       vehiclesDisabled == that.vehiclesDisabled &&
       spacesAvailable == that.spacesAvailable &&
       spacesDisabled == that.spacesDisabled &&
-      isInstalled == that.isInstalled &&
       isRenting == that.isRenting &&
       isReturning == that.isReturning &&
       overloadingAllowed == that.overloadingAllowed &&
@@ -420,21 +350,13 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       realTimeData == that.realTimeData &&
       Objects.equals(id, that.id) &&
       Objects.equals(name, that.name) &&
-      Objects.equals(shortName, that.shortName) &&
-      Objects.equals(address, that.address) &&
-      Objects.equals(crossStreet, that.crossStreet) &&
-      Objects.equals(regionId, that.regionId) &&
-      Objects.equals(postCode, that.postCode) &&
-      Objects.equals(rentalMethods, that.rentalMethods) &&
-      Objects.equals(stationArea, that.stationArea) &&
       Objects.equals(capacity, that.capacity) &&
       Objects.equals(vehicleTypeAreaCapacity, that.vehicleTypeAreaCapacity) &&
       Objects.equals(vehicleTypeDockCapacity, that.vehicleTypeDockCapacity) &&
       Objects.equals(system, that.system) &&
       Objects.equals(rentalUris, that.rentalUris) &&
       Objects.equals(vehicleTypesAvailable, that.vehicleTypesAvailable) &&
-      Objects.equals(vehicleSpacesAvailable, that.vehicleSpacesAvailable) &&
-      Objects.equals(lastReported, that.lastReported)
+      Objects.equals(vehicleSpacesAvailable, that.vehicleSpacesAvailable)
     );
   }
 
@@ -443,20 +365,11 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     return Objects.hash(
       id,
       name,
-      shortName,
       longitude,
       latitude,
-      address,
-      crossStreet,
-      regionId,
-      postCode,
-      rentalMethods,
-      isVirtualStation,
-      stationArea,
       capacity,
       vehicleTypeAreaCapacity,
       vehicleTypeDockCapacity,
-      isValetStation,
       system,
       rentalUris,
       vehiclesAvailable,
@@ -465,10 +378,8 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       spacesAvailable,
       spacesDisabled,
       vehicleSpacesAvailable,
-      isInstalled,
       isRenting,
       isReturning,
-      lastReported,
       overloadingAllowed,
       isArrivingInRentalVehicleAtDestinationAllowed,
       realTimeData

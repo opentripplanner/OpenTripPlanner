@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.vertex;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.routing.graph.Graph;
@@ -12,10 +13,10 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.PathwayNode;
-import org.opentripplanner.transit.model.site.Station;
 
 /**
  * This class is the central point where all vertices that are supposed to be permanently part
@@ -37,20 +38,8 @@ public class VertexFactory {
     return addToGraph(new TransitBoardingAreaVertex(boardingArea));
   }
 
-  public ElevatorOnboardVertex elevatorOnboard(
-    Vertex sourceVertex,
-    String label,
-    String levelName
-  ) {
-    return addToGraph(new ElevatorOnboardVertex(sourceVertex, label, levelName));
-  }
-
-  public ElevatorOffboardVertex elevatorOffboard(
-    Vertex sourceVertex,
-    String label,
-    String levelName
-  ) {
-    return addToGraph(new ElevatorOffboardVertex(sourceVertex, label, levelName));
+  public ElevatorVertex elevator(Vertex sourceVertex, String label, String levelName) {
+    return addToGraph(new ElevatorVertex(sourceVertex, label, levelName));
   }
 
   public IntersectionVertex intersection(Coordinate edgeCoordinate) {
@@ -87,8 +76,12 @@ public class VertexFactory {
     return addToGraph(new SplitterVertex(uniqueSplitLabel, x, y, originalEdge.getName()));
   }
 
-  public BarrierVertex barrier(long nid, Coordinate coordinate) {
-    return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid));
+  public BarrierVertex barrier(
+    long nid,
+    Coordinate coordinate,
+    Accessibility wheelchairAccessibility
+  ) {
+    return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid, wheelchairAccessibility));
   }
 
   public ExitVertex exit(long nid, Coordinate coordinate, String exitName) {
@@ -108,27 +101,26 @@ public class VertexFactory {
 
   public OsmVertex osm(
     Coordinate coordinate,
-    OsmNode node,
+    long nid,
     boolean highwayTrafficLight,
     boolean crossingTrafficLight
   ) {
     return addToGraph(
-      new OsmVertex(
-        coordinate.x,
-        coordinate.y,
-        node.getId(),
-        highwayTrafficLight,
-        crossingTrafficLight
-      )
+      new OsmVertex(coordinate.x, coordinate.y, nid, highwayTrafficLight, crossingTrafficLight)
     );
   }
 
-  public TransitStopVertex transitStop(TransitStopVertexBuilder transitStopVertexBuilder) {
-    return addToGraph(transitStopVertexBuilder.build());
+  public OsmVertex osmOnLinearBarrier(Coordinate coordinate, long nid, long routableWayId) {
+    return addToGraph(new BarrierPassThroughVertex(coordinate.x, coordinate.y, nid, routableWayId));
   }
 
-  public StationCentroidVertex stationCentroid(Station station) {
-    return addToGraph(new StationCentroidVertex(station));
+  public TransitStopVertex transitStop(TransitStopVertexBuilder builder) {
+    var v = builder.build();
+    return addToGraph(v);
+  }
+
+  public StationCentroidVertex stationCentroid(FeedScopedId id, WgsCoordinate coordinate) {
+    return addToGraph(new StationCentroidVertex(id, coordinate));
   }
 
   public VehicleParkingEntranceVertex vehicleParkingEntrance(VehicleParking vehicleParking) {

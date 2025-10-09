@@ -18,7 +18,7 @@ import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.PostingsFormat;
-import org.apache.lucene.codecs.lucene101.Lucene101Codec;
+import org.apache.lucene.codecs.lucene103.Lucene103Codec;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StoredField;
@@ -203,7 +203,7 @@ public class LuceneIndex implements Serializable {
 
   static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {
     IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-    Codec filterCodec = new Lucene101Codec() {
+    Codec filterCodec = new Lucene103Codec() {
       final PostingsFormat postingsFormat = new Completion101PostingsFormat();
 
       @Override

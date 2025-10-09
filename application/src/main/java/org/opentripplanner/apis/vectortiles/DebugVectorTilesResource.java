@@ -141,6 +141,7 @@ public class DebugVectorTilesResource {
       GROUP_STOPS.toVectorSourceLayer(stopsSource),
       EDGES.toVectorSourceLayer(streetSource),
       VERTICES.toVectorSourceLayer(streetSource),
+      GEOFENCING_ZONES.toVectorSourceLayer(streetSource),
       RENTAL.toVectorSourceLayer(rentalSource),
       serverContext.debugUiConfig().additionalBackgroundLayers()
     );
