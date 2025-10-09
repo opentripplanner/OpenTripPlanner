@@ -87,7 +87,7 @@ class VehicleRentalUpdaterTest {
     @Override
     public boolean update() {
       hasFailed.complete(true);
-      throw new UpdaterConstructionException("An error occurred while settin up the source.");
+      throw new UpdaterConstructionException("An error occurred while setting up the source.");
     }
 
     @Override
