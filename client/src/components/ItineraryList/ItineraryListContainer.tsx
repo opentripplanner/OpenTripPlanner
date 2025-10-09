@@ -52,19 +52,11 @@ export function ItineraryListContainer({
               previousPageCursor={tripQueryResult?.trip.previousPageCursor}
               nextPageCursor={tripQueryResult?.trip.nextPageCursor}
               loading={loading}
+              comparisonSelectedIndexes={comparisonSelectedIndexes}
+              onCompare={onCompare}
             />
           </div>
         )}
-        <div className="pagination-controls">
-          <ItineraryPaginationControl
-            onPagination={pageResults}
-            previousPageCursor={tripQueryResult?.trip.previousPageCursor}
-            nextPageCursor={tripQueryResult?.trip.nextPageCursor}
-            loading={loading}
-            comparisonSelectedIndexes={comparisonSelectedIndexes}
-            onCompare={onCompare}
-          />
-        </div>
         <Accordion
           activeKey={selectedTripPatternIndexes.map(String)}
           onSelect={(eventKey) => {

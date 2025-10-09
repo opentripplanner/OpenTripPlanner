@@ -17,11 +17,9 @@ import { getApiUrl } from '../util/getApiUrl.ts';
 export function App() {
   const serverInfo = useServerInfo();
   const { tripQueryVariables, setTripQueryVariables } = useTripQueryVariables();
-  const [tripQueryResult, loading, callback] = useTripQuery(tripQueryVariables);
-  const [selectedTripPatternIndex, setSelectedTripPatternIndex] = useState<number>(0);
   const [comparisonSelectedIndexes, setComparisonSelectedIndexes] = useState<number[]>([]);
   const [showCompareDialog, setShowCompareDialog] = useState<boolean>(false);
-  const [tripQueryResult, loading, callback, error] = useTripQuery(tripQueryVariables);
+  const [tripQueryResult, loading, callback] = useTripQuery(tripQueryVariables);
   const [selectedTripPatternIndexes, setSelectedTripPatternIndexes] = useState<number[]>([0]);
   const [expandedArguments, setExpandedArguments] = useState<Record<string, boolean>>({});
   const timeZone = serverInfo?.internalTransitModelTimeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
