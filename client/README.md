@@ -43,6 +43,15 @@ If you change graphql code during development you can issue the following comman
 
 You don't have to restart the development server for the changes to take effect.
 
+## Important when modifying dependencies
+
+If you make any changes to the dependencies in package.json, you must also update the package-lock.json
+file. Any divergence will cause CI to fail. To regenerate the lockfile, run `npm install`, and commit
+any changes.
+
+Hot tip: The best way to add or remove dependencies is to use the `npm install --save-exact` or `npm uninstall` commands
+rather than editing the package.json manually. For devDependencies use `--save-dev`.
+
 ## Build for production
 
 Change directory to `client` (current) if you haven't already.
