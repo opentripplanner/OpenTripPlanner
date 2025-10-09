@@ -204,6 +204,14 @@
       "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 14th day of the month",
       "reviewers": ["habrahamsson-skanetrafiken", "svedbod"]
+    },
+    {
+      "groupName": "Hive MQTT client",
+      "matchPackageNames": [
+        "com.hivemq:hivemq-mqtt-client"
+      ],
+      "schedule": "on the 25th day of the month",
+      "reviewers": ["optionsome", "jessicaKoehnke"]
     }
   ],
   "timezone": "Europe/Berlin"

@@ -2,6 +2,7 @@ package org.opentripplanner.routing.graphfinder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.street.model.edge.Edge;
@@ -15,12 +16,14 @@ import org.opentripplanner.utils.collection.ListUtils;
  */
 public class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
+  private final StopResolver stopResolver;
   private final double radiusMeters;
 
   /** A list of closest stops found while walking the graph */
   private final List<NearbyStop> stopsFound = new ArrayList<>();
 
-  public StopFinderTraverseVisitor(double radiusMeters) {
+  public StopFinderTraverseVisitor(StopResolver stopResolver, double radiusMeters) {
+    this.stopResolver = stopResolver;
     this.radiusMeters = radiusMeters;
   }
 
@@ -31,7 +34,8 @@ public class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
     if (vertex instanceof TransitStopVertex tsv) {
-      stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getStop()));
+      var stop = Objects.requireNonNull(stopResolver.getStop(tsv.getId()));
+      stopsFound.add(NearbyStop.nearbyStopForState(state, stop));
     }
   }
 

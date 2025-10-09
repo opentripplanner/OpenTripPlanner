@@ -382,11 +382,11 @@ class WalkableAreaBuilder {
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-        .setSkipEdgeStrategy(new ListedEdgesOnly(edges))
-        .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-        .setRequest(request)
-        .setStreetRequest(new StreetRequest(mode))
-        .setFrom(vertex)
+        .withSkipEdgeStrategy(new ListedEdgesOnly(edges))
+        .withDominanceFunction(new DominanceFunctions.EarliestArrival())
+        .withRequest(request)
+        .withStreetRequest(new StreetRequest(mode))
+        .withFrom(vertex)
         .getShortestPathTree();
 
       for (Vertex endVertex : startingVertices) {

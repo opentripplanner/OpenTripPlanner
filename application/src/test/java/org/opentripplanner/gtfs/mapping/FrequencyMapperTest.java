@@ -32,7 +32,13 @@ public class FrequencyMapperTest {
   private static final IdFactory ID_FACTORY = new IdFactory(FEED_ID);
   private static final TripMapper TRIP_MAPPER = new TripMapper(
     ID_FACTORY,
-    new RouteMapper(ID_FACTORY, new AgencyMapper(ID_FACTORY), ISSUE_STORE, translationHelper),
+    new RouteMapper(
+      ID_FACTORY,
+      new AgencyMapper(ID_FACTORY),
+      new RouteNetworkAssignmentMapper(ID_FACTORY),
+      ISSUE_STORE,
+      translationHelper
+    ),
     new DirectionMapper(ISSUE_STORE),
     translationHelper
   );

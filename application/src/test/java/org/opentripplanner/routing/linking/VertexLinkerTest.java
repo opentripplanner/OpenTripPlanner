@@ -1,26 +1,24 @@
 package org.opentripplanner.routing.linking;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class VertexLinkerTest {
 
-  public static final TimetableRepositoryForTest REPO = TimetableRepositoryForTest.of();
-  public static final AreaStop AREA_STOP_1 = REPO.areaStop("area-stop-1").build();
-  public static final AreaStop AREA_STOP_2 = REPO.areaStop("area-stop-2").build();
+  public static final FeedScopedId AREA_STOP_1 = id("area-stop-1");
+  public static final FeedScopedId AREA_STOP_2 = id("area-stop-2");
 
   @Test
   void flex() {
@@ -42,7 +40,7 @@ class VertexLinkerTest {
       graph.addVertex(v2);
       graph.index();
 
-      var linker = TestVertexLinker.of(graph);
+      var linker = VertexLinkerTestFactory.of(graph);
 
       linker.linkVertexPermanently(
         toBeLinked,

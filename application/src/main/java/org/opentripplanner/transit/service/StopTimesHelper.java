@@ -23,7 +23,6 @@ import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateMatcherFactory;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -78,7 +77,6 @@ class StopTimesHelper {
         numberOfDepartures,
         arrivalDeparture,
         includeCancelledTrips,
-        false,
         sortOrder
       );
 
@@ -146,7 +144,7 @@ class StopTimesHelper {
             continue;
           }
           for (TripTimes t : tt.getTripTimes()) {
-            if (TripTimesHelper.skipByTripCancellation(t, includeCancellations)) {
+            if (TripTimesHelper.skipByTripCancellationOrDeletion(t, includeCancellations)) {
               continue;
             }
             if (servicesRunning.contains(t.getServiceCode())) {
@@ -195,7 +193,6 @@ class StopTimesHelper {
       numberOfDepartures,
       arrivalDeparture,
       includeCancellations,
-      true,
       TripTimeOnDate.compareByDeparture()
     );
 
@@ -225,7 +222,6 @@ class StopTimesHelper {
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations,
-    boolean includeReplaced,
     Comparator<TripTimeOnDate> sortOrder
   ) {
     ZoneId zoneId = transitService.getTimeZone();
@@ -275,13 +271,7 @@ class StopTimesHelper {
             if (!servicesRunning.contains(tripTimes.getServiceCode())) {
               continue;
             }
-            if (TripTimesHelper.skipByTripCancellation(tripTimes, includeCancellations)) {
-              continue;
-            }
-            if (
-              !includeReplaced &&
-              isReplacedByAnotherPattern(tripTimes.getTrip(), serviceDate, pattern, transitService)
-            ) {
+            if (TripTimesHelper.skipByTripCancellationOrDeletion(tripTimes, includeCancellations)) {
               continue;
             }
 
@@ -310,19 +300,6 @@ class StopTimesHelper {
       }
     }
     return pq;
-  }
-
-  private static boolean isReplacedByAnotherPattern(
-    Trip trip,
-    LocalDate serviceDate,
-    TripPattern pattern,
-    TransitService transitService
-  ) {
-    final TripPattern replacement = transitService.findNewTripPatternForModifiedTrip(
-      trip.getId(),
-      serviceDate
-    );
-    return replacement != null && !replacement.equals(pattern);
   }
 
   private static boolean skipByPickUpDropOff(
