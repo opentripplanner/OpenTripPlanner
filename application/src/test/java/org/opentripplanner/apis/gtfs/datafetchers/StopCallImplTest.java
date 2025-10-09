@@ -53,9 +53,9 @@ class StopCallImplTest {
   @Test
   void fixedTrip() throws Exception {
     var realtimeEnv = envBuilder.withTrip(TRIP_INPUT).build();
-    var trip = realtimeEnv.tripFetcher("Trip1");
-    var tripTimes = trip.tripTimes();
-    var pattern = trip.tripPattern();
+    var tripData = realtimeEnv.tripData("Trip1");
+    var tripTimes = tripData.tripTimes();
+    var pattern = tripData.tripPattern();
 
     var call = new TripTimeOnDate(tripTimes, 0, pattern, SERVICE_DATE, MIDNIGHT);
 
@@ -74,9 +74,9 @@ class StopCallImplTest {
   void flexTrip() {
     OTPFeature.FlexRouting.testOn(() -> {
       var realtimeEnv = envBuilder.withFlexTrip(FLEX_TRIP_INPUT).build();
-      var trip = realtimeEnv.tripFetcher("FlexTrip1");
-      var tripTimes = trip.tripTimes();
-      var pattern = trip.tripPattern();
+      var tripData = realtimeEnv.tripData("FlexTrip1");
+      var tripTimes = tripData.tripTimes();
+      var pattern = tripData.tripPattern();
 
       var call = new TripTimeOnDate(tripTimes, 0, pattern, SERVICE_DATE, MIDNIGHT);
 

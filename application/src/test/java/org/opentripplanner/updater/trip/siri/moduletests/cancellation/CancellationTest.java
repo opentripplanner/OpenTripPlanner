@@ -39,7 +39,7 @@ class CancellationTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    assertEquals(RealTimeState.SCHEDULED, env.tripFetcher(TRIP_1_ID).getRealTimeState());
+    assertEquals(RealTimeState.SCHEDULED, env.tripData(TRIP_1_ID).getRealTimeState());
 
     var updates = siri
       .etBuilder()
@@ -59,7 +59,7 @@ class CancellationTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals(RealTimeState.CANCELED, env.tripFetcher(TRIP_1_ID).getRealTimeState());
+    assertEquals(RealTimeState.CANCELED, env.tripData(TRIP_1_ID).getRealTimeState());
   }
 
   @Test
@@ -67,7 +67,7 @@ class CancellationTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    assertEquals(RealTimeState.SCHEDULED, env.tripFetcher(TRIP_1_ID).getRealTimeState());
+    assertEquals(RealTimeState.SCHEDULED, env.tripData(TRIP_1_ID).getRealTimeState());
 
     var updates = siri
       .etBuilder()
@@ -78,7 +78,7 @@ class CancellationTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals(RealTimeState.CANCELED, env.tripFetcher(TRIP_1_ID).getRealTimeState());
+    assertEquals(RealTimeState.CANCELED, env.tripData(TRIP_1_ID).getRealTimeState());
   }
 
   /**
@@ -92,13 +92,13 @@ class CancellationTest implements RealtimeTestConstants {
 
     assertEquals(
       "SCHEDULED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
-      env.tripFetcher(TRIP_1_ID).showTimetable()
+      env.tripData(TRIP_1_ID).showTimetable()
     );
     changeQuayAndCancelTrip(siri, TRIP_1_ID);
 
     assertEquals(
       "CANCELED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
-      env.tripFetcher(TRIP_1_ID).showTimetable()
+      env.tripData(TRIP_1_ID).showTimetable()
     );
   }
 
@@ -130,7 +130,7 @@ class CancellationTest implements RealtimeTestConstants {
     assertEquals(1, creationResult.successful());
     assertEquals(
       "ADDED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
-      env.tripFetcher(ADDED_TRIP_ID).showTimetable()
+      env.tripData(ADDED_TRIP_ID).showTimetable()
     );
     changeQuayAndCancelTrip(siri, ADDED_TRIP_ID);
 
@@ -138,7 +138,7 @@ class CancellationTest implements RealtimeTestConstants {
     // conversely the departure time on last stop is adjusted to the arrival time
     assertEquals(
       "CANCELED | A 0:00:11 0:00:11 | B 0:00:20 0:00:20",
-      env.tripFetcher(ADDED_TRIP_ID).showTimetable()
+      env.tripData(ADDED_TRIP_ID).showTimetable()
     );
   }
 
@@ -161,7 +161,7 @@ class CancellationTest implements RealtimeTestConstants {
     TransitTestEnvironment transitTestEnvironment = siri.realtimeTestEnvironment();
     assertEquals(
       "MODIFIED | A 0:00:15 0:00:15 | D 0:00:25 0:00:25",
-      transitTestEnvironment.tripFetcher(tripId).showTimetable()
+      transitTestEnvironment.tripData(tripId).showTimetable()
     );
 
     var cancellation = siri

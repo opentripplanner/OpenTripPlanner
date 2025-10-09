@@ -49,7 +49,7 @@ class CancelledStopTest implements RealtimeTestConstants {
     assertSuccess(result);
     assertEquals(
       "MODIFIED | A 0:01:01 0:01:01 | B [C] 0:01:10 0:01:11 | D 0:01:30 0:01:30",
-      env.tripFetcher(TRIP_1_ID).showTimetable()
+      env.tripData(TRIP_1_ID).showTimetable()
     );
   }
 }

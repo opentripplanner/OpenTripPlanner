@@ -69,7 +69,7 @@ class ApiTransitServiceTest {
     var env = envBuilder.withTrip(TRIP1_INPUT).withTrip(TRIP2_INPUT).build();
     var service = new ApiTransitService(env.getTransitService());
 
-    var pattern = env.tripFetcher(TRIP_1_ID).tripPattern();
+    var pattern = env.tripData(TRIP_1_ID).tripPattern();
     var calls = service.getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
       STOP_A,
       pattern,
@@ -125,9 +125,9 @@ class ApiTransitServiceTest {
     var env = envBuilder.withTrip(TRIP1_INPUT).build();
     var service = new ApiTransitService(env.getTransitService());
 
-    var trip = env.tripFetcher(TRIP_1_ID);
-    var tripTimes = trip.tripTimes();
-    var pattern = trip.tripPattern();
+    var tripData = env.tripData(TRIP_1_ID);
+    var tripTimes = tripData.tripTimes();
+    var pattern = tripData.tripPattern();
 
     var leg = new ScheduledTransitLegBuilder()
       .withTripPattern(pattern)

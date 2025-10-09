@@ -56,7 +56,7 @@ class SkippedTest implements RealtimeTestConstants {
 
     assertEquals(
       "UPDATED | A 0:01 0:01:01 | B [C] 0:01:52 0:01:58 | C 0:02:50 0:02:51",
-      env.tripFetcher(TRIP_2_ID).showTimetable()
+      env.tripData(TRIP_2_ID).showTimetable()
     );
   }
 
@@ -105,11 +105,11 @@ class SkippedTest implements RealtimeTestConstants {
 
     assertEquals(
       "SCHEDULED | A 0:01 0:01:01 | B 0:01:10 0:01:11 | C 0:01:20 0:01:21",
-      env.tripFetcher(TRIP_2_ID).showScheduledTimetable()
+      env.tripData(TRIP_2_ID).showScheduledTimetable()
     );
     assertEquals(
       "UPDATED | A 0:01 0:01:01 | B 0:02 0:02:01 | C 0:02:50 0:02:51",
-      env.tripFetcher(TRIP_2_ID).showTimetable()
+      env.tripData(TRIP_2_ID).showTimetable()
     );
   }
 
@@ -138,7 +138,7 @@ class SkippedTest implements RealtimeTestConstants {
 
     assertEquals(
       "UPDATED | A [ND] 0:01 0:01:01 | B [C] 0:01:10 0:01:11 | C [ND] 0:01:20 0:01:21",
-      env.tripFetcher(tripId).showTimetable()
+      env.tripData(tripId).showTimetable()
     );
   }
 

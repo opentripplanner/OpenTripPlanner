@@ -97,14 +97,14 @@ public final class TransitTestEnvironment {
   /**
    * Get a data fetcher for the given trip id on the default ServiceDate
    */
-  public TripOnDateDataFetcher tripFetcher(String tripId) {
+  public TripOnDateDataFetcher tripData(String tripId) {
     return new TripOnDateDataFetcher(getTransitService(), id(tripId), defaultServiceDate);
   }
 
   /**
    * Get a data fetcher for the given trip id on the default ServiceDate
    */
-  public TripOnDateDataFetcher tripFetcher(String tripId, LocalDate serviceDate) {
+  public TripOnDateDataFetcher tripData(String tripId, LocalDate serviceDate) {
     return new TripOnDateDataFetcher(getTransitService(), id(tripId), serviceDate);
   }
 }

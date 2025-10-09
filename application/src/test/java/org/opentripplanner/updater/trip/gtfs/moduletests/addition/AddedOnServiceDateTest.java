@@ -57,7 +57,7 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
       .build();
 
     assertSuccess(rt.applyTripUpdate(tripUpdate));
-    var tripFetcher = env.tripFetcher(ADDED_TRIP_ID, date);
+    var tripFetcher = env.tripData(ADDED_TRIP_ID, date);
     assertNotNull(tripFetcher.tripPattern());
 
     var trip = tripFetcher.trip();

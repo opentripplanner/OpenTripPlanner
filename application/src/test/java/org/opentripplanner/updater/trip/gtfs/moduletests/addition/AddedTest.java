@@ -173,7 +173,7 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(PickDrop.CANCELLED, tripPattern.getAlightType(2));
     assertEquals(PickDrop.CANCELLED, tripPattern.getBoardType(2));
     assertEquals(PickDrop.SCHEDULED, tripPattern.getAlightType(3));
-    var tripTimes = env.tripFetcher(ADDED_TRIP_ID).tripTimes();
+    var tripTimes = env.tripData(ADDED_TRIP_ID).tripTimes();
     var trip = env.getTransitService().getTrip(id(ADDED_TRIP_ID));
     assertEquals(I18NString.of("A loop"), Objects.requireNonNull(trip).getHeadsign());
     assertEquals(I18NString.of("A loop"), tripTimes.getHeadsign(0));
@@ -198,7 +198,7 @@ class AddedTest implements RealtimeTestConstants {
 
     // THEN
     assertAddedTrip(ADDED_TRIP_ID, env);
-    var tripTimes = env.tripFetcher(ADDED_TRIP_ID).tripTimes();
+    var tripTimes = env.tripData(ADDED_TRIP_ID).tripTimes();
     assertEquals(0, tripTimes.getDepartureDelay(0));
     assertEquals(TimeUtils.time("08:00"), tripTimes.getDepartureTime(0));
     assertEquals(300, tripTimes.getArrivalDelay(1));
@@ -217,7 +217,7 @@ class AddedTest implements RealtimeTestConstants {
     RealTimeState realTimeState,
     RegularStop stop
   ) {
-    var tripFetcher = env.tripFetcher(tripId);
+    var tripFetcher = env.tripData(tripId);
 
     TransitService transitService = env.getTransitService();
     assertNotNull(tripFetcher.trip());

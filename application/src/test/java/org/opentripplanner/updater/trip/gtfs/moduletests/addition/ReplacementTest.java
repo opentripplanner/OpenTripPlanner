@@ -101,7 +101,7 @@ public class ReplacementTest implements RealtimeTestConstants {
 
     // New trip pattern
     {
-      var tripFetcher = env.tripFetcher(TRIP_1_ID);
+      var tripFetcher = env.tripData(TRIP_1_ID);
       assertEquals(RealTimeState.MODIFIED, tripFetcher.getRealTimeState());
 
       var newTripPattern = tripFetcher.tripPattern();

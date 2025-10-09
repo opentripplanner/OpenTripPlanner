@@ -57,8 +57,8 @@ class CancellationDeletionTest implements RealtimeTestConstants {
     var update = rt.tripUpdate(TRIP_1_ID, relationship).build();
     assertSuccess(rt.applyTripUpdate(update));
 
-    var forToday = env.tripFetcher(TRIP_1_ID).tripTimes();
-    var schedule = env.tripFetcher(TRIP_1_ID).scheduledTripTimes();
+    var forToday = env.tripData(TRIP_1_ID).tripTimes();
+    var schedule = env.tripData(TRIP_1_ID).scheduledTripTimes();
     assertNotSame(forToday, schedule);
 
     assertEquals(state, forToday.getRealTimeState());

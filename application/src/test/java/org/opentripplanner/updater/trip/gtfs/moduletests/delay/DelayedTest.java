@@ -46,10 +46,10 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertEquals(1, result.successful());
 
-    var trip = env.tripFetcher(TRIP_1_ID);
+    var tripData = env.tripData(TRIP_1_ID);
 
-    var trip1Realtime = trip.tripTimes();
-    var trip1Scheduled = trip.scheduledTripTimes();
+    var trip1Realtime = tripData.tripTimes();
+    var trip1Scheduled = tripData.scheduledTripTimes();
 
     assertNotSame(trip1Realtime, trip1Scheduled);
     assertEquals(DELAY, trip1Realtime.getArrivalDelay(STOP_SEQUENCE));
@@ -59,11 +59,11 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertEquals(
       "SCHEDULED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
-      env.tripFetcher(TRIP_1_ID).showScheduledTimetable()
+      env.tripData(TRIP_1_ID).showScheduledTimetable()
     );
     assertEquals(
       "UPDATED | A [ND] 0:00:10 0:00:11 | B 0:00:21 0:00:22",
-      env.tripFetcher(TRIP_1_ID).showTimetable()
+      env.tripData(TRIP_1_ID).showTimetable()
     );
   }
 
@@ -89,9 +89,9 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertSuccess(rt.applyTripUpdate(tripUpdate));
 
-    var trip = env.tripFetcher(TRIP_2_ID);
-    var realtimeTripTimes = trip.tripTimes();
-    var scheduledTripTimes = trip.scheduledTripTimes();
+    var tripData = env.tripData(TRIP_2_ID);
+    var realtimeTripTimes = tripData.tripTimes();
+    var scheduledTripTimes = tripData.scheduledTripTimes();
 
     assertNotSame(realtimeTripTimes, scheduledTripTimes);
 
@@ -109,11 +109,11 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertEquals(
       "SCHEDULED | A 0:01 0:01:01 | B 0:01:10 0:01:11 | C 0:01:20 0:01:21",
-      trip.showScheduledTimetable()
+      tripData.showScheduledTimetable()
     );
     assertEquals(
       "UPDATED | A 0:01 0:01:01 | B 0:02:10 0:02:31 | C 0:02:50 0:02:51",
-      trip.showTimetable()
+      tripData.showTimetable()
     );
   }
 }
