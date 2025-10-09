@@ -449,7 +449,10 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       ).buildGraph();
 
       var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
-      assertTransfers(bikeTransfers, tr(S0, 100, List.of(V0, V21), S21));
+      assertTransfers(
+        bikeTransfers,
+        tr(timetableRepository.getSiteRepository()::getRegularStop, S0, 100, List.of(V0, V21), S21)
+      );
     });
   }
 
@@ -473,15 +476,16 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       ).buildGraph();
 
       var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
+      StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
       assertTransfers(
         bikeTransfers,
         // no transfers involving S11, S12 and S13
-        tr(S0, 100, List.of(V0, V21), S21),
-        tr(S0, 200, List.of(V0, V22), S22),
-        tr(S0, 300, List.of(V0, V22, V23), S23),
-        tr(S21, 100, List.of(V21, V22), S22),
-        tr(S21, 200, List.of(V21, V22, V23), S23),
-        tr(S22, 100, List.of(V22, V23), S23)
+        tr(resolver, S0, 100, List.of(V0, V21), S21),
+        tr(resolver, S0, 200, List.of(V0, V22), S22),
+        tr(resolver, S0, 300, List.of(V0, V22, V23), S23),
+        tr(resolver, S21, 100, List.of(V21, V22), S22),
+        tr(resolver, S21, 200, List.of(V21, V22, V23), S23),
+        tr(resolver, S22, 100, List.of(V22, V23), S23)
       );
     });
   }
