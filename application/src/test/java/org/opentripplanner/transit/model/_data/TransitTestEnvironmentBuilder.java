@@ -31,7 +31,7 @@ public class TransitTestEnvironmentBuilder {
   }
 
   /**
-   * The default service date is used when creating trips without a specified service date
+   * The default service date is used when creating trips without an explicit service date
    */
   public LocalDate defaultServiceDate() {
     return defaultServiceDate;

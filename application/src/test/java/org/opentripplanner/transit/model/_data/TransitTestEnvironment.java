@@ -13,13 +13,15 @@ import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
 /**
- * A helper class for creating and fetching transit entities
+ * A helper class for setting up and interacting with transit data for tests.
+ * <p>
+ * The builder is used to create a SiteRepository and a TimetableRepository that can then be queried
+ * by a TransitService.
  */
 public final class TransitTestEnvironment {
 
   private final TimetableRepository timetableRepository;
   private final TimetableSnapshotManager snapshotManager;
-  private final LocalTimeParser localTimeParser;
   private final LocalDate defaultServiceDate;
 
   public static TransitTestEnvironmentBuilder of() {
@@ -44,13 +46,13 @@ public final class TransitTestEnvironment {
       () -> defaultServiceDate
     );
     this.defaultServiceDate = defaultServiceDate;
-    this.localTimeParser = new LocalTimeParser(
-      timetableRepository.getTimeZone(),
-      defaultServiceDate
-    );
   }
 
-  public LocalDate serviceDate() {
+  /**
+   * The default service date is the same as the date used by the builder when creating trips when
+   * no explicit date is specified.
+   */
+  public LocalDate defaultServiceDate() {
     return defaultServiceDate;
   }
 
@@ -80,12 +82,19 @@ public final class TransitTestEnvironment {
     return snapshotManager;
   }
 
-  public LocalTimeParser localTimeParser() {
-    return localTimeParser;
-  }
-
   public TimetableSnapshot getTimetableSnapshot() {
     return snapshotManager.getTimetableSnapshot();
+  }
+
+  /**
+   * A parser for converting local times into absolute times on the default service date in the
+   * TransitService timezone.
+   */
+  public LocalTimeParser localTimeParser() {
+    return new LocalTimeParser(
+      timetableRepository.getTimeZone(),
+      defaultServiceDate
+    );
   }
 
   /**

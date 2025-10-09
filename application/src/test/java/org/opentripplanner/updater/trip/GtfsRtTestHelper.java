@@ -20,7 +20,7 @@ public class GtfsRtTestHelper {
     this.gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(
       transitTestEnvironment.timetableRepository(),
       transitTestEnvironment.timetableSnapshotManager(),
-      () -> transitTestEnvironment.serviceDate()
+      () -> transitTestEnvironment.defaultServiceDate()
     );
   }
 
@@ -38,7 +38,7 @@ public class GtfsRtTestHelper {
   ) {
     return new TripUpdateBuilder(
       tripId,
-      transitTestEnvironment.serviceDate(),
+      transitTestEnvironment.defaultServiceDate(),
       scheduleRelationship,
       transitTestEnvironment.timeZone()
     );

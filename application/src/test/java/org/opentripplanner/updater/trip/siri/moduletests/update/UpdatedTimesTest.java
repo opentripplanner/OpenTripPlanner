@@ -55,7 +55,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
 
     var updates = updatedJourneyBuilder(siri)
       .withFramedVehicleJourneyRef(builder ->
-        builder.withServiceDate(env.serviceDate()).withVehicleJourneyRef(TRIP_1_ID)
+        builder.withServiceDate(env.defaultServiceDate()).withVehicleJourneyRef(TRIP_1_ID)
       )
       .buildEstimatedTimetableDeliveries();
     var result = siri.applyEstimatedTimetable(updates);

@@ -58,7 +58,7 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
     var updates = siri
       .etBuilder()
       .withFramedVehicleJourneyRef(builder ->
-        builder.withServiceDate(env.serviceDate()).withVehicleJourneyRef("XXX")
+        builder.withServiceDate(env.defaultServiceDate()).withVehicleJourneyRef("XXX")
       )
       .withEstimatedCalls(builder ->
         builder

@@ -111,7 +111,7 @@ class CancellationDeletionTest implements RealtimeTestConstants {
     assertNotNull(patternsAtA, "Added trip pattern should be found");
     var tripPattern = patternsAtA.stream().findFirst().get();
 
-    var forToday = snapshot.resolve(tripPattern, env.serviceDate());
+    var forToday = snapshot.resolve(tripPattern, env.defaultServiceDate());
     var schedule = snapshot.resolve(tripPattern, null);
 
     assertNotSame(forToday, schedule);

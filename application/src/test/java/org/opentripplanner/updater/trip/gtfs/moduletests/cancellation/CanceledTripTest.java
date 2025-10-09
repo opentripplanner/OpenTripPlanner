@@ -39,6 +39,6 @@ public class CanceledTripTest implements RealtimeTestConstants {
     assertThat(canceled).hasSize(1);
     var trip = canceled.getFirst();
     assertEquals(id(TRIP_1_ID), trip.getTrip().getId());
-    assertEquals(env.serviceDate(), trip.getServiceDate());
+    assertEquals(env.defaultServiceDate(), trip.getServiceDate());
   }
 }

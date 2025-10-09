@@ -58,7 +58,7 @@ public class ReplacementTest implements RealtimeTestConstants {
       assertNotNull(trip);
       var originalTripPattern = transitService.findPattern(trip);
 
-      var originalTimetableForToday = snapshot.resolve(originalTripPattern, env.serviceDate());
+      var originalTimetableForToday = snapshot.resolve(originalTripPattern, env.defaultServiceDate());
       var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
       assertNotSame(originalTimetableForToday, originalTimetableScheduled);

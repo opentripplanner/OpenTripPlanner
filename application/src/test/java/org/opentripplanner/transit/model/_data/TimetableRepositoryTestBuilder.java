@@ -33,6 +33,9 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
+/**
+ * A builder for timetable repository to simplify setting up timetable entities for tests
+ */
 public class TimetableRepositoryTestBuilder {
 
   private final List<Agency> agencies = new ArrayList<>();
