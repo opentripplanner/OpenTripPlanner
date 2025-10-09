@@ -1,4 +1,4 @@
-import React, { JSX, useEffect, useState } from 'react';
+import React, { JSX, useState } from 'react';
 import { useTripSchema } from './useTripSchema.ts';
 import { TripQueryVariables } from '../../gql/graphql';
 import { getNestedValue, setNestedValue } from './nestedUtils';
@@ -21,18 +21,11 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({
   expandedArguments,
   setExpandedArguments,
 }) => {
-  const [argumentsList, setArgumentsList] = useState<ProcessedArgument[]>([]);
   const [searchText] = useState('');
 
   const { tripArgs, loading, error } = useTripSchema();
 
-  useEffect(() => {
-    if (!tripArgs) return; // Don't run if the data isn't loaded yet
-    if (loading || error) return; // Optionally handle error/loading
-
-    const extractedArgs = extractAllArgs(tripArgs.trip.arguments);
-    setArgumentsList(extractedArgs);
-  }, [tripArgs, loading, error]);
+  const argumentsList = tripArgs && !loading && !error ? extractAllArgs(tripArgs.trip.arguments) : [];
 
   function normalizePathForList(path: string): string {
     return path.replace(/\.\d+/g, '.*');
