@@ -317,7 +317,7 @@ public class TransmodelGraphQLSchemaFactory {
       stopToStopGeometryType,
       ptSituationElementType
     );
-    GraphQLOutputType empiricalDealy = EmpiricalDelayType.create();
+    GraphQLOutputType empiricalDelay = EmpiricalDelayType.create();
     GraphQLOutputType estimatedCallType = EstimatedCallType.create(
       bookingArrangementType,
       noticeType,
@@ -326,7 +326,7 @@ public class TransmodelGraphQLSchemaFactory {
       ptSituationElementType,
       ServiceJourneyType.REF,
       DatedServiceJourneyType.REF,
-      empiricalDealy,
+      empiricalDelay,
       dateTimeScalar
     );
 
