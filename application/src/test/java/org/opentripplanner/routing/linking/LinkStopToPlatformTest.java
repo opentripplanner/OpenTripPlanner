@@ -424,7 +424,7 @@ public class LinkStopToPlatformTest {
     assertTrue(v.isConnected(near));
     Vertex far = graph.getVertex("4");
     assertNotNull(far);
-    assertTrue(v.isConnected(far) == false);
+    assertTrue(!v.isConnected(far));
   }
 
   private void linkStops(Graph graph, int maxAreaNodes, boolean permanent) {

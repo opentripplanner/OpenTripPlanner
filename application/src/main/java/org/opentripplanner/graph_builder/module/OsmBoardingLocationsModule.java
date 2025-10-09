@@ -109,7 +109,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           break;
         }
       }
-      if (alreadyLinked) continue;
+      if (alreadyLinked) {
+        continue;
+      }
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
         var stop = stopResolver.getStop(ts.getId());
@@ -124,9 +126,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   private boolean connectVertexToStop(TransitStopVertex ts, RegularStop stop, Graph index) {
-    if (connectVertexToNode(ts, stop, index)) return true;
+    if (connectVertexToNode(ts, stop, index)) {
+      return true;
+    }
 
-    if (connectVertexToWay(ts, stop, index)) return true;
+    if (connectVertexToWay(ts, stop, index)) {
+      return true;
+    }
 
     return connectVertexToArea(ts, index);
   }

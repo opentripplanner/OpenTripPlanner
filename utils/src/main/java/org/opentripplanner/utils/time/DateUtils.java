@@ -162,7 +162,9 @@ public class DateUtils {
   public static LocalTime parseTime(String time) {
     boolean amPm = false;
     int addHours = 0;
-    int hour = 0, min = 0, sec = 0;
+    int hour = 0;
+    int min = 0;
+    int sec = 0;
     try {
       String[] hms = time.toUpperCase().split(":");
 
@@ -175,7 +177,9 @@ public class DateUtils {
       if (hms[1].endsWith("PM") || hms[1].endsWith("AM")) {
         amPm = true;
 
-        if (hms[1].contains("PM")) addHours = 12;
+        if (hms[1].contains("PM")) {
+          addHours = 12;
+        }
 
         int suffex = hms[1].lastIndexOf(' ');
         if (suffex < 1) {
@@ -188,7 +192,9 @@ public class DateUtils {
       }
 
       int h = Integer.parseInt(trim(hms[0]));
-      if (amPm && h == 12) h = 0;
+      if (amPm && h == 12) {
+        h = 0;
+      }
       hour = h + addHours;
 
       min = Integer.parseInt(trim(hms[1]));

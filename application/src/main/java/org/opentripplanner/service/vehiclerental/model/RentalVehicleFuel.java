@@ -58,8 +58,12 @@ public final class RentalVehicleFuel {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     RentalVehicleFuel that = (RentalVehicleFuel) o;
     return Objects.equals(percent, that.percent) && Objects.equals(range, that.range);
   }

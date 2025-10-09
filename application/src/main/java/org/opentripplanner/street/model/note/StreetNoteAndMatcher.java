@@ -30,8 +30,12 @@ public class StreetNoteAndMatcher implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     StreetNoteAndMatcher that = (StreetNoteAndMatcher) o;
     return note.equals(that.note) && matcher.equals(that.matcher);
   }

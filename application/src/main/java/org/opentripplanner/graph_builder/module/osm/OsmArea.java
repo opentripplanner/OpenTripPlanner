@@ -128,7 +128,8 @@ class OsmArea {
       return closedRings;
     }
 
-    long firstEndpoint = 0, otherEndpoint = 0;
+    long firstEndpoint = 0;
+    long otherEndpoint = 0;
     OsmWay firstWay = null;
     for (Long endpoint : waysByEndpoint.keySet()) {
       List<OsmWay> list = waysByEndpoint.get(endpoint);

@@ -34,8 +34,12 @@ public record DiffEntry<T>(T left, T right) {
 
   @Override
   public String toString() {
-    if (isEqual()) return "(eq: " + element() + ")";
-    if (leftOnly()) return "(left: " + left + ")";
+    if (isEqual()) {
+      return "(eq: " + element() + ")";
+    }
+    if (leftOnly()) {
+      return "(left: " + left + ")";
+    }
     return "(right: " + right + ")";
   }
 

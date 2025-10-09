@@ -29,8 +29,12 @@ public abstract class AbstractViaLocation implements ViaLocation {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     AbstractViaLocation that = (AbstractViaLocation) o;
     return (
       Objects.equals(label, that.label) && Objects.equals(stopLocationIds, that.stopLocationIds)

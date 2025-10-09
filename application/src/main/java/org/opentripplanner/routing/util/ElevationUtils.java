@@ -282,8 +282,19 @@ public class ElevationUtils {
       0.0,
     };
 
-    int i, j, li, lj, lx, ky1, nky1, ly, i1, j1, l2;
-    double f, temp;
+    int i;
+    int j;
+    int li;
+    int lj;
+    int lx;
+    int ky1;
+    int nky1;
+    int ly;
+    int i1;
+    int j1;
+    int l2;
+    double f;
+    double temp;
 
     int kx1 = kx + 1;
     int nkx1 = nx - kx1;

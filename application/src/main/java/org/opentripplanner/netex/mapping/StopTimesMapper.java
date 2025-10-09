@@ -393,7 +393,9 @@ class StopTimesMapper {
 
       if (areaStop != null) {
         stopLocation = areaStop;
-      } else stopLocation = groupStop;
+      } else {
+        stopLocation = groupStop;
+      }
     }
 
     if (stopLocation == null) {

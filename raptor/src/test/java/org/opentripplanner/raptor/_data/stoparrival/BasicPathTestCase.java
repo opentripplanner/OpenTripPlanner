@@ -233,7 +233,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
   }
 
   public static DestinationArrival<TestTripSchedule> basicTripByForwardSearch() {
-    ArrivalView<TestTripSchedule> prevArrival, egress;
+    ArrivalView<TestTripSchedule> prevArrival;
+    ArrivalView<TestTripSchedule> egress;
     prevArrival = access(STOP_A, ACCESS_START, ACCESS_END, ACCESS_C1, ACCESS_C2);
     prevArrival = bus(1, STOP_B, L11_END, LINE_11_C1, LINE_11_C2, TRIP_1, prevArrival);
     prevArrival = transfer(1, STOP_C, TX_START, TX_END, TX_C1, prevArrival);
@@ -254,7 +255,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
    * search:
    */
   public static DestinationArrival<TestTripSchedule> basicTripByReverseSearch() {
-    ArrivalView<TestTripSchedule> nextArrival, egress;
+    ArrivalView<TestTripSchedule> nextArrival;
+    ArrivalView<TestTripSchedule> egress;
     nextArrival = access(STOP_E, EGRESS_END, EGRESS_START, EGRESS_C1, EGRESS_C2);
     // Board slack is subtracted from the arrival time to get the latest possible
     nextArrival = bus(1, STOP_D, L31_START, LINE_31_C1, LINE_31_C2, TRIP_3, nextArrival);

@@ -84,8 +84,12 @@ public final class ScooterPreferences implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     ScooterPreferences that = (ScooterPreferences) o;
     return (
       doubleEquals(that.speed, speed) &&

@@ -49,13 +49,17 @@ public class HashGridTest {
       // Need to remove non intersecting
       Set<DummyObject> hashGridObjs2 = new HashSet<>();
       for (DummyObject obj : hashGridObjs) {
-        if (obj.envelope.intersects(searchEnv)) hashGridObjs2.add(obj);
+        if (obj.envelope.intersects(searchEnv)) {
+          hashGridObjs2.add(obj);
+        }
       }
       List<DummyObject> strtreeObjs = hashGrid.query(searchEnv);
       // Need to remove non intersecting
       Set<DummyObject> strtreeObjs2 = new HashSet<>();
       for (DummyObject obj : strtreeObjs) {
-        if (obj.envelope.intersects(searchEnv)) strtreeObjs2.add(obj);
+        if (obj.envelope.intersects(searchEnv)) {
+          strtreeObjs2.add(obj);
+        }
       }
       boolean equals = hashGridObjs2.equals(strtreeObjs2);
       Assertions.assertTrue(equals);

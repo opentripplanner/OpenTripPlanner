@@ -235,7 +235,9 @@ public class GeometryProcessor {
         if (distance < maxStopToShapeSnapDistance || isFlexTrip) {
           stopSegments.add(segment);
           maxSegmentIndex = index;
-          if (minSegmentIndexForThisStop == -1) minSegmentIndexForThisStop = index;
+          if (minSegmentIndexForThisStop == -1) {
+            minSegmentIndexForThisStop = index;
+          }
         } else if (distance < bestDistance) {
           bestDistance = distance;
           bestSegment = segment;
@@ -566,7 +568,9 @@ public class GeometryProcessor {
     for (ShapePoint point : points) {
       coordinates[i] = point.coordinate();
       distances[i] = point.distTraveled();
-      if (!point.isDistTraveledSet()) hasAllDistances = false;
+      if (!point.isDistTraveledSet()) {
+        hasAllDistances = false;
+      }
       i++;
     }
 
