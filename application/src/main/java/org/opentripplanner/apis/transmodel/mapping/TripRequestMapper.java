@@ -84,7 +84,7 @@ public class TripRequestMapper {
         );
 
         if (GqlUtil.hasArgument(environment, "filters")) {
-          transitBuilder.setFilters(
+          transitBuilder.withFilters(
             transitFilterNewWayMapper.mapFilter(environment.getArgument("filters"))
           );
         } else {
@@ -93,7 +93,7 @@ public class TripRequestMapper {
       });
 
       if (GqlUtil.hasArgument(environment, "modes")) {
-        journeyBuilder.setModes(
+        journeyBuilder.withModes(
           RequestStreetModesMapper.mapRequestStreetModes(environment.getArgument("modes"))
         );
       }

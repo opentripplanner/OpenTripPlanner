@@ -67,7 +67,11 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
     }
     double totalPenalty = 0d;
     Instant requestInstant = s.getRequest().startTime();
-    DataOverlayContext context = s.dataOverlayContext();
+    var optCtx = s.getExtensionRequestContext(DataOverlayContext.class);
+    if (optCtx.isEmpty()) {
+      return 0d;
+    }
+    DataOverlayContext context = optCtx.get();
 
     for (Parameter parameter : context.getParameters()) {
       var threshold = parameter.getThreshold();

@@ -35,12 +35,7 @@ public abstract class AbstractIntersectionTraversalCalculator
     StreetEdge to,
     float toSpeed
   ) {
-    int outAngle = to.getOutAngle();
-    int inAngle = from.getInAngle();
-    int turnCost = Math.abs(outAngle - inAngle);
-    if (turnCost > 180) {
-      turnCost = 360 - turnCost;
-    }
+    int turnCost = Math.abs(calculateTurnAngle(from, to));
 
     // NOTE: This makes the turn duration lower the faster you're going
     return (this.nonDrivingTurnDurationFactor * turnCost) / toSpeed;
@@ -49,18 +44,22 @@ public abstract class AbstractIntersectionTraversalCalculator
   /**
    * Calculates the turn angle from the incoming/outgoing edges and routing request.
    * <p>
-   * Corrects for the side of the street they are driving on.
+   * The turn angle is specified as negative for left turn, positive for right turn, between
+   * -180 and 180.
    */
-  protected int calculateTurnAngle(StreetEdge from, StreetEdge to) {
+  public static int calculateTurnAngle(StreetEdge from, StreetEdge to) {
     int angleOutOfIntersection = to.getInAngle();
     int angleIntoIntersection = from.getOutAngle();
 
-    // Put out to the right of in; i.e. represent everything as one long right turn
-    // Also ensures that turnAngle is always positive.
-    if (angleOutOfIntersection < angleIntoIntersection) {
-      angleOutOfIntersection += 360;
-    }
+    var turnAngle = angleOutOfIntersection - angleIntoIntersection;
 
-    return angleOutOfIntersection - angleIntoIntersection;
+    // ensure that the turn angle is between -180 and 180
+    if (turnAngle >= 180) {
+      turnAngle -= 360;
+    }
+    if (turnAngle < -180) {
+      turnAngle += 360;
+    }
+    return turnAngle;
   }
 }

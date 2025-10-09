@@ -10,10 +10,11 @@ import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.api.ParameterType;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
+import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DataOverlayContext {
+public class DataOverlayContext implements ExtensionRequestContext {
 
   private static final Logger LOG = LoggerFactory.getLogger(DataOverlayContext.class);
 
