@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -45,7 +44,7 @@ class AddedTripBuilderTest {
 
   private static final Agency AGENCY = TimetableRepositoryForTest.AGENCY;
   private static final ZoneId TIME_ZONE = AGENCY.getTimezone();
-  private static final Operator OPERATOR = Operator.of(id("OPERATOR_ID"))
+  private static final Operator OPERATOR = Operator.of(TimetableRepositoryForTest.id("OPERATOR_ID"))
     .withName("OPERATOR_NAME")
     .build();
   private static final Route REPLACED_ROUTE = TimetableRepositoryForTest.route("REPLACED_ROUTE")
@@ -53,7 +52,7 @@ class AddedTripBuilderTest {
     .withOperator(OPERATOR)
     .build();
   private static final String LINE_REF = "ROUTE_ID";
-  private static final FeedScopedId TRIP_ID = id("TRIP_ID");
+  private static final FeedScopedId TRIP_ID = TimetableRepositoryForTest.id("TRIP_ID");
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 2, 17);
   private static final TransitMode TRANSIT_MODE = TransitMode.RAIL;
   private static final String SUB_MODE = "replacementRailService";
@@ -96,7 +95,7 @@ class AddedTripBuilderTest {
 
     // Crate a scheduled calendar, to have the SERVICE_DATE be within the transit feed coverage
     CalendarServiceData calendarServiceData = new CalendarServiceData();
-    var cal_id = id("CAL_1");
+    var cal_id = TimetableRepositoryForTest.id("CAL_1");
     calendarServiceData.putServiceDatesForServiceId(
       cal_id,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
@@ -255,7 +254,7 @@ class AddedTripBuilderTest {
 
     var firstTrip = firstAddedTrip.successValue().tripTimes().getTrip();
 
-    var tripId2 = id("TRIP_ID_2");
+    var tripId2 = TimetableRepositoryForTest.id("TRIP_ID_2");
 
     var secondAddedTrip = new AddedTripBuilder(
       transitService,
@@ -557,7 +556,7 @@ class AddedTripBuilderTest {
     String subMode
   ) {
     // Arrange
-    var route = Route.of(id(LINE_REF))
+    var route = Route.of(TimetableRepositoryForTest.id(LINE_REF))
       .withShortName(SHORT_NAME)
       .withAgency(AGENCY)
       .withMode(TransitMode.valueOf(replacedRouteMode))

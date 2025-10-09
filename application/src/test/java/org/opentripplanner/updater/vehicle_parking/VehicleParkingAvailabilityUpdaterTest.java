@@ -3,7 +3,7 @@ package org.opentripplanner.updater.vehicle_parking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import com.google.common.util.concurrent.Futures;
 import java.util.List;

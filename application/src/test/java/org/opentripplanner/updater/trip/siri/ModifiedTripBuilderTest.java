@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -72,7 +71,7 @@ class ModifiedTripBuilderTest {
     .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A_1, STOP_B_1, STOP_C_1))
     .build();
 
-  private static final FeedScopedId SERVICE_ID = id("CAL_1");
+  private static final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("CAL_1");
 
   private static final Trip TRIP = TimetableRepositoryForTest.trip("TRIP")
     .withRoute(ROUTE)
