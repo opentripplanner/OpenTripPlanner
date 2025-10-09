@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - dev-2.x
-#    paths:
-#      - 'client/**'
+    paths:
+      - 'client/**'
   pull_request:
     branches:
       - dev-2.x
