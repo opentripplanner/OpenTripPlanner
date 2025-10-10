@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;

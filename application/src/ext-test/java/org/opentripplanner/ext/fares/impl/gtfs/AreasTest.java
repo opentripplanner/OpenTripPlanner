@@ -83,12 +83,7 @@ class AreasTest implements PlanTestConstants {
 
     var result = SERVICE.calculateFares(i1);
     assertEquals(
-      Set.of(
-        FareOffer.of(
-          i1.listScheduledTransitLegs().getFirst().startTime(),
-          INNER_TO_OUTER_ZONE_SINGLE
-        )
-      ),
+      Set.of(FareOffer.of(i1.listTransitLegs().getFirst().startTime(), INNER_TO_OUTER_ZONE_SINGLE)),
       result.offersForLeg(i1.legs().get(1))
     );
   }
@@ -102,7 +97,7 @@ class AreasTest implements PlanTestConstants {
 
     var result = SERVICE.calculateFares(i1);
     assertEquals(
-      Set.of(FareOffer.of(i1.listScheduledTransitLegs().getFirst().startTime(), SINGLE_TO_OUTER)),
+      Set.of(FareOffer.of(i1.listTransitLegs().getFirst().startTime(), SINGLE_TO_OUTER)),
       result.offersForLeg(i1.legs().get(1))
     );
   }
@@ -116,7 +111,7 @@ class AreasTest implements PlanTestConstants {
 
     var result = SERVICE.calculateFares(i1);
     assertEquals(
-      Set.of(FareOffer.of(i1.listScheduledTransitLegs().getFirst().startTime(), SINGLE_FROM_OUTER)),
+      Set.of(FareOffer.of(i1.listTransitLegs().getFirst().startTime(), SINGLE_FROM_OUTER)),
       result.offersForLeg(i1.legs().get(1))
     );
   }
