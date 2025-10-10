@@ -1,9 +1,10 @@
 import Select from 'react-select';
-import { LegType, createLegOptions } from './compareUtils.ts';
+import { Leg } from '../../static/query/tripQueryTypes.js';
+import { createLegOptions } from './compareUtils.ts';
 
 interface LegSelectionDropdownsProps {
-  itinerary1Legs: LegType[];
-  itinerary2Legs: LegType[];
+  itinerary1Legs: Leg[];
+  itinerary2Legs: Leg[];
   selectedLeg1Ids: string[];
   selectedLeg2Ids: string[];
   setSelectedLeg1Ids: (ids: string[]) => void;

@@ -1,15 +1,10 @@
 import { Table } from 'react-bootstrap';
-import {
-  TripPatternType,
-  ItinerarySummary,
-  getComparisonClass,
-  parseDistanceToMeters,
-  columnComparisons,
-} from './compareUtils.ts';
+import { TripPattern } from '../../static/query/tripQueryTypes.js';
+import { ItinerarySummary, getComparisonClass, parseDistanceToMeters, columnComparisons } from './compareUtils.ts';
 
 interface ItinerarySummaryTableProps {
-  itinerary1: TripPatternType;
-  itinerary2: TripPatternType;
+  itinerary1: TripPattern;
+  itinerary2: TripPattern;
   summary1: ItinerarySummary;
   summary2: ItinerarySummary;
   selectedIndexes: number[];

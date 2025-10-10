@@ -1,11 +1,12 @@
 import { Table } from 'react-bootstrap';
-import { TripPatternType, LegType } from './compareUtils.ts';
+import { TripPattern, Leg } from '../../static/query/tripQueryTypes.js';
 import { formatTime } from '../../util/formatTime.ts';
 import { formatDuration } from '../../util/formatDuration.ts';
 import { formatDistance } from '../../util/formatDistance.ts';
 
 // Create a unique, content-based key for each leg
-const createLegKey = (leg: LegType, itineraryIdx: number): string => {
+const createLegKey = (leg: Leg, itineraryIdx: number): string => {
+  if (!leg) return `itinerary_${itineraryIdx}_leg_invalid`;
   // Primary: Use leg ID if available
   if (leg.id) {
     return `itinerary_${itineraryIdx}_leg_${leg.id}`;
@@ -17,8 +18,8 @@ const createLegKey = (leg: LegType, itineraryIdx: number): string => {
 };
 
 interface SelectedLegsComparisonTableProps {
-  itinerary1: TripPatternType;
-  itinerary2: TripPatternType;
+  itinerary1: TripPattern;
+  itinerary2: TripPattern;
   selectedLegIds: string[];
   selectedIndexes: number[];
   timeZone: string;
@@ -56,10 +57,11 @@ export function SelectedLegsComparisonTable({
         <tbody>
           {[itinerary1, itinerary2].map((tripPattern, itineraryIdx) =>
             tripPattern.legs
-              .filter((leg: LegType) =>
-                selectedLegIds.includes(leg.id || `leg${itineraryIdx + 1}_${tripPattern.legs.indexOf(leg)}`),
+              .filter(
+                (leg: Leg) =>
+                  leg && selectedLegIds.includes(leg.id || `leg${itineraryIdx + 1}_${tripPattern.legs.indexOf(leg)}`),
               )
-              .map((leg: LegType) => (
+              .map((leg: Leg) => (
                 <tr key={createLegKey(leg, itineraryIdx)}>
                   <td>
                     <strong>#{selectedIndexes[itineraryIdx] + 1}</strong>

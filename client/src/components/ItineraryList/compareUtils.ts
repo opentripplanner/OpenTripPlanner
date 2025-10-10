@@ -1,11 +1,8 @@
-import { TripQuery, Mode } from '../../gql/graphql.ts';
+import { Mode } from '../../gql/graphql.ts';
 import { formatTime } from '../../util/formatTime.ts';
 import { formatDuration } from '../../util/formatDuration.ts';
 import { formatDistance } from '../../util/formatDistance.ts';
-
-// Extract types from TripQuery for better type safety
-export type TripPatternType = NonNullable<TripQuery['trip']['tripPatterns'][0]>;
-export type LegType = NonNullable<TripPatternType['legs'][0]>;
+import { TripPattern, Leg } from '../../static/query/tripQueryTypes.js';
 
 export interface ItinerarySummary {
   startTime: string;
@@ -30,7 +27,6 @@ export const parseDistanceToMeters = (distanceStr: string): number => {
   return numericValue; // Already in meters
 };
 
-// Configurable comparison logic for each column
 export const getComparisonClass = (
   value1: number | null | undefined,
   value2: number | null | undefined,
@@ -41,7 +37,6 @@ export const getComparisonClass = (
   return isBest ? 'compare-value-best' : '';
 };
 
-// Column-specific comparison configurations
 export const columnComparisons = {
   duration: 'lower' as const, // Lower duration is better
   cost: 'lower' as const, // Lower cost is better
@@ -49,15 +44,16 @@ export const columnComparisons = {
   walkingDistance: 'lower' as const, // Less walking is better
 };
 
-export const getItinerarySummary = (tripPattern: TripPatternType, timeZone: string): ItinerarySummary => {
+export const getItinerarySummary = (tripPattern: TripPattern, timeZone: string): ItinerarySummary => {
+  if (!tripPattern) throw new Error('TripPattern is required');
   const startTime = formatTime(tripPattern.expectedStartTime, timeZone, 'short');
   const endTime = formatTime(tripPattern.expectedEndTime, timeZone, 'short');
   const duration = formatDuration(tripPattern.duration);
   const generalizedCost = tripPattern.generalizedCost;
 
   const walkingDistance = tripPattern.legs
-    .filter((leg: LegType) => leg.mode === Mode.Foot)
-    .reduce((sum: number, leg: LegType) => sum + leg.distance, 0);
+    .filter((leg: Leg) => leg && leg.mode === Mode.Foot)
+    .reduce((sum: number, leg: Leg) => sum + leg.distance, 0);
 
   const totalLegs = Math.max(0, tripPattern.legs.length - 1); // Transfers = legs - 1, minimum 0
 
@@ -71,8 +67,7 @@ export const getItinerarySummary = (tripPattern: TripPatternType, timeZone: stri
   };
 };
 
-// Create options for react-select dropdowns
-export const createLegOptions = (legs: LegType[], itineraryNumber: number, timeZone: string): LegOption[] => {
+export const createLegOptions = (legs: Leg[], itineraryNumber: number, timeZone: string): LegOption[] => {
   return legs.map((leg, index) => {
     const legId = leg.id || `leg${itineraryNumber}_${index}`;
     const fromName = leg.fromPlace?.name || 'Unknown';
