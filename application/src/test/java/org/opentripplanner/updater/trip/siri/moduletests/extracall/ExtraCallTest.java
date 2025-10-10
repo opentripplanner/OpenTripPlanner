@@ -36,7 +36,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraCall() {
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = updateWithExtraCall(siri);
@@ -52,7 +52,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraCallMultipleTimes() {
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = updateWithExtraCall(siri);
@@ -68,7 +68,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraCallAndCancellation() {
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = updateWithExtraCall(siri);
@@ -93,7 +93,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraUnknownStop() {
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -119,7 +119,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraCallSameNumberOfStops() {
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -143,7 +143,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
   @Test
   void testExtraCallAndIllegalChangeOfOtherStops() {
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri

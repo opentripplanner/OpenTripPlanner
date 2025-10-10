@@ -71,7 +71,7 @@ public class TripOnDateDataFetcher {
     return timetable.getTripTimes(trip());
   }
 
-  public RealTimeState getRealTimeState() {
+  public RealTimeState realTimeState() {
     return tripTimes().getRealTimeState();
   }
 

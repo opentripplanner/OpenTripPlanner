@@ -68,7 +68,7 @@ public class SiriTestHelper {
     return new EstimatedTimetableHandler(
       siriAdapter,
       fuzzyMatching,
-      transitTestEnvironment.getFeedId()
+      transitTestEnvironment.feedId()
     );
   }
 

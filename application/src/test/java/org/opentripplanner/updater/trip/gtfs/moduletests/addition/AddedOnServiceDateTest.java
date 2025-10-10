@@ -31,7 +31,7 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
   private static final LocalDate END_DATE = START_DATE.plusDays(2);
 
   private final TransitTestEnvironment env = envBuilder
-    .withTrip(
+    .addTrip(
       TripInput.of(TRIP_1_ID)
         // on either side of added date, but not on it
         .withServiceDates(START_DATE, END_DATE)

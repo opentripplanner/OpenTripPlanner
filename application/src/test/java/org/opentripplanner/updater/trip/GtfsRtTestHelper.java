@@ -65,7 +65,7 @@ public class GtfsRtTestHelper {
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
       incrementality,
       updates,
-      transitTestEnvironment.getFeedId()
+      transitTestEnvironment.feedId()
     );
     commitTimetableSnapshot();
     return updateResult;

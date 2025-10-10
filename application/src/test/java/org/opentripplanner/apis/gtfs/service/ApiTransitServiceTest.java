@@ -66,7 +66,7 @@ class ApiTransitServiceTest {
 
   @Test
   void justScheduledTrips() {
-    var env = envBuilder.withTrip(TRIP1_INPUT).withTrip(TRIP2_INPUT).build();
+    var env = envBuilder.addTrip(TRIP1_INPUT).addTrip(TRIP2_INPUT).build();
     var service = new ApiTransitService(env.getTransitService());
 
     var pattern = env.tripData(TRIP_1_ID).tripPattern();
@@ -91,7 +91,7 @@ class ApiTransitServiceTest {
    */
   @Test
   void skipStopInMultipleTripsInPattern() {
-    var env = envBuilder.withTrip(TRIP1_INPUT).withTrip(TRIP2_INPUT).build();
+    var env = envBuilder.addTrip(TRIP1_INPUT).addTrip(TRIP2_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var res = rt.applyTripUpdates(
@@ -122,7 +122,7 @@ class ApiTransitServiceTest {
 
   @Test
   void transitLegCalls() {
-    var env = envBuilder.withTrip(TRIP1_INPUT).build();
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
     var service = new ApiTransitService(env.getTransitService());
 
     var tripData = env.tripData(TRIP_1_ID);
@@ -153,7 +153,7 @@ class ApiTransitServiceTest {
 
   @Test
   void streetLegCalls() {
-    var env = envBuilder.withTrip(TRIP1_INPUT).build();
+    var env = envBuilder.addTrip(TRIP1_INPUT).build();
     var service = new ApiTransitService(env.getTransitService());
 
     var leg = StreetLeg.of()

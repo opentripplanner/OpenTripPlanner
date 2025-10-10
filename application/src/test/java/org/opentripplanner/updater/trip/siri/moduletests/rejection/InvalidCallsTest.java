@@ -35,7 +35,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
 
   @Test
   void testTooFewCalls() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -58,7 +58,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
 
   @Test
   void testTooManyCalls() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -85,7 +85,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
 
   @Test
   void testMismatchedStop() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -110,7 +110,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
 
   @Test
   void testUnknownStop() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri

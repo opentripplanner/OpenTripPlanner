@@ -30,7 +30,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithDatedVehicleJourneyRef() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = updatedJourneyBuilder(siri)
@@ -50,7 +50,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithFramedVehicleJourneyRef() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = updatedJourneyBuilder(siri)
@@ -68,7 +68,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithoutJourneyRef() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = updatedJourneyBuilder(siri).buildEstimatedTimetableDeliveries();

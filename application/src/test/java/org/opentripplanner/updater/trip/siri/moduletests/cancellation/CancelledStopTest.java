@@ -27,7 +27,7 @@ class CancelledStopTest implements RealtimeTestConstants {
 
   @Test
   void testCancelStop() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri

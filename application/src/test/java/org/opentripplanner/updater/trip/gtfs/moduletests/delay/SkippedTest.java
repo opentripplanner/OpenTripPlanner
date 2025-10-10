@@ -38,7 +38,7 @@ class SkippedTest implements RealtimeTestConstants {
 
   @Test
   void scheduledTripWithSkippedAndScheduled() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var tripUpdate = rt
@@ -71,7 +71,7 @@ class SkippedTest implements RealtimeTestConstants {
    */
   @Test
   void scheduledTripWithPreviouslySkipped() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var tripUpdate = rt
@@ -118,7 +118,7 @@ class SkippedTest implements RealtimeTestConstants {
    */
   @Test
   void skippedNoData() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     String tripId = TRIP_2_ID;

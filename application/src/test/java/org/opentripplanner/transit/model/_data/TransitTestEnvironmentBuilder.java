@@ -45,7 +45,7 @@ public class TransitTestEnvironmentBuilder {
     return site.stop(id);
   }
 
-  public TransitTestEnvironmentBuilder withStops(String... stopIds) {
+  public TransitTestEnvironmentBuilder addStops(String... stopIds) {
     Arrays.stream(stopIds).forEach(site::stop);
     return this;
   }
@@ -81,21 +81,21 @@ public class TransitTestEnvironmentBuilder {
     return timetable.operator(operatorId);
   }
 
-  public TransitTestEnvironmentBuilder withTrip(TripInput trip) {
-    timetable.withTrip(trip);
+  public TransitTestEnvironmentBuilder addTrip(TripInput trip) {
+    timetable.addTrip(trip);
     return this;
   }
 
-  public TransitTestEnvironmentBuilder withFlexTrip(FlexTripInput tripInput) {
-    timetable.withFlexTrip(tripInput);
+  public TransitTestEnvironmentBuilder addFlexTrip(FlexTripInput tripInput) {
+    timetable.addFlexTrip(tripInput);
     return this;
   }
 
-  public TransitTestEnvironmentBuilder withScheduledStopPointMapping(
+  public TransitTestEnvironmentBuilder addScheduledStopPointMapping(
     FeedScopedId scheduledStopPointId,
     RegularStop stop
   ) {
-    timetable().withScheduledStopPointMapping(scheduledStopPointId, stop);
+    timetable().addScheduledStopPointMapping(scheduledStopPointId, stop);
     return this;
   }
 }

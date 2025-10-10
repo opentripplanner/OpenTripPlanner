@@ -30,7 +30,7 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
   private final Route ROUTE_A = builder.route(ROUTE_ID);
 
   private final TransitTestEnvironment env = builder
-    .withTrip(
+    .addTrip(
       TripInput.of(TRIP_ID)
         .withRoute(ROUTE_A)
         .addStop(STOP_1, START_TIME)

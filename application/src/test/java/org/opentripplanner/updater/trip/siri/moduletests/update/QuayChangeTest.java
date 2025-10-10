@@ -28,7 +28,7 @@ class QuayChangeTest implements RealtimeTestConstants {
    */
   @Test
   void testChangeQuay() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri

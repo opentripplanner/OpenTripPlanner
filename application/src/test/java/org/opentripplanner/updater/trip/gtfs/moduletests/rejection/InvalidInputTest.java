@@ -39,7 +39,7 @@ class InvalidInputTest implements RealtimeTestConstants {
       .addStop(STOP_A, "0:00:10", "0:00:11")
       .addStop(STOP_B, "0:00:20", "0:00:21")
       .build();
-    var env = ENV_BUILDER.withTrip(tripInput).build();
+    var env = ENV_BUILDER.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, env.timeZone())

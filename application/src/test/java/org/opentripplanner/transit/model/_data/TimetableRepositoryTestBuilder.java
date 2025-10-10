@@ -148,17 +148,17 @@ public class TimetableRepositoryTestBuilder {
     return operator;
   }
 
-  public TimetableRepositoryTestBuilder withTrip(TripInput tripInput) {
+  public TimetableRepositoryTestBuilder addTrip(TripInput tripInput) {
     trip(tripInput);
     return this;
   }
 
-  public TimetableRepositoryTestBuilder withFlexTrip(FlexTripInput tripInput) {
+  public TimetableRepositoryTestBuilder addFlexTrip(FlexTripInput tripInput) {
     flexTrip(tripInput);
     return this;
   }
 
-  public TimetableRepositoryTestBuilder withScheduledStopPointMapping(
+  public TimetableRepositoryTestBuilder addScheduledStopPointMapping(
     FeedScopedId scheduledStopPointId,
     RegularStop stop
   ) {

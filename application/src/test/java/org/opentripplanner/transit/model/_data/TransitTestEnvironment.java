@@ -70,7 +70,7 @@ public final class TransitTestEnvironment {
     return new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshot());
   }
 
-  public String getFeedId() {
+  public String feedId() {
     return FeedScopedIdForTestFactory.FEED_ID;
   }
 

@@ -31,7 +31,7 @@ class SkippedWithRepeatedTimesTest implements RealtimeTestConstants {
 
   @Test
   void skippedWithRepeatedTimes() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var tripUpdate = rt

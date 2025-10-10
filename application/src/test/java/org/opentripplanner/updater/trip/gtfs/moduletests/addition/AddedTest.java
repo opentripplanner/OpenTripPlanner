@@ -39,7 +39,7 @@ class AddedTest implements RealtimeTestConstants {
   private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
 
   private final TransitTestEnvironment env = envBuilder
-    .withTrip(
+    .addTrip(
       TripInput.of(TRIP_1_ID)
         // just to set the schedule period
         .withServiceDates(
@@ -51,7 +51,7 @@ class AddedTest implements RealtimeTestConstants {
         .addStop(STOP_C, "12:20", "12:20")
         .build()
     )
-    .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
+    .addStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
     .build();
   private final GtfsRtTestHelper gtfsRt = GtfsRtTestHelper.of(env);
 
@@ -233,7 +233,7 @@ class AddedTest implements RealtimeTestConstants {
       "Added trip should be found in time table for service date"
     );
 
-    assertEquals(realTimeState, tripFetcher.getRealTimeState());
+    assertEquals(realTimeState, tripFetcher.realTimeState());
 
     // Assert that the tripPattern exists at the given stop
     assertTrue(

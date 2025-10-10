@@ -30,7 +30,7 @@ public class ReplacementTest implements RealtimeTestConstants {
       .addStop(STOP_B, "8:40:00", "8:40:00")
       .withHeadsign(I18NString.of("Original Headsign"))
       .build();
-    var env = builder.withTrip(TRIP_INPUT).build();
+    var env = builder.addTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var tripUpdate = rt
@@ -102,7 +102,7 @@ public class ReplacementTest implements RealtimeTestConstants {
     // New trip pattern
     {
       var tripFetcher = env.tripData(TRIP_1_ID);
-      assertEquals(RealTimeState.MODIFIED, tripFetcher.getRealTimeState());
+      assertEquals(RealTimeState.MODIFIED, tripFetcher.realTimeState());
 
       var newTripPattern = tripFetcher.tripPattern();
       assertNotNull(newTripPattern, "New trip pattern should be found");

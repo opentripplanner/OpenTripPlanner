@@ -45,7 +45,7 @@ class CancellationDeletionTest implements RealtimeTestConstants {
   @MethodSource("cases")
   void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
     var env = envBuilder
-      .withTrip(
+      .addTrip(
         TripInput.of(TRIP_1_ID)
           .addStop(STOP_A, "0:00:10", "0:00:11")
           .addStop(STOP_B, "0:00:20", "0:00:21")
@@ -79,7 +79,7 @@ class CancellationDeletionTest implements RealtimeTestConstants {
   @MethodSource("cases")
   void cancelingAddedTrip(ScheduleRelationship relationship, RealTimeState state) {
     var env = envBuilder
-      .withTrip(
+      .addTrip(
         TripInput.of(TRIP_1_ID)
           // just to set the scheduling period
           .withServiceDates(SERVICE_DATE)

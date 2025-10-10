@@ -36,10 +36,10 @@ class CancellationTest implements RealtimeTestConstants {
 
   @Test
   void testCancelTrip() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    assertEquals(RealTimeState.SCHEDULED, env.tripData(TRIP_1_ID).getRealTimeState());
+    assertEquals(RealTimeState.SCHEDULED, env.tripData(TRIP_1_ID).realTimeState());
 
     var updates = siri
       .etBuilder()
@@ -59,15 +59,15 @@ class CancellationTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals(RealTimeState.CANCELED, env.tripData(TRIP_1_ID).getRealTimeState());
+    assertEquals(RealTimeState.CANCELED, env.tripData(TRIP_1_ID).realTimeState());
   }
 
   @Test
   void testCancelTripWithMissingTimes() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    assertEquals(RealTimeState.SCHEDULED, env.tripData(TRIP_1_ID).getRealTimeState());
+    assertEquals(RealTimeState.SCHEDULED, env.tripData(TRIP_1_ID).realTimeState());
 
     var updates = siri
       .etBuilder()
@@ -78,7 +78,7 @@ class CancellationTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals(RealTimeState.CANCELED, env.tripData(TRIP_1_ID).getRealTimeState());
+    assertEquals(RealTimeState.CANCELED, env.tripData(TRIP_1_ID).realTimeState());
   }
 
   /**
@@ -87,7 +87,7 @@ class CancellationTest implements RealtimeTestConstants {
    */
   @Test
   void testChangeQuayAndCancelScheduledTrip() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     assertEquals(
@@ -108,7 +108,7 @@ class CancellationTest implements RealtimeTestConstants {
    */
   @Test
   void testChangeQuayAndCancelAddedTrip() {
-    var env = ENV_BUILDER.withTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var creation = new SiriEtBuilder(env.localTimeParser())

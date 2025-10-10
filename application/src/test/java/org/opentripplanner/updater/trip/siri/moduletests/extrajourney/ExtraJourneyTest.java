@@ -45,7 +45,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
 
   @Test
   void testAddJourneyWithExistingRoute() {
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     Route route = ROUTE;
@@ -85,7 +85,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
   @Test
   void testAddJourneyWithNewRoute() {
     // we actually don't need the trip, but it's the only way to add a route to the index
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     String newRouteRef = "new route ref";
@@ -116,7 +116,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
   @Test
   void testAddJourneyMultipleTimes() {
     // we actually don't need the trip, but it's the only way to add a route to the index
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = createValidAddedJourney(siri).buildEstimatedTimetableDeliveries();
@@ -133,7 +133,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
   @Test
   void testAddedJourneyWithInvalidScheduledData() {
     // we actually don't need the trip, but it's the only way to add a route to the index
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     // Create an extra journey with invalid planned data (travel back in time)
@@ -160,7 +160,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
 
   @Test
   void testReplaceJourney() {
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -195,7 +195,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
 
   @Test
   void testReplaceJourneyWithoutEstimatedVehicleJourneyCode() {
-    var env = ENV_BUILDER.withTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
