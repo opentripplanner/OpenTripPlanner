@@ -14,7 +14,9 @@ import org.onebusaway.gtfs.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareDistance.LinearDistance;
 import org.opentripplanner.ext.fares.model.FareDistance.Stops;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.transit.model.basic.Distance;
 
 class FareLegRuleMapperTest {
@@ -116,6 +118,23 @@ class FareLegRuleMapperTest {
     var mapped = List.copyOf(ruleMapper.map(List.of(obaRule))).getFirst();
 
     assertThat(mapped.priority()).hasValue(55);
+  }
+
+  @Test
+  void noProductFound() {
+    var issues = new DefaultDataImportIssueStore();
+    var ruleMapper = new FareLegRuleMapper(ID_FACTORY, new FareProductMapper(ID_FACTORY), issues);
+
+    var obaRule = new FareLegRule();
+    obaRule.setFareProductId(new AgencyAndId("1", "notfound"));
+    obaRule.setRulePriority(55);
+
+    var mapped = ruleMapper.map(List.of(obaRule));
+    assertThat(mapped).isEmpty();
+
+    assertThat(issues.listIssues().stream().map(DataImportIssue::getType)).containsExactly(
+      "UnknownFareProductId"
+    );
   }
 
   private static FareProduct cashProduct(FareMedium creditMedium) {

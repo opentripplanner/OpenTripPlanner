@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.onebusaway.gtfs.model.Area;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -62,7 +63,7 @@ final class FareLegRuleMapper {
     }
   }
 
-  private FeedScopedId areaId(@Nullable org.onebusaway.gtfs.model.Area area) {
+  private FeedScopedId areaId(@Nullable Area area) {
     if (area == null) {
       return null;
     } else {
