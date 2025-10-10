@@ -17,6 +17,7 @@ public class EmpiricalDelayType {
 
   private EmpiricalDelayType() {}
 
+  /** Create the GraphQL type definition for empirical delay. */
   public static GraphQLObjectType create() {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -48,6 +49,7 @@ public class EmpiricalDelayType {
       .build();
   }
 
+  /** Data fetcher for retrieving empirical delay from trip time data. */
   @Nullable
   public static EmpiricalDelay dataFetcherForTripTimeOnDate(DataFetchingEnvironment environment) {
     TripTimeOnDate parent = environment.getSource();

@@ -6,14 +6,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/** Builder for constructing {@link EmpiricalDelayCalendar} instances. */
 public class EmpiricalDelayCalendarBuilder {
 
   private final Map<DayOfWeek, ServiceCalendarPeriod> calendarForDays = new HashMap<>();
 
+  /** Build the calendar from the configured service periods. */
   public EmpiricalDelayCalendar build() {
     return new EmpiricalDelayCalendar(calendarForDays);
   }
 
+  /** Add a service period for specific days of the week. */
   public EmpiricalDelayCalendarBuilder with(
     String serviceId,
     Collection<DayOfWeek> days,

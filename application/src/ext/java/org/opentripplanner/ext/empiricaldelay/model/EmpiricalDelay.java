@@ -5,7 +5,7 @@ import java.time.Duration;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**
- * Empirical dalay values in seconds.
+ * Empirical delay values in seconds.
  */
 public class EmpiricalDelay implements Serializable {
 
@@ -17,10 +17,12 @@ public class EmpiricalDelay implements Serializable {
     this.p90 = p90;
   }
 
+  /** The median/50th percentile delay. */
   public Duration p50() {
     return Duration.ofSeconds(p50);
   }
 
+  /** The 90th percentile delay. */
   public Duration p90() {
     return Duration.ofSeconds(p90);
   }

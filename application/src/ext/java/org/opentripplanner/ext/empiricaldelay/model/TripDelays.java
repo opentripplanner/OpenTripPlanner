@@ -34,6 +34,7 @@ public class TripDelays implements Serializable {
     return tripId;
   }
 
+  /** Retrieve delay for a specific service and stop position. */
   public Optional<EmpiricalDelay> get(String serviceId, int stopPosInPattern) {
     TIntObjectMap<EmpiricalDelay> delayPerStop = delaysByServiceId.get(serviceId);
     // Check if empirical data for the serviceId (serviceDay) exist
@@ -60,8 +61,9 @@ public class TripDelays implements Serializable {
       this.tripId = tripId;
     }
 
-    public Builder with(String serviceId, TIntObjectMap<EmpiricalDelay> dalaysForEachStop) {
-      delaysByServiceId.put(serviceId, dalaysForEachStop);
+    /** Add delays for a specific service, indexed by stop position. */
+    public Builder with(String serviceId, TIntObjectMap<EmpiricalDelay> delaysForEachStop) {
+      delaysByServiceId.put(serviceId, delaysForEachStop);
       return this;
     }
 
@@ -75,6 +77,7 @@ public class TripDelays implements Serializable {
       return this;
     }
 
+    /** Build the trip delays object, or null if no delays were added. */
     @Nullable
     public TripDelays build() {
       return delaysByServiceId.isEmpty() ? null : new TripDelays(tripId, delaysByServiceId);

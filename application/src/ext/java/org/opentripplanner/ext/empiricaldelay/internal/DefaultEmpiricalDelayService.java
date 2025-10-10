@@ -8,6 +8,7 @@ import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
+/** Default implementation delegating to the repository. */
 public class DefaultEmpiricalDelayService implements EmpiricalDelayService {
 
   private final EmpiricalDelayRepository repository;

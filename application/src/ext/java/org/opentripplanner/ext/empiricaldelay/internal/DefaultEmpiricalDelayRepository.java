@@ -12,6 +12,7 @@ import org.opentripplanner.ext.empiricaldelay.model.TripDelays;
 import org.opentripplanner.ext.empiricaldelay.model.calendar.EmpiricalDelayCalendar;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
+/** Default implementation of the empirical delay repository. */
 public class DefaultEmpiricalDelayRepository implements EmpiricalDelayRepository {
 
   /** feedId -> calendar */

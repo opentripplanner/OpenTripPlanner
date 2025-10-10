@@ -8,7 +8,7 @@ import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameter
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
- * This class is responsible for mapping empirical delay configuration into parameters.
+ * This class is responsible for mapping empirical delay JSON configuration into parameters.
  */
 public class EmpiricalDelayConfig {
 

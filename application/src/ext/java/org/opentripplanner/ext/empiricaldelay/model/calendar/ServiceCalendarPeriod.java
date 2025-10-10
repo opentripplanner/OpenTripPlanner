@@ -27,8 +27,9 @@ public class ServiceCalendarPeriod implements Serializable {
     this.end = end;
   }
 
+  /** Check if the given date falls within this service period. */
   public boolean accept(LocalDate serviceDate) {
-    // The Java lib does not support isBeforeOrEquals, hence the ackward !(...)
+    // The Java lib does not support isBeforeOrEquals, hence the awkward !(...)
     return !(start.isAfter(serviceDate) || end.isBefore(serviceDate));
   }
 
