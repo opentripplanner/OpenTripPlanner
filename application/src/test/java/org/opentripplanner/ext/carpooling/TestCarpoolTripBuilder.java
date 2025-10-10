@@ -25,6 +25,17 @@ public class TestCarpoolTripBuilder {
   }
 
   /**
+   * Creates a simple trip with specific departure time.
+   */
+  public static CarpoolTrip createSimpleTripWithTime(
+    WgsCoordinate boarding,
+    WgsCoordinate alighting,
+    ZonedDateTime startTime
+  ) {
+    return createTripWithTime(startTime, 4, boarding, List.of(), alighting);
+  }
+
+  /**
    * Creates a trip with specified stops.
    */
   public static CarpoolTrip createTripWithStops(
@@ -80,6 +91,33 @@ public class TestCarpoolTripBuilder {
       .withAvailableSeats(seats)
       .withStartTime(ZonedDateTime.now())
       .withDeviationBudget(deviationBudget)
+      .build();
+  }
+
+  /**
+   * Creates a trip with specific start time and all other parameters.
+   * End time is calculated as startTime + 1 hour.
+   */
+  public static CarpoolTrip createTripWithTime(
+    ZonedDateTime startTime,
+    int seats,
+    WgsCoordinate boarding,
+    List<CarpoolStop> stops,
+    WgsCoordinate alighting
+  ) {
+    return new org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder(
+      org.opentripplanner.transit.model.framework.FeedScopedId.ofNullable(
+        "TEST",
+        "trip-" + idCounter.incrementAndGet()
+      )
+    )
+      .withBoardingArea(createAreaStop(boarding))
+      .withAlightingArea(createAreaStop(alighting))
+      .withStops(stops)
+      .withAvailableSeats(seats)
+      .withStartTime(startTime)
+      .withEndTime(startTime.plusHours(1))
+      .withDeviationBudget(Duration.ofMinutes(10))
       .build();
   }
 

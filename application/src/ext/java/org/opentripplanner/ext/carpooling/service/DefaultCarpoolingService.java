@@ -76,20 +76,28 @@ public class DefaultCarpoolingService implements CarpoolingService {
     // Validate request
     validateRequest(request);
 
-    // Extract passenger coordinates
+    // Extract passenger coordinates and time
     WgsCoordinate passengerPickup = new WgsCoordinate(request.from().getCoordinate());
     WgsCoordinate passengerDropoff = new WgsCoordinate(request.to().getCoordinate());
+    var passengerDepartureTime = request.dateTime();
 
-    LOG.debug("Finding carpool itineraries from {} to {}", passengerPickup, passengerDropoff);
+    LOG.debug(
+      "Finding carpool itineraries from {} to {} at {}",
+      passengerPickup,
+      passengerDropoff,
+      passengerDepartureTime
+    );
 
     // Get all trips from repository
     var allTrips = repository.getCarpoolTrips();
     LOG.debug("Repository contains {} carpool trips", allTrips.size());
 
-    // Apply pre-filters (fast rejection)
+    // Apply pre-filters (fast rejection) - pass time for time-aware filters
     var candidateTrips = allTrips
       .stream()
-      .filter(trip -> preFilters.accepts(trip, passengerPickup, passengerDropoff))
+      .filter(trip ->
+        preFilters.accepts(trip, passengerPickup, passengerDropoff, passengerDepartureTime)
+      )
       .toList();
 
     LOG.debug(

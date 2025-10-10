@@ -4,8 +4,10 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.ext.carpooling.util.PassengerCountTimeline;
 import org.opentripplanner.ext.carpooling.validation.InsertionValidator;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -38,10 +40,31 @@ public class OptimalInsertionStrategy {
 
   private final InsertionValidator validator;
   private final RoutingFunction routingFunction;
+  private final PassengerDelayConstraints delayConstraints;
+  private final BeelineEstimator beelineEstimator;
 
   public OptimalInsertionStrategy(InsertionValidator validator, RoutingFunction routingFunction) {
+    this(validator, routingFunction, new PassengerDelayConstraints(), new BeelineEstimator());
+  }
+
+  public OptimalInsertionStrategy(
+    InsertionValidator validator,
+    RoutingFunction routingFunction,
+    PassengerDelayConstraints delayConstraints
+  ) {
+    this(validator, routingFunction, delayConstraints, new BeelineEstimator());
+  }
+
+  public OptimalInsertionStrategy(
+    InsertionValidator validator,
+    RoutingFunction routingFunction,
+    PassengerDelayConstraints delayConstraints,
+    BeelineEstimator beelineEstimator
+  ) {
     this.validator = validator;
     this.routingFunction = routingFunction;
+    this.delayConstraints = delayConstraints;
+    this.beelineEstimator = beelineEstimator;
   }
 
   /**
@@ -68,12 +91,17 @@ public class OptimalInsertionStrategy {
       trip.availableSeats()
     );
 
-    // Calculate baseline duration (current route without new passenger)
-    Duration baselineDuration = calculateRouteDuration(routePoints);
-    if (baselineDuration == null) {
-      LOG.warn("Could not calculate baseline duration for trip {}", trip.getId());
+    // Calculate baseline duration and cumulative times (current route without new passenger)
+    Duration[] originalCumulativeTimes = calculateCumulativeTimes(routePoints);
+    if (originalCumulativeTimes == null) {
+      LOG.warn("Could not calculate baseline route for trip {}", trip.getId());
       return null;
     }
+    Duration baselineDuration = originalCumulativeTimes[originalCumulativeTimes.length - 1];
+
+    // Calculate beeline estimates for original route (for early rejection heuristic)
+    List<WgsCoordinate> originalCoords = routePoints.stream().map(RoutePoint::coordinate).toList();
+    Duration[] originalBeelineTimes = beelineEstimator.calculateCumulativeTimes(originalCoords);
 
     InsertionCandidate bestCandidate = null;
     Duration minAdditionalDuration = Duration.ofDays(1);
@@ -105,6 +133,28 @@ public class OptimalInsertionStrategy {
           continue;
         }
 
+        // Beeline delay heuristic check (early rejection before expensive A* routing)
+        // Only check if there are existing stops to protect
+        if (originalCoords.size() > 2) {
+          if (
+            !passesBeelineDelayCheck(
+              originalCoords,
+              originalBeelineTimes,
+              passengerPickup,
+              passengerDropoff,
+              pickupPos,
+              dropoffPos
+            )
+          ) {
+            LOG.trace(
+              "Insertion at pickup={}, dropoff={} rejected by beeline delay heuristic",
+              pickupPos,
+              dropoffPos
+            );
+            continue; // Skip expensive A* routing!
+          }
+        }
+
         // Calculate route with insertion
         InsertionCandidate candidate = evaluateInsertion(
           trip,
@@ -113,7 +163,8 @@ public class OptimalInsertionStrategy {
           dropoffPos,
           passengerPickup,
           passengerDropoff,
-          baselineDuration
+          baselineDuration,
+          originalCumulativeTimes
         );
 
         if (candidate != null) {
@@ -162,7 +213,8 @@ public class OptimalInsertionStrategy {
     int dropoffPos,
     WgsCoordinate passengerPickup,
     WgsCoordinate passengerDropoff,
-    Duration baselineDuration
+    Duration baselineDuration,
+    Duration[] originalCumulativeTimes
   ) {
     // Build modified route with passenger stops inserted
     List<RoutePoint> modifiedPoints = new ArrayList<>(originalPoints);
@@ -187,6 +239,23 @@ public class OptimalInsertionStrategy {
       totalDuration = totalDuration.plus(
         Duration.between(segment.states.getFirst().getTime(), segment.states.getLast().getTime())
       );
+    }
+
+    // Check passenger delay constraints
+    if (
+      !delayConstraints.satisfiesConstraints(
+        originalCumulativeTimes,
+        segments,
+        pickupPos,
+        dropoffPos
+      )
+    ) {
+      LOG.trace(
+        "Insertion at pickup={}, dropoff={} rejected by delay constraints",
+        pickupPos,
+        dropoffPos
+      );
+      return null;
     }
 
     return new InsertionCandidate(
@@ -220,10 +289,15 @@ public class OptimalInsertionStrategy {
   }
 
   /**
-   * Calculates the total duration for a route.
+   * Calculates cumulative durations to each point in the route.
+   * Returns an array where index i contains the cumulative duration to reach point i.
+   *
+   * @param routePoints The route points
+   * @return Array of cumulative durations, or null if routing fails
    */
-  private Duration calculateRouteDuration(List<RoutePoint> routePoints) {
-    Duration total = Duration.ZERO;
+  private Duration[] calculateCumulativeTimes(List<RoutePoint> routePoints) {
+    Duration[] cumulativeTimes = new Duration[routePoints.size()];
+    cumulativeTimes[0] = Duration.ZERO;
 
     for (int i = 0; i < routePoints.size() - 1; i++) {
       GenericLocation from = toGenericLocation(routePoints.get(i).coordinate());
@@ -234,16 +308,96 @@ public class OptimalInsertionStrategy {
         return null;
       }
 
-      total = total.plus(
-        Duration.between(segment.states.getFirst().getTime(), segment.states.getLast().getTime())
+      Duration segmentDuration = Duration.between(
+        segment.states.getFirst().getTime(),
+        segment.states.getLast().getTime()
       );
+      cumulativeTimes[i + 1] = cumulativeTimes[i].plus(segmentDuration);
     }
 
-    return total;
+    return cumulativeTimes;
   }
 
   private GenericLocation toGenericLocation(WgsCoordinate coord) {
     return GenericLocation.fromCoordinate(coord.latitude(), coord.longitude());
+  }
+
+  /**
+   * Checks if an insertion position passes the beeline delay heuristic.
+   * This is a fast, optimistic check using straight-line distance estimates.
+   * If this check fails, we know the actual A* routing will also fail, so we
+   * can skip the expensive routing calculation.
+   *
+   * @param originalCoords Original route coordinates
+   * @param originalBeelineTimes Beeline cumulative times for original route
+   * @param passengerPickup Passenger pickup location
+   * @param passengerDropoff Passenger dropoff location
+   * @param pickupPos Pickup insertion position (1-indexed)
+   * @param dropoffPos Dropoff insertion position (1-indexed)
+   * @return true if insertion might satisfy delay constraints (proceed with A* routing)
+   */
+  private boolean passesBeelineDelayCheck(
+    List<WgsCoordinate> originalCoords,
+    Duration[] originalBeelineTimes,
+    WgsCoordinate passengerPickup,
+    WgsCoordinate passengerDropoff,
+    int pickupPos,
+    int dropoffPos
+  ) {
+    // Build modified coordinate list with passenger stops inserted
+    List<WgsCoordinate> modifiedCoords = new ArrayList<>(originalCoords);
+    modifiedCoords.add(pickupPos, passengerPickup);
+    modifiedCoords.add(dropoffPos, passengerDropoff);
+
+    // Calculate beeline times for modified route
+    Duration[] modifiedBeelineTimes = beelineEstimator.calculateCumulativeTimes(modifiedCoords);
+
+    // Check delays at each existing stop (exclude boarding at 0 and alighting at end)
+    for (int originalIndex = 1; originalIndex < originalCoords.size() - 1; originalIndex++) {
+      int modifiedIndex = getModifiedIndex(originalIndex, pickupPos, dropoffPos);
+
+      Duration originalTime = originalBeelineTimes[originalIndex];
+      Duration modifiedTime = modifiedBeelineTimes[modifiedIndex];
+      Duration beelineDelay = modifiedTime.minus(originalTime);
+
+      // If even the optimistic beeline estimate exceeds threshold, actual routing will too
+      if (beelineDelay.compareTo(delayConstraints.getMaxDelay()) > 0) {
+        LOG.trace(
+          "Stop at position {} has beeline delay {}s (exceeds {}s threshold)",
+          originalIndex,
+          beelineDelay.getSeconds(),
+          delayConstraints.getMaxDelay().getSeconds()
+        );
+        return false; // Reject early!
+      }
+    }
+
+    return true; // Passes beeline check, proceed with A* routing
+  }
+
+  /**
+   * Maps an index in the original route to the corresponding index in the
+   * modified route after passenger stops have been inserted.
+   *
+   * @param originalIndex Index in original route
+   * @param pickupPos Position where pickup was inserted (1-indexed)
+   * @param dropoffPos Position where dropoff was inserted (1-indexed)
+   * @return Corresponding index in modified route
+   */
+  private int getModifiedIndex(int originalIndex, int pickupPos, int dropoffPos) {
+    int modifiedIndex = originalIndex;
+
+    // Account for pickup insertion
+    if (originalIndex >= pickupPos) {
+      modifiedIndex++;
+    }
+
+    // Account for dropoff insertion (after pickup has been inserted)
+    if (modifiedIndex >= dropoffPos) {
+      modifiedIndex++;
+    }
+
+    return modifiedIndex;
   }
 
   /**
