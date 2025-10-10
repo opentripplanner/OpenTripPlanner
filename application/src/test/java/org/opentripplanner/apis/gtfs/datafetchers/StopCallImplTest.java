@@ -29,6 +29,8 @@ class StopCallImplTest {
     SERVICE_DATE,
     TIME_ZONE
   ).toInstant();
+  private static final String TRIP_ID = "Trip1";
+  private static final String FLEX_TRIP_ID = "FlexTrip1";
 
   private static final OffsetDateTime NOON = OffsetDateTime.parse("2023-06-03T12:00+02:00");
   private static final OffsetDateTime TEN_AM = NOON.minusHours(2);
@@ -39,13 +41,13 @@ class StopCallImplTest {
   private final AreaStop STOP_D = envBuilder.areaStop("D");
   private final AreaStop STOP_E = envBuilder.areaStop("E");
 
-  private final TripInput TRIP_INPUT = TripInput.of("Trip1")
+  private final TripInput TRIP_INPUT = TripInput.of(TRIP_ID)
     .addStop(STOP_A, "12:00:00", "12:00:00")
     .addStop(STOP_B, "12:30:00", "12:30:00")
     .addStop(STOP_C, "13:00:00", "13:00:00")
     .build();
 
-  private final FlexTripInput FLEX_TRIP_INPUT = FlexTripInput.of("FlexTrip1")
+  private final FlexTripInput FLEX_TRIP_INPUT = FlexTripInput.of(FLEX_TRIP_ID)
     .addStop(STOP_D, "10:00", "10:30")
     .addStop(STOP_E, "11:00", "11:30")
     .build();
@@ -53,7 +55,7 @@ class StopCallImplTest {
   @Test
   void fixedTrip() throws Exception {
     var realtimeEnv = envBuilder.withTrip(TRIP_INPUT).build();
-    var tripData = realtimeEnv.tripData("Trip1");
+    var tripData = realtimeEnv.tripData(TRIP_ID);
     var tripTimes = tripData.tripTimes();
     var pattern = tripData.tripPattern();
 
@@ -74,7 +76,7 @@ class StopCallImplTest {
   void flexTrip() {
     OTPFeature.FlexRouting.testOn(() -> {
       var realtimeEnv = envBuilder.withFlexTrip(FLEX_TRIP_INPUT).build();
-      var tripData = realtimeEnv.tripData("FlexTrip1");
+      var tripData = realtimeEnv.tripData(FLEX_TRIP_ID);
       var tripTimes = tripData.tripTimes();
       var pattern = tripData.tripPattern();
 
