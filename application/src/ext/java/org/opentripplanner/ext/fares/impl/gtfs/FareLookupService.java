@@ -28,8 +28,6 @@ class FareLookupService implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(FareLookupService.class);
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
-  private final Set<FeedScopedId> fromAreasWithRules;
-  private final Set<FeedScopedId> toAreasWithRules;
   private final AreaMatcher areaMatcher;
   private final NetworkMatcher networkMatcher;
 
@@ -40,8 +38,6 @@ class FareLookupService implements Serializable {
   ) {
     this.legRules = List.copyOf(legRules);
     this.transferRules = stripWildcards(fareTransferRules);
-    this.fromAreasWithRules = findAreasWithRules(legRules, FareLegRule::fromAreaId);
-    this.toAreasWithRules = findAreasWithRules(legRules, FareLegRule::toAreaId);
     this.areaMatcher = new AreaMatcher(legRules, stopAreas);
     this.networkMatcher = new NetworkMatcher(legRules);
   }
@@ -59,7 +55,7 @@ class FareLookupService implements Serializable {
    */
   Set<FareLegRule> legRules(TransitLeg leg) {
     var rules =
-      this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toSet());
+      this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toUnmodifiableSet());
     var containsPriorities = rules.stream().allMatch(r -> r.priority().isPresent());
     if (containsPriorities) {
       return findHighestPriority(rules);
@@ -212,8 +208,8 @@ class FareLookupService implements Serializable {
       // apply only those fare leg rules which have the correct area ids
       // if area id is null, the rule applies to all legs UNLESS there is another rule that
       // covers this area
-      areaMatcher.matchesArea(leg.from().stop, rule.fromAreaId(), fromAreasWithRules) &&
-      areaMatcher.matchesArea(leg.to().stop, rule.toAreaId(), toAreasWithRules) &&
+      areaMatcher.matchesFromArea(leg.from().stop, rule.fromAreaId()) &&
+      areaMatcher.matchesToArea(leg.to().stop, rule.toAreaId() ) &&
       DistanceMatcher.matchesDistance(leg, rule)
     );
   }
@@ -238,12 +234,7 @@ class FareLookupService implements Serializable {
     }
   }
 
-  private static Set<FeedScopedId> findAreasWithRules(
-    List<FareLegRule> legRules,
-    Function<FareLegRule, FeedScopedId> getArea
-  ) {
-    return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
-  }
+
 
   /**
    * If a GTFS feed contains rule_priority values, then the highest priority rule is returned.
