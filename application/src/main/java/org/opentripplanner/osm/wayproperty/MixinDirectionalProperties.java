@@ -1,3 +1,10 @@
 package org.opentripplanner.osm.wayproperty;
 
-public record MixinDirectionalProperties(double walkSafety, double bicycleSafety) {}
+import org.opentripplanner.street.model.StreetTraversalPermission;
+
+public record MixinDirectionalProperties(
+  StreetTraversalPermission addedPermission,
+  StreetTraversalPermission removedPermission,
+  double walkSafety,
+  double bicycleSafety
+) {}

@@ -107,8 +107,8 @@ public class GermanyMapperTest {
     way.addTag("highway", "track");
     way.addTag("tracktype", "grade1");
     assertEquals(
-      wps.getDataForEntity(way).getPermission(),
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForEntity(way).getPermission()
     );
 
     // https://www.openstreetmap.org/way/5155805

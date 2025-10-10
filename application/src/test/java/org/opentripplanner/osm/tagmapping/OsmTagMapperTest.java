@@ -98,7 +98,8 @@ class OsmTagMapperTest {
 
   @Test
   void testFootway() {
-    assertEquals(PEDESTRIAN, wps.getDataForEntity(WayTestData.footway()).getPermission());
+    OsmWay footway = WayTestData.footway();
+    assertEquals(PEDESTRIAN, wps.getDataForEntity(footway).getPermission());
   }
 
   @Test

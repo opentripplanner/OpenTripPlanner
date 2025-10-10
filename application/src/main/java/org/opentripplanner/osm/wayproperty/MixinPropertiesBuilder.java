@@ -1,6 +1,9 @@
 package org.opentripplanner.osm.wayproperty;
 
+import java.util.function.Consumer;
+import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
  * Builder for {@link MixinProperties}. If you don't set the safety features they will have a default
@@ -47,6 +50,40 @@ public class MixinPropertiesBuilder {
     this.defaultBuilder.withWalkSafety(walkSafety);
     this.forwardBuilder.withWalkSafety(walkSafety);
     this.backwardBuilder.withWalkSafety(walkSafety);
+    return this;
+  }
+
+  /**
+   * Add the same permission to all directions
+   */
+  public MixinPropertiesBuilder addPermission(StreetTraversalPermission permission) {
+    this.defaultBuilder.addPermission(permission);
+    this.forwardBuilder.addPermission(permission);
+    this.backwardBuilder.addPermission(permission);
+    return this;
+  }
+
+  /**
+   * Remove the same permission to all directions
+   */
+  public MixinPropertiesBuilder removePermission(StreetTraversalPermission permission) {
+    this.defaultBuilder.removePermission(permission);
+    this.forwardBuilder.removePermission(permission);
+    this.backwardBuilder.removePermission(permission);
+    return this;
+  }
+
+  public MixinPropertiesBuilder directional(
+    TraverseDirection direction,
+    Consumer<MixinDirectionalPropertiesBuilder> action
+  ) {
+    var builder =
+      switch (direction) {
+        case DIRECTIONLESS -> defaultBuilder;
+        case FORWARD -> forwardBuilder;
+        case BACKWARD -> backwardBuilder;
+      };
+    action.accept(builder);
     return this;
   }
 
