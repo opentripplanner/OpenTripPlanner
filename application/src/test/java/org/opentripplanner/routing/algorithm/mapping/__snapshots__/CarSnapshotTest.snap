@@ -10,7 +10,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 498,
+      "generalizedCost" : 551,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -144,7 +144,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
             },
             "vertexType" : "BIKEPARK"
           },
-          "generalizedCost" : 292,
+          "generalizedCost" : 345,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : {
             "length" : 6,
@@ -233,7 +233,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 731,
+      "generalizedCost" : 732,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -428,7 +428,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 731,
+      "generalizedCost" : 732,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,

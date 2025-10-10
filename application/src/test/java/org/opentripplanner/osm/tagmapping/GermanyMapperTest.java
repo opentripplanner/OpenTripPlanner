@@ -63,7 +63,7 @@ public class GermanyMapperTest {
       way.addTag("zone:traffic", "DE:urban");
       assertEquals(0.9, wps.getDataForWay(way).forward().bicycleSafety(), epsilon);
       // walk safety should be default
-      assertEquals(1, wps.getDataForWay(way).forward().walkSafety(), epsilon);
+      assertEquals(0.9, wps.getDataForWay(way).forward().walkSafety(), epsilon);
     }
 
     @Test
@@ -107,8 +107,8 @@ public class GermanyMapperTest {
     way.addTag("highway", "track");
     way.addTag("tracktype", "grade1");
     assertEquals(
-      wps.getDataForEntity(way).getPermission(),
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForEntity(way).getPermission()
     );
 
     // https://www.openstreetmap.org/way/5155805
