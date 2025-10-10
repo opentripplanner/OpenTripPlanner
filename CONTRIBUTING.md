@@ -164,3 +164,19 @@ more resources. The goal of mainline OTP is not to be everything to everyone, bu
 the most solid code relied upon daily by the primary OTP contributor organizations (as well as
 Sandbox features that have been cleanly isolated from the core system). So in a sense it's
 encouraged for people to work on special-purpose forks.
+
+## Rejecting a PR - Standard Response
+
+For maintainers: Use this template when closing issues or pull requests that don't follow our
+contribution guidelines. Copy and paste as needed, adjusting the text if appropriate.
+
+```
+Hello!
+
+Thank you for your interest in contributing to OpenTripPlanner. Unfortunately we don't have the 
+resources to review changes unless they solve an actual issue, and/or follow our contribution 
+guidelines. If you would like to contribute, please feel free to join us at one of our developer
+meetings or talk to us on Gitter. We are happy to guide you through the process of creating a 
+PR and set the right expectations. You can find the links in our 
+[contribution guidelines](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CONTRIBUTING.md).
+```
