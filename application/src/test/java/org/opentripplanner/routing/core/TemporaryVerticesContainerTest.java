@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -88,40 +87,6 @@ public class TemporaryVerticesContainerTest {
     createStreetEdge(a, d, "a -> d");
     g.index();
     g.calculateConvexHull();
-  }
-
-  @Test
-  void createFromToViaVertexRequest() {
-    var fromWithStops = new GenericLocation("From with stops", stopId, 1.0, 0.4);
-    var container = new TemporaryVerticesContainer();
-    var subject = LinkingContext.of(container, g, TestVertexLinker.of(g), Set::of)
-      .withFrom(fromWithStops, StreetMode.WALK)
-      .withTo(to, StreetMode.WALK)
-      .withVia(viaLocations, EnumSet.of(StreetMode.WALK))
-      .build();
-    var request = subject.createFromToViaVertexRequest();
-    var fromVertices = request.findVertices(fromWithStops);
-    assertThat(fromVertices).isNotEmpty();
-    assertEquals(subject.fromVertices(), fromVertices);
-    var toVertices = request.findVertices(to);
-    assertThat(toVertices).isNotEmpty();
-    assertEquals(subject.toVertices(), toVertices);
-    assertThat(request.fromStops()).isNotEmpty();
-    assertEquals(subject.fromStopVertices(), request.fromStops());
-    assertThat(request.toStops()).isEmpty();
-    assertEquals(subject.toStopVertices(), request.toStops());
-    var firstViaVertices = request.findVertices(viaLocations.get(0).coordinateLocation());
-    assertThat(firstViaVertices).isNotEmpty();
-    assertEquals(
-      subject.verticesByLocation().get(viaLocations.get(0).coordinateLocation()),
-      firstViaVertices
-    );
-    var thirdViaVertices = request.findVertices(viaLocations.get(2).coordinateLocation());
-    assertThat(thirdViaVertices).isNotEmpty();
-    assertEquals(
-      subject.verticesByLocation().get(viaLocations.get(2).coordinateLocation()),
-      thirdViaVertices
-    );
   }
 
   @Test

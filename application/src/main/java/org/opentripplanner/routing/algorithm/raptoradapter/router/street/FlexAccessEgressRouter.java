@@ -14,7 +14,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.street.search.request.FromToViaVertexRequest;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.transit.service.TransitService;
 
 public class FlexAccessEgressRouter {
@@ -28,7 +28,7 @@ public class FlexAccessEgressRouter {
     FlexParameters config,
     DataOverlayContext dataOverlayContext,
     AccessEgressType accessOrEgress,
-    FromToViaVertexRequest fromToViaVertexRequest
+    LinkingContext linkingContext
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
@@ -42,7 +42,7 @@ public class FlexAccessEgressRouter {
         AccessEgressType.ACCESS,
         serverContext.flexParameters().maxAccessWalkDuration(),
         0,
-        fromToViaVertexRequest
+        linkingContext
       )
       : List.of();
 
@@ -54,7 +54,7 @@ public class FlexAccessEgressRouter {
         AccessEgressType.EGRESS,
         serverContext.flexParameters().maxEgressWalkDuration(),
         0,
-        fromToViaVertexRequest
+        linkingContext
       )
       : List.of();
 

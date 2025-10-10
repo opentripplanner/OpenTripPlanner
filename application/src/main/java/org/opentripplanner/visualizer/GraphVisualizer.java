@@ -529,7 +529,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         .build();
       List<GraphPath<State, Edge, Vertex>> paths = finder.graphPathFinderEntryPoint(
         request,
-        linkerContext.createFromToViaVertexRequest()
+        linkerContext
       );
       long dt = System.currentTimeMillis() - t0;
       searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");

@@ -176,10 +176,7 @@ public class SplitEdgeTurnRestrictionsTest {
         .withTo(to, StreetMode.CAR)
         .build();
       var gpf = new GraphPathFinder(null);
-      var paths = gpf.graphPathFinderEntryPoint(
-        request,
-        linkingContext.createFromToViaVertexRequest()
-      );
+      var paths = gpf.graphPathFinderEntryPoint(request, linkingContext);
 
       GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
         ZoneIds.BERLIN,

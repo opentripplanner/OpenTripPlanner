@@ -276,7 +276,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
         accessEgress,
         durationLimit,
         maxStopCount,
-        linkingContext.createFromToViaVertexRequest()
+        linkingContext
       );
     }
   }

@@ -9,13 +9,13 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.request.FromToViaVertexRequest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
- * This class contains temporary vertices and edges that are used in A-Star searches. After they
- * are no longer needed, this class removes the temporary vertices and edges. It implements
- * AutoCloseable and the cleanup is automatically done with a try-with-resources statement.
+ * Holds vertices (mainly temporary) that are meant to be used within the scope of a single route
+ * request that can contain access/egress/direct/transfer routing. The temporary vertices will be
+ * disposed by {@link org.opentripplanner.street.search.TemporaryVerticesContainer} after the search
+ * is over.
  */
 public class LinkingContext {
 
@@ -25,12 +25,28 @@ public class LinkingContext {
   private final Set<TransitStopVertex> fromStopVertices;
   private final Set<TransitStopVertex> toStopVertices;
 
+  public LinkingContext(
+    GenericLocation from,
+    GenericLocation to,
+    Map<GenericLocation, Set<Vertex>> verticesByLocation,
+    Set<TransitStopVertex> fromStopVertices,
+    Set<TransitStopVertex> toStopVertices
+  ) {
+    this.from = from;
+    this.fromStopVertices = fromStopVertices;
+    this.toStopVertices = toStopVertices;
+    this.to = to;
+    this.verticesByLocation = verticesByLocation;
+  }
+
   public LinkingContext(LinkingContextBuilder builder) {
-    this.from = builder.from();
-    this.to = builder.to();
-    this.fromStopVertices = builder.fromStopVertices();
-    this.verticesByLocation = builder.verticesByLocation();
-    this.toStopVertices = builder.toStopVertices();
+    this(
+      builder.from(),
+      builder.to(),
+      builder.verticesByLocation(),
+      builder.fromStopVertices(),
+      builder.toStopVertices()
+    );
   }
 
   /**
@@ -54,6 +70,16 @@ public class LinkingContext {
     Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds
   ) {
     return new LinkingContextBuilder(container, graph, linker, resolveSiteIds);
+  }
+
+  public static LinkingContext ofForTest(
+    GenericLocation from,
+    GenericLocation to,
+    Map<GenericLocation, Set<Vertex>> verticesByLocation,
+    Set<TransitStopVertex> fromStopVertices,
+    Set<TransitStopVertex> toStopVertices
+  ) {
+    return new LinkingContext(from, to, verticesByLocation, fromStopVertices, toStopVertices);
   }
 
   /**
@@ -96,9 +122,11 @@ public class LinkingContext {
   }
 
   /**
-   * Creates a {@link FromToViaVertexRequest} that contains vertices from this container.
+   * Vertices that are used for either origin, destination or for via locations. Only the visit via
+   * locations that have a coordinate specified will have vertices available. Stop vertices are not
+   * included via locations.
    */
-  public FromToViaVertexRequest createFromToViaVertexRequest() {
-    return new FromToViaVertexRequest(fromStopVertices, toStopVertices, verticesByLocation);
+  public Set<Vertex> findVertices(GenericLocation location) {
+    return verticesByLocation.getOrDefault(location, Set.of());
   }
 }

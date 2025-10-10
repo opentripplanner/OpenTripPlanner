@@ -44,7 +44,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.street.search.request.FromToViaVertexRequest;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -61,7 +61,7 @@ public class TransitRouter {
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private final ViaCoordinateTransferFactory viaTransferResolver;
-  private final FromToViaVertexRequest fromToViaVertexRequest;
+  private final LinkingContext linkingContext;
 
   private TransitRouter(
     RouteRequest request,
@@ -70,7 +70,7 @@ public class TransitRouter {
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator,
-    FromToViaVertexRequest fromToViaVertexRequest
+    LinkingContext linkingContext
   ) {
     this.request = request;
     this.serverContext = serverContext;
@@ -79,7 +79,7 @@ public class TransitRouter {
     this.additionalSearchDays = additionalSearchDays;
     this.debugTimingAggregator = debugTimingAggregator;
     this.viaTransferResolver = serverContext.viaTransferResolver();
-    this.fromToViaVertexRequest = fromToViaVertexRequest;
+    this.linkingContext = linkingContext;
   }
 
   public static TransitRouterResult route(
@@ -89,7 +89,7 @@ public class TransitRouter {
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator,
-    FromToViaVertexRequest fromToViaVertexRequest
+    LinkingContext linkingContext
   ) {
     TransitRouter transitRouter = new TransitRouter(
       request,
@@ -98,7 +98,7 @@ public class TransitRouter {
       transitSearchTimeZero,
       additionalSearchDays,
       debugTimingAggregator,
-      fromToViaVertexRequest
+      linkingContext
     );
 
     return transitRouter.route();
@@ -140,7 +140,7 @@ public class TransitRouter {
       serverContext.meterRegistry(),
       viaTransferResolver,
       this::listStopIndexes,
-      fromToViaVertexRequest
+      linkingContext
     );
 
     // Route transit
@@ -273,7 +273,7 @@ public class TransitRouter {
       type,
       durationLimit,
       stopCountLimit,
-      fromToViaVertexRequest
+      linkingContext
     );
     var accessEgresses = AccessEgressMapper.mapNearbyStops(nearbyStops, type);
     accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);
@@ -289,7 +289,7 @@ public class TransitRouter {
         serverContext.flexParameters(),
         serverContext.dataOverlayContext(accessRequest),
         type,
-        fromToViaVertexRequest
+        linkingContext
       );
 
       results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type));

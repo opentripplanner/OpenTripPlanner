@@ -33,7 +33,7 @@ import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
-import org.opentripplanner.street.search.request.FromToViaVertexRequest;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private final MeterRegistry meterRegistry;
   private final ViaCoordinateTransferFactory viaTransferResolver;
   private final LookupStopIndexCallback lookUpStopIndex;
-  private final FromToViaVertexRequest fromToViaVertexRequest;
+  private final LinkingContext linkingContext;
 
   private RaptorRequestMapper(
     RouteRequest request,
@@ -61,7 +61,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     @Nullable MeterRegistry meterRegistry,
     ViaCoordinateTransferFactory viaTransferResolver,
     LookupStopIndexCallback lookUpStopIndex,
-    FromToViaVertexRequest fromToViaVertexRequest
+    LinkingContext linkingContext
   ) {
     this.request = Objects.requireNonNull(request);
     this.isMultiThreadedEnbled = isMultiThreaded;
@@ -71,7 +71,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     this.meterRegistry = meterRegistry;
     this.viaTransferResolver = Objects.requireNonNull(viaTransferResolver);
     this.lookUpStopIndex = Objects.requireNonNull(lookUpStopIndex);
-    this.fromToViaVertexRequest = Objects.requireNonNull(fromToViaVertexRequest);
+    this.linkingContext = Objects.requireNonNull(linkingContext);
   }
 
   public static <T extends RaptorTripSchedule> RaptorRequest<T> mapRequest(
@@ -83,7 +83,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     MeterRegistry meterRegistry,
     ViaCoordinateTransferFactory viaTransferResolver,
     LookupStopIndexCallback lookUpStopIndex,
-    FromToViaVertexRequest fromToViaVertexRequest
+    LinkingContext linkingContext
   ) {
     return new RaptorRequestMapper<T>(
       request,
@@ -94,7 +94,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       meterRegistry,
       viaTransferResolver,
       lookUpStopIndex,
-      fromToViaVertexRequest
+      linkingContext
     ).doMap();
   }
 
@@ -257,9 +257,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         viaStops.add(stopIndex);
       }
       for (var coordinate : input.coordinates()) {
-        var vertices = fromToViaVertexRequest.findVertices(
-          ((VisitViaLocation) input).coordinateLocation()
-        );
+        var vertices = linkingContext.findVertices(((VisitViaLocation) input).coordinateLocation());
         if (vertices.isEmpty()) {
           LOG.warn(
             "Found no vertices for the visit via location {} which indicates a problem.",

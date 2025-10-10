@@ -13,7 +13,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.street.search.request.FromToViaVertexRequest;
+import org.opentripplanner.street.search.LinkingContext;
 
 public class DirectFlexRouter {
 
@@ -21,7 +21,7 @@ public class DirectFlexRouter {
     OtpServerRequestContext serverContext,
     RouteRequest request,
     AdditionalSearchDays additionalSearchDays,
-    FromToViaVertexRequest fromToViaVertexRequest
+    LinkingContext linkingContext
   ) {
     if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {
       return Collections.emptyList();
@@ -35,7 +35,7 @@ public class DirectFlexRouter {
       AccessEgressType.ACCESS,
       serverContext.flexParameters().maxAccessWalkDuration(),
       0,
-      fromToViaVertexRequest
+      linkingContext
     );
     Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
       request,
@@ -44,7 +44,7 @@ public class DirectFlexRouter {
       AccessEgressType.EGRESS,
       serverContext.flexParameters().maxEgressWalkDuration(),
       0,
-      fromToViaVertexRequest
+      linkingContext
     );
 
     var flexRouter = new FlexRouter(

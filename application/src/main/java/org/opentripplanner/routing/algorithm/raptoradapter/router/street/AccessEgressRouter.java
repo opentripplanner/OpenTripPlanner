@@ -11,7 +11,7 @@ import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFind
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.street.search.request.FromToViaVertexRequest;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class AccessEgressRouter {
     AccessEgressType accessOrEgress,
     Duration durationLimit,
     int maxStopCount,
-    FromToViaVertexRequest fromToViaVertexRequest
+    LinkingContext linkingContext
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
@@ -46,7 +46,7 @@ public class AccessEgressRouter {
       request,
       streetRequest,
       accessOrEgress,
-      fromToViaVertexRequest
+      linkingContext
     );
 
     // When looking for street accesses/egresses we ignore the already found direct accesses/egresses
@@ -56,8 +56,8 @@ public class AccessEgressRouter {
       .collect(Collectors.toSet());
 
     var originVertices = accessOrEgress.isAccess()
-      ? fromToViaVertexRequest.findVertices(request.from())
-      : fromToViaVertexRequest.findVertices(request.to());
+      ? linkingContext.findVertices(request.from())
+      : linkingContext.findVertices(request.to());
     var streetAccessEgress = new StreetNearbyStopFinder(
       durationLimit,
       maxStopCount,
@@ -78,11 +78,11 @@ public class AccessEgressRouter {
     RouteRequest routeRequest,
     StreetRequest streetRequest,
     AccessEgressType accessOrEgress,
-    FromToViaVertexRequest fromToViaVertexRequest
+    LinkingContext linkingContext
   ) {
     var transitStopVertices = accessOrEgress.isAccess()
-      ? fromToViaVertexRequest.fromStops()
-      : fromToViaVertexRequest.toStops();
+      ? linkingContext.fromStopVertices()
+      : linkingContext.toStopVertices();
 
     return NearbyStop.nearbyStopsForTransitStopVerticesFiltered(
       transitStopVertices,

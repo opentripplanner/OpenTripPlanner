@@ -188,7 +188,7 @@ class ScheduledDeviatedTripIntegrationTest {
         transitStartOfTime,
         additionalSearchDays,
         new DebugTimingAggregator(),
-        linkingContext.createFromToViaVertexRequest()
+        linkingContext
       );
 
       return result.getItineraries();

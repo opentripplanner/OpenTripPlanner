@@ -69,9 +69,6 @@ class TemporaryVerticesContainerTest {
       .build();
     assertThat(linkingContext.fromVertices()).hasSize(1);
     assertThat(linkingContext.toVertices()).hasSize(1);
-
-    assertThat(linkingContext.fromStopVertices()).isEmpty();
-    assertThat(linkingContext.toStopVertices()).isEmpty();
   }
 
   @Test
@@ -83,9 +80,6 @@ class TemporaryVerticesContainerTest {
       .build();
     assertEquals(stopA, toStop(linkingContext.fromVertices()));
     assertEquals(stopB, toStop(linkingContext.toVertices()));
-
-    assertEquals(stopA, toStop(linkingContext.fromStopVertices()));
-    assertEquals(stopB, toStop(linkingContext.toStopVertices()));
   }
 
   @Test
@@ -104,7 +98,6 @@ class TemporaryVerticesContainerTest {
       .withTo(stopToLocation(stopB), WALK)
       .build();
     assertThat(toStops(linkingContext.fromVertices())).containsExactly(stopC, stopD);
-    assertThat(toStops(linkingContext.fromStopVertices())).containsExactly(stopC, stopD);
   }
 
   @Test

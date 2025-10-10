@@ -105,7 +105,7 @@ class WalkRoutingTest {
         .withTo(to, StreetMode.WALK)
         .build();
       var gpf = new GraphPathFinder(null);
-      return gpf.graphPathFinderEntryPoint(request, linkingContext.createFromToViaVertexRequest());
+      return gpf.graphPathFinderEntryPoint(request, linkingContext);
     }
   }
 }

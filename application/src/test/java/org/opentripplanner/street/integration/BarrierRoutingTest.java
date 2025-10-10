@@ -194,8 +194,7 @@ public class BarrierRoutingTest {
       .withTo(to, streetMode)
       .build();
     var gpf = new GraphPathFinder(null);
-    var fromToViaVertexRequest = linkingContext.createFromToViaVertexRequest();
-    var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), fromToViaVertexRequest);
+    var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), linkingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneIds.BERLIN,

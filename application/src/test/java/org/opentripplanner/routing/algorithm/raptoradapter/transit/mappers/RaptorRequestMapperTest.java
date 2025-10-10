@@ -35,7 +35,7 @@ import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.request.FromToViaVertexRequest;
+import org.opentripplanner.street.search.LinkingContext;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -274,13 +274,15 @@ class RaptorRequestMapperTest {
       null,
       new DummyViaCoordinateTransferFactory(),
       id -> IntStream.of(STOPS_MAP.get(id).getIndex()),
-      new FromToViaVertexRequest(
-        Set.of(),
-        Set.of(),
+      LinkingContext.ofForTest(
+        GenericLocation.UNKNOWN,
+        GenericLocation.UNKNOWN,
         Map.of(
           VISIT_VIA_LOCATION_COORDINATE.coordinateLocation(),
           Set.of(new LabelledIntersectionVertex("viapoint", 1, 1, false, false))
-        )
+        ),
+        Set.of(),
+        Set.of()
       )
     );
   }
