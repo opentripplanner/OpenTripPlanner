@@ -11,12 +11,16 @@ export function ItineraryHeaderContent({
   containerWidth,
   earliestStartTime,
   latestEndTime,
+  comparisonSelectedIndexes,
+  setComparisonSelectedIndexes,
 }: {
   tripPattern: TripPattern;
   itineraryIndex: number;
   containerWidth: number;
   earliestStartTime: string | null;
   latestEndTime: string | null;
+  comparisonSelectedIndexes?: number[];
+  setComparisonSelectedIndexes?: (indexes: number[]) => void;
 }) {
   const { maxSpan, pxSpan, startPx, widthPx, leftPx } = useHeaderContentStyleCalculations(
     tripPattern,
@@ -37,8 +41,39 @@ export function ItineraryHeaderContent({
     [tripPattern.expectedEndTime, timeZone],
   );
 
+  const handleComparisonToggle = () => {
+    if (!setComparisonSelectedIndexes || !comparisonSelectedIndexes) return;
+
+    if (comparisonSelectedIndexes.includes(itineraryIndex)) {
+      setComparisonSelectedIndexes(comparisonSelectedIndexes.filter((i) => i !== itineraryIndex));
+    } else if (comparisonSelectedIndexes.length < 2) {
+      setComparisonSelectedIndexes([...comparisonSelectedIndexes, itineraryIndex]);
+    }
+  };
+
+  const isSelectedForComparison = comparisonSelectedIndexes?.includes(itineraryIndex) || false;
+
   return (
-    <div className="itinerary-header-wrapper">
+    <div className="itinerary-header-wrapper" style={{ position: 'relative' }}>
+      {comparisonSelectedIndexes && setComparisonSelectedIndexes && (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'absolute',
+            top: '4px',
+            right: '4px',
+            zIndex: 10,
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={isSelectedForComparison}
+            onChange={handleComparisonToggle}
+            disabled={!isSelectedForComparison && comparisonSelectedIndexes.length >= 2}
+            title="Select for comparison"
+          />
+        </div>
+      )}
       <div className="itinerary-header-itinerary-number">{itineraryIndex + 1}.</div>
       <div
         className="itinerary-header-itinerary-line"
