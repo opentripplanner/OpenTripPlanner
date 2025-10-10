@@ -4,9 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -53,10 +51,10 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
 
   public RentalVehicleType(
     FeedScopedId id,
-    I18NString name,
+    @Nullable I18NString name,
     RentalFormFactor formFactor,
     PropulsionType propulsionType,
-    Double maxRangeMeters
+    @Nullable Double maxRangeMeters
   ) {
     this.id = Objects.requireNonNull(id);
     this.name = name;
@@ -168,7 +166,7 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
       return this;
     }
 
-    public I18NString name() {
+    public @Nullable I18NString name() {
       return name;
     }
 
@@ -195,17 +193,12 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
       return this;
     }
 
-    public Double maxRangeMeters() {
+    public @Nullable Double maxRangeMeters() {
       return maxRangeMeters;
     }
 
     public Builder withMaxRangeMeters(@Nullable Double maxRangeMeters) {
       this.maxRangeMeters = maxRangeMeters;
-      return this;
-    }
-
-    public Builder apply(Consumer<Builder> body) {
-      body.accept(this);
       return this;
     }
 
@@ -223,19 +216,6 @@ public final class RentalVehicleType implements Serializable, Comparable<RentalV
     COMBUSTION_DIESEL,
     HYBRID,
     PLUG_IN_HYBRID,
-    HYDROGEN_FUEL_CELL;
-
-    public static PropulsionType fromGbfs(GBFSVehicleType.PropulsionType propulsionType) {
-      return switch (propulsionType) {
-        case HUMAN -> HUMAN;
-        case ELECTRIC_ASSIST -> ELECTRIC_ASSIST;
-        case ELECTRIC -> ELECTRIC;
-        case COMBUSTION -> COMBUSTION;
-        case COMBUSTION_DIESEL -> COMBUSTION_DIESEL;
-        case HYBRID -> HYBRID;
-        case PLUG_IN_HYBRID -> PLUG_IN_HYBRID;
-        case HYDROGEN_FUEL_CELL -> HYDROGEN_FUEL_CELL;
-      };
-    }
+    HYDROGEN_FUEL_CELL,
   }
 }

@@ -72,16 +72,10 @@ public class TripRequestMapper {
       callWith.argument("wheelchairAccessible", journeyBuilder::withWheelchair);
 
       journeyBuilder.withTransit(transitBuilder -> {
-        callWith.argument("preferred.authorities", (Collection<String> authorities) ->
-          transitBuilder.withPreferredAgencies(idMapper.parseListNullSafe(authorities))
-        );
         callWith.argument("unpreferred.authorities", (Collection<String> authorities) ->
           transitBuilder.withUnpreferredAgencies(idMapper.parseListNullSafe(authorities))
         );
 
-        callWith.argument("preferred.lines", (List<String> lines) ->
-          transitBuilder.withPreferredRoutes(idMapper.parseListNullSafe(lines))
-        );
         callWith.argument("unpreferred.lines", (List<String> lines) ->
           transitBuilder.withUnpreferredRoutes(idMapper.parseListNullSafe(lines))
         );
@@ -90,7 +84,7 @@ public class TripRequestMapper {
         );
 
         if (GqlUtil.hasArgument(environment, "filters")) {
-          transitBuilder.setFilters(
+          transitBuilder.withFilters(
             transitFilterNewWayMapper.mapFilter(environment.getArgument("filters"))
           );
         } else {
@@ -99,7 +93,7 @@ public class TripRequestMapper {
       });
 
       if (GqlUtil.hasArgument(environment, "modes")) {
-        journeyBuilder.setModes(
+        journeyBuilder.withModes(
           RequestStreetModesMapper.mapRequestStreetModes(environment.getArgument("modes"))
         );
       }

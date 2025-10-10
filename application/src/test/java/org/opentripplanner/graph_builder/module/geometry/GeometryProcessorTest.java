@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.geometry.GeometryUtils.makeLineString;
 import static org.opentripplanner.framework.geometry.SphericalDistanceLibrary.distance;
 import static org.opentripplanner.framework.geometry.SphericalDistanceLibrary.moveMeters;
@@ -16,6 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.LineString;
 import org.opentest4j.AssertionFailedError;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -309,6 +312,31 @@ class GeometryProcessorTest {
     );
 
     assertLineStringWithinTolerance(expected, linestrings);
+  }
+
+  @Test
+  void ignoreInvalidReference() {
+    var issueStore = new DefaultDataImportIssueStore();
+    var builder = new OtpTransitServiceBuilder(repo, issueStore);
+    builder
+      .getShapePoints()
+      .put(SHAPE_ID, List.of(new ShapePoint(0, 0, 0, 0.0), new ShapePoint(1, 1, 1, 1.0)));
+
+    var invalidRef = id("unknown");
+    var trip = TimetableRepositoryForTest.trip("t").withShapeId(invalidRef).build();
+
+    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, "8:00");
+    builder.getStopTimesSortedByTrip().put(trip, stopTimes);
+
+    var processor = new GeometryProcessor(builder, 150, issueStore);
+    var linestrings = processor.createHopGeometries(trip);
+
+    assertThat(linestrings).hasSize(2);
+
+    assertEquals(
+      "[Issue{type: 'InvalidShapeReference', message: 'Trip 'F:t' refers to unknown shape geometry 'F:unknown''}]",
+      issueStore.listIssues().toString()
+    );
   }
 
   private static void assertLineStringWithinTolerance(

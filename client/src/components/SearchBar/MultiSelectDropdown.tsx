@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Form } from 'react-bootstrap';
 
 type MultiSelectDropdownOption<T> = {
@@ -15,6 +15,7 @@ type MultiSelectDropdownProps<T> = {
 
 const MultiSelectDropdown = <T = unknown,>({ label, options, values, onChange }: MultiSelectDropdownProps<T>) => {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -31,8 +32,25 @@ const MultiSelectDropdown = <T = unknown,>({ label, options, values, onChange }:
     }
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
-    <div className={`dropdown ${isOpen ? 'show' : ''}`}>
+    <div className={`dropdown ${isOpen ? 'show' : ''}`} ref={dropdownRef}>
       <Form.Label column="sm" htmlFor="multiSelectDropdown">
         {label}
       </Form.Label>

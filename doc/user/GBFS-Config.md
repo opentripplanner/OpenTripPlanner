@@ -10,7 +10,7 @@ including the number of vehicles and free parking spaces at each station. We sup
 systems that use the [GBFS](https://github.com/NABSA/gbfs) standard, which can describe a variety of 
 shared mobility services.
 
-OTP has partial support for both GBFS v1 and v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)). 
+OTP has partial support for both GBFS v1, v2.3 and v3.0 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)). 
 Furthermore, support is limited to the following form factors:
 
 - bicycle

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,7 +18,6 @@ import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -25,6 +25,7 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.SameEdgeAdjuster;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -44,7 +45,6 @@ import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -62,7 +62,7 @@ public class TestHalfEdges {
   @BeforeEach
   public void setUp() {
     var deduplicator = new Deduplicator();
-    graph = new Graph(deduplicator);
+    graph = new Graph();
     var siteRepositoryBuilder = testModel.siteRepositoryBuilder();
     var factory = new VertexFactory(graph);
     // a 0.1 degree x 0.1 degree square
@@ -153,10 +153,8 @@ public class TestHalfEdges {
     siteRepositoryBuilder.withRegularStop(s1).withRegularStop(s2);
     timetableRepository = new TimetableRepository(siteRepositoryBuilder.build(), deduplicator);
 
-    station1 = factory.transitStop(TransitStopVertex.of().withStop(s1));
-    station2 = factory.transitStop(TransitStopVertex.of().withStop(s2));
-    station1.addMode(TransitMode.RAIL);
-    station2.addMode(TransitMode.RAIL);
+    station1 = factory.transitStop(ofStop(s1));
+    station2 = factory.transitStop(ofStop(s2));
 
     //Linkers aren't run otherwise in testNetworkLinker
     graph.hasStreets = true;
@@ -211,22 +209,22 @@ public class TestHalfEdges {
     var r = RouteRequest.defaultValue();
 
     ShortestPathTree<State, Edge, Vertex> spt1 = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setStreetRequest(r.journey().direct())
-      .setFrom(br)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withStreetRequest(r.journey().direct())
+      .withFrom(br)
+      .withTo(end)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> pathBr = spt1.getPath(end);
     assertNotNull(pathBr, "There must be a path from br to end");
 
     ShortestPathTree<State, Edge, Vertex> spt2 = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setStreetRequest(r.journey().direct())
-      .setFrom(tr)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withStreetRequest(r.journey().direct())
+      .withFrom(tr)
+      .withTo(end)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> pathTr = spt2.getPath(end);
@@ -237,11 +235,11 @@ public class TestHalfEdges {
     );
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setStreetRequest(r.journey().direct())
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withStreetRequest(r.journey().direct())
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = spt.getPath(end);
@@ -256,11 +254,11 @@ public class TestHalfEdges {
     r = RouteRequest.of().withArriveBy(true).buildDefault();
 
     spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setStreetRequest(r.journey().direct())
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withStreetRequest(r.journey().direct())
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     path = spt.getPath(start);
@@ -304,11 +302,11 @@ public class TestHalfEdges {
       .buildDefault();
 
     spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setStreetRequest(r.journey().direct())
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withStreetRequest(r.journey().direct())
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     path = spt.getPath(start);
@@ -343,10 +341,10 @@ public class TestHalfEdges {
     );
 
     spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(r)
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(r)
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     path = spt.getPath(start);
@@ -402,11 +400,11 @@ public class TestHalfEdges {
     var request = RouteRequest.defaultValue();
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(request.journey().direct())
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withStreetRequest(request.journey().direct())
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = spt.getPath(end);
@@ -453,11 +451,11 @@ public class TestHalfEdges {
     var request = RouteRequest.defaultValue();
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(request.journey().direct())
-      .setFrom(start)
-      .setTo(end)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withStreetRequest(request.journey().direct())
+      .withFrom(start)
+      .withTo(end)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = spt.getPath(end);
@@ -566,7 +564,8 @@ public class TestHalfEdges {
     try (
       var container = new TemporaryVerticesContainer(
         graph,
-        TestVertexLinker.of(graph),
+        VertexLinkerTestFactory.of(graph),
+        id -> Set.of(),
         walking.from(),
         walking.to(),
         StreetMode.WALK,
@@ -576,9 +575,9 @@ public class TestHalfEdges {
       assertNotNull(container.getFromVertices());
       assertNotNull(container.getToVertices());
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-        .setHeuristic(new EuclideanRemainingWeightHeuristic())
-        .setRequest(walking)
-        .setVerticesContainer(container)
+        .withHeuristic(new EuclideanRemainingWeightHeuristic())
+        .withRequest(walking)
+        .withVerticesContainer(container)
         .getShortestPathTree();
       GraphPath<State, Edge, Vertex> path = spt.getPath(
         container.getToVertices().iterator().next()

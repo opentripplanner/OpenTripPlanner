@@ -26,23 +26,12 @@ public class TransitRequest implements Serializable {
     List.of(),
     List.of(),
     List.of(),
-    List.of(),
-    List.of(),
     DebugRaptor.defaltValue()
   );
 
   private final List<TransitFilter> filters;
 
-  @Deprecated
-  private final List<FeedScopedId> preferredAgencies;
-
   private final List<FeedScopedId> unpreferredAgencies;
-
-  /**
-   * @deprecated TODO OTP2 Needs to be implemented
-   */
-  @Deprecated
-  private final List<FeedScopedId> preferredRoutes;
 
   private final List<FeedScopedId> unpreferredRoutes;
   private final List<FeedScopedId> bannedTrips;
@@ -52,9 +41,7 @@ public class TransitRequest implements Serializable {
 
   TransitRequest(
     List<TransitFilter> filters,
-    List<FeedScopedId> preferredAgencies,
     List<FeedScopedId> unpreferredAgencies,
-    List<FeedScopedId> preferredRoutes,
     List<FeedScopedId> unpreferredRoutes,
     List<FeedScopedId> bannedTrips,
     List<TransitGroupSelect> priorityGroupsByAgency,
@@ -62,9 +49,7 @@ public class TransitRequest implements Serializable {
     DebugRaptor raptorDebugging
   ) {
     this.filters = filters;
-    this.preferredAgencies = preferredAgencies;
     this.unpreferredAgencies = unpreferredAgencies;
-    this.preferredRoutes = preferredRoutes;
     this.unpreferredRoutes = unpreferredRoutes;
     this.bannedTrips = bannedTrips;
     this.priorityGroupsByAgency = priorityGroupsByAgency;
@@ -109,24 +94,8 @@ public class TransitRequest implements Serializable {
     return priorityGroupsGlobal;
   }
 
-  /**
-   * List of preferred agencies by user.
-   */
-  @Deprecated
-  public List<FeedScopedId> preferredAgencies() {
-    return preferredAgencies;
-  }
-
   public List<FeedScopedId> unpreferredAgencies() {
     return unpreferredAgencies;
-  }
-
-  /**
-   * Set of preferred routes by user and configuration.
-   */
-  @Deprecated
-  public List<FeedScopedId> preferredRoutes() {
-    return preferredRoutes;
   }
 
   /**
@@ -158,9 +127,7 @@ public class TransitRequest implements Serializable {
     TransitRequest that = (TransitRequest) o;
     return (
       Objects.equals(filters, that.filters) &&
-      Objects.equals(preferredAgencies, that.preferredAgencies) &&
       Objects.equals(unpreferredAgencies, that.unpreferredAgencies) &&
-      Objects.equals(preferredRoutes, that.preferredRoutes) &&
       Objects.equals(unpreferredRoutes, that.unpreferredRoutes) &&
       Objects.equals(bannedTrips, that.bannedTrips) &&
       Objects.equals(priorityGroupsByAgency, that.priorityGroupsByAgency) &&
@@ -173,9 +140,7 @@ public class TransitRequest implements Serializable {
   public int hashCode() {
     return Objects.hash(
       filters,
-      preferredAgencies,
       unpreferredAgencies,
-      preferredRoutes,
       unpreferredRoutes,
       bannedTrips,
       priorityGroupsByAgency,
@@ -188,9 +153,7 @@ public class TransitRequest implements Serializable {
   public String toString() {
     return ToStringBuilder.ofEmbeddedType()
       .addCol("filters", filters, DEFAULT.filters)
-      .addCol("preferredAgencies", preferredAgencies)
       .addCol("unpreferredAgencies", unpreferredAgencies)
-      .addCol("preferredRoutes", preferredRoutes)
       .addCol("unpreferredRoutes", unpreferredRoutes)
       .addCol("bannedTrips", bannedTrips)
       .addCol("priorityGroupsByAgency", priorityGroupsByAgency)
