@@ -6,7 +6,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -242,12 +241,10 @@ class FareLookupService implements Serializable {
    * @link <a href="https://gtfs.org/documentation/schedule/reference/#fare_leg_rulestxt">spec</a>
    */
   private static Set<FareLegRule> findHighestPriority(Set<FareLegRule> rules) {
+    var maxPriority = rules.stream().mapToInt(r -> r.priority().orElse(0)).max().orElse(0);
     return rules
       .stream()
-      // the minus reverses the order so that the highest priority rule is first
-      .sorted(Comparator.comparingInt(r -> -r.priority().orElse(0)))
-      .findFirst()
-      .map(Set::of)
-      .orElse(Set.of());
+      .filter(r -> r.priority().orElse(0) == maxPriority)
+      .collect(Collectors.toUnmodifiableSet());
   }
 }

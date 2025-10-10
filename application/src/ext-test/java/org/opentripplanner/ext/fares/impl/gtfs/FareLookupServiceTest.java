@@ -106,6 +106,20 @@ class FareLookupServiceTest implements FareTestConstants {
     assertThat(service.legRules(leg())).containsExactly(r1, r2);
   }
 
+  @Test
+  void multipleRulesWithEqualPriority() {
+    var r1 = FareLegRule.of(id("r1"), List.of(FARE_PRODUCT_A))
+      .withNetworkId(NETWORK_A.getId())
+      .withPriority(10)
+      .build();
+    var r2 = FareLegRule.of(id("r2"), List.of(FARE_PRODUCT_B))
+      .withNetworkId(NETWORK_A.getId())
+      .withPriority(10)
+      .build();
+    var service = new FareLookupService(List.of(r1, r2), List.of(), EMPTY_STOP_AREAS);
+    assertThat(service.legRules(leg())).containsExactly(r1, r2);
+  }
+
   private TransitLeg leg() {
     return newItinerary(Place.forStop(STOP_1))
       .bus(ROUTE, 100, 100, 160, Place.forStop(STOP_2))
