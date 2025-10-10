@@ -14,41 +14,47 @@ import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 
+/**
+ * Matches the GTFS fares column from_area_id and to_area_id.
+ */
 class AreaMatcher {
 
+  private final RulePriorityMatcher priorityMatcher;
   private final Multimap<FeedScopedId, FeedScopedId> stopAreas;
-  private final Set<String> feedsWithPriorities;
   private final Set<FeedScopedId> fromAreasWithRules;
   private final Set<FeedScopedId> toAreasWithRules;
 
-  AreaMatcher(Collection<FareLegRule> rules, Multimap<FeedScopedId, FeedScopedId> stopAreas) {
+  AreaMatcher(
+    RulePriorityMatcher priorityMatcher,
+    Collection<FareLegRule> rules,
+    Multimap<FeedScopedId, FeedScopedId> stopAreas
+  ) {
+    this.priorityMatcher = priorityMatcher;
     this.stopAreas = ImmutableMultimap.copyOf(stopAreas);
-    this.feedsWithPriorities = rules
-      .stream()
-      .filter(r -> r.priority().isPresent())
-      .map(FareLegRule::feedId)
-      .collect(Collectors.toUnmodifiableSet());
-
     this.fromAreasWithRules = findAreasWithRules(rules, FareLegRule::fromAreaId);
     this.toAreasWithRules = findAreasWithRules(rules, FareLegRule::toAreaId);
   }
 
   boolean matchesFromArea(StopLocation stop, FeedScopedId areaId) {
-    return extracted(stop, areaId, fromAreasWithRules);
+    return matches(stop, areaId, fromAreasWithRules);
   }
 
   boolean matchesToArea(StopLocation stop, FeedScopedId areaId) {
-    return extracted(stop, areaId, toAreasWithRules);
+    return matches(stop, areaId, toAreasWithRules);
   }
 
-  private boolean extracted(StopLocation stop, FeedScopedId areaId, Set<FeedScopedId> areasWithRules) {
+  private boolean matches(
+    StopLocation stop,
+    FeedScopedId areaId,
+    Set<FeedScopedId> areasWithRules
+  ) {
     var stopAreas = this.stopAreas.get(stop.getId());
-    if (feedsWithPriorities.contains(stop.getId().getFeedId())) {
+    if (priorityMatcher.feedContainsRulePriority(stop.getId().getFeedId())) {
       return areaId == null || stopAreas.contains(areaId);
     } else {
       return (
         (isNull(areaId) && stopAreas.stream().noneMatch(areasWithRules::contains)) ||
-          (nonNull(areaId) && stopAreas.contains(areaId))
+        (nonNull(areaId) && stopAreas.contains(areaId))
       );
     }
   }

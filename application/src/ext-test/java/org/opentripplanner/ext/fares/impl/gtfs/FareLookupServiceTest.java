@@ -20,7 +20,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 class FareLookupServiceTest implements FareTestConstants {
 
   private static final FeedScopedId A_1 = id("a1");
-  private static final Route ROUTE = TimetableRepositoryForTest.route("r1")
+  private static final Route ROUTE = TimetableRepositoryForTest.route("route1")
     .withGroupOfRoutes(List.of(NETWORK_A))
     .build();
   private static final ImmutableMultimap<FeedScopedId, FeedScopedId> EMPTY_STOP_AREAS =
@@ -36,7 +36,7 @@ class FareLookupServiceTest implements FareTestConstants {
   );
 
   @Test
-  void presenceOfAreaLeadsToEmptyResults() {
+  void presenceOfAreaAndAbsenceOfPriorityLeadsToEmptyResults() {
     var r1 = FareLegRule.of(id("r1"), List.of(FARE_PRODUCT_A))
       .withNetworkId(NETWORK_A.getId())
       .build();
@@ -53,15 +53,31 @@ class FareLookupServiceTest implements FareTestConstants {
   void priorityLeadsToResults() {
     var r1 = FareLegRule.of(id("r1"), List.of(FARE_PRODUCT_A))
       .withNetworkId(NETWORK_A.getId())
+      .withPriority(0)
       .build();
     var r2 = FareLegRule.of(id("r2"), List.of(FARE_PRODUCT_B))
       .withFromAreaId(A_1)
       .withToAreaId(A_1)
-      .withPriority(1)
+      .withPriority(2)
       .build();
     var service = new FareLookupService(List.of(r1, r2), List.of(), stopAreas);
 
-    assertThat(service.legRules(leg())).containsExactly(r1);
+    assertThat(service.legRules(leg())).containsExactly(r2);
+  }
+
+  @Test
+  void networkWildCard() {
+    var r1 = FareLegRule.of(id("r1"), List.of(FARE_PRODUCT_A))
+      .withFromAreaId(A_1)
+      .withToAreaId(A_1)
+      .build();
+    var r2 = FareLegRule.of(id("r2"), List.of(FARE_PRODUCT_B))
+      .withFromAreaId(A_1)
+      .withToAreaId(A_1)
+      .build();
+    var service = new FareLookupService(List.of(r1, r2), List.of(), stopAreas);
+
+    assertThat(service.legRules(leg())).containsExactly(r1, r2);
   }
 
   @Test

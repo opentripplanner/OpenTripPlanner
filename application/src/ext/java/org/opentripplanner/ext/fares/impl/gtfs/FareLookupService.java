@@ -8,9 +8,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.fares.model.FareLegRule;
@@ -38,8 +36,10 @@ class FareLookupService implements Serializable {
   ) {
     this.legRules = List.copyOf(legRules);
     this.transferRules = stripWildcards(fareTransferRules);
-    this.areaMatcher = new AreaMatcher(legRules, stopAreas);
-    this.networkMatcher = new NetworkMatcher(legRules);
+
+    var rulePriorityMatcher = new RulePriorityMatcher(legRules);
+    this.areaMatcher = new AreaMatcher(rulePriorityMatcher, legRules, stopAreas);
+    this.networkMatcher = new NetworkMatcher(rulePriorityMatcher, legRules);
   }
 
   /**
@@ -55,8 +55,10 @@ class FareLookupService implements Serializable {
    */
   Set<FareLegRule> legRules(TransitLeg leg) {
     var rules =
-      this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toUnmodifiableSet());
-    var containsPriorities = rules.stream().allMatch(r -> r.priority().isPresent());
+      this.legRules.stream()
+        .filter(r -> legMatchesRule(leg, r))
+        .collect(Collectors.toUnmodifiableSet());
+    var containsPriorities = rules.stream().anyMatch(r -> r.priority().isPresent());
     if (containsPriorities) {
       return findHighestPriority(rules);
     } else {
@@ -209,7 +211,7 @@ class FareLookupService implements Serializable {
       // if area id is null, the rule applies to all legs UNLESS there is another rule that
       // covers this area
       areaMatcher.matchesFromArea(leg.from().stop, rule.fromAreaId()) &&
-      areaMatcher.matchesToArea(leg.to().stop, rule.toAreaId() ) &&
+      areaMatcher.matchesToArea(leg.to().stop, rule.toAreaId()) &&
       DistanceMatcher.matchesDistance(leg, rule)
     );
   }
@@ -233,8 +235,6 @@ class FareLookupService implements Serializable {
       return true;
     }
   }
-
-
 
   /**
    * If a GTFS feed contains rule_priority values, then the highest priority rule is returned.

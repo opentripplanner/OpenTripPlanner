@@ -10,12 +10,17 @@ import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
+/**
+ * Matches based on the semantics of the GTFS fare column network_id.
+ */
 class NetworkMatcher {
 
   private final Set<FeedScopedId> networksWithRules;
+  private final RulePriorityMatcher priorityMatcher;
 
-  NetworkMatcher(List<FareLegRule> rules) {
+  NetworkMatcher(RulePriorityMatcher priorityMatcher, List<FareLegRule> rules) {
     this.networksWithRules = findNetworksWithRules(rules);
+    this.priorityMatcher = priorityMatcher;
   }
 
   /**
@@ -31,11 +36,15 @@ class NetworkMatcher {
       .filter(Objects::nonNull)
       .toList();
 
-    return (
-      (rule.networkId() == null &&
-        networksWithRules.stream().noneMatch(routesNetworkIds::contains)) ||
-      routesNetworkIds.contains(rule.networkId())
-    );
+    if (priorityMatcher.feedContainsRulePriority(rule.feedId())) {
+      return rule.networkId() == null || routesNetworkIds.contains(rule.networkId());
+    } else {
+      return (
+        (rule.networkId() == null &&
+          networksWithRules.stream().noneMatch(routesNetworkIds::contains)) ||
+        routesNetworkIds.contains(rule.networkId())
+      );
+    }
   }
 
   private static Set<FeedScopedId> findNetworksWithRules(Collection<FareLegRule> legRules) {
