@@ -5,7 +5,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -347,9 +346,9 @@ public interface TransitService {
 
   FlexIndex getFlexIndex();
 
-  ZonedDateTime getTransitServiceEnds();
+  Instant getTransitServiceEnds();
 
-  ZonedDateTime getTransitServiceStarts();
+  Instant getTransitServiceStarts();
 
   TransferService getTransferService();
 

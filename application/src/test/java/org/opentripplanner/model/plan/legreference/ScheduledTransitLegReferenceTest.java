@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
@@ -96,11 +95,7 @@ class ScheduledTransitLegReferenceTest {
     timetableRepository.getServiceCodes().put(tripPattern.getId(), SERVICE_CODE);
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     calendarServiceData.putServiceDatesForServiceId(tripPattern.getId(), List.of(SERVICE_DATE));
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
+    timetableRepository.updateCalendarServiceData(calendarServiceData);
 
     timetableRepository.addTripOnServiceDate(
       TripOnServiceDate.of(TRIP_ON_SERVICE_DATE_ID)

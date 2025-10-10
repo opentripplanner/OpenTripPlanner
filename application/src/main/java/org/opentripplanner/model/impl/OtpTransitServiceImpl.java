@@ -24,6 +24,7 @@ import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.SiteRepository;
 
 /**
@@ -63,6 +64,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Collection<Trip> trips;
 
+  private final Collection<TripOnServiceDate> tripOnServiceDates;
+
   private final Collection<FlexTrip<?, ?>> flexTrips;
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPoint;
 
@@ -83,6 +86,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
     this.transfers = immutableList(builder.getTransfers());
     this.tripPatterns = immutableList(builder.getTripPatterns().values());
     this.trips = immutableList(builder.getTripsById().values());
+    this.tripOnServiceDates = immutableList(builder.getTripOnServiceDates().values());
     this.flexTrips = immutableList(builder.getFlexTripsById().values());
     this.stopsByScheduledStopPoint = Collections.unmodifiableMap(
       builder.stopsByScheduledStopPoints()
@@ -156,6 +160,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
   @Override
   public Collection<Trip> getAllTrips() {
     return trips;
+  }
+
+  @Override
+  public Collection<TripOnServiceDate> getTripOnServiceDates() {
+    return tripOnServiceDates;
   }
 
   @Override
