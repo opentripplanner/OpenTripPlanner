@@ -9,7 +9,6 @@ import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.mapping.TripRequestMapper;
 import org.opentripplanner.apis.transmodel.mapping.ViaRequestMapper;
 import org.opentripplanner.apis.transmodel.model.PlanResponse;
-import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -31,27 +30,30 @@ public class TransmodelGraphQLPlanner {
   }
 
   public DataFetcherResult<PlanResponse> plan(DataFetchingEnvironment environment) {
-    PlanResponse response = new PlanResponse();
     TransmodelRequestContext ctx = environment.getContext();
     RouteRequest request = null;
+    PlanResponse response;
+
     try {
       request = tripRequestMapper.createRequest(environment);
       RoutingResponse res = ctx.getRoutingService().route(request);
 
-      response.plan = res.getTripPlan();
-      response.metadata = res.getMetadata();
-      response.messages = res.getRoutingErrors();
-      response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
-      response.previousPageCursor = res.getPreviousPageCursor();
-      response.nextPageCursor = res.getNextPageCursor();
+      response = PlanResponse.builder()
+        .withPlan(res.getTripPlan())
+        .withMetadata(res.getMetadata())
+        .withMessages(res.getRoutingErrors())
+        .withDebugOutput(res.getDebugTimingAggregator().finishedRendering())
+        .withPreviousPageCursor(res.getPreviousPageCursor())
+        .withNextPageCursor(res.getNextPageCursor())
+        .build();
     } catch (RoutingValidationException e) {
-      response.plan = TripPlanMapper.mapTripPlan(request, List.of());
-      response.messages.addAll(e.getRoutingErrors());
+      response = PlanResponse.ofErrors(e.getRoutingErrors());
     }
-
+    // The request can be null if the request mapper encounters a RoutingValidationException.
+    Locale locale = request == null ? defaultLocale(ctx) : request.preferences().locale();
     return DataFetcherResult.<PlanResponse>newResult()
       .data(response)
-      .localContext(Map.of("locale", request.preferences().locale()))
+      .localContext(Map.of("locale", locale))
       .build();
   }
 
@@ -66,12 +68,15 @@ public class TransmodelGraphQLPlanner {
       response = new ViaRoutingResponse(Map.of(), List.of(), e.getRoutingErrors());
     }
 
-    Locale defaultLocale = ctx.getServerContext().defaultRouteRequest().preferences().locale();
-    // This is strange, the `request` can not be null here ?
-    Locale locale = request == null ? defaultLocale : request.locale();
+    // The request can be null if the request mapper encounters a RoutingValidationException.
+    Locale locale = request == null ? defaultLocale(ctx) : request.locale();
     return DataFetcherResult.<ViaRoutingResponse>newResult()
       .data(response)
       .localContext(Map.of("locale", locale))
       .build();
+  }
+
+  private static Locale defaultLocale(TransmodelRequestContext ctx) {
+    return ctx.getServerContext().defaultRouteRequest().preferences().locale();
   }
 }

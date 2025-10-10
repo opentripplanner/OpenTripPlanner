@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,6 +16,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -25,6 +27,10 @@ public class PlaceTest {
 
   private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory()
     .createPoint(new Coordinate(11, 60));
+  private static final NonLocalizedString DEFAULT_PLACE_NAME = NonLocalizedString.ofNullable(
+    "defaultName"
+  );
+  public static final String PLACE_NAME = "PLACE_NAME";
 
   @Test
   public void sameLocationBasedOnInstance() {
@@ -100,6 +106,22 @@ public class PlaceTest {
   public void acceptsNullCoordinates() {
     var p = Place.normal(null, null, new NonLocalizedString("Test"));
     assertNull(p.coordinate);
+  }
+
+  @Test
+  void forGenericLocation() {
+    GenericLocation location = GenericLocation.fromStopId(PLACE_NAME, "id", "stopId");
+    Place place = Place.forGenericLocation(location, DEFAULT_PLACE_NAME);
+    assertNotNull(place);
+    assertEquals(PLACE_NAME, place.name.toString());
+  }
+
+  @Test
+  void forNullGenericLocation() {
+    Place place = Place.forGenericLocation(null, DEFAULT_PLACE_NAME);
+    assertNotNull(place);
+    assertNull(place.coordinate);
+    assertEquals(DEFAULT_PLACE_NAME, place.name);
   }
 
   private static Place place(RegularStop stop) {
