@@ -256,6 +256,7 @@ public abstract class GtfsTest {
     } catch (FileNotFoundException exception) {}
     serverContext = TestServerContext.createServerContext(
       graph,
+      null,
       timetableRepository,
       new DefaultFareService(),
       snapshotManager,

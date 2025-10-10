@@ -10,7 +10,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 1704,
+      "generalizedCost" : 1482,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -25,7 +25,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType" : "NORMAL"
           },
-          "generalizedCost" : 1704,
+          "generalizedCost" : 1482,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1032,60.2,1190,55.5,1430,55.5,1506,40.4,1849,40.4,1919,37.3,1931,37.3,2078,55.5,2503,55.5,2503,NaN,2635,NaN",
           "legGeometry" : {
@@ -141,7 +141,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 1131,
+      "generalizedCost" : 1005,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -243,7 +243,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 478,
+          "generalizedCost" : 353,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,484,52.4,493,52.2",
           "legGeometry" : {
