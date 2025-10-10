@@ -30,6 +30,14 @@ public class AddTransitEntitiesToTimetable {
   private void applyToTimetableRepository(TimetableRepository timetableRepository) {
     timetableRepository.mergeSiteRepositories(otpTransitService.siteRepository());
 
+    // Netex specific entities
+    for (var tripOnServiceDate : otpTransitService.getTripOnServiceDates()) {
+      timetableRepository.addTripOnServiceDate(tripOnServiceDate);
+    }
+    timetableRepository.addOperators(otpTransitService.getAllOperators());
+    timetableRepository.addNoticeAssignments(otpTransitService.getNoticeAssignments());
+    timetableRepository.addScheduledStopPointMapping(otpTransitService.stopsByScheduledStopPoint());
+
     addFeedInfoToGraph(timetableRepository);
     addAgenciesToGraph(timetableRepository);
     addServicesToTimetableRepository(timetableRepository);

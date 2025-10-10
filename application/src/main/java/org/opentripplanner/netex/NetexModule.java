@@ -75,9 +75,6 @@ public class NetexModule implements GraphBuilderModule {
 
         OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(deduplicator, issueStore);
         transitBuilder.limitServiceDays(transitPeriodLimit);
-        for (var tripOnServiceDate : transitBuilder.getTripOnServiceDates().values()) {
-          timetableRepository.addTripOnServiceDate(tripOnServiceDate);
-        }
         calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
         if (OTPFeature.FlexRouting.isOn()) {
@@ -92,13 +89,6 @@ public class NetexModule implements GraphBuilderModule {
 
         // if this or previously processed netex bundle has transit that has not been filtered out
         hasActiveTransit = hasActiveTransit || otpService.hasActiveTransit();
-
-        // TODO OTP2 - Move this into the AddTransitEntitiesToGraph
-        //           - and make sure they also work with GTFS feeds - GTFS do no
-        //           - have operators and notice assignments.
-        timetableRepository.addOperators(otpService.getAllOperators());
-        timetableRepository.addNoticeAssignments(otpService.getNoticeAssignments());
-        timetableRepository.addScheduledStopPointMapping(otpService.stopsByScheduledStopPoint());
 
         AddTransitEntitiesToTimetable.addToTimetable(otpService, timetableRepository);
         AddTransitEntitiesToGraph.addToGraph(otpService, subwayAccessTime, graph);
