@@ -4,14 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor.api.model.RaptorConstants.NOT_FOUND;
-import static org.opentripplanner.raptor.api.model.SearchDirection.FORWARD;
-import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
 
+import io.github.nchaugen.tabletest.junit.FactorySources;
+import io.github.nchaugen.tabletest.junit.TableTest;
 import java.util.List;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._support.TableTestValueParser;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -19,17 +17,10 @@ import org.opentripplanner.utils.time.TimeUtils;
  * This tests another test class - we do it to make sure the
  * {@link TestTripScheduleSearch} is following the Raptor SPI contract.
  */
-class TestTripScheduleSearchTest implements RaptorTestConstants {
+@FactorySources(TableTestValueParser.class)
+public class TestTripScheduleSearchTest implements RaptorTestConstants {
 
-  private static final int NOT_DEFINED = -999_999;
   private static final int T09_59_59 = TimeUtils.time("09:59:59");
-  private static final int T10_00_00 = TimeUtils.time("10:00:00");
-  private static final int T10_00_01 = TimeUtils.time("10:00:01");
-  private static final int T10_09_59 = TimeUtils.time("10:09:59");
-  private static final int T10_10_00 = TimeUtils.time("10:10:00");
-  private static final int T10_10_01 = TimeUtils.time("10:10:01");
-  private static final int T10_19_59 = TimeUtils.time("10:19:59");
-  private static final int T10_20_00 = TimeUtils.time("10:20:00");
   private static final int T10_20_01 = TimeUtils.time("10:20:01");
 
   private static final int TRIP_ONE = 0;
@@ -46,25 +37,23 @@ class TestTripScheduleSearchTest implements RaptorTestConstants {
     TestTripSchedule.schedule(PATTERN).times("10:10 10:20").build()
   );
 
-  static List<Arguments> tripSearchWithOneTripTestCases() {
-    return List.of(
-      Arguments.of(FORWARD, STOP_POS_0, T09_59_59, T10_00_00, Status.OK),
-      Arguments.of(FORWARD, STOP_POS_0, T10_00_00, T10_00_00, Status.OK),
-      Arguments.of(FORWARD, STOP_POS_0, T10_00_01, NOT_DEFINED, Status.EMPTY),
-      Arguments.of(FORWARD, STOP_POS_1, T10_09_59, T10_10_00, Status.OK),
-      Arguments.of(FORWARD, STOP_POS_1, T10_10_00, T10_10_00, Status.OK),
-      Arguments.of(FORWARD, STOP_POS_1, T10_10_01, NOT_DEFINED, Status.EMPTY),
-      Arguments.of(REVERSE, STOP_POS_0, T09_59_59, NOT_DEFINED, Status.EMPTY),
-      Arguments.of(REVERSE, STOP_POS_0, T10_00_00, T10_00_00, Status.OK),
-      Arguments.of(REVERSE, STOP_POS_0, T10_00_01, T10_00_00, Status.OK),
-      Arguments.of(REVERSE, STOP_POS_1, T10_09_59, NOT_DEFINED, Status.EMPTY),
-      Arguments.of(REVERSE, STOP_POS_1, T10_10_00, T10_10_00, Status.OK),
-      Arguments.of(REVERSE, STOP_POS_1, T10_10_01, T10_10_00, Status.OK)
-    );
-  }
-
-  @ParameterizedTest
-  @MethodSource("tripSearchWithOneTripTestCases")
+  @TableTest(
+    """
+    Direction | Stop Pos | Search Time | Exp Time  | Exp Status
+    FORWARD   | 0        | 09:59:59    | 10:00:00  | OK
+    FORWARD   | 0        | 10:00:00    | 10:00:00  | OK
+    FORWARD   | 0        | 10:00:01    | UNDEFINED | EMPTY
+    FORWARD   | 1        | 10:09:59    | 10:10:00  | OK
+    FORWARD   | 1        | 10:10:00    | 10:10:00  | OK
+    FORWARD   | 1        | 10:10:01    | UNDEFINED | EMPTY
+    REVERSE   | 0        | 09:59:59    | UNDEFINED | EMPTY
+    REVERSE   | 0        | 10:00:00    | 10:00:00  | OK
+    REVERSE   | 0        | 10:00:01    | 10:00:00  | OK
+    REVERSE   | 1        | 10:09:59    | UNDEFINED | EMPTY
+    REVERSE   | 1        | 10:10:00    | 10:10:00  | OK
+    REVERSE   | 1        | 10:10:01    | 10:10:00  | OK
+    """
+  )
   void tripSearchWithOneTrip(
     SearchDirection direction,
     int stopPos,
@@ -95,37 +84,37 @@ class TestTripScheduleSearchTest implements RaptorTestConstants {
     }
   }
 
-  static List<Arguments> tripSearchWithTwoTripsTestCases() {
-    return List.of(
-      Arguments.of(FORWARD, STOP_POS_0, T09_59_59, T10_00_00, TRIP_ONE),
-      Arguments.of(FORWARD, STOP_POS_0, T10_00_00, T10_00_00, TRIP_ONE),
-      Arguments.of(FORWARD, STOP_POS_0, T10_00_01, T10_10_00, TRIP_TWO),
-      Arguments.of(FORWARD, STOP_POS_0, T10_09_59, T10_10_00, TRIP_TWO),
-      Arguments.of(FORWARD, STOP_POS_0, T10_10_00, T10_10_00, TRIP_TWO),
-      Arguments.of(FORWARD, STOP_POS_0, T10_10_01, NOT_DEFINED, NOT_FOUND),
-      Arguments.of(FORWARD, STOP_POS_1, T10_09_59, T10_10_00, TRIP_ONE),
-      Arguments.of(FORWARD, STOP_POS_1, T10_10_00, T10_10_00, TRIP_ONE),
-      Arguments.of(FORWARD, STOP_POS_1, T10_10_01, T10_20_00, TRIP_TWO),
-      Arguments.of(FORWARD, STOP_POS_1, T10_19_59, T10_20_00, TRIP_TWO),
-      Arguments.of(FORWARD, STOP_POS_1, T10_20_00, T10_20_00, TRIP_TWO),
-      Arguments.of(FORWARD, STOP_POS_1, T10_20_01, NOT_DEFINED, NOT_FOUND),
-      Arguments.of(REVERSE, STOP_POS_0, T09_59_59, NOT_DEFINED, NOT_FOUND),
-      Arguments.of(REVERSE, STOP_POS_0, T10_00_00, T10_00_00, TRIP_ONE),
-      Arguments.of(REVERSE, STOP_POS_0, T10_00_01, T10_00_00, TRIP_ONE),
-      Arguments.of(REVERSE, STOP_POS_0, T10_09_59, T10_00_00, TRIP_ONE),
-      Arguments.of(REVERSE, STOP_POS_0, T10_10_00, T10_10_00, TRIP_TWO),
-      Arguments.of(REVERSE, STOP_POS_0, T10_10_01, T10_10_00, TRIP_TWO),
-      Arguments.of(REVERSE, STOP_POS_1, T10_09_59, NOT_DEFINED, NOT_FOUND),
-      Arguments.of(REVERSE, STOP_POS_1, T10_10_00, T10_10_00, TRIP_ONE),
-      Arguments.of(REVERSE, STOP_POS_1, T10_10_01, T10_10_00, TRIP_ONE),
-      Arguments.of(REVERSE, STOP_POS_1, T10_19_59, T10_10_00, TRIP_ONE),
-      Arguments.of(REVERSE, STOP_POS_1, T10_20_00, T10_20_00, TRIP_TWO),
-      Arguments.of(REVERSE, STOP_POS_1, T10_20_01, T10_20_00, TRIP_TWO)
-    );
-  }
-
-  @ParameterizedTest
-  @MethodSource("tripSearchWithTwoTripsTestCases")
+  @TableTest(
+    """
+    Direction | Stop Pos | Search Time | Exp Time  | Exp Trip Index
+    FORWARD   | 0        | 09:59:59    | 10:00:00  | 0
+    FORWARD   | 0        | 10:00:00    | 10:00:00  | 0
+    FORWARD   | 0        | 09:59:59    | 10:00:00  | 0
+    FORWARD   | 0        | 10:00:00    | 10:00:00  | 0
+    FORWARD   | 0        | 10:00:01    | 10:10:00  | 1
+    FORWARD   | 0        | 10:09:59    | 10:10:00  | 1
+    FORWARD   | 0        | 10:10:00    | 10:10:00  | 1
+    FORWARD   | 0        | 10:10:01    | UNDEFINED | NOT_FOUND
+    FORWARD   | 1        | 10:09:59    | 10:10:00  | 0
+    FORWARD   | 1        | 10:10:00    | 10:10:00  | 0
+    FORWARD   | 1        | 10:10:01    | 10:20:00  | 1
+    FORWARD   | 1        | 10:19:59    | 10:20:00  | 1
+    FORWARD   | 1        | 10:20:00    | 10:20:00  | 1
+    FORWARD   | 1        | 10:20:01    | UNDEFINED | NOT_FOUND
+    REVERSE   | 0        | 09:59:59    | UNDEFINED | NOT_FOUND
+    REVERSE   | 0        | 10:00:00    | 10:00:00  | 0
+    REVERSE   | 0        | 10:00:01    | 10:00:00  | 0
+    REVERSE   | 0        | 10:09:59    | 10:00:00  | 0
+    REVERSE   | 0        | 10:10:00    | 10:10:00  | 1
+    REVERSE   | 0        | 10:10:01    | 10:10:00  | 1
+    REVERSE   | 1        | 10:09:59    | UNDEFINED | NOT_FOUND
+    REVERSE   | 1        | 10:10:00    | 10:10:00  | 0
+    REVERSE   | 1        | 10:10:01    | 10:10:00  | 0
+    REVERSE   | 1        | 10:19:59    | 10:10:00  | 0
+    REVERSE   | 1        | 10:20:00    | 10:20:00  | 1
+    REVERSE   | 1        | 10:20:01    | 10:20:00  | 1
+    """
+  )
   void tripSearchWithTwoTrips(
     SearchDirection direction,
     int stopPos,

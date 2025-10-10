@@ -55,5 +55,10 @@
             <artifactId>archunit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.github.nchaugen</groupId>
+            <artifactId>tabletest-junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
