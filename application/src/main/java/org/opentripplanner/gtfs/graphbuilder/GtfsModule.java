@@ -23,6 +23,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToTimetable;
+import org.opentripplanner.graph_builder.module.TransitWithFutureDateValidator;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
@@ -121,8 +122,6 @@ public class GtfsModule implements GraphBuilderModule {
   public void buildGraph() {
     CalendarServiceData calendarServiceData = new CalendarServiceData();
 
-    boolean hasTransit = false;
-
     Map<String, GtfsBundle> feedIdsEncountered = new HashMap<>();
 
     try {
@@ -177,9 +176,6 @@ public class GtfsModule implements GraphBuilderModule {
 
         OtpTransitService otpTransitService = builder.build();
 
-        // if this or previously processed gtfs bundle has transit that has not been filtered out
-        hasTransit = hasTransit || otpTransitService.hasActiveTransit();
-
         addTimetableRepositoryToGraph(graph, timetableRepository, otpTransitService);
 
         if (gtfsBundle.parameters().blockBasedInterlining()) {
@@ -198,9 +194,12 @@ public class GtfsModule implements GraphBuilderModule {
       throw new RuntimeException(e);
     }
 
-    timetableRepository.validateTimeZones();
-
-    timetableRepository.updateCalendarServiceData(hasTransit, calendarServiceData, issueStore);
+    timetableRepository.updateCalendarServiceData(calendarServiceData);
+    TransitWithFutureDateValidator.validate(
+      calendarServiceData,
+      issueStore,
+      timetableRepository.getTimeZone()
+    );
   }
 
   /**

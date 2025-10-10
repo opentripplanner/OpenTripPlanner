@@ -7,6 +7,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToTimetable;
+import org.opentripplanner.graph_builder.module.TransitWithFutureDateValidator;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
@@ -68,7 +69,6 @@ public class NetexModule implements GraphBuilderModule {
   public void buildGraph() {
     try {
       var calendarServiceData = new CalendarServiceData();
-      boolean hasActiveTransit = false;
 
       for (NetexBundle netexBundle : netexBundles) {
         netexBundle.checkInputs();
@@ -87,13 +87,8 @@ public class NetexModule implements GraphBuilderModule {
 
         OtpTransitService otpService = transitBuilder.build();
 
-        // if this or previously processed netex bundle has transit that has not been filtered out
-        hasActiveTransit = hasActiveTransit || otpService.hasActiveTransit();
-
         AddTransitEntitiesToTimetable.addToTimetable(otpService, timetableRepository);
         AddTransitEntitiesToGraph.addToGraph(otpService, subwayAccessTime, graph);
-
-        timetableRepository.validateTimeZones();
 
         var lots = transitBuilder.vehicleParkings();
         parkingRepository.updateVehicleParking(lots, List.of());
@@ -101,10 +96,12 @@ public class NetexModule implements GraphBuilderModule {
         lots.forEach(linker::linkVehicleParkingToGraph);
       }
 
-      timetableRepository.updateCalendarServiceData(
-        hasActiveTransit,
+      timetableRepository.updateCalendarServiceData(calendarServiceData);
+
+      TransitWithFutureDateValidator.validate(
         calendarServiceData,
-        issueStore
+        issueStore,
+        timetableRepository.getTimeZone()
       );
     } catch (Exception e) {
       throw new RuntimeException(e);

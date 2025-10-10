@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -69,11 +68,7 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
     calendarServiceData.putServiceDatesForServiceId(SERVICE_ID, List.of(SERVICE_DATE));
     TIMETABLE_REPOSITORY.addTripPattern(TRIP_PATTERN.getId(), TRIP_PATTERN);
     TIMETABLE_REPOSITORY.getServiceCodes().put(SERVICE_ID, SERVICE_CODE);
-    TIMETABLE_REPOSITORY.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
+    TIMETABLE_REPOSITORY.updateCalendarServiceData(calendarServiceData);
     TIMETABLE_REPOSITORY.index();
   }
 
