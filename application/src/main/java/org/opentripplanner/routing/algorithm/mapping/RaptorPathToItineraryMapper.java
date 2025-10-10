@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toOtpDomainCost;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -172,7 +173,41 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       builder.withGeneralizedCost2(path.c2());
     }
 
-    return builder.build();
+    Itinerary itinerary = builder.build();
+
+    // WORKAROUND for midnight-crossing trips: Filter out itineraries where the actual
+    // arrival time exceeds the cutoff time in arriveBy searches.
+    // This handles cases where time-shifting in Raptor causes trips crossing midnight
+    // to appear with shifted times (e.g., 03:39 -> 01:46).
+    // We need to check the real arrival time from the last transit leg, not the
+    // itinerary endTime which has been time-shifted.
+    if (request.arriveBy()) {
+      Instant cutoffInstant = request.dateTime();
+
+      Leg lastTransitLeg = null;
+      for (int i = legs.size() - 1; i >= 0; i--) {
+        if (legs.get(i).isScheduledTransitLeg()) {
+          lastTransitLeg = legs.get(i);
+          break;
+        }
+      }
+
+      if (lastTransitLeg != null && lastTransitLeg.isScheduledTransitLeg()) {
+        var lastScheduledTransitLeg = lastTransitLeg.asScheduledTransitLeg();
+        var tripTimes = lastScheduledTransitLeg.tripTimes();
+
+        if (tripTimes != null) {
+          int alightStopPos = lastScheduledTransitLeg.alightStopPosInPattern();
+          int actualArrivalSeconds = tripTimes.getArrivalTime(alightStopPos);
+          Instant serviceDateMidnight = lastScheduledTransitLeg.serviceDateMidnight();
+          Instant actualArrivalInstant = serviceDateMidnight.plusSeconds(actualArrivalSeconds);
+          if (actualArrivalInstant.isAfter(cutoffInstant)) {
+            return null;
+          }
+        }
+      }
+    }
+    return itinerary;
   }
 
   private static <T extends TripSchedule> boolean isPathTransferAtSameStop(
