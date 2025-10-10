@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder;
 
 import static org.opentripplanner.datastore.api.FileType.DEM;
 import static org.opentripplanner.datastore.api.FileType.EMISSION;
+import static org.opentripplanner.datastore.api.FileType.EMPIRICAL_DATA;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
@@ -24,6 +25,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpBaseDirectory;
 import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
+import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayFeedParameters;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
@@ -132,6 +134,12 @@ public class GraphBuilderDataSources implements Closeable {
     return ofStream(EMISSION).map(this::mapEmissionFeed).toList();
   }
 
+  public Iterable<
+    ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters>
+  > getEmpiricalDelayConfiguredDataSource() {
+    return ofStream(EMPIRICAL_DATA).map(this::mapEmpiricalDelayFeed).toList();
+  }
+
   /**
    * Returns the optional data source for the stop consolidation configuration.
    */
@@ -228,6 +236,18 @@ public class GraphBuilderDataSources implements Closeable {
       .findFirst()
       .orElseThrow();
     return new ConfiguredDataSource<>(dataSource, p);
+  }
+
+  private ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters> mapEmpiricalDelayFeed(
+    DataSource dataSource
+  ) {
+    var p = buildConfig.empiricalDelay
+      .feeds()
+      .stream()
+      .filter(c -> uriMatch(c.source(), dataSource.uri()))
+      .findFirst()
+      .orElseThrow();
+    return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
   }
 
   /**

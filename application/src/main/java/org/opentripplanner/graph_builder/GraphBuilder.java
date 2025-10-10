@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emission.EmissionRepository;
+import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -79,6 +80,7 @@ public class GraphBuilder implements Runnable {
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
     @Nullable EmissionRepository emissionRepository,
+    @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters,
     boolean loadStreetGraph,
@@ -101,6 +103,7 @@ public class GraphBuilder implements Runnable {
       .vehicleParkingRepository(vehicleParkingService)
       .stopConsolidationRepository(stopConsolidationRepository)
       .emissionRepository(emissionRepository)
+      .empiricalDelayRepository(empiricalDelayRepository)
       .streetLimitationParameters(streetLimitationParameters)
       .fareServiceFactory(fareServiceFactory)
       .dataSources(dataSources)
@@ -171,6 +174,11 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModuleOptional(factory.directTransferAnalyzer(), OTPFeature.TransferAnalyzer);
 
       graphBuilder.addModuleOptional(factory.emissionGraphBuilder(), OTPFeature.Emission);
+
+      graphBuilder.addModuleOptional(
+        factory.empiricalDelayGraphBuilder(),
+        OTPFeature.EmpiricalDelay
+      );
     }
 
     if (loadStreetGraph || hasOsm) {

@@ -6,7 +6,10 @@ import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.Gbf
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.mobilitydata.gbfs.v3_0.station_information.*;
+import org.mobilitydata.gbfs.v3_0.station_information.GBFSName;
+import org.mobilitydata.gbfs.v3_0.station_information.GBFSRentalUris;
+import org.mobilitydata.gbfs.v3_0.station_information.GBFSShortName;
+import org.mobilitydata.gbfs.v3_0.station_information.GBFSStation;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
