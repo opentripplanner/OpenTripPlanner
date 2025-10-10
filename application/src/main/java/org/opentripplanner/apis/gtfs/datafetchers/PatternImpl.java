@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.model.StopInPatternModel;
 import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -192,6 +193,19 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   @Override
   public DataFetcher<Iterable<Object>> stops() {
     return this::getStops;
+  }
+
+  @Override
+  public DataFetcher<Iterable<Object>> stopsInPattern() {
+    return environment -> {
+      var pattern = getSource(environment);
+      var numberOfStops = pattern.numberOfStops();
+      var result = new StopInPatternModel[numberOfStops];
+      for (var i = 0; i < numberOfStops; i++) {
+        result[i] = StopInPatternModel.fromPatternAndIndex(pattern, i);
+      }
+      return List.of(result);
+    };
   }
 
   @Override
