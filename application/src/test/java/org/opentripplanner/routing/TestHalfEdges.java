@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,7 +45,6 @@ import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -153,10 +153,8 @@ public class TestHalfEdges {
     siteRepositoryBuilder.withRegularStop(s1).withRegularStop(s2);
     timetableRepository = new TimetableRepository(siteRepositoryBuilder.build(), deduplicator);
 
-    station1 = factory.transitStop(TransitStopVertex.of().withStop(s1));
-    station2 = factory.transitStop(TransitStopVertex.of().withStop(s2));
-    station1.addMode(TransitMode.RAIL);
-    station2.addMode(TransitMode.RAIL);
+    station1 = factory.transitStop(ofStop(s1));
+    station2 = factory.transitStop(ofStop(s2));
 
     //Linkers aren't run otherwise in testNetworkLinker
     graph.hasStreets = true;

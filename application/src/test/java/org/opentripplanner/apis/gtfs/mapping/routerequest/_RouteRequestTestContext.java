@@ -69,6 +69,7 @@ class _RouteRequestTestContext {
       GraphFinder.getInstance(
         graph,
         VertexLinkerTestFactory.of(graph),
+        transitService::getRegularStop,
         transitService::findRegularStopsByBoundingBox
       ),
       routeRequest

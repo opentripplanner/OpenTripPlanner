@@ -73,6 +73,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       GraphFinder.getInstance(
         graph,
         VertexLinkerTestFactory.of(graph),
+        transitService::getRegularStop,
         transitService::findRegularStopsByBoundingBox
       ),
       routeRequest

@@ -348,14 +348,14 @@
             <version>2.0</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.paho</groupId>
-            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-            <version>1.2.5</version>
+            <groupId>com.hivemq</groupId>
+            <artifactId>hivemq-mqtt-client</artifactId>
+            <version>1.3.9</version>
         </dependency>
         <dependency>
             <groupId>io.github.ci-cmg</groupId>
             <artifactId>mapbox-vector-tile</artifactId>
-            <version>4.0.6</version>
+            <version>4.0.7</version>
         </dependency>
         <dependency>
             <groupId>net.objecthunter</groupId>
