@@ -30,12 +30,12 @@ public class CanceledTripTest implements RealtimeTestConstants {
     ).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    assertThat(env.getTransitService().listCanceledTrips()).isEmpty();
+    assertThat(env.transitService().listCanceledTrips()).isEmpty();
 
     var update = rt.tripUpdate(TRIP_1_ID, CANCELED).build();
     assertSuccess(rt.applyTripUpdate(update));
 
-    var canceled = env.getTransitService().listCanceledTrips();
+    var canceled = env.transitService().listCanceledTrips();
     assertThat(canceled).hasSize(1);
     var trip = canceled.getFirst();
     assertEquals(id(TRIP_1_ID), trip.getTrip().getId());

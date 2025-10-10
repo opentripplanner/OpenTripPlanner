@@ -65,7 +65,7 @@ class StopCallImplTest {
     var env = DataFetchingSupport.dataFetchingEnvironment(
       call,
       Map.of(),
-      realtimeEnv.getTransitService()
+      realtimeEnv.transitService()
     );
 
     var schedule = impl.schedule().get(env);
@@ -86,7 +86,7 @@ class StopCallImplTest {
       var env = DataFetchingSupport.dataFetchingEnvironment(
         call,
         Map.of(),
-        realtimeEnv.getTransitService()
+        realtimeEnv.transitService()
       );
 
       // using try-catch is not very nice here - ideally we would just add it to the method signature.

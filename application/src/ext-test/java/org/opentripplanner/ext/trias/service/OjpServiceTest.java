@@ -72,7 +72,7 @@ class OjpServiceTest {
   @MethodSource("stopPointRefCases")
   void stopPointRef(FeedScopedId ref) {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
+    var service = new OjpService(env.transitService(), new DirectGraphFinder(e -> List.of()));
     var result = service.findCallsAtStop(ref, params(env, 100));
     assertThat(result).hasSize(1);
     var stopId = result.getFirst().tripTimeOnDate().getStop().getId();
@@ -82,7 +82,7 @@ class OjpServiceTest {
   @Test
   void notFound() {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
+    var service = new OjpService(env.transitService(), new DirectGraphFinder(e -> List.of()));
     assertThrows(EntityNotFoundException.class, () ->
       service.findCallsAtStop(id("unknown"), params(env, 100))
     );
@@ -117,7 +117,7 @@ class OjpServiceTest {
       }
     };
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var service = new OjpService(env.getTransitService(), finder);
+    var service = new OjpService(env.transitService(), finder);
     var result = service.findCallsAtStop(WgsCoordinate.GREENWICH, params(env, 100));
     assertThat(result).hasSize(1);
     var stopId = result.getFirst().tripTimeOnDate().getStop().getId();
@@ -127,7 +127,7 @@ class OjpServiceTest {
   @Test
   void tooManyDepartures() {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
+    var service = new OjpService(env.transitService(), new DirectGraphFinder(e -> List.of()));
     assertThrows(IllegalArgumentException.class, () ->
       service.findCallsAtStop(STOP_A.getId(), params(env, 101))
     );

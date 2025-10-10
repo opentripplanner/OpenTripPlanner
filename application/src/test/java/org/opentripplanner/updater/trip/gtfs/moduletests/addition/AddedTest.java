@@ -89,7 +89,7 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(TripUpdateBuilder.ROUTE_NAME, route.getName());
     assertEquals(TransitMode.RAIL, route.getMode());
 
-    TransitService transitService = env.getTransitService();
+    TransitService transitService = env.transitService();
     var fromTimetableRepository = transitService.getRoute(route.getId());
     assertEquals(fromTimetableRepository, route);
     var patternsForRoute = transitService.findPatterns(route);
@@ -148,7 +148,7 @@ class AddedTest implements RealtimeTestConstants {
     var secondRoute = secondPattern.getRoute();
 
     assertSame(firstRoute, secondRoute);
-    assertNotNull(env.getTransitService().getRoute(firstRoute.getId()));
+    assertNotNull(env.transitService().getRoute(firstRoute.getId()));
   }
 
   @Test
@@ -174,7 +174,7 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(PickDrop.CANCELLED, tripPattern.getBoardType(2));
     assertEquals(PickDrop.SCHEDULED, tripPattern.getAlightType(3));
     var tripTimes = env.tripData(ADDED_TRIP_ID).tripTimes();
-    var trip = env.getTransitService().getTrip(id(ADDED_TRIP_ID));
+    var trip = env.transitService().getTrip(id(ADDED_TRIP_ID));
     assertEquals(I18NString.of("A loop"), Objects.requireNonNull(trip).getHeadsign());
     assertEquals(I18NString.of("A loop"), tripTimes.getHeadsign(0));
     assertFalse(tripTimes.isCancelledStop(0));
@@ -219,7 +219,7 @@ class AddedTest implements RealtimeTestConstants {
   ) {
     var tripFetcher = env.tripData(tripId);
 
-    TransitService transitService = env.getTransitService();
+    TransitService transitService = env.transitService();
     assertNotNull(tripFetcher.trip());
     assertNotNull(tripFetcher.tripPattern());
     assertNotNull(transitService.getTripOnServiceDate(id(tripId)));

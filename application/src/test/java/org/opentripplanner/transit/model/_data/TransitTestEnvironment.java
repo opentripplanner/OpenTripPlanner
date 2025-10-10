@@ -66,7 +66,7 @@ public final class TransitTestEnvironment {
   /**
    * Returns a new fresh TransitService
    */
-  public TransitService getTransitService() {
+  public TransitService transitService() {
     return new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshot());
   }
 
@@ -98,13 +98,13 @@ public final class TransitTestEnvironment {
    * Get a data fetcher for the given trip id on the default ServiceDate
    */
   public TripOnDateDataFetcher tripData(String tripId) {
-    return new TripOnDateDataFetcher(getTransitService(), id(tripId), defaultServiceDate);
+    return new TripOnDateDataFetcher(transitService(), id(tripId), defaultServiceDate);
   }
 
   /**
    * Get a data fetcher for the given trip id on the default ServiceDate
    */
   public TripOnDateDataFetcher tripData(String tripId, LocalDate serviceDate) {
-    return new TripOnDateDataFetcher(getTransitService(), id(tripId), serviceDate);
+    return new TripOnDateDataFetcher(transitService(), id(tripId), serviceDate);
   }
 }

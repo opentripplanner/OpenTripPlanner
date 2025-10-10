@@ -49,7 +49,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     Route route = ROUTE;
-    int numPatternForRoute = env.getTransitService().findPatterns(route).size();
+    int numPatternForRoute = env.transitService().findPatterns(route).size();
 
     var updates = createValidAddedJourney(siri).buildEstimatedTimetableDeliveries();
 
@@ -65,7 +65,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       env.tripData(ADDED_TRIP_ID).showScheduledTimetable()
     );
     FeedScopedId tripId = id(ADDED_TRIP_ID);
-    TransitService transitService = env.getTransitService();
+    TransitService transitService = env.transitService();
     Trip trip = transitService.getTrip(tripId);
     assertNotNull(trip);
     assertNotNull(transitService.findPattern(trip));
@@ -93,7 +93,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .withLineRef(newRouteRef)
       .buildEstimatedTimetableDeliveries();
 
-    int numRoutes = env.getTransitService().listRoutes().size();
+    int numRoutes = env.transitService().listRoutes().size();
     var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
@@ -105,7 +105,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       "SCHEDULED | C 0:01 0:01 | D 0:03 0:03",
       env.tripData(ADDED_TRIP_ID).showScheduledTimetable()
     );
-    TransitService transitService = env.getTransitService();
+    TransitService transitService = env.transitService();
     assertEquals(numRoutes + 1, transitService.listRoutes().size());
     FeedScopedId newRouteId = id(newRouteRef);
     Route newRoute = transitService.getRoute(newRouteId);
@@ -121,13 +121,13 @@ class ExtraJourneyTest implements RealtimeTestConstants {
 
     var updates = createValidAddedJourney(siri).buildEstimatedTimetableDeliveries();
 
-    int numTrips = env.getTransitService().listTrips().size();
+    int numTrips = env.transitService().listTrips().size();
     var result1 = siri.applyEstimatedTimetable(updates);
     assertEquals(1, result1.successful());
-    assertEquals(numTrips + 1, env.getTransitService().listTrips().size());
+    assertEquals(numTrips + 1, env.transitService().listTrips().size());
     var result2 = siri.applyEstimatedTimetable(updates);
     assertEquals(1, result2.successful());
-    assertEquals(numTrips + 1, env.getTransitService().listTrips().size());
+    assertEquals(numTrips + 1, env.transitService().listTrips().size());
   }
 
   @Test

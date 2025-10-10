@@ -50,7 +50,7 @@ public class ReplacementTest implements RealtimeTestConstants {
     var snapshot = env.getTimetableSnapshot();
     var tripId = id(TRIP_1_ID);
 
-    var transitService = env.getTransitService();
+    var transitService = env.transitService();
 
     // Original trip pattern
     {

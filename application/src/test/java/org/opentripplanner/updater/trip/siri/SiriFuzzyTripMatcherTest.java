@@ -95,7 +95,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     EstimatedVehicleJourney evj,
     TransitTestEnvironment env
   ) {
-    var transitService = env.getTransitService();
+    var transitService = env.transitService();
     var fuzzyMatcher = new SiriFuzzyTripMatcher(transitService);
     return fuzzyMatcher.match(
       evj,

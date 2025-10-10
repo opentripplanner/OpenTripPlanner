@@ -62,7 +62,7 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
 
     var trip = tripFetcher.trip();
     var dates = env
-      .getTransitService()
+      .transitService()
       .getCalendarService()
       .getServiceDatesForServiceId(trip.getServiceId());
     assertThat(dates).containsExactly(date);

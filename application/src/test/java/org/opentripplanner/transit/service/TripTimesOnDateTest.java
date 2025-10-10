@@ -47,7 +47,7 @@ public class TripTimesOnDateTest {
   @Test
   void onFirstStop() {
     var env = envBuilder.addTrip(TRIP_INPUT1).addTrip(TRIP_INPUT2).build();
-    var transitService = env.getTransitService();
+    var transitService = env.transitService();
     var dt = env.localTimeParser();
 
     var instant = dt.instant("12:00");
@@ -73,7 +73,7 @@ public class TripTimesOnDateTest {
   @Test
   void nextDay() {
     var env = envBuilder.addTrip(TRIP_INPUT1).addTrip(TRIP_INPUT2).build();
-    var transitService = env.getTransitService();
+    var transitService = env.transitService();
     var dt = env.localTimeParser();
 
     var instant = dt.instant("12:00").plus(Duration.ofDays(1));
@@ -89,7 +89,7 @@ public class TripTimesOnDateTest {
   @Test
   void tooLate() {
     var env = envBuilder.addTrip(TRIP_INPUT1).build();
-    var transitService = env.getTransitService();
+    var transitService = env.transitService();
     var dt = env.localTimeParser();
 
     var instant = dt.instant("18:00");
@@ -102,7 +102,7 @@ public class TripTimesOnDateTest {
   @Test
   void shortWindow() {
     var env = envBuilder.addTrip(TRIP_INPUT1).build();
-    var transitService = env.getTransitService();
+    var transitService = env.transitService();
     var dt = env.localTimeParser();
 
     var instant = dt.instant("11:00");
@@ -118,7 +118,7 @@ public class TripTimesOnDateTest {
   @Test
   void longerWindow() {
     var env = envBuilder.addTrip(TRIP_INPUT1).build();
-    var transitService = env.getTransitService();
+    var transitService = env.transitService();
     var dt = env.localTimeParser();
 
     var instant = dt.instant("11:00");
@@ -134,7 +134,7 @@ public class TripTimesOnDateTest {
   @Test
   void several() {
     var env = envBuilder.addTrip(TRIP_INPUT2).addTrip(TRIP_INPUT3).build();
-    var transitService = env.getTransitService();
+    var transitService = env.transitService();
     var dt = env.localTimeParser();
 
     var instant = dt.instant("12:10");

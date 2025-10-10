@@ -67,7 +67,7 @@ class ApiTransitServiceTest {
   @Test
   void justScheduledTrips() {
     var env = envBuilder.addTrip(TRIP1_INPUT).addTrip(TRIP2_INPUT).build();
-    var service = new ApiTransitService(env.getTransitService());
+    var service = new ApiTransitService(env.transitService());
 
     var pattern = env.tripData(TRIP_1_ID).tripPattern();
     var calls = service.getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
@@ -102,11 +102,11 @@ class ApiTransitServiceTest {
       FULL_DATASET
     );
     assertSuccess(res);
-    var transitService = env.getTransitService();
+    var transitService = env.transitService();
     var service = new ApiTransitService(transitService);
 
     var trip = transitService.getTrip(id(TRIP_1_ID));
-    var scheduledPattern = env.getTransitService().findPattern(trip);
+    var scheduledPattern = env.transitService().findPattern(trip);
     var calls = service.getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
       STOP_A,
       scheduledPattern,
@@ -123,7 +123,7 @@ class ApiTransitServiceTest {
   @Test
   void transitLegCalls() {
     var env = envBuilder.addTrip(TRIP1_INPUT).build();
-    var service = new ApiTransitService(env.getTransitService());
+    var service = new ApiTransitService(env.transitService());
 
     var tripData = env.tripData(TRIP_1_ID);
     var tripTimes = tripData.tripTimes();
@@ -154,7 +154,7 @@ class ApiTransitServiceTest {
   @Test
   void streetLegCalls() {
     var env = envBuilder.addTrip(TRIP1_INPUT).build();
-    var service = new ApiTransitService(env.getTransitService());
+    var service = new ApiTransitService(env.transitService());
 
     var leg = StreetLeg.of()
       .withMode(TraverseMode.WALK)
