@@ -5,6 +5,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.impl._support.FareTestConstants;
@@ -22,9 +23,17 @@ class FareLookupServiceTest implements FareTestConstants {
   private static final Route ROUTE = TimetableRepositoryForTest.route("r1")
     .withGroupOfRoutes(List.of(NETWORK_A))
     .build();
+  private static final ImmutableMultimap<FeedScopedId, FeedScopedId> EMPTY_STOP_AREAS =
+    ImmutableMultimap.of();
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
   private final RegularStop STOP_1 = testModel.stop("stop1").build();
   private final RegularStop STOP_2 = testModel.stop("stop2").build();
+  private final Multimap<FeedScopedId, FeedScopedId> stopAreas = ImmutableMultimap.of(
+    STOP_1.getId(),
+    A_1,
+    STOP_2.getId(),
+    A_1
+  );
 
   @Test
   void presenceOfAreaLeadsToEmptyResults() {
@@ -35,15 +44,9 @@ class FareLookupServiceTest implements FareTestConstants {
       .withFromAreaId(A_1)
       .withToAreaId(A_1)
       .build();
-    var service = new FareLookupService(
-      List.of(r1, r2),
-      List.of(),
-      ImmutableMultimap.of(STOP_1.getId(), A_1, STOP_2.getId(), A_1)
-    );
+    var service = new FareLookupService(List.of(r1, r2), List.of(), stopAreas);
 
-    var leg = leg();
-    var rules = service.legRules(leg);
-    assertThat(rules).isEmpty();
+    assertThat(service.legRules(leg())).isEmpty();
   }
 
   @Test
@@ -56,15 +59,35 @@ class FareLookupServiceTest implements FareTestConstants {
       .withToAreaId(A_1)
       .withPriority(1)
       .build();
-    var service = new FareLookupService(
-      List.of(r1, r2),
-      List.of(),
-      ImmutableMultimap.of(STOP_1.getId(), A_1, STOP_2.getId(), A_1)
-    );
+    var service = new FareLookupService(List.of(r1, r2), List.of(), stopAreas);
 
-    var leg = leg();
-    var rules = service.legRules(leg);
-    assertThat(rules).containsExactly(r1);
+    assertThat(service.legRules(leg())).containsExactly(r1);
+  }
+
+  @Test
+  void conflictingRulesResolvedByPriority() {
+    var r1 = FareLegRule.of(id("r1"), List.of(FARE_PRODUCT_A))
+      .withNetworkId(NETWORK_A.getId())
+      .withPriority(1)
+      .build();
+    var r2 = FareLegRule.of(id("r2"), List.of(FARE_PRODUCT_B))
+      .withNetworkId(NETWORK_A.getId())
+      .withPriority(2)
+      .build();
+    var service = new FareLookupService(List.of(r1, r2), List.of(), EMPTY_STOP_AREAS);
+    assertThat(service.legRules(leg())).containsExactly(r2);
+  }
+
+  @Test
+  void noPriorityReturnsBoth() {
+    var r1 = FareLegRule.of(id("r1"), List.of(FARE_PRODUCT_A))
+      .withNetworkId(NETWORK_A.getId())
+      .build();
+    var r2 = FareLegRule.of(id("r2"), List.of(FARE_PRODUCT_B))
+      .withNetworkId(NETWORK_A.getId())
+      .build();
+    var service = new FareLookupService(List.of(r1, r2), List.of(), EMPTY_STOP_AREAS);
+    assertThat(service.legRules(leg())).containsExactly(r1, r2);
   }
 
   private TransitLeg leg() {

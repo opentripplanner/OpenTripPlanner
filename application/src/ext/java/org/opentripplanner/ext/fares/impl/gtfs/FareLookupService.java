@@ -6,6 +6,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -56,7 +57,14 @@ class FareLookupService implements Serializable {
    * Returns the fare leg rules for a specific leg.
    */
   Set<FareLegRule> legRules(TransitLeg leg) {
-    return this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toSet());
+    var rules =
+      this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toSet());
+    var containsPriorities = rules.stream().allMatch(r -> r.priority().isPresent());
+    if (containsPriorities) {
+      return findHighestPriority(rules);
+    } else {
+      return rules;
+    }
   }
 
   /**
@@ -234,5 +242,20 @@ class FareLookupService implements Serializable {
     Function<FareLegRule, FeedScopedId> getArea
   ) {
     return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
+  }
+
+  /**
+   * If a GTFS feed contains rule_priority values, then the highest priority rule is returned.
+   *
+   * @link <a href="https://gtfs.org/documentation/schedule/reference/#fare_leg_rulestxt">spec</a>
+   */
+  private static Set<FareLegRule> findHighestPriority(Set<FareLegRule> rules) {
+    return rules
+      .stream()
+      // the minus reverses the order so that the highest priority rule is first
+      .sorted(Comparator.comparingInt(r -> -r.priority().orElse(0)))
+      .findFirst()
+      .map(Set::of)
+      .orElse(Set.of());
   }
 }
