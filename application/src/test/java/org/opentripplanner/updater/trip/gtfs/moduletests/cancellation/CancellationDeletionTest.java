@@ -10,7 +10,6 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSucce
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
-import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,8 +28,7 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
  */
 class CancellationDeletionTest implements RealtimeTestConstants {
 
-  private final LocalDate SERVICE_DATE = LocalDate.of(2023, 2, 3);
-  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
   private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
   private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
 
@@ -82,7 +80,7 @@ class CancellationDeletionTest implements RealtimeTestConstants {
       .addTrip(
         TripInput.of(TRIP_1_ID)
           // just to set the scheduling period
-          .withServiceDates(SERVICE_DATE)
+          .withServiceDates(envBuilder.defaultServiceDate())
           .addStop(STOP_A, "0:00:10", "0:00:11")
           .addStop(STOP_B, "0:00:20", "0:00:21")
           .build()
