@@ -1,5 +1,10 @@
 package org.opentripplanner.street.model.edge;
 
+import java.util.Arrays;
+import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -96,6 +101,19 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   public StreetTraversalPermission getPermission() {
     return permission;
+  }
+
+  @Override
+  public LineString getGeometry() {
+    List<Coordinate> segmentCoordinates = Arrays.asList(fromv.getCoordinate(), tov.getCoordinate());
+    return GeometryUtils.makeLineString(segmentCoordinates);
+  }
+
+  /**
+   * The number of levels that the elevator travels
+   */
+  public double getLevels() {
+    return levels;
   }
 
   public int getTravelTime() {

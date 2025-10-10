@@ -15,6 +15,13 @@ public class ElevatorVertex extends StreetVertex {
     this.label = label;
   }
 
+  /**
+   * OSM level name or "{elevatorWay osm id} / {node index}"
+   */
+  public String getLevel() {
+    return level;
+  }
+
   @Override
   public VertexLabel getLabel() {
     return VertexLabel.string(LABEL_TEMPLATE.formatted(label, level));
