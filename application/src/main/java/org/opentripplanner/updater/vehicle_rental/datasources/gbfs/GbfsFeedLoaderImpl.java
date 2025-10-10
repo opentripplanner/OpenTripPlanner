@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.framework.io.HttpResponseWithHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.updater.spi.HttpHeaders;
@@ -112,6 +113,37 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
     }
   }
 
+  /**
+   * Fetches a feed with conditional request support (ETag/If-None-Match).
+   * Returns the response including status code and headers.
+   */
+  protected static <T> HttpResponseWithHeaders<T> fetchFeedWithResponse(
+    URI uri,
+    HttpHeaders httpHeaders,
+    String etag,
+    OtpHttpClient otpHttpClient,
+    Class<T> clazz
+  ) {
+    try {
+      // Build headers with If-None-Match if ETag is available
+      Map<String, String> headers = new HashMap<>(httpHeaders.asMap());
+      if (etag != null && !etag.isEmpty()) {
+        headers.put("If-None-Match", etag);
+      }
+
+      return otpHttpClient.getAndMapAsJsonObjectWithResponse(
+        uri,
+        null,
+        headers,
+        objectMapper,
+        clazz
+      );
+    } catch (OtpHttpClientException e) {
+      LOG.warn("Error parsing vehicle rental feed from {}. Details: {}.", uri, e.getMessage(), e);
+      return null;
+    }
+  }
+
   /* private static classes */
 
   private class GBFSFeedUpdater<T> {
@@ -124,6 +156,7 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
 
     private int nextUpdate;
     private T data;
+    private String etag;
 
     private GBFSFeedUpdater(F feed) {
       url = feed.getUrl();
@@ -135,24 +168,74 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
     }
 
     private boolean fetchData() {
-      T newData = fetchFeed(url, httpHeaders, otpHttpClient, implementingClass);
-      if (newData == null) {
+      // Use conditional request with ETag if available
+      HttpResponseWithHeaders<T> response = fetchFeedWithResponse(
+        url,
+        httpHeaders,
+        etag,
+        otpHttpClient,
+        implementingClass
+      );
+
+      if (response == null) {
         LOG.warn("Could not fetch GBFS data for {}. Retrying.", url);
         nextUpdate = getCurrentTimeSeconds();
         return false;
       }
+
+      // Handle 304 Not Modified - data hasn't changed
+      if (response.isNotModified()) {
+        LOG.debug("GBFS feed {} not modified (304), reusing cached data", url);
+        // Update TTL based on existing data
+        updateNextFetchTime(data);
+        return true;
+      }
+
+      // Handle successful response with new data
+      if (!response.isSuccess()) {
+        LOG.warn(
+          "Could not fetch GBFS data for {}. HTTP status: {}",
+          url,
+          response.getStatusCode()
+        );
+        nextUpdate = getCurrentTimeSeconds();
+        return false;
+      }
+
+      T newData = response.getBody();
+      if (newData == null) {
+        LOG.warn("Could not fetch GBFS data for {}. Empty response body.", url);
+        nextUpdate = getCurrentTimeSeconds();
+        return false;
+      }
+
+      // Store new data and ETag
       data = newData;
+      etag = response.getHeader("ETag").orElse(null);
+      if (etag != null) {
+        LOG.debug("Stored ETag {} for GBFS feed {}", etag, url);
+      }
+
+      updateNextFetchTime(newData);
+      return true;
+    }
+
+    private void updateNextFetchTime(T feedData) {
+      if (feedData == null) {
+        nextUpdate = getCurrentTimeSeconds();
+        return;
+      }
 
       try {
         // Fetch lastUpdated and ttl from the resulting class. Due to type erasure we don't know the actual
         // class, and have to use introspection to get the method references, as they do not share a supertype.
-        Object lastUpdatedValue = implementingClass.getMethod("getLastUpdated").invoke(newData);
+        Object lastUpdatedValue = implementingClass.getMethod("getLastUpdated").invoke(feedData);
         Integer lastUpdated = lastUpdatedValue == null
           ? null
           : (lastUpdatedValue instanceof Date
               ? (int) ((Date) lastUpdatedValue).getTime()
               : (Integer) lastUpdatedValue);
-        Integer ttl = (Integer) implementingClass.getMethod("getTtl").invoke(newData);
+        Integer ttl = (Integer) implementingClass.getMethod("getTtl").invoke(feedData);
         if (lastUpdated == null || ttl == null) {
           nextUpdate = getCurrentTimeSeconds();
         } else {
@@ -167,7 +250,6 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
         LOG.error("Invalid lastUpdated or ttl for {}", url);
         nextUpdate = getCurrentTimeSeconds();
       }
-      return true;
     }
 
     private boolean shouldUpdate() {

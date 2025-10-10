@@ -110,6 +110,39 @@ public class OtpHttpClient {
   }
 
   /**
+   * Executes an HTTP GET request and returns the response with headers and body.
+   * Returns null body for 304 Not Modified responses.
+   * If the protocol is neither HTTP nor HTTPS, the URI is interpreted as a local file.
+   */
+  public <T> HttpResponseWithHeaders<T> getWithResponse(
+    URI uri,
+    Duration timeout,
+    Map<String, String> headers,
+    ResponseMapper<T> contentMapper
+  ) {
+    return sendAndMapWithResponse(new HttpGet(uri), uri, timeout, headers, contentMapper);
+  }
+
+  /**
+   * Executes an HTTP GET request and returns the response with headers and body mapped as a JSON object.
+   */
+  public <T> HttpResponseWithHeaders<T> getAndMapAsJsonObjectWithResponse(
+    URI uri,
+    Duration timeout,
+    Map<String, String> headers,
+    ObjectMapper objectMapper,
+    Class<T> clazz
+  ) {
+    return getWithResponse(uri, timeout, headers, is -> {
+      try {
+        return objectMapper.readValue(is, clazz);
+      } catch (Exception e) {
+        throw new OtpHttpClientException(e);
+      }
+    });
+  }
+
+  /**
    * Executes an HTTP GET request and returns the body mapped as a JSON object.
    */
   public <T> T getAndMapAsJsonObject(
@@ -305,6 +338,56 @@ public class OtpHttpClient {
     }
   }
 
+  /**
+   * Executes an HTTP request and returns the response with status, headers, and body.
+   * For 304 Not Modified responses, the body will be null.
+   */
+  protected <T> HttpResponseWithHeaders<T> executeAndMapWithResponse(
+    HttpUriRequestBase httpRequest,
+    Duration timeout,
+    Map<String, String> requestHeaders,
+    ResponseMapper<T> contentMapper
+  ) {
+    Objects.requireNonNull(requestHeaders);
+    if (timeout != null) {
+      httpRequest.setConfig(requestConfig(timeout));
+    }
+    requestHeaders.forEach(httpRequest::addHeader);
+    try {
+      return httpClient.execute(httpRequest, response -> {
+        int statusCode = response.getCode();
+        Header[] headers = response.getHeaders();
+
+        // For 304 Not Modified, return response with null body
+        if (statusCode == 304) {
+          return new HttpResponseWithHeaders<>(statusCode, headers, null);
+        }
+
+        // For other successful responses, map the body
+        if (statusCode >= 200 && statusCode < 300) {
+          if (response.getEntity() == null) {
+            throw new OtpHttpClientException("HTTP request failed: empty response");
+          }
+          try (InputStream is = response.getEntity().getContent()) {
+            if (is == null) {
+              throw new OtpHttpClientException("HTTP request failed: empty response");
+            }
+            T body = contentMapper.apply(is);
+            return new HttpResponseWithHeaders<>(statusCode, headers, body);
+          } catch (Exception e) {
+            throw new OtpHttpClientException(e);
+          }
+        }
+
+        // For error responses
+        logResponse(response);
+        throw new OtpHttpClientException("HTTP request failed with status code " + statusCode);
+      });
+    } catch (IOException e) {
+      throw new OtpHttpClientException(e);
+    }
+  }
+
   private <T> T mapResponse(ClassicHttpResponse response, ResponseMapper<T> contentMapper) {
     if (isFailedRequest(response)) {
       logResponse(response);
@@ -345,6 +428,33 @@ public class OtpHttpClient {
       // Local file probably, try standard java
       try (InputStream is = downloadUrl.openStream()) {
         return contentMapper.apply(is);
+      } catch (Exception e) {
+        throw new OtpHttpClientException(e);
+      }
+    }
+  }
+
+  private <T> HttpResponseWithHeaders<T> sendAndMapWithResponse(
+    HttpUriRequestBase request,
+    URI uri,
+    Duration timeout,
+    Map<String, String> headers,
+    ResponseMapper<T> contentMapper
+  ) {
+    URL downloadUrl;
+    try {
+      downloadUrl = uri.toURL();
+    } catch (MalformedURLException e) {
+      throw new OtpHttpClientException(e);
+    }
+    String proto = downloadUrl.getProtocol();
+    if (proto.equals("http") || proto.equals("https")) {
+      return executeAndMapWithResponse(request, timeout, headers, contentMapper);
+    } else {
+      // Local file - return 200 OK with empty headers
+      try (InputStream is = downloadUrl.openStream()) {
+        T body = contentMapper.apply(is);
+        return new HttpResponseWithHeaders<>(200, new Header[0], body);
       } catch (Exception e) {
         throw new OtpHttpClientException(e);
       }
