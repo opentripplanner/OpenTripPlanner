@@ -35,22 +35,8 @@ class OsmAreaGroupTest {
   private static final OsmWay BARRIER_3_1 = new OsmWay();
   private static final OsmWay BOLLARD_1_2_3 = new OsmWay();
 
-  private static final OsmLevel LEVEL_0 = new OsmLevel(
-    0,
-    0,
-    "0",
-    "0",
-    OsmLevel.Source.LEVEL_TAG,
-    true
-  );
-  private static final OsmLevel LEVEL_1 = new OsmLevel(
-    1,
-    5,
-    "1",
-    "1",
-    OsmLevel.Source.LEVEL_TAG,
-    true
-  );
+  private static final Set<OsmLevel> LEVEL_0_SET = Set.of(new OsmLevel(0.0, "0"));
+  private static final Set<OsmLevel> LEVEL_1_SET = Set.of(new OsmLevel(1.0, "1"));
 
   private static final TLongObjectHashMap<OsmNode> nodes = new TLongObjectHashMap<>();
 
@@ -194,7 +180,10 @@ class OsmAreaGroupTest {
   void shouldGroupWithTwoConsecutiveNodes() {
     OsmArea a1 = createArea(L0_1_2_3_4_1);
     OsmArea a2 = createArea(L0_5_2_1_5);
-    var result = OsmAreaGroup.groupAreas(Map.of(a1, LEVEL_0, a2, LEVEL_0), generateBarrierMap());
+    var result = OsmAreaGroup.groupAreas(
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
+      generateBarrierMap()
+    );
     assertEquals(1, result.size());
     assertEquals(Set.of(a1, a2), Set.copyOf(result.getFirst().areas));
   }
@@ -204,7 +193,7 @@ class OsmAreaGroupTest {
     OsmArea a1 = createArea(L0_1_2_3_4_1);
     OsmArea a2 = createArea(L0_5_2_1_5);
     var result = OsmAreaGroup.groupAreas(
-      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
       generateBarrierMap(BARRIER_5_1_4)
     );
     assertEquals(1, result.size());
@@ -215,7 +204,10 @@ class OsmAreaGroupTest {
   void shouldNotGroupWithOnlyOneNodeInCommon() {
     OsmArea a1 = createArea(L0_1_2_3_4_1);
     OsmArea a2 = createArea(L0_1_5_6_1);
-    var result = OsmAreaGroup.groupAreas(Map.of(a1, LEVEL_0, a2, LEVEL_0), generateBarrierMap());
+    var result = OsmAreaGroup.groupAreas(
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
+      generateBarrierMap()
+    );
     assertEquals(2, result.size());
   }
 
@@ -225,7 +217,7 @@ class OsmAreaGroupTest {
     OsmArea a2 = createArea(L0_5_2_1_5);
     // the shared edge 1-2 is also shared by the barrier
     var result = OsmAreaGroup.groupAreas(
-      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
       generateBarrierMap(BARRIER_3_2_1)
     );
     assertEquals(2, result.size());
@@ -237,7 +229,7 @@ class OsmAreaGroupTest {
     OsmArea a2 = createArea(L0_5_2_1_5);
     // a1 and a2 shares the edge 1-2, but the barrier goes 1-3-2
     var result = OsmAreaGroup.groupAreas(
-      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
       generateBarrierMap(BARRIER_1_3_2)
     );
     assertEquals(1, result.size());
@@ -249,7 +241,7 @@ class OsmAreaGroupTest {
     OsmArea a1 = createArea(PEDESTRIAN_1_2_3_4_1);
     OsmArea a2 = createArea(PEDESTRIAN_5_2_1_5);
     var result = OsmAreaGroup.groupAreas(
-      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
       generateBarrierMap(BOLLARD_1_2_3)
     );
     assertEquals(1, result.size());
@@ -260,7 +252,7 @@ class OsmAreaGroupTest {
     OsmArea a1 = createArea(PEDESTRIAN_1_2_3_4_1);
     OsmArea a2 = createArea(PEDESTRIAN_5_2_1_5);
     var result = OsmAreaGroup.groupAreas(
-      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
       generateBarrierMap(BARRIER_3_2_1)
     );
     assertEquals(2, result.size());
@@ -271,7 +263,7 @@ class OsmAreaGroupTest {
     OsmArea a1 = createArea(L0_1_2_3_4_1);
     OsmArea a2 = createArea(L0_5_2_1_5);
     var result = OsmAreaGroup.groupAreas(
-      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
       generateBarrierMap(BOLLARD_1_2_3)
     );
     assertEquals(2, result.size());
@@ -282,7 +274,7 @@ class OsmAreaGroupTest {
     OsmArea a1 = createArea(L0_1_2_3_4_1);
     OsmArea a2 = createArea(L0_5_2_1_5);
     var result = OsmAreaGroup.groupAreas(
-      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
       generateBarrierMap(BARRIER_1_4, BARRIER_2_3)
     );
     assertEquals(1, result.size());
@@ -293,7 +285,10 @@ class OsmAreaGroupTest {
   void shouldNotGroupWithTwoDistinctCommonNodes() {
     OsmArea a1 = createArea(L0_1_2_3_7_8_9_1);
     OsmArea a2 = createArea(L0_2_10_7_11_6_2);
-    var result = OsmAreaGroup.groupAreas(Map.of(a1, LEVEL_0, a2, LEVEL_0), generateBarrierMap());
+    var result = OsmAreaGroup.groupAreas(
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
+      generateBarrierMap()
+    );
     assertEquals(2, result.size());
   }
 
@@ -302,7 +297,7 @@ class OsmAreaGroupTest {
     OsmArea a1 = createArea(L0_1_2_3_4_1);
     OsmArea a2 = createArea(L0_1_2_3_7_8_9_1);
     var result = OsmAreaGroup.groupAreas(
-      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
       generateBarrierMap(BARRIER_3_2_1)
     );
     assertEquals(2, result.size());
@@ -313,7 +308,7 @@ class OsmAreaGroupTest {
     OsmArea a1 = createArea(L0_1_2_3_4_1);
     OsmArea a2 = createArea(L0_1_2_3_7_8_9_1);
     var result = OsmAreaGroup.groupAreas(
-      Map.of(a1, LEVEL_0, a2, LEVEL_0),
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_0_SET),
       generateBarrierMap(BARRIER_3_1)
     );
     assertEquals(1, result.size());
@@ -323,7 +318,10 @@ class OsmAreaGroupTest {
   void shouldNotGroupBetweenLevels() {
     OsmArea a1 = createArea(L0_1_2_3_4_1);
     OsmArea a2 = createArea(L1_1_2_5_1);
-    var result = OsmAreaGroup.groupAreas(Map.of(a1, LEVEL_0, a2, LEVEL_1), generateBarrierMap());
+    var result = OsmAreaGroup.groupAreas(
+      Map.of(a1, LEVEL_0_SET, a2, LEVEL_1_SET),
+      generateBarrierMap()
+    );
     assertEquals(2, result.size());
   }
 

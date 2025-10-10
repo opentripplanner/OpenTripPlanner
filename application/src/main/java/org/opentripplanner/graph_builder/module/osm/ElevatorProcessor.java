@@ -88,14 +88,13 @@ class ElevatorProcessor {
       for (OsmLevel level : levels) {
         // get the node to build the elevator out from
         OsmVertex sourceVertex = vertices.get(level);
-        String levelName = level.longName;
 
         createElevatorVertices(
           graph,
           onboardVertices,
           sourceVertex,
           sourceVertex.getLabelString(),
-          levelName
+          level.name()
         );
       }
       long travelTime = node

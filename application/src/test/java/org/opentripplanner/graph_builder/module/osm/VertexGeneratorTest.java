@@ -136,11 +136,10 @@ class VertexGeneratorTest {
     assertFalse(barrierVertexNotOnBarrier instanceof BarrierVertex);
 
     subject.getVertexForOsmNode(n4, w1, SPLIT);
-    var issues = getBarrierLevelIssues(issueStore);
-    assertEquals(1, issues.length);
-    assertEquals(3, issues[0].node().getId());
     subject.getVertexForOsmNode(n4, w2, SPLIT);
-    issues = getBarrierLevelIssues(issueStore);
+
+    subject.createDifferentLevelsSharingBarrierIssues();
+    var issues = getBarrierLevelIssues(issueStore);
     assertEquals(2, issues.length);
     assertEquals(3, issues[0].node().getId());
     assertEquals(4, issues[1].node().getId());

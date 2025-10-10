@@ -27,9 +27,11 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -70,12 +72,11 @@ public class SidewalkNamer implements EdgeNamer {
   }
 
   @Override
-  public void recordEdges(OsmEntity way, StreetEdgePair pair) {
+  public void recordEdges(OsmEntity way, StreetEdgePair pair, OsmDatabase osmdb) {
+    Set<OsmLevel> levelSet = osmdb.getLevelSetForEntity(way);
     // This way is a sidewalk and hasn't been named yet (and is not explicitly unnamed)
     if (way.isSidewalk() && way.hasNoName() && !way.isExplicitlyUnnamed()) {
-      pair
-        .asIterable()
-        .forEach(edge -> unnamedSidewalks.add(new EdgeOnLevel(edge, way.getLevels())));
+      pair.asIterable().forEach(edge -> unnamedSidewalks.add(new EdgeOnLevel(edge, levelSet)));
     }
     // The way is _not_ a sidewalk and does have a name
     else if (way.isNamed() && !way.isLink()) {
@@ -83,10 +84,7 @@ public class SidewalkNamer implements EdgeNamer {
       // needs to contain one item for each road segment with a unique geometry and name, so we
       // add only one of the two edges.
       var edge = pair.pickAny();
-      streetEdges.insert(
-        edge.getGeometry().getEnvelopeInternal(),
-        new EdgeOnLevel(edge, way.getLevels())
-      );
+      streetEdges.insert(edge.getGeometry().getEnvelopeInternal(), new EdgeOnLevel(edge, levelSet));
     }
   }
 
@@ -211,7 +209,7 @@ public class SidewalkNamer implements EdgeNamer {
    * A group of edges that are near a sidewalk that have the same name. These groups are used
    * to figure out if the name of the group can be applied to a nearby sidewalk.
    */
-  private record CandidateGroup(I18NString name, List<StreetEdge> edges, Set<String> levels) {
+  private record CandidateGroup(I18NString name, List<StreetEdge> edges, Set<OsmLevel> levels) {
     /**
      * How much of this group intersects with the given geometry, in meters.
      */
@@ -240,7 +238,7 @@ public class SidewalkNamer implements EdgeNamer {
     }
   }
 
-  private record EdgeOnLevel(StreetEdge edge, Set<String> levels) {}
+  private record EdgeOnLevel(StreetEdge edge, Set<OsmLevel> levels) {}
 
   /**
    * A class to cache the expensive construction of a Universal Traverse Mercator coordinate

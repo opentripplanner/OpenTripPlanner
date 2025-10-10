@@ -194,13 +194,13 @@ public class WayPropertySet {
     return result;
   }
 
-  public I18NString getCreativeNameForWay(OsmEntity way) {
+  public I18NString getCreativeName(OsmEntity entity) {
     CreativeNamer bestNamer = null;
     int bestScore = 0;
     for (CreativeNamerPicker picker : creativeNamers) {
       OsmSpecifier specifier = picker.specifier;
       CreativeNamer namer = picker.namer;
-      int score = specifier.matchScore(way, DIRECTIONLESS);
+      int score = specifier.matchScore(entity, DIRECTIONLESS);
       if (score > bestScore) {
         bestNamer = namer;
         bestScore = score;
@@ -209,7 +209,7 @@ public class WayPropertySet {
     if (bestNamer == null) {
       return null;
     }
-    return bestNamer.generateCreativeName(way);
+    return bestNamer.generateCreativeName(entity);
   }
 
   /**

@@ -400,10 +400,7 @@ class ParkingProcessor {
     I18NString creativeName = osmEntity.getAssumedName();
     if (creativeName == null) {
       // ... otherwise resort to "CreativeNamer"s
-      creativeName = osmEntity
-        .getOsmProvider()
-        .getWayPropertySet()
-        .getCreativeNameForWay(osmEntity);
+      creativeName = osmEntity.getOsmProvider().getWayPropertySet().getCreativeName(osmEntity);
     }
     if (creativeName == null) {
       creativeName = new NonLocalizedString(
