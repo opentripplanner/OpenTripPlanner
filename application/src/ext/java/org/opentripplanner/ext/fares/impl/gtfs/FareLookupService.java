@@ -54,7 +54,8 @@ class FareLookupService implements Serializable {
   }
 
   /**
-   * Returns the fare leg rules for a specific leg.
+   * Returns the fare leg rules for a specific leg taking into account rule priorities, if they
+   * exist.
    */
   Set<FareLegRule> legRules(TransitLeg leg) {
     var rules =
