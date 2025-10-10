@@ -1,8 +1,7 @@
-package org.opentripplanner.street.search;
+package org.opentripplanner.routing.linking;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 
 /**
  * This class contains temporary vertices and edges that are used in A-Star searches. After they

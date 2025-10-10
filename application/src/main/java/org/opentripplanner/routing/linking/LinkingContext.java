@@ -1,4 +1,4 @@
-package org.opentripplanner.street.search;
+package org.opentripplanner.routing.linking;
 
 import java.util.Collection;
 import java.util.Map;
@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -14,7 +13,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 /**
  * Holds vertices (mainly temporary) that are meant to be used within the scope of a single route
  * request that can contain access/egress/direct/transfer routing. The temporary vertices will be
- * disposed by {@link org.opentripplanner.street.search.TemporaryVerticesContainer} after the search
+ * disposed by {@link TemporaryVerticesContainer} after the search
  * is over.
  */
 public class LinkingContext {

@@ -11,7 +11,7 @@ import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFind
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.street.search.LinkingContext;
+import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
