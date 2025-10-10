@@ -50,7 +50,10 @@ import org.opentripplanner.utils.time.TimeUtils;
  *       withing the context of a SiteRepository, mixing more than one model in a test is sharing
  *       state between tests. For now, it is just the stop index - but we want to
  *       use this to encapsulate the SiteRepository completely.
+ *
+ * @deprecated This has been deprecated in favour of {@link TransitTestEnvironment}
  */
+@Deprecated
 public class TimetableRepositoryForTest {
 
   public static final String FEED_ID = "F";

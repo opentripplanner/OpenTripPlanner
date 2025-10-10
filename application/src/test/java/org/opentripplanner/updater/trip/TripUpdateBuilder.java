@@ -39,23 +39,6 @@ public class TripUpdateBuilder {
     this.midnight = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
   }
 
-  public TripUpdateBuilder(
-    String tripId,
-    LocalDate serviceDate,
-    GtfsRealtime.TripDescriptor.ScheduleRelationship scheduleRelationship,
-    ZoneId zoneId,
-    String tripHeadsign,
-    String tripShortName
-  ) {
-    this(tripId, serviceDate, scheduleRelationship, zoneId);
-    tripUpdateBuilder.setTripProperties(
-      GtfsRealtime.TripUpdate.TripProperties.newBuilder()
-        .setTripHeadsign(tripHeadsign)
-        .setTripShortName(tripShortName)
-        .build()
-    );
-  }
-
   public TripUpdateBuilder addStopTime(String stopId, String time) {
     return addStopTime(
       stopId,
@@ -353,6 +336,16 @@ public class TripUpdateBuilder {
     tripDescriptorBuilder.setExtension(MfdzRealtimeExtensions.tripDescriptor, ext);
     tripDescriptorBuilder.setRouteId("dynamically-added-trip");
 
+    return this;
+  }
+
+  public TripUpdateBuilder withTripProperties(String tripHeadsign, String tripShortName) {
+    tripUpdateBuilder.setTripProperties(
+      GtfsRealtime.TripUpdate.TripProperties.newBuilder()
+        .setTripHeadsign(tripHeadsign)
+        .setTripShortName(tripShortName)
+        .build()
+    );
     return this;
   }
 }

@@ -7,9 +7,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.updater.spi.UpdateError;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
+import org.opentripplanner.updater.trip.SiriTestHelper;
 
 class InvalidStopPointRefTest {
 
@@ -22,11 +22,13 @@ class InvalidStopPointRefTest {
   @ParameterizedTest(name = "invalid id of ''{0}'', extraJourney={1}")
   @MethodSource("cases")
   void rejectEmptyStopPointRef(String invalidRef, boolean extraJourney) {
-    var env = RealtimeTestEnvironment.of().build();
+    var env = TransitTestEnvironment.of().build();
+    var siri = SiriTestHelper.of(env);
 
     // journey contains empty stop point ref elements
     // happens in the South Tyrolian feed: https://github.com/noi-techpark/odh-mentor-otp/issues/213
-    var invalidJourney = new SiriEtBuilder(env.getDateTimeHelper())
+    var invalidJourney = siri
+      .etBuilder()
       .withEstimatedVehicleJourneyCode("invalid-journey")
       .withOperatorRef("unknown-operator")
       .withLineRef("unknown-line")
@@ -40,7 +42,7 @@ class InvalidStopPointRefTest {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(invalidJourney);
+    var result = siri.applyEstimatedTimetable(invalidJourney);
     assertEquals(0, result.successful());
     assertFailure(UpdateError.UpdateErrorType.EMPTY_STOP_POINT_REF, result);
   }

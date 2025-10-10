@@ -4,28 +4,26 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalTime;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
-import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.utils.time.TimeUtils;
 
-public class TripTimesOnDateTest implements RealtimeTestConstants {
+public class TripTimesOnDateTest {
 
-  private final RealtimeTestEnvironmentBuilder envBuilder = RealtimeTestEnvironment.of();
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2025, 3, 3);
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
 
-  private final RegularStop STOP_A = envBuilder.stop(STOP_A_ID);
-  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
-  private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
-  private final RegularStop STOP_D = envBuilder.stop(STOP_D_ID);
-  private final RegularStop STOP_E = envBuilder.stop(STOP_E_ID);
-  private final RegularStop STOP_F = envBuilder.stop(STOP_F_ID);
+  private final RegularStop STOP_A = envBuilder.stop("A");
+  private final RegularStop STOP_B = envBuilder.stop("B");
+  private final RegularStop STOP_C = envBuilder.stop("C");
+  private final RegularStop STOP_D = envBuilder.stop("D");
+  private final RegularStop STOP_E = envBuilder.stop("E");
+  private final RegularStop STOP_F = envBuilder.stop("F");
 
   private final TripInput TRIP_INPUT1 = TripInput.of("t1")
     .withServiceDates(SERVICE_DATE, SERVICE_DATE.plusDays(1))
@@ -49,9 +47,10 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
   @Test
   void onFirstStop() {
     var env = envBuilder.addTrip(TRIP_INPUT1).addTrip(TRIP_INPUT2).build();
-    var transitService = env.getTransitService();
+    var transitService = env.transitService();
+    var dt = env.localTimeParser();
 
-    var instant = instant("12:00");
+    var instant = dt.instant("12:00");
     {
       var result = transitService.findTripTimesOnDate(
         TripTimeOnDateRequest.of(List.of(STOP_A)).withTime(instant).build()
@@ -59,7 +58,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
       assertThat(result).hasSize(1);
       var tt = result.getFirst();
-      assertEquals(instant("12:01"), tt.scheduledDeparture());
+      assertEquals(dt.instant("12:01"), tt.scheduledDeparture());
     }
     {
       var result = transitService.findTripTimesOnDate(
@@ -67,30 +66,33 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
       );
       assertThat(result).hasSize(1);
       var tt = result.getFirst();
-      assertEquals(instant("12:11"), tt.scheduledDeparture());
+      assertEquals(dt.instant("12:11"), tt.scheduledDeparture());
     }
   }
 
   @Test
   void nextDay() {
     var env = envBuilder.addTrip(TRIP_INPUT1).addTrip(TRIP_INPUT2).build();
-    var transitService = env.getTransitService();
+    var transitService = env.transitService();
+    var dt = env.localTimeParser();
 
-    var instant = instant("12:00").plus(Duration.ofDays(1));
+    var instant = dt.instant("12:00").plus(Duration.ofDays(1));
     var result = transitService.findTripTimesOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_A)).withTime(instant).build()
     );
 
     assertThat(result).hasSize(1);
     var tt = result.getFirst();
-    assertEquals(instant("12:01").plus(Duration.ofDays(1)), tt.scheduledDeparture());
+    assertEquals(dt.instant("12:01").plus(Duration.ofDays(1)), tt.scheduledDeparture());
   }
 
   @Test
   void tooLate() {
-    var transitService = envBuilder.addTrip(TRIP_INPUT1).build().getTransitService();
+    var env = envBuilder.addTrip(TRIP_INPUT1).build();
+    var transitService = env.transitService();
+    var dt = env.localTimeParser();
 
-    var instant = instant("18:00");
+    var instant = dt.instant("18:00");
     var result = transitService.findTripTimesOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_A)).withTime(instant).build()
     );
@@ -99,9 +101,11 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void shortWindow() {
-    var transitService = envBuilder.addTrip(TRIP_INPUT1).build().getTransitService();
+    var env = envBuilder.addTrip(TRIP_INPUT1).build();
+    var transitService = env.transitService();
+    var dt = env.localTimeParser();
 
-    var instant = instant("11:00");
+    var instant = dt.instant("11:00");
     var result = transitService.findTripTimesOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_A))
         .withTime(instant)
@@ -113,9 +117,11 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void longerWindow() {
-    var transitService = envBuilder.addTrip(TRIP_INPUT1).build().getTransitService();
+    var env = envBuilder.addTrip(TRIP_INPUT1).build();
+    var transitService = env.transitService();
+    var dt = env.localTimeParser();
 
-    var instant = instant("11:00");
+    var instant = dt.instant("11:00");
     var result = transitService.findTripTimesOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_A))
         .withTime(instant)
@@ -127,13 +133,11 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void several() {
-    var transitService = envBuilder
-      .addTrip(TRIP_INPUT2)
-      .addTrip(TRIP_INPUT3)
-      .build()
-      .getTransitService();
+    var env = envBuilder.addTrip(TRIP_INPUT2).addTrip(TRIP_INPUT3).build();
+    var transitService = env.transitService();
+    var dt = env.localTimeParser();
 
-    var instant = instant("12:10");
+    var instant = dt.instant("12:10");
     var result = transitService.findTripTimesOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_F))
         .withTime(instant)
@@ -141,10 +145,5 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
         .build()
     );
     assertThat(result).hasSize(2);
-  }
-
-  private static Instant instant(String time) {
-    var localTime = LocalTime.ofSecondOfDay(TimeUtils.time(time));
-    return localTime.atDate(SERVICE_DATE).atZone(TIME_ZONE).toInstant();
   }
 }
