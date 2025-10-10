@@ -1,7 +1,5 @@
 # Code Style
 
-We use the following code conventions for [Java](#Java) and [JavaScript](#JavaScript).
-
 ## Java
 
 The OpenTripPlanner Java code style is revised in OTP v2.2. We use the
