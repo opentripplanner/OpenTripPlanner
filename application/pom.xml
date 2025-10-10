@@ -28,6 +28,12 @@
             <artifactId>raptor</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>astar</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
 
         <!-- 3rd party dependencies -->
         <dependency>

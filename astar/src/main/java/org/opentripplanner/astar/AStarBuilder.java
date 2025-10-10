@@ -16,6 +16,7 @@ import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.slf4j.Logger;
 
 public abstract class AStarBuilder<
   State extends AStarState<State, Edge, Vertex>,
@@ -24,7 +25,11 @@ public abstract class AStarBuilder<
   Builder extends AStarBuilder<State, Edge, Vertex, Builder>
 > {
 
+  Logger LOG = org.slf4j.LoggerFactory.getLogger(AStarBuilder.class);
+
   private Builder builder;
+  private Runnable preStartHook = () ->
+    LOG.warn("No pre-start hook provided. Call withPreStartHook() to set one.");
   private RemainingWeightHeuristic<State> heuristic = RemainingWeightHeuristic.TRIVIAL;
   private SkipEdgeStrategy<State, Edge> skipEdgeStrategy;
   private TraverseVisitor<State, Edge> traverseVisitor;
@@ -44,6 +49,15 @@ public abstract class AStarBuilder<
 
   public Builder withHeuristic(RemainingWeightHeuristic<State> heuristic) {
     this.heuristic = heuristic;
+    return builder;
+  }
+
+  /**
+   * Set a function that will be called before the search begins. Useful for checking that
+   * a timeout has not been reached before the search begins.
+   */
+  public Builder withPreStartHook(Runnable hook) {
+    this.preStartHook = hook;
     return builder;
   }
 
@@ -135,6 +149,7 @@ public abstract class AStarBuilder<
 
     return new AStar<>(
       heuristic,
+      preStartHook,
       skipEdgeStrategy,
       traverseVisitor,
       arriveBy,
