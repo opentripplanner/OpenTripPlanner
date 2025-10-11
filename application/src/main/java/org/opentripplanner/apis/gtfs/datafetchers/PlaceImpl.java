@@ -52,6 +52,11 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
   }
 
   @Override
+  public DataFetcher<Boolean> canceled() {
+    return environment -> getSource(environment).canceled;
+  }
+
+  @Override
   public DataFetcher<VehicleParking> carPark() {
     return this::getCarPark;
   }

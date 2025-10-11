@@ -1058,6 +1058,13 @@ type Place {
   bikePark: BikePark @deprecated(reason : "bikePark is deprecated. Use vehicleParking instead.") @timingData
   "The bike rental station related to the place"
   bikeRentalStation: BikeRentalStation @deprecated(reason : "Use vehicleRentalStation and rentalVehicle instead") @timingData
+  """
+  For intermediate places, if the call is cancelled by a real-time update.
+  
+  For boarding and alighting places, if the rider is no longer able to board or alight at the place by a real-time update.
+  This can include a cancelled call or a change in pickup / drop off rules.
+  """
+  canceled: Boolean!
   "The car parking related to the place"
   carPark: CarPark @deprecated(reason : "carPark is deprecated. Use vehicleParking instead.") @timingData
   """

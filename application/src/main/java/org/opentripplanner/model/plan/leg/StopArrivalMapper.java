@@ -48,7 +48,8 @@ class StopArrivalMapper {
       arrival,
       departure,
       i,
-      tripTimes.gtfsSequenceOfStopIndex(i)
+      tripTimes.gtfsSequenceOfStopIndex(i),
+      tripTimes.isCanceled() || tripTimes.isCancelledStop(i)
     );
   }
 }
