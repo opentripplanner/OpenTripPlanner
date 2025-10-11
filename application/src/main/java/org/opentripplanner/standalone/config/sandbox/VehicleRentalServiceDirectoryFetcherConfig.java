@@ -20,7 +20,7 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
     var c = root
       .of(parameterName)
       .since(V2_0)
-      .summary("Configuration for the vehicle rental service directory.")
+      .summary("Configuration for the vehicle rental service directory using GBFS v3 manifest.")
       .asObject();
 
     if (c.isEmpty()) {
@@ -28,23 +28,16 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
     }
 
     return new VehicleRentalServiceDirectoryFetcherParameters(
-      c.of("url").since(V2_1).summary("Endpoint for the VehicleRentalServiceDirectory").asUri(),
       c
-        .of("sourcesName")
+        .of("url")
         .since(V2_1)
-        .summary("Json tag name for updater sources.")
-        .asString("systems"),
-      c
-        .of("updaterUrlName")
-        .since(V2_1)
-        .summary("Json tag name for endpoint urls for each source.")
-        .asString("url"),
-      c
-        .of("updaterNetworkName")
-        .since(V2_1)
-        .summary("Json tag name for the network name for each source.")
-        .asString("id"),
-      c.of("language").since(V2_1).summary("Language code.").asString(null),
+        .summary("URL or file path to the GBFS v3 manifest.json")
+        .description(
+          "Can be either a remote URL (http/https) or a local file path (file://). " +
+          "The manifest must conform to the GBFS v3.0 specification."
+        )
+        .asUri(),
+      c.of("language").since(V2_1).summary("Language code for GBFS feeds.").asString(null),
       HttpHeadersConfig.headers(c, V2_1),
       mapNetworkParameters("networks", c)
     );

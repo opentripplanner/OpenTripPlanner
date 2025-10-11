@@ -18,7 +18,7 @@ like OTP can connect to the directory and get the necessary configuration from i
 - Make json tag names configurable [#3447](https://github.com/opentripplanner/OpenTripPlanner/pull/3447)
 - Enable GBFS geofencing with VehicleRentalServiceDirectory [#5324](https://github.com/opentripplanner/OpenTripPlanner/pull/5324)
 - Enable `allowKeepingVehicleAtDestination` [#5944](https://github.com/opentripplanner/OpenTripPlanner/pull/5944)
-
+- Rewrite to use manifest.json from GBFS v3 as the service directory [#6900](https://github.com/opentripplanner/OpenTripPlanner/pull/6900)
 
 ## Configuration
 

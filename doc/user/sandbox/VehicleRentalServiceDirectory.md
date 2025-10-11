@@ -18,7 +18,7 @@ like OTP can connect to the directory and get the necessary configuration from i
 - Make json tag names configurable [#3447](https://github.com/opentripplanner/OpenTripPlanner/pull/3447)
 - Enable GBFS geofencing with VehicleRentalServiceDirectory [#5324](https://github.com/opentripplanner/OpenTripPlanner/pull/5324)
 - Enable `allowKeepingVehicleAtDestination` [#5944](https://github.com/opentripplanner/OpenTripPlanner/pull/5944)
-
+- Rewrite to use manifest.json from GBFS v3 as the service directory [#6900](https://github.com/opentripplanner/OpenTripPlanner/pull/6900)
 
 ## Configuration
 
@@ -32,11 +32,8 @@ the `router-config.json`
 
 | Config Parameter                                                                                                     |       Type      | Summary                                                                         |  Req./Opt. | Default Value | Since |
 |----------------------------------------------------------------------------------------------------------------------|:---------------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| language                                                                                                             |     `string`    | Language code.                                                                  | *Optional* |               |  2.1  |
-| sourcesName                                                                                                          |     `string`    | Json tag name for updater sources.                                              | *Optional* | `"systems"`   |  2.1  |
-| updaterNetworkName                                                                                                   |     `string`    | Json tag name for the network name for each source.                             | *Optional* | `"id"`        |  2.1  |
-| updaterUrlName                                                                                                       |     `string`    | Json tag name for endpoint urls for each source.                                | *Optional* | `"url"`       |  2.1  |
-| url                                                                                                                  |      `uri`      | Endpoint for the VehicleRentalServiceDirectory                                  | *Required* |               |  2.1  |
+| language                                                                                                             |     `string`    | Language code for GBFS feeds.                                                   | *Optional* |               |  2.1  |
+| [url](#vehicleRentalServiceDirectory_url)                                                                            |      `uri`      | URL or file path to the GBFS v3 manifest.json                                   | *Required* |               |  2.1  |
 | [headers](#vehicleRentalServiceDirectory_headers)                                                                    | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |  2.1  |
 | [networks](#vehicleRentalServiceDirectory_networks)                                                                  |    `object[]`   | List all networks to include. Use "network": "default-network" to set defaults. | *Optional* |               |  2.4  |
 |       [allowKeepingVehicleAtDestination](#vehicleRentalServiceDirectory_networks_0_allowKeepingVehicleAtDestination) |    `boolean`    | Enables `allowKeepingVehicleAtDestination` for the given network.               | *Optional* | `false`       |  2.5  |
@@ -50,6 +47,15 @@ the `router-config.json`
 
 <!-- PARAMETERS-DETAILS BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+<h4 id="vehicleRentalServiceDirectory_url">url</h4>
+
+**Since version:** `2.1` ∙ **Type:** `uri` ∙ **Cardinality:** `Required`   
+**Path:** /vehicleRentalServiceDirectory 
+
+URL or file path to the GBFS v3 manifest.json
+
+Can be either a remote URL (http/https) or a local file path (file://). The manifest must conform to the GBFS v3.0 specification.
 
 <h4 id="vehicleRentalServiceDirectory_headers">headers</h4>
 
@@ -106,10 +112,7 @@ See the regular [GBFS documentation](../GBFS-Config.md) for more information.
 // router-config.json
 {
   "vehicleRentalServiceDirectory" : {
-    "url" : "https://example.com",
-    "sourcesName" : "systems",
-    "updaterUrlName" : "url",
-    "updaterNetworkName" : "id",
+    "url" : "https://example.com/gbfs/v3/manifest.json",
     "headers" : {
       "ET-Client-Name" : "otp"
     },
