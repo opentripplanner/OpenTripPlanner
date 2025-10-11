@@ -35,6 +35,8 @@ How your OTP deployment looks is entirely up to you.
 
 ## What OTP can do for you
 
+For a comprehensive list of all OTP features and capabilities, see the [Features](Features.md) page.
+
 ### Transit agencies
 
 Transit agencies can use OTP as a backend for their public website/app trip planner or internal trip planner 
