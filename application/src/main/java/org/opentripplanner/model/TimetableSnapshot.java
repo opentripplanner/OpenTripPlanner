@@ -14,10 +14,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Predicate;
@@ -100,7 +102,7 @@ public class TimetableSnapshot {
    * include ones from the scheduled GTFS, as well as ones added by realtime messages and
    * tracked by the TripPatternCache. <p>
    * Note that the keys do not include all scheduled TripPatterns, only those for which we have at
-   * least one update.<p>
+   * least one update, and those for which we had updates before but just recently cleared.<p>
    * The members of the SortedSet (the Timetable for a particular day) are treated as copy-on-write
    * when we're updating them. If an update will modify the timetable for a particular day, that
    * timetable is replicated before any modifications are applied to avoid affecting any previous
@@ -111,6 +113,7 @@ public class TimetableSnapshot {
    * TripPattern and date.
    */
   private final Map<TripPattern, SortedSet<Timetable>> timetables;
+  private final Set<TripPatternAndServiceDate> patternAndServiceDatesToBeRestored = new HashSet<>();
 
   /**
    * For cases where the trip pattern (sequence of stops visited) has been changed by a realtime
@@ -401,9 +404,21 @@ public class TimetableSnapshot {
     );
 
     if (realtimeRaptorTransitDataUpdater != null) {
+      for (var patternAndServiceDate : patternAndServiceDatesToBeRestored) {
+        if (!dirtyTimetables.containsKey(patternAndServiceDate)) {
+          var pattern = patternAndServiceDate.tripPattern();
+          var scheduledTimetable = pattern.getScheduledTimetable();
+          dirtyTimetables.put(
+            patternAndServiceDate,
+            scheduledTimetable.copyForServiceDate(patternAndServiceDate.serviceDate)
+          );
+        }
+      }
+
       realtimeRaptorTransitDataUpdater.update(dirtyTimetables.values(), timetables);
     }
 
+    patternAndServiceDatesToBeRestored.clear();
     this.dirtyTimetables.clear();
     this.dirty = false;
 
@@ -568,7 +583,25 @@ public class TimetableSnapshot {
    * @return true if the timetable changed as a result of the call
    */
   private boolean clearTimetables(String feedId) {
-    return timetables.keySet().removeIf(tripPattern -> feedId.equals(tripPattern.getFeedId()));
+    var entriesToBeRemoved = timetables
+      .entrySet()
+      .stream()
+      .filter(entry -> feedId.equals(entry.getKey().getFeedId()))
+      .collect(Collectors.toSet());
+    patternAndServiceDatesToBeRestored.addAll(
+      entriesToBeRemoved
+        .stream()
+        .flatMap(entry ->
+          entry
+            .getValue()
+            .stream()
+            .map(timetable ->
+              new TripPatternAndServiceDate(entry.getKey(), timetable.getServiceDate())
+            )
+        )
+        .toList()
+    );
+    return timetables.entrySet().removeAll(entriesToBeRemoved);
   }
 
   /**
