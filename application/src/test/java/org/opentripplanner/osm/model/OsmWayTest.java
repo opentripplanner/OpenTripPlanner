@@ -7,10 +7,14 @@ import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
 import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
-public class OsmWayTest {
+class OsmWayTest {
 
   @Test
   void testIsBicycleDismountForced() {
@@ -256,5 +260,83 @@ public class OsmWayTest {
     way.addNodeRef(3);
     way.addNodeRef(1);
     return way;
+  }
+
+  private static OsmWay createGenericHighway() {
+    var way = new OsmWay();
+    way.addTag("highway", "primary");
+    return way;
+  }
+
+  private static OsmWay createGenericFootway() {
+    var way = new OsmWay();
+    way.addTag("highway", "footway");
+    return way;
+  }
+
+  private static OsmWay createFootway(
+    String footwayValue,
+    String crossingTag,
+    String crossingValue
+  ) {
+    var way = createGenericFootway();
+    way.addTag("footway", footwayValue);
+    way.addTag(crossingTag, crossingValue);
+    return way;
+  }
+
+  @Test
+  void footway() {
+    assertFalse(createGenericHighway().isFootway());
+    assertTrue(createGenericFootway().isFootway());
+  }
+
+  @Test
+  void serviceRoad() {
+    assertFalse(createGenericHighway().isServiceRoad());
+
+    var way = new OsmWay();
+    way.addTag("highway", "service");
+    assertTrue(way.isServiceRoad());
+  }
+
+  @ParameterizedTest
+  @MethodSource("createCrossingCases")
+  void markedCrossing(OsmWay way, boolean result) {
+    assertEquals(result, way.isCrossing());
+  }
+
+  static Stream<Arguments> createCrossingCases() {
+    return Stream.of(
+      Arguments.of(createGenericFootway(), false),
+      Arguments.of(createFootway("whatever", "unused", "unused"), false),
+      Arguments.of(createFootway("crossing", "crossing", "marked"), true),
+      Arguments.of(createFootway("crossing", "crossing", "other"), true),
+      Arguments.of(createFootway("crossing", "crossing:markings", "yes"), true),
+      Arguments.of(createFootway("crossing", "crossing:markings", "marking-details"), true),
+      Arguments.of(createFootway("crossing", "crossing:markings", null), true),
+      Arguments.of(createFootway("crossing", "crossing:markings", "no"), true)
+    );
+  }
+
+  @Test
+  void adjacentTo() {
+    final long nodeId1 = 10001L;
+    final long nodeId2 = 20002L;
+    final long sharedNodeId = 30003L;
+
+    OsmWay way1 = new OsmWay();
+    OsmWay way2 = new OsmWay();
+    assertFalse(way1.isAdjacentTo(way2));
+
+    var nodes1 = way1.getNodeRefs();
+    var nodes2 = way2.getNodeRefs();
+    nodes1.add(sharedNodeId);
+    nodes1.add(nodeId1);
+    nodes2.add(nodeId2);
+    assertFalse(way1.isAdjacentTo(way2));
+
+    nodes2.add(sharedNodeId);
+    assertTrue(way1.isAdjacentTo(way2));
   }
 }
