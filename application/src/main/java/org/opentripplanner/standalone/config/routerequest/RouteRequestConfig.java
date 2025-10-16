@@ -382,6 +382,25 @@ public class RouteRequestConfig {
           .summary(
             "A multiplier for how bad cycling is, compared to being in transit for equal lengths of time."
           )
+          .description(
+            """
+            If the optimization is set to `safe-streets` or `safest-streets`, or if `safety` is non-zero
+            in the triangle, the actual effect will further be affected by the safety of the cycle
+            route.
+
+            The effect of safety has changed between versions 2.8 and 2.9 by the removal of the
+            safety normalizer. Before the change, all the safety values were multiplied such that
+            the safest way in the whole map would have an effective value of 1, and traversal on any
+            ways which are not the safest in the whole map would further multiply the cost. Since
+            version 2.9, this multiplication is not done and the values set in the
+            [OSM Tag Mapper](osm/OsmTag.md) are used as-is, so it is now possible to decrease the
+            effective reluctance if a safe route is present.
+
+            For further information, please see [#6782](https://github.com/opentripplanner/OpenTripPlanner/pull/6782).
+            In particular, you may need to increase the reluctance if you have found that the
+            upgrade has resulted in too much cycling than you would like to.
+            """
+          )
           .asDouble(dft.reluctance())
       )
       .withBoardCost(
@@ -821,6 +840,9 @@ public class RouteRequestConfig {
             be taken as scientific or definitive. Your mileage may vary.
             See https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on performance with
             high values.
+
+            If safetyFactor is greater than 0, the actual effect will further be affected by the safety of the
+            walk route. See `safetyFactor` for more details.
             """
           )
           .asDouble(dft.reluctance())
@@ -867,7 +889,15 @@ public class RouteRequestConfig {
           .since(V2_2)
           .summary("Factor for how much the walk safety is considered in routing.")
           .description(
-            "Value should be between 0 and 1." + " If the value is set to be 0, safety is ignored."
+            """
+              Value should be between 0 and 1.
+
+              If the value is set to be 0, safety is ignored.
+
+              If the value is set to 1, the safety factor for the traversed way is applied in whole
+              as a multiplier on the cost, on top of the reluctance. The safety factors are set in
+              the [OSM Tag Mapper](osm/OsmTag.md) for tags in OpenStreetMap.
+            """
           )
           .asDouble(dft.safetyFactor())
       )
