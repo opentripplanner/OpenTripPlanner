@@ -20,6 +20,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -382,11 +383,12 @@ class WalkableAreaBuilder {
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-        .setSkipEdgeStrategy(new ListedEdgesOnly(edges))
-        .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-        .setRequest(request)
-        .setStreetRequest(new StreetRequest(mode))
-        .setFrom(vertex)
+        .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
+        .withSkipEdgeStrategy(new ListedEdgesOnly(edges))
+        .withDominanceFunction(new DominanceFunctions.EarliestArrival())
+        .withRequest(request)
+        .withStreetRequest(new StreetRequest(mode))
+        .withFrom(vertex)
         .getShortestPathTree();
 
       for (Vertex endVertex : startingVertices) {

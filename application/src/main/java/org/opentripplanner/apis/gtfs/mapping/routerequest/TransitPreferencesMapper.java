@@ -35,7 +35,7 @@ public class TransitPreferencesMapper {
             mode -> (Double) ((Map<String, Object>) mode.get("cost")).get("reluctance")
           )
         );
-      transitPreferences.setReluctanceForMode(reluctanceForMode);
+      transitPreferences.withReluctanceForMode(reluctanceForMode);
     }
     var transitArgs = args.getGraphQLPreferences().getGraphQLTransit();
     if (transitArgs == null) {
@@ -95,15 +95,15 @@ public class TransitPreferencesMapper {
     if (timetable != null) {
       var excludeUpdates = timetable.getGraphQLExcludeRealTimeUpdates();
       if (excludeUpdates != null) {
-        transitPreferences.setIgnoreRealtimeUpdates(excludeUpdates);
+        transitPreferences.withIgnoreRealtimeUpdates(excludeUpdates);
       }
       var includePlannedCancellations = timetable.getGraphQLIncludePlannedCancellations();
       if (includePlannedCancellations != null) {
-        transitPreferences.setIncludePlannedCancellations(includePlannedCancellations);
+        transitPreferences.withIncludePlannedCancellations(includePlannedCancellations);
       }
       var includeRealtimeCancellations = timetable.getGraphQLIncludeRealTimeCancellations();
       if (includeRealtimeCancellations != null) {
-        transitPreferences.setIncludeRealtimeCancellations(includeRealtimeCancellations);
+        transitPreferences.withIncludeRealtimeCancellations(includeRealtimeCancellations);
       }
     }
   }

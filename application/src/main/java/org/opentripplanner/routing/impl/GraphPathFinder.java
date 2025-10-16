@@ -85,24 +85,25 @@ public class GraphPathFinder {
     StreetPreferences preferences = request.preferences().street();
 
     StreetSearchBuilder aStar = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
-      .setSkipEdgeStrategy(
+      .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
+      .withSkipEdgeStrategy(
         new DurationSkipEdgeStrategy(
           preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
         )
       )
       // FORCING the dominance function to weight only
-      .setDominanceFunction(new DominanceFunctions.MinimumWeight())
-      .setRequest(request)
-      .setStreetRequest(request.journey().direct())
-      .setFrom(from)
-      .setTo(to)
-      .setExtensionRequestContexts(extensionRequestContexts);
+      .withDominanceFunction(new DominanceFunctions.MinimumWeight())
+      .withRequest(request)
+      .withStreetRequest(request.journey().direct())
+      .withFrom(from)
+      .withTo(to)
+      .withExtensionRequestContexts(extensionRequestContexts);
 
     // If the search has a traverseVisitor(GraphVisualizer) attached to it, set it as a callback
     // for the AStar search
     if (traverseVisitor != null) {
-      aStar.setTraverseVisitor(traverseVisitor);
+      aStar.withTraverseVisitor(traverseVisitor);
     }
 
     LOG.debug("rreq={}", request);

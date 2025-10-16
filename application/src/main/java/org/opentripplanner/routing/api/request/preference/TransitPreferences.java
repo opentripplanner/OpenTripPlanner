@@ -285,24 +285,24 @@ public final class TransitPreferences implements Serializable {
       return withAlightSlack(it -> it.withDefaultSec(defaultValue));
     }
 
-    public Builder setReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {
+    public Builder withReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {
       this.reluctanceForMode = reluctanceForMode;
       return this;
     }
 
     @Deprecated
-    public Builder setOtherThanPreferredRoutesPenalty(int otherThanPreferredRoutesPenalty) {
+    public Builder withOtherThanPreferredRoutesPenalty(int otherThanPreferredRoutesPenalty) {
       this.otherThanPreferredRoutesPenalty = Cost.costOfSeconds(otherThanPreferredRoutesPenalty);
       return this;
     }
 
-    public Builder setUnpreferredCost(CostLinearFunction unpreferredCost) {
+    public Builder withUnpreferredCost(CostLinearFunction unpreferredCost) {
       this.unpreferredCost = unpreferredCost;
       return this;
     }
 
-    public Builder setUnpreferredCostString(String constFunction) {
-      return setUnpreferredCost(CostLinearFunction.of(constFunction));
+    public Builder withUnpreferredCostString(String constFunction) {
+      return withUnpreferredCost(CostLinearFunction.of(constFunction));
     }
 
     public Builder withRelaxTransitGroupPriority(CostLinearFunction value) {
@@ -310,17 +310,17 @@ public final class TransitPreferences implements Serializable {
       return this;
     }
 
-    public Builder setIgnoreRealtimeUpdates(boolean ignoreRealtimeUpdates) {
+    public Builder withIgnoreRealtimeUpdates(boolean ignoreRealtimeUpdates) {
       this.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
       return this;
     }
 
-    public Builder setIncludePlannedCancellations(boolean includePlannedCancellations) {
+    public Builder withIncludePlannedCancellations(boolean includePlannedCancellations) {
       this.includePlannedCancellations = includePlannedCancellations;
       return this;
     }
 
-    public Builder setIncludeRealtimeCancellations(boolean includeRealtimeCancellations) {
+    public Builder withIncludeRealtimeCancellations(boolean includeRealtimeCancellations) {
       this.includeRealtimeCancellations = includeRealtimeCancellations;
       return this;
     }

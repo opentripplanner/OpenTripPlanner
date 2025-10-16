@@ -40,8 +40,6 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=trunk_link; cycleway=opposite_track`           | `ALL`                    | no direction: 2.5 <br> forward: 2.5 <br> back: 0.85   | 2.5         |
 | `highway=trunk; bicycle=designated`                     | `ALL`                    | 1.75                                                  | 2.5         |
 | `highway=trunk_link; bicycle=designated`                | `ALL`                    | 1.75                                                  | 2.5         |
-| `indoor=area`                                           | `PEDESTRIAN`             |                                                       |             |
-| `indoor=corridor`                                       | `PEDESTRIAN`             |                                                       |             |
 | `mtb:scale=3`                                           | `NONE`                   |                                                       |             |
 | `mtb:scale=4`                                           | `NONE`                   |                                                       |             |
 | `mtb:scale=5`                                           | `NONE`                   |                                                       |             |
@@ -58,6 +56,8 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=footway`                                       | `PEDESTRIAN`             | 1.1                                                   |             |
 | `mtb:scale=1`                                           | `PEDESTRIAN`             |                                                       |             |
 | `mtb:scale=2`                                           | `PEDESTRIAN`             |                                                       |             |
+| `indoor=area`                                           | `PEDESTRIAN`             |                                                       |             |
+| `indoor=corridor`                                       | `PEDESTRIAN`             |                                                       |             |
 | `highway=cycleway`                                      | `BICYCLE`                | 0.6                                                   |             |
 | `mtb:scale=0`                                           | `PEDESTRIAN_AND_BICYCLE` |                                                       |             |
 | `highway=path`                                          | `PEDESTRIAN_AND_BICYCLE` | 0.75                                                  |             |

@@ -7,7 +7,7 @@
   "labels": [
     "+Skip Changelog"
   ],
-  "rebaseWhen": "conflicted",
+  "rebaseWhen": "behind-base-branch",
   "enabledManagers": [
     "npm",
     "maven",
@@ -30,12 +30,14 @@
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "Debug UI dependencies (non-major)",
       "schedule": ["after 6pm on the 17th day of the month"],
-      "reviewers": ["testower"]
+      "reviewers": ["testower"],
+      "postUpdateOptions": ["npmInstallTwice"]
     },
     {
       "matchFiles": ["client/package.json"],
       "matchUpdateTypes": ["major"],
-      "reviewers": ["testower"]
+      "reviewers": ["testower"],
+      "postUpdateOptions": ["npmInstallTwice"]
     },
     // some dependencies that we auto-merge release very often and even the auto-merges create a lot of
     // noise, so we slow it down a bit
@@ -204,6 +206,14 @@
       "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 14th day of the month",
       "reviewers": ["habrahamsson-skanetrafiken", "svedbod"]
+    },
+    {
+      "groupName": "Hive MQTT client",
+      "matchPackageNames": [
+        "com.hivemq:hivemq-mqtt-client"
+      ],
+      "schedule": "on the 25th day of the month",
+      "reviewers": ["optionsome", "jessicaKoehnke"]
     }
   ],
   "timezone": "Europe/Berlin"

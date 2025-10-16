@@ -36,10 +36,6 @@ public class OsmRelation extends OsmEntity {
     return isRoute() && isTag("route", "road");
   }
 
-  public boolean isLevelMap() {
-    return isType("level_map");
-  }
-
   public boolean isRestriction() {
     return isType("restriction");
   }

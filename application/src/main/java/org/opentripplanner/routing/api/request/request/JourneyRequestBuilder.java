@@ -67,7 +67,7 @@ public class JourneyRequestBuilder implements Serializable {
   /**
    * Set access, egress, transfer and direcet mode to a given mode.
    */
-  public JourneyRequestBuilder setAllModes(StreetMode mode) {
+  public JourneyRequestBuilder withAllModes(StreetMode mode) {
     var value = new StreetRequest(mode);
     withAccess(value);
     withEgress(value);
@@ -76,7 +76,7 @@ public class JourneyRequestBuilder implements Serializable {
     return this;
   }
 
-  public JourneyRequestBuilder setModes(RequestModes modes) {
+  public JourneyRequestBuilder withModes(RequestModes modes) {
     withAccess(new StreetRequest(modes.accessMode));
     withEgress(new StreetRequest(modes.egressMode));
     withTransfer(new StreetRequest(modes.transferMode));

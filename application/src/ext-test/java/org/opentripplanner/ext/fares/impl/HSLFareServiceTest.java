@@ -99,49 +99,49 @@ public class HSLFareServiceTest implements PlanTestConstants {
     // Fare attributes
 
     FareAttribute fareAttributeAB = FareAttribute.of(new FeedScopedId(FEED_ID, "AB"))
-      .setPrice(AB_PRICE)
-      .setTransferDuration(fiveMinutes)
+      .withPrice(AB_PRICE)
+      .withTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeBC = FareAttribute.of(new FeedScopedId(FEED_ID, "BC"))
-      .setPrice(BC_PRICE)
-      .setTransferDuration(fiveMinutes)
+      .withPrice(BC_PRICE)
+      .withTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeCD = FareAttribute.of(new FeedScopedId(FEED_ID, "CD"))
-      .setPrice(CD_PRICE)
-      .setTransferDuration(fiveMinutes)
+      .withPrice(CD_PRICE)
+      .withTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeD = FareAttribute.of(new FeedScopedId(FEED_ID, "D"))
-      .setPrice(D_PRICE)
-      .setTransferDuration(fiveMinutes)
+      .withPrice(D_PRICE)
+      .withTransferDuration(fiveMinutes)
       //.setAgency(agency1.getId().getId())
       .build();
 
     FareAttribute fareAttributeABC = FareAttribute.of(new FeedScopedId(FEED_ID, "ABC"))
-      .setPrice(ABC_PRICE)
-      .setTransferDuration(fiveMinutes)
+      .withPrice(ABC_PRICE)
+      .withTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeBCD = FareAttribute.of(new FeedScopedId(FEED_ID, "BCD"))
-      .setPrice(BCD_PRICE)
-      .setTransferDuration(fiveMinutes)
+      .withPrice(BCD_PRICE)
+      .withTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeABCD = FareAttribute.of(new FeedScopedId(FEED_ID, "ABCD"))
-      .setPrice(ABCD_PRICE)
-      .setTransferDuration(fiveMinutes)
+      .withPrice(ABCD_PRICE)
+      .withTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeD2 = FareAttribute.of(new FeedScopedId(FEED_ID, "D2"))
-      .setPrice(Money.euros(0))
-      .setAgency(agency2.getId())
+      .withPrice(Money.euros(0))
+      .withAgency(agency2.getId())
       .build();
 
     FareAttribute fareAttributeAgency3 = FareAttribute.of(new FeedScopedId("FEED2", "attribute"))
-      .setPrice(Money.euros(0))
-      .setAgency(agency3.getId())
+      .withPrice(Money.euros(0))
+      .withAgency(agency3.getId())
       .build();
 
     // Fare rule sets
@@ -420,8 +420,8 @@ public class HSLFareServiceTest implements PlanTestConstants {
   @Test
   void unknownFare() {
     FareAttribute fareAttributeAB = FareAttribute.of(new FeedScopedId(FEED_ID, "AB"))
-      .setPrice(euros(2.80f))
-      .setTransferDuration(60 * 5)
+      .withPrice(euros(2.80f))
+      .withTransferDuration(60 * 5)
       .build();
 
     FareRuleSet ruleSetAB = new FareRuleSet(fareAttributeAB);

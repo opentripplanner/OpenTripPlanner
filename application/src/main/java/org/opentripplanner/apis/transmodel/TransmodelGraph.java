@@ -103,7 +103,8 @@ class TransmodelGraph {
     return new TransmodelRequestContext(
       serverContext,
       serverContext.routingService(),
-      serverContext.transitService()
+      serverContext.transitService(),
+      serverContext.empiricalDelayService()
     );
   }
 

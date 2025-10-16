@@ -63,11 +63,11 @@ class UnroutableTest {
     Vertex from = graph.getVertex(VertexLabel.osm(2003617278));
     Vertex to = graph.getVertex(VertexLabel.osm(40446276));
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(request.journey().direct())
-      .setFrom(from)
-      .setTo(to)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withStreetRequest(request.journey().direct())
+      .withFrom(from)
+      .withTo(to)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = spt.getPath(to);

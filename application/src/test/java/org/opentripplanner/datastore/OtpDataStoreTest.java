@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.datastore.api.FileType.CONFIG;
 import static org.opentripplanner.datastore.api.FileType.DEM;
+import static org.opentripplanner.datastore.api.FileType.EMISSION;
+import static org.opentripplanner.datastore.api.FileType.EMPIRICAL_DATA;
 import static org.opentripplanner.datastore.api.FileType.GRAPH;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
@@ -34,6 +36,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.configure.DataStoreModule;
+import org.opentripplanner.ext.empiricaldelay.internal.csvinput.EmpiricalDelayCsvDataReader;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.utils.lang.StringUtils;
 
@@ -46,6 +49,7 @@ public class OtpDataStoreTest {
   private static final String GRAPH_FILENAME = "graph.obj";
   private static final String STREET_GRAPH_FILENAME = "streetGraph.obj";
   private static final String REPORT_FILENAME = "report";
+  private static final String EMPIRICAL_DELAY = "empirical_delay";
   private static final long D2000_01_01 = ZonedDateTime.parse("2000-01-01T12:00+01:00")
     .toInstant()
     .toEpochMilli();
@@ -79,19 +83,22 @@ public class OtpDataStoreTest {
     assertEquals("[]", store.listExistingSourcesFor(NETEX).toString());
     assertEquals("[]", store.listExistingSourcesFor(GRAPH).toString());
     assertEquals("[]", store.listExistingSourcesFor(REPORT).toString());
+    assertEquals("[]", store.listExistingSourcesFor(EMISSION).toString());
+    assertEquals("[]", store.listExistingSourcesFor(EMPIRICAL_DATA).toString());
     assertEquals("[]", store.listExistingSourcesFor(UNKNOWN).toString());
   }
 
   @Test
   public void readDirWithEverything() throws IOException {
-    write(baseDir, BUILD_CONFIG_FILENAME, "{}");
-    write(baseDir, ROUTER_CONFIG_FILENAME, "{}");
-    write(baseDir, OSM_FILENAME, "Data");
-    write(baseDir, DEM_FILENAME, "Data");
+    writeToFile(baseDir, BUILD_CONFIG_FILENAME, "{}");
+    writeToFile(baseDir, ROUTER_CONFIG_FILENAME, "{}");
+    writeToFile(baseDir, OSM_FILENAME, "Data");
+    writeToFile(baseDir, DEM_FILENAME, "Data");
     writeZip(baseDir, GTFS_FILENAME);
     writeZip(baseDir, NETEX_FILENAME);
-    write(baseDir, STREET_GRAPH_FILENAME, "Data");
-    write(baseDir, GRAPH_FILENAME, "Data");
+    writeToDir(baseDir, EMPIRICAL_DELAY, EmpiricalDelayCsvDataReader.CALENDAR_FILE_NAME);
+    writeToFile(baseDir, STREET_GRAPH_FILENAME, "Data");
+    writeToFile(baseDir, GRAPH_FILENAME, "Data");
     writeToDir(baseDir, REPORT_FILENAME, "index.json");
 
     OtpDataStore store = DataStoreModule.provideDataStore(baseDir, config(), null);
@@ -104,6 +111,7 @@ public class OtpDataStoreTest {
     assertExistingSources(store.listExistingSourcesFor(DEM), DEM_FILENAME);
     assertExistingSources(store.listExistingSourcesFor(GTFS), GTFS_FILENAME);
     assertExistingSources(store.listExistingSourcesFor(NETEX), NETEX_FILENAME);
+    assertExistingSources(store.listExistingSourcesFor(EMPIRICAL_DATA), EMPIRICAL_DELAY);
     assertExistingSources(
       store.listExistingSourcesFor(CONFIG),
       BUILD_CONFIG_FILENAME,
@@ -140,30 +148,40 @@ public class OtpDataStoreTest {
           feedId: 'NO',
           source: '%s'
         }],
+        empiricalDelay: {
+            feeds: [
+              {
+                feedId: 'RB',
+                source: '%s'
+              }
+            ]
+        },
         graph: '%s',
         buildReportDir: '%s'
         }""".formatted(
           uri + OSM_FILENAME,
           uri + GTFS_FILENAME,
+          uri + EMPIRICAL_DELAY,
           uri + GRAPH_FILENAME,
           uri + REPORT_FILENAME
         )
     );
 
     // Create build-config  and an unknown file in the 'baseDir'
-    write(baseDir, BUILD_CONFIG_FILENAME, buildConfigJson);
-    write(baseDir, "unknown.txt", "Data");
+    writeToFile(baseDir, BUILD_CONFIG_FILENAME, buildConfigJson);
+    writeToFile(baseDir, "unknown.txt", "Data");
 
     // Save osm, gtfs, graph, and report in 'tempDataDir'- the URI location,
-    write(tempDataDir, OSM_FILENAME, "Data");
+    writeToFile(tempDataDir, OSM_FILENAME, "Data");
     writeZip(tempDataDir, GTFS_FILENAME);
-    write(tempDataDir, GRAPH_FILENAME, "Data");
+    writeToDir(tempDataDir, EMPIRICAL_DELAY, EmpiricalDelayCsvDataReader.CALENDAR_FILE_NAME);
+    writeToFile(tempDataDir, GRAPH_FILENAME, "Data");
     writeToDir(tempDataDir, REPORT_FILENAME, "index.json");
 
     // We add 2 more files, these are not configured in the build-config, and we expect
     // them to be invisible to the store; hence we won´t find them (saved to 'tempDataDir')
-    write(tempDataDir, STREET_GRAPH_FILENAME, "Data");
-    write(tempDataDir, "unknown-2.txt", "Data");
+    writeToFile(tempDataDir, STREET_GRAPH_FILENAME, "Data");
+    writeToFile(tempDataDir, "unknown-2.txt", "Data");
 
     // Open data store using the base-dir
 
@@ -182,6 +200,7 @@ public class OtpDataStoreTest {
     // added to the same temp-data-dir.
     assertEquals(
       "CONFIG base:build-config.json, " +
+      "EMPIRICAL_DATA data:empirical_delay, " +
       "GRAPH data:graph.obj, " +
       "GTFS data:gtfs.zip, " +
       "OSM data:osm.pbf, " +
@@ -200,7 +219,7 @@ public class OtpDataStoreTest {
     Files.writeString(new File(reportDir, oneFile).toPath(), "{}", UTF_8);
   }
 
-  private static void write(File dir, String filename, String data) throws IOException {
+  private static void writeToFile(File dir, String filename, String data) throws IOException {
     Files.writeString(new File(dir, filename).toPath(), data, UTF_8);
   }
 

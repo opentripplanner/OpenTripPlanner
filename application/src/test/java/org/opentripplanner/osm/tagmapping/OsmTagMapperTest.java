@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.OsmEntityForTest;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
@@ -33,7 +34,7 @@ class OsmTagMapperTest {
 
   @Test
   void isMotorThroughTrafficExplicitlyDisallowed() {
-    OsmEntity o = new OsmEntity();
+    OsmEntity o = new OsmEntityForTest();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     assertFalse(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(o));
@@ -74,7 +75,7 @@ class OsmTagMapperTest {
 
   @Test
   void testAccessNo() {
-    OsmEntity tags = new OsmEntity();
+    OsmEntity tags = new OsmEntityForTest();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "no");
@@ -86,7 +87,7 @@ class OsmTagMapperTest {
 
   @Test
   void testAccessPrivate() {
-    OsmEntity tags = new OsmEntity();
+    OsmEntity tags = new OsmEntityForTest();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "private");
@@ -99,6 +100,14 @@ class OsmTagMapperTest {
   @Test
   void testFootway() {
     assertEquals(PEDESTRIAN, wps.getDataForEntity(WayTestData.footway()).getPermission());
+  }
+
+  @Test
+  void indoor() {
+    var corridor = wps.getDataForEntity(WayTestData.indoor("corridor"));
+    assertEquals(PEDESTRIAN, corridor.getPermission());
+    var area = wps.getDataForEntity(WayTestData.indoor("area"));
+    assertEquals(PEDESTRIAN, area.getPermission());
   }
 
   @Test
@@ -212,7 +221,7 @@ class OsmTagMapperTest {
 
   @Test
   void testFootModifier() {
-    OsmEntity tags = new OsmEntity();
+    OsmEntity tags = new OsmEntityForTest();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "private");
@@ -225,7 +234,7 @@ class OsmTagMapperTest {
 
   @Test
   void testVehicleDenied() {
-    OsmEntity tags = new OsmEntity();
+    OsmEntity tags = new OsmEntityForTest();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("vehicle", "destination");
@@ -237,7 +246,7 @@ class OsmTagMapperTest {
 
   @Test
   void testVehicleDeniedMotorVehiclePermissive() {
-    OsmEntity tags = new OsmEntity();
+    OsmEntity tags = new OsmEntityForTest();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("vehicle", "destination");
@@ -250,7 +259,7 @@ class OsmTagMapperTest {
 
   @Test
   void testVehicleDeniedBicyclePermissive() {
-    OsmEntity tags = new OsmEntity();
+    OsmEntity tags = new OsmEntityForTest();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("vehicle", "destination");
@@ -263,7 +272,7 @@ class OsmTagMapperTest {
 
   @Test
   void testMotorcycleModifier() {
-    OsmEntity tags = new OsmEntity();
+    OsmEntity tags = new OsmEntityForTest();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "private");
@@ -276,7 +285,7 @@ class OsmTagMapperTest {
 
   @Test
   void testBicycleModifier() {
-    OsmEntity tags = new OsmEntity();
+    OsmEntity tags = new OsmEntityForTest();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "private");
@@ -289,7 +298,7 @@ class OsmTagMapperTest {
 
   @Test
   void testBicyclePermissive() {
-    OsmEntity tags = new OsmEntity();
+    OsmEntity tags = new OsmEntityForTest();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "private");
@@ -339,22 +348,22 @@ class OsmTagMapperTest {
   void corridorName() {
     final WayPropertySet wps = wayProperySet();
     var way = way("highway", "corridor");
-    assertEquals("corridor", wps.getCreativeNameForWay(way).toString());
-    assertEquals("Korridor", wps.getCreativeNameForWay(way).toString(Locale.GERMANY));
-    assertEquals("käytävä", wps.getCreativeNameForWay(way).toString(FI));
+    assertEquals("corridor", wps.getCreativeName(way).toString());
+    assertEquals("Korridor", wps.getCreativeName(way).toString(Locale.GERMANY));
+    assertEquals("käytävä", wps.getCreativeName(way).toString(FI));
   }
 
   @Test
   void indoorAreaName() {
     var wps = wayProperySet();
     var way = way("indoor", "area");
-    assertEquals("indoor area", wps.getCreativeNameForWay(way).toString());
-    assertEquals("Innenbereich", wps.getCreativeNameForWay(way).toString(Locale.GERMANY));
-    assertEquals("sisätila", wps.getCreativeNameForWay(way).toString(FI));
+    assertEquals("indoor area", wps.getCreativeName(way).toString());
+    assertEquals("Innenbereich", wps.getCreativeName(way).toString(Locale.GERMANY));
+    assertEquals("sisätila", wps.getCreativeName(way).toString(FI));
   }
 
   public OsmEntity way(String key, String value) {
-    var way = new OsmEntity();
+    var way = new OsmEntityForTest();
     way.addTag(key, value);
     return way;
   }

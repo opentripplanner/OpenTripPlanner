@@ -179,11 +179,11 @@ public class CarPickupTest extends GraphRoutingTest {
       .buildDefault();
 
     var tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(new StreetRequest(StreetMode.CAR_PICKUP))
-      .setFrom(fromVertex)
-      .setTo(toVertex)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withStreetRequest(new StreetRequest(StreetMode.CAR_PICKUP))
+      .withFrom(fromVertex)
+      .withTo(toVertex)
       .getShortestPathTree();
     var path = tree.getPath(arriveBy ? fromVertex : toVertex);
 

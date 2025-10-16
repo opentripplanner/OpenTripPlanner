@@ -43,13 +43,13 @@ public class DebugRequestBuilder {
     return stops.stream().sorted().collect(Collectors.toList());
   }
 
-  public DebugRequestBuilder addStops(Collection<Integer> stops) {
+  public DebugRequestBuilder withStops(Collection<Integer> stops) {
     this.stops.addAll(stops);
     return this;
   }
 
-  public DebugRequestBuilder addStops(int... stops) {
-    return addStops(Arrays.stream(stops).boxed().collect(Collectors.toList()));
+  public DebugRequestBuilder withStops(int... stops) {
+    return withStops(Arrays.stream(stops).boxed().collect(Collectors.toList()));
   }
 
   /**
@@ -59,7 +59,7 @@ public class DebugRequestBuilder {
     return path;
   }
 
-  public DebugRequestBuilder setPath(List<Integer> stopsInPath) {
+  public DebugRequestBuilder withPath(List<Integer> stopsInPath) {
     if (!path.isEmpty()) {
       throw new IllegalStateException(
         "The API support only one debug path. " + "Existing: " + path + ", new: " + stopsInPath
@@ -77,7 +77,7 @@ public class DebugRequestBuilder {
    * Select the stop index where the debugging should start. It is the index of the stops in the
    * path list.
    */
-  public DebugRequestBuilder debugPathFromStopIndex(int stopIndex) {
+  public DebugRequestBuilder withDebugPathFromStopIndex(int stopIndex) {
     this.debugPathFromStopIndex = stopIndex;
     return this;
   }
@@ -86,7 +86,9 @@ public class DebugRequestBuilder {
     return stopArrivalListener;
   }
 
-  public DebugRequestBuilder stopArrivalListener(Consumer<DebugEvent<ArrivalView<?>>> listener) {
+  public DebugRequestBuilder withStopArrivalListener(
+    Consumer<DebugEvent<ArrivalView<?>>> listener
+  ) {
     this.stopArrivalListener = listener;
     return this;
   }
@@ -95,7 +97,7 @@ public class DebugRequestBuilder {
     return patternRideDebugListener;
   }
 
-  public DebugRequestBuilder patternRideDebugListener(
+  public DebugRequestBuilder withPatternRideDebugListener(
     Consumer<DebugEvent<PatternRideView<?, ?>>> listener
   ) {
     this.patternRideDebugListener = listener;
@@ -106,7 +108,9 @@ public class DebugRequestBuilder {
     return pathFilteringListener;
   }
 
-  public DebugRequestBuilder pathFilteringListener(Consumer<DebugEvent<RaptorPath<?>>> listener) {
+  public DebugRequestBuilder withPathFilteringListener(
+    Consumer<DebugEvent<RaptorPath<?>>> listener
+  ) {
     this.pathFilteringListener = listener;
     return this;
   }
@@ -115,7 +119,7 @@ public class DebugRequestBuilder {
     return logger;
   }
 
-  public DebugRequestBuilder logger(DebugLogger logger) {
+  public DebugRequestBuilder withLogger(DebugLogger logger) {
     this.logger = logger;
     return this;
   }

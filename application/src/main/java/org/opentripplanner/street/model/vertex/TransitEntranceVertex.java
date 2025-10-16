@@ -2,7 +2,6 @@ package org.opentripplanner.street.model.vertex;
 
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.Entrance;
-import org.opentripplanner.transit.model.site.StationElement;
 
 public class TransitEntranceVertex extends StationElementVertex {
 
@@ -29,11 +28,6 @@ public class TransitEntranceVertex extends StationElementVertex {
   }
 
   public Entrance getEntrance() {
-    return this.entrance;
-  }
-
-  @Override
-  public StationElement getStationElement() {
     return this.entrance;
   }
 }

@@ -327,7 +327,7 @@ public class TestStateBuilder {
 
   private TestStateBuilder arriveAtStop(RegularStop stop) {
     var from = (StreetVertex) currentState.vertex;
-    var to = TransitStopVertex.of().withStop(stop).build();
+    var to = TransitStopVertex.of().withId(stop.getId()).withPoint(stop.getGeometry()).build();
 
     Edge edge;
     if (currentState.getRequest().arriveBy()) {

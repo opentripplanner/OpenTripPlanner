@@ -4,8 +4,8 @@ import java.io.File;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.DataSourceTestFactory;
 import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -33,7 +33,7 @@ public interface EmissionTestData {
   }
 
   default DataSource emissionOnRoutes() {
-    return DataStoreModule.dataSource(
+    return DataSourceTestFactory.dataSource(
       "em-on-routes.txt",
       FileType.EMISSION,
       """
@@ -45,7 +45,7 @@ public interface EmissionTestData {
   }
 
   default DataSource emissionOnTripHops() {
-    return DataStoreModule.dataSource(
+    return DataSourceTestFactory.dataSource(
       "em-on-trip-hops.txt",
       FileType.EMISSION,
       """
@@ -70,11 +70,11 @@ public interface EmissionTestData {
   }
 
   default CompositeDataSource gtfsDirectoryDataSourceWithoutEmissions() {
-    return DataStoreModule.compositeSource(ConstantsForTests.SIMPLE_GTFS, FileType.GTFS);
+    return DataSourceTestFactory.compositeSource(ConstantsForTests.SIMPLE_GTFS, FileType.GTFS);
   }
 
   default CompositeDataSource gtfsZipDataSourceWithoutEmissions() {
-    return DataStoreModule.compositeSource(ConstantsForTests.CALTRAIN_GTFS, FileType.GTFS);
+    return DataSourceTestFactory.compositeSource(ConstantsForTests.CALTRAIN_GTFS, FileType.GTFS);
   }
 
   private ResourceLoader resource() {

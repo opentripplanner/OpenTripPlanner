@@ -78,6 +78,21 @@ class TripTimeOnDateTest {
   }
 
   @Test
+  void previousTimesWithCount() {
+    var subject = tripTimeOnDate();
+    assertTrue(mapTripTimeOnDateToStopId(subject.previousTimes(0)).isEmpty());
+    assertEquals(List.of("F:stop-20"), mapTripTimeOnDateToStopId(subject.previousTimes(1)));
+    assertEquals(
+      List.of("F:stop-10", "F:stop-20"),
+      mapTripTimeOnDateToStopId(subject.previousTimes(2))
+    );
+    assertEquals(
+      List.of("F:stop-10", "F:stop-20"),
+      mapTripTimeOnDateToStopId(subject.previousTimes(3))
+    );
+  }
+
+  @Test
   void nextTimes() {
     var subject = tripTimeOnDate();
     var ids = subject.nextTimes().stream().map(t -> t.getStop().getId().toString()).toList();
@@ -90,6 +105,21 @@ class TripTimeOnDateTest {
       .toList();
     assertEquals(List.of("F:stop-50"), lastStop);
     assertThat(secondLast.nextTimes().getFirst().nextTimes()).isEmpty();
+  }
+
+  @Test
+  void nextTimesWithCount() {
+    var subject = tripTimeOnDate();
+    assertTrue(mapTripTimeOnDateToStopId(subject.nextTimes(0)).isEmpty());
+    assertEquals(List.of("F:stop-40"), mapTripTimeOnDateToStopId(subject.nextTimes(1)));
+    assertEquals(
+      List.of("F:stop-40", "F:stop-50"),
+      mapTripTimeOnDateToStopId(subject.nextTimes(2))
+    );
+    assertEquals(
+      List.of("F:stop-40", "F:stop-50"),
+      mapTripTimeOnDateToStopId(subject.nextTimes(3))
+    );
   }
 
   @Test
@@ -153,5 +183,9 @@ class TripTimeOnDateTest {
       assertEquals(tripTimeOnDate.getStopPosition(), i);
       i++;
     }
+  }
+
+  private List<String> mapTripTimeOnDateToStopId(List<TripTimeOnDate> tripTimes) {
+    return tripTimes.stream().map(t -> t.getStop().getId().toString()).toList();
   }
 }

@@ -17,7 +17,7 @@ public class TransitPreferencesMapper {
   ) {
     callWith.argument(
       "preferred.otherThanPreferredLinesPenalty",
-      transit::setOtherThanPreferredRoutesPenalty
+      transit::withOtherThanPreferredRoutesPenalty
     );
     transit.withBoardSlack(builder -> {
       callWith.argument("boardSlackDefault", builder::withDefaultSec);
@@ -31,9 +31,9 @@ public class TransitPreferencesMapper {
         TransportModeSlack.mapIntoDomain(builder, v)
       );
     });
-    callWith.argument("ignoreRealtimeUpdates", transit::setIgnoreRealtimeUpdates);
-    callWith.argument("includePlannedCancellations", transit::setIncludePlannedCancellations);
-    callWith.argument("includeRealtimeCancellations", transit::setIncludeRealtimeCancellations);
+    callWith.argument("ignoreRealtimeUpdates", transit::withIgnoreRealtimeUpdates);
+    callWith.argument("includePlannedCancellations", transit::withIncludePlannedCancellations);
+    callWith.argument("includeRealtimeCancellations", transit::withIncludeRealtimeCancellations);
     callWith.argument("relaxTransitGroupPriority", it ->
       transit.withRelaxTransitGroupPriority(
         RelaxCostType.mapToDomain((Map<String, Object>) it, CostLinearFunction.NORMAL)

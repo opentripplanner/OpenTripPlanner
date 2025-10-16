@@ -72,7 +72,7 @@ class RouteDataReaderTest implements EmissionTestData {
     var subject = new RouteDataReader(emissionOnTripHops(), issueStore);
     var ex = assertThrows(HeadersDoNotMatch.class, () -> subject.read(FEED_ID, null));
     assertThat(ex.getMessage()).containsMatch(
-      "The header does not match the expected values for csv file:.*em-on-trip-hops\\.txt"
+      "The header does not match the expected values. File:.*em-on-trip-hops\\.txt"
     );
   }
 }

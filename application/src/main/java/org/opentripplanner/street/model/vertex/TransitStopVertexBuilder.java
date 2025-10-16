@@ -1,14 +1,18 @@
 package org.opentripplanner.street.model.vertex;
 
-import java.util.Objects;
 import java.util.Set;
+import org.locationtech.jts.geom.Point;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TransitStopVertexBuilder {
 
-  private RegularStop stop;
-  private Set<TransitMode> modes;
+  private Point coordinate;
+  private Set<TransitMode> modes = Set.of();
+  private FeedScopedId id;
+  private Accessibility wheelchairAccessibility = Accessibility.NO_INFORMATION;
 
   /**
    * Protected access to avoid instantiation, use
@@ -16,8 +20,18 @@ public class TransitStopVertexBuilder {
    */
   TransitStopVertexBuilder() {}
 
-  public TransitStopVertexBuilder withStop(RegularStop stop) {
-    this.stop = stop;
+  public TransitStopVertexBuilder withId(FeedScopedId id) {
+    this.id = id;
+    return this;
+  }
+
+  public TransitStopVertexBuilder withPoint(Point coordinates) {
+    this.coordinate = coordinates;
+    return this;
+  }
+
+  public TransitStopVertexBuilder withWheelchairAccessiblity(Accessibility accessiblity) {
+    this.wheelchairAccessibility = accessiblity;
     return this;
   }
 
@@ -27,7 +41,6 @@ public class TransitStopVertexBuilder {
   }
 
   public TransitStopVertex build() {
-    Objects.requireNonNull(stop);
-    return new TransitStopVertex(stop, modes);
+    return new TransitStopVertex(id, new WgsCoordinate(coordinate), wheelchairAccessibility, modes);
   }
 }

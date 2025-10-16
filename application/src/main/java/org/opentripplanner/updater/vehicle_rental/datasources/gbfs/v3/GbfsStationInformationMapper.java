@@ -4,13 +4,18 @@ import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.Gbf
 import static org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3.GbfsFeedMapper.optionalLocalizedString;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import org.mobilitydata.gbfs.v3_0.station_information.*;
+import org.mobilitydata.gbfs.v3_0.station_information.GBFSName;
+import org.mobilitydata.gbfs.v3_0.station_information.GBFSRentalUris;
+import org.mobilitydata.gbfs.v3_0.station_information.GBFSShortName;
+import org.mobilitydata.gbfs.v3_0.station_information.GBFSStation;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,14 +41,7 @@ class GbfsStationInformationMapper {
   }
 
   public VehicleRentalStation mapStationInformation(GBFSStation station) {
-    if (
-      station.getStationId() == null ||
-      station.getStationId().isBlank() ||
-      station.getName() == null ||
-      station.getName().isEmpty() ||
-      station.getLon() == null ||
-      station.getLat() == null
-    ) {
+    if (!isValid(station)) {
       LOG.debug(
         "GBFS station for {} system has issues with required fields: \n{}",
         system.systemId(),
@@ -103,5 +101,25 @@ class GbfsStationInformationMapper {
     }
 
     return builder.build();
+  }
+
+  /**
+   * Return true if the station is valid.
+   */
+  static boolean isValid(GBFSStation station) {
+    return (
+      station.getStationId() != null &&
+      !station.getStationId().isBlank() &&
+      station.getName() != null &&
+      !station.getName().isEmpty() &&
+      station.getName().stream().allMatch(Objects::nonNull) &&
+      station.getName().stream().allMatch(gbfsName -> StringUtils.hasValue(gbfsName.getText())) &&
+      station
+        .getName()
+        .stream()
+        .allMatch(gbfsName -> StringUtils.hasValue(gbfsName.getLanguage())) &&
+      station.getLon() != null &&
+      station.getLat() != null
+    );
   }
 }

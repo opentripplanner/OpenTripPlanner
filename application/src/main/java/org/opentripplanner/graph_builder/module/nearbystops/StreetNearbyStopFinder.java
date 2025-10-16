@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
@@ -21,6 +22,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.graphfinder.NearbyStopFactory;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -32,14 +34,17 @@ import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 
 public class StreetNearbyStopFinder implements NearbyStopFinder {
 
   private final Duration durationLimit;
   private final int maxStopCount;
+  private final StopResolver stopResolver;
   private final Collection<ExtensionRequestContext> extensionRequestContexts;
   private final Set<Vertex> ignoreVertices;
+  private final NearbyStopFactory nearbyStopFactory;
 
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
@@ -49,15 +54,18 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * @param ignoreVertices   A set of stop vertices to ignore and not return NearbyStops for.
    */
   private StreetNearbyStopFinder(
+    StopResolver stopResolver,
     Duration durationLimit,
     int maxStopCount,
     Collection<ExtensionRequestContext> extensionRequestContexts,
     Set<Vertex> ignoreVertices
   ) {
+    this.stopResolver = requireNonNull(stopResolver);
     this.durationLimit = requireNonNull(durationLimit);
     this.maxStopCount = requireNonNull(maxStopCount);
     this.extensionRequestContexts = requireNonNull(extensionRequestContexts);
     this.ignoreVertices = requireNonNull(ignoreVertices);
+    this.nearbyStopFactory = new NearbyStopFactory(stopResolver::getRegularStop);
   }
 
   /**
@@ -66,8 +74,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the
    *                     maxStopCount we will always return all the directly connected stops.
    */
-  public static Builder of(Duration durationLimit, int maxStopCount) {
-    return new Builder(durationLimit, maxStopCount);
+  public static Builder of(StopResolver stopResolver, Duration durationLimit, int maxStopCount) {
+    return new Builder(stopResolver, durationLimit, maxStopCount);
   }
 
   /**
@@ -101,7 +109,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
-    List<NearbyStop> stopsFound = NearbyStop.nearbyStopsForTransitStopVerticesFiltered(
+    List<NearbyStop> stopsFound = nearbyStopFactory.nearbyStopsForTransitStopVerticesFiltered(
       Sets.difference(originVertices, ignoreVertices),
       reverseDirection,
       request,
@@ -118,17 +126,18 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     stopsFound = new ArrayList<>(stopsFound);
 
     var streetSearch = StreetSearchBuilder.of()
-      .setSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(durationLimit))
-      .setDominanceFunction(new DominanceFunctions.MinimumWeight())
-      .setRequest(request)
-      .setArriveBy(reverseDirection)
-      .setStreetRequest(streetRequest)
-      .setFrom(reverseDirection ? null : originVertices)
-      .setTo(reverseDirection ? originVertices : null)
-      .setExtensionRequestContexts(extensionRequestContexts);
+      .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
+      .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(durationLimit))
+      .withDominanceFunction(new DominanceFunctions.MinimumWeight())
+      .withRequest(request)
+      .withArriveBy(reverseDirection)
+      .withStreetRequest(streetRequest)
+      .withFrom(reverseDirection ? null : originVertices)
+      .withTo(reverseDirection ? originVertices : null)
+      .withExtensionRequestContexts(extensionRequestContexts);
 
     if (maxStopCount > 0) {
-      streetSearch.setTerminationStrategy(
+      streetSearch.withTerminationStrategy(
         new MaxCountTerminationStrategy<>(maxStopCount, this::hasReachedStop)
       );
     }
@@ -146,14 +155,16 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
           continue;
         }
         if (targetVertex instanceof TransitStopVertex tsv && state.isFinal()) {
-          stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getStop()));
+          var stop = requireNonNull(stopResolver.getRegularStop(tsv.getId()));
+          stopsFound.add(NearbyStop.nearbyStopForState(state, stop));
         }
         if (
           OTPFeature.FlexRouting.isOn() &&
           targetVertex instanceof StreetVertex streetVertex &&
           !streetVertex.areaStops().isEmpty()
         ) {
-          for (AreaStop areaStop : ((StreetVertex) targetVertex).areaStops()) {
+          for (FeedScopedId id : targetVertex.areaStops()) {
+            AreaStop areaStop = Objects.requireNonNull(stopResolver.getAreaStop(id));
             // This is for a simplification, so that we only return one vertex from each
             // stop location. All vertices are added to the multimap, which is filtered
             // below, so that only the closest vertex is added to stopsFound
@@ -222,8 +233,10 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     private final int maxStopCount;
     private Collection<ExtensionRequestContext> extensionRequestContexts = List.of();
     private Set<Vertex> ignoreVertices = Set.of();
+    private final StopResolver stopResolver;
 
-    public Builder(Duration durationLimit, int maxStopCount) {
+    public Builder(StopResolver stopResolver, Duration durationLimit, int maxStopCount) {
+      this.stopResolver = stopResolver;
       this.durationLimit = durationLimit;
       this.maxStopCount = maxStopCount;
     }
@@ -251,6 +264,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
 
     public StreetNearbyStopFinder build() {
       return new StreetNearbyStopFinder(
+        stopResolver,
         durationLimit,
         maxStopCount,
         extensionRequestContexts,

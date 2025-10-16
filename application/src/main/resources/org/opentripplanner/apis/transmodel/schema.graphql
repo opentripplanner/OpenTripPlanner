@@ -216,7 +216,15 @@ type Emission {
   co2: Float
 }
 
-"List of visits to quays as part of vehicle journeys. Updated with real time information where available"
+"The empirical delay indicates how late a service journey is based on historic data."
+type EmpiricalDelay {
+  "The median/50% percentile. This value is in the middle of the distribution."
+  p50: Duration
+  "The 90% percentile. 90% of the values in the distribution is better and 10% is more delayed."
+  p90: Duration
+}
+
+"List of calls on quays as part of vehicle journeys. Updated with real time information where available"
 type EstimatedCall {
   "Actual time of arrival at quay. Updated from real time information if available."
   actualArrivalTime: DateTime
@@ -234,6 +242,8 @@ type EstimatedCall {
   date: Date!
   datedServiceJourney: DatedServiceJourney
   destinationDisplay: DestinationDisplay
+  "The typical delay for this trip on this day for this stop based on historical data."
+  empiricalDelay: EmpiricalDelay
   "Expected time of arrival at quay. Updated with real time information if available. Will be null if an actualArrivalTime exists"
   expectedArrivalTime: DateTime!
   "Expected time of departure from quay. Updated with real time information if available. Will be null if an actualDepartureTime exists"
@@ -253,6 +263,8 @@ type EstimatedCall {
   "Whether vehicle will only stop on request."
   requestStop: Boolean!
   serviceJourney: ServiceJourney!
+  "Estimated calls for the ServiceJourney on this date."
+  serviceJourneyEstimatedCalls: SJEstimatedCalls!
   "Get all relevant situations for this EstimatedCall."
   situations: [PtSituationElement!]! @timingData
   stopPositionInPattern: Int!
@@ -1109,7 +1121,7 @@ type RoutingParameters {
   reverseOptimizeOnTheFly: Boolean @deprecated(reason : "NOT IN USE IN OTP2.")
   "Whether the planner should return intermediate stops lists for transit legs."
   showIntermediateStops: Boolean @deprecated(reason : "This parameter is always enabled")
-  "Used instead of walkReluctance for stairs."
+  "A multiplier to specify how bad walking on stairs is, compared to walking on flat ground, on top of the walk reluctance."
   stairsReluctance: Float
   "An extra penalty added on transfers (i.e. all boardings except the first one)."
   transferPenalty: Int
@@ -1127,6 +1139,24 @@ type RoutingParameters {
   walkSpeed: Float
   "Whether the trip must be wheelchair accessible."
   wheelChairAccessible: Boolean
+}
+
+"List of visits to quays as part of a vehicle journey, relative to the current quay and for a given date. Includes real-time updates"
+type SJEstimatedCalls {
+  "The first call in this service journey"
+  first: EstimatedCall!
+  "The last call in this service journey"
+  last: EstimatedCall!
+  "The list of subsequent calls in this service journey after the current call"
+  next(
+    "Number of subsequent calls to return. The default value (null) returns all subsequent calls"
+    count: Int
+  ): [EstimatedCall!]!
+  "The list of previous calls in this service journey before the current call"
+  previous(
+    "Number of previous calls to return. The default value (null) returns all previous calls"
+    count: Int
+  ): [EstimatedCall!]!
 }
 
 """

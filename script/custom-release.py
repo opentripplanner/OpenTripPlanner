@@ -95,7 +95,6 @@ class PullRequest:
         self.title = None
         self.commit_hash = None
         self.labels = []
-        self.ser_label_set = False
 
     def description(self):
         return f'{self.title} #{self.number}'
@@ -105,6 +104,10 @@ class PullRequest:
 
     def description_link(self):
         return f"[{self.description()}]({OTP_GITHUB_PULLREQUEST_URL}{self.number}) {self.labels}".replace("'", "`")
+
+    def is_label_bump_ser_id_set(self):
+        return LBL_BUMP_SER_VER_ID in self.labels
+
 
 # The execution state of the script + the CLI arguments
 class ScriptState:
@@ -348,7 +351,7 @@ def print_summary():
             p = execute(
                 "./script/changelog-diff.py",
                 state.production_version_tag(),
-                state.latest_version_tag(),
+                state.next_version_tag(),
                 "Changelog production 🦋"
             )
             print(p.stdout, file=f)
@@ -575,7 +578,7 @@ def check_if_prs_exist_in_latest_release():
     latest_release_hash = state.latest_version_git_hash()
 
     for pr in pullRequests:
-        if pr.ser_label_set and not git_is_commit_ancestor(pr.commit_hash, latest_release_hash):
+        if pr.is_label_bump_ser_id_set() and not git_is_commit_ancestor(pr.commit_hash, latest_release_hash):
             info(f'  - The top commit does not exist in the latest release. Bumping ser.ver.id. ({pr.description()})')
             state.prs_bump_ser_ver_id = True
             return
@@ -787,7 +790,7 @@ def git_commit_hash(ref):
 
 
 def git_is_commit_ancestor(childCommit: str, parentCommit : str):
-    p = subprocess.run("git", "merge-base" "--is-ancestor", childCommit, parentCommit, timeout=5)
+    p = subprocess.run(args=('git', 'merge-base', '--is-ancestor', childCommit, parentCommit), timeout=5)
     return p.returncode == 0
 
 
