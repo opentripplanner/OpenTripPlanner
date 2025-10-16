@@ -144,7 +144,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
     context = new TransmodelRequestContext(
       otpServerRequestContext,
       otpServerRequestContext.routingService(),
-      otpServerRequestContext.transitService()
+      otpServerRequestContext.transitService(),
+      otpServerRequestContext.empiricalDelayService()
     );
   }
 

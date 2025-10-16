@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>206</otp.serialization.version.id>
+        <otp.serialization.version.id>207</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>33.2</geotools.version>
@@ -95,6 +95,7 @@
     <modules>
         <module>utils</module>
         <module>raptor</module>
+        <module>astar</module>
         <module>gtfs-realtime-protobuf</module>
         <module>application</module>
         <module>otp-shaded</module>

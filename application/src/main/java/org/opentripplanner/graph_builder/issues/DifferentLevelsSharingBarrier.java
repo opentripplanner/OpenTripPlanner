@@ -6,21 +6,21 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.osm.model.OsmNode;
 
-public record DifferentLevelsSharingBarrier(OsmNode node) implements DataImportIssue {
+public record DifferentLevelsSharingBarrier(OsmNode node, int levels) implements DataImportIssue {
   private static final String FMT =
-    "Node %d is a barrier node but ways on different layers / levels are connected to it. Please check if the barrier actually blocks traversal, if not, please remove the node from the barrier.";
+    "Node %d is a barrier node but ways / relations on %s different layers / levels are connected to it. Please check if the barrier actually blocks traversal, if not, please remove the node from the barrier.";
 
   private static final String HTMLFMT =
-    "<a href='%s'>Node %d</a> is a barrier node but ways on different layers / levels are connected to it. Please check if the barrier actually blocks traversal, if not, please remove the node from the barrier.";
+    "<a href='%s'>Node %d</a> is a barrier node but ways / relations on %s different layers / levels are connected to it. Please check if the barrier actually blocks traversal, if not, please remove the node from the barrier.";
 
   @Override
   public String getHTMLMessage() {
-    return String.format(HTMLFMT, StringEscapeUtils.escapeHtml4(node.url()), node.getId());
+    return String.format(HTMLFMT, StringEscapeUtils.escapeHtml4(node.url()), node.getId(), levels);
   }
 
   @Override
   public String getMessage() {
-    return String.format(FMT, node.getId());
+    return String.format(FMT, node.getId(), levels);
   }
 
   @Override

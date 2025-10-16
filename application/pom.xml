@@ -28,6 +28,12 @@
             <artifactId>raptor</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>astar</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
 
         <!-- 3rd party dependencies -->
         <dependency>
@@ -365,7 +371,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.56.1</version>
+            <version>1.57.0</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
@@ -375,7 +381,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.17.0</version>
+            <version>1.18.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

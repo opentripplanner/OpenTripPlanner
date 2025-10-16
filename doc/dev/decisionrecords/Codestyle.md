@@ -1,7 +1,5 @@
 # Code Style
 
-We use the following code conventions for [Java](#Java) and [JavaScript](#JavaScript).
-
 ## Java
 
 The OpenTripPlanner Java code style is revised in OTP v2.2. We use the
@@ -169,31 +167,3 @@ Use of `@Nonnull` annotation is not allowed. It should be assumed methods/parame
 non-null if they are not marked as `@Nullable`. However, there are places where the `@Nullable`
 annotation is missing even if it should have been used. Those can be updated to use the `@Nullable`
 annotation.
-
-## JavaScript
-
-As of [#206](https://github.com/opentripplanner/OpenTripPlanner/issues/206), we follow
-[Crockford's JavaScript code conventions](http://javascript.crockford.com/code.html). Further
-guidelines include:
-
-* All .js source files should contain one class only
-* Capitalize the class name, as well as the source file name (a la Java).
-* Include the namespace definition in each and every file: `otp.namespace("otp.configure");`.
-* Include a class comment. For example,
-
-```javascript
-/**
- * Configure Class
- *
- * Purpose is to allow a generic configuration object to be read via AJAX/JSON, and inserted into an
- * Ext Store
- * The implementation is TriMet route map-specific...but replacing ConfigureStore object (or member
- * variables) with another implementation will give this widget flexibility for other uses beyond
- * the iMap.
- *
- * @class
- */
-```
-
-> **Note:** There is still a lot of code following other style conventions, but please adhere to
-> consistent style when you write new code, and help clean up and reformat code as you refactor.

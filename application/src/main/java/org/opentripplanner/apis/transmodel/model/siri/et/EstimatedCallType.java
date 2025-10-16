@@ -20,6 +20,7 @@ import org.opentripplanner.apis.transmodel.mapping.OccupancyStatusMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
+import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -45,6 +46,7 @@ public class EstimatedCallType {
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType sjEstimatedCallType,
     GraphQLOutputType datedServiceJourneyType,
+    GraphQLOutputType empiricalDelayType,
     GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType.newObject()
@@ -150,6 +152,16 @@ public class EstimatedCallType {
               1000 * (tripTimeOnDate.getServiceDayMidnight() + tripTimeOnDate.getActualDeparture())
             );
           })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("empiricalDelay")
+          .type(empiricalDelayType)
+          .description(
+            "The typical delay for this trip on this day for this stop based on historical data."
+          )
+          .dataFetcher(EmpiricalDelayType::dataFetcherForTripTimeOnDate)
           .build()
       )
       .field(

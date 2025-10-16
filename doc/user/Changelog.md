@@ -17,6 +17,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Multiplicative stairs and turn reluctance [#6783](https://github.com/opentripplanner/OpenTripPlanner/pull/6783)
 - Update contribution guidelines [#6869](https://github.com/opentripplanner/OpenTripPlanner/pull/6869)
 - Add estimated calls on same service and day in Transmodel API [#6930](https://github.com/opentripplanner/OpenTripPlanner/pull/6930)
+- Debug UI: Fix/enforce up to date package lock [#6959](https://github.com/opentripplanner/OpenTripPlanner/pull/6959)
+- Debug client itinerary compare [#6882](https://github.com/opentripplanner/OpenTripPlanner/pull/6882)
+- doc: add CLAUDE.md file [#6939](https://github.com/opentripplanner/OpenTripPlanner/pull/6939)
+- Correctly parse GTFS-Flex `priorNoticePeriod` [#6941](https://github.com/opentripplanner/OpenTripPlanner/pull/6941)
+- Reduce graph size when processing turn restrictions [#6908](https://github.com/opentripplanner/OpenTripPlanner/pull/6908)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
