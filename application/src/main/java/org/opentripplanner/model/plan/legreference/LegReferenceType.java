@@ -10,20 +10,6 @@ import java.util.Optional;
  * Enum for different types of LegReferences
  */
 enum LegReferenceType {
-  SCHEDULED_TRANSIT_LEG_V1(
-    1,
-    ScheduledTransitLegReference.class,
-    LegReferenceSerializer::writeScheduledTransitLegV1,
-    LegReferenceSerializer::readScheduledTransitLegV1
-  ),
-
-  SCHEDULED_TRANSIT_LEG_V2(
-    2,
-    ScheduledTransitLegReference.class,
-    LegReferenceSerializer::writeScheduledTransitLegV2,
-    LegReferenceSerializer::readScheduledTransitLegV2
-  ),
-
   SCHEDULED_TRANSIT_LEG_V3(
     3,
     ScheduledTransitLegReference.class,

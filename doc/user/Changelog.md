@@ -22,6 +22,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - doc: add CLAUDE.md file [#6939](https://github.com/opentripplanner/OpenTripPlanner/pull/6939)
 - Correctly parse GTFS-Flex `priorNoticePeriod` [#6941](https://github.com/opentripplanner/OpenTripPlanner/pull/6941)
 - Reduce graph size when processing turn restrictions [#6908](https://github.com/opentripplanner/OpenTripPlanner/pull/6908)
+- Allow refetching legs for trips with changed calling pattern [#6902](https://github.com/opentripplanner/OpenTripPlanner/pull/6902)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
