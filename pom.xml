@@ -66,7 +66,7 @@
         <jackson.version>2.20.0</jackson.version>
         <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
-        <junit.version>5.14.0</junit.version>
+        <junit.version>6.0.0</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.19</logback.version>
