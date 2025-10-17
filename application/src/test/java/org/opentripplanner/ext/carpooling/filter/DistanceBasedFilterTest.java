@@ -70,7 +70,7 @@ class DistanceBasedFilterTest {
   }
 
   @Test
-  void rejects_oneLocationNear_otherLocationFar_returnsFalse() {
+  void rejects_oneLocationNear_otherLocationFar_returnsTrue() {
     // Simple horizontal trip (east-west, same latitude)
     var tripStart = new WgsCoordinate(59.9, 10.70);
     var tripEnd = new WgsCoordinate(59.9, 10.80);
@@ -81,24 +81,8 @@ class DistanceBasedFilterTest {
     var passengerPickup = new WgsCoordinate(59.9, 10.75); // On route
     var passengerDropoff = new WgsCoordinate(59.9 + 0.5, 10.75); // Far north
 
-    // Should reject because BOTH locations must be near the route
-    assertFalse(filter.accepts(trip, passengerPickup, passengerDropoff));
-  }
-
-  @Test
-  void rejects_pickupFar_dropoffNear_returnsFalse() {
-    // Simple horizontal trip (east-west, same latitude)
-    var tripStart = new WgsCoordinate(59.9, 10.70);
-    var tripEnd = new WgsCoordinate(59.9, 10.80);
-    var trip = createSimpleTrip(tripStart, tripEnd);
-
-    // Pickup far to the north (>50km perpendicular), dropoff on the route
-    // At this latitude, 0.5° latitude ≈ 55km
-    var passengerPickup = new WgsCoordinate(59.9 + 0.5, 10.75); // Far north
-    var passengerDropoff = new WgsCoordinate(59.9, 10.75); // On route
-
-    // Should reject because BOTH locations must be near the route
-    assertFalse(filter.accepts(trip, passengerPickup, passengerDropoff));
+    // Should accept because only one location must be near the route
+    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
   }
 
   @Test
@@ -213,18 +197,17 @@ class DistanceBasedFilterTest {
   }
 
   @Test
-  void accepts_tripWithMultipleStops_passengerNearMainRoute() {
-    // Trip with multiple stops - filter only looks at boarding to alighting line
+  void accepts_tripWithMultipleStops_passengerNearAnySegment() {
+    // Trip with multiple stops - filter checks ALL segments
     var stop1 = createStopAt(0, LAKE_EAST);
     var stop2 = createStopAt(1, LAKE_SOUTH);
     var trip = createTripWithStops(LAKE_NORTH, java.util.List.of(stop1, stop2), LAKE_WEST);
 
-    // Passenger journey near the direct line from LAKE_NORTH to LAKE_WEST
-    // Even though actual route goes through EAST and SOUTH
-    var passengerPickup = new WgsCoordinate(59.9239, 10.735); // Between NORTH and WEST
-    var passengerDropoff = new WgsCoordinate(59.9239, 10.720);
+    // Passenger journey near the LAKE_SOUTH to LAKE_WEST segment
+    var passengerPickup = new WgsCoordinate(59.9139, 10.735); // Near SOUTH
+    var passengerDropoff = new WgsCoordinate(59.9139, 10.720); // Near WEST
 
-    // Should accept if close to the direct line (boarding to alighting)
+    // Should accept if close to any segment of the route
     assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
   }
 

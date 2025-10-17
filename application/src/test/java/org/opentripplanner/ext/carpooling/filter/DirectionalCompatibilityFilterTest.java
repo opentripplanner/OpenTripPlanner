@@ -62,14 +62,15 @@ class DirectionalCompatibilityFilterTest {
   }
 
   @Test
-  void accepts_passengerOutsideCorridor_returnsFalse() {
+  void accepts_passengerFarFromRoute_butDirectionallyAligned_returnsTrue() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
-    // Passenger far to the east, outside route corridor
+    // Passenger far to the east but directionally aligned (both going north)
     var passengerPickup = new WgsCoordinate(59.9139, 11.0000); // Way east
     var passengerDropoff = new WgsCoordinate(59.9439, 11.0000);
 
-    assertFalse(filter.accepts(trip, passengerPickup, passengerDropoff));
+    // Should accept - only checks direction, not distance (that's DistanceBasedFilter's job)
+    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
   }
 
   @Test
@@ -164,54 +165,13 @@ class DirectionalCompatibilityFilterTest {
   }
 
   @Test
-  void customCorridorTolerance_acceptsWithinWiderCorridor() {
-    // Custom filter with very wide corridor (0.5° ≈ 55km)
-    var customFilter = new DirectionalCompatibilityFilter(60.0, 0.5);
-
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-
-    // Passenger far east but directionally aligned
-    var passengerPickup = new WgsCoordinate(59.920, 11.2); // Far east
-    var passengerDropoff = new WgsCoordinate(59.950, 11.2);
-
-    // Should accept with wide corridor
-    assertTrue(customFilter.accepts(trip, passengerPickup, passengerDropoff));
-  }
-
-  @Test
-  void customCorridorTolerance_rejectsOutsideNarrowCorridor() {
-    // Custom filter with narrow corridor (0.01° ≈ 1.1km)
-    var customFilter = new DirectionalCompatibilityFilter(60.0, 0.01);
-
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-
-    // Passenger slightly east and directionally aligned
-    var passengerPickup = new WgsCoordinate(59.920, 10.80); // Slightly east
-    var passengerDropoff = new WgsCoordinate(59.950, 10.80);
-
-    // Should reject with narrow corridor
-    assertFalse(customFilter.accepts(trip, passengerPickup, passengerDropoff));
-  }
-
-  @Test
   void getBearingToleranceDegrees_returnsConfiguredValue() {
     var customFilter = new DirectionalCompatibilityFilter(45.0);
     assertEquals(45.0, customFilter.getBearingToleranceDegrees());
   }
 
   @Test
-  void getCorridorToleranceDegrees_returnsConfiguredValue() {
-    var customFilter = new DirectionalCompatibilityFilter(60.0, 0.2);
-    assertEquals(0.2, customFilter.getCorridorToleranceDegrees());
-  }
-
-  @Test
   void defaultBearingTolerance_is60Degrees() {
     assertEquals(60.0, filter.getBearingToleranceDegrees());
-  }
-
-  @Test
-  void defaultCorridorTolerance_is0Point1Degrees() {
-    assertEquals(0.1, filter.getCorridorToleranceDegrees());
   }
 }

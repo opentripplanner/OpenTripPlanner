@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.carpooling.filter;
 
+import java.util.List;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -10,10 +11,10 @@ import org.slf4j.LoggerFactory;
  * Filters trips based on geographic proximity to the passenger journey.
  * <p>
  * Checks if the passenger's pickup and dropoff locations are both within
- * a reasonable distance from the driver's main route (the direct line from
- * trip boarding to alighting). This allows passengers to join trips where they
- * share a segment of the driver's journey, while rejecting passengers whose
- * journey is far off the driver's direct path.
+ * a reasonable distance from the driver's route. The filter considers all
+ * segments of the driver's route (including intermediate stops), allowing
+ * passengers to join trips where they share a segment of the driver's journey,
+ * while rejecting passengers whose journey is far off any part of the driver's path.
  */
 public class DistanceBasedFilter implements TripFilter {
 
@@ -21,7 +22,7 @@ public class DistanceBasedFilter implements TripFilter {
 
   /**
    * Default maximum distance: 50km.
-   * If both trip start and end are more than this distance from
+   * If all segments of the trip's route are more than this distance from
    * both passenger pickup and dropoff, the trip is rejected.
    */
   public static final double DEFAULT_MAX_DISTANCE_METERS = 50_000;
@@ -42,31 +43,55 @@ public class DistanceBasedFilter implements TripFilter {
     WgsCoordinate passengerPickup,
     WgsCoordinate passengerDropoff
   ) {
-    WgsCoordinate tripStart = trip.boardingArea().getCoordinate();
-    WgsCoordinate tripEnd = trip.alightingArea().getCoordinate();
+    List<WgsCoordinate> routePoints = trip.routePoints();
 
-    // Calculate distance from passenger pickup to the driver's main route
-    double pickupDistanceToRoute = distanceToLineSegment(passengerPickup, tripStart, tripEnd);
-
-    // Calculate distance from passenger dropoff to the driver's main route
-    double dropoffDistanceToRoute = distanceToLineSegment(passengerDropoff, tripStart, tripEnd);
-
-    // Accept only if BOTH passenger locations are within threshold of the driver's route
-    boolean acceptable =
-      pickupDistanceToRoute <= maxDistanceMeters && dropoffDistanceToRoute <= maxDistanceMeters;
-
-    if (!acceptable) {
-      LOG.debug(
-        "Trip {} rejected by distance filter: passenger journey too far from trip route. " +
-        "Pickup distance: {:.0f}m, Dropoff distance: {:.0f}m (max: {:.0f}m)",
-        trip.getId(),
-        pickupDistanceToRoute,
-        dropoffDistanceToRoute,
-        maxDistanceMeters
-      );
+    if (routePoints.size() < 2) {
+      LOG.warn("Trip {} has fewer than 2 route points, rejecting", trip.getId());
+      return false;
     }
 
-    return acceptable;
+    // Check each segment of the route
+    for (int i = 0; i < routePoints.size() - 1; i++) {
+      WgsCoordinate segmentStart = routePoints.get(i);
+      WgsCoordinate segmentEnd = routePoints.get(i + 1);
+
+      double pickupDistanceToSegment = distanceToLineSegment(
+        passengerPickup,
+        segmentStart,
+        segmentEnd
+      );
+      double dropoffDistanceToSegment = distanceToLineSegment(
+        passengerDropoff,
+        segmentStart,
+        segmentEnd
+      );
+
+      // Accept if either passenger location is within threshold of this segment
+      if (
+        pickupDistanceToSegment <= maxDistanceMeters ||
+        dropoffDistanceToSegment <= maxDistanceMeters
+      ) {
+        LOG.debug(
+          "Trip {} accepted by distance filter: passenger journey close to segment {} ({} to {}). " +
+          "Pickup distance: {:.0f}m, Dropoff distance: {:.0f}m (max: {:.0f}m)",
+          trip.getId(),
+          i,
+          segmentStart,
+          segmentEnd,
+          pickupDistanceToSegment,
+          dropoffDistanceToSegment,
+          maxDistanceMeters
+        );
+        return true;
+      }
+    }
+
+    LOG.debug(
+      "Trip {} rejected by distance filter: passenger journey too far from all route segments (max: {:.0f}m)",
+      trip.getId(),
+      maxDistanceMeters
+    );
+    return false;
   }
 
   /**

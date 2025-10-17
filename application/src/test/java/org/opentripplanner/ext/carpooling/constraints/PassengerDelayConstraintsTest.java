@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.carpooling.constraints;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.*;
 import static org.opentripplanner.ext.carpooling.TestFixtures.*;
 
 import java.time.Duration;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.MockGraphPathFactory;
-import org.opentripplanner.ext.carpooling.routing.RoutePoint;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -26,12 +24,6 @@ class PassengerDelayConstraintsTest {
 
   @Test
   void satisfiesConstraints_noExistingStops_alwaysAccepts() {
-    // Route with only boarding and alighting (no stops)
-    List<RoutePoint> originalPoints = List.of(
-      new RoutePoint(OSLO_CENTER, "Boarding"),
-      new RoutePoint(OSLO_NORTH, "Alighting")
-    );
-
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10) };
 
     // Modified route with passenger inserted
@@ -47,13 +39,6 @@ class PassengerDelayConstraintsTest {
 
   @Test
   void satisfiesConstraints_delayWellUnderThreshold_accepts() {
-    // Original route: boarding -> stop1 -> alighting
-    List<RoutePoint> originalPoints = List.of(
-      new RoutePoint(OSLO_CENTER, "Boarding"),
-      new RoutePoint(OSLO_EAST, "Stop1"),
-      new RoutePoint(OSLO_NORTH, "Alighting")
-    );
-
     // Original timings: 0min -> 5min -> 15min
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(5), Duration.ofMinutes(15) };
 

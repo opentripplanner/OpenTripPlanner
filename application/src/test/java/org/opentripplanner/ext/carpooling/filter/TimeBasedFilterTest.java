@@ -27,7 +27,9 @@ class TimeBasedFilterTest {
     // Passenger requests at 10:15 (15 minutes after trip departure)
     var passengerRequestTime = tripDepartureTime.plusMinutes(15).toInstant();
 
-    assertTrue(filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime));
+    assertTrue(
+      filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime, Duration.ofMinutes(30))
+    );
   }
 
   @Test
@@ -38,7 +40,9 @@ class TimeBasedFilterTest {
     // Passenger requests exactly when trip departs
     var passengerRequestTime = tripDepartureTime.toInstant();
 
-    assertTrue(filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime));
+    assertTrue(
+      filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime, Duration.ofMinutes(30))
+    );
   }
 
   @Test
@@ -49,7 +53,9 @@ class TimeBasedFilterTest {
     // Passenger requests exactly 30 minutes after (at boundary)
     var passengerRequestTime = tripDepartureTime.plusMinutes(30).toInstant();
 
-    assertTrue(filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime));
+    assertTrue(
+      filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime, Duration.ofMinutes(30))
+    );
   }
 
   @Test
@@ -60,7 +66,9 @@ class TimeBasedFilterTest {
     // Passenger requests 20 minutes before trip departs (within 30-min window)
     var passengerRequestTime = tripDepartureTime.minusMinutes(20).toInstant();
 
-    assertTrue(filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime));
+    assertTrue(
+      filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime, Duration.ofMinutes(30))
+    );
   }
 
   @Test
@@ -71,7 +79,9 @@ class TimeBasedFilterTest {
     // Passenger requests 45 minutes after trip departs (outside 30-min window)
     var passengerRequestTime = tripDepartureTime.plusMinutes(45).toInstant();
 
-    assertFalse(filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime));
+    assertFalse(
+      filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime, Duration.ofMinutes(30))
+    );
   }
 
   @Test
@@ -82,7 +92,9 @@ class TimeBasedFilterTest {
     // Passenger requests 45 minutes before trip departs (outside 30-min window)
     var passengerRequestTime = tripDepartureTime.minusMinutes(45).toInstant();
 
-    assertFalse(filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime));
+    assertFalse(
+      filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime, Duration.ofMinutes(30))
+    );
   }
 
   @Test
@@ -93,35 +105,9 @@ class TimeBasedFilterTest {
     // Passenger requests 2 hours after trip departs
     var passengerRequestTime = tripDepartureTime.plusHours(2).toInstant();
 
-    assertFalse(filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime));
-  }
-
-  @Test
-  void customTimeWindow_acceptsWithinCustomWindow() {
-    // Custom filter with 60-minute window
-    var customFilter = new TimeBasedFilter(Duration.ofMinutes(60));
-
-    var tripDepartureTime = ZonedDateTime.parse("2024-01-15T10:00:00+01:00");
-    var trip = createSimpleTripWithTime(OSLO_CENTER, OSLO_NORTH, tripDepartureTime);
-
-    // Passenger requests 50 minutes after (within 60-min window, outside default 30-min)
-    var passengerRequestTime = tripDepartureTime.plusMinutes(50).toInstant();
-
-    assertTrue(customFilter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime));
-  }
-
-  @Test
-  void customTimeWindow_rejectsOutsideCustomWindow() {
-    // Custom filter with 10-minute window
-    var customFilter = new TimeBasedFilter(Duration.ofMinutes(10));
-
-    var tripDepartureTime = ZonedDateTime.parse("2024-01-15T10:00:00+01:00");
-    var trip = createSimpleTripWithTime(OSLO_CENTER, OSLO_NORTH, tripDepartureTime);
-
-    // Passenger requests 15 minutes after (outside 10-min window)
-    var passengerRequestTime = tripDepartureTime.plusMinutes(15).toInstant();
-
-    assertFalse(customFilter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime));
+    assertFalse(
+      filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST, passengerRequestTime, Duration.ofMinutes(30))
+    );
   }
 
   @Test
@@ -131,16 +117,5 @@ class TimeBasedFilterTest {
 
     // When called without time parameter, should accept (with warning log)
     assertTrue(filter.accepts(trip, OSLO_EAST, OSLO_NORTHEAST));
-  }
-
-  @Test
-  void getTimeWindow_returnsConfiguredWindow() {
-    var customFilter = new TimeBasedFilter(Duration.ofMinutes(45));
-    assertEquals(Duration.ofMinutes(45), customFilter.getTimeWindow());
-  }
-
-  @Test
-  void defaultTimeWindow_is30Minutes() {
-    assertEquals(Duration.ofMinutes(30), filter.getTimeWindow());
   }
 }

@@ -136,6 +136,7 @@ public class CarpoolLeg implements Leg {
     return Leg.super.overlapInTime(other);
   }
 
+  @Nullable
   @Override
   public Agency agency() {
     return null;
@@ -147,6 +148,7 @@ public class CarpoolLeg implements Leg {
     return null;
   }
 
+  @Nullable
   @Override
   public Route route() {
     return null;
@@ -158,6 +160,7 @@ public class CarpoolLeg implements Leg {
     return Leg.super.tripOnServiceDate();
   }
 
+  @Nullable
   @Override
   public Accessibility tripWheelchairAccessibility() {
     // TODO CARPOOLING
@@ -232,16 +235,19 @@ public class CarpoolLeg implements Leg {
     return Leg.super.agencyTimeZoneOffset();
   }
 
+  @Nullable
   @Override
   public Integer routeType() {
     return null;
   }
 
+  @Nullable
   @Override
   public I18NString headsign() {
     return null;
   }
 
+  @Nullable
   @Override
   public LocalDate serviceDate() {
     // TODO CARPOOLING
@@ -295,24 +301,28 @@ public class CarpoolLeg implements Leg {
     return transitAlerts;
   }
 
+  @Nullable
   @Override
   public PickDrop boardRule() {
     // TODO CARPOOLING
     return null;
   }
 
+  @Nullable
   @Override
   public PickDrop alightRule() {
     // TODO CARPOOLING
     return null;
   }
 
+  @Nullable
   @Override
   public BookingInfo dropOffBookingInfo() {
     // TODO CARPOOLING
     return null;
   }
 
+  @Nullable
   @Override
   public BookingInfo pickupBookingInfo() {
     // TODO CARPOOLING
@@ -331,16 +341,18 @@ public class CarpoolLeg implements Leg {
     return Leg.super.transferToNextLeg();
   }
 
+  @Nullable
   @Override
   public Integer boardStopPosInPattern() {
     // TODO CARPOOLING
-    return 0;
+    return null;
   }
 
+  @Nullable
   @Override
   public Integer alightStopPosInPattern() {
     // TODO CARPOOLING
-    return 1;
+    return null;
   }
 
   @Nullable

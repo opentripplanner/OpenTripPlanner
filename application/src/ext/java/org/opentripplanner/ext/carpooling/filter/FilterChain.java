@@ -1,8 +1,7 @@
 package org.opentripplanner.ext.carpooling.filter;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -24,11 +23,7 @@ public class FilterChain implements TripFilter {
   private final List<TripFilter> filters;
 
   public FilterChain(List<TripFilter> filters) {
-    this.filters = new ArrayList<>(filters);
-  }
-
-  public FilterChain(TripFilter... filters) {
-    this(Arrays.asList(filters));
+    this.filters = filters;
   }
 
   /**
@@ -39,10 +34,12 @@ public class FilterChain implements TripFilter {
    */
   public static FilterChain standard() {
     return new FilterChain(
-      new CapacityFilter(), // Fastest: O(1)
-      new TimeBasedFilter(), // Very fast: O(1)
-      new DistanceBasedFilter(), // Fast: O(1) with 4 distance calculations
-      new DirectionalCompatibilityFilter() // Medium: O(n) segments
+      List.of(
+        new CapacityFilter(), // Fastest: O(1)
+        new TimeBasedFilter(), // Very fast: O(1)
+        new DistanceBasedFilter(), // Fast: O(1) with 4 distance calculations
+        new DirectionalCompatibilityFilter() // Medium: O(n) segments
+      )
     );
   }
 
@@ -65,28 +62,22 @@ public class FilterChain implements TripFilter {
     CarpoolTrip trip,
     WgsCoordinate passengerPickup,
     WgsCoordinate passengerDropoff,
-    Instant passengerDepartureTime
+    Instant passengerDepartureTime,
+    Duration searchWindow
   ) {
     for (TripFilter filter : filters) {
-      if (!filter.accepts(trip, passengerPickup, passengerDropoff, passengerDepartureTime)) {
+      if (
+        !filter.accepts(
+          trip,
+          passengerPickup,
+          passengerDropoff,
+          passengerDepartureTime,
+          searchWindow
+        )
+      ) {
         return false; // Short-circuit: filter rejected the trip
       }
     }
     return true; // All filters passed
-  }
-
-  /**
-   * Adds a filter to the chain.
-   */
-  public FilterChain add(TripFilter filter) {
-    filters.add(filter);
-    return this;
-  }
-
-  /**
-   * Gets the number of filters in the chain.
-   */
-  public int size() {
-    return filters.size();
   }
 }

@@ -90,7 +90,12 @@ public class PassengerDelayConstraints {
       originalIndex < originalCumulativeTimes.length - 1;
       originalIndex++
     ) {
-      int modifiedIndex = getModifiedIndex(originalIndex, pickupPos, dropoffPos);
+      int modifiedIndex =
+        org.opentripplanner.ext.carpooling.routing.InsertionPosition.mapOriginalIndex(
+          originalIndex,
+          pickupPos,
+          dropoffPos
+        );
 
       Duration originalTime = originalCumulativeTimes[originalIndex];
       Duration modifiedTime = modifiedTimes[modifiedIndex];
@@ -115,33 +120,6 @@ public class PassengerDelayConstraints {
     }
 
     return true;
-  }
-
-  /**
-   * Maps an index in the original route to the corresponding index in the
-   * modified route after passenger stops have been inserted.
-   *
-   * @param originalIndex Index in original route
-   * @param pickupPos Position where pickup was inserted (1-indexed)
-   * @param dropoffPos Position where dropoff was inserted (1-indexed, in original space)
-   * @return Corresponding index in modified route
-   */
-  private int getModifiedIndex(int originalIndex, int pickupPos, int dropoffPos) {
-    int modifiedIndex = originalIndex;
-
-    // Account for pickup insertion
-    // If the original point was at or after pickupPos, it shifts by 1
-    if (originalIndex >= pickupPos) {
-      modifiedIndex++;
-    }
-
-    // Account for dropoff insertion
-    // After pickup insertion, check if the shifted index is at or after dropoffPos
-    if (modifiedIndex >= dropoffPos) {
-      modifiedIndex++;
-    }
-
-    return modifiedIndex;
   }
 
   /**

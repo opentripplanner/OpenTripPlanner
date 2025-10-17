@@ -18,22 +18,6 @@ public class TimeBasedFilter implements TripFilter {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimeBasedFilter.class);
 
-  /**
-   * Default time window: ±30 minutes from requested time.
-   * Trips departing outside this window are rejected.
-   */
-  public static final Duration DEFAULT_TIME_WINDOW = Duration.ofMinutes(30);
-
-  private final Duration timeWindow;
-
-  public TimeBasedFilter() {
-    this(DEFAULT_TIME_WINDOW);
-  }
-
-  public TimeBasedFilter(Duration timeWindow) {
-    this.timeWindow = timeWindow;
-  }
-
   @Override
   public boolean accepts(
     CarpoolTrip trip,
@@ -43,7 +27,7 @@ public class TimeBasedFilter implements TripFilter {
     // Cannot filter without time information
     LOG.warn(
       "TimeBasedFilter called without time parameter - accepting all trips. " +
-      "Use accepts(..., Instant) instead."
+      "Use accepts(..., Instant, Duration) instead."
     );
     return true;
   }
@@ -53,7 +37,8 @@ public class TimeBasedFilter implements TripFilter {
     CarpoolTrip trip,
     WgsCoordinate passengerPickup,
     WgsCoordinate passengerDropoff,
-    Instant passengerDepartureTime
+    Instant passengerDepartureTime,
+    Duration searchWindow
   ) {
     Instant tripStartTime = trip.startTime().toInstant();
 
@@ -61,7 +46,7 @@ public class TimeBasedFilter implements TripFilter {
     Duration timeDiff = Duration.between(tripStartTime, passengerDepartureTime).abs();
 
     // Check if within time window
-    boolean withinWindow = timeDiff.compareTo(timeWindow) <= 0;
+    boolean withinWindow = timeDiff.compareTo(searchWindow) <= 0;
 
     if (!withinWindow) {
       LOG.debug(
@@ -70,17 +55,10 @@ public class TimeBasedFilter implements TripFilter {
         trip.startTime(),
         passengerDepartureTime,
         timeDiff,
-        timeWindow
+        searchWindow
       );
     }
 
     return withinWindow;
-  }
-
-  /**
-   * Gets the configured time window.
-   */
-  public Duration getTimeWindow() {
-    return timeWindow;
   }
 }
