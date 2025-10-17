@@ -19,6 +19,8 @@
         "jakarta.xml.bind:jakarta.xml.bind-api",
         // need code changes, don't want to upgrade
         "io.github.origin-energy:java-snapshot-testing-junit5",
+        "org.apache.maven.plugins:maven-surefire-plugin", // can be re-enabled after https://github.com/apache/maven-surefire/issues/3203
+        "me.fabriciorby:maven-surefire-junit5-tree-reporter", // can be re-enabled after https://github.com/apache/maven-surefire/issues/3203
         "commons-cli:commons-cli",
         "org.processing:core",
         "edu.ucar:netcdf4"
@@ -47,8 +49,8 @@
       "matchPackageNames": [
         "org.mockito:mockito-core",
         "com.tngtech.archunit:archunit",
-        "org.apache.maven.plugins:maven-surefire-plugin",
-        "me.fabriciorby:maven-surefire-junit5-tree-reporter",
+        //"org.apache.maven.plugins:maven-surefire-plugin", https://github.com/apache/maven-surefire/issues/3203
+        //"me.fabriciorby:maven-surefire-junit5-tree-reporter", https://github.com/apache/maven-surefire/issues/3203
         "com.google.truth:truth",
         "org.jacoco:jacoco-maven-plugin", // coverage plugin
         "org.apache.commons:commons-compress", // only used by tests

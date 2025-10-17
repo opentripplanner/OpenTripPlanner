@@ -99,10 +99,7 @@
     }
   },
   "vehicleRentalServiceDirectory": {
-    "url": "https://example.com",
-    "sourcesName": "systems",
-    "updaterUrlName": "url",
-    "updaterNetworkName": "id",
+    "url": "https://example.com/manifest.json",
     "headers": {
       "ET-Client-Name": "{{ Entur specific header }}"
     }
