@@ -11,9 +11,6 @@ import org.opentripplanner.routing.error.RoutingValidationException;
  * Carpooling enables passengers to join existing driver journeys by being picked up and dropped off
  * along the driver's route. The service finds optimal insertion points for new passengers while
  * respecting capacity constraints, time windows, and route deviation budgets.
- *
- * @see CarpoolingRepository for managing driver trip data
- * @see org.opentripplanner.ext.carpooling.routing.OptimalInsertionStrategy for insertion algorithm details
  */
 public interface CarpoolingService {
   /**

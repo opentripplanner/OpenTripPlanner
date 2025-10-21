@@ -4,14 +4,12 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
-import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
 import org.opentripplanner.ext.carpooling.filter.FilterChain;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
+import org.opentripplanner.ext.carpooling.routing.CarpoolStreetRouter;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.ext.carpooling.routing.InsertionEvaluator;
 import org.opentripplanner.ext.carpooling.routing.InsertionPosition;
@@ -20,21 +18,12 @@ import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
-import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.strategy.DominanceFunctions;
-import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +78,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final FilterChain preFilters;
   private final CarpoolItineraryMapper itineraryMapper;
+  private final PassengerDelayConstraints delayConstraints;
+  private final InsertionPositionFinder positionFinder;
 
   /**
    * Creates a new carpooling service with the specified dependencies.
@@ -115,6 +106,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.preFilters = FilterChain.standard();
     this.itineraryMapper = new CarpoolItineraryMapper();
+    this.delayConstraints = new PassengerDelayConstraints();
+    this.positionFinder = new InsertionPositionFinder(delayConstraints, new BeelineEstimator());
   }
 
   @Override
@@ -124,6 +117,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
     WgsCoordinate passengerPickup = new WgsCoordinate(request.from().getCoordinate());
     WgsCoordinate passengerDropoff = new WgsCoordinate(request.to().getCoordinate());
     var passengerDepartureTime = request.dateTime();
+    var searchWindow = request.searchWindow() == null
+      ? Duration.ofMinutes(30)
+      : request.searchWindow();
 
     LOG.debug(
       "Finding carpool itineraries from {} to {} at {}",
@@ -143,7 +139,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
           passengerPickup,
           passengerDropoff,
           passengerDepartureTime,
-          request.searchWindow() == null ? Duration.ofMinutes(30) : request.searchWindow()
+          searchWindow
         )
       )
       .toList();
@@ -158,14 +154,13 @@ public class DefaultCarpoolingService implements CarpoolingService {
       return List.of();
     }
 
-    var routingFunction = createRoutingFunction(request);
-
-    // Phase 1: Find viable positions using fast heuristics (no routing)
-    var delayConstraints = new PassengerDelayConstraints();
-    var positionFinder = new InsertionPositionFinder(delayConstraints, new BeelineEstimator());
-
-    // Phase 2: Evaluate positions with expensive A* routing
-    var insertionEvaluator = new InsertionEvaluator(routingFunction, delayConstraints);
+    var router = new CarpoolStreetRouter(
+      graph,
+      vertexLinker,
+      streetLimitationParametersService,
+      request
+    );
+    var insertionEvaluator = new InsertionEvaluator(router::route, delayConstraints);
 
     // Find optimal insertions for remaining trips
     var insertionCandidates = candidateTrips
@@ -231,100 +226,5 @@ public class DefaultCarpoolingService implements CarpoolingService {
         List.of(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE))
       );
     }
-  }
-
-  /**
-   * Creates a routing function that performs A* street routing between coordinate pairs.
-   * <p>
-   * The returned function encapsulates all dependencies needed for routing (graph, vertex linker,
-   * street parameters) so that {@link InsertionEvaluator} can perform routing without
-   * knowing about OTP's internal routing infrastructure. This abstraction allows the evaluator
-   * to remain focused on optimization logic rather than routing mechanics.
-   *
-   * <h3>Routing Strategy</h3>
-   * <ul>
-   *   <li><strong>Mode:</strong> CAR mode for both origin and destination</li>
-   *   <li><strong>Algorithm:</strong> A* with Euclidean heuristic</li>
-   *   <li><strong>Vertex Linking:</strong> Creates temporary vertices at coordinate locations</li>
-   *   <li><strong>Error Handling:</strong> Returns null on routing failure (logged as warning)</li>
-   * </ul>
-   *
-   * @param request the route request containing preferences and parameters for routing
-   * @return a routing function that performs A* routing between two coordinates, returning
-   *         null if routing fails for any reason (network unreachable, timeout, etc.)
-   */
-  private InsertionEvaluator.RoutingFunction createRoutingFunction(RouteRequest request) {
-    return (from, to) -> {
-      try {
-        var tempVertices = new TemporaryVerticesContainer(
-          graph,
-          vertexLinker,
-          null,
-          from,
-          to,
-          StreetMode.CAR,
-          StreetMode.CAR
-        );
-
-        return carpoolRouting(
-          request,
-          new StreetRequest(StreetMode.CAR),
-          tempVertices.getFromVertices(),
-          tempVertices.getToVertices(),
-          streetLimitationParametersService.getMaxCarSpeed()
-        );
-      } catch (Exception e) {
-        LOG.warn("Routing failed from {} to {}: {}", from, to, e.getMessage());
-        return null;
-      }
-    };
-  }
-
-  /**
-   * Core A* routing for carpooling optimized for car travel.
-   * <p>
-   * Configures and executes an A* street search with settings optimized for carpooling:
-   * <ul>
-   *   <li><strong>Heuristic:</strong> Euclidean distance with max car speed for admissibility</li>
-   *   <li><strong>Skip Strategy:</strong> Skips edges exceeding max direct duration limit</li>
-   *   <li><strong>Dominance:</strong> Minimum weight dominance (finds shortest path)</li>
-   *   <li><strong>Sorting:</strong> Results sorted by arrival time or departure time</li>
-   * </ul>
-   *
-   * @param routeRequest the route request containing preferences and parameters
-   * @param streetRequest the street request specifying CAR mode
-   * @param fromVertices set of origin vertices to start routing from
-   * @param toVertices set of destination vertices to route to
-   * @param maxCarSpeed maximum car speed in meters/second, used for heuristic calculation
-   * @return the first (best) path found, or null if no paths exist
-   */
-  private GraphPath<State, Edge, Vertex> carpoolRouting(
-    RouteRequest routeRequest,
-    StreetRequest streetRequest,
-    java.util.Set<Vertex> fromVertices,
-    java.util.Set<Vertex> toVertices,
-    float maxCarSpeed
-  ) {
-    var preferences = routeRequest.preferences().street();
-
-    var streetSearch = StreetSearchBuilder.of()
-      .withHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
-      .withSkipEdgeStrategy(
-        new DurationSkipEdgeStrategy(preferences.maxDirectDuration().valueOf(streetRequest.mode()))
-      )
-      .withDominanceFunction(new DominanceFunctions.MinimumWeight())
-      .withRequest(routeRequest)
-      .withStreetRequest(streetRequest)
-      .withFrom(fromVertices)
-      .withTo(toVertices);
-
-    List<GraphPath<State, Edge, Vertex>> paths = streetSearch.getPathsToTarget();
-    paths.sort(new PathComparator(routeRequest.arriveBy()));
-
-    if (paths.isEmpty()) {
-      return null;
-    }
-
-    return paths.getFirst();
   }
 }
