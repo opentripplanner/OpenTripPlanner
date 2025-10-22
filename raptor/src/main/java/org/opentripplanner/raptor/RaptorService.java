@@ -58,6 +58,14 @@ public class RaptorService<T extends RaptorTripSchedule> {
     return response;
   }
 
+  public RaptorResponse<T> routeDirect(
+    RaptorRequest<T> request,
+    RaptorTransitDataProvider<T> transitData
+  ) {
+    logRequest(request);
+    return null;
+  }
+
   /**
    * TODO Add back the possibility to compare heuristics using a test - like the SpeedTest,
    *      but maybe better to make a separate test.
