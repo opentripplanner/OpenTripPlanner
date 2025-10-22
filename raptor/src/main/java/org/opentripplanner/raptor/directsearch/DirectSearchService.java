@@ -1,9 +1,10 @@
 package org.opentripplanner.raptor.directsearch;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -11,6 +12,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.path.PathBuilder;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
+import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.util.BitSetIterator;
@@ -20,74 +22,95 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 public class DirectSearchService<T extends RaptorTripSchedule> {
 
   private final RaptorTransitDataProvider<T> data;
-  private final RaptorRequest<T> request;
-  private final RaptorTransitCalculator<T> calculator;
+  private final RaptorTransitCalculator<T> transitCalculator;
+  private final int earliestDepartureTime;
+  private final int latestDepartureTime;
+  private final Collection<RaptorAccessEgress> accesses;
+  private final Collection<RaptorAccessEgress> egresses;
+
+  /* Variables used during the search (mutable) */
+
+  private int currentRouteBoardSlack = 0;
 
   public DirectSearchService(
     RaptorTransitDataProvider<T> data,
     RaptorRequest<T> request,
-    RaptorTransitCalculator<T> calculator
+    RaptorTransitCalculator<T> transitCalculator
   ) {
     this.data = data;
-    this.calculator = calculator;
-    this.request = request;
+    this.transitCalculator = transitCalculator;
+    this.earliestDepartureTime = request.searchParams().earliestDepartureTime();
+    this.latestDepartureTime = earliestDepartureTime + request.searchParams().searchWindowInSeconds();
+    this.accesses = filterAccessEgress(request.searchParams().accessPaths());
+    this.egresses = filterAccessEgress(request.searchParams().egressPaths());
   }
 
   public Collection<RaptorPath<T>> route() {
-    // TODO DT - search direction
+    var results = new ParetoSet<RaptorPath<T>>(new DestinationArrivalComparator<>());
 
-    var params = request.searchParams();
-    var accesses = params.accessPaths();
+    var routes = data.routeIndexIterator(findAllAccessStopIndexes());
 
-    var destinationSet = new ParetoSet<RaptorPath<T>>(new DestinationArrivalComparator<>());
+    while (routes.hasNext()) {
+      var route = data.getRouteForIndex(routes.next());
+      var paths = routeSearch(route);
+      results.addAll(paths);
+    }
+    return results;
+  }
 
+  private static Collection<RaptorAccessEgress> filterAccessEgress(
+    Collection<RaptorAccessEgress> list
+  ) {
+    return list.stream().filter(a -> !a.hasRides() && !a.hasOpeningHours()).toList();
+  }
+
+  private IntIterator findAllAccessStopIndexes() {
     BitSet accessStopBitSet = new BitSet();
     for (RaptorAccessEgress it : accesses) {
       accessStopBitSet.set(it.stop());
     }
+    return new BitSetIterator(accessStopBitSet);
+  }
 
-    BitSet egressStopBitSet = new BitSet();
-    for (RaptorAccessEgress it : params.egressPaths()) {
-      egressStopBitSet.set(it.stop());
-    }
+  /// First find ONE path for each combination of access/egress. This correspond to the
+  /// first iteration of a RangeRaptor search. We will later expand this to all trip schedules
+  /// within the search-window. All paths with the same (route, access, and egress) will have
+  /// almost identical cost, so we can use this to prune the set of paths before expanding the
+  /// timetable. For each route/pattern we only want the best combination of access and egress.
+  private List<RaptorPath<T>> routeSearch(RaptorRoute<T> route) {
+    this.currentRouteBoardSlack = data.slackProvider().boardSlack(route.pattern().slackIndex());
+    RaptorPath<T> bestPath = null;
 
-    var accessStopIterator = new BitSetIterator(accessStopBitSet);
-    var routes = data.routeIndexIterator(accessStopIterator);
+    for (var access : accesses) {
+      var pattern = route.pattern();
+      int boardPos = pattern.findStopPositionAfter(0, access.stop());
 
-    while (routes.hasNext()) {
-      var routeIdx = routes.next();
-      var route = data.getRouteForIndex(routeIdx);
+      if (boardPos == -1) {
+        continue;
+      }
 
-      var routeResults = new TIntObjectHashMap<RaptorPath<T>>();
+      for (var egress : egresses) {
+        int alightPos = pattern.findStopPositionAfter(boardPos + 1, egress.stop());
 
-      for (var access : accesses) {
-        var pattern = route.pattern();
-        int boardPos = pattern.findStopPositionAfter(0, access.stop());
-        if (boardPos == -1) {
+        if (alightPos == -1) {
           continue;
         }
 
-        for (var e : params.egressPaths()) {
-          int alightPos = pattern.findStopPositionAfter(boardPos + 1, e.stop());
-          if (alightPos == -1) {
-            continue;
-          }
-          var paths = mapToPaths(route, access, e, boardPos, alightPos);
-          for (RaptorPath<T> path : paths) {
-            int tripIndex = path.accessLeg().nextLeg().asTransitLeg().trip().tripSortIndex();
-            var other = routeResults.get(tripIndex);
-            if (other == null || path.c1() < other.c1()) {
-              routeResults.put(tripIndex, path);
-            }
+        var pathOp = findFirstPathInSearchWindow(route, access, egress, boardPos, alightPos);
+
+        if (pathOp.isPresent()) {
+          var candidate = pathOp.get();
+          if (bestPath == null || candidate.c1() < bestPath.c1()) {
+            bestPath = candidate;
           }
         }
       }
-      destinationSet.addAll(routeResults.valueCollection());
     }
-    return destinationSet;
+    // Expand the best-path into all paths within the search-window
+    return bestPath == null ? List.of() : findAllPathsInSearchWindow(route, bestPath);
   }
 
-  private Collection<RaptorPath<T>> mapToPaths(
+  private Optional<RaptorPath<T>> findFirstPathInSearchWindow(
     RaptorRoute<T> route,
     RaptorAccessEgress access,
     RaptorAccessEgress egress,
@@ -95,20 +118,55 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
     int alightPos
   ) {
     var timetable = route.timetable();
-    var edt = request.searchParams().earliestDepartureTime();
-    var ldt = edt + request.searchParams().searchWindowInSeconds();
-    var results = new ArrayList<RaptorPath<T>>();
+    var search = transitCalculator.createTripSearch(timetable);
+    int boardTime = earliestDepartureTime + access.durationInSeconds() + currentRouteBoardSlack;
 
-    for (int scheduleIdx = 0; scheduleIdx < timetable.numberOfTripSchedules(); scheduleIdx++) {
-      var schedule = timetable.getTripSchedule(scheduleIdx);
+    // find th first possible trip
+    var boardEvent = search.search(boardTime, boardPos);
+
+    if (boardEvent.empty()) {
+      return Optional.empty();
+    }
+    var path = mapToPath(boardEvent.trip(), access, egress, boardPos, alightPos);
+
+      if (path.startTime() < earliestDepartureTime) {
+        throw new IllegalStateException(
+          "This should not happen. There is a mismatch between the calculated board time/" +
+          "trip search and the assembly of the path.");
+      }
+
+      if (path.endTime() < latestDepartureTime) {
+        return Optional.of(path);
+      }
+      return Optional.empty();
+  }
+
+  private List<RaptorPath<T>> findAllPathsInSearchWindow(
+    RaptorRoute<T> route,
+    RaptorPath<T> firstPath
+  ) {
+    var transitLeg = firstPath.accessLeg().nextLeg().asTransitLeg();
+    int firstScheduleIndex = transitLeg.trip().tripSortIndex();
+    var access = firstPath.accessLeg().access();
+    var egress = firstPath.egressLeg().egress();
+    int boardPos = transitLeg.getFromStopPosition();
+    int alightPos = transitLeg.getToStopPosition();
+    var timetable = route.timetable();
+
+    var results = new ArrayList<RaptorPath<T>>();
+    results.add(firstPath);
+
+    for (int i = firstScheduleIndex + 1; i < timetable.numberOfTripSchedules(); i++) {
+      var schedule = timetable.getTripSchedule(i);
       var path = mapToPath(schedule, access, egress, boardPos, alightPos);
 
-      if (path.endTime() > ldt) {
-        break;
+      // We only need to check the end of the search-window, since we know the {@code firstPath} is
+      // inside. All successive schedules will therefore also be after the
+      // {@code earliestDepartureTime}.
+      if (path.endTime() > latestDepartureTime) {
+        return results;
       }
-      if (path.startTime() > edt) {
-        results.add(path);
-      }
+      results.add(path);
     }
     return results;
   }
@@ -122,9 +180,12 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
   ) {
     var times = new BoardAndAlightTime(schedule, boardPos, alightPos);
 
-    // This is the range-raptor iteration start time, this is requiered meta-info
-    var iterationDepartureTime =
-      ((schedule.departure(boardPos) - access.durationInSeconds()) / 60) * 60;
+    // This is the range-raptor iteration start time, this is required meta-info
+    var iterationDepartureTime = calculateIterationDepartureTime(
+      access.durationInSeconds(),
+      schedule.departure(boardPos),
+      currentRouteBoardSlack
+    );
 
     var pathBuilder = PathBuilder.tailPathBuilder(
       data.slackProvider(),
@@ -139,24 +200,10 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
     return pathBuilder.build();
   }
 
-  //private final class StreamIterator implements IntIterator {
-
-  //  private final PrimitiveIterator.OfInt it;
-
-  //  public StreamIterator(IntStream intStream) {
-  //    this.it = intStream.iterator();
-  //  }
-
-  //  @Override
-  //  public int next() {
-  //    return it.nextInt();
-  //  }
-
-  //  @Override
-  //  public boolean hasNext() {
-  //    return it.hasNext();
-  //  }
-  //}
+  // TODO DT - Add unit tests
+  static int calculateIterationDepartureTime(int accessDuration, int boardTime, int boardSlack) {
+    return ((boardTime - (accessDuration + boardSlack)) / 60) * 60;
+  }
 
   private static class DestinationArrivalComparator<T extends RaptorTripSchedule>
     implements ParetoComparator<RaptorPath<T>> {
