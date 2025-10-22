@@ -1,12 +1,9 @@
 package org.opentripplanner.raptor.directsearch;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -61,7 +58,7 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
       var routeIdx = routes.next();
       var route = data.getRouteForIndex(routeIdx);
 
-      Map<T, List<RaptorPath<T>>> routeResults = new HashMap<>();
+      var routeResults = new TIntObjectHashMap<RaptorPath<T>>();
 
       for (var access : accesses) {
         var pattern = route.pattern();
@@ -77,19 +74,16 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
           }
           var paths = mapToPaths(route, access, e, boardPos, alightPos);
           for (RaptorPath<T> path : paths) {
-            routeResults.computeIfAbsent(path.accessLeg().nextLeg().asTransitLeg().trip(), key -> new ArrayList<>()).add(path);
+            int tripIndex = path.accessLeg().nextLeg().asTransitLeg().trip().tripSortIndex();
+            var other = routeResults.get(tripIndex);
+            if(other == null || path.c1() < other.c1()) {
+              routeResults.put(tripIndex, path);
+            }
           }
         }
       }
-      for (T trip : routeResults.keySet()) {
-        var paths = routeResults.get(trip);
-        var path = paths.stream().min(Comparator.comparingInt(it -> it.c1()));
-        if(path.isPresent()) {
-          destinationSet.add(path.get());
-        }
-      }
+      destinationSet.addAll(routeResults.valueCollection());
     }
-
     return destinationSet;
   }
 
