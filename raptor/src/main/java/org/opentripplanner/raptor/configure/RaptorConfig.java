@@ -6,6 +6,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorEnvironment;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.raptor.directsearch.DirectSearchService;
 import org.opentripplanner.raptor.rangeraptor.ConcurrentCompositeRaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
@@ -93,6 +94,14 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       threadPool(),
       environment::mapInterruptedException
     );
+  }
+
+  public DirectSearchService<T> createDirectSearchService(
+    RaptorTransitDataProvider<T> transitData,
+    RaptorRequest<T> request
+  ) {
+    var context = context(transitData, request);
+    return new DirectSearchService<>(transitData, request, context.calculator());
   }
 
   private RaptorRouter<T> createRangeRaptorWithMcWorker(

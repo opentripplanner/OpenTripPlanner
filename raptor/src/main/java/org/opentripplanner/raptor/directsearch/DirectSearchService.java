@@ -1,18 +1,13 @@
 package org.opentripplanner.raptor.directsearch;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.PrimitiveIterator;
-import java.util.stream.IntStream;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.path.PathBuilder;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
-import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.util.IntIterators;
@@ -20,6 +15,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
 public class DirectSearchService<T extends RaptorTripSchedule> {
+
   private final RaptorTransitDataProvider<T> data;
   private final RaptorRequest<T> request;
   private final RaptorTransitCalculator<T> calculator;
@@ -42,7 +38,7 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
 
     var destinationSet = new ParetoSet<RaptorPath<T>>(new DestinationArrivalComparator<>());
 
-    for (var access: accesses) {
+    for (var access : accesses) {
       var origin = access.stop();
       var routesFromOrigin = data.routeIndexIterator(IntIterators.singleValueIterator(origin));
 
@@ -56,7 +52,7 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
         // TODO: this is inefficient
         var alightPos = -1;
         RaptorAccessEgress egress = null;
-        for (var e: params.egressPaths()) {
+        for (var e : params.egressPaths()) {
           alightPos = pattern.findStopPositionAfter(boardPos + 1, e.stop());
           if (alightPos != -1) {
             // TODO: This might not be the best position
@@ -76,14 +72,7 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
 
         for (int scheduleIdx = 0; scheduleIdx < timetable.numberOfTripSchedules(); scheduleIdx++) {
           var schedule = timetable.getTripSchedule(scheduleIdx);
-          var path = mapToPath(
-            route,
-            schedule,
-            access,
-            egress,
-            boardPos,
-            alightPos
-          );
+          var path = mapToPath(route, schedule, access, egress, boardPos, alightPos);
           if (path.endTime() > ldt) {
             break;
           }
@@ -97,13 +86,24 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
     return destinationSet;
   }
 
-  private RaptorPath<T> mapToPath(RaptorRoute<T> route, T schedule, RaptorAccessEgress access, RaptorAccessEgress egress, int boardPos, int alightPos) {
+  private RaptorPath<T> mapToPath(
+    RaptorRoute<T> route,
+    T schedule,
+    RaptorAccessEgress access,
+    RaptorAccessEgress egress,
+    int boardPos,
+    int alightPos
+  ) {
     var times = new BoardAndAlightTime(schedule, boardPos, alightPos);
 
     var earliestDepartureTime = 0;
 
     var pathBuilder = PathBuilder.headPathBuilder(
-      data.slackProvider(), earliestDepartureTime, data.multiCriteriaCostCalculator(), null, null
+      data.slackProvider(),
+      earliestDepartureTime,
+      data.multiCriteriaCostCalculator(),
+      null,
+      null
     );
     pathBuilder.access(access);
     pathBuilder.transit(schedule, times);
@@ -130,11 +130,18 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
   //  }
   //}
 
-  private static class DestinationArrivalComparator<T extends RaptorTripSchedule> implements ParetoComparator<RaptorPath<T>> {
-    private final static int COST_SLACK_FACTOR = 2;
+  private static class DestinationArrivalComparator<T extends RaptorTripSchedule>
+    implements ParetoComparator<RaptorPath<T>> {
+
+    private static final int COST_SLACK_FACTOR = 2;
+
     @Override
     public boolean leftDominanceExist(RaptorPath<T> left, RaptorPath<T> right) {
-      return left.startTime() > right.startTime() || left.endTime() < right.endTime() || left.c1() < right.c1() * COST_SLACK_FACTOR;
+      return (
+        left.startTime() > right.startTime() ||
+        left.endTime() < right.endTime() ||
+        left.c1() < right.c1() * COST_SLACK_FACTOR
+      );
     }
   }
 }
