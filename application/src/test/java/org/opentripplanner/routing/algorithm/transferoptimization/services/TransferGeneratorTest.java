@@ -357,8 +357,8 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   void findTransferForDifferentRoutesWithCustomBoardingSlack() {
     RaptorSlackProvider slackProvider = new DefaultSlackProvider(0, 0, 0) {
       @Override
-      public int boardSlack(int slackIndex) {
-        return slackIndex == 1 ? 20 * 60 : 0;
+      public int boardSlack(int patternSlackIndex) {
+        return patternSlackIndex == 1 ? 20 * 60 : 0;
       }
     };
     data.withSlackProvider(slackProvider);

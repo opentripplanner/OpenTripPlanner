@@ -16,8 +16,8 @@ class RaptorSlackProviderTest {
     }
 
     @Override
-    public int boardSlack(int slackIndex) {
-      return BOARD_SLACK[slackIndex];
+    public int boardSlack(int patternSlackIndex) {
+      return BOARD_SLACK[patternSlackIndex];
     }
 
     @Override

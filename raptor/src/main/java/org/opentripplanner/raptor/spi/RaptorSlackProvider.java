@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.spi;
 
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
+
 /**
  * Responsible for providing {@code boardSlack}, {@code alightSlack} and {@code transferSlack}.
  */
@@ -20,8 +22,10 @@ public interface RaptorSlackProvider {
    * calculate the earliest-bord-time before boarding).
    * <p>
    * Unit: seconds.
+   *
+   * @param patternSlackIndex The {@link RaptorTripPattern#slackIndex()} should be passed in here.
    */
-  int boardSlack(int slackIndex);
+  int boardSlack(int patternSlackIndex);
 
   /**
    * The alight-slack (duration time in seconds) to add to the trip alight time for the given

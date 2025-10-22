@@ -45,8 +45,8 @@ public final class SlackProvider implements RaptorSlackProvider {
   }
 
   @Override
-  public int boardSlack(int slackIndex) {
-    return boardSlack[slackIndex];
+  public int boardSlack(int patternSlackIndex) {
+    return boardSlack[patternSlackIndex];
   }
 
   @Override

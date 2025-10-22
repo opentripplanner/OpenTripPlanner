@@ -22,7 +22,7 @@ public class DefaultSlackProvider implements RaptorSlackProvider {
   }
 
   @Override
-  public int boardSlack(int slackIndex) {
+  public int boardSlack(int patternSlackIndex) {
     return boardSlack;
   }
 
