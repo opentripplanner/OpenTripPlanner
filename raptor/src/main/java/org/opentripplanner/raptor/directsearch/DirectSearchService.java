@@ -63,7 +63,7 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
       for (var access : accesses) {
         var pattern = route.pattern();
         int boardPos = pattern.findStopPositionAfter(0, access.stop());
-        if(boardPos == -1) {
+        if (boardPos == -1) {
           continue;
         }
 
@@ -76,7 +76,7 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
           for (RaptorPath<T> path : paths) {
             int tripIndex = path.accessLeg().nextLeg().asTransitLeg().trip().tripSortIndex();
             var other = routeResults.get(tripIndex);
-            if(other == null || path.c1() < other.c1()) {
+            if (other == null || path.c1() < other.c1()) {
               routeResults.put(tripIndex, path);
             }
           }
@@ -87,7 +87,13 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
     return destinationSet;
   }
 
-  private Collection<RaptorPath<T>> mapToPaths(RaptorRoute<T> route, RaptorAccessEgress access, RaptorAccessEgress egress, int boardPos, int alightPos) {
+  private Collection<RaptorPath<T>> mapToPaths(
+    RaptorRoute<T> route,
+    RaptorAccessEgress access,
+    RaptorAccessEgress egress,
+    int boardPos,
+    int alightPos
+  ) {
     var timetable = route.timetable();
     var edt = request.searchParams().earliestDepartureTime();
     var ldt = edt + request.searchParams().searchWindowInSeconds();
@@ -116,12 +122,13 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
   ) {
     var times = new BoardAndAlightTime(schedule, boardPos, alightPos);
 
-    var earliestDepartureTime =
-      (((schedule.departure(boardPos) - access.durationInSeconds()) - 59) / 60) * 60;
+    // This is the range-raptor iteration start time, this is requiered meta-info
+    var iterationDepartureTime =
+      ((schedule.departure(boardPos) - access.durationInSeconds()) / 60) * 60;
 
     var pathBuilder = PathBuilder.tailPathBuilder(
       data.slackProvider(),
-      earliestDepartureTime,
+      iterationDepartureTime,
       data.multiCriteriaCostCalculator(),
       null,
       null
