@@ -1,6 +1,12 @@
 package org.opentripplanner.raptor.directsearch;
 
+import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -10,7 +16,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
-import org.opentripplanner.raptor.util.IntIterators;
+import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
@@ -38,47 +44,48 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
 
     var destinationSet = new ParetoSet<RaptorPath<T>>(new DestinationArrivalComparator<>());
 
-    for (var access : accesses) {
-      var origin = access.stop();
-      var routesFromOrigin = data.routeIndexIterator(IntIterators.singleValueIterator(origin));
+    BitSet accessStopBitSet = new BitSet();
+    for (RaptorAccessEgress it : accesses) {
+      accessStopBitSet.set(it.stop());
+    }
 
-      while (routesFromOrigin.hasNext()) {
-        var routeIdx = routesFromOrigin.next();
-        var route = data.getRouteForIndex(routeIdx);
+    BitSet egressStopBitSet = new BitSet();
+    for (RaptorAccessEgress it : params.egressPaths()) {
+      egressStopBitSet.set(it.stop());
+    }
+
+    var accessStopIterator = new BitSetIterator(accessStopBitSet);
+    var routes = data.routeIndexIterator(accessStopIterator);
+
+    while (routes.hasNext()) {
+      var routeIdx = routes.next();
+      var route = data.getRouteForIndex(routeIdx);
+
+      Map<T, List<RaptorPath<T>>> routeResults = new HashMap<>();
+
+      for (var access : accesses) {
         var pattern = route.pattern();
-
-        var boardPos = pattern.findStopPositionAfter(0, origin);
-
-        // TODO: this is inefficient
-        var alightPos = -1;
-        RaptorAccessEgress egress = null;
-        for (var e : params.egressPaths()) {
-          alightPos = pattern.findStopPositionAfter(boardPos + 1, e.stop());
-          if (alightPos != -1) {
-            // TODO: This might not be the best position
-            egress = e;
-            break;
-          }
-        }
-
-        if (alightPos != -1) {
-          // Next route
+        int boardPos = pattern.findStopPositionAfter(0, access.stop());
+        if(boardPos == -1) {
           continue;
         }
 
-        var timetable = route.timetable();
-        var edt = request.searchParams().earliestDepartureTime();
-        var ldt = edt + request.searchParams().searchWindowInSeconds();
-
-        for (int scheduleIdx = 0; scheduleIdx < timetable.numberOfTripSchedules(); scheduleIdx++) {
-          var schedule = timetable.getTripSchedule(scheduleIdx);
-          var path = mapToPath(route, schedule, access, egress, boardPos, alightPos);
-          if (path.endTime() > ldt) {
-            break;
+        for (var e : params.egressPaths()) {
+          int alightPos = pattern.findStopPositionAfter(boardPos + 1, e.stop());
+          if (alightPos == -1) {
+            continue;
           }
-          if (path.startTime() > edt) {
-            destinationSet.add(path);
+          var paths = mapToPaths(route, access, e, boardPos, alightPos);
+          for (RaptorPath<T> path : paths) {
+            routeResults.computeIfAbsent(path.accessLeg().nextLeg().asTransitLeg().trip(), key -> new ArrayList<>()).add(path);
           }
+        }
+      }
+      for (T trip : routeResults.keySet()) {
+        var paths = routeResults.get(trip);
+        var path = paths.stream().min(Comparator.comparingInt(it -> it.c1()));
+        if(path.isPresent()) {
+          destinationSet.add(path.get());
         }
       }
     }
@@ -86,8 +93,27 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
     return destinationSet;
   }
 
+  private Collection<RaptorPath<T>> mapToPaths(RaptorRoute<T> route, RaptorAccessEgress access, RaptorAccessEgress egress, int boardPos, int alightPos) {
+    var timetable = route.timetable();
+    var edt = request.searchParams().earliestDepartureTime();
+    var ldt = edt + request.searchParams().searchWindowInSeconds();
+    var results = new ArrayList<RaptorPath<T>>();
+
+    for (int scheduleIdx = 0; scheduleIdx < timetable.numberOfTripSchedules(); scheduleIdx++) {
+      var schedule = timetable.getTripSchedule(scheduleIdx);
+      var path = mapToPath(schedule, access, egress, boardPos, alightPos);
+
+      if (path.endTime() > ldt) {
+        break;
+      }
+      if (path.startTime() > edt) {
+        results.add(path);
+      }
+    }
+    return results;
+  }
+
   private RaptorPath<T> mapToPath(
-    RaptorRoute<T> route,
     T schedule,
     RaptorAccessEgress access,
     RaptorAccessEgress egress,
@@ -96,9 +122,10 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
   ) {
     var times = new BoardAndAlightTime(schedule, boardPos, alightPos);
 
-    var earliestDepartureTime = 0;
+    var earliestDepartureTime =
+      (((schedule.departure(boardPos) - access.durationInSeconds()) - 59) / 60) * 60;
 
-    var pathBuilder = PathBuilder.headPathBuilder(
+    var pathBuilder = PathBuilder.tailPathBuilder(
       data.slackProvider(),
       earliestDepartureTime,
       data.multiCriteriaCostCalculator(),
