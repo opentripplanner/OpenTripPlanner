@@ -162,7 +162,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
     // create and return response
     return new RaptorResponse<>(
-      ListUtils.combine(result.extractPaths(), directResult),
+      directResult == null ? result.extractPaths() : ListUtils.combine(result.extractPaths(), directResult),
       new DefaultStopArrivals(result),
       request,
       // This method is not run unless the heuristic reached the destination
