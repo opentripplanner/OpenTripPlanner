@@ -1,5 +1,7 @@
 ## PR Instructions
 
+Please read our [contribution guidelines](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CONTRIBUTING.md) before creating a PR.
+
 When creating a pull request, please follow the format below. For each section, *replace* the
 guidance text with your own text, keeping the section heading. If you have nothing to say in a
 particular section, you can completely delete the section including its heading to indicate that you

@@ -64,7 +64,7 @@ public class PatternCostCalculatorTest {
         })
       )
       .withPreferences(p ->
-        p.withTransit(tr -> tr.setUnpreferredCost(unpreferredCostFunctionOtpDomain))
+        p.withTransit(tr -> tr.withUnpreferredCost(unpreferredCostFunctionOtpDomain))
       )
       .buildDefault();
 
@@ -194,7 +194,7 @@ public class PatternCostCalculatorTest {
       return RouteRequest.of()
         .withPreferences(preferences -> {
           preferences.withTransit(transit ->
-            transit.setUnpreferredCost(
+            transit.withUnpreferredCost(
               CostLinearFunction.of(UNPREFERRED_ROUTE_PENALTY, UNPREFERRED_ROUTE_RELUCTANCE)
             )
           );

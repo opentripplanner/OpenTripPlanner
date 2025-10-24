@@ -24,10 +24,11 @@ public interface GraphFinder {
   static GraphFinder getInstance(
     Graph graph,
     VertexLinker linker,
+    StopResolver stopResolver,
     Function<Envelope, Collection<RegularStop>> queryNearbyStops
   ) {
     return graph.hasStreets
-      ? new StreetGraphFinder(graph, linker)
+      ? new StreetGraphFinder(graph, linker, stopResolver)
       : new DirectGraphFinder(queryNearbyStops);
   }
 

@@ -260,7 +260,7 @@
 
 .sidebar-button.right {
   position: absolute;
-  right: 0; /* Default position when sidebar is closed */
+  right: 0;
   background: #fff;
   color: white;
   border: none;
@@ -269,11 +269,11 @@
   cursor: pointer;
   transition:
     right 0.3s,
-    background-color 0.2s; /* Smooth transitions */
+    background-color 0.2s;
 }
 
 .sidebar-button.right.open {
-  right: 270px; /* Shifted position when sidebar is open */
+  right: 270px;
 }
 
 .sidebar-button.active {
@@ -281,7 +281,7 @@
 }
 
 .sidebar-button:hover {
-  background: #4078bc; /* Slightly darker when hovered */
+  background: #4078bc;
 }
 
 .sidebar-button.active:hover {
@@ -307,6 +307,13 @@ input[type='number'] {
 .pagination-controls {
   margin-top: 10px;
   margin-bottom: 5px;
+}
+
+.pagination-controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
 }
 
 .default-tooltip-icon {
@@ -400,7 +407,7 @@ input[type='number'] {
 }
 
 .argument-list button:hover {
-  background-color: #0056b3; /* Darker on hover */
+  background-color: #0056b3;
 }
 
 .argument-list input[type='text'],
@@ -411,7 +418,7 @@ select {
   padding: 0;
   margin: 0;
   border: none;
-  border-bottom: 1px solid #ccc; /* Bottom border only */
+  border-bottom: 1px solid #ccc;
   background: none;
   box-sizing: border-box;
 }
@@ -544,4 +551,182 @@ input.comma-separated-input[type='number'] {
   cursor: pointer;
   color: #721c24;
   margin-left: 8px;
+}
+
+/* Itinerary Comparison Dialog */
+.compare-section-divider {
+  margin-top: 20px;
+}
+
+.compare-legs-container {
+  display: flex;
+  gap: 20px;
+}
+
+.compare-leg-column {
+  flex: 1;
+}
+
+.compare-leg-item {
+  padding: 4px;
+  border: 1px solid #dee2e6;
+  margin-bottom: 2px;
+  border-radius: 2px;
+}
+
+.compare-leg-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.compare-leg-checkbox {
+  margin-right: 6px;
+}
+
+.compare-selected-legs-section {
+  margin-top: 20px;
+}
+
+.compare-selected-legs-section table th,
+.compare-selected-legs-section table td {
+  font-size: 13px;
+}
+.compare-summary-table {
+  margin-bottom: 30px;
+}
+
+.compare-summary-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px 8px;
+  font-size: 13px;
+}
+
+.compare-summary-table td {
+  text-align: center;
+  padding: 12px 8px;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+.compare-itinerary-number {
+  font-size: 14px;
+  font-weight: bold;
+  color: #0056b3;
+}
+
+.compare-summary-table .compare-value-best {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+  font-weight: 600;
+}
+
+.compare-leg-column h6 {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.compare-leg-item {
+  padding: 8px;
+  border: 1px solid #dee2e6;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.compare-leg-item:hover {
+  background-color: #f8f9fa;
+}
+
+.compare-leg-item.selected {
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.compare-leg-mode {
+  font-weight: 600;
+  color: #495057;
+}
+
+.compare-leg-details {
+  color: #6c757d;
+  font-size: 12px;
+}
+
+.compare-selected-legs-title {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.compare-legs-select-container {
+  display: flex;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.compare-leg-select-column {
+  flex: 1;
+}
+
+.compare-leg-select-label {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.compare-leg-select .compare-leg-select__control {
+  min-height: 40px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.compare-leg-select .compare-leg-select__control--is-focused {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 1px #0056b3;
+}
+
+.compare-leg-select .compare-leg-select__multi-value {
+  background-color: #e3f2fd;
+  border: 1px solid #2196f3;
+}
+
+.compare-leg-select .compare-leg-select__multi-value__label {
+  color: #1976d2;
+  font-size: 12px;
+}
+
+.compare-leg-select .compare-leg-select__multi-value__remove {
+  color: #1976d2;
+  cursor: pointer;
+}
+
+.compare-leg-select .compare-leg-select__multi-value__remove:hover {
+  background-color: #1976d2;
+  color: white;
+}
+
+.compare-leg-select .compare-leg-select__placeholder {
+  color: #6c757d;
+  font-size: 13px;
+}
+
+/* Responsive modal for itinerary comparison */
+.full-width-modal .modal-dialog {
+  max-width: 95vw; /* Full-width for screens below lg breakpoint */
+}
+
+@media (min-width: 992px) {
+  .full-width-modal .modal-dialog {
+    max-width: 1140px; /* Bootstrap xl size for lg screens and up */
+  }
 }

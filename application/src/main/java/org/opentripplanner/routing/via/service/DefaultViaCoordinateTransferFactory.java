@@ -9,6 +9,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
+import org.opentripplanner.graph_builder.module.nearbystops.TransitServiceResolver;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -133,7 +134,11 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     if (!graph.hasStreets) {
       return new StraightLineNearbyStopFinder(transitService, radiusAsDuration);
     } else {
-      return StreetNearbyStopFinder.of(radiusAsDuration, 0).build();
+      return StreetNearbyStopFinder.of(
+        new TransitServiceResolver(transitService),
+        radiusAsDuration,
+        0
+      ).build();
     }
   }
 

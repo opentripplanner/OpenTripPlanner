@@ -13,7 +13,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -22,6 +21,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -119,14 +119,14 @@ public class SplitEdgeTurnRestrictionsTest {
     // right hand turn out of the the residential road onto the main road, only right turn allowed plus there
     // is a bus station along the way, splitting the edge
     var noLeftTurnPermitted = computeCarPolyline(graph, paulGerhardtWegEast, parkStrasse);
-    assertThatPolylinesAreEqual(noLeftTurnPermitted, "sochHof~u@KY_@mAVi@Te@DK");
+    assertThatPolylinesAreEqual(noLeftTurnPermitted, "sochHof~u@KY_@mAl@oADK");
 
-    // right hand turn out of the the residential road onto the main road, only right turn allowed plus there
+    // right hand turn out of the residential road onto the main road, only right turn allowed plus there
     // is a bus station along the way, splitting the edge
     var longWay = computeCarPolyline(graph, paulGerhardtWegEast, herrenbergerStrasse);
     assertThatPolylinesAreEqual(
       longWay,
-      "sochHof~u@KY_@mAVi@Te@N]L]N_@v@mBDKN]KKM\\{@~BKXWj@KRKPCFa@`@_@XWPSHQDMCEAQMKKSgAa@qCMe@"
+      "sochHof~u@KY_@mAl@oAN]L]N_@v@mBDKN]KKM\\{@~BKXWj@KRKPCFa@`@_@XWPSHQDMCEAQMKKSgAa@qCMe@"
     );
 
     var longWayBack = computeCarPolyline(graph, herrenbergerStrasse, paulGerhardtWegEast);
@@ -164,11 +164,12 @@ public class SplitEdgeTurnRestrictionsTest {
       .withFrom(from)
       .withTo(to)
       .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
+      .withPreferences(p -> p.withStreet(s -> s.withTurnReluctance(0.5)))
       .buildRequest();
 
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
-      TestVertexLinker.of(graph),
+      VertexLinkerTestFactory.of(graph),
       id -> List.of(),
       from,
       to,
@@ -179,6 +180,7 @@ public class SplitEdgeTurnRestrictionsTest {
     var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+      id -> null,
       ZoneIds.BERLIN,
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference

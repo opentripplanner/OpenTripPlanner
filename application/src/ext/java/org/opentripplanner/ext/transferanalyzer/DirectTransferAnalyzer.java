@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferCouldNotBeRouted;
@@ -74,7 +75,11 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(
       timetableRepository.getSiteRepository()::findRegularStops
     );
-    StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(graph, linker);
+    StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(
+      graph,
+      linker,
+      timetableRepository.getSiteRepository()::getRegularStop
+    );
 
     int stopsAnalyzed = 0;
 
@@ -101,7 +106,9 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
           .forEach(t -> stopsStreets.putIfAbsent((RegularStop) t.stop, t));
       } catch (Exception ignored) {}
 
-      RegularStop originStop = originStopVertex.getStop();
+      RegularStop originStop = Objects.requireNonNull(
+        timetableRepository.getSiteRepository().getRegularStop(originStopVertex.getId())
+      );
 
       /* Get stops found by both street and euclidean search */
       List<RegularStop> stopsConnected = stopsEuclidean

@@ -7,7 +7,7 @@
   "labels": [
     "+Skip Changelog"
   ],
-  "rebaseWhen": "conflicted",
+  "rebaseWhen": "behind-base-branch",
   "enabledManagers": [
     "npm",
     "maven",
@@ -19,6 +19,8 @@
         "jakarta.xml.bind:jakarta.xml.bind-api",
         // need code changes, don't want to upgrade
         "io.github.origin-energy:java-snapshot-testing-junit5",
+        "org.apache.maven.plugins:maven-surefire-plugin", // can be re-enabled after https://github.com/apache/maven-surefire/issues/3203
+        "me.fabriciorby:maven-surefire-junit5-tree-reporter", // can be re-enabled after https://github.com/apache/maven-surefire/issues/3203
         "commons-cli:commons-cli",
         "org.processing:core",
         "edu.ucar:netcdf4"
@@ -30,12 +32,14 @@
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "Debug UI dependencies (non-major)",
       "schedule": ["after 6pm on the 17th day of the month"],
-      "reviewers": ["testower"]
+      "reviewers": ["testower"],
+      "postUpdateOptions": ["npmInstallTwice"]
     },
     {
       "matchFiles": ["client/package.json"],
       "matchUpdateTypes": ["major"],
-      "reviewers": ["testower"]
+      "reviewers": ["testower"],
+      "postUpdateOptions": ["npmInstallTwice"]
     },
     // some dependencies that we auto-merge release very often and even the auto-merges create a lot of
     // noise, so we slow it down a bit
@@ -45,8 +49,8 @@
       "matchPackageNames": [
         "org.mockito:mockito-core",
         "com.tngtech.archunit:archunit",
-        "org.apache.maven.plugins:maven-surefire-plugin",
-        "me.fabriciorby:maven-surefire-junit5-tree-reporter",
+        //"org.apache.maven.plugins:maven-surefire-plugin", https://github.com/apache/maven-surefire/issues/3203
+        //"me.fabriciorby:maven-surefire-junit5-tree-reporter", https://github.com/apache/maven-surefire/issues/3203
         "com.google.truth:truth",
         "org.jacoco:jacoco-maven-plugin", // coverage plugin
         "org.apache.commons:commons-compress", // only used by tests
@@ -204,6 +208,14 @@
       "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 14th day of the month",
       "reviewers": ["habrahamsson-skanetrafiken", "svedbod"]
+    },
+    {
+      "groupName": "Hive MQTT client",
+      "matchPackageNames": [
+        "com.hivemq:hivemq-mqtt-client"
+      ],
+      "schedule": "on the 25th day of the month",
+      "reviewers": ["optionsome", "jessicaKoehnke"]
     }
   ],
   "timezone": "Europe/Berlin"

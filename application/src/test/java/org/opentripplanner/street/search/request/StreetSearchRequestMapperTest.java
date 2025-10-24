@@ -29,7 +29,7 @@ class StreetSearchRequestMapperTest {
     builder.withJourney(jb ->
       jb
         .withWheelchair(true)
-        .setModes(RequestModes.of().withAllStreetModes(StreetMode.BIKE).build())
+        .withModes(RequestModes.of().withAllStreetModes(StreetMode.BIKE).build())
     );
 
     var request = builder.buildRequest();

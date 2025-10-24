@@ -36,7 +36,7 @@ public class FareAttributeBuilder
     return agency;
   }
 
-  public FareAttributeBuilder setAgency(FeedScopedId agency) {
+  public FareAttributeBuilder withAgency(FeedScopedId agency) {
     this.agency = agency;
     return this;
   }
@@ -45,7 +45,7 @@ public class FareAttributeBuilder
     return price;
   }
 
-  public FareAttributeBuilder setPrice(Money price) {
+  public FareAttributeBuilder withPrice(Money price) {
     this.price = price;
     return this;
   }
@@ -54,7 +54,7 @@ public class FareAttributeBuilder
     return paymentMethod;
   }
 
-  public FareAttributeBuilder setPaymentMethod(int paymentMethod) {
+  public FareAttributeBuilder withPaymentMethod(int paymentMethod) {
     this.paymentMethod = paymentMethod;
     return this;
   }
@@ -63,7 +63,7 @@ public class FareAttributeBuilder
     return transfers;
   }
 
-  public FareAttributeBuilder setTransfers(int transfers) {
+  public FareAttributeBuilder withTransfers(int transfers) {
     this.transfers = transfers;
     return this;
   }
@@ -72,7 +72,7 @@ public class FareAttributeBuilder
     return transferDuration;
   }
 
-  public FareAttributeBuilder setTransferDuration(int transferDuration) {
+  public FareAttributeBuilder withTransferDuration(int transferDuration) {
     this.transferDuration = transferDuration;
     return this;
   }
@@ -81,7 +81,7 @@ public class FareAttributeBuilder
     return journeyDuration;
   }
 
-  public FareAttributeBuilder setJourneyDuration(int journeyDuration) {
+  public FareAttributeBuilder withJourneyDuration(int journeyDuration) {
     this.journeyDuration = journeyDuration;
     return this;
   }

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -15,18 +14,14 @@ class StopFinderTraverseVisitorTest {
 
   @Test
   void deduplicateStops() {
-    var visitor = new StopFinderTraverseVisitor(1000);
+    var visitor = new StopFinderTraverseVisitor(id -> STOP, 1000);
 
     assertEquals(List.of(), visitor.stopsFound());
     var state1 = TestStateBuilder.ofWalking().streetEdge().stop(STOP).build();
 
     visitor.visitVertex(state1);
 
-    var transitStopVertex = (TransitStopVertex) state1.getVertex();
-    final NearbyStop nearbyStop = NearbyStop.nearbyStopForState(
-      state1,
-      transitStopVertex.getStop()
-    );
+    final NearbyStop nearbyStop = NearbyStop.nearbyStopForState(state1, STOP);
 
     assertEquals(List.of(nearbyStop), visitor.stopsFound());
 

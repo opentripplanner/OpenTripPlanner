@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -98,13 +99,16 @@ public class StreetLinkerModule implements GraphBuilderModule {
     Set<StopLocation> stopLocationsUsedForCarsAllowedTrips =
       timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
 
-    for (TransitStopVertex tStop : vertices) {
+    for (TransitStopVertex stopVertex : vertices) {
+      var stop = Objects.requireNonNull(
+        timetableRepository.getSiteRepository().getRegularStop(stopVertex.getId())
+      );
       // Stops with pathways do not need to be connected to the street network, since there are explicit entrances defined for that
-      if (tStop.hasPathways()) {
+      if (stopVertex.hasPathways()) {
         continue;
       }
       // check if stop is already linked, to allow multiple idempotent linking cycles
-      if (isAlreadyLinked(tStop, stopLocationsUsedForFlexTrips)) {
+      if (isAlreadyLinked(stopVertex, stop, stopLocationsUsedForFlexTrips)) {
         continue;
       }
 
@@ -112,14 +116,13 @@ public class StreetLinkerModule implements GraphBuilderModule {
       StopLinkType linkType = StopLinkType.WALK_ONLY;
 
       if (
-        (OTPFeature.FlexRouting.isOn() &&
-          stopLocationsUsedForFlexTrips.contains(tStop.getStop())) ||
-        stopLocationsUsedForCarsAllowedTrips.contains(tStop.getStop())
+        (OTPFeature.FlexRouting.isOn() && stopLocationsUsedForFlexTrips.contains(stop)) ||
+        stopLocationsUsedForCarsAllowedTrips.contains(stop)
       ) {
         linkType = StopLinkType.WALK_AND_CAR;
       }
 
-      linkStopToStreetNetwork(tStop, linkType);
+      linkStopToStreetNetwork(stopVertex, linkType);
 
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
@@ -138,9 +141,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
    */
   private static boolean isAlreadyLinked(
     TransitStopVertex stopVertex,
+    RegularStop stop,
     Set<StopLocation> stopLocationsUsedForFlexTrips
   ) {
-    if (stopLocationsUsedForFlexTrips.contains(stopVertex.getStop())) {
+    if (stopLocationsUsedForFlexTrips.contains(stop)) {
       return stopVertex.isLinkedToDrivableEdge() && stopVertex.isLinkedToWalkableEdge();
     } else {
       return stopVertex.isConnectedToGraph();

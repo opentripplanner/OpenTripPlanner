@@ -17,6 +17,7 @@ import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationB
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
@@ -53,7 +54,10 @@ public class PlaceFinderTraverseVisitorTest {
 
   static final Route r = route("r").build();
 
-  static TimetableRepository a = new TimetableRepository();
+  static final TimetableRepository timetableRepo = new TimetableRepository(
+    model.siteRepositoryBuilder().withRegularStops(List.of(STOP1, STOP2, STOP3, STOP4)).build(),
+    new Deduplicator()
+  );
 
   static {
     TripPatternBuilder t = tripPattern("trip", r);
@@ -65,24 +69,24 @@ public class PlaceFinderTraverseVisitorTest {
     st2.setStop(STOP2);
     st2.setArrivalTime(T11_05);
     t.withStopPattern(new StopPattern(List.of(st1, st2)));
-    a.addTripPattern(id("tp1"), t.build());
+    timetableRepo.addTripPattern(id("tp1"), t.build());
 
     var st3 = new StopTime();
     st3.setStop(STOP3);
     st3.setArrivalTime(T11_10);
     t.withStopPattern(new StopPattern(List.of(st3)));
-    a.addTripPattern(id("tp2"), t.build());
+    timetableRepo.addTripPattern(id("tp2"), t.build());
 
     var st4 = new StopTime();
     st4.setStop(STOP4);
     st4.setArrivalTime(T11_10);
     t.withStopPattern(new StopPattern(List.of(st4)));
-    a.addTripPattern(id("tp3"), t.build());
+    timetableRepo.addTripPattern(id("tp3"), t.build());
 
-    a.index();
+    timetableRepo.index();
   }
 
-  static DefaultTransitService transitService = new DefaultTransitService(a);
+  static DefaultTransitService transitService = new DefaultTransitService(timetableRepo);
 
   @Test
   void stopsOnly() {

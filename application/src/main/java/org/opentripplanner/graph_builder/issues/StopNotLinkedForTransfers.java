@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -23,7 +24,7 @@ public record StopNotLinkedForTransfers(TransitStopVertex stop) implements DataI
       stop.getLat(),
       stop.getLon(),
       stop.getDefaultName(),
-      stop.getStop().getId()
+      stop.getId()
     );
   }
 
@@ -34,6 +35,6 @@ public record StopNotLinkedForTransfers(TransitStopVertex stop) implements DataI
 
   @Override
   public Geometry getGeometry() {
-    return stop.getStop().getGeometry();
+    return GeometryUtils.getGeometryFactory().createPoint(stop.getCoordinate());
   }
 }

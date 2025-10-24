@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 
 import java.io.File;
 import java.util.List;
@@ -18,10 +19,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
@@ -36,10 +37,8 @@ import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 class OsmBoardingLocationsModuleTest {
@@ -85,19 +84,22 @@ class OsmBoardingLocationsModuleTest {
     RegularStop busStop = testModel.stop("de:08115:4512:5:C", 48.59434, 8.86452).build();
     RegularStop floatingBusStop = testModel.stop("floating-bus-stop", 48.59417, 8.86464).build();
 
+    var siteRepo = testModel
+      .siteRepositoryBuilder()
+      .withRegularStops(List.of(platform, busStop, floatingBusStop))
+      .build();
+
     var deduplicator = new Deduplicator();
     var graph = new Graph();
-    var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepo, deduplicator);
     var factory = new VertexFactory(graph);
 
     var provider = new DefaultOsmProvider(file, false);
-    var floatingBusVertex = factory.transitStop(
-      TransitStopVertex.of().withStop(floatingBusStop).withModes(Set.of(TransitMode.BUS))
-    );
+    var floatingBusVertex = factory.transitStop(ofStop(floatingBusStop));
     var floatingBoardingLocation = factory.osmBoardingLocation(
       floatingBusVertex.getCoordinate(),
       "floating-bus-stop",
-      Set.of(floatingBusVertex.getStop().getId().getId()),
+      Set.of(floatingBusVertex.getId().getId()),
       new NonLocalizedString("bus stop not connected to street network")
     );
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
@@ -109,12 +111,8 @@ class OsmBoardingLocationsModuleTest {
 
     osmModule.buildGraph();
 
-    var platformVertex = factory.transitStop(
-      TransitStopVertex.of().withStop(platform).withModes(Set.of(TransitMode.RAIL))
-    );
-    var busVertex = factory.transitStop(
-      TransitStopVertex.of().withStop(busStop).withModes(Set.of(TransitMode.BUS))
-    );
+    var platformVertex = factory.transitStop(ofStop(platform));
+    var busVertex = factory.transitStop(ofStop(busStop));
 
     timetableRepository.index();
     graph.index();
@@ -126,7 +124,12 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getOutgoing().size());
 
     var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
-    new OsmBoardingLocationsModule(graph, TestVertexLinker.of(graph), osmService).buildGraph();
+    new OsmBoardingLocationsModule(
+      graph,
+      timetableRepository,
+      VertexLinkerTestFactory.of(graph),
+      osmService
+    ).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module
@@ -251,33 +254,27 @@ class OsmBoardingLocationsModuleTest {
        */
       TransitStopVertex getPlatformVertex() {
         if (platformVertex == null) {
-          platformVertex = factory.transitStop(TransitStopVertex.of().withStop(platform));
+          platformVertex = factory.transitStop(ofStop(platform));
         }
         return platformVertex;
       }
     }
 
+    var platform9 = testModel
+      .stop("9100MRGT9")
+      .withName(I18NString.of("Moorgate (Platform 9)"))
+      .withCoordinate(51.51922107872304, -0.08767468698832413)
+      .withPlatformCode("9")
+      .build();
+    var platform7 = testModel
+      .stop("9400ZZLUMGT3")
+      .withName(I18NString.of("Moorgate (Platform 7)"))
+      .withCoordinate(51.51919235051611, -0.08769925990953176)
+      .withPlatformCode("7")
+      .build();
     var testCases = List.of(
-      new TestCase(
-        testModel
-          .stop("9100MRGT9")
-          .withName(I18NString.of("Moorgate (Platform 9)"))
-          .withCoordinate(51.51922107872304, -0.08767468698832413)
-          .withPlatformCode("9")
-          .build(),
-        VertexLabel.osm(12288669589L),
-        VertexLabel.osm(12288675219L)
-      ),
-      new TestCase(
-        testModel
-          .stop("9400ZZLUMGT3")
-          .withName(I18NString.of("Moorgate (Platform 7)"))
-          .withCoordinate(51.51919235051611, -0.08769925990953176)
-          .withPlatformCode("7")
-          .build(),
-        VertexLabel.osm(12288669575L),
-        VertexLabel.osm(12288675230L)
-      )
+      new TestCase(platform9, VertexLabel.osm(12288669589L), VertexLabel.osm(12288675219L)),
+      new TestCase(platform7, VertexLabel.osm(12288669575L), VertexLabel.osm(12288675230L))
     );
 
     for (var testCase : testCases) {
@@ -299,9 +296,14 @@ class OsmBoardingLocationsModuleTest {
       );
     }
 
+    var siteRepo = testModel
+      .siteRepositoryBuilder()
+      .withRegularStops(List.of(platform9, platform7))
+      .build();
     new OsmBoardingLocationsModule(
       graph,
-      TestVertexLinker.of(graph),
+      new TimetableRepository(siteRepo, new Deduplicator()),
+      VertexLinkerTestFactory.of(graph),
       new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();
 

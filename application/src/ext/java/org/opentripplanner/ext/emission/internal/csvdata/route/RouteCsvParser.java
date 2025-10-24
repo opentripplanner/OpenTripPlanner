@@ -30,7 +30,7 @@ class RouteCsvParser extends AbstractCsvParser<RouteRow> {
   }
 
   @Override
-  protected List<String> headers() {
+  public List<String> headers() {
     return HEADERS;
   }
 

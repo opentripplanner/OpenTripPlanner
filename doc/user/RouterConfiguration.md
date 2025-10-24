@@ -73,7 +73,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [triasApi](sandbox/TriasApi.md)                                                           |        `object`       | Configuration for the TRIAS API.                                                                                                                                                                                     | *Optional* |               |  2.8  |
 | [updaters](Realtime-Updaters.md)                                                          |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                                                                                                                                           | *Optional* |               |  1.5  |
 | [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | Vector tile configuration                                                                                                                                                                                            | *Optional* |               |   na  |
-| [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory.                                                                                                                                                              | *Optional* |               |  2.0  |
+| [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory using GBFS v3 manifest.                                                                                                                                       | *Optional* |               |  2.0  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -675,10 +675,7 @@ Used to group requests when monitoring OTP.
     ]
   },
   "vehicleRentalServiceDirectory" : {
-    "url" : "https://entur.no/bikeRentalServiceDirectory",
-    "sourcesName" : "systems",
-    "updaterUrlName" : "url",
-    "updaterNetworkName" : "id",
+    "url" : "https://entur.no/bikeRentalServiceDirectory/manifest.json",
     "headers" : {
       "ET-Client-Name" : "MY_ORG_CLIENT_NAME"
     }

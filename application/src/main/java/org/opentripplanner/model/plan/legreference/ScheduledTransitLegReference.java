@@ -2,6 +2,8 @@ package org.opentripplanner.model.plan.legreference;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.OptionalInt;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.plan.leg.LegConstructionSupport;
@@ -15,6 +17,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.lang.ObjectUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,45 +27,59 @@ import org.slf4j.LoggerFactory;
  * {@link org.opentripplanner.routing.api.RoutingService}
  */
 public record ScheduledTransitLegReference(
-  FeedScopedId tripId,
+  @Nullable FeedScopedId tripId,
   LocalDate serviceDate,
   int fromStopPositionInPattern,
   int toStopPositionInPattern,
   FeedScopedId fromStopId,
 
   FeedScopedId toStopId,
-  FeedScopedId tripOnServiceDateId
+  @Nullable FeedScopedId tripOnServiceDateId
 )
   implements LegReference {
   private static final Logger LOG = LoggerFactory.getLogger(ScheduledTransitLegReference.class);
 
   public ScheduledTransitLegReference {
-    if (tripId != null && tripOnServiceDateId != null) {
+    if (!ObjectUtils.oneOf(tripId, tripOnServiceDateId)) {
       throw new IllegalArgumentException(
-        "ScheduledTransitLegReference cannot refer to both a Trip id " +
-        tripId +
-        " and a TripOnServiceDate id " +
-        tripOnServiceDateId
+        "ScheduledTransitLegReference must contain either a Trip id or a TripOnServiceDate id but not both."
+      );
+    }
+
+    if (fromStopPositionInPattern >= toStopPositionInPattern) {
+      throw new IllegalArgumentException(
+        "toStopPositionInPattern must be larger than fromStopPositionInPattern."
       );
     }
   }
 
   /**
    * Reconstruct a scheduled transit leg from this scheduled transit leg reference.
-   * Since the transit model could have been modified between the time the reference is created
-   * and the time the transit leg is reconstructed (either because new planned data have been
-   * rolled out, or because a realtime update has modified a trip),
-   * it may not be possible to reconstruct the leg.
-   * In this case the method returns null.
-   * The method checks that the referenced stop positions still refer to the same stop ids.
-   * As an exception, the reference is still considered valid if the referenced stop is different
-   * but belongs to the same parent station: this covers for example the case of a last-minute
-   * platform change in a train station that typically does not affect the validity of the leg.
-   * <p/>
+   * <p>
+   * The method attempts to find a leg which starts and ends in the same station of the given stops.
+   * The transit model could have been modified between the time the reference is created and the
+   * time the transit leg is reconstructed (either because new planned data have been
+   * rolled out, or because a realtime update has modified a trip).
+   * <p>
+   * If there are multiple possibilities, the stop which has the closest stop position in pattern
+   * to the given reference is used. However, if the stop is on a different platform and a call
+   * at the exact stop is immediately before / after it, the exact stop is used.
+   * <p>
+   * As examples, if E1 and E2 are in the same station and the reference for an A(0)-E2(2) leg was
+   * constructed on a trip which now becomes A-B-C-D-E1-F-G-H-E2, it will become an
+   * A(0)-E1(4) leg, however, if it now becomes A-B-C-D-E1-E2, it will become an A(0)-E2(5) leg.
+   * <p>
+   * If it is not possible to reconstruct the leg, which may be because the trip no longer runs
+   * between the stations given, or the trip runs between them in the reverse order, the method
+   * returns null.
+   * <p>
    * If the referenced trip is based on a TripOnServiceDate (i.e. a TransModel dated service
    * journey), the TripOnServiceDate id is stored in the leg reference instead of the Trip id:
    * A TripOnServiceDate id is meant to be more stable than a Trip id across deliveries of planned
    * data, using it gives a better guarantee to reconstruct correctly the original leg.
+   *
+   * @return The reconstructed leg usable in the current transit model, {@code null} if it is not
+   * possible to reconstruct the leg.
    */
   @Override
   @Nullable
@@ -103,29 +120,58 @@ public record ScheduledTransitLegReference(
       return null;
     }
 
-    int numStops = tripPattern.numberOfStops();
-    if (fromStopPositionInPattern >= numStops || toStopPositionInPattern >= numStops) {
-      logInvalidLegRef(
-        "Invalid transit leg reference: boarding stop {} or alighting stop {} is out of range" +
-        " in trip '{}' and service date {} ({} stops in trip pattern) ",
+    OptionalInt optionalUpdatedFromStopPositionInPattern = findStopPositionInPattern(
+      tripPattern,
+      fromStopPositionInPattern,
+      fromStopId,
+      transitService
+    );
+    OptionalInt optionalUpdatedToStopPositionInPattern = findStopPositionInPattern(
+      tripPattern,
+      toStopPositionInPattern,
+      toStopId,
+      transitService
+    );
+
+    if (optionalUpdatedFromStopPositionInPattern.isEmpty()) {
+      LOG.info(
+        "Invalid transit leg reference:" +
+        " The referenced from stop at position {} with id '{}' cannot be found" +
+        " in trip '{}' and service date {}",
         fromStopPositionInPattern,
-        toStopPositionInPattern,
-        trip.getId(),
-        serviceDate,
-        numStops
+        fromStopId,
+        tripId,
+        serviceDate
       );
       return null;
     }
 
-    if (
-      !matchReferencedStopInPattern(
-        tripPattern,
-        fromStopPositionInPattern,
+    if (optionalUpdatedToStopPositionInPattern.isEmpty()) {
+      LOG.info(
+        "Invalid transit leg reference:" +
+        " The referenced to stop at position {} with id '{}' cannot be found" +
+        " in trip '{}' and service date {}",
+        toStopPositionInPattern,
+        toStopId,
+        tripId,
+        serviceDate
+      );
+      return null;
+    }
+
+    var updatedFromStopPositionInPattern = optionalUpdatedFromStopPositionInPattern.getAsInt();
+    var updatedToStopPositionInPattern = optionalUpdatedToStopPositionInPattern.getAsInt();
+
+    if (updatedFromStopPositionInPattern >= updatedToStopPositionInPattern) {
+      LOG.info(
+        "Invalid transit leg reference:" +
+        " The calling order for stops with id '{}' and '{}' is reversed" +
+        " in trip '{}' and service date {}",
         fromStopId,
-        transitService
-      ) ||
-      !matchReferencedStopInPattern(tripPattern, toStopPositionInPattern, toStopId, transitService)
-    ) {
+        toStopId,
+        tripId,
+        serviceDate
+      );
       return null;
     }
 
@@ -153,14 +199,14 @@ public record ScheduledTransitLegReference(
     // TODO: What should we have here
     ZoneId timeZone = transitService.getTimeZone();
 
-    int boardingTime = tripTimes.getDepartureTime(fromStopPositionInPattern);
-    int alightingTime = tripTimes.getArrivalTime(toStopPositionInPattern);
+    int boardingTime = tripTimes.getDepartureTime(updatedFromStopPositionInPattern);
+    int alightingTime = tripTimes.getArrivalTime(updatedToStopPositionInPattern);
 
     ScheduledTransitLeg leg = new ScheduledTransitLegBuilder<>()
       .withTripTimes(tripTimes)
       .withTripPattern(tripPattern)
-      .withBoardStopIndexInPattern(fromStopPositionInPattern)
-      .withAlightStopIndexInPattern(toStopPositionInPattern)
+      .withBoardStopIndexInPattern(updatedFromStopPositionInPattern)
+      .withAlightStopIndexInPattern(updatedToStopPositionInPattern)
       .withStartTime(ServiceDateUtils.toZonedDateTime(serviceDate, timeZone, boardingTime))
       .withEndTime(ServiceDateUtils.toZonedDateTime(serviceDate, timeZone, alightingTime))
       .withServiceDate(serviceDate)
@@ -169,8 +215,8 @@ public record ScheduledTransitLegReference(
       .withDistanceMeters(
         LegConstructionSupport.computeDistanceMeters(
           tripPattern,
-          fromStopPositionInPattern,
-          toStopPositionInPattern
+          updatedFromStopPositionInPattern,
+          updatedToStopPositionInPattern
         )
       )
       // TODO: What should we have here
@@ -184,59 +230,98 @@ public record ScheduledTransitLegReference(
   }
 
   /**
-   * Return false if the stop id in the reference does not match the actual stop id in the trip
+   * Get the stop position of the given stop id, or another stop in the same station, in the given
    * pattern.
-   * Return true in the specific case where the stop ids differ, but belong to the same parent
-   * station.
    *
+   * @return The match closest to the given stop position in the given pattern, except that if
+   * an exact match is next to the same station match of a different platform, the exact match
+   * is returned.
    */
-  private boolean matchReferencedStopInPattern(
+  private OptionalInt findStopPositionInPattern(
     TripPattern tripPattern,
     int stopPosition,
     FeedScopedId stopId,
     TransitService transitService
   ) {
-    if (stopId == null) {
-      // this is a legacy reference, skip validation
-      // TODO: remove backward-compatible logic after OTP release 2.5
-      return true;
+    var stop = transitService.getStopLocation(stopId);
+    OptionalInt exactMatch = findStopPositionInPattern(tripPattern, stopPosition, s ->
+      s.getId().equals(stopId)
+    );
+    OptionalInt sameStationMatch = findStopPositionInPattern(tripPattern, stopPosition, s ->
+      s.isPartOfSameStationAs(stop)
+    );
+
+    if (exactMatch.isPresent() && sameStationMatch.isPresent()) {
+      var exactPosition = exactMatch.getAsInt();
+      var sameStationPosition = sameStationMatch.getAsInt();
+      if (Math.abs(exactPosition - sameStationPosition) <= 1) {
+        return exactMatch;
+      }
+      if (
+        Math.abs(sameStationPosition - stopPosition) < Math.abs(sameStationPosition - exactPosition)
+      ) {
+        logMatchForChangedStop(tripPattern, stopPosition, stopId, sameStationPosition);
+        return sameStationMatch;
+      }
+      return exactMatch;
     }
 
-    StopLocation stopLocationInPattern = tripPattern.getStops().get(stopPosition);
-    if (stopId.equals(stopLocationInPattern.getId())) {
-      return true;
+    if (exactMatch.isPresent()) {
+      return exactMatch;
     }
-    StopLocation stopLocationInLegReference = transitService.getStopLocation(stopId);
-    if (
-      stopLocationInLegReference == null ||
-      stopLocationInPattern.getParentStation() == null ||
-      !stopLocationInPattern
-        .getParentStation()
-        .equals(stopLocationInLegReference.getParentStation())
-    ) {
-      LOG.info(
-        "Invalid transit leg reference:" +
-        " The referenced stop at position {} with id '{}' does not match" +
-        " the stop id '{}' in trip '{}' and service date {}",
-        stopPosition,
-        stopId,
-        stopLocationInPattern.getId(),
-        tripId,
-        serviceDate
-      );
-      return false;
+
+    if (sameStationMatch.isPresent()) {
+      logMatchForChangedStop(tripPattern, stopPosition, stopId, sameStationMatch.getAsInt());
+      return sameStationMatch;
     }
+
+    return OptionalInt.empty();
+  }
+
+  private void logMatchForChangedStop(
+    TripPattern tripPattern,
+    int originalStopPosition,
+    FeedScopedId originalStopId,
+    int updatedStopPosition
+  ) {
     LOG.info(
       "Transit leg reference with modified stop id within the same station: " +
       "The referenced stop at position {} with id '{}' does not match" +
       " the stop id '{}' in trip {} and service date {}",
-      stopPosition,
-      stopId,
-      stopLocationInPattern.getId(),
+      originalStopPosition,
+      originalStopId,
+      tripPattern.getStop(updatedStopPosition).getId(),
       tripId,
       serviceDate
     );
-    return true;
+  }
+
+  /**
+   * Find the stop position in pattern for a stop closest to the given stop position matching the
+   * provided matcher
+   */
+  private OptionalInt findStopPositionInPattern(
+    TripPattern tripPattern,
+    int stopPosition,
+    Function<StopLocation, Boolean> matcher
+  ) {
+    var beforeInRange = true;
+    var afterInRange = true;
+    for (var diff = 0; beforeInRange || afterInRange; ++diff) {
+      var stopPositionAfter = stopPosition + diff;
+      afterInRange = stopPositionAfter < tripPattern.numberOfStops();
+      if (afterInRange && matcher.apply(tripPattern.getStops().get(stopPositionAfter))) {
+        return OptionalInt.of(stopPositionAfter);
+      }
+      var stopPositionBefore = stopPosition - diff;
+      beforeInRange = stopPositionBefore >= 0;
+      if (
+        diff != 0 && beforeInRange && matcher.apply(tripPattern.getStops().get(stopPositionBefore))
+      ) {
+        return OptionalInt.of(stopPositionBefore);
+      }
+    }
+    return OptionalInt.empty();
   }
 
   private void logInvalidLegRef(String message, Object... args) {

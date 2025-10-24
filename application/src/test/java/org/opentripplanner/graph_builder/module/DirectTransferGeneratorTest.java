@@ -24,6 +24,7 @@ import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.graphfinder.StopResolver;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -33,6 +34,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -98,18 +100,20 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       transferRequests
     ).buildGraph();
 
+    StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
+
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
-      tr(S0, 556, S11),
-      tr(S0, 935, S21),
-      tr(S11, 751, S21),
-      tr(S12, 751, S22),
-      tr(S13, 2224, S12),
-      tr(S13, 2347, S22),
-      tr(S21, 751, S11),
-      tr(S22, 751, S12),
-      tr(S23, 2347, S12),
-      tr(S23, 2224, S22)
+      tr(resolver, S0, 556, S11),
+      tr(resolver, S0, 935, S21),
+      tr(resolver, S11, 751, S21),
+      tr(resolver, S12, 751, S22),
+      tr(resolver, S13, 2224, S12),
+      tr(resolver, S13, 2347, S22),
+      tr(resolver, S21, 751, S11),
+      tr(resolver, S22, 751, S12),
+      tr(resolver, S23, 2347, S12),
+      tr(resolver, S23, 2224, S22)
     );
   }
 
@@ -129,19 +133,20 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       transferRequests
     ).buildGraph();
 
+    StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
-      tr(S0, 2780, S12),
-      tr(S0, 935, S21),
-      tr(S11, 2224, S12),
-      tr(S11, 751, S21),
-      tr(S12, 751, S22),
-      tr(S13, 2224, S12),
-      tr(S13, 2347, S22),
-      tr(S21, 2347, S12),
-      tr(S22, 751, S12),
-      tr(S23, 2347, S12),
-      tr(S23, 2224, S22)
+      tr(resolver, S0, 2780, S12),
+      tr(resolver, S0, 935, S21),
+      tr(resolver, S11, 2224, S12),
+      tr(resolver, S11, 751, S21),
+      tr(resolver, S12, 751, S22),
+      tr(resolver, S13, 2224, S12),
+      tr(resolver, S13, 2347, S22),
+      tr(resolver, S21, 2347, S12),
+      tr(resolver, S22, 751, S12),
+      tr(resolver, S23, 2347, S12),
+      tr(resolver, S23, 2224, S22)
     );
   }
 
@@ -182,11 +187,12 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       transferRequests
     ).buildGraph();
 
+    StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 100, List.of(V0, V21), S21),
-      tr(S11, 100, List.of(V11, V21), S21)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 100, List.of(V0, V21), S21),
+      tr(resolver, S11, 100, List.of(V11, V21), S21)
     );
   }
 
@@ -231,17 +237,18 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
     var carTransfers = timetableRepository.findTransfers(StreetMode.CAR);
 
+    StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
     assertTransfers(
       walkTransfers,
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 100, List.of(V0, V21), S21),
-      tr(S11, 100, List.of(V11, V21), S21)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 100, List.of(V0, V21), S21),
+      tr(resolver, S11, 100, List.of(V11, V21), S21)
     );
     assertTransfers(
       bikeTransfers,
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 100, List.of(V0, V21), S21),
-      tr(S11, 110, List.of(V11, V22), S22)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 100, List.of(V0, V21), S21),
+      tr(resolver, S11, 110, List.of(V11, V22), S22)
     );
     assertTransfers(carTransfers);
   }
@@ -290,10 +297,11 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       transferParametersForMode
     ).buildGraph();
 
+    StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 200, List.of(V0, V12), S12)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 200, List.of(V0, V12), S12)
     );
   }
 
@@ -321,7 +329,11 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       transferParametersForMode
     ).buildGraph();
 
-    assertTransfers(timetableRepository.getAllPathTransfers(), tr(S0, 100, List.of(V0, V11), S11));
+    StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
+    assertTransfers(
+      timetableRepository.getAllPathTransfers(),
+      tr(resolver, S0, 100, List.of(V0, V11), S11)
+    );
   }
 
   @Test
@@ -356,27 +368,28 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
     var carTransfers = timetableRepository.findTransfers(StreetMode.CAR);
 
+    StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
     assertTransfers(
       walkTransfers,
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 100, List.of(V0, V21), S21),
-      tr(S11, 100, List.of(V11, V21), S21),
-      tr(S0, 200, List.of(V0, V12), S12),
-      tr(S11, 100, List.of(V11, V12), S12)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 100, List.of(V0, V21), S21),
+      tr(resolver, S11, 100, List.of(V11, V21), S21),
+      tr(resolver, S0, 200, List.of(V0, V12), S12),
+      tr(resolver, S11, 100, List.of(V11, V12), S12)
     );
     assertTransfers(
       bikeTransfers,
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 100, List.of(V0, V21), S21),
-      tr(S11, 110, List.of(V11, V22), S22),
-      tr(S0, 200, List.of(V0, V12), S12),
-      tr(S11, 100, List.of(V11, V12), S12)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 100, List.of(V0, V21), S21),
+      tr(resolver, S11, 110, List.of(V11, V22), S22),
+      tr(resolver, S0, 200, List.of(V0, V12), S12),
+      tr(resolver, S11, 100, List.of(V11, V12), S12)
     );
     assertTransfers(
       carTransfers,
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 200, List.of(V0, V12), S12),
-      tr(S0, 100, List.of(V0, V21), S21)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 200, List.of(V0, V12), S12),
+      tr(resolver, S0, 100, List.of(V0, V21), S21)
     );
   }
 
@@ -403,13 +416,14 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       transferParametersForMode
     ).buildGraph();
 
+    StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 100, List.of(V0, V21), S21),
-      tr(S0, 200, List.of(V0, V12), S12),
-      tr(S11, 110, List.of(V11, V22), S22),
-      tr(S11, 100, List.of(V11, V12), S12)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 100, List.of(V0, V21), S21),
+      tr(resolver, S0, 200, List.of(V0, V12), S12),
+      tr(resolver, S11, 110, List.of(V11, V22), S22),
+      tr(resolver, S11, 100, List.of(V11, V12), S12)
     );
   }
 
@@ -430,11 +444,12 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       transferRequests
     ).buildGraph();
 
+    StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 100, List.of(V0, V21), S21),
-      tr(S11, 110, List.of(V11, V22), S22)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 100, List.of(V0, V21), S21),
+      tr(resolver, S11, 110, List.of(V11, V22), S22)
     );
   }
 
@@ -472,13 +487,14 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
     var carTransfers = timetableRepository.findTransfers(StreetMode.CAR);
 
+    StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
     assertTransfers(
       walkTransfers,
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 100, List.of(V0, V21), S21),
-      tr(S11, 100, List.of(V11, V21), S21),
-      tr(S0, 200, List.of(V0, V12), S12),
-      tr(S11, 100, List.of(V11, V12), S12)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 100, List.of(V0, V21), S21),
+      tr(resolver, S11, 100, List.of(V11, V21), S21),
+      tr(resolver, S0, 200, List.of(V0, V12), S12),
+      tr(resolver, S11, 100, List.of(V11, V12), S12)
     );
     assertTransfers(bikeTransfers);
     assertTransfers(carTransfers);
@@ -514,17 +530,18 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
     var carTransfers = timetableRepository.findTransfers(StreetMode.CAR);
 
+    StopResolver resolver = timetableRepository.getSiteRepository()::getRegularStop;
     assertTransfers(
       walkTransfers,
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 100, List.of(V0, V21), S21),
-      tr(S11, 100, List.of(V11, V21), S21),
-      tr(S11, 100, List.of(V11, V12), S12)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 100, List.of(V0, V21), S21),
+      tr(resolver, S11, 100, List.of(V11, V21), S21),
+      tr(resolver, S11, 100, List.of(V11, V12), S12)
     );
     assertTransfers(
       bikeTransfers,
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 100, List.of(V0, V21), S21)
+      tr(resolver, S0, 100, List.of(V0, V11), S11),
+      tr(resolver, S0, 100, List.of(V0, V21), S21)
     );
     assertTransfers(carTransfers);
   }
@@ -697,17 +714,27 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     };
   }
 
-  private TransferDescriptor tr(TransitStopVertex from, double distance, TransitStopVertex to) {
-    return new TransferDescriptor(from, distance, to);
+  private TransferDescriptor tr(
+    StopResolver resolver,
+    TransitStopVertex from,
+    double distance,
+    TransitStopVertex to
+  ) {
+    return new TransferDescriptor(
+      resolver.getStop(from.getId()),
+      distance,
+      resolver.getStop(to.getId())
+    );
   }
 
   private TransferDescriptor tr(
+    StopResolver resolver,
     TransitStopVertex from,
     double distance,
     List<StreetVertex> vertices,
     TransitStopVertex to
   ) {
-    return new TransferDescriptor(from, distance, vertices, to);
+    return new TransferDescriptor(resolver, from, distance, vertices, to);
   }
 
   private static class TransferDescriptor {
@@ -717,23 +744,24 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     private final Double distanceMeters;
     private final List<StreetVertex> vertices;
 
-    public TransferDescriptor(TransitStopVertex from, Double distanceMeters, TransitStopVertex to) {
-      this.from = from.getStop();
+    public TransferDescriptor(RegularStop from, Double distanceMeters, RegularStop to) {
+      this.from = from;
       this.distanceMeters = distanceMeters;
       this.vertices = null;
-      this.to = to.getStop();
+      this.to = to;
     }
 
     public TransferDescriptor(
+      StopResolver resolver,
       TransitStopVertex from,
       Double distanceMeters,
       List<StreetVertex> vertices,
       TransitStopVertex to
     ) {
-      this.from = from.getStop();
+      this.from = resolver.getStop(from.getId());
       this.distanceMeters = distanceMeters;
       this.vertices = vertices;
-      this.to = to.getStop();
+      this.to = resolver.getStop(to.getId());
     }
 
     @Override

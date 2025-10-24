@@ -1,12 +1,8 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.PathwayNode;
-import org.opentripplanner.transit.model.site.StationElement;
 
 public class TransitPathwayNodeVertex extends StationElementVertex {
-
-  private final boolean wheelchairEntrance;
 
   private final PathwayNode node;
 
@@ -21,19 +17,9 @@ public class TransitPathwayNodeVertex extends StationElementVertex {
       node.getName()
     );
     this.node = node;
-    this.wheelchairEntrance = node.getWheelchairAccessibility() != Accessibility.NOT_POSSIBLE;
-  }
-
-  public boolean isWheelchairEntrance() {
-    return wheelchairEntrance;
   }
 
   public PathwayNode getNode() {
-    return this.node;
-  }
-
-  @Override
-  public StationElement getStationElement() {
     return this.node;
   }
 }

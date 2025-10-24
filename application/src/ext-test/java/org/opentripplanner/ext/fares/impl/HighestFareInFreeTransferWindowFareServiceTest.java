@@ -63,7 +63,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     FareAttribute oneDollarFareAttribute = FareAttribute.of(
       new FeedScopedId(FEED_ID, "oneDollarAttribute")
     )
-      .setPrice(oneDollar)
+      .withPrice(oneDollar)
       .build();
     FareRuleSet oneDollarRouteBasedFares = new FareRuleSet(oneDollarFareAttribute);
     oneDollarRouteBasedFares.addRoute(routeA.getId());
@@ -75,7 +75,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     FareAttribute twoDollarFareAttribute = FareAttribute.of(
       new FeedScopedId(FEED_ID, "twoDollarAttribute")
     )
-      .setPrice(twoDollars)
+      .withPrice(twoDollars)
       .build();
 
     FareRuleSet twoDollarRouteBasedFares = new FareRuleSet(twoDollarFareAttribute);

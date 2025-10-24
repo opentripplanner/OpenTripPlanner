@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.datastore.api.DataSourceTestFactory;
 import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.framework.csv.HeadersDoNotMatch;
 import org.opentripplanner.framework.csv.OtpCsvReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -19,7 +19,7 @@ class OtpCsvReaderTest {
 
   @Test
   void read() throws HeadersDoNotMatch {
-    var ds = DataStoreModule.dataSource(
+    var ds = DataSourceTestFactory.dataSource(
       "OtpCsvReaderTest",
       FileType.GTFS,
       """
@@ -64,7 +64,7 @@ class OtpCsvReaderTest {
     }
 
     @Override
-    protected List<String> headers() {
+    public List<String> headers() {
       return List.of("a", "b", "c");
     }
 
