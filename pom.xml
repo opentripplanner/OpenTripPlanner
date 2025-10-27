@@ -71,7 +71,7 @@
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.19</logback.version>
         <lucene.version>10.3.0</lucene.version>
-        <micrometer.version>1.15.4</micrometer.version>
+        <micrometer.version>1.15.5</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.32.1</protobuf.version>
