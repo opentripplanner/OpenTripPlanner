@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.api.request;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
@@ -22,16 +23,20 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   @Nullable
   private final Double relaxCostAtDestination;
 
+  private final DirectTransitRequest directTransitRequest;
+
   private MultiCriteriaRequest() {
     this.relaxC1 = RelaxFunction.NORMAL;
     this.transitPriorityCalculator = null;
     this.relaxCostAtDestination = null;
+    this.directTransitRequest = DirectTransitRequest.of().build();
   }
 
   public MultiCriteriaRequest(Builder<T> builder) {
     this.relaxC1 = Objects.requireNonNull(builder.relaxC1());
     this.transitPriorityCalculator = builder.transitPriorityCalculator();
     this.relaxCostAtDestination = builder.relaxCostAtDestination();
+    this.directTransitRequest = builder.directTransitRequest();
   }
 
   public static <S extends RaptorTripSchedule> Builder<S> of() {
@@ -85,6 +90,11 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return relaxCostAtDestination;
   }
 
+  ///  The Request for configuring direct transit search.
+  public DirectTransitRequest directTransitRequest() {
+    return directTransitRequest;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -117,12 +127,14 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     private RelaxFunction relaxC1;
     private RaptorTransitGroupPriorityCalculator transitPriorityCalculator;
     private Double relaxCostAtDestination;
+    private DirectTransitRequest directTransitRequest;
 
     public Builder(MultiCriteriaRequest<T> original) {
       this.original = original;
       this.relaxC1 = original.relaxC1;
       this.transitPriorityCalculator = original.transitPriorityCalculator;
       this.relaxCostAtDestination = original.relaxCostAtDestination;
+      this.directTransitRequest = original.directTransitRequest;
     }
 
     @Nullable
@@ -154,6 +166,22 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     @Deprecated
     public Builder<T> withRelaxCostAtDestination(Double value) {
       relaxCostAtDestination = value;
+      return this;
+    }
+
+    public DirectTransitRequest directTransitRequest() {
+      return directTransitRequest;
+    }
+
+    public Builder<T> withDirectTransitRequest(DirectTransitRequest directTransitRequest) {
+      this.directTransitRequest = directTransitRequest;
+      return this;
+    }
+
+    public Builder<T> withDirectTransitRequest(Consumer<DirectTransitRequest.Builder> body) {
+      var builder = this.directTransitRequest.copyOf();
+      body.accept(builder);
+      this.directTransitRequest = builder.build();
       return this;
     }
 

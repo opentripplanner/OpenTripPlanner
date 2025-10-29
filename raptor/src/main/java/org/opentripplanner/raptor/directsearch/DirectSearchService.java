@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.path.PathBuilder;
+import org.opentripplanner.raptor.rangeraptor.transit.AccessEgressWithExtraCost;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.raptor.spi.IntIterator;
@@ -27,6 +29,7 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
   private final int latestDepartureTime;
   private final Collection<RaptorAccessEgress> accesses;
   private final Collection<RaptorAccessEgress> egresses;
+  private final RelaxFunction relaxFunction;
 
   /* Variables used during the search (mutable) */
 
@@ -40,13 +43,26 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
     this.data = data;
     this.transitCalculator = transitCalculator;
     this.earliestDepartureTime = request.searchParams().earliestDepartureTime();
-    this.latestDepartureTime = earliestDepartureTime + request.searchParams().searchWindowInSeconds();
-    this.accesses = filterAccessEgress(request.searchParams().accessPaths());
-    this.egresses = filterAccessEgress(request.searchParams().egressPaths());
+    this.latestDepartureTime =
+      earliestDepartureTime + request.searchParams().searchWindowInSeconds();
+    var directTransitRequest = request.multiCriteria().directTransitRequest();
+    var disableAccessEgress = directTransitRequest.disableAccessEgress();
+    var extraAccessEgressCostFactor = directTransitRequest.extraAccessEgressCostFactor();
+    this.accesses = filterAndMapAccessEgress(
+      request.searchParams().accessPaths(),
+      disableAccessEgress,
+      extraAccessEgressCostFactor
+    );
+    this.egresses = filterAndMapAccessEgress(
+      request.searchParams().egressPaths(),
+      disableAccessEgress,
+      extraAccessEgressCostFactor
+    );
+    this.relaxFunction = directTransitRequest.costRelaxFunction();
   }
 
   public Collection<RaptorPath<T>> route() {
-    var results = new ParetoSet<RaptorPath<T>>(new DestinationArrivalComparator<>());
+    var results = new ParetoSet<RaptorPath<T>>(new DestinationArrivalComparator<>(relaxFunction));
 
     var routes = data.routeIndexIterator(findAllAccessStopIndexes());
 
@@ -58,10 +74,19 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
     return results;
   }
 
-  private static Collection<RaptorAccessEgress> filterAccessEgress(
-    Collection<RaptorAccessEgress> list
+  private static Collection<RaptorAccessEgress> filterAndMapAccessEgress(
+    Collection<RaptorAccessEgress> list,
+    boolean disableAccessEgress,
+    double extraCostFactor
   ) {
-    return list.stream().filter(a -> !a.hasRides() && !a.hasOpeningHours()).toList();
+    return list
+      .stream()
+      .filter(a -> !a.hasRides() && !a.hasOpeningHours())
+      .filter(accessEgress -> !disableAccessEgress || accessEgress.isFree())
+      .map(accessEgress ->
+        (RaptorAccessEgress) new AccessEgressWithExtraCost(accessEgress, extraCostFactor)
+      )
+      .toList();
   }
 
   private IntIterator findAllAccessStopIndexes() {
@@ -129,16 +154,17 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
     }
     var path = mapToPath(boardEvent.trip(), access, egress, boardPos, alightPos);
 
-      if (path.startTime() < earliestDepartureTime) {
-        throw new IllegalStateException(
-          "This should not happen. There is a mismatch between the calculated board time/" +
-          "trip search and the assembly of the path.");
-      }
+    if (path.startTime() < earliestDepartureTime) {
+      throw new IllegalStateException(
+        "This should not happen. There is a mismatch between the calculated board time/" +
+        "trip search and the assembly of the path."
+      );
+    }
 
-      if (path.endTime() < latestDepartureTime) {
-        return Optional.of(path);
-      }
-      return Optional.empty();
+    if (path.endTime() < latestDepartureTime) {
+      return Optional.of(path);
+    }
+    return Optional.empty();
   }
 
   private List<RaptorPath<T>> findAllPathsInSearchWindow(
@@ -208,14 +234,18 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
   private static class DestinationArrivalComparator<T extends RaptorTripSchedule>
     implements ParetoComparator<RaptorPath<T>> {
 
-    private static final int COST_SLACK_FACTOR = 2;
+    private final RelaxFunction relaxFunction;
+
+    public DestinationArrivalComparator(RelaxFunction relaxFunction) {
+      this.relaxFunction = relaxFunction;
+    }
 
     @Override
     public boolean leftDominanceExist(RaptorPath<T> left, RaptorPath<T> right) {
       return (
         left.startTime() > right.startTime() ||
         left.endTime() < right.endTime() ||
-        left.c1() < right.c1() * COST_SLACK_FACTOR
+        left.c1() < relaxFunction.relax(right.c1())
       );
     }
   }
