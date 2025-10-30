@@ -3,21 +3,21 @@ package org.opentripplanner.raptor.api.request;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 
-public class DirectTransitRequest {
+public class RelaxedLimitedTransferRequest {
 
   private final boolean enabled;
   private final RelaxFunction costRelaxFunction;
   private final double extraAccessEgressCostFactor;
   private final boolean disableAccessEgress;
 
-  private DirectTransitRequest() {
+  private RelaxedLimitedTransferRequest() {
     this.enabled = false;
     this.costRelaxFunction = GeneralizedCostRelaxFunction.of(2, 20 * 60 * 100);
     this.extraAccessEgressCostFactor = 1.0;
     this.disableAccessEgress = false;
   }
 
-  DirectTransitRequest(Builder builder) {
+  RelaxedLimitedTransferRequest(Builder builder) {
     this.enabled = builder.enabled;
     this.costRelaxFunction = builder.costRelaxFunction;
     this.extraAccessEgressCostFactor = builder.extraAccessEgressCostFactor;
@@ -25,7 +25,7 @@ public class DirectTransitRequest {
   }
 
   public static Builder of() {
-    return new Builder(new DirectTransitRequest());
+    return new Builder(new RelaxedLimitedTransferRequest());
   }
 
   /// Whether to enable Direct transit search
@@ -63,7 +63,7 @@ public class DirectTransitRequest {
     private double extraAccessEgressCostFactor;
     private boolean disableAccessEgress;
 
-    public Builder(DirectTransitRequest original) {
+    public Builder(RelaxedLimitedTransferRequest original) {
       this.enabled = original.enabled;
       this.costRelaxFunction = original.costRelaxFunction;
       this.extraAccessEgressCostFactor = original.extraAccessEgressCostFactor;
@@ -90,8 +90,8 @@ public class DirectTransitRequest {
       return this;
     }
 
-    public DirectTransitRequest build() {
-      return new DirectTransitRequest(this);
+    public RelaxedLimitedTransferRequest build() {
+      return new RelaxedLimitedTransferRequest(this);
     }
   }
 }

@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.directsearch;
+package org.opentripplanner.raptor.relaxedlimitedtransit;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -21,7 +21,7 @@ import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
-public class DirectSearchService<T extends RaptorTripSchedule> {
+public class RelaxedLimitedTransferSearch<T extends RaptorTripSchedule> {
 
   private final RaptorTransitDataProvider<T> data;
   private final RaptorTransitCalculator<T> transitCalculator;
@@ -35,7 +35,7 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
 
   private int currentRouteBoardSlack = 0;
 
-  public DirectSearchService(
+  public RelaxedLimitedTransferSearch(
     RaptorTransitDataProvider<T> data,
     RaptorRequest<T> request,
     RaptorTransitCalculator<T> transitCalculator
@@ -45,9 +45,9 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
     this.earliestDepartureTime = request.searchParams().earliestDepartureTime();
     this.latestDepartureTime =
       earliestDepartureTime + request.searchParams().searchWindowInSeconds();
-    var directTransitRequest = request.multiCriteria().directTransitRequest();
-    var disableAccessEgress = directTransitRequest.disableAccessEgress();
-    var extraAccessEgressCostFactor = directTransitRequest.extraAccessEgressCostFactor();
+    var rltRequest = request.multiCriteria().relaxedLimitedTransferRequest();
+    var disableAccessEgress = rltRequest.disableAccessEgress();
+    var extraAccessEgressCostFactor = rltRequest.extraAccessEgressCostFactor();
     this.accesses = filterAndMapAccessEgress(
       request.searchParams().accessPaths(),
       disableAccessEgress,
@@ -58,7 +58,7 @@ public class DirectSearchService<T extends RaptorTripSchedule> {
       disableAccessEgress,
       extraAccessEgressCostFactor
     );
-    this.relaxFunction = directTransitRequest.costRelaxFunction();
+    this.relaxFunction = rltRequest.costRelaxFunction();
   }
 
   public Collection<RaptorPath<T>> route() {

@@ -160,7 +160,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
       request
         .mutate()
         .withMultiCriteria(m ->
-          m.withDirectTransitRequest(direct ->
+          m.withRelaxedLimitedTransferRequest(direct ->
             direct
               .withEnabled(true)
               .withCostRelaxFunction(GeneralizedCostRelaxFunction.of(2, 30 * 60 * 100))

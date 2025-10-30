@@ -23,20 +23,20 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   @Nullable
   private final Double relaxCostAtDestination;
 
-  private final DirectTransitRequest directTransitRequest;
+  private final RelaxedLimitedTransferRequest relaxedLimitedTransferRequest;
 
   private MultiCriteriaRequest() {
     this.relaxC1 = RelaxFunction.NORMAL;
     this.transitPriorityCalculator = null;
     this.relaxCostAtDestination = null;
-    this.directTransitRequest = DirectTransitRequest.of().build();
+    this.relaxedLimitedTransferRequest = RelaxedLimitedTransferRequest.of().build();
   }
 
   public MultiCriteriaRequest(Builder<T> builder) {
     this.relaxC1 = Objects.requireNonNull(builder.relaxC1());
     this.transitPriorityCalculator = builder.transitPriorityCalculator();
     this.relaxCostAtDestination = builder.relaxCostAtDestination();
-    this.directTransitRequest = builder.directTransitRequest();
+    this.relaxedLimitedTransferRequest = builder.relaxedLimitedTransferRequest();
   }
 
   public static <S extends RaptorTripSchedule> Builder<S> of() {
@@ -91,8 +91,8 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   }
 
   ///  The Request for configuring direct transit search.
-  public DirectTransitRequest directTransitRequest() {
-    return directTransitRequest;
+  public RelaxedLimitedTransferRequest relaxedLimitedTransferRequest() {
+    return relaxedLimitedTransferRequest;
   }
 
   @Override
@@ -127,14 +127,14 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     private RelaxFunction relaxC1;
     private RaptorTransitGroupPriorityCalculator transitPriorityCalculator;
     private Double relaxCostAtDestination;
-    private DirectTransitRequest directTransitRequest;
+    private RelaxedLimitedTransferRequest relaxedLimitedTransferRequest;
 
     public Builder(MultiCriteriaRequest<T> original) {
       this.original = original;
       this.relaxC1 = original.relaxC1;
       this.transitPriorityCalculator = original.transitPriorityCalculator;
       this.relaxCostAtDestination = original.relaxCostAtDestination;
-      this.directTransitRequest = original.directTransitRequest;
+      this.relaxedLimitedTransferRequest = original.relaxedLimitedTransferRequest;
     }
 
     @Nullable
@@ -169,19 +169,23 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
       return this;
     }
 
-    public DirectTransitRequest directTransitRequest() {
-      return directTransitRequest;
+    public RelaxedLimitedTransferRequest relaxedLimitedTransferRequest() {
+      return relaxedLimitedTransferRequest;
     }
 
-    public Builder<T> withDirectTransitRequest(DirectTransitRequest directTransitRequest) {
-      this.directTransitRequest = directTransitRequest;
+    public Builder<T> withRelaxedLimitedTransferRequest(
+      RelaxedLimitedTransferRequest relaxedLimitedTransferRequest
+    ) {
+      this.relaxedLimitedTransferRequest = relaxedLimitedTransferRequest;
       return this;
     }
 
-    public Builder<T> withDirectTransitRequest(Consumer<DirectTransitRequest.Builder> body) {
-      var builder = this.directTransitRequest.copyOf();
+    public Builder<T> withRelaxedLimitedTransferRequest(
+      Consumer<RelaxedLimitedTransferRequest.Builder> body
+    ) {
+      var builder = this.relaxedLimitedTransferRequest.copyOf();
       body.accept(builder);
-      this.directTransitRequest = builder.build();
+      this.relaxedLimitedTransferRequest = builder.build();
       return this;
     }
 
