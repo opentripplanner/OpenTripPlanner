@@ -153,30 +153,30 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
       raptorRouter = config.createRangeRaptorWithStdWorker(transitData, request);
     }
 
-    Collection<RaptorPath<T>> directResult = null;
+    Collection<RaptorPath<T>> relaxedLimitedTransferResult = null;
     // TODO DT - pass in information to enable this
     if (true) {
       // TODO DT - configure this in config file / request
       request
         .mutate()
         .withMultiCriteria(m ->
-          m.withRelaxedLimitedTransferRequest(direct ->
-            direct
+          m.withRelaxedLimitedTransferRequest(relaxed ->
+            relaxed
               .withEnabled(true)
               .withCostRelaxFunction(GeneralizedCostRelaxFunction.of(2, 30 * 60 * 100))
           )
         );
 
-      directResult = config.createDirectSearchService(transitData, request).route();
+      relaxedLimitedTransferResult = config.createDirectSearchService(transitData, request).route();
     }
     // Route
     var result = raptorRouter.route();
 
     // create and return response
     return new RaptorResponse<>(
-      directResult == null
+      relaxedLimitedTransferResult == null
         ? result.extractPaths()
-        : ListUtils.combine(result.extractPaths(), directResult),
+        : ListUtils.combine(result.extractPaths(), relaxedLimitedTransferResult),
       new DefaultStopArrivals(result),
       request,
       // This method is not run unless the heuristic reached the destination
