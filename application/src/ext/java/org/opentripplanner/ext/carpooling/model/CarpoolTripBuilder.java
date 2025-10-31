@@ -122,7 +122,6 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
 
   @Override
   protected CarpoolTrip buildFromValues() {
-    // Validate stops are properly ordered by sequence number
     validateStopSequence();
 
     return new CarpoolTrip(this);

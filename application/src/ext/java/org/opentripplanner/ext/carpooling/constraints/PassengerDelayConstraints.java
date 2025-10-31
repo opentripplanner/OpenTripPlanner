@@ -1,11 +1,8 @@
 package org.opentripplanner.ext.carpooling.constraints;
 
 import java.time.Duration;
-import java.util.List;
-import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.ext.carpooling.routing.InsertionPosition;
+import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,59 +43,39 @@ public class PassengerDelayConstraints {
    * @param maxDelay Maximum acceptable delay for existing passengers
    */
   public PassengerDelayConstraints(Duration maxDelay) {
-    if (maxDelay.isNegative()) {
-      throw new IllegalArgumentException("maxDelay must be non-negative");
-    }
-    this.maxDelay = maxDelay;
+    this.maxDelay = DurationUtils.requireNonNegative(maxDelay);
   }
 
   /**
    * Checks if a passenger insertion satisfies delay constraints.
    *
-   * @param originalCumulativeTimes Cumulative duration to each point in original route
-   * @param modifiedSegments Route segments after passenger insertion
+   * @param originalCumulativeDurations Cumulative duration to each point in original route
+   * @param modifiedCumulativeDurations Cumulative duration to each point in modified route
    * @param pickupPos Position where passenger pickup is inserted (1-indexed)
    * @param dropoffPos Position where passenger dropoff is inserted (1-indexed)
    * @return true if all existing passengers experience acceptable delays
    */
   public boolean satisfiesConstraints(
-    Duration[] originalCumulativeTimes,
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments,
+    Duration[] originalCumulativeDurations,
+    Duration[] modifiedCumulativeDurations,
     int pickupPos,
     int dropoffPos
   ) {
     // If no existing stops (only boarding and alighting), no constraint to check
-    if (originalCumulativeTimes.length <= 2) {
+    if (originalCumulativeDurations.length <= 2) {
       return true;
-    }
-
-    // Calculate cumulative times for modified route
-    Duration[] modifiedTimes = new Duration[modifiedSegments.size() + 1];
-    modifiedTimes[0] = Duration.ZERO;
-    for (int i = 0; i < modifiedSegments.size(); i++) {
-      GraphPath<State, Edge, Vertex> segment = modifiedSegments.get(i);
-      Duration segmentDuration = Duration.between(
-        segment.states.getFirst().getTime(),
-        segment.states.getLast().getTime()
-      );
-      modifiedTimes[i + 1] = modifiedTimes[i].plus(segmentDuration);
     }
 
     // Check delay at each existing stop (exclude boarding at 0 and alighting at end)
     for (
       int originalIndex = 1;
-      originalIndex < originalCumulativeTimes.length - 1;
+      originalIndex < originalCumulativeDurations.length - 1;
       originalIndex++
     ) {
-      int modifiedIndex =
-        org.opentripplanner.ext.carpooling.routing.InsertionPosition.mapOriginalIndex(
-          originalIndex,
-          pickupPos,
-          dropoffPos
-        );
+      int modifiedIndex = InsertionPosition.mapOriginalIndex(originalIndex, pickupPos, dropoffPos);
 
-      Duration originalTime = originalCumulativeTimes[originalIndex];
-      Duration modifiedTime = modifiedTimes[modifiedIndex];
+      Duration originalTime = originalCumulativeDurations[originalIndex];
+      Duration modifiedTime = modifiedCumulativeDurations[modifiedIndex];
       Duration delay = modifiedTime.minus(originalTime);
 
       if (delay.compareTo(maxDelay) > 0) {

@@ -22,9 +22,6 @@ import org.slf4j.LoggerFactory;
  *   <li>Beeline delay heuristic - optimistic straight-line time estimates</li>
  * </ul>
  * <p>
- * By rejecting incompatible positions early, this class significantly reduces the number
- * of expensive routing operations needed by {@link OptimalInsertionStrategy}.
- * <p>
  * This follows the established OTP pattern of separating candidate generation from evaluation,
  * similar to {@code TransferGenerator} and {@code StreetNearbyStopFinder}.
  */
@@ -73,10 +70,8 @@ public class InsertionPositionFinder {
     WgsCoordinate passengerPickup,
     WgsCoordinate passengerDropoff
   ) {
-    // Extract route points from trip
     List<WgsCoordinate> routePoints = trip.routePoints();
 
-    // Calculate beeline times internally - this is an implementation detail
     Duration[] beelineTimes = beelineEstimator.calculateCumulativeTimes(routePoints);
 
     List<InsertionPosition> viable = new ArrayList<>();
@@ -92,7 +87,6 @@ public class InsertionPositionFinder {
           continue;
         }
 
-        // Directional validation
         if (
           !insertionMaintainsForwardProgress(
             routePoints,
@@ -110,7 +104,6 @@ public class InsertionPositionFinder {
           continue;
         }
 
-        // Beeline delay check (only if there are existing stops to protect)
         if (routePoints.size() > 2) {
           if (
             !passesBeelineDelayCheck(
@@ -131,7 +124,6 @@ public class InsertionPositionFinder {
           }
         }
 
-        // This position passed all checks!
         viable.add(new InsertionPosition(pickupPos, dropoffPos));
       }
     }
@@ -158,7 +150,6 @@ public class InsertionPositionFinder {
     WgsCoordinate passengerPickup,
     WgsCoordinate passengerDropoff
   ) {
-    // Validate pickup insertion
     if (pickupPos > 0 && pickupPos < routePoints.size()) {
       WgsCoordinate prevPoint = routePoints.get(pickupPos - 1);
       WgsCoordinate nextPoint = routePoints.get(pickupPos);
@@ -168,27 +159,20 @@ public class InsertionPositionFinder {
       }
     }
 
-    // Validate dropoff insertion (in modified route with pickup already inserted)
-    int dropoffPosInModified = dropoffPos;
-    if (dropoffPosInModified > 0 && dropoffPosInModified <= routePoints.size()) {
-      // Get the previous point (which might be the pickup if dropoff is right after)
+    if (dropoffPos > 0 && dropoffPos <= routePoints.size()) {
       WgsCoordinate prevPoint;
-      if (dropoffPosInModified == pickupPos) {
-        prevPoint = passengerPickup; // Previous point is the pickup
-      } else if (dropoffPosInModified - 1 < routePoints.size()) {
-        prevPoint = routePoints.get(dropoffPosInModified - 1);
+      if (dropoffPos == pickupPos) {
+        prevPoint = passengerPickup;
+      } else if (dropoffPos - 1 < routePoints.size()) {
+        prevPoint = routePoints.get(dropoffPos - 1);
       } else {
-        // Edge case: dropoff at the end
         return true;
       }
 
-      // Get next point if it exists
-      if (dropoffPosInModified < routePoints.size()) {
-        WgsCoordinate nextPoint = routePoints.get(dropoffPosInModified);
+      if (dropoffPos < routePoints.size()) {
+        WgsCoordinate nextPoint = routePoints.get(dropoffPos);
 
-        if (!maintainsForwardProgress(prevPoint, passengerDropoff, nextPoint)) {
-          return false;
-        }
+        return maintainsForwardProgress(prevPoint, passengerDropoff, nextPoint);
       }
     }
 
@@ -270,10 +254,10 @@ public class InsertionPositionFinder {
           beelineDelay.getSeconds(),
           delayConstraints.getMaxDelay().getSeconds()
         );
-        return false; // Reject early!
+        return false;
       }
     }
 
-    return true; // Passes beeline check, proceed with A* routing
+    return true;
   }
 }

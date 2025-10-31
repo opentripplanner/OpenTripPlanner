@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.carpooling.routing;
 
+import static org.opentripplanner.ext.carpooling.util.GraphPathUtils.calculateCumulativeDurations;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,24 +80,6 @@ public class InsertionEvaluator {
   }
 
   /**
-   * Calculates cumulative durations from pre-routed segments.
-   */
-  private Duration[] calculateCumulativeTimes(GraphPath<State, Edge, Vertex>[] segments) {
-    Duration[] cumulativeTimes = new Duration[segments.length + 1];
-    cumulativeTimes[0] = Duration.ZERO;
-
-    for (int i = 0; i < segments.length; i++) {
-      Duration segmentDuration = Duration.between(
-        segments[i].states.getFirst().getTime(),
-        segments[i].states.getLast().getTime()
-      );
-      cumulativeTimes[i + 1] = cumulativeTimes[i].plus(segmentDuration);
-    }
-
-    return cumulativeTimes;
-  }
-
-  /**
    * Evaluates pre-filtered insertion positions using A* routing.
    * <p>
    * This method assumes the provided positions have already passed heuristic
@@ -122,11 +106,11 @@ public class InsertionEvaluator {
       return null;
     }
 
-    Duration[] cumulativeTimes = calculateCumulativeTimes(baselineSegments);
+    Duration[] cumulativeDurations = calculateCumulativeDurations(baselineSegments);
 
     InsertionCandidate bestCandidate = null;
     Duration minAdditionalDuration = Duration.ofDays(1);
-    Duration baselineDuration = cumulativeTimes[cumulativeTimes.length - 1];
+    Duration baselineDuration = cumulativeDurations[cumulativeDurations.length - 1];
 
     for (InsertionPosition position : viablePositions) {
       InsertionCandidate candidate = evaluateInsertion(
@@ -136,7 +120,7 @@ public class InsertionEvaluator {
         passengerPickup,
         passengerDropoff,
         baselineSegments,
-        cumulativeTimes,
+        cumulativeDurations,
         baselineDuration
       );
 
@@ -176,7 +160,7 @@ public class InsertionEvaluator {
     WgsCoordinate passengerPickup,
     WgsCoordinate passengerDropoff,
     GraphPath<State, Edge, Vertex>[] baselineSegments,
-    Duration[] originalCumulativeTimes,
+    Duration[] originalCumulativeDurations,
     Duration baselineDuration
   ) {
     // Build modified route segments by reusing cached baseline segments
@@ -204,8 +188,10 @@ public class InsertionEvaluator {
     // Check passenger delay constraints
     if (
       !delayConstraints.satisfiesConstraints(
-        originalCumulativeTimes,
-        modifiedSegments,
+        originalCumulativeDurations,
+        calculateCumulativeDurations(
+          modifiedSegments.toArray(new GraphPath[modifiedSegments.size()])
+        ),
         pickupPos,
         dropoffPos
       )
@@ -339,7 +325,6 @@ public class InsertionEvaluator {
       }
     }
 
-    // No matching baseline segment found - this segment must be routed
     LOG.trace(
       "Modified segment {} has no matching baseline segment (endpoints changed)",
       modifiedIndex

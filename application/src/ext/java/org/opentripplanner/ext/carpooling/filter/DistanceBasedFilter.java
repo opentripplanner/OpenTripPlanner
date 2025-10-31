@@ -20,11 +20,6 @@ public class DistanceBasedFilter implements TripFilter {
 
   private static final Logger LOG = LoggerFactory.getLogger(DistanceBasedFilter.class);
 
-  /**
-   * Default maximum distance: 50km.
-   * If all segments of the trip's route are more than this distance from
-   * both passenger pickup and dropoff, the trip is rejected.
-   */
   public static final double DEFAULT_MAX_DISTANCE_METERS = 50_000;
 
   private final double maxDistanceMeters;
@@ -94,6 +89,10 @@ public class DistanceBasedFilter implements TripFilter {
     return false;
   }
 
+  double getMaxDistanceMeters() {
+    return maxDistanceMeters;
+  }
+
   /**
    * Calculates the distance from a point to a line segment.
    * <p>
@@ -131,7 +130,6 @@ public class DistanceBasedFilter implements TripFilter {
     double dx = lineEnd.longitude() - lineStart.longitude();
     double dy = lineEnd.latitude() - lineStart.latitude();
 
-    // Calculate squared length of line segment
     double lineLengthSquared = dx * dx + dy * dy;
 
     // Calculate projection parameter t
@@ -152,17 +150,9 @@ public class DistanceBasedFilter implements TripFilter {
     double closestLat = lineStart.latitude() + t * dy;
     WgsCoordinate closestPoint = new WgsCoordinate(closestLat, closestLon);
 
-    // Return spherical distance from point to closest point on segment
     return SphericalDistanceLibrary.fastDistance(
       point.asJtsCoordinate(),
       closestPoint.asJtsCoordinate()
     );
-  }
-
-  /**
-   * Gets the configured maximum distance in meters.
-   */
-  public double getMaxDistanceMeters() {
-    return maxDistanceMeters;
   }
 }

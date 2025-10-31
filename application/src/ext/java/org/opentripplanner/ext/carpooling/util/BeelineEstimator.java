@@ -59,6 +59,14 @@ public class BeelineEstimator {
     this.speedMps = speedMps;
   }
 
+  public double getDetourFactor() {
+    return detourFactor;
+  }
+
+  public double getSpeedMps() {
+    return speedMps;
+  }
+
   /**
    * Estimates travel duration between two points using beeline distance.
    *
@@ -97,23 +105,5 @@ public class BeelineEstimator {
     }
 
     return cumulativeTimes;
-  }
-
-  /**
-   * Gets the configured detour factor.
-   *
-   * @return Detour factor
-   */
-  public double getDetourFactor() {
-    return detourFactor;
-  }
-
-  /**
-   * Gets the configured average speed in meters per second.
-   *
-   * @return Speed in m/s
-   */
-  public double getSpeedMps() {
-    return speedMps;
   }
 }

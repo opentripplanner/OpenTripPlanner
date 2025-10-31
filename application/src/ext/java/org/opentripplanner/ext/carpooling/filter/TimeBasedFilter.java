@@ -24,11 +24,6 @@ public class TimeBasedFilter implements TripFilter {
     WgsCoordinate passengerPickup,
     WgsCoordinate passengerDropoff
   ) {
-    // Cannot filter without time information
-    LOG.warn(
-      "TimeBasedFilter called without time parameter - accepting all trips. " +
-      "Use accepts(..., Instant, Duration) instead."
-    );
     return true;
   }
 
@@ -42,10 +37,8 @@ public class TimeBasedFilter implements TripFilter {
   ) {
     Instant tripStartTime = trip.startTime().toInstant();
 
-    // Calculate time difference
     Duration timeDiff = Duration.between(tripStartTime, passengerDepartureTime).abs();
 
-    // Check if within time window
     boolean withinWindow = timeDiff.compareTo(searchWindow) <= 0;
 
     if (!withinWindow) {

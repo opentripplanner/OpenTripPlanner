@@ -66,19 +66,13 @@ public class DirectionalCompatibilityFilter implements TripFilter {
       }
     }
 
-    // Check full route as fallback (handles complex multi-segment compatibility)
-    if (
-      isSegmentCompatible(
-        routePoints.get(0),
-        routePoints.get(routePoints.size() - 1),
-        passengerBearing
-      )
-    ) {
+    // Check full route as fallback
+    if (isSegmentCompatible(routePoints.getFirst(), routePoints.getLast(), passengerBearing)) {
       LOG.debug(
         "Trip {} accepted: passenger journey aligns with full route ({} to {})",
         trip.getId(),
-        routePoints.get(0),
-        routePoints.get(routePoints.size() - 1)
+        routePoints.getFirst(),
+        routePoints.getLast()
       );
       return true;
     }
@@ -89,6 +83,10 @@ public class DirectionalCompatibilityFilter implements TripFilter {
       Math.round(passengerBearing)
     );
     return false;
+  }
+
+  double getBearingToleranceDegrees() {
+    return bearingToleranceDegrees;
   }
 
   /**
@@ -109,12 +107,5 @@ public class DirectionalCompatibilityFilter implements TripFilter {
     double bearingDiff = DirectionalCalculator.bearingDifference(segmentBearing, passengerBearing);
 
     return bearingDiff <= bearingToleranceDegrees;
-  }
-
-  /**
-   * Gets the configured bearing tolerance in degrees.
-   */
-  public double getBearingToleranceDegrees() {
-    return bearingToleranceDegrees;
   }
 }

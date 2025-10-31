@@ -2,9 +2,9 @@ package org.opentripplanner.ext.carpooling.constraints;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.opentripplanner.ext.carpooling.TestFixtures.*;
+import static org.opentripplanner.ext.carpooling.util.GraphPathUtils.calculateCumulativeDurations;
 
 import java.time.Duration;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
@@ -27,14 +27,21 @@ class PassengerDelayConstraintsTest {
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10) };
 
     // Modified route with passenger inserted
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(7))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(7)),
+    };
 
     // Should accept - no existing passengers to protect
-    assertTrue(constraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 2));
+    assertTrue(
+      constraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        2
+      )
+    );
   }
 
   @Test
@@ -45,14 +52,21 @@ class PassengerDelayConstraintsTest {
     // Modified route: boarding -> pickup -> stop1 -> dropoff -> alighting
     // Timings: 0min -> 3min -> 7min -> 12min -> 17min
     // Stop1 delay: 7min - 5min = 2min (well under 5min threshold)
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(4)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+    };
 
-    assertTrue(constraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 3));
+    assertTrue(
+      constraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        3
+      )
+    );
   }
 
   @Test
@@ -63,14 +77,21 @@ class PassengerDelayConstraintsTest {
     // Modified route where stop1 is delayed by exactly 5 minutes
     // Timings: 0min -> 5min -> 15min -> 20min -> 25min
     // Stop1 delay: 15min - 10min = 5min (exactly at threshold)
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+    };
 
-    assertTrue(constraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 3));
+    assertTrue(
+      constraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        3
+      )
+    );
   }
 
   @Test
@@ -81,14 +102,21 @@ class PassengerDelayConstraintsTest {
     // Modified route where stop1 is delayed by 6 minutes (over 5min threshold)
     // Timings: 0min -> 5min -> 16min -> 21min -> 26min
     // Stop1 delay: 16min - 10min = 6min (exceeds threshold)
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+    };
 
-    assertFalse(constraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 3));
+    assertFalse(
+      constraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        3
+      )
+    );
   }
 
   @Test
@@ -105,15 +133,22 @@ class PassengerDelayConstraintsTest {
     // Timings: 0min -> 5min -> 13min -> 18min -> 27min -> 32min
     // Stop1 delay: 13min - 10min = 3min ✓
     // Stop2 delay: 27min - 20min = 7min ✗
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(8)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(9)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+    };
 
-    assertFalse(constraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 3));
+    assertFalse(
+      constraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        3
+      )
+    );
   }
 
   @Test
@@ -130,15 +165,22 @@ class PassengerDelayConstraintsTest {
     // Timings: 0min -> 5min -> 12min -> 17min -> 24min -> 34min
     // Stop1 delay: 12min - 10min = 2min ✓
     // Stop2 delay: 24min - 20min = 4min ✓
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(7)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(7)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
+    };
 
-    assertTrue(constraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 3));
+    assertTrue(
+      constraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        3
+      )
+    );
   }
 
   @Test
@@ -157,15 +199,22 @@ class PassengerDelayConstraintsTest {
     // Timings: 0min -> 3min -> 5min -> 13min -> 24min -> 34min
     // Stop1 delay: 13min - 10min = 3min ✓
     // Stop2 delay: 24min - 20min = 4min ✓
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(2)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(8)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
+    };
 
-    assertTrue(constraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 2));
+    assertTrue(
+      constraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        2
+      )
+    );
   }
 
   @Test
@@ -185,15 +234,22 @@ class PassengerDelayConstraintsTest {
     // Timings: 0min -> 11min -> 22min -> 27min -> 30min -> 40min
     // Stop1 delay: 11min - 10min = 1min ✓
     // Stop2 delay: 22min - 20min = 2min ✓
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
+    };
 
-    assertTrue(constraints.satisfiesConstraints(originalTimes, modifiedSegments, 3, 4));
+    assertTrue(
+      constraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        3,
+        4
+      )
+    );
   }
 
   @Test
@@ -212,15 +268,22 @@ class PassengerDelayConstraintsTest {
     // Timings: 0min -> 11min -> 14min -> 17min -> 24min -> 34min
     // Stop1 delay: 11min - 10min = 1min ✓
     // Stop2 delay: 24min - 20min = 4min ✓
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(7)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
+    };
 
-    assertTrue(constraints.satisfiesConstraints(originalTimes, modifiedSegments, 2, 3));
+    assertTrue(
+      constraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        2,
+        3
+      )
+    );
   }
 
   @Test
@@ -230,14 +293,21 @@ class PassengerDelayConstraintsTest {
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
 
     // Stop1 delayed by 8 minutes (within 10min custom threshold)
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(13)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+    };
 
-    assertTrue(customConstraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 3));
+    assertTrue(
+      customConstraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        3
+      )
+    );
   }
 
   @Test
@@ -247,14 +317,21 @@ class PassengerDelayConstraintsTest {
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
 
     // Stop1 delayed by 3 minutes (over 2min custom threshold)
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(8)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+    };
 
-    assertFalse(customConstraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 3));
+    assertFalse(
+      customConstraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        3
+      )
+    );
   }
 
   @Test
@@ -264,14 +341,21 @@ class PassengerDelayConstraintsTest {
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
 
     // Stop1 delayed by even 1 second
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5).plusSeconds(1)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+    };
 
-    assertFalse(strictConstraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 3));
+    assertFalse(
+      strictConstraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        3
+      )
+    );
   }
 
   @Test
@@ -281,14 +365,21 @@ class PassengerDelayConstraintsTest {
     Duration[] originalTimes = { Duration.ZERO, Duration.ofMinutes(10), Duration.ofMinutes(20) };
 
     // Stop1 delayed by 30 minutes (well within 1 hour threshold)
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(35)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+    };
 
-    assertTrue(permissiveConstraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 3));
+    assertTrue(
+      permissiveConstraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        3
+      )
+    );
   }
 
   @Test
@@ -318,14 +409,21 @@ class PassengerDelayConstraintsTest {
 
     // Modified route where stop1 arrives at exactly the same time
     // (perfect routing somehow)
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(4)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(6)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+    };
 
-    assertTrue(constraints.satisfiesConstraints(originalTimes, modifiedSegments, 1, 3));
+    assertTrue(
+      constraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        1,
+        3
+      )
+    );
   }
 
   @Test
@@ -344,7 +442,7 @@ class PassengerDelayConstraintsTest {
     // Insert passenger between stop2 and stop3 (positions 3, 4)
     // All stops should have delays <= 5 minutes
     // Modified indices: 0,1,2,pickup@3,dropoff@4,3,4,5,6
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = List.of(
+    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
@@ -352,9 +450,16 @@ class PassengerDelayConstraintsTest {
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(9)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
       MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10))
-    );
+      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
+    };
 
-    assertTrue(constraints.satisfiesConstraints(originalTimes, modifiedSegments, 3, 4));
+    assertTrue(
+      constraints.satisfiesConstraints(
+        originalTimes,
+        calculateCumulativeDurations(modifiedSegments),
+        3,
+        4
+      )
+    );
   }
 }

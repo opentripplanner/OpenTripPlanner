@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.carpooling.CarpoolingRepository;
+import org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.LogInfo;
@@ -40,7 +42,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
  * <p>
  * CarpoolTrip instances are immutable. Updates to trip state (e.g., adding a booked passenger)
  * require creating a new trip instance via {@link CarpoolTripBuilder} and upserting it to the
- * {@link org.opentripplanner.ext.carpooling.CarpoolingRepository}.
+ * {@link CarpoolingRepository}.
  *
  * <h2>Usage in Routing</h2>
  * <p>
@@ -53,7 +55,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
  *
  * @see CarpoolStop for individual stop details
  * @see CarpoolTripBuilder for constructing trip instances
- * @see org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater for trip updates
+ * @see SiriETCarpoolingUpdater for trip updates
  */
 public class CarpoolTrip
   extends AbstractTransitEntity<CarpoolTrip, CarpoolTripBuilder>

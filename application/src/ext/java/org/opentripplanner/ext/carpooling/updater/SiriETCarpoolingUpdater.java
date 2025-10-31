@@ -28,9 +28,6 @@ import uk.org.siri.siri21.ServiceDelivery;
 public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETCarpoolingUpdater.class);
-  /**
-   * Update streamer
-   */
   private final EstimatedTimetableSource updateSource;
 
   private final CarpoolingRepository repository;

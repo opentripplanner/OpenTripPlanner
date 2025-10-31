@@ -3,6 +3,7 @@ package org.opentripplanner.ext.carpooling.internal;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -92,14 +93,13 @@ public class CarpoolItineraryMapper {
    * @return an itinerary with a single carpool leg, or null if shared segments are empty
    *         (should not occur for valid candidates)
    */
+  @Nullable
   public Itinerary toItinerary(RouteRequest request, InsertionCandidate candidate) {
-    // Get shared route segments (passenger pickup to dropoff)
     var sharedSegments = candidate.getSharedSegments();
     if (sharedSegments.isEmpty()) {
       return null;
     }
 
-    // Calculate times
     var pickupSegments = candidate.getPickupSegments();
     Duration pickupDuration = Duration.ZERO;
     for (var segment : pickupSegments) {
@@ -110,7 +110,6 @@ public class CarpoolItineraryMapper {
 
     var driverPickupTime = candidate.trip().startTime().plus(pickupDuration);
 
-    // Passenger start time is max of request time and when driver arrives
     var startTime = request.dateTime().isAfter(driverPickupTime.toInstant())
       ? request.dateTime().atZone(ZoneId.of("Europe/Oslo"))
       : driverPickupTime;
@@ -125,17 +124,14 @@ public class CarpoolItineraryMapper {
 
     var endTime = startTime.plus(carpoolDuration);
 
-    // Get vertices from first and last segment
-    var firstSegment = sharedSegments.get(0);
-    var lastSegment = sharedSegments.get(sharedSegments.size() - 1);
+    var firstSegment = sharedSegments.getFirst();
+    var lastSegment = sharedSegments.getLast();
 
     Vertex fromVertex = firstSegment.states.getFirst().getVertex();
     Vertex toVertex = lastSegment.states.getLast().getVertex();
 
-    // Collect all edges from shared segments
     var allEdges = sharedSegments.stream().flatMap(seg -> seg.edges.stream()).toList();
 
-    // Create carpool leg
     CarpoolLeg carpoolLeg = CarpoolLeg.of()
       .withStartTime(startTime)
       .withEndTime(endTime)

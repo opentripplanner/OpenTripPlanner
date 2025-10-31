@@ -3,6 +3,7 @@ package org.opentripplanner.ext.carpooling.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
@@ -17,6 +18,7 @@ public class CarpoolingModule {
 
   @Provides
   @Singleton
+  @Nullable
   public CarpoolingRepository provideCarpoolingRepository() {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
@@ -25,8 +27,9 @@ public class CarpoolingModule {
   }
 
   @Provides
+  @Nullable
   public static CarpoolingService provideCarpoolingService(
-    CarpoolingRepository repository,
+    @Nullable CarpoolingRepository repository,
     Graph graph,
     VertexLinker vertexLinker,
     StreetLimitationParametersService streetLimitationParametersService

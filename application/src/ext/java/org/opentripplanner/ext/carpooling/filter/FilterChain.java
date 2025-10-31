@@ -35,10 +35,10 @@ public class FilterChain implements TripFilter {
   public static FilterChain standard() {
     return new FilterChain(
       List.of(
-        new CapacityFilter(), // Fastest: O(1)
-        new TimeBasedFilter(), // Very fast: O(1)
-        new DistanceBasedFilter(), // Fast: O(1) with 4 distance calculations
-        new DirectionalCompatibilityFilter() // Medium: O(n) segments
+        new CapacityFilter(),
+        new TimeBasedFilter(),
+        new DistanceBasedFilter(),
+        new DirectionalCompatibilityFilter()
       )
     );
   }
@@ -49,12 +49,9 @@ public class FilterChain implements TripFilter {
     WgsCoordinate passengerPickup,
     WgsCoordinate passengerDropoff
   ) {
-    for (TripFilter filter : filters) {
-      if (!filter.accepts(trip, passengerPickup, passengerDropoff)) {
-        return false; // Short-circuit: filter rejected the trip
-      }
-    }
-    return true; // All filters passed
+    return filters
+      .stream()
+      .allMatch(filter -> filter.accepts(trip, passengerPickup, passengerDropoff));
   }
 
   @Override
@@ -65,19 +62,16 @@ public class FilterChain implements TripFilter {
     Instant passengerDepartureTime,
     Duration searchWindow
   ) {
-    for (TripFilter filter : filters) {
-      if (
-        !filter.accepts(
+    return filters
+      .stream()
+      .allMatch(filter ->
+        filter.accepts(
           trip,
           passengerPickup,
           passengerDropoff,
           passengerDepartureTime,
           searchWindow
         )
-      ) {
-        return false; // Short-circuit: filter rejected the trip
-      }
-    }
-    return true; // All filters passed
+      );
   }
 }
