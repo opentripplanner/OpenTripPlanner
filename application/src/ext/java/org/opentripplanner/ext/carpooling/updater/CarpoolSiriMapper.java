@@ -363,6 +363,10 @@ public class CarpoolSiriMapper {
 
   private AreaStop buildAreaStop(EstimatedCall call, String id) {
     var stopAssignments = call.getDepartureStopAssignments();
+    if (stopAssignments == null || stopAssignments.isEmpty()) {
+      stopAssignments = call.getArrivalStopAssignments();
+    }
+
     if (stopAssignments == null || stopAssignments.size() != 1) {
       throw new IllegalArgumentException("Expected exactly one stop assignment for call: " + call);
     }
