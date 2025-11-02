@@ -243,12 +243,9 @@ public class RoutingWorker {
 
     debugTimingAggregator.startedDirectStreetRouter();
     try {
+      var directStreetRouter = new DefaultDirectStreetRouter();
       return RoutingResult.ok(
-        DefaultDirectStreetRouter.route(
-          serverContext,
-          directBuilder.buildRequest(),
-          linkingContext()
-        ),
+        directStreetRouter.route(serverContext, directBuilder.buildRequest(), linkingContext()),
         emptyDirectModeHandler.removeWalkAllTheWayResults()
       );
     } finally {

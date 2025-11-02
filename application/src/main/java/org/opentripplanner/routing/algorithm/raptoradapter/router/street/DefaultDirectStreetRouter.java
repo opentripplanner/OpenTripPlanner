@@ -20,13 +20,11 @@ import org.opentripplanner.street.search.state.State;
 
 /**
  * Generates "direct" street routes, i.e. those that do not use transit and are on the street
- * network for the entire itinerary.
- *
- * @see DirectFlexRouter
+ * network for the entire itinerary. Doesn't support via locations or flex.
  */
-public class DefaultDirectStreetRouter {
+public class DefaultDirectStreetRouter implements DirectStreetRouter {
 
-  public static List<Itinerary> route(
+  public List<Itinerary> route(
     OtpServerRequestContext serverContext,
     RouteRequest request,
     LinkingContext linkingContext
