@@ -70,7 +70,7 @@ class StopTimesMapper {
     stopTime.setDepartureTime(isLastStop ? aimedArrivalTimeSeconds : aimedDepartureTimeSeconds);
 
     // Update destination display
-    var destinationDisplay = getFirstStringFromList(call.getDestinationDisplaies());
+    var destinationDisplay = getFirstStringFromList(call.getDestinationDisplays());
     if (!destinationDisplay.isEmpty()) {
       stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay));
     } else if (trip.getHeadsign() != null) {

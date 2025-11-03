@@ -7,10 +7,14 @@ import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
 import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
-public class OsmWayTest {
+class OsmWayTest {
 
   @Test
   void testIsBicycleDismountForced() {
@@ -256,5 +260,120 @@ public class OsmWayTest {
     way.addNodeRef(3);
     way.addNodeRef(1);
     return way;
+  }
+
+  private static OsmWay createCrossing(String crossingTag, String crossingValue) {
+    var way = WayTestData.footway();
+    way.addTag("footway", "crossing");
+    way.addTag(crossingTag, crossingValue);
+    return way;
+  }
+
+  @Test
+  void footway() {
+    assertFalse(WayTestData.highwayPrimary().isFootway());
+    assertTrue(WayTestData.footway().isFootway());
+  }
+
+  @Test
+  void serviceRoad() {
+    assertFalse(WayTestData.highwayPrimary().isServiceRoad());
+
+    var way = new OsmWay();
+    way.addTag("highway", "service");
+    assertTrue(way.isServiceRoad());
+  }
+
+  @Test
+  void motorwayRamp() {
+    assertFalse(WayTestData.highwayPrimary().isMotorwayRamp());
+    assertFalse(WayTestData.motorway().isMotorwayRamp());
+    assertTrue(WayTestData.motorwayRamp().isMotorwayRamp());
+  }
+
+  @Test
+  void turnLane() {
+    assertFalse(WayTestData.highwayTertiary().isTurnLane());
+
+    var namedOneWay = new OsmWay();
+    namedOneWay.addTag("name", "3rd Street");
+    namedOneWay.addTag("oneway", "yes");
+    assertFalse(namedOneWay.isTurnLane());
+
+    var oneWay = WayTestData.highwayTertiary();
+    oneWay.addTag("oneway", "yes");
+    assertTrue(oneWay.isTurnLane());
+  }
+
+  @ParameterizedTest
+  @MethodSource("createRampAsTurnLaneCases")
+  void rampAsTurnLane(String turnValue, boolean oneWay, boolean expected) {
+    var ramp = WayTestData.motorwayRamp();
+    if (oneWay) ramp.addTag("oneway", "yes");
+    ramp.addTag("turn:lanes", turnValue);
+
+    assertEquals(
+      expected,
+      ramp.isTurnLane(),
+      String.format(
+        "%s-way ramp with '%s' turn lane attribute %s a turn lane.",
+        oneWay ? "One" : "Two",
+        turnValue,
+        expected ? "should be" : "should not be"
+      )
+    );
+  }
+
+  static Stream<Arguments> createRampAsTurnLaneCases() {
+    return Stream.of(
+      Arguments.of("right", true, true),
+      Arguments.of("right", false, false),
+      Arguments.of("left", true, true),
+      Arguments.of("left", false, false),
+      Arguments.of("merge_left", true, false),
+      Arguments.of("merge_left", false, false),
+      Arguments.of(null, true, false),
+      Arguments.of(null, false, false)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("createCrossingCases")
+  void crossing(OsmWay way, boolean result) {
+    assertEquals(result, way.isCrossing());
+  }
+
+  static Stream<Arguments> createCrossingCases() {
+    return Stream.of(
+      Arguments.of(WayTestData.footway(), false),
+      Arguments.of(WayTestData.footwaySidewalk(), false),
+      Arguments.of(createCrossing("crossing", "marked"), true),
+      Arguments.of(createCrossing("crossing", "other"), true),
+      Arguments.of(createCrossing("crossing:markings", "yes"), true),
+      Arguments.of(createCrossing("crossing:markings", "marking-details"), true),
+      Arguments.of(createCrossing("crossing:markings", null), true),
+      Arguments.of(createCrossing("crossing:markings", "no"), true)
+    );
+  }
+
+  @Test
+  void adjacentTo() {
+    final long nodeId1 = 10001L;
+    final long nodeId2 = 20002L;
+    final long sharedNodeId = 30003L;
+
+    OsmWay way1 = new OsmWay();
+    OsmWay way2 = new OsmWay();
+    assertFalse(way1.isAdjacentTo(way2));
+
+    var nodes1 = way1.getNodeRefs();
+    var nodes2 = way2.getNodeRefs();
+    nodes1.add(sharedNodeId);
+    nodes1.add(nodeId1);
+    nodes2.add(nodeId2);
+    assertFalse(way1.isAdjacentTo(way2));
+
+    nodes2.add(sharedNodeId);
+    assertTrue(way1.isAdjacentTo(way2));
   }
 }

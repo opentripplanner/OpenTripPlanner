@@ -67,6 +67,12 @@ public class VertexLinker {
     SphericalDistanceLibrary.metersToDegrees(0.001);
 
   /**
+   * Edge - area intersection often tests edges which start/end at area edge.
+   * Shrink egde slightly to avoid accuracy errors
+   */
+  private static final double AREA_INTERSECTION_SHRINKING = 0.0001;
+
+  /**
    * Minimal distance for considering two nodes the same
    */
   private static final double DUPLICATE_NODE_EPSILON_DEGREES_SQUARED =
@@ -681,6 +687,20 @@ public class VertexLinker {
     return modes;
   }
 
+  /**
+   * Create a slightly shortened line between two coordinates.
+   * This is used when testing if a polygon contains a line between two
+   * of its boundary points. Floating point math cannot represent boundaries
+   * precisely, so we need to shrink the line to ensure robust testing.
+   */
+  private LineString createShrunkLine(Coordinate from, Coordinate to) {
+    var dx = AREA_INTERSECTION_SHRINKING * (to.x - from.x);
+    var dy = AREA_INTERSECTION_SHRINKING * (to.y - from.y);
+    var c1 = new Coordinate(from.x + dx, from.y + dy);
+    var c2 = new Coordinate(to.x - dx, to.y - dy);
+    return GEOMETRY_FACTORY.createLineString(new Coordinate[] { c1, c2 });
+  }
+
   /* Check if an edge candiate does not cross the area boundary and add it if it does not */
   private boolean addVisibilityEdges(
     IntersectionVertex from,
@@ -698,13 +718,13 @@ public class VertexLinker {
     if (!force && distSquared(from, to) < DUPLICATE_NODE_EPSILON_DEGREES_SQUARED) {
       return false;
     }
-    LineString line = GEOMETRY_FACTORY.createLineString(
-      new Coordinate[] { from.getCoordinate(), to.getCoordinate() }
-    );
+    var c1 = from.getCoordinate();
+    var c2 = to.getCoordinate();
     // ensure that new edge does not leave the bounds of the area or hit any holes
-    if (!force && !ag.getGeometry().contains(line)) {
+    if (!force && !ag.getGeometry().contains(createShrunkLine(c1, c2))) {
       return false;
     }
+    LineString line = GEOMETRY_FACTORY.createLineString(new Coordinate[] { c1, c2 });
     // add connecting edges
     createEdges(line, from, to, ag, scope, tempEdges);
 

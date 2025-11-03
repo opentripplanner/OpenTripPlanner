@@ -41,7 +41,7 @@ public class BarrierEdgeBuilder {
         );
         wheelchairAccessible = wheelchairAccessible && barrier.isWheelchairAccessible();
         if (!barrier.hasNoName()) {
-          name = edgeNamer.getNameForWay(barrier, ("barrier " + barrier.getId()).intern());
+          name = edgeNamer.getName(barrier, ("barrier " + barrier.getId()).intern());
         }
       }
     }

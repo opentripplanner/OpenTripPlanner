@@ -1,9 +1,10 @@
 package org.opentripplanner.apis.transmodel.model.framework;
 
 import graphql.Scalars;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.api.model.geometry.EncodedPolyline;
 
 public class PointsOnLinkType {
 
@@ -18,7 +19,7 @@ public class PointsOnLinkType {
           .name("length")
           .description("The number of points in the string")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(environment -> ((EncodedPolyline) environment.getSource()).length())
+          .dataFetcher(env -> encodedPolyline(env).length())
           .build()
       )
       .field(
@@ -29,9 +30,21 @@ public class PointsOnLinkType {
             "(https://www.freeformatter.com/javascript-escape.html)"
           )
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((EncodedPolyline) environment.getSource()).points())
+          .dataFetcher(env -> encodedPolyline(env).points())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("distance")
+          .description("The distance in meters.")
+          .type(Scalars.GraphQLInt)
+          .dataFetcher(env -> encodedPolyline(env).distanceInMeters())
           .build()
       )
       .build();
+  }
+
+  private static EncodedPolyline encodedPolyline(DataFetchingEnvironment environment) {
+    return environment.getSource();
   }
 }

@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -21,21 +19,24 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.street.search.state.TestStateBuilder;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
-import org.opentripplanner.updater.trip.TripInput;
-import org.opentripplanner.utils.time.TimeUtils;
 
-class OjpServiceTest implements RealtimeTestConstants {
+class OjpServiceTest {
 
-  private final RealtimeTestEnvironmentBuilder envBuilder = RealtimeTestEnvironment.of();
+  private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
+
+  private static final String STOP_A_ID = "A";
+  private static final String STOP_B_ID = "B";
+  private static final String STOP_C_ID = "C";
+  private static final String STATION_OMEGA_ID = "OMEGA";
 
   private final RegularStop STOP_A = envBuilder.stopAtStation(STOP_A_ID, STATION_OMEGA_ID);
   private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
@@ -44,14 +45,11 @@ class OjpServiceTest implements RealtimeTestConstants {
   private final TripInput TRIP_INPUT = TripInput.of("t1")
     .addStop(STOP_A, "12:00", "12:01")
     .addStop(STOP_B, "12:10", "12:11")
-    .addStop(STOP_C, "12:20", "12:21")
-    .build();
+    .addStop(STOP_C, "12:20", "12:21");
 
-  public static final OjpService.StopEventRequestParams PARAMS = params(100);
-
-  private static OjpService.StopEventRequestParams params(int departures) {
+  private OjpService.StopEventRequestParams params(TransitTestEnvironment env, int departures) {
     return new OjpService.StopEventRequestParams(
-      instant("12:00"),
+      env.localTimeParser().instant("12:00"),
       ArrivalDeparture.BOTH,
       Duration.ofHours(2),
       1000,
@@ -73,8 +71,8 @@ class OjpServiceTest implements RealtimeTestConstants {
   @MethodSource("stopPointRefCases")
   void stopPointRef(FeedScopedId ref) {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
-    var result = service.findCallsAtStop(ref, PARAMS);
+    var service = new OjpService(env.transitService(), new DirectGraphFinder(e -> List.of()));
+    var result = service.findCallsAtStop(ref, params(env, 100));
     assertThat(result).hasSize(1);
     var stopId = result.getFirst().tripTimeOnDate().getStop().getId();
     assertEquals(STOP_A.getId(), stopId);
@@ -83,9 +81,9 @@ class OjpServiceTest implements RealtimeTestConstants {
   @Test
   void notFound() {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
+    var service = new OjpService(env.transitService(), new DirectGraphFinder(e -> List.of()));
     assertThrows(EntityNotFoundException.class, () ->
-      service.findCallsAtStop(id("unknown"), PARAMS)
+      service.findCallsAtStop(id("unknown"), params(env, 100))
     );
   }
 
@@ -118,8 +116,8 @@ class OjpServiceTest implements RealtimeTestConstants {
       }
     };
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var service = new OjpService(env.getTransitService(), finder);
-    var result = service.findCallsAtStop(WgsCoordinate.GREENWICH, PARAMS);
+    var service = new OjpService(env.transitService(), finder);
+    var result = service.findCallsAtStop(WgsCoordinate.GREENWICH, params(env, 100));
     assertThat(result).hasSize(1);
     var stopId = result.getFirst().tripTimeOnDate().getStop().getId();
     assertEquals(STOP_A.getId(), stopId);
@@ -128,14 +126,9 @@ class OjpServiceTest implements RealtimeTestConstants {
   @Test
   void tooManyDepartures() {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
-    var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
+    var service = new OjpService(env.transitService(), new DirectGraphFinder(e -> List.of()));
     assertThrows(IllegalArgumentException.class, () ->
-      service.findCallsAtStop(STOP_A.getId(), params(101))
+      service.findCallsAtStop(STOP_A.getId(), params(env, 101))
     );
-  }
-
-  private static Instant instant(String time) {
-    var localTime = LocalTime.ofSecondOfDay(TimeUtils.time(time));
-    return localTime.atDate(SERVICE_DATE).atZone(TIME_ZONE).toInstant();
   }
 }

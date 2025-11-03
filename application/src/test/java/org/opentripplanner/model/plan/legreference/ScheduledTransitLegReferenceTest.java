@@ -415,4 +415,45 @@ class ScheduledTransitLegReferenceTest {
     assertEquals(SIMPLE_TRIP_ID, leg.trip().getId());
     assertEquals(SERVICE_DATE, leg.serviceDate());
   }
+
+  @Test
+  void getLegFromReferenceWayOutOfRangeBoardingStop() {
+    // Test for issue #6999: ArrayIndexOutOfBoundsException when stop position is way beyond
+    // the number of stops in the pattern. The algorithm should gracefully search backwards
+    // to find a match without throwing an exception.
+    ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
+      SIMPLE_TRIP_ID,
+      SERVICE_DATE,
+      15, // Way beyond the 3 stops in the pattern
+      16,
+      STOP_1_ID,
+      STOP_2_ID,
+      null
+    );
+    // Should handle gracefully by finding the closest matching stops, not throw ArrayIndexOutOfBoundsException
+    var leg = scheduledTransitLegReference.getLeg(transitService);
+    assertNotNull(leg);
+    assertEquals(0, leg.boardStopPosInPattern());
+    assertEquals(1, leg.alightStopPosInPattern());
+  }
+
+  @Test
+  void getLegFromReferenceWayOutOfRangeAlightingStop() {
+    // Test for issue #6999: ArrayIndexOutOfBoundsException when stop position is way beyond
+    // the number of stops in the pattern
+    ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
+      SIMPLE_TRIP_ID,
+      SERVICE_DATE,
+      0,
+      15, // Way beyond the 3 stops in the pattern
+      STOP_1_ID,
+      STOP_2_ID,
+      null
+    );
+    // Should handle gracefully by finding the closest matching stop, or return null
+    var leg = scheduledTransitLegReference.getLeg(transitService);
+    assertNotNull(leg);
+    assertEquals(0, leg.boardStopPosInPattern());
+    assertEquals(1, leg.alightStopPosInPattern());
+  }
 }

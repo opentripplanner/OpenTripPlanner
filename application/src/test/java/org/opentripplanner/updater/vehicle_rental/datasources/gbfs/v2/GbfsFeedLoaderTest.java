@@ -99,9 +99,9 @@ class GbfsFeedLoaderTest {
     List<Exception> exceptions = otpHttpClient.getAndMap(
       URI.create("https://raw.githubusercontent.com/NABSA/gbfs/master/systems.csv"),
       Map.of(),
-      is -> {
+      response -> {
         List<Exception> cvsExceptions = new ArrayList<>();
-        CsvReader reader = new CsvReader(is, StandardCharsets.UTF_8);
+        CsvReader reader = new CsvReader(response.body(), StandardCharsets.UTF_8);
         reader.readHeaders();
         while (reader.readRecord()) {
           try {

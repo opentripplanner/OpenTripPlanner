@@ -4,12 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.graph_builder.module.osm.naming.StreetEdgeBuilderFactory.edgeBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -19,9 +18,7 @@ import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.test.support.GeoJsonIo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +29,9 @@ class SidewalkNamerTest {
   private static final Logger LOG = LoggerFactory.getLogger(SidewalkNamerTest.class);
 
   @Test
-  void postprocess() {
+  void finalizeNames() {
     var builder = new ModelBuilder();
-    var sidewalk = builder.addUnamedSidewalk(
+    var sidewalk = builder.addUnnamedSidewalk(
       new WgsCoordinate(33.75029, -84.39198),
       new WgsCoordinate(33.74932, -84.39275)
     );
@@ -58,7 +55,7 @@ class SidewalkNamerTest {
     );
 
     assertNotEquals(sidewalk.edge.getName(), pryorStreet.edge.getName());
-    builder.postProcess(new SidewalkNamer());
+    builder.finalizeNames(new SidewalkNamer());
     assertEquals(sidewalk.edge.getName(), pryorStreet.edge.getName());
     assertFalse(sidewalk.edge.nameIsDerived());
   }
@@ -67,7 +64,7 @@ class SidewalkNamerTest {
 
     private final List<EdgePair> pairs = new ArrayList<>();
 
-    EdgePair addUnamedSidewalk(WgsCoordinate... coordinates) {
+    EdgePair addUnnamedSidewalk(WgsCoordinate... coordinates) {
       var edge = edgeBuilder(coordinates)
         .withName(SIDEWALK)
         .withPermission(StreetTraversalPermission.PEDESTRIAN)
@@ -95,7 +92,7 @@ class SidewalkNamerTest {
       return p;
     }
 
-    void postProcess(EdgeNamer namer) {
+    void finalizeNames(EdgeNamer namer) {
       pairs.forEach(p ->
         namer.recordEdges(
           p.way,
@@ -103,20 +100,7 @@ class SidewalkNamerTest {
           new OsmDatabase(DataImportIssueStore.NOOP)
         )
       );
-      namer.postprocess();
-    }
-
-    private static StreetEdgeBuilder<?> edgeBuilder(WgsCoordinate... c) {
-      var coordinates = Arrays.stream(c).toList();
-      var ls = GeometryUtils.makeLineString(c);
-      return new StreetEdgeBuilder<>()
-        .withFromVertex(
-          StreetModelForTest.intersectionVertex(coordinates.getFirst().asJtsCoordinate())
-        )
-        .withToVertex(
-          StreetModelForTest.intersectionVertex(coordinates.getLast().asJtsCoordinate())
-        )
-        .withGeometry(ls);
+      namer.finalizeNames();
     }
   }
 
