@@ -76,8 +76,7 @@ public class CarpoolSiriMapper {
     var boardingCall = calls.getFirst();
     var alightingCall = calls.getLast();
 
-    String lineRef = journey.getLineRef().getValue();
-    String tripId = lineRef.substring(lineRef.lastIndexOf(':') + 1);
+    String tripId = journey.getEstimatedVehicleJourneyCode();
 
     AreaStop boardingArea = buildAreaStop(boardingCall, tripId + "_boarding");
     AreaStop alightingArea = buildAreaStop(alightingCall, tripId + "_alighting");
