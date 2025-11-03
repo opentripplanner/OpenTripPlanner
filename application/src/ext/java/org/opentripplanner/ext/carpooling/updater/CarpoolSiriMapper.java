@@ -92,10 +92,14 @@ public class CarpoolSiriMapper {
 
     var scheduledDuration = Duration.between(startTime, endTime);
 
-    // Calculate estimated drive time between stops for deviation budget
+    // TODO: Find a better way to exchange deviation budget with providers.
     var estimatedDriveTime = calculateDriveTimeWithRouting(boardingArea, alightingArea);
 
     var deviationBudget = scheduledDuration.minus(estimatedDriveTime);
+    if (deviationBudget.isNegative()) {
+      // Using 15 minutes as a default for now when the "time left over" method doesn't work.
+      deviationBudget = Duration.ofMinutes(15);
+    }
 
     String provider = journey.getOperatorRef().getValue();
 
@@ -106,7 +110,7 @@ public class CarpoolSiriMapper {
     List<CarpoolStop> stops = new ArrayList<>();
     for (int i = 1; i < calls.size() - 1; i++) {
       EstimatedCall intermediateCall = calls.get(i);
-      CarpoolStop stop = buildCarpoolStop(intermediateCall, tripId, i - 1); // 0-based sequence
+      CarpoolStop stop = buildCarpoolStop(intermediateCall, tripId, i - 1);
       stops.add(stop);
     }
 
@@ -117,7 +121,8 @@ public class CarpoolSiriMapper {
       .withEndTime(endTime)
       .withProvider(provider)
       .withDeviationBudget(deviationBudget)
-      .withAvailableSeats(2) // Default value, could be enhanced if data available
+      // TODO: Make available seats dynamic based on EstimatedVehicleJourney data
+      .withAvailableSeats(2)
       .withStops(stops)
       .build();
   }

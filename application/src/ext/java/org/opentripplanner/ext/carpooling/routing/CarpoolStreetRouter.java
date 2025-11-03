@@ -5,12 +5,10 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -39,17 +37,7 @@ import org.slf4j.LoggerFactory;
  *   <li><strong>Error Handling:</strong> Returns null on routing failure (logged as warning)</li>
  * </ul>
  *
- * <h2>Design Rationale</h2>
- * <p>
- * This class follows OTP's established pattern for routing services (see {@code AccessEgressRouter},
- * {@code GraphPathFinder}). Previously, routing logic was created as a lambda in
- * {@code DefaultCarpoolingService} and passed to {@code InsertionEvaluator}, creating tight
- * coupling. This service class provides proper encapsulation, clear ownership, and improved
- * testability.
- *
  * @see InsertionEvaluator for usage in insertion evaluation
- * @see AccessEgressRouter
- * @see GraphPathFinder
  */
 public class CarpoolStreetRouter {
 
