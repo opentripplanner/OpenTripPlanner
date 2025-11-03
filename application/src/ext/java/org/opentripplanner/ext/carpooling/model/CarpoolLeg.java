@@ -35,8 +35,8 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
- * particular vehicle, which is running on flexible trip, i.e. not using fixed schedule and stops.
+ * One leg of a carpooling trip -- that is, a temporally continuous piece of the journey that takes
+ * place on a particular vehicle.
  */
 public class CarpoolLeg implements Leg {
 

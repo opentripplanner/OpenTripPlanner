@@ -66,6 +66,19 @@ class CarpoolTripCapacityTest {
   }
 
   @Test
+  void getPassengerCountAtPosition_positionTooLarge_throwsException() {
+    var stop1 = createStop(0, +1);
+    var stop2 = createStop(1, +1);
+    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2), OSLO_NORTH);
+
+    // Valid positions are 0 to 3 (stops.size() + 1)
+    // Position 4 should throw
+    assertThrows(IllegalArgumentException.class, () -> trip.getPassengerCountAtPosition(4));
+    // Position 999 should also throw
+    assertThrows(IllegalArgumentException.class, () -> trip.getPassengerCountAtPosition(999));
+  }
+
+  @Test
   void hasCapacityForInsertion_noPassengers_hasCapacity() {
     var trip = createTripWithCapacity(4, OSLO_CENTER, List.of(), OSLO_NORTH);
 

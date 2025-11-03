@@ -174,7 +174,8 @@ public class InsertionEvaluator {
     );
 
     if (modifiedSegments == null) {
-      return null; // Routing failed for new segments
+      // Routing failed for new segments
+      return null;
     }
 
     // Calculate total duration

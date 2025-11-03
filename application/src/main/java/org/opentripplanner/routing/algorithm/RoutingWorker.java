@@ -261,15 +261,13 @@ public class RoutingWorker {
     if (OTPFeature.CarPooling.isOff()) {
       return RoutingResult.ok(List.of());
     }
-    // TODO CARPOOLING Add carpooling timer
-    // debugTimingAggregator.startedCarpoolingRouter();
+    debugTimingAggregator.startedDirectCarpoolRouter();
     try {
       return RoutingResult.ok(serverContext.carpoolingService().route(request));
     } catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
     } finally {
-      // TODO CARPOOLING Add
-      //debugTimingAggregator.finishedCarpoolingRouter();
+      debugTimingAggregator.finishedDirectCarpoolRouter();
     }
   }
 

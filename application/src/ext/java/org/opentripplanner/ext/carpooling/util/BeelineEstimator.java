@@ -12,7 +12,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
  * performing expensive A* street routing. The estimates are intentionally optimistic
  * (lower bounds) to ensure we never incorrectly reject valid insertions.
  * <p>
- * Formula: duration = (beeline_distance × detour_factor) / average_speed
+ * Formula: duration = (beeline_distance × detour_factor) / average_speed (in m/s)
  * <p>
  * The detour factor accounts for the fact that street routes are rarely straight lines.
  * Typical values: 1.2-1.5, with 1.3 being a reasonable default for urban areas.
@@ -33,7 +33,7 @@ public class BeelineEstimator {
   public static final double DEFAULT_SPEED_MPS = 10.0;
 
   private final double detourFactor;
-  private final double speedMps;
+  private final double speed;
 
   /**
    * Creates estimator with default parameters.
@@ -46,25 +46,25 @@ public class BeelineEstimator {
    * Creates estimator with custom parameters.
    *
    * @param detourFactor Factor by which street routes are longer than beeline (typically 1.2-1.5)
-   * @param speedMps Average travel speed in meters per second
+   * @param speed Average travel speed in meters per second
    */
-  public BeelineEstimator(double detourFactor, double speedMps) {
+  public BeelineEstimator(double detourFactor, double speed) {
     if (detourFactor < 1.0) {
       throw new IllegalArgumentException("detourFactor must be >= 1.0 (got " + detourFactor + ")");
     }
-    if (speedMps <= 0) {
-      throw new IllegalArgumentException("speedMps must be positive (got " + speedMps + ")");
+    if (speed <= 0) {
+      throw new IllegalArgumentException("speedMps must be positive (got " + speed + ")");
     }
     this.detourFactor = detourFactor;
-    this.speedMps = speedMps;
+    this.speed = speed;
   }
 
   public double getDetourFactor() {
     return detourFactor;
   }
 
-  public double getSpeedMps() {
-    return speedMps;
+  public double getSpeed() {
+    return speed;
   }
 
   /**
@@ -80,7 +80,7 @@ public class BeelineEstimator {
       to.asJtsCoordinate()
     );
     double routeDistance = beelineDistance * detourFactor;
-    double seconds = routeDistance / speedMps;
+    double seconds = routeDistance / speed;
     return Duration.ofSeconds((long) seconds);
   }
 

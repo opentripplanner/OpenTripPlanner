@@ -175,10 +175,10 @@ class BeelineEstimatorTest {
 
   @Test
   void getSpeedMps_returnsConfiguredValue() {
-    assertEquals(10.0, estimator.getSpeedMps());
+    assertEquals(10.0, estimator.getSpeed());
 
     var customEstimator = new BeelineEstimator(1.3, 15.0);
-    assertEquals(15.0, customEstimator.getSpeedMps());
+    assertEquals(15.0, customEstimator.getSpeed());
   }
 
   @Test

@@ -80,23 +80,23 @@ class InsertionEvaluatorTest {
 
   @Test
   void findOptimalInsertion_routingFails_skipsPosition() {
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
+    // Use a trip with one stop to have multiple viable insertion positions
+    var stop1 = createStopAt(0, OSLO_EAST);
+    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
-    // Create mock paths BEFORE any when() statements
     var mockPath = createMockGraphPath(Duration.ofMinutes(5));
 
     // Routing sequence:
-    // 1. Baseline calculation (1 segment: OSLO_CENTER → OSLO_NORTH) = mockPath
-    // 2. First insertion attempt fails (null, null, null for 3 segments)
-    // 3. Second insertion attempt succeeds (mockPath for all 3 segments)
+    // 1. Baseline calculation (2 segments: OSLO_CENTER → OSLO_EAST → OSLO_NORTH) = mockPath x2
+    // 2. First insertion attempt fails (null for first segment)
+    // 3. Second insertion attempt succeeds (mockPath for all segments)
     when(mockRoutingFunction.route(any(), any()))
-      .thenReturn(mockPath) // Baseline
-      .thenReturn(null) // First insertion - segment 1 fails
-      .thenReturn(mockPath) // Second insertion - all segments succeed
-      .thenReturn(mockPath)
-      .thenReturn(mockPath);
+      .thenReturn(mockPath, mockPath) // Baseline (2 segments)
+      .thenReturn(null) // First insertion - segment fails
+      .thenReturn(mockPath, mockPath, mockPath, mockPath); // Second insertion succeeds
 
-    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST);
+    // Use passenger coordinates that are compatible with trip direction (CENTER->EAST->NORTH)
+    var result = findOptimalInsertion(trip, OSLO_MIDPOINT_NORTH, OSLO_NORTHEAST);
 
     // Should skip failed routing and find a valid one
     assertNotNull(result);
@@ -127,7 +127,6 @@ class InsertionEvaluatorTest {
     var stop2 = createStopAt(1, OSLO_WEST);
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2), OSLO_NORTH);
 
-    // Create mock paths BEFORE any when() statements
     var mockPath = createMockGraphPath();
 
     when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);

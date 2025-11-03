@@ -155,28 +155,31 @@ public class CarpoolTrip
    * Position semantics:
    * - Position 0: Boarding area (before any stops) → 0 passengers
    * - Position N: After Nth stop → cumulative passenger delta up to stop N
-   * - Position beyond all stops: Alighting area → 0 passengers
+   * - Position stops.size() + 1: Alighting area → 0 passengers
    *
    * @param position The position index (0 = boarding, 1 = after first stop, etc.)
    * @return Number of passengers after this position
-   * @throws IllegalArgumentException if position is negative
+   * @throws IllegalArgumentException if position is negative or greater than stops.size() + 1
    */
   public int getPassengerCountAtPosition(int position) {
     if (position < 0) {
       throw new IllegalArgumentException("Position must be non-negative, got: " + position);
     }
 
-    if (position == 0) {
-      return 0;
+    if (position > stops.size() + 1) {
+      throw new IllegalArgumentException(
+        "Position " + position + " exceeds valid range (0 to " + (stops.size() + 1) + ")"
+      );
     }
 
-    if (position > stops.size()) {
+    // At the start and end of the trip there are no passengers
+    if (position == 0 || position == stops.size() + 1) {
       return 0;
     }
 
     // Accumulate passenger deltas up to this position
     int count = 0;
-    for (int i = 0; i < position && i < stops.size(); i++) {
+    for (int i = 0; i < position; i++) {
       count += stops.get(i).getPassengerDelta();
     }
 

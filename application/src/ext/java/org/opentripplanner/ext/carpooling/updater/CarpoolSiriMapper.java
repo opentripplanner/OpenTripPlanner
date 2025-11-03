@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
+import net.opengis.gml._3.LinearRingType;
+import net.opengis.gml._3.PolygonType;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
@@ -214,7 +216,10 @@ public class CarpoolSiriMapper {
    * @return the estimated drive time as a Duration
    */
   private Duration calculateDriveTimeFromDistance(AreaStop boardingArea, AreaStop alightingArea) {
-    double distanceInMeters = calculateDistance(boardingArea, alightingArea);
+    double distanceInMeters = SphericalDistanceLibrary.distance(
+      boardingArea.getCoordinate().asJtsCoordinate(),
+      alightingArea.getCoordinate().asJtsCoordinate()
+    );
 
     // Add a buffer factor for traffic, stops, etc (30% additional time for straight-line)
     double adjustedDistanceInMeters = distanceInMeters * 1.3;
@@ -226,24 +231,6 @@ public class CarpoolSiriMapper {
     long timeInMinutes = (long) Math.ceil(timeInSeconds / 60.0);
 
     return Duration.ofMinutes(timeInMinutes);
-  }
-
-  /**
-   * Calculate the straight-line distance between two area stops using their centroids.
-   *
-   * @param boardingArea the boarding area stop
-   * @param alightingArea the alighting area stop
-   * @return the distance in meters
-   */
-  private double calculateDistance(AreaStop boardingArea, AreaStop alightingArea) {
-    var boardingCoord = boardingArea.getCoordinate();
-    var alightingCoord = alightingArea.getCoordinate();
-
-    // Convert WgsCoordinate to JTS Coordinate for SphericalDistanceLibrary
-    Coordinate from = new Coordinate(boardingCoord.longitude(), boardingCoord.latitude());
-    Coordinate to = new Coordinate(alightingCoord.longitude(), alightingCoord.latitude());
-
-    return SphericalDistanceLibrary.distance(from, to);
   }
 
   /**
@@ -275,9 +262,6 @@ public class CarpoolSiriMapper {
    * Determine the carpool stop type from the EstimatedCall data.
    */
   private CarpoolStop.CarpoolStopType determineCarpoolStopType(EstimatedCall call) {
-    // This is a simplified implementation - adapt based on your SIRI ET data structure
-    // You might have specific fields indicating whether this is pickup, drop-off, or both
-
     boolean hasArrival =
       call.getExpectedArrivalTime() != null || call.getAimedArrivalTime() != null;
     boolean hasDeparture =
@@ -290,7 +274,6 @@ public class CarpoolSiriMapper {
     } else if (hasArrival) {
       return CarpoolStop.CarpoolStopType.DROP_OFF_ONLY;
     } else {
-      // Default fallback
       return CarpoolStop.CarpoolStopType.PICKUP_AND_DROP_OFF;
     }
   }
@@ -304,11 +287,14 @@ public class CarpoolSiriMapper {
 
     // For now, return a default value of 1 passenger pickup/dropoff
     if (stopType == CarpoolStop.CarpoolStopType.DROP_OFF_ONLY) {
-      return -1; // Assume 1 passenger drop-off
+      // Assume 1 passenger drop-off
+      return -1;
     } else if (stopType == CarpoolStop.CarpoolStopType.PICKUP_ONLY) {
-      return 1; // Assume 1 passenger pickup
+      // Assume 1 passenger pickup
+      return 1;
     } else {
-      return 0; // No net change for both pickup and drop-off
+      // No net change for both pickup and drop-off
+      return 0;
     }
   }
 
@@ -318,11 +304,11 @@ public class CarpoolSiriMapper {
    */
   private void validateEstimatedCallOrder(List<EstimatedCall> calls) {
     if (calls.size() < 2) {
-      return; // No validation needed for fewer than 2 calls
+      return;
     }
 
-    ZonedDateTime firstTime = calls.getFirst().getAimedDepartureTime(); // Use departure time for first call
-    ZonedDateTime lastTime = calls.getLast().getAimedArrivalTime(); // Use arrival time for last call
+    ZonedDateTime firstTime = calls.getFirst().getAimedDepartureTime();
+    ZonedDateTime lastTime = calls.getLast().getAimedArrivalTime();
 
     if (firstTime == null || lastTime == null) {
       LOG.warn("Cannot validate call order - missing timing information in first or last call");
@@ -388,10 +374,10 @@ public class CarpoolSiriMapper {
       .build();
   }
 
-  private Polygon createPolygonFromGml(net.opengis.gml._3.PolygonType gmlPolygon) {
+  private Polygon createPolygonFromGml(PolygonType gmlPolygon) {
     var abstractRing = gmlPolygon.getExterior().getAbstractRing().getValue();
 
-    if (!(abstractRing instanceof net.opengis.gml._3.LinearRingType linearRing)) {
+    if (!(abstractRing instanceof LinearRingType linearRing)) {
       throw new IllegalArgumentException("Expected LinearRingType for polygon exterior");
     }
 

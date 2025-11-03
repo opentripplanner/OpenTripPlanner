@@ -176,7 +176,6 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
         return s.mode().name();
       }
       if (leg instanceof CarpoolLeg cl) {
-        // CarpoolLeg is a special case, it has no StreetLeg or TransitLeg, but we can still return the mode
         return cl.mode().name();
       }
       throw new IllegalStateException("Unhandled leg type: " + leg);

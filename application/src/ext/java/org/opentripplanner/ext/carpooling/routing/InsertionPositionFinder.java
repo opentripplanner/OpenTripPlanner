@@ -76,8 +76,8 @@ public class InsertionPositionFinder {
 
     List<InsertionPosition> viable = new ArrayList<>();
 
-    for (int pickupPos = 1; pickupPos <= routePoints.size(); pickupPos++) {
-      for (int dropoffPos = pickupPos + 1; dropoffPos <= routePoints.size() + 1; dropoffPos++) {
+    for (int pickupPos = 1; pickupPos < routePoints.size(); pickupPos++) {
+      for (int dropoffPos = pickupPos + 1; dropoffPos <= routePoints.size(); dropoffPos++) {
         if (!trip.hasCapacityForInsertion(pickupPos, dropoffPos, 1)) {
           LOG.trace(
             "Insertion at pickup={}, dropoff={} rejected by capacity check",

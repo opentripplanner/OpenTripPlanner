@@ -516,7 +516,6 @@ public class LegType {
       return transitLegAccessor.apply(tl);
     }
     if (leg instanceof CarpoolLeg cl) {
-      // CarpoolLeg is a special case, it has no StreetLeg or TransitLeg, but we can still return the mode
       return cl.mode();
     }
     throw new IllegalStateException("Unhandled leg type: " + leg);

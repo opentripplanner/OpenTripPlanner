@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.PathComparator;
@@ -121,8 +122,8 @@ public class CarpoolStreetRouter {
    */
   private GraphPath<State, Edge, Vertex> carpoolRouting(
     StreetRequest streetRequest,
-    java.util.Set<Vertex> fromVertices,
-    java.util.Set<Vertex> toVertices,
+    Set<Vertex> fromVertices,
+    Set<Vertex> toVertices,
     float maxCarSpeed
   ) {
     var preferences = request.preferences().street();
