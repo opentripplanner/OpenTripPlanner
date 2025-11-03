@@ -269,8 +269,15 @@ public class GeometryUtilsTest {
 
   @Test
   void sumDistances() {
-    var coordinates = List.of(Coordinates.BERLIN, Coordinates.HAMBURG, Coordinates.BERLIN);
+    var coordinates = List.of(Coordinates.BERLIN, Coordinates.HAMBURG);
     var meters = GeometryUtils.sumDistances(coordinates);
-    assertEquals(510_768, meters, 50);
+    assertEquals(255_384.0, meters, 0.5);
+  }
+
+  @Test
+  void sumDistancesArraySinglePoint() {
+    var coordinates = new Coordinate[] { Coordinates.BERLIN };
+    var meters = GeometryUtils.sumDistances(coordinates);
+    assertEquals(0.0, meters);
   }
 }

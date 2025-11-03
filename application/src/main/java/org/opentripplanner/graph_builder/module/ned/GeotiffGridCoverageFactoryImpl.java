@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.ned;
 
 import java.io.File;
 import java.io.IOException;
-import javax.media.jai.InterpolationBilinear;
+import org.eclipse.imagen.Interpolation;
 import org.geotools.api.coverage.grid.GridCoverage;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
@@ -44,7 +44,10 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
   @Override
   public GridCoverage getGridCoverage() {
     return NoDataGridCoverage.create(
-      Interpolator2D.create(getUninterpolatedGridCoverage(), new InterpolationBilinear())
+      Interpolator2D.create(
+        getUninterpolatedGridCoverage(),
+        Interpolation.getInstance(Interpolation.INTERP_BILINEAR)
+      )
     );
   }
 

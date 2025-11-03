@@ -79,7 +79,7 @@ public class EstimatedCallType {
           .name("expectedArrivalTime")
           .type(new GraphQLNonNull(dateTimeScalar))
           .description(
-            "Expected time of arrival at quay. Updated with real time information if available. Will be null if an actualArrivalTime exists"
+            "Expected time of arrival at quay. Updated with real time information if available."
           )
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
@@ -125,7 +125,7 @@ public class EstimatedCallType {
           .name("expectedDepartureTime")
           .type(new GraphQLNonNull(dateTimeScalar))
           .description(
-            "Expected time of departure from quay. Updated with real time information if available. Will be null if an actualDepartureTime exists"
+            "Expected time of departure from quay. Updated with real time information if available."
           )
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();

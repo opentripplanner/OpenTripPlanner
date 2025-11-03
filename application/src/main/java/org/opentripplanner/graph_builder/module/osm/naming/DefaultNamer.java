@@ -5,17 +5,18 @@ import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.OsmWay;
 
 public class DefaultNamer implements EdgeNamer {
 
   @Override
-  public I18NString name(OsmEntity way) {
-    return way.getAssumedName();
+  public I18NString name(OsmEntity entity) {
+    return entity.getAssumedName();
   }
 
   @Override
-  public void recordEdges(OsmEntity way, StreetEdgePair edge, OsmDatabase osmdb) {}
+  public void recordEdges(OsmWay way, StreetEdgePair edge, OsmDatabase osmdb) {}
 
   @Override
-  public void postprocess() {}
+  public void finalizeNames() {}
 }

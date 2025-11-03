@@ -137,6 +137,19 @@ public class TimeUtilsTest {
   }
 
   @Test
+  void normalize() {
+    int halfASecond = 500_000_000;
+    // Plus 0.499_999_999 seconds -> round down
+    assertEquals(CAL, TimeUtils.normalize(CAL.plusNanos(halfASecond - 1)));
+    // Plus 0.5 seconds -> round up
+    assertEquals(CAL.plusSeconds(1), TimeUtils.normalize(CAL.plusNanos(halfASecond)));
+    // Minus 0.5 seconds -> round up
+    assertEquals(CAL, TimeUtils.normalize(CAL.minusNanos(halfASecond)));
+    // Minus 0.500_000_001 seconds -> round down
+    assertEquals(CAL.minusSeconds(1), TimeUtils.normalize(CAL.minusNanos(halfASecond + 1)));
+  }
+
+  @Test
   public void toZonedDateTimeDST() {
     ZoneId CET = ZoneIds.OSLO;
     // test daylight-saving-time

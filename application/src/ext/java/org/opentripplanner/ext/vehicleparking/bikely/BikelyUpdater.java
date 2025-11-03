@@ -59,10 +59,10 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
       POST_PARAMS,
       Duration.ofSeconds(30),
       parameters.httpHeaders().asMap(),
-      is -> {
+      response -> {
         try {
           var lots = new ArrayList<VehicleParking>();
-          OBJECT_MAPPER.readTree(is)
+          OBJECT_MAPPER.readTree(response.body())
             .path(JSON_PARSE_PATH)
             .forEach(node -> lots.add(parseElement(node)));
 

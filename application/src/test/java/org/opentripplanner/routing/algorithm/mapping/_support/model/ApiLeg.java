@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.mapping._support.model;
 
 import java.util.Calendar;
 import java.util.List;
-import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.api.model.geometry.EncodedPolyline;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a

@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.apis.gtfs.mapping.LocalDateMapper;
-import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -123,7 +123,7 @@ class LegMapper {
     if (addIntermediateStops) {
       api.intermediateStops = placeMapper.mapStopArrivals(domain.listIntermediateStops());
     }
-    api.legGeometry = EncodedPolyline.encode(domain.legGeometry());
+    api.legGeometry = EncodedPolyline.of(domain.legGeometry());
     api.legElevation = mapElevation(domain.elevationProfile());
     api.steps = walkStepMapper.mapWalkSteps(domain.listWalkSteps());
 

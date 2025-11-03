@@ -307,7 +307,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
         dataInitializationUrl,
         initialGetDataTimeout,
         Map.of("Content-Type", "application/xml"),
-        ByteString::readFrom
+        response -> ByteString.readFrom(response.body())
       );
     }
   }

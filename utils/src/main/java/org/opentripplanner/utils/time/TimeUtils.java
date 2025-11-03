@@ -23,6 +23,7 @@ public class TimeUtils {
   public static final Integer ONE_DAY_SECONDS = 24 * 60 * 60;
   private static final Pattern DAYS_SUFFIX = Pattern.compile("([-+])(\\d+)d");
   private static final AtomicLong BUSY_WAIT_GRACE_PERIOD_TIMEOUT = new AtomicLong(0);
+  private static final int NANOS_IN_SECOND = 1_000_000_000;
 
   /** This is a utility class. Do not instantiate this class. It should have only static methods. */
   private TimeUtils() {}
@@ -167,6 +168,12 @@ public class TimeUtils {
    */
   public static ZonedDateTime zonedDateTime(LocalDate date, int seconds, ZoneId zoneId) {
     return RelativeTime.ofSeconds(seconds).toZonedDateTime(date, zoneId);
+  }
+
+  /// Round the given `value` to the closest second value.
+  /// Throws [NullPointerException] if `value` is `null`
+  public static ZonedDateTime normalize(ZonedDateTime value) {
+    return value.plusNanos(NANOS_IN_SECOND / 2).truncatedTo(ChronoUnit.SECONDS);
   }
 
   /**

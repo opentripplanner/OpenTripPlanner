@@ -16,6 +16,7 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -44,8 +45,8 @@ public class StreetLeg implements Leg {
 
   protected StreetLeg(StreetLegBuilder builder) {
     this.mode = Objects.requireNonNull(builder.getMode());
-    this.startTime = builder.getStartTime();
-    this.endTime = builder.getEndTime();
+    this.startTime = TimeUtils.normalize(builder.getStartTime());
+    this.endTime = TimeUtils.normalize(builder.getEndTime());
     this.distanceMeters = DoubleUtils.roundTo2Decimals(builder.getDistanceMeters());
     this.from = builder.getFrom();
     this.to = builder.getTo();

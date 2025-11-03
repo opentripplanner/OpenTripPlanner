@@ -52,9 +52,9 @@ public class JsonDataListDownloader<T> {
       return null;
     }
     try {
-      return otpHttpClient.getAndMap(URI.create(url), headers, is -> {
+      return otpHttpClient.getAndMap(URI.create(url), headers, response -> {
         try {
-          return parseJSON(is);
+          return parseJSON(response.body());
         } catch (IllegalArgumentException e) {
           LOG.warn("Error parsing feed from {}", url, e);
         } catch (JsonProcessingException e) {

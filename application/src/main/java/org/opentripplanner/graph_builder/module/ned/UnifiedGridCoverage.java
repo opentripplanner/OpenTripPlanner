@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.ned;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.media.jai.InterpolationBilinear;
+import org.eclipse.imagen.Interpolation;
 import org.geotools.api.coverage.CannotEvaluateException;
 import org.geotools.api.coverage.Coverage;
 import org.geotools.api.coverage.PointOutsideCoverageException;
@@ -53,7 +53,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
       // TODO might bicubic interpolation give better results?
       GridCoverage2D regionCoverageInterpolator = Interpolator2D.create(
         regionCoverage,
-        new InterpolationBilinear()
+        Interpolation.getInstance(Interpolation.INTERP_BILINEAR)
       );
 
       // Iterate over datums to find intersection envelope with each region and add to spatial index.

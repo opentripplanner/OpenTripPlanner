@@ -75,7 +75,9 @@
       "wheelchairAccessibility": {
         "enabled": true
       }
-    }
+    },
+    { "modes": "BICYCLE" },
+    { "modes": "CAR" }
   ],
   "stopConsolidationFile": "consolidated-stops.csv",
   "transferParametersForMode": {
@@ -84,8 +86,10 @@
       "carsAllowedStopMaxTransferDuration": "3h"
     },
     "BIKE": {
+      "disableDefaultTransfers": true,
       "maxTransferDuration": "30m",
-      "carsAllowedStopMaxTransferDuration": "3h"
+      "carsAllowedStopMaxTransferDuration": "3h",
+      "bikesAllowedStopMaxTransferDuration": "1h"
     }
   }
 }

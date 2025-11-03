@@ -305,18 +305,26 @@ public record ScheduledTransitLegReference(
     int stopPosition,
     Function<StopLocation, Boolean> matcher
   ) {
-    var beforeInRange = true;
-    var afterInRange = true;
-    for (var diff = 0; beforeInRange || afterInRange; ++diff) {
+    // Look up for candidate stops before the original stop and after the original stop.
+    // Keep searching until reaching the first stop and the last stop in the pattern.
+    var keepSearchingBackward = true;
+    var keepSearchingForward = true;
+    for (var diff = 0; keepSearchingBackward || keepSearchingForward; ++diff) {
       var stopPositionAfter = stopPosition + diff;
-      afterInRange = stopPositionAfter < tripPattern.numberOfStops();
-      if (afterInRange && matcher.apply(tripPattern.getStops().get(stopPositionAfter))) {
+      keepSearchingForward = stopPositionAfter < tripPattern.numberOfStops();
+      if (keepSearchingForward && matcher.apply(tripPattern.getStops().get(stopPositionAfter))) {
         return OptionalInt.of(stopPositionAfter);
       }
       var stopPositionBefore = stopPosition - diff;
-      beforeInRange = stopPositionBefore >= 0;
+      keepSearchingBackward = stopPositionBefore >= 0;
+      // when searching backward, check that the candidate stop is before the last stop.
+      // it could be out of range if the current pattern has fewer stops than the original pattern.
+      boolean stopPositionBeforeIsInRange = stopPositionBefore < tripPattern.numberOfStops();
       if (
-        diff != 0 && beforeInRange && matcher.apply(tripPattern.getStops().get(stopPositionBefore))
+        diff != 0 &&
+        keepSearchingBackward &&
+        stopPositionBeforeIsInRange &&
+        matcher.apply(tripPattern.getStops().get(stopPositionBefore))
       ) {
         return OptionalInt.of(stopPositionBefore);
       }
