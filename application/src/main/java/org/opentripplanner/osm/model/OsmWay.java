@@ -2,6 +2,7 @@ package org.opentripplanner.osm.model;
 
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
+import java.util.Optional;
 import java.util.Set;
 
 public class OsmWay extends OsmEntity {
@@ -102,6 +103,53 @@ public class OsmWay extends OsmEntity {
 
   public boolean isBarrier() {
     return hasTag("barrier");
+  }
+
+  public boolean isFootway() {
+    return isTag("highway", "footway");
+  }
+
+  public boolean isCrossing() {
+    return isFootway() && isTag("footway", "crossing");
+  }
+
+  public boolean isServiceRoad() {
+    return isTag("highway", "service");
+  }
+
+  /**
+   * Whether a way is an entrance or an exit of a freeway/motorway or similar access-controlled, car-only road.
+   */
+  public boolean isMotorwayRamp() {
+    return isTag("highway", "motorway_link");
+  }
+
+  public boolean isTurnLane() {
+    Optional<TraverseDirection> oneWayCar = isOneWay("motorcar");
+    boolean oneWay = oneWayCar.isPresent();
+    return (
+      !isNamed() &&
+      oneWay &&
+      (!isMotorwayRamp() || isTag("turn:lanes", "right") || isTag("turn:lanes", "left"))
+    );
+  }
+
+  /** Whether this way is connected to the given way through their extremities. */
+  public boolean isAdjacentTo(OsmWay way) {
+    if (nodes.isEmpty() || way.nodes.isEmpty()) return false;
+
+    long wayFirstNode = way.nodes.get(0);
+    long wayLastNode = way.nodes.get(way.nodes.size() - 1);
+
+    long firstNode = nodes.get(0);
+    long lastNode = nodes.get(nodes.size() - 1);
+
+    return (
+      (firstNode == wayFirstNode && lastNode != wayLastNode) ||
+      (firstNode == wayLastNode && lastNode != wayFirstNode) ||
+      (lastNode == wayFirstNode && firstNode != wayLastNode) ||
+      (lastNode == wayLastNode && firstNode != wayFirstNode)
+    );
   }
 
   @Override

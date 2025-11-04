@@ -29,7 +29,6 @@ final class TestDriver {
   private final Instant edt;
   private final Instant lat;
   private final SortOrder sortOrder;
-  private final ListSection cropSection;
   private final PageCursorInput results;
 
   public TestDriver(
@@ -40,7 +39,6 @@ final class TestDriver {
     Instant edt,
     Instant lat,
     SortOrder sortOrder,
-    ListSection cropSection,
     PageCursorInput results
   ) {
     this.nResults = nResults;
@@ -50,7 +48,6 @@ final class TestDriver {
     this.edt = edt;
     this.lat = lat;
     this.sortOrder = sortOrder;
-    this.cropSection = cropSection;
     this.results = results;
     debug();
   }
@@ -109,10 +106,6 @@ final class TestDriver {
 
   PageCursorInput filterResults() {
     return results;
-  }
-
-  ItinerarySortKey expectedCut() {
-    return results == null ? null : results.pageCut();
   }
 
   TestDriver newPage(PageCursor cursor) {
@@ -188,7 +181,6 @@ final class TestDriver {
       edt,
       lat,
       sortOrder,
-      ListSection.TAIL,
       filterResultBox.get()
     );
   }

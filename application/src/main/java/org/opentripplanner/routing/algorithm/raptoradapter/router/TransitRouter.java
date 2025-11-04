@@ -32,8 +32,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccess
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorRequestMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DefaultTransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RouteRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -343,7 +343,7 @@ public class TransitRouter {
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
-      new RouteRequestTransitDataProviderFilter(request),
+      DefaultTransitDataProviderFilter.ofRequest(request),
       request
     );
   }

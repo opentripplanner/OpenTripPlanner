@@ -217,6 +217,12 @@ public class WayTestData {
     return way;
   }
 
+  public static OsmWay motorwayRamp() {
+    var way = new OsmWay();
+    way.addTag("highway", "motorway_link");
+    return way;
+  }
+
   public static OsmWay highwayTrunk() {
     var way = new OsmWay();
     way.addTag("highway", "trunk");
@@ -230,9 +236,14 @@ public class WayTestData {
     return way;
   }
 
-  public static OsmWay highwayPrimaryWithMotorroad() {
+  public static OsmWay highwayPrimary() {
     var way = new OsmWay();
     way.addTag("highway", "primary");
+    return way;
+  }
+
+  public static OsmWay highwayPrimaryWithMotorroad() {
+    var way = highwayPrimary();
     way.addTag("motorroad", "yes");
     return way;
   }

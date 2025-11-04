@@ -1,15 +1,21 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -25,7 +31,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   public static final FeedScopedId TP_ID_1 = id("1");
   public static final FeedScopedId TP_ID_2 = id("2");
@@ -61,7 +67,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     tripPatternsForDates.add(new TripPatternForDate(tripPattern1, tripTimes, List.of(), third));
     tripPatternsForDates.add(new TripPatternForDate(tripPattern3, tripTimes, List.of(), third));
 
-    var noOpFilter = new RouteRequestTransitDataProviderFilter(RouteRequest.defaultValue());
+    var noOpFilter = DefaultTransitDataProviderFilter.ofRequest(RouteRequest.defaultValue());
 
     // Patterns containing trip schedules for all 3 days. Trip schedules for later days are offset
     // in time when requested.
@@ -87,6 +93,80 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     assertEquals(-82800, ((TripScheduleWithOffset) r3.getTripSchedule(0)).getSecondsOffset());
     assertEquals(0, ((TripScheduleWithOffset) r3.getTripSchedule(1)).getSecondsOffset());
     assertEquals(86400, ((TripScheduleWithOffset) r3.getTripSchedule(2)).getSecondsOffset());
+  }
+
+  @Test
+  public void testCreateTripPatterns() {
+    var date = LocalDate.of(2025, 10, 10);
+    List<TripTimes> tripTimes = List.of(
+      ScheduledTripTimes.of()
+        .withTrip(TimetableRepositoryForTest.trip("Test").build())
+        .withDepartureTimes("23:45 23:55")
+        .build(),
+      ScheduledTripTimes.of()
+        .withTrip(TimetableRepositoryForTest.trip("Test").build())
+        .withDepartureTimes("23:47 23:57")
+        .build(),
+      ScheduledTripTimes.of()
+        .withTrip(TimetableRepositoryForTest.trip("Test").build())
+        .withDepartureTimes("23:49 23:59")
+        .build(),
+      ScheduledTripTimes.of()
+        .withTrip(TimetableRepositoryForTest.trip("Test").build())
+        .withDepartureTimes("23:51 24:01")
+        .build(),
+      ScheduledTripTimes.of()
+        .withTrip(TimetableRepositoryForTest.trip("Test").build())
+        .withDepartureTimes("23:53 24:03")
+        .build()
+    );
+    var tripPattern = createTripPattern(TP_ID_1);
+    Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate = new HashMap<>();
+    for (var i = -5; i <= 5; ++i) {
+      var tripPatternForDate = new TripPatternForDate(
+        tripPattern,
+        tripTimes,
+        List.of(),
+        date.minusDays(i)
+      );
+      for (var runningDate : tripPatternForDate.getRunningPeriodDates()) {
+        tripPatternsRunningOnDate.putIfAbsent(runningDate, new ArrayList<>());
+        tripPatternsRunningOnDate.get(runningDate).add(tripPatternForDate);
+      }
+    }
+
+    var subject = new RaptorRoutingRequestTransitDataCreator(
+      new RaptorTransitData(
+        tripPatternsRunningOnDate,
+        List.of(),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ),
+      ZonedDateTime.of(date, LocalTime.MIDNIGHT, ZoneIds.UTC)
+    );
+    var result = subject.createTripPatterns(
+      2,
+      0,
+      DefaultTransitDataProviderFilter.ofRequest(RouteRequest.defaultValue()),
+      TransitGroupPriorityService.empty()
+    );
+    var expectedDates = List.of(
+      LocalDate.of(2025, 10, 7),
+      LocalDate.of(2025, 10, 8),
+      LocalDate.of(2025, 10, 9),
+      LocalDate.of(2025, 10, 10)
+    );
+    TripPatternForDates resultPattern = result.getFirst();
+    var iterator = resultPattern.tripPatternForDatesIndexIterator(true);
+    for (var item : expectedDates) {
+      assertTrue(iterator.hasNext());
+      assertEquals(item, resultPattern.tripPatternForDate(iterator.next()).getServiceDate());
+    }
+    assertFalse(iterator.hasNext());
   }
 
   private static TripPatternForDates findTripPatternForDate(

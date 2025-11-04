@@ -8,16 +8,14 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.updater.spi.HttpHeaders;
 
+/**
+ * Parameters for fetching vehicle rental services from a GBFS v3 manifest.json file.
+ * The manifest can be loaded from a remote URL or a local file path.
+ */
 public class VehicleRentalServiceDirectoryFetcherParameters {
 
   public static final String DEFAULT_NETWORK_NAME = "default-network";
   private final URI url;
-
-  private final String sourcesName;
-
-  private final String sourceUrlName;
-
-  private final String sourceNetworkName;
 
   private final HttpHeaders headers;
 
@@ -30,17 +28,11 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
 
   public VehicleRentalServiceDirectoryFetcherParameters(
     URI url,
-    String sourcesName,
-    String updaterUrlName,
-    String networkName,
     String language,
     HttpHeaders headers,
     Collection<NetworkParameters> networkParameters
   ) {
     this.url = url;
-    this.sourcesName = sourcesName;
-    this.sourceUrlName = updaterUrlName;
-    this.sourceNetworkName = networkName;
     this.language = language;
     this.headers = headers;
     this.parametersForNetwork = networkParameters
@@ -50,39 +42,14 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
   }
 
   /**
-   * Endpoint for the VehicleRentalServiceDirectory
+   * URL or file path to the GBFS v3 manifest.json
    * <p>
-   * This is required.
+   * This is required. Can be either:
+   * - A remote URL (http/https)
+   * - A local file path (file://)
    */
   public URI getUrl() {
     return url;
-  }
-
-  /**
-   * Json tag name for updater sources
-   * <p>
-   * Optional, default values is "systems".
-   */
-  public String getSourcesName() {
-    return sourcesName;
-  }
-
-  /**
-   * Json tag name for endpoint urls for each source
-   * <p>
-   * Optional, default values is "url".
-   */
-  public String getSourceUrlName() {
-    return sourceUrlName;
-  }
-
-  /**
-   * Json tag name for the network name for each source
-   * <p>
-   * Optional, default values is "id".
-   */
-  public String getSourceNetworkName() {
-    return sourceNetworkName;
   }
 
   /**

@@ -312,8 +312,6 @@ public class SiriAlertsUpdateHandler {
       translations.put("", "");
     }
 
-    return translations.isEmpty()
-      ? null
-      : TranslatedString.getI18NString(translations, false, true);
+    return translations.isEmpty() ? null : TranslatedString.getI18NString(translations, true);
   }
 }

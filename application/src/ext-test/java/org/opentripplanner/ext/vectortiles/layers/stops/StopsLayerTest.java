@@ -28,7 +28,6 @@ public class StopsLayerTest {
         put("de", "nameDE");
       }
     },
-    false,
     false
   );
   private static final I18NString DESC_TRANSLATIONS = TranslatedString.getI18NString(
@@ -38,7 +37,6 @@ public class StopsLayerTest {
         put("de", "descDE");
       }
     },
-    false,
     false
   );
 

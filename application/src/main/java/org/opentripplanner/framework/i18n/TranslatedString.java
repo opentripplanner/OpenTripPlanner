@@ -49,23 +49,64 @@ public class TranslatedString implements I18NString, Serializable {
     for (int i = 0; i < translations.length - 1; i += 2) {
       map.put(translations[i], translations[i + 1]);
     }
-    return getI18NString(map, false, false);
+    return getI18NString(map, false);
   }
 
   /**
-   * Gets an I18NString. If the translations only have a single value, return a NonTranslatedString,
-   * otherwise a TranslatedString
+   * Gets a deduplicated I18NString. If the translations only have a single value, return a
+   * NonLocalizedString, otherwise a TranslatedString. The resulting I18NString is interned for
+   * memory efficiency.
+   * <p>
+   * This should be used when calling this method during graph building. This should not be called
+   * from a real-time updater as this is not thread-safe and may cause a memory leak.
    *
    * @param translations A Map of languages and translations, a null language is the default
    *                     translation
-   * @param intern Should the resulting I18NString be interned. This should be used when calling
-   *               this method during graph building, or when the string will be retained until the
-   *               instance is shut down, as it will cause a memory leak otherwise.
+   * @param forceTranslatedString Should the language information be kept, even when only a single
+   *                              translation is provided. This is useful when the language
+   *                              information is important or is presented to the user.
+   */
+  public static I18NString getDeduplicatedI18NString(
+    Map<String, String> translations,
+    boolean forceTranslatedString
+  ) {
+    return getI18NString(translations, true, forceTranslatedString);
+  }
+
+  /**
+   * Gets a non-deduplicated I18NString. If the translations only have a single value, return a
+   * NonLocalizedString, otherwise a TranslatedString. The resulting I18NString is NOT interned.
+   * <p>
+   * This should be used from real-time updaters to avoid memory leaks. For graph building, use
+   * {@link #getDeduplicatedI18NString(Map, boolean)} instead.
+   *
+   * @param translations A Map of languages and translations, a null language is the default
+   *                     translation
    * @param forceTranslatedString Should the language information be kept, even when only a single
    *                              translation is provided. This is useful when the language
    *                              information is important or is presented to the user.
    */
   public static I18NString getI18NString(
+    Map<String, String> translations,
+    boolean forceTranslatedString
+  ) {
+    return getI18NString(translations, false, forceTranslatedString);
+  }
+
+  /**
+   * Gets an I18NString. If the translations only have a single value, return a NonLocalizedString,
+   * otherwise a TranslatedString
+   *
+   * @param translations A Map of languages and translations, a null language is the default
+   *                     translation
+   * @param intern Should the resulting I18NString be interned. This should be used when calling
+   *               this method during graph building. This should not be called from a real-time
+   *               updater as this is not thread-safe and may cause a memory leak.
+   * @param forceTranslatedString Should the language information be kept, even when only a single
+   *                              translation is provided. This is useful when the language
+   *                              information is important or is presented to the user.
+   */
+  static I18NString getI18NString(
     Map<String, String> translations,
     boolean intern,
     boolean forceTranslatedString

@@ -501,7 +501,7 @@ class WalkableAreaBuilder {
       .getOsmTagMapper()
       .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS);
 
-    I18NString name = namer.getNameForWay(parent, label);
+    I18NString name = namer.getName(parent, label);
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex1)
       .withToVertex(vertex2)
@@ -517,7 +517,7 @@ class WalkableAreaBuilder {
       .withLink(parent.isLink());
 
     label = String.format(labelTemplate, parent.getId(), vertex2.getLabel(), vertex1.getLabel());
-    name = namer.getNameForWay(parent, label);
+    name = namer.getName(parent, label);
     AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex2)
       .withToVertex(vertex1)
@@ -549,7 +549,7 @@ class WalkableAreaBuilder {
       OsmEntity areaEntity = area.parent;
 
       String id = "way (area) " + areaEntity.getId();
-      I18NString name = namer.getNameForWay(areaEntity, id);
+      I18NString name = namer.getName(areaEntity, id);
       namedArea.setName(name);
 
       WayProperties wayData = findAreaProperties(areaEntity);

@@ -239,7 +239,7 @@ public class OsmModule implements GraphBuilderModule {
 
     TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore, osmInfoGraphBuildRepository);
 
-    params.edgeNamer().postprocess();
+    params.edgeNamer().finalizeNames();
   }
 
   /**
@@ -547,7 +547,7 @@ public class OsmModule implements GraphBuilderModule {
 
       return Optional.of(
         new Platform(
-          params.edgeNamer().getNameForWay(way, "platform " + way.getId()),
+          params.edgeNamer().getName(way, "platform " + way.getId()),
           geometry,
           references
         )
@@ -676,7 +676,7 @@ public class OsmModule implements GraphBuilderModule {
 
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
-    I18NString name = params.edgeNamer().getNameForWay(way, label);
+    I18NString name = params.edgeNamer().getName(way, label);
     float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, direction);
 
     StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
@@ -690,6 +690,7 @@ public class OsmModule implements GraphBuilderModule {
       .withCarSpeed(carSpeed)
       .withLink(way.isLink())
       .withRoundabout(way.isRoundabout())
+      .withCrossing(way.isCrossing())
       .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
       .withStairs(way.isSteps())
       .withWheelchairAccessible(way.isWheelchairAccessible())

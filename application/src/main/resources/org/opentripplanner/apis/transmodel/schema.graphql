@@ -244,9 +244,9 @@ type EstimatedCall {
   destinationDisplay: DestinationDisplay
   "The typical delay for this trip on this day for this stop based on historical data."
   empiricalDelay: EmpiricalDelay
-  "Expected time of arrival at quay. Updated with real time information if available. Will be null if an actualArrivalTime exists"
+  "Expected time of arrival at quay. Updated with real time information if available."
   expectedArrivalTime: DateTime!
-  "Expected time of departure from quay. Updated with real time information if available. Will be null if an actualDepartureTime exists"
+  "Expected time of departure from quay. Updated with real time information if available."
   expectedDepartureTime: DateTime!
   "Whether vehicle may be alighted at quay."
   forAlighting: Boolean!
@@ -356,7 +356,11 @@ type Leg {
   fromPlace: Place!
   "Generalized cost or weight of the leg. Used for debugging."
   generalizedCost: Int
-  "An identifier for the leg, which can be used to re-fetch transit leg information."
+  """
+  An identifier for the leg, which can be used to re-fetch transit leg information. The
+  identifier is valid for a maximum of 2 years, but sometimes it will fail after a few hours.
+  We do not recommend storing IDs for a long time.
+  """
   id: ID
   interchangeFrom: Interchange
   interchangeTo: Interchange
@@ -533,6 +537,8 @@ type PlaceAtDistance {
 
 "A list of coordinates encoded as a polyline string (see http://code.google.com/apis/maps/documentation/polylinealgorithm.html)"
 type PointsOnLink {
+  "The distance in meters."
+  distance: Int
   "The number of points in the string"
   length: Int
   "The encoded points of the polyline. Be aware that the string could contain escape characters that need to be accounted for. (https://www.freeformatter.com/javascript-escape.html)"
@@ -808,6 +814,8 @@ type QueryType {
     "MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response. Does not affect mono modal stop places that do not belong to a multi modal stop place."
     multiModalMode: MultiModalMode = parent
   ): [StopPlace]! @timingData
+  "Get information about the transit data available in the system."
+  transitInfo: TransitInfo!
   "Input type for executing a travel search for a trip between two locations. Returns trip patterns describing suggested alternatives for the trip."
   trip(
     "Time and cost penalty on access/egress modes."
@@ -1178,6 +1186,8 @@ type ServerInfo {
     Note: The input data can be in several time zones, but OTP internally operates on a single one.
   """
   internalTransitModelTimeZone: String
+  "Number of CPU cores on the OTP server"
+  numberOfCores: Int
   "The 'configVersion' of the otp-config.json file."
   otpConfigVersion: String
   "The otp-serialization-version-id used to check graphs for compatibility with current version of OTP."
@@ -1374,6 +1384,12 @@ type TimetabledPassingTime {
   serviceJourney: ServiceJourney!
   "Whether this is a timing point or not. Boarding and alighting is not allowed at timing points."
   timingPoint: Boolean!
+}
+
+"Information about the transit data available in the system."
+type TransitInfo {
+  "The validity period for the transit data currently loaded in the system."
+  validityPeriod: ValidityPeriod
 }
 
 "Used to specify board and alight slack for a given modes."

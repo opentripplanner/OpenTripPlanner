@@ -59,11 +59,7 @@ public class VehicleParkingsLayerTest {
     vehicleParking = VehicleParking.builder()
       .id(ID)
       .name(
-        TranslatedString.getI18NString(
-          Map.of("", "default name", "de", "deutscher Name"),
-          false,
-          false
-        )
+        TranslatedString.getI18NString(Map.of("", "default name", "de", "deutscher Name"), false)
       )
       .coordinate(new WgsCoordinate(2, 1))
       .bicyclePlaces(true)
