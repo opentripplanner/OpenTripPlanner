@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.edge;
 import static org.opentripplanner.street.model.edge.StreetEdge.BACK_FLAG_INDEX;
 import static org.opentripplanner.street.model.edge.StreetEdge.BICYCLE_NOTHRUTRAFFIC;
 import static org.opentripplanner.street.model.edge.StreetEdge.CLASS_LINK;
+import static org.opentripplanner.street.model.edge.StreetEdge.CROSSING_FLAG_INDEX;
 import static org.opentripplanner.street.model.edge.StreetEdge.MOTOR_VEHICLE_NOTHRUTRAFFIC;
 import static org.opentripplanner.street.model.edge.StreetEdge.NAME_IS_DERIVED_FLAG_INDEX;
 import static org.opentripplanner.street.model.edge.StreetEdge.ROUNDABOUT_FLAG_INDEX;
@@ -196,6 +197,11 @@ public class StreetEdgeBuilder<B extends StreetEdgeBuilder<B>> {
 
   public B withRoundabout(boolean roundabout) {
     flags = BitSetUtils.set(flags, ROUNDABOUT_FLAG_INDEX, roundabout);
+    return instance();
+  }
+
+  public B withCrossing(boolean crossing) {
+    flags = BitSetUtils.set(flags, CROSSING_FLAG_INDEX, crossing);
     return instance();
   }
 

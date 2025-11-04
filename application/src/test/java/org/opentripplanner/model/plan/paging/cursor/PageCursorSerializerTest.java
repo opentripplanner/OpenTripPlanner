@@ -42,7 +42,7 @@ class PageCursorSerializerTest {
   private static final ItinerarySortKey CUT = new DeduplicationPageCut(
     DT,
     AT,
-    Cost.costOfSeconds(1200),
+    Cost.normalizedCost(1200),
     3,
     true
   );

@@ -1,9 +1,6 @@
 {
   "vehicleRentalServiceDirectory": {
-    "url": "https://example.com",
-    "sourcesName": "systems",
-    "updaterUrlName": "url",
-    "updaterNetworkName": "id",
+    "url": "https://example.com/gbfs/v3/manifest.json",
     "headers": {
       "ET-Client-Name": "otp"
     },

@@ -44,8 +44,8 @@ public class SiriFmDataSource implements DataSource<AvailabiltyUpdate> {
 
   @Override
   public boolean update() {
-    updates = httpClient.getAndMap(params.url(), headers, resp -> {
-      var siri = SiriXml.parseXml(resp);
+    updates = httpClient.getAndMap(params.url(), headers, response -> {
+      var siri = SiriXml.parseXml(response.body());
 
       return Stream.ofNullable(siri.getServiceDelivery())
         .flatMap(sd -> sd.getFacilityMonitoringDeliveries().stream())

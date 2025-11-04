@@ -58,20 +58,20 @@
 
 
     <properties>
-        <otp.serialization.version.id>206</otp.serialization.version.id>
+        <otp.serialization.version.id>210</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>33.2</geotools.version>
+        <geotools.version>34.0</geotools.version>
         <google.dagger.version>2.57.2</google.dagger.version>
         <jackson.version>2.20.0</jackson.version>
         <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
-        <junit.version>5.13.4</junit.version>
+        <junit.version>6.0.0</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.19</logback.version>
+        <logback.version>1.5.20</logback.version>
         <lucene.version>10.3.0</lucene.version>
-        <micrometer.version>1.15.4</micrometer.version>
+        <micrometer.version>1.15.5</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.32.1</protobuf.version>
@@ -95,6 +95,7 @@
     <modules>
         <module>utils</module>
         <module>raptor</module>
+        <module>astar</module>
         <module>gtfs-realtime-protobuf</module>
         <module>application</module>
         <module>otp-shaded</module>
@@ -118,7 +119,7 @@
                 <plugin>
                     <groupId>com.diffplug.spotless</groupId>
                     <artifactId>spotless-maven-plugin</artifactId>
-                    <version>2.46.1</version>
+                    <version>3.0.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -189,7 +190,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.4</version>
+                <version>3.5.3</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
@@ -260,7 +261,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.13</version>
+                <version>0.8.14</version>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -456,8 +457,12 @@
                 <version>3.0.3</version>
             </dependency>
 
-            <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
-            <!-- GEOTOOLS includes JTS as a transitive dependency. -->
+            <!--
+             GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections.
+             GEOTOOLS includes JTS as a transitive dependency. It also includes Eclipse ImageN as a
+             transitive dependency, but its use should be limited to input/output for geotools
+             usage.
+            -->
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-coverage</artifactId>
@@ -509,7 +514,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.19.0</version>
+                <version>5.20.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.origin-energy</groupId>
@@ -629,7 +634,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.8.0</version>
+                        <version>0.9.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <!-- if someone else other than Leonard deploys to Maven Central this might need to change -->

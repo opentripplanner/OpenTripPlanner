@@ -126,6 +126,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     stopsFound = new ArrayList<>(stopsFound);
 
     var streetSearch = StreetSearchBuilder.of()
+      .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(durationLimit))
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
       .withRequest(request)

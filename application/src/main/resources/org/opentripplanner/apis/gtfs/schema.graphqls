@@ -784,6 +784,9 @@ type Leg {
   Re-fetching fails when the underlying transit data no longer exists.
   **Note:** when both id and fare products are queried with [Relay](https://relay.dev/), id should be queried using a suitable GraphQL alias
   such as `legId: id`. Relay does not accept different fare product ids in otherwise identical legs.
+  
+  The identifier is valid for a maximum of 2 years, but sometimes it will fail after a few hours.
+  We do not recommend storing IDs for a long time.
   """
   id: String
   """

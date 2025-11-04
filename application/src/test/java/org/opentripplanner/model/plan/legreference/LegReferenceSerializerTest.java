@@ -20,18 +20,6 @@ class LegReferenceSerializerTest {
   private static final FeedScopedId TO_STOP_ID = TimetableRepositoryForTest.id("Alighting Stop");
 
   /**
-   * Token based on the initial format, without stop ids.
-   */
-  private static final String ENCODED_TOKEN_V1 =
-    "rO0ABXc2ABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjEABkY6VHJpcAAKMjAyMi0wMS0zMQAAAAEAAAAD";
-
-  /**
-   * Token based on the second version of the format, including stop ids.
-   */
-  private static final String ENCODED_TOKEN_V2 =
-    "rO0ABXdZABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjIABkY6VHJpcAAKMjAyMi0wMS0zMQAAAAEAAAADAA9GOkJvYXJkaW5nIFN0b3AAEEY6QWxpZ2h0aW5nIFN0b3A=";
-
-  /**
    * Token based on the latest format, including stop ids and TripOnServiceDate id.
    */
   private static final String ENCODED_TOKEN_V3 =
@@ -61,26 +49,6 @@ class LegReferenceSerializerTest {
   @Test
   void testScheduledTransitLegReferenceDeserialize() {
     var ref = (ScheduledTransitLegReference) LegReferenceSerializer.decode(ENCODED_TOKEN_V3);
-    assertNotNull(ref);
-    assertEquals(TRIP_ID, ref.tripId());
-    assertEquals(SERVICE_DATE, ref.serviceDate());
-    assertEquals(FROM_STOP_POS, ref.fromStopPositionInPattern());
-    assertEquals(TO_STOP_POS, ref.toStopPositionInPattern());
-  }
-
-  @Test
-  void testScheduledTransitLegReferenceLegacyV1Deserialize() {
-    var ref = (ScheduledTransitLegReference) LegReferenceSerializer.decode(ENCODED_TOKEN_V1);
-    assertNotNull(ref);
-    assertEquals(TRIP_ID, ref.tripId());
-    assertEquals(SERVICE_DATE, ref.serviceDate());
-    assertEquals(FROM_STOP_POS, ref.fromStopPositionInPattern());
-    assertEquals(TO_STOP_POS, ref.toStopPositionInPattern());
-  }
-
-  @Test
-  void testScheduledTransitLegReferenceLegacyV2Deserialize() {
-    var ref = (ScheduledTransitLegReference) LegReferenceSerializer.decode(ENCODED_TOKEN_V2);
     assertNotNull(ref);
     assertEquals(TRIP_ID, ref.tripId());
     assertEquals(SERVICE_DATE, ref.serviceDate());

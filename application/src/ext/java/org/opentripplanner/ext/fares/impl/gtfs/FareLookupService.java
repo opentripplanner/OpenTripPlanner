@@ -1,31 +1,21 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static org.opentripplanner.utils.collection.ListUtils.partitionIntoOverlappingPairs;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.SetMultimap;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.transit.model.basic.Distance;
-import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.collection.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +25,8 @@ class FareLookupService implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(FareLookupService.class);
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
-  private final SetMultimap<FeedScopedId, FeedScopedId> stopAreas;
-  private final Set<FeedScopedId> networksWithRules;
-  private final Set<FeedScopedId> fromAreasWithRules;
-  private final Set<FeedScopedId> toAreasWithRules;
-  private List<FareLegRule> fromRules;
+  private final AreaMatcher areaMatcher;
+  private final NetworkMatcher networkMatcher;
 
   FareLookupService(
     List<FareLegRule> legRules,
@@ -48,10 +35,10 @@ class FareLookupService implements Serializable {
   ) {
     this.legRules = List.copyOf(legRules);
     this.transferRules = stripWildcards(fareTransferRules);
-    this.networksWithRules = findNetworksWithRules(legRules);
-    this.fromAreasWithRules = findAreasWithRules(legRules, FareLegRule::fromAreaId);
-    this.toAreasWithRules = findAreasWithRules(legRules, FareLegRule::toAreaId);
-    this.stopAreas = ImmutableSetMultimap.copyOf(stopAreas);
+
+    var rulePriorityMatcher = new RulePriorityMatcher(legRules);
+    this.areaMatcher = new AreaMatcher(rulePriorityMatcher, legRules, stopAreas);
+    this.networkMatcher = new NetworkMatcher(rulePriorityMatcher, legRules);
   }
 
   /**
@@ -62,10 +49,20 @@ class FareLookupService implements Serializable {
   }
 
   /**
-   * Returns the fare leg rules for a specific leg.
+   * Returns the fare leg rules for a specific leg taking into account rule priorities, if they
+   * exist.
    */
   Set<FareLegRule> legRules(TransitLeg leg) {
-    return this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toSet());
+    var rules =
+      this.legRules.stream()
+        .filter(r -> legMatchesRule(leg, r))
+        .collect(Collectors.toUnmodifiableSet());
+    var containsPriorities = rules.stream().anyMatch(r -> r.priority().isPresent());
+    if (containsPriorities) {
+      return findHighestPriority(rules);
+    } else {
+      return rules;
+    }
   }
 
   /**
@@ -98,7 +95,7 @@ class FareLookupService implements Serializable {
     Set<TransferMatch> rules =
       this.transferRules.stream()
         .flatMap(r -> {
-          fromRules = findFareLegRule(r.fromLegGroup());
+          var fromRules = findFareLegRule(r.fromLegGroup());
           var toRules = findFareLegRule(r.toLegGroup());
           if (fromRules.isEmpty() || toRules.isEmpty()) {
             return Stream.of();
@@ -208,13 +205,13 @@ class FareLookupService implements Serializable {
     // make sure that you only get rules for the correct feed
     return (
       leg.agency().getId().getFeedId().equals(rule.feedId()) &&
-      matchesNetworkId(leg, rule) &&
+      networkMatcher.matchesNetworkId(leg, rule) &&
       // apply only those fare leg rules which have the correct area ids
       // if area id is null, the rule applies to all legs UNLESS there is another rule that
       // covers this area
-      matchesArea(leg.from().stop, rule.fromAreaId(), fromAreasWithRules) &&
-      matchesArea(leg.to().stop, rule.toAreaId(), toAreasWithRules) &&
-      matchesDistance(leg, rule)
+      areaMatcher.matchesFromArea(leg.from().stop, rule.fromAreaId()) &&
+      areaMatcher.matchesToArea(leg.to().stop, rule.toAreaId()) &&
+      DistanceMatcher.matchesDistance(leg, rule)
     );
   }
 
@@ -238,65 +235,16 @@ class FareLookupService implements Serializable {
     }
   }
 
-  private boolean matchesArea(
-    StopLocation stop,
-    FeedScopedId areaId,
-    Set<FeedScopedId> areasWithRules
-  ) {
-    var stopAreas = this.stopAreas.get(stop.getId());
-    return (
-      (isNull(areaId) && stopAreas.stream().noneMatch(areasWithRules::contains)) ||
-      (nonNull(areaId) && stopAreas.contains(areaId))
-    );
-  }
-
   /**
-   * Get the fare products that match the network_id. If the network id of the product is null it
-   * depends on the presence/absence of other rules with that network id.
+   * If a GTFS feed contains rule_priority values, then the highest priority rule is returned.
+   *
+   * @link <a href="https://gtfs.org/documentation/schedule/reference/#fare_leg_rulestxt">spec</a>
    */
-  private boolean matchesNetworkId(TransitLeg leg, FareLegRule rule) {
-    var routesNetworkIds = leg
-      .route()
-      .getGroupsOfRoutes()
+  private static Set<FareLegRule> findHighestPriority(Set<FareLegRule> rules) {
+    var maxPriority = rules.stream().mapToInt(r -> r.priority().orElse(0)).max().orElse(0);
+    return rules
       .stream()
-      .map(AbstractTransitEntity::getId)
-      .filter(Objects::nonNull)
-      .toList();
-
-    return (
-      (isNull(rule.networkId()) &&
-        networksWithRules.stream().noneMatch(routesNetworkIds::contains)) ||
-      routesNetworkIds.contains(rule.networkId())
-    );
-  }
-
-  private boolean matchesDistance(TransitLeg leg, FareLegRule rule) {
-    // If no valid distance type is given, do not consider distances in fare computation
-    FareDistance distance = rule.fareDistance();
-    if (distance instanceof FareDistance.Stops(int min, int max)) {
-      var numStops = leg.listIntermediateStops().size();
-      return numStops >= min && max >= numStops;
-    } else if (
-      rule.fareDistance() instanceof FareDistance.LinearDistance(Distance min, Distance max)
-    ) {
-      var legDistance = leg.from().coordinate.distanceTo(leg.to().coordinate);
-
-      return legDistance > min.toMeters() && legDistance < max.toMeters();
-    } else return true;
-  }
-
-  private static Set<FeedScopedId> findAreasWithRules(
-    List<FareLegRule> legRules,
-    Function<FareLegRule, FeedScopedId> getArea
-  ) {
-    return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
-  }
-
-  private static Set<FeedScopedId> findNetworksWithRules(Collection<FareLegRule> legRules) {
-    return legRules
-      .stream()
-      .map(FareLegRule::networkId)
-      .filter(Objects::nonNull)
-      .collect(Collectors.toSet());
+      .filter(r -> r.priority().orElse(0) == maxPriority)
+      .collect(Collectors.toUnmodifiableSet());
   }
 }

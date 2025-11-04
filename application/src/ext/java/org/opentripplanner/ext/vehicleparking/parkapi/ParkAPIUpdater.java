@@ -66,7 +66,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
         var noteFiled = noteFieldIterator.next();
         noteLocalizations.put(noteFiled.getKey(), noteFiled.getValue().asText());
       }
-      note = TranslatedString.getI18NString(noteLocalizations, true, false);
+      note = TranslatedString.getI18NString(noteLocalizations, false);
     }
 
     var vehicleParkId = createIdForNode(jsonNode);

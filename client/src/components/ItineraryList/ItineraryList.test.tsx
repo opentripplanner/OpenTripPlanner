@@ -2389,6 +2389,9 @@ it('renders without crashing', () => {
       setSelectedTripPatternIndexes={() => {}}
       pageResults={() => {}}
       loading={false}
+      comparisonSelectedIndexes={[]}
+      setComparisonSelectedIndexes={() => {}}
+      onCompare={() => {}}
     />,
   );
 });

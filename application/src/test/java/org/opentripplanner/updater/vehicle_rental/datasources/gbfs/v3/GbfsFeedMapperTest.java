@@ -94,7 +94,6 @@ class GbfsFeedMapperTest {
     assertEquals(
       TranslatedString.getI18NString(
         Map.of("en", "Check Technologies", "nl", "Check Technologies (nl)"),
-        false,
         false
       ),
       system.name()

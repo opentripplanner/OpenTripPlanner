@@ -2,6 +2,7 @@ package org.opentripplanner.framework.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
@@ -42,5 +43,15 @@ class TimeAndCostTest {
   void cost() {
     assertEquals(Cost.ZERO, TimeAndCost.ZERO.cost());
     assertEquals(COST, subject.cost().toSeconds());
+  }
+
+  @Test
+  void normalize() {
+    assertSame(TimeAndCost.ZERO, TimeAndCost.ZERO.normalize());
+    assertSame(subject, subject.normalize());
+
+    var c1 = Cost.costOfCentiSeconds(549);
+    var c1n = Cost.costOfSeconds(5);
+    assertEquals(new TimeAndCost(TIME, c1n), new TimeAndCost(TIME, c1).normalize());
   }
 }

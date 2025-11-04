@@ -52,7 +52,7 @@ public class LiipiHubToVehicleParkingGroupMapper {
         });
       I18NString name = translations.isEmpty()
         ? new NonLocalizedString(hubId.getId())
-        : TranslatedString.getI18NString(translations, true, false);
+        : TranslatedString.getI18NString(translations, false);
       Geometry geometry = GEOMETRY_PARSER.geometryFromJson(jsonNode.path("location"));
       var vehicleParkingGroup = VehicleParkingGroup.of(hubId)
         .withName(name)

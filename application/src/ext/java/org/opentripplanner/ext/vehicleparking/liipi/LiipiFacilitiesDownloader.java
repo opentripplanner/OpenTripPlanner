@@ -54,9 +54,9 @@ public class LiipiFacilitiesDownloader {
     }
 
     try {
-      return otpHttpClient.getAndMap(URI.create(url), Map.of(), is -> {
+      return otpHttpClient.getAndMap(URI.create(url), Map.of(), response -> {
         try {
-          return parseJSON(is, hubForPark);
+          return parseJSON(response.body(), hubForPark);
         } catch (IllegalArgumentException e) {
           LOG.warn("Error parsing facilities from {}", url, e);
         } catch (JsonProcessingException e) {

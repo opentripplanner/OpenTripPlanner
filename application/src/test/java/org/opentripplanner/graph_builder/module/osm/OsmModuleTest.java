@@ -273,7 +273,7 @@ public class OsmModuleTest {
     );
     namer = new CreativeNamer("sidewalk");
     propset.addCreativeNamer(new BestMatchSpecifier("highway=footway;footway=sidewalk"), namer);
-    assertEquals("sidewalk", propset.getCreativeNameForWay(way).toString());
+    assertEquals("sidewalk", propset.getCreativeName(way).toString());
   }
 
   @Test

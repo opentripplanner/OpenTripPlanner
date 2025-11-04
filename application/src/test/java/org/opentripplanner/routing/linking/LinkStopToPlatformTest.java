@@ -427,6 +427,46 @@ public class LinkStopToPlatformTest {
     assertTrue(v.isConnected(far) == false);
   }
 
+  /**
+   * Test that edge split point connects to other visibility points.
+   * This used to occasionally fail due to jts geometry.contains accuracy limitations.
+   * The test geometry is taken from Bletchley station platform 6, where
+   * the problem was easy to duplicate.
+   */
+  @Test
+  void boundaryTest() {
+    Coordinate[] platform = {
+      new Coordinate(-0.7360985, 51.9962091), // northwest
+      new Coordinate(-0.7360355, 51.9962165), // northeast
+      new Coordinate(-0.7357519, 51.9953057), // east exit
+      new Coordinate(-0.7356841, 51.9950911), // southeast
+      new Coordinate(-0.7357458, 51.9950836), // southwest
+    };
+
+    // 1 visibility point at eastern exit
+    int[] visibilityPoints = { 2 };
+
+    // stop at western boundary splits the visibility edge pair
+    Coordinate[] stops = { new Coordinate(-0.73577352323178, 51.995172067528664) };
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+    linkStops(graph, 20, true);
+
+    // Edge split points become visibility points
+    var aEdges = graph.getEdgesOfType(AreaEdge.class);
+    assertEquals(3, aEdges.getFirst().getArea().visibilityVertices().size());
+
+    // platform is a loop of 6 points, which adds 5 area edge pairs
+    // western boundary splitting adds an edge pair
+    // visibility edge connection from split points to exit adds two pairs more
+    // Transit stop linking adds 2 pairs more
+    assertEquals(
+      20,
+      graph.getEdges().size(),
+      "Incorrect number of edges, check %s".formatted(GeoJsonIo.toUrl(graph))
+    );
+  }
+
   private void linkStops(Graph graph, int maxAreaNodes, boolean permanent) {
     var linker = new VertexLinker(graph, COMPUTE_AREA_VISIBILITY_LINES, maxAreaNodes);
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
