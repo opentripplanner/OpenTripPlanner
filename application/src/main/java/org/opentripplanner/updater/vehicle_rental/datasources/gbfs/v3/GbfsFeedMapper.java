@@ -167,11 +167,7 @@ public class GbfsFeedMapper
       return null;
     }
 
-    return TranslatedString.getI18NString(
-      name.stream().collect(toMap(language, text)),
-      true,
-      false
-    );
+    return TranslatedString.getI18NString(name.stream().collect(toMap(language, text)), false);
   }
 
   static <X> I18NString localizedString(

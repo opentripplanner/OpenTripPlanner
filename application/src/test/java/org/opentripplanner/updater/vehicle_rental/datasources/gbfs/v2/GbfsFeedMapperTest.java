@@ -8,10 +8,12 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.framework.io.TestHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.GbfsVehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
@@ -114,6 +116,25 @@ class GbfsFeedMapperTest {
       duplicatedVehicleTypes
     );
     assertEquals(1, vehicleTypes.size());
+  }
+
+  @Test
+  void testClientExceptionRethrowsAsUpdaterConstructionException() {
+    var dataSource = new GbfsVehicleRentalDataSource(
+      new GbfsVehicleRentalDataSourceParameters(
+        "file:src/test/resources/gbfs/tieroslo/gbfs.json",
+        "en",
+        false,
+        HttpHeaders.empty(),
+        null,
+        true,
+        false,
+        RentalPickupType.ALL
+      ),
+      TestHttpClientFactory.failingHttpFactory()
+    );
+
+    assertThrows(UpdaterConstructionException.class, dataSource::setup);
   }
 
   @Test

@@ -28,6 +28,7 @@ import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -52,8 +53,8 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   FlexibleTransitLeg(FlexibleTransitLegBuilder builder) {
     this.edge = Objects.requireNonNull(builder.flexTripEdge());
-    this.startTime = Objects.requireNonNull(builder.startTime());
-    this.endTime = Objects.requireNonNull(builder.endTime());
+    this.startTime = TimeUtils.normalize(builder.startTime());
+    this.endTime = TimeUtils.normalize(builder.endTime());
     this.generalizedCost = builder.generalizedCost();
     this.transitAlerts = Set.copyOf(builder.alerts());
     this.fareOffers = List.copyOf(builder.fareOffers());

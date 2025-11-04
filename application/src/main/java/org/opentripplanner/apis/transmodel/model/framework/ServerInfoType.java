@@ -111,6 +111,14 @@ public class ServerInfoType {
           .dataFetcher(e -> GqlUtil.getTransitService(e).getTimeZone())
           .build()
       )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("numberOfCores")
+          .description("Number of CPU cores on the OTP server")
+          .type(Scalars.GraphQLInt)
+          .dataFetcher(e -> Runtime.getRuntime().availableProcessors())
+          .build()
+      )
       .build();
   }
 }

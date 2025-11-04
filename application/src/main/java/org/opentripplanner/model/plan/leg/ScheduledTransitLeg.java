@@ -42,6 +42,7 @@ import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.time.ServiceDateUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -101,8 +102,8 @@ public class ScheduledTransitLeg implements TransitLeg {
       "alightStopPosInPattern"
     );
 
-    this.startTime = Objects.requireNonNull(builder.startTime());
-    this.endTime = Objects.requireNonNull(builder.endTime());
+    this.startTime = TimeUtils.normalize(builder.startTime());
+    this.endTime = TimeUtils.normalize(builder.endTime());
     this.serviceDate = Objects.requireNonNull(builder.serviceDate());
     this.zoneId = Objects.requireNonNull(builder.zoneId());
 
@@ -129,6 +130,10 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.accessibilityScore = builder.accessibilityScore();
     this.emissionPerPerson = builder.emissionPerPerson();
     this.fareOffers = builder.fareOffers().stream().sorted(FARE_OFFER_COMPARATOR).toList();
+  }
+
+  public static ScheduledTransitLegBuilder of() {
+    return new ScheduledTransitLegBuilder<>();
   }
 
   public ScheduledTransitLegBuilder copyOf() {

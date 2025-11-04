@@ -1,8 +1,14 @@
 package org.opentripplanner.framework.io;
 
+import static org.apache.hc.core5.http.HttpStatus.SC_NOT_MODIFIED;
+import static org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.hc.core5.http.HttpStatus.SC_OK;
+import static org.apache.hc.core5.http.HttpStatus.SC_REDIRECTION;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,7 +35,6 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHeaders;
-import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.util.Timeout;
@@ -119,9 +124,9 @@ public class OtpHttpClient {
     ObjectMapper objectMapper,
     Class<T> clazz
   ) {
-    return getAndMap(uri, timeout, headers, is -> {
+    return getAndMap(uri, timeout, headers, response -> {
       try {
-        return objectMapper.readValue(is, clazz);
+        return objectMapper.readValue(response.body(), clazz);
       } catch (Exception e) {
         throw new OtpHttpClientException(e);
       }
@@ -149,9 +154,9 @@ public class OtpHttpClient {
     Map<String, String> headers,
     ObjectMapper objectMapper
   ) {
-    return getAndMap(uri, timeout, headers, is -> {
+    return getAndMap(uri, timeout, headers, response -> {
       try {
-        return objectMapper.readTree(is);
+        return objectMapper.readTree(response.body());
       } catch (Exception e) {
         throw new OtpHttpClientException(e);
       }
@@ -162,8 +167,8 @@ public class OtpHttpClient {
    * Executes an HTTP GET request and returns the body mapped according to the provided content
    * mapper. The default timeout is applied.
    */
-  public <T> T getAndMap(URI uri, Map<String, String> headers, ResponseMapper<T> contentMapper) {
-    return getAndMap(uri, null, headers, contentMapper);
+  public <T> T getAndMap(URI uri, Map<String, String> headers, ResponseMapper<T> responseMapper) {
+    return getAndMap(uri, null, headers, responseMapper);
   }
 
   /**
@@ -174,9 +179,9 @@ public class OtpHttpClient {
     URI uri,
     Duration timeout,
     Map<String, String> headers,
-    ResponseMapper<T> contentMapper
+    ResponseMapper<T> responseMapper
   ) {
-    return sendAndMap(new HttpGet(uri), uri, timeout, headers, contentMapper);
+    return sendAndMap(new HttpGet(uri), uri, timeout, headers, responseMapper);
   }
 
   /**
@@ -188,12 +193,12 @@ public class OtpHttpClient {
     JsonNode jsonBody,
     Duration timeout,
     Map<String, String> headers,
-    ResponseMapper<T> contentMapper
+    ResponseMapper<T> responseMapper
   ) {
     var request = new HttpPost(uri);
     request.setEntity(new StringEntity(jsonBody.toString()));
     request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON);
-    return sendAndMap(request, uri, timeout, headers, contentMapper);
+    return sendAndMap(request, uri, timeout, headers, responseMapper);
   }
 
   /**
@@ -205,14 +210,14 @@ public class OtpHttpClient {
     String xmlData,
     Duration timeout,
     Map<String, String> requestHeaderValues,
-    ResponseMapper<T> contentMapper
+    ResponseMapper<T> responseMapper
   ) {
     HttpPost httppost = new HttpPost(url);
     if (xmlData != null) {
       httppost.setEntity(new StringEntity(xmlData, ContentType.APPLICATION_XML));
     }
 
-    return executeAndMap(httppost, timeout, requestHeaderValues, contentMapper);
+    return executeAndMap(httppost, timeout, requestHeaderValues, responseMapper);
   }
 
   /**
@@ -222,10 +227,10 @@ public class OtpHttpClient {
     HttpUriRequestBase httpRequest,
     Duration timeout,
     Map<String, String> headers,
-    ResponseMapper<T> contentMapper
+    ResponseMapper<T> responseMapper
   ) {
     return executeAndMapWithResponseHandler(httpRequest, timeout, headers, response ->
-      mapResponse(response, contentMapper)
+      mapResponse(response, responseMapper)
     );
   }
 
@@ -237,13 +242,13 @@ public class OtpHttpClient {
     HttpUriRequestBase httpRequest,
     Duration timeout,
     Map<String, String> headers,
-    ResponseMapper<T> contentMapper
+    ResponseMapper<T> responseMapper
   ) {
     return executeAndMapWithResponseHandler(httpRequest, timeout, headers, response -> {
-      if (response.getCode() == 204) {
+      if (response.getCode() == SC_NO_CONTENT) {
         return Optional.empty();
       }
-      return Optional.of(mapResponse(response, contentMapper));
+      return Optional.of(mapResponse(response, responseMapper));
     });
   }
 
@@ -305,24 +310,50 @@ public class OtpHttpClient {
     }
   }
 
-  private <T> T mapResponse(ClassicHttpResponse response, ResponseMapper<T> contentMapper) {
+  private <T> T mapResponse(ClassicHttpResponse response, ResponseMapper<T> responseMapper) {
     if (isFailedRequest(response)) {
       logResponse(response);
       throw new OtpHttpClientException(
         "HTTP request failed with status code " + response.getCode()
       );
     }
+
+    // Handle NOT_MODIFIED response.
+    if (response.getCode() == SC_NOT_MODIFIED) {
+      try {
+        OtpHttpResponse httpResponse = new OtpHttpResponse(
+          emptyInputStream(),
+          response.getHeaders(),
+          response.getCode()
+        );
+        return responseMapper.apply(httpResponse);
+      } catch (Exception e) {
+        throw new OtpHttpClientException(e);
+      }
+    }
+
+    // Other types of valid responses should have a body.
     if (response.getEntity() == null) {
       throw new OtpHttpClientException("HTTP request failed: empty response");
     }
+
     try (InputStream is = response.getEntity().getContent()) {
       if (is == null) {
         throw new OtpHttpClientException("HTTP request failed: empty response");
       }
-      return contentMapper.apply(is);
+      OtpHttpResponse httpResponse = new OtpHttpResponse(
+        is,
+        response.getHeaders(),
+        response.getCode()
+      );
+      return responseMapper.apply(httpResponse);
     } catch (Exception e) {
       throw new OtpHttpClientException(e);
     }
+  }
+
+  private static ByteArrayInputStream emptyInputStream() {
+    return new ByteArrayInputStream(new byte[0]);
   }
 
   private <T> T sendAndMap(
@@ -330,7 +361,7 @@ public class OtpHttpClient {
     URI uri,
     Duration timeout,
     Map<String, String> headers,
-    ResponseMapper<T> contentMapper
+    ResponseMapper<T> responseMapper
   ) {
     URL downloadUrl;
     try {
@@ -340,11 +371,13 @@ public class OtpHttpClient {
     }
     String proto = downloadUrl.getProtocol();
     if (proto.equals("http") || proto.equals("https")) {
-      return executeAndMap(request, timeout, headers, contentMapper);
+      return executeAndMap(request, timeout, headers, responseMapper);
     } else {
       // Local file probably, try standard java
       try (InputStream is = downloadUrl.openStream()) {
-        return contentMapper.apply(is);
+        // Create empty headers and status code OK for local file
+        OtpHttpResponse httpResponse = new OtpHttpResponse(is, new Header[0], SC_OK);
+        return responseMapper.apply(httpResponse);
       } catch (Exception e) {
         throw new OtpHttpClientException(e);
       }
@@ -364,10 +397,14 @@ public class OtpHttpClient {
   }
 
   /**
-   * Returns true if the HTTP status code is not 200.
+   * Returns true if the HTTP status code is not in the range [200,300[, except for the code
+   * 304 NOT_MODIFIED which is not a failed request.
    */
-  private static boolean isFailedRequest(HttpResponse response) {
-    return response.getCode() < 200 || response.getCode() >= 300;
+  private static boolean isFailedRequest(org.apache.hc.core5.http.HttpResponse response) {
+    return (
+      (response.getCode() < SC_OK || response.getCode() >= SC_REDIRECTION) &&
+      response.getCode() != SC_NOT_MODIFIED
+    );
   }
 
   /**
@@ -398,10 +435,12 @@ public class OtpHttpClient {
   @FunctionalInterface
   public interface ResponseMapper<R> {
     /**
-     * Maps the response input stream.
+     * Maps the HTTP response including body, headers and status code.
      *
+     * @param response the HTTP response containing headers and body stream
      * @return the mapping function result
+     * @throws Exception if an error occurs during mapping
      */
-    R apply(InputStream t) throws Exception;
+    R apply(OtpHttpResponse response) throws Exception;
   }
 }

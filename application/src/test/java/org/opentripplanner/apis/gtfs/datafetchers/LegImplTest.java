@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.apis.gtfs.datafetchers.DataFetchingSupport.dataFetchingEnvironment;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,21 @@ class LegImplTest implements PlanTestConstants {
     "include",
     List.of(GraphQLTypes.GraphQLStopType.STOP)
   );
-  private static final StreetLeg WALK_LEG = StreetLeg.of().withMode(TraverseMode.WALK).build();
+  private static final ZonedDateTime ANY_TIME = ZonedDateTime.of(
+    2025,
+    10,
+    21,
+    13,
+    59,
+    45,
+    0,
+    ZoneId.of("UTC")
+  );
+  private static final StreetLeg WALK_LEG = StreetLeg.of()
+    .withStartTime(ANY_TIME)
+    .withEndTime(ANY_TIME.plusMinutes(23))
+    .withMode(TraverseMode.WALK)
+    .build();
 
   @Test
   void intermediateStops() throws Exception {

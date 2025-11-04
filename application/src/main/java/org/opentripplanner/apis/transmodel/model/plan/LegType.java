@@ -20,13 +20,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.leg.StopArrival;
@@ -67,7 +67,11 @@ public class LegType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .description(
-            "An identifier for the leg, which can be used to re-fetch transit leg information."
+            """
+            An identifier for the leg, which can be used to re-fetch transit leg information. The
+            identifier is valid for a maximum of 2 years, but sometimes it will fail after a few hours.
+            We do not recommend storing IDs for a long time.
+            """
           )
           .type(Scalars.GraphQLID)
           .dataFetcher(env -> LegReferenceSerializer.encode(leg(env).legReference()))
@@ -157,7 +161,7 @@ public class LegType {
           .name("pointsOnLink")
           .description("The leg's geometry.")
           .type(linkGeometryType)
-          .dataFetcher(env -> EncodedPolyline.encode(leg(env).legGeometry()))
+          .dataFetcher(env -> EncodedPolyline.of(leg(env).legGeometry()))
           .build()
       )
       .field(

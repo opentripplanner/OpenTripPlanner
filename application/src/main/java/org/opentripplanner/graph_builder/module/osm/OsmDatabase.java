@@ -13,11 +13,8 @@ import gnu.trove.set.hash.TLongHashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -28,17 +25,15 @@ import org.opentripplanner.framework.collection.TroveUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
-import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
-import org.opentripplanner.osm.model.OsmLevel.Source;
+import org.opentripplanner.osm.model.OsmLevelFactory;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
@@ -48,7 +43,6 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +51,7 @@ public class OsmDatabase {
   private static final Logger LOG = LoggerFactory.getLogger(OsmDatabase.class);
 
   private final DataImportIssueStore issueStore;
+  private final OsmLevelFactory osmLevelFactory;
 
   /* Map of all nodes used in ways/areas keyed by their OSM ID */
   private final TLongObjectMap<OsmNode> nodesById = new TLongObjectHashMap<>();
@@ -88,7 +83,6 @@ public class OsmDatabase {
   /* Map of all area OSMWay for a given node */
   private final TLongObjectMap<Set<OsmWay>> areasForNode = new TLongObjectHashMap<>();
 
-  /* Map of all area OSMWay for a given node */
   private final List<OsmWay> singleWayAreas = new ArrayList<>();
 
   private final Set<OsmEntity> processedAreas = new HashSet<>();
@@ -102,8 +96,14 @@ public class OsmDatabase {
   /* Set of all node IDs of kept areas. Needed to mark which nodes to keep in stage 3. */
   private final TLongSet areaNodeIds = new TLongHashSet();
 
-  /* Track which vertical level each OSM way belongs to, for building elevators etc. */
-  private final Map<OsmEntity, OsmLevel> wayLevels = new HashMap<>();
+  /**
+   * Track which vertical levels OSM entities belong to.
+   * Level information can be set for ways, nodes and relations.
+   * An entity only has an entry if at least one level is defined in OSM.
+   * The ordering is important because in the future it will be used for building stairs
+   * and escalators. At the moment, the level is used e.g. for building elevators.
+   */
+  private final ArrayListMultimap<OsmEntity, OsmLevel> entityLevels = ArrayListMultimap.create();
 
   /* Set of turn restrictions for each turn "from" way ID */
   private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay =
@@ -125,14 +125,9 @@ public class OsmDatabase {
    */
   private long virtualNodeId = -100000;
 
-  /**
-   * If true, disallow zero floors and add 1 to non-negative numeric floors, as is generally done in
-   * the United States. This does not affect floor names from level maps.
-   */
-  public boolean noZeroLevels = true;
-
   public OsmDatabase(DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
+    this.osmLevelFactory = new OsmLevelFactory(issueStore);
   }
 
   public OsmNode getNode(Long nodeId) {
@@ -195,8 +190,41 @@ public class OsmDatabase {
     return stopsInAreas.get(areaParent);
   }
 
-  public OsmLevel getLevelForWay(OsmEntity way) {
-    return Objects.requireNonNullElse(wayLevels.get(way), OsmLevel.DEFAULT);
+  /**
+   * @return If a single level is defined for an entity return that level,
+   * otherwise the default level is returned.
+   */
+  public OsmLevel findSingleLevelForEntity(OsmEntity entity) {
+    List<OsmLevel> levels = entityLevels.get(entity);
+    if (levels.size() == 1) {
+      return levels.getFirst();
+    } else {
+      return OsmLevelFactory.DEFAULT;
+    }
+  }
+
+  /**
+   * @return All defined levels for an entity. If no levels are found a list with the default
+   * level is returned.
+   */
+  public List<OsmLevel> getLevelsForEntity(OsmEntity entity) {
+    if (entityLevels.containsKey(entity)) {
+      return entityLevels.get(entity);
+    } else {
+      return List.of(OsmLevelFactory.DEFAULT);
+    }
+  }
+
+  /**
+   * @return A set of all defined levels for an entity. If no levels are found a set with the
+   * default level is returned.
+   */
+  public Set<OsmLevel> getLevelSetForEntity(OsmEntity entity) {
+    if (entityLevels.containsKey(entity)) {
+      return Set.copyOf(entityLevels.get(entity));
+    } else {
+      return Set.of(OsmLevelFactory.DEFAULT);
+    }
   }
 
   public Set<OsmWay> getAreasForNode(Long nodeId) {
@@ -212,6 +240,7 @@ public class OsmDatabase {
   }
 
   public void addNode(OsmNode node) {
+    createLevelsForEntity(node);
     if (node.isBikeParking()) {
       bikeParkingNodes.put(node.getId(), node);
     }
@@ -248,7 +277,7 @@ public class OsmDatabase {
       return;
     }
 
-    applyLevelsForWay(way);
+    createLevelsForEntity(way);
 
     if (way.isRoutableArea()) {
       // this is an area that's a simple polygon. So we can just add it straight
@@ -289,12 +318,11 @@ public class OsmDatabase {
       for (OsmRelationMember member : relation.getMembers()) {
         areaWayIds.add(member.getRef());
       }
-      applyLevelsForWay(relation);
+      createLevelsForEntity(relation);
     } else if (
       !relation.isRestriction() &&
       !relation.isRoadRoute() &&
       !(relation.isMultiPolygon() && relation.isRoutable()) &&
-      !relation.isLevelMap() &&
       !relation.isStopArea() &&
       !(relation.isRoadRoute() || relation.isBicycleRoute())
     ) {
@@ -381,7 +409,7 @@ public class OsmDatabase {
     // For each way, intersect with areas
     int nCreatedNodes = 0;
     for (OsmWay way : waysById.valueCollection()) {
-      OsmLevel wayLevel = getLevelForWay(way);
+      List<OsmLevel> wayLevels = getLevelsForEntity(way);
 
       // For each segment of the way
       for (int i = 0; i < way.getNodeRefs().size() - 1; i++) {
@@ -412,8 +440,12 @@ public class OsmDatabase {
           }
 
           // Skip if area and way are from "incompatible" levels
-          OsmLevel areaLevel = getLevelForWay(ringSegment.area.parent);
-          if (!wayLevel.equals(areaLevel)) {
+          List<OsmLevel> areaLevels = getLevelsForEntity(ringSegment.area.parent);
+          if (
+            wayLevels.size() != 1 ||
+            areaLevels.size() != 1 ||
+            !areaLevels.getFirst().equals((wayLevels.getFirst()))
+          ) {
             continue;
           }
 
@@ -635,40 +667,8 @@ public class OsmDatabase {
     return node;
   }
 
-  private void applyLevelsForWay(OsmEntity way) {
-    /* Determine OSM level for each way, if it was not already set */
-    if (!wayLevels.containsKey(way)) {
-      // if this way is not a key in the wayLevels map, a level map was not
-      // already applied in processRelations
-
-      /* try to find a level name in tags */
-      String levelName = null;
-      OsmLevel level = OsmLevel.DEFAULT;
-      if (way.hasTag("level")) { // TODO: floating-point levels &c.
-        levelName = way.getTag("level");
-        level = OsmLevel.fromString(
-          levelName,
-          OsmLevel.Source.LEVEL_TAG,
-          noZeroLevels,
-          issueStore,
-          way
-        );
-      } else if (way.hasTag("layer")) {
-        levelName = way.getTag("layer");
-        level = OsmLevel.fromString(
-          levelName,
-          OsmLevel.Source.LAYER_TAG,
-          noZeroLevels,
-          issueStore,
-          way
-        );
-      }
-      if (level == null || (!level.reliable)) {
-        issueStore.add(new LevelAmbiguous(levelName, way));
-        level = OsmLevel.DEFAULT;
-      }
-      wayLevels.put(way, level);
-    }
+  private void createLevelsForEntity(OsmEntity entity) {
+    entityLevels.putAll(entity, osmLevelFactory.createOsmLevelsForEntity(entity));
   }
 
   private void markNodesForKeeping(Collection<OsmWay> osmWays, TLongSet nodeSet) {
@@ -794,8 +794,6 @@ public class OsmDatabase {
     for (OsmRelation relation : relationsById.valueCollection()) {
       if (relation.isRestriction()) {
         processRestriction(relation);
-      } else if (relation.isLevelMap()) {
-        processLevelMap(relation);
       } else if (relation.isRoute()) {
         processRoute(relation);
       } else if (relation.isPublicTransport()) {
@@ -929,48 +927,6 @@ public class OsmDatabase {
   }
 
   /**
-   * Process an OSM level map.
-   */
-  private void processLevelMap(OsmRelation relation) {
-    var levelsTag = relation.getTag("levels");
-    if (!StringUtils.hasValue(levelsTag)) {
-      issueStore.add(
-        Issue.issue(
-          "InvalidLevelMap",
-          "Could not parse level map for osm relation %d as it was malformed. Skipped.",
-          relation.getId()
-        )
-      );
-      return;
-    }
-
-    Map<String, OsmLevel> levels = OsmLevel.mapFromSpecList(
-      levelsTag,
-      Source.LEVEL_MAP,
-      true,
-      issueStore,
-      relation
-    );
-    for (OsmRelationMember member : relation.getMembers()) {
-      if (member.hasTypeWay() && waysById.containsKey(member.getRef())) {
-        OsmWay way = waysById.get(member.getRef());
-        if (way != null) {
-          String role = member.getRole();
-          // if the level map relation has a role:xyz tag, this way is something
-          // more complicated than a single level (e.g. ramp/stairway).
-          if (!relation.hasTag("role:" + role)) {
-            if (levels.containsKey(role)) {
-              wayLevels.put(way, levels.get(role));
-            } else {
-              LOG.warn("{} has undefined level {}", member.getRef(), role);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
    * Handle route=road and route=bicycle relations.
    */
   private void processRoute(OsmRelation relation) {
@@ -979,7 +935,7 @@ public class OsmDatabase {
         continue;
       }
 
-      OsmEntity way = waysById.get(member.getRef());
+      OsmWay way = waysById.get(member.getRef());
       if (way == null) {
         continue;
       }
@@ -1055,10 +1011,10 @@ public class OsmDatabase {
       // single platform area presumably contains only one level in most cases
       // a node inside it may specify several levels if it is an elevator
       // make sure each node has access to the current platform level
-      final Set<String> filterLevels = area.getLevels();
+      Set<OsmLevel> areaLevelSet = getLevelSetForEntity(area);
       platformNodes
         .stream()
-        .filter(node -> node.getLevels().containsAll(filterLevels))
+        .filter(node -> getLevelSetForEntity(node).containsAll(areaLevelSet))
         .forEach(node -> stopsInAreas.put(area, node));
     }
   }

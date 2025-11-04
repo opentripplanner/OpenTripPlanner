@@ -3,9 +3,11 @@ package org.opentripplanner.graph_builder.module.osm.naming;
 import java.util.HashSet;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**
@@ -45,19 +47,19 @@ public class PortlandCustomNamer implements EdgeNamer {
   private final HashSet<StreetEdge> nameByDestination = new HashSet<>();
 
   @Override
-  public I18NString name(OsmEntity way) {
-    var defaultName = way.getAssumedName();
-    if (!way.hasTag("name")) {
+  public I18NString name(OsmEntity entity) {
+    var defaultName = entity.getAssumedName();
+    if (!entity.hasTag("name")) {
       // this is already a generated name, so there's no need to add any
       // additional data
       return defaultName;
     }
-    if (way.isTag("footway", "sidewalk") || way.isTag("path", "sidewalk")) {
+    if (entity.isTag("footway", "sidewalk") || entity.isTag("path", "sidewalk")) {
       if (isStreet(defaultName.toString())) {
         return NonLocalizedString.ofNullable(sidewalk(defaultName.toString()));
       }
     }
-    String highway = way.getTag("highway");
+    String highway = entity.getTag("highway");
     if ("footway".equals(highway) || "path".equals(highway) || "cycleway".equals(highway)) {
       if (!isObviouslyPath(defaultName.toString())) {
         return NonLocalizedString.ofNullable(path(defaultName.toString()));
@@ -70,7 +72,7 @@ public class PortlandCustomNamer implements EdgeNamer {
   }
 
   @Override
-  public void recordEdges(OsmEntity way, StreetEdgePair edgePair) {
+  public void recordEdges(OsmWay way, StreetEdgePair edgePair, OsmDatabase osmdb) {
     final boolean isHighwayLink = isHighwayLink(way);
     final boolean isLowerLink = isLowerLink(way);
     edgePair
@@ -96,7 +98,7 @@ public class PortlandCustomNamer implements EdgeNamer {
   }
 
   @Override
-  public void postprocess() {
+  public void finalizeNames() {
     for (StreetEdge e : nameByOrigin) {
       nameAccordingToOrigin(e, 15);
     }
@@ -186,12 +188,12 @@ public class PortlandCustomNamer implements EdgeNamer {
     return null;
   }
 
-  private static boolean isHighwayLink(OsmEntity way) {
+  private static boolean isHighwayLink(OsmWay way) {
     String highway = way.getTag("highway");
     return "motorway_link".equals(highway) || "trunk_link".equals(highway);
   }
 
-  private static boolean isLowerLink(OsmEntity way) {
+  private static boolean isLowerLink(OsmWay way) {
     String highway = way.getTag("highway");
     return (
       "secondary_link".equals(highway) ||

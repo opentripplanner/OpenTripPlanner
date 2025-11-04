@@ -42,10 +42,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 327,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "}f{tGv}{kVjCA?e@WA"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -128,10 +125,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 423,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 7,
-            "points" : "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
-          },
+          "legGeometry" : { },
           "mode" : "BICYCLE",
           "pathway" : false,
           "realTime" : false,
@@ -201,10 +195,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 61,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 5,
-            "points" : "ic{tG~uzkV@n@M@C??H"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -358,10 +349,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "zoneId" : "0"
             }
           ],
-          "legGeometry" : {
-            "length" : 39,
-            "points" : "{c{tGnwzkVR?lCEvBC??VAlCClCEAkA??A}BCkEAkECaD???g@CiECiEEiE?c@?o@?]Aa@?w@AoD???YEkEAkECiEA_A??AiCCkECmD???[A_CCiD"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -409,10 +397,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 479,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 15,
-            "points" : "}rztGlnwkVM??C?[?SC_D?M?E?MCgD?A?O?C?M?a@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -479,7 +464,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         ]
       },
-      "generalizedCost" : 2895,
+      "generalizedCost" : 2896,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -496,10 +481,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 1102,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 34,
-            "points" : "}f{tGv}{kVjCAjCEnCCFCFErACj@CLMHGFJLNNNDBDBDBF@FBLBH@FBDBNHNJLDPLb@Z^XPNNTBQT{ARJEP"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -731,10 +713,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "zoneId" : "0"
             }
           ],
-          "legGeometry" : {
-            "length" : 57,
-            "points" : "gkztGz_|kVTmALiBt@mJJ_DBoA??@e@D}AFyDBgADwB??@]BaADgCDmC??By@FiEJoEBuA??DsBD}BBiADmC@y@AiB???Y?g@As@?_@?YAeB@uD???{@G{D?mECeBAu@??Ai@CoEASAuDAmB???MCqEA_B??A{ACsEAwB"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -782,10 +761,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 591,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 18,
-            "points" : "qeztGn|vkVK@?v@@f@?RWBK@kBBI?K?wBBI?K?I?mBBK@?M?a@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -908,10 +884,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 456,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 6,
-            "points" : "}f{tGv}{kVC?mCBmCD@zCN?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1078,10 +1051,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "zoneId" : "0"
             }
           ],
-          "legGeometry" : {
-            "length" : 60,
-            "points" : "yo{tG|b|kVC}CEuKGwI???}@G{J???YGsKEuKCuD???UCiECeEAgA?{@AkA?WAwDE{C???i@CiECkECcD??Ae@?mE{BDQ@q@@??{ADCsDbBiB`DaEt@_AVANIX?tBCLK`@c@\\c@l@w@??\\c@FKDCFEXCCgEvBEVAlCClCEnCECoD"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -1129,10 +1099,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 128,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 3,
-            "points" : "ksztGh{vkVI?@~B"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1216,10 +1183,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 327,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "}f{tGv}{kVjCA?e@WA"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1302,10 +1266,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 423,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 7,
-            "points" : "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
-          },
+          "legGeometry" : { },
           "mode" : "BICYCLE",
           "pathway" : false,
           "realTime" : false,
@@ -1375,10 +1336,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 61,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 5,
-            "points" : "ic{tG~uzkV@n@M@C??H"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1532,10 +1490,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "zoneId" : "0"
             }
           ],
-          "legGeometry" : {
-            "length" : 39,
-            "points" : "{c{tGnwzkVR?lCEvBC??VAlCClCEAkA??A}BCkEAkECaD???g@CiECiEEiE?c@?o@?]Aa@?w@AoD???YEkEAkECiEA_A??AiCCkECmD???[A_CCiD"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -1583,10 +1538,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 479,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 15,
-            "points" : "}rztGlnwkVM??C?[?SC_D?M?E?MCgD?A?O?C?M?a@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1670,10 +1622,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 327,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "}f{tGv}{kVjCA?e@WA"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1756,10 +1705,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 423,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 7,
-            "points" : "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
-          },
+          "legGeometry" : { },
           "mode" : "BICYCLE",
           "pathway" : false,
           "realTime" : false,
@@ -1829,10 +1775,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 61,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 5,
-            "points" : "ic{tG~uzkV@n@M@C??H"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1986,10 +1929,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "zoneId" : "0"
             }
           ],
-          "legGeometry" : {
-            "length" : 39,
-            "points" : "{c{tGnwzkVR?lCEvBC??VAlCClCEAkA??A}BCkEAkECaD???g@CiECiEEiE?c@?o@?]Aa@?w@AoD???YEkEAkECiEA_A??AiCCkECmD???[A_CCiD"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -2037,10 +1977,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 479,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 15,
-            "points" : "}rztGlnwkVM??C?[?SC_D?M?E?MCgD?A?O?C?M?a@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2124,10 +2061,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 456,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 6,
-            "points" : "}f{tGv}{kVC?mCBmCD@zCN?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2294,10 +2228,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "zoneId" : "0"
             }
           ],
-          "legGeometry" : {
-            "length" : 60,
-            "points" : "yo{tG|b|kVC}CEuKGwI???}@G{J???YGsKEuKCuD???UCiECeEAgA?{@AkA?WAwDE{C???i@CiECkECcD??Ae@?mE{BDQ@q@@??{ADCsDbBiB`DaEt@_AVANIX?tBCLK`@c@\\c@l@w@??\\c@FKDCFEXCCgEvBEVAlCClCEnCECoD"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -2345,10 +2276,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "generalizedCost" : 128,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 3,
-            "points" : "ksztGh{vkVI?@~B"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2406,7 +2334,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 1169,
+      "generalizedCost" : 1170,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2423,10 +2351,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "generalizedCost" : 327,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "}f{tGv}{kVjCA?e@WA"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2509,10 +2434,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "generalizedCost" : 423,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 7,
-            "points" : "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
-          },
+          "legGeometry" : { },
           "mode" : "BICYCLE",
           "pathway" : false,
           "realTime" : false,
@@ -2582,10 +2504,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "generalizedCost" : 419,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "ic{tG~uzkVEcJlCE?C"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2669,7 +2588,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 900,
+      "generalizedCost" : 901,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2686,10 +2605,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "generalizedCost" : 327,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "}f{tGv}{kVjCA?e@WA"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2772,10 +2688,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "generalizedCost" : 573,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 11,
-            "points" : "ic{tGl|{kVV@GsJL?F?tBCEuK?g@GmJEuK?C"
-          },
+          "legGeometry" : { },
           "mode" : "BICYCLE",
           "pathway" : false,
           "realTime" : false,
@@ -2872,7 +2785,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 899,
+      "generalizedCost" : 900,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2889,10 +2802,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "generalizedCost" : 327,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "}f{tGv}{kVjCA?e@WA"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2975,10 +2885,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "generalizedCost" : 572,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 10,
-            "points" : "ic{tGl|{kVV@GsJEuKE}HAwAAo@EcJlCE?C"
-          },
+          "legGeometry" : { },
           "mode" : "BICYCLE",
           "pathway" : false,
           "realTime" : false,
@@ -3107,10 +3014,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 325,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 10,
-            "points" : "ssztGh_wkV?`@?LK?uBBK??F?JBbDN?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -3303,10 +3207,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 39,
-            "points" : "kwztGhgwkVQ?kC@@zD???PBjE?`B??@X@jEBjD???\\BhEBpD???XBhE@nD??@Z?hEBtA?h@@h@??@Z@nEBhEBhD???`@FtKDhH??@hBoCD}BB"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -3354,10 +3255,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 179,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "wb{tG`wzkV?LO?Ao@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -3427,10 +3325,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 413,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 7,
-            "points" : "ic{tG~uzkV@n@@vAD|HDtKFrJWA"
-          },
+          "legGeometry" : { },
           "mode" : "BICYCLE",
           "pathway" : false,
           "realTime" : false,
@@ -3500,10 +3395,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 207,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "ic{tGl|{kVV@?d@kC@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -3596,7 +3488,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         ]
       },
-      "generalizedCost" : 2855,
+      "generalizedCost" : 2856,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -3613,10 +3505,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 550,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 17,
-            "points" : "ssztGh_wkV?`@?LJAlBCH?J?H?vBCJ?H?jBCJA?D@L?lAE?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -3822,10 +3711,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 56,
-            "points" : "efztGhcwkV@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APu@lJMhBI`@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -3873,10 +3759,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 1102,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 34,
-            "points" : "ikztGh~{kVNDEVUzACPOUQO_@Yc@[QMMEOKOIECGCIAMCGCGAECECECOOMOGKIFMLk@BsABGDGBoCBkCDkC@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -3999,10 +3882,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 521,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 19,
-            "points" : "ssztGh_wkV?`@?LK?uBBK??F?JBbD?D?N?BK?uBBM??E?IC??E"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -4221,10 +4101,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 53,
-            "points" : "i|ztG|fwkV?LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ???d@FtKmCBo@@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -4272,10 +4149,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 1023,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 25,
-            "points" : "}~{tGnq{kV?LVAF?J?L?rBCLAJ?H?l@Ab@?XAJ?~BEL?L?rBCJ?LArBCL??j@DhJB?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -4385,10 +4259,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 325,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 10,
-            "points" : "ssztGh_wkV?`@?LK?uBBK??F?JBbDN?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -4581,10 +4452,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 39,
-            "points" : "kwztGhgwkVQ?kC@@zD???PBjE?`B??@X@jEBjD???\\BhEBpD???XBhE@nD??@Z?hEBtA?h@@h@??@Z@nEBhEBhD???`@FtKDhH??@hBoCD}BB"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -4632,10 +4500,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 179,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "wb{tG`wzkV?LO?Ao@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -4705,10 +4570,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 413,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 7,
-            "points" : "ic{tG~uzkV@n@@vAD|HDtKFrJWA"
-          },
+          "legGeometry" : { },
           "mode" : "BICYCLE",
           "pathway" : false,
           "realTime" : false,
@@ -4778,10 +4640,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 207,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "ic{tGl|{kVV@?d@kC@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -4874,7 +4733,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         ]
       },
-      "generalizedCost" : 2915,
+      "generalizedCost" : 2916,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -4891,10 +4750,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 550,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 17,
-            "points" : "ssztGh_wkV?`@?LJAlBCH?J?H?vBCJ?H?jBCJA?D@L?lAE?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -5100,10 +4956,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 56,
-            "points" : "efztGhcwkV@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APu@lJMhBI`@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -5151,10 +5004,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 1102,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 34,
-            "points" : "ikztGh~{kVNDEVUzACPOUQO_@Yc@[QMMEOKOIECGCIAMCGCGAECECECOOMOGKIFMLk@BsABGDGBoCBkCDkC@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -5277,10 +5127,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 521,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 19,
-            "points" : "ssztGh_wkV?`@?LK?uBBK??F?JBbD?D?N?BK?uBBM??E?IC??E"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -5499,10 +5346,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 53,
-            "points" : "i|ztG|fwkV?LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ???d@FtKmCBo@@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -5550,10 +5394,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "generalizedCost" : 1023,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 25,
-            "points" : "}~{tGnq{kV?LVAF?J?L?rBCLAJ?H?l@Ab@?XAJ?~BEL?L?rBCJ?LArBCL??j@DhJB?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,

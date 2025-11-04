@@ -48,7 +48,7 @@ public interface CallWrapper {
   Boolean isPredictionInaccurate();
   boolean isExtraCall();
   OccupancyEnumeration getOccupancy();
-  List<NaturalLanguageStringStructure> getDestinationDisplaies();
+  List<NaturalLanguageStringStructure> getDestinationDisplays();
   ZonedDateTime getAimedArrivalTime();
   ZonedDateTime getExpectedArrivalTime();
   ZonedDateTime getActualArrivalTime();
@@ -94,7 +94,7 @@ public interface CallWrapper {
     }
 
     @Override
-    public List<NaturalLanguageStringStructure> getDestinationDisplaies() {
+    public List<NaturalLanguageStringStructure> getDestinationDisplays() {
       return call.getDestinationDisplaies();
     }
 
@@ -196,8 +196,8 @@ public interface CallWrapper {
     }
 
     @Override
-    public List<NaturalLanguageStringStructure> getDestinationDisplaies() {
-      return List.of();
+    public List<NaturalLanguageStringStructure> getDestinationDisplays() {
+      return call.getDestinationDisplaies();
     }
 
     @Override
