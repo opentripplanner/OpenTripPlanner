@@ -48,8 +48,8 @@ class HttpTripUpdateSource {
     updateIncrementality = FULL_DATASET;
     try {
       // Decode message
-      feedMessage = otpHttpClient.getAndMap(URI.create(url), this.headers.asMap(), is ->
-        FeedMessage.parseFrom(is, registry)
+      feedMessage = otpHttpClient.getAndMap(URI.create(url), this.headers.asMap(), response ->
+        FeedMessage.parseFrom(response.body(), registry)
       );
       feedEntityList = feedMessage.getEntityList();
 

@@ -136,6 +136,13 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   }
 
   /**
+   * Edges are not crossings by default.
+   */
+  public boolean isCrossing() {
+    return false;
+  }
+
+  /**
    * Returns the default name of the edge
    */
   public String getDefaultName() {

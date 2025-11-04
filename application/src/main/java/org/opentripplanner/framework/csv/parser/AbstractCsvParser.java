@@ -46,11 +46,13 @@ public abstract class AbstractCsvParser<T> {
     this.issueType = issueType;
   }
 
-  protected abstract List<String> headers();
+  /** Return the expected CSV headers for validation. */
+  public abstract List<String> headers();
 
   @Nullable
   protected abstract T createNextRow() throws HandledCsvParseException;
 
+  /** Check if the CSV file headers match the expected headers. */
   public boolean headersMatch() {
     try {
       ++lineNumber;
@@ -65,6 +67,7 @@ public abstract class AbstractCsvParser<T> {
     }
   }
 
+  /** Check if there are more rows to read. */
   public boolean hasNext() {
     while (true) {
       try {
@@ -84,6 +87,7 @@ public abstract class AbstractCsvParser<T> {
     }
   }
 
+  /** Return the current parsed row. */
   public T next() {
     return next;
   }

@@ -14,9 +14,12 @@ import org.opentripplanner.utils.logging.ProgressTracker;
  * Use this class to read in a CSV file from a {@link DataSource}. You must provide (required):
  * <ul>
  *   <li>the {@code datasource} - the csv file to read</li>
- *   <li>the {@code logger} - the logger ro write progress tracking events.</li>
- *   <li>the {@code parserFactory} the factory to create a CSV parser for mapping into the row type.</li>
- *   <li>the {@code rowHandler} a handler for each row read. </li>
+ *   <li>the {@code parserFactory} - the factory to create a CSV parser for mapping into the row type.</li>
+ *   <li>the {@code rowHandler} - a handler for each row read. </li>
+ * </ul>
+ * Optional:
+ * <ul>
+ *   <li>the {@code logger} - the logger to write progress tracking events.</li>
  * </ul>
  *
  * The class is responsible for processing the CSV file and orchestrating the parsing process.
@@ -39,13 +42,14 @@ public class OtpCsvReader<T> {
     return new OtpCsvReader<S>();
   }
 
+  /** Set the data source to read from. */
   public OtpCsvReader<T> withDataSource(DataSource dataSource) {
     this.dataSource = dataSource;
     return this;
   }
 
   /**
-   * The logger is optional. If pressent, a {@link ProgressTracker} is created and the
+   * The logger is optional. If present, a {@link ProgressTracker} is created and the
    * log events is written to the logger.
    */
   public OtpCsvReader<T> withProgressLogger(Consumer<String> logger) {
@@ -53,6 +57,7 @@ public class OtpCsvReader<T> {
     return this;
   }
 
+  /** Set the parser factory for converting CSV rows to objects. */
   public OtpCsvReader<T> withParserFactory(
     Function<com.csvreader.CsvReader, AbstractCsvParser<T>> parserFactory
   ) {
@@ -60,11 +65,13 @@ public class OtpCsvReader<T> {
     return this;
   }
 
+  /** Set the handler to process each parsed row. */
   public OtpCsvReader<T> withRowHandler(Consumer<T> rowHandler) {
     this.rowHandler = rowHandler;
     return this;
   }
 
+  /** Read and process the CSV file. */
   public void read() throws HeadersDoNotMatch {
     Objects.requireNonNull(dataSource);
     Objects.requireNonNull(parserFactory);
@@ -87,7 +94,7 @@ public class OtpCsvReader<T> {
     var parser = parserFactory.apply(reader);
 
     if (!parser.headersMatch()) {
-      throw new HeadersDoNotMatch(dataSource.path());
+      throw new HeadersDoNotMatch(dataSource.path(), reader.getRawRecord(), parser.headers());
     }
 
     while (parser.hasNext()) {

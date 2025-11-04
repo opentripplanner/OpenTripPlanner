@@ -1,6 +1,6 @@
 import { Mode } from '../../gql/graphql.ts';
 import { LegTime } from './LegTime.tsx';
-import { formatDistance } from '../../util/formatDistance.ts';
+import { formatDistance } from '../../util/distanceUtils.ts';
 import { formatDuration } from '../../util/formatDuration.ts';
 import { InterchangeInfo } from './InterchangeInfo.tsx';
 import { ItineraryGraphiQLLineLink } from './ItineraryGraphiQLLineLink.tsx';

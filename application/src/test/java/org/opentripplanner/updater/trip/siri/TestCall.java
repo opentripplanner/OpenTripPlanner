@@ -90,7 +90,7 @@ public class TestCall implements CallWrapper {
   }
 
   @Override
-  public List<NaturalLanguageStringStructure> getDestinationDisplaies() {
+  public List<NaturalLanguageStringStructure> getDestinationDisplays() {
     return destinationDisplaies;
   }
 

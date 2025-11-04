@@ -10,7 +10,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 7479,
+      "generalizedCost" : 7480,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -27,10 +27,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 7479,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 207,
-            "points" : "kaytG~wqkV?T?fCAl@?R?jE?rC?t@?hEAvD?R?R?|@?dBAP?PAxD?nD?X?jE?bA?t@?N?Z?ZAX?^@bBAt@?zC?N?J?NR?f@?@?X?b@?R?LNBH?vB?\\?JAFEP?NCpD?lECfE?H?`E@T`@@LBBCD?D?HHCJAF@ZAL?FAJGTCJGLQPKLWVSVMLILY`@c@v@INKRGNELEPENKb@iAvGkAxGETCRGd@If@Eb@Ip@APANAJ?J?H?H?L?DG@E?A@?@?@AB?HOhCIvAFBCRGPKRERg@xCETGXg@zCETGZg@vCCPADERADi@|CEXABCTi@vCCRGZm@fD[jBm@jDCJAFEVk@|CCVCFALk@|CEVETk@|CERG\\SjASnAGVCPAFg@tCCPCRm@lDw@fEi@bDCNETKf@EVEHMNATAh@ElCIlD?D?VARA`@EpB?N?TEjBCfAAP?RC`BATClAI|DK?G?mCBkCDoCDmCBoCDkCBoCB[?sBD]?Y@eA@K?C?K?W@{A@M@C@I?_CB?G"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -257,10 +254,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 1546,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 37,
-            "points" : "kaytG~wqkV?T?fCAl@?R?jE?rC?t@?hEAvD?R?R?|@?dBAP?PAxD?nD?X?jE?bA?t@?N?Z?ZAX?^@bBAt@?zC?N?J?NQ?O?sA@?W"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -401,10 +395,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 35,
-            "points" : "meytGtdtkVC?OAQ?}B?mC?{BA??Q?oCAmC?mC?qBA??]?mC?mCAm@???aB?{AC[?kDAsCBq@A??uA?iCAgC?w@???yA?sCCoCAiB@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -452,10 +443,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 81,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 10,
-            "points" : "g~{tGjctkV?B`@?\\?R?@?@?BC???I"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -635,10 +623,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 101,
-            "points" : "}z{tG~btkV?^?nE?V@Z?PH\\Nb@`@~@Rf@??`@bANb@FV@R?P?pE?jA@h@AnAbBl@LFJN\\f@LT??NXJPPVJFf@Vf@Pp@Nd@NRLB@RNXZR\\vAhC@BhAhD`AhClAbDBrDCnG@n@@^@d@HdAP`CBjEDvD???LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -686,10 +671,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 44,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 7,
-            "points" : "sy{tGxc{kV???LABF?B??J"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -756,7 +738,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4300,
+      "generalizedCost" : 4301,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -773,10 +755,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 1411,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 45,
-            "points" : "kaytG~wqkV?T?fCAl@?RmC?oCAmCAoC?_CAM?aC??A?A?A?A??AA?AAA??AAA???A?A?A???A@A??@A@?@??A@?@?BcC?mCAmCAmC?QBIYIWOH"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1060,10 +1039,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 94,
-            "points" : "coztGd}qkVNl@r@`CZhA`A`D??Ph@l@tBb@rARh@Pd@???BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE???JEnE@fEDlE@hE@~A??@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -1111,10 +1087,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 1518,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 29,
-            "points" : "ugztGdzzkVL?ATClAI|DK?G?mCBkCDoCDmCBoCDkCBoCB[?sBD]?Y@eA@K?C?K?W@{A@M@C@I?_CB?G"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1224,10 +1197,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 95,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "kaytG~wqkV?T?fCG?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1589,10 +1559,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 135,
-            "points" : "kaytG||qkVA~@?jE?tC???r@AhE?jE?rA???tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB??S?oCDmCDmCBo@@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -1640,10 +1607,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 409,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 13,
-            "points" : "}~{tGnq{kV?LVAF?J?L?rBCLA?Q?EAyAEcH?G"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1753,10 +1717,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 1546,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 37,
-            "points" : "kaytG~wqkV?T?fCAl@?R?jE?rC?t@?hEAvD?R?R?|@?dBAP?PAxD?nD?X?jE?bA?t@?N?Z?ZAX?^@bBAt@?zC?N?J?NQ?O?sA@?W"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1897,10 +1858,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 35,
-            "points" : "meytGtdtkVC?OAQ?}B?mC?{BA??Q?oCAmC?mC?qBA??]?mC?mCAm@???aB?{AC[?kDAsCBq@A??uA?iCAgC?w@???yA?sCCoCAiB@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -1948,10 +1906,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 81,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 10,
-            "points" : "g~{tGjctkV?B`@?\\?R?@?@?BC???I"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2131,10 +2086,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 101,
-            "points" : "}z{tG~btkV?^?nE?V@Z?PH\\Nb@`@~@Rf@??`@bANb@FV@R?P?pE?jA@h@AnAbBl@LFJN\\f@LT??NXJPPVJFf@Vf@Pp@Nd@NRLB@RNXZR\\vAhC@BhAhD`AhClAbDBrDCnG@n@@^@d@HdAP`CBjEDvD???LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -2182,10 +2134,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 44,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 7,
-            "points" : "sy{tGxc{kV???LABF?B??J"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2252,7 +2201,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 4314,
+      "generalizedCost" : 4315,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -2269,10 +2218,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 1411,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 45,
-            "points" : "kaytG~wqkV?T?fCAl@?RmC?oCAmCAoC?_CAM?aC??A?A?A?A??AA?AAA??AAA???A?A?A???A@A??@A@?@??A@?@?BcC?mCAmCAmC?QBIYIWOH"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2556,10 +2502,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 94,
-            "points" : "coztGd}qkVNl@r@`CZhA`A`D??Ph@l@tBb@rARh@Pd@???BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE???JEnE@fEDlE@hE@~A??@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -2607,10 +2550,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 1518,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 29,
-            "points" : "ugztGdzzkVL?ATClAI|DK?G?mCBkCDoCDmCBoCDkCBoCB[?sBD]?Y@eA@K?C?K?W@{A@M@C@I?_CB?G"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2714,10 +2654,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 6731,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 208,
-            "points" : "ahztGxxrkV@Sb@?`@@T??V?vCAT?R?`D?T?RA`D?R?R?t@?n@?z@?T?R?jB?@?r@?R?R?tA?\\?l@?R?T?VAd@?jA?N?N?J?Z?jA?z@?P?Z?J@N?hA@x@Ap@ATETGpJCjEA|CArAAxAAxAAdBEzHClF?@Ax@GTAjBAZ?R@hC@h@Q@cBBM?M?_CDsA@Y?Q@O?K?Q?mBB[?C?W@[?]@E?IDI@]DO@SBM?S@G@A?GDEJQ|@AL?L@nA?j@@L?V?d@@~@@NI?E?W@Q?Q?m@@Q@AF?DAJBzB?V?NANM@K?GBEDEHIJUX_@f@KNQRSVGFCBQPIHGDGBIBK@W@a@?mA@E?C@C@A?CBQTKJEHIJeC~CYZo@v@g@d@IJAFAD?L@vC@hB@p@?X?T@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?RDbH@xA?D?P?RDpH"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2934,10 +2871,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 139,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 9,
-            "points" : "ahztGxxrkV@Sb@?`@@?a@?k@GGKY@A"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -3078,10 +3012,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "0"
             }
           ],
-          "legGeometry" : {
-            "length" : 46,
-            "points" : "weztGdtrkV?BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE???JEnE@fEDlE@hE\\CPBt@ZvAl@d@R??|Ar@rB|@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -3129,10 +3060,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 652,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 25,
-            "points" : "wxytGjgwkVDWF@LFABCJm@lDADCRABCNi@zCETEXm@lD]hBo@rDCPADL@H@F@JB@@@K"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -3351,10 +3279,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 55,
-            "points" : "e~ytGbdxkV[OQ@{CFa@B{B@??S@mC@Q@eB@??U@mCB{BD??S?mCBmCFyBB??U?kCBsCDsBD??W?kCBBlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ???d@FtKvBE"
-          },
+          "legGeometry" : { },
           "mode" : "TRAM",
           "pathway" : false,
           "realTime" : false,
@@ -3401,10 +3326,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 290,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 7,
-            "points" : "iu{tGxq{kV?DK?GBwADK?DpH"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -3517,10 +3439,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 139,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 9,
-            "points" : "ahztGxxrkV@Sb@?`@@?a@?k@GGKY@A"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -3778,10 +3697,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 95,
-            "points" : "weztGdtrkV?BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE???JEnE@fEDlE@hE@~A??@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APu@lJMhBI`@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -3829,10 +3745,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 1402,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 39,
-            "points" : "ikztGh~{kVNDEVUzACPOUQO_@Yc@[QMMEOKOIECGCIAMCGCGAECECECOOMOGKIFMLk@BsABGDGBoCBkCDoC@mCBmCDoCDmCD?qA"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -3964,7 +3877,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 3720,
+      "generalizedCost" : 3721,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -3984,10 +3897,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 139,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 9,
-            "points" : "ahztGxxrkV@Sb@?`@@?a@?k@GGKY@A"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -4102,10 +4012,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 32,
-            "points" : "weztGdtrkV?BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -4153,10 +4060,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 690,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 32,
-            "points" : "ggztGlfvkVA?Ab@?\\AbC?BAD?NP?RA?R?JB~B?h@@\\@jB?d@@X?T@z@?v@@f@?R?F?L?HBfD?N?BLDLDD["
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -4427,10 +4331,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 56,
-            "points" : "}dztGpgwkVe@S]EoB@mCBoCF{BB??Q?kC@@zD???PBjE?`B??@X@jEBjD???\\BhEBpD???XBhE@nD??@Z?hEBtA?h@@h@??@Z@nEBhEBhD???`@FtKDhH??@hBoCD}BB??O@mCBoCDM@_C@q@@??{AByBD"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -4478,10 +4379,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 694,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 13,
-            "points" : "yx{tGzwzkV?LI?M@?PFlJ?RDbH@xA?D?P?RDpH"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -4581,10 +4479,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 139,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 9,
-            "points" : "ahztGxxrkV@Sb@?`@@?a@?k@GGKY@A"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -4842,10 +4737,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 95,
-            "points" : "weztGdtrkV?BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE???JEnE@fEDlE@hE@~A??@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APu@lJMhBI`@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -4893,10 +4785,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 1402,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 39,
-            "points" : "ikztGh~{kVNDEVUzACPOUQO_@Yc@[QMMEOKOIECGCIAMCGCGAECECECOOMOGKIFMLk@BsABGDGBoCBkCDoC@mCBmCDoCDmCD?qA"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -5028,7 +4917,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         ]
       },
-      "generalizedCost" : 3720,
+      "generalizedCost" : 3721,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -5048,10 +4937,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 139,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 9,
-            "points" : "ahztGxxrkV@Sb@?`@@?a@?k@GGKY@A"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -5166,10 +5052,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 32,
-            "points" : "weztGdtrkV?BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -5217,10 +5100,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 690,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 32,
-            "points" : "ggztGlfvkVA?Ab@?\\AbC?BAD?NP?RA?R?JB~B?h@@\\@jB?d@@X?T@z@?v@@f@?R?F?L?HBfD?N?BLDLDD["
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -5491,10 +5371,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 56,
-            "points" : "}dztGpgwkVe@S]EoB@mCBoCF{BB??Q?kC@@zD???PBjE?`B??@X@jEBjD???\\BhEBpD???XBhE@nD??@Z?hEBtA?h@@h@??@Z@nEBhEBhD???`@FtKDhH??@hBoCD}BB??O@mCBoCDM@_C@q@@??{AByBD"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -5542,10 +5419,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 694,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 13,
-            "points" : "yx{tGzwzkV?LI?M@?PFlJ?RDbH@xA?D?P?RDpH"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -5633,10 +5507,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 7427,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 252,
-            "points" : "unytGpxqkVA??dACpB@P?f@?p@?j@?dAAhE?jE?vD?P?RK?GFCDCFADABADADAF?D?FADCF?B?B?@?D@DADABCBC?A?C?AA??GICAAAA?A?A?AACAC?A@ABABC@CDCBCBC@CBABABCJ?J?@?@MR?hE?fEAdB?dB?lE?`A?T?pBA|D?J?x@?r@y@??bBuA?y@AU?{@?O?}@?E?y@?_@Aa@?u@?W??J@N?hA@x@Ap@ATETGpJCjEA|CArAAxAAxAAdBEzHClF?@Ax@GTAjBAZ?R@hC@h@Q@cBBM?M?_CDsA@Y?Q@O?K?Q?mBB[?C?W@[?]@E?IDI@]DO@SBM?S@G@A?GDEJQ|@AL?L@nA?j@@L?V?d@@~@@NI?E?W@Q?Q?m@@Q@AF?DAJBzB?V?NANM@K?GBEDEHIJUX_@f@KNQRSVGFCBQPIHGDGBIBK@W@a@?mA@E?C@C@A?CBQTKJEHIJeC~CYZo@v@g@d@IJAFAD?L@vC@hB@p@?X?T@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?J"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -5896,10 +5767,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 6297,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 202,
-            "points" : "ahztGxxrkV@Sb@?`@@T??V?vCAT?R?`D?T?RA`D?R?R?t@?n@?z@?T?R?jB?@?r@?R?R?tA?\\?l@?R?T?VAd@?jA?N?N?J?Z?jA?z@?P?Z?J@N?hA@x@Ap@ATETGpJCjEA|CArAAxAAxAAdBEzHClF?@Ax@GTAjBAZ?R@hC@h@Q@cBBM?M?_CDsA@Y?Q@O?K?Q?mBB[?C?W@[?]@E?IDI@]DO@SBM?S@G@A?GDEJQ|@AL?L@nA?j@@L?V?d@@~@@NI?E?W@Q?Q?m@@Q@AF?DAJBzB?V?NANM@K?GBEDEHIJUX_@f@KNQRSVGFCBQPIHGDGBIBK@W@a@?mA@E?C@C@A?CBQTKJEHIJeC~CYZo@v@g@d@IJAFAD?L@vC@hB@p@?X?T@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?J"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -6094,10 +5962,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "generalizedCost" : 4643,
           "interlineWithPreviousLeg" : false,
-          "legGeometry" : {
-            "length" : 137,
-            "points" : "_s{tGvpukV??c@tAIIMb@ADIZM\\KZWr@Ud@Ud@IRSb@k@x@_@h@a@f@_AfAYXKQMUIKGGIGKEOCI?I?KBKBQHqAxAONL\\j@rA@R?FVh@~EpKxFzLdA|B^x@BD@@BDHLHJBFBDBF@DBF?J?HAF?HGbAK~AGz@IlAEd@?TAP?L?L@Z?`@?R?T?TBlBCJ?D?BAFAB?DADABEFCDA@CDC?c@@{@@O?K?eBBM?M@@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?RDbH@xA?D?P?RDpH"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,

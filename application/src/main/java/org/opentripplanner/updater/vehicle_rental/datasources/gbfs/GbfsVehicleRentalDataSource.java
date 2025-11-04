@@ -4,12 +4,11 @@ import java.util.List;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
 /**
- * Created by demory on 2017-03-14.
- * <p>
  * Leaving OTPFeature.FloatingBike turned off both prevents floating bike updaters added to
  * router-config.json from being used, but more importantly, floating bikes added by a
  * VehicleRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be
@@ -31,7 +30,11 @@ public class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
 
   @Override
   public void setup() {
-    loaderAndMapper = new GbfsFeedLoaderAndMapper(params, otpHttpClientFactory);
+    try {
+      loaderAndMapper = new GbfsFeedLoaderAndMapper(params, otpHttpClientFactory);
+    } catch (Exception e) {
+      throw new UpdaterConstructionException(e);
+    }
   }
 
   @Override

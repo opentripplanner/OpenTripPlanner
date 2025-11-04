@@ -1,24 +1,28 @@
 package org.opentripplanner.graph_builder.module;
 
 import java.time.Duration;
+import javax.annotation.Nullable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Mode-specific parameters for transfers.
  */
 public record TransferParameters(
-  Duration maxTransferDuration,
-  Duration carsAllowedStopMaxTransferDuration,
+  @Nullable Duration maxTransferDuration,
+  @Nullable Duration carsAllowedStopMaxTransferDuration,
+  @Nullable Duration bikesAllowedStopMaxTransferDuration,
   boolean disableDefaultTransfers
 ) {
   public static final Duration DEFAULT_MAX_TRANSFER_DURATION = null;
   public static final Duration DEFAULT_CARS_ALLOWED_STOP_MAX_TRANSFER_DURATION = null;
+  public static final Duration DEFAULT_BIKES_ALLOWED_STOP_MAX_TRANSFER_DURATION = null;
   public static final boolean DEFAULT_DISABLE_DEFAULT_TRANSFERS = false;
 
   TransferParameters(Builder builder) {
     this(
       builder.maxTransferDuration,
       builder.carsAllowedStopMaxTransferDuration,
+      builder.bikesAllowedStopMaxTransferDuration,
       builder.disableDefaultTransfers
     );
   }
@@ -27,6 +31,7 @@ public record TransferParameters(
     return ToStringBuilder.of(getClass())
       .addDuration("maxTransferDuration", maxTransferDuration)
       .addDuration("carsAllowedStopMaxTransferDuration", carsAllowedStopMaxTransferDuration)
+      .addDuration("bikesAllowedStopMaxTransferDuration", bikesAllowedStopMaxTransferDuration)
       .addBool("disableDefaultTransfers", disableDefaultTransfers)
       .toString();
   }
@@ -35,6 +40,7 @@ public record TransferParameters(
 
     private Duration maxTransferDuration;
     private Duration carsAllowedStopMaxTransferDuration;
+    private Duration bikesAllowedStopMaxTransferDuration;
     private boolean disableDefaultTransfers;
 
     public Builder() {
@@ -52,6 +58,13 @@ public record TransferParameters(
       Duration carsAllowedStopMaxTransferDuration
     ) {
       this.carsAllowedStopMaxTransferDuration = carsAllowedStopMaxTransferDuration;
+      return this;
+    }
+
+    public Builder withBikesAllowedStopMaxTransferDuration(
+      Duration bikesAllowedStopMaxTransferDuration
+    ) {
+      this.bikesAllowedStopMaxTransferDuration = bikesAllowedStopMaxTransferDuration;
       return this;
     }
 

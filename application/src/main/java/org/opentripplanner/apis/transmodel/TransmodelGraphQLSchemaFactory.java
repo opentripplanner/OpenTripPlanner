@@ -66,6 +66,7 @@ import org.opentripplanner.apis.transmodel.model.framework.RentalVehicleTypeType
 import org.opentripplanner.apis.transmodel.model.framework.ServerInfoType;
 import org.opentripplanner.apis.transmodel.model.framework.StreetModeDurationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.SystemNoticeType;
+import org.opentripplanner.apis.transmodel.model.framework.TransitInfoType;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.framework.ValidityPeriodType;
@@ -105,6 +106,7 @@ import org.opentripplanner.apis.transmodel.model.stop.TariffZoneType;
 import org.opentripplanner.apis.transmodel.model.timetable.BookingArrangementType;
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyQuery;
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyType;
+import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.model.timetable.InterchangeType;
 import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.TimetabledPassingTimeType;
@@ -218,6 +220,7 @@ public class TransmodelGraphQLSchemaFactory {
     GraphQLOutputType systemNoticeType = SystemNoticeType.create();
     GraphQLOutputType linkGeometryType = PointsOnLinkType.create();
     GraphQLOutputType serverInfoType = ServerInfoType.create();
+    GraphQLOutputType transitInfoType = TransitInfoType.create(validityPeriodType);
     GraphQLOutputType authorityType = authorityTypeFactory.create(
       LineType.REF,
       PtSituationElementType.REF
@@ -293,7 +296,8 @@ public class TransmodelGraphQLSchemaFactory {
       DatedServiceJourneyType.REF
     );
 
-    // Timetable
+    /* Timetable */
+
     GraphQLNamedOutputType ptSituationElementType = PtSituationElementType.create(
       authorityType,
       quayType,
@@ -316,6 +320,7 @@ public class TransmodelGraphQLSchemaFactory {
       stopToStopGeometryType,
       ptSituationElementType
     );
+    GraphQLOutputType empiricalDelay = EmpiricalDelayType.create();
 
     GraphQLOutputType sjEstimatedCallsType = SJEstimatedCallsType.create();
 
@@ -328,6 +333,7 @@ public class TransmodelGraphQLSchemaFactory {
       ServiceJourneyType.REF,
       sjEstimatedCallsType,
       DatedServiceJourneyType.REF,
+      empiricalDelay,
       dateTimeScalar
     );
 
@@ -1527,6 +1533,14 @@ public class TransmodelGraphQLSchemaFactory {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(serverInfoType))
           .dataFetcher(e -> projectInfo())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("transitInfo")
+          .description("Get information about the transit data available in the system.")
+          .type(new GraphQLNonNull(transitInfoType))
+          .dataFetcher(e -> new Object())
           .build()
       )
       .field(datedServiceJourneyQueryFactory.createGetById(datedServiceJourneyType))

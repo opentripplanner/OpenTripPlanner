@@ -119,7 +119,7 @@ class OsmAreaGroup {
   }
 
   public static List<OsmAreaGroup> groupAreas(
-    Map<OsmArea, OsmLevel> areasLevels,
+    Map<OsmArea, Set<OsmLevel>> areasLevels,
     Multimap<OsmNode, OsmWay> barriers
   ) {
     DisjointSet<OsmArea> groups = new DisjointSet<>();
@@ -138,11 +138,12 @@ class OsmAreaGroup {
     // and these two consecutive nodes must not also be consecutive nodes on a barrier
     for (var nodePair : areasForNodePair.keySet()) {
       for (OsmArea area1 : areasForNodePair.get(nodePair)) {
-        OsmLevel level1 = areasLevels.get(area1);
+        Set<OsmLevel> levelSet1 = areasLevels.get(area1);
         for (OsmArea area2 : areasForNodePair.get(nodePair)) {
-          OsmLevel level2 = areasLevels.get(area2);
-          boolean onSameLevel =
-            (level1 == null && level2 == null) || (level1 != null && level1.equals(level2));
+          Set<OsmLevel> levelSet2 = areasLevels.get(area2);
+          boolean onSameLevels =
+            (levelSet1 == null && levelSet2 == null) ||
+            (levelSet1 != null && levelSet1.equals(levelSet2));
           var crossablePermissions = Objects.requireNonNull(area1)
             .getPermission()
             .intersection(Objects.requireNonNull(area2).getPermission());
@@ -165,7 +166,7 @@ class OsmAreaGroup {
             })
             .toList();
           boolean shareBarrier = area1 != area2 && !sharedBarriers.isEmpty();
-          if (onSameLevel && !shareBarrier) {
+          if (onSameLevels && !shareBarrier) {
             groups.union(area1, area2);
           }
         }

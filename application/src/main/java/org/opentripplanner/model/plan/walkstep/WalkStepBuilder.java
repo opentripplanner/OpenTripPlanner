@@ -29,6 +29,7 @@ public class WalkStepBuilder {
   private String exit;
   private Entrance entrance;
   private boolean stayOn = false;
+  private boolean crossing;
   /**
    * Distance used for appending elevation profiles
    */
@@ -84,6 +85,11 @@ public class WalkStepBuilder {
 
   public WalkStepBuilder withStayOn(boolean stayOn) {
     this.stayOn = stayOn;
+    return this;
+  }
+
+  public WalkStepBuilder withCrossing(boolean crossing) {
+    this.crossing = crossing;
     return this;
   }
 
@@ -161,6 +167,10 @@ public class WalkStepBuilder {
 
   public RelativeDirection relativeDirection() {
     return relativeDirection;
+  }
+
+  public boolean isCrossing() {
+    return crossing;
   }
 
   public WalkStep build() {

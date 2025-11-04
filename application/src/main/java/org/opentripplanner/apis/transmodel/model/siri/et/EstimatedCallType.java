@@ -20,6 +20,7 @@ import org.opentripplanner.apis.transmodel.mapping.OccupancyStatusMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
+import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -45,6 +46,7 @@ public class EstimatedCallType {
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType sjEstimatedCallType,
     GraphQLOutputType datedServiceJourneyType,
+    GraphQLOutputType empiricalDelayType,
     GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType.newObject()
@@ -77,7 +79,7 @@ public class EstimatedCallType {
           .name("expectedArrivalTime")
           .type(new GraphQLNonNull(dateTimeScalar))
           .description(
-            "Expected time of arrival at quay. Updated with real time information if available. Will be null if an actualArrivalTime exists"
+            "Expected time of arrival at quay. Updated with real time information if available."
           )
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
@@ -123,7 +125,7 @@ public class EstimatedCallType {
           .name("expectedDepartureTime")
           .type(new GraphQLNonNull(dateTimeScalar))
           .description(
-            "Expected time of departure from quay. Updated with real time information if available. Will be null if an actualDepartureTime exists"
+            "Expected time of departure from quay. Updated with real time information if available."
           )
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
@@ -150,6 +152,16 @@ public class EstimatedCallType {
               1000 * (tripTimeOnDate.getServiceDayMidnight() + tripTimeOnDate.getActualDeparture())
             );
           })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("empiricalDelay")
+          .type(empiricalDelayType)
+          .description(
+            "The typical delay for this trip on this day for this stop based on historical data."
+          )
+          .dataFetcher(EmpiricalDelayType::dataFetcherForTripTimeOnDate)
           .build()
       )
       .field(

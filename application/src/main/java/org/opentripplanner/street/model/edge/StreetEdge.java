@@ -61,6 +61,7 @@ public class StreetEdge
   static final int BICYCLE_NOTHRUTRAFFIC = 7;
   static final int WALK_NOTHRUTRAFFIC = 8;
   static final int CLASS_LINK = 9;
+  static final int CROSSING_FLAG_INDEX = 10;
 
   private StreetEdgeCostExtension costExtension;
 
@@ -301,6 +302,10 @@ public class StreetEdge
 
   public boolean isRoundabout() {
     return BitSetUtils.get(flags, ROUNDABOUT_FLAG_INDEX);
+  }
+
+  public boolean isCrossing() {
+    return BitSetUtils.get(flags, CROSSING_FLAG_INDEX);
   }
 
   @Override

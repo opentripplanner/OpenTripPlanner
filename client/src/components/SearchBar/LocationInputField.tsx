@@ -1,7 +1,7 @@
 import { Form } from 'react-bootstrap';
 import { toString, parseLocation } from '../../util/locationConverter.ts';
-import { Location, TripQueryVariables } from '../../gql/graphql.ts';
-import { useCallback, useEffect, useState } from 'react';
+import { TripQueryVariables } from '../../gql/graphql.ts';
+import { useCallback, useState } from 'react';
 
 interface Props {
   id: string;
@@ -12,13 +12,15 @@ interface Props {
 }
 
 export function LocationInputField({ id, label, tripQueryVariables, setTripQueryVariables, locationFieldKey }: Props) {
-  const [value, setValue] = useState('');
+  const currentLocation = tripQueryVariables[locationFieldKey];
+  const locationString = toString(currentLocation) || '';
+  const [value, setValue] = useState(locationString);
 
-  useEffect(() => {
-    const initialLocation: Location = tripQueryVariables[locationFieldKey];
-
-    setValue(toString(initialLocation) || '');
-  }, [tripQueryVariables, locationFieldKey]);
+  const [prevLocation, setPrevLocation] = useState(currentLocation);
+  if (prevLocation !== currentLocation) {
+    setPrevLocation(currentLocation);
+    setValue(locationString);
+  }
 
   const onLocationChange = useCallback(
     (value: string) => {

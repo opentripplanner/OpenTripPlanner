@@ -4,14 +4,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.framework.model.NormalizedCost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFare;
@@ -39,7 +38,8 @@ public class Itinerary implements ItinerarySortKey {
   /* COST AND PENALTY */
   private final TimeAndCost accessPenalty;
   private final TimeAndCost egressPenalty;
-  private final Cost generalizedCost;
+  private final NormalizedCost generalizedCost;
+  private final NormalizedCost generalizedCostIncludingPenalty;
 
   @Nullable
   private final Integer generalizedCost2;
@@ -94,14 +94,16 @@ public class Itinerary implements ItinerarySortKey {
   Itinerary(ItineraryBuilder builder) {
     this.legs = List.copyOf(builder.legs);
 
-    this.generalizedCost = Objects.requireNonNull(builder.calculateGeneralizedCostWithoutPenalty());
+    // Normalize (round to seconds) to make sure insignificant small differences do not
+    // have an effect when comparing itineraries in the filter-chain and in paging
+    this.generalizedCost = builder.calculateGeneralizedCostWithoutPenalty().normalize();
     this.generalizedCost2 = builder.generalizedCost2;
 
     this.searchWindowAware = builder.searchWindowAware;
     this.transferPriorityCost = builder.transferPriorityCost;
     this.waitTimeOptimizedCost = builder.waitTimeOptimizedCost;
-    this.accessPenalty = Objects.requireNonNull(builder.accessPenalty);
-    this.egressPenalty = Objects.requireNonNull(builder.egressPenalty);
+    this.accessPenalty = builder.accessPenalty.normalize();
+    this.egressPenalty = builder.egressPenalty.normalize();
     this.tooSloped = builder.tooSloped;
     this.maxSlope = builder.maxSlope;
     this.elevationGained_edges_m = builder.elevationGained_m;
@@ -113,6 +115,11 @@ public class Itinerary implements ItinerarySortKey {
     this.fare = builder.fare;
 
     // Set aggregated data
+    this.generalizedCostIncludingPenalty = generalizedCost
+      .plus(accessPenalty.cost())
+      .plus(egressPenalty.cost())
+      .normalize();
+
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
 
     this.totalDuration = totals.totalDuration;
@@ -149,31 +156,40 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
-   * Time that the trip departs.
+   * Time that the trip departs. The time is normalized(rounded to closest second).
+   * @see #endTime() for details no the normalization.
    */
   public ZonedDateTime startTime() {
     return legs().getFirst().startTime();
   }
 
   /**
-   * Time that the trip departs as a Java Instant type.
+   * Time that the trip departs as a Java Instant type. The same normalization as in
+   * {@link #startTime()} applies.
    */
+  @Override
   public Instant startTimeAsInstant() {
-    return legs().getFirst().startTime().toInstant();
+    return startTime().toInstant();
   }
 
   /**
-   * Time that the trip arrives.
+   * Time that the trip arrives. The time is normalized(rounded to closest second). The value is
+   * normalized (rounded to seconds) is required for the paging to work properly. We serialize the
+   * times in the paging-token with a resolution of seconds. When filtering the page-cut, any
+   * millis part could cause duplicates. This also have an effect when sorting itineraries in the
+   * itinerary-filter-chain.
    */
   public ZonedDateTime endTime() {
     return legs().getLast().endTime();
   }
 
   /**
-   * Time that the trip arrives as a Java Instant type.
+   * Time that the trip arrives as a Java Instant type. The same normalization as in
+   * {@link #startTime()} applies.
    */
+  @Override
   public Instant endTimeAsInstant() {
-    return legs().getLast().endTime().toInstant();
+    return endTime().toInstant();
   }
 
   /**
@@ -454,8 +470,8 @@ public class Itinerary implements ItinerarySortKey {
    * @see org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
    */
   @Override
-  public Cost generalizedCostIncludingPenalty() {
-    return generalizedCost.plus(accessPenalty.cost().plus(egressPenalty.cost()));
+  public NormalizedCost generalizedCostIncludingPenalty() {
+    return generalizedCostIncludingPenalty;
   }
 
   /**

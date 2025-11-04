@@ -96,6 +96,14 @@ public class RouteRequestBuilder implements Serializable {
     return dateTime;
   }
 
+  public GenericLocation from() {
+    return from;
+  }
+
+  public GenericLocation to() {
+    return to;
+  }
+
   /**
    * The dateTime will be set to a whole number of seconds. We don't do sub-second accuracy,
    * and if we set the millisecond part to a non-zero value, rounding will not be guaranteed

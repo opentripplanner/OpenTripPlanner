@@ -10,7 +10,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 1704,
+      "generalizedCost" : 1705,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -28,10 +28,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
           "generalizedCost" : 1704,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1032,60.2,1190,55.5,1430,55.5,1506,40.4,1849,40.4,1919,37.3,1931,37.3,2078,55.5,2503,55.5,2503,NaN,2635,NaN",
-          "legGeometry" : {
-            "length" : 59,
-            "points" : "}f{tGv}{kVC?mCBmCDoCDmCDmCBoCDmCDkCDoCB_CBM@iGEE@MB[H}@@s@@GsKAkCCkCA}BCkE?EAcEoCB{BBS@K?wDD}@@I?IAECKMKOIKyAmBCCQScB`DeAzBOVYj@eCxECF{@eAq@nAcAzBeAbBKDy@Ou@a@k@]c@_@Ws@M{@BsA"
-          },
+          "legGeometry" : { },
           "mode" : "BICYCLE",
           "pathway" : false,
           "realTime" : false,
@@ -159,10 +156,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
           "generalizedCost" : 311,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4,93,66.6,107,66.2",
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "}f{tGv}{kVjCA?e@WA"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -246,10 +240,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
           "generalizedCost" : 478,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,484,52.4,493,52.2",
-          "legGeometry" : {
-            "length" : 7,
-            "points" : "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
-          },
+          "legGeometry" : { },
           "mode" : "BICYCLE",
           "pathway" : false,
           "realTime" : false,
@@ -320,10 +311,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
           "generalizedCost" : 340,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,52.2,1,52.2,11,51.9,21,51.6,31,51.3,41,51.2,51,51.2,61,50.7,71,50.9,81,50.5,91,50.4,101,50.0,111,49.7,121,49.4,131,49.0,138,48.9,148,49.2,158,49.5,168,49.8,178,50.1,188,50.4,198,50.7,208,51.0,217,51.2,219,51.1",
-          "legGeometry" : {
-            "length" : 4,
-            "points" : "ic{tG~uzkVEcJlCE?C"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -425,10 +413,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
           "generalizedCost" : 3663,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1466,60.2,1540,55.5,2299,55.5,2299,NaN,2432,NaN",
-          "legGeometry" : {
-            "length" : 62,
-            "points" : "}f{tGv}{kVC?mCBmCDoCDmCDmCBoCDmCDkCDoCB_CBM@iGEE@MB[H}@@s@@oCDmCBC@eCBK@SBWDeCZ]eFYyDEu@C_@Ce@Gm@EeAMmBGiAGoAWWg@s@EEGKIM]i@k@w@A?QWOVYj@eCxECF{@eAq@nAcAzBeAbBKDy@Ou@a@k@]c@_@Ws@M{@BsA"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -553,7 +538,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2318,
+      "generalizedCost" : 2319,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -571,10 +556,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 266,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.3,116,29.4,126,29.4,136,29.4,146,29.4,156,29.3,168,29.3",
-          "legGeometry" : {
-            "length" : 10,
-            "points" : "ssztGh_wkV?`@?LK?uBBK??F?JBbDN?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -767,10 +749,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 39,
-            "points" : "kwztGhgwkVQ?kC@@zD???PBjE?`B??@X@jEBjD???\\BhEBpD???XBhE@nD??@Z?hEBtA?h@@h@??@Z@nEBhEBhD???`@FtKDhH??@hBoCD}BB"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -819,10 +798,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 929,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,52.7,9,52.6,19,52.7,29,52.9,43,53.0,53,53.2,63,53.3,73,53.4,83,53.6,93,53.7,103,54.0,113,54.3,123,54.6,133,54.9,143,55.2,153,55.4,167,55.7,177,56.0,187,56.3,197,56.5,207,56.6,217,56.9,227,57.2,237,57.5,247,57.8,257,58.1,267,58.5,277,58.8,287,59.1,297,59.3,307,59.6,317,59.9,325,60.2,335,60.5,345,60.8,355,61.1,365,61.2,375,61.5,385,61.8,395,62.0,405,62.3,415,62.5,425,62.7,435,63.6,445,64.5,455,65.3,470,66.6,484,67.4,494,67.2,504,66.8,514,66.3,524,65.8,534,65.2,544,64.7,554,64.1,563,63.7",
-          "legGeometry" : {
-            "length" : 9,
-            "points" : "wb{tG`wzkV?LO?@vAD|HDtKFrJ?d@kC@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -915,7 +891,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2482,
+      "generalizedCost" : 2483,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -933,10 +909,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 450,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,260,29.7,270,29.8,280,29.7,288,29.7",
-          "legGeometry" : {
-            "length" : 17,
-            "points" : "ssztGh_wkV?`@?LJAlBCH?J?H?vBCJ?H?jBCJA?D@L?lAE?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1142,10 +1115,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 56,
-            "points" : "efztGhcwkV@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APu@lJMhBI`@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -1194,10 +1164,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 829,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,82.0,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
-          "legGeometry" : {
-            "length" : 34,
-            "points" : "ikztGh~{kVNDEVUzACPOUQO_@Yc@[QMMEOKOIECGCIAMCGCGAECECECOOMOGKIFMLk@BsABGDGBoCBkCDkC@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1321,10 +1288,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 401,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.2,116,29.3,126,29.2,136,29.2,146,29.2,156,29.2,166,29.3,176,29.3,183,29.3,195,29.4,205,29.5,215,29.6,225,29.6,235,29.6,250,29.4,253,29.4",
-          "legGeometry" : {
-            "length" : 15,
-            "points" : "ssztGh_wkV?`@?LK?uBBK?K@sBBM??D?L@\\?lCC??E"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1517,10 +1481,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 53,
-            "points" : "i|ztG|fwkV?LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ???d@FtKmCBo@@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -1569,10 +1530,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 934,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,55.5,25,55.5,183,60.2,341,60.2,421,60.2,431,60.4,441,60.6,451,60.9,461,61.2,471,61.5,481,61.8,491,62.0,499,62.2,509,62.5,519,62.9,529,63.3,539,63.5,549,63.3,559,63.2,569,63.4,579,63.7,581,63.7",
-          "legGeometry" : {
-            "length" : 12,
-            "points" : "}~{tGnq{kV?LVAF?J?FtKlCClCEnCElCElCCB?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1683,10 +1641,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 955,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,263,29.6,273,29.6,283,29.5,293,29.5,303,29.7,314,29.6,324,29.7,334,29.7,344,29.7,354,29.8,367,29.8,375,29.9,385,29.9,395,30.0,405,30.0,415,30.1,425,30.0,438,30.1,447,30.0,457,29.9,467,29.9,477,30.0,487,30.0,497,30.0,507,30.1,514,30.1,526,30.2,536,30.3,546,30.3,556,30.5,566,30.6,576,30.7,586,30.8,599,30.9,605,30.9,619,30.9",
-          "legGeometry" : {
-            "length" : 37,
-            "points" : "ssztGh_wkV?`@?LJAlBCH?J?H?vBCJ?H?jBCJAVCJAF@F@b@NPHFBD@fA`@JDJBhBx@NFNJ~Ap@F@LFLFhBx@@?HDBOBOGE"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -1957,10 +1912,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 73,
-            "points" : "osytGbhwkVIf@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -2009,10 +1961,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 417,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,60.3,12,60.2,22,60.5,32,60.8,42,61.1,52,61.2,62,61.5,72,61.8,82,62.0,92,62.3,102,62.5,112,62.7,122,63.6,132,64.5,142,65.3,157,66.6,171,67.4,181,67.2,191,66.8,201,66.3,211,65.8,221,65.2,231,64.7,241,64.1,250,63.7",
-          "legGeometry" : {
-            "length" : 7,
-            "points" : "cb{tGnp{kV?JG?M?FrJ?d@kC@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2105,7 +2054,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2318,
+      "generalizedCost" : 2319,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2123,10 +2072,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 266,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.3,116,29.4,126,29.4,136,29.4,146,29.4,156,29.3,168,29.3",
-          "legGeometry" : {
-            "length" : 10,
-            "points" : "ssztGh_wkV?`@?LK?uBBK??F?JBbDN?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2319,10 +2265,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 39,
-            "points" : "kwztGhgwkVQ?kC@@zD???PBjE?`B??@X@jEBjD???\\BhEBpD???XBhE@nD??@Z?hEBtA?h@@h@??@Z@nEBhEBhD???`@FtKDhH??@hBoCD}BB"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -2371,10 +2314,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 929,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,52.7,9,52.6,19,52.7,29,52.9,43,53.0,53,53.2,63,53.3,73,53.4,83,53.6,93,53.7,103,54.0,113,54.3,123,54.6,133,54.9,143,55.2,153,55.4,167,55.7,177,56.0,187,56.3,197,56.5,207,56.6,217,56.9,227,57.2,237,57.5,247,57.8,257,58.1,267,58.5,277,58.8,287,59.1,297,59.3,307,59.6,317,59.9,325,60.2,335,60.5,345,60.8,355,61.1,365,61.2,375,61.5,385,61.8,395,62.0,405,62.3,415,62.5,425,62.7,435,63.6,445,64.5,455,65.3,470,66.6,484,67.4,494,67.2,504,66.8,514,66.3,524,65.8,534,65.2,544,64.7,554,64.1,563,63.7",
-          "legGeometry" : {
-            "length" : 9,
-            "points" : "wb{tG`wzkV?LO?@vAD|HDtKFrJ?d@kC@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2467,7 +2407,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2542,
+      "generalizedCost" : 2543,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2485,10 +2425,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 450,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,29.6,0,29.6,10,29.5,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,260,29.7,270,29.8,280,29.7,288,29.7",
-          "legGeometry" : {
-            "length" : 17,
-            "points" : "ssztGh_wkV?`@?LJAlBCH?J?H?vBCJ?H?jBCJA?D@L?lAE?"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,
@@ -2694,10 +2631,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "zoneId" : "1"
             }
           ],
-          "legGeometry" : {
-            "length" : 56,
-            "points" : "efztGhcwkV@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APu@lJMhBI`@"
-          },
+          "legGeometry" : { },
           "mode" : "BUS",
           "pathway" : false,
           "realTime" : false,
@@ -2746,10 +2680,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "generalizedCost" : 829,
           "interlineWithPreviousLeg" : false,
           "legElevation" : "0,82.0,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
-          "legGeometry" : {
-            "length" : 34,
-            "points" : "ikztGh~{kVNDEVUzACPOUQO_@Yc@[QMMEOKOIECGCIAMCGCGAECECECOOMOGKIFMLk@BsABGDGBoCBkCDkC@"
-          },
+          "legGeometry" : { },
           "mode" : "WALK",
           "pathway" : false,
           "realTime" : false,

@@ -38,6 +38,7 @@ public class ObjectUtils {
    * Get the value or {@code null}, ignore any exceptions. This is useful if you must traverse
    * a long call-chain like {@code a.b().c().d()...} when e.g. logging.
    */
+  @Nullable
   public static <T> T safeGetOrNull(Supplier<T> body) {
     try {
       return body.get();
@@ -46,11 +47,15 @@ public class ObjectUtils {
     }
   }
 
-  public static <T> T requireNotInitialized(T oldValue, T newValue) {
+  public static <T> T requireNotInitialized(@Nullable T oldValue, T newValue) {
     return requireNotInitialized(null, oldValue, newValue);
   }
 
-  public static <T> T requireNotInitialized(@Nullable String name, T oldValue, T newValue) {
+  public static <T> T requireNotInitialized(
+    @Nullable String name,
+    @Nullable T oldValue,
+    T newValue
+  ) {
     if (oldValue != null) {
       throw new IllegalStateException(
         "Field%s is already set! Old value: %s, new value: %s.".formatted(
@@ -67,7 +72,15 @@ public class ObjectUtils {
    * Map an object to a string. This is null safe and a empty string is returned if the given input
    * is {@code null}.
    */
-  public static String toString(Object object) {
+  public static String toString(@Nullable Object object) {
     return object == null ? "" : object.toString();
+  }
+
+  /**
+   * Check that exactly one of {@code a} or {@code b} is not {@code null}, and the other is
+   * {@code null}.
+   */
+  public static boolean oneOf(@Nullable Object a, @Nullable Object b) {
+    return (a == null) != (b == null);
   }
 }

@@ -44,7 +44,7 @@ jobs:
       - name: Build debug client
         working-directory: client
         run: |
-          npm install
+          npm ci
           npm run build -- --base https://www.opentripplanner.org/debug-client-assets/${VERSION}/
           npm run coverage
 
@@ -56,8 +56,6 @@ jobs:
           REMOTE_BRANCH: main
           TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
         run: |
-          # throw away changes to package-lock.json
-          git checkout -- client/package-lock.json
 
           # Configure git user
           git config --global user.name 'OTP Bot'
