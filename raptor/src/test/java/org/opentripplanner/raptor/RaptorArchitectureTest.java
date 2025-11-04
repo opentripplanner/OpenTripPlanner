@@ -45,6 +45,7 @@ public class RaptorArchitectureTest {
   private static final Package RR_STANDARD = RANGE_RAPTOR.subPackage("standard");
   private static final Package RR_STD_CONFIGURE = RR_STANDARD.subPackage("configure");
   private static final Package RR_CONTEXT = RANGE_RAPTOR.subPackage("context");
+  private static final Package RAPTOR_RLT_SEARCH = RAPTOR.subPackage("relaxedlimitedtransfer");
 
   /**
    * Packages used by standard-range-raptor and multi-criteria-range-raptor.
@@ -195,6 +196,7 @@ public class RaptorArchitectureTest {
       RAPTOR_API,
       RAPTOR_SPI,
       RAPTOR_UTIL,
+      RAPTOR_RLT_SEARCH,
       CONFIGURE,
       RR_INTERNAL_API,
       RR_TRANSIT,
@@ -208,6 +210,7 @@ public class RaptorArchitectureTest {
       OTP_UTILS,
       RAPTOR_API,
       RAPTOR_SPI,
+      RAPTOR_RLT_SEARCH,
       RANGE_RAPTOR,
       RR_INTERNAL_API,
       RR_TRANSIT,
