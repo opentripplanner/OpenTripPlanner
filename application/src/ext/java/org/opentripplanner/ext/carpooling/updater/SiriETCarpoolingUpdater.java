@@ -1,25 +1,23 @@
 package org.opentripplanner.ext.carpooling.updater;
 
 import java.util.List;
-import java.util.function.Consumer;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.support.siri.SiriFileLoader;
 import org.opentripplanner.updater.support.siri.SiriHttpLoader;
 import org.opentripplanner.updater.support.siri.SiriLoader;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
-import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableSource;
 import org.opentripplanner.updater.trip.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.ServiceDelivery;
 
 /**
@@ -31,15 +29,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
   private final EstimatedTimetableSource updateSource;
 
   private final CarpoolingRepository repository;
-
   private final CarpoolSiriMapper mapper;
-
-  /**
-   * Feed id that is used for the trip ids in the TripUpdates
-   */
-  private final String feedId;
-
-  private final Consumer<UpdateResult> metricsConsumer;
 
   public SiriETCarpoolingUpdater(
     SiriETCarpoolingUpdaterParameters config,
@@ -49,61 +39,91 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
     StreetLimitationParametersService streetLimitationParametersService
   ) {
     super(config);
-    this.feedId = config.feedId();
 
-    SiriLoader siriHttpLoader = siriLoader(config);
-    updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters(), siriHttpLoader);
-
+    this.updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters(), siriLoader(config));
     this.repository = repository;
-
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
-    this.metricsConsumer = TripUpdateMetrics.streaming(config);
-
     this.mapper = new CarpoolSiriMapper(graph, vertexLinker, streetLimitationParametersService);
   }
 
+  public interface Parameters extends UrlUpdaterParameters, PollingGraphUpdaterParameters {
+    String url();
+    boolean blockReadinessUntilInitialized();
+    boolean fuzzyTripMatching();
+  }
+
   /**
-   * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
-   * applies those updates to the graph.
+   * Repeatedly makes blocking calls to an UpdateStreamer to retrieve carpooling trip updates.
    */
   @Override
   public void runPolling() {
-    boolean moreData = false;
+    boolean moreData;
     do {
-      var updates = updateSource.getUpdates();
-      if (updates.isPresent()) {
-        ServiceDelivery serviceDelivery = updates.get().getServiceDelivery();
-        moreData = Boolean.TRUE.equals(serviceDelivery.isMoreData());
-        List<EstimatedTimetableDeliveryStructure> etds =
-          serviceDelivery.getEstimatedTimetableDeliveries();
-        if (etds != null) {
-          for (EstimatedTimetableDeliveryStructure etd : etds) {
-            var ejvfs = etd.getEstimatedJourneyVersionFrames();
-            for (var ejvf : ejvfs) {
-              if (ejvf.getEstimatedVehicleJourneies() == null) {
-                LOG.warn("Received an empty EstimatedJourneyVersionFrame, skipping");
-                continue;
-              }
-              ejvf
-                .getEstimatedVehicleJourneies()
-                .forEach(ejv -> {
-                  try {
-                    var carpoolTrip = mapper.mapSiriToCarpoolTrip(ejv);
-                    if (carpoolTrip != null) {
-                      repository.upsertCarpoolTrip(carpoolTrip);
-                    }
-                  } catch (Exception e) {
-                    LOG.warn("Failed to process EstimatedVehicleJourney: {}", e.getMessage());
-                  }
-                });
-            }
-          }
-        }
-      }
+      moreData = fetchAndProcessUpdates();
     } while (moreData);
+  }
+
+  /**
+   * Fetches updates from the source and processes them.
+   *
+   * @return true if there is more data available to fetch
+   */
+  private boolean fetchAndProcessUpdates() {
+    var updates = updateSource.getUpdates();
+    if (updates.isEmpty()) {
+      return false;
+    }
+
+    ServiceDelivery serviceDelivery = updates.get().getServiceDelivery();
+    processEstimatedTimetableDeliveries(serviceDelivery.getEstimatedTimetableDeliveries());
+    return Boolean.TRUE.equals(serviceDelivery.isMoreData());
+  }
+
+  /**
+   * Processes a list of estimated timetable deliveries.
+   *
+   * @param deliveries the list of estimated timetable deliveries, may be null
+   */
+  private void processEstimatedTimetableDeliveries(
+    List<EstimatedTimetableDeliveryStructure> deliveries
+  ) {
+    if (deliveries == null || deliveries.isEmpty()) {
+      return;
+    }
+
+    for (EstimatedTimetableDeliveryStructure delivery : deliveries) {
+      var frames = delivery.getEstimatedJourneyVersionFrames();
+      for (var frame : frames) {
+        var estimatedVehicleJourneys = frame.getEstimatedVehicleJourneies();
+
+        if (estimatedVehicleJourneys == null || estimatedVehicleJourneys.isEmpty()) {
+          LOG.warn("Received an empty EstimatedJourneyVersionFrame, skipping");
+          continue;
+        }
+
+        estimatedVehicleJourneys.forEach(this::processEstimatedVehicleJourney);
+      }
+    }
+  }
+
+  /**
+   * Processes a single estimated vehicle journey, mapping it to a carpool trip and upserting it
+   * to the repository.
+   *
+   * @param estimatedVehicleJourney the estimated vehicle journey to process
+   */
+  private void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
+    try {
+      var carpoolTrip = mapper.mapSiriToCarpoolTrip(estimatedVehicleJourney);
+      if (carpoolTrip != null) {
+        repository.upsertCarpoolTrip(carpoolTrip);
+      }
+    } catch (Exception e) {
+      LOG.warn("Failed to process EstimatedVehicleJourney: {}", e.getMessage());
+    }
   }
 
   @Override
@@ -112,14 +132,6 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
       .addStr("source", updateSource.toString())
       .addDuration("frequency", pollingPeriod())
       .toString();
-  }
-
-  public interface Parameters extends UrlUpdaterParameters, PollingGraphUpdaterParameters {
-    String url();
-
-    boolean blockReadinessUntilInitialized();
-
-    boolean fuzzyTripMatching();
   }
 
   private static SiriLoader siriLoader(SiriETCarpoolingUpdaterParameters config) {
