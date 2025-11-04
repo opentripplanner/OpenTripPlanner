@@ -2,6 +2,8 @@ package org.opentripplanner.ext.carpooling.updater;
 
 import java.time.Duration;
 import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.SiriETHttpTripUpdateSource;
 
 public record SiriETCarpoolingUpdaterParameters(
@@ -17,7 +19,8 @@ public record SiriETCarpoolingUpdaterParameters(
   HttpHeaders httpRequestHeaders,
   boolean producerMetrics
 )
-  implements SiriETCarpoolingUpdater.Parameters, SiriETHttpTripUpdateSource.Parameters {
+  implements
+    UrlUpdaterParameters, PollingGraphUpdaterParameters, SiriETHttpTripUpdateSource.Parameters {
   public SiriETHttpTripUpdateSource.Parameters sourceParameters() {
     return this;
   }

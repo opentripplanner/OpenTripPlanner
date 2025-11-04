@@ -6,11 +6,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
-import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.support.siri.SiriFileLoader;
 import org.opentripplanner.updater.support.siri.SiriHttpLoader;
 import org.opentripplanner.updater.support.siri.SiriLoader;
-import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableSource;
 import org.opentripplanner.updater.trip.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -39,20 +37,16 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
     StreetLimitationParametersService streetLimitationParametersService
   ) {
     super(config);
-
-    this.updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters(), siriLoader(config));
+    this.updateSource = new SiriETHttpTripUpdateSource(
+      config.sourceParameters(),
+      siriLoader(config)
+    );
     this.repository = repository;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
     this.mapper = new CarpoolSiriMapper(graph, vertexLinker, streetLimitationParametersService);
-  }
-
-  public interface Parameters extends UrlUpdaterParameters, PollingGraphUpdaterParameters {
-    String url();
-    boolean blockReadinessUntilInitialized();
-    boolean fuzzyTripMatching();
   }
 
   /**
