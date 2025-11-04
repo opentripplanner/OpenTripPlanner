@@ -12,7 +12,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -119,14 +119,14 @@ public class SplitEdgeTurnRestrictionsTest {
     // right hand turn out of the the residential road onto the main road, only right turn allowed plus there
     // is a bus station along the way, splitting the edge
     var noLeftTurnPermitted = computeCarPolyline(graph, paulGerhardtWegEast, parkStrasse);
-    assertThatPolylinesAreEqual(noLeftTurnPermitted, "sochHof~u@KY_@mAVi@Te@DK");
+    assertThatPolylinesAreEqual(noLeftTurnPermitted, "sochHof~u@KY_@mAl@oADK");
 
-    // right hand turn out of the the residential road onto the main road, only right turn allowed plus there
+    // right hand turn out of the residential road onto the main road, only right turn allowed plus there
     // is a bus station along the way, splitting the edge
     var longWay = computeCarPolyline(graph, paulGerhardtWegEast, herrenbergerStrasse);
     assertThatPolylinesAreEqual(
       longWay,
-      "sochHof~u@KY_@mAVi@Te@N]L]N_@v@mBDKN]KKM\\{@~BKXWj@KRKPCFa@`@_@XWPSHQDMCEAQMKKSgAa@qCMe@"
+      "sochHof~u@KY_@mAl@oAN]L]N_@v@mBDKN]KKM\\{@~BKXWj@KRKPCFa@`@_@XWPSHQDMCEAQMKKSgAa@qCMe@"
     );
 
     var longWayBack = computeCarPolyline(graph, herrenbergerStrasse, paulGerhardtWegEast);
@@ -202,6 +202,6 @@ public class SplitEdgeTurnRestrictionsTest {
         })
     );
     Geometry geometry = itineraries.get(0).legs().get(0).legGeometry();
-    return EncodedPolyline.encode(geometry).points();
+    return EncodedPolyline.of(geometry).points();
   }
 }

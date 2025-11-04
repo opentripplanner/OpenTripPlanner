@@ -294,4 +294,14 @@ public class GeometryUtils {
     }
     return distance;
   }
+
+  /// Returns the sum of the distances in between the pairs of coordinates in meters.
+  /// If the number of coordinates is empty or just one(a point), then `0` is returned.
+  public static double sumDistances(Coordinate[] coordinates) {
+    double distance = 0;
+    for (int i = 1; i < coordinates.length; i++) {
+      distance += SphericalDistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
+    }
+    return distance;
+  }
 }

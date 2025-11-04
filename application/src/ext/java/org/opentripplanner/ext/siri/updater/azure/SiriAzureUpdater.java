@@ -571,7 +571,7 @@ public class SiriAzureUpdater implements GraphUpdater {
         new HttpGet(dataInitializationUrl),
         Duration.ofMillis(timeout),
         headers,
-        SiriXml::parseXml
+        response -> SiriXml.parseXml(response.body())
       );
       var t2 = System.currentTimeMillis();
       log.info("Fetched initial data in {} ms", (t2 - t1));

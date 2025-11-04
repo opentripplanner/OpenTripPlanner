@@ -16,7 +16,7 @@ public class PolylineEncoderTest {
     points.add(new Coordinate(-73.85062, 40.903125, Double.NaN));
     points.add(new Coordinate(-73.85136, 40.902261, Double.NaN));
     points.add(new Coordinate(-73.85151, 40.902066, Double.NaN));
-    EncodedPolyline eplb = PolylineEncoder.encodeCoordinates(points.toArray(new Coordinate[0]));
+    var eplb = PolylineEncoder.encodeCoordinates(points.toArray(new Coordinate[0]));
     assertEquals("o{sxFl}vaMjDpCf@\\", eplb.points());
     assertEquals(3, eplb.length());
   }

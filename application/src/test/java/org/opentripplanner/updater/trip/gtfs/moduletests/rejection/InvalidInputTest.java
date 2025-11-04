@@ -9,11 +9,12 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.updater.trip.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
-import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
@@ -22,7 +23,8 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  */
 class InvalidInputTest implements RealtimeTestConstants {
 
-  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2025, 7, 8);
+  private final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of(SERVICE_DATE);
   private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
   private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
 
@@ -35,17 +37,17 @@ class InvalidInputTest implements RealtimeTestConstants {
   void invalidTripDate(LocalDate date) {
     var tripInput = TripInput.of(TRIP_1_ID)
       .addStop(STOP_A, "0:00:10", "0:00:11")
-      .addStop(STOP_B, "0:00:20", "0:00:21")
-      .build();
+      .addStop(STOP_B, "0:00:20", "0:00:21");
     var env = ENV_BUILDER.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
 
-    var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, TIME_ZONE)
+    var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, env.timeZone())
       .addDelayedStopTime(2, 60, 80)
       .build();
 
-    var result = env.applyTripUpdate(update);
+    var result = rt.applyTripUpdate(update);
 
-    var snapshot = env.getTimetableSnapshot();
+    var snapshot = env.timetableSnapshot();
     assertTrue(snapshot.isEmpty());
     assertFailure(NO_SERVICE_ON_DATE, result);
   }

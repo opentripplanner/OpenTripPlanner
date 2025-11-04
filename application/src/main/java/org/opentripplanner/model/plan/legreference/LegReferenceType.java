@@ -6,24 +6,16 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Optional;
 
-/**
- * Enum for different types of LegReferences
- */
+///
+/// Enum for different types and versions of LegReferences.
+///
+/// **NOTE!** Keep each [LegReferenceType] for at least 2 years after replacing it with a new
+/// version. Customers can store leg references in tickets, and we want tickets to remain valid for
+/// a year. If a customer buys the ticket 6 months before travel, this adds up to 18 months. We do
+/// _not_ recommend using leg references in tickets. Instead, use actual entity IDs like TripOnDate
+/// or (Trip + service-date), from and to stop IDs, and position.
+///
 enum LegReferenceType {
-  SCHEDULED_TRANSIT_LEG_V1(
-    1,
-    ScheduledTransitLegReference.class,
-    LegReferenceSerializer::writeScheduledTransitLegV1,
-    LegReferenceSerializer::readScheduledTransitLegV1
-  ),
-
-  SCHEDULED_TRANSIT_LEG_V2(
-    2,
-    ScheduledTransitLegReference.class,
-    LegReferenceSerializer::writeScheduledTransitLegV2,
-    LegReferenceSerializer::readScheduledTransitLegV2
-  ),
-
   SCHEDULED_TRANSIT_LEG_V3(
     3,
     ScheduledTransitLegReference.class,

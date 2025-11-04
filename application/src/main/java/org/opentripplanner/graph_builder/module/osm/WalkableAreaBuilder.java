@@ -20,6 +20,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -382,6 +383,7 @@ class WalkableAreaBuilder {
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
+        .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
         .withSkipEdgeStrategy(new ListedEdgesOnly(edges))
         .withDominanceFunction(new DominanceFunctions.EarliestArrival())
         .withRequest(request)
@@ -499,7 +501,7 @@ class WalkableAreaBuilder {
       .getOsmTagMapper()
       .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS);
 
-    I18NString name = namer.getNameForWay(parent, label);
+    I18NString name = namer.getName(parent, label);
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex1)
       .withToVertex(vertex2)
@@ -515,7 +517,7 @@ class WalkableAreaBuilder {
       .withLink(parent.isLink());
 
     label = String.format(labelTemplate, parent.getId(), vertex2.getLabel(), vertex1.getLabel());
-    name = namer.getNameForWay(parent, label);
+    name = namer.getName(parent, label);
     AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
       .withFromVertex(vertex2)
       .withToVertex(vertex1)
@@ -547,7 +549,7 @@ class WalkableAreaBuilder {
       OsmEntity areaEntity = area.parent;
 
       String id = "way (area) " + areaEntity.getId();
-      I18NString name = namer.getNameForWay(areaEntity, id);
+      I18NString name = namer.getName(areaEntity, id);
       namedArea.setName(name);
 
       WayProperties wayData = findAreaProperties(areaEntity);

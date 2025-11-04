@@ -14,6 +14,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.OsmEntityForTest;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
@@ -41,32 +42,32 @@ public class MapperTest {
   public void testCarSpeeds() {
     OsmEntity way;
 
-    way = new OsmEntity();
+    way = new OsmEntityForTest();
     way.addTag("maxspeed", "60");
     assertTrue(within(kmhAsMs(60), wps.getCarSpeedForWay(way, FORWARD), epsilon));
     assertTrue(within(kmhAsMs(60), wps.getCarSpeedForWay(way, BACKWARD), epsilon));
 
-    way = new OsmEntity();
+    way = new OsmEntityForTest();
     way.addTag("maxspeed:forward", "80");
     way.addTag("maxspeed:backward", "20");
     way.addTag("maxspeed", "40");
     assertTrue(within(kmhAsMs(80), wps.getCarSpeedForWay(way, FORWARD), epsilon));
     assertTrue(within(kmhAsMs(20), wps.getCarSpeedForWay(way, BACKWARD), epsilon));
 
-    way = new OsmEntity();
+    way = new OsmEntityForTest();
     way.addTag("maxspeed", "40");
     way.addTag("maxspeed:lanes", "60|80|40");
     assertTrue(within(kmhAsMs(80), wps.getCarSpeedForWay(way, FORWARD), epsilon));
     assertTrue(within(kmhAsMs(80), wps.getCarSpeedForWay(way, BACKWARD), epsilon));
 
-    way = new OsmEntity();
+    way = new OsmEntityForTest();
     way.addTag("maxspeed", "20");
     way.addTag("maxspeed:motorcar", "80");
     assertTrue(within(kmhAsMs(80), wps.getCarSpeedForWay(way, FORWARD), epsilon));
     assertTrue(within(kmhAsMs(80), wps.getCarSpeedForWay(way, BACKWARD), epsilon));
 
     // test with english units
-    way = new OsmEntity();
+    way = new OsmEntityForTest();
     way.addTag("maxspeed", "35 mph");
     assertTrue(within(kmhAsMs(35 * 1.609f), wps.getCarSpeedForWay(way, FORWARD), epsilon));
     assertTrue(within(kmhAsMs(35 * 1.609f), wps.getCarSpeedForWay(way, BACKWARD), epsilon));
@@ -78,7 +79,7 @@ public class MapperTest {
     wps.addSpeedPicker(getSpeedPicker("surface=gravel", kmhAsMs(10)));
     wps.defaultCarSpeed = kmhAsMs(25);
 
-    way = new OsmEntity();
+    way = new OsmEntityForTest();
 
     // test default speeds
     assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, FORWARD), epsilon));
@@ -88,18 +89,18 @@ public class MapperTest {
     assertTrue(within(kmhAsMs(35), wps.getCarSpeedForWay(way, FORWARD), epsilon));
     assertTrue(within(kmhAsMs(35), wps.getCarSpeedForWay(way, BACKWARD), epsilon));
 
-    way = new OsmEntity();
+    way = new OsmEntityForTest();
     way.addTag("surface", "gravel");
     assertTrue(within(kmhAsMs(10), wps.getCarSpeedForWay(way, FORWARD), epsilon));
     assertTrue(within(kmhAsMs(10), wps.getCarSpeedForWay(way, BACKWARD), epsilon));
 
-    way = new OsmEntity();
+    way = new OsmEntityForTest();
     way.addTag("highway", "motorway");
     assertTrue(within(kmhAsMs(100), wps.getCarSpeedForWay(way, FORWARD), epsilon));
     assertTrue(within(kmhAsMs(100), wps.getCarSpeedForWay(way, BACKWARD), epsilon));
 
     // make sure that 0-speed ways can't exist
-    way = new OsmEntity();
+    way = new OsmEntityForTest();
     way.addTag("maxspeed", "0");
     assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, FORWARD), epsilon));
     assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, BACKWARD), epsilon));
@@ -225,12 +226,12 @@ public class MapperTest {
     wps.setProperties("tag=imaginary", withModes(CAR).bicycleSafety(2));
     wps.setMixinProperties("foo=bar", ofBicycleSafety(0.5));
 
-    var withoutFoo = new OsmEntity();
+    var withoutFoo = new OsmEntityForTest();
     withoutFoo.addTag("tag", "imaginary");
     assertEquals(2, wps.getDataForEntity(withoutFoo).bicycleSafety());
 
     // the mixin for foo=bar reduces the bike safety factor
-    var withFoo = new OsmEntity();
+    var withFoo = new OsmEntityForTest();
     withFoo.addTag("tag", "imaginary");
     withFoo.addTag("foo", "bar");
     assertEquals(1, wps.getDataForEntity(withFoo).bicycleSafety());

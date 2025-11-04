@@ -3,8 +3,8 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.framework.geometry.EncodedPolyline;
 
 public class GeometryImpl implements GraphQLDataFetchers.GraphQLGeometry {
 
@@ -19,6 +19,6 @@ public class GeometryImpl implements GraphQLDataFetchers.GraphQLGeometry {
   }
 
   private EncodedPolyline getSource(DataFetchingEnvironment environment) {
-    return EncodedPolyline.encode((Geometry) environment.getSource());
+    return EncodedPolyline.of((Geometry) environment.getSource());
   }
 }

@@ -156,7 +156,7 @@ public interface Leg {
    */
   default boolean overlapInTime(Leg other) {
     return (
-      // We convert to epoch seconds to ignore nanos (save CPU),
+      // We convert to epoch seconds to ignore nanos (the times are normalized),
       // in favor of using the methods isAfter(...) and isBefore(...)
       startTime().toEpochSecond() < other.endTime().toEpochSecond() &&
       other.startTime().toEpochSecond() < endTime().toEpochSecond()
@@ -222,13 +222,13 @@ public interface Leg {
   LegCallTime end();
 
   /**
-   * The date and time this leg begins.
+   * The date and time this leg begins. The time is normalized(rounded to closest second).
    * TODO Does the start-time incorporate slack and/or wait-time? - This should be documented!
    */
   ZonedDateTime startTime();
 
   /**
-   * The date and time this leg ends.
+   * The date and time this leg ends. The time is normalized(rounded to closest second).
    * TODO Does the end-time incorporate slack and/or wait-time? - This should be documented!
    */
   ZonedDateTime endTime();

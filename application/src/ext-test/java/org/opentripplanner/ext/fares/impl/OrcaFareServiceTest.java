@@ -8,6 +8,7 @@ import static org.opentripplanner.ext.fares.impl.OrcaFareService.COMM_TRANS_AGEN
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.COMM_TRANS_FLEX_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.KC_METRO_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.KITSAP_TRANSIT_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.MONORAIL_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.PIERCE_COUNTY_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.SKAGIT_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.SOUND_TRANSIT_AGENCY_ID;
@@ -20,8 +21,10 @@ import static org.opentripplanner.transit.model.basic.Money.USD;
 import static org.opentripplanner.transit.model.basic.Money.ZERO_USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -91,17 +94,33 @@ public class OrcaFareServiceTest {
 
     // Track unique fare products by their ID to avoid double counting
     var uniqueFareProducts = new HashSet<FareOffer>();
+    var seenFareOffers = new HashSet<String>();
 
     legs.forEach(leg -> {
       var legProducts = itineraryFares.getLegProducts().get(leg);
+      var validOffersForLeg = new ArrayList<FareOffer>();
+
+      // Collect all valid offers for this leg
       for (var offer : legProducts) {
         var product = offer.fareProduct();
         if (
           product.category().name().equals(expectedCategoryName) &&
-          product.medium().name().equals(expectedMediumName)
+          product.medium().name().equals(expectedMediumName) &&
+          !seenFareOffers.contains(offer.uniqueId())
         ) {
-          uniqueFareProducts.add(offer);
+          validOffersForLeg.add(offer);
         }
+      }
+
+      // If multiple valid offers for this leg, select the cheapest one
+      if (!validOffersForLeg.isEmpty()) {
+        var cheapestOffer = validOffersForLeg
+          .stream()
+          .min(Comparator.comparing(o -> o.fareProduct().price()))
+          .orElse(validOffersForLeg.get(0));
+
+        uniqueFareProducts.add(cheapestOffer);
+        seenFareOffers.add(cheapestOffer.uniqueId());
       }
     });
 
@@ -478,7 +497,7 @@ public class OrcaFareServiceTest {
     List<Leg> rides = List.of(
       getLeg(KC_METRO_AGENCY_ID, 0), // extended transfer due to middle leg
       getLeg(KC_METRO_AGENCY_ID, "973", 100), // higher fare, extends transfer
-      getLeg(KC_METRO_AGENCY_ID, 219) // extended transfer due to middle leg
+      getLeg(KC_METRO_AGENCY_ID, 200) // extended transfer due to middle leg
     );
     calculateFare(rides, regular, usDollars(13.23f));
     calculateFare(rides, FareType.senior, usDollars(4.50f));
@@ -505,6 +524,43 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.youth, ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, ZERO_USD);
     calculateFare(rides, FareType.electronicRegular, ZERO_USD);
+  }
+
+  /**
+   * Test monorail fares to ensure correct fare amounts are applied for all fare types.
+   * Monorail has unique fare structure where youth are not free (unlike other agencies).
+   */
+  @Test
+  void calculateMonorailFares() {
+    List<Leg> rides = List.of(getLeg(MONORAIL_AGENCY_ID, 0));
+
+    calculateFare(rides, regular, usDollars(4.00f));
+    calculateFare(rides, FareType.senior, usDollars(2.00f));
+    calculateFare(rides, FareType.youth, usDollars(2.00f));
+    calculateFare(rides, FareType.electronicSpecial, usDollars(2.00f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(4.00f));
+    calculateFare(rides, FareType.electronicSenior, usDollars(2.00f));
+    calculateFare(rides, FareType.electronicYouth, usDollars(0.00f));
+  }
+
+  /**
+   * Test monorail fares with transfers to ensure transfer logic works correctly
+   * with monorail's unique fare structure.
+   */
+  @Test
+  void calculateMonorailFaresWithTransfers() {
+    List<Leg> rides = List.of(
+      getLeg(MONORAIL_AGENCY_ID, 0),
+      getLeg(KC_METRO_AGENCY_ID, 30),
+      getLeg(COMM_TRANS_AGENCY_ID, 60)
+    );
+
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(2).plus(usDollars(4.00f)));
+    calculateFare(rides, FareType.youth, usDollars(2.00f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(4.00f));
+    calculateFare(rides, FareType.electronicSenior, usDollars(2.00f));
+    calculateFare(rides, FareType.electronicYouth, usDollars(0.00f));
+    calculateFare(rides, FareType.electronicSpecial, usDollars(2.00f));
   }
 
   static Stream<Arguments> allTypes() {

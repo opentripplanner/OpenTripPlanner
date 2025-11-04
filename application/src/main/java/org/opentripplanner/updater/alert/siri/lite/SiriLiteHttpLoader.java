@@ -48,8 +48,8 @@ public class SiriLiteHttpLoader implements SiriLoader {
   }
 
   private Optional<Siri> fetchFeed() {
-    return otpHttpClient.getAndMap(uri, timeout, headers.asMap(), is ->
-      Optional.of(SiriHelper.unmarshal(is))
+    return otpHttpClient.getAndMap(uri, timeout, headers.asMap(), response ->
+      Optional.of(SiriHelper.unmarshal(response.body()))
     );
   }
 }

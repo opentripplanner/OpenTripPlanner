@@ -64,7 +64,7 @@ class OtpCsvReaderTest {
     }
 
     @Override
-    protected List<String> headers() {
+    public List<String> headers() {
       return List.of("a", "b", "c");
     }
 

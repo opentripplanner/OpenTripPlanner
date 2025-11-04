@@ -1,6 +1,7 @@
 package org.opentripplanner.framework.model;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**
@@ -15,6 +16,11 @@ public record TimeAndCost(Duration time, Cost cost) {
 
   public boolean isZero() {
     return this.equals(ZERO);
+  }
+
+  public TimeAndCost normalize() {
+    var temp = new TimeAndCost(time.truncatedTo(ChronoUnit.SECONDS), cost.normalize());
+    return equals(temp) ? this : temp;
   }
 
   @Override

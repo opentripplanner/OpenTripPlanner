@@ -14,6 +14,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -39,8 +40,8 @@ public class UnknownPathLeg implements Leg {
   ) {
     this.from = from;
     this.to = to;
-    this.startTime = startTime;
-    this.endTime = endTime;
+    this.startTime = TimeUtils.normalize(startTime);
+    this.endTime = TimeUtils.normalize(endTime);
     this.nTransfers = nTransfers;
   }
 
