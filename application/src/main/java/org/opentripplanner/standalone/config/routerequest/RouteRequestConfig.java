@@ -7,6 +7,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
 import static org.opentripplanner.standalone.config.routerequest.TriangleOptimizationConfig.mapOptimizationTriangle;
@@ -27,6 +28,7 @@ import org.opentripplanner.routing.api.request.preference.AccessEgressPreference
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.EscalatorPreferences;
+import org.opentripplanner.routing.api.request.preference.RelaxedLimitedTransferPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
@@ -362,6 +364,79 @@ public class RouteRequestConfig {
         .asDoubleOptional()
         .ifPresent(it::withRelaxGeneralizedCostAtDestination)
     );
+
+    mapRelaxedLimitedTransferSearchPreferences(c, dft.relaxedLimitedTransferSearch().copyOf());
+  }
+
+  private static void mapRelaxedLimitedTransferSearchPreferences(
+    NodeAdapter root,
+    RelaxedLimitedTransferPreferences.Builder builder
+  ) {
+    NodeAdapter c = root
+      .of("relaxedLimitedTransferSearch")
+      .since(V2_9)
+      .summary("Extend the search result with extra paths using a limited number of transit legs")
+      .description(
+        """
+        The relaxed limited transfer search finds paths using a single transiit leg, limited to a
+        specified cost window. It will find paths even if they are not optimal with regards to the
+        criteria in the main raptor search.
+        """
+      )
+      .asObject();
+
+    if (c.isEmpty()) {
+      return;
+    }
+    var dft = RelaxedLimitedTransferPreferences.DEFAULT;
+
+    builder
+      .withEnabled(
+        c
+          .of("enabled")
+          .since(V2_9)
+          .summary("Enable the relaxed limited transfer search")
+          .asBoolean(dft.enabled())
+      )
+      .withCostRelaxFunction(
+        c
+          .of("costRelaxFunction")
+          .since(V2_9)
+          .summary("The cost window for which paths to include.")
+          .description(
+            """
+            A cost relax function of `10m + 2x` will include paths that have a cost up to 2 times plus
+            10 minutes compared to the cheapest  path. I.e. if the cheapest path has a cost of 100m
+            the results will include paths with a cost 210m.
+            """
+          )
+          .asCostLinearFunction(dft.costRelaxFunction())
+      )
+      .withExtraAccessEgressCostFactor(
+        c
+          .of("extraAccessEgressCostFactor")
+          .since(V2_9)
+          .summary("Add an extra cost to access/egress legs for these results")
+          .description(
+            """
+            The cost for access/egress will be multiplied by this factor. This can be used to limit
+            the amount of walking in the paths.
+            """
+          )
+          .asDouble(dft.extraAccessEgressCostFactor())
+      )
+      .withDisableAccessEgress(
+        c
+          .of("disableAccessEgress")
+          .since(V2_9)
+          .summary("Only add paths for stop to stop searches")
+          .description(
+            """
+            Don't include paths where access or egress is necessary.
+            """
+          )
+          .asBoolean(dft.disableAccessEgress())
+      );
   }
 
   private static void mapBikePreferences(NodeAdapter root, BikePreferences.Builder builder) {

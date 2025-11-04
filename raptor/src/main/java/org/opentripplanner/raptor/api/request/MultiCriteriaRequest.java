@@ -174,13 +174,6 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     }
 
     public Builder<T> withRelaxedLimitedTransferRequest(
-      RelaxedLimitedTransferRequest relaxedLimitedTransferRequest
-    ) {
-      this.relaxedLimitedTransferRequest = relaxedLimitedTransferRequest;
-      return this;
-    }
-
-    public Builder<T> withRelaxedLimitedTransferRequest(
       Consumer<RelaxedLimitedTransferRequest.Builder> body
     ) {
       var builder = this.relaxedLimitedTransferRequest.copyOf();

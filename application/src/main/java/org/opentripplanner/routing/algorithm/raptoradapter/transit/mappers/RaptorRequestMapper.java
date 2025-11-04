@@ -146,6 +146,17 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         // via location and the relaxTransitGroupPriority is not used (Normal).
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
       }
+
+      var rel = pt.relaxedLimitedTransferSearch();
+      if (rel.enabled()) {
+        mcBuilder.withRelaxedLimitedTransferRequest(relaxedSearch ->
+          relaxedSearch
+            .withEnabled(true)
+            .withCostRelaxFunction(mapRelaxCost(rel.costRelaxFunction()))
+            .withDisableAccessEgress(rel.disableAccessEgress())
+            .withExtraAccessEgressCostFactor(rel.extraAccessEgressCostFactor())
+        );
+      }
     });
 
     for (Optimization optimization : preferences.transit().raptor().optimizations()) {

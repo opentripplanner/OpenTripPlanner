@@ -13,7 +13,6 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.RaptorService;
-import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
@@ -154,19 +153,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     }
 
     Collection<RaptorPath<T>> relaxedLimitedTransferResult = null;
-    // TODO DT - pass in information to enable this
-    if (true) {
-      // TODO DT - configure this in config file / request
-      request
-        .mutate()
-        .withMultiCriteria(m ->
-          m.withRelaxedLimitedTransferRequest(relaxed ->
-            relaxed
-              .withEnabled(true)
-              .withCostRelaxFunction(GeneralizedCostRelaxFunction.of(2, 30 * 60 * 100))
-          )
-        );
-
+    if (request.multiCriteria().relaxedLimitedTransferRequest().enabled()) {
       relaxedLimitedTransferResult = config.createDirectSearchService(transitData, request).route();
     }
     // Route
