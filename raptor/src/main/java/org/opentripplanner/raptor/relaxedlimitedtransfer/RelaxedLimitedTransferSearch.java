@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.relaxedlimitedtransit;
+package org.opentripplanner.raptor.relaxedlimitedtransfer;
 
 import java.util.ArrayList;
 import java.util.BitSet;
