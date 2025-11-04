@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.carpooling.util;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.opentripplanner.ext.carpooling.TestFixtures.*;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.*;
 
 import java.time.Duration;
 import java.util.List;

@@ -128,24 +128,24 @@ public class SpeedTest {
       TestServerContext.createStreetLimitationParametersService(),
       config.transitRoutingParams,
       new DefaultTransitService(timetableRepository),
-      null, // TriasApiParameters
-      null, // GtfsApiParameters
+      null,
+      null,
       VectorTileConfig.DEFAULT,
       TestServerContext.createVehicleParkingService(),
       TestServerContext.createVehicleRentalService(),
       VertexLinkerTestFactory.of(graph),
       TestServerContext.createViaTransferResolver(graph, transitService),
       TestServerContext.createWorldEnvelopeService(),
-      null, // CarpoolingService
-      null, // ItineraryDecorator
-      null, // EmpiricalDelayService
-      null, // LuceneIndex
-      null, // GraphQLSchema (gtfs)
-      null, // GraphQLSchema (transmodel)
-      null, // SorlandsbanenNorwayService
-      null, // StopConsolidationService
-      null, // TraverseVisitor
-      null // TransmodelAPIParameters
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     );
     // Creating raptor transit data should be integrated into the TimetableRepository, but for now
     // we do it manually here

@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.carpooling.filter;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.*;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.*;
-import static org.opentripplanner.ext.carpooling.TestFixtures.*;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

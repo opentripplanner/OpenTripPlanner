@@ -3,9 +3,9 @@ package org.opentripplanner.ext.carpooling.routing;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.*;
 import static org.opentripplanner.ext.carpooling.MockGraphPathFactory.*;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.*;
-import static org.opentripplanner.ext.carpooling.TestFixtures.*;
 
 import java.time.Duration;
 import java.util.List;

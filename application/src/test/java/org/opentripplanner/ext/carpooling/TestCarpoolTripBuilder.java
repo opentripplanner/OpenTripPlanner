@@ -125,7 +125,7 @@ public class TestCarpoolTripBuilder {
    * Creates a CarpoolStop with specified sequence (0-based) and passenger delta.
    */
   public static CarpoolStop createStop(int zeroBasedSequence, int passengerDelta) {
-    return createStopAt(zeroBasedSequence, passengerDelta, TestFixtures.OSLO_CENTER);
+    return createStopAt(zeroBasedSequence, passengerDelta, CarpoolTestCoordinates.OSLO_CENTER);
   }
 
   /**

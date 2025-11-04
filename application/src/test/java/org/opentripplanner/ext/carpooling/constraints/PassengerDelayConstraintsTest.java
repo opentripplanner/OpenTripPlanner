@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.carpooling.constraints;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.opentripplanner.ext.carpooling.TestFixtures.*;
 import static org.opentripplanner.ext.carpooling.util.GraphPathUtils.calculateCumulativeDurations;
 
 import java.time.Duration;
