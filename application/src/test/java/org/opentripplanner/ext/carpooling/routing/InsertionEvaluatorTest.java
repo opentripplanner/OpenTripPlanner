@@ -307,14 +307,15 @@ class InsertionEvaluatorTest {
     // Expected: Segment A→B should be reused, B→dropoff and dropoff→C should be routed
 
     var stop1 = createStopAt(0, OSLO_EAST);
-    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
+    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTHEAST);
 
     var mockPath = createMockGraphPath(Duration.ofMinutes(5));
 
     when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
 
-    // Pickup exactly at OSLO_EAST (existing stop), dropoff at OSLO_MIDPOINT_NORTH (new)
-    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_MIDPOINT_NORTH);
+    // Pickup exactly at OSLO_EAST (existing stop), dropoff at OSLO_NORTH (new)
+    // OSLO_NORTH is directly on the way from OSLO_EAST to OSLO_NORTHEAST (same longitude as OSLO_EAST)
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_NORTH);
 
     assertNotNull(result, "Should find valid insertion");
 

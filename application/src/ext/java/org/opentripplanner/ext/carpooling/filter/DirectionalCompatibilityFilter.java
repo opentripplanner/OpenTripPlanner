@@ -2,7 +2,7 @@ package org.opentripplanner.ext.carpooling.filter;
 
 import java.util.List;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.util.DirectionalCalculator;
+import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +48,9 @@ public class DirectionalCompatibilityFilter implements TripFilter {
       return false;
     }
 
-    double passengerBearing = DirectionalCalculator.calculateBearing(
-      passengerPickup,
-      passengerDropoff
+    double passengerBearing = DirectionUtils.getAzimuth(
+      passengerPickup.asJtsCoordinate(),
+      passengerDropoff.asJtsCoordinate()
     );
 
     for (int i = 0; i < routePoints.size() - 1; i++) {
@@ -102,9 +102,12 @@ public class DirectionalCompatibilityFilter implements TripFilter {
     WgsCoordinate segmentEnd,
     double passengerBearing
   ) {
-    double segmentBearing = DirectionalCalculator.calculateBearing(segmentStart, segmentEnd);
+    double segmentBearing = DirectionUtils.getAzimuth(
+      segmentStart.asJtsCoordinate(),
+      segmentEnd.asJtsCoordinate()
+    );
 
-    double bearingDiff = DirectionalCalculator.bearingDifference(segmentBearing, passengerBearing);
+    double bearingDiff = DirectionUtils.bearingDifference(segmentBearing, passengerBearing);
 
     return bearingDiff <= bearingToleranceDegrees;
   }

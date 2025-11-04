@@ -6,7 +6,7 @@ import java.util.List;
 import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
-import org.opentripplanner.ext.carpooling.util.DirectionalCalculator;
+import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,19 +187,31 @@ public class InsertionPositionFinder {
     WgsCoordinate newPoint,
     WgsCoordinate next
   ) {
+    // Skip check if inserting at an existing point (newPoint equals next or previous)
+    // This avoids undefined bearing calculations from a point to itself
+    if (newPoint.equals(next) || newPoint.equals(previous)) {
+      return true;
+    }
+
     // Calculate intended direction (previous → next)
-    double intendedBearing = DirectionalCalculator.calculateBearing(previous, next);
+    double intendedBearing = DirectionUtils.getAzimuth(
+      previous.asJtsCoordinate(),
+      next.asJtsCoordinate()
+    );
 
     // Calculate detour directions
-    double bearingToNew = DirectionalCalculator.calculateBearing(previous, newPoint);
-    double bearingFromNew = DirectionalCalculator.calculateBearing(newPoint, next);
+    double bearingToNew = DirectionUtils.getAzimuth(
+      previous.asJtsCoordinate(),
+      newPoint.asJtsCoordinate()
+    );
+    double bearingFromNew = DirectionUtils.getAzimuth(
+      newPoint.asJtsCoordinate(),
+      next.asJtsCoordinate()
+    );
 
     // Check deviations
-    double deviationToNew = DirectionalCalculator.bearingDifference(intendedBearing, bearingToNew);
-    double deviationFromNew = DirectionalCalculator.bearingDifference(
-      intendedBearing,
-      bearingFromNew
-    );
+    double deviationToNew = DirectionUtils.bearingDifference(intendedBearing, bearingToNew);
+    double deviationFromNew = DirectionUtils.bearingDifference(intendedBearing, bearingFromNew);
 
     // Allow some deviation but not complete reversal
     return (

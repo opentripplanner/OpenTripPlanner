@@ -83,4 +83,61 @@ public class DirectionUtilsTest {
     System.out.println("Max error in azimuth: " + maxError + " degrees.");
     assertTrue(maxError < 0.15);
   }
+
+  @Test
+  public void bearingDifference_similarDirections_returnsSmallValue() {
+    // 10° and 20° should be 10° apart
+    double diff = DirectionUtils.bearingDifference(10.0, 20.0);
+    assertEquals(10.0, diff, 0.01);
+  }
+
+  @Test
+  public void bearingDifference_oppositeDirections_returns180() {
+    // North (0°) and South (180°) are 180° apart
+    double diff = DirectionUtils.bearingDifference(0.0, 180.0);
+    assertEquals(180.0, diff, 0.01);
+
+    // North (0°) and South (-180°) are also 180° apart
+    diff = DirectionUtils.bearingDifference(0.0, -180.0);
+    assertEquals(180.0, diff, 0.01);
+  }
+
+  @Test
+  public void bearingDifference_wrapAround_returnsShortestAngle() {
+    // 10° and -10° are only 20° apart (wrap around at 0°)
+    double diff = DirectionUtils.bearingDifference(10.0, -10.0);
+    assertEquals(20.0, diff, 0.01);
+
+    // Also test with positive wrap-around equivalent (350° is same as -10°)
+    diff = DirectionUtils.bearingDifference(10.0, 350.0);
+    assertEquals(20.0, diff, 0.01);
+  }
+
+  @Test
+  public void bearingDifference_reverse_isSymmetric() {
+    // Should be symmetric
+    double diff1 = DirectionUtils.bearingDifference(10.0, -10.0);
+    double diff2 = DirectionUtils.bearingDifference(-10.0, 10.0);
+    assertEquals(diff1, diff2, 0.01);
+
+    diff1 = DirectionUtils.bearingDifference(45.0, -45.0);
+    diff2 = DirectionUtils.bearingDifference(-45.0, 45.0);
+    assertEquals(diff1, diff2, 0.01);
+  }
+
+  @Test
+  public void bearingDifference_worksWithBothRanges() {
+    // Test that it works with both [0, 360) and [-180, 180] ranges
+
+    // Range [0, 360): 10° and 350° are 20° apart
+    double diff1 = DirectionUtils.bearingDifference(10.0, 350.0);
+    assertEquals(20.0, diff1, 0.01);
+
+    // Range [-180, 180]: 10° and -10° are 20° apart (350° = -10° in this range)
+    double diff2 = DirectionUtils.bearingDifference(10.0, -10.0);
+    assertEquals(20.0, diff2, 0.01);
+
+    // Both should give same result since 350° ≡ -10°
+    assertEquals(diff1, diff2, 0.01);
+  }
 }
