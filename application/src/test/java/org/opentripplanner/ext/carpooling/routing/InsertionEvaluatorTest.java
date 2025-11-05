@@ -1,15 +1,11 @@
 package org.opentripplanner.ext.carpooling.routing;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder.createGraphPath;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
@@ -27,23 +23,25 @@ import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
+import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.routing.InsertionEvaluator.RoutingFunction;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 
 class InsertionEvaluatorTest {
 
-  private RoutingFunction mockRoutingFunction;
   private PassengerDelayConstraints delayConstraints;
   private InsertionPositionFinder positionFinder;
-  private InsertionEvaluator evaluator;
 
   @BeforeEach
   void setup() {
-    mockRoutingFunction = mock(RoutingFunction.class);
     delayConstraints = new PassengerDelayConstraints();
     positionFinder = new InsertionPositionFinder(delayConstraints, new BeelineEstimator());
-    evaluator = new InsertionEvaluator(mockRoutingFunction, delayConstraints);
   }
 
   /**
@@ -51,9 +49,10 @@ class InsertionEvaluatorTest {
    * This explicitly performs position finding followed by evaluation.
    */
   private InsertionCandidate findOptimalInsertion(
-    org.opentripplanner.ext.carpooling.model.CarpoolTrip trip,
-    org.opentripplanner.framework.geometry.WgsCoordinate passengerPickup,
-    org.opentripplanner.framework.geometry.WgsCoordinate passengerDropoff
+    CarpoolTrip trip,
+    WgsCoordinate passengerPickup,
+    WgsCoordinate passengerDropoff,
+    RoutingFunction routingFunction
   ) {
     List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
       trip,
@@ -65,14 +64,18 @@ class InsertionEvaluatorTest {
       return null;
     }
 
+    var evaluator = new InsertionEvaluator(routingFunction, delayConstraints);
     return evaluator.findBestInsertion(trip, viablePositions, passengerPickup, passengerDropoff);
   }
 
   @Test
   void findOptimalInsertion_noValidPositions_returnsNull() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
+    // Routing function returns null (simulating routing failure)
+    // This causes evaluator to skip all positions
+    RoutingFunction routingFunction = (from, to) -> null;
 
-    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST);
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
     assertNull(result);
   }
@@ -83,10 +86,9 @@ class InsertionEvaluatorTest {
 
     var mockPath = createGraphPath();
 
-    // Mock routing to return valid paths
-    when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
+    RoutingFunction routingFunction = (from, to) -> mockPath;
 
-    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST);
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
     assertNotNull(result);
     assertEquals(1, result.pickupPosition());
@@ -105,13 +107,20 @@ class InsertionEvaluatorTest {
     // 1. Baseline calculation (2 segments: OSLO_CENTER → OSLO_EAST → OSLO_NORTH) = mockPath x2
     // 2. First insertion attempt fails (null for first segment)
     // 3. Second insertion attempt succeeds (mockPath for all segments)
-    when(mockRoutingFunction.route(any(), any()))
-      .thenReturn(mockPath, mockPath)
-      .thenReturn(null)
-      .thenReturn(mockPath, mockPath, mockPath, mockPath);
+    final int[] callCount = { 0 };
+    RoutingFunction routingFunction = (from, to) -> {
+      int call = callCount[0]++;
+      if (call < 2) {
+        return mockPath;
+      } else if (call == 2) {
+        return null;
+      } else {
+        return mockPath;
+      }
+    };
 
     // Use passenger coordinates that are compatible with trip direction (CENTER->EAST->NORTH)
-    var result = findOptimalInsertion(trip, OSLO_MIDPOINT_NORTH, OSLO_NORTHEAST);
+    var result = findOptimalInsertion(trip, OSLO_MIDPOINT_NORTH, OSLO_NORTHEAST, routingFunction);
 
     // Should skip failed routing and find a valid one
     assertNotNull(result);
@@ -121,16 +130,15 @@ class InsertionEvaluatorTest {
   void findOptimalInsertion_exceedsDeviationBudget_returnsNull() {
     var trip = createTripWithDeviationBudget(Duration.ofMinutes(5), OSLO_CENTER, OSLO_NORTH);
 
-    // Create mock paths BEFORE any when() statements
     // Create routing that results in excessive additional time
     // Baseline is 2 segments * 5 min = 10 min
     // Modified route is 3 segments * 20 min = 60 min
     // Additional = 50 min, exceeds 5 min budget
     var mockPath = createGraphPath(Duration.ofMinutes(20));
 
-    when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
+    RoutingFunction routingFunction = (from, to) -> mockPath;
 
-    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST);
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
     // Should not return candidate that exceeds budget
     assertNull(result);
@@ -144,17 +152,20 @@ class InsertionEvaluatorTest {
 
     var mockPath = createGraphPath();
 
-    when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
+    RoutingFunction routingFunction = (from, to) -> mockPath;
+
+    assertDoesNotThrow(() ->
+      findOptimalInsertion(trip, OSLO_MIDPOINT_NORTH, OSLO_NORTHEAST, routingFunction)
+    );
   }
 
   @Test
   void findOptimalInsertion_baselineDurationCalculationFails_returnsNull() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
-    // Routing returns null (failure) for baseline calculation
-    when(mockRoutingFunction.route(any(), any())).thenReturn(null);
+    RoutingFunction routingFunction = (from, to) -> null;
 
-    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST);
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
     assertNull(result);
   }
@@ -163,27 +174,44 @@ class InsertionEvaluatorTest {
   void findOptimalInsertion_selectsMinimumAdditionalDuration() {
     var trip = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_CENTER, OSLO_NORTH);
 
-    // Create mock paths BEFORE any when() statements
     // Baseline: 1 segment (CENTER → NORTH) at 10 min
     // The algorithm will try multiple pickup/dropoff positions
-    // We'll use Answer to return different durations based on segment index
+    // We'll return different durations based on segment index
     var mockPath10 = createGraphPath(Duration.ofMinutes(10));
     var mockPath4 = createGraphPath(Duration.ofMinutes(4));
     var mockPath6 = createGraphPath(Duration.ofMinutes(6));
     var mockPath5 = createGraphPath(Duration.ofMinutes(5));
     var mockPath7 = createGraphPath(Duration.ofMinutes(7));
 
-    // Use thenAnswer to provide consistent route times
-    // Just return paths with reasonable durations for all calls
+    // Provide consistent route times
     // Baseline
     // First insertion (15 min total, 5 min additional)
     // Second insertion (18 min total, 8 min additional)
-    when(mockRoutingFunction.route(any(), any()))
-      .thenReturn(mockPath10)
-      .thenReturn(mockPath4, mockPath5, mockPath6)
-      .thenReturn(mockPath5, mockPath6, mockPath7);
+    @SuppressWarnings("unchecked")
+    final GraphPath<State, Edge, Vertex>[] firstInsertionPaths = new GraphPath[] {
+      mockPath4,
+      mockPath5,
+      mockPath6,
+    };
+    @SuppressWarnings("unchecked")
+    final GraphPath<State, Edge, Vertex>[] secondInsertionPaths = new GraphPath[] {
+      mockPath5,
+      mockPath6,
+      mockPath7,
+    };
+    final int[] callCount = { 0 };
+    RoutingFunction routingFunction = (from, to) -> {
+      int call = callCount[0]++;
+      if (call == 0) {
+        return mockPath10;
+      } else if (call >= 1 && call <= 3) {
+        return firstInsertionPaths[call - 1];
+      } else {
+        return secondInsertionPaths[(call - 4) % 3];
+      }
+    };
 
-    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST);
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
     assertNotNull(result);
     // Should have selected one of the evaluated insertions
@@ -196,12 +224,11 @@ class InsertionEvaluatorTest {
   void findOptimalInsertion_simpleTrip_hasExpectedStructure() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
-    // Create mock paths BEFORE any when() statements
     var mockPath = createGraphPath();
 
-    when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
+    RoutingFunction routingFunction = (from, to) -> mockPath;
 
-    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST);
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
     assertNotNull(result);
     assertNotNull(result.trip());
@@ -233,9 +260,10 @@ class InsertionEvaluatorTest {
     // MIDPOINT_NORTH → NORTH
     var segmentDB = createGraphPath(Duration.ofMinutes(4));
 
-    // Setup routing mock: return all segment mocks for any routing call
+    // Setup routing: return all segment mocks for any routing call
     // The algorithm will evaluate multiple insertion positions
-    when(mockRoutingFunction.route(any(), any())).thenReturn(
+    @SuppressWarnings("unchecked")
+    final GraphPath<State, Edge, Vertex>[] paths = new GraphPath[] {
       baselinePath,
       segmentAC,
       segmentCD,
@@ -244,12 +272,17 @@ class InsertionEvaluatorTest {
       segmentCD,
       segmentDB,
       segmentAC,
-      segmentCD
-    );
+      segmentCD,
+    };
+    final int[] callCount = { 0 };
+    RoutingFunction routingFunction = (from, to) -> {
+      int call = callCount[0]++;
+      return call < paths.length ? paths[call] : segmentAC;
+    };
 
     // Passenger pickup at OSLO_EAST, dropoff at OSLO_MIDPOINT_NORTH
     // Both are between OSLO_CENTER and OSLO_NORTH
-    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_MIDPOINT_NORTH);
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_MIDPOINT_NORTH, routingFunction);
 
     assertNotNull(result, "Should find valid insertion");
 
@@ -280,9 +313,8 @@ class InsertionEvaluatorTest {
       result.additionalDuration()
     );
 
-    // Verify routing was called at least 4 times (1 baseline + 3 new segments minimum)
-    // May be more due to evaluating multiple positions
-    verify(mockRoutingFunction, atLeast(4)).route(any(), any());
+    // Routing was called at least 4 times (1 baseline + 3 new segments minimum)
+    assertTrue(callCount[0] >= 4, "Should have called routing at least 4 times");
   }
 
   @Test
@@ -297,11 +329,14 @@ class InsertionEvaluatorTest {
     // Baseline has 2 segments: CENTER→EAST, EAST→NORTH
     var mockPath = createGraphPath(Duration.ofMinutes(5));
 
-    // Return mock paths for all routing calls (baseline + any new segments)
-    when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
+    final int[] callCount = { 0 };
+    RoutingFunction routingFunction = (from, to) -> {
+      callCount[0]++;
+      return mockPath;
+    };
 
     // Insert passenger - the algorithm will find the best position
-    var result = findOptimalInsertion(trip, OSLO_WEST, OSLO_SOUTH);
+    var result = findOptimalInsertion(trip, OSLO_WEST, OSLO_SOUTH, routingFunction);
 
     assertNotNull(result, "Should find valid insertion");
 
@@ -320,10 +355,8 @@ class InsertionEvaluatorTest {
       "Adding passenger should increase duration"
     );
 
-    // Verify that routing was called for baseline and new segments
-    // If all segments were re-routed, we'd see many more calls
-    // The exact number depends on which position is optimal and how many segments can be reused
-    verify(mockRoutingFunction, atLeast(2)).route(any(), any());
+    // Routing was called for baseline and new segments
+    assertTrue(callCount[0] >= 2, "Should have called routing at least 2 times");
   }
 
   @Test
@@ -336,11 +369,15 @@ class InsertionEvaluatorTest {
 
     var mockPath = createGraphPath(Duration.ofMinutes(5));
 
-    when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
+    final int[] callCount = { 0 };
+    RoutingFunction routingFunction = (from, to) -> {
+      callCount[0]++;
+      return mockPath;
+    };
 
     // Pickup exactly at OSLO_EAST (existing stop), dropoff at OSLO_NORTH (new)
     // OSLO_NORTH is directly on the way from OSLO_EAST to OSLO_NORTHEAST (same longitude as OSLO_EAST)
-    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_NORTH);
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_NORTH, routingFunction);
 
     assertNotNull(result, "Should find valid insertion");
 
@@ -348,7 +385,7 @@ class InsertionEvaluatorTest {
     assertTrue(result.routeSegments().size() >= 2);
 
     // Routing should be called for baseline and new segments
-    verify(mockRoutingFunction, atLeast(2)).route(any(), any());
+    assertTrue(callCount[0] >= 2, "Should have called routing at least 2 times");
   }
 
   @Test
@@ -360,15 +397,19 @@ class InsertionEvaluatorTest {
 
     var mockPath = createGraphPath(Duration.ofMinutes(5));
 
-    when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
+    final int[] callCount = { 0 };
+    RoutingFunction routingFunction = (from, to) -> {
+      callCount[0]++;
+      return mockPath;
+    };
 
-    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST);
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
     assertNotNull(result);
     assertEquals(3, result.routeSegments().size());
 
-    // Verify routing was called for baseline and new segments
-    verify(mockRoutingFunction, atLeast(4)).route(any(), any());
+    // Routing was called for baseline and new segments
+    assertTrue(callCount[0] >= 4, "Should have called routing at least 4 times");
 
     // Total duration should be positive
     assertTrue(result.totalDuration().compareTo(Duration.ZERO) > 0);

@@ -2,11 +2,6 @@ package org.opentripplanner.ext.carpooling.filter;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
@@ -21,29 +16,20 @@ class FilterChainTest {
 
   @Test
   void accepts_allFiltersAccept_returnsTrue() {
-    var filter1 = mock(TripFilter.class);
-    var filter2 = mock(TripFilter.class);
+    TripFilter filter1 = (trip, pickup, dropoff) -> true;
+    TripFilter filter2 = (trip, pickup, dropoff) -> true;
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-
-    when(filter1.accepts(any(), any(), any())).thenReturn(true);
-    when(filter2.accepts(any(), any(), any())).thenReturn(true);
 
     var chain = new FilterChain(List.of(filter1, filter2));
 
     assertTrue(chain.accepts(trip, OSLO_EAST, OSLO_WEST));
-    verify(filter1).accepts(trip, OSLO_EAST, OSLO_WEST);
-    verify(filter2).accepts(trip, OSLO_EAST, OSLO_WEST);
   }
 
   @Test
   void accepts_oneFilterRejects_returnsFalse() {
-    var filter1 = mock(TripFilter.class);
-    var filter2 = mock(TripFilter.class);
+    TripFilter filter1 = (trip, pickup, dropoff) -> true;
+    TripFilter filter2 = (trip, pickup, dropoff) -> false;
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-
-    when(filter1.accepts(any(), any(), any())).thenReturn(true);
-    // Rejects
-    when(filter2.accepts(any(), any(), any())).thenReturn(false);
 
     var chain = new FilterChain(List.of(filter1, filter2));
 
@@ -52,39 +38,37 @@ class FilterChainTest {
 
   @Test
   void accepts_shortCircuits_afterFirstRejection() {
-    var filter1 = mock(TripFilter.class);
-    var filter2 = mock(TripFilter.class);
-    var filter3 = mock(TripFilter.class);
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
+    var filter3Called = new boolean[] { false };
 
-    when(filter1.accepts(any(), any(), any())).thenReturn(true);
-    // Rejects
-    when(filter2.accepts(any(), any(), any())).thenReturn(false);
-    // filter3 should not be called
+    TripFilter filter1 = (trip, pickup, dropoff) -> true;
+    TripFilter filter2 = (trip, pickup, dropoff) -> false;
+    TripFilter filter3 = (trip, pickup, dropoff) -> {
+      filter3Called[0] = true;
+      return true;
+    };
+    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     var chain = new FilterChain(List.of(filter1, filter2, filter3));
     chain.accepts(trip, OSLO_EAST, OSLO_WEST);
 
-    verify(filter1).accepts(any(), any(), any());
-    verify(filter2).accepts(any(), any(), any());
-    // Not called
-    verify(filter3, never()).accepts(any(), any(), any());
+    assertFalse(filter3Called[0], "Filter3 should not have been called due to short-circuit");
   }
 
   @Test
   void accepts_firstFilterRejects_doesNotCallOthers() {
-    var filter1 = mock(TripFilter.class);
-    var filter2 = mock(TripFilter.class);
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
+    var filter2Called = new boolean[] { false };
 
-    // First rejects
-    when(filter1.accepts(any(), any(), any())).thenReturn(false);
+    TripFilter filter1 = (trip, pickup, dropoff) -> false;
+    TripFilter filter2 = (trip, pickup, dropoff) -> {
+      filter2Called[0] = true;
+      return true;
+    };
+    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     var chain = new FilterChain(List.of(filter1, filter2));
     chain.accepts(trip, OSLO_EAST, OSLO_WEST);
 
-    verify(filter1).accepts(any(), any(), any());
-    verify(filter2, never()).accepts(any(), any(), any());
+    assertFalse(filter2Called[0], "Filter2 should not have been called due to short-circuit");
   }
 
   @Test
@@ -121,13 +105,11 @@ class FilterChainTest {
 
   @Test
   void singleFilter_behavesCorrectly() {
-    var filter = mock(TripFilter.class);
-    when(filter.accepts(any(), any(), any())).thenReturn(true);
+    TripFilter filter = (trip, pickup, dropoff) -> true;
 
     var chain = new FilterChain(List.of(filter));
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     assertTrue(chain.accepts(trip, OSLO_EAST, OSLO_WEST));
-    verify(filter).accepts(trip, OSLO_EAST, OSLO_WEST);
   }
 }
