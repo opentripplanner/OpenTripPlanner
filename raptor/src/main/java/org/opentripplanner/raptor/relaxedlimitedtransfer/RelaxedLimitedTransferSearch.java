@@ -146,7 +146,7 @@ public class RelaxedLimitedTransferSearch<T extends RaptorTripSchedule> {
     var search = transitCalculator.createTripSearch(timetable);
     int boardTime = earliestDepartureTime + access.durationInSeconds() + currentRouteBoardSlack;
 
-    // find th first possible trip
+    // find the first possible trip
     var boardEvent = search.search(boardTime, boardPos);
 
     if (boardEvent.empty()) {
@@ -182,8 +182,11 @@ public class RelaxedLimitedTransferSearch<T extends RaptorTripSchedule> {
     var results = new ArrayList<RaptorPath<T>>();
     results.add(firstPath);
 
-    for (int i = firstScheduleIndex + 1; i < timetable.numberOfTripSchedules(); i++) {
+    for (int i = 0; i < timetable.numberOfTripSchedules(); i++) {
       var schedule = timetable.getTripSchedule(i);
+      if (schedule.tripSortIndex() <= firstScheduleIndex) {
+        continue;
+      }
       var path = mapToPath(schedule, access, egress, boardPos, alightPos);
 
       // We only need to check the end of the search-window, since we know the {@code firstPath} is
