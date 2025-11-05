@@ -127,6 +127,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                              | `cost-linear-function` | The base function used by the filter.                                                                                                                    | *Optional* | `"15m + 1.50 t"` |  2.2  |
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                          |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                                       | *Optional* | `0.4`            |  2.2  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                                         | `enum map of duration` | Limit direct route duration per street mode.                                                                                                             | *Optional* |                  |  2.2  |
+| [relaxedLimitedTransferSearch](#rd_relaxedLimitedTransferSearch)                                             |        `object`        | Extend the search result with extra paths using a limited number of transit legs                                                                         | *Optional* |                  |  2.9  |
 | scooter                                                                                                      |        `object`        | Scooter preferences.                                                                                                                                     | *Optional* |                  |  2.5  |
 |    [optimization](#rd_scooter_optimization)                                                                  |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                                          | *Optional* | `"safe-streets"` |  2.0  |
 |    reluctance                                                                                                |        `double`        | A multiplier for how bad scooter travel is, compared to being in transit for equal lengths of time.                                                      | *Optional* | `2.0`            |  2.0  |
@@ -910,6 +911,18 @@ Limit direct route duration per street mode.
 
 Override the settings in `maxDirectStreetDuration` for specific street modes. This is
 done because some street modes searches are much more resource intensive than others.
+
+
+<h3 id="rd_relaxedLimitedTransferSearch">relaxedLimitedTransferSearch</h3>
+
+**Since version:** `2.9` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults 
+
+Extend the search result with extra paths using a limited number of transit legs
+
+The relaxed limited transfer search finds paths using a single transiit leg, limited to a
+specified cost window. It will find paths even if they are not optimal with regards to the
+criteria in the main raptor search.
 
 
 <h3 id="rd_scooter_optimization">optimization</h3>
