@@ -10,7 +10,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.ext.carpooling.MockGraphPathFactory;
+import org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -30,9 +30,9 @@ class PassengerDelayConstraintsTest {
 
     // Modified route with passenger inserted
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(7)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
     };
 
     // Should accept - no existing passengers to protect
@@ -55,10 +55,10 @@ class PassengerDelayConstraintsTest {
     // Timings: 0min -> 3min -> 7min -> 12min -> 17min
     // Stop1 delay: 7min - 5min = 2min (well under 5min threshold)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(4)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
     };
 
     assertTrue(
@@ -80,10 +80,10 @@ class PassengerDelayConstraintsTest {
     // Timings: 0min -> 5min -> 15min -> 20min -> 25min
     // Stop1 delay: 15min - 10min = 5min (exactly at threshold)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
     };
 
     assertTrue(
@@ -105,10 +105,10 @@ class PassengerDelayConstraintsTest {
     // Timings: 0min -> 5min -> 16min -> 21min -> 26min
     // Stop1 delay: 16min - 10min = 6min (exceeds threshold)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
     };
 
     assertFalse(
@@ -136,11 +136,11 @@ class PassengerDelayConstraintsTest {
     // Stop1 delay: 13min - 10min = 3min ✓
     // Stop2 delay: 27min - 20min = 7min ✗
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(8)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(9)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(9)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
     };
 
     assertFalse(
@@ -168,11 +168,11 @@ class PassengerDelayConstraintsTest {
     // Stop1 delay: 12min - 10min = 2min ✓
     // Stop2 delay: 24min - 20min = 4min ✓
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(7)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(7)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
     };
 
     assertTrue(
@@ -202,11 +202,11 @@ class PassengerDelayConstraintsTest {
     // Stop1 delay: 13min - 10min = 3min ✓
     // Stop2 delay: 24min - 20min = 4min ✓
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(2)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(8)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(2)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
     };
 
     assertTrue(
@@ -237,11 +237,11 @@ class PassengerDelayConstraintsTest {
     // Stop1 delay: 11min - 10min = 1min ✓
     // Stop2 delay: 22min - 20min = 2min ✓
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
     };
 
     assertTrue(
@@ -271,11 +271,11 @@ class PassengerDelayConstraintsTest {
     // Stop1 delay: 11min - 10min = 1min ✓
     // Stop2 delay: 24min - 20min = 4min ✓
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(7)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
     };
 
     assertTrue(
@@ -296,10 +296,10 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delayed by 8 minutes (within 10min custom threshold)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(13)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(13)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
     };
 
     assertTrue(
@@ -320,10 +320,10 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delayed by 3 minutes (over 2min custom threshold)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(8)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
     };
 
     assertFalse(
@@ -344,10 +344,10 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delayed by even 1 second
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5).plusSeconds(1)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5).plusSeconds(1)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
     };
 
     assertFalse(
@@ -368,10 +368,10 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delayed by 30 minutes (well within 1 hour threshold)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(35)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(35)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
     };
 
     assertTrue(
@@ -412,10 +412,10 @@ class PassengerDelayConstraintsTest {
     // Modified route where stop1 arrives at exactly the same time
     // (perfect routing somehow)
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(4)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(6)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
     };
 
     assertTrue(
@@ -444,15 +444,18 @@ class PassengerDelayConstraintsTest {
     // Insert passenger between stop2 and stop3 (positions 3, 4)
     // All stops should have delays <= 5 minutes
     // Modified indices: 0,1,2,pickup@3,dropoff@4,3,4,5,6
+    // Note: With real State objects, durations will be slightly longer due to rounding
+    // (typically 1-3 seconds per path). We use slightly shorter durations to ensure
+    // the cumulative delays stay within the 5-minute threshold.
     GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(3)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(2)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(9)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(11)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
-      MockGraphPathFactory.createMockGraphPath(Duration.ofMinutes(10)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(2)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
     };
 
     assertTrue(

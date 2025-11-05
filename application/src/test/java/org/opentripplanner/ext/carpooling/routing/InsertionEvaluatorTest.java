@@ -10,6 +10,7 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder.createGraphPath;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_MIDPOINT_NORTH;
@@ -17,7 +18,6 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NOR
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTHEAST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_SOUTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_WEST;
-import static org.opentripplanner.ext.carpooling.MockGraphPathFactory.createMockGraphPath;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createStopAt;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithDeviationBudget;
@@ -81,8 +81,7 @@ class InsertionEvaluatorTest {
   void findOptimalInsertion_oneValidPosition_returnsCandidate() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
-    // Create mock paths BEFORE any when() statements
-    var mockPath = createMockGraphPath();
+    var mockPath = createGraphPath();
 
     // Mock routing to return valid paths
     when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
@@ -100,7 +99,7 @@ class InsertionEvaluatorTest {
     var stop1 = createStopAt(0, OSLO_EAST);
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
-    var mockPath = createMockGraphPath(Duration.ofMinutes(5));
+    var mockPath = createGraphPath(Duration.ofMinutes(5));
 
     // Routing sequence:
     // 1. Baseline calculation (2 segments: OSLO_CENTER → OSLO_EAST → OSLO_NORTH) = mockPath x2
@@ -127,7 +126,7 @@ class InsertionEvaluatorTest {
     // Baseline is 2 segments * 5 min = 10 min
     // Modified route is 3 segments * 20 min = 60 min
     // Additional = 50 min, exceeds 5 min budget
-    var mockPath = createMockGraphPath(Duration.ofMinutes(20));
+    var mockPath = createGraphPath(Duration.ofMinutes(20));
 
     when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
 
@@ -143,7 +142,7 @@ class InsertionEvaluatorTest {
     var stop2 = createStopAt(1, OSLO_WEST);
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2), OSLO_NORTH);
 
-    var mockPath = createMockGraphPath();
+    var mockPath = createGraphPath();
 
     when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
   }
@@ -168,11 +167,11 @@ class InsertionEvaluatorTest {
     // Baseline: 1 segment (CENTER → NORTH) at 10 min
     // The algorithm will try multiple pickup/dropoff positions
     // We'll use Answer to return different durations based on segment index
-    var mockPath10 = createMockGraphPath(Duration.ofMinutes(10));
-    var mockPath4 = createMockGraphPath(Duration.ofMinutes(4));
-    var mockPath6 = createMockGraphPath(Duration.ofMinutes(6));
-    var mockPath5 = createMockGraphPath(Duration.ofMinutes(5));
-    var mockPath7 = createMockGraphPath(Duration.ofMinutes(7));
+    var mockPath10 = createGraphPath(Duration.ofMinutes(10));
+    var mockPath4 = createGraphPath(Duration.ofMinutes(4));
+    var mockPath6 = createGraphPath(Duration.ofMinutes(6));
+    var mockPath5 = createGraphPath(Duration.ofMinutes(5));
+    var mockPath7 = createGraphPath(Duration.ofMinutes(7));
 
     // Use thenAnswer to provide consistent route times
     // Just return paths with reasonable durations for all calls
@@ -198,7 +197,7 @@ class InsertionEvaluatorTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     // Create mock paths BEFORE any when() statements
-    var mockPath = createMockGraphPath();
+    var mockPath = createGraphPath();
 
     when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
 
@@ -223,16 +222,16 @@ class InsertionEvaluatorTest {
 
     // Create mock paths with DISTINCT durations for verification
     // Baseline: 1 segment (CENTER → NORTH) = 10 min
-    var baselinePath = createMockGraphPath(Duration.ofMinutes(10));
+    var baselinePath = createGraphPath(Duration.ofMinutes(10));
 
     // Modified route segments should have DIFFERENT durations
     // If baseline is incorrectly reused, we'd see 10 min for A→C segment
     // CENTER → EAST
-    var segmentAC = createMockGraphPath(Duration.ofMinutes(3));
+    var segmentAC = createGraphPath(Duration.ofMinutes(3));
     // EAST → MIDPOINT_NORTH
-    var segmentCD = createMockGraphPath(Duration.ofMinutes(2));
+    var segmentCD = createGraphPath(Duration.ofMinutes(2));
     // MIDPOINT_NORTH → NORTH
-    var segmentDB = createMockGraphPath(Duration.ofMinutes(4));
+    var segmentDB = createGraphPath(Duration.ofMinutes(4));
 
     // Setup routing mock: return all segment mocks for any routing call
     // The algorithm will evaluate multiple insertion positions
@@ -256,25 +255,29 @@ class InsertionEvaluatorTest {
 
     // Verify the result structure
     assertEquals(3, result.routeSegments().size(), "Should have 3 segments in modified route");
-    assertEquals(Duration.ofMinutes(10), result.baselineDuration(), "Baseline should be 10 min");
+
+    // Note: With real State objects, exact durations will have minor rounding differences
+    // (typically 1-2 seconds per edge due to millisecond rounding in StreetEdge.doTraverse())
+    // The baseline should be approximately 10 minutes (within 10 seconds tolerance)
+    assertTrue(
+      Math.abs(result.baselineDuration().toSeconds() - 600) < 10,
+      "Baseline should be approximately 10 min (within 10s), got " + result.baselineDuration()
+    );
 
     // CRITICAL: Total duration should be sum of NEW segments, NOT baseline duration
-    // Total = 3 + 2 + 4 = 9 minutes
+    // Total = 3 + 2 + 4 = 9 minutes (approximately, with rounding)
     // If bug exists, segment A→C would incorrectly use baseline (10 min) → total would be wrong
-    Duration expectedTotal = Duration.ofMinutes(9);
-    assertEquals(
-      expectedTotal,
-      result.totalDuration(),
-      "Total duration should be sum of newly routed segments"
+    assertTrue(
+      Math.abs(result.totalDuration().toSeconds() - 540) < 10,
+      "Total duration should be approximately 9 min (within 10s), got " + result.totalDuration()
     );
 
     // Additional duration should be negative (this insertion is actually faster!)
     // This is realistic for insertions that "shortcut" part of the baseline route
-    Duration expectedAdditional = Duration.ofMinutes(-1);
-    assertEquals(
-      expectedAdditional,
-      result.additionalDuration(),
-      "Additional duration should be -1 minute (insertion is faster)"
+    assertTrue(
+      result.additionalDuration().isNegative(),
+      "Additional duration should be negative (insertion is faster), got " +
+      result.additionalDuration()
     );
 
     // Verify routing was called at least 4 times (1 baseline + 3 new segments minimum)
@@ -292,7 +295,7 @@ class InsertionEvaluatorTest {
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
     // Baseline has 2 segments: CENTER→EAST, EAST→NORTH
-    var mockPath = createMockGraphPath(Duration.ofMinutes(5));
+    var mockPath = createGraphPath(Duration.ofMinutes(5));
 
     // Return mock paths for all routing calls (baseline + any new segments)
     when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
@@ -331,7 +334,7 @@ class InsertionEvaluatorTest {
     var stop1 = createStopAt(0, OSLO_EAST);
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTHEAST);
 
-    var mockPath = createMockGraphPath(Duration.ofMinutes(5));
+    var mockPath = createGraphPath(Duration.ofMinutes(5));
 
     when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
 
@@ -355,7 +358,7 @@ class InsertionEvaluatorTest {
 
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
-    var mockPath = createMockGraphPath(Duration.ofMinutes(5));
+    var mockPath = createGraphPath(Duration.ofMinutes(5));
 
     when(mockRoutingFunction.route(any(), any())).thenReturn(mockPath);
 

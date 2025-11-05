@@ -3,9 +3,9 @@ package org.opentripplanner.ext.carpooling.routing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder.createGraphPaths;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
-import static org.opentripplanner.ext.carpooling.MockGraphPathFactory.createMockGraphPaths;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithDeviationBudget;
 
@@ -18,7 +18,7 @@ class InsertionCandidateTest {
   void additionalDuration_calculatesCorrectly() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
     // 3 segments
-    var segments = createMockGraphPaths(3);
+    var segments = createGraphPaths(3);
 
     var candidate = new InsertionCandidate(
       trip,
@@ -35,7 +35,7 @@ class InsertionCandidateTest {
   @Test
   void additionalDuration_zeroAdditional_returnsZero() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(2);
+    var segments = createGraphPaths(2);
 
     var candidate = new InsertionCandidate(
       trip,
@@ -53,7 +53,7 @@ class InsertionCandidateTest {
   @Test
   void isWithinDeviationBudget_withinBudget_returnsTrue() {
     var trip = createTripWithDeviationBudget(Duration.ofMinutes(10), OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(2);
+    var segments = createGraphPaths(2);
 
     var candidate = new InsertionCandidate(
       trip,
@@ -72,7 +72,7 @@ class InsertionCandidateTest {
   @Test
   void isWithinDeviationBudget_exceedsBudget_returnsFalse() {
     var trip = createTripWithDeviationBudget(Duration.ofMinutes(5), OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(2);
+    var segments = createGraphPaths(2);
 
     var candidate = new InsertionCandidate(
       trip,
@@ -91,7 +91,7 @@ class InsertionCandidateTest {
   @Test
   void isWithinDeviationBudget_exactlyAtBudget_returnsTrue() {
     var trip = createTripWithDeviationBudget(Duration.ofMinutes(5), OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(2);
+    var segments = createGraphPaths(2);
 
     var candidate = new InsertionCandidate(
       trip,
@@ -109,7 +109,7 @@ class InsertionCandidateTest {
   @Test
   void getPickupSegments_returnsCorrectRange() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(5);
+    var segments = createGraphPaths(5);
 
     var candidate = new InsertionCandidate(
       trip,
@@ -129,7 +129,7 @@ class InsertionCandidateTest {
   @Test
   void getPickupSegments_positionZero_returnsEmpty() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(3);
+    var segments = createGraphPaths(3);
 
     var candidate = new InsertionCandidate(
       trip,
@@ -147,7 +147,7 @@ class InsertionCandidateTest {
   @Test
   void getSharedSegments_returnsCorrectRange() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(5);
+    var segments = createGraphPaths(5);
 
     var candidate = new InsertionCandidate(
       trip,
@@ -167,7 +167,7 @@ class InsertionCandidateTest {
   @Test
   void getSharedSegments_adjacentPositions_returnsSingleSegment() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(3);
+    var segments = createGraphPaths(3);
 
     var candidate = new InsertionCandidate(
       trip,
@@ -185,7 +185,7 @@ class InsertionCandidateTest {
   @Test
   void getDropoffSegments_returnsCorrectRange() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(5);
+    var segments = createGraphPaths(5);
 
     var candidate = new InsertionCandidate(
       trip,
@@ -205,7 +205,7 @@ class InsertionCandidateTest {
   @Test
   void getDropoffSegments_atEnd_returnsEmpty() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(3);
+    var segments = createGraphPaths(3);
 
     var candidate = new InsertionCandidate(
       trip,
@@ -223,7 +223,7 @@ class InsertionCandidateTest {
   @Test
   void toString_includesKeyInformation() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(3);
+    var segments = createGraphPaths(3);
 
     var candidate = new InsertionCandidate(
       trip,
