@@ -1,10 +1,18 @@
 package org.opentripplanner.ext.carpooling.filter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.*;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_WEST;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithCapacity;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

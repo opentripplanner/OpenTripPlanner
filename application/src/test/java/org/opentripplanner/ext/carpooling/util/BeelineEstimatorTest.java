@@ -1,7 +1,13 @@
 package org.opentripplanner.ext.carpooling.util;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTHEAST;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTHWEST;
 
 import java.time.Duration;
 import java.util.List;

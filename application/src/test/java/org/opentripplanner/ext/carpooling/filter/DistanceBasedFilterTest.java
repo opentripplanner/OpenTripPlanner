@@ -1,8 +1,17 @@
 package org.opentripplanner.ext.carpooling.filter;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.*;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.LAKE_EAST;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.LAKE_NORTH;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.LAKE_SOUTH;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.LAKE_WEST;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createStopAt;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithStops;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

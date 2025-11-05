@@ -1,11 +1,27 @@
 package org.opentripplanner.ext.carpooling.routing;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.*;
-import static org.opentripplanner.ext.carpooling.MockGraphPathFactory.*;
-import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.*;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_MIDPOINT_NORTH;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTHEAST;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_SOUTH;
+import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_WEST;
+import static org.opentripplanner.ext.carpooling.MockGraphPathFactory.createMockGraphPath;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createStopAt;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithDeviationBudget;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithStops;
 
 import java.time.Duration;
 import java.util.List;
@@ -91,9 +107,9 @@ class InsertionEvaluatorTest {
     // 2. First insertion attempt fails (null for first segment)
     // 3. Second insertion attempt succeeds (mockPath for all segments)
     when(mockRoutingFunction.route(any(), any()))
-      .thenReturn(mockPath, mockPath) // Baseline (2 segments)
-      .thenReturn(null) // First insertion - segment fails
-      .thenReturn(mockPath, mockPath, mockPath, mockPath); // Second insertion succeeds
+      .thenReturn(mockPath, mockPath)
+      .thenReturn(null)
+      .thenReturn(mockPath, mockPath, mockPath, mockPath);
 
     // Use passenger coordinates that are compatible with trip direction (CENTER->EAST->NORTH)
     var result = findOptimalInsertion(trip, OSLO_MIDPOINT_NORTH, OSLO_NORTHEAST);
