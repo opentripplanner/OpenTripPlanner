@@ -75,27 +75,27 @@ public class CarpoolSiriMapper {
       );
     }
 
-    var boardingCall = calls.getFirst();
-    var alightingCall = calls.getLast();
+    var origin = calls.getFirst();
+    var destination = calls.getLast();
 
-    String tripId = journey.getEstimatedVehicleJourneyCode();
+    var tripId = journey.getEstimatedVehicleJourneyCode();
 
-    AreaStop boardingArea = buildAreaStop(boardingCall, tripId + "_boarding");
-    AreaStop alightingArea = buildAreaStop(alightingCall, tripId + "_alighting");
+    var originArea = buildAreaStop(origin, tripId + "_trip_origin");
+    var destinationArea = buildAreaStop(destination, tripId + "_trip_destination");
 
-    ZonedDateTime startTime = boardingCall.getExpectedDepartureTime() != null
-      ? boardingCall.getExpectedDepartureTime()
-      : boardingCall.getAimedDepartureTime();
+    var startTime = origin.getExpectedDepartureTime() != null
+      ? origin.getExpectedDepartureTime()
+      : origin.getAimedDepartureTime();
 
     // Use provided end time if available, otherwise estimate based on drive time
-    ZonedDateTime endTime = alightingCall.getExpectedArrivalTime() != null
-      ? alightingCall.getExpectedArrivalTime()
-      : alightingCall.getAimedArrivalTime();
+    var endTime = destination.getExpectedArrivalTime() != null
+      ? destination.getExpectedArrivalTime()
+      : destination.getAimedArrivalTime();
 
     var scheduledDuration = Duration.between(startTime, endTime);
 
     // TODO: Find a better way to exchange deviation budget with providers.
-    var estimatedDriveTime = calculateDriveTimeWithRouting(boardingArea, alightingArea);
+    var estimatedDriveTime = calculateDriveTimeWithRouting(originArea, destinationArea);
 
     var deviationBudget = scheduledDuration.minus(estimatedDriveTime);
     if (deviationBudget.isNegative()) {
@@ -103,7 +103,7 @@ public class CarpoolSiriMapper {
       deviationBudget = Duration.ofMinutes(15);
     }
 
-    String provider = journey.getOperatorRef().getValue();
+    var provider = journey.getOperatorRef().getValue();
 
     // Validate EstimatedCall timing order before processing
     validateEstimatedCallOrder(calls);
@@ -111,14 +111,14 @@ public class CarpoolSiriMapper {
     // Build intermediate stops from EstimatedCalls (excluding first and last)
     List<CarpoolStop> stops = new ArrayList<>();
     for (int i = 1; i < calls.size() - 1; i++) {
-      EstimatedCall intermediateCall = calls.get(i);
-      CarpoolStop stop = buildCarpoolStop(intermediateCall, tripId, i - 1);
+      var intermediateCall = calls.get(i);
+      var stop = buildCarpoolStop(intermediateCall, tripId, i - 1);
       stops.add(stop);
     }
 
     return new CarpoolTripBuilder(new FeedScopedId(FEED_ID, tripId))
-      .withBoardingArea(boardingArea)
-      .withAlightingArea(alightingArea)
+      .withBoardingArea(originArea)
+      .withAlightingArea(destinationArea)
       .withStartTime(startTime)
       .withEndTime(endTime)
       .withProvider(provider)
@@ -133,18 +133,18 @@ public class CarpoolSiriMapper {
    * Calculate the estimated drive time between two area stops using A* routing.
    * Falls back to straight-line distance estimation if routing fails.
    *
-   * @param boardingArea the boarding area stop
-   * @param alightingArea the alighting area stop
+   * @param originArea the boarding area stop
+   * @param destinationArea the alighting area stop
    * @return the estimated drive time as a Duration
    */
-  private Duration calculateDriveTimeWithRouting(AreaStop boardingArea, AreaStop alightingArea) {
+  private Duration calculateDriveTimeWithRouting(AreaStop originArea, AreaStop destinationArea) {
     try {
       var tempVertices = new TemporaryVerticesContainer(
         graph,
         vertexLinker,
         null,
-        GenericLocation.fromCoordinate(boardingArea.getLat(), boardingArea.getLon()),
-        GenericLocation.fromCoordinate(alightingArea.getLat(), alightingArea.getLon()),
+        GenericLocation.fromCoordinate(originArea.getLat(), originArea.getLon()),
+        GenericLocation.fromCoordinate(destinationArea.getLat(), destinationArea.getLon()),
         StreetMode.CAR,
         StreetMode.CAR
       );
@@ -161,11 +161,11 @@ public class CarpoolSiriMapper {
         return Duration.ofSeconds(durationSeconds);
       } else {
         LOG.debug("No route found between carpool stops, using straight-line estimate");
-        return calculateDriveTimeFromDistance(boardingArea, alightingArea);
+        return calculateDriveTimeFromDistance(originArea, destinationArea);
       }
     } catch (Exception e) {
       LOG.error("Error calculating drive time with routing, falling back to distance estimate", e);
-      return calculateDriveTimeFromDistance(boardingArea, alightingArea);
+      return calculateDriveTimeFromDistance(originArea, destinationArea);
     }
   }
 
