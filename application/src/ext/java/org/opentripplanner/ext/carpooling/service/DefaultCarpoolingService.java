@@ -25,6 +25,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,20 +93,22 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * @param vertexLinker links coordinates to graph vertices for routing, must not be null
    * @param streetLimitationParametersService provides street routing configuration including
    *        speed limits, must not be null
+   * @param transitService provides timezone from GTFS agency data for time conversions, must not be null
    * @throws NullPointerException if any parameter is null
    */
   public DefaultCarpoolingService(
     CarpoolingRepository repository,
     Graph graph,
     VertexLinker vertexLinker,
-    StreetLimitationParametersService streetLimitationParametersService
+    StreetLimitationParametersService streetLimitationParametersService,
+    TransitService transitService
   ) {
     this.repository = repository;
     this.graph = graph;
     this.vertexLinker = vertexLinker;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.preFilters = FilterChain.standard();
-    this.itineraryMapper = new CarpoolItineraryMapper();
+    this.itineraryMapper = new CarpoolItineraryMapper(transitService.getTimeZone());
     this.delayConstraints = new PassengerDelayConstraints();
     this.positionFinder = new InsertionPositionFinder(delayConstraints, new BeelineEstimator());
   }

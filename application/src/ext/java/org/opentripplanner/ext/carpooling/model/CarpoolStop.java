@@ -194,13 +194,6 @@ public class CarpoolStop implements StopLocation {
   }
 
   /**
-   * @return The type of carpool stop operation allowed
-   */
-  public CarpoolStopType getCarpoolStopType() {
-    return carpoolStopType;
-  }
-
-  /**
    * @return The passenger delta at this stop. Positive values indicate pickups,
    *         negative values indicate drop-offs
    */
@@ -213,55 +206,6 @@ public class CarpoolStop implements StopLocation {
    */
   public int getSequenceNumber() {
     return sequenceNumber;
-  }
-
-  /**
-   * @return The estimated time at this stop, null if not available
-   */
-  @Nullable
-  public ZonedDateTime getEstimatedTime() {
-    return estimatedTime;
-  }
-
-  /**
-   * @return true if this stop allows passenger pickups
-   */
-  public boolean allowsPickup() {
-    return (
-      carpoolStopType == CarpoolStopType.PICKUP_ONLY ||
-      carpoolStopType == CarpoolStopType.PICKUP_AND_DROP_OFF
-    );
-  }
-
-  /**
-   * @return true if this stop allows passenger drop-offs
-   */
-  public boolean allowsDropOff() {
-    return (
-      carpoolStopType == CarpoolStopType.DROP_OFF_ONLY ||
-      carpoolStopType == CarpoolStopType.PICKUP_AND_DROP_OFF
-    );
-  }
-
-  /**
-   * @return true if passengers are being picked up at this stop (positive delta)
-   */
-  public boolean isPickupStop() {
-    return passengerDelta > 0;
-  }
-
-  /**
-   * @return true if passengers are being dropped off at this stop (negative delta)
-   */
-  public boolean isDropOffStop() {
-    return passengerDelta < 0;
-  }
-
-  /**
-   * @return the absolute number of passengers affected at this stop
-   */
-  public int getPassengerCount() {
-    return Math.abs(passengerDelta);
   }
 
   @Override

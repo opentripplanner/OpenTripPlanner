@@ -22,7 +22,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
  *
  * <h2>Core Concepts</h2>
  * <ul>
- *   <li><strong>Boarding/Alighting Areas:</strong> Start and end zones for the driver's journey</li>
+ *   <li><strong>Origin/Destination Areas:</strong> Start and end zones for the driver's journey</li>
  *   <li><strong>Stops:</strong> Ordered sequence of waypoints along the route where passengers
  *       can be picked up or dropped off. Stops are dynamically updated as bookings occur.</li>
  *   <li><strong>Deviation Budget:</strong> Maximum additional time the driver is willing to spend
@@ -59,8 +59,8 @@ public class CarpoolTrip
   extends AbstractTransitEntity<CarpoolTrip, CarpoolTripBuilder>
   implements LogInfo {
 
-  private final AreaStop boardingArea;
-  private final AreaStop alightingArea;
+  private final AreaStop originArea;
+  private final AreaStop destinationArea;
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
   private final String provider;
@@ -75,8 +75,8 @@ public class CarpoolTrip
 
   public CarpoolTrip(CarpoolTripBuilder builder) {
     super(builder.getId());
-    this.boardingArea = builder.boardingArea();
-    this.alightingArea = builder.alightingArea();
+    this.originArea = builder.originArea();
+    this.destinationArea = builder.destinationArea();
     this.startTime = builder.startTime();
     this.endTime = builder.endTime();
     this.provider = builder.provider();
@@ -85,12 +85,12 @@ public class CarpoolTrip
     this.stops = Collections.unmodifiableList(builder.stops());
   }
 
-  public AreaStop boardingArea() {
-    return boardingArea;
+  public AreaStop originArea() {
+    return originArea;
   }
 
-  public AreaStop alightingArea() {
-    return alightingArea;
+  public AreaStop destinationArea() {
+    return destinationArea;
   }
 
   public ZonedDateTime startTime() {
@@ -128,7 +128,7 @@ public class CarpoolTrip
   }
 
   /**
-   * Builds the full list of route points including boarding area, all stops, and alighting area.
+   * Builds the full list of route points including origin area, all stops, and destination area.
    * <p>
    * This list represents the complete path of the carpool trip, useful for distance and
    * direction calculations during filtering and matching.
@@ -138,13 +138,13 @@ public class CarpoolTrip
   public List<WgsCoordinate> routePoints() {
     List<WgsCoordinate> points = new ArrayList<>();
 
-    points.add(boardingArea().getCoordinate());
+    points.add(originArea().getCoordinate());
 
     for (CarpoolStop stop : stops()) {
       points.add(stop.getCoordinate());
     }
 
-    points.add(alightingArea().getCoordinate());
+    points.add(destinationArea().getCoordinate());
 
     return points;
   }
@@ -227,8 +227,8 @@ public class CarpoolTrip
   public boolean sameAs(CarpoolTrip other) {
     return (
       getId().equals(other.getId()) &&
-      boardingArea.equals(other.boardingArea) &&
-      alightingArea.equals(other.alightingArea) &&
+      originArea.equals(other.originArea) &&
+      destinationArea.equals(other.destinationArea) &&
       startTime.equals(other.startTime) &&
       endTime.equals(other.endTime) &&
       stops.equals(other.stops)

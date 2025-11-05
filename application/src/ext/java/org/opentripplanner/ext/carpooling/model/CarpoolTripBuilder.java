@@ -10,8 +10,8 @@ import org.opentripplanner.transit.model.site.AreaStop;
 
 public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, CarpoolTripBuilder> {
 
-  private AreaStop boardingArea;
-  private AreaStop alightingArea;
+  private AreaStop originArea;
+  private AreaStop destinationArea;
   private ZonedDateTime startTime;
   private ZonedDateTime endTime;
   private String provider;
@@ -22,8 +22,8 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
 
   public CarpoolTripBuilder(CarpoolTrip original) {
     super(original);
-    this.boardingArea = original.boardingArea();
-    this.alightingArea = original.alightingArea();
+    this.originArea = original.originArea();
+    this.destinationArea = original.destinationArea();
     this.startTime = original.startTime();
     this.endTime = original.endTime();
     this.provider = original.provider();
@@ -36,13 +36,13 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
     super(id);
   }
 
-  public CarpoolTripBuilder withBoardingArea(AreaStop boardingArea) {
-    this.boardingArea = boardingArea;
+  public CarpoolTripBuilder withOriginArea(AreaStop originArea) {
+    this.originArea = originArea;
     return this;
   }
 
-  public CarpoolTripBuilder withAlightingArea(AreaStop alightingArea) {
-    this.alightingArea = alightingArea;
+  public CarpoolTripBuilder withDestinationArea(AreaStop destinationArea) {
+    this.destinationArea = destinationArea;
     return this;
   }
 
@@ -71,12 +71,12 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
     return this;
   }
 
-  public AreaStop boardingArea() {
-    return boardingArea;
+  public AreaStop originArea() {
+    return originArea;
   }
 
-  public AreaStop alightingArea() {
-    return alightingArea;
+  public AreaStop destinationArea() {
+    return destinationArea;
   }
 
   public ZonedDateTime startTime() {

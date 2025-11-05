@@ -75,9 +75,9 @@ public class TestCarpoolTripBuilder {
   public static CarpoolTrip createTripWithDeviationBudget(
     Duration deviationBudget,
     int seats,
-    WgsCoordinate boarding,
+    WgsCoordinate origin,
     List<CarpoolStop> stops,
-    WgsCoordinate alighting
+    WgsCoordinate destination
   ) {
     return new org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder(
       org.opentripplanner.transit.model.framework.FeedScopedId.ofNullable(
@@ -85,8 +85,8 @@ public class TestCarpoolTripBuilder {
         "trip-" + idCounter.incrementAndGet()
       )
     )
-      .withBoardingArea(createAreaStop(boarding))
-      .withAlightingArea(createAreaStop(alighting))
+      .withOriginArea(createAreaStop(origin))
+      .withDestinationArea(createAreaStop(destination))
       .withStops(stops)
       .withAvailableSeats(seats)
       .withStartTime(ZonedDateTime.now())
@@ -101,9 +101,9 @@ public class TestCarpoolTripBuilder {
   public static CarpoolTrip createTripWithTime(
     ZonedDateTime startTime,
     int seats,
-    WgsCoordinate boarding,
+    WgsCoordinate origin,
     List<CarpoolStop> stops,
-    WgsCoordinate alighting
+    WgsCoordinate destination
   ) {
     return new org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder(
       org.opentripplanner.transit.model.framework.FeedScopedId.ofNullable(
@@ -111,8 +111,8 @@ public class TestCarpoolTripBuilder {
         "trip-" + idCounter.incrementAndGet()
       )
     )
-      .withBoardingArea(createAreaStop(boarding))
-      .withAlightingArea(createAreaStop(alighting))
+      .withOriginArea(createAreaStop(origin))
+      .withDestinationArea(createAreaStop(destination))
       .withStops(stops)
       .withAvailableSeats(seats)
       .withStartTime(startTime)

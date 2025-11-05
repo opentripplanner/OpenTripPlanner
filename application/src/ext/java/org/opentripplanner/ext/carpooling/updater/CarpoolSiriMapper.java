@@ -117,8 +117,8 @@ public class CarpoolSiriMapper {
     }
 
     return new CarpoolTripBuilder(new FeedScopedId(FEED_ID, tripId))
-      .withBoardingArea(originArea)
-      .withAlightingArea(destinationArea)
+      .withOriginArea(originArea)
+      .withDestinationArea(destinationArea)
       .withStartTime(startTime)
       .withEndTime(endTime)
       .withProvider(provider)
@@ -251,7 +251,6 @@ public class CarpoolSiriMapper {
       : call.getAimedArrivalTime();
 
     // Determine stop type and passenger delta from call attributes
-    // In SIRI ET, passenger changes are typically indicated by boarding/alighting counts
     CarpoolStop.CarpoolStopType stopType = determineCarpoolStopType(call);
     int passengerDelta = calculatePassengerDelta(call, stopType);
 

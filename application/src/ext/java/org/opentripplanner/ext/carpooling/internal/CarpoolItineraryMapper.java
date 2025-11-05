@@ -9,6 +9,7 @@ import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -67,6 +68,20 @@ import org.opentripplanner.street.model.vertex.Vertex;
  */
 public class CarpoolItineraryMapper {
 
+  private final ZoneId timeZone;
+
+  /**
+   * Creates a new carpool itinerary mapper with the specified timezone.
+   * <p>
+   * The timezone is used to convert passenger requested departure times from Instant to
+   * ZonedDateTime for comparison with driver pickup times.
+   * <p>
+   * @param timeZone the timezone for time conversions, typically from TransitService.getTimeZone()
+   */
+  public CarpoolItineraryMapper(ZoneId timeZone) {
+    this.timeZone = ZoneIdFallback.zoneId(timeZone);
+  }
+
   /**
    * Converts an insertion candidate into an OTP itinerary representing the passenger's journey.
    * <p>
@@ -111,7 +126,7 @@ public class CarpoolItineraryMapper {
     var driverPickupTime = candidate.trip().startTime().plus(pickupDuration);
 
     var startTime = request.dateTime().isAfter(driverPickupTime.toInstant())
-      ? request.dateTime().atZone(ZoneId.of("Europe/Oslo"))
+      ? request.dateTime().atZone(timeZone)
       : driverPickupTime;
 
     // Calculate shared journey duration
