@@ -31,24 +31,21 @@ class DirectionalCompatibilityFilterTest {
 
   @Test
   void accepts_passengerAlignedWithTrip_returnsTrue() {
-    var trip = createSimpleTrip(
-      OSLO_CENTER,
-      OSLO_NORTH // Trip goes north
-    );
+    // Trip goes north
+    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     // Passenger also going north
     var passengerPickup = OSLO_EAST;
-    var passengerDropoff = new WgsCoordinate(59.9549, 10.7922); // Northeast
+    // Northeast
+    var passengerDropoff = new WgsCoordinate(59.9549, 10.7922);
 
     assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
   }
 
   @Test
   void accepts_passengerOppositeDirection_returnsFalse() {
-    var trip = createSimpleTrip(
-      OSLO_CENTER,
-      OSLO_NORTH // Trip goes north
-    );
+    // Trip goes north
+    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     // Passenger going south
     var passengerPickup = OSLO_EAST;
@@ -65,8 +62,10 @@ class DirectionalCompatibilityFilterTest {
     var trip = createTripWithStops(LAKE_NORTH, List.of(stop1, stop2), LAKE_WEST);
 
     // Passenger aligned with the southward segment (East → South)
-    var passengerPickup = new WgsCoordinate(59.9339, 10.7922); // East side
-    var passengerDropoff = new WgsCoordinate(59.9139, 10.7922); // South of east
+    // East side
+    var passengerPickup = new WgsCoordinate(59.9339, 10.7922);
+    // South of east
+    var passengerDropoff = new WgsCoordinate(59.9139, 10.7922);
 
     // Should accept because passenger aligns with East→South segment
     assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
@@ -77,7 +76,8 @@ class DirectionalCompatibilityFilterTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     // Passenger far to the east but directionally aligned (both going north)
-    var passengerPickup = new WgsCoordinate(59.9139, 11.0000); // Way east
+    // Way east
+    var passengerPickup = new WgsCoordinate(59.9139, 11.0000);
     var passengerDropoff = new WgsCoordinate(59.9439, 11.0000);
 
     // Should accept - only checks direction, not distance (that's DistanceBasedFilter's job)
@@ -86,33 +86,31 @@ class DirectionalCompatibilityFilterTest {
 
   @Test
   void accepts_passengerPartiallyAligned_withinTolerance_returnsTrue() {
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH); // Going north
+    // Going north
+    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     // Passenger going northeast (~45° off)
-    var passengerPickup = OSLO_CENTER;
-    var passengerDropoff = OSLO_NORTHEAST;
-
     // Should accept within default tolerance (60°)
-    assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(filter.accepts(trip, OSLO_CENTER, OSLO_NORTHEAST));
   }
 
   @Test
   void accepts_passengerPerpendicularToTrip_returnsFalse() {
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH); // Going north
+    // Going north
+    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     // Passenger going east (90° perpendicular)
-    var passengerPickup = OSLO_CENTER;
-    var passengerDropoff = OSLO_EAST;
-
     // Should reject (exceeds 60° tolerance)
-    assertFalse(filter.accepts(trip, passengerPickup, passengerDropoff));
+    assertFalse(filter.accepts(trip, OSLO_CENTER, OSLO_EAST));
   }
 
   @Test
   void accepts_complexRoute_multipleSegments_findsCompatibleSegment() {
     // Trip with multiple segments going different directions
-    var stop1 = createStopAt(0, OSLO_EAST); // Go east first
-    var stop2 = createStopAt(1, OSLO_NORTHEAST); // Then northeast
+    // Go east first
+    var stop1 = createStopAt(0, OSLO_EAST);
+    // Then northeast
+    var stop2 = createStopAt(1, OSLO_NORTHEAST);
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2), OSLO_NORTH);
 
     // Passenger going northeast (aligns with second segment)
@@ -136,11 +134,14 @@ class DirectionalCompatibilityFilterTest {
 
   @Test
   void accepts_passengerWithinCorridorButWrongDirection_returnsFalse() {
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH); // Going north
+    // Going north
+    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     // Passenger nearby but going opposite direction
-    var passengerPickup = new WgsCoordinate(59.9239, 10.7522); // North
-    var passengerDropoff = new WgsCoordinate(59.9139, 10.7522); // South (backtracking)
+    // North
+    var passengerPickup = new WgsCoordinate(59.9239, 10.7522);
+    // South (backtracking)
+    var passengerDropoff = new WgsCoordinate(59.9139, 10.7522);
 
     assertFalse(filter.accepts(trip, passengerPickup, passengerDropoff));
   }
@@ -150,14 +151,12 @@ class DirectionalCompatibilityFilterTest {
     // Custom filter with 90° tolerance (very permissive)
     var customFilter = new DirectionalCompatibilityFilter(90.0);
 
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH); // Going north
+    // Going north
+    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     // Passenger going east (90° perpendicular)
-    var passengerPickup = OSLO_CENTER;
-    var passengerDropoff = OSLO_EAST;
-
     // Should accept with 90° tolerance (default 60° would reject)
-    assertTrue(customFilter.accepts(trip, passengerPickup, passengerDropoff));
+    assertTrue(customFilter.accepts(trip, OSLO_CENTER, OSLO_EAST));
   }
 
   @Test
@@ -165,14 +164,12 @@ class DirectionalCompatibilityFilterTest {
     // Custom filter with 30° tolerance (strict)
     var customFilter = new DirectionalCompatibilityFilter(30.0);
 
-    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH); // Going north
+    // Going north
+    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     // Passenger going northeast (~45° off)
-    var passengerPickup = OSLO_CENTER;
-    var passengerDropoff = OSLO_NORTHEAST;
-
     // Should reject with 30° tolerance (default 60° would accept)
-    assertFalse(customFilter.accepts(trip, passengerPickup, passengerDropoff));
+    assertFalse(customFilter.accepts(trip, OSLO_CENTER, OSLO_NORTHEAST));
   }
 
   @Test

@@ -34,7 +34,8 @@ class CapacityFilterTest {
   void accepts_tripAtFullCapacity_returnsTrue() {
     // CapacityFilter only checks configured capacity, not actual occupancy
     // Detailed capacity validation happens in the validator layer
-    var stop1 = createStop(0, +4); // All 4 seats taken
+    // All 4 seats taken
+    var stop1 = createStop(0, 4);
     var trip = createTripWithCapacity(4, OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
     // Filter accepts because trip has capacity configured (even if currently full)
@@ -43,7 +44,8 @@ class CapacityFilterTest {
 
   @Test
   void accepts_tripWithOneOpenSeat_returnsTrue() {
-    var stop1 = createStop(0, +3); // 3 of 4 seats taken
+    // 3 of 4 seats taken
+    var stop1 = createStop(0, 3);
     var trip = createTripWithCapacity(4, OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
     assertTrue(filter.accepts(trip, OSLO_EAST, OSLO_WEST));
@@ -68,9 +70,12 @@ class CapacityFilterTest {
 
   @Test
   void accepts_tripWithFluctuatingCapacity_checksOverallAvailability() {
-    var stop1 = createStop(0, +2); // 2 passengers
-    var stop2 = createStop(1, -2); // Dropoff 2
-    var stop3 = createStop(2, +1); // Pickup 1
+    // 2 passengers
+    var stop1 = createStop(0, 2);
+    // Dropoff 2
+    var stop2 = createStop(1, -2);
+    // Pickup 1
+    var stop3 = createStop(2, 1);
     var trip = createTripWithCapacity(4, OSLO_CENTER, List.of(stop1, stop2, stop3), OSLO_NORTH);
 
     // At some point there's capacity (positions 0, 2+)
@@ -80,9 +85,12 @@ class CapacityFilterTest {
   @Test
   void accepts_tripAlwaysAtCapacity_returnsTrue() {
     // CapacityFilter only checks configured capacity, not actual occupancy
-    var stop1 = createStop(0, +4); // Fill to capacity
-    var stop2 = createStop(1, -1); // Drop 1
-    var stop3 = createStop(2, +1); // Pick 1 (back to full)
+    // Fill to capacity
+    var stop1 = createStop(0, 4);
+    // Drop 1
+    var stop2 = createStop(1, -1);
+    // Pick 1 (back to full)
+    var stop3 = createStop(2, 1);
     var trip = createTripWithCapacity(4, OSLO_CENTER, List.of(stop1, stop2, stop3), OSLO_NORTH);
 
     // Filter accepts because trip has capacity configured

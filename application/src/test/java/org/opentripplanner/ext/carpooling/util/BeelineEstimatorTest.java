@@ -32,8 +32,10 @@ class BeelineEstimatorTest {
 
     // With default parameters (1.3 detour factor, 10 m/s speed):
     // Expected: ~2500m * 1.3 / 10 = ~325 seconds = ~5.4 minutes
-    assertTrue(duration.getSeconds() > 240); // > 4 minutes
-    assertTrue(duration.getSeconds() < 480); // < 8 minutes
+    // > 4 minutes
+    assertTrue(duration.getSeconds() > 240);
+    // < 8 minutes
+    assertTrue(duration.getSeconds() < 480);
   }
 
   @Test
@@ -42,8 +44,10 @@ class BeelineEstimatorTest {
     Duration duration = estimator.estimateDuration(OSLO_CENTER, OSLO_NORTH);
 
     // Expected: ~3300m * 1.3 / 10 = ~429 seconds = ~7.2 minutes
-    assertTrue(duration.getSeconds() > 300); // > 5 minutes
-    assertTrue(duration.getSeconds() < 600); // < 10 minutes
+    // > 5 minutes
+    assertTrue(duration.getSeconds() > 300);
+    // < 10 minutes
+    assertTrue(duration.getSeconds() < 600);
   }
 
   @Test
@@ -72,15 +76,18 @@ class BeelineEstimatorTest {
     Duration[] times = estimator.calculateCumulativeTimes(points);
 
     assertEquals(3, times.length);
-    assertEquals(Duration.ZERO, times[0]); // Start at 0
+    // Start at 0
+    assertEquals(Duration.ZERO, times[0]);
 
     // Each segment should add positive duration
     assertTrue(times[1].compareTo(Duration.ZERO) > 0);
     assertTrue(times[2].compareTo(times[1]) > 0);
 
     // Total duration should be reasonable (sum of two ~3-5km segments)
-    assertTrue(times[2].getSeconds() > 600); // > 10 minutes
-    assertTrue(times[2].getSeconds() < 1800); // < 30 minutes
+    // > 10 minutes
+    assertTrue(times[2].getSeconds() > 600);
+    // < 30 minutes
+    assertTrue(times[2].getSeconds() < 1800);
   }
 
   @Test
@@ -240,8 +247,10 @@ class BeelineEstimatorTest {
 
     // Expected: ~300,000m * 1.3 / 10 = 39,000 seconds = 650 minutes
     // This is just a sanity check - beeline is not accurate for such long distances
-    assertTrue(duration.getSeconds() > 30000); // > 8.3 hours
-    assertTrue(duration.getSeconds() < 60000); // < 16.7 hours
+    // > 8.3 hours
+    assertTrue(duration.getSeconds() > 30000);
+    // < 16.7 hours
+    assertTrue(duration.getSeconds() < 60000);
   }
 
   @Test

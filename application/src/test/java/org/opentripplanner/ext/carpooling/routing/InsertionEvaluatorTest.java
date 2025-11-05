@@ -176,10 +176,13 @@ class InsertionEvaluatorTest {
 
     // Use thenAnswer to provide consistent route times
     // Just return paths with reasonable durations for all calls
+    // Baseline
+    // First insertion (15 min total, 5 min additional)
+    // Second insertion (18 min total, 8 min additional)
     when(mockRoutingFunction.route(any(), any()))
-      .thenReturn(mockPath10) // Baseline
-      .thenReturn(mockPath4, mockPath5, mockPath6) // First insertion (15 min total, 5 min additional)
-      .thenReturn(mockPath5, mockPath6, mockPath7); // Second insertion (18 min total, 8 min additional)
+      .thenReturn(mockPath10)
+      .thenReturn(mockPath4, mockPath5, mockPath6)
+      .thenReturn(mockPath5, mockPath6, mockPath7);
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST);
 
@@ -224,9 +227,12 @@ class InsertionEvaluatorTest {
 
     // Modified route segments should have DIFFERENT durations
     // If baseline is incorrectly reused, we'd see 10 min for A→C segment
-    var segmentAC = createMockGraphPath(Duration.ofMinutes(3)); // CENTER → EAST
-    var segmentCD = createMockGraphPath(Duration.ofMinutes(2)); // EAST → MIDPOINT_NORTH
-    var segmentDB = createMockGraphPath(Duration.ofMinutes(4)); // MIDPOINT_NORTH → NORTH
+    // CENTER → EAST
+    var segmentAC = createMockGraphPath(Duration.ofMinutes(3));
+    // EAST → MIDPOINT_NORTH
+    var segmentCD = createMockGraphPath(Duration.ofMinutes(2));
+    // MIDPOINT_NORTH → NORTH
+    var segmentDB = createMockGraphPath(Duration.ofMinutes(4));
 
     // Setup routing mock: return all segment mocks for any routing call
     // The algorithm will evaluate multiple insertion positions

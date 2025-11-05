@@ -52,15 +52,16 @@ class CarpoolStreetRouterTest {
   @Test
   void constructor_storesDependencies() {
     assertNotNull(router);
-    // Router should be successfully constructed with all dependencies
   }
 
   @Test
   void route_withValidLocations_returnsNonNull() {
     // This is a basic smoke test - actual routing behavior depends on
     // the graph and is tested via integration tests
-    var from = GenericLocation.fromCoordinate(59.9139, 10.7522); // Oslo center
-    var to = GenericLocation.fromCoordinate(59.9149, 10.7522); // Oslo north
+    // Oslo center
+    var from = GenericLocation.fromCoordinate(59.9139, 10.7522);
+    // Oslo north
+    var to = GenericLocation.fromCoordinate(59.9149, 10.7522);
 
     // Note: Without a real graph, this will likely return null
     // The important thing is that it doesn't throw exceptions

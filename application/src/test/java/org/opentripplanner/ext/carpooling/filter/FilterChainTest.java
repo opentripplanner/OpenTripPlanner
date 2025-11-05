@@ -42,7 +42,8 @@ class FilterChainTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     when(filter1.accepts(any(), any(), any())).thenReturn(true);
-    when(filter2.accepts(any(), any(), any())).thenReturn(false); // Rejects
+    // Rejects
+    when(filter2.accepts(any(), any(), any())).thenReturn(false);
 
     var chain = new FilterChain(List.of(filter1, filter2));
 
@@ -57,7 +58,8 @@ class FilterChainTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     when(filter1.accepts(any(), any(), any())).thenReturn(true);
-    when(filter2.accepts(any(), any(), any())).thenReturn(false); // Rejects
+    // Rejects
+    when(filter2.accepts(any(), any(), any())).thenReturn(false);
     // filter3 should not be called
 
     var chain = new FilterChain(List.of(filter1, filter2, filter3));
@@ -65,7 +67,8 @@ class FilterChainTest {
 
     verify(filter1).accepts(any(), any(), any());
     verify(filter2).accepts(any(), any(), any());
-    verify(filter3, never()).accepts(any(), any(), any()); // Not called
+    // Not called
+    verify(filter3, never()).accepts(any(), any(), any());
   }
 
   @Test
@@ -74,7 +77,8 @@ class FilterChainTest {
     var filter2 = mock(TripFilter.class);
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
-    when(filter1.accepts(any(), any(), any())).thenReturn(false); // First rejects
+    // First rejects
+    when(filter1.accepts(any(), any(), any())).thenReturn(false);
 
     var chain = new FilterChain(List.of(filter1, filter2));
     chain.accepts(trip, OSLO_EAST, OSLO_WEST);

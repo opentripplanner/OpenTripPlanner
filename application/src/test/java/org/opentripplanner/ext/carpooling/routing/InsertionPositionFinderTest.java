@@ -80,11 +80,9 @@ class InsertionPositionFinderTest {
     var trip = createTripWithStops(OSLO_CENTER, List.of(createStopAt(0, OSLO_EAST)), OSLO_NORTH);
 
     // Try to insert passenger that would cause significant detour
-    var viablePositions = restrictiveFinder.findViablePositions(
-      trip,
-      OSLO_WEST, // Far from route
-      OSLO_SOUTH // Even farther
-    );
+    // Far from route
+    // Even farther
+    var viablePositions = restrictiveFinder.findViablePositions(trip, OSLO_WEST, OSLO_SOUTH);
 
     // With very restrictive constraints, positions causing significant detours should be rejected
     // However, the beeline check only applies if there are existing stops (routePoints.size() > 2)

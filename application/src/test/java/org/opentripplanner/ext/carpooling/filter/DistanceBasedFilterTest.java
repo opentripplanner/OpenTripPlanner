@@ -60,8 +60,10 @@ class DistanceBasedFilterTest {
 
     // Passenger journey perpendicular to the route, far to the west
     // > 50km perpendicular distance from the route line
-    var passengerPickup = new WgsCoordinate(59.9139, 9.5); // Far west
-    var passengerDropoff = new WgsCoordinate(59.9549, 9.5); // Still far west
+    // Far west
+    var passengerPickup = new WgsCoordinate(59.9139, 9.5);
+    // Still far west
+    var passengerDropoff = new WgsCoordinate(59.9549, 9.5);
 
     assertFalse(filter.accepts(trip, passengerPickup, passengerDropoff));
   }
@@ -87,8 +89,10 @@ class DistanceBasedFilterTest {
 
     // Pickup on the route, but dropoff far to the north (>50km perpendicular)
     // At this latitude, 0.5° latitude ≈ 55km
-    var passengerPickup = new WgsCoordinate(59.9, 10.75); // On route
-    var passengerDropoff = new WgsCoordinate(59.9 + 0.5, 10.75); // Far north
+    // On route
+    var passengerPickup = new WgsCoordinate(59.9, 10.75);
+    // Far north
+    var passengerDropoff = new WgsCoordinate(59.9 + 0.5, 10.75);
 
     // Should accept because only one location must be near the route
     assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
@@ -114,8 +118,10 @@ class DistanceBasedFilterTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
     // Passenger very close to trip start and end points
-    var passengerPickup = new WgsCoordinate(59.914, 10.753); // Very close to start
-    var passengerDropoff = new WgsCoordinate(59.954, 10.791); // Very close to end
+    // Very close to start
+    var passengerPickup = new WgsCoordinate(59.914, 10.753);
+    // Very close to end
+    var passengerDropoff = new WgsCoordinate(59.954, 10.791);
 
     assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
   }
@@ -213,8 +219,10 @@ class DistanceBasedFilterTest {
     var trip = createTripWithStops(LAKE_NORTH, java.util.List.of(stop1, stop2), LAKE_WEST);
 
     // Passenger journey near the LAKE_SOUTH to LAKE_WEST segment
-    var passengerPickup = new WgsCoordinate(59.9139, 10.735); // Near SOUTH
-    var passengerDropoff = new WgsCoordinate(59.9139, 10.720); // Near WEST
+    // Near SOUTH
+    var passengerPickup = new WgsCoordinate(59.9139, 10.735);
+    // Near WEST
+    var passengerDropoff = new WgsCoordinate(59.9139, 10.720);
 
     // Should accept if close to any segment of the route
     assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));
@@ -227,7 +235,8 @@ class DistanceBasedFilterTest {
     var trip = createSimpleTrip(sameLocation, sameLocation);
 
     // Passenger at the same location
-    var passengerPickup = new WgsCoordinate(59.901, 10.751); // Very close
+    // Very close
+    var passengerPickup = new WgsCoordinate(59.901, 10.751);
     var passengerDropoff = new WgsCoordinate(59.902, 10.752);
 
     assertTrue(filter.accepts(trip, passengerPickup, passengerDropoff));

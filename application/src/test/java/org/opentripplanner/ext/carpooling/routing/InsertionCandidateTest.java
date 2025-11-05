@@ -17,15 +17,16 @@ class InsertionCandidateTest {
   @Test
   void additionalDuration_calculatesCorrectly() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createMockGraphPaths(3); // 3 segments
+    // 3 segments
+    var segments = createMockGraphPaths(3);
 
     var candidate = new InsertionCandidate(
       trip,
-      1, // pickup position
-      2, // dropoff position
+      1,
+      2,
       segments,
-      Duration.ofMinutes(10), // baseline
-      Duration.ofMinutes(15) // total
+      Duration.ofMinutes(10),
+      Duration.ofMinutes(15)
     );
 
     assertEquals(Duration.ofMinutes(5), candidate.additionalDuration());
@@ -42,7 +43,8 @@ class InsertionCandidateTest {
       2,
       segments,
       Duration.ofMinutes(10),
-      Duration.ofMinutes(10) // Same as baseline
+      // Same as baseline
+      Duration.ofMinutes(10)
     );
 
     assertEquals(Duration.ZERO, candidate.additionalDuration());
@@ -58,8 +60,10 @@ class InsertionCandidateTest {
       1,
       2,
       segments,
-      Duration.ofMinutes(10), // baseline
-      Duration.ofMinutes(18) // total (8 min additional, within 10 min budget)
+      // baseline
+      Duration.ofMinutes(10),
+      // total (8 min additional, within 10 min budget)
+      Duration.ofMinutes(18)
     );
 
     assertTrue(candidate.isWithinDeviationBudget());
@@ -75,8 +79,10 @@ class InsertionCandidateTest {
       1,
       2,
       segments,
-      Duration.ofMinutes(10), // baseline
-      Duration.ofMinutes(20) // total (10 min additional, exceeds 5 min budget)
+      // baseline
+      Duration.ofMinutes(10),
+      // total (10 min additional, exceeds 5 min budget)
+      Duration.ofMinutes(20)
     );
 
     assertFalse(candidate.isWithinDeviationBudget());
@@ -93,7 +99,8 @@ class InsertionCandidateTest {
       2,
       segments,
       Duration.ofMinutes(10),
-      Duration.ofMinutes(15) // Exactly 5 min additional
+      // Exactly 5 min additional
+      Duration.ofMinutes(15)
     );
 
     assertTrue(candidate.isWithinDeviationBudget());
@@ -114,7 +121,8 @@ class InsertionCandidateTest {
     );
 
     var pickupSegments = candidate.getPickupSegments();
-    assertEquals(2, pickupSegments.size()); // Segments 0-1 (before position 2)
+    // Segments 0-1 (before position 2)
+    assertEquals(2, pickupSegments.size());
     assertEquals(segments.subList(0, 2), pickupSegments);
   }
 
@@ -151,7 +159,8 @@ class InsertionCandidateTest {
     );
 
     var sharedSegments = candidate.getSharedSegments();
-    assertEquals(2, sharedSegments.size()); // Segments 1-2 (positions 1 to 3)
+    // Segments 1-2 (positions 1 to 3)
+    assertEquals(2, sharedSegments.size());
     assertEquals(segments.subList(1, 3), sharedSegments);
   }
 
@@ -188,7 +197,8 @@ class InsertionCandidateTest {
     );
 
     var dropoffSegments = candidate.getDropoffSegments();
-    assertEquals(2, dropoffSegments.size()); // Segments 3-4 (after position 3)
+    // Segments 3-4 (after position 3)
+    assertEquals(2, dropoffSegments.size());
     assertEquals(segments.subList(3, 5), dropoffSegments);
   }
 
@@ -227,7 +237,8 @@ class InsertionCandidateTest {
     var str = candidate.toString();
     assertTrue(str.contains("pickup@1"));
     assertTrue(str.contains("dropoff@2"));
-    assertTrue(str.contains("300s")); // 5 min = 300s additional
+    // 5 min = 300s additional
+    assertTrue(str.contains("300s"));
     assertTrue(str.contains("segments=3"));
   }
 }
