@@ -42,7 +42,10 @@ public class CarpoolStop implements StopLocation {
   private final CarpoolStopType carpoolStopType;
   private final int passengerDelta;
   private final int sequenceNumber;
-  private final ZonedDateTime estimatedTime;
+  private final ZonedDateTime expectedArrivalTime;
+  private final ZonedDateTime aimedArrivalTime;
+  private final ZonedDateTime expectedDepartureTime;
+  private final ZonedDateTime aimedDepartureTime;
 
   /**
    * Creates a new CarpoolStop
@@ -51,20 +54,29 @@ public class CarpoolStop implements StopLocation {
    * @param carpoolStopType The type of operation allowed at this stop
    * @param passengerDelta Number of passengers picked up (positive) or dropped off (negative)
    * @param sequenceNumber The order of this stop in the trip (0-based)
-   * @param estimatedTime The estimated arrival/departure time at this stop
+   * @param expectedArrivalTime The expected arrival time, or null if not applicable (e.g., origin stop)
+   * @param aimedArrivalTime The aimed arrival time, or null if not applicable (e.g., origin stop)
+   * @param expectedDepartureTime The expected departure time, or null if not applicable (e.g., destination stop)
+   * @param aimedDepartureTime The aimed departure time, or null if not applicable (e.g., destination stop)
    */
   public CarpoolStop(
     AreaStop areaStop,
     CarpoolStopType carpoolStopType,
     int passengerDelta,
     int sequenceNumber,
-    @Nullable ZonedDateTime estimatedTime
+    @Nullable ZonedDateTime expectedArrivalTime,
+    @Nullable ZonedDateTime aimedArrivalTime,
+    @Nullable ZonedDateTime expectedDepartureTime,
+    @Nullable ZonedDateTime aimedDepartureTime
   ) {
     this.areaStop = areaStop;
     this.carpoolStopType = carpoolStopType;
     this.passengerDelta = passengerDelta;
     this.sequenceNumber = sequenceNumber;
-    this.estimatedTime = estimatedTime;
+    this.expectedArrivalTime = expectedArrivalTime;
+    this.aimedArrivalTime = aimedArrivalTime;
+    this.expectedDepartureTime = expectedDepartureTime;
+    this.aimedDepartureTime = aimedDepartureTime;
   }
 
   // StopLocation interface implementation - delegate to the underlying AreaStop
@@ -208,6 +220,56 @@ public class CarpoolStop implements StopLocation {
     return sequenceNumber;
   }
 
+  /**
+   * @return The type of carpool operation allowed at this stop
+   */
+  public CarpoolStopType getCarpoolStopType() {
+    return carpoolStopType;
+  }
+
+  /**
+   * @return The expected arrival time, or null if not applicable (e.g., origin stop)
+   */
+  @Nullable
+  public ZonedDateTime getExpectedArrivalTime() {
+    return expectedArrivalTime;
+  }
+
+  /**
+   * @return The aimed arrival time, or null if not applicable (e.g., origin stop)
+   */
+  @Nullable
+  public ZonedDateTime getAimedArrivalTime() {
+    return aimedArrivalTime;
+  }
+
+  /**
+   * @return The expected departure time, or null if not applicable (e.g., destination stop)
+   */
+  @Nullable
+  public ZonedDateTime getExpectedDepartureTime() {
+    return expectedDepartureTime;
+  }
+
+  /**
+   * @return The aimed departure time, or null if not applicable (e.g., destination stop)
+   */
+  @Nullable
+  public ZonedDateTime getAimedDepartureTime() {
+    return aimedDepartureTime;
+  }
+
+  /**
+   * Returns the primary timing for this stop, preferring aimed arrival time.
+   * This provides backward compatibility for code that expects a single time value.
+   *
+   * @return The aimed arrival time if set, otherwise aimed departure time
+   */
+  @Nullable
+  public ZonedDateTime getEstimatedTime() {
+    return aimedArrivalTime != null ? aimedArrivalTime : aimedDepartureTime;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) return true;
@@ -218,7 +280,10 @@ public class CarpoolStop implements StopLocation {
       carpoolStopType == other.carpoolStopType &&
       passengerDelta == other.passengerDelta &&
       sequenceNumber == other.sequenceNumber &&
-      java.util.Objects.equals(estimatedTime, other.estimatedTime)
+      java.util.Objects.equals(expectedArrivalTime, other.expectedArrivalTime) &&
+      java.util.Objects.equals(aimedArrivalTime, other.aimedArrivalTime) &&
+      java.util.Objects.equals(expectedDepartureTime, other.expectedDepartureTime) &&
+      java.util.Objects.equals(aimedDepartureTime, other.aimedDepartureTime)
     );
   }
 
@@ -229,19 +294,25 @@ public class CarpoolStop implements StopLocation {
       carpoolStopType,
       passengerDelta,
       sequenceNumber,
-      estimatedTime
+      expectedArrivalTime,
+      aimedArrivalTime,
+      expectedDepartureTime,
+      aimedDepartureTime
     );
   }
 
   @Override
   public String toString() {
     return String.format(
-      "CarpoolStop{stop=%s, type=%s, delta=%d, seq=%d, time=%s}",
+      "CarpoolStop{stop=%s, type=%s, delta=%d, seq=%d, arr=%s/%s, dep=%s/%s}",
       areaStop.getId(),
       carpoolStopType,
       passengerDelta,
       sequenceNumber,
-      estimatedTime
+      expectedArrivalTime,
+      aimedArrivalTime,
+      expectedDepartureTime,
+      aimedDepartureTime
     );
   }
 }

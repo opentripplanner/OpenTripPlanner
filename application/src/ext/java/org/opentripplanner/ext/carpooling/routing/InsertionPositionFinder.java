@@ -76,7 +76,9 @@ public class InsertionPositionFinder {
 
     List<InsertionPosition> viable = new ArrayList<>();
 
+    // Pickup positions: 1 to routePoints.size()-1 (cannot pick up at position 0/origin)
     for (int pickupPos = 1; pickupPos < routePoints.size(); pickupPos++) {
+      // Dropoff positions: pickupPos+1 to routePoints.size() (can drop off up to and including destination)
       for (int dropoffPos = pickupPos + 1; dropoffPos <= routePoints.size(); dropoffPos++) {
         if (!trip.hasCapacityForInsertion(pickupPos, dropoffPos, 1)) {
           LOG.trace(

@@ -59,8 +59,6 @@ public class CarpoolTrip
   extends AbstractTransitEntity<CarpoolTrip, CarpoolTripBuilder>
   implements LogInfo {
 
-  private final AreaStop originArea;
-  private final AreaStop destinationArea;
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
   private final String provider;
@@ -75,8 +73,6 @@ public class CarpoolTrip
 
   public CarpoolTrip(CarpoolTripBuilder builder) {
     super(builder.getId());
-    this.originArea = builder.originArea();
-    this.destinationArea = builder.destinationArea();
     this.startTime = builder.startTime();
     this.endTime = builder.endTime();
     this.provider = builder.provider();
@@ -85,12 +81,30 @@ public class CarpoolTrip
     this.stops = Collections.unmodifiableList(builder.stops());
   }
 
-  public AreaStop originArea() {
-    return originArea;
+  /**
+   * Returns the origin stop (first stop in the trip).
+   *
+   * @return the origin stop
+   * @throws IllegalStateException if the trip has no stops
+   */
+  public CarpoolStop getOrigin() {
+    if (stops.isEmpty()) {
+      throw new IllegalStateException("Trip has no stops");
+    }
+    return stops.get(0);
   }
 
-  public AreaStop destinationArea() {
-    return destinationArea;
+  /**
+   * Returns the destination stop (last stop in the trip).
+   *
+   * @return the destination stop
+   * @throws IllegalStateException if the trip has no stops
+   */
+  public CarpoolStop getDestination() {
+    if (stops.isEmpty()) {
+      throw new IllegalStateException("Trip has no stops");
+    }
+    return stops.get(stops.size() - 1);
   }
 
   public ZonedDateTime startTime() {
@@ -136,44 +150,33 @@ public class CarpoolTrip
    * @return a list of coordinates representing the full route of the trip
    */
   public List<WgsCoordinate> routePoints() {
-    List<WgsCoordinate> points = new ArrayList<>();
-
-    points.add(originArea().getCoordinate());
-
-    for (CarpoolStop stop : stops()) {
-      points.add(stop.getCoordinate());
-    }
-
-    points.add(destinationArea().getCoordinate());
-
-    return points;
+    return stops.stream().map(CarpoolStop::getCoordinate).toList();
   }
 
   /**
    * Calculates the number of passengers in the vehicle after visiting the specified position.
    * <p>
    * Position semantics:
-   * - Position 0: Boarding area (before any stops) → 0 passengers
+   * - Position 0: Before any stops → 0 passengers
    * - Position N: After Nth stop → cumulative passenger delta up to stop N
-   * - Position stops.size() + 1: Alighting area → 0 passengers
    *
-   * @param position The position index (0 = boarding, 1 = after first stop, etc.)
+   * @param position The position index (0 = before any stops, 1 = after first stop, etc.)
    * @return Number of passengers after this position
-   * @throws IllegalArgumentException if position is negative or greater than stops.size() + 1
+   * @throws IllegalArgumentException if position is negative or greater than stops.size()
    */
   public int getPassengerCountAtPosition(int position) {
     if (position < 0) {
       throw new IllegalArgumentException("Position must be non-negative, got: " + position);
     }
 
-    if (position > stops.size() + 1) {
+    if (position > stops.size()) {
       throw new IllegalArgumentException(
-        "Position " + position + " exceeds valid range (0 to " + (stops.size() + 1) + ")"
+        "Position " + position + " exceeds valid range (0 to " + stops.size() + ")"
       );
     }
 
-    // At the start and end of the trip there are no passengers
-    if (position == 0 || position == stops.size() + 1) {
+    // Position 0 is before any stops
+    if (position == 0) {
       return 0;
     }
 
@@ -227,8 +230,6 @@ public class CarpoolTrip
   public boolean sameAs(CarpoolTrip other) {
     return (
       getId().equals(other.getId()) &&
-      originArea.equals(other.originArea) &&
-      destinationArea.equals(other.destinationArea) &&
       startTime.equals(other.startTime) &&
       endTime.equals(other.endTime) &&
       stops.equals(other.stops)

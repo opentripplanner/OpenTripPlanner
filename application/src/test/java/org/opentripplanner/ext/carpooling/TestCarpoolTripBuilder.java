@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
@@ -18,10 +19,12 @@ public class TestCarpoolTripBuilder {
   private static final AtomicInteger areaStopCounter = new AtomicInteger(0);
 
   /**
-   * Creates a simple trip with no stops and default capacity of 4.
+   * Creates a simple trip with origin and destination stops, default capacity of 4.
    */
   public static CarpoolTrip createSimpleTrip(WgsCoordinate boarding, WgsCoordinate alighting) {
-    return createTripWithCapacity(4, boarding, List.of(), alighting);
+    var origin = createOriginStop(boarding);
+    var destination = createDestinationStop(alighting, 1);
+    return createTripWithCapacity(4, List.of(origin, destination));
   }
 
   /**
@@ -32,30 +35,53 @@ public class TestCarpoolTripBuilder {
     WgsCoordinate alighting,
     ZonedDateTime startTime
   ) {
-    return createTripWithTime(startTime, 4, boarding, List.of(), alighting);
+    var origin = createOriginStopWithTime(boarding, startTime, startTime);
+    var destination = createDestinationStopWithTime(
+      alighting,
+      1,
+      startTime.plusHours(1),
+      startTime.plusHours(1)
+    );
+    return createTripWithTime(startTime, 4, List.of(origin, destination));
   }
 
   /**
-   * Creates a trip with specified stops.
+   * Creates a trip with origin, intermediate stops, and destination.
    */
   public static CarpoolTrip createTripWithStops(
     WgsCoordinate boarding,
-    List<CarpoolStop> stops,
+    List<CarpoolStop> intermediateStops,
     WgsCoordinate alighting
   ) {
-    return createTripWithCapacity(4, boarding, stops, alighting);
+    List<CarpoolStop> allStops = new ArrayList<>();
+    allStops.add(createOriginStop(boarding));
+
+    // Renumber intermediate stops to account for origin at position 0
+    for (int i = 0; i < intermediateStops.size(); i++) {
+      CarpoolStop intermediate = intermediateStops.get(i);
+      allStops.add(
+        new CarpoolStop(
+          intermediate.getAreaStop(),
+          intermediate.getCarpoolStopType(),
+          intermediate.getPassengerDelta(),
+          i + 1,
+          intermediate.getExpectedArrivalTime(),
+          intermediate.getAimedArrivalTime(),
+          intermediate.getExpectedDepartureTime(),
+          intermediate.getAimedDepartureTime()
+        )
+      );
+    }
+
+    allStops.add(createDestinationStop(alighting, allStops.size()));
+    return createTripWithCapacity(4, allStops);
   }
 
   /**
-   * Creates a trip with specified capacity.
+   * Creates a trip with specified capacity and all stops (including origin/destination).
    */
-  public static CarpoolTrip createTripWithCapacity(
-    int seats,
-    WgsCoordinate boarding,
-    List<CarpoolStop> stops,
-    WgsCoordinate alighting
-  ) {
-    return createTripWithDeviationBudget(Duration.ofMinutes(10), seats, boarding, stops, alighting);
+  public static CarpoolTrip createTripWithCapacity(int seats, List<CarpoolStop> stops) {
+    return createTripWithDeviationBudget(Duration.ofMinutes(10), seats, stops);
   }
 
   /**
@@ -66,7 +92,9 @@ public class TestCarpoolTripBuilder {
     WgsCoordinate boarding,
     WgsCoordinate alighting
   ) {
-    return createTripWithDeviationBudget(deviationBudget, 4, boarding, List.of(), alighting);
+    var origin = createOriginStop(boarding);
+    var destination = createDestinationStop(alighting, 1);
+    return createTripWithDeviationBudget(deviationBudget, 4, List.of(origin, destination));
   }
 
   /**
@@ -75,9 +103,7 @@ public class TestCarpoolTripBuilder {
   public static CarpoolTrip createTripWithDeviationBudget(
     Duration deviationBudget,
     int seats,
-    WgsCoordinate origin,
-    List<CarpoolStop> stops,
-    WgsCoordinate destination
+    List<CarpoolStop> stops
   ) {
     return new org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder(
       org.opentripplanner.transit.model.framework.FeedScopedId.ofNullable(
@@ -85,8 +111,6 @@ public class TestCarpoolTripBuilder {
         "trip-" + idCounter.incrementAndGet()
       )
     )
-      .withOriginArea(createAreaStop(origin))
-      .withDestinationArea(createAreaStop(destination))
       .withStops(stops)
       .withAvailableSeats(seats)
       .withStartTime(ZonedDateTime.now())
@@ -101,9 +125,7 @@ public class TestCarpoolTripBuilder {
   public static CarpoolTrip createTripWithTime(
     ZonedDateTime startTime,
     int seats,
-    WgsCoordinate origin,
-    List<CarpoolStop> stops,
-    WgsCoordinate destination
+    List<CarpoolStop> stops
   ) {
     return new org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder(
       org.opentripplanner.transit.model.framework.FeedScopedId.ofNullable(
@@ -111,8 +133,6 @@ public class TestCarpoolTripBuilder {
         "trip-" + idCounter.incrementAndGet()
       )
     )
-      .withOriginArea(createAreaStop(origin))
-      .withDestinationArea(createAreaStop(destination))
       .withStops(stops)
       .withAvailableSeats(seats)
       .withStartTime(startTime)
@@ -144,6 +164,64 @@ public class TestCarpoolTripBuilder {
       CarpoolStop.CarpoolStopType.PICKUP_AND_DROP_OFF,
       passengerDelta,
       sequence,
+      null,
+      null,
+      null,
+      null
+    );
+  }
+
+  /**
+   * Creates an origin stop (first stop, PICKUP_ONLY, passengerDelta=0, departure times only).
+   */
+  public static CarpoolStop createOriginStop(WgsCoordinate location) {
+    return createOriginStopWithTime(location, null, null);
+  }
+
+  /**
+   * Creates an origin stop with specific departure times.
+   */
+  public static CarpoolStop createOriginStopWithTime(
+    WgsCoordinate location,
+    ZonedDateTime expectedDepartureTime,
+    ZonedDateTime aimedDepartureTime
+  ) {
+    return new CarpoolStop(
+      createAreaStop(location),
+      CarpoolStop.CarpoolStopType.PICKUP_ONLY,
+      0,
+      0,
+      null,
+      null,
+      expectedDepartureTime,
+      aimedDepartureTime
+    );
+  }
+
+  /**
+   * Creates a destination stop (last stop, DROP_OFF_ONLY, passengerDelta=0, arrival times only).
+   */
+  public static CarpoolStop createDestinationStop(WgsCoordinate location, int sequenceNumber) {
+    return createDestinationStopWithTime(location, sequenceNumber, null, null);
+  }
+
+  /**
+   * Creates a destination stop with specific arrival times.
+   */
+  public static CarpoolStop createDestinationStopWithTime(
+    WgsCoordinate location,
+    int sequenceNumber,
+    ZonedDateTime expectedArrivalTime,
+    ZonedDateTime aimedArrivalTime
+  ) {
+    return new CarpoolStop(
+      createAreaStop(location),
+      CarpoolStop.CarpoolStopType.DROP_OFF_ONLY,
+      0,
+      sequenceNumber,
+      expectedArrivalTime,
+      aimedArrivalTime,
+      null,
       null
     );
   }

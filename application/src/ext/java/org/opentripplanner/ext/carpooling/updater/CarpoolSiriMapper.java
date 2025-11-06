@@ -37,44 +37,39 @@ public class CarpoolSiriMapper {
       );
     }
 
-    var origin = calls.getFirst();
-    var destination = calls.getLast();
-
     var tripId = journey.getEstimatedVehicleJourneyCode();
-
-    var originArea = buildAreaStop(origin, tripId + "_trip_origin");
-    var destinationArea = buildAreaStop(destination, tripId + "_trip_destination");
-
-    var startTime = origin.getExpectedDepartureTime() != null
-      ? origin.getExpectedDepartureTime()
-      : origin.getAimedDepartureTime();
-
-    var endTime = destination.getExpectedArrivalTime() != null
-      ? destination.getExpectedArrivalTime()
-      : destination.getAimedArrivalTime();
-
-    // TODO: Find a better way to exchange deviation budget with providers.
-    // Using 15 minutes as a default for now.
-    var deviationBudget = Duration.ofMinutes(15);
-
-    var provider = journey.getOperatorRef().getValue();
 
     validateEstimatedCallOrder(calls);
 
     List<CarpoolStop> stops = new ArrayList<>();
-    for (int i = 1; i < calls.size() - 1; i++) {
-      var intermediateCall = calls.get(i);
-      var stop = buildCarpoolStop(intermediateCall, tripId, i - 1);
+
+    for (int i = 0; i < calls.size(); i++) {
+      EstimatedCall call = calls.get(i);
+      boolean isFirst = (i == 0);
+      boolean isLast = (i == calls.size() - 1);
+
+      CarpoolStop stop = buildCarpoolStopForPosition(call, tripId, i, isFirst, isLast);
       stops.add(stop);
     }
 
+    // Extract start/end times from first/last stops
+    CarpoolStop firstStop = stops.getFirst();
+    CarpoolStop lastStop = stops.getLast();
+
+    ZonedDateTime startTime = firstStop.getExpectedDepartureTime() != null
+      ? firstStop.getExpectedDepartureTime()
+      : firstStop.getAimedDepartureTime();
+
+    ZonedDateTime endTime = lastStop.getExpectedArrivalTime() != null
+      ? lastStop.getExpectedArrivalTime()
+      : lastStop.getAimedArrivalTime();
+
     return new CarpoolTripBuilder(new FeedScopedId(FEED_ID, tripId))
-      .withOriginArea(originArea)
-      .withDestinationArea(destinationArea)
       .withStartTime(startTime)
       .withEndTime(endTime)
-      .withProvider(provider)
-      .withDeviationBudget(deviationBudget)
+      .withProvider(journey.getOperatorRef().getValue())
+      // TODO: Find a better way to exchange deviation budget with providers.
+      .withDeviationBudget(Duration.ofMinutes(15))
       // TODO: Make available seats dynamic based on EstimatedVehicleJourney data
       .withAvailableSeats(2)
       .withStops(stops)
@@ -82,27 +77,66 @@ public class CarpoolSiriMapper {
   }
 
   /**
-   * Build a CarpoolStop from an EstimatedCall, using point geometry instead of area geometry.
-   * Determines the stop type and passenger delta from the call data.
+   * Build a CarpoolStop from an EstimatedCall with special handling for first/last positions.
    *
    * @param call The SIRI EstimatedCall containing stop information
    * @param tripId The trip ID for generating unique stop IDs
    * @param sequenceNumber The 0-based sequence number of this stop
-   * @return A CarpoolStop representing the intermediate pickup/drop-off point
+   * @param isFirst true if this is the first stop (origin)
+   * @param isLast true if this is the last stop (destination)
+   * @return A CarpoolStop representing the stop
    */
-  private CarpoolStop buildCarpoolStop(EstimatedCall call, String tripId, int sequenceNumber) {
-    var areaStop = buildAreaStop(call, tripId + "_stop_" + sequenceNumber);
+  private CarpoolStop buildCarpoolStopForPosition(
+    EstimatedCall call,
+    String tripId,
+    int sequenceNumber,
+    boolean isFirst,
+    boolean isLast
+  ) {
+    String stopId = isFirst
+      ? tripId + "_trip_origin"
+      : isLast ? tripId + "_trip_destination" : tripId + "_stop_" + sequenceNumber;
 
-    // Extract timing information
-    ZonedDateTime estimatedTime = call.getExpectedArrivalTime() != null
-      ? call.getExpectedArrivalTime()
-      : call.getAimedArrivalTime();
+    var areaStop = buildAreaStop(call, stopId);
 
-    // Determine stop type and passenger delta from call attributes
-    CarpoolStop.CarpoolStopType stopType = determineCarpoolStopType(call);
-    int passengerDelta = calculatePassengerDelta(call, stopType);
+    // Extract all four timing fields
+    ZonedDateTime expectedArrivalTime = call.getExpectedArrivalTime();
+    ZonedDateTime aimedArrivalTime = call.getAimedArrivalTime();
+    ZonedDateTime expectedDepartureTime = call.getExpectedDepartureTime();
+    ZonedDateTime aimedDepartureTime = call.getAimedDepartureTime();
 
-    return new CarpoolStop(areaStop, stopType, passengerDelta, sequenceNumber, estimatedTime);
+    // Special handling for first and last stops
+    CarpoolStop.CarpoolStopType stopType;
+    int passengerDelta;
+
+    if (isFirst) {
+      // Origin: PICKUP_ONLY, no passengers initially, only departure times
+      stopType = CarpoolStop.CarpoolStopType.PICKUP_ONLY;
+      passengerDelta = 0;
+      expectedArrivalTime = null;
+      aimedArrivalTime = null;
+    } else if (isLast) {
+      // Destination: DROP_OFF_ONLY, no passengers remain, only arrival times
+      stopType = CarpoolStop.CarpoolStopType.DROP_OFF_ONLY;
+      passengerDelta = 0;
+      expectedDepartureTime = null;
+      aimedDepartureTime = null;
+    } else {
+      // Intermediate stop: determine from call data
+      stopType = determineCarpoolStopType(call);
+      passengerDelta = calculatePassengerDelta(call, stopType);
+    }
+
+    return new CarpoolStop(
+      areaStop,
+      stopType,
+      passengerDelta,
+      sequenceNumber,
+      expectedArrivalTime,
+      aimedArrivalTime,
+      expectedDepartureTime,
+      aimedDepartureTime
+    );
   }
 
   /**

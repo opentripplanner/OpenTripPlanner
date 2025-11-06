@@ -31,16 +31,21 @@ class CarpoolTripCapacityTest {
 
   @Test
   void getPassengerCountAtPosition_onePickupStop_incrementsAtStop() {
-    // Pickup 1 passenger
+    // Pickup 1 passenger, then drop off 1 passenger
     var stop1 = createStop(0, 1);
-    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
+    var stop2 = createStop(1, -1);
+    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2), OSLO_NORTH);
 
-    // Before stop
+    // Position 0: Before origin stop
     assertEquals(0, trip.getPassengerCountAtPosition(0));
-    // After stop
-    assertEquals(1, trip.getPassengerCountAtPosition(1));
-    // Alighting
-    assertEquals(0, trip.getPassengerCountAtPosition(2));
+    // Position 1: After origin stop (passengerDelta=0)
+    assertEquals(0, trip.getPassengerCountAtPosition(1));
+    // Position 2: After pickup stop (passengerDelta=1)
+    assertEquals(1, trip.getPassengerCountAtPosition(2));
+    // Position 3: After dropoff stop (passengerDelta=-1)
+    assertEquals(0, trip.getPassengerCountAtPosition(3));
+    // Position 4: After destination stop (passengerDelta=0)
+    assertEquals(0, trip.getPassengerCountAtPosition(4));
   }
 
   @Test
@@ -49,16 +54,22 @@ class CarpoolTripCapacityTest {
     var stop1 = createStop(0, 2);
     // Dropoff 1 passenger
     var stop2 = createStop(1, -1);
-    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2), OSLO_NORTH);
+    // Dropoff remaining passenger
+    var stop3 = createStop(2, -1);
+    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2, stop3), OSLO_NORTH);
 
-    // Before any stops
+    // Position 0: Before origin stop
     assertEquals(0, trip.getPassengerCountAtPosition(0));
-    // After first pickup
-    assertEquals(2, trip.getPassengerCountAtPosition(1));
-    // After dropoff
-    assertEquals(1, trip.getPassengerCountAtPosition(2));
-    // Alighting
-    assertEquals(0, trip.getPassengerCountAtPosition(3));
+    // Position 1: After origin stop (passengerDelta=0)
+    assertEquals(0, trip.getPassengerCountAtPosition(1));
+    // Position 2: After first intermediate stop (passengerDelta=2)
+    assertEquals(2, trip.getPassengerCountAtPosition(2));
+    // Position 3: After second intermediate stop (passengerDelta=-1)
+    assertEquals(1, trip.getPassengerCountAtPosition(3));
+    // Position 4: After third intermediate stop (passengerDelta=-1)
+    assertEquals(0, trip.getPassengerCountAtPosition(4));
+    // Position 5: After destination stop (passengerDelta=0)
+    assertEquals(0, trip.getPassengerCountAtPosition(5));
   }
 
   @Test
@@ -67,19 +78,29 @@ class CarpoolTripCapacityTest {
     var stop2 = createStop(1, 2);
     var stop3 = createStop(2, -1);
     var stop4 = createStop(3, 1);
-    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2, stop3, stop4), OSLO_NORTH);
+    var stop5 = createStop(4, -3);
+    var trip = createTripWithStops(
+      OSLO_CENTER,
+      List.of(stop1, stop2, stop3, stop4, stop5),
+      OSLO_NORTH
+    );
 
+    // Position 0: Before origin
     assertEquals(0, trip.getPassengerCountAtPosition(0));
-    // 0 + 1
-    assertEquals(1, trip.getPassengerCountAtPosition(1));
-    // 1 + 2
-    assertEquals(3, trip.getPassengerCountAtPosition(2));
-    // 3 - 1
-    assertEquals(2, trip.getPassengerCountAtPosition(3));
-    // 2 + 1
-    assertEquals(3, trip.getPassengerCountAtPosition(4));
-    // Alighting
-    assertEquals(0, trip.getPassengerCountAtPosition(5));
+    // Position 1: After origin (passengerDelta=0)
+    assertEquals(0, trip.getPassengerCountAtPosition(1));
+    // Position 2: After stop1 (0 + 1)
+    assertEquals(1, trip.getPassengerCountAtPosition(2));
+    // Position 3: After stop2 (1 + 2)
+    assertEquals(3, trip.getPassengerCountAtPosition(3));
+    // Position 4: After stop3 (3 - 1)
+    assertEquals(2, trip.getPassengerCountAtPosition(4));
+    // Position 5: After stop4 (2 + 1)
+    assertEquals(3, trip.getPassengerCountAtPosition(5));
+    // Position 6: After stop5 (3 - 3)
+    assertEquals(0, trip.getPassengerCountAtPosition(6));
+    // Position 7: After destination (passengerDelta=0)
+    assertEquals(0, trip.getPassengerCountAtPosition(7));
   }
 
   @Test
@@ -95,16 +116,17 @@ class CarpoolTripCapacityTest {
     var stop2 = createStop(1, 1);
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2), OSLO_NORTH);
 
-    // Valid positions are 0 to 3 (stops.size() + 1)
-    // Position 4 should throw
-    assertThrows(IllegalArgumentException.class, () -> trip.getPassengerCountAtPosition(4));
+    // Trip has: origin (0), stop1 (1), stop2 (2), destination (3) = 4 stops total
+    // Valid positions are 0 to 4 (0 to stops.size())
+    // Position 5 should throw
+    assertThrows(IllegalArgumentException.class, () -> trip.getPassengerCountAtPosition(5));
     // Position 999 should also throw
     assertThrows(IllegalArgumentException.class, () -> trip.getPassengerCountAtPosition(999));
   }
 
   @Test
   void hasCapacityForInsertion_noPassengers_hasCapacity() {
-    var trip = createTripWithCapacity(4, OSLO_CENTER, List.of(), OSLO_NORTH);
+    var trip = createTripWithStops(OSLO_CENTER, List.of(), OSLO_NORTH);
 
     assertTrue(trip.hasCapacityForInsertion(1, 2, 1));
     // Can fit all 4 seats
@@ -115,7 +137,7 @@ class CarpoolTripCapacityTest {
   void hasCapacityForInsertion_fullCapacity_noCapacity() {
     // Fill all 4 seats
     var stop1 = createStop(0, 4);
-    var trip = createTripWithCapacity(4, OSLO_CENTER, List.of(stop1), OSLO_NORTH);
+    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
     // No room for additional passenger after stop 1
     assertFalse(trip.hasCapacityForInsertion(2, 3, 1));
@@ -125,7 +147,7 @@ class CarpoolTripCapacityTest {
   void hasCapacityForInsertion_partialCapacity_hasCapacityForOne() {
     // 3 of 4 seats taken
     var stop1 = createStop(0, 3);
-    var trip = createTripWithCapacity(4, OSLO_CENTER, List.of(stop1), OSLO_NORTH);
+    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
     // Room for 1
     assertTrue(trip.hasCapacityForInsertion(2, 3, 1));
@@ -136,20 +158,21 @@ class CarpoolTripCapacityTest {
   @Test
   void hasCapacityForInsertion_acrossMultiplePositions_checksAll() {
     var stop1 = createStop(0, 2);
-    // Total 3 passengers at position 2
+    // Total 3 passengers at position 3
     var stop2 = createStop(1, 1);
-    var trip = createTripWithCapacity(4, OSLO_CENTER, List.of(stop1, stop2), OSLO_NORTH);
+    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2), OSLO_NORTH);
 
-    // Range 1-3 includes position with 3 passengers, so only 1 seat available
-    assertTrue(trip.hasCapacityForInsertion(1, 3, 1));
-    assertFalse(trip.hasCapacityForInsertion(1, 3, 2));
+    // Trip positions: 0 (before origin), 1 (after origin=0), 2 (after stop1=2), 3 (after stop2=3), 4 (after dest=0)
+    // Range 2-4 includes position 3 with 3 passengers, so only 1 seat available
+    assertTrue(trip.hasCapacityForInsertion(2, 4, 1));
+    assertFalse(trip.hasCapacityForInsertion(2, 4, 2));
   }
 
   @Test
   void hasCapacityForInsertion_rangeBeforeStop_usesInitialCapacity() {
     // Fill capacity at position 1
     var stop1 = createStop(0, 4);
-    var trip = createTripWithCapacity(4, OSLO_CENTER, List.of(stop1), OSLO_NORTH);
+    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
     // Pickup at position 1, dropoff at position 1 - only checks capacity at boarding (position 0)
     // At boarding there are no passengers yet, so we have full capacity
@@ -162,7 +185,7 @@ class CarpoolTripCapacityTest {
     var stop1 = createStop(0, 3);
     // 2 dropoff, leaving 1
     var stop2 = createStop(1, -2);
-    var trip = createTripWithCapacity(4, OSLO_CENTER, List.of(stop1, stop2), OSLO_NORTH);
+    var trip = createTripWithStops(OSLO_CENTER, List.of(stop1, stop2), OSLO_NORTH);
 
     // Range includes both positions - max passengers is 3 (at position 1)
     // 4 total - 3 max = 1 available

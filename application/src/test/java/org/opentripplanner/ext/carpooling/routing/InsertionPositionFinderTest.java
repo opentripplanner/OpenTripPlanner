@@ -8,6 +8,8 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAS
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_SOUTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_WEST;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createDestinationStop;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createOriginStop;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createStopAt;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithCapacity;
@@ -60,7 +62,8 @@ class InsertionPositionFinderTest {
   @Test
   void findViablePositions_noCapacity_rejectsPosition() {
     // Create a trip with 0 available seats
-    var trip = createTripWithCapacity(0, OSLO_CENTER, List.of(), OSLO_NORTH);
+    var stops = List.of(createOriginStop(OSLO_CENTER), createDestinationStop(OSLO_NORTH, 1));
+    var trip = createTripWithCapacity(0, stops);
 
     var viablePositions = finder.findViablePositions(trip, OSLO_EAST, OSLO_WEST);
 

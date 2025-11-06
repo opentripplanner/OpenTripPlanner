@@ -10,8 +10,6 @@ import org.opentripplanner.transit.model.site.AreaStop;
 
 public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, CarpoolTripBuilder> {
 
-  private AreaStop originArea;
-  private AreaStop destinationArea;
   private ZonedDateTime startTime;
   private ZonedDateTime endTime;
   private String provider;
@@ -22,8 +20,6 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
 
   public CarpoolTripBuilder(CarpoolTrip original) {
     super(original);
-    this.originArea = original.originArea();
-    this.destinationArea = original.destinationArea();
     this.startTime = original.startTime();
     this.endTime = original.endTime();
     this.provider = original.provider();
@@ -34,16 +30,6 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
 
   public CarpoolTripBuilder(FeedScopedId id) {
     super(id);
-  }
-
-  public CarpoolTripBuilder withOriginArea(AreaStop originArea) {
-    this.originArea = originArea;
-    return this;
-  }
-
-  public CarpoolTripBuilder withDestinationArea(AreaStop destinationArea) {
-    this.destinationArea = destinationArea;
-    return this;
   }
 
   public CarpoolTripBuilder withStartTime(ZonedDateTime startTime) {
@@ -69,14 +55,6 @@ public class CarpoolTripBuilder extends AbstractEntityBuilder<CarpoolTrip, Carpo
   public CarpoolTripBuilder withAvailableSeats(int availableSeats) {
     this.availableSeats = availableSeats;
     return this;
-  }
-
-  public AreaStop originArea() {
-    return originArea;
-  }
-
-  public AreaStop destinationArea() {
-    return destinationArea;
   }
 
   public ZonedDateTime startTime() {

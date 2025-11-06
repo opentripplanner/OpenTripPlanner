@@ -6,6 +6,8 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CEN
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_WEST;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createDestinationStop;
+import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createOriginStop;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createSimpleTrip;
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithCapacity;
 
@@ -77,7 +79,8 @@ class FilterChainTest {
 
     // Should contain CapacityFilter and DirectionalCompatibilityFilter
     // Verify by testing behavior with a trip that has no capacity
-    var emptyTrip = createTripWithCapacity(0, OSLO_CENTER, List.of(), OSLO_NORTH);
+    var stops = List.of(createOriginStop(OSLO_CENTER), createDestinationStop(OSLO_NORTH, 1));
+    var emptyTrip = createTripWithCapacity(0, stops);
 
     // Should reject due to capacity filter
     assertFalse(chain.accepts(emptyTrip, OSLO_EAST, OSLO_WEST));
