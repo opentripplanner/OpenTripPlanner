@@ -103,13 +103,19 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return (
       Objects.equals(relaxC1, that.relaxC1) &&
       Objects.equals(transitPriorityCalculator, that.transitPriorityCalculator) &&
-      Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination)
+      Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination) &&
+      Objects.equals(relaxedLimitedTransferRequest, that.relaxedLimitedTransferRequest)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(relaxC1, transitPriorityCalculator, relaxCostAtDestination);
+    return Objects.hash(
+      relaxC1,
+      transitPriorityCalculator,
+      relaxCostAtDestination,
+      relaxedLimitedTransferRequest
+    );
   }
 
   @Override

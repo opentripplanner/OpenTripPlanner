@@ -365,7 +365,9 @@ public class RouteRequestConfig {
         .ifPresent(it::withRelaxGeneralizedCostAtDestination)
     );
 
-    mapRelaxedLimitedTransferSearchPreferences(c, dft.relaxedLimitedTransferSearch().copyOf());
+    builder.withRelaxedLimitedTransferSearch(it ->
+      mapRelaxedLimitedTransferSearchPreferences(c, it)
+    );
   }
 
   private static void mapRelaxedLimitedTransferSearchPreferences(

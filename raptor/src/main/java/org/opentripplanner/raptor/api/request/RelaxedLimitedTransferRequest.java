@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.api.request;
 
+import java.util.Objects;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 
@@ -54,6 +55,28 @@ public class RelaxedLimitedTransferRequest {
 
   public Builder copyOf() {
     return new Builder(this);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    RelaxedLimitedTransferRequest that = (RelaxedLimitedTransferRequest) o;
+    return (
+      enabled == that.enabled &&
+      Double.compare(extraAccessEgressCostFactor, that.extraAccessEgressCostFactor) == 0 &&
+      disableAccessEgress == that.disableAccessEgress &&
+      Objects.equals(costRelaxFunction, that.costRelaxFunction)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      enabled,
+      costRelaxFunction,
+      extraAccessEgressCostFactor,
+      disableAccessEgress
+    );
   }
 
   public static class Builder {

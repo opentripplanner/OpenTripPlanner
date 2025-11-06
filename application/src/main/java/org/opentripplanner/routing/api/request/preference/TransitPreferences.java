@@ -191,7 +191,8 @@ public final class TransitPreferences implements Serializable {
       ignoreRealtimeUpdates == that.ignoreRealtimeUpdates &&
       includePlannedCancellations == that.includePlannedCancellations &&
       includeRealtimeCancellations == that.includeRealtimeCancellations &&
-      raptor.equals(that.raptor)
+      raptor.equals(that.raptor) &&
+      relaxedLimitedTransferSearch.equals(that.relaxedLimitedTransferSearch)
     );
   }
 
@@ -207,7 +208,8 @@ public final class TransitPreferences implements Serializable {
       ignoreRealtimeUpdates,
       includePlannedCancellations,
       includeRealtimeCancellations,
-      raptor
+      raptor,
+      relaxedLimitedTransferSearch
     );
   }
 
