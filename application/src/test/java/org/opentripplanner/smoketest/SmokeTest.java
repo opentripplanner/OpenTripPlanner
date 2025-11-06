@@ -49,7 +49,7 @@ public class SmokeTest {
    * before the expiration date of the old one.
    */
   public static LocalDateTime weekdayAtNoon() {
-    var requiredDay = DayOfWeek.TUESDAY;
+    var requiredDay = DayOfWeek.MONDAY;
     var today = LocalDate.now();
     if (today.getDayOfWeek().equals(requiredDay)) {
       return today.atTime(LocalTime.of(12, 0));

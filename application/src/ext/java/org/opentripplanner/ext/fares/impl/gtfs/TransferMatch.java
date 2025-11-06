@@ -10,4 +10,8 @@ record TransferMatch(
   FareTransferRule transferRule,
   FareLegRule fromLegRule,
   FareLegRule toLegRule
-) {}
+) {
+  public boolean isFree() {
+    return transferRule.isFree();
+  }
+}

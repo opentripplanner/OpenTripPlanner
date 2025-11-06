@@ -32,7 +32,6 @@ public class DenverSmokeTest {
     );
   }
 
-  @Test
   @Disabled("There seem to be no vehicle positions in their feed anymore.")
   public void vehiclePositions() {
     SmokeTest.assertThereArePatternsWithVehiclePositions();

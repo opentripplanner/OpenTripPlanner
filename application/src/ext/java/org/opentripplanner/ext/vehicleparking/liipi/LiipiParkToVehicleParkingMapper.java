@@ -90,7 +90,7 @@ public class LiipiParkToVehicleParkingMapper {
         });
       I18NString name = translations.isEmpty()
         ? new NonLocalizedString(vehicleParkId.getId())
-        : TranslatedString.getI18NString(translations, true, false);
+        : TranslatedString.getI18NString(translations, false);
       Geometry geometry = GEOMETRY_PARSER.geometryFromJson(jsonNode.path("location"));
 
       var stateText = jsonNode.path("status").asText();

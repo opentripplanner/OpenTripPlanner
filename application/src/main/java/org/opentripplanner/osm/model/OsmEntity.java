@@ -521,7 +521,10 @@ public abstract class OsmEntity {
       return null;
     }
     if (tags.containsKey("name")) {
-      return TranslatedString.getI18NString(this.generateI18NForPattern("{name}"), true, false);
+      return TranslatedString.getDeduplicatedI18NString(
+        this.generateI18NForPattern("{name}"),
+        false
+      );
     }
     if (tags.containsKey("otp:route_name")) {
       return new NonLocalizedString(tags.get("otp:route_name"));

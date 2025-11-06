@@ -204,6 +204,6 @@ public class AlertsUpdateHandler {
       String string = translation.getText();
       translations.put(language, string);
     }
-    return translations.isEmpty() ? null : TranslatedString.getI18NString(translations, true, true);
+    return translations.isEmpty() ? null : TranslatedString.getI18NString(translations, true);
   }
 }

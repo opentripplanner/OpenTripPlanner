@@ -79,7 +79,6 @@ public class VehicleRentalLayerTest {
               put("de", germanName);
             }
           },
-          false,
           false
         )
       )

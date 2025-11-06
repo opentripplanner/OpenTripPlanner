@@ -1,16 +1,20 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareProduct;
 import org.onebusaway.gtfs.model.FareTransferRule;
+import org.opentripplanner.ext.fares.model.TimeLimit;
+import org.opentripplanner.ext.fares.model.TimeLimitType;
 
 class FareTransferRuleMapperTest {
 
@@ -43,6 +47,27 @@ class FareTransferRuleMapperTest {
     assertEquals(FEED_ID, transferRule.id().getFeedId());
     assertNull(transferRule.fromLegGroup());
     assertNull(transferRule.toLegGroup());
+  }
+
+  @Test
+  void timeLimit() {
+    var fareProduct = fareProduct();
+
+    var rule = new FareTransferRule();
+    rule.setFareProductId(id);
+    rule.setDurationLimit(120 * 60);
+    rule.setDurationLimitType(0);
+
+    var transferRule = map(fareProduct, rule);
+    assertThat(transferRule.timeLimit()).hasValue(
+      new TimeLimit(TimeLimitType.DEPARTURE_TO_ARRIVAL, Duration.ofMinutes(120))
+    );
+  }
+
+  @Test
+  void limitType() {
+    assertEquals(TimeLimitType.DEPARTURE_TO_ARRIVAL, FareTransferRuleMapper.mapLimitType(0));
+    assertEquals(TimeLimitType.DEPARTURE_TO_DEPARTURE, FareTransferRuleMapper.mapLimitType(1));
   }
 
   @Test

@@ -168,6 +168,39 @@ class GbfsStationStatusMapperTest {
     assertTrue(mapped.canDropOffFormFactor(formFactor, false));
   }
 
+  @Test
+  void stationStatusWithUnknownVehicleTypesInDocksAvailable() {
+    var gbfsStation = station();
+    gbfsStation.setNumDocksAvailable(50);
+    gbfsStation.setNumVehiclesAvailable(10);
+
+    // Add vehicle docks available with both known and unknown vehicle type IDs
+    var docksKnown = new GBFSVehicleDocksAvailable();
+    docksKnown.setCount(30);
+    docksKnown.setVehicleTypeIds(List.of(TYPE_CAR.id().getId()));
+
+    var docksUnknown = new GBFSVehicleDocksAvailable();
+    docksUnknown.setCount(20);
+    docksUnknown.setVehicleTypeIds(List.of("unknown-vehicle-type"));
+
+    gbfsStation.setVehicleDocksAvailable(List.of(docksKnown, docksUnknown));
+
+    var mapper = new GbfsStationStatusMapper(
+      Map.of(ID, gbfsStation),
+      Map.of(TYPE_CAR.id().getId(), TYPE_CAR)
+    );
+
+    var mapped = mapper.mapStationStatus(STATION);
+
+    assertThat(mapped).isNotNull();
+    var spaces = mapped.vehicleSpaceCounts();
+    assertEquals(50, spaces.total());
+    // Should only include the known vehicle type in the spaces map
+    assertThat(spaces.byType()).hasSize(1);
+    assertThat(spaces.byType()).containsExactly(new RentalVehicleTypeCount(TYPE_CAR, 30));
+    assertSame(SPECIFIC_TYPES, mapped.returnPolicy());
+  }
+
   private static GBFSStation station() {
     var gbfsStation = new GBFSStation();
     gbfsStation.setStationId(ID);

@@ -48,7 +48,6 @@ public class VehicleParkingGroupsLayerTest {
               put("de", "groupDE");
             }
           },
-          false,
           false
         )
       )
@@ -64,7 +63,6 @@ public class VehicleParkingGroupsLayerTest {
               put("de", "DE");
             }
           },
-          false,
           false
         )
       )
