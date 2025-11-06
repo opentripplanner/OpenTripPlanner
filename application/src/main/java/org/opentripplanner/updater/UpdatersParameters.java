@@ -50,6 +50,6 @@ public interface UpdatersParameters {
   List<SiriAzureSXUpdaterParameters> getSiriAzureSXUpdaterParameters();
 
   List<SiriETCarpoolingUpdaterParameters> getSiriETCarpoolingUpdaterParameters();
-  
+
   List<MqttSiriETUpdaterParameters> getMqttSiriETUpdaterParameters();
 }

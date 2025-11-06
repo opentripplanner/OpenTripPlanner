@@ -200,12 +200,7 @@ public class UpdaterConfigurator {
       var streetLimitationParametersService = new DefaultStreetLimitationParametersService(
         new StreetLimitationParameters()
       );
-      updaters.add(
-        new SiriETCarpoolingUpdater(
-          configItem,
-          carpoolingRepository
-        )
-      );
+      updaters.add(new SiriETCarpoolingUpdater(configItem, carpoolingRepository));
     }
     for (var configItem : updatersParameters.getSiriETLiteUpdaterParameters()) {
       updaters.add(SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriAdapter()));
