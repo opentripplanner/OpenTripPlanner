@@ -202,10 +202,7 @@ public class UpdaterConfigurator {
       updaters.add(
         new SiriETCarpoolingUpdater(
           configItem,
-          carpoolingRepository,
-          graph,
-          linker,
-          streetLimitationParametersService
+          carpoolingRepository
         )
       );
     }

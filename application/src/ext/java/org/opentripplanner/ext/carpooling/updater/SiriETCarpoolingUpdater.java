@@ -2,9 +2,6 @@ package org.opentripplanner.ext.carpooling.updater;
 
 import java.util.List;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.support.siri.SiriFileLoader;
 import org.opentripplanner.updater.support.siri.SiriHttpLoader;
@@ -31,10 +28,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
 
   public SiriETCarpoolingUpdater(
     SiriETCarpoolingUpdaterParameters config,
-    CarpoolingRepository repository,
-    Graph graph,
-    VertexLinker vertexLinker,
-    StreetLimitationParametersService streetLimitationParametersService
+    CarpoolingRepository repository
   ) {
     super(config);
     this.updateSource = new SiriETHttpTripUpdateSource(
@@ -46,7 +40,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
-    this.mapper = new CarpoolSiriMapper(graph, vertexLinker, streetLimitationParametersService);
+    this.mapper = new CarpoolSiriMapper();
   }
 
   /**
