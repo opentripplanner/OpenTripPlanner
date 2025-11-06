@@ -1,0 +1,11 @@
+{
+  "last_updated": 1631258451,
+  "ttl": 86400,
+  "version": "2.2",
+  "data": {
+    "system_id": "test_duplicate_system",
+    "language": "en",
+    "name": "Test Duplicate System",
+    "timezone": "Europe/Oslo"
+  }
+}

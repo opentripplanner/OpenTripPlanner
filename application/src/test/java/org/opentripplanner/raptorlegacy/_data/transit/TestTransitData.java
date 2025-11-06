@@ -215,9 +215,7 @@ public class TestTransitData
   public TestTransitData withTransfer(int fromStop, DefaultRaptorTransfer transfer) {
     expandNumOfStops(Math.max(fromStop, transfer.stop()));
     transfersFromStop.get(fromStop).add(transfer);
-    transfersToStop
-      .get(transfer.stop())
-      .add(((DefaultRaptorTransfer) transfer).reverseOf(fromStop));
+    transfersToStop.get(transfer.stop()).add(transfer.reverseOf(fromStop));
     return this;
   }
 

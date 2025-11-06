@@ -64,11 +64,19 @@ public class GbfsFeedMapper
       var stationStatus = loader.getFeed(GBFSStationStatus.class);
       if (stationInformation != null && stationStatus != null) {
         // Index all the station status entries on their station ID.
+        // in case of duplicates entries (stations with identical unique id),
+        // only the first occurrence is kept.
         Map<String, GBFSStation> statusLookup = stationStatus
           .getData()
           .getStations()
           .stream()
-          .collect(Collectors.toMap(GBFSStation::getStationId, Function.identity()));
+          .collect(
+            Collectors.toMap(
+              GBFSStation::getStationId,
+              Function.identity(),
+              (gbfsStation1, gbfsStation2) -> gbfsStation1
+            )
+          );
         GbfsStationStatusMapper stationStatusMapper = new GbfsStationStatusMapper(
           statusLookup,
           vehicleTypes
@@ -167,11 +175,7 @@ public class GbfsFeedMapper
       return null;
     }
 
-    return TranslatedString.getI18NString(
-      name.stream().collect(toMap(language, text)),
-      true,
-      false
-    );
+    return TranslatedString.getI18NString(name.stream().collect(toMap(language, text)), false);
   }
 
   static <X> I18NString localizedString(

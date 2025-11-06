@@ -5,6 +5,9 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.time.DurationUtils;
 
+/**
+ * A Raptor transfer which goes directly to the target stop
+ */
 public final class DefaultRaptorTransfer implements RaptorTransfer {
 
   private final int stop;

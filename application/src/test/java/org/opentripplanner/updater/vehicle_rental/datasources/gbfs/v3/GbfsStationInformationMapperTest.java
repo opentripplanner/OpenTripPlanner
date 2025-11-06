@@ -1,10 +1,13 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,11 +15,35 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mobilitydata.gbfs.v3_0.station_information.GBFSName;
 import org.mobilitydata.gbfs.v3_0.station_information.GBFSStation;
+import org.mobilitydata.gbfs.v3_0.station_information.GBFSVehicleTypesCapacity;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
+import org.opentripplanner.street.model.RentalFormFactor;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GbfsStationInformationMapperTest {
 
   private static final String TEST_STATION_ID = "TEST_STATION_ID";
   private static final String TEST_STATION_NAME = "TEST_STATION_NAME";
+  private static final String SYSTEM_ID = "test-system";
+  private static final VehicleRentalSystem TEST_SYSTEM = new VehicleRentalSystem(
+    SYSTEM_ID,
+    I18NString.of("Test System"),
+    I18NString.of("Test"),
+    I18NString.of("Test Operator"),
+    "https://example.com"
+  );
+
+  private static final RentalVehicleType TYPE_BIKE = RentalVehicleType.of()
+    .withFormFactor(RentalFormFactor.BICYCLE)
+    .withId(new FeedScopedId(SYSTEM_ID, "bike"))
+    .build();
+
+  private static final RentalVehicleType TYPE_SCOOTER = RentalVehicleType.of()
+    .withFormFactor(RentalFormFactor.SCOOTER)
+    .withId(new FeedScopedId(SYSTEM_ID, "scooter"))
+    .build();
 
   @Test
   void acceptValidStation() {
@@ -27,6 +54,38 @@ class GbfsStationInformationMapperTest {
   @MethodSource("provideInvalidStations")
   void invalidStationsShouldFail(GBFSStation station) {
     assertFalse(GbfsStationInformationMapper.isValid(station));
+  }
+
+  @Test
+  void stationWithUnknownVehicleTypesInCapacity() {
+    var station = validStation();
+
+    // Add vehicle types capacity with both known and unknown vehicle type IDs
+    var capacityKnown = new GBFSVehicleTypesCapacity();
+    capacityKnown.setVehicleTypeIds(List.of("bike"));
+    capacityKnown.setCount(10);
+
+    var capacityUnknown = new GBFSVehicleTypesCapacity();
+    capacityUnknown.setVehicleTypeIds(List.of("unknown-type"));
+    capacityUnknown.setCount(5);
+
+    station.setVehicleTypesCapacity(List.of(capacityKnown, capacityUnknown));
+
+    var mapper = new GbfsStationInformationMapper(
+      TEST_SYSTEM,
+      Map.of("bike", TYPE_BIKE, "scooter", TYPE_SCOOTER),
+      false,
+      false
+    );
+
+    var result = mapper.mapStationInformation(station);
+
+    assertNotNull(result);
+    assertEquals(TEST_STATION_ID, result.stationId());
+    // Should only include the known vehicle type in the capacity map
+    assertEquals(1, result.vehicleTypeAreaCapacity().size());
+    assertTrue(result.vehicleTypeAreaCapacity().containsKey(TYPE_BIKE));
+    assertEquals(10, result.vehicleTypeAreaCapacity().get(TYPE_BIKE));
   }
 
   private static GBFSStation validStation() {

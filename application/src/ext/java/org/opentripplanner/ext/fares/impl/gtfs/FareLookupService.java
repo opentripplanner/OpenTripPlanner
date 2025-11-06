@@ -42,6 +42,13 @@ class FareLookupService implements Serializable {
   }
 
   /**
+   * Are there free transfers between the legs?
+   */
+  boolean hasFreeTransfers(List<TransitLeg> legs) {
+    return !findTransfersMatchingAllLegs(legs).isEmpty();
+  }
+
+  /**
    * Returns true if the service contains no data at all.
    */
   boolean isEmpty() {
@@ -69,9 +76,13 @@ class FareLookupService implements Serializable {
    * Find those fare products that match all legs through an unlimited transfer.
    */
   Set<FareProduct> findTransfersMatchingAllLegs(List<TransitLeg> legs) {
+    if (legs.size() < 2) {
+      return Set.of();
+    }
     return this.transferRules.stream()
       .filter(FareTransferRule::unlimitedTransfers)
       .filter(FareTransferRule::isFree)
+      .filter(r -> TimeLimitEvaluator.withinTimeLimit(r, legs.getFirst(), legs.getLast()))
       .flatMap(r -> findTransferMatches(r, legs).stream())
       .filter(transferMatch -> appliesToAllLegs(legs, transferMatch))
       .flatMap(transferRule -> transferRule.fromLegRule().fareProducts().stream())
@@ -91,8 +102,8 @@ class FareLookupService implements Serializable {
   /**
    * Find fare offers for a specific pair of legs.
    */
-  Set<FareOffer> findTransferOffersForSubLegs(TransitLeg head, List<TransitLeg> tail) {
-    Set<TransferMatch> rules =
+  Set<LegOffer> findTransferOffersForSubLegs(TransitLeg head, List<TransitLeg> tail) {
+    Set<TransferMatch> transfers =
       this.transferRules.stream()
         .flatMap(r -> {
           var fromRules = findFareLegRule(r.fromLegGroup());
@@ -108,37 +119,40 @@ class FareLookupService implements Serializable {
 
     Multimap<FareProduct, FareProduct> dependencies = HashMultimap.create();
 
-    rules.forEach(transfer ->
+    transfers.forEach(transfer ->
       transfer
         .transferRule()
         .fareProducts()
         .forEach(p -> dependencies.putAll(p, transfer.fromLegRule().fareProducts()))
     );
 
-    return dependencies
+    Set<LegOffer> dependentOffers = dependencies
       .keySet()
       .stream()
-      .map(product -> FareOffer.of(head.startTime(), product, dependencies.get(product)))
+      .map(product ->
+        LegOffer.of(FareOffer.of(head.startTime(), product, dependencies.get(product)))
+      )
       .collect(Collectors.toSet());
-  }
 
-  boolean hasFreeTransfer(TransitLeg head, List<TransitLeg> tail) {
-    return this.transferRules.stream()
-      .anyMatch(r -> {
-        var fromRules = findFareLegRule(r.fromLegGroup());
-        var toRules = findFareLegRule(r.toLegGroup());
-        if (fromRules.isEmpty() || toRules.isEmpty()) {
-          return false;
-        } else {
-          return tail
-            .stream()
-            .allMatch(to ->
-              findTransferMatches(head, to, r, fromRules, toRules).anyMatch(t ->
-                t.transferRule().isFree()
-              )
-            );
-        }
-      });
+    Set<LegOffer> freeTransferOffers = transfers
+      .stream()
+      .filter(TransferMatch::isFree)
+      .flatMap(t ->
+        t
+          .fromLegRule()
+          .fareProducts()
+          .stream()
+          .map(product ->
+            LegOffer.of(
+              FareOffer.of(head.startTime(), product, dependencies.get(product)),
+              head,
+              t.transferRule().timeLimit().orElse(null)
+            )
+          )
+      )
+      .collect(Collectors.toUnmodifiableSet());
+
+    return SetUtils.combine(dependentOffers, freeTransferOffers);
   }
 
   private Set<Set<TransferMatch>> findPossibleTransfers(
@@ -165,6 +179,7 @@ class FareLookupService implements Serializable {
   ) {
     return fromRules
       .stream()
+      .filter(match -> TimeLimitEvaluator.withinTimeLimit(r, from, to))
       .flatMap(fromRule -> toRules.stream().map(toRule -> new TransferMatch(r, fromRule, toRule)))
       .filter(
         match -> legMatchesRule(from, match.fromLegRule()) && legMatchesRule(to, match.toLegRule())
