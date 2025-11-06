@@ -90,7 +90,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return relaxCostAtDestination;
   }
 
-  ///  The Request for configuring direct transit search.
+  ///  The Request for configuring relaxed limited transfer search
   public RelaxedLimitedTransferRequest relaxedLimitedTransferRequest() {
     return relaxedLimitedTransferRequest;
   }

@@ -29,26 +29,26 @@ public class RelaxedLimitedTransferRequest {
     return new Builder(new RelaxedLimitedTransferRequest());
   }
 
-  /// Whether to enable Direct transit search
+  /// Whether to enable relaxed limited transfer search
   public boolean enabled() {
     return enabled;
   }
 
-  /// This is used to limit the results from the direct transit search. Paths are compared with the
-  /// cheapest path in the search window and are included in the result if they fall within the
-  /// limit given by the costRelaxFunction.
+  /// This is used to limit the results from the relaxed limited transfer search. Paths are compared
+  /// with the cheapest path in the search window and are included in the result if they fall within
+  /// the limit given by the costRelaxFunction.
   public RelaxFunction costRelaxFunction() {
     return costRelaxFunction;
   }
 
-  /// An extra cost that is used to increase the cost of the access/egress legs for direct transit
-  /// search.
+  /// An extra cost that is used to increase the cost of the access/egress legs for the relaxed
+  /// limited transfer search
   public double extraAccessEgressCostFactor() {
     return extraAccessEgressCostFactor;
   }
 
-  /// If access egress is disabled the direct transit search will only include results that require
-  /// no access or egress. I.e. a stop-to-stop search.
+  /// If access egress is disabled the relaxed limited transfer search will only include results
+  /// that require no access or egress. I.e. a stop-to-stop search.
   public boolean disableAccessEgress() {
     return disableAccessEgress;
   }

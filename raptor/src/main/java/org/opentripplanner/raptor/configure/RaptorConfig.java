@@ -96,7 +96,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     );
   }
 
-  public RelaxedLimitedTransferSearch<T> createDirectSearchService(
+  public RelaxedLimitedTransferSearch<T> createRelaxedLimitedTransferSearch(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {

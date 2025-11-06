@@ -48,7 +48,7 @@ public class M02_TwoTripsTest implements RaptorTestConstants {
 
   @Test
   void testRelaxedLimitedTransferSearch() {
-    var result = config.createDirectSearchService(data, requestBuilder.build()).route();
+    var result = config.createRelaxedLimitedTransferSearch(data, requestBuilder.build()).route();
     assertEquals(
       "Walk 30s ~ A ~ BUS R1 0:02 0:04 ~ B ~ Walk 20s [0:01:30 0:04:20 2m50s Tₓ0 C₁820]\n" +
       "Walk 30s ~ A ~ BUS R1 0:03 0:05 ~ B ~ Walk 20s [0:02:30 0:05:20 2m50s Tₓ0 C₁820]",
