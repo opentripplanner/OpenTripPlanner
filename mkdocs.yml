@@ -107,6 +107,7 @@ nav:
 - Sandbox:
     - About: 'SandboxExtension.md'
     - Actuator API: 'sandbox/ActuatorAPI.md'
+    - Carpooling: 'sandbox/Carpooling.md'
     - Debug Raster Tiles: 'sandbox/DebugRasterTiles.md'
     - Direct Transfer Analyzer: 'sandbox/transferanalyzer.md'
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
