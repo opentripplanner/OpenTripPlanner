@@ -4,6 +4,7 @@ import java.util.List;
 import org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
+import org.opentripplanner.ext.siri.updater.mqtt.MqttSiriETUpdaterParameters;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.alert.siri.SiriSXUpdaterParameters;
@@ -49,4 +50,6 @@ public interface UpdatersParameters {
   List<SiriAzureSXUpdaterParameters> getSiriAzureSXUpdaterParameters();
 
   List<SiriETCarpoolingUpdaterParameters> getSiriETCarpoolingUpdaterParameters();
+  
+  List<MqttSiriETUpdaterParameters> getMqttSiriETUpdaterParameters();
 }

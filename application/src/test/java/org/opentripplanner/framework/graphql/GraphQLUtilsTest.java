@@ -52,7 +52,7 @@ class GraphQLUtilsTest {
       entry("en", "translationEn"),
       entry("fr", frenchTranslation)
     );
-    var translatedString = TranslatedString.getI18NString(translations, true, false);
+    var translatedString = TranslatedString.getDeduplicatedI18NString(translations, false);
 
     var translation = GraphQLUtils.getTranslation(translatedString, env);
 
