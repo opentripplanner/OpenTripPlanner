@@ -76,6 +76,11 @@
                                 <Extension-Name>com.sun.media.imageio</Extension-Name>
                             </manifestEntries>
                         </transformer>
+                        <!-- Combine the various ImageN/JAI configuration files into a single one.
+                         Required by GeoTools for reading TIFF image during elevation data processing   -->
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                            <resource>META-INF/registryFile.jai</resource>
+                        </transformer>
                     </transformers>
                 </configuration>
                 <executions>
