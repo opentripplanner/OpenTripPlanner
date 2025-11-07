@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
+import org.opentripplanner.ext.carpooling.model.CarpoolStopType;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -161,7 +162,7 @@ public class TestCarpoolTripBuilder {
   public static CarpoolStop createStopAt(int sequence, int passengerDelta, WgsCoordinate location) {
     return new CarpoolStop(
       createAreaStop(location),
-      CarpoolStop.CarpoolStopType.PICKUP_AND_DROP_OFF,
+      CarpoolStopType.PICKUP_AND_DROP_OFF,
       passengerDelta,
       sequence,
       null,
@@ -188,7 +189,7 @@ public class TestCarpoolTripBuilder {
   ) {
     return new CarpoolStop(
       createAreaStop(location),
-      CarpoolStop.CarpoolStopType.PICKUP_ONLY,
+      CarpoolStopType.PICKUP_ONLY,
       0,
       0,
       null,
@@ -216,7 +217,7 @@ public class TestCarpoolTripBuilder {
   ) {
     return new CarpoolStop(
       createAreaStop(location),
-      CarpoolStop.CarpoolStopType.DROP_OFF_ONLY,
+      CarpoolStopType.DROP_OFF_ONLY,
       0,
       sequenceNumber,
       expectedArrivalTime,

@@ -12,6 +12,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
+import org.opentripplanner.ext.carpooling.model.CarpoolStopType;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -28,6 +29,9 @@ public class CarpoolSiriMapper {
   private static final String FEED_ID = "ENT";
   private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
   private static final AtomicInteger COUNTER = new AtomicInteger(0);
+
+  private static final int DEFAULT_AVAILABLE_SEATS = 2;
+  private static final Duration DEFAULT_DEVIATION_BUDGET = Duration.ofMinutes(15);
 
   public CarpoolTrip mapSiriToCarpoolTrip(EstimatedVehicleJourney journey) {
     var calls = journey.getEstimatedCalls().getEstimatedCalls();
@@ -69,9 +73,9 @@ public class CarpoolSiriMapper {
       .withEndTime(endTime)
       .withProvider(journey.getOperatorRef().getValue())
       // TODO: Find a better way to exchange deviation budget with providers.
-      .withDeviationBudget(Duration.ofMinutes(15))
+      .withDeviationBudget(DEFAULT_DEVIATION_BUDGET)
       // TODO: Make available seats dynamic based on EstimatedVehicleJourney data
-      .withAvailableSeats(2)
+      .withAvailableSeats(DEFAULT_AVAILABLE_SEATS)
       .withStops(stops)
       .build();
   }
@@ -106,18 +110,18 @@ public class CarpoolSiriMapper {
     ZonedDateTime aimedDepartureTime = call.getAimedDepartureTime();
 
     // Special handling for first and last stops
-    CarpoolStop.CarpoolStopType stopType;
+    CarpoolStopType stopType;
     int passengerDelta;
 
     if (isFirst) {
       // Origin: PICKUP_ONLY, no passengers initially, only departure times
-      stopType = CarpoolStop.CarpoolStopType.PICKUP_ONLY;
+      stopType = CarpoolStopType.PICKUP_ONLY;
       passengerDelta = 0;
       expectedArrivalTime = null;
       aimedArrivalTime = null;
     } else if (isLast) {
       // Destination: DROP_OFF_ONLY, no passengers remain, only arrival times
-      stopType = CarpoolStop.CarpoolStopType.DROP_OFF_ONLY;
+      stopType = CarpoolStopType.DROP_OFF_ONLY;
       passengerDelta = 0;
       expectedDepartureTime = null;
       aimedDepartureTime = null;
@@ -142,35 +146,35 @@ public class CarpoolSiriMapper {
   /**
    * Determine the carpool stop type from the EstimatedCall data.
    */
-  private CarpoolStop.CarpoolStopType determineCarpoolStopType(EstimatedCall call) {
+  private CarpoolStopType determineCarpoolStopType(EstimatedCall call) {
     boolean hasArrival =
       call.getExpectedArrivalTime() != null || call.getAimedArrivalTime() != null;
     boolean hasDeparture =
       call.getExpectedDepartureTime() != null || call.getAimedDepartureTime() != null;
 
     if (hasArrival && hasDeparture) {
-      return CarpoolStop.CarpoolStopType.PICKUP_AND_DROP_OFF;
+      return CarpoolStopType.PICKUP_AND_DROP_OFF;
     } else if (hasDeparture) {
-      return CarpoolStop.CarpoolStopType.PICKUP_ONLY;
+      return CarpoolStopType.PICKUP_ONLY;
     } else if (hasArrival) {
-      return CarpoolStop.CarpoolStopType.DROP_OFF_ONLY;
+      return CarpoolStopType.DROP_OFF_ONLY;
     } else {
-      return CarpoolStop.CarpoolStopType.PICKUP_AND_DROP_OFF;
+      return CarpoolStopType.PICKUP_AND_DROP_OFF;
     }
   }
 
   /**
    * Calculate the passenger delta (change in passenger count) from the EstimatedCall.
    */
-  private int calculatePassengerDelta(EstimatedCall call, CarpoolStop.CarpoolStopType stopType) {
+  private int calculatePassengerDelta(EstimatedCall call, CarpoolStopType stopType) {
     // This is a placeholder implementation - adapt based on SIRI ET data structure
     // SIRI ET may have passenger count changes, boarding/alighting numbers, etc.
 
     // For now, return a default value of 1 passenger pickup/dropoff
-    if (stopType == CarpoolStop.CarpoolStopType.DROP_OFF_ONLY) {
+    if (stopType == CarpoolStopType.DROP_OFF_ONLY) {
       // Assume 1 passenger drop-off
       return -1;
-    } else if (stopType == CarpoolStop.CarpoolStopType.PICKUP_ONLY) {
+    } else if (stopType == CarpoolStopType.PICKUP_ONLY) {
       // Assume 1 passenger pickup
       return 1;
     } else {

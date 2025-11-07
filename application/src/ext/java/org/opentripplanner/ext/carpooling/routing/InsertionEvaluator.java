@@ -32,6 +32,8 @@ public class InsertionEvaluator {
 
   private static final Logger LOG = LoggerFactory.getLogger(InsertionEvaluator.class);
 
+  private static final Duration INITIAL_ADDITIONAL_DURATION = Duration.ofDays(1);
+
   private final RoutingFunction routingFunction;
   private final PassengerDelayConstraints delayConstraints;
 
@@ -109,7 +111,7 @@ public class InsertionEvaluator {
     Duration[] cumulativeDurations = calculateCumulativeDurations(baselineSegments);
 
     InsertionCandidate bestCandidate = null;
-    Duration minAdditionalDuration = Duration.ofDays(1);
+    Duration minAdditionalDuration = INITIAL_ADDITIONAL_DURATION;
     Duration baselineDuration = cumulativeDurations[cumulativeDurations.length - 1];
 
     for (InsertionPosition position : viablePositions) {
@@ -331,13 +333,5 @@ public class InsertionEvaluator {
       modifiedIndex
     );
     return -1;
-  }
-
-  /**
-   * Functional interface for street routing.
-   */
-  @FunctionalInterface
-  public interface RoutingFunction {
-    GraphPath<State, Edge, Vertex> route(GenericLocation from, GenericLocation to);
   }
 }

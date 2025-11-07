@@ -1,22 +1,36 @@
 package org.opentripplanner.ext.carpooling.routing;
 
-/**
- * Represents a pickup and dropoff position pair that passed heuristic validation.
- * <p>
- * This is an intermediate value used between finding viable positions (via heuristics)
- * and evaluating them (via A* routing). Positions are 1-indexed to match the insertion
- * point semantics in the route modification algorithm.
- *
- * @param pickupPos Position to insert passenger pickup (1-indexed)
- * @param dropoffPos Position to insert passenger dropoff (1-indexed, always > pickupPos)
- */
-public record InsertionPosition(int pickupPos, int dropoffPos) {
-  public InsertionPosition {
+public class InsertionPosition {
+
+  private final int pickupPos;
+  private final int dropOffPos;
+
+  /**
+   * Represents a pickup and dropoff position pair that passed heuristic validation.
+   * <p>
+   * This is an intermediate value used between finding viable positions (via heuristics)
+   * and evaluating them (via A* routing). Positions are 1-indexed to match the insertion
+   * point semantics in the route modification algorithm.
+   *
+   * @param pickupPos  Position to insert passenger pickup (1-indexed)
+   * @param dropoffPos Position to insert passenger dropoff (1-indexed, always > pickupPos)
+   */
+  public InsertionPosition(int pickupPos, int dropoffPos) {
     if (dropoffPos <= pickupPos) {
       throw new IllegalArgumentException(
         "dropoffPos (%d) must be greater than pickupPos (%d)".formatted(dropoffPos, pickupPos)
       );
     }
+    this.pickupPos = pickupPos;
+    this.dropOffPos = dropoffPos;
+  }
+
+  public int pickupPos() {
+    return pickupPos;
+  }
+
+  public int dropoffPos() {
+    return dropOffPos;
   }
 
   /**

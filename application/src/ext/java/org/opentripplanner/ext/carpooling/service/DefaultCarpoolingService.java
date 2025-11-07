@@ -72,6 +72,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultCarpoolingService.class);
   private static final int DEFAULT_MAX_CARPOOL_RESULTS = 3;
+  private static final Duration DEFAULT_SEARCH_WINDOW = Duration.ofMinutes(30);
 
   private final CarpoolingRepository repository;
   private final Graph graph;
@@ -121,7 +122,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     WgsCoordinate passengerDropoff = new WgsCoordinate(request.to().getCoordinate());
     var passengerDepartureTime = request.dateTime();
     var searchWindow = request.searchWindow() == null
-      ? Duration.ofMinutes(30)
+      ? DEFAULT_SEARCH_WINDOW
       : request.searchWindow();
 
     LOG.debug(
@@ -213,18 +214,14 @@ public class DefaultCarpoolingService implements CarpoolingService {
   }
 
   private void validateRequest(RouteRequest request) throws RoutingValidationException {
-    if (
-      Objects.requireNonNull(request.from()).lat == null ||
-      Objects.requireNonNull(request.from()).lng == null
-    ) {
+    Objects.requireNonNull(request.from());
+    Objects.requireNonNull(request.to());
+    if (request.from().lat == null || request.from() == null) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE))
       );
     }
-    if (
-      Objects.requireNonNull(request.to()).lat == null ||
-      Objects.requireNonNull(request.to()).lng == null
-    ) {
+    if (request.to().lat == null || request.to().lng == null) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE))
       );

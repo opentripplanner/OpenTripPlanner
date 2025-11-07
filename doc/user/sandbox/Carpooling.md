@@ -65,70 +65,37 @@ The system supports multi-stop trips where drivers have already accepted multipl
 
 ## Features
 
-### Trip Matching Algorithm
+### Trip Matching
 
-The carpooling service uses a multi-phase algorithm to match passengers with compatible carpool trips:
+The carpooling service matches passengers with compatible carpool trips based on several criteria:
 
-1. **Filter Phase** - Fast pre-screening to eliminate incompatible trips:
-   - **Capacity Filter**: Checks if any seats are available
-   - **Time-Based Filter**: Ensures departure time compatibility
-   - **Distance-Based Filter**: Validates pickup/dropoff are within 50km of driver's route
-   - **Directional Compatibility Filter**: Verifies passenger direction aligns with trip route
+- **Availability**: Checks if seats are available in the vehicle
+- **Time Compatibility**: Ensures the trip timing works for the passenger
+- **Route Alignment**: Validates that pickup and dropoff locations are reasonably close to the driver's route
+- **Direction**: Verifies the passenger's travel direction aligns with the trip route
 
-2. **Routing Phase** - Optimal insertion point calculation:
-   - Uses beeline estimates for early rejection
-   - Routes baseline segments once and caches results
-   - Evaluates all viable insertion positions
-   - Selects position with minimum additional travel time
+The system automatically calculates the optimal pickup and dropoff points along the driver's route that minimize additional travel time while respecting all constraints.
 
-3. **Constraint Validation**:
-   - **Capacity constraints**: Ensures vehicle capacity is not exceeded
-   - **Directional constraints**: Prevents backtracking (90° tolerance)
-   - **Passenger delay constraints**: Protects existing passengers (max 5 minutes additional delay)
-   - **Deviation budget**: Respects driver's maximum acceptable detour time
+### Constraints and Protections
 
-### Multi-Stop Support
+To ensure a good experience for all users, the system enforces several constraints:
 
-The system handles trips with multiple existing passengers:
-- Each stop tracks passenger count changes (pickups and dropoffs)
-- Capacity validation ensures vehicle is never over capacity
-- Route optimization considers all existing stops when inserting new passengers
-- Passenger delay constraints protect all existing passengers from excessive delays
+- **Vehicle Capacity**: Never exceeds the maximum number of seats
+- **Route Logic**: Prevents backtracking or illogical detours
+- **Existing Passenger Protection**: Limits additional delay to existing passengers (maximum 5 minutes)
+- **Driver Deviation Budget**: Respects the driver's maximum acceptable detour time (currently 15 minutes)
 
-### Integration with GraphQL API
+### Multi-Stop Trips
 
-Carpooling results are integrated into the standard OTP GraphQL API. Carpool legs appear as a distinct leg mode (`CARPOOL`) in multi-modal itineraries, similar to how transit, walking, and biking legs are represented.
+The system supports trips where drivers have already accepted multiple passengers. When matching a new passenger to such a trip, the system:
+- Considers all existing pickup and dropoff points
+- Ensures the vehicle capacity is never exceeded at any point in the trip
+- Protects all existing passengers from excessive delays
+- Finds the optimal insertion point for the new passenger
 
-## Architecture
+### API Integration
 
-### Package Structure
-
-```
-org.opentripplanner.ext.carpooling/
-├── model/                    # Domain models
-│   ├── CarpoolTrip          # Represents a carpool trip offer
-│   ├── CarpoolStop          # Intermediate stops with passenger delta
-│   └── CarpoolLeg           # Carpool segment in an itinerary
-├── routing/                  # Routing and insertion algorithms
-│   ├── InsertionEvaluator   # Finds optimal passenger insertion
-│   ├── InsertionCandidate   # Represents a viable insertion
-│   └── CarpoolStreetRouter  # Street routing for carpooling
-├── filter/                   # Trip pre-filtering
-│   ├── TripFilter           # Filter interface
-│   ├── CapacityFilter       # Checks available capacity
-│   ├── TimeBasedFilter      # Time window filtering
-│   ├── DistanceBasedFilter  # Geographic distance checks
-│   └── DirectionalCompatibilityFilter # Directional alignment
-├── constraints/              # Post-routing constraints
-│   └── PassengerDelayConstraints # Protects existing passengers
-├── util/                     # Utilities
-│   ├── BeelineEstimator     # Fast travel time estimates
-│   └── DirectionalCalculator # Geographic bearing calculations
-├── updater/                  # Real-time updates
-│   ├── SiriETCarpoolingUpdater # SIRI-ET integration
-│   └── CarpoolSiriMapper    # Maps SIRI to domain model
-└── CarpoolingService         # Main service interface
-```
+Carpooling results are available through the standard OTP GraphQL API. Carpool legs appear as a distinct mode (`CARPOOL`) in multi-modal itineraries, alongside transit, walking, and biking legs.
 
 ## Current Limitations
 
