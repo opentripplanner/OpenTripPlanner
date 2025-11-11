@@ -1,0 +1,45 @@
+{
+  "data": {
+    "stations": [
+      {
+        "station_id": "station_1",
+        "num_vehicles_available": 5,
+        "num_docks_available": 15,
+        "is_installed": true,
+        "is_renting": true,
+        "is_returning": true,
+        "last_reported": "2025-11-05T12:00:00+00:00"
+      },
+      {
+        "station_id": "station_duplicate",
+        "num_vehicles_available": 10,
+        "num_docks_available": 5,
+        "is_installed": true,
+        "is_renting": true,
+        "is_returning": true,
+        "last_reported": "2025-11-05T12:00:00+00:00"
+      },
+      {
+        "station_id": "station_duplicate",
+        "num_vehicles_available": 8,
+        "num_docks_available": 7,
+        "is_installed": true,
+        "is_renting": true,
+        "is_returning": true,
+        "last_reported": "2025-11-05T12:00:01+00:00"
+      },
+      {
+        "station_id": "station_3",
+        "num_vehicles_available": 3,
+        "num_docks_available": 7,
+        "is_installed": true,
+        "is_renting": true,
+        "is_returning": true,
+        "last_reported": "2025-11-05T12:00:00+00:00"
+      }
+    ]
+  },
+  "last_updated": "2025-11-05T12:00:00+00:00",
+  "ttl": 60,
+  "version": "3.0"
+}

@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.vehiclerentalservicedirectory.api;
 
-import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
-
 /**
  * Parameters for a specific network.
  * <p>

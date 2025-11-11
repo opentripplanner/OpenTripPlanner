@@ -27,8 +27,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.routing.linking.configure.VertexLinkerRoutingModule;
+import org.opentripplanner.routing.linking.configure.LinkingServiceModule;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.configure.ViaModule;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -49,7 +50,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.ConfigModule;
 import org.opentripplanner.standalone.server.MetricsLogging;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.service.StreetLimitationParametersServiceModule;
 import org.opentripplanner.transit.configure.TransitModule;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -70,6 +71,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     EmpiricalDelayServiceModule.class,
     GeocoderModule.class,
     InteractiveLauncherModule.class,
+    LinkingServiceModule.class,
     RealtimeVehicleServiceModule.class,
     RealtimeVehicleRepositoryModule.class,
     RideHailingServicesModule.class,
@@ -83,7 +85,6 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     VehicleRentalRepositoryModule.class,
     VehicleRentalServiceModule.class,
     ViaModule.class,
-    VertexLinkerRoutingModule.class,
     WorldEnvelopeServiceModule.class,
   }
 )
@@ -91,6 +92,7 @@ public interface ConstructApplicationFactory {
   ConfigModel config();
   RaptorConfig<TripSchedule> raptorConfig();
   Graph graph();
+  LinkingContextFactory linkingContextFactory();
   VertexLinker vertexLinker();
   TimetableRepository timetableRepository();
   WorldEnvelopeRepository worldEnvelopeRepository();
@@ -123,7 +125,7 @@ public interface ConstructApplicationFactory {
   @Nullable
   StopConsolidationRepository stopConsolidationRepository();
 
-  StreetLimitationParameters streetLimitationParameters();
+  StreetRepository streetRepository();
 
   @Nullable
   SorlandsbanenNorwayService enturSorlandsbanenService();
@@ -179,7 +181,7 @@ public interface ConstructApplicationFactory {
     Builder schema(RouteRequest defaultRouteRequest);
 
     @BindsInstance
-    Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);
+    Builder streetStreetRepository(StreetRepository streetRepository);
 
     @BindsInstance
     Builder fareServiceFactory(FareServiceFactory fareService);

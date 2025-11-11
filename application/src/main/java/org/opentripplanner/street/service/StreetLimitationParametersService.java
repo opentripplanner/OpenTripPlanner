@@ -11,6 +11,11 @@ public interface StreetLimitationParametersService {
     public float getMaxCarSpeed() {
       return DEFAULT_MAX_CAR_SPEED;
     }
+    
+    @Override
+    public int maxAreaNodes() {
+      return 150;
+    }
 
     @Override
     public float getBestWalkSafety() {
@@ -29,6 +34,8 @@ public interface StreetLimitationParametersService {
    * @return Maximum car speed in meters per second.
    */
   float getMaxCarSpeed();
+
+  public int maxAreaNodes();
 
   /**
    * Get the graph wide best walk safety.

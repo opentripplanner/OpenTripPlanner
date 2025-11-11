@@ -142,7 +142,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   }
 
   @Override
-  public Iterator<RaptorTransfer> getTransfersFromStop(int stopIndex) {
+  public Iterator<? extends RaptorTransfer> getTransfersFromStop(int stopIndex) {
     return transferIndex.getForwardTransfers(stopIndex).iterator();
   }
 

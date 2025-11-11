@@ -19,13 +19,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
@@ -103,8 +102,10 @@ class OsmBoardingLocationsModuleTest {
       new NonLocalizedString("bus stop not connected to street network")
     );
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-    var osmModule = OsmModule.of(provider, graph, osmInfoRepository, vehicleParkingRepository)
+    var osmModule = OsmModuleTestFactory.of(provider)
+      .withGraph(graph)
+      .withOsmInfoGraphBuildRepository(osmInfoRepository)
+      .builder()
       .withBoardingAreaRefTags(Set.of("ref", "ref:IFOPT"))
       .withAreaVisibility(areaVisibility)
       .build();
@@ -207,15 +208,15 @@ class OsmBoardingLocationsModuleTest {
   void testLinearPlatforms() {
     var graph = new Graph();
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmModule = OsmModule.of(
+    var osmModule = OsmModuleTestFactory.of(
       new DefaultOsmProvider(
         ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file("moorgate.osm.pbf"),
         false
-      ),
-      graph,
-      osmInfoRepository,
-      new DefaultVehicleParkingRepository()
+      )
     )
+      .withGraph(graph)
+      .withOsmInfoGraphBuildRepository(osmInfoRepository)
+      .builder()
       .withBoardingAreaRefTags(Set.of("naptan:AtcoCode"))
       .build();
     osmModule.buildGraph();

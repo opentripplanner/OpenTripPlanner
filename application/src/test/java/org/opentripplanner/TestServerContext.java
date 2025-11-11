@@ -16,8 +16,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.service.DefaultViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -36,7 +38,7 @@ import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -106,11 +108,14 @@ public class TestServerContext {
       RaptorEnvironmentFactory.create(routerConfig.transitTuningConfig().searchThreadPoolSize())
     );
 
+    var vertexLinker = createVertexLinker(graph);
+
     return new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
       fareService,
       routerConfig.flexParameters(),
       graph,
+      createLinkingContextFactory(graph, vertexLinker, transitService),
       Metrics.globalRegistry,
       raptorConfig,
       createRealtimeVehicleService(transitService),
@@ -124,7 +129,7 @@ public class TestServerContext {
       routerConfig.vectorTileConfig(),
       createVehicleParkingService(),
       createVehicleRentalService(),
-      createVertexLinker(graph),
+      vertexLinker,
       createViaTransferResolver(graph, transitService),
       createWorldEnvelopeService(),
       createEmissionsItineraryDecorator(),
@@ -173,7 +178,7 @@ public class TestServerContext {
   }
 
   public static StreetLimitationParametersService createStreetLimitationParametersService() {
-    return new DefaultStreetLimitationParametersService(new StreetLimitationParameters());
+    return new DefaultStreetLimitationParametersService(new DefaultStreetRepository());
   }
 
   public static StreetLimitationParametersService createStreetLimitationParametersService(
@@ -186,11 +191,18 @@ public class TestServerContext {
     Graph graph,
     TransitService transitService
   ) {
-    return new DefaultViaCoordinateTransferFactory(
+    return new DefaultViaCoordinateTransferFactory(graph, transitService, Duration.ofMinutes(30));
+  }
+
+  public static LinkingContextFactory createLinkingContextFactory(
+    Graph graph,
+    VertexLinker vertexLinker,
+    TransitService transitService
+  ) {
+    return new LinkingContextFactory(
       graph,
-      VertexLinkerTestFactory.of(graph),
-      transitService,
-      Duration.ofMinutes(30)
+      new VertexCreationService(vertexLinker),
+      transitService::findStopOrChildIds
     );
   }
 }
