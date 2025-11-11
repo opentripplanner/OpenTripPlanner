@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import javax.annotation.Nullable;
@@ -30,6 +31,9 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
+import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -66,6 +70,10 @@ public class RoutingWorker {
   private SearchParams raptorSearchParamsUsed = null;
   private PageCursorInput pageCursorInput = null;
 
+  /// Lazy-init linkingContext, use {@link #linkingContext()} to access
+  @Nullable
+  private LinkingContext currentLinkingContext = null;
+
   public RoutingWorker(
     OtpServerRequestContext serverContext,
     RouteRequest orginalRequest,
@@ -92,25 +100,29 @@ public class RoutingWorker {
 
   public RoutingResponse route() {
     OTPRequestTimeoutException.checkForTimeout();
-
     this.debugTimingAggregator.finishedPrecalculating();
-
     var result = RoutingResult.empty();
 
-    if (OTPFeature.ParallelRouting.isOn()) {
-      // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
-      //       log-trace-parameters-propagation and graceful timeout handling here.
-      try {
-        var r1 = CompletableFuture.supplyAsync(this::routeDirectStreet);
-        var r2 = CompletableFuture.supplyAsync(this::routeDirectFlex);
-        var r3 = CompletableFuture.supplyAsync(this::routeTransit);
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      this.currentLinkingContext = createLinkingContext(temporaryVerticesContainer);
 
-        result.merge(r1.join(), r2.join(), r3.join());
-      } catch (CompletionException e) {
-        RoutingValidationException.unwrapAndRethrowCompletionException(e);
+      if (OTPFeature.ParallelRouting.isOn()) {
+        // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
+        //       log-trace-parameters-propagation and graceful timeout handling here.
+        try {
+          var r1 = CompletableFuture.supplyAsync(() -> routeDirectStreet());
+          var r2 = CompletableFuture.supplyAsync(() -> routeDirectFlex());
+          var r3 = CompletableFuture.supplyAsync(() -> routeTransit());
+
+          result.merge(r1.join(), r2.join(), r3.join());
+        } catch (CompletionException e) {
+          RoutingValidationException.unwrapAndRethrowCompletionException(e);
+        }
+      } else {
+        result.merge(routeDirectStreet(), routeDirectFlex(), routeTransit());
       }
-    } else {
-      result.merge(routeDirectStreet(), routeDirectFlex(), routeTransit());
+    } catch (RoutingValidationException e) {
+      result.merge(RoutingResult.failed(e.getRoutingErrors()));
     }
 
     // Set C2 value for Street and FLEX if transit-group-priority is used
@@ -232,11 +244,9 @@ public class RoutingWorker {
     debugTimingAggregator.startedDirectStreetRouter();
     try {
       return RoutingResult.ok(
-        DirectStreetRouter.route(serverContext, directBuilder.buildRequest()),
+        DirectStreetRouter.route(serverContext, directBuilder.buildRequest(), linkingContext()),
         emptyDirectModeHandler.removeWalkAllTheWayResults()
       );
-    } catch (RoutingValidationException e) {
-      return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedDirectStreetRouter();
     }
@@ -248,9 +258,9 @@ public class RoutingWorker {
     }
     debugTimingAggregator.startedDirectFlexRouter();
     try {
-      return RoutingResult.ok(DirectFlexRouter.route(serverContext, request, additionalSearchDays));
-    } catch (RoutingValidationException e) {
-      return RoutingResult.failed(e.getRoutingErrors());
+      return RoutingResult.ok(
+        DirectFlexRouter.route(serverContext, request, additionalSearchDays, linkingContext())
+      );
     } finally {
       debugTimingAggregator.finishedDirectFlexRouter();
     }
@@ -265,12 +275,11 @@ public class RoutingWorker {
         transitGroupPriorityService,
         transitSearchTimeZero,
         additionalSearchDays,
-        debugTimingAggregator
+        debugTimingAggregator,
+        linkingContext()
       );
       raptorSearchParamsUsed = transitResults.getSearchParams();
       return RoutingResult.ok(transitResults.getItineraries());
-    } catch (RoutingValidationException e) {
-      return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedTransitRouter();
     }
@@ -290,5 +299,14 @@ public class RoutingWorker {
       pageCursorInput,
       itineraries
     );
+  }
+
+  private LinkingContext linkingContext() {
+    return Objects.requireNonNull(currentLinkingContext);
+  }
+
+  private LinkingContext createLinkingContext(TemporaryVerticesContainer container) {
+    var linkingRequest = LinkingContextRequestMapper.map(request);
+    return serverContext.linkingContextFactory().create(container, linkingRequest);
   }
 }

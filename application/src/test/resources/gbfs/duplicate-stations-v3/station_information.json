@@ -1,0 +1,45 @@
+{
+  "data": {
+    "stations": [
+      {
+        "station_id": "station_1",
+        "name": [
+          {
+            "text": "Station One",
+            "language": "en"
+          }
+        ],
+        "lat": 59.911491,
+        "lon": 10.757933,
+        "capacity": 20
+      },
+      {
+        "station_id": "station_duplicate",
+        "name": [
+          {
+            "text": "Station Duplicate First",
+            "language": "en"
+          }
+        ],
+        "lat": 59.912491,
+        "lon": 10.758933,
+        "capacity": 15
+      },
+      {
+        "station_id": "station_3",
+        "name": [
+          {
+            "text": "Station Three",
+            "language": "en"
+          }
+        ],
+        "lat": 59.913491,
+        "lon": 10.759933,
+        "capacity": 10
+      }
+    ]
+  },
+  "last_updated": "2025-11-05T12:00:00+00:00",
+  "ttl": 86400,
+  "version": "3.0"
+}

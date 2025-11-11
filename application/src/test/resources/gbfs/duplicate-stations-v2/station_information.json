@@ -1,0 +1,30 @@
+{
+  "last_updated": 1631258451,
+  "ttl": 86400,
+  "version": "2.2",
+  "data": {
+    "stations": [
+      {
+        "station_id": "station_1",
+        "name": "Station One",
+        "lat": 59.911491,
+        "lon": 10.757933,
+        "capacity": 20
+      },
+      {
+        "station_id": "station_duplicate",
+        "name": "Station Duplicate First",
+        "lat": 59.912491,
+        "lon": 10.758933,
+        "capacity": 15
+      },
+      {
+        "station_id": "station_3",
+        "name": "Station Three",
+        "lat": 59.913491,
+        "lon": 10.759933,
+        "capacity": 10
+      }
+    ]
+  }
+}

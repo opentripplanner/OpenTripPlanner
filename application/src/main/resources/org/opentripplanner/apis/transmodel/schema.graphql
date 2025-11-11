@@ -1635,9 +1635,9 @@ enum FilterPlaceType {
   "Bicycle rent stations"
   bicycleRent
   "Bike parks"
-  bikePark
+  bikePark @deprecated(reason : "Not supported")
   "Car parks"
-  carPark
+  carPark @deprecated(reason : "Not supported")
   "Quay"
   quay
   "StopPlace"

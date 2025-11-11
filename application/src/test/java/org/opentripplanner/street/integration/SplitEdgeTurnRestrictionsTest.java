@@ -6,7 +6,6 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
@@ -21,8 +20,11 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
 
@@ -167,41 +169,38 @@ public class SplitEdgeTurnRestrictionsTest {
       .withPreferences(p -> p.withStreet(s -> s.withTurnReluctance(0.5)))
       .buildRequest();
 
-    var temporaryVertices = new TemporaryVerticesContainer(
-      graph,
-      VertexLinkerTestFactory.of(graph),
-      id -> List.of(),
-      from,
-      to,
-      StreetMode.CAR,
-      StreetMode.CAR
-    );
-    var gpf = new GraphPathFinder(null);
-    var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var vertexLinker = VertexLinkerTestFactory.of(graph);
+      var vertexCreationService = new VertexCreationService(vertexLinker);
+      var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
+      var linkingRequest = LinkingContextRequestMapper.map(request);
+      var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
+      var gpf = new GraphPathFinder(null);
+      var paths = gpf.graphPathFinderEntryPoint(request, linkingContext);
 
-    GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      id -> null,
-      ZoneIds.BERLIN,
-      graph.streetNotesService,
-      graph.ellipsoidToGeoidDifference
-    );
+      GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+        id -> null,
+        ZoneIds.BERLIN,
+        graph.streetNotesService,
+        graph.ellipsoidToGeoidDifference
+      );
 
-    var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
-    temporaryVertices.close();
+      var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
 
-    // make sure that we only get CAR legs
-    itineraries.forEach(i ->
-      i
-        .legs()
-        .forEach(l -> {
-          if (l instanceof StreetLeg stLeg) {
-            assertEquals(TraverseMode.CAR, stLeg.getMode());
-          } else {
-            fail("Expected StreetLeg (CAR): " + l);
-          }
-        })
-    );
-    Geometry geometry = itineraries.get(0).legs().get(0).legGeometry();
-    return EncodedPolyline.of(geometry).points();
+      // make sure that we only get CAR legs
+      itineraries.forEach(i ->
+        i
+          .legs()
+          .forEach(l -> {
+            if (l instanceof StreetLeg stLeg) {
+              assertEquals(TraverseMode.CAR, stLeg.getMode());
+            } else {
+              fail("Expected StreetLeg (CAR): " + l);
+            }
+          })
+      );
+      Geometry geometry = itineraries.get(0).legs().get(0).legGeometry();
+      return EncodedPolyline.of(geometry).points();
+    }
   }
 }

@@ -9,7 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -113,9 +115,13 @@ class StreetGraphFinderTest extends GraphRoutingTest {
     );
 
     transitService = new DefaultTransitService(otpModel.timetableRepository());
-    graphFinder = new StreetGraphFinder(
+    var vertexLinker = VertexLinkerTestFactory.of(otpModel.graph());
+    var linkingContextFactory = new LinkingContextFactory(
       otpModel.graph(),
-      VertexLinkerTestFactory.of(otpModel.graph()),
+      new VertexCreationService(vertexLinker)
+    );
+    graphFinder = new StreetGraphFinder(
+      linkingContextFactory,
       otpModel.timetableRepository().getSiteRepository()::getRegularStop
     );
   }

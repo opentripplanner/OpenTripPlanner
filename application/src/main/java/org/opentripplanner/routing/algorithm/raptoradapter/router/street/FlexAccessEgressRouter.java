@@ -12,9 +12,9 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.service.TransitService;
 
 public class FlexAccessEgressRouter {
@@ -24,12 +24,12 @@ public class FlexAccessEgressRouter {
   public static Collection<FlexAccessEgress> routeAccessEgress(
     RouteRequest request,
     AccessEgressRouter accessEgressRouter,
-    TemporaryVerticesContainer verticesContainer,
     OtpServerRequestContext serverContext,
     AdditionalSearchDays searchDays,
     FlexParameters config,
     Collection<ExtensionRequestContext> extensionRequestContexts,
-    AccessEgressType accessOrEgress
+    AccessEgressType accessOrEgress,
+    LinkingContext linkingContext
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
@@ -38,24 +38,24 @@ public class FlexAccessEgressRouter {
     Collection<NearbyStop> accessStops = accessOrEgress.isAccess()
       ? accessEgressRouter.findAccessEgresses(
         request,
-        verticesContainer,
         new StreetRequest(StreetMode.WALK),
         extensionRequestContexts,
         AccessEgressType.ACCESS,
         serverContext.flexParameters().maxAccessWalkDuration(),
-        0
+        0,
+        linkingContext
       )
       : List.of();
 
     Collection<NearbyStop> egressStops = accessOrEgress.isEgress()
       ? accessEgressRouter.findAccessEgresses(
         request,
-        verticesContainer,
         new StreetRequest(StreetMode.WALK),
         extensionRequestContexts,
         AccessEgressType.EGRESS,
         serverContext.flexParameters().maxEgressWalkDuration(),
-        0
+        0,
+        linkingContext
       )
       : List.of();
 
