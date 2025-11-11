@@ -152,7 +152,12 @@ public class OsmModule implements GraphBuilderModule {
     build(osmdb, vertexGenerator);
     graph.hasStreets = true;
     streetRepository.setStreetModelDetails(
-      new StreetModelDetails(getMaxCarSpeed(), params.maxAreaNodes(), safetyValueApplier.getBestBikeSafety(), safetyValueApplier.getBestWalkSafety())
+      new StreetModelDetails(
+        getMaxCarSpeed(),
+        params.maxAreaNodes(),
+        safetyValueApplier.getBestBikeSafety(),
+        safetyValueApplier.getBestWalkSafety()
+      )
     );
     vertexGenerator.createDifferentLevelsSharingBarrierIssues();
   }

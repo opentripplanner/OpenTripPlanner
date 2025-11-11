@@ -11,31 +11,34 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.model.StreetConstants;
+import org.opentripplanner.street.model.StreetModelDetails;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 
 class EuclideanRemainingWeightHeuristicTest {
 
   public static Stream<Arguments> testCases() {
-    var safeStreets = new StreetLimitationParameters();
-    safeStreets.initBestBikeSafety(0.6f);
-    safeStreets.initBestWalkSafety(0.8f);
-
-    var unsafeStreets = new StreetLimitationParameters();
-    unsafeStreets.initBestWalkSafety(2);
-    unsafeStreets.initBestBikeSafety(2);
-
-    var slowCar = new StreetLimitationParameters();
-    slowCar.initMaxCarSpeed(1);
-
+    var safeStreets = new StreetModelDetails(
+      StreetConstants.DEFAULT_MAX_CAR_SPEED,
+      StreetConstants.DEFAULT_MAX_AREA_NODES,
+      0.6f,
+      0.8f
+    );
+    var unsafeStreets = new StreetModelDetails(
+      StreetConstants.DEFAULT_MAX_CAR_SPEED,
+      StreetConstants.DEFAULT_MAX_AREA_NODES,
+      2,
+      2
+    );
+    var slowCar = new StreetModelDetails(1.0f, StreetConstants.DEFAULT_MAX_AREA_NODES, 1, 1);
     return Stream.of(
       // default walk speed = 1.33, walk reluctance = 2
       Arguments.argumentSet(
         "default walk",
-        new StreetLimitationParameters(),
+        StreetModelDetails.DEFAULT,
         StreetMode.WALK,
         RoutingPreferences.DEFAULT,
         150.38
@@ -43,7 +46,7 @@ class EuclideanRemainingWeightHeuristicTest {
       // default bike speed = 5, bike reluctance = 2
       Arguments.argumentSet(
         "default bike",
-        new StreetLimitationParameters(),
+        StreetModelDetails.DEFAULT,
         StreetMode.BIKE,
         RoutingPreferences.DEFAULT,
         40
@@ -51,21 +54,21 @@ class EuclideanRemainingWeightHeuristicTest {
       // default car speed = 40
       Arguments.argumentSet(
         "default car",
-        new StreetLimitationParameters(),
+        StreetModelDetails.DEFAULT,
         StreetMode.CAR,
         RoutingPreferences.DEFAULT,
         2.5
       ),
       Arguments.argumentSet(
         "slow walk",
-        new StreetLimitationParameters(),
+        StreetModelDetails.DEFAULT,
         StreetMode.WALK,
         RoutingPreferences.of().withWalk(w -> w.withSpeed(1)).build(),
         200
       ),
       Arguments.argumentSet(
         "slow preferred walk",
-        new StreetLimitationParameters(),
+        StreetModelDetails.DEFAULT,
         StreetMode.WALK,
         RoutingPreferences.of().withWalk(w -> w.withSpeed(1).withReluctance(0.5)).build(),
         50
@@ -134,13 +137,33 @@ class EuclideanRemainingWeightHeuristicTest {
   @ParameterizedTest
   @MethodSource("testCases")
   void estimateRemainingWeight(
-    StreetLimitationParameters streetLimitationParameters,
+    StreetModelDetails streetModelDetails,
     StreetMode streetMode,
     RoutingPreferences preferences,
     double expected
   ) {
     var subject = new EuclideanRemainingWeightHeuristic(
-      new DefaultStreetLimitationParametersService(streetLimitationParameters)
+      new StreetLimitationParametersService() {
+        @Override
+        public float maxCarSpeed() {
+          return streetModelDetails.maxCarSpeed();
+        }
+
+        @Override
+        public int maxAreaNodes() {
+          return streetModelDetails.maxAreaNodes();
+        }
+
+        @Override
+        public float getBestWalkSafety() {
+          return streetModelDetails.bestWalkSafety();
+        }
+
+        @Override
+        public float getBestBikeSafety() {
+          return streetModelDetails.bestBikeSafety();
+        }
+      }
     );
     var fromVertex = new SimpleVertex("origin", 0, 0);
     var toCoordinate = SphericalDistanceLibrary.moveMeters(new WgsCoordinate(0, 0), 100, 0);

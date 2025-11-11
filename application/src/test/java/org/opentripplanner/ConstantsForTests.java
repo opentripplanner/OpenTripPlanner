@@ -44,7 +44,6 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
-import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
@@ -147,7 +146,6 @@ public class ConstantsForTests {
       var graph = new Graph();
       var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
       var fareFactory = new DefaultFareServiceFactory();
-      var streetLimitationParameters = new StreetLimitationParameters();
       // Add street data from OSM
       {
         var osmModule = OsmModuleTestFactory.of(new DefaultOsmProvider(PORTLAND_CENTRAL_OSM, false))
@@ -155,7 +153,6 @@ public class ConstantsForTests {
           .builder()
           .withStaticParkAndRide(true)
           .withStaticBikeParkAndRide(true)
-          .withStreetLimitationParameters(streetLimitationParameters)
           .build();
         osmModule.buildGraph();
       }
@@ -189,7 +186,7 @@ public class ConstantsForTests {
 
       graph.index();
 
-      return new TestOtpModel(graph, streetLimitationParameters, timetableRepository, fareFactory);
+      return new TestOtpModel(graph, timetableRepository, fareFactory);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

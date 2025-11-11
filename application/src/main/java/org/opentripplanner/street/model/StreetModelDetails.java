@@ -1,8 +1,6 @@
 package org.opentripplanner.street.model;
 
 import java.io.Serializable;
-import java.util.Objects;
-import javax.annotation.Nullable;
 
 /**
  * Container for street model information calculated during graph build.
@@ -23,7 +21,12 @@ public class StreetModelDetails implements Serializable {
     1.0f
   );
 
-  public StreetModelDetails(Float maxCarSpeed, Integer maxAreaNodes, float bestBikeSafety, float bestWalkSafety) {
+  public StreetModelDetails(
+    Float maxCarSpeed,
+    Integer maxAreaNodes,
+    float bestBikeSafety,
+    float bestWalkSafety
+  ) {
     this.maxCarSpeed = maxCarSpeed;
     this.maxAreaNodes = maxAreaNodes;
     this.bestBikeSafety = bestBikeSafety;

@@ -96,7 +96,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
    */
   private double getMinimumCostPerDistance(RoutingPreferences preferences, StreetMode streetMode) {
     double drivingPace = streetMode.includesDriving()
-      ? 1.0 / streetLimitationParametersService.getMaxCarSpeed()
+      ? 1.0 / streetLimitationParametersService.maxCarSpeed()
       : Double.MAX_VALUE;
     double cyclingPace = streetMode.includesBiking()
       ? getCyclingCostPerDistance(preferences.bike())

@@ -24,11 +24,11 @@ public class DefaultStreetLimitationParametersService implements StreetLimitatio
 
   @Override
   public float getBestWalkSafety() {
-    return streetLimitationParameters.bestWalkSafety();
+    return streetRepository.streetModelDetails().bestWalkSafety();
   }
 
   @Override
   public float getBestBikeSafety() {
-    return streetLimitationParameters.bestBikeSafety();
+    return streetRepository.streetModelDetails().bestBikeSafety();
   }
 }
