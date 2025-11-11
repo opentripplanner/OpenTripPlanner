@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpStatus;
 
 /**
  * Represents an HTTP response containing the body content, headers and status code.
@@ -96,6 +97,20 @@ public class OtpHttpResponse {
    */
   public int statusCode() {
     return statusCode;
+  }
+
+  /**
+   * Returns true if status code is 304 (Not Modified)
+   */
+  public boolean statusNotModified() {
+    return statusCode == HttpStatus.SC_NOT_MODIFIED;
+  }
+
+  /**
+   * Returns true if status code is 200 (OK)
+   */
+  public boolean statusOk() {
+    return statusCode == HttpStatus.SC_OK;
   }
 
   /**

@@ -1,0 +1,7 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: org.opentripplanner.CodeStyle
+recipeList:
+  # Note, these recipes should be listed in the order they should be applied.
+  # However, even a single recipe can cause a need to run rewrite twice.
+  - org.openrewrite.staticanalysis.RemoveUnusedLocalVariables
+  - org.openrewrite.java.RemoveUnusedImports

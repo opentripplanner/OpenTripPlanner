@@ -113,11 +113,14 @@ public class SpeedTest {
       RaptorEnvironmentFactory.create(config.transitRoutingParams.searchThreadPoolSize())
     );
 
+    var vertexLinker = VertexLinkerTestFactory.of(graph);
+
     this.serverContext = new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
       new DefaultFareService(),
       config.flexConfig,
       graph,
+      TestServerContext.createLinkingContextFactory(graph, vertexLinker, transitService),
       timer.getRegistry(),
       raptorConfig,
       TestServerContext.createRealtimeVehicleService(transitService),
@@ -131,7 +134,7 @@ public class SpeedTest {
       VectorTileConfig.DEFAULT,
       TestServerContext.createVehicleParkingService(),
       TestServerContext.createVehicleRentalService(),
-      VertexLinkerTestFactory.of(graph),
+      vertexLinker,
       TestServerContext.createViaTransferResolver(graph, transitService),
       TestServerContext.createWorldEnvelopeService(),
       null,

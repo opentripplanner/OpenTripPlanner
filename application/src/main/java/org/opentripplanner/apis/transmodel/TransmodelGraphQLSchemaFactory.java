@@ -908,8 +908,6 @@ public class TransmodelGraphQLSchemaFactory {
             List<FeedScopedId> filterByStations = null;
             List<FeedScopedId> filterByRoutes = null;
             List<String> filterByBikeRentalStations = null;
-            List<String> filterByBikeParks = null;
-            List<String> filterByCarParks = null;
             List<String> filterByNetwork = null;
             @SuppressWarnings("rawtypes")
             Map filterByIds = environment.getArgument("filterByIds");
@@ -920,12 +918,6 @@ public class TransmodelGraphQLSchemaFactory {
               );
               filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null
                 ? (List<String>) filterByIds.get("bikeRentalStations")
-                : List.of();
-              filterByBikeParks = filterByIds.get("bikeParks") != null
-                ? (List<String>) filterByIds.get("bikeParks")
-                : List.of();
-              filterByCarParks = filterByIds.get("carParks") != null
-                ? (List<String>) filterByIds.get("carParks")
                 : List.of();
             }
 

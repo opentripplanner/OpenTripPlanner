@@ -15,7 +15,6 @@ import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,12 +25,15 @@ import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.linking.LinkingContextRequest;
+import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
 
 /**
  * This tests linking of GenericLocations to streets for each StreetMode. The test has 5 parallel
@@ -224,40 +226,32 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   ) {
     var linker = VertexLinkerTestFactory.of(graph);
     for (final StreetMode streetMode : streetModes) {
-      try (
-        var temporaryVertices = new TemporaryVerticesContainer(
-          graph,
-          linker,
-          id -> Set.of(),
-          location,
-          ANY_PLACE,
-          streetMode,
-          streetMode
-        )
-      ) {
+      try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+        var vertexCreationService = new VertexCreationService(linker);
+        var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
+        var request = LinkingContextRequest.of()
+          .withFrom(location)
+          .withTo(ANY_PLACE)
+          .withDirectMode(streetMode)
+          .build();
+        var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, request);
         assertFromLink(
           expectedFromStreetName.name(),
           streetMode,
-          temporaryVertices.getFromVertices().iterator().next()
+          linkingContext.findVertices(location).iterator().next()
         );
-      }
 
-      try (
-        var temporaryVertices = new TemporaryVerticesContainer(
-          graph,
-          linker,
-          id -> Set.of(),
-          ANY_PLACE,
-          location,
-          streetMode,
-          streetMode
-        )
-      ) {
+        var request2 = LinkingContextRequest.of()
+          .withFrom(ANY_PLACE)
+          .withTo(location)
+          .withDirectMode(streetMode)
+          .build();
+        var linkingContext2 = linkingContextFactory.create(temporaryVerticesContainer, request2);
         if (expectedToStreetName != null) {
           assertToLink(
             expectedToStreetName.name(),
             streetMode,
-            temporaryVertices.getToVertices().iterator().next()
+            linkingContext2.findVertices(location).iterator().next()
           );
         }
       }
