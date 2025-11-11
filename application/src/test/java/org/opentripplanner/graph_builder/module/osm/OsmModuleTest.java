@@ -43,7 +43,6 @@ import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
@@ -59,13 +58,10 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OsmModuleTest {
 
   private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(OsmModuleTest.class);
-  private static final Logger log = LoggerFactory.getLogger(OsmModuleTest.class);
 
   @Test
   public void testGraphBuilder() {
@@ -75,12 +71,9 @@ public class OsmModuleTest {
 
     DefaultOsmProvider provider = new DefaultOsmProvider(file, true);
 
-    OsmModule osmModule = OsmModule.of(
-      provider,
-      graph,
-      new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultVehicleParkingRepository()
-    )
+    OsmModule osmModule = OsmModuleTestFactory.of(provider)
+      .withGraph(graph)
+      .builder()
       .withAreaVisibility(true)
       .build();
 
@@ -137,9 +130,10 @@ public class OsmModuleTest {
 
     File file = RESOURCE_LOADER.file("NYC_small.osm.pbf");
     var provider = new DefaultOsmProvider(file, true);
-    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-    var osmModule = OsmModule.of(provider, gg, osmInfoRepository, vehicleParkingRepository)
+
+    var osmModule = OsmModuleTestFactory.of(provider)
+      .withGraph(gg)
+      .builder()
       .withAreaVisibility(true)
       .build();
 
@@ -332,16 +326,10 @@ public class OsmModuleTest {
   @Test
   void testBarrierAtEnd() {
     var graph = new Graph();
+    var file = RESOURCE_LOADER.file("accessno-at-end.pbf");
+    var provider = new DefaultOsmProvider(file, false);
 
-    File file = RESOURCE_LOADER.file("accessno-at-end.pbf");
-    DefaultOsmProvider provider = new DefaultOsmProvider(file, false);
-    OsmModule loader = OsmModule.of(
-      provider,
-      graph,
-      new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultVehicleParkingRepository()
-    ).build();
-    loader.buildGraph();
+    OsmModuleTestFactory.of(provider).withGraph(graph).builder().build().buildGraph();
 
     Vertex start = graph.getVertex(VertexLabel.osm(1));
     Vertex end = graph.getVertex(VertexLabel.osm(3));
@@ -387,15 +375,13 @@ public class OsmModuleTest {
 
     var graph = new Graph();
     var issueStore = new DefaultDataImportIssueStore();
-    var subject = OsmModule.of(
-      osmProvider,
-      graph,
-      new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultVehicleParkingRepository()
-    )
+
+    OsmModuleTestFactory.of(osmProvider)
+      .withGraph(graph)
+      .builder()
       .withIssueStore(issueStore)
-      .build();
-    subject.buildGraph();
+      .build()
+      .buildGraph();
 
     assertEquals(3, graph.getVertices().size());
     var barrierVertices = graph.getVerticesOfType(BarrierVertex.class);
@@ -454,12 +440,9 @@ public class OsmModuleTest {
     new OsmTagMapper().populateProperties(osmProvider.getWayPropertySet());
 
     var graph = new Graph();
-    var subject = OsmModule.of(
-      osmProvider,
-      graph,
-      new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultVehicleParkingRepository()
-    ).build();
+
+    var subject = OsmModuleTestFactory.of(osmProvider).withGraph(graph).builder().build();
+
     subject.buildGraph();
 
     // the vertex for node 1 has been split, one for the area and one for the crossing of the linear
@@ -504,8 +487,6 @@ public class OsmModuleTest {
 
   @Test
   void testDifferentLevelsConnectingBarrier() {
-    Graph graph = new Graph();
-
     var n1 = new OsmNode(0, 0);
     n1.setId(1);
     var n2 = new OsmNode(0, 1);
@@ -568,14 +549,11 @@ public class OsmModuleTest {
     var osmDb = new OsmDatabase(issueStore);
     osmProvider.readOsm(osmDb);
 
-    var osmModule = OsmModule.of(
-      osmProvider,
-      graph,
-      new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultVehicleParkingRepository()
-    )
+    var osmModule = OsmModuleTestFactory.of(osmProvider)
+      .builder()
       .withIssueStore(issueStore)
       .build();
+
     osmModule.buildGraph();
 
     var issues = getBarrierLevelIssues(issueStore);
@@ -586,17 +564,24 @@ public class OsmModuleTest {
 
   private BuildResult buildParkingLots() {
     var graph = new Graph();
-    var service = new DefaultVehicleParkingRepository();
+    var parkingRepository = new DefaultVehicleParkingRepository();
+
     List<OsmProvider> providers = Stream.of("B+R.osm.pbf", "P+R.osm.pbf")
       .map(RESOURCE_LOADER::file)
       .map(f -> (OsmProvider) new DefaultOsmProvider(f, false))
       .toList();
-    var module = OsmModule.of(providers, graph, new DefaultOsmInfoGraphBuildRepository(), service)
+
+    var osmModule = OsmModuleTestFactory.of(providers)
+      .withGraph(graph)
+      .withVehicleParkingRepository(parkingRepository)
+      .builder()
       .withStaticParkAndRide(true)
       .withStaticBikeParkAndRide(true)
       .build();
-    module.buildGraph();
-    return new BuildResult(graph, service);
+
+    osmModule.buildGraph();
+
+    return new BuildResult(graph, parkingRepository);
   }
 
   private record BuildResult(Graph graph, VehicleParkingRepository repository) {}
@@ -615,14 +600,14 @@ public class OsmModuleTest {
 
     File file = RESOURCE_LOADER.file("usf_area.osm.pbf");
     var provider = new DefaultOsmProvider(file, false);
-    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var vehicleParkingRepository = new DefaultVehicleParkingRepository();
 
-    var loader = OsmModule.of(provider, graph, osmInfoRepository, vehicleParkingRepository)
+    var osmModule = OsmModuleTestFactory.of(provider)
+      .withGraph(graph)
+      .builder()
       .withAreaVisibility(!skipVisibility)
       .build();
 
-    loader.buildGraph();
+    osmModule.buildGraph();
 
     RouteRequest request = RouteRequest.defaultValue();
 

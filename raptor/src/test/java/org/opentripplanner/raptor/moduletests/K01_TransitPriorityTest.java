@@ -53,7 +53,7 @@ public class K01_TransitPriorityTest {
    * outside the range allowed by the slack).
    */
   @BeforeEach
-  private void prepareRequest() {
+  void prepareRequest() {
     data.withRoutes(
       route(TestTripPattern.of("L1", STOP_B, STOP_C).priorityGroup(GROUP_A).build()).withTimetable(
         schedule("00:02 00:12")

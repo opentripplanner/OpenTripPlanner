@@ -3,6 +3,7 @@ package org.opentripplanner.ext.fares.model;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -12,7 +13,7 @@ public class FareTransferRuleBuilder {
   private FeedScopedId fromLegGroup;
   private FeedScopedId toLegGroup;
   private int transferCount = FareTransferRule.UNLIMITED_TRANSFERS;
-  private Duration timeLimit;
+  private TimeLimit timeLimit;
   private Collection<FareProduct> fareProducts = List.of();
 
   FareTransferRuleBuilder() {}
@@ -37,8 +38,8 @@ public class FareTransferRuleBuilder {
     return this;
   }
 
-  public FareTransferRuleBuilder withTimeLimit(Duration timeLimit) {
-    this.timeLimit = timeLimit;
+  public FareTransferRuleBuilder withTimeLimit(TimeLimitType type, Duration timeLimit) {
+    this.timeLimit = new TimeLimit(type, timeLimit);
     return this;
   }
 
@@ -63,7 +64,8 @@ public class FareTransferRuleBuilder {
     return transferCount;
   }
 
-  public Duration timeLimit() {
+  @Nullable
+  public TimeLimit timeLimit() {
     return timeLimit;
   }
 

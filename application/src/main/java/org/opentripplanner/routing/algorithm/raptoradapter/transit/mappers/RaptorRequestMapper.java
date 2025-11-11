@@ -31,10 +31,16 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
+import org.opentripplanner.routing.api.request.via.VisitViaLocation;
+import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RaptorRequestMapper<T extends RaptorTripSchedule> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RaptorRequestMapper.class);
 
   private final RouteRequest request;
   private final Collection<? extends RaptorAccessEgress> accessPaths;
@@ -44,6 +50,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private final MeterRegistry meterRegistry;
   private final ViaCoordinateTransferFactory viaTransferResolver;
   private final LookupStopIndexCallback lookUpStopIndex;
+  private final LinkingContext linkingContext;
 
   private RaptorRequestMapper(
     RouteRequest request,
@@ -53,7 +60,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     long transitSearchTimeZeroEpocSecond,
     @Nullable MeterRegistry meterRegistry,
     ViaCoordinateTransferFactory viaTransferResolver,
-    LookupStopIndexCallback lookUpStopIndex
+    LookupStopIndexCallback lookUpStopIndex,
+    LinkingContext linkingContext
   ) {
     this.request = Objects.requireNonNull(request);
     this.isMultiThreadedEnbled = isMultiThreaded;
@@ -63,6 +71,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     this.meterRegistry = meterRegistry;
     this.viaTransferResolver = Objects.requireNonNull(viaTransferResolver);
     this.lookUpStopIndex = Objects.requireNonNull(lookUpStopIndex);
+    this.linkingContext = Objects.requireNonNull(linkingContext);
   }
 
   public static <T extends RaptorTripSchedule> RaptorRequest<T> mapRequest(
@@ -73,7 +82,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     Collection<? extends RaptorAccessEgress> egressPaths,
     MeterRegistry meterRegistry,
     ViaCoordinateTransferFactory viaTransferResolver,
-    LookupStopIndexCallback lookUpStopIndex
+    LookupStopIndexCallback lookUpStopIndex,
+    LinkingContext linkingContext
   ) {
     return new RaptorRequestMapper<T>(
       request,
@@ -83,7 +93,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       transitSearchTimeZero.toEpochSecond(),
       meterRegistry,
       viaTransferResolver,
-      lookUpStopIndex
+      lookUpStopIndex,
+      linkingContext
     ).doMap();
   }
 
@@ -205,19 +216,19 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private boolean hasPassThroughOnly() {
     return (
       request.isViaSearch() &&
-      request.getViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation)
+      request.listViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation)
     );
   }
 
   private boolean hasViaLocationsOnly() {
     return (
       request.isViaSearch() &&
-      request.getViaLocations().stream().noneMatch(ViaLocation::isPassThroughLocation)
+      request.listViaLocations().stream().noneMatch(ViaLocation::isPassThroughLocation)
     );
   }
 
   private boolean hasViaLocationsAndPassThroughLocations() {
-    var c = request.getViaLocations();
+    var c = request.listViaLocations();
     return (
       request.isViaSearch() &&
       c.stream().anyMatch(ViaLocation::isPassThroughLocation) &&
@@ -226,7 +237,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   }
 
   private List<RaptorViaLocation> mapViaLocations() {
-    return request.getViaLocations().stream().map(this::mapViaLocation).toList();
+    return request.listViaLocations().stream().map(this::mapViaLocation).toList();
   }
 
   private RaptorViaLocation mapViaLocation(ViaLocation input) {
@@ -246,19 +257,25 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         viaStops.add(stopIndex);
       }
       for (var coordinate : input.coordinates()) {
-        var viaTransfers = viaTransferResolver.createViaTransfers(
-          request,
-          input.label(),
-          coordinate
-        );
-        for (var it : viaTransfers) {
-          // If via-stop and via-transfers are used together then walking from a stop
-          // to the coordinate and back is not pareto optimal, using just the stop
-          // is the optimal option.
-          if (it.stop() == it.fromStopIndex() && viaStops.contains(it.stop())) {
-            continue;
+        var vertices = linkingContext.findVertices(((VisitViaLocation) input).coordinateLocation());
+        if (vertices.isEmpty()) {
+          LOG.warn(
+            "Found no vertices for the visit via location {} which indicates a problem.",
+            input
+          );
+          continue;
+        }
+        for (var vertex : vertices) {
+          var viaTransfers = viaTransferResolver.createViaTransfers(request, vertex, coordinate);
+          for (var it : viaTransfers) {
+            // If via-stop and via-transfers are used together then walking from a stop
+            // to the coordinate and back is not pareto optimal, using just the stop
+            // is the optimal option.
+            if (it.stop() == it.fromStopIndex() && viaStops.contains(it.stop())) {
+              continue;
+            }
+            builder.addViaTransfer(it.fromStopIndex(), it);
           }
-          builder.addViaTransfer(it.fromStopIndex(), it);
         }
       }
       return builder.build();

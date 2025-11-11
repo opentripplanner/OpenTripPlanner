@@ -10,8 +10,8 @@ import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.model.StreetConstants;
-import org.opentripplanner.street.model.StreetLimitationParameters;
 
 /**
  * Builder for the {@link OsmModule}
@@ -21,6 +21,7 @@ public class OsmModuleBuilder {
   private final Collection<OsmProvider> providers;
   private final Graph graph;
   private final VehicleParkingRepository parkingRepository;
+  private final StreetRepository streetRepository;
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
@@ -31,16 +32,17 @@ public class OsmModuleBuilder {
   private boolean staticBikeParkAndRide = false;
   private boolean includeOsmSubwayEntrances = false;
   private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
-  private StreetLimitationParameters streetLimitationParameters = new StreetLimitationParameters();
 
-  OsmModuleBuilder(
+  public OsmModuleBuilder(
     Collection<OsmProvider> providers,
     Graph graph,
+    StreetRepository streetRepository,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     VehicleParkingRepository parkingRepository
   ) {
     this.providers = providers;
     this.graph = graph;
+    this.streetRepository = streetRepository;
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
     this.parkingRepository = parkingRepository;
   }
@@ -90,19 +92,14 @@ public class OsmModuleBuilder {
     return this;
   }
 
-  public OsmModuleBuilder withStreetLimitationParameters(StreetLimitationParameters parameters) {
-    this.streetLimitationParameters = parameters;
-    return this;
-  }
-
   public OsmModule build() {
     return new OsmModule(
       providers,
       graph,
       osmInfoGraphBuildRepository,
       parkingRepository,
+      streetRepository,
       issueStore,
-      streetLimitationParameters,
       new OsmProcessingParameters(
         boardingAreaRefTags,
         edgeNamer,

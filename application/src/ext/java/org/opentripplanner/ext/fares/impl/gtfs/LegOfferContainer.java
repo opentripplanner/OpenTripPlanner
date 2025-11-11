@@ -16,17 +16,21 @@ import org.opentripplanner.model.plan.TransitLeg;
  */
 class LegOfferContainer {
 
-  private final SetMultimap<Leg, FareOffer> multimap = HashMultimap.create();
+  private final SetMultimap<Leg, LegOffer> multimap = HashMultimap.create();
 
   /**
    * Take all offers from {@code from} and apply them to {@code targets}.
    */
   public void transferProducts(TransitLeg from, List<TransitLeg> targets) {
-    var previousLegsProducts = multimap.get(from);
-    targets.forEach(leg -> addToLeg(leg, previousLegsProducts));
+    var previousLegsOffer = multimap.get(from);
+    previousLegsOffer.forEach(previousOffer -> {
+      if (previousOffer.withinTimeLimit(targets.getLast())) {
+        targets.forEach(leg -> addToLeg(leg, previousOffer));
+      }
+    });
   }
 
-  void addToLeg(TransitLeg leg, Collection<FareOffer> products) {
+  void addToLeg(TransitLeg leg, Collection<LegOffer> products) {
     products.forEach(p -> addToLeg(leg, p));
   }
 
@@ -35,26 +39,28 @@ class LegOfferContainer {
    * one, this means that the currently existing one is worse than the proposed new one and
    * is removed.
    */
-  void addToLeg(Leg leg, FareOffer offer) {
+  void addToLeg(Leg leg, LegOffer legOffer) {
     var legContainsItAlready = multimap
       .get(leg)
       .stream()
-      .filter(existingOffer -> existingOffer.fareProduct().equals(offer.fareProduct()))
+      .filter(existingOffer -> existingOffer.fareProduct().equals(legOffer.fareProduct()))
       .findAny();
 
     if (legContainsItAlready.isPresent()) {
       var existing = legContainsItAlready.get();
       // there is a better offer with the same product available, remove the current one
-      if (existing.startTime().isAfter(offer.startTime())) {
+      if (existing.offer().startTime().isAfter(legOffer.offer().startTime())) {
         multimap.remove(leg, existing);
-        multimap.put(leg, offer);
+        multimap.put(leg, legOffer);
       }
     } else {
-      multimap.put(leg, offer);
+      multimap.put(leg, legOffer);
     }
   }
 
   SetMultimap<Leg, FareOffer> toMultimap() {
-    return ImmutableSetMultimap.copyOf(multimap);
+    var ret = ImmutableSetMultimap.<Leg, FareOffer>builder();
+    multimap.forEach((leg, offer) -> ret.put(leg, offer.offer()));
+    return ret.build();
   }
 }

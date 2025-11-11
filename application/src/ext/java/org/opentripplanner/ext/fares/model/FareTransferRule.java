@@ -1,10 +1,10 @@
 package org.opentripplanner.ext.fares.model;
 
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -23,10 +23,10 @@ public final class FareTransferRule implements Serializable {
 
   private final int transferCount;
 
-  @Nullable
-  private final Duration timeLimit;
-
   private final Collection<FareProduct> fareProducts;
+
+  @Nullable
+  private final TimeLimit timeLimit;
 
   FareTransferRule(FareTransferRuleBuilder b) {
     this.id = Objects.requireNonNull(b.id());
@@ -73,6 +73,10 @@ public final class FareTransferRule implements Serializable {
     return fareProducts;
   }
 
+  public Optional<TimeLimit> timeLimit() {
+    return Optional.ofNullable(timeLimit);
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj == this) return true;
@@ -100,7 +104,7 @@ public final class FareTransferRule implements Serializable {
       .addObj("fromLegGroup", fromLegGroup)
       .addObj("toLegGroup", toLegGroup)
       .addNum("transferCount", transferCount)
-      .addDuration("timeLimit", timeLimit)
+      .addObj("timeLimit", timeLimit)
       .addCol("fareProducts", fareProducts)
       .toString();
   }

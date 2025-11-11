@@ -1007,6 +1007,7 @@ public class GraphQLTypes {
     DATE_TIME,
     FROM,
     TO,
+    VIA,
   }
 
   public static class GraphQLInputFiltersInput {

@@ -72,6 +72,7 @@
       "groupName": "Maven plugins",
       "matchPackageNames": [
         "io.github.git-commit-id:git-commit-id-maven-plugin",
+        "org.apache.maven.plugins:maven-checkstyle-plugin",
         "org.apache.maven.plugins:maven-gpg-plugin",
         "org.codehaus.mojo:build-helper-maven-plugin",
         "org.apache.maven.plugins:maven-source-plugin",
@@ -80,8 +81,9 @@
         "org.apache.maven.plugins:maven-shade-plugin",
         "org.apache.maven.plugins:maven-compiler-plugin",
         "org.apache.maven.plugins:maven-jar-plugin",
+        "org.openrewrite.maven:rewrite-maven-plugin",
+        "org.openrewrite.recipe:rewrite-static-analysis",
         "org.sonatype.plugins:nexus-staging-maven-plugin",
-        "com.diffplug.spotless:spotless-maven-plugin",
         "org.sonatype.central:central-publishing-maven-plugin"
       ],
       "schedule": "on the 23rd day of the month",

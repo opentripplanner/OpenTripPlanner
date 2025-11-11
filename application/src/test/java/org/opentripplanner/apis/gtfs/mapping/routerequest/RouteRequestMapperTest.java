@@ -253,13 +253,13 @@ class RouteRequestMapperTest {
     );
     assertEquals(
       "[PassThroughViaLocation{label: a label, stopLocationIds: [F:stop1]}]",
-      routeRequest.getViaLocations().toString()
+      routeRequest.listViaLocations().toString()
     );
 
     var noParamsReq = RouteRequestMapper.toRouteRequest(
       testCtx.executionContext(testCtx.basicRequest()),
       testCtx.context()
     );
-    assertEquals(List.of(), noParamsReq.getViaLocations());
+    assertEquals(List.of(), noParamsReq.listViaLocations());
   }
 }

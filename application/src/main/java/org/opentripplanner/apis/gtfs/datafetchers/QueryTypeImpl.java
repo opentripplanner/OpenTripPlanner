@@ -298,9 +298,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       List<FeedScopedId> filterByStations = null;
       List<FeedScopedId> filterByRoutes = null;
       List<String> filterByBikeRentalStations = null;
-      // TODO implement
-      List<String> filterByBikeParks = null;
-      List<String> filterByCarParks = null;
 
       GraphQLTypes.GraphQLQueryTypeNearestArgs args = new GraphQLTypes.GraphQLQueryTypeNearestArgs(
         environment.getArguments()
@@ -319,8 +316,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           ? filterByIds.getGraphQLRoutes().stream().map(FeedScopedId::parse).toList()
           : null;
         filterByBikeRentalStations = filterByIds.getGraphQLBikeRentalStations();
-        filterByBikeParks = filterByIds.getGraphQLBikeParks();
-        filterByCarParks = filterByIds.getGraphQLCarParks();
       }
 
       List<TransitMode> filterByModes = args.getGraphQLFilterByModes() != null

@@ -26,6 +26,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
+import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -167,16 +169,24 @@ class ScheduledDeviatedTripIntegrationTest {
 
     var transitStartOfTime = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     var additionalSearchDays = AdditionalSearchDays.defaults(dateTime);
-    var result = TransitRouter.route(
-      request,
-      serverContext,
-      TransitGroupPriorityService.empty(),
-      transitStartOfTime,
-      additionalSearchDays,
-      new DebugTimingAggregator()
-    );
 
-    return result.getItineraries();
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var linkingRequest = LinkingContextRequestMapper.map(request);
+      var linkingContext = serverContext
+        .linkingContextFactory()
+        .create(temporaryVerticesContainer, linkingRequest);
+      var result = TransitRouter.route(
+        request,
+        serverContext,
+        TransitGroupPriorityService.empty(),
+        transitStartOfTime,
+        additionalSearchDays,
+        new DebugTimingAggregator(),
+        linkingContext
+      );
+
+      return result.getItineraries();
+    }
   }
 
   private static FlexTrip<?, ?> getFlexTrip() {
