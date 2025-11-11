@@ -195,6 +195,64 @@ class GbfsFeedMapperTest {
     assertEquals("check_almere:fb345775", almereStad.id().toString());
   }
 
+  @Test
+  void duplicatedStationsDoNotThrowException() {
+    var params = new GbfsVehicleRentalDataSourceParameters(
+      "file:src/test/resources/gbfs/duplicate-stations-v3/gbfs.json",
+      null,
+      false,
+      HttpHeaders.empty(),
+      null,
+      false,
+      false,
+      RentalPickupType.ALL
+    );
+    var otpHttpClient = new OtpHttpClientFactory()
+      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var loader = new GbfsFeedLoader(params.url(), params.httpHeaders(), otpHttpClient);
+    var mapper = new GbfsFeedMapper(loader, params);
+
+    assertTrue(loader.update());
+
+    assertDoesNotThrow(() -> {
+      mapper.getUpdates();
+    });
+  }
+
+  @Test
+  void duplicatedStationsKeepFirstOccurrence() {
+    var params = new GbfsVehicleRentalDataSourceParameters(
+      "file:src/test/resources/gbfs/duplicate-stations-v3/gbfs.json",
+      null,
+      false,
+      HttpHeaders.empty(),
+      null,
+      false,
+      false,
+      RentalPickupType.ALL
+    );
+    var otpHttpClient = new OtpHttpClientFactory()
+      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var loader = new GbfsFeedLoader(params.url(), params.httpHeaders(), otpHttpClient);
+    var mapper = new GbfsFeedMapper(loader, params);
+
+    assertTrue(loader.update());
+
+    List<VehicleRentalPlace> stations = mapper.getUpdates();
+
+    // Should have 3 stations (station_1, station_duplicate, station_3)
+    // even though station_status has 4 entries (with duplicate station_duplicate)
+    assertEquals(3, stations.size());
+
+    // Verify the duplicate station uses the first occurrence data (10 vehicles available)
+    var duplicateStation = stations
+      .stream()
+      .filter(s -> s.id().getId().contains("station_duplicate"))
+      .findFirst()
+      .orElseThrow();
+    assertEquals(10, duplicateStation.vehiclesAvailable());
+  }
+
   private static List<GBFSVehicleType> getDuplicatedGbfsVehicleTypes() {
     GBFSVehicleType gbfsVehicleType1 = new GBFSVehicleType();
     gbfsVehicleType1.setVehicleTypeId("sameId");

@@ -1,0 +1,21 @@
+{
+  "data": {
+    "feeds": [
+      {
+        "name": "system_information",
+        "url": "file:src/test/resources/gbfs/duplicate-stations-v3/system_information.json"
+      },
+      {
+        "name": "station_information",
+        "url": "file:src/test/resources/gbfs/duplicate-stations-v3/station_information.json"
+      },
+      {
+        "name": "station_status",
+        "url": "file:src/test/resources/gbfs/duplicate-stations-v3/station_status.json"
+      }
+    ]
+  },
+  "last_updated": "2025-11-05T12:00:00+00:00",
+  "ttl": 600,
+  "version": "3.0"
+}

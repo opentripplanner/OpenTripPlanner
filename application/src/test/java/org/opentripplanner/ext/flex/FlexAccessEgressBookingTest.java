@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.flex;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 
 import java.time.Duration;

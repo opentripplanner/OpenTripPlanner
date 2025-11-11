@@ -21,7 +21,9 @@ import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
@@ -58,6 +60,13 @@ class _RouteRequestTestContext {
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
     var routeRequest = RouteRequest.defaultValue();
+    var vertexLinker = VertexLinkerTestFactory.of(graph);
+    var vertexCreationService = new VertexCreationService(vertexLinker);
+    var linkingContextFactory = new LinkingContextFactory(
+      graph,
+      vertexCreationService,
+      transitService::findStopOrChildIds
+    );
     this.context = new GraphQLRequestContext(
       new TestRoutingService(List.of()),
       transitService,
@@ -67,10 +76,10 @@ class _RouteRequestTestContext {
       new DefaultRealtimeVehicleService(transitService),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       GraphFinder.getInstance(
-        graph,
-        VertexLinkerTestFactory.of(graph),
+        graph.hasStreets,
         transitService::getRegularStop,
-        transitService::findRegularStopsByBoundingBox
+        transitService::findRegularStopsByBoundingBox,
+        linkingContextFactory
       ),
       routeRequest
     );

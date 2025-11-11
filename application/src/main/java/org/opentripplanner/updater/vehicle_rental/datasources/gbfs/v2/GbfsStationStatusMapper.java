@@ -10,6 +10,7 @@ import org.mobilitydata.gbfs.v2_3.station_status.GBFSVehicleTypesAvailable;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.ReturnPolicy;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.updater.vehicle_rental.datasources.gbfs.support.UnknownVehicleTypeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,7 @@ class GbfsStationStatusMapper {
 
   private final Map<String, GBFSStation> statusLookup;
   private final Map<String, RentalVehicleType> vehicleTypes;
+  private final UnknownVehicleTypeFilter vehicleTypeFilter;
 
   public GbfsStationStatusMapper(
     Map<String, GBFSStation> statusLookup,
@@ -31,6 +33,7 @@ class GbfsStationStatusMapper {
   ) {
     this.statusLookup = Objects.requireNonNull(statusLookup);
     this.vehicleTypes = Objects.requireNonNull(vehicleTypes);
+    this.vehicleTypeFilter = new UnknownVehicleTypeFilter(vehicleTypes);
   }
 
   VehicleRentalStation mapStationStatus(VehicleRentalStation station) {
@@ -91,6 +94,13 @@ class GbfsStationStatusMapper {
           available
             .getVehicleTypeIds()
             .stream()
+            .filter(t ->
+              vehicleTypeFilter.filterUnknownVehicleType(
+                t,
+                status.getStationId(),
+                "vehicle_docks_available"
+              )
+            )
             .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount()))
         )
         .collect(TYPE_MAP_COLLECTOR);

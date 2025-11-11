@@ -44,7 +44,7 @@ import org.opentripplanner.service.osminfo.configure.OsmInfoGraphBuildServiceMod
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 @Singleton
@@ -126,7 +126,7 @@ public interface GraphBuilderFactory {
     Builder fareServiceFactory(FareServiceFactory fareServiceFactory);
 
     @BindsInstance
-    Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);
+    Builder streetRepository(StreetRepository streetRepository);
 
     @BindsInstance
     Builder dataSources(GraphBuilderDataSources graphBuilderDataSources);

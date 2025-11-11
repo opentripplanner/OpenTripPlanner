@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.core;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,6 +26,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.routing.api.response.InputField;
@@ -37,14 +39,23 @@ class RouteRequestTest {
 
   private static final GenericLocation FROM = GenericLocation.fromCoordinate(60.0, 10.0);
   private static final GenericLocation TO = GenericLocation.fromCoordinate(59.0, 12.0);
-  private static final List<ViaLocation> VIA = List.of(
-    new VisitViaLocation(
-      "Via",
-      Duration.ofMinutes(10),
-      List.of(),
-      List.of(new WgsCoordinate(59.5, 11.0))
-    )
+  private static final VisitViaLocation FIRST_VIA = new VisitViaLocation(
+    "Via1",
+    Duration.ofMinutes(10),
+    List.of(),
+    List.of(new WgsCoordinate(59.5, 11.0))
   );
+  private static final PassThroughViaLocation SECOND_VIA = new PassThroughViaLocation(
+    "Via2",
+    List.of(new FeedScopedId("F", "1"))
+  );
+  private static final VisitViaLocation THIRD_VIA = new VisitViaLocation(
+    "Via3",
+    Duration.ofMinutes(10),
+    List.of(new FeedScopedId("F", "2")),
+    List.of()
+  );
+  private static final List<ViaLocation> VIA = List.of(FIRST_VIA, SECOND_VIA, THIRD_VIA);
   private static final Instant DATE_TIME = LocalDateTime.of(2025, Month.MAY, 17, 11, 15).toInstant(
     ZoneOffset.UTC
   );
@@ -114,7 +125,7 @@ class RouteRequestTest {
 
   @Test
   void via() {
-    assertEquals(VIA, subject.getViaLocations());
+    assertEquals(VIA, subject.listViaLocations());
   }
 
   @Test
@@ -223,7 +234,11 @@ class RouteRequestTest {
       RouteRequest{
         from:(60.0,10.0),
         to:(59.0,12.0),
-        via: [VisitViaLocation{label:Via,minimumWaitTime:10m,coordinates:[(59.5,11.0)]}],
+        via: [
+          VisitViaLocation{label:Via1,minimumWaitTime:10m,coordinates:[(59.5,11.0)]},
+          PassThroughViaLocation{label:Via2,stopLocationIds:[F:1]},
+          VisitViaLocation{label:Via3,minimumWaitTime:10m,stopLocationIds:[F:2],coordinates:[]}
+        ],
         dateTime:2025-05-17T11:15:00Z,
         arriveBy,
         timetableView:false,
@@ -292,6 +307,22 @@ class RouteRequestTest {
       List.of(new VisitViaLocation("VIA", null, List.of(new FeedScopedId("F", "1")), List.of()))
     );
     assertFalse(builder.buildDefault().allowTransferOptimization());
+  }
+
+  @Test
+  void listVisitViaLocations() {
+    var visitViaLocations = subject.listVisitViaLocations();
+    assertThat(visitViaLocations).hasSize(2);
+    assertEquals(FIRST_VIA, visitViaLocations.getFirst());
+    assertEquals(THIRD_VIA, visitViaLocations.getLast());
+  }
+
+  @Test
+  void listViaLocationsWithCoordinates() {
+    var visitViaLocationsWithCoordinates = subject.listViaLocationsWithCoordinates();
+    assertThat(visitViaLocationsWithCoordinates).hasSize(1);
+    var visitViaLocationWithCoordinate = visitViaLocationsWithCoordinates.getFirst();
+    assertEquals(FIRST_VIA.coordinateLocation(), visitViaLocationWithCoordinate);
   }
 
   private void expectOneRoutingValidationException(

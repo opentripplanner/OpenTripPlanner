@@ -32,7 +32,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -88,12 +88,13 @@ public class SerializedGraphObject implements Serializable {
   public final EmissionRepository emissionRepository;
   public final @Nullable EmpiricalDelayRepository empiricalDelayRepository;
   public final FareServiceFactory fareServiceFactory;
-  public final StreetLimitationParameters streetLimitationParameters;
+  public final StreetRepository streetRepository;
   public final VehicleParkingRepository parkingRepository;
 
   public SerializedGraphObject(
     Graph graph,
     @Nullable OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    StreetRepository streetRepository,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
@@ -103,12 +104,12 @@ public class SerializedGraphObject implements Serializable {
     EmissionRepository emissionRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     StopConsolidationRepository stopConsolidationRepository,
-    StreetLimitationParameters streetLimitationParameters,
     FareServiceFactory fareServiceFactory
   ) {
     this.graph = graph;
     this.edges = graph.getEdges();
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
+    this.streetRepository = streetRepository;
     this.timetableRepository = timetableRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.parkingRepository = parkingRepository;
@@ -120,7 +121,6 @@ public class SerializedGraphObject implements Serializable {
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();
     this.stopConsolidationRepository = stopConsolidationRepository;
-    this.streetLimitationParameters = streetLimitationParameters;
     this.fareServiceFactory = fareServiceFactory;
   }
 
