@@ -100,7 +100,6 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     double drivingPace = streetMode.includesDriving()
       ? 1.0 / streetLimitationParametersService.maxCarSpeed()
       : Double.MAX_VALUE;
-    double bestBikeSafety = streetLimitationParametersService.getBestBikeSafety();
     double cyclingPace = streetMode.includesBiking()
       ? getCyclingCostPerDistance(preferences.bike())
       : Double.MAX_VALUE;
