@@ -423,6 +423,30 @@ public class RouteRequest implements Serializable {
     return numItineraries;
   }
 
+  /**
+   * Calculates the maximum distance in meters based on the maxDirectStreetDuration and the
+   * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
+   * preferences.
+   */
+  public double getMaximumDirectDistance(float maxCarSpeed) {
+    StreetMode mode = journey.direct().mode();
+    double durationLimit = preferences.street().maxDirectDuration().valueOf(mode).toSeconds();
+
+    if (mode.includesDriving()) {
+      return durationLimit * maxCarSpeed;
+    }
+    if (mode.includesBiking()) {
+      return durationLimit * preferences.bike().speed();
+    }
+    if (mode.includesScooter()) {
+      return durationLimit * preferences.scooter().speed();
+    }
+    if (mode.includesWalking()) {
+      return durationLimit * preferences.walk().speed();
+    }
+    throw new IllegalStateException("Direct mode is not specified or there is no support for it.");
+  }
+
   boolean isDefaultRequest() {
     return defaultRequest;
   }

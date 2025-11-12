@@ -80,7 +80,8 @@ public class GraphPathFinder {
   public List<GraphPath<State, Edge, Vertex>> getPaths(
     RouteRequest request,
     Set<Vertex> from,
-    Set<Vertex> to
+    Set<Vertex> to,
+    @Nullable State parentState
   ) {
     StreetPreferences preferences = request.preferences().street();
 
@@ -104,6 +105,10 @@ public class GraphPathFinder {
     // for the AStar search
     if (traverseVisitor != null) {
       aStar.withTraverseVisitor(traverseVisitor);
+    }
+
+    if (parentState != null) {
+      aStar.withParentState(parentState);
     }
 
     LOG.debug("rreq={}", request);
@@ -133,15 +138,40 @@ public class GraphPathFinder {
     );
   }
 
+  /**
+   * Try to find N paths through the Graph starting from an existing state
+   */
+  public List<GraphPath<State, Edge, Vertex>> graphPathFinderEntryPoint(
+    RouteRequest request,
+    LinkingContext linkingContext,
+    State parentState
+  ) {
+    return graphPathFinderEntryPoint(
+      request,
+      linkingContext.findVertices(request.from()),
+      linkingContext.findVertices(request.to()),
+      parentState
+    );
+  }
+
   public List<GraphPath<State, Edge, Vertex>> graphPathFinderEntryPoint(
     RouteRequest request,
     Set<Vertex> from,
     Set<Vertex> to
   ) {
+    return graphPathFinderEntryPoint(request, from, to, null);
+  }
+
+  public List<GraphPath<State, Edge, Vertex>> graphPathFinderEntryPoint(
+    RouteRequest request,
+    Set<Vertex> from,
+    Set<Vertex> to,
+    @Nullable State parentState
+  ) {
     OTPRequestTimeoutException.checkForTimeout();
     var reqTime = request.dateTime() == null ? RouteRequest.normalizeNow() : request.dateTime();
 
-    List<GraphPath<State, Edge, Vertex>> paths = getPaths(request, from, to);
+    List<GraphPath<State, Edge, Vertex>> paths = getPaths(request, from, to, parentState);
 
     // Detect and report that most obnoxious of bugs: path reversal asymmetry.
     // Removing paths might result in an empty list, so do this check before the empty list check.
@@ -151,7 +181,9 @@ public class GraphPathFinder {
         GraphPath<State, Edge, Vertex> graphPath = gpi.next();
         // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
         if (request.arriveBy()) {
-          if (graphPath.states.getLast().getTimeAccurate().isAfter(reqTime)) {
+          if (
+            parentState == null && graphPath.states.getLast().getTimeAccurate().isAfter(reqTime)
+          ) {
             LOG.error(
               "A graph path arrives {} after the requested time {}. This implies a bug.",
               graphPath.states.getLast().getTimeAccurate(),
@@ -160,7 +192,9 @@ public class GraphPathFinder {
             gpi.remove();
           }
         } else {
-          if (graphPath.states.getFirst().getTimeAccurate().isBefore(reqTime)) {
+          if (
+            parentState == null && graphPath.states.getFirst().getTimeAccurate().isBefore(reqTime)
+          ) {
             LOG.error(
               "A graph path leaves {} before the requested time {}. This implies a bug.",
               graphPath.states.getFirst().getTimeAccurate(),

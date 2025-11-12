@@ -80,33 +80,6 @@ public class DefaultDirectStreetRouter implements DirectStreetRouter {
       linkingContext.findVertices(request.from()).iterator().next().getCoordinate(),
       linkingContext.findVertices(request.to()).iterator().next().getCoordinate()
     );
-    return distance < calculateDistanceMaxLimit(request, maxCarSpeed);
-  }
-
-  /**
-   * Calculates the maximum distance in meters based on the maxDirectStreetDuration and the
-   * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
-   * RouteRequest.
-   */
-  private static double calculateDistanceMaxLimit(RouteRequest request, float maxCarSpeed) {
-    var preferences = request.preferences();
-    double distanceLimit;
-    StreetMode mode = request.journey().direct().mode();
-
-    double durationLimit = preferences.street().maxDirectDuration().valueOf(mode).toSeconds();
-
-    if (mode.includesDriving()) {
-      distanceLimit = durationLimit * maxCarSpeed;
-    } else if (mode.includesBiking()) {
-      distanceLimit = durationLimit * preferences.bike().speed();
-    } else if (mode.includesScooter()) {
-      distanceLimit = durationLimit * preferences.scooter().speed();
-    } else if (mode.includesWalking()) {
-      distanceLimit = durationLimit * preferences.walk().speed();
-    } else {
-      throw new IllegalStateException("Could not set max limit for StreetMode");
-    }
-
-    return distanceLimit;
+    return distance < request.getMaximumDirectDistance(maxCarSpeed);
   }
 }

@@ -361,6 +361,7 @@ public class GraphPathToItineraryMapper {
       // link to the user so we remove it here
       .filter(e -> !(e.backEdge instanceof BoardingLocationToStopLink))
       .map(State::getBackEdge)
+      .filter(Objects::nonNull)
       .toList();
 
     State firstState = states.get(0);

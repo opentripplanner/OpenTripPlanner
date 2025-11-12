@@ -42,6 +42,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   // allow path reconstruction from states
   protected State backState;
 
+  @Nullable
   public Edge backEdge;
 
   /* StateData contains data which is unlikely to change as often */
@@ -81,6 +82,27 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     this.time_ms = startTime.toEpochMilli();
   }
 
+  public State(
+    Vertex vertex,
+    Instant startTime,
+    StateData stateData,
+    StreetSearchRequest request,
+    @Nullable State parentState
+  ) {
+    this.request = request;
+    this.weight = parentState == null ? 0 : parentState.getWeight();
+    this.vertex = vertex;
+    this.backState = parentState;
+    this.stateData = stateData;
+    if (request.arriveBy() && !vertex.rentalRestrictions().noDropOffNetworks().isEmpty()) {
+      this.stateData.noRentalDropOffZonesAtStartOfReverseSearch = vertex
+        .rentalRestrictions()
+        .noDropOffNetworks();
+    }
+    this.walkDistance = parentState == null ? 0 : parentState.getWalkDistance();
+    this.time_ms = startTime.toEpochMilli();
+  }
+
   /**
    * Create an initial state representing the beginning of a search for the given routing request.
    * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all
@@ -90,11 +112,30 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     Set<Vertex> vertices,
     StreetSearchRequest streetSearchRequest
   ) {
+    return getInitialStates(vertices, streetSearchRequest, null);
+  }
+
+  /**
+   * Create an initial state representing the beginning of a search for the given routing request.
+   * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all
+   * states must be created from a parent and associated with an edge.
+   */
+  public static Collection<State> getInitialStates(
+    Set<Vertex> vertices,
+    StreetSearchRequest streetSearchRequest,
+    @Nullable State parentState
+  ) {
     Collection<State> states = new ArrayList<>();
     for (Vertex vertex : vertices) {
       for (StateData stateData : StateData.getInitialStateDatas(streetSearchRequest)) {
         states.add(
-          new State(vertex, streetSearchRequest.startTime(), stateData, streetSearchRequest)
+          new State(
+            vertex,
+            streetSearchRequest.startTime(),
+            stateData,
+            streetSearchRequest,
+            parentState
+          )
         );
       }
     }
@@ -306,6 +347,12 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return stateData.backWalkingBike;
   }
 
+  /**
+   * The state that was traversed to reach this state.
+   * <p>
+   * Back edge can be null for the first state.
+   */
+  @Nullable
   public Edge getBackEdge() {
     return this.backEdge;
   }
