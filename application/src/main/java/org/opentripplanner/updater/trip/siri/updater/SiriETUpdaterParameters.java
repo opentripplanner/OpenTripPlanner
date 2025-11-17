@@ -17,7 +17,4 @@ public record SiriETUpdaterParameters(
   boolean producerMetrics
 )
   implements SiriETUpdater.Parameters, SiriETHttpTripUpdateSource.Parameters {
-  public SiriETHttpTripUpdateSource.Parameters sourceParameters() {
-    return this;
-  }
 }

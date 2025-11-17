@@ -41,11 +41,11 @@ public class SiriUpdaterModule {
   private static EstimatedTimetableSource createSource(SiriETUpdater.Parameters params) {
     return switch (params) {
       case SiriETUpdaterParameters p -> new SiriETHttpTripUpdateSource(
-        p.sourceParameters(),
+        p,
         createLoader(params)
       );
       case SiriETLiteUpdaterParameters p -> new SiriETLiteHttpTripUpdateSource(
-        p.sourceParameters(),
+        p,
         createLoader(params)
       );
       default -> throw new IllegalArgumentException("Unexpected value: " + params);

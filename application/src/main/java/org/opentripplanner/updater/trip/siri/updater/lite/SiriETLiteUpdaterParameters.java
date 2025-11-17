@@ -15,9 +15,6 @@ public record SiriETLiteUpdaterParameters(
   HttpHeaders httpRequestHeaders
 )
   implements SiriETUpdater.Parameters, SiriETLiteHttpTripUpdateSource.Parameters {
-  public SiriETLiteHttpTripUpdateSource.Parameters sourceParameters() {
-    return this;
-  }
 
   @Override
   public String url() {
