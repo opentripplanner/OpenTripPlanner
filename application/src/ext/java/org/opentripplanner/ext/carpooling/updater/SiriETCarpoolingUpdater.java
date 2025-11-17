@@ -6,6 +6,7 @@ import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.support.siri.SiriFileLoader;
 import org.opentripplanner.updater.support.siri.SiriHttpLoader;
 import org.opentripplanner.updater.support.siri.SiriLoader;
+import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableSource;
 import org.opentripplanner.updater.trip.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -27,14 +28,11 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
   private final CarpoolSiriMapper mapper;
 
   public SiriETCarpoolingUpdater(
-    SiriETCarpoolingUpdaterParameters config,
+    DefaultSiriETUpdaterParameters config,
     CarpoolingRepository repository
   ) {
     super(config);
-    this.updateSource = new SiriETHttpTripUpdateSource(
-      config.sourceParameters(),
-      siriLoader(config)
-    );
+    this.updateSource = new SiriETHttpTripUpdateSource(config, siriLoader(config));
     this.repository = repository;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
@@ -122,7 +120,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater {
       .toString();
   }
 
-  private static SiriLoader siriLoader(SiriETCarpoolingUpdaterParameters config) {
+  private static SiriLoader siriLoader(DefaultSiriETUpdaterParameters config) {
     // Load real-time updates from a file.
     if (SiriFileLoader.matchesUrl(config.url())) {
       return new SiriFileLoader(config.url());

@@ -1,7 +1,6 @@
 package org.opentripplanner.updater;
 
 import java.util.List;
-import org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.mqtt.MqttSiriETUpdaterParameters;
@@ -49,7 +48,7 @@ public interface UpdatersParameters {
 
   List<SiriAzureSXUpdaterParameters> getSiriAzureSXUpdaterParameters();
 
-  List<SiriETCarpoolingUpdaterParameters> getSiriETCarpoolingUpdaterParameters();
+  List<DefaultSiriETUpdaterParameters> getSiriETCarpoolingUpdaterParameters();
 
   List<MqttSiriETUpdaterParameters> getMqttSiriETUpdaterParameters();
 }

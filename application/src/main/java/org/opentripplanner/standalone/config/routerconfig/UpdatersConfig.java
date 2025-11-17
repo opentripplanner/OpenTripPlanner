@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.mqtt.MqttSiriETUpdaterParameters;
@@ -34,7 +33,6 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.GtfsRealtimeAlertsUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.MqttGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.PollingTripUpdaterConfig;
-import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETCarpoolingUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETGooglePubsubUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETLiteUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETMqttUpdaterConfig;
@@ -183,7 +181,7 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<SiriETCarpoolingUpdaterParameters> getSiriETCarpoolingUpdaterParameters() {
+  public List<DefaultSiriETUpdaterParameters> getSiriETCarpoolingUpdaterParameters() {
     return getParameters(Type.SIRI_ET_CARPOOLING_UPDATER);
   }
 
@@ -248,7 +246,7 @@ public class UpdatersConfig implements UpdatersParameters {
     REAL_TIME_ALERTS(GtfsRealtimeAlertsUpdaterConfig::create),
     VEHICLE_POSITIONS(VehiclePositionsUpdaterConfig::create),
     SIRI_ET_UPDATER(SiriETUpdaterConfig::create),
-    SIRI_ET_CARPOOLING_UPDATER(SiriETCarpoolingUpdaterConfig::create),
+    SIRI_ET_CARPOOLING_UPDATER(SiriETUpdaterConfig::create),
     SIRI_ET_LITE(SiriETLiteUpdaterConfig::create),
     SIRI_ET_GOOGLE_PUBSUB_UPDATER(SiriETGooglePubsubUpdaterConfig::create),
     SIRI_SX_UPDATER(SiriSXUpdaterConfig::create),
