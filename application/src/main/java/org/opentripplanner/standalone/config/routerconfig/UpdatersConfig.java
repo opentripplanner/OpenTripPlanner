@@ -54,7 +54,7 @@ import org.opentripplanner.updater.alert.siri.SiriSXUpdaterParameters;
 import org.opentripplanner.updater.alert.siri.lite.SiriSXLiteUpdaterParameters;
 import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdaterParameters;
 import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.updater.trip.siri.updater.SiriETUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.lite.SiriETLiteUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -178,7 +178,7 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<SiriETUpdaterParameters> getSiriETUpdaterParameters() {
+  public List<DefaultSiriETUpdaterParameters> getSiriETUpdaterParameters() {
     return getParameters(SIRI_ET_UPDATER);
   }
 

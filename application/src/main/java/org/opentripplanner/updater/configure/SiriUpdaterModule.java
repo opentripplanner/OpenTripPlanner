@@ -12,10 +12,10 @@ import org.opentripplanner.updater.support.siri.SiriHttpLoader;
 import org.opentripplanner.updater.support.siri.SiriLoader;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
+import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableSource;
 import org.opentripplanner.updater.trip.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.updater.trip.siri.updater.SiriETUpdater;
-import org.opentripplanner.updater.trip.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.lite.SiriETLiteHttpTripUpdateSource;
 import org.opentripplanner.updater.trip.siri.updater.lite.SiriETLiteUpdaterParameters;
 
@@ -40,7 +40,7 @@ public class SiriUpdaterModule {
 
   private static EstimatedTimetableSource createSource(SiriETUpdater.Parameters params) {
     return switch (params) {
-      case SiriETUpdaterParameters p -> new SiriETHttpTripUpdateSource(
+      case DefaultSiriETUpdaterParameters p -> new SiriETHttpTripUpdateSource(
         p,
         createLoader(params)
       );
@@ -81,7 +81,7 @@ public class SiriUpdaterModule {
     // Fallback to default loader
     else {
       return switch (params) {
-        case SiriETUpdaterParameters p -> new SiriHttpLoader(
+        case DefaultSiriETUpdaterParameters p -> new SiriHttpLoader(
           p.url(),
           p.timeout(),
           p.httpRequestHeaders(),
@@ -99,7 +99,7 @@ public class SiriUpdaterModule {
 
   private static Consumer<UpdateResult> createMetricsConsumer(SiriETUpdater.Parameters params) {
     return switch (params) {
-      case SiriETUpdaterParameters p -> TripUpdateMetrics.streaming(p);
+      case DefaultSiriETUpdaterParameters p -> TripUpdateMetrics.streaming(p);
       case SiriETLiteUpdaterParameters p -> TripUpdateMetrics.batch(p);
       default -> throw new IllegalArgumentException("Unexpected value: " + params);
     };

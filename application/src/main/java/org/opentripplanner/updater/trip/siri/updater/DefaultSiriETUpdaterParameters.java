@@ -3,7 +3,7 @@ package org.opentripplanner.updater.trip.siri.updater;
 import java.time.Duration;
 import org.opentripplanner.updater.spi.HttpHeaders;
 
-public record SiriETUpdaterParameters(
+public record DefaultSiriETUpdaterParameters(
   String configRef,
   String feedId,
   boolean blockReadinessUntilInitialized,
@@ -16,5 +16,4 @@ public record SiriETUpdaterParameters(
   HttpHeaders httpRequestHeaders,
   boolean producerMetrics
 )
-  implements SiriETUpdater.Parameters, SiriETHttpTripUpdateSource.Parameters {
-}
+  implements SiriETUpdater.Parameters, SiriETHttpTripUpdateSource.Parameters {}

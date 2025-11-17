@@ -15,7 +15,6 @@ public record SiriETLiteUpdaterParameters(
   HttpHeaders httpRequestHeaders
 )
   implements SiriETUpdater.Parameters, SiriETLiteHttpTripUpdateSource.Parameters {
-
   @Override
   public String url() {
     return uri.toString();
