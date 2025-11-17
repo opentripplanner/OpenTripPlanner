@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
+import java.util.Objects;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -22,6 +23,8 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   private final StreetTraversalPermission permission;
 
   private final Accessibility wheelchairAccessibility;
+  private Accessibility elevatorAccessibility;
+
 
   private final double levels;
   private final int travelTime;
@@ -102,8 +105,20 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     return travelTime;
   }
 
+  public Accessibility getElevatorAccessibility() {
+    return this.elevatorAccessibility;
+  }
+
+  public void setElevatorAccessibility(Accessibility elevatorAccessibility) {
+    this.elevatorAccessibility = elevatorAccessibility;
+  }
+
   @Override
   public State[] traverse(State s0) {
+    if (elevatorAccessibility == Accessibility.NOT_POSSIBLE) {
+      return State.empty();
+    }
+
     RoutingPreferences preferences = s0.getPreferences();
 
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
@@ -111,7 +126,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     if (s0.getRequest().wheelchair()) {
       if (
         wheelchairAccessibility != Accessibility.POSSIBLE &&
-        preferences.wheelchair().elevator().onlyConsiderAccessible()
+          preferences.wheelchair().elevator().onlyConsiderAccessible()
       ) {
         return State.empty();
       } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
@@ -145,6 +160,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
       : (int) (preferences.street().elevator().hopTime() * this.levels);
     s1.incrementTimeInSeconds(seconds);
     return s1.makeStateArray();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(fromv, tov, elevatorAccessibility);
   }
 
   @Override
