@@ -15,7 +15,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
@@ -39,7 +39,9 @@ public class LoadApplication {
    */
   public LoadApplication(CommandLineParameters commandLineParameters) {
     this.cli = commandLineParameters;
-    this.factory = DaggerLoadApplicationFactory.builder().commandLineParameters(cli).build();
+    this.factory = org.opentripplanner.standalone.configure.DaggerLoadApplicationFactory.builder()
+      .commandLineParameters(cli)
+      .build();
   }
 
   public void validateConfigAndDataSources() {
@@ -66,7 +68,7 @@ public class LoadApplication {
       obj.emissionRepository,
       obj.empiricalDelayRepository,
       obj.stopConsolidationRepository,
-      obj.streetLimitationParameters,
+      obj.streetRepository,
       obj.fareServiceFactory
     );
   }
@@ -83,7 +85,7 @@ public class LoadApplication {
       factory.emptyEmissionsDataModel(),
       factory.emptyEmpiricalDelayRepository(),
       factory.emptyStopConsolidationRepository(),
-      factory.emptyStreetLimitationParameters(),
+      factory.emptyStreetRepository(),
       factory.emptyFareServiceFactory()
     );
   }
@@ -109,7 +111,7 @@ public class LoadApplication {
     @Nullable EmissionRepository emissionRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
-    StreetLimitationParameters streetLimitationParameters,
+    StreetRepository streetRepository,
     FareServiceFactory fareServiceFactory
   ) {
     return new ConstructApplication(
@@ -125,7 +127,7 @@ public class LoadApplication {
       empiricalDelayRepository,
       parkingRepository,
       stopConsolidationRepository,
-      streetLimitationParameters,
+      streetRepository,
       fareServiceFactory
     );
   }

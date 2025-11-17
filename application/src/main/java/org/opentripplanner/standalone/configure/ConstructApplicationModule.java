@@ -24,6 +24,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -47,6 +48,7 @@ public class ConstructApplicationModule {
     DebugUiConfig debugUiConfig,
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
+    LinkingContextFactory linkingContextFactory,
     VertexLinker vertexLinker,
     TransitService transitService,
     WorldEnvelopeService worldEnvelopeService,
@@ -82,6 +84,7 @@ public class ConstructApplicationModule {
       fareService,
       flexParameters,
       graph,
+      linkingContextFactory,
       Metrics.globalRegistry,
       raptorConfig,
       realtimeVehicleService,

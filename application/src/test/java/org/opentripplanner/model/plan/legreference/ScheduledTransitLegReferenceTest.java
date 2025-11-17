@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
@@ -81,6 +80,7 @@ class ScheduledTransitLegReferenceTest {
     );
     // build transit data
     CalendarServiceData calendarServiceData = new CalendarServiceData();
+    timetableRepository.updateCalendarServiceData(calendarServiceData);
     for (var item : Map.of(
       SIMPLE_TRIP_ID,
       TimetableRepositoryForTest.stopPattern(stop1, stop2, stop3a),
@@ -117,11 +117,7 @@ class ScheduledTransitLegReferenceTest {
       calendarServiceData.putServiceDatesForServiceId(tripPattern.getId(), List.of(SERVICE_DATE));
     }
 
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
+    timetableRepository.updateCalendarServiceData(calendarServiceData);
 
     timetableRepository.index();
 

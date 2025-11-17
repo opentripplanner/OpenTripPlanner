@@ -26,6 +26,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -51,6 +52,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final FareService fareService;
   private final FlexParameters flexParameters;
   private final Graph graph;
+  private final LinkingContextFactory linkingContextFactory;
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
   private final RealtimeVehicleService realtimeVehicleService;
@@ -116,6 +118,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     FareService fareService,
     FlexParameters flexParameters,
     Graph graph,
+    LinkingContextFactory linkingContextFactory,
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
     RealtimeVehicleService realtimeVehicleService,
@@ -147,6 +150,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.flexParameters = flexParameters;
     this.fareService = fareService;
     this.graph = graph;
+    this.linkingContextFactory = linkingContextFactory;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
     this.realtimeVehicleService = realtimeVehicleService;
@@ -339,5 +343,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public VertexLinker vertexLinker() {
     return vertexLinker;
+  }
+
+  @Override
+  public LinkingContextFactory linkingContextFactory() {
+    return linkingContextFactory;
   }
 }

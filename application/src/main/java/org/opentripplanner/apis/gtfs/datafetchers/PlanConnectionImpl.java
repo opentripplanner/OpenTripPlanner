@@ -61,7 +61,7 @@ public class PlanConnectionImpl implements GraphQLDataFetchers.GraphQLPlanConnec
       Duration searchWindowUsed = null;
       var metadata = getSource(environment).getMetadata();
       if (metadata != null) {
-        searchWindowUsed = metadata.searchWindowUsed;
+        searchWindowUsed = metadata.raptorSearchWindowUsed();
       }
       return new PlanPageInfo(
         startConnectionCursor,

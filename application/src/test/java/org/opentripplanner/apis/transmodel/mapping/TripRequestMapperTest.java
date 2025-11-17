@@ -32,7 +32,6 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -108,11 +107,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
+    timetableRepository.updateCalendarServiceData(calendarServiceData);
     timetableRepository.index();
   }
 
@@ -327,7 +322,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
     final List<ViaLocation> viaLocations = MAPPER.createRequest(
       executionContext(arguments)
-    ).getViaLocations();
+    ).listViaLocations();
     assertEquals(
       "PassThroughViaLocation{label: PTP1, stopLocationIds: [F:ST:stop1, F:ST:stop2, F:ST:stop3]}",
       viaLocations.get(0).toString()

@@ -692,6 +692,6 @@ public class OrcaFareService extends DefaultFareService {
     } else {
       name = fareType.toString();
     }
-    return new RiderCategory(new FeedScopedId(FEED_ID, name), name, null);
+    return RiderCategory.of(new FeedScopedId(FEED_ID, name)).withName(name).build();
   }
 }

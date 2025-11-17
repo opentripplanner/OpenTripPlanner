@@ -1,11 +1,14 @@
 package org.opentripplanner.routing.api.response;
 
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class RoutingError {
 
   public final RoutingErrorCode code;
+
+  @Nullable
   public final InputField inputField;
 
   public RoutingError(RoutingErrorCode code, InputField inputField) {

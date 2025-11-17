@@ -85,7 +85,7 @@ public class LegType {
           .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(env ->
             // startTime is already adjusted for real-time - need to subtract delay to get aimed time
-            leg(env).startTime().minusSeconds(leg(env).departureDelay()).toInstant().toEpochMilli()
+            leg(env).startTime().minusSeconds(leg(env).departureDelay())
           )
           .build()
       )
@@ -94,7 +94,7 @@ public class LegType {
           .name("expectedStartTime")
           .description("The expected, real-time adjusted date and time this leg starts.")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(env -> leg(env).startTime().toInstant().toEpochMilli())
+          .dataFetcher(env -> leg(env).startTime())
           .build()
       )
       .field(
@@ -102,9 +102,7 @@ public class LegType {
           .name("aimedEndTime")
           .description("The aimed date and time this leg ends.")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(env -> // endTime is already adjusted for real-time - need to subtract delay to get aimed time
-            leg(env).endTime().minusSeconds(leg(env).arrivalDelay()).toInstant().toEpochMilli()
-          )
+          .dataFetcher(env -> leg(env).endTime().minusSeconds(leg(env).arrivalDelay())) // endTime is already adjusted for real-time - need to subtract delay to get aimed time
           .build()
       )
       .field(
@@ -112,7 +110,7 @@ public class LegType {
           .name("expectedEndTime")
           .description("The expected, real-time adjusted date and time this leg ends.")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(env -> leg(env).endTime().toInstant().toEpochMilli())
+          .dataFetcher(env -> leg(env).endTime())
           .build()
       )
       .field(

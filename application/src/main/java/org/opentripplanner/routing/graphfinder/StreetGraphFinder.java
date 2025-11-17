@@ -4,7 +4,6 @@ import static java.lang.Integer.min;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
@@ -12,11 +11,11 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.linking.LinkingContextRequest;
+import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -29,13 +28,11 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class StreetGraphFinder implements GraphFinder {
 
-  private final Graph graph;
-  private final VertexLinker linker;
+  private final LinkingContextFactory linkingContextFactory;
   private StopResolver stopResolver;
 
-  public StreetGraphFinder(Graph graph, VertexLinker linker, StopResolver stopResolver) {
-    this.graph = graph;
-    this.linker = linker;
+  public StreetGraphFinder(LinkingContextFactory linkingContextFactory, StopResolver stopResolver) {
+    this.linkingContextFactory = linkingContextFactory;
     this.stopResolver = stopResolver;
   }
 
@@ -91,34 +88,29 @@ public class StreetGraphFinder implements GraphFinder {
     TraverseVisitor<State, Edge> visitor,
     SkipEdgeStrategy<State, Edge> skipEdgeStrategy
   ) {
-    // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-    // TODO make a function that builds normal routing requests from profile requests
-    // TODO: This is incorrect, the configured defaults are not used.
-    var request = RouteRequest.of()
-      .withPreferences(pref -> pref.withWalk(it -> it.withSpeed(1)))
-      .withNumItineraries(1)
-      .buildDefault();
-
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
-    try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        graph,
-        linker,
-        id -> Set.of(),
-        GenericLocation.fromCoordinate(lat, lon),
-        GenericLocation.UNKNOWN,
-        StreetMode.WALK,
-        StreetMode.WALK
-      )
-    ) {
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var from = GenericLocation.fromCoordinate(lat, lon);
+      var linkingRequest = LinkingContextRequest.of()
+        .withFrom(from)
+        .withDirectMode(StreetMode.WALK)
+        .build();
+      var linkerContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
+      // Make a normal OTP routing request so we can traverse edges and use GenericAStar
+      // TODO make a function that builds normal routing requests from profile requests
+      // TODO: This is incorrect, the configured defaults are not used.
+      var request = RouteRequest.of()
+        .withPreferences(pref -> pref.withWalk(it -> it.withSpeed(1)))
+        .withNumItineraries(1)
+        .buildDefault();
       StreetSearchBuilder.of()
         .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
         .withSkipEdgeStrategy(skipEdgeStrategy)
         .withTraverseVisitor(visitor)
         .withDominanceFunction(new DominanceFunctions.LeastWalk())
         .withRequest(request)
-        .withVerticesContainer(temporaryVertices)
+        .withFrom(linkerContext.findVertices(from))
         .getShortestPathTree();
     }
   }

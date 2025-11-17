@@ -37,7 +37,8 @@ public class TurnRestrictionTest {
 
   private Vertex bottomLeft;
 
-  private StreetEdge maple_main1, broad1_2;
+  private StreetEdge maple_main1;
+  private StreetEdge broad1_2;
 
   @BeforeEach
   public void before() {

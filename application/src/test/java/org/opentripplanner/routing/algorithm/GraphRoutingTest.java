@@ -200,14 +200,18 @@ public abstract class GraphRoutingTest {
       List<ElevatorEdge> edges = new ArrayList<>();
       List<ElevatorVertex> onboardVertices = new ArrayList<>();
 
-      for (Vertex v : vertices) {
-        var level = String.format("L-%s", v.getDefaultName());
+      for (int i = 0; i < vertices.length; i++) {
+        Vertex v = vertices[i];
 
-        var onboard = vertexFactory.elevator(v, v.getLabelString(), level);
+        var onboard = vertexFactory.elevator(v, v.getLabelString(), i);
 
         edges.add(ElevatorBoardEdge.createElevatorBoardEdge(v, onboard));
         edges.add(
-          ElevatorAlightEdge.createElevatorAlightEdge(onboard, v, new NonLocalizedString(level))
+          ElevatorAlightEdge.createElevatorAlightEdge(
+            onboard,
+            v,
+            new NonLocalizedString(String.valueOf(i))
+          )
         );
 
         onboardVertices.add(onboard);

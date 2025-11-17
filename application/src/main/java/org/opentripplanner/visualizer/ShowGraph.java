@@ -50,7 +50,6 @@ import org.opentripplanner.street.model.vertex.TransitPathwayNodeVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -112,7 +111,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   protected double mouseModelX;
   protected double mouseModelY;
   private Point startDrag = null;
-  private int dragX, dragY;
+  private int dragX;
+  private int dragY;
   private boolean ctrlPressed = false;
   boolean drawFast = false;
   boolean drawStreetEdges = true;
@@ -383,7 +383,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   }
 
   public void highlightCoordinate(Coordinate c) {
-    double xd = 0, yd = 0;
+    double xd = 0;
+    double yd = 0;
     while (!modelBounds.contains(c)) {
       xd = modelBounds.getWidth() / 100;
       yd = modelBounds.getHeight() / 100;
@@ -603,8 +604,6 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   private void drawGraphPath(GraphPath<State, Edge, Vertex> gp) {
     // draw edges in different colors according to mode
     for (State s : gp.states) {
-      TraverseMode mode = s.getBackMode();
-
       Edge e = s.getBackEdge();
       if (e == null) continue;
 

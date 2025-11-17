@@ -13,7 +13,7 @@ public sealed interface VertexLabel {
     return new StringLabel(label);
   }
 
-  static VertexLabel osm(long nodeId, String level) {
+  static VertexLabel osm(long nodeId, double level) {
     return new OsmNodeOnLevelLabel(nodeId, level);
   }
 
@@ -77,7 +77,7 @@ public sealed interface VertexLabel {
    * A vertex label for an OSM node that also has a level, for example the upper and lower
    * vertices of an elevator edge.
    */
-  record OsmNodeOnLevelLabel(long nodeId, String level) implements VertexLabel {
+  record OsmNodeOnLevelLabel(long nodeId, double level) implements VertexLabel {
     private static final String TEMPLATE = "osm:node:%s/%s";
 
     @Override

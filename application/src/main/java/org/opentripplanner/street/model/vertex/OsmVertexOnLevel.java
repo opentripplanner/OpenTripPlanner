@@ -10,9 +10,9 @@ import org.opentripplanner.osm.model.OsmNode;
  */
 public class OsmVertexOnLevel extends OsmVertex {
 
-  private final String level;
+  private final double level;
 
-  public OsmVertexOnLevel(OsmNode node, String level) {
+  public OsmVertexOnLevel(OsmNode node, double level) {
     super(node.getCoordinate().x, node.getCoordinate().y, node.getId());
     this.level = level;
   }

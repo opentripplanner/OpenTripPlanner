@@ -747,12 +747,11 @@ public abstract class OsmEntity {
    * from being linked to transit stops that are underneath it.
    **/
   public boolean isPlatform() {
-    var isPlatform = isTag("public_transport", "platform") || isRailwayPlatform();
+    var isPlatform =
+      isTag("public_transport", "platform") ||
+      isTag("railway", "platform") ||
+      isTag("railway", "platform_edge");
     return isPlatform && !isTag("usage", "tourism");
-  }
-
-  public boolean isRailwayPlatform() {
-    return isTag("railway", "platform");
   }
 
   /**

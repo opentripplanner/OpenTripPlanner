@@ -49,7 +49,7 @@ public class K02_TransitPriorityDestinationTest {
   );
 
   @BeforeEach
-  private void prepareRequest() {
+  void prepareRequest() {
     // Each pattern depart at the same time, but arrive at different times and they may
     // belong to different groups.
     // Line U1 is not optimal, because it slower than L1 and is in the same group.

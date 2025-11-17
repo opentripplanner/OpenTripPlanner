@@ -209,8 +209,8 @@ public class TestStateBuilder {
   public TestStateBuilder elevator() {
     count++;
 
-    var onboard1 = elevator(count, "1");
-    var onboard2 = elevator(count, "2");
+    var onboard1 = elevator(count, "1", 1.0);
+    var onboard2 = elevator(count, "2", 2.0);
     var offboard1 = intersection(count);
     var offboard2 = intersection(count);
 
@@ -347,8 +347,8 @@ public class TestStateBuilder {
     return StreetModelForTest.intersectionVertex(count, count);
   }
 
-  private static ElevatorVertex elevator(int count, String suffix) {
-    return new ElevatorVertex(StreetModelForTest.intersectionVertex(count, count), suffix, suffix);
+  private static ElevatorVertex elevator(int count, String suffix, double level) {
+    return new ElevatorVertex(StreetModelForTest.intersectionVertex(count, count), suffix, level);
   }
 
   private TestStateBuilder pickUpRentalVehicle(

@@ -32,14 +32,17 @@ public enum SortOrder {
   STREET_AND_DEPARTURE_TIME;
 
   /**
-   * The itineraries are sorted by arrival time with the earliest arrival time first. When
-   * paging we need to know which end of the list of itineraries we should crop. This method is used
-   * to decide that together with the current page type (next/previous).
+   * The itineraries are sorted by arrival time with the earliest arrival time first. When paging
+   * we need to know which end of the list of itineraries we should crop. This method is used to
+   * decide that together with the current page type (next/previous).
+   * <p>
+   * Note! It is the first search which determines the sort order, the next-/previous- page will
+   * keep the same sort order, but might go from arrive-by to depart-after search.
    * <p>
    * This returns {@code true} for the default depart-after search, and {@code false} for an
    * arrive-by search.
    */
-  public boolean isSortedByAscendingArrivalTime() {
+  public boolean isSortedForDepartAfterSearch() {
     return this == STREET_AND_ARRIVAL_TIME;
   }
 }

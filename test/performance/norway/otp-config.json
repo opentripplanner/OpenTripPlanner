@@ -1,0 +1,13 @@
+{
+  "otpFeatures" : {
+    "FlexRouting" : true,
+    "FloatingBike" : true,
+    "IncludeEmptyRailStopsInTransfers" : true,
+    "MultiCriteriaGroupMaxFilter" : true,
+    "OptimizeTransfers" : true,
+    "ParallelRouting" : false,
+    "ReportApi" : true,
+    "Sorlandsbanen" : true,
+    "TransferConstraints" : true
+  }
+}
