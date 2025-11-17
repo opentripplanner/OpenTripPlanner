@@ -16,4 +16,4 @@ public record DefaultSiriETUpdaterParameters(
   HttpHeaders httpRequestHeaders,
   boolean producerMetrics
 )
-  implements SiriETUpdater.Parameters, SiriETHttpTripUpdateSource.Parameters {}
+  implements SiriETUpdaterParameters, SiriETHttpTripUpdateSource.Parameters {}

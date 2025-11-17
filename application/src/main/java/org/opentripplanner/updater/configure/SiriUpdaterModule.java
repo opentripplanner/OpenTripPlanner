@@ -16,6 +16,7 @@ import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParamet
 import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableSource;
 import org.opentripplanner.updater.trip.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.updater.trip.siri.updater.SiriETUpdater;
+import org.opentripplanner.updater.trip.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.lite.SiriETLiteHttpTripUpdateSource;
 import org.opentripplanner.updater.trip.siri.updater.lite.SiriETLiteUpdaterParameters;
 
@@ -25,7 +26,7 @@ import org.opentripplanner.updater.trip.siri.updater.lite.SiriETLiteUpdaterParam
 public class SiriUpdaterModule {
 
   public static SiriETUpdater createSiriETUpdater(
-    SiriETUpdater.Parameters params,
+    SiriETUpdaterParameters params,
     SiriRealTimeTripUpdateAdapter adapter
   ) {
     return new SiriETUpdater(params, adapter, createSource(params), createMetricsConsumer(params));
@@ -38,7 +39,7 @@ public class SiriUpdaterModule {
     return new SiriSXUpdater(params, timetableRepository, createLoader(params));
   }
 
-  private static EstimatedTimetableSource createSource(SiriETUpdater.Parameters params) {
+  private static EstimatedTimetableSource createSource(SiriETUpdaterParameters params) {
     return switch (params) {
       case DefaultSiriETUpdaterParameters p -> new SiriETHttpTripUpdateSource(
         p,
@@ -73,7 +74,7 @@ public class SiriUpdaterModule {
     };
   }
 
-  private static SiriLoader createLoader(SiriETUpdater.Parameters params) {
+  private static SiriLoader createLoader(SiriETUpdaterParameters params) {
     // Load real-time updates from a file.
     if (SiriFileLoader.matchesUrl(params.url())) {
       return new SiriFileLoader(params.url());
@@ -97,7 +98,7 @@ public class SiriUpdaterModule {
     }
   }
 
-  private static Consumer<UpdateResult> createMetricsConsumer(SiriETUpdater.Parameters params) {
+  private static Consumer<UpdateResult> createMetricsConsumer(SiriETUpdaterParameters params) {
     return switch (params) {
       case DefaultSiriETUpdaterParameters p -> TripUpdateMetrics.streaming(p);
       case SiriETLiteUpdaterParameters p -> TripUpdateMetrics.batch(p);
