@@ -161,7 +161,7 @@ public class RelaxedLimitedTransferSearch<T extends RaptorTripSchedule> {
       );
     }
 
-    if (path.endTime() < latestDepartureTime) {
+    if (path.startTime() < latestDepartureTime) {
       return Optional.of(path);
     }
     return Optional.empty();
@@ -192,7 +192,7 @@ public class RelaxedLimitedTransferSearch<T extends RaptorTripSchedule> {
       // We only need to check the end of the search-window, since we know the {@code firstPath} is
       // inside. All successive schedules will therefore also be after the
       // {@code earliestDepartureTime}.
-      if (path.endTime() > latestDepartureTime) {
+      if (path.startTime() > latestDepartureTime) {
         return results;
       }
       results.add(path);
