@@ -2,9 +2,9 @@ package org.opentripplanner.service.vehicleparking;
 
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 
 public class VehicleParkingTestUtil {

@@ -15,7 +15,7 @@ import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTr
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 class DistanceBasedFilterTest {
 

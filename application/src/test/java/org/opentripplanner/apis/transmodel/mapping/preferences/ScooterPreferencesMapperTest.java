@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.apis.transmodel._support.TestDataFetcherDecorator;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
-import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 
 class ScooterPreferencesMapperTest {
 

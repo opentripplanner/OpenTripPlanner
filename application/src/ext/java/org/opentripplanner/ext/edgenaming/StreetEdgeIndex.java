@@ -3,10 +3,10 @@ package org.opentripplanner.ext.edgenaming;
 import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.street.geometry.HashGridSpatialIndex;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**

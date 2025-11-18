@@ -11,13 +11,12 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPoint;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.model.basic.TransitMode;
 
 class Subgraph {
 
@@ -136,9 +135,7 @@ class Subgraph {
    */
   boolean hasOnlyFerryStops() {
     for (TransitStopVertex v : stopsVertexSet) {
-      Set<TransitMode> modes = v.getModes();
-      // test if stop has other transit modes than FERRY
-      if (!modes.contains(TransitMode.FERRY)) {
+      if (!v.isFerryStop()) {
         return false;
       }
     }

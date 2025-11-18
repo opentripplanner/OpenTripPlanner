@@ -1,9 +1,9 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.StationElement;
 import org.opentripplanner.transit.model.site.StopLevel;
 

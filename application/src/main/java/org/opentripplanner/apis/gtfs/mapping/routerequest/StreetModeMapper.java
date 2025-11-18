@@ -3,8 +3,8 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
+import org.opentripplanner.street.model.StreetMode;
 
 /**
  * Mapping and validation methods for StreetModes.

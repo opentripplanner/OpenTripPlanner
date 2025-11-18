@@ -2,7 +2,7 @@ package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class StreetRequest implements Serializable {

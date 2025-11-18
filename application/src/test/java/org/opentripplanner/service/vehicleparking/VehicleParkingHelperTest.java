@@ -8,14 +8,14 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking.VehicleParkingEntranceCreator;
-import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.streetadapter.VehicleParkingHelper;
 
 class VehicleParkingHelperTest {
 

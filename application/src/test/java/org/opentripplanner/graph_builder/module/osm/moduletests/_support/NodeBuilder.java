@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm.moduletests._support;
 
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 public class NodeBuilder {
 

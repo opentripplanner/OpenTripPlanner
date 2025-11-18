@@ -28,9 +28,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.calendar.openinghours.OHCalendar;
-import org.opentripplanner.model.calendar.openinghours.OHCalendarBuilder;
-import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
+import org.opentripplanner.street.model.openinghours.OHCalendar;
+import org.opentripplanner.street.model.openinghours.OHCalendarBuilder;
+import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,7 +180,7 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Creates a {@link org.opentripplanner.model.calendar.openinghours.OHCalendarBuilder.OpeningHoursBuilder}
+   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder}
    * that is always open on the days defined in the rule's {@link DateRange}.
    */
   private List<OHCalendarBuilder.OpeningHoursBuilder> createOHCalendarBuildersForOpen24DayRanges(
@@ -199,7 +199,7 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Creates a {@link org.opentripplanner.model.calendar.openinghours.OHCalendarBuilder.OpeningHoursBuilder}
+   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder}
    * that is open according to the {@link TimeSpan} in the rule on the days defined
    * in the rule's {@link DateRange} and {@link WeekDayRange}.
    *
@@ -249,7 +249,7 @@ public class OsmOpeningHoursParser {
 
   /**
    * Sets provided {@link WeekDayRange} to be open according to the {@link DateRange} on a
-   * {@link org.opentripplanner.model.calendar.openinghours.OHCalendarBuilder.OpeningHoursBuilder}.
+   * {@link OHCalendarBuilder.OpeningHoursBuilder}.
    *
    * TODO there are a lot of unhandled things here
    */
@@ -278,7 +278,7 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Creates a {@link org.opentripplanner.model.calendar.openinghours.OHCalendarBuilder.OpeningHoursBuilder}
+   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder}
    * that is open according to the {@link TimeSpan} in the rule or 24 hours a day on the days defined
    * in the rule's {@link WeekDayRange}.
    */
@@ -310,7 +310,7 @@ public class OsmOpeningHoursParser {
 
   /**
    * Sets provided weekday(s) to be open on a
-   * {@link org.opentripplanner.model.calendar.openinghours.OHCalendarBuilder.OpeningHoursBuilder}.
+   * {@link OHCalendarBuilder.OpeningHoursBuilder}.
    *
    * TODO there are a some unhandled things here
    */
@@ -333,7 +333,7 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Creates a {@link org.opentripplanner.model.calendar.openinghours.OHCalendarBuilder.OpeningHoursBuilder}
+   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder}
    * that is open according to the provided {@link TimeSpan} but doesn't set the builder to be open on any days.
    * That part should be handled by a separate method.
    */
@@ -368,7 +368,7 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Creates a {@link org.opentripplanner.model.calendar.openinghours.OHCalendarBuilder.OpeningHoursBuilder}
+   * Creates a {@link OHCalendarBuilder.OpeningHoursBuilder}
    * that is always open.
    */
   private OHCalendarBuilder.OpeningHoursBuilder createOHCalendarBuilderForOpen247(
@@ -383,7 +383,7 @@ public class OsmOpeningHoursParser {
   }
 
   /**
-   * Edits {@link org.opentripplanner.model.calendar.openinghours.OHCalendarBuilder.OpeningHoursBuilder}
+   * Edits {@link OHCalendarBuilder.OpeningHoursBuilder}
    * that have been created based on previous rules so that they are not on the same days as in the
    * newly created builder based on a new rule that can partly override previous rules.
    */
@@ -406,7 +406,7 @@ public class OsmOpeningHoursParser {
    * 4. if the place is closed in the middle of the opening period, edit the old builder to be off on the common days
    *    and create two new builders that are open on the common days, one for the beginning and one for the end part of the opening period
    *
-   * @return a list of new {@link org.opentripplanner.model.calendar.openinghours.OHCalendarBuilder.OpeningHoursBuilder} created while
+   * @return a list of new {@link OHCalendarBuilder.OpeningHoursBuilder} created while
    * splitting existing builders.
    */
   private List<OHCalendarBuilder.OpeningHoursBuilder> splitPreviousBuilders(

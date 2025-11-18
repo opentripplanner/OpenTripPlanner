@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs;
 
-import org.opentripplanner.framework.doc.DocumentedEnum;
+import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 public enum ForwardsDelayPropagationType implements DocumentedEnum<ForwardsDelayPropagationType> {
   NONE,

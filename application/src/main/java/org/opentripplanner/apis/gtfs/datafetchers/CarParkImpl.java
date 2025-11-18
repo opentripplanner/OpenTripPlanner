@@ -5,8 +5,8 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.street.model.openinghours.OHCalendar;
 
 public class CarParkImpl implements GraphQLDataFetchers.GraphQLCarPark {
 

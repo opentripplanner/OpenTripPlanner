@@ -2,7 +2,7 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 
 /**
  * Maps vehicle optimization type from API to internal model.

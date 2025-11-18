@@ -4,13 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.framework.model.Cost.ONE_HOUR_WITH_TRANSIT;
+import static org.opentripplanner.core.model.basic.Cost.ONE_HOUR_WITH_TRANSIT;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
+import org.opentripplanner.core.model.basic.Cost;
 
 class CostTest {
 

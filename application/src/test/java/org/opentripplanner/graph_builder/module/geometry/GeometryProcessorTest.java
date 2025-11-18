@@ -2,10 +2,10 @@ package org.opentripplanner.graph_builder.module.geometry;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.geometry.GeometryUtils.makeLineString;
-import static org.opentripplanner.framework.geometry.SphericalDistanceLibrary.distance;
-import static org.opentripplanner.framework.geometry.SphericalDistanceLibrary.moveMeters;
 import static org.opentripplanner.graph_builder.issue.api.DataImportIssueStore.NOOP;
+import static org.opentripplanner.street.geometry.GeometryUtils.makeLineString;
+import static org.opentripplanner.street.geometry.SphericalDistanceLibrary.distance;
+import static org.opentripplanner.street.geometry.SphericalDistanceLibrary.moveMeters;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
@@ -18,10 +18,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.LineString;
 import org.opentest4j.AssertionFailedError;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;

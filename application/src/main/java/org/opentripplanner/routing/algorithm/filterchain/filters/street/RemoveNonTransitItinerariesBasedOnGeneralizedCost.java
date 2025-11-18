@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.street;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;

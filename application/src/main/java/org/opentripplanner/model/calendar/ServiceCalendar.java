@@ -4,6 +4,7 @@ package org.opentripplanner.model.calendar;
 import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateInterval;
 
 /**
  * Note that I decided to call this class ServiceCalendar instead of Calendar, so as to avoid
@@ -29,7 +30,7 @@ public final class ServiceCalendar implements Serializable {
 
   private int sunday;
 
-  private ServiceDateInterval period;
+  private LocalDateInterval period;
 
   public FeedScopedId getServiceId() {
     return serviceId;
@@ -113,11 +114,11 @@ public final class ServiceCalendar implements Serializable {
     setWeekend(value);
   }
 
-  public ServiceDateInterval getPeriod() {
+  public LocalDateInterval getPeriod() {
     return period;
   }
 
-  public void setPeriod(ServiceDateInterval period) {
+  public void setPeriod(LocalDateInterval period) {
     this.period = period;
   }
 

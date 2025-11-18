@@ -3,7 +3,7 @@ package org.opentripplanner.ext.carpooling.filter;
 import java.time.Duration;
 import java.time.Instant;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Interface for filtering carpool trips before expensive routing calculations.

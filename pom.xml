@@ -96,13 +96,14 @@
 
     <modules>
         <module>utils</module>
+        <module>domain-core</module>
         <module>raptor</module>
         <module>astar</module>
         <module>gtfs-realtime-protobuf</module>
         <module>application</module>
         <module>otp-shaded</module>
         <module>test/integration</module>
-        <module>domain-core</module>
+        <module>street</module>
     </modules>
 
 

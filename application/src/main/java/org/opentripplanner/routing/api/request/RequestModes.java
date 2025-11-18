@@ -1,8 +1,9 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
+import static org.opentripplanner.street.model.StreetMode.NOT_SET;
 
 import java.util.Objects;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class RequestModes {

@@ -1,13 +1,13 @@
 package org.opentripplanner.street.search.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.model.Cost.costOfSeconds;
+import static org.opentripplanner.core.model.basic.Cost.costOfSeconds;
 import static org.opentripplanner.street.search.request.ImmutableRequestAsserts.assertEqualsAndHashCode;
 
 import java.time.Duration;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.street.search.request.filter.ParkingFilter;
 import org.opentripplanner.street.search.request.filter.ParkingSelect.TagsSelect;
 

@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.params.provider.Arguments.of;
-import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.SAFE_STREETS;
-import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.TRIANGLE;
+import static org.opentripplanner.street.model.VehicleRoutingOptimizeType.SAFE_STREETS;
+import static org.opentripplanner.street.model.VehicleRoutingOptimizeType.TRIANGLE;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;

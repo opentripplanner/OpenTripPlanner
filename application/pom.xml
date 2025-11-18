@@ -35,9 +35,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>domain-core</artifactId>
+            <artifactId>street</artifactId>
             <version>${project.version}</version>
         </dependency>
+
 
 
         <!-- 3rd party dependencies -->
@@ -74,25 +75,6 @@
             <groupId>com.google.dagger</groupId>
             <artifactId>dagger</artifactId>
             <version>${google.dagger.version}</version>
-        </dependency>
-
-        <!-- GEOTOOLS -->
-
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-coverage</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-geotiff</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-geojson-core</artifactId>
         </dependency>
 
         <!-- Lucene is used by the Debug Client Geocode API -->

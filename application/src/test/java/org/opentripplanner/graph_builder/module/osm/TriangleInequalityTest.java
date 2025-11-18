@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
-import static org.opentripplanner.routing.api.request.StreetMode.CAR;
+import static org.opentripplanner.street.model.StreetMode.BIKE;
+import static org.opentripplanner.street.model.StreetMode.CAR;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,12 +23,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
-import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
+import org.opentripplanner.streetadapter.EuclideanRemainingWeightHeuristic;
+import org.opentripplanner.streetadapter.StreetSearchBuilder;
 import org.opentripplanner.test.support.ResourceLoader;
 
 public class TriangleInequalityTest {

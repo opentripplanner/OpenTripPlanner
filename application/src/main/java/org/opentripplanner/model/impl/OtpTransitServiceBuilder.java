@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
@@ -21,7 +22,6 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
@@ -281,7 +281,7 @@ public class OtpTransitServiceBuilder {
    * period. If a service is start before and/or ends after the period then the service is modified
    * to match the period.
    */
-  public void limitServiceDays(ServiceDateInterval periodLimit) {
+  public void limitServiceDays(LocalDateInterval periodLimit) {
     if (periodLimit.isUnbounded()) {
       LOG.info("Limiting transit service is skipped, the period is unbounded.");
       return;

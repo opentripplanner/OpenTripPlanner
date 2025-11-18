@@ -3,8 +3,8 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.model.calendar.openinghours.OHCalendar;
-import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
+import org.opentripplanner.street.model.openinghours.OHCalendar;
+import org.opentripplanner.street.model.openinghours.OsmOpeningHoursSupport;
 
 public class OpeningHoursImpl implements GraphQLDataFetchers.GraphQLOpeningHours {
 

@@ -31,7 +31,9 @@ public interface OtpArchitectureModules {
   Package TRANSIT = OTP_ROOT.subPackage("transit");
   Package TRANSIT_MODEL = TRANSIT.subPackage("model");
   Package DOMAIN_CORE = OTP_ROOT.subPackage("core");
+  Package GEOMETRY = OTP_ROOT.subPackage("street.geometry");
   Package DOMAIN_CORE_FRAMEWORK = DOMAIN_CORE.subPackage("framework");
+  Package DOMAIN_CORE_FRAMEWORK_ALL = DOMAIN_CORE.subPackage("framework..");
   Package DOMAIN_CORE_MODEL = DOMAIN_CORE.subPackage("model");
   Package DOMAIN_CORE_MODEL_ALL = DOMAIN_CORE.subPackage("model..");
 
@@ -55,6 +57,7 @@ public interface OtpArchitectureModules {
   Module FRAMEWORK_UTILS = Module.of(
     OTP_UTILS,
     DOMAIN_CORE_MODEL_ALL,
+    DOMAIN_CORE_FRAMEWORK_ALL,
     FRAMEWORK.subPackage("application"),
     FRAMEWORK.subPackage("error"),
     FRAMEWORK.subPackage("i18n"),

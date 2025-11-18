@@ -1,6 +1,8 @@
 package org.opentripplanner.netex;
 
 import java.util.List;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -12,13 +14,11 @@ import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesF
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
-import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.transit.model.framework.DeduplicatorService;
+import org.opentripplanner.streetadapter.VehicleParkingHelper;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
@@ -41,7 +41,7 @@ public class NetexModule implements GraphBuilderModule {
    * @see BuildConfig#transitServiceStart
    * @see BuildConfig#transitServiceEnd
    */
-  private final ServiceDateInterval transitPeriodLimit;
+  private final LocalDateInterval transitPeriodLimit;
 
   private final List<NetexBundle> netexBundles;
 
@@ -52,7 +52,7 @@ public class NetexModule implements GraphBuilderModule {
     VehicleParkingRepository parkingRepository,
     DataImportIssueStore issueStore,
     int subwayAccessTime,
-    ServiceDateInterval transitPeriodLimit,
+    LocalDateInterval transitPeriodLimit,
     List<NetexBundle> netexBundles
   ) {
     this.graph = graph;

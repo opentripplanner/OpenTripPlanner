@@ -2,7 +2,7 @@ package org.opentripplanner.routing.linking;
 
 import java.util.List;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 
 public class LinkingContextRequestBuilder {
 
