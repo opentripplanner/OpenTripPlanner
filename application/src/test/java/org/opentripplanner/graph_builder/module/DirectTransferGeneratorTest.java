@@ -64,8 +64,20 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     .withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.CAR)))
     .buildDefault();
 
-  private TransitStopVertex S0, S11, S12, S13, S21, S22, S23;
-  private StreetVertex V0, V11, V12, V13, V21, V22, V23;
+  private TransitStopVertex S0;
+  private TransitStopVertex S11;
+  private TransitStopVertex S12;
+  private TransitStopVertex S13;
+  private TransitStopVertex S21;
+  private TransitStopVertex S22;
+  private TransitStopVertex S23;
+  private StreetVertex V0;
+  private StreetVertex V11;
+  private StreetVertex V12;
+  private StreetVertex V13;
+  private StreetVertex V21;
+  private StreetVertex V22;
+  private StreetVertex V23;
 
   @Test
   public void testDirectTransfersWithoutPatterns() {

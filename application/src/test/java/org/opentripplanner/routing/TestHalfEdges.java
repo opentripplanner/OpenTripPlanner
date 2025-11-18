@@ -2,6 +2,7 @@ package org.opentripplanner.routing;
 
 import static com.google.common.collect.Iterables.filter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,8 +25,12 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.SameEdgeAdjuster;
+import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -39,7 +44,6 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
@@ -53,8 +57,16 @@ public class TestHalfEdges {
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   private Graph graph;
-  private StreetEdge top, bottom, left, right, leftBack, rightBack;
-  private IntersectionVertex br, tr, bl, tl;
+  private StreetEdge top;
+  private StreetEdge bottom;
+  private StreetEdge left;
+  private StreetEdge right;
+  private StreetEdge leftBack;
+  private StreetEdge rightBack;
+  private IntersectionVertex br;
+  private IntersectionVertex tr;
+  private IntersectionVertex bl;
+  private IntersectionVertex tl;
   private TransitStopVertex station1;
   private TransitStopVertex station2;
   private TimetableRepository timetableRepository;
@@ -556,32 +568,27 @@ public class TestHalfEdges {
   @Test
   public void testTemporaryVerticesContainer() {
     // test that it is possible to travel between two splits on the same street
-    RouteRequest walking = RouteRequest.of()
-      .withFrom(GenericLocation.fromCoordinate(40.004, -74.0))
-      .withTo(GenericLocation.fromCoordinate(40.008, -74.0))
-      .buildRequest();
+    var from = GenericLocation.fromCoordinate(40.004, -74.0);
+    var to = GenericLocation.fromCoordinate(40.008, -74.0);
+    RouteRequest walking = RouteRequest.of().withFrom(from).withTo(to).buildRequest();
 
-    try (
-      var container = new TemporaryVerticesContainer(
-        graph,
-        VertexLinkerTestFactory.of(graph),
-        id -> Set.of(),
-        walking.from(),
-        walking.to(),
-        StreetMode.WALK,
-        StreetMode.WALK
-      )
-    ) {
-      assertNotNull(container.getFromVertices());
-      assertNotNull(container.getToVertices());
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var vertexLinker = VertexLinkerTestFactory.of(graph);
+      var vertexCreationService = new VertexCreationService(vertexLinker);
+      var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService);
+      var linkingRequest = LinkingContextRequestMapper.map(walking);
+      var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
+      var fromVertices = linkingContext.findVertices(from);
+      assertFalse(fromVertices.isEmpty());
+      var toVertices = linkingContext.findVertices(to);
+      assertFalse(toVertices.isEmpty());
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
         .withHeuristic(new EuclideanRemainingWeightHeuristic())
         .withRequest(walking)
-        .withVerticesContainer(container)
+        .withFrom(fromVertices)
+        .withTo(toVertices)
         .getShortestPathTree();
-      GraphPath<State, Edge, Vertex> path = spt.getPath(
-        container.getToVertices().iterator().next()
-      );
+      GraphPath<State, Edge, Vertex> path = spt.getPath(toVertices.iterator().next());
       for (State s : path.states) {
         assertNotSame(s.getBackEdge(), top);
       }

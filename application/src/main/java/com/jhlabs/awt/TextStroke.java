@@ -49,9 +49,12 @@ public class TextStroke implements Stroke {
     GeneralPath result = new GeneralPath();
     PathIterator it = new FlatteningPathIterator(shape.getPathIterator(null), FLATNESS);
     float[] points = new float[6];
-    float moveX = 0, moveY = 0;
-    float lastX = 0, lastY = 0;
-    float thisX = 0, thisY = 0;
+    float moveX = 0;
+    float moveY = 0;
+    float lastX = 0;
+    float lastY = 0;
+    float thisX = 0;
+    float thisY = 0;
     int type = 0;
     float next = 0;
     int currentChar = 0;
@@ -123,9 +126,12 @@ public class TextStroke implements Stroke {
   public float measurePathLength(Shape shape) {
     PathIterator it = new FlatteningPathIterator(shape.getPathIterator(null), FLATNESS);
     float[] points = new float[6];
-    float moveX = 0, moveY = 0;
-    float lastX = 0, lastY = 0;
-    float thisX = 0, thisY = 0;
+    float moveX = 0;
+    float moveY = 0;
+    float lastX = 0;
+    float lastY = 0;
+    float thisX = 0;
+    float thisY = 0;
     int type = 0;
     float total = 0;
 

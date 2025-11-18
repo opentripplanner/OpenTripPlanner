@@ -162,7 +162,9 @@ public class DateUtils {
   public static LocalTime parseTime(String time) {
     boolean amPm = false;
     int addHours = 0;
-    int hour = 0, min = 0, sec = 0;
+    int hour = 0;
+    int min = 0;
+    int sec = 0;
     try {
       String[] hms = time.toUpperCase().split(":");
 

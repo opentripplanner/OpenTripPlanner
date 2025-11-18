@@ -303,6 +303,14 @@ public class OsmEntityTest {
   }
 
   @Test
+  void platformEdge() {
+    var w = new OsmEntityForTest().addTag("railway", "platform_edge");
+    assertTrue(w.isRoutable());
+    assertTrue(w.isBoardingLocation());
+    assertTrue(w.isPlatform());
+  }
+
+  @Test
   void testGenerateI18NForPattern() {
     OsmEntity osmTags = new OsmEntityForTest();
     osmTags.addTag("note", "Note EN");

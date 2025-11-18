@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -57,6 +56,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -216,6 +216,11 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public RegularStop getRegularStop(FeedScopedId id) {
     return this.timetableRepository.getSiteRepository().getRegularStop(id);
+  }
+
+  @Override
+  public Entrance getEntrance(FeedScopedId id) {
+    return this.timetableRepository.getSiteRepository().getEntrance(id);
   }
 
   @Override
@@ -657,12 +662,12 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public ZonedDateTime getTransitServiceEnds() {
+  public Instant getTransitServiceEnds() {
     return timetableRepository.getTransitServiceEnds();
   }
 
   @Override
-  public ZonedDateTime getTransitServiceStarts() {
+  public Instant getTransitServiceStarts() {
     return timetableRepository.getTransitServiceStarts();
   }
 

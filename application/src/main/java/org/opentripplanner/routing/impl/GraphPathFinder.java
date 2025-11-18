@@ -14,12 +14,12 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
@@ -124,12 +124,12 @@ public class GraphPathFinder {
    */
   public List<GraphPath<State, Edge, Vertex>> graphPathFinderEntryPoint(
     RouteRequest request,
-    TemporaryVerticesContainer vertexContainer
+    LinkingContext linkingContext
   ) {
     return graphPathFinderEntryPoint(
       request,
-      vertexContainer.getFromVertices(),
-      vertexContainer.getToVertices()
+      linkingContext.findVertices(request.from()),
+      linkingContext.findVertices(request.to())
     );
   }
 

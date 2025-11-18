@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.RiderCategory;
+import org.opentripplanner.model.fare.RiderCategoryBuilder;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -18,11 +19,9 @@ class FareProductTest {
 
   static ZonedDateTime ZDT = OffsetDateTime.parse("2023-03-27T10:44:54+02:00").toZonedDateTime();
 
-  static RiderCategory CATEGORY = new RiderCategory(
-    new FeedScopedId("1", "pensioners"),
-    "Pensioners",
-    null
-  );
+  static RiderCategory CATEGORY = RiderCategory.of(new FeedScopedId("1", "pensioners"))
+    .withName("Pensioners")
+    .build();
 
   static FareMedium MEDIUM = new FareMedium(new FeedScopedId("1", "app"), "App");
 

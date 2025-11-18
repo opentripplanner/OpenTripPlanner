@@ -19,11 +19,11 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.BoardingArea;
-import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.SiteRepository;
 
 /**
@@ -51,8 +51,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Collection<FeedScopedId> serviceIds;
 
-  private final Map<FeedScopedId, Entrance> entrancesById;
-
   private final Map<FeedScopedId, PathwayNode> pathwayNodesById;
 
   private final Map<FeedScopedId, BoardingArea> boardingAreasById;
@@ -62,6 +60,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
   private final Collection<TripPattern> tripPatterns;
 
   private final Collection<Trip> trips;
+
+  private final Collection<TripOnServiceDate> tripOnServiceDates;
 
   private final Collection<FlexTrip<?, ?>> flexTrips;
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPoint;
@@ -77,12 +77,12 @@ class OtpTransitServiceImpl implements OtpTransitService {
     this.operators = immutableList(builder.getOperatorsById().values());
     this.pathways = immutableList(builder.getPathways());
     this.serviceIds = immutableList(builder.findAllServiceIds());
-    this.entrancesById = builder.getEntrances().asImmutableMap();
     this.pathwayNodesById = builder.getPathwayNodes().asImmutableMap();
     this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
     this.transfers = immutableList(builder.getTransfers());
     this.tripPatterns = immutableList(builder.getTripPatterns().values());
     this.trips = immutableList(builder.getTripsById().values());
+    this.tripOnServiceDates = immutableList(builder.getTripOnServiceDates().values());
     this.flexTrips = immutableList(builder.getFlexTripsById().values());
     this.stopsByScheduledStopPoint = Collections.unmodifiableMap(
       builder.stopsByScheduledStopPoints()
@@ -129,11 +129,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
   }
 
   @Override
-  public Collection<Entrance> getAllEntrances() {
-    return immutableList(entrancesById.values());
-  }
-
-  @Override
   public Collection<PathwayNode> getAllPathwayNodes() {
     return immutableList(pathwayNodesById.values());
   }
@@ -156,6 +151,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
   @Override
   public Collection<Trip> getAllTrips() {
     return trips;
+  }
+
+  @Override
+  public Collection<TripOnServiceDate> getTripOnServiceDates() {
+    return tripOnServiceDates;
   }
 
   @Override

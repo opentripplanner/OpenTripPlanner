@@ -1,21 +1,24 @@
 package org.opentripplanner.street.service;
 
-import jakarta.inject.Singleton;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import jakarta.inject.Inject;
+import org.opentripplanner.street.StreetRepository;
 
-@Singleton
 public class DefaultStreetLimitationParametersService implements StreetLimitationParametersService {
 
-  private final StreetLimitationParameters streetLimitationParameters;
+  private final StreetRepository streetRepository;
 
-  public DefaultStreetLimitationParametersService(
-    StreetLimitationParameters streetLimitationParameters
-  ) {
-    this.streetLimitationParameters = streetLimitationParameters;
+  @Inject
+  public DefaultStreetLimitationParametersService(StreetRepository streetRepository) {
+    this.streetRepository = streetRepository;
   }
 
   @Override
-  public float getMaxCarSpeed() {
-    return streetLimitationParameters.maxCarSpeed();
+  public float maxCarSpeed() {
+    return streetRepository.streetModelDetails().maxCarSpeed();
+  }
+
+  @Override
+  public int maxAreaNodes() {
+    return streetRepository.streetModelDetails().maxAreaNodes();
   }
 }

@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
-import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static java.util.Map.entry;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,7 +9,6 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import graphql.ExecutionInput;
-import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
@@ -30,9 +28,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
+import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -108,11 +106,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
+    timetableRepository.updateCalendarServiceData(calendarServiceData);
     timetableRepository.index();
   }
 
@@ -327,7 +321,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
     final List<ViaLocation> viaLocations = MAPPER.createRequest(
       executionContext(arguments)
-    ).getViaLocations();
+    ).listViaLocations();
     assertEquals(
       "PassThroughViaLocation{label: PTP1, stopLocationIds: [F:ST:stop1, F:ST:stop2, F:ST:stop3]}",
       viaLocations.get(0).toString()
@@ -430,10 +424,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .locale(Locale.ENGLISH)
       .build();
 
-    var executionContext = newExecutionContextBuilder()
-      .executionInput(executionInput)
-      .executionId(ExecutionId.from(this.getClass().getName()))
-      .build();
+    var executionContext = DataFetchingSupport.executionContext();
 
     var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .context(context)

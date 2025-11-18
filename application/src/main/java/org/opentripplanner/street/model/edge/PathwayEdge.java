@@ -13,7 +13,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
-import org.opentripplanner.transit.model.site.PathwayMode;
 
 /**
  * A walking pathway as described in GTFS
@@ -29,7 +28,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   private final double distance;
   private final int steps;
   private final double slope;
-  private final PathwayMode mode;
 
   private final boolean wheelchairAccessible;
 
@@ -41,8 +39,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     double distance,
     int steps,
     double slope,
-    boolean wheelchairAccessible,
-    PathwayMode mode
+    boolean wheelchairAccessible
   ) {
     super(fromv, tov);
     this.signpostedAs = signpostedAs;
@@ -51,14 +48,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     this.slope = slope;
     this.wheelchairAccessible = wheelchairAccessible;
     this.distance = distance;
-    this.mode = mode;
-  }
-
-  /**
-   * {@link #createLowCostPathwayEdge(Vertex, Vertex, boolean, PathwayMode)}
-   */
-  public static PathwayEdge createLowCostPathwayEdge(Vertex fromV, Vertex toV, PathwayMode mode) {
-    return PathwayEdge.createLowCostPathwayEdge(fromV, toV, true, mode);
   }
 
   /**
@@ -69,10 +58,9 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   public static PathwayEdge createLowCostPathwayEdge(
     Vertex fromV,
     Vertex toV,
-    boolean wheelchairAccessible,
-    PathwayMode mode
+    boolean wheelchairAccessible
   ) {
-    return createPathwayEdge(fromV, toV, null, 0, 0, 0, 0, wheelchairAccessible, mode);
+    return createPathwayEdge(fromV, toV, null, 0, 0, 0, 0, wheelchairAccessible);
   }
 
   public static PathwayEdge createPathwayEdge(
@@ -83,8 +71,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     double distance,
     int steps,
     double slope,
-    boolean wheelchairAccessible,
-    PathwayMode mode
+    boolean wheelchairAccessible
   ) {
     return connectToGraph(
       new PathwayEdge(
@@ -95,8 +82,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
         distance,
         steps,
         slope,
-        wheelchairAccessible,
-        mode
+        wheelchairAccessible
       )
     );
   }
@@ -110,7 +96,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
 
     RoutingPreferences preferences = s0.getPreferences();
 
-    /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
     long time_ms = 1000L * traversalTime;
 
     if (time_ms == 0) {
@@ -197,10 +182,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   @Override
   public boolean isWheelchairAccessible() {
     return wheelchairAccessible;
-  }
-
-  public PathwayMode getMode() {
-    return mode;
   }
 
   private boolean isStairs() {

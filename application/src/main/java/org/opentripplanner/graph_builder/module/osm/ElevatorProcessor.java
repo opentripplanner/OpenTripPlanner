@@ -4,6 +4,7 @@ import gnu.trove.list.TLongList;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,9 @@ import java.util.function.Consumer;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
+import org.opentripplanner.graph_builder.issues.CouldNotApplyMultiLevelInfoToElevatorWay;
 import org.opentripplanner.osm.model.OsmLevel;
+import org.opentripplanner.osm.model.OsmLevelFactory;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.routing.graph.Graph;
@@ -41,6 +44,7 @@ class ElevatorProcessor {
   private final OsmDatabase osmdb;
   private final VertexGenerator vertexGenerator;
   private final Consumer<String> osmEntityDurationIssueConsumer;
+  private final DataImportIssueStore issueStore;
 
   public ElevatorProcessor(
     DataImportIssueStore issueStore,
@@ -57,6 +61,7 @@ class ElevatorProcessor {
           v
         )
       );
+    this.issueStore = issueStore;
   }
 
   public void buildElevatorEdges(Graph graph) {
@@ -94,7 +99,7 @@ class ElevatorProcessor {
           onboardVertices,
           sourceVertex,
           sourceVertex.getLabelString(),
-          level.name()
+          level
         );
       }
       long travelTime = node
@@ -118,6 +123,7 @@ class ElevatorProcessor {
 
     while (elevators.hasNext()) {
       OsmWay elevatorWay = elevators.next();
+      List<OsmLevel> nodeLevels = osmdb.getLevelsForEntity(elevatorWay);
 
       List<Long> nodes = Arrays.stream(elevatorWay.getNodeRefs().toArray())
         .filter(
@@ -128,18 +134,24 @@ class ElevatorProcessor {
         .boxed()
         .toList();
 
+      if (nodeLevels.size() != nodes.size()) {
+        issueStore.add(
+          new CouldNotApplyMultiLevelInfoToElevatorWay(elevatorWay, nodeLevels.size(), nodes.size())
+        );
+        nodeLevels = Collections.nCopies(nodes.size(), OsmLevelFactory.DEFAULT);
+      }
+
       ArrayList<Vertex> onboardVertices = new ArrayList<>();
       for (int i = 0; i < nodes.size(); i++) {
         Long node = nodes.get(i);
         var sourceVertex = vertexGenerator.intersectionNodes().get(node);
         String sourceVertexLabel = sourceVertex.getLabelString();
-        String levelName = elevatorWay.getId() + " / " + i;
         createElevatorVertices(
           graph,
           onboardVertices,
           sourceVertex,
-          elevatorWay.getId() + "_" + sourceVertexLabel,
-          levelName
+          elevatorWay.getId() + "_" + sourceVertexLabel + "_" + i,
+          nodeLevels.get(i)
         );
       }
 
@@ -166,16 +178,16 @@ class ElevatorProcessor {
     ArrayList<Vertex> onboardVertices,
     IntersectionVertex sourceVertex,
     String label,
-    String levelName
+    OsmLevel level
   ) {
     var factory = new VertexFactory(graph);
-    ElevatorVertex onboardVertex = factory.elevator(sourceVertex, label, levelName);
+    ElevatorVertex onboardVertex = factory.elevator(sourceVertex, label, level.level());
 
     ElevatorBoardEdge.createElevatorBoardEdge(sourceVertex, onboardVertex);
     ElevatorAlightEdge.createElevatorAlightEdge(
       onboardVertex,
       sourceVertex,
-      new NonLocalizedString(levelName)
+      new NonLocalizedString(level.name())
     );
 
     // accumulate onboard vertices to so they can be connected by hop edges later

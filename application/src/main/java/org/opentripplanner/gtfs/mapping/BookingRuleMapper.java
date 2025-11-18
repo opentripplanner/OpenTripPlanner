@@ -62,26 +62,36 @@ class BookingRuleMapper {
   }
 
   /**
-   * If GTFS does not specify the latest booking time/day, the underlying values default to 0.
+   * If GTFS does not specify the latest booking time/day, the underlying values default to NO_VALUE.
    * In that case, we do not set the booking time so that min/max booking notice can apply.
    *
-   * @return null if both timeSeconds and day are 0, otherwise a BookingTime instance
+   * @return null if either timeSeconds or day are NO_VALUE, otherwise a BookingTime instance
    */
   @Nullable
   private BookingTime resolveBookingTime(int timeSeconds, int day) {
-    if (timeSeconds == 0 && day == 0) {
+    if (timeSeconds == BookingRule.NO_VALUE || day == BookingRule.NO_VALUE) {
       return null;
     }
 
     return new BookingTime(LocalTime.ofSecondOfDay(timeSeconds), day);
   }
 
+  @Nullable
   private Duration minimumBookingNotice(BookingRule rule) {
-    return Duration.ofMinutes(rule.getPriorNoticeDurationMin());
+    return resolveNoticePeriod(rule.getPriorNoticeDurationMin());
   }
 
+  @Nullable
   private Duration maximumBookingNotice(BookingRule rule) {
-    return Duration.ofMinutes(rule.getPriorNoticeDurationMax());
+    return resolveNoticePeriod(rule.getPriorNoticeDurationMax());
+  }
+
+  @Nullable
+  private static Duration resolveNoticePeriod(int minutes) {
+    if (minutes == BookingRule.NO_VALUE) {
+      return null;
+    }
+    return Duration.ofMinutes(minutes);
   }
 
   private String message(BookingRule rule) {

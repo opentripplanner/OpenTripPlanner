@@ -833,7 +833,9 @@ public class OsmDatabase {
    * Store turn restrictions.
    */
   private void processRestriction(OsmRelation relation) {
-    long from = -1, to = -1, via = -1;
+    long from = -1;
+    long to = -1;
+    long via = -1;
     for (OsmRelationMember member : relation.getMembers()) {
       String role = member.getRole();
       if (role.equals("from")) {

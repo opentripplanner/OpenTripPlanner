@@ -27,8 +27,14 @@ import org.opentripplanner.street.search.state.State;
 public class TemporaryPartialStreetEdgeTest {
 
   private Graph graph;
-  private IntersectionVertex v1, v2, v3, v4;
-  private StreetEdge e1, e1Reverse, e2, e3;
+  private IntersectionVertex v1;
+  private IntersectionVertex v2;
+  private IntersectionVertex v3;
+  private IntersectionVertex v4;
+  private StreetEdge e1;
+  private StreetEdge e1Reverse;
+  private StreetEdge e2;
+  private StreetEdge e3;
 
   @BeforeEach
   public void setUp() throws Exception {

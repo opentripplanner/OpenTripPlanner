@@ -28,7 +28,7 @@ import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.leg.StreetLegBuilder;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
-import org.opentripplanner.routing.graphfinder.StopResolver;
+import org.opentripplanner.routing.graphfinder.SiteResolver;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -53,18 +53,18 @@ import org.opentripplanner.street.search.state.State;
  */
 public class GraphPathToItineraryMapper {
 
-  private final StopResolver stopResolver;
+  private final SiteResolver siteResolver;
   private final ZoneId timeZone;
   private final StreetNotesService streetNotesService;
   private final double ellipsoidToGeoidDifference;
 
   public GraphPathToItineraryMapper(
-    StopResolver stopResolver,
+    SiteResolver siteResolver,
     ZoneId timeZone,
     StreetNotesService streetNotesService,
     double ellipsoidToGeoidDifference
   ) {
-    this.stopResolver = stopResolver;
+    this.siteResolver = siteResolver;
     this.timeZone = ZoneIdFallback.zoneId(timeZone);
     this.streetNotesService = streetNotesService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
@@ -208,7 +208,7 @@ public class GraphPathToItineraryMapper {
   /**
    * Calculate the elevationGained and elevationLost fields of an {@link Itinerary}.
    *
-   * @param itinerary The itinerary to calculate the elevation changes for
+   * @param builder   The itinerary builder to calculate the elevation changes for
    * @param edges     The edges that go with the itinerary
    */
   private static void calculateElevations(ItineraryBuilder builder, List<Edge> edges) {
@@ -313,7 +313,7 @@ public class GraphPathToItineraryMapper {
     }
 
     if (vertex instanceof TransitStopVertex tsv) {
-      var stop = Objects.requireNonNull(stopResolver.getStop(tsv.getId()));
+      var stop = Objects.requireNonNull(siteResolver.getStop(tsv.getId()));
       return Place.forStop(stop);
     } else if (vertex instanceof VehicleRentalPlaceVertex) {
       return Place.forVehicleRentalPlace((VehicleRentalPlaceVertex) vertex);
@@ -374,6 +374,7 @@ public class GraphPathToItineraryMapper {
       states,
       previousStep,
       streetNotesService,
+      siteResolver,
       ellipsoidToGeoidDifference
     );
     List<WalkStep> walkSteps = statesToWalkStepsMapper.generateWalkSteps();

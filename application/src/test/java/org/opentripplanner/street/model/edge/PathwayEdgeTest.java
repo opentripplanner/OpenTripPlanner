@@ -19,7 +19,6 @@ import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.site.PathwayMode;
 
 class PathwayEdgeTest {
 
@@ -38,8 +37,7 @@ class PathwayEdgeTest {
       0,
       0,
       0,
-      true,
-      PathwayMode.ELEVATOR
+      true
     );
 
     assertThatEdgeIsTraversable(edge);
@@ -55,8 +53,7 @@ class PathwayEdgeTest {
       0,
       2,
       0,
-      true,
-      PathwayMode.STAIRS
+      true
     );
 
     assertThatEdgeIsTraversable(edge);
@@ -72,8 +69,7 @@ class PathwayEdgeTest {
       0,
       0,
       0,
-      true,
-      PathwayMode.ESCALATOR
+      true
     );
 
     var state = assertThatEdgeIsTraversable(edge);
@@ -91,8 +87,7 @@ class PathwayEdgeTest {
       1000,
       0,
       0,
-      true,
-      PathwayMode.MOVING_SIDEWALK
+      true
     );
 
     assertEquals(1000, edge.getDistanceMeters());
@@ -112,8 +107,7 @@ class PathwayEdgeTest {
       60,
       0,
       0,
-      true,
-      PathwayMode.WALKWAY
+      true
     );
 
     var state = assertThatEdgeIsTraversable(edge);
@@ -131,8 +125,7 @@ class PathwayEdgeTest {
       60,
       0,
       0,
-      false,
-      PathwayMode.WALKWAY
+      false
     );
 
     var state = assertThatEdgeIsTraversable(edge, true);
@@ -175,8 +168,7 @@ class PathwayEdgeTest {
       100,
       0,
       slope,
-      true,
-      PathwayMode.WALKWAY
+      true
     );
 
     var state = assertThatEdgeIsTraversable(edge, true);
@@ -234,23 +226,13 @@ class PathwayEdgeTest {
 
     @Test
     void emptySignpostedAs() {
-      var edge = PathwayEdge.createLowCostPathwayEdge(from, to, PathwayMode.WALKWAY);
+      var edge = PathwayEdge.createLowCostPathwayEdge(from, to, true);
       assertEquals(Optional.empty(), edge.signpostedAs());
       assertEquals(PathwayEdge.DEFAULT_NAME, edge.getName());
     }
 
     private PathwayEdge pathwayEdge(I18NString sign) {
-      return PathwayEdge.createPathwayEdge(
-        from,
-        to,
-        sign,
-        60,
-        100,
-        0,
-        0,
-        false,
-        PathwayMode.WALKWAY
-      );
+      return PathwayEdge.createPathwayEdge(from, to, sign, 60, 100, 0, 0, false);
     }
   }
 }

@@ -10,6 +10,7 @@ import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.SAFE_S
 import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.TRIANGLE;
 
 import graphql.ExecutionInput;
+import graphql.GraphQLContext;
 import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
@@ -29,6 +30,7 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -37,7 +39,9 @@ import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
@@ -62,6 +66,13 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
     var routeRequest = RouteRequest.defaultValue();
+    var vertexLinker = VertexLinkerTestFactory.of(graph);
+    var vertexCreationService = new VertexCreationService(vertexLinker);
+    var linkingContextFactory = new LinkingContextFactory(
+      graph,
+      vertexCreationService,
+      transitService::findStopOrChildIds
+    );
     context = new GraphQLRequestContext(
       new TestRoutingService(List.of()),
       transitService,
@@ -71,10 +82,10 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       new DefaultRealtimeVehicleService(transitService),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       GraphFinder.getInstance(
-        graph,
-        VertexLinkerTestFactory.of(graph),
+        graph.hasStreets,
         transitService::getRegularStop,
-        transitService::findRegularStopsByBoundingBox
+        transitService::findRegularStopsByBoundingBox,
+        linkingContextFactory
       ),
       routeRequest
     );
@@ -294,28 +305,18 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     );
     assertEquals(
       "[PassThroughViaLocation{label: a label, stopLocationIds: [F:stop1]}]",
-      routeRequest.getViaLocations().toString()
+      routeRequest.listViaLocations().toString()
     );
 
     var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(
       executionContext(decorateWithRequiredParams(Map.of())),
       context
     );
-    assertEquals(List.of(), noParamsReq.getViaLocations());
+    assertEquals(List.of(), noParamsReq.listViaLocations());
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
-    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
-      .query("")
-      .operationName("plan")
-      .context(context)
-      .locale(Locale.ENGLISH)
-      .build();
-
-    var executionContext = newExecutionContextBuilder()
-      .executionInput(executionInput)
-      .executionId(ExecutionId.from(this.getClass().getName()))
-      .build();
+    var executionContext = DataFetchingSupport.executionContext();
     return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .arguments(arguments)
       .build();

@@ -46,7 +46,8 @@ public class FileUtils {
     var expectedLines = expectedDoc.split("[\n\r]+");
     var resultLines = resultDoc.split("[\n\r]+");
 
-    int i = 0, j = 0;
+    int i = 0;
+    int j = 0;
 
     while (i < expectedLines.length && j < resultLines.length) {
       while (expectedLines[i].isBlank()) {

@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -58,8 +60,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.site.Entrance;
-import org.opentripplanner.transit.model.site.PathwayMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
@@ -200,14 +200,18 @@ public abstract class GraphRoutingTest {
       List<ElevatorEdge> edges = new ArrayList<>();
       List<ElevatorVertex> onboardVertices = new ArrayList<>();
 
-      for (Vertex v : vertices) {
-        var level = String.format("L-%s", v.getDefaultName());
+      for (int i = 0; i < vertices.length; i++) {
+        Vertex v = vertices[i];
 
-        var onboard = vertexFactory.elevator(v, v.getLabelString(), level);
+        var onboard = vertexFactory.elevator(v, v.getLabelString(), i);
 
         edges.add(ElevatorBoardEdge.createElevatorBoardEdge(v, onboard));
         edges.add(
-          ElevatorAlightEdge.createElevatorAlightEdge(onboard, v, new NonLocalizedString(level))
+          ElevatorAlightEdge.createElevatorAlightEdge(
+            onboard,
+            v,
+            new NonLocalizedString(String.valueOf(i))
+          )
         );
 
         onboardVertices.add(onboard);
@@ -229,13 +233,6 @@ public abstract class GraphRoutingTest {
     }
 
     // -- Transit network (pathways, linking)
-    public Entrance entranceEntity(String id, double latitude, double longitude) {
-      return Entrance.of(TimetableRepositoryForTest.id(id))
-        .withName(new NonLocalizedString(id))
-        .withCode(id)
-        .withCoordinate(latitude, longitude)
-        .build();
-    }
 
     RegularStop stopEntity(
       String id,
@@ -307,7 +304,12 @@ public abstract class GraphRoutingTest {
     }
 
     public TransitEntranceVertex entrance(String id, double latitude, double longitude) {
-      return new TransitEntranceVertex(entranceEntity(id, latitude, longitude));
+      return new TransitEntranceVertex(
+        id(id),
+        new WgsCoordinate(latitude, longitude),
+        I18NString.of(id),
+        Accessibility.NO_INFORMATION
+      );
     }
 
     public StationCentroidVertex stationCentroid(Station station) {
@@ -362,8 +364,7 @@ public abstract class GraphRoutingTest {
         length,
         0,
         0,
-        false,
-        PathwayMode.WALKWAY
+        false
       );
     }
 
@@ -461,7 +462,7 @@ public abstract class GraphRoutingTest {
       String... tags
     ) {
       var vehicleParking = VehicleParking.builder()
-        .id(TimetableRepositoryForTest.id(id))
+        .id(id(id))
         .coordinate(new WgsCoordinate(y, x))
         .bicyclePlaces(bicyclePlaces)
         .carPlaces(carPlaces)
@@ -484,7 +485,7 @@ public abstract class GraphRoutingTest {
     ) {
       return builder ->
         builder
-          .entranceId(TimetableRepositoryForTest.id(id))
+          .entranceId(id(id))
           .name(new NonLocalizedString(id))
           .coordinate(new WgsCoordinate(streetVertex.getCoordinate()))
           .vertex(streetVertex)

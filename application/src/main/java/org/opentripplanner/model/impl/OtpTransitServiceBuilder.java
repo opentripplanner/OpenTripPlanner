@@ -42,7 +42,6 @@ import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.BoardingArea;
-import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Pathway;
@@ -88,8 +87,6 @@ public class OtpTransitServiceBuilder {
   private final EntityById<Route> routesById = new DefaultEntityById<>();
 
   private final Map<FeedScopedId, Iterable<ShapePoint>> shapePoints = new HashMap<>();
-
-  private final EntityById<Entrance> entrancesById = new DefaultEntityById<>();
 
   private final EntityById<PathwayNode> pathwayNodesById = new DefaultEntityById<>();
 
@@ -191,10 +188,6 @@ public class OtpTransitServiceBuilder {
 
   public ImmutableEntityById<RegularStop> getStops() {
     return siteRepositoryBuilder.regularStopsById();
-  }
-
-  public EntityById<Entrance> getEntrances() {
-    return entrancesById;
   }
 
   public EntityById<PathwayNode> getPathwayNodes() {

@@ -26,10 +26,21 @@ import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuris
  */
 public class BikeWalkingTest extends GraphRoutingTest {
 
-  private TransitStopVertex S1, S2;
+  private TransitStopVertex S1;
+  private TransitStopVertex S2;
   private TransitEntranceVertex E1;
-  private StreetVertex A, B, C, D, E, F, Q;
-  private StreetEdge AB, BC, CD, DE, EF;
+  private StreetVertex A;
+  private StreetVertex B;
+  private StreetVertex C;
+  private StreetVertex D;
+  private StreetVertex E;
+  private StreetVertex F;
+  private StreetVertex Q;
+  private StreetEdge AB;
+  private StreetEdge BC;
+  private StreetEdge CD;
+  private StreetEdge DE;
+  private StreetEdge EF;
 
   @Test
   public void testWalkOnly() {
@@ -244,7 +255,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
       "WALK - 10 / 20.0 - CD street",
       "WALK - 90 / 90.0 - Elevator",
       "WALK - 20 / 20.0 - null",
-      "WALK - 0 / 1.0 - L-Q"
+      "WALK - 0 / 1.0 - 1"
     );
   }
 
@@ -260,7 +271,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
       "🚲WALK - 20 / 100.0 - CD street",
       "🚲WALK - 90 / 90.0 - Elevator",
       "🚲WALK - 20 / 20.0 - null",
-      "🚲WALK - 0 / 1.0 - L-Q"
+      "🚲WALK - 0 / 1.0 - 1"
     );
   }
 
@@ -275,14 +286,14 @@ public class BikeWalkingTest extends GraphRoutingTest {
         "BICYCLE - 5 / 10.0 - CD street",
         "🚲WALK - 190 / 1090.0 - Elevator",
         "🚲WALK - 20 / 20.0 - null",
-        "🚲WALK - 0 / 1.0 - L-Q"
+        "🚲WALK - 0 / 1.0 - 1"
       ),
       List.of(
         "null - 0 / 0.0 - null",
         "BICYCLE - 105 / 1010.0 - CD street",
         "🚲WALK - 90 / 90.0 - Elevator",
         "🚲WALK - 20 / 20.0 - null",
-        "🚲WALK - 0 / 1.0 - L-Q"
+        "🚲WALK - 0 / 1.0 - 1"
       )
     );
   }

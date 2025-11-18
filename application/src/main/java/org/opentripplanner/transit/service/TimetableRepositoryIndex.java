@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -137,14 +136,6 @@ class TimetableRepositoryIndex {
 
   Collection<TripPattern> getPatternsForStop(StopLocation stop) {
     return Collections.unmodifiableCollection(patternsForStop.get(stop));
-  }
-
-  Collection<Trip> getTripsForStop(StopLocation stop) {
-    return patternsForStop
-      .get(stop)
-      .stream()
-      .flatMap(TripPattern::scheduledTripsAsStream)
-      .collect(Collectors.toList());
   }
 
   /**

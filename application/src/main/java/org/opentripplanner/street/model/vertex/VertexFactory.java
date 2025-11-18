@@ -34,12 +34,19 @@ public class VertexFactory {
     this.graph = graph;
   }
 
-  public TransitBoardingAreaVertex transitBoardingArea(BoardingArea boardingArea) {
-    return addToGraph(new TransitBoardingAreaVertex(boardingArea));
+  public TransitBoardingAreaVertex transitBoardingArea(BoardingArea ba) {
+    return addToGraph(
+      new TransitBoardingAreaVertex(
+        ba.getId(),
+        ba.getCoordinate(),
+        ba.getName(),
+        ba.getWheelchairAccessibility()
+      )
+    );
   }
 
-  public ElevatorVertex elevator(Vertex sourceVertex, String label, String levelName) {
-    return addToGraph(new ElevatorVertex(sourceVertex, label, levelName));
+  public ElevatorVertex elevator(Vertex sourceVertex, String label, double level) {
+    return addToGraph(new ElevatorVertex(sourceVertex, label, level));
   }
 
   public IntersectionVertex intersection(Coordinate edgeCoordinate) {
@@ -136,15 +143,26 @@ public class VertexFactory {
   }
 
   public TransitPathwayNodeVertex transitPathwayNode(PathwayNode node) {
-    return addToGraph(new TransitPathwayNodeVertex(node));
+    return addToGraph(
+      new TransitPathwayNodeVertex(node.getId(), node.getCoordinate(), node.getName())
+    );
   }
 
   public TransitEntranceVertex transitEntrance(Entrance entrance) {
-    return addToGraph(new TransitEntranceVertex(entrance));
+    return addToGraph(
+      new TransitEntranceVertex(
+        entrance.getId(),
+        entrance.getCoordinate(),
+        entrance.getName(),
+        entrance.getWheelchairAccessibility()
+      )
+    );
   }
 
-  public OsmVertex levelledOsm(OsmNode node, String level) {
-    return addToGraph(new OsmVertexOnLevel(node, level));
+  public OsmVertex levelledOsm(OsmNode node, double level) {
+    return addToGraph(
+      new OsmVertexOnLevel(node.getId(), new WgsCoordinate(node.getCoordinate()), level)
+    );
   }
 
   private <T extends Vertex> T addToGraph(T vertex) {
