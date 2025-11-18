@@ -11,6 +11,7 @@ import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -36,19 +37,23 @@ public class InsertionEvaluator {
 
   private final RoutingFunction routingFunction;
   private final PassengerDelayConstraints delayConstraints;
+  private final LinkingContext linkingContext;
 
   /**
-   * Creates an evaluator with the specified routing function and delay constraints.
+   * Creates an evaluator with the specified routing function, delay constraints, and linking context.
    *
    * @param routingFunction Function that performs A* routing between coordinates
    * @param delayConstraints Constraints for acceptable passenger delays
+   * @param linkingContext Linking context with pre-linked vertices for routing
    */
   public InsertionEvaluator(
     RoutingFunction routingFunction,
-    PassengerDelayConstraints delayConstraints
+    PassengerDelayConstraints delayConstraints,
+    LinkingContext linkingContext
   ) {
     this.routingFunction = routingFunction;
     this.delayConstraints = delayConstraints;
+    this.linkingContext = linkingContext;
   }
 
   /**
@@ -69,7 +74,7 @@ public class InsertionEvaluator {
       );
       GenericLocation to = GenericLocation.fromCoordinate(toCoord.latitude(), toCoord.longitude());
 
-      GraphPath<State, Edge, Vertex> segment = routingFunction.route(from, to);
+      GraphPath<State, Edge, Vertex> segment = routingFunction.route(from, to, linkingContext);
       if (segment == null) {
         LOG.debug("Baseline routing failed for segment {} → {}", i, i + 1);
         return null;
@@ -224,10 +229,6 @@ public class InsertionEvaluator {
    * <p>This is the key optimization: instead of routing ALL segments again,
    * we only route segments that changed due to passenger insertion.
    *
-   * <p>Segments are reused when both endpoints match between baseline and modified routes.
-   * Endpoint matching uses {@link WgsCoordinate#equals()} which compares coordinates with
-   * 7-decimal precision (~1cm tolerance).
-   *
    * @param originalPoints Route points before passenger insertion
    * @param baselineSegments Pre-routed segments for baseline route
    * @param pickupPos Passenger pickup position (1-indexed)
@@ -276,7 +277,7 @@ public class InsertionEvaluator {
           toCoord.longitude()
         );
 
-        segment = routingFunction.route(from, to);
+        segment = routingFunction.route(from, to, linkingContext);
         if (segment == null) {
           LOG.trace("Routing failed for new segment {} → {}", i, i + 1);
           return null;

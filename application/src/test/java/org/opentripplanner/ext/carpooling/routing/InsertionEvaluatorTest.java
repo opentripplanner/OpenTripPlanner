@@ -63,7 +63,7 @@ class InsertionEvaluatorTest {
       return null;
     }
 
-    var evaluator = new InsertionEvaluator(routingFunction, delayConstraints);
+    var evaluator = new InsertionEvaluator(routingFunction, delayConstraints, null);
     return evaluator.findBestInsertion(trip, viablePositions, passengerPickup, passengerDropoff);
   }
 
@@ -72,7 +72,7 @@ class InsertionEvaluatorTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
     // Routing function returns null (simulating routing failure)
     // This causes evaluator to skip all positions
-    RoutingFunction routingFunction = (from, to) -> null;
+    RoutingFunction routingFunction = (from, to, linkingContext) -> null;
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
@@ -85,7 +85,7 @@ class InsertionEvaluatorTest {
 
     var mockPath = createGraphPath();
 
-    RoutingFunction routingFunction = (from, to) -> mockPath;
+    RoutingFunction routingFunction = (from, to, linkingContext) -> mockPath;
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
@@ -107,7 +107,7 @@ class InsertionEvaluatorTest {
     // 2. First insertion attempt fails (null for first segment)
     // 3. Second insertion attempt succeeds (mockPath for all segments)
     final int[] callCount = { 0 };
-    RoutingFunction routingFunction = (from, to) -> {
+    RoutingFunction routingFunction = (from, to, linkingContext) -> {
       int call = callCount[0]++;
       if (call < 2) {
         return mockPath;
@@ -135,7 +135,7 @@ class InsertionEvaluatorTest {
     // Additional = 50 min, exceeds 5 min budget
     var mockPath = createGraphPath(Duration.ofMinutes(20));
 
-    RoutingFunction routingFunction = (from, to) -> mockPath;
+    RoutingFunction routingFunction = (from, to, linkingContext) -> mockPath;
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
@@ -151,7 +151,7 @@ class InsertionEvaluatorTest {
 
     var mockPath = createGraphPath();
 
-    RoutingFunction routingFunction = (from, to) -> mockPath;
+    RoutingFunction routingFunction = (from, to, linkingContext) -> mockPath;
 
     assertDoesNotThrow(() ->
       findOptimalInsertion(trip, OSLO_MIDPOINT_NORTH, OSLO_NORTHEAST, routingFunction)
@@ -162,7 +162,7 @@ class InsertionEvaluatorTest {
   void findOptimalInsertion_baselineDurationCalculationFails_returnsNull() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
-    RoutingFunction routingFunction = (from, to) -> null;
+    RoutingFunction routingFunction = (from, to, linkingContext) -> null;
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
@@ -199,7 +199,7 @@ class InsertionEvaluatorTest {
       mockPath7,
     };
     final int[] callCount = { 0 };
-    RoutingFunction routingFunction = (from, to) -> {
+    RoutingFunction routingFunction = (from, to, linkingContext) -> {
       int call = callCount[0]++;
       if (call == 0) {
         return mockPath10;
@@ -225,7 +225,7 @@ class InsertionEvaluatorTest {
 
     var mockPath = createGraphPath();
 
-    RoutingFunction routingFunction = (from, to) -> mockPath;
+    RoutingFunction routingFunction = (from, to, linkingContext) -> mockPath;
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
@@ -274,7 +274,7 @@ class InsertionEvaluatorTest {
       segmentCD,
     };
     final int[] callCount = { 0 };
-    RoutingFunction routingFunction = (from, to) -> {
+    RoutingFunction routingFunction = (from, to, linkingContext) -> {
       int call = callCount[0]++;
       return call < paths.length ? paths[call] : segmentAC;
     };
@@ -329,7 +329,7 @@ class InsertionEvaluatorTest {
     var mockPath = createGraphPath(Duration.ofMinutes(5));
 
     final int[] callCount = { 0 };
-    RoutingFunction routingFunction = (from, to) -> {
+    RoutingFunction routingFunction = (from, to, linkingContext) -> {
       callCount[0]++;
       return mockPath;
     };
@@ -369,7 +369,7 @@ class InsertionEvaluatorTest {
     var mockPath = createGraphPath(Duration.ofMinutes(5));
 
     final int[] callCount = { 0 };
-    RoutingFunction routingFunction = (from, to) -> {
+    RoutingFunction routingFunction = (from, to, linkingContext) -> {
       callCount[0]++;
       return mockPath;
     };
@@ -397,7 +397,7 @@ class InsertionEvaluatorTest {
     var mockPath = createGraphPath(Duration.ofMinutes(5));
 
     final int[] callCount = { 0 };
-    RoutingFunction routingFunction = (from, to) -> {
+    RoutingFunction routingFunction = (from, to, linkingContext) -> {
       callCount[0]++;
       return mockPath;
     };

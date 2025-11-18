@@ -5,16 +5,23 @@ import java.util.Set;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.PathComparator;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.LinkingDirection;
+import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
+import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
+import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
@@ -44,63 +51,112 @@ public class CarpoolStreetRouter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CarpoolStreetRouter.class);
 
-  private final Graph graph;
-  private final VertexLinker vertexLinker;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final RouteRequest request;
+  private final VertexLinker vertexLinker;
+  private final TemporaryVerticesContainer temporaryVerticesContainer;
 
   /**
    * Creates a new carpool street router.
    *
-   * @param graph the street network graph
-   * @param vertexLinker links coordinates to graph vertices
    * @param streetLimitationParametersService provides street routing parameters (speed limits, etc.)
    * @param request the route request containing preferences and timing
+   * @param vertexLinker links coordinates to graph vertices
+   * @param temporaryVerticesContainer container for temporary vertices and edges
    */
   public CarpoolStreetRouter(
-    Graph graph,
-    VertexLinker vertexLinker,
     StreetLimitationParametersService streetLimitationParametersService,
-    RouteRequest request
+    RouteRequest request,
+    VertexLinker vertexLinker,
+    TemporaryVerticesContainer temporaryVerticesContainer
   ) {
-    this.graph = graph;
-    this.vertexLinker = vertexLinker;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.request = request;
+    this.vertexLinker = vertexLinker;
+    this.temporaryVerticesContainer = temporaryVerticesContainer;
   }
 
   /**
    * Routes from one location to another using A* street search.
    * <p>
-   * Creates temporary vertices at the given coordinates, performs A* search,
-   * and returns the best path found. Returns null if routing fails.
+   * Uses the provided linking context to find vertices at the given coordinates,
+   * performs A* search, and returns the best path found. Returns null if routing fails.
    *
    * @param from origin coordinate
    * @param to destination coordinate
+   * @param linkingContext linking context containing pre-linked vertices
    * @return the best path found, or null if routing failed
    */
-  public GraphPath<State, Edge, Vertex> route(GenericLocation from, GenericLocation to) {
+  public GraphPath<State, Edge, Vertex> route(
+    GenericLocation from,
+    GenericLocation to,
+    LinkingContext linkingContext
+  ) {
     try {
-      var tempVertices = new TemporaryVerticesContainer(
-        graph,
-        vertexLinker,
-        null,
-        from,
-        to,
-        StreetMode.CAR,
-        StreetMode.CAR
-      );
+      var fromVertices = getOrCreateVertices(from, linkingContext);
+      var toVertices = getOrCreateVertices(to, linkingContext);
 
       return carpoolRouting(
         new StreetRequest(StreetMode.CAR),
-        tempVertices.getFromVertices(),
-        tempVertices.getToVertices(),
-        streetLimitationParametersService.getMaxCarSpeed()
+        fromVertices,
+        toVertices,
+        streetLimitationParametersService.maxCarSpeed()
       );
     } catch (Exception e) {
       LOG.warn("Routing failed from {} to {}: {}", from, to, e.getMessage());
       return null;
     }
+  }
+
+  /**
+   * Gets vertices for a location, either from the LinkingContext or by creating
+   * temporary vertices on-demand.
+   * <p>
+   * This method first checks if vertices already exist in the LinkingContext (which
+   * contains pre-linked vertices for the passenger's origin and destination). If not
+   * found (e.g., for driver trip waypoints), it creates a temporary vertex on-demand
+   * using VertexLinker and adds it to the TemporaryVerticesContainer for automatic cleanup.
+   * <p>
+   * This follows the pattern used in VertexCreationService but uses VertexLinker directly
+   * to respect package boundaries (VertexCreationService is in the 'internal' package).
+   *
+   * @param location the location to get vertices for
+   * @param linkingContext linking context to check for existing vertices
+   * @return set of vertices for the location (either existing or newly created)
+   */
+  private Set<Vertex> getOrCreateVertices(GenericLocation location, LinkingContext linkingContext) {
+    var vertices = linkingContext.findVertices(location);
+    if (!vertices.isEmpty()) {
+      return vertices;
+    }
+
+    var coordinate = location.getCoordinate();
+    var tempVertex = new TemporaryStreetLocation(
+      coordinate,
+      new NonLocalizedString(location.label != null ? location.label : "Waypoint")
+    );
+
+    var disposableEdges = vertexLinker.linkVertexForRequest(
+      tempVertex,
+      new TraverseModeSet(TraverseMode.CAR),
+      LinkingDirection.BIDIRECTIONAL,
+      (vertex, streetVertex) ->
+        List.of(
+          TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryVertex) vertex, streetVertex),
+          TemporaryFreeEdge.createTemporaryFreeEdge(streetVertex, (TemporaryVertex) vertex)
+        )
+    );
+
+    // Add to container for automatic cleanup
+    temporaryVerticesContainer.addEdgeCollection(disposableEdges);
+
+    if (tempVertex.getIncoming().isEmpty() && tempVertex.getOutgoing().isEmpty()) {
+      LOG.warn("Couldn't link coordinate {} to graph for location {}", coordinate, location);
+    } else {
+      LOG.debug("Created temporary vertex for coordinate {} (not in LinkingContext)", coordinate);
+    }
+
+    return Set.of(tempVertex);
   }
 
   /**

@@ -9,7 +9,6 @@ import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.service.DefaultCarpoolingService;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
@@ -31,20 +30,18 @@ public class CarpoolingModule {
   @Nullable
   public static CarpoolingService provideCarpoolingService(
     @Nullable CarpoolingRepository repository,
-    Graph graph,
-    VertexLinker vertexLinker,
     StreetLimitationParametersService streetLimitationParametersService,
-    TransitService transitService
+    TransitService transitService,
+    VertexLinker vertexLinker
   ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
     return new DefaultCarpoolingService(
       repository,
-      graph,
-      vertexLinker,
       streetLimitationParametersService,
-      transitService
+      transitService,
+      vertexLinker
     );
   }
 }

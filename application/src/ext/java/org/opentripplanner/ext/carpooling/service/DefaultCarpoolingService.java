@@ -22,7 +22,8 @@ import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
@@ -54,7 +55,6 @@ import org.slf4j.LoggerFactory;
  * <h2>Component Dependencies</h2>
  * <ul>
  *   <li><strong>{@link CarpoolingRepository}:</strong> Source of available driver trips</li>
- *   <li><strong>{@link Graph}:</strong> Street network for routing calculations</li>
  *   <li><strong>{@link VertexLinker}:</strong> Links coordinates to graph vertices</li>
  *   <li><strong>{@link StreetLimitationParametersService}:</strong> Street routing configuration</li>
  *   <li><strong>{@link FilterChain}:</strong> Pre-screening filters</li>
@@ -75,13 +75,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private static final Duration DEFAULT_SEARCH_WINDOW = Duration.ofMinutes(30);
 
   private final CarpoolingRepository repository;
-  private final Graph graph;
-  private final VertexLinker vertexLinker;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final FilterChain preFilters;
   private final CarpoolItineraryMapper itineraryMapper;
   private final PassengerDelayConstraints delayConstraints;
   private final InsertionPositionFinder positionFinder;
+  private final VertexLinker vertexLinker;
 
   /**
    * Creates a new carpooling service with the specified dependencies.
@@ -90,32 +89,33 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * is currently hardcoded but could be made configurable in future versions.
    *
    * @param repository provides access to active driver trips, must not be null
-   * @param graph the street network used for routing calculations, must not be null
-   * @param vertexLinker links coordinates to graph vertices for routing, must not be null
    * @param streetLimitationParametersService provides street routing configuration including
    *        speed limits, must not be null
    * @param transitService provides timezone from GTFS agency data for time conversions, must not be null
+   * @param vertexLinker links coordinates to graph vertices, must not be null
    * @throws NullPointerException if any parameter is null
    */
   public DefaultCarpoolingService(
     CarpoolingRepository repository,
-    Graph graph,
-    VertexLinker vertexLinker,
     StreetLimitationParametersService streetLimitationParametersService,
-    TransitService transitService
+    TransitService transitService,
+    VertexLinker vertexLinker
   ) {
     this.repository = repository;
-    this.graph = graph;
-    this.vertexLinker = vertexLinker;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.preFilters = FilterChain.standard();
     this.itineraryMapper = new CarpoolItineraryMapper(transitService.getTimeZone());
     this.delayConstraints = new PassengerDelayConstraints();
     this.positionFinder = new InsertionPositionFinder(delayConstraints, new BeelineEstimator());
+    this.vertexLinker = vertexLinker;
   }
 
   @Override
-  public List<Itinerary> route(RouteRequest request) throws RoutingValidationException {
+  public List<Itinerary> route(
+    RouteRequest request,
+    LinkingContext linkingContext,
+    TemporaryVerticesContainer temporaryVerticesContainer
+  ) throws RoutingValidationException {
     validateRequest(request);
 
     WgsCoordinate passengerPickup = new WgsCoordinate(request.from().getCoordinate());
@@ -159,12 +159,16 @@ public class DefaultCarpoolingService implements CarpoolingService {
     }
 
     var router = new CarpoolStreetRouter(
-      graph,
-      vertexLinker,
       streetLimitationParametersService,
-      request
+      request,
+      vertexLinker,
+      temporaryVerticesContainer
     );
-    var insertionEvaluator = new InsertionEvaluator(router::route, delayConstraints);
+    var insertionEvaluator = new InsertionEvaluator(
+      router::route,
+      delayConstraints,
+      linkingContext
+    );
 
     // Find optimal insertions for remaining trips
     var insertionCandidates = candidateTrips
