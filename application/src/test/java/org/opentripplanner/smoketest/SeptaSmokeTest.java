@@ -8,7 +8,6 @@ import static org.opentripplanner.client.model.RequestMode.WALK;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.client.model.Coordinate;
@@ -63,7 +62,6 @@ public class SeptaSmokeTest {
   }
 
   @Test
-  @Disabled
   public void vehiclePositions() {
     SmokeTest.assertThereArePatternsWithVehiclePositions();
   }
