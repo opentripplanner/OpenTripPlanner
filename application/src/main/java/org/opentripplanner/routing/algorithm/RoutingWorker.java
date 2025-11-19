@@ -74,10 +74,6 @@ public class RoutingWorker {
   @Nullable
   private LinkingContext currentLinkingContext = null;
 
-  /// Store container for access in routeCarpooling() which may run in CompletableFuture
-  @Nullable
-  private TemporaryVerticesContainer temporaryVerticesContainer = null;
-
   public RoutingWorker(
     OtpServerRequestContext serverContext,
     RouteRequest orginalRequest,
@@ -108,7 +104,6 @@ public class RoutingWorker {
     var result = RoutingResult.empty();
 
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
-      this.temporaryVerticesContainer = temporaryVerticesContainer;
       this.currentLinkingContext = createLinkingContext(temporaryVerticesContainer);
 
       if (OTPFeature.ParallelRouting.isOn()) {
@@ -278,11 +273,7 @@ public class RoutingWorker {
     }
     debugTimingAggregator.startedDirectCarpoolRouter();
     try {
-      return RoutingResult.ok(
-        serverContext
-          .carpoolingService()
-          .route(request, linkingContext(), temporaryVerticesContainer)
-      );
+      return RoutingResult.ok(serverContext.carpoolingService().route(request, linkingContext()));
     } catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
     } finally {

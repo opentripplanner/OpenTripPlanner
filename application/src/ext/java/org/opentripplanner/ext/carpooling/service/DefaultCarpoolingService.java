@@ -111,11 +111,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
   }
 
   @Override
-  public List<Itinerary> route(
-    RouteRequest request,
-    LinkingContext linkingContext,
-    TemporaryVerticesContainer temporaryVerticesContainer
-  ) throws RoutingValidationException {
+  public List<Itinerary> route(RouteRequest request, LinkingContext linkingContext)
+    throws RoutingValidationException {
     validateRequest(request);
 
     WgsCoordinate passengerPickup = new WgsCoordinate(request.from().getCoordinate());
@@ -158,60 +155,62 @@ public class DefaultCarpoolingService implements CarpoolingService {
       return List.of();
     }
 
-    var router = new CarpoolStreetRouter(
-      streetLimitationParametersService,
-      request,
-      vertexLinker,
-      temporaryVerticesContainer
-    );
-    var insertionEvaluator = new InsertionEvaluator(
-      router::route,
-      delayConstraints,
-      linkingContext
-    );
+    var itineraries = List.<Itinerary>of();
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var router = new CarpoolStreetRouter(
+        streetLimitationParametersService,
+        request,
+        vertexLinker,
+        temporaryVerticesContainer
+      );
+      var insertionEvaluator = new InsertionEvaluator(
+        router::route,
+        delayConstraints,
+        linkingContext
+      );
 
-    // Find optimal insertions for remaining trips
-    var insertionCandidates = candidateTrips
-      .stream()
-      .map(trip -> {
-        List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
-          trip,
-          passengerPickup,
-          passengerDropoff
-        );
+      // Find optimal insertions for remaining trips
+      var insertionCandidates = candidateTrips
+        .stream()
+        .map(trip -> {
+          List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
+            trip,
+            passengerPickup,
+            passengerDropoff
+          );
 
-        if (viablePositions.isEmpty()) {
-          LOG.debug("No viable positions found for trip {} (avoided all routing!)", trip.getId());
-          return null;
-        }
+          if (viablePositions.isEmpty()) {
+            LOG.debug("No viable positions found for trip {} (avoided all routing!)", trip.getId());
+            return null;
+          }
 
-        LOG.debug(
-          "{} viable positions found for trip {}, evaluating with routing",
-          viablePositions.size(),
-          trip.getId()
-        );
+          LOG.debug(
+            "{} viable positions found for trip {}, evaluating with routing",
+            viablePositions.size(),
+            trip.getId()
+          );
 
-        // Evaluate only viable positions with expensive routing
-        return insertionEvaluator.findBestInsertion(
-          trip,
-          viablePositions,
-          passengerPickup,
-          passengerDropoff
-        );
-      })
-      .filter(Objects::nonNull)
-      .sorted(Comparator.comparing(InsertionCandidate::additionalDuration))
-      .limit(DEFAULT_MAX_CARPOOL_RESULTS)
-      .toList();
+          // Evaluate only viable positions with expensive routing
+          return insertionEvaluator.findBestInsertion(
+            trip,
+            viablePositions,
+            passengerPickup,
+            passengerDropoff
+          );
+        })
+        .filter(Objects::nonNull)
+        .sorted(Comparator.comparing(InsertionCandidate::additionalDuration))
+        .limit(DEFAULT_MAX_CARPOOL_RESULTS)
+        .toList();
 
-    LOG.debug("Found {} viable insertion candidates", insertionCandidates.size());
+      LOG.debug("Found {} viable insertion candidates", insertionCandidates.size());
 
-    // Map to itineraries
-    var itineraries = insertionCandidates
-      .stream()
-      .map(candidate -> itineraryMapper.toItinerary(request, candidate))
-      .filter(Objects::nonNull)
-      .toList();
+      itineraries = insertionCandidates
+        .stream()
+        .map(candidate -> itineraryMapper.toItinerary(request, candidate))
+        .filter(Objects::nonNull)
+        .toList();
+    }
 
     LOG.info("Returning {} carpool itineraries", itineraries.size());
     return itineraries;
