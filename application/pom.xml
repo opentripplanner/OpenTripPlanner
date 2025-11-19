@@ -147,7 +147,7 @@
         <dependency>
             <groupId>org.mobilitydata</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>1.0.9</version>
+            <version>1.0.12</version>
         </dependency>
 
         <!-- TESTING -->
@@ -330,7 +330,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>24.3</version>
+            <version>25.0</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>

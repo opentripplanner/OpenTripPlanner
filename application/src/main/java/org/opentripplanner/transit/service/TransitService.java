@@ -39,6 +39,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -144,6 +145,12 @@ public interface TransitService {
 
   @Nullable
   RegularStop getRegularStop(FeedScopedId id);
+
+  /**
+   * @return the transit entrance
+   * @throws Exception if not found
+   */
+  Entrance getEntrance(FeedScopedId id);
 
   /**
    * Gets the area stop with the given id and throws an exception if it was not found.

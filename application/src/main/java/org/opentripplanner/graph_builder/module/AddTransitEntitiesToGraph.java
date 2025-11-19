@@ -120,7 +120,7 @@ public class AddTransitEntitiesToGraph {
   }
 
   private void addEntrancesToGraph() {
-    for (Entrance entrance : otpTransitService.getAllEntrances()) {
+    for (Entrance entrance : otpTransitService.siteRepository().listEntrances()) {
       TransitEntranceVertex entranceVertex = vertexFactory.transitEntrance(entrance);
       stationElementNodes.put(entrance, entranceVertex);
     }
@@ -129,7 +129,7 @@ public class AddTransitEntitiesToGraph {
   private void addStationCentroidsToGraph() {
     for (Station station : otpTransitService.siteRepository().listStations()) {
       if (station.shouldRouteToCentroid()) {
-        vertexFactory.stationCentroid(station.getId(), station.getCoordinate());
+        vertexFactory.stationCentroid(station);
       }
     }
   }
@@ -151,19 +151,9 @@ public class AddTransitEntitiesToGraph {
         var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
         boolean wheelchair = boardingArea.getWheelchairAccessibility() == Accessibility.POSSIBLE;
 
-        PathwayEdge.createLowCostPathwayEdge(
-          boardingAreaVertex,
-          platformVertex,
-          wheelchair,
-          PathwayMode.WALKWAY
-        );
+        PathwayEdge.createLowCostPathwayEdge(boardingAreaVertex, platformVertex, wheelchair);
 
-        PathwayEdge.createLowCostPathwayEdge(
-          platformVertex,
-          boardingAreaVertex,
-          wheelchair,
-          PathwayMode.WALKWAY
-        );
+        PathwayEdge.createLowCostPathwayEdge(platformVertex, boardingAreaVertex, wheelchair);
       }
     }
   }
@@ -193,8 +183,7 @@ public class AddTransitEntitiesToGraph {
             distance,
             pathway.getStairCount(),
             pathway.getSlope(),
-            pathway.isPathwayModeWheelchairAccessible(),
-            pathway.getPathwayMode()
+            pathway.isPathwayModeWheelchairAccessible()
           );
           if (pathway.isBidirectional()) {
             PathwayEdge.createPathwayEdge(
@@ -205,8 +194,7 @@ public class AddTransitEntitiesToGraph {
               distance,
               -1 * pathway.getStairCount(),
               -1 * pathway.getSlope(),
-              pathway.isPathwayModeWheelchairAccessible(),
-              pathway.getPathwayMode()
+              pathway.isPathwayModeWheelchairAccessible()
             );
           }
         }

@@ -248,6 +248,8 @@ public class RoutingWorker {
         DirectStreetRouter.route(serverContext, directBuilder.buildRequest(), linkingContext()),
         emptyDirectModeHandler.removeWalkAllTheWayResults()
       );
+    } catch (RoutingValidationException e) {
+      return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedDirectStreetRouter();
     }
@@ -262,6 +264,8 @@ public class RoutingWorker {
       return RoutingResult.ok(
         DirectFlexRouter.route(serverContext, request, additionalSearchDays, linkingContext())
       );
+    } catch (RoutingValidationException e) {
+      return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedDirectFlexRouter();
     }
@@ -295,6 +299,8 @@ public class RoutingWorker {
       );
       raptorSearchParamsUsed = transitResults.getSearchParams();
       return RoutingResult.ok(transitResults.getItineraries());
+    } catch (RoutingValidationException e) {
+      return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedTransitRouter();
     }

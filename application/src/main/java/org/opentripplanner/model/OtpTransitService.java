@@ -12,7 +12,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.BoardingArea;
-import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -51,8 +50,6 @@ public interface OtpTransitService {
    * @return all ids for both Calendars and CalendarDates merged into on list without duplicates.
    */
   Collection<FeedScopedId> getAllServiceIds();
-
-  Collection<Entrance> getAllEntrances();
 
   Collection<PathwayNode> getAllPathwayNodes();
 

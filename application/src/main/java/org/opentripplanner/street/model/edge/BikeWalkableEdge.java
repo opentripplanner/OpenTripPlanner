@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.edge;
 
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
@@ -10,7 +10,7 @@ public interface BikeWalkableEdge {
     return state.currentMode() == TraverseMode.BICYCLE;
   }
 
-  default void switchToWalkingBike(RoutingPreferences preferences, StateEditor editor) {
+  default void switchToWalkingBike(StreetSearchRequest preferences, StateEditor editor) {
     // If this is the first traversed edge than the bikeSwitch cost doesn't need to be applied
     var parentState = editor.getBackState();
     var shouldIncludeCost = !parentState.isBackWalkingBike() && hadBackModeSet(parentState);
@@ -24,7 +24,7 @@ public interface BikeWalkableEdge {
     }
   }
 
-  default void switchToBiking(RoutingPreferences preferences, StateEditor editor) {
+  default void switchToBiking(StreetSearchRequest preferences, StateEditor editor) {
     var parentState = editor.getBackState();
     var shouldIncludeCost = parentState.isBackWalkingBike();
 
@@ -69,12 +69,12 @@ public interface BikeWalkableEdge {
 
     if (bicycleWalking) {
       if (canSwitchToWalkingBike(s0)) {
-        switchToWalkingBike(s0.getPreferences(), editor);
+        switchToWalkingBike(s0.getRequest(), editor);
       } else {
         return null;
       }
     } else if (mode == TraverseMode.BICYCLE) {
-      switchToBiking(s0.getPreferences(), editor);
+      switchToBiking(s0.getRequest(), editor);
     }
 
     editor.setBackMode(mode);

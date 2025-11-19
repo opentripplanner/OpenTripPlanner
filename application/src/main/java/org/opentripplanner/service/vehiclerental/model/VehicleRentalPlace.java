@@ -2,8 +2,8 @@ package org.opentripplanner.service.vehiclerental.model;
 
 import java.util.Set;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.street.model.RentalFormFactor;
+import org.opentripplanner.street.search.request.RentalRequest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -90,7 +90,7 @@ public interface VehicleRentalPlace {
   /** System information for the vehicle rental provider */
   VehicleRentalSystem vehicleRentalSystem();
 
-  default boolean networkIsNotAllowed(VehicleRentalPreferences preferences) {
+  default boolean networkIsNotAllowed(RentalRequest preferences) {
     if (
       network() == null &&
       (!preferences.allowedNetworks().isEmpty() || !preferences.bannedNetworks().isEmpty())

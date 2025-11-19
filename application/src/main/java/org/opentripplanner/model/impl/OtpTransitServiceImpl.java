@@ -19,7 +19,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.BoardingArea;
-import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -52,8 +51,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Collection<FeedScopedId> serviceIds;
 
-  private final Map<FeedScopedId, Entrance> entrancesById;
-
   private final Map<FeedScopedId, PathwayNode> pathwayNodesById;
 
   private final Map<FeedScopedId, BoardingArea> boardingAreasById;
@@ -80,7 +77,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
     this.operators = immutableList(builder.getOperatorsById().values());
     this.pathways = immutableList(builder.getPathways());
     this.serviceIds = immutableList(builder.findAllServiceIds());
-    this.entrancesById = builder.getEntrances().asImmutableMap();
     this.pathwayNodesById = builder.getPathwayNodes().asImmutableMap();
     this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
     this.transfers = immutableList(builder.getTransfers());
@@ -130,11 +126,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
   @Override
   public Collection<FeedScopedId> getAllServiceIds() {
     return serviceIds;
-  }
-
-  @Override
-  public Collection<Entrance> getAllEntrances() {
-    return immutableList(entrancesById.values());
   }
 
   @Override

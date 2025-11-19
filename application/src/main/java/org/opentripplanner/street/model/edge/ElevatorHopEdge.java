@@ -3,7 +3,6 @@ package org.opentripplanner.street.model.edge;
 import java.time.Duration;
 import java.util.Optional;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -117,20 +116,20 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   @Override
   public State[] traverse(State s0) {
-    RoutingPreferences preferences = s0.getPreferences();
+    var request = s0.getRequest();
 
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
 
-    if (s0.getRequest().wheelchair()) {
+    if (s0.getRequest().wheelchairEnabled()) {
       if (
         wheelchairAccessibility != Accessibility.POSSIBLE &&
-        preferences.wheelchair().elevator().onlyConsiderAccessible()
+        request.wheelchair().elevator().onlyConsiderAccessible()
       ) {
         return State.empty();
       } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
-        s1.incrementWeight(preferences.wheelchair().elevator().unknownCost());
+        s1.incrementWeight(request.wheelchair().elevator().unknownCost());
       } else if (wheelchairAccessibility == Accessibility.NOT_POSSIBLE) {
-        s1.incrementWeight(preferences.wheelchair().elevator().inaccessibleCost());
+        s1.incrementWeight(request.wheelchair().elevator().inaccessibleCost());
       }
     }
 
@@ -149,13 +148,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     }
 
     s1.incrementWeight(
-      this.travelTime > 0
-        ? this.travelTime
-        : (preferences.street().elevator().hopCost() * this.levels)
+      this.travelTime > 0 ? this.travelTime : (request.elevator().hopCost() * this.levels)
     );
     int seconds = this.travelTime > 0
       ? this.travelTime
-      : (int) (preferences.street().elevator().hopTime() * this.levels);
+      : (int) (request.elevator().hopTime() * this.levels);
     s1.incrementTimeInSeconds(seconds);
     return s1.makeStateArray();
   }

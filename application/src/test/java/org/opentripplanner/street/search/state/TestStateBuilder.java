@@ -2,7 +2,6 @@ package org.opentripplanner.street.search.state;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType.EGRESS;
-import static org.opentripplanner.transit.model.site.PathwayMode.WALKWAY;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -295,7 +294,7 @@ public class TestStateBuilder {
     count++;
     var from = (StreetVertex) currentState.vertex;
     var entranceVertex = StreetModelForTest.transitEntranceVertex(id, count, count);
-    var edge = PathwayEdge.createLowCostPathwayEdge(from, entranceVertex, WALKWAY);
+    var edge = PathwayEdge.createLowCostPathwayEdge(from, entranceVertex, true);
     var state = edge.traverse(currentState)[0];
 
     count++;
@@ -310,17 +309,7 @@ public class TestStateBuilder {
     count++;
     var from = (StreetVertex) currentState.vertex;
     var tov = StreetModelForTest.intersectionVertex(count, count);
-    var edge = PathwayEdge.createPathwayEdge(
-      from,
-      tov,
-      I18NString.of(s),
-      60,
-      100,
-      0,
-      0,
-      true,
-      WALKWAY
-    );
+    var edge = PathwayEdge.createPathwayEdge(from, tov, I18NString.of(s), 60, 100, 0, 0, true);
     currentState = edge.traverse(currentState)[0];
     return this;
   }

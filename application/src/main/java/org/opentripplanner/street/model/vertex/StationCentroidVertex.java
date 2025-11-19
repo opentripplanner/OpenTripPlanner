@@ -10,10 +10,12 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class StationCentroidVertex extends Vertex {
 
   private final FeedScopedId id;
+  private final I18NString name;
 
-  public StationCentroidVertex(FeedScopedId id, WgsCoordinate coordinate) {
+  public StationCentroidVertex(FeedScopedId id, I18NString name, WgsCoordinate coordinate) {
     super(coordinate.longitude(), coordinate.latitude());
     this.id = id;
+    this.name = name;
   }
 
   public FeedScopedId getId() {
@@ -22,7 +24,7 @@ public class StationCentroidVertex extends Vertex {
 
   @Override
   public I18NString getName() {
-    return I18NString.of(id.getId());
+    return name;
   }
 
   @Override

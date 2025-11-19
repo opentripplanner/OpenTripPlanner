@@ -28,6 +28,7 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
+import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -288,6 +289,41 @@ class LinkingContextFactoryTest {
     assertEquals(RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, fromError.code);
   }
 
+  @Test
+  void nonExistingPlaceIdWithCoordinatesShouldFallbackToCoordinates() {
+    var container = new TemporaryVerticesContainer();
+    var nonExistingStopId = new FeedScopedId("F", "NonExistingStop");
+
+    // Create locations with both a non-existing stop ID and valid coordinates
+    var from = new GenericLocation("From", nonExistingStopId, stopA.getLat(), stopA.getLon());
+    var to = new GenericLocation(
+      "To",
+      new FeedScopedId("F", "AnotherNonExisting"),
+      stopD.getLat(),
+      stopD.getLon()
+    );
+
+    var request = LinkingContextRequest.of()
+      .withFrom(from)
+      .withTo(to)
+      .withDirectMode(StreetMode.WALK)
+      .build();
+
+    // This should NOT throw an exception - it should fall back to using coordinates
+    var linkingContext = linkingContextFactory.create(container, request);
+
+    // Verify that vertices were created from the coordinates
+    var fromVertices = linkingContext.findVertices(from);
+    assertThat(fromVertices).hasSize(1);
+    assertTemporaryVertexOnStop(fromVertices.stream().findFirst().get(), stopA);
+
+    var toVertices = linkingContext.findVertices(to);
+    assertThat(toVertices).hasSize(1);
+    assertTemporaryVertexOnStop(toVertices.stream().findFirst().get(), stopD);
+
+    container.close();
+  }
+
   private static Graph buildGraph(Station station, RegularStop... stops) {
     var graph = new Graph();
     var left = StreetModelForTest.intersectionVertex(CENTER.asJtsCoordinate());
@@ -305,7 +341,11 @@ class LinkingContextFactoryTest {
     graph.addVertex(right);
     graph.addVertex(top);
     graph.addVertex(distant);
-    var centroidVertex = new StationCentroidVertex(station.getId(), station.getCoordinate());
+    var centroidVertex = new StationCentroidVertex(
+      station.getId(),
+      station.getName(),
+      station.getCoordinate()
+    );
     graph.addVertex(centroidVertex);
     StreetStationCentroidLink.createStreetStationLink(centroidVertex, left);
     Arrays.stream(stops).forEach(s -> {
@@ -317,6 +357,12 @@ class LinkingContextFactoryTest {
     graph.index();
     graph.calculateConvexHull();
     return graph;
+  }
+
+  private void assertTemporaryVertexOnStop(Vertex vertex, RegularStop stop) {
+    assertThat(vertex).isInstanceOf(TemporaryStreetLocation.class);
+    assertEquals(stop.getLat(), vertex.getLat(), 0.0001);
+    assertEquals(stop.getLon(), vertex.getLon(), 0.0001);
   }
 
   private RegularStop toStop(Set<? extends Vertex> fromVertices) {

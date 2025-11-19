@@ -8,12 +8,10 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
-import org.opentripplanner.transit.model.site.PathwayMode;
 
 /**
  * A walking pathway as described in GTFS
@@ -29,7 +27,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   private final double distance;
   private final int steps;
   private final double slope;
-  private final PathwayMode mode;
 
   private final boolean wheelchairAccessible;
 
@@ -41,8 +38,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     double distance,
     int steps,
     double slope,
-    boolean wheelchairAccessible,
-    PathwayMode mode
+    boolean wheelchairAccessible
   ) {
     super(fromv, tov);
     this.signpostedAs = signpostedAs;
@@ -51,14 +47,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     this.slope = slope;
     this.wheelchairAccessible = wheelchairAccessible;
     this.distance = distance;
-    this.mode = mode;
-  }
-
-  /**
-   * {@link #createLowCostPathwayEdge(Vertex, Vertex, boolean, PathwayMode)}
-   */
-  public static PathwayEdge createLowCostPathwayEdge(Vertex fromV, Vertex toV, PathwayMode mode) {
-    return PathwayEdge.createLowCostPathwayEdge(fromV, toV, true, mode);
   }
 
   /**
@@ -69,10 +57,9 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   public static PathwayEdge createLowCostPathwayEdge(
     Vertex fromV,
     Vertex toV,
-    boolean wheelchairAccessible,
-    PathwayMode mode
+    boolean wheelchairAccessible
   ) {
-    return createPathwayEdge(fromV, toV, null, 0, 0, 0, 0, wheelchairAccessible, mode);
+    return createPathwayEdge(fromV, toV, null, 0, 0, 0, 0, wheelchairAccessible);
   }
 
   public static PathwayEdge createPathwayEdge(
@@ -83,8 +70,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     double distance,
     int steps,
     double slope,
-    boolean wheelchairAccessible,
-    PathwayMode mode
+    boolean wheelchairAccessible
   ) {
     return connectToGraph(
       new PathwayEdge(
@@ -95,8 +81,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
         distance,
         steps,
         slope,
-        wheelchairAccessible,
-        mode
+        wheelchairAccessible
       )
     );
   }
@@ -108,32 +93,31 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
       return State.empty();
     }
 
-    RoutingPreferences preferences = s0.getPreferences();
+    var request = s0.getRequest();
 
-    /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
     long time_ms = 1000L * traversalTime;
 
     if (time_ms == 0) {
       if (distance > 0) {
-        time_ms = (long) ((1000.0 * distance) / preferences.walk().speed());
+        time_ms = (long) ((1000.0 * distance) / request.walk().speed());
       } else if (isStairs()) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
-        time_ms = (long) ((1000.0 * 0.4 * Math.abs(steps)) / preferences.walk().speed());
+        time_ms = (long) ((1000.0 * 0.4 * Math.abs(steps)) / request.walk().speed());
       }
     }
 
     if (time_ms > 0) {
       double weight = time_ms / 1000.0;
-      if (s0.getRequest().wheelchair()) {
+      if (s0.getRequest().wheelchairEnabled()) {
         weight *= StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
-          preferences,
+          request,
           slope,
           wheelchairAccessible,
           isStairs()
         );
       } else {
         weight *= StreetEdgeReluctanceCalculator.computeReluctance(
-          preferences,
+          request,
           TraverseMode.WALK,
           s0.currentMode() == TraverseMode.BICYCLE,
           isStairs()
@@ -197,10 +181,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   @Override
   public boolean isWheelchairAccessible() {
     return wheelchairAccessible;
-  }
-
-  public PathwayMode getMode() {
-    return mode;
   }
 
   private boolean isStairs() {

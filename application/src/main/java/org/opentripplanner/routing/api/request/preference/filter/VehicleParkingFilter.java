@@ -8,7 +8,7 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A filter class that checks if parking faclities match certain conditions for
+ * A filter class that checks if parking facilities match certain conditions for
  * inclusion/exclusion or preference/unpreference.
  */
 public class VehicleParkingFilter implements Serializable {
@@ -22,10 +22,6 @@ public class VehicleParkingFilter implements Serializable {
   ) {
     this.not = makeFilter(not);
     this.select = makeFilter(select);
-  }
-
-  public VehicleParkingFilter(VehicleParkingSelect not, VehicleParkingSelect select) {
-    this(List.of(not), List.of(select));
   }
 
   public List<VehicleParkingSelect> not() {

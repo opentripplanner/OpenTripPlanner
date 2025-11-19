@@ -169,7 +169,7 @@ public class TemporaryPartialStreetEdgeTest {
 
     StreetSearchRequest request = StreetSearchRequest.of()
       .withMode(StreetMode.CAR)
-      .withPreferences(p -> p.withStreet(s -> s.withTurnReluctance(0.5)))
+      .withTurnReluctance(0.5)
       .build();
 
     // All intersections take 10 minutes - we'll notice if one isn't counted.

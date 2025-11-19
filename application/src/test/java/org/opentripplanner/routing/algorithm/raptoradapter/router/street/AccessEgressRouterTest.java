@@ -65,17 +65,13 @@ class AccessEgressRouterTest extends GraphRoutingTest {
           );
 
           // StopForCentroidRoutingStation is a child of centroidRoutingStation
-          stopForCentroidRoutingStation = stop(
-            "StopForCentroidRoutingStation",
-            B.toWgsCoordinate(),
-            centroidRoutingStation
+          stopForCentroidRoutingStation = stop("StopForCentroidRoutingStation", b ->
+            b.withCoordinate(B.toWgsCoordinate()).withParentStation(centroidRoutingStation)
           );
 
           // StopForNoCentroidRoutingStation is a child of noCentroidRoutingStation
-          stopForNoCentroidRoutingStation = stop(
-            "StopForNoCentroidRoutingStation",
-            C.toWgsCoordinate(),
-            noCentroidRoutingStation
+          stopForNoCentroidRoutingStation = stop("StopForNoCentroidRoutingStation", b ->
+            b.withCoordinate(C.toWgsCoordinate()).withParentStation(noCentroidRoutingStation)
           );
 
           biLink(A, centroidRoutingStationVertex);
