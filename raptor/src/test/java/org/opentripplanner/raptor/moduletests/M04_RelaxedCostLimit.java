@@ -6,14 +6,12 @@ import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
-import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -31,10 +29,8 @@ public class M04_RelaxedCostLimit implements RaptorTestConstants {
   @Test
   void testIncludeExpensive() {
     var data = new TestTransitData();
-    data.withRoute(
-        route(pattern("FAST", STOP_A, STOP_B)).withTimetable(
-          schedule("01:00, 01:10")
-        ))
+    data
+      .withRoute(route(pattern("FAST", STOP_A, STOP_B)).withTimetable(schedule("01:00, 01:10")))
       .withRoute(
         route(pattern("SLOW", STOP_A, STOP_B)).withTimetable(
           schedule("00:05, 01:05"),
@@ -45,8 +41,8 @@ public class M04_RelaxedCostLimit implements RaptorTestConstants {
     var result = config.createRelaxedLimitedTransferSearch(data, createRequest()).route();
     assertEquals(
       "A ~ BUS SLOW 0:05 1:05 ~ B [0:05 1:05 1h Tₓ0 C₁4_200]\n" +
-        "A ~ BUS FAST 1:00 1:10 ~ B [1:00 1:10 10m Tₓ0 C₁1_200]\n" +
-        "A ~ BUS SLOW 1:05 2:05 ~ B [1:05 2:05 1h Tₓ0 C₁4_200]",
+      "A ~ BUS FAST 1:00 1:10 ~ B [1:00 1:10 10m Tₓ0 C₁1_200]\n" +
+      "A ~ BUS SLOW 1:05 2:05 ~ B [1:05 2:05 1h Tₓ0 C₁4_200]",
       pathsToString(result)
     );
   }
@@ -55,25 +51,15 @@ public class M04_RelaxedCostLimit implements RaptorTestConstants {
   @Test
   void testRejectExpensive() {
     var data = new TestTransitData();
-    data.withRoute(
-        route(pattern("FAST", STOP_A, STOP_B)).withTimetable(
-          schedule("01:00, 01:10")
-        ))
-      .withRoute(
-        route(pattern("SLOWER", STOP_A, STOP_B)).withTimetable(
-          schedule("01:00, 01:29")
-        )
-      )
-      .withRoute(
-        route(pattern("SLOWEST", STOP_A, STOP_B)).withTimetable(
-          schedule("01:00, 01:30")
-        )
-      );
+    data
+      .withRoute(route(pattern("FAST", STOP_A, STOP_B)).withTimetable(schedule("01:00, 01:10")))
+      .withRoute(route(pattern("SLOWER", STOP_A, STOP_B)).withTimetable(schedule("01:00, 01:29")))
+      .withRoute(route(pattern("SLOWEST", STOP_A, STOP_B)).withTimetable(schedule("01:00, 01:30")));
 
     var result = config.createRelaxedLimitedTransferSearch(data, createRequest()).route();
     assertEquals(
       "A ~ BUS FAST 1:00 1:10 ~ B [1:00 1:10 10m Tₓ0 C₁1_200]\n" +
-        "A ~ BUS SLOWER 1:00 1:29 ~ B [1:00 1:29 29m Tₓ0 C₁2_340]",
+      "A ~ BUS SLOWER 1:00 1:29 ~ B [1:00 1:29 29m Tₓ0 C₁2_340]",
       pathsToString(result)
     );
   }
@@ -88,8 +74,7 @@ public class M04_RelaxedCostLimit implements RaptorTestConstants {
       .searchWindowInSeconds(D24h);
     requestBuilder.withMultiCriteria(mc ->
       mc.withRelaxedLimitedTransferRequest(rlt ->
-        rlt.withEnabled(true)
-          .withCostRelaxFunction(GeneralizedCostRelaxFunction.of(2))
+        rlt.withEnabled(true).withCostRelaxFunction(GeneralizedCostRelaxFunction.of(2))
       )
     );
     return requestBuilder.build();

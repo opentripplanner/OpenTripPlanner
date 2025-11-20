@@ -9,7 +9,6 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.path.PathBuilder;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessEgressWithExtraCost;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
@@ -36,29 +35,21 @@ public class RelaxedLimitedTransferSearch<T extends RaptorTripSchedule> {
   private int currentRouteBoardSlack = 0;
 
   public RelaxedLimitedTransferSearch(
+    Collection<RaptorAccessEgress> accesses,
+    Collection<RaptorAccessEgress> egresses,
     RaptorTransitDataProvider<T> data,
-    RaptorRequest<T> request,
-    RaptorTransitCalculator<T> transitCalculator
+    int earliestDepartureTime,
+    int searchWindowInSeconds,
+    RaptorTransitCalculator<T> transitCalculator,
+    RelaxFunction costRelaxFunction
   ) {
     this.data = data;
     this.transitCalculator = transitCalculator;
-    this.earliestDepartureTime = request.searchParams().earliestDepartureTime();
-    this.latestDepartureTime =
-      earliestDepartureTime + request.searchParams().searchWindowInSeconds();
-    var rltRequest = request.multiCriteria().relaxedLimitedTransferRequest();
-    var disableAccessEgress = rltRequest.disableAccessEgress();
-    var extraAccessEgressCostFactor = rltRequest.extraAccessEgressCostFactor();
-    this.accesses = filterAndMapAccessEgress(
-      request.searchParams().accessPaths(),
-      disableAccessEgress,
-      extraAccessEgressCostFactor
-    );
-    this.egresses = filterAndMapAccessEgress(
-      request.searchParams().egressPaths(),
-      disableAccessEgress,
-      extraAccessEgressCostFactor
-    );
-    this.relaxFunction = rltRequest.costRelaxFunction();
+    this.earliestDepartureTime = earliestDepartureTime;
+    this.latestDepartureTime = earliestDepartureTime + searchWindowInSeconds;
+    this.accesses = accesses;
+    this.egresses = egresses;
+    this.relaxFunction = costRelaxFunction;
   }
 
   public Collection<RaptorPath<T>> route() {
