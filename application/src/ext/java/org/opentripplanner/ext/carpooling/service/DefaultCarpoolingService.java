@@ -219,7 +219,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private void validateRequest(RouteRequest request) throws RoutingValidationException {
     Objects.requireNonNull(request.from());
     Objects.requireNonNull(request.to());
-    if (request.from().lat == null || request.from() == null) {
+    if (request.from().lat == null || request.from().lng == null) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE))
       );
