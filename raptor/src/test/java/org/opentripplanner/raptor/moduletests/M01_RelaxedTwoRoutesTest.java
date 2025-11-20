@@ -18,9 +18,10 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  * <p>
- * The relaxed limited transfer search should return two trips on the same route.
+ * The relaxed limited transfer search should return both the optimal path and the slightly slower
+ * path.
  */
-public class M02_TwoTripsTest implements RaptorTestConstants {
+public class M01_RelaxedTwoRoutesTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
@@ -29,16 +30,15 @@ public class M02_TwoTripsTest implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    data.withRoute(
-      route(pattern("R1", STOP_A, STOP_B)).withTimetable(
-        schedule("00:02, 00:04"),
-        schedule("00:03, 00:05")
-      )
-    );
+    data
+      .withRoute(route(pattern("R1", STOP_B, STOP_D)).withTimetable(schedule("00:02, 00:04")))
+      .withRoute(
+        route(pattern("R2", STOP_B, STOP_C, STOP_D)).withTimetable(schedule("00:01, 00:03, 00:05"))
+      );
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D20s))
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D30s))
+      .addEgressPaths(TestAccessEgress.walk(STOP_D, D20s))
       .earliestDepartureTime(T00_00)
       .searchWindowInSeconds(D10m);
     requestBuilder.withMultiCriteria(mc ->
@@ -50,8 +50,8 @@ public class M02_TwoTripsTest implements RaptorTestConstants {
   void testRelaxedLimitedTransferSearch() {
     var result = config.createRelaxedLimitedTransferSearch(data, requestBuilder.build()).route();
     assertEquals(
-      "Walk 30s ~ A ~ BUS R1 0:02 0:04 ~ B ~ Walk 20s [0:01:30 0:04:20 2m50s Tₓ0 C₁820]\n" +
-      "Walk 30s ~ A ~ BUS R1 0:03 0:05 ~ B ~ Walk 20s [0:02:30 0:05:20 2m50s Tₓ0 C₁820]",
+      "Walk 30s ~ B ~ BUS R1 0:02 0:04 ~ D ~ Walk 20s [0:01:30 0:04:20 2m50s Tₓ0 C₁820]\n" +
+      "Walk 30s ~ B ~ BUS R2 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s Tₓ0 C₁940]",
       pathsToString(result)
     );
   }

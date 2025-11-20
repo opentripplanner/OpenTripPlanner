@@ -18,9 +18,9 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  * <p>
- * The relaxed limited transfer search should return two trips on the same route.
+ * The relaxed limited transfer search should only return trips in the search window
  */
-public class M03_RelaxedArriveBy implements RaptorTestConstants {
+public class M03_RelaxedSearchWindow implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
@@ -31,27 +31,29 @@ public class M03_RelaxedArriveBy implements RaptorTestConstants {
   void setup() {
     data.withRoute(
       route(pattern("R1", STOP_A, STOP_B)).withTimetable(
-        schedule("00:02, 00:04"),
-        schedule("00:03, 00:05")
+        schedule("00:02, 00:03"),
+        schedule("00:03, 00:04"),
+        schedule("00:04, 00:05"),
+        schedule("00:05, 00:06")
       )
     );
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_B, D20s))
-      .earliestDepartureTime(T00_00)
-      .searchWindowInSeconds(D10m);
+      .addAccessPaths(TestAccessEgress.walk(STOP_A, D1m))
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D1m))
+      .earliestDepartureTime(T00_02)
+      .searchWindowInSeconds(D1m);
     requestBuilder.withMultiCriteria(mc ->
       mc.withRelaxedLimitedTransferRequest(rlt -> rlt.withEnabled(true))
     );
   }
 
   @Test
-  void testRelaxedLimitedTransferSearch() {
+  void testRelaxedSearchWindow() {
     var result = config.createRelaxedLimitedTransferSearch(data, requestBuilder.build()).route();
     assertEquals(
-      "Walk 30s ~ A ~ BUS R1 0:02 0:04 ~ B ~ Walk 20s [0:01:30 0:04:20 2m50s Tₓ0 C₁820]\n" +
-      "Walk 30s ~ A ~ BUS R1 0:03 0:05 ~ B ~ Walk 20s [0:02:30 0:05:20 2m50s Tₓ0 C₁820]",
+      "Walk 1m ~ A ~ BUS R1 0:03 0:04 ~ B ~ Walk 1m [0:02 0:05 3m Tₓ0 C₁900]\n" +
+      "Walk 1m ~ A ~ BUS R1 0:04 0:05 ~ B ~ Walk 1m [0:03 0:06 3m Tₓ0 C₁900]",
       pathsToString(result)
     );
   }

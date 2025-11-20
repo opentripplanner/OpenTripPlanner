@@ -154,7 +154,9 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
     Collection<RaptorPath<T>> relaxedLimitedTransferResult = null;
     if (request.multiCriteria().relaxedLimitedTransferRequest().enabled()) {
-      relaxedLimitedTransferResult = config.createRelaxedLimitedTransferSearch(transitData, request).route();
+      relaxedLimitedTransferResult = config
+        .createRelaxedLimitedTransferSearch(transitData, request)
+        .route();
     }
     // Route
     var result = raptorRouter.route();
