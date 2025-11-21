@@ -218,9 +218,13 @@ public class GraphPathToItineraryMapper {
       }
       PackedCoordinateSequence coordinates = edgeWithElevation.getElevationProfile();
 
-      if (coordinates == null) continue;
+      if (coordinates == null) {
+        continue;
+      }
       // TODO Check the test below, AFAIU current elevation profile has 3 dimensions.
-      if (coordinates.getDimension() != 2) continue;
+      if (coordinates.getDimension() != 2) {
+        continue;
+      }
 
       for (int i = 0; i < coordinates.size() - 1; i++) {
         double change = coordinates.getOrdinate(i + 1, 1) - coordinates.getOrdinate(i, 1);
@@ -398,9 +402,7 @@ public class GraphPathToItineraryMapper {
       .withDistanceMeters(distanceMeters)
       .withGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
       .withGeometry(geometry)
-      .withElevationProfile(
-        makeElevation(edges, firstState.getPreferences().system().geoidElevation())
-      )
+      .withElevationProfile(makeElevation(edges, firstState.getRequest().geoidElevation()))
       .withWalkSteps(walkSteps)
       .withRentedVehicle(firstState.isRentingVehicle())
       .withWalkingBike(false);

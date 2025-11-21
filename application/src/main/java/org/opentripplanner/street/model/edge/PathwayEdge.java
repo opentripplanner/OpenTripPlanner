@@ -8,7 +8,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -94,31 +93,31 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
       return State.empty();
     }
 
-    RoutingPreferences preferences = s0.getPreferences();
+    var request = s0.getRequest();
 
     long time_ms = 1000L * traversalTime;
 
     if (time_ms == 0) {
       if (distance > 0) {
-        time_ms = (long) ((1000.0 * distance) / preferences.walk().speed());
+        time_ms = (long) ((1000.0 * distance) / request.walk().speed());
       } else if (isStairs()) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
-        time_ms = (long) ((1000.0 * 0.4 * Math.abs(steps)) / preferences.walk().speed());
+        time_ms = (long) ((1000.0 * 0.4 * Math.abs(steps)) / request.walk().speed());
       }
     }
 
     if (time_ms > 0) {
       double weight = time_ms / 1000.0;
-      if (s0.getRequest().wheelchair()) {
+      if (s0.getRequest().wheelchairEnabled()) {
         weight *= StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
-          preferences,
+          request,
           slope,
           wheelchairAccessible,
           isStairs()
         );
       } else {
         weight *= StreetEdgeReluctanceCalculator.computeReluctance(
-          preferences,
+          request,
           TraverseMode.WALK,
           s0.currentMode() == TraverseMode.BICYCLE,
           isStairs()

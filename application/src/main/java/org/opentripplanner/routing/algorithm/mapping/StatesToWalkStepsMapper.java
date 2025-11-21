@@ -321,7 +321,9 @@ public class StatesToWalkStepsMapper {
     String lastStepName = lastStep.directionTextNoParens();
     String twoBackStepName = twoBack.directionTextNoParens();
     String threeBackStepName = threeBack.directionTextNoParens();
-    if (lastStepName == null || twoBackStepName == null || threeBackStepName == null) return false;
+    if (lastStepName == null || twoBackStepName == null || threeBackStepName == null) {
+      return false;
+    }
 
     return (
       (!lastStep.isCrossing() || lastStep.nameIsDerived()) &&
@@ -348,7 +350,7 @@ public class StatesToWalkStepsMapper {
     ElevationProfile p = encodeElevationProfile(
       edge,
       distance,
-      backState.getPreferences().system().geoidElevation() ? -ellipsoidToGeoidDifference : 0
+      backState.getRequest().geoidElevation() ? -ellipsoidToGeoidDifference : 0
     );
     current.addElevation(p);
   }
@@ -607,7 +609,7 @@ public class StatesToWalkStepsMapper {
         encodeElevationProfile(
           backEdge,
           0,
-          forwardState.getPreferences().system().geoidElevation() ? -ellipsoidToGeoidDifference : 0
+          forwardState.getRequest().geoidElevation() ? -ellipsoidToGeoidDifference : 0
         )
       )
       .addStreetNotes(streetNotesService.getNotes(forwardState));

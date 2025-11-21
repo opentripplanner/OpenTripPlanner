@@ -55,8 +55,12 @@ public class DoubleRange {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     var other = (DoubleRange) o;
     return start == other.start && end == other.end;
   }

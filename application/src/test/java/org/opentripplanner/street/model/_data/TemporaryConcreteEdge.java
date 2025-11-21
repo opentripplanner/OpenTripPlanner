@@ -7,6 +7,7 @@ import org.opentripplanner.street.model.edge.TemporaryEdge;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
@@ -32,7 +33,7 @@ public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
   public State[] traverse(State s0) {
     double d = getDistanceMeters();
     TraverseMode mode = s0.currentMode();
-    int t = (int) ((1000.0 * d) / s0.getPreferences().getSpeed(mode, false));
+    int t = (int) ((1000.0 * d) / getSpeed(mode, s0.getRequest(), false));
     StateEditor s1 = s0.edit(this);
     s1.incrementTimeInMilliseconds(t);
     s1.incrementWeight(d);
@@ -50,5 +51,18 @@ public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
       getFromVertex().getCoordinate(),
       getToVertex().getCoordinate()
     );
+  }
+
+  /**
+   * The road speed for a specific traverse mode.
+   *
+   */
+  public static double getSpeed(TraverseMode mode, StreetSearchRequest req, boolean walkingBike) {
+    return switch (mode) {
+      case WALK -> walkingBike ? req.bike().walking().speed() : req.walk().speed();
+      case BICYCLE -> req.bike().speed();
+      case SCOOTER -> req.scooter().speed();
+      default -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
+    };
   }
 }

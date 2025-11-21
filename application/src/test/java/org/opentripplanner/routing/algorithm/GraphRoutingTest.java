@@ -61,6 +61,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -241,16 +242,23 @@ public abstract class GraphRoutingTest {
       @Nullable Station parentStation,
       @Nullable TransitMode vehicleType
     ) {
+      return stopEntity(id, b -> {
+        b.withCoordinate(latitude, longitude);
+        if (parentStation != null) {
+          b.withParentStation(parentStation);
+        }
+        if (vehicleType != null) {
+          b.withVehicleType(vehicleType);
+        }
+      });
+    }
+
+    RegularStop stopEntity(String id, Consumer<RegularStopBuilder> body) {
       var siteRepositoryBuilder = timetableRepository.getSiteRepository().withContext();
       var testModel = new TimetableRepositoryForTest(siteRepositoryBuilder);
 
-      var stopBuilder = testModel.stop(id).withCoordinate(latitude, longitude);
-      if (parentStation != null) {
-        stopBuilder.withParentStation(parentStation);
-      }
-      if (vehicleType != null) {
-        stopBuilder.withVehicleType(vehicleType);
-      }
+      var stopBuilder = testModel.stop(id);
+      body.accept(stopBuilder);
 
       var stop = stopBuilder.build();
       timetableRepository.mergeSiteRepositories(
@@ -271,35 +279,16 @@ public abstract class GraphRoutingTest {
       return station;
     }
 
-    public TransitStopVertex stop(String id, WgsCoordinate coordinate, Station parentStation) {
-      return stop(id, coordinate.latitude(), coordinate.longitude(), parentStation);
-    }
-
     public TransitStopVertex stop(String id, WgsCoordinate coordinate) {
-      return stop(id, coordinate, null);
+      return stop(id, b -> b.withCoordinate(coordinate));
     }
 
     public TransitStopVertex stop(String id, double latitude, double longitude) {
-      return stop(id, latitude, longitude, null);
+      return stop(id, b -> b.withCoordinate(latitude, longitude));
     }
 
-    public TransitStopVertex stop(
-      String id,
-      double latitude,
-      double longitude,
-      @Nullable Station parentStation
-    ) {
-      return stop(id, latitude, longitude, parentStation, null);
-    }
-
-    public TransitStopVertex stop(
-      String id,
-      double latitude,
-      double longitude,
-      @Nullable Station parentStation,
-      @Nullable TransitMode vehicleType
-    ) {
-      var stop = stopEntity(id, latitude, longitude, parentStation, vehicleType);
+    public TransitStopVertex stop(String id, Consumer<RegularStopBuilder> body) {
+      var stop = stopEntity(id, body);
       return vertexFactory.transitStop(ofStop(stop));
     }
 
@@ -314,7 +303,7 @@ public abstract class GraphRoutingTest {
 
     public StationCentroidVertex stationCentroid(Station station) {
       assertTrue(station.shouldRouteToCentroid());
-      return vertexFactory.stationCentroid(station.getId(), station.getCoordinate());
+      return vertexFactory.stationCentroid(station);
     }
 
     public StreetTransitEntranceLink link(StreetVertex from, TransitEntranceVertex to) {

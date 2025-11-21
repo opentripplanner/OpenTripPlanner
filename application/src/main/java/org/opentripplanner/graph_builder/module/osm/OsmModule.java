@@ -194,7 +194,9 @@ public class OsmModule implements GraphBuilderModule {
       osmdb.getWalkableAreas(),
       osmdb.getParkAndRideAreas(),
       osmdb.getBikeParkingAreas()
-    )) setEntityName(area.parent);
+    )) {
+      setEntityName(area.parent);
+    }
 
     // figure out which nodes that are actually intersections
     vertexGenerator.initIntersectionNodes();
@@ -353,7 +355,9 @@ public class OsmModule implements GraphBuilderModule {
       for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext();) {
         long nodeId = iter.next();
         OsmNode node = osmdb.getNode(nodeId);
-        if (node == null) continue WAY;
+        if (node == null) {
+          continue WAY;
+        }
         boolean levelsDiffer = false;
         String level = node.getTag("level");
         if (lastLevel == null) {
@@ -365,9 +369,9 @@ public class OsmModule implements GraphBuilderModule {
             levelsDiffer = true;
           }
         }
-        if (
-          nodeId != last && (node.lat != lastLat || node.lon != lastLon || levelsDiffer)
-        ) nodes.add(nodeId);
+        if (nodeId != last && (node.lat != lastLat || node.lon != lastLon || levelsDiffer)) {
+          nodes.add(nodeId);
+        }
         last = nodeId;
         lastLon = node.lon;
         lastLat = node.lat;

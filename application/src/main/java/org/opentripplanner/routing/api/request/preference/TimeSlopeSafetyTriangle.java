@@ -53,6 +53,10 @@ public record TimeSlopeSafetyTriangle(double time, double slope, double safety) 
     this.safety = roundTo2Decimals(1.0 - (this.time + this.slope));
   }
 
+  public TimeSlopeSafetyTriangle.Builder copyOf() {
+    return new Builder(this);
+  }
+
   /**
    * Creates a special builder, which used together with the
    * {@link Builder#buildOrDefault(TimeSlopeSafetyTriangle)} can return a new instance or the
@@ -77,6 +81,12 @@ public record TimeSlopeSafetyTriangle(double time, double slope, double safety) 
     private double time;
     private double slope;
     private double safety;
+
+    private Builder(TimeSlopeSafetyTriangle original) {
+      this.time = original.time;
+      this.slope = original.slope;
+      this.safety = original.safety;
+    }
 
     private Builder() {
       this.time = ZERO;

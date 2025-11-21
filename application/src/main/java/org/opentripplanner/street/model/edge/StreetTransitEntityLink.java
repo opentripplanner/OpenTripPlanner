@@ -4,7 +4,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -58,15 +57,15 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       return State.empty();
     }
 
-    RoutingPreferences pref = s0.getPreferences();
+    var request = s0.getRequest();
 
     // Do not check here whether any transit modes are selected. A check for the presence of
     // transit modes will instead be done in the following PreBoard edge.
     // This allows searching for nearby transit stops using walk-only options.
     StateEditor s1 = s0.edit(this);
 
-    if (s0.getRequest().wheelchair()) {
-      var accessibility = pref.wheelchair();
+    if (s0.getRequest().wheelchairEnabled()) {
+      var accessibility = request.wheelchair();
       if (
         accessibility.stop().onlyConsiderAccessible() &&
         wheelchairAccessibility != Accessibility.POSSIBLE
@@ -92,13 +91,12 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
           !(s0.mayKeepRentedVehicleAtDestination() &&
             s0
               .getRequest()
-              .preferences()
               .rental(s0.getRequest().mode())
               .allowArrivingInRentedVehicleAtDestination())
         ) {
           yield State.empty();
         }
-        yield buildState(s0, s1, pref);
+        yield buildState(s0, s1);
       }
       // Allow taking an owned bike in the station
       case CAR -> {
@@ -117,18 +115,18 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         if (s0.isRentingVehicleFromStation()) {
           yield State.empty();
         }
-        yield buildState(s0, s1, pref);
+        yield buildState(s0, s1);
       }
       // If Kiss & Ride (Taxi) mode is not enabled allow car traversal so that the Stop
       // may be reached by car
-      case WALK -> buildState(s0, s1, pref);
+      case WALK -> buildState(s0, s1);
       case FLEX -> State.empty();
     };
   }
 
-  private State[] buildState(State s0, StateEditor s1, RoutingPreferences pref) {
+  private State[] buildState(State s0, StateEditor s1) {
     if (s0.isRentingVehicleFromStation() && s0.mayKeepRentedVehicleAtDestination()) {
-      var rentalPreferences = s0.getRequest().preferences().rental(s0.getRequest().mode());
+      var rentalPreferences = s0.getRequest().rental(s0.getRequest().mode());
       if (rentalPreferences.allowArrivingInRentedVehicleAtDestination()) {
         s1.incrementWeight(
           rentalPreferences.arrivingInRentalVehicleAtDestinationCost().toSeconds()

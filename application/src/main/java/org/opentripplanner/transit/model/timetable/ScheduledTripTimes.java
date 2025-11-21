@@ -323,8 +323,12 @@ public final class ScheduledTripTimes implements TripTimes {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     ScheduledTripTimes that = (ScheduledTripTimes) o;
     return (
       timeShift == that.timeShift &&

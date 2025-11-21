@@ -667,7 +667,9 @@ public class OrcaFareService extends DefaultFareService {
     ZonedDateTime currentLegStartTime
   ) {
     // If there is no free transfer, then return false.
-    if (freeTransferStartTime == null) return false;
+    if (freeTransferStartTime == null) {
+      return false;
+    }
     Duration duration = Duration.between(freeTransferStartTime, currentLegStartTime);
     return duration.compareTo(MAX_TRANSFER_DISCOUNT_DURATION) < 0;
   }

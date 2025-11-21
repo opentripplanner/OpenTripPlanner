@@ -43,7 +43,9 @@ public class BinHeapTest {
     // fill and empty the queue a few times
     int sum = 0;
     for (Integer i : input) q.insert(i, i);
-    while (!q.empty()) sum += q.extract_min();
+    while (!q.empty()) {
+      sum += q.extract_min();
+    }
     // keep compiler from optimizing out extract
     assertEquals(sum, expectedSum);
   }
@@ -68,7 +70,9 @@ public class BinHeapTest {
   public void testCompareHeaps() throws InterruptedException {
     List<Integer> input, expected;
     input = new ArrayList<>(N);
-    for (int i = 0; i < N; i++) input.add((int) (Math.random() * 10000));
+    for (int i = 0; i < N; i++) {
+      input.add((int) (Math.random() * 10000));
+    }
 
     // First determine the expected results using a plain old PriorityQueue
     expected = new ArrayList<>(N);

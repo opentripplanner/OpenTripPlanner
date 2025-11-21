@@ -297,19 +297,41 @@ public final class TripPattern
   }
 
   /**
-   * Returns whether passengers can board at a given stop. This is an inefficient method iterating
-   * over the stops, do not use it in routing.
+   * Use {@link #canBoard(int)} if you want to check if a stop can be boarded at a given
+   * stop position, ONLY use this method if you would like to search the stop-pattern for
+   * if it contains a bording for the given stop.
+   * <p>
+   * Returns whether passengers can board at a given stop SOMEWHERE in the pattern,
+   * considering all stops in case the pattern visit the same stop twice.
+   * <p>
+   * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
+   * <p>
+   * WARNING! This does not produce the same result as the {@link #canBoard(int)},
+   *          this method ALWAYS returns {@code false} for the last stop, while the
+   *          other method returns whatever is in the data. This method is probably the
+   *          correct way - but this is not a clear decision.
    */
-  public boolean canBoard(StopLocation stop) {
-    return stopPattern.canBoard(stop);
+  public boolean boardingExist(StopLocation stop) {
+    return stopPattern.boardingExist(stop);
   }
 
   /**
-   * Returns whether passengers can alight at a given stop. This is an inefficient method iterating
-   * over the stops, do not use it in routing.
+   * Use {@link #canAlight(int)} if you want to check if a stop can be alighted at a given
+   * stop position, ONLY use this method if you would like to search the stop-pattern for a
+   * alighting.
+   * <p>
+   * Returns whether passengers can alight at a given stop SOMEWHERE in the pattern,
+   * considering all stops in case the pattern visit the same stop twice.
+   * <p>
+   * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
+   * <p>
+   * WARNING! This does not produce the same result as the {@link #canAlight(int)},
+   *          this method ALWAYS returns {@code false} for the first stop, while the
+   *          other method returns whatever is in the data. This method is probably the
+   *          correct way - but this is not a clear decision.
    */
-  public boolean canAlight(StopLocation stop) {
-    return stopPattern.canAlight(stop);
+  public boolean alightingExist(StopLocation stop) {
+    return stopPattern.alightingExist(stop);
   }
 
   /** Returns whether a given stop is wheelchair-accessible. */

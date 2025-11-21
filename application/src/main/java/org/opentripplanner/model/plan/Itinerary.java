@@ -59,7 +59,7 @@ public class Itinerary implements ItinerarySortKey {
   private final Duration totalWalkDuration;
   private final boolean walkOnly;
 
-  /* RENATL */
+  /* RENTAL */
   private final boolean arrivedAtDestinationWithRentedVehicle;
 
   /* WAIT */

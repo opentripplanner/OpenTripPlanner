@@ -321,7 +321,9 @@ public class LegacyRouteRequestMapper {
   ) {
     callWith.argument("bikeWalkingReluctance", walking::withReluctance);
     callWith.argument("bikeWalkingSpeed", walking::withSpeed);
-    callWith.argument("bikeSwitchTime", time -> walking.withMountDismountTime((int) time));
+    callWith.argument("bikeSwitchTime", time ->
+      walking.withMountDismountTime(Duration.ofSeconds((int) time))
+    );
     callWith.argument("bikeSwitchCost", cost -> walking.withMountDismountCost((int) cost));
   }
 

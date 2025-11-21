@@ -2,6 +2,7 @@ package org.opentripplanner.street.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -380,7 +381,10 @@ public class BikeWalkingTest extends GraphRoutingTest {
             it
               .withSpeed(20d)
               .withWalking(w ->
-                w.withSpeed(5d).withMountDismountTime(100).withMountDismountCost(1000)
+                w
+                  .withSpeed(5d)
+                  .withMountDismountTime(Duration.ofSeconds(100))
+                  .withMountDismountCost(1000)
               )
           )
       )

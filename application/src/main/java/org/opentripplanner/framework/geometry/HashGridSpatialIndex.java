@@ -59,9 +59,9 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   private int nEntries = 0;
 
   public HashGridSpatialIndex(double xBinSize, double yBinSize) {
-    if (xBinSize <= 0 || yBinSize <= 0) throw new IllegalStateException(
-      "bin size must be positive."
-    );
+    if (xBinSize <= 0 || yBinSize <= 0) {
+      throw new IllegalStateException("bin size must be positive.");
+    }
     this.xBinSize = xBinSize;
     this.yBinSize = yBinSize;
     // For 200m bins, 500x500 = 100x100km = 250000 bins

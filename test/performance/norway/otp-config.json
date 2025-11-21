@@ -2,7 +2,7 @@
   "otpFeatures" : {
     "FlexRouting" : true,
     "FloatingBike" : true,
-    "IncludeEmptyRailStopsInTransfers" : true,
+    "IncludeStopsUsedRealtimeInTransfers" : true,
     "MultiCriteriaGroupMaxFilter" : true,
     "OptimizeTransfers" : true,
     "ParallelRouting" : false,

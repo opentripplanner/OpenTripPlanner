@@ -22,17 +22,6 @@ public enum OTPFeature {
   ),
   APIServerInfo(true, false, "Enable the server info endpoint."),
   APIUpdaterStatus(true, false, "Enable endpoint for graph updaters status."),
-  IncludeEmptyRailStopsInTransfers(
-    false,
-    false,
-    """
-    Turning this on guarantees that Rail stops without scheduled departures still get included
-    when generating transfers using `ConsiderPatternsForDirectTransfers`. It is common for stops
-    to be assign at real-time for Rail. Turning this on will help to avoid dropping transfers which
-    are needed, when the stop is in use later. Turning this on, if
-    ConsiderPatternsForDirectTransfers is off has no effect.
-    """
-  ),
   ConsiderPatternsForDirectTransfers(
     true,
     false,
@@ -54,6 +43,20 @@ public enum OTPFeature {
   ),
   FloatingBike(true, false, "Enable floating bike routing."),
   GtfsGraphQlApi(true, false, "Enable the [GTFS GraphQL API](apis/GTFS-GraphQL-API.md)."),
+  IncludeStopsUsedRealTimeInTransfers(
+    false,
+    false,
+    """
+    When generating transfers, stops without any patterns are excluded to improve performance if
+    `ConsiderPatternsForDirectTransfers` is enabled. However, some stops are only used by trips
+    changed or added by real-time updates. Since transfer generation happens before real-time
+    updates are applied, OTP cannot know which stops will be needed. Instead, OTP will attempt to
+    identify stops likely to be used by real-time updates at import time. Common cases include rail
+    stops (which often have late platform assignments) and stops reserved for replacement services.
+    This is detected examining the stop `subMode`(NeTEx) and `vehicleType`(GTFS). This feature has
+    no effect if `ConsiderPatternsForDirectTransfers` is disabled.
+    """
+  ),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
    * time, but the definitive transfer time. Use this to override what we think the transfer will
@@ -114,6 +117,7 @@ public enum OTPFeature {
     "Make all polling updaters wait for graph updates to complete before finishing. " +
     "If this is not enabled, the updaters will finish after submitting the task to update the graph."
   ),
+  CarPooling(false, true, "Enable the carpooling sandbox module."),
   Emission(false, true, "Enable the emission sandbox module."),
   EmpiricalDelay(false, true, "Enable empirical delay sandbox module."),
   DataOverlay(
