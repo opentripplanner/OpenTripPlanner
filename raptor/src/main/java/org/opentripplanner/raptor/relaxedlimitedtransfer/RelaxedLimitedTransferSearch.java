@@ -220,7 +220,6 @@ public class RelaxedLimitedTransferSearch<T extends RaptorTripSchedule> {
     return pathBuilder.build();
   }
 
-  // TODO DT - Add unit tests
   static int calculateIterationDepartureTime(int accessDuration, int boardTime, int boardSlack) {
     return ((boardTime - (accessDuration + boardSlack)) / 60) * 60;
   }
