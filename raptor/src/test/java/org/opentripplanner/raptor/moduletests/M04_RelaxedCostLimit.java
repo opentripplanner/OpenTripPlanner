@@ -19,7 +19,7 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  * <p>
- * The relaxed limited transfer search should only return trips in the search window
+ * The relaxed limited transfer search should include trips within the cost limit
  */
 public class M04_RelaxedCostLimit implements RaptorTestConstants {
 
@@ -47,7 +47,7 @@ public class M04_RelaxedCostLimit implements RaptorTestConstants {
     );
   }
 
-  ///  Expensive trips should be rejected
+  ///  Expensive trips should be rejected if they are not optimal on arrival or departure
   @Test
   void testRejectExpensive() {
     var data = new TestTransitData();
