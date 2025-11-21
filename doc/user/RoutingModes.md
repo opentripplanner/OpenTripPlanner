@@ -51,6 +51,10 @@ See [the sandbox documentation](sandbox/RideHailing.md) on how to configure it.
 
 Walking to a pickup point along the road, driving to a drop-off point along the road, and walking the rest of the way. <br/> This can include various taxi-services or kiss & ride.
 
+<h4 id="CAR_POOL">CAR_POOL</h4>
+
+Carpool or rideshare with other passengers. Share a car ride with a driver and potentially other passengers going in the same direction.
+
 <h4 id="CAR_RENTAL">CAR_RENTAL</h4>
 
 Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.

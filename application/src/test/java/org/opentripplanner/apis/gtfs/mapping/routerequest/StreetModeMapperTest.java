@@ -104,4 +104,20 @@ class StreetModeMapperTest {
       exception.getMessage()
     );
   }
+
+  @Test
+  void testGetStreetModeForRoutingWithCarPoolOnly() {
+    assertEquals(
+      StreetMode.CAR_POOL,
+      StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.CAR_POOL))
+    );
+  }
+
+  @Test
+  void testGetStreetModeForRoutingWithCarPoolAndWalk() {
+    assertEquals(
+      StreetMode.CAR_POOL,
+      StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.WALK, StreetMode.CAR_POOL))
+    );
+  }
 }

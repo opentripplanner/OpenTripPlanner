@@ -61,6 +61,13 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
   CAR_HAILING(Feature.ACCESS, Feature.EGRESS, Feature.DRIVING, Feature.PICKUP),
 
   /**
+   * Carpool or rideshare with other passengers traveling in the same direction.
+   * Share a ride with a driver and other passengers.
+   * Currently only supported for direct routing (origin to destination).
+   */
+  CAR_POOL(Feature.WALKING, Feature.DRIVING, Feature.PICKUP),
+
+  /**
    * Encompasses all types of on-demand and flexible transportation.
    */
   FLEXIBLE(Feature.ACCESS, Feature.EGRESS, Feature.WALKING);
@@ -183,6 +190,8 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
 
       See [the sandbox documentation](sandbox/RideHailing.md) on how to configure it.
       """;
+      case CAR_POOL -> "Carpool or rideshare with other passengers. Share a car ride with a driver and potentially other passengers going in the " +
+      "same direction.";
       case FLEXIBLE -> "Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTEx Flexible Stop Places.";
     };
   }

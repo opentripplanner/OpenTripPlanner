@@ -21,6 +21,7 @@ public class StreetModeToRentalTraverseModeMapper {
         CAR_TO_PARK,
         CAR_PICKUP,
         CAR_HAILING,
+        CAR_POOL,
         FLEXIBLE -> throw new IllegalArgumentException("%s is not a rental mode.".formatted(mode));
     };
   }
