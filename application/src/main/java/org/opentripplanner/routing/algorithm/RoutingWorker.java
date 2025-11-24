@@ -261,12 +261,9 @@ public class RoutingWorker {
 
     debugTimingAggregator.startedDirectStreetRouter();
     try {
+      var directRouter = new DefaultDirectStreetRouter();
       return RoutingResult.ok(
-        DefaultDirectStreetRouter.route(
-          serverContext,
-          directBuilder.buildRequest(),
-          linkingContext()
-        ),
+        directRouter.route(serverContext, directBuilder.buildRequest(), linkingContext()),
         emptyDirectModeHandler.removeWalkAllTheWayResults()
       );
     } catch (RoutingValidationException e) {
