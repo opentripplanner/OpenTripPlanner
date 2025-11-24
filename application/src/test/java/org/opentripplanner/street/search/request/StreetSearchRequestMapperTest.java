@@ -12,6 +12,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -47,18 +49,19 @@ class StreetSearchRequestMapperTest {
     assertTrue(subject.wheelchairEnabled());
   }
 
-  @Test
-  void mapVehicleWalkingToTransferRequest() {
-    var builder = builder();
-
-    Instant dateTime = Instant.parse("2022-11-10T10:00:00Z");
-    builder.withDateTime(dateTime);
+  @ParameterizedTest
+  @ValueSource(booleans = { true, false })
+  void mapTransferRequest(boolean arriveBy) {
     var from = new GenericLocation(null, id("STOP"), null, null);
-    builder.withFrom(from);
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
-    builder.withTo(to);
-    builder.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
-    builder.withJourney(j -> j.withWheelchair(true));
+    var dateTime = Instant.parse("2022-11-10T10:00:00Z");
+    var builder = builder()
+      .withArriveBy(arriveBy)
+      .withDateTime(dateTime)
+      .withFrom(from)
+      .withTo(to)
+      .withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)))
+      .withJourney(j -> j.withWheelchair(true));
 
     var request = builder.buildRequest();
 
@@ -68,6 +71,10 @@ class StreetSearchRequestMapperTest {
     assertNull(subject.fromEnvelope());
     assertNull(subject.toEnvelope());
     assertTrue(subject.wheelchairEnabled());
+    assertEquals(2.4, subject.walk().speed());
+    assertEquals(Instant.ofEpochSecond(0), subject.startTime());
+    // arrive by must always be false for transfer requests
+    assertFalse(subject.arriveBy());
   }
 
   @Test

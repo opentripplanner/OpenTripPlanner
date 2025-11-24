@@ -46,6 +46,8 @@ public class StreetSearchRequestMapper {
     return mapInternal(request)
       .withFrom(null)
       .withTo(null)
+      // transfer requests are always depart-at
+      .withArriveBy(false)
       .withStartTime(Instant.ofEpochSecond(0))
       .withMode(request.journey().transfer().mode());
   }
