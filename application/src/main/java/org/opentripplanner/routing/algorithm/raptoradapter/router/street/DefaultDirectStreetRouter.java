@@ -25,7 +25,7 @@ import org.opentripplanner.street.search.state.State;
  *
  * @see DirectFlexRouter
  */
-public class DirectStreetRouter {
+public class DefaultDirectStreetRouter {
 
   public static List<Itinerary> route(
     OtpServerRequestContext serverContext,
