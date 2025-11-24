@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -103,20 +104,16 @@ public class GraphPathToItineraryMapper {
   /**
    * Generates a TripPlan from a set of paths
    */
-  public List<Itinerary> mapItineraries(
-    List<GraphPath<State, Edge, Vertex>> paths,
+  public Optional<Itinerary> mapToItinerary(
+    GraphPath<State, Edge, Vertex> path,
     RouteRequest request
   ) {
-    List<Itinerary> itineraries = new LinkedList<>();
-    for (GraphPath<State, Edge, Vertex> path : paths) {
-      Itinerary itinerary = generateItinerary(path, request);
-      if (itinerary.legs().isEmpty()) {
-        continue;
-      }
-      itineraries.add(itinerary);
+    Itinerary itinerary = generateItinerary(path, request);
+    if (itinerary.legs().isEmpty()) {
+      return Optional.empty();
     }
 
-    return itineraries;
+    return Optional.of(itinerary);
   }
 
   /**

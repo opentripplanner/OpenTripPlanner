@@ -98,7 +98,7 @@ public class BicycleRoutingTest {
     var linkingRequest = LinkingContextRequestMapper.map(request);
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
     var gpf = new GraphPathFinder(null);
-    var paths = gpf.graphPathFinderEntryPoint(request, linkingContext);
+    var path = gpf.graphPathFinderEntryPoint(request, linkingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       new NoopSiteResolver(),
@@ -108,22 +108,20 @@ public class BicycleRoutingTest {
       graph.ellipsoidToGeoidDifference
     );
 
-    var itineraries = graphPathToItineraryMapper.mapItineraries(paths, request);
+    var itinerary = graphPathToItineraryMapper.mapToItinerary(path, request).get();
     temporaryVerticesContainer.close();
 
     // make sure that we only get BICYCLE legs
-    itineraries.forEach(i ->
-      i
-        .legs()
-        .forEach(l -> {
-          if (l instanceof StreetLeg stLeg) {
-            assertEquals(TraverseMode.BICYCLE, stLeg.getMode());
-          } else {
-            fail("Expected StreetLeg (BICYCLE): " + l);
-          }
-        })
-    );
-    Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
+    itinerary
+      .legs()
+      .forEach(l -> {
+        if (l instanceof StreetLeg stLeg) {
+          assertEquals(TraverseMode.BICYCLE, stLeg.getMode());
+        } else {
+          fail("Expected StreetLeg (BICYCLE): " + l);
+        }
+      });
+    Geometry legGeometry = itinerary.legs().getFirst().legGeometry();
     return EncodedPolyline.of(legGeometry).points();
   }
 }

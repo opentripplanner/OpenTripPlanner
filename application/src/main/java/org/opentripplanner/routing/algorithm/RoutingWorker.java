@@ -263,7 +263,10 @@ public class RoutingWorker {
     try {
       var directRouter = new DefaultDirectStreetRouter();
       return RoutingResult.ok(
-        directRouter.route(serverContext, directBuilder.buildRequest(), linkingContext()),
+        directRouter
+          .route(serverContext, directBuilder.buildRequest(), linkingContext())
+          .stream()
+          .toList(),
         emptyDirectModeHandler.removeWalkAllTheWayResults()
       );
     } catch (RoutingValidationException e) {
