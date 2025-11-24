@@ -23,7 +23,7 @@ import org.opentripplanner.street.model.StreetMode;
  *
  * @see DirectFlexRouter
  */
-public class DirectStreetRouter {
+public class DefaultDirectStreetRouter {
 
   public static List<Itinerary> route(
     OtpServerRequestContext serverContext,
