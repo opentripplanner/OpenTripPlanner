@@ -103,7 +103,7 @@ public class StreetModeMapper {
       mode == StreetMode.BIKE ||
       mode == StreetMode.CAR ||
       mode == StreetMode.WALK ||
-      mode == StreetMode.CAR_POOL ||
+      mode == StreetMode.CARPOOL ||
       mode.includesParking()
     );
   }

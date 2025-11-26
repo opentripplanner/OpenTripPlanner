@@ -422,8 +422,8 @@ public class EnumTypes {
       "This can include car rentals at fixed locations or free-floating services."
     )
     .value(
-      "car_pool",
-      StreetMode.CAR_POOL,
+      "carpool",
+      StreetMode.CARPOOL,
       "Share a car ride with a driver and other passengers going in the same direction."
     )
     .value(

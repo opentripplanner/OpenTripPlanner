@@ -108,16 +108,16 @@ class StreetModeMapperTest {
   @Test
   void testGetStreetModeForRoutingWithCarPoolOnly() {
     assertEquals(
-      StreetMode.CAR_POOL,
-      StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.CAR_POOL))
+      StreetMode.CARPOOL,
+      StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.CARPOOL))
     );
   }
 
   @Test
   void testGetStreetModeForRoutingWithCarPoolAndWalk() {
     assertEquals(
-      StreetMode.CAR_POOL,
-      StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.WALK, StreetMode.CAR_POOL))
+      StreetMode.CARPOOL,
+      StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.WALK, StreetMode.CARPOOL))
     );
   }
 }

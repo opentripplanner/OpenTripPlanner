@@ -35,7 +35,7 @@ public class DirectModeMapper {
       case WALK,
         CAR_HAILING,
         CAR_PICKUP,
-        CAR_POOL,
+        CARPOOL,
         NOT_SET -> GraphQLTypes.GraphQLPlanDirectMode.WALK;
     };
   }

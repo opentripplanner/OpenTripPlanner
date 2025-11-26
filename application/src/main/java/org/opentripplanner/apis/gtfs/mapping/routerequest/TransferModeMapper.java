@@ -25,7 +25,7 @@ public class TransferModeMapper {
         CAR_HAILING,
         CAR_RENTAL,
         CAR_PICKUP,
-        CAR_POOL,
+        CARPOOL,
         CAR_TO_PARK,
         BIKE_TO_PARK,
         FLEXIBLE,

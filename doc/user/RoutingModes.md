@@ -40,6 +40,10 @@ This can be combined with transit, where will return routes with a [Kiss & Ride]
 This means that the car is not parked in a permanent parking area but rather the passenger is dropped off (for example, at an airport) and the driver continues driving the car away from the drop off location.
 
 
+<h4 id="CARPOOL">CARPOOL</h4>
+
+Carpool or rideshare with other passengers. Share a car ride with a driver and potentially other passengers going in the same direction.
+
 <h4 id="CAR_HAILING">CAR_HAILING</h4>
 
 Using a car hailing app like Uber or Lyft to get to a train station or all the way to the destination.
@@ -50,10 +54,6 @@ See [the sandbox documentation](sandbox/RideHailing.md) on how to configure it.
 <h4 id="CAR_PICKUP">CAR_PICKUP</h4>
 
 Walking to a pickup point along the road, driving to a drop-off point along the road, and walking the rest of the way. <br/> This can include various taxi-services or kiss & ride.
-
-<h4 id="CAR_POOL">CAR_POOL</h4>
-
-Carpool or rideshare with other passengers. Share a car ride with a driver and potentially other passengers going in the same direction.
 
 <h4 id="CAR_RENTAL">CAR_RENTAL</h4>
 

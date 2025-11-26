@@ -22,7 +22,7 @@ public class StreetModeToFormFactorMapper {
         CAR_TO_PARK,
         CAR_PICKUP,
         CAR_HAILING,
-        CAR_POOL,
+        CARPOOL,
         FLEXIBLE -> throw new IllegalStateException(
         "Cannot convert street mode %s to a form factor".formatted(streetMode)
       );
