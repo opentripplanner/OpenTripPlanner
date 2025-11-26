@@ -42,7 +42,12 @@ This means that the car is not parked in a permanent parking area but rather the
 
 <h4 id="CARPOOL">CARPOOL</h4>
 
-Carpool or rideshare with other passengers. Share a car ride with a driver and potentially other passengers going in the same direction.
+Carpool or rideshare with other passengers going in the same direction.
+
+This is the request mode for enabling carpooling in route searches. Results will contain legs with
+transit mode `CARPOOL`. Carpooling combines characteristics of both transit (scheduled departures)
+and street modes (private vehicles on roads).
+
 
 <h4 id="CAR_HAILING">CAR_HAILING</h4>
 
@@ -112,7 +117,12 @@ Used for street-level rail cars where the cable runs beneath the vehicle.
 
 <h4 id="CARPOOL">CARPOOL</h4>
 
-Private car trips shared with others.
+Private car trips shared with others, operating on scheduled routes similar to transit.
+
+Used in itinerary responses to describe legs where a passenger travels as part of a carpool/rideshare.
+Unlike traditional transit, carpooling uses private vehicles traveling on streets, but like transit,
+trips follow fixed schedules and routes. For specifying carpooling in routing requests, use the
+`CARPOOL` street mode instead.
 
 This is currently not specified in GTFS so we use the mode type values 1550-1560 which are in the range of private taxis.
 

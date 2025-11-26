@@ -75,7 +75,12 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
       case TROLLEYBUS -> "Used for trolleybus systems which draw power from overhead wires using poles on the roof of the vehicle.";
       case MONORAIL -> "Used for any rail system that runs on a single rail.";
       case CARPOOL -> """
-      Private car trips shared with others.
+      Private car trips shared with others, operating on scheduled routes similar to transit.
+
+      Used in itinerary responses to describe legs where a passenger travels as part of a carpool/rideshare.
+      Unlike traditional transit, carpooling uses private vehicles traveling on streets, but like transit,
+      trips follow fixed schedules and routes. For specifying carpooling in routing requests, use the
+      `CARPOOL` street mode instead.
 
       This is currently not specified in GTFS so we use the mode type values 1550-1560 which are in the range of private taxis.
       """;
