@@ -1,0 +1,207 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:gis="http://www.opengis.net/gml/3.2" xmlns:siri="http://www.siri.org.uk/siri" version="1.07:NO-NeTEx-networktimetable:1.1">
+  <PublicationTimestamp>2017-11-02T00:39:16.632</PublicationTimestamp>
+  <ParticipantRef>RB</ParticipantRef>
+  <Description>Shared data used across line files</Description>
+  <dataObjects>
+    <CompositeFrame created="2017-11-02T00:39:16.632" version="1" id="RUT:CompositeFrame:17062">
+      <validityConditions>
+        <AvailabilityCondition version="1" id="RUT:AvailabilityCondition:17058">
+          <FromDate>2017-10-31T00:00:00</FromDate>
+          <ToDate>2018-11-02T00:00:00</ToDate>
+        </AvailabilityCondition>
+      </validityConditions>
+      <codespaces>
+        <Codespace id="rut">
+          <Xmlns>RUT</Xmlns>
+          <XmlnsUrl>http://www.rutebanken.org/ns/rut</XmlnsUrl>
+        </Codespace>
+        <Codespace id="nsr">
+          <Xmlns>NSR</Xmlns>
+          <XmlnsUrl>http://www.rutebanken.org/ns/nsr</XmlnsUrl>
+        </Codespace>
+      </codespaces>
+      <FrameDefaults>
+        <DefaultLocale>
+          <TimeZone>Europe/Oslo</TimeZone>
+          <DefaultLanguage>no</DefaultLanguage>
+        </DefaultLocale>
+      </FrameDefaults>
+      <frames>
+        <ResourceFrame version="1" id="RUT:ResourceFrame:17063">
+          <organisations>
+            <Operator version="0" id="RUT:Operator:130c">
+              <Name>Ruter</Name>
+              <OrganisationType>operator</OrganisationType>
+              <CustomerServiceContactDetails>
+                <Email>https://ruter.no/fa-hjelp/kontakt-oss/kontaktskjema/</Email>
+              </CustomerServiceContactDetails>
+            </Operator>
+            <Authority version="0" id="RUT:Authority:RUT">
+              <Name>RUT</Name>
+              <OrganisationType>authority</OrganisationType>
+            </Authority>
+          </organisations>
+        </ResourceFrame>
+        <ServiceFrame version="1" id="RUT:ServiceFrame:17064">
+          <Network version="0" id="RUT:Network:1">
+            <Name>Ruter</Name>
+            <AuthorityRef ref="RUT:Authority:RUT" version="0"/>
+          </Network>
+        </ServiceFrame>
+        <ServiceFrame version="1" id="RUT:ServiceFrame:17065">
+          <destinationDisplays>
+            <DestinationDisplay version="1" id="RUT:DestinationDisplay:649-NOLINENUMBER">
+              <Name></Name>
+              <FrontText>Jernbanetorget</FrontText>
+            </DestinationDisplay>
+            <DestinationDisplay version="1" id="RUT:DestinationDisplay:1809-NOLINENUMBER">
+              <Name></Name>
+              <FrontText>Bergkrystallen</FrontText>
+            </DestinationDisplay>
+            <DestinationDisplay version="1" id="RUT:DestinationDisplay:4203">
+              <FrontText>Majorstuen</FrontText>
+            </DestinationDisplay>
+          </destinationDisplays>
+          <notices>
+            <Notice version="1" id="RUT:Notice:035-2018-01-15">
+              <Text>Notice on TimetabledPassingTime</Text>
+              <PublicCode>035</PublicCode>
+            </Notice>
+            <Notice version="1" id="RUT:Notice:045-2018-01-15">
+              <Text>Notice on ServiceJourney</Text>
+              <PublicCode>045</PublicCode>
+            </Notice>
+            <Notice version="1" id="RUT:Notice:075-2018-01-15">
+              <Text>Notice on Line</Text>
+              <PublicCode>075</PublicCode>
+            </Notice>
+            <Notice version="1" id="RUT:Notice:080-2018-01-15">
+              <Text>Notice on StopPointInJourneyPattern</Text>
+              <PublicCode>080</PublicCode>
+            </Notice>
+            <Notice version="1" id="RUT:Notice:080-2018-01-15">
+              <Text>Notice on Journeypattern</Text>
+              <PublicCode>090</PublicCode>
+            </Notice>
+          </notices>
+          <scheduledStopPoints>
+            <ScheduledStopPoint version="1" id="RUT:ScheduledStopPoint:ANR-6950">
+              <Name>Bergkrystallen</Name>
+            </ScheduledStopPoint>
+            <ScheduledStopPoint version="1" id="RUT:ScheduledStopPoint:ONOB-11197">
+              <Name>Jernbanetorget</Name>
+            </ScheduledStopPoint>
+            <ScheduledStopPoint version="1" id="RUT:ScheduledStopPoint:ONOB-11198">
+              <Name>Bergkrystallen</Name>
+            </ScheduledStopPoint>
+            <ScheduledStopPoint version="1" id="RUT:ScheduledStopPoint:ANR-6951">
+              <Name>Jernbanetorget</Name>
+            </ScheduledStopPoint>
+            <ScheduledStopPoint version="1" id="RUT:ScheduledStopPoint:OT-8051">
+              <Name>Jernbanetorget</Name>
+            </ScheduledStopPoint>
+            <ScheduledStopPoint version="1" id="RUT:ScheduledStopPoint:OT-8201">
+              <Name>Majorstuen</Name>
+            </ScheduledStopPoint>
+            <ScheduledStopPoint version="1" id="RUT:ScheduledStopPoint:OT-11244">
+              <Name>Majorstuen</Name>
+            </ScheduledStopPoint>
+            <ScheduledStopPoint version="1" id="RUT:ScheduledStopPoint:OT-11245">
+              <Name>Jernbanetorget</Name>
+            </ScheduledStopPoint>
+          </scheduledStopPoints>
+          <stopAssignments>
+            <PassengerStopAssignment order="2" version="1" id="RUT:PassengerStopAssignment:TBANE-7305">
+              <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:ANR-6950" version="1"/>
+              <QuayRef ref="NSR:Quay:10682"/>
+            </PassengerStopAssignment>
+            <PassengerStopAssignment order="19" version="1" id="RUT:PassengerStopAssignment:OUNI-7159">
+              <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:ONOB-11197" version="1"/>
+              <QuayRef ref="NSR:Quay:7184"/>
+            </PassengerStopAssignment>
+            <PassengerStopAssignment order="65" version="1" id="RUT:PassengerStopAssignment:TBANE-7304">
+              <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:ONOB-11198" version="1"/>
+              <QuayRef ref="NSR:Quay:10681"/>
+            </PassengerStopAssignment>
+            <PassengerStopAssignment order="87" version="1" id="RUT:PassengerStopAssignment:ANR-8491">
+              <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:ANR-6951" version="1"/>
+              <QuayRef ref="NSR:Quay:7183"/>
+            </PassengerStopAssignment>
+            <PassengerStopAssignment order="87" version="1" id="RUT:PassengerStopAssignment:ANR-8491">
+              <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:OT-8051" version="1"/>
+              <QuayRef ref="NSR:Quay:7203"/>
+            </PassengerStopAssignment>
+            <PassengerStopAssignment order="87" version="1" id="RUT:PassengerStopAssignment:ANR-8491">
+              <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:OT-8201" version="1"/>
+              <QuayRef ref="NSR:Quay:8027"/>
+            </PassengerStopAssignment>
+            <PassengerStopAssignment order="87" version="1" id="RUT:PassengerStopAssignment:ANR-8491">
+              <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:OT-11244" version="1"/>
+              <QuayRef ref="NSR:Quay:8028"/>
+            </PassengerStopAssignment>
+            <PassengerStopAssignment order="87" version="1" id="RUT:PassengerStopAssignment:ANR-8491">
+              <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:OT-11245" version="1"/>
+              <QuayRef ref="NSR:Quay:7194"/>
+            </PassengerStopAssignment>
+          </stopAssignments>
+        </ServiceFrame>
+        <ServiceCalendarFrame version="1" id="RUT:ServiceCalendarFrame:17066">
+          <dayTypes>
+            <DayType version="1" id="RUT:DayType:6-101468">
+              <properties>
+                <PropertyOfDay>
+                  <DaysOfWeek>Weekdays</DaysOfWeek>
+                </PropertyOfDay>
+              </properties>
+            </DayType>
+            <DayType version="1" id="RUT:DayType:0-105025">
+              <properties>
+                <PropertyOfDay>
+                  <DaysOfWeek>Saturday</DaysOfWeek>
+                </PropertyOfDay>
+              </properties>
+            </DayType>
+            <DayType version="1" id="RUT:DayType:0-105026">
+              <properties>
+                <PropertyOfDay>
+                  <DaysOfWeek>Sunday</DaysOfWeek>
+                </PropertyOfDay>
+              </properties>
+            </DayType>
+          </dayTypes>
+          <operatingPeriods>
+            <OperatingPeriod version="1" id="RUT:OperatingPeriod:4-10400">
+              <FromDate>2017-12-21T00:00:00</FromDate>
+              <ToDate>2018-01-04T00:00:00</ToDate>
+            </OperatingPeriod>
+          </operatingPeriods>
+          <operatingDays>
+            <OperatingDay id="RUT:OperatingDay:2018-11-01">
+              <CalendarDate>2018-11-01</CalendarDate>
+            </OperatingDay>
+          </operatingDays>
+          <dayTypeAssignments>
+            <DayTypeAssignment order="1" version="1" id="RUT:DayTypeAssignment:4-100524-2">
+              <OperatingPeriodRef ref="RUT:OperatingPeriod:4-10400" version="1"/>
+              <DayTypeRef ref="RUT:DayType:6-101468" version="1"/>
+            </DayTypeAssignment>
+            <DayTypeAssignment order="1" version="1" id="RUT:DayTypeAssignment:4-100524-1">
+              <OperatingPeriodRef ref="RUT:OperatingPeriod:4-10400" version="1"/>
+              <DayTypeRef ref="RUT:DayType:0-105025" version="1"/>
+            </DayTypeAssignment>
+            <DayTypeAssignment order="1" version="1" id="RUT:DayTypeAssignment:5-90988-1">
+              <OperatingPeriodRef ref="RUT:OperatingPeriod:4-10400" version="1"/>
+              <DayTypeRef ref="RUT:DayType:0-105026" version="1"/>
+            </DayTypeAssignment>
+            <DayTypeAssignment order="1" version="1" id="RUT:DayTypeAssignment:5-90900-1">
+              <Date>2018-01-01</Date>
+              <DayTypeRef ref="RUT:DayType:6-101468" version="1"/>
+              <isAvailable>false</isAvailable>
+            </DayTypeAssignment>
+          </dayTypeAssignments>
+        </ServiceCalendarFrame>
+      </frames>
+    </CompositeFrame>
+  </dataObjects>
+</PublicationDelivery>

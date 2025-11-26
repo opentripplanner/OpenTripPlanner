@@ -1,19 +1,18 @@
 package org.opentripplanner.street.search.request;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Coordinate;
+import java.util.Optional;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.astar.spi.AStarRequest;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
@@ -31,19 +30,26 @@ public class StreetSearchRequest implements AStarRequest {
    * @see StreetSearchRequest#isCloseToStartOrEnd(Vertex)
    * @see DominanceFunctions#betterOrEqualAndComparable(State, State)
    */
-  private static final int MAX_CLOSENESS_METERS = 500;
+  public static final int MAX_CLOSENESS_METERS = 500;
 
   // the time at which the search started
   private final Instant startTime;
-  private final RoutingPreferences preferences;
   private final StreetMode mode;
   private final boolean arriveBy;
   private final boolean wheelchair;
 
-  private final GenericLocation from;
   private final Envelope fromEnvelope;
-  private final GenericLocation to;
   private final Envelope toEnvelope;
+
+  private final boolean geoidElevation;
+
+  private final double turnReluctance;
+  private final WalkRequest walk;
+  private final BikeRequest bike;
+  private final ScooterRequest scooter;
+  private final CarRequest car;
+  private final WheelchairRequest wheelchairRequest;
+  private final ElevatorRequest elevator;
 
   private IntersectionTraversalCalculator intersectionTraversalCalculator =
     IntersectionTraversalCalculator.DEFAULT;
@@ -55,26 +61,36 @@ public class StreetSearchRequest implements AStarRequest {
    */
   private StreetSearchRequest() {
     this.startTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-    this.preferences = RoutingPreferences.DEFAULT;
     this.mode = StreetMode.WALK;
     this.arriveBy = false;
     this.wheelchair = false;
-    this.from = null;
     this.fromEnvelope = null;
-    this.to = null;
     this.toEnvelope = null;
+    this.geoidElevation = false;
+    this.turnReluctance = 1.0;
+    this.walk = WalkRequest.DEFAULT;
+    this.bike = BikeRequest.DEFAULT;
+    this.scooter = ScooterRequest.DEFAULT;
+    this.car = CarRequest.DEFAULT;
+    this.wheelchairRequest = WheelchairRequest.DEFAULT;
+    this.elevator = ElevatorRequest.DEFAULT;
   }
 
   StreetSearchRequest(StreetSearchRequestBuilder builder) {
     this.startTime = RouteRequest.normalizeDateTime(builder.startTimeOrNow());
-    this.preferences = builder.preferences;
     this.mode = builder.mode;
     this.arriveBy = builder.arriveBy;
-    this.wheelchair = builder.wheelchair;
-    this.from = builder.from;
-    this.fromEnvelope = createEnvelope(from);
-    this.to = builder.to;
-    this.toEnvelope = createEnvelope(to);
+    this.wheelchair = builder.wheelchairEnabled;
+    this.fromEnvelope = builder.fromEnvelope;
+    this.toEnvelope = builder.toEnvelope;
+    this.geoidElevation = builder.geoidElevation;
+    this.turnReluctance = builder.turnReluctance;
+    this.walk = requireNonNull(builder.walk);
+    this.bike = requireNonNull(builder.bike);
+    this.scooter = requireNonNull(builder.scooter);
+    this.car = requireNonNull(builder.car);
+    this.wheelchairRequest = requireNonNull(builder.wheelchair);
+    this.elevator = requireNonNull(builder.elevator);
   }
 
   public static StreetSearchRequestBuilder of() {
@@ -89,8 +105,18 @@ public class StreetSearchRequest implements AStarRequest {
     return startTime;
   }
 
-  public RoutingPreferences preferences() {
-    return preferences;
+  public boolean allowsArrivingInRentalAtDestination() {
+    return Optional.ofNullable(rental(mode()))
+      .map(RentalRequest::allowArrivingInRentedVehicleAtDestination)
+      .orElse(false);
+  }
+
+  public WheelchairRequest wheelchair() {
+    return wheelchairRequest;
+  }
+
+  public boolean geoidElevation() {
+    return geoidElevation;
   }
 
   /**
@@ -102,20 +128,20 @@ public class StreetSearchRequest implements AStarRequest {
     return mode;
   }
 
+  public Envelope fromEnvelope() {
+    return fromEnvelope;
+  }
+
+  public Envelope toEnvelope() {
+    return toEnvelope;
+  }
+
   public boolean arriveBy() {
     return arriveBy;
   }
 
-  public boolean wheelchair() {
+  public boolean wheelchairEnabled() {
     return wheelchair;
-  }
-
-  public GenericLocation from() {
-    return from;
-  }
-
-  public GenericLocation to() {
-    return to;
   }
 
   public IntersectionTraversalCalculator intersectionTraversalCalculator() {
@@ -161,23 +187,60 @@ public class StreetSearchRequest implements AStarRequest {
     );
   }
 
-  @Nullable
-  private static Envelope createEnvelope(GenericLocation location) {
-    if (location == null) {
-      return null;
-    }
+  public WalkRequest walk() {
+    return walk;
+  }
 
-    Coordinate coordinate = location.getCoordinate();
-    if (coordinate == null) {
-      return null;
-    }
+  public BikeRequest bike() {
+    return bike;
+  }
 
-    double lat = SphericalDistanceLibrary.metersToDegrees(MAX_CLOSENESS_METERS);
-    double lon = SphericalDistanceLibrary.metersToLonDegrees(MAX_CLOSENESS_METERS, coordinate.y);
+  public CarRequest car() {
+    return car;
+  }
 
-    Envelope env = new Envelope(coordinate);
-    env.expandBy(lon, lat);
+  public ScooterRequest scooter() {
+    return scooter;
+  }
 
-    return env;
+  public double turnReluctance() {
+    return turnReluctance;
+  }
+
+  public RentalRequest rental(TraverseMode traverseMode) {
+    return switch (traverseMode) {
+      case BICYCLE -> bike.rental();
+      case SCOOTER -> scooter.rental();
+      case CAR -> car.rental();
+      case WALK, FLEX -> throw new IllegalArgumentException();
+    };
+  }
+
+  public RentalRequest rental(StreetMode mode) {
+    return switch (mode) {
+      case BIKE_RENTAL -> bike.rental();
+      case SCOOTER_RENTAL -> scooter.rental();
+      case CAR_RENTAL -> car.rental();
+      case NOT_SET,
+        WALK,
+        BIKE,
+        BIKE_TO_PARK,
+        CAR,
+        CAR_TO_PARK,
+        CAR_PICKUP,
+        CAR_HAILING,
+        FLEXIBLE -> null;
+    };
+  }
+
+  public ElevatorRequest elevator() {
+    return elevator;
+  }
+
+  /**
+   * Get parking preferences for the traverse mode. Note, only car and bike are supported.
+   */
+  public ParkingRequest parking(TraverseMode mode) {
+    return mode == TraverseMode.CAR ? car.parking() : bike.parking();
   }
 }

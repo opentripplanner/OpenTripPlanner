@@ -10,7 +10,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -85,19 +84,16 @@ class StreetEdgeWheelchairCostTest {
     assertEquals(slope, edge.getMaxSlope(), 0.0001);
 
     var req = StreetSearchRequest.of();
-    req.withWheelchair(true);
-    req.withPreferences(preferences ->
-      preferences.withWheelchair(
-        WheelchairPreferences.of()
-          .withTripOnlyAccessible()
-          .withStopOnlyAccessible()
-          .withElevatorOnlyAccessible()
-          .withInaccessibleStreetReluctance(25)
-          .withMaxSlope(0.09)
-          .withSlopeExceededReluctance(reluctance)
-          .withStairsReluctance(10)
-          .build()
-      )
+    req.withWheelchairEnabled(true);
+    req.withWheelchair(b ->
+      b
+        .withStopOnlyAccessible()
+        .withElevatorOnlyAccessible()
+        .withInaccessibleStreetReluctance(25)
+        .withMaxSlope(0.09)
+        .withSlopeExceededReluctance(reluctance)
+        .withStairsReluctance(10)
+        .build()
     );
     State result = traverse(edge, req.build());
     assertNotNull(result);
@@ -125,22 +121,19 @@ class StreetEdgeWheelchairCostTest {
       .buildAndConnect();
 
     var req = StreetSearchRequest.of();
-    req.withWheelchair(true);
-    req.withPreferences(preferences ->
-      preferences.withWheelchair(
-        WheelchairPreferences.of()
-          .withTripOnlyAccessible()
-          .withStopOnlyAccessible()
-          .withElevatorOnlyAccessible()
-          .withInaccessibleStreetReluctance(25)
-          .withMaxSlope(0)
-          .withSlopeExceededReluctance(1.1)
-          .withStairsReluctance(stairsReluctance)
-          .build()
-      )
+    req.withWheelchairEnabled(true);
+    req.withWheelchair(b ->
+      b
+        .withStopOnlyAccessible()
+        .withElevatorOnlyAccessible()
+        .withInaccessibleStreetReluctance(25)
+        .withMaxSlope(0)
+        .withSlopeExceededReluctance(1.1)
+        .withStairsReluctance(stairsReluctance)
+        .build()
     );
 
-    req.withPreferences(pref -> pref.withWalk(w -> w.withReluctance(1.0)));
+    req.withWalk(w -> w.withReluctance(1.0));
 
     var result = traverse(stairEdge, req.build());
     assertEquals(expectedCost, (long) result.weight);
@@ -171,19 +164,16 @@ class StreetEdgeWheelchairCostTest {
       .buildAndConnect();
 
     var req = StreetSearchRequest.of();
-    req.withWheelchair(true);
-    req.withPreferences(preferences ->
-      preferences.withWheelchair(
-        WheelchairPreferences.of()
-          .withTripOnlyAccessible()
-          .withStopOnlyAccessible()
-          .withElevatorOnlyAccessible()
-          .withInaccessibleStreetReluctance(inaccessibleStreetReluctance)
-          .withMaxSlope(0)
-          .withSlopeExceededReluctance(1.1)
-          .withStairsReluctance(25)
-          .build()
-      )
+    req.withWheelchairEnabled(true);
+    req.withWheelchair(b ->
+      b
+        .withStopOnlyAccessible()
+        .withElevatorOnlyAccessible()
+        .withInaccessibleStreetReluctance(inaccessibleStreetReluctance)
+        .withMaxSlope(0)
+        .withSlopeExceededReluctance(1.1)
+        .withStairsReluctance(25)
+        .build()
     );
 
     var result = traverse(edge, req.build());
@@ -220,8 +210,8 @@ class StreetEdgeWheelchairCostTest {
       .buildAndConnect();
 
     var req = StreetSearchRequest.of();
-    req.withPreferences(p -> p.withWalk(w -> w.withReluctance(walkReluctance)));
-    req.withWheelchair(true);
+    req.withWalk(w -> w.withReluctance(walkReluctance));
+    req.withWheelchairEnabled(true);
 
     var result = traverse(edge, req.build());
     assertEquals(expectedCost, (long) result.weight);

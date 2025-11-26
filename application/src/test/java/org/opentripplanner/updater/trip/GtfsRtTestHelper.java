@@ -3,6 +3,7 @@ package org.opentripplanner.updater.trip;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
 import com.google.transit.realtime.GtfsRealtime;
+import java.time.LocalDate;
 import java.util.List;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -20,7 +21,7 @@ public class GtfsRtTestHelper {
     this.gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(
       transitTestEnvironment.timetableRepository(),
       transitTestEnvironment.timetableSnapshotManager(),
-      () -> transitTestEnvironment.defaultServiceDate()
+      transitTestEnvironment::defaultServiceDate
     );
   }
 
@@ -32,13 +33,29 @@ public class GtfsRtTestHelper {
     return tripUpdate(tripId, GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED);
   }
 
+  public TripUpdateBuilder tripUpdateScheduled(String tripId, LocalDate serviceDate) {
+    return tripUpdate(
+      tripId,
+      serviceDate,
+      GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED
+    );
+  }
+
   public TripUpdateBuilder tripUpdate(
     String tripId,
     GtfsRealtime.TripDescriptor.ScheduleRelationship scheduleRelationship
   ) {
+    return tripUpdate(tripId, transitTestEnvironment.defaultServiceDate(), scheduleRelationship);
+  }
+
+  public TripUpdateBuilder tripUpdate(
+    String tripId,
+    LocalDate serviceDate,
+    GtfsRealtime.TripDescriptor.ScheduleRelationship scheduleRelationship
+  ) {
     return new TripUpdateBuilder(
       tripId,
-      transitTestEnvironment.defaultServiceDate(),
+      serviceDate,
       scheduleRelationship,
       transitTestEnvironment.timeZone()
     );
@@ -53,6 +70,10 @@ public class GtfsRtTestHelper {
     UpdateIncrementality incrementality
   ) {
     return applyTripUpdates(List.of(update), incrementality);
+  }
+
+  public UpdateResult applyTripUpdates(List<GtfsRealtime.TripUpdate> updates) {
+    return applyTripUpdates(updates, FULL_DATASET);
   }
 
   public UpdateResult applyTripUpdates(

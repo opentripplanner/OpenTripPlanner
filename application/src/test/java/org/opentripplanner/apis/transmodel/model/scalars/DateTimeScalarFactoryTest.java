@@ -8,6 +8,7 @@ import graphql.schema.Coercing;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -27,8 +28,22 @@ class DateTimeScalarFactoryTest {
   }
 
   @Test
-  void serialize() {
+  void serializeEpochMillis() {
     var result = subject.getCoercing().serialize(EPOCH_MILLIS);
+    assertEquals(DATE_TIME, result);
+  }
+
+  @Test
+  void serializeInstant() {
+    var result = subject.getCoercing().serialize(Instant.parse(DATE_TIME));
+    assertEquals(DATE_TIME, result);
+  }
+
+  @Test
+  void serializeZonedDateTime() {
+    var result = subject
+      .getCoercing()
+      .serialize(Instant.parse(DATE_TIME).atZone(ZoneId.of("Australia/Sydney")));
     assertEquals(DATE_TIME, result);
   }
 

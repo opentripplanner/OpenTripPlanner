@@ -63,7 +63,7 @@ class PagingServiceFactoryTest {
     );
     assertEquals(
       "PagingService{" +
-      "searchWindowUsed: 2h30m, " +
+      "raptorSearchWindowUsed: 2h30m, " +
       "earliestDepartureTime: 2023-11-11T10:00:00Z, " +
       "latestArrivalTime: 2023-11-11T11:30:00Z, " +
       "itinerariesSortOrder: STREET_AND_ARRIVAL_TIME, " +

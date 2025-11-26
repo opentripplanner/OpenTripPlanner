@@ -65,7 +65,9 @@ public enum StreetTraversalPermission {
       return true;
     } else if (modes.getBicycle() && allows(StreetTraversalPermission.BICYCLE)) {
       return true;
-    } else return modes.getCar() && allows(StreetTraversalPermission.CAR);
+    } else {
+      return modes.getCar() && allows(StreetTraversalPermission.CAR);
+    }
   }
 
   /**
@@ -76,7 +78,9 @@ public enum StreetTraversalPermission {
       return true;
     } else if (mode.isCyclingIsh() && allows(StreetTraversalPermission.BICYCLE)) {
       return true;
-    } else return mode == TraverseMode.CAR && allows(StreetTraversalPermission.CAR);
+    } else {
+      return mode == TraverseMode.CAR && allows(StreetTraversalPermission.CAR);
+    }
   }
 
   /**

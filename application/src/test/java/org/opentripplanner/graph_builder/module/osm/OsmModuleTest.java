@@ -96,7 +96,9 @@ public class OsmModuleTest {
     assertNotNull(v3);
     assertNotNull(v4);
 
-    Edge e1 = null, e2 = null, e3 = null;
+    Edge e1 = null;
+    Edge e2 = null;
+    Edge e3 = null;
     for (Edge e : v2.getOutgoing()) {
       if (e.getToVertex() == v1) {
         e1 = e;

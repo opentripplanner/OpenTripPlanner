@@ -34,6 +34,7 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.vertex.ElevatorVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.utils.collection.ListUtils;
 
@@ -118,6 +119,7 @@ public class DebugStyleSpec {
   private static final String RENTAL_GROUP = "Rental";
   private static final String PERMISSIONS_GROUP = "Permissions";
   private static final String NO_THRU_TRAFFIC_GROUP = "No-thru traffic";
+  private static final String ELEVATORS_GROUP = "Elevators";
 
   private static final StreetTraversalPermission[] streetModes = new StreetTraversalPermission[] {
     StreetTraversalPermission.PEDESTRIAN,
@@ -173,6 +175,7 @@ public class DebugStyleSpec {
         traversalPermissions(edges),
         edges(edges),
         elevation(edges, vertices),
+        elevators(edges, vertices),
         vertices(vertices),
         stops(regularStops, areaStops, groupStops)
       )
@@ -255,6 +258,35 @@ public class DebugStyleSpec {
         .circleRadius(MEDIUM_CIRCLE_RADIUS)
         .circleColor(DARK_GREEN)
         .minZoom(13)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
+  }
+
+  private static List<StyleBuilder> elevators(VectorSourceLayer edges, VectorSourceLayer vertices) {
+    return List.of(
+      StyleBuilder.ofId("elevator-hop-edge")
+        .group(ELEVATORS_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .edgeFilter(ElevatorHopEdge.class)
+        .lineColor(ORANGE)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("elevator-vertex")
+        .group(ELEVATORS_GROUP)
+        .typeCircle()
+        .vectorSourceLayer(vertices)
+        .vertexFilter(ElevatorVertex.class)
+        .circleStroke(BLACK, CIRCLE_STROKE)
+        .circleRadius(
+          new ZoomDependentNumber(List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 7)))
+        )
+        .circleColor(ORANGE)
+        .minZoom(15)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );

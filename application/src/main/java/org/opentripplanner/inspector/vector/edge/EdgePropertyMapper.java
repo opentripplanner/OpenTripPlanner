@@ -4,12 +4,14 @@ import static org.opentripplanner.inspector.vector.KeyValue.kv;
 import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
 
 import com.google.common.collect.Lists;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.utils.collection.ListUtils;
@@ -24,7 +26,13 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
         case StreetEdge e -> mapStreetEdge(e);
         case EscalatorEdge e -> List.of(
           kv("distance", e.getDistanceMeters()),
-          kv("duration", e.getDuration().map(d -> d.toString()).orElse(null))
+          kv("duration", e.getDuration().map(Duration::toString).orElse(null))
+        );
+        case ElevatorHopEdge e -> List.of(
+          kv("permission", e.getPermission()),
+          kv("levels", e.getLevels()),
+          kv("wheelchairAccessible", e.isWheelchairAccessible()),
+          kv("travelTime", e.getTravelTime().map(Duration::toString).orElse(null))
         );
         default -> List.of();
       };

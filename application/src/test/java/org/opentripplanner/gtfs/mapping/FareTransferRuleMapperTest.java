@@ -68,6 +68,8 @@ class FareTransferRuleMapperTest {
   void limitType() {
     assertEquals(TimeLimitType.DEPARTURE_TO_ARRIVAL, FareTransferRuleMapper.mapLimitType(0));
     assertEquals(TimeLimitType.DEPARTURE_TO_DEPARTURE, FareTransferRuleMapper.mapLimitType(1));
+    assertEquals(TimeLimitType.ARRIVAL_TO_DEPARTURE, FareTransferRuleMapper.mapLimitType(2));
+    assertEquals(TimeLimitType.ARRIVAL_TO_ARRIVAL, FareTransferRuleMapper.mapLimitType(3));
   }
 
   @Test

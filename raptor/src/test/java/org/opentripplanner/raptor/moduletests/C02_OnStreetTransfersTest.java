@@ -22,7 +22,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 /**
  * FEATURE UNDER TEST
@@ -44,7 +44,7 @@ public class C02_OnStreetTransfersTest implements RaptorTestConstants {
   @BeforeEach
   public void setup() {
     //Given slack: transfer 30s, board 0s, alight 0s
-    data.withSlackProvider(new DefaultSlackProvider(D30s, D0s, D0s));
+    data.withSlackProvider(new TestSlackProvider(D30s, D0s, D0s));
 
     data.withRoute(
       route(pattern("R1", STOP_B, STOP_C)).withTimetable(

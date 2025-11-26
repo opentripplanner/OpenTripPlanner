@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:gis="http://www.opengis.net/gml/3.2" xmlns:siri="http://www.siri.org.uk/siri" version="1.07:NO-NeTEx-networktimetable:1.1">
+  <PublicationTimestamp>2017-11-02T00:36:30.092</PublicationTimestamp>
+  <ParticipantRef>RB</ParticipantRef>
+  <Description>Majorstuen - Kjelsås</Description>
+  <dataObjects>
+    <CompositeFrame created="2017-11-02T00:36:30.092" version="1" id="RUT:CompositeFrame:15584">
+      <validityConditions>
+        <AvailabilityCondition version="1" id="RUT:AvailabilityCondition:15582">
+          <FromDate>2017-10-31T00:00:00</FromDate>
+          <ToDate>2018-11-02T00:00:00</ToDate>
+        </AvailabilityCondition>
+      </validityConditions>
+      <codespaces>
+        <Codespace id="rut">
+          <Xmlns>RUT</Xmlns>
+          <XmlnsUrl>http://www.rutebanken.org/ns/rut</XmlnsUrl>
+        </Codespace>
+        <Codespace id="nsr">
+          <Xmlns>NSR</Xmlns>
+          <XmlnsUrl>http://www.rutebanken.org/ns/nsr</XmlnsUrl>
+        </Codespace>
+      </codespaces>
+      <FrameDefaults>
+        <DefaultLocale>
+          <TimeZone>Europe/Oslo</TimeZone>
+          <DefaultLanguage>no</DefaultLanguage>
+        </DefaultLocale>
+      </FrameDefaults>
+      <frames>
+        <ServiceFrame version="1" id="RUT:ServiceFrame:15585">
+          <routePoints>
+            <RoutePoint version="1" id="RUT:RoutePoint:OT-8051">
+              <projections>
+                <PointProjection version="1" id="RUT:PointProjection:OT-8051">
+                  <ProjectedPointRef ref="RUT:ScheduledStopPoint:OT-8051"/>
+                </PointProjection>
+              </projections>
+            </RoutePoint>
+            <RoutePoint version="1" id="RUT:RoutePoint:OT-8171">
+              <projections>
+                <PointProjection version="1" id="RUT:PointProjection:OT-8171">
+                  <ProjectedPointRef ref="RUT:ScheduledStopPoint:OT-8171"/>
+                </PointProjection>
+              </projections>
+            </RoutePoint>
+          </routePoints>
+          <routes>
+            <Route version="0" id="RUT:Route:12-1">
+              <Name>Majorstuen-Kjelsås</Name>
+              <ShortName>Majorstuen-Kjelsås</ShortName>
+              <LineRef ref="RUT:Line:12" version="0"/>
+              <pointsInSequence>
+                <PointOnRoute order="1" version="1" id="RUT:PointOnRoute:12-1-1-0">
+                  <RoutePointRef ref="RUT:RoutePoint:OT-8051" version="1"/>
+                </PointOnRoute>
+                <PointOnRoute order="1" version="1" id="RUT:PointOnRoute:12-1-2-1">
+                  <RoutePointRef ref="RUT:RoutePoint:OT-8201" version="1"/>
+                </PointOnRoute>
+              </pointsInSequence>
+            </Route>
+          </routes>
+          <lines>
+            <Line version="0" id="RUT:Line:12">
+              <Name>Majorstuen - Kjelsås</Name>
+              <TransportMode>tram</TransportMode>
+              <TransportSubmode>
+                <TramSubmode>localTram</TramSubmode>
+              </TransportSubmode>
+              <PublicCode>12</PublicCode>
+              <OperatorRef ref="RUT:Operator:130c"/>
+              <RepresentedByGroupRef ref="RUT:Network:1"/>
+            </Line>
+          </lines>
+          <journeyPatterns>
+            <JourneyPattern version="0" id="RUT:JourneyPattern:12-1">
+              <Name>Majorstuen-Kjelsås</Name>
+              <RouteRef ref="RUT:Route:12-1" version="0"/>
+              <pointsInSequence>
+                <StopPointInJourneyPattern order="1" version="0" id="RUT:StopPointInJourneyPattern:12-1-1">
+                  <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:OT-8051"/>
+                  <DestinationDisplayRef ref="RUT:DestinationDisplay:649-NOLINENUMBER"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="2" version="0" id="RUT:StopPointInJourneyPattern:12-1-2">
+                  <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:OT-8201"/>
+                </StopPointInJourneyPattern>
+              </pointsInSequence>
+            </JourneyPattern>
+            <JourneyPattern version="0" id="RUT:JourneyPattern:12-2">
+              <Name>Kjelsås-Majorstuen</Name>
+              <RouteRef ref="RUT:Route:12-1" version="0"/>
+              <pointsInSequence>
+                <StopPointInJourneyPattern order="1" version="0" id="RUT:StopPointInJourneyPattern:12-2-1">
+                  <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:OT-11244"/>
+                  <DestinationDisplayRef ref="RUT:DestinationDisplay:649-NOLINENUMBER"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="2" version="0" id="RUT:StopPointInJourneyPattern:12-2-2">
+                  <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:OT-11245"/>
+                </StopPointInJourneyPattern>
+              </pointsInSequence>
+            </JourneyPattern>
+          </journeyPatterns>
+        </ServiceFrame>
+        <TimetableFrame version="1" id="RUT:TimetableFrame:15586">
+          <vehicleJourneys>
+            <ServiceJourney version="0" id="RUT:ServiceJourney:12-101375-1000">
+              <Name>Kjelsås</Name>
+              <dayTypes>
+                <DayTypeRef ref="RUT:DayType:6-101468"/>
+              </dayTypes>
+              <JourneyPatternRef ref="RUT:JourneyPattern:12-1" version="0"/>
+              <OperatorRef ref="RUT:Operator:130c"/>
+              <LineRef ref="RUT:Line:12" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="RUT:TimetabledPassingTime:a03b6aeb-c130-4c95-bec1-99b0f493fbd2">
+                  <StopPointInJourneyPatternRef ref="RUT:StopPointInJourneyPattern:12-1-1" version="0"/>
+                  <DepartureTime>06:34:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="RUT:TimetabledPassingTime:59fc18c4-7c5b-415b-aa99-9104897c50dd">
+                  <StopPointInJourneyPatternRef ref="RUT:StopPointInJourneyPattern:12-1-2" version="0"/>
+                  <DepartureTime>06:49:00</DepartureTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="RUT:ServiceJourney:12-101375-1001">
+              <Name>Kjelsås</Name>
+              <dayTypes>
+                <DayTypeRef ref="RUT:DayType:6-101468"/>
+              </dayTypes>
+              <JourneyPatternRef ref="RUT:JourneyPattern:12-2" version="0"/>
+              <OperatorRef ref="RUT:Operator:130c"/>
+              <LineRef ref="RUT:Line:12" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="RUT:TimetabledPassingTime:56c49927-9017-4de7-9118-2226ba4ab2cb">
+                  <StopPointInJourneyPatternRef ref="RUT:StopPointInJourneyPattern:12-2-1" version="0"/>
+                  <DepartureTime>07:04:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="RUT:TimetabledPassingTime:c7975165-f32f-4f0b-b408-37c0dd131440">
+                  <StopPointInJourneyPatternRef ref="RUT:StopPointInJourneyPattern:12-2-2" version="0"/>
+                  <DepartureTime>07:19:00</DepartureTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+          </vehicleJourneys>
+        </TimetableFrame>
+      </frames>
+    </CompositeFrame>
+  </dataObjects>
+</PublicationDelivery>

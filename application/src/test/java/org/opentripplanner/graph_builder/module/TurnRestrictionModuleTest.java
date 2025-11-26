@@ -17,7 +17,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
@@ -89,18 +88,6 @@ public class TurnRestrictionModuleTest {
       traverseModeSet
     );
     return restriction;
-  }
-
-  private void turnRestriction(
-    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
-    StreetEdge from,
-    StreetEdge to,
-    TraverseModeSet traverseModeSet,
-    TurnRestrictionType turnRestrictionType
-  ) {
-    osmInfoGraphBuildRepository.addTurnRestriction(
-      turnRestriction(from, to, traverseModeSet, turnRestrictionType)
-    );
   }
 
   private TurnRestriction turnRestriction(
@@ -286,7 +273,6 @@ public class TurnRestrictionModuleTest {
     order /= 3;
     useTurnRestrictions.add(turnRestrictions.get(order % 2));
     turnRestrictions.remove(order % 2);
-    order /= 2;
     useTurnRestrictions.add(turnRestrictions.get(0));
 
     assertEquals(7, graph.countVertices());
@@ -411,7 +397,7 @@ public class TurnRestrictionModuleTest {
     var AC = edges(A, C, 1.0);
     var CB = edges(C, B, 1.0);
     var CD = edges(C, D, 1.0);
-    var CE = edges(C, E, 1.0);
+    edges(C, E, 1.0);
     osmInfoGraphBuildRepository.addTurnRestriction(
       turnRestriction(
         AC[0],

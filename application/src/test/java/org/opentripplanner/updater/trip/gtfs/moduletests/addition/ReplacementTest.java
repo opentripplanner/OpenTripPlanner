@@ -24,7 +24,7 @@ public class ReplacementTest implements RealtimeTestConstants {
     var builder = TransitTestEnvironment.of();
     var STOP_A = builder.stop(STOP_A_ID);
     var STOP_B = builder.stop(STOP_B_ID);
-    var STOP_C = builder.stop(STOP_C_ID);
+    builder.stop(STOP_C_ID);
     var TRIP_INPUT = TripInput.of(TRIP_1_ID)
       .addStop(STOP_A, "8:30:00", "8:30:00")
       .addStop(STOP_B, "8:40:00", "8:40:00")

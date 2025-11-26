@@ -2,7 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
-import org.opentripplanner.transit.model.site.Entrance;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This represents the connection between a street vertex and a transit vertex belonging the street
@@ -45,13 +45,13 @@ public class StreetTransitEntranceLink extends StreetTransitEntityLink<TransitEn
   }
 
   /**
-   * Get the {@link Entrance} that this edge links to.
+   * Get the id of the entrance that this edge links to.
    */
-  public Entrance entrance() {
+  public FeedScopedId entrance() {
     if (getToVertex() instanceof TransitEntranceVertex tev) {
-      return tev.getEntrance();
+      return tev.getId();
     } else if (getFromVertex() instanceof TransitEntranceVertex tev) {
-      return tev.getEntrance();
+      return tev.getId();
     }
     throw new IllegalStateException("%s doesn't link to an entrance.".formatted(this));
   }

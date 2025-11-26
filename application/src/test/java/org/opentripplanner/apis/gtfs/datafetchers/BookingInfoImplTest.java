@@ -2,7 +2,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.apis.gtfs.datafetchers.DataFetchingSupport.dataFetchingEnvironment;
+import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.dataFetchingEnvironment;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;

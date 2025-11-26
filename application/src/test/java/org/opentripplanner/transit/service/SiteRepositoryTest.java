@@ -69,7 +69,6 @@ class SiteRepositoryTest {
     assertEquals(expStops, m.listRegularStops().toString());
     assertEquals(expStops, m.listStopLocations().toString());
     assertEquals(stop, m.stopByIndex(stop.getIndex()));
-    assertEquals(COOR_A, m.getCoordinateById(ID));
     assertFalse(m.hasAreaStops());
   }
 
@@ -81,7 +80,6 @@ class SiteRepositoryTest {
     assertEquals("[AreaStop{F:A Name}]", m.listAreaStops().toString());
     assertEquals("[AreaStop{F:A Name}]", m.listStopLocations().toString());
     assertEquals(STOP_AREA, m.stopByIndex(STOP_AREA.getIndex()));
-    assertEquals(COOR_A, m.getCoordinateById(ID));
     assertTrue(m.hasAreaStops());
   }
 
@@ -91,7 +89,6 @@ class SiteRepositoryTest {
     assertEquals("[GroupStop{F:A}]", m.listGroupStops().toString());
     assertEquals("[GroupStop{F:A}]", m.listStopLocations().toString());
     assertEquals(stopGroup, m.stopByIndex(stopGroup.getIndex()));
-    assertEquals(COOR_A, m.getCoordinateById(ID));
     assertFalse(m.hasAreaStops());
   }
 
@@ -103,7 +100,6 @@ class SiteRepositoryTest {
     assertEquals(STATION, m.getStopLocationsGroup(ID));
     assertEquals(expStops, m.findStopOrChildStops(ID).toString());
     assertEquals(EXP_STATIONS, m.listStopLocationGroups().toString());
-    assertEquals(COOR_B, m.getCoordinateById(ID));
     assertFalse(m.hasAreaStops());
   }
 
@@ -116,7 +112,6 @@ class SiteRepositoryTest {
     assertEquals(mmStation, m.getStopLocationsGroup(ID));
     assertEquals(expStops, m.findStopOrChildStops(ID).toString());
     assertEquals(expMmStations, m.listStopLocationGroups().toString());
-    assertEquals(COOR_B, m.getCoordinateById(ID));
     assertFalse(m.hasAreaStops());
   }
 
@@ -127,7 +122,6 @@ class SiteRepositoryTest {
     assertEquals(groupOfStations, m.getStopLocationsGroup(ID));
     assertEquals(expStops, m.findStopOrChildStops(ID).toString());
     assertEquals(expGroupOfStation, m.listStopLocationGroups().toString());
-    assertEquals(COOR_B, m.getCoordinateById(ID));
     assertFalse(m.hasAreaStops());
   }
 

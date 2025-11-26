@@ -25,7 +25,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.TestSlackProvider;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**
@@ -54,7 +54,7 @@ public class F02_EgressWithRidesTest implements RaptorTestConstants {
       )
     );
     // We will test board- and alight-slack in a separate test
-    data.withSlackProvider(new DefaultSlackProvider(60, 0, 0));
+    data.withSlackProvider(new TestSlackProvider(60, 0, 0));
 
     requestBuilder
       .searchParams()

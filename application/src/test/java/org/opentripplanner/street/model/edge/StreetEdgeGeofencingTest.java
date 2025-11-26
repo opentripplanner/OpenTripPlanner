@@ -414,9 +414,7 @@ class StreetEdgeGeofencingTest {
 
     private static StreetSearchRequest defaultArriveByRequest() {
       return StreetSearchRequest.of()
-        .withPreferences(p ->
-          p.withScooter(b -> b.withRental(r -> r.withAllowedNetworks(Set.of(NETWORK_TIER))))
-        )
+        .withScooter(b -> b.withRental(r -> r.withAllowedNetworks(Set.of(NETWORK_TIER))))
         .withMode(StreetMode.SCOOTER_RENTAL)
         .withArriveBy(true)
         .build();
@@ -427,11 +425,9 @@ class StreetEdgeGeofencingTest {
       Set<String> bannedNetworks
     ) {
       return StreetSearchRequest.of()
-        .withPreferences(p ->
-          p.withScooter(b ->
-            b.withRental(r ->
-              r.withAllowedNetworks(allowedNetworks).withBannedNetworks(bannedNetworks)
-            )
+        .withScooter(b ->
+          b.withRental(r ->
+            r.withAllowedNetworks(allowedNetworks).withBannedNetworks(bannedNetworks)
           )
         )
         .withMode(StreetMode.SCOOTER_RENTAL)

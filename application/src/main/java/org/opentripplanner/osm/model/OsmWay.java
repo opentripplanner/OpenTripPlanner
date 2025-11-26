@@ -136,7 +136,9 @@ public class OsmWay extends OsmEntity {
 
   /** Whether this way is connected to the given way through their extremities. */
   public boolean isAdjacentTo(OsmWay way) {
-    if (nodes.isEmpty() || way.nodes.isEmpty()) return false;
+    if (nodes.isEmpty() || way.nodes.isEmpty()) {
+      return false;
+    }
 
     long wayFirstNode = way.nodes.get(0);
     long wayLastNode = way.nodes.get(way.nodes.size() - 1);

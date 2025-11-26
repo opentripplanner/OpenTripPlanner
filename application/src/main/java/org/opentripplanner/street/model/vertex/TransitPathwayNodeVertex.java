@@ -1,25 +1,12 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.transit.model.site.PathwayNode;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TransitPathwayNodeVertex extends StationElementVertex {
 
-  private final PathwayNode node;
-
-  /**
-   * @param node The transit model pathway node reference.
-   */
-  public TransitPathwayNodeVertex(PathwayNode node) {
-    super(
-      node.getId(),
-      node.getCoordinate().longitude(),
-      node.getCoordinate().latitude(),
-      node.getName()
-    );
-    this.node = node;
-  }
-
-  public PathwayNode getNode() {
-    return this.node;
+  public TransitPathwayNodeVertex(FeedScopedId id, WgsCoordinate coordinate, I18NString name) {
+    super(id, coordinate.longitude(), coordinate.latitude(), name);
   }
 }
