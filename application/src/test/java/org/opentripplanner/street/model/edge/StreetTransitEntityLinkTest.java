@@ -16,11 +16,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
-import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.search.request.AccessibilityRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
@@ -94,25 +93,23 @@ class StreetTransitEntityLinkTest {
         .build();
 
       var req = StreetSearchRequest.of().withMode(StreetMode.BIKE);
-      AccessibilityPreferences feature;
+      AccessibilityRequest feature;
       if (onlyAccessible) {
-        feature = AccessibilityPreferences.ofOnlyAccessible();
+        feature = AccessibilityRequest.ofOnlyAccessible();
       } else {
-        feature = AccessibilityPreferences.ofCost(100, 100);
+        feature = AccessibilityRequest.ofCost(100, 100);
       }
-      req.withWheelchair(true);
-      req.withPreferences(p ->
-        p.withWheelchair(
-          WheelchairPreferences.of()
-            .withTrip(feature)
-            .withStop(feature)
-            .withElevator(feature)
-            .withInaccessibleStreetReluctance(25)
-            .withMaxSlope(0.045)
-            .withSlopeExceededReluctance(10)
-            .withStairsReluctance(25)
-            .build()
-        )
+      req.withWheelchairEnabled(true);
+      req.withWheelchair(b ->
+        b
+          .withTrip(feature)
+          .withStop(feature)
+          .withElevator(feature)
+          .withInaccessibleStreetReluctance(25)
+          .withMaxSlope(0.045)
+          .withSlopeExceededReluctance(10)
+          .withStairsReluctance(25)
+          .build()
       );
 
       var edge = StreetTransitStopLink.createStreetTransitStopLink(from, to);

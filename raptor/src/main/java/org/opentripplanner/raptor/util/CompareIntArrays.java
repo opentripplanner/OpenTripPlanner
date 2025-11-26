@@ -136,12 +136,17 @@ public class CompareIntArrays {
   }
 
   private void countDiff(int a, int b) {
-    if (a == unreached) aNotReached++;
-    else if (b == unreached) bNotReached++;
-    else {
+    if (a == unreached) {
+      aNotReached++;
+    } else if (b == unreached) {
+      bNotReached++;
+    } else {
       int c = comparator.compare(a, b);
-      if (c < 0) aLess++;
-      else if (c > 0) bLess++;
+      if (c < 0) {
+        aLess++;
+      } else if (c > 0) {
+        bLess++;
+      }
     }
   }
 

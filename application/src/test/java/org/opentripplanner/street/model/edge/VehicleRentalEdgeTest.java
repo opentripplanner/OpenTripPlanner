@@ -326,14 +326,10 @@ class VehicleRentalEdgeTest {
 
     this.request = StreetSearchRequest.of()
       .withMode(mode)
-      .withPreferences(preferences ->
-        preferences
-          .withBike(bike ->
-            bike.withRental(rental ->
-              rental.withUseAvailabilityInformation(useRealtime).withBannedNetworks(bannedNetworks)
-            )
-          )
-          .build()
+      .withBike(bike ->
+        bike.withRental(rental ->
+          rental.withUseAvailabilityInformation(useRealtime).withBannedNetworks(bannedNetworks)
+        )
       )
       .build();
   }
@@ -351,14 +347,10 @@ class VehicleRentalEdgeTest {
 
     this.request = StreetSearchRequest.of()
       .withMode(mode)
-      .withPreferences(preferences ->
-        preferences
-          .withCar(car -> car.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
-          .withBike(bike -> bike.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
-          .withScooter(scooter ->
-            scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
-          )
-          .build()
+      .withCar(car -> car.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
+      .withBike(bike -> bike.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
+      .withScooter(scooter ->
+        scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
       )
       .build();
   }

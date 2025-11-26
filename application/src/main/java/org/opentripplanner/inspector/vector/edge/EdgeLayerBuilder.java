@@ -25,12 +25,15 @@ public class EdgeLayerBuilder extends LayerBuilder<Edge> {
     return graph
       .findEdges(query)
       .stream()
-      .filter(e -> e.getGeometry() != null)
-      .map(edge -> {
-        Geometry geometry = edge.getGeometry();
-        geometry.setUserData(edge);
+      .map(e -> new DebugEdge(e, EdgeGeometryMapper.map(e)))
+      .filter(e -> e.geometry != null)
+      .map(debugEdge -> {
+        Geometry geometry = debugEdge.geometry.copy();
+        geometry.setUserData(debugEdge.edge);
         return geometry;
       })
       .toList();
   }
+
+  private record DebugEdge(Edge edge, Geometry geometry) {}
 }

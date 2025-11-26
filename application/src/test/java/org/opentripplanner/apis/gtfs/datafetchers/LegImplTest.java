@@ -2,7 +2,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.apis.gtfs.datafetchers.DataFetchingSupport.dataFetchingEnvironment;
+import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.dataFetchingEnvironment;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

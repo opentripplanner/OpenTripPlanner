@@ -67,10 +67,10 @@ public class PlanImpl implements GraphQLDataFetchers.GraphQLPlan {
   public DataFetcher<Long> nextDateTime() {
     return environment -> {
       TripSearchMetadata metadata = getSource(environment).getMetadata();
-      if (metadata == null || metadata.nextDateTime == null) {
+      if (metadata == null || metadata.nextDateTime() == null) {
         return null;
       }
-      return metadata.nextDateTime.getEpochSecond() * 1000;
+      return metadata.nextDateTime().getEpochSecond() * 1000;
     };
   }
 
@@ -86,10 +86,10 @@ public class PlanImpl implements GraphQLDataFetchers.GraphQLPlan {
   public DataFetcher<Long> prevDateTime() {
     return environment -> {
       TripSearchMetadata metadata = getSource(environment).getMetadata();
-      if (metadata == null || metadata.prevDateTime == null) {
+      if (metadata == null || metadata.prevDateTime() == null) {
         return null;
       }
-      return metadata.prevDateTime.getEpochSecond() * 1000;
+      return metadata.prevDateTime().getEpochSecond() * 1000;
     };
   }
 
@@ -105,10 +105,10 @@ public class PlanImpl implements GraphQLDataFetchers.GraphQLPlan {
   public DataFetcher<Long> searchWindowUsed() {
     return environment -> {
       TripSearchMetadata metadata = getSource(environment).getMetadata();
-      if (metadata == null || metadata.searchWindowUsed == null) {
+      if (metadata == null || metadata.raptorSearchWindowUsed() == null) {
         return null;
       }
-      return metadata.searchWindowUsed.toSeconds();
+      return metadata.raptorSearchWindowUsed().toSeconds();
     };
   }
 

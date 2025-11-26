@@ -46,10 +46,10 @@ public class VehicleRentalEdge extends Edge {
     VehicleRentalPlaceVertex stationVertex = (VehicleRentalPlaceVertex) tov;
     VehicleRentalPlace station = stationVertex.getStation();
     String network = station.network();
-    var preferences = s0.getPreferences().rental(formFactor.traverseMode);
-    boolean realtimeAvailability = preferences.useAvailabilityInformation();
+    var request = s0.getRequest().rental(formFactor.traverseMode);
+    boolean realtimeAvailability = request.useAvailabilityInformation();
 
-    if (station.networkIsNotAllowed(preferences)) {
+    if (station.networkIsNotAllowed(request)) {
       return State.empty();
     }
 
@@ -122,7 +122,7 @@ public class VehicleRentalEdge extends Edge {
             s1.beginFloatingVehicleRenting(formFactor, network, false);
           } else {
             boolean mayKeep =
-              preferences.allowArrivingInRentedVehicleAtDestination() &&
+              request.allowArrivingInRentedVehicleAtDestination() &&
               station.isArrivingInRentalVehicleAtDestinationAllowed();
             s1.beginVehicleRentingAtStation(formFactor, network, mayKeep, false);
           }
@@ -146,10 +146,10 @@ public class VehicleRentalEdge extends Edge {
     }
 
     s1.incrementWeight(
-      pickedUp ? preferences.pickupCost().toSeconds() : preferences.dropOffCost().toSeconds()
+      pickedUp ? request.pickupCost().toSeconds() : request.dropOffCost().toSeconds()
     );
     s1.incrementTimeInMilliseconds(
-      pickedUp ? preferences.pickupTime().toMillis() : preferences.dropOffTime().toMillis()
+      pickedUp ? request.pickupTime().toMillis() : request.dropOffTime().toMillis()
     );
     s1.setBackMode(null);
     return s1.makeStateArray();

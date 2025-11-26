@@ -31,7 +31,9 @@ public class TimeLimit implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     TimeLimit timeLimit = (TimeLimit) o;
     return type == timeLimit.type && Objects.equals(duration, timeLimit.duration);
   }

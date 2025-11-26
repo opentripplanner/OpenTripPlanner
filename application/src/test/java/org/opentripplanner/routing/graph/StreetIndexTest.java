@@ -24,6 +24,7 @@ class StreetIndexTest {
     .build();
   private final StationCentroidVertex centroidVertex = new StationCentroidVertex(
     station.getId(),
+    station.getName(),
     station.getCoordinate()
   );
 

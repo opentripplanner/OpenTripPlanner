@@ -29,7 +29,7 @@ import org.opentripplanner.transit.service.TransitService;
 public class StreetGraphFinder implements GraphFinder {
 
   private final LinkingContextFactory linkingContextFactory;
-  private StopResolver stopResolver;
+  private final StopResolver stopResolver;
 
   public StreetGraphFinder(LinkingContextFactory linkingContextFactory, StopResolver stopResolver) {
     this.linkingContextFactory = linkingContextFactory;

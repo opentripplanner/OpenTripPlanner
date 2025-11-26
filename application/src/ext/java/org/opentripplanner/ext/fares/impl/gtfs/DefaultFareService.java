@@ -283,7 +283,9 @@ public class DefaultFareService implements FareService {
       FareAttribute attribute = ruleSet.getFareAttribute();
       // fares also don't really have an agency id, they will have the per-feed default id
       // check only if the fare is not mapped to an agency
-      if (!attribute.getId().getFeedId().equals(feedId)) continue;
+      if (!attribute.getId().getFeedId().equals(feedId)) {
+        continue;
+      }
 
       if (
         ruleSet.matches(

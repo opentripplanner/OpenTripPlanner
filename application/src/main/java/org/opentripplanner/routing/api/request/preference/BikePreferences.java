@@ -111,8 +111,12 @@ public final class BikePreferences implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     BikePreferences that = (BikePreferences) o;
     return (
       doubleEquals(that.speed, speed) &&

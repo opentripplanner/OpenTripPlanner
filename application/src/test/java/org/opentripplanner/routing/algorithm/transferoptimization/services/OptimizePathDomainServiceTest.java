@@ -8,13 +8,13 @@ import static org.opentripplanner.utils.time.TimeUtils.time;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.api.PathUtils;
 import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TestSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;
@@ -32,10 +32,10 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   private static final int TRANSFER_COST_SEC = 20;
   private static final double WAIT_RELUCTANCE = 1.0;
 
-  private static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
-    TRANSFER_SLACK,
+  private static final RaptorSlackProvider SLACK_PROVIDER = new TestSlackProvider(
     BOARD_SLACK,
-    ALIGHT_SLACK
+    ALIGHT_SLACK,
+    TRANSFER_SLACK
   );
 
   public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR =
@@ -314,7 +314,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
   static TestPathBuilder pathBuilder() {
     return new TestPathBuilder(
-      new DefaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK),
+      new TestSlackProvider(BOARD_SLACK, ALIGHT_SLACK, TRANSFER_SLACK),
       COST_CALCULATOR
     );
   }

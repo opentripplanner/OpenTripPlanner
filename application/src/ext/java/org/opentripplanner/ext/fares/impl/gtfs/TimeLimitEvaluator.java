@@ -16,6 +16,8 @@ class TimeLimitEvaluator {
       switch (limit.type()) {
         case DEPARTURE_TO_DEPARTURE -> Duration.between(from.startTime(), to.startTime());
         case DEPARTURE_TO_ARRIVAL -> Duration.between(from.startTime(), to.endTime());
+        case ARRIVAL_TO_ARRIVAL -> Duration.between(from.endTime(), to.endTime());
+        case ARRIVAL_TO_DEPARTURE -> Duration.between(from.endTime(), to.startTime());
       };
 
     return duration.compareTo(limit.duration()) <= 0;

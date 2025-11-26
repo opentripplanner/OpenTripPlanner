@@ -67,9 +67,8 @@ class FareTransferRuleMapper {
     return switch (durationLimitType) {
       case 0 -> TimeLimitType.DEPARTURE_TO_ARRIVAL;
       case 1 -> TimeLimitType.DEPARTURE_TO_DEPARTURE;
-      case 2, 3 -> throw new IllegalArgumentException(
-        "Duration limit type %s not implemented.".formatted(durationLimitType)
-      );
+      case 2 -> TimeLimitType.ARRIVAL_TO_DEPARTURE;
+      case 3 -> TimeLimitType.ARRIVAL_TO_ARRIVAL;
       default -> throw new IllegalArgumentException("Valid duration limit type must be provided.");
     };
   }

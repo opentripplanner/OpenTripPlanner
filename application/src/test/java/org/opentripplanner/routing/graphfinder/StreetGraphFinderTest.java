@@ -28,15 +28,25 @@ import org.opentripplanner.transit.service.TransitService;
 
 class StreetGraphFinderTest extends GraphRoutingTest {
 
-  private TransitStopVertex S1, S2, S3;
-  private IntersectionVertex A, B, C, D;
-  private VehicleRentalPlaceVertex BR1, BR2;
+  private TransitStopVertex S1;
+  private TransitStopVertex S2;
+  private TransitStopVertex S3;
+  private IntersectionVertex A;
+  private IntersectionVertex B;
+  private IntersectionVertex C;
+  private IntersectionVertex D;
+  private VehicleRentalPlaceVertex BR1;
+  private VehicleRentalPlaceVertex BR2;
 
   private TransitService transitService;
   private StreetGraphFinder graphFinder;
-  private Route R1, R2;
-  private TripPattern TP1, TP2;
-  private VehicleParking BP1, PR1, PR2;
+  private Route R1;
+  private Route R2;
+  private TripPattern TP1;
+  private TripPattern TP2;
+  private VehicleParking BP1;
+  private VehicleParking PR1;
+  private VehicleParking PR2;
 
   @BeforeEach
   protected void setUp() throws Exception {

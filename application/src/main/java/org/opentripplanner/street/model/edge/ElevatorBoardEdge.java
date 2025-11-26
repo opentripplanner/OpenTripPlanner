@@ -42,10 +42,10 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
       return State.empty();
     }
 
-    var streetPreferences = s0.getPreferences().street();
+    var req = s0.getRequest();
 
-    s1.incrementWeight(streetPreferences.elevator().boardCost());
-    s1.incrementTimeInSeconds(streetPreferences.elevator().boardTime());
+    s1.incrementWeight(req.elevator().boardCost());
+    s1.incrementTimeInSeconds(req.elevator().boardTime());
 
     return s1.makeStateArray();
   }

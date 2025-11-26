@@ -30,9 +30,7 @@ class EscalatorEdgeTest {
   void testWalking(double escalatorReluctance, double expectedWeight) {
     var edge = EscalatorEdge.createEscalatorEdge(from, to, 45, null);
     var req = StreetSearchRequest.of()
-      .withPreferences(p ->
-        p.withWalk(w -> w.withEscalator(escalator -> escalator.withReluctance(escalatorReluctance)))
-      )
+      .withWalk(b -> b.withEscalator(b2 -> b2.withReluctance(escalatorReluctance).build()).build())
       .withMode(StreetMode.WALK);
 
     var res = edge.traverse(new State(from, req.build()))[0];
@@ -60,7 +58,7 @@ class EscalatorEdgeTest {
   @Test
   void testWheelchair() {
     var edge = EscalatorEdge.createEscalatorEdge(from, to, 10, null);
-    var req = StreetSearchRequest.of().withMode(StreetMode.WALK).withWheelchair(true);
+    var req = StreetSearchRequest.of().withMode(StreetMode.WALK).withWheelchairEnabled(true);
     var res = edge.traverse(new State(from, req.build()));
     assertThat(res).isEmpty();
   }

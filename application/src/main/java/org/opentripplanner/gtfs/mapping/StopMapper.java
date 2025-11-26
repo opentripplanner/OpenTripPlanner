@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -45,6 +47,8 @@ class StopMapper {
   }
 
   private RegularStop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
+    TransitMode mode = TransitModeMapper.mapMode(gtfsStop.getVehicleType());
+
     assertLocationTypeIsStop(gtfsStop);
     StopMappingWrapper base = new StopMappingWrapper(idFactory, gtfsStop);
     RegularStopBuilder builder = siteRepositoryBuilder
@@ -54,7 +58,8 @@ class StopMapper {
       .withWheelchairAccessibility(base.getWheelchairAccessibility())
       .withLevel(base.getLevel())
       .withPlatformCode(gtfsStop.getPlatformCode())
-      .withVehicleType(TransitModeMapper.mapMode(gtfsStop.getVehicleType()));
+      .withVehicleType(mode)
+      .withSometimesUsedRealtime(mapSometimesUsedRealtime(mode, gtfsStop));
 
     builder.withName(
       translationHelper.getTranslation(
@@ -98,6 +103,28 @@ class StopMapper {
     }
 
     return builder.build();
+  }
+
+  /**
+   * If a stop is sometimes used by realtime, then we must include it in transfer generation, even
+   * when it does not have any trips/routes visiting it.
+   */
+  private static boolean mapSometimesUsedRealtime(TransitMode mode, Stop gtfsStop) {
+    if (OTPFeature.IncludeStopsUsedRealTimeInTransfers.isOn()) {
+      if (mode == TransitMode.RAIL) {
+        return true;
+      }
+      // We only consider rail and rail-replacement-bus stops when generating transfers. The reason
+      // we do not include all stops is due to perfomance reasons. This should be replaced by
+      // generating transfers as needed for realtime updates.
+      else if (
+        mode == TransitMode.BUS &&
+        TransitModeMapper.isRailReplacementBusService(gtfsStop.getVehicleType())
+      ) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void assertLocationTypeIsStop(Stop gtfsStop) {

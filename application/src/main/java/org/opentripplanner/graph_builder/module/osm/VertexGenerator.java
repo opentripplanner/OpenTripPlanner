@@ -332,7 +332,7 @@ class VertexGenerator {
     // If an OsmEntity has multiple levels, default to the DEFAULT level.
     OsmLevel level = osmdb.findSingleLevelForEntity(entity);
     if (!verticesOnLevel.containsKey(level)) {
-      OsmVertex vertex = vertexFactory.levelledOsm(node, level.name());
+      OsmVertex vertex = vertexFactory.levelledOsm(node, level.level());
       verticesOnLevel.put(level, vertex);
       return vertex;
     }

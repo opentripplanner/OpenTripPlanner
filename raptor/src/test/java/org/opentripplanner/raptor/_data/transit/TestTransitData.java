@@ -18,7 +18,6 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
@@ -27,6 +26,7 @@ import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.TestSlackProvider;
 import org.opentripplanner.raptor.util.BitSetIterator;
 
 @SuppressWarnings("UnusedReturnValue")
@@ -37,7 +37,7 @@ public class TestTransitData
   public static final TestTransferConstraint TX_NOT_ALLOWED = TestTransferConstraint.notAllowed();
 
   // Slack defaults: 1 minute for transfer-slack, 0 minutes for board- and alight-slack.
-  public static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(60, 0, 0);
+  public static final RaptorSlackProvider SLACK_PROVIDER = new TestSlackProvider(60, 0, 0);
 
   private final List<List<RaptorTransfer>> transfersFromStop = new ArrayList<>();
   private final List<List<RaptorTransfer>> transfersToStop = new ArrayList<>();
