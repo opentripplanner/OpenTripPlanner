@@ -6,12 +6,12 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.updater.trip.siri.updater.SiriETUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 
 public class SiriETUpdaterConfig {
 
-  public static SiriETUpdaterParameters create(String configRef, NodeAdapter c) {
-    return new SiriETUpdaterParameters(
+  public static DefaultSiriETUpdaterParameters create(String configRef, NodeAdapter c) {
+    return new DefaultSiriETUpdaterParameters(
       configRef,
       c.of("feedId").since(V2_0).summary("The ID of the feed to apply the updates to.").asString(),
       c

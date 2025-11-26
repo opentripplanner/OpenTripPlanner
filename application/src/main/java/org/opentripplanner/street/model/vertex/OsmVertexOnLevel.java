@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 
 /**
  * A vertex that represents an OSM node in conjunction with its level tag like both ends of an
@@ -10,10 +10,10 @@ import org.opentripplanner.osm.model.OsmNode;
  */
 public class OsmVertexOnLevel extends OsmVertex {
 
-  private final String level;
+  private final double level;
 
-  public OsmVertexOnLevel(OsmNode node, String level) {
-    super(node.getCoordinate().x, node.getCoordinate().y, node.getId());
+  public OsmVertexOnLevel(long id, WgsCoordinate coordinate, double level) {
+    super(coordinate.longitude(), coordinate.latitude(), id);
     this.level = level;
   }
 

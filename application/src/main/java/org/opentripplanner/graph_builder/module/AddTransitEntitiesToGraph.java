@@ -4,16 +4,12 @@ import static org.opentripplanner.framework.geometry.SphericalDistanceLibrary.di
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -30,9 +26,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Pathway;
@@ -41,8 +35,8 @@ import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationElement;
+import org.opentripplanner.transit.model.site.StopLevel;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,17 +70,13 @@ public class AddTransitEntitiesToGraph {
   public static void addToGraph(
     OtpTransitService otpTransitService,
     int subwayAccessTime,
-    Graph graph,
-    TimetableRepository timetableRepository
+    Graph graph
   ) {
-    new AddTransitEntitiesToGraph(otpTransitService, subwayAccessTime, graph).applyToGraph(
-      timetableRepository
-    );
+    var adder = new AddTransitEntitiesToGraph(otpTransitService, subwayAccessTime, graph);
+    adder.applyToGraph();
   }
 
-  private void applyToGraph(TimetableRepository timetableRepository) {
-    timetableRepository.mergeSiteRepositories(otpTransitService.siteRepository());
-
+  private void applyToGraph() {
     addStopsToGraphAndGenerateStopVertexes();
     addEntrancesToGraph();
     addStationCentroidsToGraph();
@@ -96,17 +86,6 @@ public class AddTransitEntitiesToGraph {
     // Although pathways are loaded from GTFS they are street data, so we will put them in the
     // street graph.
     createPathwayEdgesAndAddThemToGraph();
-    addFeedInfoToGraph(timetableRepository);
-    addAgenciesToGraph(timetableRepository);
-    addServicesToTimetableRepository(timetableRepository);
-    addTripPatternsToTimetableRepository(timetableRepository);
-
-    /* Interpret the transfers explicitly defined in transfers.txt. */
-    addTransfersToGraph(timetableRepository);
-
-    if (OTPFeature.FlexRouting.isOn()) {
-      addFlexTripsToGraph(timetableRepository);
-    }
   }
 
   private void addStopsToGraphAndGenerateStopVertexes() {
@@ -141,7 +120,7 @@ public class AddTransitEntitiesToGraph {
   }
 
   private void addEntrancesToGraph() {
-    for (Entrance entrance : otpTransitService.getAllEntrances()) {
+    for (Entrance entrance : otpTransitService.siteRepository().listEntrances()) {
       TransitEntranceVertex entranceVertex = vertexFactory.transitEntrance(entrance);
       stationElementNodes.put(entrance, entranceVertex);
     }
@@ -150,7 +129,7 @@ public class AddTransitEntitiesToGraph {
   private void addStationCentroidsToGraph() {
     for (Station station : otpTransitService.siteRepository().listStations()) {
       if (station.shouldRouteToCentroid()) {
-        vertexFactory.stationCentroid(station.getId(), station.getCoordinate());
+        vertexFactory.stationCentroid(station);
       }
     }
   }
@@ -172,19 +151,9 @@ public class AddTransitEntitiesToGraph {
         var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
         boolean wheelchair = boardingArea.getWheelchairAccessibility() == Accessibility.POSSIBLE;
 
-        PathwayEdge.createLowCostPathwayEdge(
-          boardingAreaVertex,
-          platformVertex,
-          wheelchair,
-          PathwayMode.WALKWAY
-        );
+        PathwayEdge.createLowCostPathwayEdge(boardingAreaVertex, platformVertex, wheelchair);
 
-        PathwayEdge.createLowCostPathwayEdge(
-          platformVertex,
-          boardingAreaVertex,
-          wheelchair,
-          PathwayMode.WALKWAY
-        );
+        PathwayEdge.createLowCostPathwayEdge(platformVertex, boardingAreaVertex, wheelchair);
       }
     }
   }
@@ -214,8 +183,7 @@ public class AddTransitEntitiesToGraph {
             distance,
             pathway.getStairCount(),
             pathway.getSlope(),
-            pathway.isPathwayModeWheelchairAccessible(),
-            pathway.getPathwayMode()
+            pathway.isPathwayModeWheelchairAccessible()
           );
           if (pathway.isBidirectional()) {
             PathwayEdge.createPathwayEdge(
@@ -226,8 +194,7 @@ public class AddTransitEntitiesToGraph {
               distance,
               -1 * pathway.getStairCount(),
               -1 * pathway.getSlope(),
-              pathway.isPathwayModeWheelchairAccessible(),
-              pathway.getPathwayMode()
+              pathway.isPathwayModeWheelchairAccessible()
             );
           }
         }
@@ -252,31 +219,31 @@ public class AddTransitEntitiesToGraph {
     StationElementVertex fromVertex,
     StationElementVertex toVertex
   ) {
-    StopLevel fromLevel = getStopLevel(fromVertex);
-    StopLevel toLevel = getStopLevel(toVertex);
+    StopLevel fromLevel = findStopLevel(fromVertex);
+    StopLevel toLevel = findStopLevel(toVertex);
 
     double levels = 1;
-    if (
-      fromLevel.index() != null &&
-      toLevel.index() != null &&
-      !fromLevel.index().equals(toLevel.index())
-    ) {
+    if (fromLevel.index() != toLevel.index()) {
       levels = Math.abs(fromLevel.index() - toLevel.index());
     }
 
     ElevatorVertex fromOnboardVertex = vertexFactory.elevator(
       fromVertex,
-      elevatorLabel(fromVertex, pathway),
-      fromLevel.name().toString()
+      getElevatorLabel(fromVertex, pathway),
+      fromLevel.index()
     );
     ElevatorVertex toOnboardVertex = vertexFactory.elevator(
       toVertex,
-      elevatorLabel(toVertex, pathway),
-      toLevel.name().toString()
+      getElevatorLabel(toVertex, pathway),
+      toLevel.index()
     );
 
     ElevatorBoardEdge.createElevatorBoardEdge(fromVertex, fromOnboardVertex);
-    ElevatorAlightEdge.createElevatorAlightEdge(toOnboardVertex, toVertex, toLevel.name());
+    ElevatorAlightEdge.createElevatorAlightEdge(
+      toOnboardVertex,
+      toVertex,
+      new NonLocalizedString(toLevel.name())
+    );
 
     StreetTraversalPermission permission = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
     ElevatorHopEdge.createElevatorHopEdge(
@@ -290,7 +257,11 @@ public class AddTransitEntitiesToGraph {
 
     if (pathway.isBidirectional()) {
       ElevatorBoardEdge.createElevatorBoardEdge(toVertex, toOnboardVertex);
-      ElevatorAlightEdge.createElevatorAlightEdge(fromOnboardVertex, fromVertex, fromLevel.name());
+      ElevatorAlightEdge.createElevatorAlightEdge(
+        fromOnboardVertex,
+        fromVertex,
+        new NonLocalizedString(fromLevel.name())
+      );
       ElevatorHopEdge.createElevatorHopEdge(
         toOnboardVertex,
         fromOnboardVertex,
@@ -302,69 +273,26 @@ public class AddTransitEntitiesToGraph {
     }
   }
 
-  private static String elevatorLabel(StationElementVertex fromVertex, Pathway pathway) {
-    return "%s_%s".formatted(fromVertex.getLabel(), pathway.getId());
+  private static String getElevatorLabel(StationElementVertex vertex, Pathway pathway) {
+    return "%s_%s".formatted(vertex.getLabel(), pathway.getId());
   }
 
-  private StopLevel getStopLevel(StationElementVertex vertex) {
-    var dfltLevel = new StopLevel(vertex.getName(), null);
+  /**
+   * Try to find a stop level. If one can not be found, return the default level.
+   * If a name is not present, default to the index as the name.
+   *
+   * @return StopLevel that can not be null without any null fields
+   */
+  public StopLevel findStopLevel(StationElementVertex vertex) {
     var stop = otpTransitService.siteRepository().getRegularStop(vertex.getId());
-    if (stop == null) {
-      return dfltLevel;
-    } else if (stop.level() == null) {
-      return dfltLevel;
+    if (stop == null || stop.level() == null) {
+      return StationElement.DEFAULT_LEVEL;
     } else {
       var level = stop.level();
       return new StopLevel(
-        NonLocalizedString.ofNullableOrElse(level.name(), stop.getName()),
+        Objects.requireNonNullElse(level.name(), String.valueOf(level.index())),
         level.index()
       );
     }
   }
-
-  private void addFeedInfoToGraph(TimetableRepository timetableRepository) {
-    for (FeedInfo info : otpTransitService.getAllFeedInfos()) {
-      timetableRepository.addFeedInfo(info);
-    }
-  }
-
-  private void addAgenciesToGraph(TimetableRepository timetableRepository) {
-    for (Agency agency : otpTransitService.getAllAgencies()) {
-      timetableRepository.addAgency(agency);
-    }
-  }
-
-  private void addTransfersToGraph(TimetableRepository timetableRepository) {
-    timetableRepository.getTransferService().addAll(otpTransitService.getAllTransfers());
-  }
-
-  private void addServicesToTimetableRepository(TimetableRepository timetableRepository) {
-    /* Assign 0-based numeric codes to all GTFS service IDs. */
-    for (FeedScopedId serviceId : otpTransitService.getAllServiceIds()) {
-      timetableRepository
-        .getServiceCodes()
-        .put(serviceId, timetableRepository.getServiceCodes().size());
-    }
-  }
-
-  private void addTripPatternsToTimetableRepository(TimetableRepository timetableRepository) {
-    Collection<TripPattern> tripPatterns = otpTransitService.getTripPatterns();
-
-    /* Loop over all new TripPatterns setting the service codes. */
-    for (TripPattern tripPattern : tripPatterns) {
-      // TODO this could be more elegant
-      tripPattern.getScheduledTimetable().setServiceCodes(timetableRepository.getServiceCodes());
-
-      // Store the tripPattern in the Graph so it will be serialized and usable in routing.
-      timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
-    }
-  }
-
-  private void addFlexTripsToGraph(TimetableRepository timetableRepository) {
-    for (FlexTrip<?, ?> flexTrip : otpTransitService.getAllFlexTrips()) {
-      timetableRepository.addFlexTrip(flexTrip.getId(), flexTrip);
-    }
-  }
-
-  private record StopLevel(I18NString name, Double index) {}
 }

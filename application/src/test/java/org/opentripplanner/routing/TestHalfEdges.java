@@ -57,8 +57,16 @@ public class TestHalfEdges {
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   private Graph graph;
-  private StreetEdge top, bottom, left, right, leftBack, rightBack;
-  private IntersectionVertex br, tr, bl, tl;
+  private StreetEdge top;
+  private StreetEdge bottom;
+  private StreetEdge left;
+  private StreetEdge right;
+  private StreetEdge leftBack;
+  private StreetEdge rightBack;
+  private IntersectionVertex br;
+  private IntersectionVertex tr;
+  private IntersectionVertex bl;
+  private IntersectionVertex tl;
   private TransitStopVertex station1;
   private TransitStopVertex station2;
   private TimetableRepository timetableRepository;
@@ -112,8 +120,7 @@ public class TestHalfEdges {
       .withBack(false)
       .buildAndConnect();
 
-    @SuppressWarnings("unused")
-    StreetEdge topBack = new StreetEdgeBuilder<>()
+    new StreetEdgeBuilder<>()
       .withFromVertex(tr)
       .withToVertex(tl)
       .withGeometry(top.getGeometry().reverse())
@@ -122,8 +129,7 @@ public class TestHalfEdges {
       .withPermission(StreetTraversalPermission.ALL)
       .withBack(true)
       .buildAndConnect();
-    @SuppressWarnings("unused")
-    StreetEdge bottomBack = new StreetEdgeBuilder<>()
+    new StreetEdgeBuilder<>()
       .withFromVertex(br)
       .withToVertex(bl)
       .withGeometry(bottom.getGeometry().reverse())
@@ -531,7 +537,7 @@ public class TestHalfEdges {
       StreetNotesService.WHEELCHAIR_MATCHER
     );
 
-    req.withWheelchair(true);
+    req.withWheelchairEnabled(true);
 
     start = StreetModelForTest.createTemporaryStreetLocationForTest(
       "start",

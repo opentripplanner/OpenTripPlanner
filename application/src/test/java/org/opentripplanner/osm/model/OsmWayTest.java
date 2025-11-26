@@ -309,7 +309,9 @@ class OsmWayTest {
   @MethodSource("createRampAsTurnLaneCases")
   void rampAsTurnLane(String turnValue, boolean oneWay, boolean expected) {
     var ramp = WayTestData.motorwayRamp();
-    if (oneWay) ramp.addTag("oneway", "yes");
+    if (oneWay) {
+      ramp.addTag("oneway", "yes");
+    }
     ramp.addTag("turn:lanes", turnValue);
 
     assertEquals(

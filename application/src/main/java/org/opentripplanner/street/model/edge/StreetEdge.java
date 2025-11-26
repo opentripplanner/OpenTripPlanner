@@ -26,6 +26,7 @@ import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.street.search.state.VehicleRentalState;
@@ -201,7 +202,7 @@ public class StreetEdge
    * Calculate the speed appropriately given the RouteRequest and traverseMode.
    */
   public double calculateSpeed(
-    RoutingPreferences preferences,
+    StreetSearchRequest preferences,
     TraverseMode traverseMode,
     boolean walkingBike
   ) {
@@ -829,13 +830,13 @@ public class StreetEdge
    * unless the known network is not accepted by the provided {@link RoutingPreferences}.
    * @param s0 The parent state (i.e. the following state, as we are in reverse)
    * @param network Network id, or null if unknown
-   * @param preferences Active {@link RoutingPreferences}
+   * @param request Active {@link RoutingPreferences}
    * @return Newly generated {@link State}, or null if the state would have been forbidden.
    */
   private State createStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(
     State s0,
     String network,
-    RoutingPreferences preferences
+    StreetSearchRequest request
   ) {
     var edit = doTraverse(s0, TraverseMode.WALK, false);
     if (edit != null) {
@@ -845,9 +846,8 @@ public class StreetEdge
       }
       State state = edit.makeState();
       if (state != null && network != null) {
-        var rentalPreferences = preferences.rental(state.currentMode());
-        var allowedNetworks = rentalPreferences.allowedNetworks();
-        var bannedNetworks = rentalPreferences.bannedNetworks();
+        var allowedNetworks = request.rental(state.currentMode()).allowedNetworks();
+        var bannedNetworks = request.rental(state.currentMode()).bannedNetworks();
         if (allowedNetworks.isEmpty()) {
           if (bannedNetworks.contains(network)) {
             return null;
@@ -874,7 +874,7 @@ public class StreetEdge
    * zone applies to where we pick up a vehicle with a specific network.
    */
   private State[] splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(State s0) {
-    var preferences = s0.getRequest().preferences();
+    var request = s0.getRequest();
     var states = new ArrayList<State>();
 
     // Also include a state which continues walking, because the vehicle rental states are
@@ -891,7 +891,7 @@ public class StreetEdge
       var state = createStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(
         s0,
         network,
-        preferences
+        request
       );
       if (state != null) {
         states.add(state);
@@ -901,9 +901,7 @@ public class StreetEdge
     if (hasNetworkStates) {
       // null is a special rental network that speculatively assumes that you can take any vehicle
       // you have to check in the rental edge if this has search has been started in a no-drop off zone
-      states.add(
-        createStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, null, preferences)
-      );
+      states.add(createStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, null, request));
     }
     return states.toArray(State[]::new);
   }
@@ -986,22 +984,22 @@ public class StreetEdge
       }
     }
 
-    final RoutingPreferences preferences = s0.getPreferences();
+    var request = s0.getRequest();
 
     // Automobiles have variable speeds depending on the edge type
-    double speed = calculateSpeed(preferences, traverseMode, walkingBike);
+    double speed = calculateSpeed(request, traverseMode, walkingBike);
 
     var traversalCosts =
       switch (traverseMode) {
-        case BICYCLE, SCOOTER -> bicycleOrScooterTraversalCost(preferences, traverseMode, speed);
+        case BICYCLE, SCOOTER -> bicycleOrScooterTraversalCost(request, traverseMode, speed);
         case WALK -> walkingTraversalCosts(
-          preferences,
+          request,
           traverseMode,
           speed,
           walkingBike,
-          s0.getRequest().wheelchair()
+          s0.getRequest().wheelchairEnabled()
         );
-        default -> otherTraversalCosts(preferences, traverseMode, walkingBike, speed);
+        default -> otherTraversalCosts(request, traverseMode, walkingBike, speed);
       };
 
     long time_ms = (long) Math.ceil(1000.0 * traversalCosts.time());
@@ -1012,7 +1010,7 @@ public class StreetEdge
       TraverseMode backMode = s0.getBackMode();
       final boolean arriveBy = s0.getRequest().arriveBy();
 
-      double backSpeed = backPSE.calculateSpeed(preferences, backMode, s0.isBackWalkingBike());
+      double backSpeed = backPSE.calculateSpeed(request, backMode, s0.isBackWalkingBike());
       final double turnDuration; // Units are seconds.
 
       /*
@@ -1059,15 +1057,15 @@ public class StreetEdge
       var modeReluctance =
         switch (intersectionMode) {
           case WALK -> walkingBikeThroughIntersection
-            ? preferences.bike().walking().reluctance()
-            : preferences.walk().reluctance();
-          case BICYCLE -> preferences.bike().reluctance();
-          case SCOOTER -> preferences.scooter().reluctance();
-          case CAR -> preferences.car().reluctance();
+            ? request.bike().walking().reluctance()
+            : request.walk().reluctance();
+          case BICYCLE -> request.bike().reluctance();
+          case SCOOTER -> request.scooter().reluctance();
+          case CAR -> request.car().reluctance();
           case FLEX -> 1;
         };
       time_ms += (long) Math.ceil(1000.0 * turnDuration);
-      weight += modeReluctance * preferences.street().turnReluctance() * turnDuration;
+      weight += modeReluctance * request.turnReluctance() * turnDuration;
     }
 
     if (!traverseMode.isInCar()) {
@@ -1086,7 +1084,7 @@ public class StreetEdge
   }
 
   private TraversalCosts otherTraversalCosts(
-    RoutingPreferences preferences,
+    StreetSearchRequest request,
     TraverseMode traverseMode,
     boolean walkingBike,
     double speed
@@ -1095,7 +1093,7 @@ public class StreetEdge
     var weight =
       time *
       StreetEdgeReluctanceCalculator.computeReluctance(
-        preferences,
+        request,
         traverseMode,
         walkingBike,
         isStairs()
@@ -1104,15 +1102,15 @@ public class StreetEdge
   }
 
   private TraversalCosts bicycleOrScooterTraversalCost(
-    RoutingPreferences pref,
+    StreetSearchRequest req,
     TraverseMode mode,
     double speed
   ) {
     double time = getEffectiveBikeDistance() / speed;
     double weight;
     var optimizeType = mode == TraverseMode.BICYCLE
-      ? pref.bike().optimizeType()
-      : pref.scooter().optimizeType();
+      ? req.bike().optimizeType()
+      : req.scooter().optimizeType();
     switch (optimizeType) {
       case SAFEST_STREETS -> {
         weight = (bicycleSafetyFactor * getDistanceMeters()) / speed;
@@ -1130,25 +1128,20 @@ public class StreetEdge
         double safety = getEffectiveBicycleSafetyDistance();
         double slope = getEffectiveBikeDistanceForWorkCost();
         var triangle = mode == TraverseMode.BICYCLE
-          ? pref.bike().optimizeTriangle()
-          : pref.scooter().optimizeTriangle();
+          ? req.bike().optimizeTriangle()
+          : req.scooter().optimizeTriangle();
         weight = quick * triangle.time() + slope * triangle.slope() + safety * triangle.safety();
         weight /= speed;
       }
       default -> weight = getDistanceMeters() / speed;
     }
-    var reluctance = StreetEdgeReluctanceCalculator.computeReluctance(
-      pref,
-      mode,
-      false,
-      isStairs()
-    );
+    var reluctance = StreetEdgeReluctanceCalculator.computeReluctance(req, mode, false, isStairs());
     weight *= reluctance;
     return new TraversalCosts(time, weight);
   }
 
   private TraversalCosts walkingTraversalCosts(
-    RoutingPreferences preferences,
+    StreetSearchRequest request,
     TraverseMode traverseMode,
     double speed,
     boolean walkingBike,
@@ -1160,7 +1153,7 @@ public class StreetEdge
       weight =
         (getEffectiveBikeDistance() / speed) *
         StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
-          preferences,
+          request,
           getMaxSlope(),
           isWheelchairAccessible(),
           isStairs()
@@ -1173,13 +1166,13 @@ public class StreetEdge
         // take slopes into account when walking
         time = getEffectiveWalkDistance() / speed;
         weight =
-          getEffectiveWalkSafetyDistance() * preferences.walk().safetyFactor() +
-          getEffectiveWalkDistance() * (1 - preferences.walk().safetyFactor());
+          getEffectiveWalkSafetyDistance() * request.walk().safetyFactor() +
+          getEffectiveWalkDistance() * (1 - request.walk().safetyFactor());
         weight /= speed;
       }
 
       weight *= StreetEdgeReluctanceCalculator.computeReluctance(
-        preferences,
+        request,
         traverseMode,
         walkingBike,
         isStairs()

@@ -526,7 +526,9 @@ public class OsmDatabase {
 
             // don't insert the same node twice. This is not always safe; suppose a way crosses over the same node in the parking area twice.
             // but we assume it doesn't (and even if it does, it's not a huge deal, as it is still connected elsewhere on the same way).
-            if (way.getNodeRefs().contains(ringSegment.nA.getId())) continue;
+            if (way.getNodeRefs().contains(ringSegment.nA.getId())) {
+              continue;
+            }
 
             way.addNodeRef(ringSegment.nA.getId(), i + 1);
 
@@ -543,7 +545,9 @@ public class OsmDatabase {
           } else if (checkIntersectionDistance(p, ringSegment.nB, epsilon)) {
             // insert node B into the road, if it's not already there
 
-            if (way.getNodeRefs().contains(ringSegment.nB.getId())) continue;
+            if (way.getNodeRefs().contains(ringSegment.nB.getId())) {
+              continue;
+            }
 
             way.addNodeRef(ringSegment.nB.getId(), i + 1);
 
@@ -833,7 +837,9 @@ public class OsmDatabase {
    * Store turn restrictions.
    */
   private void processRestriction(OsmRelation relation) {
-    long from = -1, to = -1, via = -1;
+    long from = -1;
+    long to = -1;
+    long via = -1;
     for (OsmRelationMember member : relation.getMembers()) {
       String role = member.getRole();
       if (role.equals("from")) {

@@ -667,7 +667,9 @@ public class OrcaFareService extends DefaultFareService {
     ZonedDateTime currentLegStartTime
   ) {
     // If there is no free transfer, then return false.
-    if (freeTransferStartTime == null) return false;
+    if (freeTransferStartTime == null) {
+      return false;
+    }
     Duration duration = Duration.between(freeTransferStartTime, currentLegStartTime);
     return duration.compareTo(MAX_TRANSFER_DISCOUNT_DURATION) < 0;
   }
@@ -692,6 +694,6 @@ public class OrcaFareService extends DefaultFareService {
     } else {
       name = fareType.toString();
     }
-    return new RiderCategory(new FeedScopedId(FEED_ID, name), name, null);
+    return RiderCategory.of(new FeedScopedId(FEED_ID, name)).withName(name).build();
   }
 }

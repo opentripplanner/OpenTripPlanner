@@ -240,7 +240,7 @@ public class TestRouteData {
       if (times == null) {
         var buf = new StringBuilder();
         int t = TimeUtils.time("10:00");
-        for (var ignore : stops()) {
+        for (int i = 0; i < stops.size(); i++) {
           t += 600;
           buf.append(" ").append(TimeUtils.timeToStrLong(t));
         }

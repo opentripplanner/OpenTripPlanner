@@ -190,7 +190,9 @@ public abstract class OsmEntity {
    * Adds a tag.
    */
   public void addTag(OsmTag tag) {
-    if (tags == null) tags = new HashMap<>();
+    if (tags == null) {
+      tags = new HashMap<>();
+    }
 
     tags.put(tag.getK().toLowerCase(), tag.getV());
   }
@@ -558,7 +560,9 @@ public abstract class OsmEntity {
     int lastEnd = 0;
     while (matcher.find()) {
       // add the stuff before the match
-      for (StringBuffer sb : i18n.values()) sb.append(pattern, lastEnd, matcher.start());
+      for (StringBuffer sb : i18n.values()) {
+        sb.append(pattern, lastEnd, matcher.start());
+      }
       lastEnd = matcher.end();
       // and then the value for the match
       String defKey = matcher.group(1);
@@ -567,7 +571,9 @@ public abstract class OsmEntity {
       for (Map.Entry<String, String> kv : i18nTags.entrySet()) {
         if (!kv.getKey().equals(defKey)) {
           String lang = kv.getKey().substring(defKey.length() + 1);
-          if (!i18n.containsKey(lang)) i18n.put(lang, new StringBuffer(i18n.get(null)));
+          if (!i18n.containsKey(lang)) {
+            i18n.put(lang, new StringBuffer(i18n.get(null)));
+          }
         }
       }
       // get the simple value (eg: description=...)
@@ -581,12 +587,13 @@ public abstract class OsmEntity {
         i18n.get(lang).append(i18nTag != null ? i18nTag : (defTag != null ? defTag : ""));
       }
     }
-    for (StringBuffer sb : i18n.values()) sb.append(pattern, lastEnd, pattern.length());
+    for (StringBuffer sb : i18n.values()) {
+      sb.append(pattern, lastEnd, pattern.length());
+    }
     Map<String, String> out = new HashMap<>(i18n.size());
-    for (Map.Entry<String, StringBuffer> kv : i18n.entrySet()) out.put(
-      kv.getKey(),
-      kv.getValue().toString()
-    );
+    for (Map.Entry<String, StringBuffer> kv : i18n.entrySet()) {
+      out.put(kv.getKey(), kv.getValue().toString());
+    }
     return out;
   }
 
@@ -747,12 +754,11 @@ public abstract class OsmEntity {
    * from being linked to transit stops that are underneath it.
    **/
   public boolean isPlatform() {
-    var isPlatform = isTag("public_transport", "platform") || isRailwayPlatform();
+    var isPlatform =
+      isTag("public_transport", "platform") ||
+      isTag("railway", "platform") ||
+      isTag("railway", "platform_edge");
     return isPlatform && !isTag("usage", "tourism");
-  }
-
-  public boolean isRailwayPlatform() {
-    return isTag("railway", "platform");
   }
 
   /**

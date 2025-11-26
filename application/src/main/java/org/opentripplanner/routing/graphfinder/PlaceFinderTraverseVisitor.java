@@ -241,7 +241,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
         .filter(
           pattern -> filterByRoutes.isEmpty() || filterByRoutes.contains(pattern.getRoute().getId())
         )
-        .filter(pattern -> pattern.canBoard(stop))
+        .filter(pattern -> pattern.boardingExist(stop))
         .toList();
 
       for (TripPattern pattern : patterns) {

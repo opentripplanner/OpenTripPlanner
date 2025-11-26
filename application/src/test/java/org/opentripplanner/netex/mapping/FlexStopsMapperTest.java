@@ -19,7 +19,6 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -36,8 +35,8 @@ class FlexStopsMapperTest {
 
   static final String FLEXIBLE_STOP_PLACE_ID = "RUT:FlexibleStopPlace:1";
   static final String FLEXIBLE_STOP_PLACE_NAME = "Sauda-HentMeg";
-  static final String FLEXIBLE_AREA_ID = "RUT:FlexibleArea:1";
-  static final List<Double> AREA_POS_LIST = Arrays.asList(
+  static final String FLEXIBLE_AREA_ID = "RUT:FlexibleArea:";
+  static final List<Double> VALID_POLYGON = Arrays.asList(
     59.62575084033623,
     6.3023991052849,
     59.62883380609349,
@@ -139,7 +138,7 @@ class FlexStopsMapperTest {
       DataImportIssueStore.NOOP
     );
 
-    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(VALID_POLYGON);
 
     StopLocation areaStop = flexStopsMapper.map(flexibleStopPlace);
 
@@ -148,9 +147,9 @@ class FlexStopsMapperTest {
     assertEquals(1, areaStop.getGeometry().getNumGeometries());
     var areaStopPolygon = areaStop.getGeometry().getGeometryN(0);
 
-    Coordinate[] coordinates = new Coordinate[AREA_POS_LIST.size() / 2];
-    for (int i = 0; i < AREA_POS_LIST.size(); i += 2) {
-      coordinates[i / 2] = new Coordinate(AREA_POS_LIST.get(i + 1), AREA_POS_LIST.get(i));
+    Coordinate[] coordinates = new Coordinate[VALID_POLYGON.size() / 2];
+    for (int i = 0; i < VALID_POLYGON.size(); i += 2) {
+      coordinates[i / 2] = new Coordinate(VALID_POLYGON.get(i + 1), VALID_POLYGON.get(i));
     }
     var geometryFactory = GeometryUtils.getGeometryFactory();
     var ring = geometryFactory.createLinearRing(coordinates);
@@ -160,26 +159,33 @@ class FlexStopsMapperTest {
 
   @Test
   void testMapInvalidNonClosedAreaStop() {
-    AreaStop areaStop = createAreaStop(INVALID_NON_CLOSED_POLYGON);
-    assertNull(areaStop);
+    assertNull(createGroupStop(INVALID_NON_CLOSED_POLYGON));
   }
 
   @Test
   void testMapInvalidSelfIntersectingAreaStop() {
-    AreaStop areaStop = createAreaStop(INVALID_SELF_INTERSECTING_POLYGON);
-    assertNull(areaStop);
+    assertNull(createGroupStop(INVALID_SELF_INTERSECTING_POLYGON));
+  }
+
+  @Test
+  void testMapInvalidAreaStopWithMultipleFlexibleAreas() {
+    GroupStop groupStop = createGroupStop(
+      List.of(VALID_POLYGON, INVALID_SELF_INTERSECTING_POLYGON)
+    );
+    assertNotNull(groupStop);
+    assertEquals(1, groupStop.getEncompassingAreaGeometry().stream().count());
   }
 
   @Test
   void testMapGroupStopWithKeyValueOnFlexibleStopPlace() {
-    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(VALID_POLYGON);
     flexibleStopPlace.setKeyList(KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS);
     assertGroupStopMapping(flexibleStopPlace);
   }
 
   @Test
   void testMapGroupStopWithKeyValueOnArea() {
-    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(VALID_POLYGON);
     var area = (FlexibleArea) flexibleStopPlace
       .getAreas()
       .getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea()
@@ -190,7 +196,7 @@ class FlexStopsMapperTest {
 
   @Test
   void testMapFlexibleStopPlaceMissingStops() {
-    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(VALID_POLYGON);
     flexibleStopPlace.setKeyList(KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS);
 
     FlexStopsMapper subject = new FlexStopsMapper(
@@ -263,40 +269,58 @@ class FlexStopsMapperTest {
     assertEquals(stop1.getId(), locations.stream().findFirst().orElseThrow().getId());
   }
 
-  private FlexibleStopPlace getFlexibleStopPlace(Collection<Double> areaPosList) {
+  private FlexibleStopPlace getFlexibleStopPlace(Collection<Double> polygon) {
+    return getFlexibleStopPlace(List.of(polygon));
+  }
+
+  private FlexibleStopPlace getFlexibleStopPlace(List<Collection<Double>> polygons) {
+    FlexibleStopPlace_VersionStructure.Areas areas = new FlexibleStopPlace_VersionStructure.Areas();
+    for (int i = 0; i < polygons.size(); i++) {
+      Collection<Double> areaPosList = polygons.get(i);
+      areas.withFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea(
+        getFlexibleArea(FLEXIBLE_AREA_ID + i, areaPosList)
+      );
+    }
+
     return new FlexibleStopPlace()
       .withId(FLEXIBLE_STOP_PLACE_ID)
       .withName(new MultilingualString().withValue(FLEXIBLE_STOP_PLACE_NAME))
       .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
-      .withAreas(
-        new FlexibleStopPlace_VersionStructure.Areas()
-          .withFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea(
-            new FlexibleArea()
-              .withId(FLEXIBLE_AREA_ID)
-              .withPolygon(
-                new PolygonType()
-                  .withExterior(
-                    new AbstractRingPropertyType()
-                      .withAbstractRing(
-                        MappingSupport.createJaxbElement(
-                          new LinearRingType()
-                            .withPosList(new DirectPositionListType().withValue(areaPosList))
-                        )
-                      )
-                  )
+      .withAreas(areas);
+  }
+
+  private static FlexibleArea getFlexibleArea(
+    String flexibleAreaId,
+    Collection<Double> areaPosList
+  ) {
+    return new FlexibleArea()
+      .withId(flexibleAreaId)
+      .withPolygon(
+        new PolygonType()
+          .withExterior(
+            new AbstractRingPropertyType()
+              .withAbstractRing(
+                MappingSupport.createJaxbElement(
+                  new LinearRingType()
+                    .withPosList(new DirectPositionListType().withValue(areaPosList))
+                )
               )
           )
       );
   }
 
-  private AreaStop createAreaStop(Collection<Double> polygonCoordinates) {
+  private GroupStop createGroupStop(Collection<Double> polygon) {
+    return createGroupStop(List.of(polygon));
+  }
+
+  private GroupStop createGroupStop(List<Collection<Double>> polygons) {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
       siteRepositoryBuilder,
       DataImportIssueStore.NOOP
     );
-    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(polygonCoordinates);
-    return (AreaStop) flexStopsMapper.map(flexibleStopPlace);
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(polygons);
+    return (GroupStop) flexStopsMapper.map(flexibleStopPlace);
   }
 }

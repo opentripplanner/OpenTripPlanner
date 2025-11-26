@@ -223,7 +223,7 @@ public class GTFSToOtpTransitServiceMapper {
       if (it.getLocationType() == LOCATION_TYPE_STOP) {
         builder.siteRepository().withRegularStop(stopMapper.map(it));
       } else if (it.getLocationType() == LOCATION_TYPE_ENTRANCE_EXIT) {
-        builder.getEntrances().add(entranceMapper.map(it));
+        builder.siteRepository().withEntrance(entranceMapper.map(it));
       } else if (it.getLocationType() == LOCATION_TYPE_NODE) {
         builder.getPathwayNodes().add(pathwayNodeMapper.map(it));
       }

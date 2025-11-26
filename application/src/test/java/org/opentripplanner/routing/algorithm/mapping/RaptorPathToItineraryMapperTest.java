@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptorlegacy._data.RaptorTestConstants.BOARD_SLACK;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -23,8 +22,6 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Leg;
@@ -157,7 +154,7 @@ public class RaptorPathToItineraryMapperTest {
     // Arrange
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
-    var penalty = new TimeAndCost(Duration.ofMinutes(10), Cost.costOfMinutes(10));
+    // var penalty = new TimeAndCost(Duration.ofMinutes(10), Cost.costOfMinutes(10));
     // TODO - The TestAccessEgress is an internal Raptor test dummy class and is not allowed
     //        to be used outside raptor and optimized transfers. Also, the Itinerary mapper
     //        expect the generic type DefaultTripSchedule and not TestTripSchedule - it is pure

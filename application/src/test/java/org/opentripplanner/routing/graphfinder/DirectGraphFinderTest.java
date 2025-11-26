@@ -15,7 +15,9 @@ class DirectGraphFinderTest extends GraphRoutingTest {
 
   private SiteRepository siteRepository;
 
-  private TransitStopVertex S1, S2, S3;
+  private TransitStopVertex S1;
+  private TransitStopVertex S2;
+  private TransitStopVertex S3;
 
   @BeforeEach
   protected void setUp() throws Exception {

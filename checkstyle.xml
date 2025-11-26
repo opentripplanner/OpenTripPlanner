@@ -9,5 +9,6 @@
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
         <module name="UnusedLocalVariable"/>
+        <module name="NeedBraces"/>
     </module>
 </module>

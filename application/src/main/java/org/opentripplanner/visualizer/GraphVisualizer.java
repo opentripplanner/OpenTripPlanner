@@ -956,7 +956,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           String result = JOptionPane.showInputDialog("Enter the location (lat lon)");
-          if (result == null || result.length() == 0) return;
+          if (result == null || result.length() == 0) {
+            return;
+          }
           String[] tokens = result.split("[\\s,]+");
           double lat = Double.parseDouble(tokens[0]);
           double lon = Double.parseDouble(tokens[1]);

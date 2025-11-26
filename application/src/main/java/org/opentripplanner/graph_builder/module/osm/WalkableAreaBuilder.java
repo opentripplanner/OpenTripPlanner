@@ -367,7 +367,9 @@ class WalkableAreaBuilder {
     Set<Edge> edges,
     Set<Edge> edgesToKeep
   ) {
-    if (edges.isEmpty()) return;
+    if (edges.isEmpty()) {
+      return;
+    }
     StreetMode mode;
     StreetEdge firstEdge = (StreetEdge) edges.iterator().next();
 

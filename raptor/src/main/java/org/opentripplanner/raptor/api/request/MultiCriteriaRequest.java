@@ -87,8 +87,12 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     MultiCriteriaRequest<?> that = (MultiCriteriaRequest<?>) o;
     return (
       Objects.equals(relaxC1, that.relaxC1) &&

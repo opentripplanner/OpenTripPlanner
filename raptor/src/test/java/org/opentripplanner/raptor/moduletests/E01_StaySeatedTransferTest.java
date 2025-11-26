@@ -21,7 +21,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 /**
  * FEATURE UNDER TEST
@@ -73,7 +73,7 @@ public class E01_StaySeatedTransferTest implements RaptorTestConstants {
 
     // Make sure the slack have values which prevent a normal transfer.
     // The test scenario have zero seconds to transfer, so any slack will do.
-    data.withSlackProvider(new DefaultSlackProvider(D30s, D20s, D10s));
+    data.withSlackProvider(new TestSlackProvider(D30s, D20s, D10s));
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }

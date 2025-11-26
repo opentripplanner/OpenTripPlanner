@@ -220,7 +220,9 @@ public class GeometryUtils {
       int i = 0;
       for (List<List<LngLatAlt>> geoJsonRings : geoJsonMultiPolygon.getCoordinates()) {
         org.geojson.Polygon geoJsonPoly = new org.geojson.Polygon();
-        for (List<LngLatAlt> geoJsonRing : geoJsonRings) geoJsonPoly.add(geoJsonRing);
+        for (List<LngLatAlt> geoJsonRing : geoJsonRings) {
+          geoJsonPoly.add(geoJsonRing);
+        }
         jtsPolygons[i++] = (Polygon) convertGeoJsonToJtsGeometry(geoJsonPoly);
       }
       return gf.createMultiPolygon(jtsPolygons);

@@ -30,6 +30,8 @@ public final class RegularStopBuilder
 
   private String netexVehicleSubmode;
 
+  private boolean sometimesUsedRealtime = false;
+
   private final Set<BoardingArea> boardingAreas = new HashSet<>();
 
   private final Set<FareZone> fareZones = new HashSet<>();
@@ -47,6 +49,7 @@ public final class RegularStopBuilder
     this.timeZone = original.getTimeZone();
     this.vehicleType = original.getVehicleType();
     this.netexVehicleSubmode = original.getNetexVehicleSubmode().name();
+    this.sometimesUsedRealtime = original.isSometimesUsedRealtime();
   }
 
   public String platformCode() {
@@ -82,6 +85,15 @@ public final class RegularStopBuilder
 
   public RegularStopBuilder withNetexVehicleSubmode(String netexVehicleSubmode) {
     this.netexVehicleSubmode = netexVehicleSubmode;
+    return this;
+  }
+
+  public boolean isSometimesUsedRealtime() {
+    return sometimesUsedRealtime;
+  }
+
+  public RegularStopBuilder withSometimesUsedRealtime(boolean sometimesUsedRealtime) {
+    this.sometimesUsedRealtime = sometimesUsedRealtime;
     return this;
   }
 

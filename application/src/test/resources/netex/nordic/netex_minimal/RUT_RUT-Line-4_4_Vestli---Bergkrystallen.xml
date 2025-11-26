@@ -1,0 +1,214 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex"
+  xmlns:gis="http://www.opengis.net/gml/3.2" xmlns:siri="http://www.siri.org.uk/siri"
+  version="1.07:NO-NeTEx-networktimetable:1.1">
+  <PublicationTimestamp>2017-11-02T00:35:27.119</PublicationTimestamp>
+  <ParticipantRef>RB</ParticipantRef>
+  <Description>Vestli - Bergkrystallen</Description>
+  <dataObjects>
+    <CompositeFrame created="2017-11-02T00:35:27.119" version="1" id="RUT:CompositeFrame:15214">
+      <validityConditions>
+        <AvailabilityCondition version="1" id="RUT:AvailabilityCondition:15212">
+          <FromDate>2017-10-31T00:00:00</FromDate>
+          <ToDate>2018-11-02T00:00:00</ToDate>
+        </AvailabilityCondition>
+      </validityConditions>
+      <codespaces>
+        <Codespace id="rut">
+          <Xmlns>RUT</Xmlns>
+          <XmlnsUrl>http://www.rutebanken.org/ns/rut</XmlnsUrl>
+        </Codespace>
+        <Codespace id="nsr">
+          <Xmlns>NSR</Xmlns>
+          <XmlnsUrl>http://www.rutebanken.org/ns/nsr</XmlnsUrl>
+        </Codespace>
+      </codespaces>
+      <FrameDefaults>
+        <DefaultLocale>
+          <TimeZone>Europe/Oslo</TimeZone>
+          <DefaultLanguage>no</DefaultLanguage>
+        </DefaultLocale>
+      </FrameDefaults>
+      <frames>
+        <ServiceFrame version="1" id="RUT:ServiceFrame:15215">
+          <routePoints>
+            <RoutePoint version="1" id="RUT:RoutePoint:TBANE-12292">
+              <projections>
+                <PointProjection version="1" id="RUT:PointProjection:TBANE-12292">
+                  <ProjectedPointRef ref="RUT:ScheduledStopPoint:TBANE-12292"/>
+                </PointProjection>
+              </projections>
+            </RoutePoint>
+            <RoutePoint version="1" id="RUT:RoutePoint:TBANE-12293">
+              <projections>
+                <PointProjection version="1" id="RUT:PointProjection:TBANE-12293">
+                  <ProjectedPointRef ref="RUT:ScheduledStopPoint:TBANE-12293"/>
+                </PointProjection>
+              </projections>
+            </RoutePoint>
+          </routePoints>
+          <routes>
+            <Route version="0" id="RUT:Route:4-5">
+              <Name>Bergkrystallen-Vestli</Name>
+              <ShortName>Bergkrystallen-Vestli</ShortName>
+              <LineRef ref="RUT:Line:4" version="0"/>
+              <pointsInSequence>
+                <PointOnRoute order="1" version="1" id="RUT:PointOnRoute:4-5-1-0">
+                  <RoutePointRef ref="RUT:RoutePoint:TBANE-12292" version="1"/>
+                </PointOnRoute>
+                <PointOnRoute order="1" version="1" id="RUT:PointOnRoute:4-5-1-1">
+                  <RoutePointRef ref="RUT:RoutePoint:TBANE-12293" version="1"/>
+                </PointOnRoute>
+              </pointsInSequence>
+            </Route>
+          </routes>
+          <lines>
+            <Line version="0" id="RUT:Line:4">
+              <Name>Vestli - Bergkrystallen</Name>
+              <TransportMode>metro</TransportMode>
+              <TransportSubmode>
+                <MetroSubmode>metro</MetroSubmode>
+              </TransportSubmode>
+              <PublicCode>4</PublicCode>
+              <OperatorRef ref="RUT:Operator:130c"/>
+              <RepresentedByGroupRef ref="RUT:Network:1"/>
+            </Line>
+          </lines>
+          <journeyPatterns>
+            <JourneyPattern version="0" id="RUT:JourneyPattern:4-5">
+              <Name>Bergkrystallen-Vestli</Name>
+              <RouteRef ref="RUT:Route:4-5" version="0"/>
+              <pointsInSequence>
+                <StopPointInJourneyPattern order="1" version="0"
+                  id="RUT:StopPointInJourneyPattern:4-5-1">
+                  <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:ANR-6950"/>
+                  <DestinationDisplayRef ref="RUT:DestinationDisplay:649-NOLINENUMBER"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="37" version="0"
+                  id="RUT:StopPointInJourneyPattern:4-5-2">
+                  <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:ONOB-11197"/>
+                </StopPointInJourneyPattern>
+              </pointsInSequence>
+            </JourneyPattern>
+            <JourneyPattern version="0" id="RUT:JourneyPattern:4-6">
+              <Name>Bergkrystallen-Vestli</Name>
+              <RouteRef ref="RUT:Route:4-5" version="0"/>
+              <pointsInSequence>
+                <StopPointInJourneyPattern order="1" version="0"
+                  id="RUT:StopPointInJourneyPattern:4-6-1">
+                  <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:ONOB-11198"/>
+                  <DestinationDisplayRef ref="RUT:DestinationDisplay:649-NOLINENUMBER"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="37" version="0"
+                  id="RUT:StopPointInJourneyPattern:4-6-2">
+                  <ScheduledStopPointRef ref="RUT:ScheduledStopPoint:ANR-6951"/>
+                </StopPointInJourneyPattern>
+              </pointsInSequence>
+            </JourneyPattern>
+          </journeyPatterns>
+          <noticeAssignments>
+            <NoticeAssignment order="1" version="1" id="HED:NoticeAssignment:135623">
+              <NoticeRef ref="RUT:Notice:035-2018-01-15"/>
+              <NoticedObjectRef ref="RUT:TimetabledPassingTime:f05d8d73-506f-441c-a489-6e50497cac25"
+                version="1"/>
+            </NoticeAssignment>
+            <NoticeAssignment order="2" version="1" id="HED:NoticeAssignment:135624">
+              <NoticeRef ref="RUT:Notice:045-2018-01-15"/>
+              <NoticedObjectRef ref="RUT:ServiceJourney:4-101468-583"
+                version="1"/>
+            </NoticeAssignment>
+            <NoticeAssignment order="2" version="1" id="HED:NoticeAssignment:135625">
+              <NoticeRef ref="RUT:Notice:075-2018-01-15"/>
+              <NoticedObjectRef ref="RUT:Line:4"
+                version="1"/>
+            </NoticeAssignment>
+            <NoticeAssignment order="2" version="1" id="HED:NoticeAssignment:135626">
+              <NoticeRef ref="RUT:Notice:080-2018-01-15"/>
+              <NoticedObjectRef ref="RUT:StopPointInJourneyPattern:4-5-2"
+                version="1"/>
+            </NoticeAssignment>
+            <NoticeAssignment order="2" version="1" id="HED:NoticeAssignment:135627">
+              <NoticeRef ref="RUT:Notice:090-2018-01-15"/>
+              <NoticedObjectRef ref="RUT:JourneyPattern:4-6"
+                version="1"/>
+            </NoticeAssignment>
+          </noticeAssignments>
+        </ServiceFrame>
+        <TimetableFrame version="1" id="RUT:TimetableFrame:15216">
+          <vehicleJourneys>
+            <ServiceJourney version="0" id="RUT:ServiceJourney:4-101493-1098">
+              <Name>Bergkrystallen - Jernbanetorget</Name>
+              <dayTypes>
+                <DayTypeRef ref="RUT:DayType:6-101468"/>
+                <DayTypeRef ref="RUT:DayType:0-105025"/>
+                <DayTypeRef ref="RUT:DayType:0-105026"/>
+              </dayTypes>
+              <JourneyPatternRef ref="RUT:JourneyPattern:4-5" version="0"/>
+              <OperatorRef ref="RUT:Operator:130c"/>
+              <LineRef ref="RUT:Line:4" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0"
+                  id="RUT:TimetabledPassingTime:a73c406f-ca79-452e-bdaa-0f5ffc951b46">
+                  <StopPointInJourneyPatternRef ref="RUT:StopPointInJourneyPattern:4-5-1"
+                    version="0"/>
+                  <DepartureTime>14:30:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0"
+                  id="RUT:TimetabledPassingTime:39f3e3e9-c89a-45a7-84c2-78546395e7eb">
+                  <StopPointInJourneyPatternRef ref="RUT:StopPointInJourneyPattern:4-5-2"
+                    version="0"/>
+                  <DepartureTime>14:50:00</DepartureTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="RUT:ServiceJourney:4-101468-583">
+              <Name>Jernbanetorget - Bergkrystallen</Name>
+              <dayTypes>
+                <DayTypeRef ref="RUT:DayType:6-101468"/>
+                <DayTypeRef ref="RUT:DayType:0-105025"/>
+                <DayTypeRef ref="RUT:DayType:0-105026"/>
+              </dayTypes>
+              <JourneyPatternRef ref="RUT:JourneyPattern:4-6" version="0"/>
+              <OperatorRef ref="RUT:Operator:130c"/>
+              <LineRef ref="RUT:Line:4" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0"
+                  id="RUT:TimetabledPassingTime:f05d8d73-506f-441c-a489-6e50497cac25">
+                  <StopPointInJourneyPatternRef ref="RUT:StopPointInJourneyPattern:4-6-1"
+                    version="0"/>
+                  <DepartureTime>11:10:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0"
+                  id="RUT:TimetabledPassingTime:e79ed9f7-f1ce-4e2a-8076-38bb4453da68">
+                  <StopPointInJourneyPatternRef ref="RUT:StopPointInJourneyPattern:4-6-2"
+                    version="0"/>
+                  <DepartureTime>11:29:00</DepartureTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="RUT:ServiceJourney:4-3">
+              <Name>WithDatedServiceJourney</Name>
+              <JourneyPatternRef ref="RUT:JourneyPattern:4-6" version="0"/>
+              <OperatorRef ref="RUT:Operator:130c"/>
+              <LineRef ref="RUT:Line:4" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="RUT:TimetabledPassingTime:100">
+                  <StopPointInJourneyPatternRef ref="RUT:StopPointInJourneyPattern:4-6-1" version="0"/>
+                  <DepartureTime>12:10:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="RUT:TimetabledPassingTime:101">
+                  <StopPointInJourneyPatternRef ref="RUT:StopPointInJourneyPattern:4-6-2" version="0"/>
+                  <DepartureTime>12:29:00</DepartureTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <DatedServiceJourney id="RUT:DatedServiceJourney:1">
+              <ServiceJourneyRef ref="RUT:ServiceJourney:4-3"/>
+              <OperatingDayRef ref="RUT:OperatingDay:2018-11-01"/>
+            </DatedServiceJourney>
+          </vehicleJourneys>
+        </TimetableFrame>
+      </frames>
+    </CompositeFrame>
+  </dataObjects>
+</PublicationDelivery>

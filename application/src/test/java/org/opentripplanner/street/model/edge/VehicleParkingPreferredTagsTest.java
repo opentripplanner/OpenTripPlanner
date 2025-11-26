@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.edge;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.of;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,6 +11,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
@@ -17,6 +19,8 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.filter.ParkingFilter;
+import org.opentripplanner.street.search.request.filter.ParkingSelect;
 import org.opentripplanner.street.search.state.State;
 
 class VehicleParkingPreferredTagsTest {
@@ -80,13 +84,13 @@ class VehicleParkingPreferredTagsTest {
     var req = StreetSearchRequest.of();
     req.withMode(StreetMode.BIKE_TO_PARK);
     req.withArriveBy(arriveBy);
-    req.withPreferences(p ->
-      p.withBike(bike -> {
-        bike.withParking(parkingPreferences -> {
-          parkingPreferences.withUnpreferredVehicleParkingTagCost(EXTRA_COST);
-          parkingPreferences.withPreferredVehicleParkingTags(preferredTags);
-          parkingPreferences.withCost(0);
-        });
+    req.withBike(p ->
+      p.withParking(parkingPreferences -> {
+        parkingPreferences.withUnpreferredTagCost(Cost.costOfSeconds(EXTRA_COST));
+        parkingPreferences.withPreferred(
+          new ParkingFilter(List.of(), List.of(new ParkingSelect.TagsSelect(preferredTags)))
+        );
+        parkingPreferences.withCost(Cost.ZERO);
       })
     );
 

@@ -8,13 +8,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.StreetModelDetails;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 
@@ -175,7 +177,15 @@ class EuclideanRemainingWeightHeuristicTest {
 
     var state = new State(
       fromVertex,
-      StreetSearchRequest.of().withMode(streetMode).withPreferences(preferences).build()
+      StreetSearchRequestMapper.mapInternal(
+        RouteRequest.of()
+          .withFrom(GenericLocation.fromCoordinate(0, 0))
+          .withTo(GenericLocation.fromCoordinate(toCoordinate.latitude(), toCoordinate.longitude()))
+          .withPreferences(preferences)
+          .buildRequest()
+      )
+        .withMode(streetMode)
+        .build()
     );
 
     subject.initialize(streetMode, Set.of(toVertex), false, preferences);

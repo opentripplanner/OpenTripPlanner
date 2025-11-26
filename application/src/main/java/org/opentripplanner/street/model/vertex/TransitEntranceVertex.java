@@ -1,33 +1,25 @@
 package org.opentripplanner.street.model.vertex;
 
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.site.Entrance;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TransitEntranceVertex extends StationElementVertex {
 
   private final Accessibility wheelchairAccessibility;
 
-  private final Entrance entrance;
-
-  /**
-   * @param entrance The transit model entrance reference.
-   */
-  public TransitEntranceVertex(Entrance entrance) {
-    super(
-      entrance.getId(),
-      entrance.getCoordinate().longitude(),
-      entrance.getCoordinate().latitude(),
-      entrance.getName()
-    );
-    this.entrance = entrance;
-    this.wheelchairAccessibility = entrance.getWheelchairAccessibility();
+  public TransitEntranceVertex(
+    FeedScopedId id,
+    WgsCoordinate coordinate,
+    I18NString name,
+    Accessibility accessibility
+  ) {
+    super(id, coordinate.longitude(), coordinate.latitude(), name);
+    this.wheelchairAccessibility = accessibility;
   }
 
   public Accessibility getWheelchairAccessibility() {
     return wheelchairAccessibility;
-  }
-
-  public Entrance getEntrance() {
-    return this.entrance;
   }
 }
