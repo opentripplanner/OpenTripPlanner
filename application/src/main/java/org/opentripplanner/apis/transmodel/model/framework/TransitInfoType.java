@@ -22,8 +22,8 @@ public class TransitInfoType {
             var startTime = transitService.getTransitServiceStarts();
             var endTime = transitService.getTransitServiceEnds();
 
-            Long startMillis = startTime != null ? startTime.toInstant().toEpochMilli() : null;
-            Long endMillis = endTime != null ? endTime.toInstant().toEpochMilli() : null;
+            Long startMillis = startTime != null ? startTime.toEpochMilli() : null;
+            Long endMillis = endTime != null ? endTime.toEpochMilli() : null;
 
             return new ValidityPeriod(startMillis, endMillis);
           })

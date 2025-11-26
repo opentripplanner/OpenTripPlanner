@@ -1,7 +1,10 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
+
 import java.util.Collection;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -12,10 +15,14 @@ import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
+import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 
 class QuayMapper {
+
+  private static final String RAIL_REPLACEMENT_BUS_VALUE =
+    BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value();
 
   private final DataImportIssueStore issueStore;
 
@@ -69,6 +76,21 @@ class QuayMapper {
       return null;
     }
 
+    String subMode = transitMode.subMode();
+    boolean sometimesUsedRealtime = false;
+
+    if (OTPFeature.IncludeStopsUsedRealTimeInTransfers.isOn()) {
+      if (transitMode.mainMode() == RAIL) {
+        sometimesUsedRealtime = true;
+      }
+      // We only consider rail and rail-replacement-bus stops when generating transfers. The reason
+      // we do not include all stops is due to perfomance reasons. This should be replaced by
+      // generating transfers as needed for realtime updates.
+      else if (subMode != null && subMode.equals(RAIL_REPLACEMENT_BUS_VALUE)) {
+        sometimesUsedRealtime = true;
+      }
+    }
+
     var builder = siteRepositoryBuilder
       .regularStop(id)
       .withParentStation(parentStation)
@@ -80,7 +102,8 @@ class QuayMapper {
       .withCoordinate(WgsCoordinateMapper.mapToDomain(quay.getCentroid()))
       .withWheelchairAccessibility(wheelchair)
       .withVehicleType(transitMode.mainMode())
-      .withNetexVehicleSubmode(transitMode.subMode());
+      .withNetexVehicleSubmode(subMode)
+      .withSometimesUsedRealtime(sometimesUsedRealtime);
 
     builder.fareZones().addAll(fareZones);
 

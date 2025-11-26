@@ -6,6 +6,9 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -40,8 +43,14 @@ public final class TransitTestEnvironment {
     this.timetableRepository = timetableRepository;
 
     this.timetableRepository.index();
+    this.timetableRepository.setRaptorTransitData(
+        RaptorTransitDataMapper.map(new TestTransitTuningParameters(), timetableRepository)
+      );
+    this.timetableRepository.setRealtimeRaptorTransitData(
+        new RaptorTransitData(timetableRepository.getRaptorTransitData())
+      );
     this.snapshotManager = new TimetableSnapshotManager(
-      null,
+      new RealTimeRaptorTransitDataUpdater(timetableRepository),
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       () -> defaultServiceDate
     );

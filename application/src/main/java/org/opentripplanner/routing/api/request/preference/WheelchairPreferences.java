@@ -123,8 +123,12 @@ public class WheelchairPreferences implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     WheelchairPreferences that = (WheelchairPreferences) o;
     return (
       Double.compare(that.inaccessibleStreetReluctance, inaccessibleStreetReluctance) == 0 &&

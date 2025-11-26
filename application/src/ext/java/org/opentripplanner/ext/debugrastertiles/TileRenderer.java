@@ -38,7 +38,8 @@ public interface TileRenderer {
     public double metersPerPixel;
 
     /** Tile size in pixels */
-    public int tileWidth, tileHeight;
+    public int tileWidth;
+    public int tileHeight;
 
     /** Expand the bounding box to add some margins, in pixel size. */
     public abstract Envelope expandPixels(double marginXPixels, double marginYPixels);

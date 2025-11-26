@@ -148,12 +148,12 @@ public class OsmEntityTest {
     assertFalse(o.isGeneralAccessDenied(FORWARD));
 
     OsmEntity p = new OsmEntityForTest();
-    o.addTag("access", "no");
-    o.addTag("access:backward", "yes");
-    assertTrue(o.isGeneralAccessDenied(DIRECTIONLESS));
-    assertTrue(o.isGeneralAccessDenied());
-    assertFalse(o.isGeneralAccessDenied(BACKWARD));
-    assertTrue(o.isGeneralAccessDenied(FORWARD));
+    p.addTag("access", "no");
+    p.addTag("access:backward", "yes");
+    assertTrue(p.isGeneralAccessDenied(DIRECTIONLESS));
+    assertTrue(p.isGeneralAccessDenied());
+    assertFalse(p.isGeneralAccessDenied(BACKWARD));
+    assertTrue(p.isGeneralAccessDenied(FORWARD));
   }
 
   @Test
@@ -300,6 +300,14 @@ public class OsmEntityTest {
   @Test
   void isPlatform() {
     assertFalse(WayTestData.zooPlatform().isPlatform());
+  }
+
+  @Test
+  void platformEdge() {
+    var w = new OsmEntityForTest().addTag("railway", "platform_edge");
+    assertTrue(w.isRoutable());
+    assertTrue(w.isBoardingLocation());
+    assertTrue(w.isPlatform());
   }
 
   @Test

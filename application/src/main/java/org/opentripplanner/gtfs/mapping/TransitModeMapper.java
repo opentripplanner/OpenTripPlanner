@@ -4,6 +4,8 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class TransitModeMapper {
 
+  private static final int RAIL_REPLACEMENT_BUS_SERVICE = 714;
+
   /**
    * Return an OTP TransitMode matching a routeType. If no good match is found, it returns null.
    *
@@ -85,5 +87,9 @@ public class TransitModeMapper {
       case 12 -> TransitMode.MONORAIL;
       default -> throw new IllegalArgumentException("unknown gtfs route type " + routeType);
     };
+  }
+
+  public static boolean isRailReplacementBusService(int routeType) {
+    return routeType == RAIL_REPLACEMENT_BUS_SERVICE;
   }
 }

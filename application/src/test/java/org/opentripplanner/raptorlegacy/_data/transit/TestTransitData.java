@@ -13,7 +13,6 @@ import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
@@ -50,9 +49,6 @@ public class TestTransitData
   public static final TransferConstraint TX_LONG_MIN_TIME = TransferConstraint.of()
     .minTransferTime(3600)
     .build();
-
-  // Slack defaults: 1 minute for transfer-slack, 0 minutes for board- and alight-slack.
-  public static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(60, 0, 0);
 
   private final List<List<RaptorTransfer>> transfersFromStop = new ArrayList<>();
   private final List<List<RaptorTransfer>> transfersToStop = new ArrayList<>();

@@ -145,24 +145,14 @@ public final class RoutingPreferences implements Serializable {
     return locale;
   }
 
-  /**
-   * The road speed for a specific traverse mode.
-   *
-   * NOTE, this is only used for tests and doesn't support scooter walking
-   */
-  public double getSpeed(TraverseMode mode, boolean walkingBike) {
-    return switch (mode) {
-      case WALK -> walkingBike ? bike.walking().speed() : walk.speed();
-      case BICYCLE -> bike.speed();
-      case SCOOTER -> scooter.speed();
-      default -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
-    };
-  }
-
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     RoutingPreferences that = (RoutingPreferences) o;
     return (
       Objects.equals(transit, that.transit) &&

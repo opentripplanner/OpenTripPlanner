@@ -77,6 +77,10 @@ class FlexStopsMapper {
       }
 
       Geometry flexibleAreaGeometry = mapGeometry(flexibleArea);
+      if (flexibleAreaGeometry == null) {
+        // ignore invalid geometries, issue already created
+        continue;
+      }
       areaGeometries.add(flexibleAreaGeometry);
 
       if (shouldAddStopsFromArea(flexibleArea, flexibleStopPlace)) {
@@ -112,6 +116,7 @@ class FlexStopsMapper {
   /**
    * Allows pickup / drop off along any eligible street inside the area
    */
+  @Nullable
   AreaStop mapFlexArea(FlexibleArea area, Geometry geometry, String backupName) {
     if (geometry == null) {
       return null;
@@ -158,6 +163,7 @@ class FlexStopsMapper {
     return stops;
   }
 
+  @Nullable
   private Geometry mapGeometry(FlexibleArea area) {
     try {
       return OpenGisMapper.mapGeometry(area.getPolygon());

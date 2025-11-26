@@ -101,7 +101,7 @@ final class TestDriver {
   }
 
   boolean arrivedBy() {
-    return !sortOrder.isSortedByAscendingArrivalTime();
+    return !sortOrder.isSortedForDepartAfterSearch();
   }
 
   PageCursorInput filterResults() {

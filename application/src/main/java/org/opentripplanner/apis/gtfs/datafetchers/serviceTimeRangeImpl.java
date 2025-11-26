@@ -10,12 +10,12 @@ public class serviceTimeRangeImpl implements GraphQLDataFetchers.GraphQLServiceT
 
   @Override
   public DataFetcher<Long> end() {
-    return environment -> getTransitService(environment).getTransitServiceEnds().toEpochSecond();
+    return environment -> getTransitService(environment).getTransitServiceEnds().getEpochSecond();
   }
 
   @Override
   public DataFetcher<Long> start() {
-    return environment -> getTransitService(environment).getTransitServiceStarts().toEpochSecond();
+    return environment -> getTransitService(environment).getTransitServiceStarts().getEpochSecond();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

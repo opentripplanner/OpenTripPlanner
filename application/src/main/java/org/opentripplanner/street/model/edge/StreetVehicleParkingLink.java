@@ -3,11 +3,11 @@ package org.opentripplanner.street.model.edge;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.request.ParkingRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
@@ -61,10 +61,7 @@ public class StreetVehicleParkingLink extends Edge {
     }
 
     var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
-    final VehicleParkingPreferences parkingPreferences = s0
-      .getRequest()
-      .preferences()
-      .parking(s0.currentMode());
+    var parkingPreferences = s0.getRequest().parking(s0.currentMode());
     if (traversalBanned(parkingPreferences, vehicleParking)) {
       return State.empty();
     }
@@ -77,7 +74,7 @@ public class StreetVehicleParkingLink extends Edge {
   }
 
   private boolean traversalBanned(
-    VehicleParkingPreferences parkingPreferences,
+    ParkingRequest parkingPreferences,
     VehicleParking vehicleParking
   ) {
     return !parkingPreferences.filter().matches(vehicleParking);

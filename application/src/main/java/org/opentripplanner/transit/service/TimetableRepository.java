@@ -26,8 +26,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.calendar.CalendarService;
@@ -97,8 +95,6 @@ public class TimetableRepository implements Serializable {
   private final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
   private SiteRepository siteRepository;
-  private ZonedDateTime transitServiceStarts = LocalDate.MAX.atStartOfDay(ZoneId.systemDefault());
-  private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
   /**
    * The RaptorTransitData representation (optimized and rearranged for Raptor) of this TimetableRepository's
@@ -122,8 +118,6 @@ public class TimetableRepository implements Serializable {
   private boolean timeZoneExplicitlySet = false;
 
   private transient GraphUpdaterManager updaterManager = null;
-
-  private boolean hasTransit = false;
 
   private boolean hasFrequencyService = false;
   private boolean hasScheduledService = false;
@@ -201,10 +195,7 @@ public class TimetableRepository implements Serializable {
    * Returns true if this repository contains any transit data at the given instant.
    */
   public boolean transitFeedCovers(Instant time) {
-    return (
-      !time.isBefore(this.transitServiceStarts.toInstant()) &&
-      time.isBefore(this.transitServiceEnds.toInstant())
-    );
+    return (!time.isBefore(getTransitServiceStarts()) && time.isBefore(getTransitServiceEnds()));
   }
 
   public CalendarService getCalendarService() {
@@ -212,16 +203,9 @@ public class TimetableRepository implements Serializable {
     return new CalendarServiceImpl(calendarServiceData);
   }
 
-  public void updateCalendarServiceData(
-    boolean hasActiveTransit,
-    CalendarServiceData data,
-    DataImportIssueStore issueStore
-  ) {
+  public void updateCalendarServiceData(CalendarServiceData data) {
     invalidateIndex();
-    updateTransitFeedValidity(data, issueStore);
     calendarServiceData.add(data);
-
-    updateHasTransit(hasActiveTransit);
   }
 
   /**
@@ -276,7 +260,29 @@ public class TimetableRepository implements Serializable {
   public void addAgency(Agency agency) {
     invalidateIndex();
     agencies.add(agency);
-    this.feedIds.add(agency.getId().getFeedId());
+    feedIds.add(agency.getId().getFeedId());
+
+    if (!timeZoneExplicitlySet) {
+      // We use the agency timezone unless the timezone is specifically set.
+      if (timeZone == null) {
+        timeZone = agency.getTimezone();
+      } else if (!timeZone.equals(agency.getTimezone())) {
+        /*
+         * OTP doesn't currently support multiple time zones in a single graph, unless explicitly
+         * configured. Check that the time zone of the added agencies are the same as the current.
+         * At least this way we catch the error and log it instead of silently ignoring because the
+         * time zone from the first agency is used
+         */
+        throw new IllegalStateException(
+          String.format(
+            "The graph contains agencies with different time zones: %s != %s. Please configure the one to be used in the %s",
+            timeZone,
+            agency.getTimezone(),
+            BUILD_CONFIG_FILENAME
+          )
+        );
+      }
+    }
   }
 
   public void addFeedInfo(FeedInfo info) {
@@ -289,9 +295,15 @@ public class TimetableRepository implements Serializable {
    * Ideally we would want to interpret times in the time zone of the geographic location where the
    * origin/destination vertex or board/alight event is located. This may become necessary when we
    * start making graphs with long distance train, boat, or air services.
+   * <p>
+   * Defaults to GMT if not set and there are no agencies specified.
    */
   public ZoneId getTimeZone() {
-    return timeZone;
+    if (timeZone != null) {
+      return timeZone;
+    }
+    LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
+    return ZoneId.of("GMT");
   }
 
   /**
@@ -331,30 +343,25 @@ public class TimetableRepository implements Serializable {
   }
 
   /**
-   * OTP doesn't currently support multiple time zones in a single graph, unless explicitly
-   * configured. Check that the time zone of the added agencies are the same as the current.
-   * At least this way we catch the error and log it instead of silently ignoring because the
-   * time zone from the first agency is used
+   * The time when the transit service start. Will return EPOCH if there is no transit.
    */
-  public void validateTimeZones() {
-    if (!timeZoneExplicitlySet) {
-      Collection<ZoneId> zones = getAgencyTimeZones();
-      if (zones.size() > 1) {
-        throw new IllegalStateException(
-          ("The graph contains agencies with different time zones: %s. " +
-            "Please configure the one to be used in the %s").formatted(zones, BUILD_CONFIG_FILENAME)
-        );
-      }
-    }
+  public Instant getTransitServiceStarts() {
+    return calendarServiceData
+      .getFirstDate()
+      .map(serviceDate -> ServiceDateUtils.asStartOfService(serviceDate, getTimeZone()).toInstant())
+      .orElse(Instant.EPOCH);
   }
 
-  /** transit feed validity information in seconds since epoch */
-  public ZonedDateTime getTransitServiceStarts() {
-    return transitServiceStarts;
-  }
-
-  public ZonedDateTime getTransitServiceEnds() {
-    return transitServiceEnds;
+  /**
+   * The time when the transit service ends. Will return EPOCH if there is no transit.
+   */
+  public Instant getTransitServiceEnds() {
+    return calendarServiceData
+      .getLastDate()
+      .map(serviceDate ->
+        ServiceDateUtils.asStartOfService(serviceDate.plusDays(1), getTimeZone()).toInstant()
+      )
+      .orElse(Instant.EPOCH);
   }
 
   /**
@@ -485,15 +492,11 @@ public class TimetableRepository implements Serializable {
 
   /** True if there are active transit services loaded into this Graph. */
   public boolean hasTransit() {
-    return hasTransit;
+    return !calendarServiceData.getServiceIds().isEmpty();
   }
 
   public Optional<Agency> findAgencyById(FeedScopedId id) {
     return agencies.stream().filter(a -> a.getId().equals(id)).findAny();
-  }
-
-  private void updateHasTransit(boolean hasTransit) {
-    this.hasTransit = this.hasTransit || hasTransit;
   }
 
   /**
@@ -622,57 +625,5 @@ public class TimetableRepository implements Serializable {
 
   private void invalidateIndex() {
     this.index = null;
-  }
-
-  /**
-   * Infer the time period covered by the transit feed
-   */
-  private void updateTransitFeedValidity(
-    CalendarServiceData data,
-    @Nullable DataImportIssueStore issueStore
-  ) {
-    Instant now = Instant.now();
-    HashSet<String> agenciesWithFutureDates = new HashSet<>();
-    HashSet<String> agencies = new HashSet<>();
-    initTimeZone();
-
-    for (FeedScopedId sid : data.getServiceIds()) {
-      agencies.add(sid.getFeedId());
-      for (LocalDate sd : data.getServiceDatesForServiceId(sid)) {
-        // Adjust for timezone, assuming there is only one per graph.
-
-        ZonedDateTime t = ServiceDateUtils.asStartOfService(sd, getTimeZone());
-        if (t.toInstant().isAfter(now)) {
-          agenciesWithFutureDates.add(sid.getFeedId());
-        }
-        // assume feed is unreliable after midnight on last service day
-        ZonedDateTime u = t.plusDays(1);
-        if (t.isBefore(this.transitServiceStarts)) {
-          this.transitServiceStarts = t;
-        }
-        if (u.isAfter(this.transitServiceEnds)) {
-          this.transitServiceEnds = u;
-        }
-      }
-    }
-    if (issueStore != null) {
-      for (String agency : agencies) {
-        if (!agenciesWithFutureDates.contains(agency)) {
-          issueStore.add(new NoFutureDates(agency));
-        }
-      }
-    }
-  }
-
-  private void initTimeZone() {
-    if (timeZone == null) {
-      if (agencies.isEmpty()) {
-        timeZone = ZoneId.of("GMT");
-        LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
-      } else {
-        timeZone = getAgencyTimeZones().iterator().next();
-        LOG.debug("graph time zone set to {}", timeZone);
-      }
-    }
   }
 }

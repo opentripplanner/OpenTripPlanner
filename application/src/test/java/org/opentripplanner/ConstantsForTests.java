@@ -11,17 +11,16 @@ import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
-import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
-import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
+import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -80,12 +79,12 @@ public class ConstantsForTests {
 
   private static final String NETEX_NORDIC_DIR = "src/test/resources/netex/nordic";
 
-  private static final String NETEX_NORDIC_FILENAME = "netex_minimal.zip";
+  private static final String NETEX_NORDIC_DIR_NAME = "netex_minimal/";
   private static final String NETEX_EPIP_DIR = "src/test/resources/netex/epip/";
   private static final String NETEX_EPIP_DATA_DIR = NETEX_EPIP_DIR + "netex_epip_minimal/";
 
-  private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
-    new File(NETEX_NORDIC_DIR, NETEX_NORDIC_FILENAME),
+  private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new DirectoryDataSource(
+    new File(NETEX_NORDIC_DIR, NETEX_NORDIC_DIR_NAME),
     FileType.NETEX
   );
 
@@ -104,9 +103,9 @@ public class ConstantsForTests {
 
   public static NetexBundle createMinimalNetexNordicBundle() {
     var buildConfig = createNetexNordicBuilderParameters();
-    var netexZipFile = new File(NETEX_NORDIC_DIR, NETEX_NORDIC_FILENAME);
+    var netexZipFile = new File(NETEX_NORDIC_DIR, NETEX_NORDIC_DIR_NAME);
 
-    var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
+    var dataSource = new DirectoryDataSource(netexZipFile, FileType.NETEX);
     var configuredDataSource = new ConfiguredCompositeDataSource<>(
       dataSource,
       buildConfig.netexDefaults

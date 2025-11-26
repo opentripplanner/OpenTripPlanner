@@ -3,8 +3,8 @@ package org.opentripplanner.raptor._data;
 import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.utils.time.TimeUtils.hm2time;
 
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 public interface RaptorTestConstants {
   // Time duration(D) constants, all values are in seconds
@@ -66,7 +66,7 @@ public interface RaptorTestConstants {
   int ALIGHT_SLACK = 15;
   int TRANSFER_SLACK = 60;
 
-  RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
+  RaptorSlackProvider SLACK_PROVIDER = new TestSlackProvider(
     TRANSFER_SLACK,
     BOARD_SLACK,
     ALIGHT_SLACK

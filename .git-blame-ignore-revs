@@ -22,3 +22,6 @@ c287575df6798810a69fafc54c8c4e1867b71367
 
 # update prettier to 2.6.8
 5e507bb6960746fb367672c27fb607e9335366f9
+
+# add braces with OpenRewrite
+882e72ca362b25d5c76204e7d5db2bcee611c069

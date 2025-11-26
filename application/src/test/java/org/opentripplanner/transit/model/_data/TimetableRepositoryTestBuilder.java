@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -95,11 +94,7 @@ public class TimetableRepositoryTestBuilder {
       timetableRepository.getServiceCodes().put(serviceCode.id(), serviceCodeCounter);
       serviceCodeCounter += 1;
     }
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
+    timetableRepository.updateCalendarServiceData(calendarServiceData);
 
     timetableRepository
       .getAllTripPatterns()

@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
-import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -9,15 +8,12 @@ import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.SAFE_STREETS;
 import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.TRIANGLE;
 
-import graphql.ExecutionInput;
-import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -29,6 +25,7 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -314,17 +311,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
-    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
-      .query("")
-      .operationName("plan")
-      .context(context)
-      .locale(Locale.ENGLISH)
-      .build();
-
-    var executionContext = newExecutionContextBuilder()
-      .executionInput(executionInput)
-      .executionId(ExecutionId.from(this.getClass().getName()))
-      .build();
+    var executionContext = DataFetchingSupport.executionContext();
     return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .arguments(arguments)
       .build();

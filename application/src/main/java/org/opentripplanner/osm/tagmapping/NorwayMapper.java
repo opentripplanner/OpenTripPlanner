@@ -133,7 +133,9 @@ class NorwayMapper extends OsmTagMapper {
       else if (speedLimit >= 19.4f) {
         if (isTrunkOrPrimary.isMatch(way)) {
           return cycleSafetyHighTraffic;
-        } else return cycleSafetyMediumHighTraffic;
+        } else {
+          return cycleSafetyMediumHighTraffic;
+        }
       }
       // between ~60 km/h and ~40 km/
       else if (speedLimit >= 11.1f) {
@@ -149,10 +151,11 @@ class NorwayMapper extends OsmTagMapper {
         }
       }
       // 30 km/h or lower, or lower road class than unclassified
-      if (
-        this.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)
-      ) return cycleSafetyVeryLowTraffic;
-      else return cycleSafetyLowTraffic;
+      if (this.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)) {
+        return cycleSafetyVeryLowTraffic;
+      } else {
+        return cycleSafetyLowTraffic;
+      }
     };
 
     props.setDefaultBicycleSafetyForPermission((permission, speedLimit, way) ->

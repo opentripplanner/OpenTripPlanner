@@ -20,7 +20,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -184,11 +183,7 @@ class DefaultTransitServiceTest {
     timetableRepository.addTripPattern(BUS_PATTERN.getId(), BUS_PATTERN);
     timetableRepository.addTripPattern(BUS_PATTERN_TODAY.getId(), BUS_PATTERN_TODAY);
 
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
+    timetableRepository.updateCalendarServiceData(calendarServiceData);
 
     timetableRepository.index();
 

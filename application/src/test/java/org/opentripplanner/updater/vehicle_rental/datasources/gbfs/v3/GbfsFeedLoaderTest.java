@@ -1,6 +1,9 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSGeofencingZones;

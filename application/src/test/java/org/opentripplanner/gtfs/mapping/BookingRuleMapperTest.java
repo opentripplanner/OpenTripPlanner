@@ -1,6 +1,12 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.onebusaway.gtfs.model.BookingRule.NO_VALUE;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -20,7 +26,7 @@ class BookingRuleMapperTest {
 
   @Test
   void mapContactInfoAndMessages() {
-    var rule = rule("A", "1");
+    var rule = rule("1");
     rule.setPhoneNumber("123");
     rule.setInfoUrl("https://info");
     rule.setUrl("https://book");
@@ -37,11 +43,16 @@ class BookingRuleMapperTest {
     assertEquals("msg", mapped.getMessage());
     assertEquals("pmsg", mapped.getPickupMessage());
     assertEquals("dmsg", mapped.getDropOffMessage());
+
+    assertNull(mapped.getLatestBookingTime());
+    assertNull(mapped.getLatestBookingTime());
+    assertThat(mapped.getMinimumBookingNotice()).isEmpty();
+    assertThat(mapped.getMaximumBookingNotice()).isEmpty();
   }
 
   @Test
   void mapEarliestAndLatestBookingTime() {
-    var rule = rule("A", "2");
+    var rule = rule("2");
     // earliest: 10:00, 1 day prior
     rule.setPriorNoticeStartTime(LocalTime.of(10, 0).toSecondOfDay());
     rule.setPriorNoticeStartDay(1);
@@ -70,12 +81,12 @@ class BookingRuleMapperTest {
 
   @Test
   void mapNoEarliestOrLatestFallsBackToMinMaxNotice() {
-    var rule = rule("A", "3");
-    // when both prior notice time and day are set to 0, they should be treated as "not set".
-    rule.setPriorNoticeStartTime(0);
-    rule.setPriorNoticeStartDay(0);
-    rule.setPriorNoticeLastTime(0);
-    rule.setPriorNoticeLastDay(0);
+    var rule = rule("3");
+    // when either of prior notice time and day are set to -999(NO_VALUE), they should be treated as "not set".
+    rule.setPriorNoticeStartTime(NO_VALUE);
+    rule.setPriorNoticeStartDay(NO_VALUE);
+    rule.setPriorNoticeLastTime(NO_VALUE);
+    rule.setPriorNoticeLastDay(NO_VALUE);
 
     rule.setPriorNoticeDurationMin(45);
     rule.setPriorNoticeDurationMax(120);
@@ -89,15 +100,28 @@ class BookingRuleMapperTest {
 
   @Test
   void mapCacheReturnsSameInstanceForSameRule() {
-    var rule = rule("A", "4");
+    var rule = rule("4");
     var r1 = subject.map(rule);
     var r2 = subject.map(rule);
     assertSame(r1, r2);
   }
 
-  private static BookingRule rule(String agency, String id) {
+  @Test
+  void acceptZeroAsMidnight() {
+    var rule = rule("5");
+    rule.setPriorNoticeStartTime(0);
+    rule.setPriorNoticeStartDay(10);
+    rule.setPriorNoticeLastTime(0);
+    rule.setPriorNoticeLastDay(5);
+
+    var mapped = subject.map(rule);
+    assertEquals("00:00-10d", mapped.getEarliestBookingTime().toString());
+    assertEquals("00:00-5d", mapped.getLatestBookingTime().toString());
+  }
+
+  private static BookingRule rule(String id) {
     var r = new BookingRule();
-    r.setId(new AgencyAndId(agency, id));
+    r.setId(new AgencyAndId("A", id));
     return r;
   }
 }

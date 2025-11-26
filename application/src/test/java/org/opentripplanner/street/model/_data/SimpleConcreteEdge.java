@@ -2,7 +2,6 @@ package org.opentripplanner.street.model._data;
 
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -26,13 +25,13 @@ public class SimpleConcreteEdge extends Edge {
   public State[] traverse(State s0) {
     double d = getDistanceMeters();
     TraverseMode mode = s0.currentMode();
-    RoutingPreferences preferences = s0.getPreferences();
-    double t = d / preferences.getSpeed(mode, false);
+    var request = s0.getRequest();
+    double t = d / TemporaryConcreteEdge.getSpeed(mode, s0.getRequest(), false);
     double reluctance =
       switch (mode) {
-        case WALK -> preferences.walk().reluctance();
-        case BICYCLE -> preferences.bike().reluctance();
-        case SCOOTER -> preferences.scooter().reluctance();
+        case WALK -> request.walk().reluctance();
+        case BICYCLE -> request.bike().reluctance();
+        case SCOOTER -> request.scooter().reluctance();
         default -> 1;
       };
     double w = t * reluctance;

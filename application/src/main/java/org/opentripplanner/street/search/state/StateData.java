@@ -70,13 +70,10 @@ public class StateData implements Cloneable {
    * Returns a set of initial StateDatas based on the options from the RouteRequest
    */
   public static List<StateData> getInitialStateDatas(StreetSearchRequest request) {
-    var rentalPreferences = request.preferences().rental(request.mode());
     return getInitialStateDatas(
       request.mode(),
       request.arriveBy(),
-      rentalPreferences != null
-        ? rentalPreferences.allowArrivingInRentedVehicleAtDestination()
-        : false
+      request.allowsArrivingInRentalAtDestination()
     );
   }
 
@@ -86,13 +83,10 @@ public class StateData implements Cloneable {
    * the given {@code request}.
    */
   public static StateData getBaseCaseStateData(StreetSearchRequest request) {
-    var rentalPreferences = request.preferences().rental(request.mode());
     var stateDatas = getInitialStateDatas(
       request.mode(),
       request.arriveBy(),
-      rentalPreferences != null
-        ? rentalPreferences.allowArrivingInRentedVehicleAtDestination()
-        : false
+      request.allowsArrivingInRentalAtDestination()
     );
 
     var baseCaseDatas =

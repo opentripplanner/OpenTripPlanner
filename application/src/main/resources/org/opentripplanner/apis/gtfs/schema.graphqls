@@ -933,7 +933,7 @@ type Location {
 }
 
 """
-A group of fixed stops that is visited in an arbitrary order.
+A group of fixed stops that are visited in an arbitrary order.
 
 This is mostly used by demand-responsive services.
 """
@@ -1119,12 +1119,7 @@ type Plan {
   messageEnums: [String]!
   "A list of possible error messages in cleartext"
   messageStrings: [String]!
-  """
-  This is the suggested search time for the "next page" or time window. Insert it together
-  with the searchWindowUsed in the request to get a new set of trips following in the
-  search-window AFTER the current search. No duplicate trips should be returned, unless a trip
-  is delayed and new real-time data is available.
-  """
+  "This will not be available after Match 2026."
   nextDateTime: Long @deprecated(reason : "Use nextPageCursor instead") @timingData
   """
   Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last response
@@ -1134,12 +1129,7 @@ type Plan {
   This is only usable when public transportation mode(s) are included in the query.
   """
   nextPageCursor: String
-  """
-  This is the suggested search time for the "previous page" or time window. Insert it together
-  with the searchWindowUsed in the request to get a new set of trips preceding in the
-  search-window BEFORE the current search. No duplicate trips should be returned, unless a trip
-  is delayed and new real-time data is available.
-  """
+  "This will not be available after Match 2026."
   prevDateTime: Long @deprecated(reason : "Use previousPageCursor instead") @timingData
   """
   Use the cursor to go to the previous "page" of itineraries. Copy the cursor from the last
@@ -1158,7 +1148,7 @@ type Plan {
     
   The unit is seconds.
   """
-  searchWindowUsed: Long
+  searchWindowUsed: Long @deprecated(reason : "This is not needed for debugging, and is misleading if the window is cropped.")
   "The destination"
   to: Place!
 }
@@ -2045,6 +2035,13 @@ type RideHailingProvider {
 type RiderCategory {
   "ID of the category"
   id: String!
+  """
+  If this category is considered the "default" one. In most places this means "Adult" or
+  "Regular".
+  Frontends can use this property to display this category more prominently or pre-select this
+  in a UI.
+  """
+  isDefault: Boolean!
   "Human readable name of the category."
   name: String
 }

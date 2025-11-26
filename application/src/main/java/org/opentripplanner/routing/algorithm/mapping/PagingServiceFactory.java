@@ -32,7 +32,6 @@ public class PagingServiceFactory {
       edt(searchStartTime, raptorSearchParamsUsed),
       lat(searchStartTime, raptorSearchParamsUsed),
       request.itinerariesSortOrder(),
-      request.arriveBy(),
       request.numItineraries(),
       request.pageCursor(),
       pageCursorInput,

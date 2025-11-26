@@ -202,8 +202,8 @@ class StreetLinkerModuleTest {
       graph.addVertex(from);
       graph.addVertex(to);
 
-      var walkableEdge = StreetModelForTest.streetEdge(from, to, PEDESTRIAN);
-      var drivableEdge = StreetModelForTest.streetEdge(from, to, CAR);
+      StreetModelForTest.streetEdge(from, to, PEDESTRIAN);
+      StreetModelForTest.streetEdge(from, to, CAR);
       var builder = SiteRepository.of();
       stop = builder
         .regularStop(id("platform-1"))

@@ -22,7 +22,7 @@ class RouterConfigDocTest {
 
     // Setup so we get access to the NodeAdapter
     var a = new NodeAdapter(node, SOURCE);
-    var c = new RouterConfig(a, false);
+    new RouterConfig(a, false);
 
     // Test for unused parameters
     var buf = new StringBuilder();

@@ -59,7 +59,7 @@ public class StreetEdgeScooterTraversalTest {
 
     var request = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL);
 
-    request.withPreferences(pref -> pref.withScooter(scooter -> scooter.withSpeed(5)));
+    request.withScooter(scooter -> scooter.withSpeed(5));
 
     State slowResult = traverseStreetFromRental(
       testStreet,
@@ -68,7 +68,7 @@ public class StreetEdgeScooterTraversalTest {
       rentalVertex,
       request.build()
     );
-    request.withPreferences(pref -> pref.withScooter(scooter -> scooter.withSpeed(10)));
+    request.withScooter(scooter -> scooter.withSpeed(10));
 
     State fastResult = traverseStreetFromRental(
       testStreet,
@@ -82,7 +82,7 @@ public class StreetEdgeScooterTraversalTest {
     assertTrue(slowResult.getWeight() > fastResult.getWeight() + DELTA);
     assertTrue(slowResult.getElapsedTimeSeconds() > fastResult.getElapsedTimeSeconds());
 
-    request.withPreferences(pref -> pref.withScooter(scooter -> scooter.withReluctance(1)));
+    request.withScooter(scooter -> scooter.withReluctance(1));
     State lowReluctanceResult = traverseStreetFromRental(
       testStreet,
       vehicleRentalEdge,
@@ -91,7 +91,7 @@ public class StreetEdgeScooterTraversalTest {
       request.build()
     );
 
-    request.withPreferences(pref -> pref.withScooter(scooter -> scooter.withReluctance(5)));
+    request.withScooter(scooter -> scooter.withReluctance(5));
 
     State highReluctanceResult = traverseStreetFromRental(
       testStreet,
@@ -121,15 +121,13 @@ public class StreetEdgeScooterTraversalTest {
       .buildAndConnect();
 
     var request = StreetSearchRequest.of()
-      .withPreferences(pref -> pref.withWalk(walk -> walk.withReluctance(1)))
+      .withWalk(walk -> walk.withReluctance(1))
       .withMode(StreetMode.SCOOTER_RENTAL);
 
     State s0 = new State(StreetModelForTest.V1, request.build());
     State result = e1.traverse(s0)[0];
 
-    request.withPreferences(pref ->
-      pref.withScooter(scooter -> scooter.withReluctance(5).withSpeed(8.5))
-    );
+    request.withScooter(scooter -> scooter.withReluctance(5).withSpeed(8.5));
 
     s0 = new State(StreetModelForTest.V1, request.build());
     var scooterReluctanceResult = e1.traverse(s0)[0];
@@ -191,18 +189,16 @@ public class StreetEdgeScooterTraversalTest {
 
     var request = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL);
 
-    request.withPreferences(pref ->
-      pref
-        .withScooter(scooter ->
-          scooter
-            .withSpeed(SPEED)
-            .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
-            .withOptimizeTriangle(it -> it.withTime(1))
-            .withReluctance(1)
-        )
-        .withWalk(walk -> walk.withReluctance(1))
-        .withCar(car -> car.withReluctance(1))
-    );
+    request
+      .withScooter(scooter ->
+        scooter
+          .withSpeed(SPEED)
+          .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
+          .withOptimizeTriangle(it -> it.withTime(1))
+          .withReluctance(1)
+      )
+      .withWalk(walk -> walk.withReluctance(1))
+      .withCar(car -> car.withReluctance(1));
 
     var rentedState = vehicleRentalEdge.traverse(new State(rentalVertex, request.build()));
     var startState = link.traverse(rentedState[0])[0];
@@ -212,9 +208,7 @@ public class StreetEdgeScooterTraversalTest {
     assertEquals(TraverseMode.SCOOTER, result.currentMode());
     assertEquals(expectedTimeWeight, result.getWeight() - startState.getWeight(), DELTA);
 
-    request.withPreferences(p ->
-      p.withScooter(scooter -> scooter.withOptimizeTriangle(it -> it.withSlope(1)))
-    );
+    request.withScooter(scooter -> scooter.withOptimizeTriangle(it -> it.withSlope(1)));
     rentedState = vehicleRentalEdge.traverse(new State(rentalVertex, request.build()));
     startState = link.traverse(rentedState[0])[0];
 
@@ -225,9 +219,7 @@ public class StreetEdgeScooterTraversalTest {
     assertTrue((length * 1.5) / SPEED < slopeWeight);
     assertTrue((length * 1.5 * 10) / SPEED > slopeWeight);
 
-    request.withPreferences(p ->
-      p.withScooter(scooter -> scooter.withOptimizeTriangle(it -> it.withSafety(1)))
-    );
+    request.withScooter(scooter -> scooter.withOptimizeTriangle(it -> it.withSafety(1)));
     rentedState = vehicleRentalEdge.traverse(new State(rentalVertex, request.build()));
     startState = link.traverse(rentedState[0])[0];
 

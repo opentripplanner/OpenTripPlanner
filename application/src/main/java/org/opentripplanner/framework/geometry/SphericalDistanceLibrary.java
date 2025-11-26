@@ -66,6 +66,64 @@ public abstract class SphericalDistanceLibrary {
   }
 
   /**
+   * Compute the (approximated) distance from a point to a line segment using
+   * Cartesian projection for the perpendicular distance calculation.
+   * <p>
+   * This method projects the point onto the line segment (treating lat/lon as
+   * Cartesian coordinates for the projection), then calculates the spherical
+   * distance to the closest point on the segment.
+   * <p>
+   * The algorithm:
+   * <ol>
+   *   <li>Projects the point onto the infinite line passing through segmentStart and segmentEnd</li>
+   *   <li>Clamps the projection to stay within the segment [segmentStart, segmentEnd]</li>
+   *   <li>Calculates the spherical distance from the point to the closest point on the segment</li>
+   * </ol>
+   * <p>
+   * The Cartesian approximation for the projection is acceptable for typical
+   * urban and suburban distances (under 50 km) where the Earth's curvature effect
+   * is minimal. For longer distances or higher accuracy requirements, consider
+   * using spherical trigonometry approaches.
+   *
+   * @param point The point to measure from (longitude, latitude degrees)
+   * @param segmentStart Start of the line segment (longitude, latitude degrees)
+   * @param segmentEnd End of the line segment (longitude, latitude degrees)
+   * @return The (approximated) distance, in meters, from the point to the closest
+   *         point on the line segment
+   */
+  public static double fastDistance(
+    Coordinate point,
+    Coordinate segmentStart,
+    Coordinate segmentEnd
+  ) {
+    // Handle degenerate case: segment start equals segment end
+    if (segmentStart.equals(segmentEnd)) {
+      return fastDistance(point, segmentStart);
+    }
+
+    // Calculate vector from segmentStart to segmentEnd
+    double dx = segmentEnd.x - segmentStart.x;
+    double dy = segmentEnd.y - segmentStart.y;
+    double lineLengthSquared = dx * dx + dy * dy;
+
+    // Calculate projection parameter t
+    // t represents where the projection falls on the line segment:
+    // t = 0 means the projection is at segmentStart
+    // t = 1 means the projection is at segmentEnd
+    // 0 < t < 1 means the projection is between them
+    double t =
+      ((point.x - segmentStart.x) * dx + (point.y - segmentStart.y) * dy) / lineLengthSquared;
+
+    // Clamp t to [0, 1] to ensure we stay on the segment
+    t = Math.max(0, Math.min(1, t));
+
+    // Calculate the closest point on the segment
+    Coordinate closestPoint = new Coordinate(segmentStart.x + t * dx, segmentStart.y + t * dy);
+
+    return fastDistance(point, closestPoint);
+  }
+
+  /**
    * Compute the length of a polyline
    *
    * @param lineString The polyline in (longitude, latitude degrees).

@@ -78,6 +78,7 @@
         "org.apache.maven.plugins:maven-source-plugin",
         "com.hubspot.maven.plugins:prettier-maven-plugin",
         "com.google.cloud.tools:jib-maven-plugin",
+        "com.puppycrawl.tools:checkstyle",
         "org.apache.maven.plugins:maven-shade-plugin",
         "org.apache.maven.plugins:maven-compiler-plugin",
         "org.apache.maven.plugins:maven-jar-plugin",

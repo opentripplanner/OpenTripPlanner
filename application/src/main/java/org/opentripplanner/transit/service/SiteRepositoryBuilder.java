@@ -9,6 +9,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.AreaStopBuilder;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.GroupStopBuilder;
@@ -27,6 +28,7 @@ public class SiteRepositoryBuilder {
   private final EntityById<Station> stationById = new DefaultEntityById<>();
   private final EntityById<MultiModalStation> multiModalStationById = new DefaultEntityById<>();
   private final EntityById<GroupOfStations> groupOfStationById = new DefaultEntityById<>();
+  private final EntityById<Entrance> entrancesById = new DefaultEntityById<>();
 
   SiteRepositoryBuilder(AtomicInteger stopIndexCounter) {
     this.stopIndexCounter = stopIndexCounter;
@@ -117,6 +119,15 @@ public class SiteRepositoryBuilder {
 
   public ImmutableEntityById<GroupStop> groupStopById() {
     return groupStopById;
+  }
+
+  public SiteRepositoryBuilder withEntrance(Entrance map) {
+    entrancesById.add(map);
+    return this;
+  }
+
+  public ImmutableEntityById<Entrance> entrancesById() {
+    return entrancesById;
   }
 
   public SiteRepositoryBuilder withGroupStop(GroupStop group) {

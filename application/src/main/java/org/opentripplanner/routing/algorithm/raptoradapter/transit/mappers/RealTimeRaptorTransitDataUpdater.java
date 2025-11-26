@@ -66,6 +66,31 @@ public class RealTimeRaptorTransitDataUpdater {
     this.timetableRepository = timetableRepository;
   }
 
+  /// Updates the real-time [RaptorTransitData] to use the modified timetables.
+  ///
+  /// This method bridges the different update approaches:
+  /// 1. `updatedTimetables` and `timetables` only contains [Timetable]s with real-time
+  ///    updates. This means that removed items are not present.
+  /// 2. [RaptorTransitData] requires applying the changes to a previous snapshot: adding,
+  ///    updating and removing timetables.
+  ///
+  /// To support this the method has three tasks:
+  /// 1. Collect [TripPatternForDate]s which have invalidated data (`oldTripPatternsForDate`).
+  ///    Trips may change in multiple ways and because of that may move between [TripPattern]s. To
+  ///    track a [TripIdAndServiceDate] it's previous state needs to be stored so that all relevant
+  ///    places may be updated.
+  ///      * a trip may have a new (real-time) Timetable, which results in two updated [Timetable]s
+  ///      * a trip may move between scheduled [StopPattern]s and/or real-time [StopPattern]s
+  /// 2. Collect [TripPatternForDate]s which have valid data (`newTripPatternsForDate`).
+  ///    There are two options:
+  ///    1. an update was received
+  ///    2. no update was received, and so the previous updated should be removed. If the update
+  ///       was for a scheduled trip, then the schedule should be restored.
+  /// 3. Remove the `oldTripPatternsForDate` and add the `newTripPatternsForDate` to the
+  ///    [RaptorTransitData].
+  ///
+  /// @param updatedTimetables that changed with the current snapshot
+  /// @param timetables which are affected by real-time updates
   public void update(
     Collection<Timetable> updatedTimetables,
     Map<TripPattern, SortedSet<Timetable>> timetables
@@ -204,7 +229,8 @@ public class RealTimeRaptorTransitDataUpdater {
               patternsForDate.remove(tripPatternForDate);
             }
           } else {
-            LOG.warn("Could not fetch timetable for {}", pattern);
+            LOG.warn("Could not fetch timetable for {}, removing.", pattern);
+            patternsForDate.remove(tripPatternForDate);
           }
         }
       }

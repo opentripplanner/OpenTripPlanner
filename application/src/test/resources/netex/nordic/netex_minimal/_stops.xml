@@ -1,0 +1,699 @@
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex"
+  xmlns:ns2="http://www.opengis.net/gml/3.2" xmlns:ns3="http://www.siri.org.uk/siri" version="any">
+  <PublicationTimestamp>2017-11-03T14:17:31.709+01:00</PublicationTimestamp>
+  <ParticipantRef>NSR</ParticipantRef>
+  <dataObjects>
+    <SiteFrame modification="new" version="1" id="NSR:SiteFrame:1294206082">
+      <Description>Site frame with stops</Description>
+      <stopPlaces modificationSet="all">
+        <StopPlace created="2017-10-04T12:33:12.909+02:00" changed="2017-10-13T14:04:00.629+02:00"
+          modification="new" version="4" id="NSR:StopPlace:58366">
+          <ValidBetween>
+            <FromDate>2017-10-13T14:05:10.498+02:00</FromDate>
+          </ValidBetween>
+          <keyList>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>true</Value>
+            </KeyValue>
+          </keyList>
+          <Name lang="no">Jernbanetorget</Name>
+          <Description lang="no"/>
+          <Centroid>
+            <Location>
+              <Longitude>10.750707</Longitude>
+              <Latitude>59.912146</Latitude>
+            </Location>
+          </Centroid>
+          <AccessModes/>
+          <TopographicPlaceRef ref="KVE:TopographicPlace:0301"
+            created="2017-11-03T14:19:55.704+01:00"/>
+          <AirSubmode>unknown</AirSubmode>
+          <OtherTransportModes/>
+        </StopPlace>
+        <StopPlace created="2017-06-19T19:17:47.202+02:00" changed="2017-10-13T14:04:00.629+02:00"
+          modification="new" version="10" id="NSR:StopPlace:3990">
+          <keyList>
+            <KeyValue>
+              <Key>imported-id</Key>
+              <Value>
+                RUT:StopPlace:03010011-8,NRI:StopPlace:761012249,RUT:StopPlace:03010011,RUT:StopPlace:3010011-8
+              </Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>false</Value>
+            </KeyValue>
+          </keyList>
+          <Description lang="no"/>
+          <Centroid>
+            <Location>
+              <Longitude>10.751321</Longitude>
+              <Latitude>59.912235</Latitude>
+            </Location>
+          </Centroid>
+          <AccessibilityAssessment modification="new" version="13"
+            id="NSR:AccessibilityAssessment:3990">
+            <MobilityImpairedAccess>unknown</MobilityImpairedAccess>
+            <limitations>
+              <AccessibilityLimitation modification="new" version="7" id="74915">
+                <WheelchairAccess>unknown</WheelchairAccess>
+                <StepFreeAccess>unknown</StepFreeAccess>
+                <EscalatorFreeAccess>unknown</EscalatorFreeAccess>
+                <LiftFreeAccess>unknown</LiftFreeAccess>
+                <AudibleSignalsAvailable>unknown</AudibleSignalsAvailable>
+              </AccessibilityLimitation>
+            </limitations>
+          </AccessibilityAssessment>
+          <AccessModes/>
+          <ParentSiteRef ref="NSR:StopPlace:58366" version="4"/>
+          <TransportMode>metro</TransportMode>
+          <OtherTransportModes/>
+          <StopPlaceType>metroStation</StopPlaceType>
+          <Weighting>interchangeAllowed</Weighting>
+          <quays>
+            <Quay changed="2017-09-20T16:29:43.331+02:00" modification="new" version="10"
+              id="NSR:Quay:7184">
+              <Description lang="no">Retning vest</Description>
+              <PrivateCode>2</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.751326</Longitude>
+                  <Latitude>59.912268</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes/>
+              <OtherTransportModes/>
+              <PublicCode>2</PublicCode>
+              <CompassBearing>271.0</CompassBearing>
+            </Quay>
+            <Quay changed="2017-09-20T16:29:43.33+02:00" modification="new" version="10"
+              id="NSR:Quay:7183">
+              <keyList>
+                <KeyValue>
+                  <Key>merged-id</Key>
+                  <Value>NSR:Quay:7191</Value>
+                </KeyValue>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>
+                    NRI:Quay:762133233,RUT:Quay:0301001101,RUT:Quay:0301001103,RUT:Quay:301001103,RUT:Quay:301001101
+                  </Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no">Retning øst</Description>
+              <PrivateCode>1</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.751310</Longitude>
+                  <Latitude>59.912197</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes/>
+              <OtherTransportModes/>
+              <PublicCode>1</PublicCode>
+              <CompassBearing>91.0</CompassBearing>
+            </Quay>
+          </quays>
+        </StopPlace>
+        <StopPlace created="2017-06-19T19:17:48.725+02:00" changed="2017-10-13T14:04:00.629+02:00" modification="new" version="13" id="NSR:StopPlace:3995">
+          <keyList>
+            <KeyValue>
+              <Key>merged-id</Key>
+              <Value>NSR:StopPlace:3992,NSR:StopPlace:4008,NSR:StopPlace:4000</Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>imported-id</Key>
+              <Value>RUT:StopPlace:3010014-2,RUT:StopPlace:3010012-2,RUT:StopPlace:3010013-2,RUT:StopPlace:3010011-2,RUT:StopPlace:03010016,RUT:StopPlace:03010014,RUT:StopPlace:03010013,RUT:StopPlace:03010012,RUT:StopPlace:03010011,RUT:StopPlace:03010011-2,NRI:StopPlace:761012266,RUT:StopPlace:3010016,NRI:StopPlace:761012180,RUT:StopPlace:03010014-2,RUT:StopPlace:03010012-2,RUT:StopPlace:03010013-2</Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>VERSION_COMMENT</Key>
+              <Value>Flettet Jernbanetorget (NSR:StopPlace:4008) inn i Jernbanetorget (NSR:StopPlace:3995). 2 quayer flettet.</Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>false</Value>
+            </KeyValue>
+          </keyList>
+          <Description lang="no"/>
+          <Centroid>
+            <Location>
+              <Longitude>10.750760</Longitude>
+              <Latitude>59.912208</Latitude>
+            </Location>
+          </Centroid>
+          <AccessibilityAssessment modification="new" version="17" id="NSR:AccessibilityAssessment:3995">
+            <MobilityImpairedAccess>unknown</MobilityImpairedAccess>
+            <limitations>
+              <AccessibilityLimitation modification="new" version="9" id="74914">
+                <WheelchairAccess>unknown</WheelchairAccess>
+                <StepFreeAccess>unknown</StepFreeAccess>
+                <EscalatorFreeAccess>unknown</EscalatorFreeAccess>
+                <LiftFreeAccess>unknown</LiftFreeAccess>
+                <AudibleSignalsAvailable>unknown</AudibleSignalsAvailable>
+              </AccessibilityLimitation>
+            </limitations>
+          </AccessibilityAssessment>
+          <AccessModes></AccessModes>
+          <ParentSiteRef ref="NSR:StopPlace:58366" version="4"/>
+          <TransportMode>bus</TransportMode>
+          <OtherTransportModes></OtherTransportModes>
+          <tariffZones>
+            <TariffZoneRef ref="RUT:TariffZone:1"/>
+          </tariffZones>
+          <StopPlaceType>onstreetBus</StopPlaceType>
+          <Weighting>interchangeAllowed</Weighting>
+          <quays>
+            <Quay changed="2017-10-04T12:32:09.311+02:00" modification="new" version="11" id="NSR:Quay:104023">
+              <keyList>
+                <KeyValue>
+                  <Key>RUT:Quay:301000702</Key>
+                  <Value></Value>
+                </KeyValue>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>RUT:Quay:301000702</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no"/>
+              <PrivateCode>12</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.749637</Longitude>
+                  <Latitude>59.912331</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes></AccessModes>
+              <OtherTransportModes></OtherTransportModes>
+              <PublicCode>F</PublicCode>
+            </Quay>
+            <Quay changed="2017-10-04T12:32:09.312+02:00" modification="new" version="13" id="NSR:Quay:7194">
+              <keyList>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>RUT:Quay:0301001201,NRI:Quay:762012195,RUT:Quay:301001201</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no"></Description>
+              <PrivateCode>1</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.751654</Longitude>
+                  <Latitude>59.912095</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes></AccessModes>
+              <OtherTransportModes></OtherTransportModes>
+              <PublicCode>H</PublicCode>
+              <CompassBearing>121.0</CompassBearing>
+            </Quay>
+            <Quay changed="2017-10-04T12:32:09.312+02:00" modification="new" version="11" id="NSR:Quay:7203">
+              <keyList>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>NRI:Quay:762012190,RUT:Quay:0301001302,RUT:Quay:301001302</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no"></Description>
+              <PrivateCode>2</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.749757</Longitude>
+                  <Latitude>59.911465</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes></AccessModes>
+              <OtherTransportModes></OtherTransportModes>
+              <PublicCode>A</PublicCode>
+            </Quay>
+            <Quay created="2017-06-19T20:15:52.704+02:00" changed="2017-10-04T12:32:09.312+02:00" modification="new" version="11" id="NSR:Quay:7202">
+              <keyList>
+                <KeyValue>
+                  <Key>hpltype</Key>
+                  <Value>9766</Value>
+                </KeyValue>
+                <KeyValue>
+                  <Key>merged-id</Key>
+                  <Value>NSR:Quay:98629</Value>
+                </KeyValue>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>NRI:Quay:762012191,HED:Quay:301001301,OPP:Quay:301001301,RUT:Quay:0301001301,RUT:Quay:301001301</Value>
+                </KeyValue>
+                <KeyValue>
+                  <Key>retn_nett</Key>
+                  <Value>9769</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no"></Description>
+              <PrivateCode>1</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.750409</Longitude>
+                  <Latitude>59.911737</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes></AccessModes>
+              <placeEquipments id="NSR:PlaceEquipment:41777">
+                <GeneralSign modification="new" version="5" id="53644">
+                  <PrivateCode>512</PrivateCode>
+                  <SignContentType>transportMode</SignContentType>
+                </GeneralSign>
+              </placeEquipments>
+              <OtherTransportModes></OtherTransportModes>
+              <PublicCode>D</PublicCode>
+            </Quay>
+            <Quay changed="2017-10-13T13:58:29.542+02:00" modification="new" version="6" id="NSR:Quay:122003">
+              <keyList>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>RUT:Quay:301001601</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no"/>
+              <PrivateCode>1</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.748062</Longitude>
+                  <Latitude>59.909803</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes></AccessModes>
+              <OtherTransportModes></OtherTransportModes>
+              <PublicCode>L</PublicCode>
+            </Quay>
+            <Quay changed="2017-10-04T12:32:09.313+02:00" modification="new" version="12" id="NSR:Quay:104022">
+              <keyList>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>RUT:Quay:301000701</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no"/>
+              <PrivateCode>11</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.750144</Longitude>
+                  <Latitude>59.912249</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes></AccessModes>
+              <OtherTransportModes></OtherTransportModes>
+              <PublicCode>E</PublicCode>
+            </Quay>
+            <Quay changed="2017-10-13T13:58:29.542+02:00" modification="new" version="7" id="NSR:Quay:7216">
+              <keyList>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>NRI:Quay:762148898,RUT:Quay:301001402,RUT:Quay:0301001402</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no"></Description>
+              <PrivateCode>2</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.748676</Longitude>
+                  <Latitude>59.910379</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes></AccessModes>
+              <OtherTransportModes></OtherTransportModes>
+              <PublicCode></PublicCode>
+            </Quay>
+            <Quay changed="2017-10-04T12:32:09.313+02:00" modification="new" version="13" id="NSR:Quay:7193">
+              <keyList>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>NRI:Quay:762012197,RUT:Quay:0301001202,RUT:Quay:301001202</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no"></Description>
+              <PrivateCode>2</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.751367</Longitude>
+                  <Latitude>59.912323</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes></AccessModes>
+              <OtherTransportModes></OtherTransportModes>
+              <PublicCode>G</PublicCode>
+              <CompassBearing>301.0</CompassBearing>
+            </Quay>
+          </quays>
+        </StopPlace>
+        <StopPlace created="2017-10-02T09:31:42.139+02:00" modification="new" version="1"
+          id="NSR:StopPlace:58243">
+          <ValidBetween>
+            <FromDate>2017-10-02T09:32:30+02:00</FromDate>
+          </ValidBetween>
+          <keyList>
+            <KeyValue>
+              <Key>imported-id</Key>
+              <Value/>
+            </KeyValue>
+            <KeyValue>
+              <Key>CHANGED_BY</Key>
+              <Value>torbjorn.barslett</Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>VERSION_COMMENT</Key>
+              <Value>Nytt MMSP buss/bane</Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>true</Value>
+            </KeyValue>
+          </keyList>
+          <Name lang="no">Bergkrystallen</Name>
+          <Centroid>
+            <Location>
+              <Longitude>10.821614</Longitude>
+              <Latitude>59.866603</Latitude>
+            </Location>
+          </Centroid>
+          <AccessModes/>
+          <TopographicPlaceRef ref="KVE:TopographicPlace:0301"
+            created="2017-11-03T01:06:08.721+01:00" version="2"/>
+          <AirSubmode>unknown</AirSubmode>
+          <OtherTransportModes/>
+          <tariffZones>
+            <TariffZoneRef ref="RUT:TariffZone:1"/>
+          </tariffZones>
+        </StopPlace>
+        <StopPlace created="2017-06-19T19:19:08.426+02:00" modification="new" version="2"
+          id="NSR:StopPlace:5825">
+          <keyList>
+            <KeyValue>
+              <Key>imported-id</Key>
+              <Value>RUT:StopPlace:03011031-2,NRI:StopPlace:761014415,RUT:StopPlace:3011031-2,RUT:StopPlace:03011031</Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>false</Value>
+            </KeyValue>
+          </keyList>
+          <Name lang="no">Bergkrystallen T</Name>
+          <Centroid>
+            <Location>
+              <Longitude>10.821484</Longitude>
+              <Latitude>59.866297</Latitude>
+            </Location>
+          </Centroid>
+          <AccessibilityAssessment modification="new" version="3"
+            id="NSR:AccessibilityAssessment:5825">
+            <MobilityImpairedAccess>unknown</MobilityImpairedAccess>
+            <limitations>
+              <AccessibilityLimitation modification="new" version="3" id="72455">
+                <WheelchairAccess>unknown</WheelchairAccess>
+                <StepFreeAccess>unknown</StepFreeAccess>
+              </AccessibilityLimitation>
+            </limitations>
+          </AccessibilityAssessment>
+          <AccessModes/>
+          <ParentSiteRef ref="NSR:StopPlace:58243" version="1"/>
+          <TransportMode>bus</TransportMode>
+          <OtherTransportModes/>
+          <tariffZones>
+            <TariffZoneRef ref="RUT:TariffZone:1"/>
+          </tariffZones>
+          <StopPlaceType>onstreetBus</StopPlaceType>
+          <Weighting>interchangeAllowed</Weighting>
+          <quays>
+            <Quay modification="new" version="2" id="NSR:Quay:10685">
+              <keyList>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>RUT:Quay:301103101,RUT:Quay:0301103101,NRI:Quay:762084542</Value>
+                </KeyValue>
+              </keyList>
+              <PrivateCode type="StopPoint">1</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.821484</Longitude>
+                  <Latitude>59.866297</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes/>
+              <OtherTransportModes/>
+              <PublicCode/>
+              <CompassBearing>316.0</CompassBearing>
+            </Quay>
+          </quays>
+        </StopPlace>
+        <StopPlace created="2017-06-19T19:19:08.385+02:00" changed="2017-08-29T14:41:50.668+02:00"
+          modification="new" version="3" id="NSR:StopPlace:5823">
+          <keyList>
+            <KeyValue>
+              <Key>imported-id</Key>
+              <Value>RUT:StopPlace:3011030-8,NRI:StopPlace:761014254,RUT:StopPlace:03011030-8,RUT:StopPlace:03011030</Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>false</Value>
+            </KeyValue>
+          </keyList>
+          <Description lang="no"/>
+          <Centroid>
+            <Location>
+              <Longitude>10.821030</Longitude>
+              <Latitude>59.867145</Latitude>
+            </Location>
+          </Centroid>
+          <AccessibilityAssessment modification="new" version="4"
+            id="NSR:AccessibilityAssessment:5823">
+            <MobilityImpairedAccess>unknown</MobilityImpairedAccess>
+            <limitations>
+              <AccessibilityLimitation modification="new" version="3" id="72454">
+                <WheelchairAccess>unknown</WheelchairAccess>
+                <StepFreeAccess>unknown</StepFreeAccess>
+                <EscalatorFreeAccess>unknown</EscalatorFreeAccess>
+                <LiftFreeAccess>unknown</LiftFreeAccess>
+                <AudibleSignalsAvailable>unknown</AudibleSignalsAvailable>
+              </AccessibilityLimitation>
+            </limitations>
+          </AccessibilityAssessment>
+          <AccessModes/>
+          <ParentSiteRef ref="NSR:StopPlace:58243" version="1"/>
+          <TransportMode>metro</TransportMode>
+          <OtherTransportModes/>
+          <tariffZones>
+            <TariffZoneRef ref="RUT:TariffZone:1"/>
+          </tariffZones>
+          <StopPlaceType>metroStation</StopPlaceType>
+          <Weighting>interchangeAllowed</Weighting>
+          <quays>
+            <Quay changed="2017-08-29T14:41:50.589+02:00" modification="new" version="3"
+              id="NSR:Quay:10681">
+              <keyList>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>RUT:Quay:0301103001,RUT:Quay:301103001,NRI:Quay:762133161</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no">Retning sentrum</Description>
+              <PrivateCode>1</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.821010</Longitude>
+                  <Latitude>59.867110</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes/>
+              <OtherTransportModes/>
+              <PublicCode>1</PublicCode>
+              <CompassBearing>114.0</CompassBearing>
+            </Quay>
+            <Quay changed="2017-08-29T14:41:50.589+02:00" modification="new" version="3"
+              id="NSR:Quay:10682">
+              <keyList>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>RUT:Quay:0301103002,RUT:Quay:301103002,NRI:Quay:762133160</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no">Retning sentrum</Description>
+              <PrivateCode>2</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.821050</Longitude>
+                  <Latitude>59.867180</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes/>
+              <OtherTransportModes/>
+              <PublicCode>2</PublicCode>
+              <CompassBearing>291.0</CompassBearing>
+            </Quay>
+          </quays>
+        </StopPlace>
+        <StopPlace created="2017-10-06T13:05:26.241+02:00" changed="2017-10-06T13:06:04.153+02:00"
+          modification="new" version="3" id="NSR:StopPlace:58381">
+          <ValidBetween>
+            <FromDate>2017-10-06T13:06:59+02:00</FromDate>
+          </ValidBetween>
+          <keyList>
+            <KeyValue>
+              <Key>imported-id</Key>
+              <Value/>
+            </KeyValue>
+            <KeyValue>
+              <Key>CHANGED_BY</Key>
+              <Value>torbjorn.barslett</Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>VERSION_COMMENT</Key>
+              <Value>Lagt til T</Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>true</Value>
+            </KeyValue>
+          </keyList>
+          <Name lang="no">Majorstuen</Name>
+          <Description lang="no"/>
+          <Centroid>
+            <Location>
+              <Longitude>10.716340</Longitude>
+              <Latitude>59.929213</Latitude>
+            </Location>
+          </Centroid>
+          <AccessModes/>
+          <TopographicPlaceRef ref="KVE:TopographicPlace:0301"
+            created="2017-11-03T00:58:22.094+01:00" version="2"/>
+          <AirSubmode>unknown</AirSubmode>
+          <OtherTransportModes/>
+          <tariffZones>
+            <TariffZoneRef ref="RUT:TariffZone:1"/>
+          </tariffZones>
+        </StopPlace>
+        <StopPlace created="2017-06-19T19:18:08.804+02:00" changed="2017-10-06T13:06:04.153+02:00"
+          modification="new" version="9" id="NSR:StopPlace:4452">
+          <keyList>
+            <KeyValue>
+              <Key>imported-id</Key>
+              <Value>NRI:StopPlace:761011883,RUT:StopPlace:3010200-2,RUT:StopPlace:3010200-8,RUT:StopPlace:03010200,RUT:StopPlace:03010200-2,RUT:StopPlace:03010200-8</Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>false</Value>
+            </KeyValue>
+          </keyList>
+          <Description lang="no"/>
+          <Centroid>
+            <Location>
+              <Longitude>10.714759</Longitude>
+              <Latitude>59.930105</Latitude>
+            </Location>
+          </Centroid>
+          <AccessibilityAssessment modification="new" version="11"
+            id="NSR:AccessibilityAssessment:4453">
+            <MobilityImpairedAccess>unknown</MobilityImpairedAccess>
+            <limitations>
+              <AccessibilityLimitation modification="new" version="5" id="73585">
+                <WheelchairAccess>unknown</WheelchairAccess>
+                <StepFreeAccess>unknown</StepFreeAccess>
+                <EscalatorFreeAccess>unknown</EscalatorFreeAccess>
+                <LiftFreeAccess>unknown</LiftFreeAccess>
+                <AudibleSignalsAvailable>unknown</AudibleSignalsAvailable>
+              </AccessibilityLimitation>
+            </limitations>
+          </AccessibilityAssessment>
+          <AccessModes/>
+          <ParentSiteRef ref="NSR:StopPlace:58381" version="3"/>
+          <TransportMode>metro</TransportMode>
+          <MetroSubmode>metro</MetroSubmode>
+          <OtherTransportModes/>
+          <tariffZones>
+            <TariffZoneRef ref="RUT:TariffZone:1"/>
+          </tariffZones>
+          <StopPlaceType>metroStation</StopPlaceType>
+          <Weighting>interchangeAllowed</Weighting>
+          <quays>
+            <Quay changed="2017-09-06T10:14:47.204+02:00" modification="new" version="9"
+              id="NSR:Quay:8028">
+              <ValidBetween>
+                <FromDate>2017-06-30T14:29:50.442+02:00</FromDate>
+              </ValidBetween>
+              <keyList>
+                <KeyValue>
+                  <Key>merged-id</Key>
+                  <Value>NSR:Quay:8036</Value>
+                </KeyValue>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>RUT:Quay:0301020002,RUT:Quay:301020002,NRI:Quay:762133252,RUT:Quay:0301020006,RUT:Quay:301020006</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no">Retning vest</Description>
+              <PrivateCode>2</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.714860</Longitude>
+                  <Latitude>59.930140</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes/>
+              <OtherTransportModes/>
+              <PublicCode>2</PublicCode>
+              <CompassBearing>352.0</CompassBearing>
+            </Quay>
+            <Quay changed="2017-09-06T10:14:47.204+02:00" modification="new" version="9"
+              id="NSR:Quay:8027">
+              <ValidBetween>
+                <FromDate>2017-06-30T14:29:50.442+02:00</FromDate>
+              </ValidBetween>
+              <keyList>
+                <KeyValue>
+                  <Key>merged-id</Key>
+                  <Value>NSR:Quay:8035</Value>
+                </KeyValue>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value>RUT:Quay:0301020005,RUT:Quay:0301020001,RUT:Quay:301020001,NRI:Quay:762133253,RUT:Quay:301020005</Value>
+                </KeyValue>
+              </keyList>
+              <Description lang="no">Retning øst</Description>
+              <PrivateCode>1</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.714658</Longitude>
+                  <Latitude>59.930071</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes/>
+              <OtherTransportModes/>
+              <PublicCode>1</PublicCode>
+              <CompassBearing>140.0</CompassBearing>
+            </Quay>
+            <Quay changed="2017-09-06T10:14:47.205+02:00" modification="new" version="3"
+              id="NSR:Quay:102023">
+              <keyList>
+                <KeyValue>
+                  <Key>imprted-id</Key>
+                  <Value>RUT:Quay:301020004</Value>
+                </KeyValue>
+                <KeyValue>
+                  <Key>imported-id</Key>
+                  <Value/>
+                </KeyValue>
+              </keyList>
+              <Description lang="no">Retning vest</Description>
+              <PrivateCode>4</PrivateCode>
+              <Centroid>
+                <Location>
+                  <Longitude>10.714323</Longitude>
+                  <Latitude>59.930547</Latitude>
+                </Location>
+              </Centroid>
+              <AccessModes/>
+              <OtherTransportModes/>
+              <PublicCode>4</PublicCode>
+            </Quay>
+          </quays>
+        </StopPlace>
+        
+      </stopPlaces>
+    </SiteFrame>
+  </dataObjects>
+</PublicationDelivery>

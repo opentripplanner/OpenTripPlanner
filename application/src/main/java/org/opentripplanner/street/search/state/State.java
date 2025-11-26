@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -225,10 +224,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
       (stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING &&
         !stateData.insideNoRentalDropOffArea) ||
-      (getRequest()
-          .preferences()
-          .rental(getRequest().mode())
-          .allowArrivingInRentedVehicleAtDestination() &&
+      (getRequest().allowsArrivingInRentalAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
         stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION)
     );
@@ -316,10 +312,6 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public StreetSearchRequest getRequest() {
     return request;
-  }
-
-  public RoutingPreferences getPreferences() {
-    return request.preferences();
   }
 
   /**
@@ -535,10 +527,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     // depend on arriveBy
     StreetSearchRequest reversedRequest = request
       .copyOfReversed(getTime())
-      .withPreferences(p -> {
-        p.withCar(c -> c.withRental(r -> r.withUseAvailabilityInformation(false)));
-        p.withBike(b -> b.withRental(r -> r.withUseAvailabilityInformation(false)));
-      })
+      .withUseRentalAvailability(false)
       .build();
     StateData newStateData = stateData.clone();
     newStateData.backMode = null;

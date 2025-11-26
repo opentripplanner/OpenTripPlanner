@@ -42,7 +42,7 @@ public class StreetNotesService implements Serializable {
   public static final StreetNoteMatcher WHEELCHAIR_MATCHER = new StreetNoteMatcher() {
     @Override
     public boolean matches(State state) {
-      return state.getRequest().wheelchair();
+      return state.getRequest().wheelchairEnabled();
     }
   };
 
@@ -94,7 +94,9 @@ public class StreetNotesService implements Serializable {
 
     for (StreetNoteModel source : sources) {
       Set<StreetNoteAndMatcher> maas2 = source.getNotes(edge);
-      if (maas2 != null) maas.addAll(maas2);
+      if (maas2 != null) {
+        maas.addAll(maas2);
+      }
     }
     if (maas == null || maas.isEmpty()) {
       return Set.of();

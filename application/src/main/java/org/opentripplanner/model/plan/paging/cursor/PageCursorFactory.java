@@ -123,7 +123,7 @@ public class PageCursorFactory {
    * equivalent when creating new cursors.
    */
   private static PageType resolvePageTypeForTheFirstSearch(SortOrder sortOrder) {
-    return sortOrder.isSortedByAscendingArrivalTime() ? NEXT_PAGE : PREVIOUS_PAGE;
+    return sortOrder.isSortedForDepartAfterSearch() ? NEXT_PAGE : PREVIOUS_PAGE;
   }
 
   /**
