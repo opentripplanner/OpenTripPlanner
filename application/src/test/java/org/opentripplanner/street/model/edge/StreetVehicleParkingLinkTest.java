@@ -7,6 +7,7 @@ import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
@@ -22,6 +24,8 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.filter.ParkingFilter;
+import org.opentripplanner.street.search.request.filter.ParkingSelect.TagsSelect;
 import org.opentripplanner.street.search.state.State;
 
 class StreetVehicleParkingLinkTest {
@@ -51,14 +55,13 @@ class StreetVehicleParkingLinkTest {
 
     var req = StreetSearchRequest.of();
     req.withMode(StreetMode.BIKE_TO_PARK);
-    req.withPreferences(p ->
-      p.withBike(bike ->
-        bike.withParking(parkingPreferences -> {
-          parkingPreferences.withRequiredVehicleParkingTags(select);
-          parkingPreferences.withBannedVehicleParkingTags(not);
-          parkingPreferences.withCost(0);
-        })
-      )
+    req.withBike(bike ->
+      bike.withParking(parkingPreferences -> {
+        parkingPreferences.withFilter(
+          new ParkingFilter(List.of(new TagsSelect(not)), List.of(new TagsSelect(select)))
+        );
+        parkingPreferences.withCost(Cost.ZERO);
+      })
     );
 
     var edge = StreetVehicleParkingLink.createStreetVehicleParkingLink(

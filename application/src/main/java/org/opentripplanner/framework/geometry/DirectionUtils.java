@@ -24,6 +24,29 @@ public final class DirectionUtils {
   }
 
   /**
+   * Calculates the angular difference between two bearings in degrees.
+   * <p>
+   * Returns the smallest angle between the two bearings, accounting for the circular nature
+   * of angles (e.g., 10° and -170° are only 20° apart, not 180°).
+   * <p>
+   * Works with any degree range (e.g., [0, 360) or [-180, 180]).
+   *
+   * @param bearing1 First bearing in degrees
+   * @param bearing2 Second bearing in degrees
+   * @return Smallest angular difference in degrees [0, 180]
+   */
+  public static double bearingDifference(double bearing1, double bearing2) {
+    double diff = Math.abs(bearing1 - bearing2);
+
+    // Take the smaller angle (handle wrap-around)
+    if (diff > 180.0) {
+      diff = 360.0 - diff;
+    }
+
+    return diff;
+  }
+
+  /**
    * Computes the angle of the last segment of a LineString or MultiLineString in radians clockwise
    * from North in the range (-PI, PI).
    *

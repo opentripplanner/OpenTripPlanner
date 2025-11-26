@@ -104,9 +104,6 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     var stopL = transitService.getRegularStop(idL);
     FeedScopedId idM = new FeedScopedId(feedId, "M");
     var stopM = transitService.getRegularStop(idM);
-    TransitStopVertex stopvJ = graph.getStopVertex(idJ);
-    TransitStopVertex stopvL = graph.getStopVertex(idL);
-    TransitStopVertex stopvM = graph.getStopVertex(idM);
     // There are a two other stops within 100 meters of stop J.
     Envelope env = new Envelope(new Coordinate(stopJ.getLon(), stopJ.getLat()));
     env.expandBy(

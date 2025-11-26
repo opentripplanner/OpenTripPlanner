@@ -65,8 +65,12 @@ public class RoutingTag implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     RoutingTag that = (RoutingTag) o;
     return category == that.category && Objects.equals(tag, that.tag);
   }

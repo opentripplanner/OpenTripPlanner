@@ -103,7 +103,7 @@ class PullRequest:
         return f'{self.description()} {self.labels}'
 
     def description_link(self):
-        return f"[{self.description()}]({OTP_GITHUB_PULLREQUEST_URL}{self.number}) {self.labels}".replace("'", "`")
+        return f"{self.title} [#{self.number}]({OTP_GITHUB_PULLREQUEST_URL}{self.number}) {self.labels}"
 
     def is_label_bump_ser_id_set(self):
         return LBL_BUMP_SER_VER_ID in self.labels

@@ -9,7 +9,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.osm.model.OsmNode;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -98,7 +97,6 @@ public class BarrierVertexTest {
 
   @Test
   public void testStreetsWithBollard() {
-    Graph graph = new Graph();
     BarrierVertex bv = new BarrierVertex(2.0, 2.0, 0, Accessibility.NO_INFORMATION);
     bv.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 

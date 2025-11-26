@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.datastore.gs.config.GsConfig;
+import org.opentripplanner.ext.edgenaming.EdgeNamerFactory;
 import org.opentripplanner.ext.emission.config.EmissionConfig;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.ext.empiricaldelay.config.EmpiricalDelayConfig;
@@ -149,7 +150,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   /**
    * A custom OSM namer to use.
    */
-  public final EdgeNamer edgeNamer;
+  public final EdgeNamer.EdgeNamerType edgeNamer;
 
   public final boolean osmCacheDataInMem;
 
@@ -609,7 +610,7 @@ public class BuildConfig implements OtpDataStoreConfig {
 
     // List of complex parameters
     fareConfig = FaresConfiguration.fromConfig(root, "fares");
-    edgeNamer = EdgeNamer.EdgeNamerFactory.fromConfig(root, "osmNaming");
+    edgeNamer = EdgeNamerFactory.fromConfig(root, "osmNaming");
     dataOverlay = DataOverlayConfigMapper.map(root, "dataOverlay");
 
     transferRequests = TransferRequestConfig.map(root, "transferRequests");

@@ -32,8 +32,12 @@ class FieldDefinition {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     FieldDefinition that = (FieldDefinition) o;
     return deprecated == that.deprecated && Objects.equals(name, that.name) && type == that.type;
   }

@@ -58,12 +58,9 @@ public class StreetNoteModel implements Serializable {
   }
 
   void addNote(Edge edge, StreetNote note, StreetNoteMatcher matcher) {
-    if (LOG.isDebugEnabled()) LOG.debug(
-      "Adding note {} to {} with matcher {}",
-      note,
-      edge,
-      matcher
-    );
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Adding note {} to {} with matcher {}", note, edge, matcher);
+    }
     notesForEdge.put(edge, buildMatcherAndAlert(matcher, note));
   }
 
@@ -72,7 +69,9 @@ public class StreetNoteModel implements Serializable {
    * building context (or unit testing).
    */
   void removeNotes(Edge edge) {
-    if (LOG.isDebugEnabled()) LOG.debug("Removing notes for edge: {}", edge);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Removing notes for edge: {}", edge);
+    }
     notesForEdge.removeAll(edge);
   }
 

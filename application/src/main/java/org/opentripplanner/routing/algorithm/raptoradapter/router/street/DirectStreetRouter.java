@@ -11,6 +11,7 @@ import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.graphfinder.TransitServiceResolver;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -54,7 +55,7 @@ public class DirectStreetRouter {
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-        serverContext.transitService()::getRegularStop,
+        new TransitServiceResolver(serverContext.transitService()),
         serverContext.transitService().getTimeZone(),
         serverContext.graph().streetNotesService,
         serverContext.graph().ellipsoidToGeoidDifference

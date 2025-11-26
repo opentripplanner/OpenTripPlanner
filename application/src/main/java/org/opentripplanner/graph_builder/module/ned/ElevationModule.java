@@ -436,7 +436,10 @@ public class ElevationModule implements GraphBuilderModule {
       double edgeLenM = 0;
       double sampleDistance = distanceBetweenSamplesM;
       double previousDistance = 0;
-      double x1 = coords[0].x, y1 = coords[0].y, x2, y2;
+      double x1 = coords[0].x;
+      double y1 = coords[0].y;
+      double x2;
+      double y2;
       for (int i = 0; i < coords.length - 1; i++) {
         x2 = coords[i + 1].x;
         y2 = coords[i + 1].y;

@@ -145,7 +145,9 @@ class TransferMapper {
     Trip toTrip = tripMapper.map(t.getToTrip());
     if (t.getTransferType() == STAY_SEATED_NOT_ALLOWED) {
       return new StaySeatedNotAllowed(fromTrip, toTrip);
-    } else return null;
+    } else {
+      return null;
+    }
   }
 
   ConstrainedTransfer map(org.onebusaway.gtfs.model.Transfer rhs) {

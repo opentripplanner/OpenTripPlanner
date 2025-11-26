@@ -50,6 +50,32 @@ class StopPatternTest {
   }
 
   @Test
+  void boardingAlightingUsingStopInstance() {
+    // We have different types of stops, of which only regular stops should allow boarding/alighting
+    var s1 = testModel.stop("1", 60.0, 11.0).build();
+    var s2 = testModel.stop("2", 61.0, 11.0).build();
+    var s3 = testModel.stop("3", 62.0, 11.0).build();
+
+    Trip t = TimetableRepositoryForTest.trip("trip").build();
+
+    StopPattern stopPattern = new StopPattern(
+      List.of(
+        testModel.stopTime(t, 0, s1),
+        testModel.stopTime(t, 1, s2),
+        testModel.stopTime(t, 2, s3)
+      )
+    );
+
+    assertFalse(stopPattern.alightingExist(s1), "Alight is not allowed on the first stop!");
+    assertTrue(stopPattern.alightingExist(s2));
+    assertTrue(stopPattern.alightingExist(s3));
+
+    assertTrue(stopPattern.boardingExist(s1));
+    assertTrue(stopPattern.boardingExist(s2));
+    assertFalse(stopPattern.boardingExist(s3), "Boarding is not allowed on the last stop!");
+  }
+
+  @Test
   void replaceStop() {
     var s1 = testModel.stop("1").build();
     var s2 = testModel.stop("2").build();

@@ -21,8 +21,8 @@ import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.TestSlackProvider;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
@@ -61,7 +61,7 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
     null
   );
 
-  public static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
+  public static final RaptorSlackProvider SLACK_PROVIDER = new TestSlackProvider(
     TRANSFER_SLACK,
     BOARD_SLACK,
     ALIGHT_SLACK

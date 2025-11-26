@@ -16,7 +16,12 @@ public class CarParkAndRideTest extends ParkAndRideTest {
    * Car Park
    */
 
-  private StreetVertex A, B, C, D, E, F;
+  private StreetVertex A;
+  private StreetVertex B;
+  private StreetVertex C;
+  private StreetVertex D;
+  private StreetVertex E;
+  private StreetVertex F;
 
   @BeforeEach
   public void setUp() throws Exception {

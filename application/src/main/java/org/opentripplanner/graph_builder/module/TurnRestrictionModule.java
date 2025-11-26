@@ -62,7 +62,9 @@ public class TurnRestrictionModule implements GraphBuilderModule {
   }
 
   boolean isCorrespondingVertex(Vertex a, Vertex b) {
-    if (a == b) return true;
+    if (a == b) {
+      return true;
+    }
     return getMainVertex(a) == getMainVertex(b);
   }
 

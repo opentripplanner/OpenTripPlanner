@@ -5,12 +5,13 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
@@ -37,6 +38,7 @@ public class SiteRepository implements Serializable {
   private final Map<FeedScopedId, GroupOfStations> groupOfStationsById;
   private final Map<FeedScopedId, AreaStop> areaStopById;
   private final Map<FeedScopedId, GroupStop> groupStopById;
+  private final Map<FeedScopedId, Entrance> entrancesById;
   private transient SiteRepositoryIndex index;
 
   @Inject
@@ -48,6 +50,7 @@ public class SiteRepository implements Serializable {
     this.groupOfStationsById = Map.of();
     this.areaStopById = Map.of();
     this.groupStopById = Map.of();
+    this.entrancesById = Map.of();
     this.index = createIndex();
   }
 
@@ -59,6 +62,7 @@ public class SiteRepository implements Serializable {
     this.groupOfStationsById = builder.groupOfStationById().asImmutableMap();
     this.areaStopById = builder.areaStopById().asImmutableMap();
     this.groupStopById = builder.groupStopById().asImmutableMap();
+    this.entrancesById = builder.entrancesById().asImmutableMap();
     reindex();
   }
 
@@ -81,6 +85,7 @@ public class SiteRepository implements Serializable {
       child.multiModalStationById
     );
     this.stationById = MapUtils.combine(main.stationById, child.stationById);
+    this.entrancesById = MapUtils.combine(main.entrancesById, child.entrancesById);
     reindex();
   }
 
@@ -116,6 +121,13 @@ public class SiteRepository implements Serializable {
    */
   public RegularStop getRegularStop(FeedScopedId id) {
     return regularStopById.get(id);
+  }
+
+  /**
+   * Return an entrance if found and an exception if not.
+   */
+  public Entrance getEntrance(FeedScopedId id) {
+    return Objects.requireNonNull(entrancesById.get(id));
   }
 
   /**
@@ -242,30 +254,8 @@ public class SiteRepository implements Serializable {
     );
   }
 
-  /**
-   * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
-   * @return The coordinate for the transit entity
-   */
-  @Nullable
-  public WgsCoordinate getCoordinateById(FeedScopedId id) {
-    // GroupOfStations
-    GroupOfStations groupOfStations = groupOfStationsById.get(id);
-    if (groupOfStations != null) {
-      return groupOfStations.getCoordinate();
-    }
-    // Multimodal station
-    MultiModalStation multiModalStation = multiModalStationById.get(id);
-    if (multiModalStation != null) {
-      return multiModalStation.getCoordinate();
-    }
-    // Station
-    Station station = stationById.get(id);
-    if (station != null) {
-      return station.getCoordinate();
-    }
-    // Single stop (regular transit and flex)
-    StopLocation stop = getStopLocation(id);
-    return stop == null ? null : stop.getCoordinate();
+  public Collection<Entrance> listEntrances() {
+    return entrancesById.values();
   }
 
   /**

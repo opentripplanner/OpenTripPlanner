@@ -57,7 +57,9 @@ public final class ShapePoint implements Comparable<ShapePoint> {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     ShapePoint that = (ShapePoint) o;
     return (
       sequence == that.sequence &&

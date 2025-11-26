@@ -30,7 +30,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 /**
  * FEATURE UNDER TEST
@@ -82,7 +82,7 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
     );
 
     // We will test board- and alight-slack in a separate test
-    data.withSlackProvider(new DefaultSlackProvider(D1m, D0s, D0s));
+    data.withSlackProvider(new TestSlackProvider(D1m, D0s, D0s));
 
     requestBuilder
       .searchParams()

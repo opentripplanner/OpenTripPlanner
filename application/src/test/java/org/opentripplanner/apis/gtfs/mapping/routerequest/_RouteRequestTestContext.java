@@ -1,11 +1,8 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
-import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static java.util.Map.entry;
 import static org.opentripplanner.apis.gtfs.SchemaObjectMappersForTests.mapCoordinate;
 
-import graphql.ExecutionInput;
-import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.util.HashMap;
@@ -17,6 +14,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
+import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -104,17 +102,7 @@ class _RouteRequestTestContext {
   }
 
   DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
-    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
-      .query("")
-      .operationName("planConnection")
-      .context(context)
-      .locale(locale)
-      .build();
-
-    var executionContext = newExecutionContextBuilder()
-      .executionInput(executionInput)
-      .executionId(ExecutionId.from("planConnectionTest"))
-      .build();
+    var executionContext = DataFetchingSupport.executionContext();
     return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .arguments(arguments)
       .localContext(Map.of("locale", locale))

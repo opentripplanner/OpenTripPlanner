@@ -196,18 +196,18 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
     return system;
   }
 
-  public RentalVehicleFuel getFuel() {
-    return fuel;
-  }
-
   public OffsetDateTime availableUntil() {
     return availableUntil;
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     VehicleRentalVehicle that = (VehicleRentalVehicle) o;
     return (
       Double.compare(that.longitude, longitude) == 0 &&

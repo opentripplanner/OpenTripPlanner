@@ -5,6 +5,7 @@ import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
@@ -43,8 +44,11 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
       wheelchairAccessible.set(s, pattern.wheelchairAccessible(s));
     }
 
-    this.slackIndex = builder.slackIndex();
-    this.transitReluctanceFactorIndex = builder.transitReluctanceFactorIndex();
+    // This uses a static SlackProvider. Change it to be injectable if required
+    this.slackIndex = slackIndex(pattern.getRoute().getMode());
+
+    // Change the calculation to be injectable if required
+    this.transitReluctanceFactorIndex = pattern.getRoute().getMode().ordinal();
   }
 
   /**
@@ -150,5 +154,13 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
    */
   public static void initIndexCounter(int indexCounter) {
     INDEX_COUNTER.set(indexCounter);
+  }
+
+  /**
+   * Return an index used to look up the slack for a {@link RaptorTripPattern}. OTP support
+   * setting a slack per mode or the same value for all modes.
+   */
+  public static int slackIndex(final TransitMode mode) {
+    return mode.ordinal();
   }
 }

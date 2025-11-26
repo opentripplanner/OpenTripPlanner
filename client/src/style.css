@@ -210,6 +210,13 @@
   padding: 0 5px;
 }
 
+/* feature select popup */
+
+.feature-select-item:hover td {
+  background-color: #d5d5d5;
+  cursor: pointer;
+}
+
 /* debug layer selector */
 
 .maplibregl-ctrl-group.layer-select {

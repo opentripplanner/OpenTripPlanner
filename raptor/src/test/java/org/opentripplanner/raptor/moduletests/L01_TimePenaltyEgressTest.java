@@ -14,7 +14,6 @@ import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -139,10 +138,6 @@ public class L01_TimePenaltyEgressTest implements RaptorTestConstants {
   }
 
   public static String focusOnEgress(String path) {
-    // We are only interested in the access and the first boarding. We include the
-    // pareto vector as well.
-    var p = Pattern.compile("(BUS R1 .+)(\\[.+)");
-
     // BUS R1 0:18 0:48 30m ~ B 0s ~ Walk 1m 0:48 0:49  .. [0:16 0:49 33m Tₓ0]
     String[] lines = path.split("\n");
     return Stream.of(lines)

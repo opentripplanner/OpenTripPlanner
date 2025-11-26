@@ -5,7 +5,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -402,31 +417,7 @@ class SiriAzureUpdaterTest {
     );
 
     assertEquals("Unexpected null value", thrown.getMessage(), "Exception message should match");
-    verify(updater, never()).sleep(anyInt());
     verify(task, times(1)).run();
-  }
-
-  /**
-   * Verifies that executeWithRetry returns false when startupTimeout is exceeded.
-   */
-  @Test
-  void testExecuteWithRetry_TimeoutAfterStartupTimeout() throws Throwable {
-    SiriAzureUpdater timeoutUpdater = spy(createUpdater(mockConfig));
-
-    doNothing().when(timeoutUpdater).sleep(anyInt());
-
-    // fail with a retryable exception
-    doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY)).when(task).run();
-
-    // Use a very short timeout for this test to avoid waiting
-    long shortTimeout = 100L; // 100ms
-    boolean result = timeoutUpdater.executeWithRetry(task, "Test Task", shortTimeout);
-
-    assertFalse(result, "Expected executeWithRetry to return false due to timeout");
-
-    // Verify that multiple retries were attempted
-    verify(task, atLeast(2)).run();
-    verify(timeoutUpdater, atLeast(1)).sleep(anyInt());
   }
 
   /**
@@ -529,32 +520,6 @@ class SiriAzureUpdaterTest {
       defaultConfig.getStartupTimeout(),
       "Default startup timeout should be 5 minutes"
     );
-  }
-
-  /**
-   * Verifies that custom startup timeout values are properly applied.
-   */
-  @Test
-  void testCustomStartupTimeoutConfiguration() throws Exception {
-    when(mockConfig.getStartupTimeout()).thenReturn(Duration.ofMinutes(1));
-    SiriAzureUpdater customTimeoutUpdater = spy(createUpdater(mockConfig));
-
-    doNothing().when(customTimeoutUpdater).sleep(anyInt());
-    doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY)).when(task).run();
-
-    long testTimeout = 200L;
-    boolean result;
-    try {
-      result = customTimeoutUpdater.executeWithRetry(task, "Test Task", testTimeout);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-
-    assertFalse(result, "executeWithRetry should return false on timeout");
-
-    // Verify retries were attempted
-    verify(task, atLeast(2)).run();
-    verify(customTimeoutUpdater, atLeast(1)).sleep(anyInt());
   }
 
   /**

@@ -12,11 +12,11 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.BoardingArea;
-import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.SiteRepository;
 
 /**
@@ -51,8 +51,6 @@ public interface OtpTransitService {
    */
   Collection<FeedScopedId> getAllServiceIds();
 
-  Collection<Entrance> getAllEntrances();
-
   Collection<PathwayNode> getAllPathwayNodes();
 
   Collection<BoardingArea> getAllBoardingAreas();
@@ -62,6 +60,8 @@ public interface OtpTransitService {
   Collection<TripPattern> getTripPatterns();
 
   Collection<Trip> getAllTrips();
+
+  Collection<TripOnServiceDate> getTripOnServiceDates();
 
   Collection<FlexTrip<?, ?>> getAllFlexTrips();
 

@@ -11,10 +11,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
-import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.AccessibilityRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -32,21 +31,18 @@ class ElevatorHopEdgeTest {
   @MethodSource("noTraverse")
   void shouldNotTraverse(Accessibility wheelchair) {
     var req = StreetSearchRequest.of();
-    AccessibilityPreferences feature = AccessibilityPreferences.ofOnlyAccessible();
+    var feature = AccessibilityRequest.ofOnlyAccessible();
     req
-      .withWheelchair(true)
-      .withPreferences(preferences ->
-        preferences.withWheelchair(
-          WheelchairPreferences.of()
-            .withTrip(feature)
-            .withStop(feature)
-            .withElevator(feature)
-            .withInaccessibleStreetReluctance(25)
-            .withMaxSlope(0.5)
-            .withSlopeExceededReluctance(10)
-            .withStairsReluctance(25)
-            .build()
-        )
+      .withWheelchairEnabled(true)
+      .withWheelchair(b ->
+        b
+          .withStop(feature)
+          .withElevator(feature)
+          .withInaccessibleStreetReluctance(25)
+          .withMaxSlope(0.5)
+          .withSlopeExceededReluctance(10)
+          .withStairsReluctance(25)
+          .build()
       );
 
     var result = traverse(wheelchair, req.build());
@@ -72,7 +68,7 @@ class ElevatorHopEdgeTest {
     assertNotNull(result);
     assertTrue(result.weight > 1);
 
-    req = StreetSearchRequest.copyOf(req).withWheelchair(true).build();
+    req = StreetSearchRequest.copyOf(req).withWheelchairEnabled(true).build();
     var wheelchairResult = traverse(wheelchair, req)[0];
     assertNotNull(wheelchairResult);
     assertEquals(expectedCost, wheelchairResult.weight);

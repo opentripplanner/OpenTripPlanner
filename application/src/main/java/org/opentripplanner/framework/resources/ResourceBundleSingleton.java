@@ -15,16 +15,7 @@ public enum ResourceBundleSingleton {
   static final ResourceBundle.Control noFallbackControl = Control.getNoFallbackControl(
     Control.FORMAT_PROPERTIES
   );
-  private static final Set<String> INTERNAL_KEYS = Set.of(
-    "corner",
-    "unnamedStreet",
-    "origin",
-    "destination",
-    "partOf",
-    "price.free",
-    "price.startMain",
-    "locationGroup"
-  );
+  private static final Set<String> INTERNAL_KEYS = ResourceBundle.getBundle("internals").keySet();
 
   //in singleton because resurce bundles are cached based on calling class
   //http://java2go.blogspot.com/2010/03/dont-be-smart-never-implement-resource.html
