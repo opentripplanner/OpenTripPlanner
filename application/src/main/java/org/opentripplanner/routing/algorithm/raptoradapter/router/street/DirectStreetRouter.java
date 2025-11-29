@@ -69,7 +69,9 @@ public abstract class DirectStreetRouter {
   );
 
   /**
-   * Find graph paths between the locations in the request.
+   * Find an ordered set of graph paths between the locations in the request starting from the
+   * origin and ending in the destination. If there are no via locations, there is exactly one path.
+   * With via locations, there is one path between each location.
    */
   abstract List<Itinerary> findItineraries(
     OtpServerRequestContext serverContext,
