@@ -102,18 +102,80 @@ public class GraphPathToItineraryMapper {
   }
 
   /**
-   * Generates a TripPlan from a set of paths
+   * Generates a TripPlan from a set of paths. Each path generates a leg in the itinerary.
    */
+
   public Optional<Itinerary> mapToItinerary(
-    GraphPath<State, Edge, Vertex> path,
+    List<GraphPath<State, Edge, Vertex>> paths,
     RouteRequest request
   ) {
-    Itinerary itinerary = generateItinerary(path, request);
+    Itinerary itinerary = generateItinerary(paths, request);
     if (itinerary.legs().isEmpty()) {
       return Optional.empty();
     }
 
     return Optional.of(itinerary);
+  }
+
+  /**
+   * Generates a TripPlan from a path.
+   */
+  public Optional<Itinerary> mapToItinerary(
+    GraphPath<State, Edge, Vertex> path,
+    RouteRequest request
+  ) {
+    return mapToItinerary(List.of(path), request);
+  }
+
+  /**
+   * Generate an itinerary from a list {@link GraphPath}s. Each path generates one more or more
+   * legs. This method first slices the list of states at the leg boundaries. These smaller state
+   * arrays are then used to generate legs.
+   *
+   * @param paths The graph paths to base the itinerary on
+   * @return The generated itinerary
+   */
+  public Itinerary generateItinerary(
+    List<GraphPath<State, Edge, Vertex>> paths,
+    RouteRequest request
+  ) {
+    List<Leg> legs = new ArrayList<>();
+    for (GraphPath<State, Edge, Vertex> path : paths) {
+      WalkStep previousStep = null;
+      for (List<State> legStates : sliceStates(path.states)) {
+        if (OTPFeature.FlexRouting.isOn() && legStates.get(1).backEdge instanceof FlexTripEdge) {
+          legs.add(generateFlexLeg(legStates));
+          previousStep = null;
+          continue;
+        }
+        StreetLeg leg = generateLeg(legStates, previousStep, request);
+        legs.add(leg);
+
+        List<WalkStep> walkSteps = leg.listWalkSteps();
+        if (walkSteps.size() > 0) {
+          previousStep = walkSteps.get(walkSteps.size() - 1);
+        } else {
+          previousStep = null;
+        }
+      }
+    }
+
+    var cost = Cost.costOfSeconds(
+      paths.stream().map(GraphPath::getWeight).reduce(0.0, Double::sum)
+    );
+    var builder = Itinerary.ofDirect(legs).withGeneralizedCost(cost);
+
+    builder.withArrivedAtDestinationWithRentedVehicle(
+      paths.getLast().states.getLast().isRentingVehicleFromStation()
+    );
+
+    var allEdges = paths
+      .stream()
+      .flatMap(p -> p.edges.stream())
+      .toList();
+    calculateElevations(builder, allEdges);
+
+    return builder.build();
   }
 
   /**
@@ -124,34 +186,7 @@ public class GraphPathToItineraryMapper {
    * @return The generated itinerary
    */
   public Itinerary generateItinerary(GraphPath<State, Edge, Vertex> path, RouteRequest request) {
-    List<Leg> legs = new ArrayList<>();
-    WalkStep previousStep = null;
-    for (List<State> legStates : sliceStates(path.states)) {
-      if (OTPFeature.FlexRouting.isOn() && legStates.get(1).backEdge instanceof FlexTripEdge) {
-        legs.add(generateFlexLeg(legStates));
-        previousStep = null;
-        continue;
-      }
-      StreetLeg leg = generateLeg(legStates, previousStep, request);
-      legs.add(leg);
-
-      List<WalkStep> walkSteps = leg.listWalkSteps();
-      if (walkSteps.size() > 0) {
-        previousStep = walkSteps.get(walkSteps.size() - 1);
-      } else {
-        previousStep = null;
-      }
-    }
-
-    State lastState = path.states.getLast();
-    var cost = Cost.costOfSeconds(lastState.weight);
-    var builder = Itinerary.ofDirect(legs).withGeneralizedCost(cost);
-
-    builder.withArrivedAtDestinationWithRentedVehicle(lastState.isRentingVehicleFromStation());
-
-    calculateElevations(builder, path.edges);
-
-    return builder.build();
+    return generateItinerary(List.of(path), request);
   }
 
   /**

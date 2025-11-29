@@ -23,8 +23,8 @@ import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DefaultDirectStreetRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouterFactory;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
@@ -234,14 +234,6 @@ public class RoutingWorker {
   }
 
   private RoutingResult routeDirectStreet() {
-    // TODO: Add support for via search to the direct-street search and remove this.
-    //       The direct search is used to prune away silly transit results and it
-    //       would be nice to also support via as a feature in the direct-street
-    //       search.
-    if (request.isViaSearch()) {
-      return RoutingResult.empty();
-    }
-
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
     var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
@@ -261,7 +253,7 @@ public class RoutingWorker {
 
     debugTimingAggregator.startedDirectStreetRouter();
     try {
-      var directRouter = new DefaultDirectStreetRouter();
+      var directRouter = DirectStreetRouterFactory.create(request);
       return RoutingResult.ok(
         directRouter
           .route(serverContext, directBuilder.buildRequest(), linkingContext())

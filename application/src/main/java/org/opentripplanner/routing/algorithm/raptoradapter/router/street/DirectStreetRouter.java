@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
+import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.model.GraphPath;
@@ -11,6 +12,7 @@ import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.graphfinder.TransitServiceResolver;
+import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.StreetMode;
@@ -33,20 +35,26 @@ public abstract class DirectStreetRouter {
     RouteRequest request,
     LinkingContext linkingContext
   ) {
-    if (isRequestValidForRouting(request)) {
+    if (isRequestInvalidForRouting(request)) {
       return Optional.empty();
     }
     OTPRequestTimeoutException.checkForTimeout();
 
     var maxCarSpeed = serverContext.streetLimitationParametersService().maxCarSpeed();
     var maxDistanceLimit = calculateDistanceMaxLimit(request, maxCarSpeed);
-    if (!isStraightLineDistanceIsWithinLimit(linkingContext, request, maxDistanceLimit)) {
+    if (!isStraightLineDistanceWithinLimit(linkingContext, request, maxDistanceLimit)) {
       return Optional.empty();
     }
 
     try {
-      var path = findPath(serverContext, linkingContext, request, maxCarSpeed);
-      return mapToItinerary(serverContext, request, path);
+      // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
+      GraphPathFinder gpFinder = new GraphPathFinder(
+        serverContext.traverseVisitor(),
+        serverContext.listExtensionRequestContexts(request),
+        maxCarSpeed
+      );
+      var paths = findPaths(gpFinder, linkingContext, request);
+      return mapToItinerary(serverContext, request, paths);
     } catch (PathNotFoundException e) {
       return Optional.empty();
     }
@@ -55,26 +63,27 @@ public abstract class DirectStreetRouter {
   /**
    * Checks that the route request is configured to allow direct street results.
    */
-  abstract boolean isRequestValidForRouting(RouteRequest request);
+  abstract boolean isRequestInvalidForRouting(RouteRequest request);
 
   /**
    * Checks that as the crow flies distance between locations in the search are within the maximum
    * distance limit.
    */
-  abstract boolean isStraightLineDistanceIsWithinLimit(
+  abstract boolean isStraightLineDistanceWithinLimit(
     LinkingContext linkingContext,
     RouteRequest request,
     double maxDistanceLimit
   );
 
   /**
-   * Find a graph path between the locations in the request.
+   * Find an ordered set of graph paths between the locations in the request starting from the
+   * origin and ending in the destination. If there are no via locations, there is exactly one path.
+   * With via locations, there is one path between each location.
    */
-  abstract GraphPath<State, Edge, Vertex> findPath(
-    OtpServerRequestContext serverContext,
+  abstract List<GraphPath<State, Edge, Vertex>> findPaths(
+    GraphPathFinder graphPathFinder,
     LinkingContext linkingContext,
-    RouteRequest request,
-    float maxCarSpeed
+    RouteRequest request
   );
 
   static Coordinate getFirstCoordinateForLocation(
@@ -110,10 +119,13 @@ public abstract class DirectStreetRouter {
     throw new IllegalStateException("Could not set max limit for StreetMode");
   }
 
+  /**
+   * Creates an itinerary where one graph path generates one or more legs.
+   */
   private static Optional<Itinerary> mapToItinerary(
     OtpServerRequestContext serverContext,
     RouteRequest request,
-    GraphPath<State, Edge, Vertex> path
+    List<GraphPath<State, Edge, Vertex>> paths
   ) {
     final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       new TransitServiceResolver(serverContext.transitService()),
@@ -122,7 +134,7 @@ public abstract class DirectStreetRouter {
       serverContext.streetDetailsService(),
       serverContext.graph().ellipsoidToGeoidDifference
     );
-    var response = graphPathToItineraryMapper.mapToItinerary(path, request);
+    var response = graphPathToItineraryMapper.mapToItinerary(paths, request);
     return response.map(itinerary ->
       ItinerariesHelper.decorateItineraryWithRequestData(
         itinerary,
