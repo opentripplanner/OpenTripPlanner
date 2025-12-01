@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>219</otp.serialization.version.id>
+        <otp.serialization.version.id>220</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>34.0</geotools.version>
@@ -74,7 +74,7 @@
         <micrometer.version>1.16.0</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.33.0</protobuf.version>
+        <protobuf.version>4.33.1</protobuf.version>
         <siri-java-model.version>2.0.1</siri-java-model.version>
         <slf4j.version>2.0.17</slf4j.version>
         <!-- Other properties -->
@@ -254,6 +254,26 @@
                     <excludedGroups>${tests.excludedGroups}</excludedGroups>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>build-helper-generate-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java</source>
+                                <source>src/test-fixtures/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- code coverage report -->
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -333,7 +353,19 @@
                     <failsOnError>true</failsOnError>
                     <linkXRef>false</linkXRef>
                     <skip>${plugin.checkstyle.skip}</skip>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <sourceDirectories>
+                        <sourceDirectory>src/main/java</sourceDirectory>
+                        <sourceDirectory>src/test-fixtures/java</sourceDirectory>
+                    </sourceDirectories>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>12.1.2</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>validate</id>

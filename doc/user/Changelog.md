@@ -49,6 +49,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix default via vertex name translation mapping [#7046](https://github.com/opentripplanner/OpenTripPlanner/pull/7046)
 - To fix arriveBy searches always set arriveBy property to false in transfer requests [#7089](https://github.com/opentripplanner/OpenTripPlanner/pull/7089)
 - Improve handling of realtime updated StopPatterns [#6909](https://github.com/opentripplanner/OpenTripPlanner/pull/6909)
+- Refactor `ElevatorProcessor` and add tests for elevators [#7079](https://github.com/opentripplanner/OpenTripPlanner/pull/7079)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)

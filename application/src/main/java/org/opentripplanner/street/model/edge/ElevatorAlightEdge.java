@@ -4,7 +4,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.street.model.vertex.ElevatorVertex;
+import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
@@ -34,7 +34,7 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
    * @param to the vertex on the street network
    * @param level a human-readable label of the alighting level
    */
-  private ElevatorAlightEdge(ElevatorVertex from, Vertex to, I18NString level) {
+  private ElevatorAlightEdge(ElevatorHopVertex from, Vertex to, I18NString level) {
     super(from, to);
     this.level = level;
 
@@ -46,7 +46,7 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
   }
 
   public static ElevatorAlightEdge createElevatorAlightEdge(
-    ElevatorVertex from,
+    ElevatorHopVertex from,
     Vertex to,
     I18NString level
   ) {

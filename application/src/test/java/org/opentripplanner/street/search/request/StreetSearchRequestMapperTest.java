@@ -24,11 +24,55 @@ import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
 class StreetSearchRequestMapperTest {
 
+  private static final double DELTA = 0.00001;
+  private static final Instant INSTANT = Instant.parse("2022-11-10T10:00:00Z");
+
+  @Test
+  void mapFromToCoordinates() {
+    var builder = builder();
+
+    var from = GenericLocation.fromCoordinate(10, 11);
+    var to = GenericLocation.fromCoordinate(20, 21);
+
+    var req = builder.withDateTime(INSTANT).withFrom(from).withTo(to).buildRequest();
+
+    var subject = StreetSearchRequestMapper.mapInternal(req).build();
+
+    assertEquals(INSTANT, subject.startTime());
+
+    var fromEnvelope = subject.fromEnvelope();
+    assertEquals(10.9954339685, fromEnvelope.getMinX(), DELTA);
+    assertEquals(9.99550339902, fromEnvelope.getMinY(), DELTA);
+    assertEquals(11.0045660314, fromEnvelope.getMaxX(), DELTA);
+    assertEquals(10.0044966009, fromEnvelope.getMaxY(), DELTA);
+
+    var toEnvelope = subject.toEnvelope();
+    assertEquals(20.9952146804, toEnvelope.getMinX(), DELTA);
+    assertEquals(19.9955033990, toEnvelope.getMinY(), DELTA);
+    assertEquals(21.0047853195, toEnvelope.getMaxX(), DELTA);
+    assertEquals(20.0044966009, toEnvelope.getMaxY(), DELTA);
+  }
+
+  @Test
+  void mapFromToStopIds() {
+    var builder = builder();
+
+    var from = GenericLocation.fromStopId("S1", "A", "STOP1");
+    var to = GenericLocation.fromStopId("S2", "A", "STOP2");
+
+    var req = builder.withDateTime(INSTANT).withFrom(from).withTo(to).buildRequest();
+
+    var subject = StreetSearchRequestMapper.mapInternal(req).build();
+
+    assertNull(subject.fromEnvelope());
+    assertNull(subject.toEnvelope());
+  }
+
   @Test
   void mapVehicleWalking() {
     var builder = builder();
 
-    Instant dateTime = Instant.parse("2022-11-10T10:00:00Z");
+    Instant dateTime = INSTANT;
     builder.withDateTime(dateTime);
     var from = new GenericLocation(null, id("STOP"), null, null);
     builder.withFrom(from);
@@ -54,10 +98,9 @@ class StreetSearchRequestMapperTest {
   void mapTransferRequest(boolean arriveBy) {
     var from = new GenericLocation(null, id("STOP"), null, null);
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
-    var dateTime = Instant.parse("2022-11-10T10:00:00Z");
     var builder = builder()
       .withArriveBy(arriveBy)
-      .withDateTime(dateTime)
+      .withDateTime(INSTANT)
       .withFrom(from)
       .withTo(to)
       .withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)))
@@ -67,12 +110,11 @@ class StreetSearchRequestMapperTest {
 
     var subject = StreetSearchRequestMapper.mapToTransferRequest(request).build();
 
-    assertEquals(Instant.EPOCH, subject.startTime());
     assertNull(subject.fromEnvelope());
     assertNull(subject.toEnvelope());
     assertTrue(subject.wheelchairEnabled());
     assertEquals(2.4, subject.walk().speed());
-    assertEquals(Instant.ofEpochSecond(0), subject.startTime());
+    assertEquals(Instant.EPOCH, subject.startTime());
     // arrive by must always be false for transfer requests
     assertFalse(subject.arriveBy());
   }

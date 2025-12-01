@@ -8,18 +8,6 @@ import org.junit.jupiter.api.Test;
 public class OsmNodeTest {
 
   @Test
-  public void testIsMultiLevel() {
-    OsmNode node = new OsmNode();
-    assertFalse(node.isMultiLevel());
-
-    node.addTag("highway", "var");
-    assertFalse(node.isMultiLevel());
-
-    node.addTag("highway", "elevator");
-    assertTrue(node.isMultiLevel());
-  }
-
-  @Test
   public void isBarrier() {
     OsmNode node = new OsmNode();
     assertFalse(node.isBarrier());

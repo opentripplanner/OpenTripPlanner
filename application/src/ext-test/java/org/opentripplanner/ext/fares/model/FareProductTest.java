@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.RiderCategory;
-import org.opentripplanner.model.fare.RiderCategoryBuilder;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 

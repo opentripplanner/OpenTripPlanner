@@ -8,14 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
-import graphql.ExecutionInput;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -417,13 +415,6 @@ public class TripRequestMapperTest implements PlanTestConstants {
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
-    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
-      .query("")
-      .operationName("trip")
-      .context(context)
-      .locale(Locale.ENGLISH)
-      .build();
-
     var executionContext = DataFetchingSupport.executionContext();
 
     var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)

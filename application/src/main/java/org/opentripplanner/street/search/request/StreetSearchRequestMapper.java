@@ -2,6 +2,9 @@ package org.opentripplanner.street.search.request;
 
 import java.time.Instant;
 import java.util.List;
+import javax.annotation.Nullable;
+import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
@@ -29,8 +32,8 @@ public class StreetSearchRequestMapper {
     return StreetSearchRequest.of()
       .withStartTime(time)
       .withArriveBy(request.arriveBy())
-      .withFrom(request.from())
-      .withTo(request.to())
+      .withFrom(mapGenericLocation(request.from()))
+      .withTo(mapGenericLocation(request.to()))
       .withWheelchairEnabled(request.journey().wheelchair())
       .withGeoidElevation(preferences.system().geoidElevation())
       .withTurnReluctance(preferences.street().turnReluctance())
@@ -53,6 +56,15 @@ public class StreetSearchRequestMapper {
   }
 
   // private methods
+
+  @Nullable
+  private static Coordinate mapGenericLocation(@Nullable GenericLocation location) {
+    if (location != null) {
+      return location.getCoordinate();
+    } else {
+      return null;
+    }
+  }
 
   private static void mapWheelchair(WheelchairRequest.Builder b, WheelchairPreferences wheelchair) {
     b

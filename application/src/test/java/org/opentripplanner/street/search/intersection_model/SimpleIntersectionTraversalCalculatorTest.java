@@ -370,7 +370,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     StreetEdge toEdge = edge(v, w, 1.0, false);
 
     // 3rd edge prevents inferral of free-flowingness
-    StreetEdge extraEdge = edge(v, u, 1.0, false);
+    edge(v, u, 1.0, false);
 
     float fromSpeed = 1.0f;
     float toSpeed = 1.0f;
@@ -406,7 +406,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     StreetEdge toEdge = edge(v, w, 1.0, false);
 
     // 3rd edge prevents inferral of free-flowingness
-    StreetEdge extraEdge = edge(v, u, 1.0, false);
+    edge(v, u, 1.0, false);
 
     int turnAngle = calculateTurnAngle(fromEdge, toEdge);
     assertTrue(calculator.isSafeTurn(turnAngle));
@@ -446,7 +446,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     StreetEdge toEdge = edge(v, w, 1.0, false);
 
     // 3rd edge prevents inferral of free-flowingness
-    StreetEdge extraEdge = edge(v, u, 1.0, false);
+    edge(v, u, 1.0, false);
 
     int turnAngle = calculateTurnAngle(fromEdge, toEdge);
     assertFalse(calculator.isSafeTurn(turnAngle));

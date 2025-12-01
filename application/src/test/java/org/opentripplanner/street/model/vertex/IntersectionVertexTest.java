@@ -38,21 +38,21 @@ public class IntersectionVertexTest {
     StreetEdge maple1_2 = edge(maple1, maple2, 100.0, false);
     StreetEdge maple2_3 = edge(maple2, maple3, 100.0, false);
 
-    StreetEdge main1_2 = edge(main1, main2, 100.0, false);
-    StreetEdge main2_3 = edge(main2, main3, 100.0, false);
+    edge(main1, main2, 100.0, false);
+    edge(main2, main3, 100.0, false);
 
-    StreetEdge broad1_2 = edge(broad1, broad2, 100.0, false);
-    StreetEdge broad2_3 = edge(broad2, broad3, 100.0, false);
+    edge(broad1, broad2, 100.0, false);
+    edge(broad2, broad3, 100.0, false);
 
     // Each cross-street connects
-    StreetEdge maple_main1 = edge(maple1, main1, 50.0, false);
-    StreetEdge main_broad1 = edge(main1, broad1, 100.0, false);
+    edge(maple1, main1, 50.0, false);
+    edge(main1, broad1, 100.0, false);
 
-    StreetEdge maple_main2 = edge(maple2, main2, 50.0, false);
-    StreetEdge main_broad2 = edge(main2, broad2, 50.0, false);
+    edge(maple2, main2, 50.0, false);
+    edge(main2, broad2, 50.0, false);
 
-    StreetEdge maple_main3 = edge(maple3, main3, 100.0, false);
-    StreetEdge main_broad3 = edge(main3, broad3, 100.0, false);
+    edge(maple3, main3, 100.0, false);
+    edge(main3, broad3, 100.0, false);
 
     this.fromEdge = maple1_2;
     this.straightAheadEdge = maple2_3;

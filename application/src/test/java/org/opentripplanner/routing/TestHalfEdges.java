@@ -120,8 +120,7 @@ public class TestHalfEdges {
       .withBack(false)
       .buildAndConnect();
 
-    @SuppressWarnings("unused")
-    StreetEdge topBack = new StreetEdgeBuilder<>()
+    new StreetEdgeBuilder<>()
       .withFromVertex(tr)
       .withToVertex(tl)
       .withGeometry(top.getGeometry().reverse())
@@ -130,8 +129,7 @@ public class TestHalfEdges {
       .withPermission(StreetTraversalPermission.ALL)
       .withBack(true)
       .buildAndConnect();
-    @SuppressWarnings("unused")
-    StreetEdge bottomBack = new StreetEdgeBuilder<>()
+    new StreetEdgeBuilder<>()
       .withFromVertex(br)
       .withToVertex(bl)
       .withGeometry(bottom.getGeometry().reverse())

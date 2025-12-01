@@ -4,6 +4,7 @@ import java.util.Map;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 
 /**
  * This class provides transferSlack, boardSlack and alightSlack for the Raptor algorithm.
@@ -12,7 +13,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  * ordinal, and not in a {@link Map}, because it is faster. The board-slack and alight-slack lookup
  * is done for every strop-arrival computation, and should be as fast as possible.
  */
-public final class SlackProvider implements RaptorSlackProvider {
+public final class DefaultSlackProvider implements RaptorSlackProvider {
 
   /**
    * Keep a list of board-slack values for each mode.
@@ -29,7 +30,7 @@ public final class SlackProvider implements RaptorSlackProvider {
    */
   private final int transferSlack;
 
-  public SlackProvider(
+  public DefaultSlackProvider(
     int transferSlack,
     DurationForEnum<TransitMode> boardSlack,
     DurationForEnum<TransitMode> alightSlack
@@ -59,12 +60,8 @@ public final class SlackProvider implements RaptorSlackProvider {
   private static int[] slackByMode(DurationForEnum<TransitMode> slack) {
     int[] result = new int[TransitMode.values().length];
     for (TransitMode mode : TransitMode.values()) {
-      result[SlackProvider.slackIndex(mode)] = (int) slack.valueOf(mode).toSeconds();
+      result[RoutingTripPattern.slackIndex(mode)] = (int) slack.valueOf(mode).toSeconds();
     }
     return result;
-  }
-
-  public static int slackIndex(final TransitMode mode) {
-    return mode.ordinal();
   }
 }

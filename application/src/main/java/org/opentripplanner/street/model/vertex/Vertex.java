@@ -164,6 +164,16 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /**
+   * Implementing this method breaks at least one test.
+   * <p>
+   * TODO implement this method, vertex label should be globally unique
+   */
+  @Override
+  public boolean equals(Object o) {
+    return this == o;
+  }
+
+  /**
    * If applying turn restrictions to a graph has generated multiple instances of a vertex,
    * one of them is the parent, and the others are subsidiary vertices. Calling getParent()
    * on any of these will always return the same parent, which is used for example for

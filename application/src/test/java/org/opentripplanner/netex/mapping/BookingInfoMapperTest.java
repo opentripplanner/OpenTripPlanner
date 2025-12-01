@@ -86,8 +86,6 @@ class BookingInfoMapperTest {
    */
   @Test
   void testBookingInfoMergingAndOverriding() {
-    StopPointInJourneyPattern emptyStopPoint = new StopPointInJourneyPattern();
-    ServiceJourney emptyServiceJourney = new ServiceJourney();
     LocalTime stopPointLatestBookingTime = FIVE_THIRTY;
 
     StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern()

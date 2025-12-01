@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.trias.trias;
 
-import static jakarta.xml.bind.Marshaller.*;
+import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import de.vdv.ojp20.OJP;

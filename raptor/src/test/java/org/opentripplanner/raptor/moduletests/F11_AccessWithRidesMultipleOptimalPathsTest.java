@@ -25,7 +25,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 /**
  * FEATURE UNDER TEST
@@ -67,7 +67,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
       route("L3", STOP_D, STOP_F).withTimetable(schedule("0:16 0:22"))
     );
     // We will test board- and alight-slack in a separate test
-    data.withSlackProvider(new DefaultSlackProvider(D1m, D0s, D0s));
+    data.withSlackProvider(new TestSlackProvider(D1m, D0s, D0s));
 
     requestBuilder
       .searchParams()

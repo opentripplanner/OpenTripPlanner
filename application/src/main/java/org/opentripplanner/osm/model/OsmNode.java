@@ -25,17 +25,6 @@ public class OsmNode extends OsmEntity {
     return new Coordinate(this.lon, this.lat);
   }
 
-  /**
-   * Is this a multi-level node that should be decomposed to multiple coincident nodes? Currently
-   * returns true only for elevators.
-   *
-   * @return whether the node is multi-level
-   * @author mattwigway
-   */
-  public boolean isMultiLevel() {
-    return isElevator();
-  }
-
   public boolean hasHighwayTrafficLight() {
     return hasTag("highway") && "traffic_signals".equals(getTag("highway"));
   }
