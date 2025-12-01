@@ -28,6 +28,7 @@ public class FlexAccessEgressRouter {
     Graph graph,
     RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
+    AccessEgressRouter accessEgressRouter,
     AdditionalSearchDays searchDays,
     FlexParameters config,
     Collection<ExtensionRequestContext> extensionRequestContexts,
@@ -37,7 +38,7 @@ public class FlexAccessEgressRouter {
     OTPRequestTimeoutException.checkForTimeout();
 
     Collection<NearbyStop> accessStops = accessOrEgress.isAccess()
-      ? DefaultAccessEgressRouter.findAccessEgresses(
+      ? accessEgressRouter.findAccessEgresses(
           request,
           StreetMode.WALK,
           extensionRequestContexts,
@@ -49,7 +50,7 @@ public class FlexAccessEgressRouter {
       : List.of();
 
     Collection<NearbyStop> egressStops = accessOrEgress.isEgress()
-      ? DefaultAccessEgressRouter.findAccessEgresses(
+      ? accessEgressRouter.findAccessEgresses(
           request,
           StreetMode.WALK,
           extensionRequestContexts,
