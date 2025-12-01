@@ -20,13 +20,13 @@ import org.slf4j.LoggerFactory;
 /**
  * This uses a street search to find paths to all the access/egress stop within range
  */
-public class AccessEgressRouter {
+public class DefaultAccessEgressRouter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultAccessEgressRouter.class);
   private final StopResolver stopResolver;
   private final NearbyStopFactory nearbyStopFactory;
 
-  public AccessEgressRouter(StopResolver stopResolver) {
+  public DefaultAccessEgressRouter(StopResolver stopResolver) {
     this.stopResolver = stopResolver;
     this.nearbyStopFactory = new NearbyStopFactory(stopResolver::getRegularStop);
   }

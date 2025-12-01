@@ -24,7 +24,7 @@ public class DirectFlexRouter {
     AdditionalSearchDays additionalSearchDays,
     LinkingContext linkingContext
   ) {
-    var accessEgressRouter = new AccessEgressRouter(
+    var accessEgressRouter = new DefaultAccessEgressRouter(
       new TransitServiceResolver(serverContext.transitService())
     );
     if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {

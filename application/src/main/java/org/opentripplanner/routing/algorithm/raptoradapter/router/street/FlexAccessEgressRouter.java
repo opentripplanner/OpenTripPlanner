@@ -22,7 +22,7 @@ public class FlexAccessEgressRouter {
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
     RouteRequest request,
-    AccessEgressRouter accessEgressRouter,
+    DefaultAccessEgressRouter accessEgressRouter,
     OtpServerRequestContext serverContext,
     AdditionalSearchDays searchDays,
     FlexParameters config,
