@@ -42,7 +42,6 @@ public class AccessEgressMapper {
     if (!(stop instanceof RegularStop)) {
       return null;
     }
-
-    return new DefaultAccessEgress(stop.getIndex(), nearbyStop.state);
+    return new DefaultAccessEgress(stop.getIndex(), nearbyStop.finalStates);
   }
 }
