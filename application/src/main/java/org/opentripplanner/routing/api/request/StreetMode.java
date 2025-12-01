@@ -198,9 +198,9 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
       case CARPOOL -> """
       Carpool or rideshare with other passengers going in the same direction.
 
-      This is the request mode for enabling carpooling in route searches. Results will contain legs with
-      transit mode `CARPOOL`. Carpooling combines characteristics of both transit (scheduled departures)
-      and street modes (private vehicles on roads).
+      This is the request mode for enabling carpooling in street route searches.
+
+      Use this _street_ mode, if your data source for trips is SIRI, not GTFS static.
       """;
       case FLEXIBLE -> "Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTEx Flexible Stop Places.";
     };

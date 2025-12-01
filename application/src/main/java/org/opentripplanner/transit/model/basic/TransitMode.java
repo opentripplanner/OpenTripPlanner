@@ -77,12 +77,11 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
       case CARPOOL -> """
       Private car trips shared with others, operating on scheduled routes similar to transit.
 
-      Used in itinerary responses to describe legs where a passenger travels as part of a carpool/rideshare.
-      Unlike traditional transit, carpooling uses private vehicles traveling on streets, but like transit,
-      trips follow fixed schedules and routes. For specifying carpooling in routing requests, use the
-      `CARPOOL` street mode instead.
+      Use the _transit mode_, as opposed to the street mode `CARPOOL`, if your data source comes from
+      static GTFS feeds. This is currently not part of the specification, so we use the mode type values 1550-1560
+      which are in the range of private taxis.
 
-      This is currently not specified in GTFS so we use the mode type values 1550-1560 which are in the range of private taxis.
+      If your data source for the carpool trips is SIRI use the `CARPOOL` street mode instead.
       """;
       case TAXI -> "Using a taxi service";
     };

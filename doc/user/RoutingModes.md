@@ -44,9 +44,9 @@ This means that the car is not parked in a permanent parking area but rather the
 
 Carpool or rideshare with other passengers going in the same direction.
 
-This is the request mode for enabling carpooling in route searches. Results will contain legs with
-transit mode `CARPOOL`. Carpooling combines characteristics of both transit (scheduled departures)
-and street modes (private vehicles on roads).
+This is the request mode for enabling carpooling in street route searches.
+
+Use this _street_ mode, if your data source for trips is SIRI, not GTFS static.
 
 
 <h4 id="CAR_HAILING">CAR_HAILING</h4>
@@ -119,12 +119,11 @@ Used for street-level rail cars where the cable runs beneath the vehicle.
 
 Private car trips shared with others, operating on scheduled routes similar to transit.
 
-Used in itinerary responses to describe legs where a passenger travels as part of a carpool/rideshare.
-Unlike traditional transit, carpooling uses private vehicles traveling on streets, but like transit,
-trips follow fixed schedules and routes. For specifying carpooling in routing requests, use the
-`CARPOOL` street mode instead.
+Use the _transit mode_, as opposed to the street mode `CARPOOL`, if your data source comes from
+static GTFS feeds. This is currently not part of the specification, so we use the mode type values 1550-1560
+which are in the range of private taxis.
 
-This is currently not specified in GTFS so we use the mode type values 1550-1560 which are in the range of private taxis.
+If your data source for the carpool trips is SIRI use the `CARPOOL` street mode instead.
 
 
 <h4 id="COACH">COACH</h4>
