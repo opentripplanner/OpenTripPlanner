@@ -21,8 +21,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardac
 import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.TripAndServiceDateResolver;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.TripLocationResolver;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.TripScheduleIndexResolver;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DefaultAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
@@ -178,7 +178,7 @@ class AccessEgressFetcher {
       accessRequest.preferences().system().dataOverlay(),
       dataOverlayParameterBindings
     );
-    var nearbyStops = AccessEgressRouter.findAccessEgresses(
+    var nearbyStops = DefaultAccessEgressRouter.findAccessEgresses(
       accessRequest,
       mode,
       dataOverlayContext,

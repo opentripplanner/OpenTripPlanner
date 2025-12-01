@@ -44,7 +44,7 @@ public class DirectFlexRouter {
       request.preferences().system().dataOverlay(),
       dataOverlayParameterBindings
     );
-    Collection<NearbyStop> accessStops = AccessEgressRouter.findAccessEgresses(
+    Collection<NearbyStop> accessStops = DefaultAccessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
       dataOverlayContext,
@@ -53,7 +53,7 @@ public class DirectFlexRouter {
       0,
       linkingContext
     );
-    Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
+    Collection<NearbyStop> egressStops = DefaultAccessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
       dataOverlayContext,
