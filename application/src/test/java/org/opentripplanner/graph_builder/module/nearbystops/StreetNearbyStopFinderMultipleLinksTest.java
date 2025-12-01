@@ -81,8 +81,9 @@ class StreetNearbyStopFinderMultipleLinksTest extends GraphRoutingTest {
     assertEquals(stopResolver.getRegularStop(expected.getId()), nearbyStop.stop);
     assertEquals(0, nearbyStop.distance);
     assertEquals(0, nearbyStop.edges.size());
-    assertEquals(expected, nearbyStop.state.getVertex());
-    assertNull(nearbyStop.state.getBackState());
+    var lastState = nearbyStop.lastStates.getLast();
+    assertEquals(expected, lastState.getVertex());
+    assertNull(lastState.getBackState());
   }
 
   /**
@@ -95,8 +96,9 @@ class StreetNearbyStopFinderMultipleLinksTest extends GraphRoutingTest {
   ) {
     assertEquals(stopResolver.getRegularStop(expected.getId()), nearbyStop.stop);
     assertEquals(expectedDistance, nearbyStop.distance);
-    assertEquals(expected, nearbyStop.state.getVertex());
+    var lastState = nearbyStop.lastStates.getLast();
+    assertEquals(expected, lastState.getVertex());
     assertFalse(nearbyStop.edges.isEmpty());
-    assertNotNull(nearbyStop.state.getBackState());
+    assertNotNull(lastState.getBackState());
   }
 }

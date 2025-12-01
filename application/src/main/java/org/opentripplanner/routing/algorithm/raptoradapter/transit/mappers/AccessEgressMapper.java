@@ -10,6 +10,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccess
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 public class AccessEgressMapper {
@@ -45,7 +46,9 @@ public class AccessEgressMapper {
 
     return new DefaultAccessEgress(
       nearbyStop.stop.getIndex(),
-      accessOrEgress.isEgress() ? nearbyStop.state.reverse() : nearbyStop.state
+      accessOrEgress.isEgress()
+        ? nearbyStop.lastStates.stream().map(State::reverse).toList().reversed()
+        : nearbyStop.lastStates
     );
   }
 }

@@ -105,7 +105,8 @@ public class FlexDirectPathFactory {
     int accessAlightStopPosition = accessTemplate.alightStopPosition;
     int requestedBookingTime = accessTemplate.requestedBookingTime;
 
-    var flexToVertex = egress.state.getVertex();
+    // TODO flex doesn't support via locations yet
+    var flexToVertex = egress.lastStates.getLast().getVertex();
 
     if (!isRouteable(accessTemplate, flexToVertex)) {
       return Optional.empty();
@@ -117,7 +118,9 @@ public class FlexDirectPathFactory {
       return Optional.empty();
     }
 
-    final State[] afterFlexState = flexEdge.traverse(accessNearbyStop.state);
+    // TODO flex doesn't support via locations yet
+    var lastState = accessNearbyStop.lastStates.getLast();
+    final State[] afterFlexState = flexEdge.traverse(lastState);
 
     var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState[0], egress.edges);
 
@@ -183,12 +186,14 @@ public class FlexDirectPathFactory {
   }
 
   protected boolean isRouteable(FlexAccessTemplate accessTemplate, Vertex flexVertex) {
-    if (accessTemplate.accessEgress.state.getVertex() == flexVertex) {
+    // TODO flex doesn't support via locations yet
+    var lastVertex = accessTemplate.accessEgress.lastStates.getLast().getVertex();
+    if (lastVertex == flexVertex) {
       return false;
     } else {
       return (
         accessTemplate.calculator.calculateFlexPath(
-          accessTemplate.accessEgress.state.getVertex(),
+          lastVertex,
           flexVertex,
           accessTemplate.boardStopPosition,
           accessTemplate.alightStopPosition

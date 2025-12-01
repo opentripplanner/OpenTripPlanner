@@ -229,7 +229,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     if (nearbyStop.edges.isEmpty()) {
       return "direct[" + nearbyStop.stop.getName() + "]";
     } else {
-      return "street[" + stateDescription(nearbyStop.state) + "]";
+      return "street" + nearbyStop.lastStates.stream().map(this::stateDescription).toList();
     }
   }
 
