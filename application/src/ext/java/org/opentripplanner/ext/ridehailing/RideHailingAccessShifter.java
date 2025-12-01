@@ -12,6 +12,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccess
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,7 @@ public class RideHailingAccessShifter {
       .map(ae -> {
         // only time-shift access legs on a car
         // (there could be walk-only accesses if you're close to the stop)
-        if (isAccess && ae.getLastState().containsModeCar()) {
+        if (isAccess && ae.getLastStates().stream().allMatch(State::containsModeCar)) {
           var duration = fetchArrivalDelay(services, request, now);
           if (duration.isSuccess()) {
             return new RideHailingAccessAdapter(ae, duration.successValue());

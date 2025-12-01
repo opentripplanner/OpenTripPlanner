@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
+import java.util.List;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.street.search.state.State;
@@ -18,9 +19,11 @@ public interface RoutingAccessEgress extends RaptorAccessEgress {
   RoutingAccessEgress withPenalty(TimeAndCost penalty);
 
   /**
-   * Return the last state both in the case of access and egress.
+   * For access, this is a list of states starting from origin to the access stop split at via
+   * locations visited inside the access. For egress, this is a list starting at the egress stop
+   * ending at the destination split at the via locations visited inside the egress.
    */
-  State getLastState();
+  List<State> getLastStates();
 
   /**
    * Return true if all edges are traversed on foot.

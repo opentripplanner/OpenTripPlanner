@@ -497,12 +497,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   private Itinerary mapAccessEgressPathLeg(RaptorAccessEgress accessEgress) {
-    return accessEgress
-      .findOriginal(RoutingAccessEgress.class)
-      .map(RoutingAccessEgress::getLastState)
-      .map(GraphPath::new)
-      .map(path -> graphPathToItineraryMapper.generateItinerary(path, request))
-      .orElseThrow();
+    var routingAccessEgress = accessEgress.findOriginal(RoutingAccessEgress.class).orElseThrow();
+    var paths = routingAccessEgress.getLastStates().stream().map(GraphPath::new).toList();
+    return graphPathToItineraryMapper.generateItinerary(paths, request);
   }
 
   private TimeAndCost mapAccessEgressPenalty(RaptorAccessEgress accessEgress) {
