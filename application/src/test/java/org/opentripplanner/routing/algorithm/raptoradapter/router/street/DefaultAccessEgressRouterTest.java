@@ -274,8 +274,9 @@ class DefaultAccessEgressRouterTest extends GraphRoutingTest {
       );
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(verticesContainer, linkingRequest);
+      var router = new DefaultAccessEgressRouter();
 
-      return DefaultAccessEgressRouter.findAccessEgresses(
+      return router.findAccessEgresses(
         request,
         StreetMode.WALK,
         List.of(),
