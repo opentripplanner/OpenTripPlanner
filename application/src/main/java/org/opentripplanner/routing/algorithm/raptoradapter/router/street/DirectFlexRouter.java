@@ -39,12 +39,13 @@ public class DirectFlexRouter {
       return Collections.emptyList();
     }
     OTPRequestTimeoutException.checkForTimeout();
+    var accessEgressRouter = new DefaultAccessEgressRouter();
     // Prepare access/egress transfers
     var dataOverlayContext = DataOverlayContext.listExtensionRequestContexts(
       request.preferences().system().dataOverlay(),
       dataOverlayParameterBindings
     );
-    Collection<NearbyStop> accessStops = DefaultAccessEgressRouter.findAccessEgresses(
+    Collection<NearbyStop> accessStops = accessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
       dataOverlayContext,
@@ -53,7 +54,7 @@ public class DirectFlexRouter {
       0,
       linkingContext
     );
-    Collection<NearbyStop> egressStops = DefaultAccessEgressRouter.findAccessEgresses(
+    Collection<NearbyStop> egressStops = accessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
       dataOverlayContext,
