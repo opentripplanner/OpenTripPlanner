@@ -77,8 +77,8 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   @Test
   void findClosestStopsByCoordinate() {
     var nearbyStopFinder = StreetNearbyStopFinder.of(linkingContextFactory).build();
-    var ns1 = new NearbyStop(stopA.getId(), 0, null, null);
-    var ns2 = new NearbyStop(stopB.getId(), 100, null, null);
+    var ns1 = new NearbyStop(stopA.getId(), 0, List.of(), List.of());
+    var ns2 = new NearbyStop(stopB.getId(), 100, List.of(), List.of());
     var coordinate = ORIGIN.asJtsCoordinate();
 
     assertEquals(List.of(ns1), simplify(nearbyStopFinder.findNearbyStops(coordinate, 10)));
@@ -237,9 +237,10 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   void assertZeroDistanceStop(TransitStopVertex expected, NearbyStop nearbyStop) {
     assertEquals(expected.getId(), nearbyStop.stopId());
     assertEquals(0, nearbyStop.distance());
-    assertEquals(0, nearbyStop.edges().size());
-    assertEquals(expected, nearbyStop.state().getVertex());
-    assertNull(nearbyStop.state().getBackState());
+    assertEquals(0, nearbyStop.edges.size());
+    var lastState = nearbyStop.finalStates.getLast();
+    assertEquals(expected, lastState.getVertex());
+    assertNull(lastState.getBackState());
   }
 
   /**
@@ -252,15 +253,16 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   ) {
     assertEquals(expected.getId(), nearbyStop.stopId());
     assertEquals(expectedDistance, nearbyStop.distance());
-    assertEquals(expected, nearbyStop.state().getVertex());
-    assertFalse(nearbyStop.edges().isEmpty());
-    assertNotNull(nearbyStop.state().getBackState());
+    var lastState = nearbyStop.finalStates.getLast();
+    assertEquals(expected, lastState.getVertex());
+    assertFalse(nearbyStop.edges.isEmpty());
+    assertNotNull(lastState.getBackState());
   }
 
   private List<NearbyStop> simplify(List<NearbyStop> closestStops) {
     return closestStops
       .stream()
-      .map(ns -> new NearbyStop(ns.stopId(), ns.distance(), null, null))
+      .map(ns -> new NearbyStop(ns.stopId(), ns.distance(), List.of(), List.of()))
       .collect(Collectors.toList());
   }
 }

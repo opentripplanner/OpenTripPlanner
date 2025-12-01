@@ -236,7 +236,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
         "]"
       );
     } else {
-      return "street[" + stateDescription(nearbyStop.state()) + "]";
+      return "street" + nearbyStop.finalStates.stream().map(this::stateDescription).toList();
     }
   }
 
