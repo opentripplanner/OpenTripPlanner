@@ -29,7 +29,7 @@ import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 
-class AccessEgressRouterTest extends GraphRoutingTest {
+class DefaultAccessEgressRouterTest extends GraphRoutingTest {
 
   private Graph graph;
   private TransitRepository transitRepository;
@@ -282,7 +282,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       var linkingRequest = LinkingContextRequestMapper.map(request);
       var linkingContext = linkingContextFactory.create(verticesContainer, linkingRequest);
 
-      return AccessEgressRouter.findAccessEgresses(
+      return DefaultAccessEgressRouter.findAccessEgresses(
         request,
         StreetMode.WALK,
         List.of(),
