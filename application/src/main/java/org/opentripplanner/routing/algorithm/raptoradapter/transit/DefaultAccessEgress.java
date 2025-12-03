@@ -164,6 +164,11 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   }
 
   @Override
+  public int numberOfViaLocationsVisited() {
+    return Math.max(0, finalStates.size() - 1);
+  }
+
+  @Override
   public String toString() {
     return asString(true, true, summary());
   }
