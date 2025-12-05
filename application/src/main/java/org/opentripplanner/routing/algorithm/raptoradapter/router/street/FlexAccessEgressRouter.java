@@ -12,9 +12,11 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSear
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -27,6 +29,8 @@ public class FlexAccessEgressRouter {
     TransitService transitService,
     Graph graph,
     RegularTransferService transferService,
+    GeofencingZoneService geofencingZoneService,
+    StreetLimitationParametersService streetLimitationParametersService,
     StreetDetailsService streetDetailsService,
     AccessEgressRouter accessEgressRouter,
     AdditionalSearchDays searchDays,
@@ -45,7 +49,9 @@ public class FlexAccessEgressRouter {
           AccessEgressType.ACCESS,
           config.maxAccessWalkDuration(),
           0,
-          linkingContext
+          linkingContext,
+          streetLimitationParametersService,
+          geofencingZoneService
         )
       : List.of();
 
@@ -57,7 +63,9 @@ public class FlexAccessEgressRouter {
           AccessEgressType.EGRESS,
           config.maxEgressWalkDuration(),
           0,
-          linkingContext
+          linkingContext,
+          streetLimitationParametersService,
+          geofencingZoneService
         )
       : List.of();
 

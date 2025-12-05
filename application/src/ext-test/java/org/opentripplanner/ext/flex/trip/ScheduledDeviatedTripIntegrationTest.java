@@ -30,10 +30,12 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
+import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -242,6 +244,8 @@ class ScheduledDeviatedTripIntegrationTest {
         Metrics.globalRegistry,
         TestServerContext.createStreetDetailsService(),
         TransferServiceTestFactory.transferService(transferRepository),
+        VehicleRentalService.EMPTY,
+        StreetLimitationParametersService.DEFAULT,
         RouterConfig.DEFAULT.flexParameters(),
         List.of(),
         null,

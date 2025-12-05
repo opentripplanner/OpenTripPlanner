@@ -10,9 +10,11 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.place.nearbystopfinder.NearbyStopFactory;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +37,9 @@ public abstract class AccessEgressRouter {
     AccessEgressType accessOrEgress,
     Duration durationLimit,
     int maxStopCount,
-    LinkingContext linkingContext
+    LinkingContext linkingContext,
+    StreetLimitationParametersService streetLimitationParametersService,
+    GeofencingZoneService geofencingZoneService
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
@@ -63,7 +67,9 @@ public abstract class AccessEgressRouter {
       durationLimit,
       maxStopCount,
       linkingContext,
-      ignoreVertices
+      ignoreVertices,
+      streetLimitationParametersService,
+      geofencingZoneService
     );
 
     var results = ListUtils.combine(zeroDistanceAccessEgress, streetAccessEgress);
@@ -82,7 +88,9 @@ public abstract class AccessEgressRouter {
     Duration durationLimit,
     int maxStopCount,
     LinkingContext linkingContext,
-    Set<Vertex> ignoreVertices
+    Set<Vertex> ignoreVertices,
+    StreetLimitationParametersService streetLimitationParametersService,
+    GeofencingZoneService geofencingZoneService
   );
 
   /**

@@ -22,8 +22,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardac
 import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.TripLocationResolver;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.TripScheduleIndexResolver;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouterFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DefaultAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
@@ -32,8 +32,10 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
@@ -50,6 +52,8 @@ class AccessEgressFetcher {
   private final TransitService transitService;
   private final Graph graph;
   private final RegularTransferService transferService;
+  private final GeofencingZoneService geofencingZoneService;
+  private final StreetLimitationParametersService streetLimitationParametersService;
   private final StreetDetailsService streetDetailsService;
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
@@ -80,6 +84,8 @@ class AccessEgressFetcher {
     TransitService transitService,
     Graph graph,
     RegularTransferService transferService,
+    GeofencingZoneService geofencingZoneService,
+    StreetLimitationParametersService streetLimitationParametersService,
     StreetDetailsService streetDetailsService,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
@@ -94,6 +100,8 @@ class AccessEgressFetcher {
     this.transitService = transitService;
     this.graph = graph;
     this.transferService = transferService;
+    this.geofencingZoneService = geofencingZoneService;
+    this.streetLimitationParametersService = streetLimitationParametersService;
     this.streetDetailsService = streetDetailsService;
     this.flexParameters = flexParameters;
     this.rideHailingServices = rideHailingServices;
@@ -106,7 +114,7 @@ class AccessEgressFetcher {
     this.accessEgressMapper = new AccessEgressMapper(transitServiceResolver);
     this.tripScheduleIndexResolver = new TripScheduleIndexResolver(requestTransitDataProvider);
     this.tripLocationResolver = new TripLocationResolver(transitService);
-    this.accessEgressRouter = new DefaultAccessEgressRouter();
+    this.accessEgressRouter = AccessEgressRouterFactory.create(request);
   }
 
   Collection<? extends RoutingAccessEgress> fetchAccess() {
@@ -188,7 +196,9 @@ class AccessEgressFetcher {
       type,
       durationLimit,
       stopCountLimit,
-      linkingContext
+      linkingContext,
+      streetLimitationParametersService,
+      geofencingZoneService
     );
     var accessEgresses = accessEgressMapper.mapNearbyStops(nearbyStops);
     accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);
@@ -202,6 +212,8 @@ class AccessEgressFetcher {
         transitService,
         graph,
         transferService,
+        geofencingZoneService,
+        streetLimitationParametersService,
         streetDetailsService,
         accessEgressRouter,
         additionalSearchDays,
