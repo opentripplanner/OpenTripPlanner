@@ -62,6 +62,11 @@ public class StreetPath {
     }
   }
 
+  // TODO don't expose edges
+  public List<Edge> edges() {
+    return edges;
+  }
+
   /// The start of the path in seconds
   public Instant startTime() {
     return states.getFirst().getTime();
