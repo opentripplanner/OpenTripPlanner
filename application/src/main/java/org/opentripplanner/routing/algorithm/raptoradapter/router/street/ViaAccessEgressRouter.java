@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
 import org.opentripplanner.astar.spi.TraverseVisitor;
@@ -48,10 +47,23 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
     Set<Vertex> ignoreVertices,
     float maxCarSpeed
   ) {
+    var accessEgressRequest = getViaFriendlyRequest(request);
+    var firstVertices = accessOrEgress.isAccess()
+      ? linkingContext.findVertices(accessEgressRequest.from())
+      : linkingContext.findVertices(accessEgressRequest.to());
+    var stopsFromFirstLocation = StreetNearbyStopFinder.of(
+      stopResolver,
+      durationLimit,
+      maxStopCount
+    )
+      .withIgnoreVertices(ignoreVertices)
+      .withExtensionRequestContexts(extensionRequestContexts)
+      .build()
+      .findNearbyStops(firstVertices, accessEgressRequest, streetMode, accessOrEgress.isEgress());
     var lastViaWithCoordinates = lastCoordinateViaLocationIndex(request, accessOrEgress);
     // There are no coordinate locations to route to/from
     if (lastViaWithCoordinates.isEmpty()) {
-      return List.of();
+      return stopsFromFirstLocation;
     }
     var graphPathFinder = new GraphPathFinder(
       traverseVisitor,
@@ -63,13 +75,13 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
       accessOrEgress,
       lastViaWithCoordinates.getAsInt()
     );
-    var accessEgressRequest = getViaFriendlyRequest(request);
     return accessOrEgress.isAccess()
       ? findStreetAccesses(
           accessEgressRequest,
           directRequest,
           streetMode,
           extensionRequestContexts,
+          stopsFromFirstLocation,
           durationLimit,
           maxStopCount,
           linkingContext,
@@ -81,6 +93,7 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
           directRequest,
           streetMode,
           extensionRequestContexts,
+          stopsFromFirstLocation,
           durationLimit,
           maxStopCount,
           linkingContext,
@@ -94,19 +107,14 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
     RouteRequest directRequest,
     StreetMode streetMode,
     Collection<ExtensionRequestContext> extensionRequestContexts,
+    Collection<NearbyStop> stopsFromFirstLocation,
     Duration durationLimit,
     int maxStopCount,
     LinkingContext linkingContext,
     Set<Vertex> ignoreVertices,
     GraphPathFinder graphPathFinder
   ) {
-    var originVertices = linkingContext.findVertices(accessEgressRequest.from());
-    var stopsFromOrigin = StreetNearbyStopFinder.of(stopResolver, durationLimit, maxStopCount)
-      .withIgnoreVertices(ignoreVertices)
-      .withExtensionRequestContexts(extensionRequestContexts)
-      .build()
-      .findNearbyStops(originVertices, accessEgressRequest, streetMode, false);
-    var nearbyStops = new ArrayList<>(stopsFromOrigin);
+    var nearbyStops = new ArrayList<>(stopsFromFirstLocation);
     var paths = directRouter.findDepartAfterPaths(
       linkingContext,
       graphPathFinder,
@@ -156,19 +164,14 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
     RouteRequest directRequest,
     StreetMode streetMode,
     Collection<ExtensionRequestContext> extensionRequestContexts,
+    Collection<NearbyStop> stopsFromFirstLocation,
     Duration durationLimit,
     int maxStopCount,
     LinkingContext linkingContext,
     Set<Vertex> ignoreVertices,
     GraphPathFinder graphPathFinder
   ) {
-    var originVertices = linkingContext.findVertices(accessEgressRequest.to());
-    var stopsFromOrigin = StreetNearbyStopFinder.of(stopResolver, durationLimit, maxStopCount)
-      .withIgnoreVertices(ignoreVertices)
-      .withExtensionRequestContexts(extensionRequestContexts)
-      .build()
-      .findNearbyStops(originVertices, accessEgressRequest, streetMode, true);
-    var nearbyStops = new ArrayList<>(stopsFromOrigin);
+    var nearbyStops = new ArrayList<>(stopsFromFirstLocation);
     var paths = directRouter.findArriveByPaths(
       linkingContext,
       graphPathFinder,
