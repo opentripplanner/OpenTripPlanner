@@ -7,9 +7,11 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 
 /**
  * This uses a street search to find paths to all the access/egress stop within range. Doesn't
@@ -17,9 +19,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
  */
 public class DefaultAccessEgressRouter extends AccessEgressRouter {
 
-  /**
-   * Find accesses or egresses.
-   */
   @Override
   Collection<NearbyStop> findStreetAccessEgresses(
     RouteRequest request,
@@ -29,7 +28,9 @@ public class DefaultAccessEgressRouter extends AccessEgressRouter {
     Duration durationLimit,
     int maxStopCount,
     LinkingContext linkingContext,
-    Set<Vertex> ignoreVertices
+    Set<Vertex> ignoreVertices,
+    StreetLimitationParametersService streetLimitationParametersService,
+    GeofencingZoneService geofencingZoneService
   ) {
     var originVertices = accessOrEgress.isAccess()
       ? linkingContext.findVertices(request.from())
