@@ -277,11 +277,13 @@ class DefaultAccessEgressRouterTest extends GraphRoutingTest {
       ).findAccessEgresses(
         request,
         StreetMode.WALK,
+        null,
         List.of(),
         accessEgress,
         durationLimit,
         maxStopCount,
-        linkingContext
+        linkingContext,
+        30
       );
     }
   }

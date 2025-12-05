@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.graph_builder.module.nearbystops.StopResolver;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -12,8 +13,10 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.NearbyStopFactory;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +30,7 @@ public abstract class AccessEgressRouter {
   private static final Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
   private final NearbyStopFactory nearbyStopFactory;
 
-  public AccessEgressRouter(StopResolver stopResolver) {
+  AccessEgressRouter(StopResolver stopResolver) {
     this.nearbyStopFactory = new NearbyStopFactory(stopResolver::getRegularStop);
   }
 
@@ -37,11 +40,13 @@ public abstract class AccessEgressRouter {
   public Collection<NearbyStop> findAccessEgresses(
     RouteRequest request,
     StreetMode streetMode,
+    TraverseVisitor<State, Edge> traverseVisitor,
     Collection<ExtensionRequestContext> extensionRequestContexts,
     AccessEgressType accessOrEgress,
     Duration durationLimit,
     int maxStopCount,
-    LinkingContext linkingContext
+    LinkingContext linkingContext,
+    float maxCarSpeed
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
@@ -64,12 +69,14 @@ public abstract class AccessEgressRouter {
     var streetAccessEgress = findStreetAccessEgresses(
       request,
       streetMode,
+      traverseVisitor,
       extensionRequestContexts,
       accessOrEgress,
       durationLimit,
       maxStopCount,
       linkingContext,
-      ignoreVertices
+      ignoreVertices,
+      maxCarSpeed
     );
 
     var results = ListUtils.combine(zeroDistanceAccessEgress, streetAccessEgress);
@@ -83,12 +90,14 @@ public abstract class AccessEgressRouter {
   abstract Collection<NearbyStop> findStreetAccessEgresses(
     RouteRequest request,
     StreetMode streetMode,
+    TraverseVisitor<State, Edge> traverseVisitor,
     Collection<ExtensionRequestContext> extensionRequestContexts,
     AccessEgressType accessOrEgress,
     Duration durationLimit,
     int maxStopCount,
     LinkingContext linkingContext,
-    Set<Vertex> ignoreVertices
+    Set<Vertex> ignoreVertices,
+    float maxCarSpeed
   );
 
   /**

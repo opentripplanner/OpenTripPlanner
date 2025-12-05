@@ -36,14 +36,14 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
     int durationInSeconds,
     int generalizedCost,
     TimeAndCost penalty,
-    List<State> lastState
+    List<State> lastStates
   ) {
     this.stop = stop;
     this.durationInSeconds = durationInSeconds;
     this.generalizedCost = generalizedCost;
     this.timePenalty = penalty.isZero() ? RaptorConstants.TIME_NOT_SET : penalty.timeInSeconds();
     this.penalty = penalty;
-    this.lastStates = ListUtils.requireAtLeastNElements(lastState, 1);
+    this.lastStates = ListUtils.requireAtLeastNElements(lastStates, 1);
   }
 
   public DefaultAccessEgress(int stop, List<State> lastStates) {
