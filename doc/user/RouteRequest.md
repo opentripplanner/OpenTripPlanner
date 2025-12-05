@@ -68,6 +68,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                          | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                                       | *Optional* | `30`             |  2.0  |
 |       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                                       | *Optional* | `"PT30S"`        |  2.0  |
+|       [electricAssistSlopeSensitivity](#rd_bicycle_rental_electricAssistSlopeSensitivity)                    |        `double`        | How sensitive electric-assist rental vehicles are to slopes.                                                                                             | *Optional* | `0.3`            |  2.8  |
 |       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                                 | *Optional* | `0`              |  2.2  |
 |       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                                  | *Optional* | `120`            |  2.0  |
 |       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                                  | *Optional* | `"PT1M"`         |  2.0  |
@@ -103,6 +104,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                          | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                                       | *Optional* | `30`             |  2.0  |
 |       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                                       | *Optional* | `"PT30S"`        |  2.0  |
+|       [electricAssistSlopeSensitivity](#rd_car_rental_electricAssistSlopeSensitivity)                        |        `double`        | How sensitive electric-assist rental vehicles are to slopes.                                                                                             | *Optional* | `0.3`            |  2.8  |
 |       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                                 | *Optional* | `0`              |  2.2  |
 |       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                                  | *Optional* | `120`            |  2.0  |
 |       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                                  | *Optional* | `"PT1M"`         |  2.0  |
@@ -135,6 +137,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                          | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                                       | *Optional* | `30`             |  2.0  |
 |       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                                       | *Optional* | `"PT30S"`        |  2.0  |
+|       [electricAssistSlopeSensitivity](#rd_scooter_rental_electricAssistSlopeSensitivity)                    |        `double`        | How sensitive electric-assist rental vehicles are to slopes.                                                                                             | *Optional* | `0.3`            |  2.8  |
 |       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                                 | *Optional* | `0`              |  2.2  |
 |       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                                  | *Optional* | `120`            |  2.0  |
 |       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                                  | *Optional* | `"PT1M"`         |  2.0  |
@@ -550,6 +553,19 @@ Tags without which a vehicle parking will not be used. If empty, no tags are req
 Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
 
 
+<h3 id="rd_bicycle_rental_electricAssistSlopeSensitivity">electricAssistSlopeSensitivity</h3>
+
+**Since version:** `2.8` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.3`   
+**Path:** /routingDefaults/bicycle/rental 
+
+How sensitive electric-assist rental vehicles are to slopes.
+
+A value between 0 and 1 where:
+- 0.0 means the motor fully compensates for slopes (like fully electric vehicles)
+- 1.0 means no motor assistance on slopes (like human-powered vehicles)
+- 0.3 (default) means the motor compensates for 70% of slope difficulty
+
+
 <h3 id="rd_bicycle_rental_allowedNetworks">allowedNetworks</h3>
 
 **Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
@@ -664,6 +680,19 @@ Vehicle parking tags can originate from different places depending on the origin
 Tags without which a vehicle parking will not be used. If empty, no tags are required.
 
 Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
+
+
+<h3 id="rd_car_rental_electricAssistSlopeSensitivity">electricAssistSlopeSensitivity</h3>
+
+**Since version:** `2.8` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.3`   
+**Path:** /routingDefaults/car/rental 
+
+How sensitive electric-assist rental vehicles are to slopes.
+
+A value between 0 and 1 where:
+- 0.0 means the motor fully compensates for slopes (like fully electric vehicles)
+- 1.0 means no motor assistance on slopes (like human-powered vehicles)
+- 0.3 (default) means the motor compensates for 70% of slope difficulty
 
 
 <h3 id="rd_car_rental_allowedNetworks">allowedNetworks</h3>
@@ -921,6 +950,19 @@ done because some street modes searches are much more resource intensive than ot
 The set of characteristics that the user wants to optimize for.
 
 If the triangle optimization is used, it's enough to just define the triangle parameters
+
+<h3 id="rd_scooter_rental_electricAssistSlopeSensitivity">electricAssistSlopeSensitivity</h3>
+
+**Since version:** `2.8` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.3`   
+**Path:** /routingDefaults/scooter/rental 
+
+How sensitive electric-assist rental vehicles are to slopes.
+
+A value between 0 and 1 where:
+- 0.0 means the motor fully compensates for slopes (like fully electric vehicles)
+- 1.0 means no motor assistance on slopes (like human-powered vehicles)
+- 0.3 (default) means the motor compensates for 70% of slope difficulty
+
 
 <h3 id="rd_scooter_rental_allowedNetworks">allowedNetworks</h3>
 

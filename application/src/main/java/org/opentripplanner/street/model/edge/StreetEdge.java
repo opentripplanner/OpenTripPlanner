@@ -17,6 +17,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
@@ -327,6 +328,7 @@ public class StreetEdge
       if (editor != null) {
         editor.dropFloatingVehicle(
           s0.vehicleRentalFormFactor(),
+          s0.rentalVehiclePropulsionType(),
           s0.getVehicleRentalNetwork(),
           s0.getRequest().arriveBy()
         );
@@ -343,6 +345,7 @@ public class StreetEdge
       if (editor != null) {
         editor.dropFloatingVehicle(
           s0.vehicleRentalFormFactor(),
+          s0.rentalVehiclePropulsionType(),
           s0.getVehicleRentalNetwork(),
           s0.getRequest().arriveBy()
         );
@@ -372,6 +375,7 @@ public class StreetEdge
       if (afterTraversal != null) {
         afterTraversal.dropFloatingVehicle(
           state.vehicleRentalFormFactor(),
+          state.rentalVehiclePropulsionType(),
           state.getVehicleRentalNetwork(),
           state.getRequest().arriveBy()
         );
@@ -840,7 +844,12 @@ public class StreetEdge
   ) {
     var edit = doTraverse(s0, TraverseMode.WALK, false);
     if (edit != null) {
-      edit.dropFloatingVehicle(s0.vehicleRentalFormFactor(), network, s0.getRequest().arriveBy());
+      edit.dropFloatingVehicle(
+        s0.vehicleRentalFormFactor(),
+        s0.rentalVehiclePropulsionType(),
+        network,
+        s0.getRequest().arriveBy()
+      );
       if (network != null) {
         edit.resetStartedInNoDropOffZone();
       }
@@ -991,7 +1000,7 @@ public class StreetEdge
 
     var traversalCosts =
       switch (traverseMode) {
-        case BICYCLE, SCOOTER -> bicycleOrScooterTraversalCost(request, traverseMode, speed);
+        case BICYCLE, SCOOTER -> bicycleOrScooterTraversalCost(request, traverseMode, speed, s0);
         case WALK -> walkingTraversalCosts(
           request,
           traverseMode,
@@ -1104,9 +1113,23 @@ public class StreetEdge
   private TraversalCosts bicycleOrScooterTraversalCost(
     StreetSearchRequest req,
     TraverseMode mode,
-    double speed
+    double speed,
+    State state
   ) {
-    double time = getEffectiveBikeDistance() / speed;
+    PropulsionType propulsion = state.isRentingVehicle()
+      ? state.rentalVehiclePropulsionType()
+      : null;
+
+    double electricAssistSlopeSensitivity = mode == TraverseMode.BICYCLE
+      ? req.bike().rental().electricAssistSlopeSensitivity()
+      : req.scooter().rental().electricAssistSlopeSensitivity();
+
+    double effectiveTimeDistance = getEffectiveDistanceForPropulsion(
+      propulsion,
+      electricAssistSlopeSensitivity
+    );
+    double time = effectiveTimeDistance / speed;
+
     double weight;
     var optimizeType = mode == TraverseMode.BICYCLE
       ? req.bike().optimizeType()
@@ -1121,12 +1144,15 @@ public class StreetEdge
       }
       case SAFE_STREETS -> weight = getEffectiveBicycleSafetyDistance() / speed;
       case FLAT_STREETS -> /* see notes in StreetVertex on speed overhead */weight =
-        getEffectiveBikeDistanceForWorkCost() / speed;
-      case SHORTEST_DURATION -> weight = getEffectiveBikeDistance() / speed;
+        getEffectiveWorkDistanceForPropulsion(propulsion, electricAssistSlopeSensitivity) / speed;
+      case SHORTEST_DURATION -> weight = effectiveTimeDistance / speed;
       case TRIANGLE -> {
-        double quick = getEffectiveBikeDistance();
+        double quick = effectiveTimeDistance;
         double safety = getEffectiveBicycleSafetyDistance();
-        double slope = getEffectiveBikeDistanceForWorkCost();
+        double slope = getEffectiveWorkDistanceForPropulsion(
+          propulsion,
+          electricAssistSlopeSensitivity
+        );
         var triangle = mode == TraverseMode.BICYCLE
           ? req.bike().optimizeTriangle()
           : req.scooter().optimizeTriangle();
@@ -1138,6 +1164,62 @@ public class StreetEdge
     var reluctance = StreetEdgeReluctanceCalculator.computeReluctance(req, mode, false, isStairs());
     weight *= reluctance;
     return new TraversalCosts(time, weight);
+  }
+
+  /**
+   * Calculate effective distance for time/speed based on propulsion type.
+   *
+   * For ELECTRIC (e-scooters): constant speed, ignore slope
+   * For ELECTRIC_ASSIST (e-bikes): reduced slope sensitivity (motor helps uphill)
+   * For HUMAN and others: full slope effect
+   */
+  private double getEffectiveDistanceForPropulsion(
+    PropulsionType propulsion,
+    double electricAssistSlopeSensitivity
+  ) {
+    if (propulsion == null) {
+      return getEffectiveBikeDistance();
+    }
+    return switch (propulsion) {
+      case ELECTRIC -> getDistanceMeters();
+      case ELECTRIC_ASSIST -> interpolateSlopeEffect(
+        getEffectiveBikeDistance(),
+        electricAssistSlopeSensitivity
+      );
+      default -> getEffectiveBikeDistance();
+    };
+  }
+
+  /**
+   * Calculate effective work distance based on propulsion type.
+   */
+  private double getEffectiveWorkDistanceForPropulsion(
+    PropulsionType propulsion,
+    double electricAssistSlopeSensitivity
+  ) {
+    if (propulsion == null) {
+      return getEffectiveBikeDistanceForWorkCost();
+    }
+    return switch (propulsion) {
+      case ELECTRIC -> getDistanceMeters();
+      case ELECTRIC_ASSIST -> interpolateSlopeEffect(
+        getEffectiveBikeDistanceForWorkCost(),
+        electricAssistSlopeSensitivity
+      );
+      default -> getEffectiveBikeDistanceForWorkCost();
+    };
+  }
+
+  /**
+   * Interpolate between flat distance and slope-adjusted distance.
+   * Formula: flat + (sloped - flat) × sensitivity = flat × (1 - sensitivity) + sloped × sensitivity
+   *
+   * @param slopedDistance the slope-adjusted effective distance
+   * @param slopeSensitivity 0.0 = ignore slope (use flat distance), 1.0 = full slope effect
+   */
+  private double interpolateSlopeEffect(double slopedDistance, double slopeSensitivity) {
+    double flatDistance = getDistanceMeters();
+    return flatDistance + (slopedDistance - flatDistance) * slopeSensitivity;
   }
 
   private TraversalCosts walkingTraversalCosts(

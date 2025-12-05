@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Units;
+import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -17,6 +18,13 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public final class VehicleRentalPreferences implements Serializable {
 
   public static final VehicleRentalPreferences DEFAULT = new VehicleRentalPreferences();
+
+  /**
+   * Default slope sensitivity for electric-assist vehicles.
+   * 0.0 = motor fully compensates (ignore slope), 1.0 = no assistance (full slope effect).
+   */
+  public static final double DEFAULT_ELECTRIC_ASSIST_SLOPE_SENSITIVITY = 0.3;
+
   private final Duration pickupTime;
   private final Cost pickupCost;
   private final Duration dropOffTime;
@@ -28,6 +36,7 @@ public final class VehicleRentalPreferences implements Serializable {
 
   private final Set<String> allowedNetworks;
   private final Set<String> bannedNetworks;
+  private final double electricAssistSlopeSensitivity;
 
   private VehicleRentalPreferences() {
     this.pickupTime = Duration.ofMinutes(1);
@@ -39,6 +48,7 @@ public final class VehicleRentalPreferences implements Serializable {
     this.allowArrivingInRentedVehicleAtDestination = false;
     this.allowedNetworks = Set.of();
     this.bannedNetworks = Set.of();
+    this.electricAssistSlopeSensitivity = DEFAULT_ELECTRIC_ASSIST_SLOPE_SENSITIVITY;
   }
 
   private VehicleRentalPreferences(Builder builder) {
@@ -53,6 +63,7 @@ public final class VehicleRentalPreferences implements Serializable {
       builder.allowArrivingInRentedVehicleAtDestination;
     this.allowedNetworks = builder.allowedNetworks;
     this.bannedNetworks = builder.bannedNetworks;
+    this.electricAssistSlopeSensitivity = Units.ratio(builder.electricAssistSlopeSensitivity);
   }
 
   public static Builder of() {
@@ -121,6 +132,18 @@ public final class VehicleRentalPreferences implements Serializable {
     return bannedNetworks;
   }
 
+  /**
+   * How sensitive electric-assist vehicles are to slope. A value between 0 and 1:
+   * <ul>
+   *   <li>0.0 = motor fully compensates for slopes (like fully electric)</li>
+   *   <li>1.0 = no motor assistance on slopes (like human-powered)</li>
+   *   <li>0.3 (default) = motor compensates for 70% of slope difficulty</li>
+   * </ul>
+   */
+  public double electricAssistSlopeSensitivity() {
+    return electricAssistSlopeSensitivity;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -142,7 +165,8 @@ public final class VehicleRentalPreferences implements Serializable {
       ) &&
       allowArrivingInRentedVehicleAtDestination == that.allowArrivingInRentedVehicleAtDestination &&
       allowedNetworks.equals(that.allowedNetworks) &&
-      bannedNetworks.equals(that.bannedNetworks)
+      bannedNetworks.equals(that.bannedNetworks) &&
+      DoubleUtils.doubleEquals(electricAssistSlopeSensitivity, that.electricAssistSlopeSensitivity)
     );
   }
 
@@ -157,7 +181,8 @@ public final class VehicleRentalPreferences implements Serializable {
       arrivingInRentalVehicleAtDestinationCost,
       allowArrivingInRentedVehicleAtDestination,
       allowedNetworks,
-      bannedNetworks
+      bannedNetworks,
+      electricAssistSlopeSensitivity
     );
   }
 
@@ -180,6 +205,11 @@ public final class VehicleRentalPreferences implements Serializable {
       )
       .addCol("allowedNetworks", allowedNetworks, DEFAULT.allowedNetworks)
       .addCol("bannedNetworks", bannedNetworks, DEFAULT.bannedNetworks)
+      .addNum(
+        "electricAssistSlopeSensitivity",
+        electricAssistSlopeSensitivity,
+        DEFAULT.electricAssistSlopeSensitivity
+      )
       .toString();
   }
 
@@ -195,6 +225,7 @@ public final class VehicleRentalPreferences implements Serializable {
     private boolean allowArrivingInRentedVehicleAtDestination;
     private Set<String> allowedNetworks;
     private Set<String> bannedNetworks;
+    private double electricAssistSlopeSensitivity;
 
     private Builder(VehicleRentalPreferences original) {
       this.original = original;
@@ -209,6 +240,7 @@ public final class VehicleRentalPreferences implements Serializable {
         original.allowArrivingInRentedVehicleAtDestination;
       this.allowedNetworks = original.allowedNetworks;
       this.bannedNetworks = original.bannedNetworks;
+      this.electricAssistSlopeSensitivity = original.electricAssistSlopeSensitivity;
     }
 
     public VehicleRentalPreferences original() {
@@ -273,6 +305,11 @@ public final class VehicleRentalPreferences implements Serializable {
 
     public Builder withBannedNetworks(Set<String> bannedNetworks) {
       this.bannedNetworks = bannedNetworks;
+      return this;
+    }
+
+    public Builder withElectricAssistSlopeSensitivity(double electricAssistSlopeSensitivity) {
+      this.electricAssistSlopeSensitivity = electricAssistSlopeSensitivity;
       return this;
     }
 

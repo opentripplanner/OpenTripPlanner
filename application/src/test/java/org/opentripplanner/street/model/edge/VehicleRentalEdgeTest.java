@@ -216,6 +216,29 @@ class VehicleRentalEdgeTest {
     assertTrue(State.isEmpty(s1));
   }
 
+  @Test
+  void propulsionTypeIsStoredInStateAfterRentingFromStation() {
+    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, ELECTRIC, 3, 3, false, true, true, false);
+
+    var s1 = rent();
+
+    assertFalse(State.isEmpty(s1));
+    assertEquals(ELECTRIC, s1[0].rentalVehiclePropulsionType());
+    assertTrue(s1[0].isRentingVehicle());
+  }
+
+  @Test
+  void propulsionTypeIsStoredInStateAfterRentingFloatingVehicle() {
+    initFreeFloatingEdgeAndRequest(SCOOTER_RENTAL, SCOOTER, false);
+
+    var s1 = rent();
+
+    assertFalse(State.isEmpty(s1));
+    // Free floating vehicles from TestFreeFloatingRentalVehicleBuilder use ELECTRIC propulsion
+    assertEquals(ELECTRIC, s1[0].rentalVehiclePropulsionType());
+    assertTrue(s1[0].isRentingVehicle());
+  }
+
   @Nested
   class StartedReverseSearchInNoGeofencingZone {
 

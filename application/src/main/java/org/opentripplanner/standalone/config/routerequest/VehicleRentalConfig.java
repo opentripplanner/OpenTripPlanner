@@ -4,6 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_8;
 
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -93,6 +94,21 @@ public class VehicleRentalConfig {
             "The vehicle rental networks which may not be used. If empty, no networks are banned."
           )
           .asStringSet(dft.bannedNetworks())
+      )
+      .withElectricAssistSlopeSensitivity(
+        c
+          .of("electricAssistSlopeSensitivity")
+          .since(V2_8)
+          .summary("How sensitive electric-assist rental vehicles are to slopes.")
+          .description(
+            """
+            A value between 0 and 1 where:
+            - 0.0 means the motor fully compensates for slopes (like fully electric vehicles)
+            - 1.0 means no motor assistance on slopes (like human-powered vehicles)
+            - 0.3 (default) means the motor compensates for 70% of slope difficulty
+            """
+          )
+          .asDouble(dft.electricAssistSlopeSensitivity())
       );
   }
 }
