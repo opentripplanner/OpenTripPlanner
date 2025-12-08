@@ -6,9 +6,8 @@ import java.util.Map;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.FareRulesData;
-import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
 
 public class AtlantaFareServiceFactory extends DefaultFareServiceFactory {
 
@@ -23,7 +22,7 @@ public class AtlantaFareServiceFactory extends DefaultFareServiceFactory {
    * This step ensures that the fares in the source GTFS data are accounted for correctly.
    */
   @Override
-  public void processGtfs(FareRulesData fareRuleService, OtpTransitServiceBuilder transitService) {
+  public void processGtfs(FareRulesData fareRuleService) {
     fillFareRules(fareRuleService.fareAttributes(), fareRuleService.fareRules(), regularFareRules);
   }
 

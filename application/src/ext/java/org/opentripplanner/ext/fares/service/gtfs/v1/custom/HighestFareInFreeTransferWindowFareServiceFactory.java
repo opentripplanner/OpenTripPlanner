@@ -48,7 +48,7 @@ public class HighestFareInFreeTransferWindowFareServiceFactory extends DefaultFa
    * This step ensures that the fares in the source GTFS data are accounted for correctly.
    */
   @Override
-  public void processGtfs(FareRulesData fareRulesData, OtpTransitServiceBuilder transitService) {
+  public void processGtfs(FareRulesData fareRulesData) {
     fillFareRules(fareRulesData.fareAttributes(), fareRulesData.fareRules(), regularFareRules);
   }
 
