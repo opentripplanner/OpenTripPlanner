@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -44,7 +44,7 @@ public class AddTransitEntitiesToGraph {
 
   private static final Logger LOG = LoggerFactory.getLogger(AddTransitEntitiesToGraph.class);
 
-  private final OtpTransitService otpTransitService;
+  private final OtpTransitServiceBuilder otpTransitService;
 
   // Map of all station elements and their vertices in the graph
   private final Map<StationElement<?, ?>, StationElementVertex> stationElementNodes =
@@ -58,7 +58,7 @@ public class AddTransitEntitiesToGraph {
    *                         negative the default value of zero is used.
    */
   private AddTransitEntitiesToGraph(
-    OtpTransitService otpTransitService,
+    OtpTransitServiceBuilder otpTransitService,
     int subwayAccessTime,
     Graph graph
   ) {
@@ -68,7 +68,7 @@ public class AddTransitEntitiesToGraph {
   }
 
   public static void addToGraph(
-    OtpTransitService otpTransitService,
+    OtpTransitServiceBuilder otpTransitService,
     int subwayAccessTime,
     Graph graph
   ) {
@@ -92,7 +92,7 @@ public class AddTransitEntitiesToGraph {
     // Compute the set of modes for each stop based on all the TripPatterns it is part of
     SetMultimap<StopLocation, TransitMode> stopModeMap = HashMultimap.create();
 
-    for (TripPattern pattern : otpTransitService.getTripPatterns()) {
+    for (TripPattern pattern : otpTransitService.getTripPatterns().values()) {
       TransitMode mode = pattern.getMode();
       for (var stop : pattern.getStops()) {
         stopModeMap.put(stop, mode);
@@ -101,7 +101,7 @@ public class AddTransitEntitiesToGraph {
 
     // Add a vertex representing the stop.
     // It is now possible for these vertices to not be connected to any edges.
-    for (RegularStop stop : otpTransitService.siteRepository().listRegularStops()) {
+    for (RegularStop stop : otpTransitService.listRegularStops()) {
       Set<TransitMode> modes = stopModeMap.get(stop);
       var b = TransitStopVertex.of()
         .withId(stop.getId())
@@ -120,14 +120,14 @@ public class AddTransitEntitiesToGraph {
   }
 
   private void addEntrancesToGraph() {
-    for (Entrance entrance : otpTransitService.siteRepository().listEntrances()) {
+    for (Entrance entrance : otpTransitService.listEntrances()) {
       TransitEntranceVertex entranceVertex = vertexFactory.transitEntrance(entrance);
       stationElementNodes.put(entrance, entranceVertex);
     }
   }
 
   private void addStationCentroidsToGraph() {
-    for (Station station : otpTransitService.siteRepository().listStations()) {
+    for (Station station : otpTransitService.listStations()) {
       if (station.shouldRouteToCentroid()) {
         vertexFactory.stationCentroid(station);
       }
@@ -282,7 +282,7 @@ public class AddTransitEntitiesToGraph {
    * @return StopLevel that can not be null without any null fields
    */
   public StopLevel findStopLevel(StationElementVertex vertex) {
-    var stop = otpTransitService.siteRepository().getRegularStop(vertex.getId());
+    var stop = otpTransitService.getRegularStop(vertex.getId());
     if (stop == null || stop.level() == null) {
       return StationElement.DEFAULT_LEVEL;
     } else {

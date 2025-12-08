@@ -5,21 +5,21 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class AddTransitEntitiesToTimetable {
 
-  private final OtpTransitService otpTransitService;
+  private final OtpTransitServiceBuilder otpTransitService;
 
-  private AddTransitEntitiesToTimetable(OtpTransitService otpTransitService) {
+  private AddTransitEntitiesToTimetable(OtpTransitServiceBuilder otpTransitService) {
     this.otpTransitService = otpTransitService;
   }
 
   public static void addToTimetable(
-    OtpTransitService otpTransitService,
+    OtpTransitServiceBuilder otpTransitService,
     TimetableRepository timetableRepository
   ) {
     new AddTransitEntitiesToTimetable(otpTransitService).applyToTimetableRepository(
@@ -28,10 +28,10 @@ public class AddTransitEntitiesToTimetable {
   }
 
   private void applyToTimetableRepository(TimetableRepository timetableRepository) {
-    timetableRepository.mergeSiteRepositories(otpTransitService.siteRepository());
+    timetableRepository.mergeSiteRepositories(otpTransitService.siteRepository().build());
 
     // Netex specific entities
-    for (var tripOnServiceDate : otpTransitService.getTripOnServiceDates()) {
+    for (var tripOnServiceDate : otpTransitService.getTripOnServiceDates().values()) {
       timetableRepository.addTripOnServiceDate(tripOnServiceDate);
     }
     timetableRepository.addOperators(otpTransitService.getAllOperators());
@@ -64,12 +64,12 @@ public class AddTransitEntitiesToTimetable {
   }
 
   private void addTransfers(TimetableRepository timetableRepository) {
-    timetableRepository.getTransferService().addAll(otpTransitService.getAllTransfers());
+    timetableRepository.getTransferService().addAll(otpTransitService.getTransfers());
   }
 
   private void addServices(TimetableRepository timetableRepository) {
     /* Assign 0-based numeric codes to all GTFS service IDs. */
-    for (FeedScopedId serviceId : otpTransitService.getAllServiceIds()) {
+    for (FeedScopedId serviceId : otpTransitService.buildCalendarServiceData().getServiceIds()) {
       timetableRepository
         .getServiceCodes()
         .put(serviceId, timetableRepository.getServiceCodes().size());
@@ -77,7 +77,7 @@ public class AddTransitEntitiesToTimetable {
   }
 
   private void addTripPatterns(TimetableRepository timetableRepository) {
-    Collection<TripPattern> tripPatterns = otpTransitService.getTripPatterns();
+    Collection<TripPattern> tripPatterns = otpTransitService.getTripPatterns().values();
 
     /* Loop over all new TripPatterns setting the service codes. */
     for (TripPattern tripPattern : tripPatterns) {

@@ -2,8 +2,8 @@ package org.opentripplanner.ext.fares.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.model.FareRulesData;
-import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.fare.ItineraryFare;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -20,7 +20,7 @@ public class NoopFareServiceFactory implements FareServiceFactory {
   }
 
   @Override
-  public void processGtfs(FareRulesData a, OtpTransitService b) {}
+  public void processGtfs(FareRulesData a, OtpTransitServiceBuilder b) {}
 
   @Override
   public void configure(JsonNode config) {}

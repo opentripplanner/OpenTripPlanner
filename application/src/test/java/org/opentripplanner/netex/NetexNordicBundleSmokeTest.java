@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -66,17 +65,20 @@ public class NetexNordicBundleSmokeTest {
     );
 
     // Then - smoke test model
-    OtpTransitService otpModel = transitBuilder.build();
+    var otpModel = transitBuilder;
 
     assertAgencies(otpModel.getAllAgencies());
-    assertMultiModalStations(otpModel.siteRepository().listMultiModalStations());
+    assertMultiModalStations(otpModel.listMultiModalStations());
     assertOperators(otpModel.getAllOperators());
-    assertStops(otpModel.siteRepository().listRegularStops());
-    assertStations(otpModel.siteRepository().listStations());
-    assertTripPatterns(otpModel.getTripPatterns());
-    assertTrips(otpModel.getAllTrips());
-    assertTripsOnServiceDate(otpModel.getTripOnServiceDates());
-    assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());
+    assertStops(otpModel.listRegularStops());
+    assertStations(otpModel.listStations());
+    assertTripPatterns(otpModel.getTripPatterns().values());
+    assertTrips(otpModel.getTripsById().values());
+    assertTripsOnServiceDate(otpModel.getTripOnServiceDates().values());
+    assertServiceIds(
+      otpModel.getTripsById().values(),
+      otpModel.buildCalendarServiceData().getServiceIds()
+    );
     assertNoticeAssignments(otpModel.getNoticeAssignments());
 
     // And then - smoke test service calendar

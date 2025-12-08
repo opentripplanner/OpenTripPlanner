@@ -9,7 +9,6 @@ import org.opentripplanner.graph_builder.module.AddTransitEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToTimetable;
 import org.opentripplanner.graph_builder.module.TransitWithFutureDateValidator;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
-import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -85,10 +84,8 @@ public class NetexModule implements GraphBuilderModule {
 
         validateStopTimesForEachTrip(transitBuilder.getStopTimesSortedByTrip());
 
-        OtpTransitService otpService = transitBuilder.build();
-
-        AddTransitEntitiesToTimetable.addToTimetable(otpService, timetableRepository);
-        AddTransitEntitiesToGraph.addToGraph(otpService, subwayAccessTime, graph);
+        AddTransitEntitiesToTimetable.addToTimetable(transitBuilder, timetableRepository);
+        AddTransitEntitiesToGraph.addToGraph(transitBuilder, subwayAccessTime, graph);
 
         var lots = transitBuilder.vehicleParkings();
         parkingRepository.updateVehicleParking(lots, List.of());

@@ -30,7 +30,6 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.gtfs.interlining.InterlineProcessor;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
-import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -174,7 +173,7 @@ public class GtfsModule implements GraphBuilderModule {
           issueStore
         );
 
-        OtpTransitService otpTransitService = builder.build();
+        var otpTransitService = builder;
 
         addTimetableRepositoryToGraph(graph, timetableRepository, otpTransitService);
 
@@ -185,7 +184,7 @@ public class GtfsModule implements GraphBuilderModule {
             gtfsBundle.parameters().maxInterlineDistance(),
             issueStore,
             calendarServiceData
-          ).run(otpTransitService.getTripPatterns());
+          ).run(otpTransitService.getTripPatterns().values());
         }
 
         fareServiceFactory.processGtfs(fareRulesData, otpTransitService);
@@ -277,7 +276,7 @@ public class GtfsModule implements GraphBuilderModule {
   private void addTimetableRepositoryToGraph(
     Graph graph,
     TimetableRepository timetableRepository,
-    OtpTransitService otpTransitService
+    OtpTransitServiceBuilder otpTransitService
   ) {
     AddTransitEntitiesToTimetable.addToTimetable(otpTransitService, timetableRepository);
     AddTransitEntitiesToGraph.addToGraph(otpTransitService, subwayAccessTime_s, graph);

@@ -3,6 +3,7 @@ package org.opentripplanner.model.impl;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +16,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -41,6 +41,7 @@ import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.BoardingArea;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Pathway;
@@ -272,10 +273,6 @@ public class OtpTransitServiceBuilder {
     return stopsByScheduledStopPoints;
   }
 
-  public OtpTransitService build() {
-    return new OtpTransitServiceImpl(this);
-  }
-
   /**
    * Limit the transit service to a time period removing calendar dates and services outside the
    * period. If a service is start before and/or ends after the period then the service is modified
@@ -316,6 +313,58 @@ public class OtpTransitServiceBuilder {
    */
   public void addStopByScheduledStopPoint(FeedScopedId sspid, RegularStop stop) {
     stopsByScheduledStopPoints.put(sspid, stop);
+  }
+
+  public Collection<RegularStop> listRegularStops() {
+    return siteRepositoryBuilder.regularStopsById().values();
+  }
+
+  public Collection<Entrance> listEntrances() {
+    return siteRepositoryBuilder.entrancesById().values();
+  }
+
+  public Collection<Station> listStations() {
+    return siteRepositoryBuilder.stationById().values();
+  }
+
+  public Collection<PathwayNode> getAllPathwayNodes() {
+    return pathwayNodesById.values();
+  }
+
+  public Collection<BoardingArea> getAllBoardingAreas() {
+    return boardingAreasById.values();
+  }
+
+  public Collection<Pathway> getAllPathways() {
+    return pathways;
+  }
+
+  public RegularStop getRegularStop(FeedScopedId id) {
+    return siteRepositoryBuilder.regularStopsById().get(id);
+  }
+
+  public Collection<Operator> getAllOperators() {
+    return operatorsById.values();
+  }
+
+  public Map<FeedScopedId, RegularStop> stopsByScheduledStopPoint() {
+    return stopsByScheduledStopPoints;
+  }
+
+  public Collection<FeedInfo> getAllFeedInfos() {
+    return feedInfos;
+  }
+
+  public Collection<Agency> getAllAgencies() {
+    return agenciesById.values();
+  }
+
+  public Collection<FlexTrip<?, ?>> getAllFlexTrips() {
+    return flexTripsById.values();
+  }
+
+  public Collection<MultiModalStation> listMultiModalStations() {
+    return siteRepositoryBuilder.multiModalStationById().values();
   }
 
   /**
