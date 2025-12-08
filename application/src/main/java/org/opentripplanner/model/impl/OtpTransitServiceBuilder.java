@@ -369,7 +369,7 @@ public class OtpTransitServiceBuilder {
   /**
    * Find all serviceIds in both CalendarServices and CalendarServiceDates.
    */
-  Set<FeedScopedId> findAllServiceIds() {
+  public Set<FeedScopedId> findAllServiceIds() {
     Set<FeedScopedId> serviceIds = new HashSet<>();
     for (ServiceCalendar calendar : getCalendars()) {
       serviceIds.add(calendar.getServiceId());

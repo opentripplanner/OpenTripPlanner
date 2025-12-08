@@ -69,7 +69,7 @@ public class AddTransitEntitiesToTimetable {
 
   private void addServices(TimetableRepository timetableRepository) {
     /* Assign 0-based numeric codes to all GTFS service IDs. */
-    for (FeedScopedId serviceId : otpTransitService.buildCalendarServiceData().getServiceIds()) {
+    for (FeedScopedId serviceId : otpTransitService.findAllServiceIds()) {
       timetableRepository
         .getServiceCodes()
         .put(serviceId, timetableRepository.getServiceCodes().size());
