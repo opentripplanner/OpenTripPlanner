@@ -65,21 +65,20 @@ public class NetexNordicBundleSmokeTest {
     );
 
     // Then - smoke test model
-    var otpModel = transitBuilder;
 
-    assertAgencies(otpModel.getAllAgencies());
-    assertMultiModalStations(otpModel.listMultiModalStations());
-    assertOperators(otpModel.getAllOperators());
-    assertStops(otpModel.listRegularStops());
-    assertStations(otpModel.listStations());
-    assertTripPatterns(otpModel.getTripPatterns().values());
-    assertTrips(otpModel.getTripsById().values());
-    assertTripsOnServiceDate(otpModel.getTripOnServiceDates().values());
+    assertAgencies(transitBuilder.getAllAgencies());
+    assertMultiModalStations(transitBuilder.listMultiModalStations());
+    assertOperators(transitBuilder.getAllOperators());
+    assertStops(transitBuilder.listRegularStops());
+    assertStations(transitBuilder.listStations());
+    assertTripPatterns(transitBuilder.getTripPatterns().values());
+    assertTrips(transitBuilder.getTripsById().values());
+    assertTripsOnServiceDate(transitBuilder.getTripOnServiceDates().values());
     assertServiceIds(
-      otpModel.getTripsById().values(),
-      otpModel.buildCalendarServiceData().getServiceIds()
+      transitBuilder.getTripsById().values(),
+      transitBuilder.buildCalendarServiceData().getServiceIds()
     );
-    assertNoticeAssignments(otpModel.getNoticeAssignments());
+    assertNoticeAssignments(transitBuilder.getNoticeAssignments());
 
     // And then - smoke test service calendar
     assetServiceCalendar(transitBuilder.buildCalendarServiceData());

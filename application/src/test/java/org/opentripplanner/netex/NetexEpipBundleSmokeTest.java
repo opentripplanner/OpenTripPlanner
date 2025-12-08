@@ -57,17 +57,16 @@ class NetexEpipBundleSmokeTest {
     }
 
     // Then - smoke test model
-    var otpModel = transitBuilder;
 
-    assertAgencies(otpModel.getAllAgencies());
-    assertOperators(otpModel.getAllOperators());
-    assertStops(otpModel.listRegularStops());
-    assertStations(otpModel.listStations());
-    assertTripPatterns(otpModel.getTripPatterns().values());
-    assertTrips(otpModel.getTripsById().values());
+    assertAgencies(transitBuilder.getAllAgencies());
+    assertOperators(transitBuilder.getAllOperators());
+    assertStops(transitBuilder.listRegularStops());
+    assertStations(transitBuilder.listStations());
+    assertTripPatterns(transitBuilder.getTripPatterns().values());
+    assertTrips(transitBuilder.getTripsById().values());
     assertServiceIds(
-      otpModel.getTripsById().values(),
-      otpModel.buildCalendarServiceData().getServiceIds()
+      transitBuilder.getTripsById().values(),
+      transitBuilder.buildCalendarServiceData().getServiceIds()
     );
 
     // And then - smoke test service calendar
