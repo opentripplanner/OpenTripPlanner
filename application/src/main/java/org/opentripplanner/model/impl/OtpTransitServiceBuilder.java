@@ -58,9 +58,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for building a {@link OtpTransitService}. The instance returned by the
- * {@link #build()} method is read only, and this class provide a mutable collections to construct a
- * {@link OtpTransitService} instance.
+ * This class is responsible for building OTP's internal transit data. It is mutable and can
+ * be used to construct other immutable data structures later on.
  */
 public class OtpTransitServiceBuilder {
 

@@ -148,23 +148,16 @@ public class GtfsContextBuilder {
   private static class GtfsContextImpl implements GtfsContext {
 
     private final String feedId;
-    private final OtpTransitServiceBuilder transitService;
     private final CalendarServiceData calendarServiceData;
 
     private GtfsContextImpl(String feedId, OtpTransitServiceBuilder builder) {
       this.feedId = feedId;
       this.calendarServiceData = builder.buildCalendarServiceData();
-      this.transitService = builder;
     }
 
     @Override
     public String getFeedId() {
       return feedId;
-    }
-
-    @Override
-    public OtpTransitServiceBuilder getTransitService() {
-      return transitService;
     }
 
     @Override
