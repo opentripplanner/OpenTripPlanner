@@ -1,7 +1,7 @@
 package org.opentripplanner.api.model.transit;
 
 import java.util.Objects;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * An id mapper that appends a configured feed id to all input ids and strips the

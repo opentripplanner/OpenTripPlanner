@@ -16,11 +16,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mobilitydata.gbfs.v3_0.station_information.GBFSName;
 import org.mobilitydata.gbfs.v3_0.station_information.GBFSStation;
 import org.mobilitydata.gbfs.v3_0.station_information.GBFSVehicleTypesCapacity;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.street.model.RentalFormFactor;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GbfsStationInformationMapperTest {
 

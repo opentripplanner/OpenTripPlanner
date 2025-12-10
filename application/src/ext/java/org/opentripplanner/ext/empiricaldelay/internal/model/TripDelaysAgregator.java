@@ -5,8 +5,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TripDelaysAgregator {
 

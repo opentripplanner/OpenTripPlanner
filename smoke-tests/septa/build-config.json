@@ -12,7 +12,7 @@
     },
     {
       "type": "gtfs",
-      "source": "https://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip",
+      "source": "https://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/13562/PATCO_GTFS.zip",
       "feedId": "patco"
     }
   ],

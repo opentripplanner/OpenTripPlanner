@@ -132,6 +132,19 @@
         "patterns": []
       },
       {
+        "longName": "Long name for SNOW_AND_ICE",
+        "shortName": "RSNOW_AND_ICE",
+        "gtfsId": "F:SNOW_AND_ICE",
+        "agency": {
+          "gtfsId": "F:A1",
+          "name": "Agency Test"
+        },
+        "mode": "SNOW_AND_ICE",
+        "sortOrder": 14,
+        "bikesAllowed": "NO_INFORMATION",
+        "patterns": []
+      },
+      {
         "longName": "Long name for SUBWAY",
         "shortName": "RSUBWAY",
         "gtfsId": "F:SUBWAY",

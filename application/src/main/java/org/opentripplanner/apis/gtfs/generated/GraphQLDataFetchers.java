@@ -46,6 +46,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.LegCallTime;
 import org.opentripplanner.model.plan.leg.LegRealTimeEstimate;
 import org.opentripplanner.model.plan.leg.StopArrival;
+import org.opentripplanner.model.plan.leg.ViaLocationType;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -389,6 +390,13 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
   }
 
+  /**
+   * A (possibly discounted) fare product that requires another fare product to be purchased previously
+   * in order to be valid.
+   *
+   * For example, when taking the train into a city, you might get a discounted "transfer fare" when
+   * switching to the bus for the second leg.
+   */
   public interface GraphQLDependentFareProduct {
     public DataFetcher<Iterable<FareOffer>> dependencies();
 
@@ -754,6 +762,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<VehicleRentalStation> vehicleRentalStation();
 
     public DataFetcher<String> vertexType();
+
+    public DataFetcher<ViaLocationType> viaLocationType();
   }
 
   /** Interface for places, e.g. stops, stations, parking areas.. */
@@ -1032,6 +1042,8 @@ public class GraphQLDataFetchers {
   public interface GraphQLRiderCategory {
     public DataFetcher<String> id();
 
+    public DataFetcher<Boolean> isDefault();
+
     public DataFetcher<String> name();
   }
 
@@ -1281,7 +1293,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<String>> zones();
   }
 
-  /** A time window when a vehicle visit a stop, area or group of stops. */
+  /** A time window when a vehicle visits a stop, area or group of stops. */
   public interface GraphQLTimeWindow {
     public DataFetcher<java.time.OffsetDateTime> end();
 

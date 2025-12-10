@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
@@ -26,7 +27,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.test.support.TestTableParser;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 
@@ -83,7 +83,9 @@ public class PatternCostCalculatorTest {
 
     GeneralizedCostParameters costParams = GeneralizedCostParametersMapper.map(
       routingRequest,
-      data.getPatterns()
+      data.getPatterns(),
+      p -> p.route().getId(),
+      p -> p.route().getAgency().getId()
     );
     var unpreferredPatterns = costParams.unpreferredPatterns();
 
@@ -173,7 +175,9 @@ public class PatternCostCalculatorTest {
     RaptorCostCalculator<TestTripSchedule> createCostCalculator(TestTripSchedule schedule) {
       GeneralizedCostParameters costParams = GeneralizedCostParametersMapper.map(
         createRouteRequest(),
-        List.of(schedule.pattern())
+        List.of(schedule.pattern()),
+        p -> p.route().getId(),
+        p -> p.route().getAgency().getId()
       );
       return CostCalculatorFactory.createCostCalculator(costParams, null);
     }

@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
@@ -27,7 +28,6 @@ import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
@@ -235,7 +235,9 @@ public class GeometryProcessor {
         if (distance < maxStopToShapeSnapDistance || isFlexTrip) {
           stopSegments.add(segment);
           maxSegmentIndex = index;
-          if (minSegmentIndexForThisStop == -1) minSegmentIndexForThisStop = index;
+          if (minSegmentIndexForThisStop == -1) {
+            minSegmentIndexForThisStop = index;
+          }
         } else if (distance < bestDistance) {
           bestDistance = distance;
           bestSegment = segment;
@@ -566,7 +568,9 @@ public class GeometryProcessor {
     for (ShapePoint point : points) {
       coordinates[i] = point.coordinate();
       distances[i] = point.distTraveled();
-      if (!point.isDistTraveledSet()) hasAllDistances = false;
+      if (!point.isDistTraveledSet()) {
+        hasAllDistances = false;
+      }
       i++;
     }
 

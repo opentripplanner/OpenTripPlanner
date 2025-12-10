@@ -6,12 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.street.BusinessAreaBorder;
 import org.opentripplanner.service.vehiclerental.street.CompositeRentalRestrictionExtension;
 import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class RentalRestrictionExtensionTest {
 

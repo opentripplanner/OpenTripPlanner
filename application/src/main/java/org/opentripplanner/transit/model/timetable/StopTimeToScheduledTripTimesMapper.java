@@ -5,7 +5,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -94,7 +94,9 @@ class StopTimeToScheduledTripTimesMapper {
     for (final StopTime st : stopTimes) {
       final I18NString headsign = st.getStopHeadsign();
       hs[i++] = headsign;
-      if (headsign != null) allNull = false;
+      if (headsign != null) {
+        allNull = false;
+      }
     }
     if (allNull) {
       return null;

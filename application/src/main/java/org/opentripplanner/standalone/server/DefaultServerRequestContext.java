@@ -9,6 +9,7 @@ import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
@@ -25,6 +26,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -50,6 +52,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final FareService fareService;
   private final FlexParameters flexParameters;
   private final Graph graph;
+  private final LinkingContextFactory linkingContextFactory;
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
   private final RealtimeVehicleService realtimeVehicleService;
@@ -65,6 +68,9 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final WorldEnvelopeService worldEnvelopeService;
 
   /* Optional fields */
+
+  @Nullable
+  private final CarpoolingService carpoolingService;
 
   @Nullable
   private final ItineraryDecorator emissionItineraryDecorator;
@@ -112,6 +118,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     FareService fareService,
     FlexParameters flexParameters,
     Graph graph,
+    LinkingContextFactory linkingContextFactory,
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
     RealtimeVehicleService realtimeVehicleService,
@@ -128,6 +135,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VertexLinker vertexLinker,
     ViaCoordinateTransferFactory viaTransferResolver,
     WorldEnvelopeService worldEnvelopeService,
+    @Nullable CarpoolingService carpoolingService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
     @Nullable EmpiricalDelayService empiricalDelayService,
     @Nullable LuceneIndex luceneIndex,
@@ -142,6 +150,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.flexParameters = flexParameters;
     this.fareService = fareService;
     this.graph = graph;
+    this.linkingContextFactory = linkingContextFactory;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
     this.realtimeVehicleService = realtimeVehicleService;
@@ -161,6 +170,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.worldEnvelopeService = worldEnvelopeService;
 
     // Optional fields
+    this.carpoolingService = carpoolingService;
     this.emissionItineraryDecorator = emissionItineraryDecorator;
     this.empiricalDelayService = empiricalDelayService;
     this.luceneIndex = luceneIndex;
@@ -300,6 +310,12 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Nullable
   @Override
+  public CarpoolingService carpoolingService() {
+    return carpoolingService;
+  }
+
+  @Nullable
+  @Override
   public LuceneIndex lucenceIndex() {
     return luceneIndex;
   }
@@ -327,5 +343,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public VertexLinker vertexLinker() {
     return vertexLinker;
+  }
+
+  @Override
+  public LinkingContextFactory linkingContextFactory() {
+    return linkingContextFactory;
   }
 }

@@ -79,14 +79,6 @@ class McStopArrivalTest {
 
     RelaxFunction relaxC1 = GeneralizedCostRelaxFunction.of(1.25, 150);
 
-    var referenceArrival = new A(
-      ARRIVAL_TIME_EARLY,
-      PARETO_ROUND_ONE,
-      bestC1,
-      C1_100,
-      ARRIVED_ON_BOARD
-    );
-
     // Test same values arrival-time, round and c1 should not dominate.
     // Ignore better c2 and onBoardArrival
     assertFalse(

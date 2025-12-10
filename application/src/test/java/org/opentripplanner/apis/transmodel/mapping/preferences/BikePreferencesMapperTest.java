@@ -46,17 +46,17 @@ class BikePreferencesMapperTest {
       Arguments.of(
         "triangleFactors.time",
         0.17,
-        "TimeSlopeSafetyTriangle[time=1.0, slope=0.0, safety=0.0]"
+        "TimeSlopeSafetyTriangle[time=0.17, slope=0.0, safety=0.0]"
       ),
       Arguments.of(
         "triangleFactors.slope",
         0.12,
-        "TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]"
+        "TimeSlopeSafetyTriangle[time=0.0, slope=0.12, safety=0.0]"
       ),
       Arguments.of(
         "triangleFactors.safety",
         0.13,
-        "TimeSlopeSafetyTriangle[time=0.0, slope=0.0, safety=1.0]"
+        "TimeSlopeSafetyTriangle[time=0.0, slope=0.0, safety=0.13]"
       )
     );
   }

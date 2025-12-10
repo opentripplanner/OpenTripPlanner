@@ -4,7 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import org.onebusaway.gtfs.model.RouteNetworkAssignment;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * Keeps the mapping between GTFS route and their network IDs. These assignments don't result

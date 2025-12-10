@@ -777,6 +777,15 @@ public class GraphQLTypes {
     }
   }
 
+  /**
+   * Dependent fare products can lead to many combinations of fares, however it is often not useful
+   * information to the passenger.
+   *
+   * This enum allows filtering of the dependencies.
+   *
+   * Since it is recognised that this is not covered well in the specification, it is discussed here:
+   * https://github.com/google/transit/pull/423
+   */
   public enum GraphQLDependentFareProductFilter {
     ALL,
     MATCH_CATEGORY_AND_MEDIUM,
@@ -1007,6 +1016,7 @@ public class GraphQLTypes {
     DATE_TIME,
     FROM,
     TO,
+    VIA,
   }
 
   public static class GraphQLInputFiltersInput {
@@ -5252,6 +5262,7 @@ public class GraphQLTypes {
     GONDOLA,
     MONORAIL,
     RAIL,
+    SNOW_AND_ICE,
     SUBWAY,
     TAXI,
     TRAM,
@@ -5681,6 +5692,12 @@ public class GraphQLTypes {
     NORMAL,
     PARKANDRIDE,
     TRANSIT,
+  }
+
+  /** Categorization for via locations. */
+  public enum GraphQLViaLocationType {
+    PASS_THROUGH,
+    VISIT,
   }
 
   public static class GraphQLWalkPreferencesInput {

@@ -110,7 +110,7 @@ class VertexGeneratorTest {
 
     assertInstanceOf(BarrierPassThroughVertex.class, vertexForW2OnBarrier);
     assertEquals(n3.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).nodeId);
-    assertEquals(w2.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).wayId);
+    assertEquals(w2.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).getEntityId());
     assertFalse(vertexForW2NotOnBarrier instanceof BarrierPassThroughVertex);
 
     Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers =

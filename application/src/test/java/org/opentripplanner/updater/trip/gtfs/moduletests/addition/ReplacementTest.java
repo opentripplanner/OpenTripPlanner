@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TripInput;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -24,7 +24,7 @@ public class ReplacementTest implements RealtimeTestConstants {
     var builder = TransitTestEnvironment.of();
     var STOP_A = builder.stop(STOP_A_ID);
     var STOP_B = builder.stop(STOP_B_ID);
-    var STOP_C = builder.stop(STOP_C_ID);
+    builder.stop(STOP_C_ID);
     var TRIP_INPUT = TripInput.of(TRIP_1_ID)
       .addStop(STOP_A, "8:30:00", "8:30:00")
       .addStop(STOP_B, "8:40:00", "8:40:00")

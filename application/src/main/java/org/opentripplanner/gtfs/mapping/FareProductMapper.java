@@ -6,11 +6,11 @@ import java.util.Currency;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class FareProductMapper {
 
@@ -61,12 +61,17 @@ class FareProductMapper {
     if (riderCategory == null) {
       return null;
     } else {
-      return new RiderCategory(
-        idFactory.createId(riderCategory.getId(), "rider category"),
-        riderCategory.getName(),
-        riderCategory.getEligibilityUrl()
-      );
+      return RiderCategory.of(idFactory.createId(riderCategory.getId(), "rider category"))
+        .withName(riderCategory.getName())
+        .withIsDefault(mapIsDefaultCategory(riderCategory))
+        .build();
     }
+  }
+
+  private static boolean mapIsDefaultCategory(
+    org.onebusaway.gtfs.model.RiderCategory riderCategory
+  ) {
+    return riderCategory.getIsDefaultFareCategory() == 1;
   }
 
   private static Duration toDuration(int unit, int amount) {

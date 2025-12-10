@@ -3,6 +3,7 @@ package org.opentripplanner.street.search.state;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -102,7 +103,9 @@ public class StateEditor {
   @Nullable
   public State makeState() {
     // check that this editor has not been used already
-    if (spawned) throw new IllegalStateException("A StateEditor can only be used once.");
+    if (spawned) {
+      throw new IllegalStateException("A StateEditor can only be used once.");
+    }
 
     // if something was flagged incorrect, do not make a new state
     if (defectiveTraversal) {
@@ -240,14 +243,18 @@ public class StateEditor {
   }
 
   public void setBackMode(TraverseMode mode) {
-    if (mode == child.stateData.backMode) return;
+    if (mode == child.stateData.backMode) {
+      return;
+    }
 
     cloneStateDataAsNeeded();
     child.stateData.backMode = mode;
   }
 
   public void setBackWalkingBike(boolean walkingBike) {
-    if (walkingBike == child.stateData.backWalkingBike) return;
+    if (walkingBike == child.stateData.backWalkingBike) {
+      return;
+    }
 
     cloneStateDataAsNeeded();
     child.stateData.backWalkingBike = walkingBike;
@@ -255,6 +262,7 @@ public class StateEditor {
 
   public void beginFloatingVehicleRenting(
     RentalFormFactor formFactor,
+    PropulsionType propulsionType,
     String network,
     boolean reverse
   ) {
@@ -264,17 +272,20 @@ public class StateEditor {
       child.stateData.currentMode = TraverseMode.WALK;
       child.stateData.vehicleRentalNetwork = null;
       child.stateData.rentalVehicleFormFactor = null;
+      child.stateData.rentalVehiclePropulsionType = null;
       child.stateData.insideNoRentalDropOffArea = false;
     } else {
       child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
       child.stateData.currentMode = formFactor.traverseMode;
       child.stateData.vehicleRentalNetwork = network;
       child.stateData.rentalVehicleFormFactor = formFactor;
+      child.stateData.rentalVehiclePropulsionType = propulsionType;
     }
   }
 
   public void beginVehicleRentingAtStation(
     RentalFormFactor formFactor,
+    PropulsionType propulsionType,
     String network,
     boolean mayKeep,
     boolean reverse
@@ -286,6 +297,7 @@ public class StateEditor {
       child.stateData.currentMode = TraverseMode.WALK;
       child.stateData.vehicleRentalNetwork = null;
       child.stateData.rentalVehicleFormFactor = null;
+      child.stateData.rentalVehiclePropulsionType = null;
       child.stateData.backWalkingBike = false;
     } else {
       child.stateData.mayKeepRentedVehicleAtDestination = mayKeep;
@@ -293,11 +305,13 @@ public class StateEditor {
       child.stateData.currentMode = formFactor.traverseMode;
       child.stateData.vehicleRentalNetwork = network;
       child.stateData.rentalVehicleFormFactor = formFactor;
+      child.stateData.rentalVehiclePropulsionType = propulsionType;
     }
   }
 
   public void dropOffRentedVehicleAtStation(
     RentalFormFactor formFactor,
+    PropulsionType propulsionType,
     String network,
     boolean reverse
   ) {
@@ -308,17 +322,24 @@ public class StateEditor {
       child.stateData.currentMode = formFactor.traverseMode;
       child.stateData.vehicleRentalNetwork = network;
       child.stateData.rentalVehicleFormFactor = formFactor;
+      child.stateData.rentalVehiclePropulsionType = propulsionType;
     } else {
       child.stateData.mayKeepRentedVehicleAtDestination = false;
       child.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
       child.stateData.currentMode = TraverseMode.WALK;
       child.stateData.vehicleRentalNetwork = null;
       child.stateData.rentalVehicleFormFactor = null;
+      child.stateData.rentalVehiclePropulsionType = null;
       child.stateData.backWalkingBike = false;
     }
   }
 
-  public void dropFloatingVehicle(RentalFormFactor formFactor, String network, boolean reverse) {
+  public void dropFloatingVehicle(
+    RentalFormFactor formFactor,
+    PropulsionType propulsionType,
+    String network,
+    boolean reverse
+  ) {
     cloneStateDataAsNeeded();
     if (reverse) {
       child.stateData.mayKeepRentedVehicleAtDestination = false;
@@ -328,12 +349,14 @@ public class StateEditor {
         : StreetModeToRentalTraverseModeMapper.map(child.getRequest().mode());
       child.stateData.vehicleRentalNetwork = network;
       child.stateData.rentalVehicleFormFactor = formFactor;
+      child.stateData.rentalVehiclePropulsionType = propulsionType;
     } else {
       child.stateData.mayKeepRentedVehicleAtDestination = false;
       child.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
       child.stateData.currentMode = TraverseMode.WALK;
       child.stateData.vehicleRentalNetwork = null;
       child.stateData.rentalVehicleFormFactor = null;
+      child.stateData.rentalVehiclePropulsionType = null;
       child.stateData.backWalkingBike = false;
     }
   }
@@ -399,7 +422,8 @@ public class StateEditor {
    * older states.
    */
   private void cloneStateDataAsNeeded() {
-    if (child.backState != null && child.stateData == child.backState.stateData) child.stateData =
-      child.stateData.clone();
+    if (child.backState != null && child.stateData == child.backState.stateData) {
+      child.stateData = child.stateData.clone();
+    }
   }
 }

@@ -19,16 +19,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedInfoTestFactory;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
@@ -132,7 +132,9 @@ public class CalendarServiceDataFactoryImplTest {
 
     // Supplement test data with at least one entity in all collections
     builder.getCalendarDates().add(removeMondayFromAlldays());
-    builder.getFeedInfos().add(FeedInfo.dummyForTest(TimetableRepositoryForTest.FEED_ID));
+    builder
+      .getFeedInfos()
+      .add(FeedInfoTestFactory.dummyForTest(TimetableRepositoryForTest.FEED_ID));
 
     return ctxBuilder.build();
   }

@@ -1,18 +1,17 @@
 package org.opentripplanner.framework.graphql;
 
-import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import graphql.ExecutionInput;
 import graphql.execution.ExecutionContext;
-import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.i18n.TranslatedString;
+import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
+import org.opentripplanner.core.model.i18n.TranslatedString;
 
 class GraphQLUtilsTest {
 
@@ -24,10 +23,7 @@ class GraphQLUtilsTest {
       .locale(Locale.ENGLISH)
       .build();
 
-    executionContext = newExecutionContextBuilder()
-      .executionInput(executionInput)
-      .executionId(ExecutionId.from("GraphQLUtilsTest"))
-      .build();
+    executionContext = DataFetchingSupport.executionContext(executionInput);
   }
 
   @Test

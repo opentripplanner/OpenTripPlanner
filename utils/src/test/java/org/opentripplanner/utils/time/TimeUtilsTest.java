@@ -112,6 +112,7 @@ public class TimeUtilsTest {
     assertEquals("[120]", Arrays.toString(TimeUtils.times("0:2")));
     assertEquals("[3]", Arrays.toString(TimeUtils.times("0:0:3")));
     assertEquals("[3723]", Arrays.toString(TimeUtils.times("01:02:03")));
+    assertEquals("[3600, 60]", Arrays.toString(TimeUtils.times(" 1   0:1 ")));
     assertEquals("[3600, 60, 1]", Arrays.toString(TimeUtils.times("1 0:1 0:0:1")));
     assertEquals("[3600, 60, 1, 7200]", Arrays.toString(TimeUtils.times("1,0:1;0:0:1,; 2")));
   }

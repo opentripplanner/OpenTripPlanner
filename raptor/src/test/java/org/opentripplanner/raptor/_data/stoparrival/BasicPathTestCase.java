@@ -5,7 +5,6 @@ import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.bus;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.egress;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.transfer;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexWithOnBoard;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.raptor.api.model.RaptorTransferConstraint.REGULAR_TRANSFER;
@@ -75,7 +74,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     "BUS L31 11:40 11:52 12m C₁1_776 " +
     "~ E 15s ~ " +
     "Walk 7m45s 11:52:15 12:00 C₁930 " +
-    "[10:00:15 12:00 1h59m45s Tₓ2 C₁8_154 C₂7]";
+    "[10:00:15 12:00 1h59m45s Tₙ2 C₁8_154 C₂7]";
 
   public static final String BASIC_PATH_AS_STRING =
     "Walk 3m ~ A" +
@@ -84,7 +83,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     " ~ BUS L21 11:00 11:23 ~ D" +
     " ~ BUS L31 11:40 11:52 ~ E" +
     " ~ Walk 7m45s " +
-    "[10:00:15 12:00 1h59m45s Tₓ2 C₁8_154 C₂7]";
+    "[10:00:15 12:00 1h59m45s Tₙ2 C₁8_154 C₂7]";
 
   private static final int BOARD_C1_SEC = 60;
   private static final int TRANSFER_C1_SEC = 120;
@@ -182,11 +181,10 @@ public class BasicPathTestCase implements RaptorTestConstants {
     EGRESS_C1
   );
   // this is of course not a real flex egress
-  private static final RaptorAccessEgress FLEX = flexWithOnBoard(
+  private static final RaptorAccessEgress FLEX = TestAccessEgress.flex(
     STOP_E,
-    EGRESS_DURATION,
-    EGRESS_C1
-  );
+    EGRESS_DURATION
+  ).withCost(EGRESS_C1);
 
   public static final String LINE_11 = "L11";
   public static final String LINE_21 = "L21";

@@ -5,11 +5,11 @@ import java.util.Optional;
 import java.util.function.IntSupplier;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Location corresponding to a location where riders may request pickup or drop off, defined in the

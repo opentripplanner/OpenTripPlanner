@@ -30,16 +30,16 @@ class PS1_LegacyMetaDataTest {
     var testDriver = model.departAfterDriver(T12_00, SEARCH_WINDOW_USED, 3);
     var subject = testDriver.pagingService();
 
-    assertEquals(D30m, subject.createTripSearchMetadata().searchWindowUsed);
+    assertEquals(D30m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
     assertEquals(
       "11:30",
-      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime)
+      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime())
     );
     // 12:11 will drop results, the solution is to use the complete sort-vector.
     // The cursor implementation does that
     assertEquals(
       "12:11",
-      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime)
+      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime())
     );
   }
 
@@ -50,11 +50,17 @@ class PS1_LegacyMetaDataTest {
     var testDriver = model.departAfterDriver(T08_45, SEARCH_WINDOW_USED, 3);
     var subject = testDriver.pagingService();
 
-    assertEquals(D30m, subject.createTripSearchMetadata().searchWindowUsed);
-    assertEquals("8:15", TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime));
+    assertEquals(D30m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
+    assertEquals(
+      "8:15",
+      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime())
+    );
     // 12:11 will drop results, the solution is to use the complete sort-vector.
     // The cursor implementation does that
-    assertEquals("9:15", TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime));
+    assertEquals(
+      "9:15",
+      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime())
+    );
   }
 
   @Test
@@ -64,14 +70,14 @@ class PS1_LegacyMetaDataTest {
     var testDriver = model.arriveByDriver(T12_00, T13_00, SEARCH_WINDOW_USED, 3);
     var subject = testDriver.pagingService();
 
-    assertEquals(D30m, subject.createTripSearchMetadata().searchWindowUsed);
+    assertEquals(D30m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
     assertEquals(
       "11:39",
-      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime)
+      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime())
     );
     assertEquals(
       "12:30",
-      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime)
+      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime())
     );
   }
 
@@ -82,8 +88,14 @@ class PS1_LegacyMetaDataTest {
     var testDriver = model.arriveByDriver(T09_15, T12_00, SEARCH_WINDOW_USED, 3);
     var subject = testDriver.pagingService();
 
-    assertEquals(D30m, subject.createTripSearchMetadata().searchWindowUsed);
-    assertEquals("8:45", TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime));
-    assertEquals("9:45", TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime));
+    assertEquals(D30m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
+    assertEquals(
+      "8:45",
+      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime())
+    );
+    assertEquals(
+      "9:45",
+      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime())
+    );
   }
 }

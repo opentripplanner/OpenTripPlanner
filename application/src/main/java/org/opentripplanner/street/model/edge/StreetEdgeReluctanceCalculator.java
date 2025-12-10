@@ -1,9 +1,10 @@
 package org.opentripplanner.street.model.edge;
 
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
-import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.VehicleWalkingRequest;
+import org.opentripplanner.street.search.request.WalkRequest;
 
 class StreetEdgeReluctanceCalculator {
 
@@ -15,7 +16,7 @@ class StreetEdgeReluctanceCalculator {
    * see {@link #computeWheelchairReluctance(RoutingPreferences, double, boolean, boolean)}.
    */
   static double computeReluctance(
-    RoutingPreferences pref,
+    StreetSearchRequest pref,
     TraverseMode traverseMode,
     boolean walkingBike,
     boolean edgeIsStairs
@@ -33,27 +34,27 @@ class StreetEdgeReluctanceCalculator {
     };
   }
 
-  private static double computeWalkReluctance(WalkPreferences pref, boolean edgeIsStairs) {
-    return pref.reluctance() * (edgeIsStairs ? pref.stairsReluctance() : 1);
+  private static double computeWalkReluctance(WalkRequest req, boolean edgeIsStairs) {
+    return req.reluctance() * (edgeIsStairs ? req.stairsReluctance() : 1);
   }
 
   private static double computeBikeWalkingReluctance(
-    VehicleWalkingPreferences pref,
+    VehicleWalkingRequest pref,
     boolean edgeIsStairs
   ) {
     return pref.reluctance() * (edgeIsStairs ? pref.stairsReluctance() : 1);
   }
 
   static double computeWheelchairReluctance(
-    RoutingPreferences preferences,
+    StreetSearchRequest request,
     double maxSlope,
     boolean edgeWheelchairAccessible,
     boolean stairs
   ) {
-    var wheelchair = preferences.wheelchair();
+    var wheelchair = request.wheelchair();
     // Add reluctance if street is not wheelchair accessible
     double reluctance = edgeWheelchairAccessible ? 1.0 : wheelchair.inaccessibleStreetReluctance();
-    reluctance *= preferences.walk().reluctance();
+    reluctance *= request.walk().reluctance();
 
     // Add reluctance for stairs
     if (stairs) {

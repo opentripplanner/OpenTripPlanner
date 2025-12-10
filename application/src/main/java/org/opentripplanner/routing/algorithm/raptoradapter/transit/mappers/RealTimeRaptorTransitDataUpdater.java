@@ -10,13 +10,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.Timetable;
+import org.opentripplanner.transit.model.timetable.TimetableSnapshotUpdateListener;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -35,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * incremental changes are applied to both the TimetableSnapshot and the RaptorTransitData and they are
  * published together.
  */
-public class RealTimeRaptorTransitDataUpdater {
+public class RealTimeRaptorTransitDataUpdater implements TimetableSnapshotUpdateListener {
 
   private static final Logger LOG = LoggerFactory.getLogger(RealTimeRaptorTransitDataUpdater.class);
 
@@ -66,9 +69,32 @@ public class RealTimeRaptorTransitDataUpdater {
     this.timetableRepository = timetableRepository;
   }
 
+  /// Updates the real-time [RaptorTransitData] to use the modified timetables.
+  ///
+  /// This method bridges the different update approaches:
+  /// 1. `updatedTimetables` and `timetables` only contains [Timetable]s with real-time
+  ///    updates. This means that removed items are not present.
+  /// 2. [RaptorTransitData] requires applying the changes to a previous snapshot: adding,
+  ///    updating and removing timetables.
+  ///
+  /// To support this the method has three tasks:
+  /// 1. Collect [TripPatternForDate]s which have invalidated data (`oldTripPatternsForDate`).
+  ///    Trips may change in multiple ways and because of that may move between [TripPattern]s. To
+  ///    track a [TripIdAndServiceDate] it's previous state needs to be stored so that all relevant
+  ///    places may be updated.
+  ///      * a trip may have a new (real-time) Timetable, which results in two updated [Timetable]s
+  ///      * a trip may move between scheduled [StopPattern]s and/or real-time [StopPattern]s
+  /// 2. Collect [TripPatternForDate]s which have valid data (`newTripPatternsForDate`).
+  ///    There are two options:
+  ///    1. an update was received
+  ///    2. no update was received, and so the previous updated should be removed. If the update
+  ///       was for a scheduled trip, then the schedule should be restored.
+  /// 3. Remove the `oldTripPatternsForDate` and add the `newTripPatternsForDate` to the
+  ///    [RaptorTransitData].
+  @Override
   public void update(
     Collection<Timetable> updatedTimetables,
-    Map<TripPattern, SortedSet<Timetable>> timetables
+    Function<FeedScopedId, SortedSet<Timetable>> timetableProvider
   ) {
     if (!timetableRepository.hasRealtimeRaptorTransitData()) {
       return;
@@ -191,7 +217,7 @@ public class RealTimeRaptorTransitDataUpdater {
           if (!pattern.isCreatedByRealtimeUpdater()) {
             continue;
           }
-          var oldTimeTable = timetables.get(pattern);
+          var oldTimeTable = timetableProvider.apply(pattern.getId());
           if (oldTimeTable != null) {
             var toRemove = oldTimeTable
               .stream()
@@ -204,7 +230,8 @@ public class RealTimeRaptorTransitDataUpdater {
               patternsForDate.remove(tripPatternForDate);
             }
           } else {
-            LOG.warn("Could not fetch timetable for {}", pattern);
+            LOG.warn("Could not fetch timetable for {}, removing.", pattern);
+            patternsForDate.remove(tripPatternForDate);
           }
         }
       }

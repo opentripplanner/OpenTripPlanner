@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assertions;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -30,10 +32,12 @@ import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
+import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
+import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.collection.ListUtils;
 
@@ -64,6 +68,12 @@ class RaptorRequestMapperTest {
     List.of(),
     10,
     12.0
+  );
+  private static final VisitViaLocation VISIT_VIA_LOCATION_COORDINATE = new VisitViaLocation(
+    "Via coordinate",
+    Duration.ofMinutes(10),
+    List.of(),
+    List.of(VIA_COORDINATE)
   );
 
   private static final CostLinearFunction R1 = CostLinearFunction.of("50 + 1.0x");
@@ -132,13 +142,7 @@ class RaptorRequestMapperTest {
   @Test
   void testViaCoordinate() {
     var req = requestBuilder();
-    Duration minimumWaitTime = Duration.ofMinutes(10);
-
-    req.withViaLocations(
-      List.of(
-        new VisitViaLocation("Via coordinate", minimumWaitTime, List.of(), List.of(VIA_COORDINATE))
-      )
-    );
+    req.withViaLocations(List.of(VISIT_VIA_LOCATION_COORDINATE));
 
     var result = map(req.buildRequest());
 
@@ -260,6 +264,24 @@ class RaptorRequestMapperTest {
     }
   }
 
+  @Test
+  void testRaptorDegugRequest() {
+    var request = requestBuilder()
+      .withJourney(jb ->
+        jb.withTransit(tb ->
+          tb.withRaptorDebugging(db -> db.withStops(STOP_A.getId().toString()).withPath("2 3* 4"))
+        )
+      )
+      .buildRequest();
+
+    var result = map(request);
+    var subject = result.debug();
+
+    assertEquals(List.of(STOP_A.getIndex()), subject.stops());
+    assertEquals(List.of(2, 3, 4), subject.path());
+    assertEquals(1, subject.debugPathFromStopIndex());
+  }
+
   private static RaptorRequest<TestTripSchedule> map(RouteRequest request) {
     return RaptorRequestMapper.mapRequest(
       request,
@@ -269,7 +291,15 @@ class RaptorRequestMapperTest {
       EGRESS,
       null,
       new DummyViaCoordinateTransferFactory(),
-      id -> IntStream.of(STOPS_MAP.get(id).getIndex())
+      id -> IntStream.of(STOPS_MAP.get(id).getIndex()),
+      new LinkingContext(
+        Map.of(
+          VISIT_VIA_LOCATION_COORDINATE.coordinateLocation(),
+          Set.of(new LabelledIntersectionVertex("viapoint", 1, 1, false, false))
+        ),
+        Set.of(),
+        Set.of()
+      )
     );
   }
 
@@ -324,10 +354,10 @@ class RaptorRequestMapperTest {
   ) {
     return switch (feature) {
       case VIA_VISIT -> req.withViaLocations(
-        ListUtils.combine(req.buildRequest().getViaLocations(), List.of(VISIT_VIA_LOCATION))
+        ListUtils.combine(req.buildRequest().listViaLocations(), List.of(VISIT_VIA_LOCATION))
       );
       case VIA_PASS_THROUGH -> req.withViaLocations(
-        ListUtils.combine(req.buildRequest().getViaLocations(), List.of(PASS_THROUGH_VIA_LOCATION))
+        ListUtils.combine(req.buildRequest().listViaLocations(), List.of(PASS_THROUGH_VIA_LOCATION))
       );
       case TRANSIT_GROUP_PRIORITY -> req.withPreferences(p ->
         p.withTransit(t -> t.withRelaxTransitGroupPriority(RELAX_TRANSIT_GROUP_PRIORITY))
@@ -354,7 +384,7 @@ class RaptorRequestMapperTest {
     @Override
     public List<ViaCoordinateTransfer> createViaTransfers(
       RouteRequest request,
-      String ignore,
+      Vertex viaVertex,
       WgsCoordinate coordinate
     ) {
       // Make sure the input is the expected via-coordinate

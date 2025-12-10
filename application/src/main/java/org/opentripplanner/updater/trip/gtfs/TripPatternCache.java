@@ -2,8 +2,8 @@ package org.opentripplanner.updater.trip.gtfs;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;

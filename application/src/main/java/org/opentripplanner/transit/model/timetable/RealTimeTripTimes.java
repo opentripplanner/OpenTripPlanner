@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -351,8 +351,12 @@ public final class RealTimeTripTimes implements TripTimes {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     RealTimeTripTimes that = (RealTimeTripTimes) o;
     return (
       Objects.equals(scheduledTripTimes, that.scheduledTripTimes) &&

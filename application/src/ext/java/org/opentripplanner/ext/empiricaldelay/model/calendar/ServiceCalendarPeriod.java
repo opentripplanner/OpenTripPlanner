@@ -39,7 +39,9 @@ public class ServiceCalendarPeriod implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     ServiceCalendarPeriod that = (ServiceCalendarPeriod) o;
     return (
       Objects.equals(serviceId, that.serviceId) &&

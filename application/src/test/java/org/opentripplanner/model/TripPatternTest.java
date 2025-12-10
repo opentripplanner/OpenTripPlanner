@@ -7,9 +7,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -105,7 +105,7 @@ public class TripPatternTest {
     var stopPattern = builder.build();
     var route = TimetableRepositoryForTest.route("R1").build();
 
-    return TripPattern.of(new FeedScopedId("Test", "T1"))
+    return TripPattern.of(new FeedScopedId(route.getId().getFeedId(), "T1"))
       .withRoute(route)
       .withStopPattern(stopPattern)
       .withOriginalTripPattern(originalTripPattern)

@@ -10,12 +10,11 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransfe
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.BikePreferences;
-import org.opentripplanner.routing.api.request.preference.StreetPreferences;
-import org.opentripplanner.routing.api.request.preference.WalkPreferences;
-import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
+import org.opentripplanner.street.search.request.BikeRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
+import org.opentripplanner.street.search.request.WalkRequest;
+import org.opentripplanner.street.search.request.WheelchairRequest;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,40 +108,39 @@ public class RaptorRequestTransferCache {
   private static class StreetRelevantOptions {
 
     private final StreetMode transferMode;
-    private final boolean wheelchair;
-    private final WalkPreferences walk;
-    private final BikePreferences bike;
-    private final StreetPreferences street;
-    private final WheelchairPreferences wheelchairPreferences;
+    private final boolean wheelchairEnabled;
+    private final WalkRequest walk;
+    private final BikeRequest bike;
+    private final WheelchairRequest wheelchair;
+    private final double turnReluctance;
 
     public StreetRelevantOptions(StreetSearchRequest request) {
       this.transferMode = request.mode();
-      this.wheelchair = request.wheelchair();
+      this.wheelchairEnabled = request.wheelchairEnabled();
 
-      var preferences = request.preferences();
-      this.walk = preferences.walk();
-      this.bike = transferMode.includesBiking() ? preferences.bike() : BikePreferences.DEFAULT;
-      this.street = preferences.street();
-      this.wheelchairPreferences = this.wheelchair
-        ? preferences.wheelchair()
-        : WheelchairPreferences.DEFAULT;
+      this.walk = request.walk();
+      this.bike = transferMode.includesBiking() ? request.bike() : BikeRequest.DEFAULT;
+      this.turnReluctance = request.turnReluctance();
+      this.wheelchair = request.wheelchairEnabled()
+        ? request.wheelchair()
+        : WheelchairRequest.DEFAULT;
     }
 
     @Override
     public String toString() {
       return ToStringBuilder.of(StreetRelevantOptions.class)
         .addEnum("transferMode", transferMode)
-        .addBoolIfTrue("wheelchair", wheelchair)
-        .addObj("walk", walk, WalkPreferences.DEFAULT)
-        .addObj("bike", bike, BikePreferences.DEFAULT)
-        .addObj("street", street, StreetPreferences.DEFAULT)
-        .addObj("wheelchairPreferences", wheelchairPreferences, WheelchairPreferences.DEFAULT)
+        .addBoolIfTrue("wheelchair", wheelchairEnabled)
+        .addObj("walk", walk, WalkRequest.DEFAULT)
+        .addObj("bike", bike, BikeRequest.DEFAULT)
+        .addNum("turnReluctance", turnReluctance)
+        .addObj("wheelchair", wheelchair, WheelchairRequest.DEFAULT)
         .toString();
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(transferMode, wheelchair, walk, bike, street, wheelchairPreferences);
+      return Objects.hash(transferMode, wheelchairEnabled, walk, bike, turnReluctance, wheelchair);
     }
 
     @Override
@@ -155,11 +153,11 @@ public class RaptorRequestTransferCache {
       }
       return (
         transferMode == that.transferMode &&
-        wheelchair == that.wheelchair &&
+        wheelchairEnabled == that.wheelchairEnabled &&
         Objects.equals(that.walk, walk) &&
         Objects.equals(that.bike, bike) &&
-        Objects.equals(that.street, street) &&
-        Objects.equals(that.wheelchairPreferences, wheelchairPreferences)
+        Objects.equals(that.turnReluctance, turnReluctance) &&
+        Objects.equals(that.wheelchair, wheelchair)
       );
     }
   }

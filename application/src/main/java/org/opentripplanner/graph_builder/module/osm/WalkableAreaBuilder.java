@@ -20,10 +20,10 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmEntity;
@@ -367,7 +367,9 @@ class WalkableAreaBuilder {
     Set<Edge> edges,
     Set<Edge> edgesToKeep
   ) {
-    if (edges.isEmpty()) return;
+    if (edges.isEmpty()) {
+      return;
+    }
     StreetMode mode;
     StreetEdge firstEdge = (StreetEdge) edges.iterator().next();
 

@@ -17,6 +17,7 @@ import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.GenericLocation;
@@ -32,7 +33,6 @@ import org.opentripplanner.routing.api.request.request.filter.TransitFilterReque
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class LegacyRouteRequestMapper {
 
@@ -321,7 +321,9 @@ public class LegacyRouteRequestMapper {
   ) {
     callWith.argument("bikeWalkingReluctance", walking::withReluctance);
     callWith.argument("bikeWalkingSpeed", walking::withSpeed);
-    callWith.argument("bikeSwitchTime", time -> walking.withMountDismountTime((int) time));
+    callWith.argument("bikeSwitchTime", time ->
+      walking.withMountDismountTime(Duration.ofSeconds((int) time))
+    );
     callWith.argument("bikeSwitchCost", cost -> walking.withMountDismountCost((int) cost));
   }
 

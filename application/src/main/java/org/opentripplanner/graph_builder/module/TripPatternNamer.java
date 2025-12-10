@@ -152,7 +152,9 @@ public class TripPatternNamer implements GraphBuilderModule {
 
         /* Still not unique; try (end, start, via) for each via. */
         for (var via : pattern.getStops()) {
-          if (via.equals(start) || via.equals(end)) continue;
+          if (via.equals(start) || via.equals(end)) {
+            continue;
+          }
           Set<TripPattern> intersection = new HashSet<>(remainingPatterns);
           intersection.retainAll(vias.get(via));
           if (intersection.size() == 1) {

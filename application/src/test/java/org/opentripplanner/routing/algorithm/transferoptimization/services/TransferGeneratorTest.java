@@ -18,7 +18,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
@@ -27,6 +26,7 @@ import org.opentripplanner.raptorlegacy._data.transit.TestTransfers;
 import org.opentripplanner.raptorlegacy._data.transit.TestTransitData;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TestSlackProvider;
 import org.opentripplanner.utils.time.TimeUtils;
 
 public class TransferGeneratorTest implements RaptorTestConstants {
@@ -39,10 +39,10 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   private static final int ACCESS_START = TimeUtils.time("10:00");
   private static final int ACCESS_DURATION = D1m;
 
-  private static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
-    TRANSFER_SLACK,
+  private static final RaptorSlackProvider SLACK_PROVIDER = new TestSlackProvider(
     BOARD_SLACK,
-    ALIGHT_SLACK
+    ALIGHT_SLACK,
+    TRANSFER_SLACK
   );
 
   private final TestPathBuilder pathBuilder = new TestPathBuilder(SLACK_PROVIDER, COST_CALCULATOR);
@@ -355,7 +355,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
   @Test
   void findTransferForDifferentRoutesWithCustomBoardingSlack() {
-    RaptorSlackProvider slackProvider = new DefaultSlackProvider(0, 0, 0) {
+    RaptorSlackProvider slackProvider = new TestSlackProvider(0, 0, 0) {
       @Override
       public int boardSlack(int slackIndex) {
         return slackIndex == 1 ? 20 * 60 : 0;
@@ -547,7 +547,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // The only possible place to transfer between A and C is stop B (no extra transfers):
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_C);
 
-    data.withSlackProvider(new DefaultSlackProvider((int) transferSlack.toSeconds(), 0, 0));
+    data.withSlackProvider(new TestSlackProvider(0, 0, (int) transferSlack.toSeconds()));
 
     var subject = new TransferGenerator<>(tsAdaptor, data);
 

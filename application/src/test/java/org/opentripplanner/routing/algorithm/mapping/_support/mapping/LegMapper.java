@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.apis.gtfs.mapping.LocalDateMapper;
-import org.opentripplanner.framework.i18n.I18NStringMapper;
+import org.opentripplanner.core.model.i18n.I18NStringMapper;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.leg.StreetLeg;

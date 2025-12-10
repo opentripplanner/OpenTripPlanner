@@ -47,12 +47,6 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
     return this;
   }
 
-  public StreetSearchBuilder withVerticesContainer(TemporaryVerticesContainer container) {
-    withFrom(container.getFromVertices());
-    withTo(container.getToVertices());
-    return this;
-  }
-
   public StreetSearchBuilder withIntersectionTraversalCalculator(
     IntersectionTraversalCalculator intersectionTraversalCalculator
   ) {
@@ -74,7 +68,7 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
 
   @Override
   protected Collection<State> createInitialStates(Set<Vertex> originVertices) {
-    StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper.map(routeRequest)
+    StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper.mapInternal(routeRequest)
       .withMode(streetRequest.mode())
       .withArriveBy(arriveBy())
       .build();

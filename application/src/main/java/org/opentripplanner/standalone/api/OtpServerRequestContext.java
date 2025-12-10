@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -27,6 +28,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -124,10 +126,10 @@ public interface OtpServerRequestContext {
 
   default GraphFinder graphFinder() {
     return GraphFinder.getInstance(
-      graph(),
-      vertexLinker(),
+      graph().hasStreets,
       transitService()::getRegularStop,
-      transitService()::findRegularStopsByBoundingBox
+      transitService()::findRegularStopsByBoundingBox,
+      linkingContextFactory()
     );
   }
 
@@ -144,6 +146,9 @@ public interface OtpServerRequestContext {
   TransmodelAPIParameters transmodelAPIParameters();
 
   /* Sandbox modules */
+
+  @Nullable
+  CarpoolingService carpoolingService();
 
   @Nullable
   default List<ExtensionRequestContext> listExtensionRequestContexts(RouteRequest request) {
@@ -183,4 +188,6 @@ public interface OtpServerRequestContext {
   FareService fareService();
 
   VertexLinker vertexLinker();
+
+  LinkingContextFactory linkingContextFactory();
 }

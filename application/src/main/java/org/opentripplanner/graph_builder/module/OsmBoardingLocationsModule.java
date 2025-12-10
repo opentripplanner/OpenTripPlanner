@@ -12,10 +12,10 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.StopResolver;
@@ -109,7 +109,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           break;
         }
       }
-      if (alreadyLinked) continue;
+      if (alreadyLinked) {
+        continue;
+      }
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
         var stop = stopResolver.getStop(ts.getId());
@@ -124,9 +126,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   private boolean connectVertexToStop(TransitStopVertex ts, RegularStop stop, Graph index) {
-    if (connectVertexToNode(ts, stop, index)) return true;
+    if (connectVertexToNode(ts, stop, index)) {
+      return true;
+    }
 
-    if (connectVertexToWay(ts, stop, index)) return true;
+    if (connectVertexToWay(ts, stop, index)) {
+      return true;
+    }
 
     return connectVertexToArea(ts, index);
   }

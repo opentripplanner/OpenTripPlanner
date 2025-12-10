@@ -5,7 +5,6 @@ import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATI
 import java.time.LocalDate;
 import java.util.Arrays;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -16,7 +15,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.
  * <p>
- * The {@link DefaultTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
+ * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
  *
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
  *             module. Use the OTP model entities instead.
@@ -26,7 +25,7 @@ public class TestTripSchedule implements TripSchedule {
 
   private static final int DEFAULT_DEPARTURE_DELAY = 10;
   private static final LocalDate DATE = LocalDate.of(2025, 6, 25);
-  private final DefaultTripPattern pattern;
+  private final TestTripPattern pattern;
   private final int[] arrivalTimes;
   private final int[] departureTimes;
   private final int transitReluctanceIndex;
@@ -84,8 +83,7 @@ public class TestTripSchedule implements TripSchedule {
     return departureTimes[stopPosInPattern];
   }
 
-  @Override
-  public DefaultTripPattern pattern() {
+  public TestTripPattern pattern() {
     return pattern;
   }
 

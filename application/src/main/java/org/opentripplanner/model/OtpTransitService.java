@@ -3,20 +3,20 @@ package org.opentripplanner.model;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.Map;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.BoardingArea;
-import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.SiteRepository;
 
 /**
@@ -51,8 +51,6 @@ public interface OtpTransitService {
    */
   Collection<FeedScopedId> getAllServiceIds();
 
-  Collection<Entrance> getAllEntrances();
-
   Collection<PathwayNode> getAllPathwayNodes();
 
   Collection<BoardingArea> getAllBoardingAreas();
@@ -62,6 +60,8 @@ public interface OtpTransitService {
   Collection<TripPattern> getTripPatterns();
 
   Collection<Trip> getAllTrips();
+
+  Collection<TripOnServiceDate> getTripOnServiceDates();
 
   Collection<FlexTrip<?, ?>> getAllFlexTrips();
 

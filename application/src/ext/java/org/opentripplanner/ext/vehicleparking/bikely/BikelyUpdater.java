@@ -11,9 +11,10 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.i18n.LocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.LocalizedString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
@@ -22,7 +23,6 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.transit.model.basic.LocalizedMoney;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.spi.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +145,10 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
   }
 
   private static VehicleParkingState toState(boolean isUnderMaintenance) {
-    if (isUnderMaintenance) return VehicleParkingState.TEMPORARILY_CLOSED;
-    else return OPERATIONAL;
+    if (isUnderMaintenance) {
+      return VehicleParkingState.TEMPORARILY_CLOSED;
+    } else {
+      return OPERATIONAL;
+    }
   }
 }

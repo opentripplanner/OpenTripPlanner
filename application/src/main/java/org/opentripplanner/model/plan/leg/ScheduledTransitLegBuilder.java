@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -36,6 +37,8 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   private int generalizedCost;
   private Set<TransitAlert> alerts = Set.of();
   private Double distanceMeters;
+  private ViaLocationType fromViaLocationType;
+  private ViaLocationType toViaLocationType;
 
   // Sandbox fields
   private Float accessibilityScore;
@@ -60,6 +63,8 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     alerts = original.listTransitAlerts();
     distanceMeters = original.distanceMeters();
     fareOffers = original.fareOffers();
+    fromViaLocationType = original.fromViaLocationType();
+    toViaLocationType = original.toViaLocationType();
 
     // Sandbox fields
     accessibilityScore = original.accessibilityScore();
@@ -217,6 +222,26 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   public B withFareProducts(List<FareOffer> fareProducts) {
     this.fareOffers = Objects.requireNonNull(fareProducts);
     return instance();
+  }
+
+  public B withFromViaLocationType(@Nullable ViaLocationType type) {
+    this.fromViaLocationType = type;
+    return instance();
+  }
+
+  @Nullable
+  public ViaLocationType fromViaLocationType() {
+    return fromViaLocationType;
+  }
+
+  public B withToViaLocationType(@Nullable ViaLocationType type) {
+    this.toViaLocationType = type;
+    return instance();
+  }
+
+  @Nullable
+  public ViaLocationType toViaLocationType() {
+    return toViaLocationType;
   }
 
   public ScheduledTransitLeg build() {

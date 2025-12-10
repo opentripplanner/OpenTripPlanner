@@ -17,7 +17,8 @@ import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -31,7 +32,6 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.VehicleRentalState;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class VehicleRentalEdgeTest {
 
@@ -216,6 +216,29 @@ class VehicleRentalEdgeTest {
     assertTrue(State.isEmpty(s1));
   }
 
+  @Test
+  void propulsionTypeIsStoredInStateAfterRentingFromStation() {
+    initEdgeAndRequest(BIKE_RENTAL, BICYCLE, ELECTRIC, 3, 3, false, true, true, false);
+
+    var s1 = rent();
+
+    assertFalse(State.isEmpty(s1));
+    assertEquals(ELECTRIC, s1[0].rentalVehiclePropulsionType());
+    assertTrue(s1[0].isRentingVehicle());
+  }
+
+  @Test
+  void propulsionTypeIsStoredInStateAfterRentingFloatingVehicle() {
+    initFreeFloatingEdgeAndRequest(SCOOTER_RENTAL, SCOOTER, false);
+
+    var s1 = rent();
+
+    assertFalse(State.isEmpty(s1));
+    // Free floating vehicles from TestFreeFloatingRentalVehicleBuilder use ELECTRIC propulsion
+    assertEquals(ELECTRIC, s1[0].rentalVehiclePropulsionType());
+    assertTrue(s1[0].isRentingVehicle());
+  }
+
   @Nested
   class StartedReverseSearchInNoGeofencingZone {
 
@@ -326,14 +349,10 @@ class VehicleRentalEdgeTest {
 
     this.request = StreetSearchRequest.of()
       .withMode(mode)
-      .withPreferences(preferences ->
-        preferences
-          .withBike(bike ->
-            bike.withRental(rental ->
-              rental.withUseAvailabilityInformation(useRealtime).withBannedNetworks(bannedNetworks)
-            )
-          )
-          .build()
+      .withBike(bike ->
+        bike.withRental(rental ->
+          rental.withUseAvailabilityInformation(useRealtime).withBannedNetworks(bannedNetworks)
+        )
       )
       .build();
   }
@@ -351,14 +370,10 @@ class VehicleRentalEdgeTest {
 
     this.request = StreetSearchRequest.of()
       .withMode(mode)
-      .withPreferences(preferences ->
-        preferences
-          .withCar(car -> car.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
-          .withBike(bike -> bike.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
-          .withScooter(scooter ->
-            scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
-          )
-          .build()
+      .withCar(car -> car.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
+      .withBike(bike -> bike.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
+      .withScooter(scooter ->
+        scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
       )
       .build();
   }

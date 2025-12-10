@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -103,8 +103,12 @@ public abstract class FilterValues<E> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof FilterValues<?> that)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof FilterValues<?> that)) {
+      return false;
+    }
     return Objects.equals(values, that.values) && Objects.equals(name, that.name);
   }
 

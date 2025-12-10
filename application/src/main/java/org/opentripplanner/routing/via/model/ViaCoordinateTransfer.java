@@ -4,7 +4,7 @@ import java.util.List;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
-import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
+import org.opentripplanner.raptor.api.model.RaptorValueType;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -101,7 +101,7 @@ public class ViaCoordinateTransfer implements RaptorTransfer {
       " " +
       DurationUtils.durationToStr(durationInSeconds) +
       " " +
-      RaptorValueFormatter.formatC1(raptorCost) +
+      RaptorValueType.C1.format(raptorCost) +
       "}"
     );
   }

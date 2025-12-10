@@ -796,7 +796,7 @@ type Leg {
   """
   interlineWithPreviousLeg: Boolean
   "Whether the destination of this leg (field `to`) is one of the intermediate places specified in the query."
-  intermediatePlace: Boolean @deprecated(reason : "Not implemented")
+  intermediatePlace: Boolean @deprecated(reason : "Not implemented. Use `viaLocationType` from from/to fields instead.")
   """
   For transit legs, intermediate stops between the Place where the leg
   originates and the Place where the leg ends. For non-transit legs, null.
@@ -933,7 +933,7 @@ type Location {
 }
 
 """
-A group of fixed stops that is visited in an arbitrary order.
+A group of fixed stops that are visited in an arbitrary order.
 
 This is mostly used by demand-responsive services.
 """
@@ -1104,6 +1104,11 @@ type Place {
   used for better localization of bike sharing and P+R station names
   """
   vertexType: VertexType @deprecated(reason : "Unmaintained. Use `stop`, `rentalVehicle`, `vehicleParking` or `vehicleRentalStation` to tell which type it is.") @timingData
+  """
+  This defines if the place is a requested via location, and what kind it is. If the value is
+  `null`, this place is not a via location.
+  """
+  viaLocationType: ViaLocationType
 }
 
 type Plan {
@@ -1119,12 +1124,7 @@ type Plan {
   messageEnums: [String]!
   "A list of possible error messages in cleartext"
   messageStrings: [String]!
-  """
-  This is the suggested search time for the "next page" or time window. Insert it together
-  with the searchWindowUsed in the request to get a new set of trips following in the
-  search-window AFTER the current search. No duplicate trips should be returned, unless a trip
-  is delayed and new real-time data is available.
-  """
+  "This will not be available after Match 2026."
   nextDateTime: Long @deprecated(reason : "Use nextPageCursor instead") @timingData
   """
   Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last response
@@ -1134,12 +1134,7 @@ type Plan {
   This is only usable when public transportation mode(s) are included in the query.
   """
   nextPageCursor: String
-  """
-  This is the suggested search time for the "previous page" or time window. Insert it together
-  with the searchWindowUsed in the request to get a new set of trips preceding in the
-  search-window BEFORE the current search. No duplicate trips should be returned, unless a trip
-  is delayed and new real-time data is available.
-  """
+  "This will not be available after Match 2026."
   prevDateTime: Long @deprecated(reason : "Use previousPageCursor instead") @timingData
   """
   Use the cursor to go to the previous "page" of itineraries. Copy the cursor from the last
@@ -1158,7 +1153,7 @@ type Plan {
     
   The unit is seconds.
   """
-  searchWindowUsed: Long
+  searchWindowUsed: Long @deprecated(reason : "This is not needed for debugging, and is misleading if the window is cropped.")
   "The destination"
   to: Place!
 }
@@ -2045,6 +2040,13 @@ type RideHailingProvider {
 type RiderCategory {
   "ID of the category"
   id: String!
+  """
+  If this category is considered the "default" one. In most places this means "Adult" or
+  "Regular".
+  Frontends can use this property to display this category more prominently or pre-select this
+  in a UI.
+  """
+  isDefault: Boolean!
   "Human readable name of the category."
   name: String
 }
@@ -3185,9 +3187,9 @@ enum FilterPlaceType {
   "Old value for VEHICLE_RENT"
   BICYCLE_RENT @deprecated(reason : "Use VEHICLE_RENT instead as it's clearer that it also returns rental scooters, cars...")
   "Parking lots (not rental stations) that contain spaces for bicycles"
-  BIKE_PARK
+  BIKE_PARK @deprecated(reason : "Not supported.")
   "Parking lots that contain spaces for cars"
-  CAR_PARK
+  CAR_PARK @deprecated(reason : "Not supported.")
   "Departure rows"
   DEPARTURE_ROW
   """
@@ -3227,6 +3229,7 @@ enum InputField {
   DATE_TIME
   FROM
   TO
+  VIA
 }
 
 """
@@ -3860,6 +3863,8 @@ enum TransitMode {
   MONORAIL
   "This includes long or short distance trains."
   RAIL
+  "Used for off-road snow and ice vehicles"
+  SNOW_AND_ICE
   "Subway or metro, depending on the local terminology."
   SUBWAY
   "A taxi, possibly operated by a public transport agency."
@@ -3922,6 +3927,21 @@ enum VertexType {
   PARKANDRIDE
   "TRANSIT"
   TRANSIT
+}
+
+"Categorization for via locations."
+enum ViaLocationType {
+  """
+  The via stop location must be visited as part of a transit trip as at the boarding stop, the
+  intermediate stop, or the alighting stop.
+  """
+  PASS_THROUGH
+  """
+  The location is visited physically by boarding or alighting a transit trip at a given stop, or by
+  traveling via requested coordinate location as part of a access, transfer, egress or direct
+  segment. Intermediate stops visited on-board do not count.
+  """
+  VISIT
 }
 
 enum WheelchairBoarding {

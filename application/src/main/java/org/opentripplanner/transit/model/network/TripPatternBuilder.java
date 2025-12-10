@@ -6,16 +6,15 @@ import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableBuilder;
-import org.opentripplanner.routing.algorithm.raptoradapter.api.SlackProvider;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Direction;
+import org.opentripplanner.transit.model.timetable.Timetable;
+import org.opentripplanner.transit.model.timetable.TimetableBuilder;
 
 @SuppressWarnings("UnusedReturnValue")
 public final class TripPatternBuilder
@@ -126,16 +125,6 @@ public final class TripPatternBuilder
     return this;
   }
 
-  // TODO: This uses a static SlackProvider. Change it to be injectable if required
-  public int slackIndex() {
-    return SlackProvider.slackIndex(route.getMode());
-  }
-
-  // TODO: Change the calculation to be injectable if required
-  public int transitReluctanceFactorIndex() {
-    return route.getMode().ordinal();
-  }
-
   public Direction getDirection() {
     if (scheduledTimetable != null) {
       return scheduledTimetable.getDirection();
@@ -160,7 +149,7 @@ public final class TripPatternBuilder
     return netexSubMode != null ? netexSubMode : route.getNetexSubmode();
   }
 
-  public boolean getContainsMultipleModes() {
+  boolean getContainsMultipleModes() {
     return containsMultipleModes;
   }
 
@@ -168,7 +157,7 @@ public final class TripPatternBuilder
     return stopPattern;
   }
 
-  public Timetable getScheduledTimetable() {
+  Timetable getScheduledTimetable() {
     return scheduledTimetable;
   }
 
@@ -176,7 +165,7 @@ public final class TripPatternBuilder
     return scheduledTimetableBuilder;
   }
 
-  public String getName() {
+  String getName() {
     return name;
   }
 
@@ -184,7 +173,7 @@ public final class TripPatternBuilder
     return originalTripPattern;
   }
 
-  public boolean isCreatedByRealtimeUpdate() {
+  boolean isCreatedByRealtimeUpdate() {
     return createdByRealtimeUpdate;
   }
 

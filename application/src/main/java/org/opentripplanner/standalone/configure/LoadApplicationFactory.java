@@ -26,7 +26,8 @@ import org.opentripplanner.service.worldenvelope.configure.WorldEnvelopeReposito
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.LoadConfigModule;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.street.configure.StreetRepositoryModule;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
@@ -43,6 +44,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
     EmissionRepositoryModule.class,
     EmpiricalDelayRepositoryModule.class,
     StopConsolidationRepositoryModule.class,
+    StreetRepositoryModule.class,
     VehicleParkingRepositoryModule.class,
     FareModule.class,
   }
@@ -78,7 +80,7 @@ public interface LoadApplicationFactory {
   StopConsolidationRepository emptyStopConsolidationRepository();
 
   @Singleton
-  StreetLimitationParameters emptyStreetLimitationParameters();
+  StreetRepository emptyStreetRepository();
 
   @Singleton
   FareServiceFactory emptyFareServiceFactory();

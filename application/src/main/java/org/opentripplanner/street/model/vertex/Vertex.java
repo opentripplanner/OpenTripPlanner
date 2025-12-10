@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,6 +164,16 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /**
+   * Implementing this method breaks at least one test.
+   * <p>
+   * TODO implement this method, vertex label should be globally unique
+   */
+  @Override
+  public boolean equals(Object o) {
+    return this == o;
+  }
+
+  /**
    * If applying turn restrictions to a graph has generated multiple instances of a vertex,
    * one of them is the parent, and the others are subsidiary vertices. Calling getParent()
    * on any of these will always return the same parent, which is used for example for
@@ -290,7 +300,9 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   private Edge[] removeEdge(Edge[] existing, Edge e) {
     int nfound = 0;
     for (Edge edge : existing) {
-      if (edge == e) nfound++;
+      if (edge == e) {
+        nfound++;
+      }
     }
     if (nfound == 0) {
       LOG.debug(

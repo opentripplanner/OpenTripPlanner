@@ -9,7 +9,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.SortOrder;
@@ -56,10 +56,13 @@ class PlanResponseBuilderTest {
   @Test
   void buildWithAllData() {
     TripPlan tripPlan = createTripPlan(List.of());
+    Instant ldt = TEST_DATE.plus(Duration.ofHours(1));
     TripSearchMetadata metadata = TripSearchMetadata.createForDepartAfter(
       TEST_DATE,
+      ldt,
+      TEST_DATE,
       Duration.ofHours(2),
-      TEST_DATE.plus(Duration.ofHours(1))
+      null
     );
     List<RoutingError> messages = List.of(
       new RoutingError(RoutingErrorCode.NO_TRANSIT_CONNECTION, InputField.DATE_TIME)

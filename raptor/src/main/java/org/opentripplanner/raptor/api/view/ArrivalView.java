@@ -1,12 +1,14 @@
 package org.opentripplanner.raptor.api.view;
 
+import static org.opentripplanner.raptor.api.model.RaptorValueType.C1;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.C2;
+
 import java.util.function.IntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
 import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -156,8 +158,8 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
     String arrival =
       "[" +
       TimeUtils.timeToStrCompact(arrivalTime()) +
-      cost(c1(), RaptorCostCalculator.ZERO_COST, RaptorValueFormatter::formatC1) +
-      cost(c2(), RaptorConstants.NOT_SET, RaptorValueFormatter::formatC2) +
+      cost(c1(), RaptorCostCalculator.ZERO_COST, C1::format) +
+      cost(c2(), RaptorConstants.NOT_SET, C2::format) +
       "]";
     return switch (arrivedBy()) {
       case ACCESS -> String.format(

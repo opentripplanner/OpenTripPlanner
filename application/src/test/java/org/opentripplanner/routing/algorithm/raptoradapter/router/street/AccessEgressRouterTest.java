@@ -8,20 +8,22 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.module.nearbystops.SiteRepositoryResolver;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -63,17 +65,13 @@ class AccessEgressRouterTest extends GraphRoutingTest {
           );
 
           // StopForCentroidRoutingStation is a child of centroidRoutingStation
-          stopForCentroidRoutingStation = stop(
-            "StopForCentroidRoutingStation",
-            B.toWgsCoordinate(),
-            centroidRoutingStation
+          stopForCentroidRoutingStation = stop("StopForCentroidRoutingStation", b ->
+            b.withCoordinate(B.toWgsCoordinate()).withParentStation(centroidRoutingStation)
           );
 
           // StopForNoCentroidRoutingStation is a child of noCentroidRoutingStation
-          stopForNoCentroidRoutingStation = stop(
-            "StopForNoCentroidRoutingStation",
-            C.toWgsCoordinate(),
-            noCentroidRoutingStation
+          stopForNoCentroidRoutingStation = stop("StopForNoCentroidRoutingStation", b ->
+            b.withCoordinate(C.toWgsCoordinate()).withParentStation(noCentroidRoutingStation)
           );
 
           biLink(A, centroidRoutingStationVertex);
@@ -257,27 +255,25 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     var durationLimit = Duration.ofMinutes(10);
     var request = requestFromTo(from, to);
 
-    try (
-      var verticesContainer = new TemporaryVerticesContainer(
-        graph,
-        VertexLinkerTestFactory.of(graph),
-        id -> new DefaultTransitService(timetableRepository).findStopOrChildIds(id),
-        from,
-        to,
-        StreetMode.WALK,
-        StreetMode.WALK
-      )
-    ) {
+    try (var verticesContainer = new TemporaryVerticesContainer()) {
+      var vertexLinker = VertexLinkerTestFactory.of(graph);
+      var vertexCreationService = new VertexCreationService(vertexLinker);
+      var linkingContextFactory = new LinkingContextFactory(graph, vertexCreationService, id ->
+        new DefaultTransitService(timetableRepository).findStopOrChildIds(id)
+      );
+      var linkingRequest = LinkingContextRequestMapper.map(request);
+      var linkingContext = linkingContextFactory.create(verticesContainer, linkingRequest);
+
       return new AccessEgressRouter(
         new SiteRepositoryResolver(timetableRepository.getSiteRepository())
       ).findAccessEgresses(
         request,
-        verticesContainer,
         StreetRequest.DEFAULT,
         List.of(),
         accessEgress,
         durationLimit,
-        maxStopCount
+        maxStopCount,
+        linkingContext
       );
     }
   }

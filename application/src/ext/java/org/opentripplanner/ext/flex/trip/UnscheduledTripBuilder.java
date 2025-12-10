@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.flex.trip;
 
 import java.util.List;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class UnscheduledTripBuilder
   extends FlexTripBuilder<UnscheduledTrip, UnscheduledTripBuilder> {

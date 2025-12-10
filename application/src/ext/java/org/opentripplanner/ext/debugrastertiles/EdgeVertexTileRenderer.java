@@ -149,7 +149,10 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         midLineGeom.getCoordinates(),
         lineWidth * 0.4
       );
-      if (coords.length < 2) continue; // Can happen for very small edges (<1mm)
+      if (coords.length < 2) {
+        // Can happen for very small edges (<1mm)
+        continue;
+      }
       LineString offsetLine = GeometryUtils.makeLineString(coords);
       Shape midLineShape = shapeWriter.toShape(midLineGeom);
       Shape offsetShape = shapeWriter.toShape(offsetLine);
@@ -225,7 +228,9 @@ public class EdgeVertexTileRenderer implements TileRenderer {
          * need to expand the envelope by an unbounded amount (max label size).
          */
         double x = tilePoint.getX();
-        if (x + labelWidth > context.tileWidth) x -= labelWidth;
+        if (x + labelWidth > context.tileWidth) {
+          x -= labelWidth;
+        }
         context.graphics.drawString(vvAttrs.label, (float) x, (float) tilePoint.getY());
       }
     }

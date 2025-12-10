@@ -21,7 +21,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
@@ -33,7 +32,9 @@ import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
+import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
@@ -47,7 +48,7 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -65,9 +66,10 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    StreetRepository streetRepository,
     VehicleParkingRepository vehicleParkingRepository,
-    DataImportIssueStore issueStore,
-    StreetLimitationParameters streetLimitationParameters
+    EdgeNamer edgeNamer,
+    DataImportIssueStore issueStore
   ) {
     List<OsmProvider> providers = new ArrayList<>();
     for (ConfiguredDataSource<
@@ -84,8 +86,14 @@ public class GraphBuilderModules {
       );
     }
 
-    return OsmModule.of(providers, graph, osmInfoGraphBuildRepository, vehicleParkingRepository)
-      .withEdgeNamer(config.edgeNamer)
+    return OsmModule.of(
+      providers,
+      graph,
+      osmInfoGraphBuildRepository,
+      streetRepository,
+      vehicleParkingRepository
+    )
+      .withEdgeNamer(edgeNamer)
       .withAreaVisibility(config.areaVisibility)
       .withPlatformEntriesLinking(config.platformEntriesLinking)
       .withStaticParkAndRide(config.staticParkAndRide)
@@ -94,7 +102,6 @@ public class GraphBuilderModules {
       .withBoardingAreaRefTags(config.boardingLocationTags)
       .withIncludeOsmSubwayEntrances(config.osmDefaults.includeOsmSubwayEntrances())
       .withIssueStore(issueStore)
-      .withStreetLimitationParameters(streetLimitationParameters)
       .build();
   }
 

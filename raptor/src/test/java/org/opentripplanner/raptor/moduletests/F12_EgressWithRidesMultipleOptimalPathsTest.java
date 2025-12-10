@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
@@ -21,16 +19,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 /**
  * FEATURE UNDER TEST
@@ -57,32 +54,36 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestConstants {
 
   private static final String EXPECTED_PATH_FLEX_7M =
-    "A ~ BUS R2 0:05 0:16 ~ B ~ Walk 2m ~ C ~ Flex 7m 1x [0:05 0:26 21m Tₓ1 C₁2_160]";
+    "A ~ BUS R2 0:05 0:16 ~ B ~ Walk 2m ~ C ~ Flex 7m Rₙ1 [0:05 0:26 21m Tₙ1 C₁2_160]";
 
   private static final String EXPECTED_PATH_WALK_5M =
-    "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 5m [0:04 0:25 21m Tₓ0 C₁2_160]";
+    "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 5m [0:04 0:25 21m Tₙ0 C₁2_160]";
 
   private static final String EXPECTED_PATH_WALK_7M =
-    "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 7m [0:04 0:27 23m Tₓ0 C₁2_400]";
+    "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 7m [0:04 0:27 23m Tₙ0 C₁2_400]";
 
   private static final int C1_10m = RaptorCostConverter.toRaptorCost(D10m);
 
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   @BeforeEach
   public void setup() {
-    data.withRoutes(
-      route("R1", STOP_A, STOP_C).withTimetable(schedule("0:04 0:20")),
-      route("R2", STOP_A, STOP_B).withTimetable(schedule("0:05 0:16"))
-    );
+    data
+      .access("Free ~ A")
+      .withTimetables(
+        """
+        A     C
+        0:04  0:20
+        --
+        A     B
+        0:05  0:16
+        """
+      );
 
     // We will test board- and alight-slack in a separate test
-    data.withSlackProvider(new DefaultSlackProvider(D1m, D0s, D0s));
+    data.withSlackProvider(new TestSlackProvider(D1m, D0s, D0s));
 
     requestBuilder
       .searchParams()
@@ -90,12 +91,10 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
       .searchWindowInSeconds(D20m)
       .latestArrivalTime(T00_30);
 
-    requestBuilder.searchParams().addAccessPaths(TestAccessEgress.free(STOP_A));
-
     data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D2m));
 
     // Set ModuleTestDebugLogging.DEBUG=true to enable debugging output
-    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> withFlexAsBestOptionTestCases() {
@@ -104,8 +103,8 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
       .withRequest(r ->
         r.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, C1_10m), walk(STOP_C, D7m))
       )
-      .add(TC_MIN_DURATION, "[0:00 0:21 21m Tₓ1]", "[0:00 0:23 23m Tₓ0]")
-      .add(TC_MIN_DURATION_REV, "[0:09 0:30 21m Tₓ0]")
+      .add(TC_MIN_DURATION, "[0:00 0:21 21m Tₙ1]", "[0:00 0:23 23m Tₙ0]")
+      .add(TC_MIN_DURATION_REV, "[0:09 0:30 21m Tₙ0]")
       .add(TC_STANDARD, withoutCost(EXPECTED_PATH_FLEX_7M, EXPECTED_PATH_WALK_7M))
       .add(TC_STANDARD_ONE, withoutCost(EXPECTED_PATH_FLEX_7M))
       .add(TC_STANDARD_REV, withoutCost(EXPECTED_PATH_FLEX_7M))

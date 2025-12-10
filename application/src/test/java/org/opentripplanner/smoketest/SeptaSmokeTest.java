@@ -7,7 +7,6 @@ import static org.opentripplanner.client.model.RequestMode.WALK;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -51,11 +50,6 @@ public class SeptaSmokeTest {
       .toList();
 
     //assertFalse(products.isEmpty());
-
-    var prices = products
-      .stream()
-      .map(p -> p.price().amount().doubleValue())
-      .collect(Collectors.toSet());
 
     LOG.info("Received fare products {}", products);
     //assertTrue(prices.contains(6.75d));

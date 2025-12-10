@@ -11,11 +11,11 @@ import java.util.function.Function;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsDao;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
@@ -223,7 +223,7 @@ public class GTFSToOtpTransitServiceMapper {
       if (it.getLocationType() == LOCATION_TYPE_STOP) {
         builder.siteRepository().withRegularStop(stopMapper.map(it));
       } else if (it.getLocationType() == LOCATION_TYPE_ENTRANCE_EXIT) {
-        builder.getEntrances().add(entranceMapper.map(it));
+        builder.siteRepository().withEntrance(entranceMapper.map(it));
       } else if (it.getLocationType() == LOCATION_TYPE_NODE) {
         builder.getPathwayNodes().add(pathwayNodeMapper.map(it));
       }

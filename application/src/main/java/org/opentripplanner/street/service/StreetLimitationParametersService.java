@@ -9,5 +9,7 @@ public interface StreetLimitationParametersService {
    *
    * @return Maximum car speed in meters per second.
    */
-  float getMaxCarSpeed();
+  float maxCarSpeed();
+
+  public int maxAreaNodes();
 }

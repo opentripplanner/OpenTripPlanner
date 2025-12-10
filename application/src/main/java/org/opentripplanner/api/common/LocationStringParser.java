@@ -2,8 +2,8 @@ package org.opentripplanner.api.common;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This class is used by the GTFS GraphQL API to parse strings representing the from and to places for a

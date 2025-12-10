@@ -2,8 +2,8 @@ package org.opentripplanner.apis.transmodel.mapping;
 
 import java.util.Map;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GenericLocationMapper {
 

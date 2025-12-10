@@ -1,6 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street;
 
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.state.State;
@@ -46,7 +46,7 @@ public class StreetVehicleRentalLink extends Edge {
       return State.empty();
     }
 
-    var preferences = s0.getPreferences().rental(s0.getRequest().mode());
+    var preferences = s0.getRequest().rental(s0.getRequest().mode());
     // preferences will be null while finding nearest places with WALK mode
     if (
       preferences != null && vehicleRentalPlaceVertex.getStation().networkIsNotAllowed(preferences)

@@ -30,6 +30,10 @@ public interface OtpArchitectureModules {
   Package RAPTOR_ADAPTER_API = RAPTOR_ADAPTER.subPackage("api");
   Package TRANSIT = OTP_ROOT.subPackage("transit");
   Package TRANSIT_MODEL = TRANSIT.subPackage("model");
+  Package DOMAIN_CORE = OTP_ROOT.subPackage("core");
+  Package DOMAIN_CORE_FRAMEWORK = DOMAIN_CORE.subPackage("framework");
+  Package DOMAIN_CORE_MODEL = DOMAIN_CORE.subPackage("model");
+  Package DOMAIN_CORE_MODEL_ALL = DOMAIN_CORE.subPackage("model..");
 
   /* The Raptor module */
   Package RAPTOR_ROOT = OTP_ROOT.subPackage("raptor");
@@ -50,6 +54,7 @@ public interface OtpArchitectureModules {
 
   Module FRAMEWORK_UTILS = Module.of(
     OTP_UTILS,
+    DOMAIN_CORE_MODEL_ALL,
     FRAMEWORK.subPackage("application"),
     FRAMEWORK.subPackage("error"),
     FRAMEWORK.subPackage("i18n"),

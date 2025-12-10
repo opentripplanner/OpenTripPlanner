@@ -61,7 +61,7 @@ public class RentalVehicleType {
           .name("currentRangeMeters")
           .type(Scalars.GraphQLFloat)
           .dataFetcher(environment ->
-            ((VehicleRentalVehicle) environment.getSource()).getFuel().range()
+            ((VehicleRentalVehicle) environment.getSource()).fuel().range()
           )
           .build()
       )

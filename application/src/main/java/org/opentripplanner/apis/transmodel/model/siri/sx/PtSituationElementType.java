@@ -12,7 +12,6 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLTypeReference;
-import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Objects;
@@ -20,8 +19,8 @@ import java.util.stream.Collectors;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.stop.MonoOrMultiModalStation;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.TranslatedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -285,8 +284,7 @@ public class PtSituationElementType {
           .type(dateTimeScalar)
           .description("Timestamp for when the situation was created.")
           .dataFetcher(environment -> {
-            final ZonedDateTime creationTime = environment.<TransitAlert>getSource().creationTime();
-            return creationTime == null ? null : creationTime.toInstant().toEpochMilli();
+            return environment.<TransitAlert>getSource().creationTime();
           })
           .build()
       )
@@ -296,8 +294,7 @@ public class PtSituationElementType {
           .type(dateTimeScalar)
           .description("Timestamp when the situation element was updated.")
           .dataFetcher(environment -> {
-            final ZonedDateTime updatedTime = environment.<TransitAlert>getSource().updatedTime();
-            return updatedTime == null ? null : updatedTime.toInstant().toEpochMilli();
+            return environment.<TransitAlert>getSource().updatedTime();
           })
           .build()
       )

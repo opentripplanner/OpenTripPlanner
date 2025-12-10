@@ -112,6 +112,7 @@ import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.TimetabledPassingTimeType;
 import org.opentripplanner.apis.transmodel.model.timetable.TripMetadataType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -128,7 +129,6 @@ import org.opentripplanner.transit.api.request.FindRoutesRequest;
 import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.lang.StringUtils;
@@ -908,8 +908,6 @@ public class TransmodelGraphQLSchemaFactory {
             List<FeedScopedId> filterByStations = null;
             List<FeedScopedId> filterByRoutes = null;
             List<String> filterByBikeRentalStations = null;
-            List<String> filterByBikeParks = null;
-            List<String> filterByCarParks = null;
             List<String> filterByNetwork = null;
             @SuppressWarnings("rawtypes")
             Map filterByIds = environment.getArgument("filterByIds");
@@ -920,12 +918,6 @@ public class TransmodelGraphQLSchemaFactory {
               );
               filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null
                 ? (List<String>) filterByIds.get("bikeRentalStations")
-                : List.of();
-              filterByBikeParks = filterByIds.get("bikeParks") != null
-                ? (List<String>) filterByIds.get("bikeParks")
-                : List.of();
-              filterByCarParks = filterByIds.get("carParks") != null
-                ? (List<String>) filterByIds.get("carParks")
                 : List.of();
             }
 

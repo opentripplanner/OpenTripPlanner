@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
+import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -101,6 +102,7 @@ public class SpeedTest {
       new DefaultVehicleRentalService(),
       new DefaultVehicleParkingRepository(),
       timetableRepository,
+      new DefaultCarpoolingRepository(),
       new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, LocalDate::now),
       config.updatersConfig
     );
@@ -113,11 +115,14 @@ public class SpeedTest {
       RaptorEnvironmentFactory.create(config.transitRoutingParams.searchThreadPoolSize())
     );
 
+    var vertexLinker = VertexLinkerTestFactory.of(graph);
+
     this.serverContext = new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
       new DefaultFareService(),
       config.flexConfig,
       graph,
+      TestServerContext.createLinkingContextFactory(graph, vertexLinker, transitService),
       timer.getRegistry(),
       raptorConfig,
       TestServerContext.createRealtimeVehicleService(transitService),
@@ -131,9 +136,10 @@ public class SpeedTest {
       VectorTileConfig.DEFAULT,
       TestServerContext.createVehicleParkingService(),
       TestServerContext.createVehicleRentalService(),
-      VertexLinkerTestFactory.of(graph),
+      vertexLinker,
       TestServerContext.createViaTransferResolver(graph, transitService),
       TestServerContext.createWorldEnvelopeService(),
+      null,
       null,
       null,
       null,

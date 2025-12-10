@@ -2,6 +2,7 @@ package org.opentripplanner.ext.emission;
 
 import java.io.File;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.DataSourceTestFactory;
@@ -9,7 +10,6 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public interface EmissionTestData {
   String FEED_FEED_ID = "em";

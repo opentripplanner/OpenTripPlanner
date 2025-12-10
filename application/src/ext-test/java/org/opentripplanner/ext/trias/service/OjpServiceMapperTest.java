@@ -23,8 +23,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ojp.time.XmlDateTime;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class OjpServiceMapperTest {
 
