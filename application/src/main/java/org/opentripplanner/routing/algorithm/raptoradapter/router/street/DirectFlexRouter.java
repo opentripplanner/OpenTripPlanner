@@ -64,6 +64,6 @@ public class DirectFlexRouter {
       egressStops
     );
 
-    return new ArrayList<>(flexRouter.createFlexOnlyItineraries(request.arriveBy()));
+    return new ArrayList<>(flexRouter.createFlexOnlyItineraries(request.arriveBy(), request));
   }
 }

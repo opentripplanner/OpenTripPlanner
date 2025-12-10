@@ -2,9 +2,12 @@ package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.C1;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.C2;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.TRANSFER_PRIORITY;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.WAIT_TIME_COST;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.routing.algorithm.transferoptimization.BasicPathTestCase;
 
@@ -67,13 +70,13 @@ class OptimizedPathTest implements RaptorTestConstants {
 
     var exp = BasicPathTestCase.BASIC_PATH_AS_STRING.replace(
       "C₁8_154 C₂7]",
-      RaptorValueFormatter.formatC1(generalizedCost) +
+      C1.format(generalizedCost) +
       " " +
-      RaptorValueFormatter.formatC2(c2) +
+      C2.format(c2) +
       " " +
-      RaptorValueFormatter.formatTransferPriority(transferPriorityCost) +
+      TRANSFER_PRIORITY.format(transferPriorityCost) +
       " " +
-      RaptorValueFormatter.formatWaitTimeCost(generalizedCostWaitTimeOptimized) +
+      WAIT_TIME_COST.format(generalizedCostWaitTimeOptimized) +
       "]"
     );
 

@@ -953,7 +953,7 @@ The named set of mapping rules applied when parsing OSM tags.
 
 **Since version:** `2.7` ∙ **Type:** `enum map of object` ∙ **Cardinality:** `Optional`   
 **Path:** /   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `carpool` | `flexible`
 
 Configures mode-specific properties for transfer calculations.
 

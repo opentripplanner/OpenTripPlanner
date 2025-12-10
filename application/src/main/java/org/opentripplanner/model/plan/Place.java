@@ -1,11 +1,12 @@
 package org.opentripplanner.model.plan;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.LocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.LocalizedString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.leg.ViaLocationType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -42,25 +43,35 @@ public class Place {
   /**
    * Reference to the stop if the type is {@link VertexType#TRANSIT}.
    */
+  @Nullable
   public final StopLocation stop;
 
   /**
    * The vehicle rental place if the type is {@link VertexType#VEHICLERENTAL}.
    */
+  @Nullable
   public final VehicleRentalPlace vehicleRentalPlace;
 
   /**
    * The vehicle parking entrance if the type is {@link VertexType#VEHICLEPARKING}.
    */
+  @Nullable
   public final VehicleParkingWithEntrance vehicleParkingWithEntrance;
+
+  /**
+   * Categorization for a via location, if the place is a via location in the request.
+   */
+  @Nullable
+  public final ViaLocationType viaLocationType;
 
   private Place(
     I18NString name,
     WgsCoordinate coordinate,
     VertexType vertexType,
-    StopLocation stop,
-    VehicleRentalPlace vehicleRentalPlace,
-    VehicleParkingWithEntrance vehicleParkingWithEntrance
+    @Nullable StopLocation stop,
+    @Nullable VehicleRentalPlace vehicleRentalPlace,
+    @Nullable VehicleParkingWithEntrance vehicleParkingWithEntrance,
+    @Nullable ViaLocationType viaLocationType
   ) {
     this.name = name;
     this.coordinate = coordinate;
@@ -68,6 +79,7 @@ public class Place {
     this.stop = stop;
     this.vehicleRentalPlace = vehicleRentalPlace;
     this.vehicleParkingWithEntrance = vehicleParkingWithEntrance;
+    this.viaLocationType = viaLocationType;
   }
 
   public static Place normal(Double lat, Double lon, I18NString name) {
@@ -77,7 +89,24 @@ public class Place {
       VertexType.NORMAL,
       null,
       null,
+      null,
       null
+    );
+  }
+
+  public static Place normal(
+    Vertex vertex,
+    I18NString name,
+    @Nullable ViaLocationType viaLocationType
+  ) {
+    return new Place(
+      name,
+      WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
+      VertexType.NORMAL,
+      null,
+      null,
+      null,
+      viaLocationType
     );
   }
 
@@ -88,12 +117,33 @@ public class Place {
       VertexType.NORMAL,
       null,
       null,
+      null,
       null
     );
   }
 
+  public static Place forStop(StopLocation stop, @Nullable ViaLocationType viaLocationType) {
+    return new Place(
+      stop.getName(),
+      stop.getCoordinate(),
+      VertexType.TRANSIT,
+      stop,
+      null,
+      null,
+      viaLocationType
+    );
+  }
+
   public static Place forStop(StopLocation stop) {
-    return new Place(stop.getName(), stop.getCoordinate(), VertexType.TRANSIT, stop, null, null);
+    return new Place(
+      stop.getName(),
+      stop.getCoordinate(),
+      VertexType.TRANSIT,
+      stop,
+      null,
+      null,
+      null
+    );
   }
 
   public static Place forFlexStop(StopLocation stop, Vertex vertex) {
@@ -113,6 +163,7 @@ public class Place {
       WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
       VertexType.TRANSIT,
       stop,
+      null,
       null,
       null
     );
@@ -140,6 +191,7 @@ public class Place {
       VertexType.VEHICLERENTAL,
       null,
       vertex.getStation(),
+      null,
       null
     );
   }
@@ -166,7 +218,8 @@ public class Place {
         .vehicleParking(vertex.getVehicleParking())
         .entrance(vertex.getParkingEntrance())
         .realtime(realTime)
-        .build()
+        .build(),
+      null
     );
   }
 
@@ -208,6 +261,7 @@ public class Place {
       .addEnum("vertexType", vertexType)
       .addObj("vehicleRentalPlace", vehicleRentalPlace)
       .addObj("vehicleParkingEntrance", vehicleParkingWithEntrance)
+      .addObj("viaLocationType", viaLocationType)
       .toString();
   }
 }

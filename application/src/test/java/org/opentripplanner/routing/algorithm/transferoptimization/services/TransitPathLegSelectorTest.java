@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TestSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
@@ -24,10 +24,10 @@ import org.opentripplanner.utils.time.TimeUtils;
 
 public class TransitPathLegSelectorTest implements RaptorTestConstants {
 
-  private static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
-    TRANSFER_SLACK,
+  private static final RaptorSlackProvider SLACK_PROVIDER = new TestSlackProvider(
     BOARD_SLACK,
-    ALIGHT_SLACK
+    ALIGHT_SLACK,
+    TRANSFER_SLACK
   );
 
   private static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR =

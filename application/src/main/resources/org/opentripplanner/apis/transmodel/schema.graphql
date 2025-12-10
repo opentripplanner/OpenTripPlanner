@@ -527,6 +527,8 @@ type Place {
   rentalVehicle: RentalVehicle
   "Type of vertex. (Normal, Bike sharing station, Bike P+R, Transit quay) Mostly used for better localization of bike sharing and P+R station names"
   vertexType: VertexType
+  "This defines if the place is a requested via location, and what kind it is. If the value is `null`, this place is not a via location."
+  viaLocationType: ViaLocationType
 }
 
 type PlaceAtDistance {
@@ -1741,6 +1743,7 @@ enum Mode {
   monorail
   rail
   scooter
+  snowAndIce
   taxi
   tram
   trolleybus
@@ -1932,6 +1935,8 @@ enum StreetMode {
   car_pickup
   "Walk to a car rental point along the road, drive to a drop-off point along the road, and walk the rest of the way. This can include car rentals at fixed locations or free-floating services."
   car_rental
+  "Share a car ride with a driver and other passengers going in the same direction."
+  carpool
   "Walk to an eligible pickup area for flexible transportation, ride to an eligible drop-off area and then walk the rest of the way."
   flexible
   "Walk only"
@@ -2077,6 +2082,14 @@ enum VertexType {
   bikeShare
   normal
   transit
+}
+
+"Categorization for via locations."
+enum ViaLocationType {
+  "The via stop location must be visited as part of a transit trip as at the boarding stop, the intermediate stop, or the alighting stop."
+  passThrough
+  "The location is visited physically by boarding or alighting a transit trip at a given stop, or by traveling via requested coordinate location as part of a access, transfer, egress or direct segment. Intermediate stops visited on-board do not count."
+  visit
 }
 
 enum WheelchairBoarding {

@@ -1,9 +1,6 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -14,11 +11,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.api.PathUtils;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
@@ -31,11 +27,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class A01_SingleRouteTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   /**
    * Stops: 0..3
@@ -54,22 +47,27 @@ public class A01_SingleRouteTest implements RaptorTestConstants {
    */
   @BeforeEach
   void setup() {
-    data.withRoute(
-      route(pattern("R1", STOP_B, STOP_C, STOP_D)).withTimetable(schedule("00:01, 00:03, 00:05"))
-    );
+    data
+      .access("Walk 30s ~ B")
+      .withTimetables(
+        """
+        B      C      D
+        00:01  00:03  00:05
+        """
+      )
+      .egress("D ~ Walk 20s");
+
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_D, D20s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       .timetable(true);
 
-    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var path = "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s Tₓ0 C₁940]";
+    var path = "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s Tₙ0 C₁940]";
     return RaptorModuleTestCase.of()
       .addMinDuration("4m50s", TX_0, T00_00, T00_10)
       .add(standard(), PathUtils.withoutCost(path))

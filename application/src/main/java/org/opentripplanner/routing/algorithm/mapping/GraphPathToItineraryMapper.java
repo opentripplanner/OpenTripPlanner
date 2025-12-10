@@ -13,11 +13,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
@@ -28,6 +28,7 @@ import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.leg.StreetLegBuilder;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graphfinder.SiteResolver;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
@@ -98,10 +99,13 @@ public class GraphPathToItineraryMapper {
   /**
    * Generates a TripPlan from a set of paths
    */
-  public List<Itinerary> mapItineraries(List<GraphPath<State, Edge, Vertex>> paths) {
+  public List<Itinerary> mapItineraries(
+    List<GraphPath<State, Edge, Vertex>> paths,
+    RouteRequest request
+  ) {
     List<Itinerary> itineraries = new LinkedList<>();
     for (GraphPath<State, Edge, Vertex> path : paths) {
-      Itinerary itinerary = generateItinerary(path);
+      Itinerary itinerary = generateItinerary(path, request);
       if (itinerary.legs().isEmpty()) {
         continue;
       }
@@ -118,7 +122,7 @@ public class GraphPathToItineraryMapper {
    * @param path The graph path to base the itinerary on
    * @return The generated itinerary
    */
-  public Itinerary generateItinerary(GraphPath<State, Edge, Vertex> path) {
+  public Itinerary generateItinerary(GraphPath<State, Edge, Vertex> path, RouteRequest request) {
     List<Leg> legs = new ArrayList<>();
     WalkStep previousStep = null;
     for (List<State> legStates : sliceStates(path.states)) {
@@ -127,7 +131,7 @@ public class GraphPathToItineraryMapper {
         previousStep = null;
         continue;
       }
-      StreetLeg leg = generateLeg(legStates, previousStep);
+      StreetLeg leg = generateLeg(legStates, previousStep, request);
       legs.add(leg);
 
       List<WalkStep> walkSteps = leg.listWalkSteps();
@@ -305,7 +309,7 @@ public class GraphPathToItineraryMapper {
    * @param state The {@link State}.
    * @return The resulting {@link Place} object.
    */
-  private Place makePlace(State state) {
+  private Place makePlace(State state, RouteRequest request) {
     Vertex vertex = state.getVertex();
     I18NString name = vertex.getName();
 
@@ -318,11 +322,17 @@ public class GraphPathToItineraryMapper {
 
     if (vertex instanceof TransitStopVertex tsv) {
       var stop = Objects.requireNonNull(siteResolver.getStop(tsv.getId()));
-      return Place.forStop(stop);
+      return Place.forStop(stop, ViaLocationTypeMapper.map(request, stop));
     } else if (vertex instanceof VehicleRentalPlaceVertex) {
       return Place.forVehicleRentalPlace((VehicleRentalPlaceVertex) vertex);
     } else if (vertex instanceof VehicleParkingEntranceVertex) {
       return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, state);
+    } else if (vertex instanceof TemporaryStreetLocation temporaryStreetLocation) {
+      return Place.normal(
+        vertex,
+        name,
+        ViaLocationTypeMapper.map(request, temporaryStreetLocation)
+      );
     } else {
       return Place.normal(vertex, name);
     }
@@ -355,7 +365,7 @@ public class GraphPathToItineraryMapper {
    *                     calculated correctly
    * @return The generated leg
    */
-  private StreetLeg generateLeg(List<State> states, WalkStep previousStep) {
+  private StreetLeg generateLeg(List<State> states, WalkStep previousStep, RouteRequest request) {
     List<Edge> edges = states
       .stream()
       // The first back edge is part of the previous leg, skip it
@@ -397,8 +407,8 @@ public class GraphPathToItineraryMapper {
       .withMode(resolveMode(states))
       .withStartTime(startTimeState.getTime().atZone(timeZone))
       .withEndTime(lastState.getTime().atZone(timeZone))
-      .withFrom(makePlace(firstState))
-      .withTo(makePlace(lastState))
+      .withFrom(makePlace(firstState, request))
+      .withTo(makePlace(lastState, request))
       .withDistanceMeters(distanceMeters)
       .withGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
       .withGeometry(geometry)

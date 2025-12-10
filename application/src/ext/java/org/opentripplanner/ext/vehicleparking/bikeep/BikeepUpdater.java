@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectReader;
 import java.io.IOException;
 import java.util.List;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.spi.GenericJsonDataSource;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

@@ -9,7 +9,7 @@ import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
 import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
-import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaLeg;
+import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaSegments;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
@@ -44,7 +44,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  */
 public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
-  private final SearchContextViaLeg<T> contextLeg;
+  private final SearchContextViaSegments<T> contextSegment;
   private final PathConfig<T> pathConfig;
   private final PassThroughPointsService passThroughPointsService;
   private DestinationArrivalPaths<T> paths;
@@ -55,12 +55,12 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private McStopArrivalFactory<T> stopArrivalFactory = null;
 
   public McRangeRaptorConfig(
-    SearchContextViaLeg<T> contextLeg,
+    SearchContextViaSegments<T> contextSegment,
     PassThroughPointsService passThroughPointsService
   ) {
-    this.contextLeg = Objects.requireNonNull(contextLeg);
+    this.contextSegment = Objects.requireNonNull(contextSegment);
     this.passThroughPointsService = Objects.requireNonNull(passThroughPointsService);
-    this.pathConfig = new PathConfig<>(this.contextLeg.parent());
+    this.pathConfig = new PathConfig<>(this.contextSegment.parent());
   }
 
   /**
@@ -115,7 +115,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (arrivals == null) {
       this.arrivals = new McStopArrivals<>(
         context().nStops(),
-        contextLeg.egressPaths(),
+        contextSegment.egressPaths(),
         createViaConnectionListeners(),
         createDestinationArrivalPaths(),
         createFactoryParetoComparator(),
@@ -182,14 +182,14 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private SearchContext<T> context() {
-    return contextLeg.parent();
+    return contextSegment.parent();
   }
 
   private HeuristicsProvider<T> createHeuristicsProvider(Heuristics heuristics) {
     if (heuristics == null) {
       return new HeuristicsProvider<>();
     } else {
-      var ctx = contextLeg.parent();
+      var ctx = contextSegment.parent();
       return new HeuristicsProvider<>(
         heuristics,
         createDestinationArrivalPaths(),
@@ -219,7 +219,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private List<ViaConnectionStopArrivalEventListener<T>> createViaConnectionListeners() {
     return ViaConnectionStopArrivalEventListener.createEventListeners(
-      contextLeg.viaConnections(),
+      contextSegment.viaConnections(),
       createStopArrivalFactory(),
       nextLegArrivals,
       context().lifeCycle()::onTransfersForRoundComplete

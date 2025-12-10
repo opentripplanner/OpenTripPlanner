@@ -7,7 +7,7 @@ import java.util.Objects;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.utils.collection.MapUtils;
 

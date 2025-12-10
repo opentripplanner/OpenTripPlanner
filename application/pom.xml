@@ -33,6 +33,11 @@
             <artifactId>astar</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>domain-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 
         <!-- 3rd party dependencies -->
@@ -393,7 +398,7 @@
         <dependency>
             <groupId>ch.poole</groupId>
             <artifactId>OpeningHoursParser</artifactId>
-            <version>0.28.2</version>
+            <version>0.29.0</version>
         </dependency>
 
         <dependency>
@@ -511,18 +516,27 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <sourceDirectories>
+                        <sourceDirectory>src/main/java</sourceDirectory>
+                        <sourceDirectory>src/ext/java</sourceDirectory>
+                        <sourceDirectory>src/ext-test/java</sourceDirectory>
+                        <sourceDirectory>src/test-fixtures/java</sourceDirectory>
+                    </sourceDirectories>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>com.hubspot.maven.plugins</groupId>
                 <artifactId>prettier-maven-plugin</artifactId>
                 <configuration>
-                    <inputGlobs>
-                        <inputGlob>src/main/java/**/*.java</inputGlob>
+                    <inputGlobs combine.children="append">
+                        <!-- Additional patterns specific to the application module -->
                         <inputGlob>src/ext/java/**/*.java</inputGlob>
-                        <inputGlob>src/test/java/**/*.java</inputGlob>
-                        <inputGlob>src/test-fixtures/java/**/*.java</inputGlob>
                         <inputGlob>src/ext-test/java/**/*.java</inputGlob>
                         <inputGlob>src/**/*.json</inputGlob>
                         <inputGlob>src/test/resources/org/opentripplanner/apis/**/*.graphql</inputGlob>
-                        <!-- Ignore patterns. -->
                         <inputGlob>!src/test/resources/org/opentripplanner/apis/vectortiles/style.json</inputGlob>
                     </inputGlobs>
                 </configuration>

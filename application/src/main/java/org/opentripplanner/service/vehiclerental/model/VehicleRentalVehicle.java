@@ -5,9 +5,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.RentalFormFactor;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

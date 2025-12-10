@@ -3,7 +3,6 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 import static java.util.Map.entry;
 import static org.opentripplanner.apis.gtfs.SchemaObjectMappersForTests.mapCoordinate;
 
-import graphql.ExecutionInput;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.util.HashMap;
@@ -16,7 +15,7 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
@@ -103,13 +102,6 @@ class _RouteRequestTestContext {
   }
 
   DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
-    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
-      .query("")
-      .operationName("planConnection")
-      .context(context)
-      .locale(locale)
-      .build();
-
     var executionContext = DataFetchingSupport.executionContext();
     return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .arguments(arguments)

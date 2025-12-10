@@ -7,7 +7,7 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 class OsmVertexTest {
 

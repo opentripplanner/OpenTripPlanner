@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.emission.EmissionService;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
@@ -19,7 +20,6 @@ import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class EmissionItineraryDecoratorTest implements PlanTestConstants {
 

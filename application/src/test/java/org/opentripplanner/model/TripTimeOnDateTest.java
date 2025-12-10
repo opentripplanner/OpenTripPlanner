@@ -16,8 +16,9 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
+import org.opentripplanner.transit.model.timetable.Timetable;
+import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -161,7 +162,6 @@ class TripTimeOnDateTest {
     timetableRepository.index();
     var timetableSnapshot = new TimetableSnapshot();
     timetableSnapshot.commit();
-    var transitService = new DefaultTransitService(timetableRepository, timetableSnapshot);
     var serviceDate = LocalDate.of(2025, 1, 1);
     // Construct a timetable which definitely does not contain this trip, because it is empty.
     Timetable timetable = Timetable.of()

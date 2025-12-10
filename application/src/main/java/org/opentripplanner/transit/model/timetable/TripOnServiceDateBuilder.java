@@ -3,8 +3,8 @@ package org.opentripplanner.transit.model.timetable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TripOnServiceDateBuilder
   extends AbstractEntityBuilder<TripOnServiceDate, TripOnServiceDateBuilder> {

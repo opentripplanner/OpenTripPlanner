@@ -11,7 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
-import org.opentripplanner.framework.i18n.TranslatedString;
+import org.opentripplanner.core.model.i18n.TranslatedString;
 
 class GraphQLUtilsTest {
 

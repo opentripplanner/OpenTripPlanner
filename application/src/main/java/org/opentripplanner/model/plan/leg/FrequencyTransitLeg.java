@@ -69,7 +69,8 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
           ServiceDateUtils.toZonedDateTime(serviceDate(), zoneId(), departureTime)
         ),
         i,
-        tripTimes().gtfsSequenceOfStopIndex(i)
+        tripTimes().gtfsSequenceOfStopIndex(i),
+        null
       );
       visits.add(visit);
     }

@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolStopType;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
@@ -107,10 +108,7 @@ public class TestCarpoolTripBuilder {
     List<CarpoolStop> stops
   ) {
     return new org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder(
-      org.opentripplanner.transit.model.framework.FeedScopedId.ofNullable(
-        "TEST",
-        "trip-" + idCounter.incrementAndGet()
-      )
+      FeedScopedId.ofNullable("TEST", "trip-" + idCounter.incrementAndGet())
     )
       .withStops(stops)
       .withAvailableSeats(seats)
@@ -129,10 +127,7 @@ public class TestCarpoolTripBuilder {
     List<CarpoolStop> stops
   ) {
     return new org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder(
-      org.opentripplanner.transit.model.framework.FeedScopedId.ofNullable(
-        "TEST",
-        "trip-" + idCounter.incrementAndGet()
-      )
+      FeedScopedId.ofNullable("TEST", "trip-" + idCounter.incrementAndGet())
     )
       .withStops(stops)
       .withAvailableSeats(seats)
@@ -238,10 +233,7 @@ public class TestCarpoolTripBuilder {
     );
 
     return AreaStop.of(
-      org.opentripplanner.transit.model.framework.FeedScopedId.ofNullable(
-        "TEST",
-        "area-" + areaStopCounter.incrementAndGet()
-      ),
+      FeedScopedId.ofNullable("TEST", "area-" + areaStopCounter.incrementAndGet()),
       areaStopCounter::getAndIncrement
     )
       .withGeometry(point)

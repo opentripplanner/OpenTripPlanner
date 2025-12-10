@@ -18,9 +18,9 @@ import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.util.BitSetIterator;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
@@ -100,14 +100,19 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.transferIndex = raptorTransitData.getRaptorTransfersForRequest(request);
     this.constrainedTransfers = raptorTransitData.getConstrainedTransfers();
 
-    var mcCostParams = GeneralizedCostParametersMapper.map(request, patternIndex);
+    var mcCostParams = GeneralizedCostParametersMapper.map(
+      request,
+      patternIndex,
+      p -> p.route().getId(),
+      p -> p.route().getAgency().getId()
+    );
 
     this.generalizedCostCalculator = CostCalculatorFactory.createCostCalculator(
       mcCostParams,
       raptorTransitData.getStopBoardAlightTransferCosts()
     );
 
-    this.slackProvider = new SlackProvider(
+    this.slackProvider = new DefaultSlackProvider(
       (int) request.preferences().transfer().slack().toSeconds(),
       request.preferences().transit().boardSlack(),
       request.preferences().transit().alightSlack()

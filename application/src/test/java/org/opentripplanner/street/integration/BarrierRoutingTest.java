@@ -204,7 +204,7 @@ public class BarrierRoutingTest {
       graph.ellipsoidToGeoidDifference
     );
 
-    var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
+    var itineraries = graphPathToItineraryMapper.mapItineraries(paths, request);
 
     assertAll(assertions.apply(itineraries));
 

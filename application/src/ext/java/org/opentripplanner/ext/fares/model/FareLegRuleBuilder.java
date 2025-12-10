@@ -2,8 +2,8 @@ package org.opentripplanner.ext.fares.model;
 
 import java.util.Collection;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Builder for {@link FareLegRule}.

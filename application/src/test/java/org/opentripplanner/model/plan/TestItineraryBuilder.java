@@ -14,6 +14,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
@@ -21,7 +23,6 @@ import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.leg.FrequencyTransitLegBuilder;
@@ -37,7 +38,6 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -93,7 +93,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   /**
-   * Create a new itinerary that start by waling from a place - the origin.
+   * Create a new itinerary that start by walking from a place - the origin.
    */
   public static TestItineraryBuilder newItinerary(Place origin, int startTime) {
     return new TestItineraryBuilder(origin, startTime);
@@ -567,6 +567,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
         .withGeneralizedCost(legCost)
         .withDistanceMeters(distance)
         .withFrequencyHeadwayInSeconds(headwaySecs)
+        .withToViaLocationType(to.viaLocationType)
         .build();
     } else {
       leg = new ScheduledTransitLegBuilder()
@@ -581,6 +582,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
         .withTransferFromPreviousLeg(transferFromPreviousLeg)
         .withGeneralizedCost(legCost)
         .withDistanceMeters(distance)
+        .withToViaLocationType(to.viaLocationType)
         .build();
     }
 

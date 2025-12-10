@@ -4,7 +4,7 @@ package org.opentripplanner.model.calendar;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

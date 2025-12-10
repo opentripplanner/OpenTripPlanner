@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module;
 
 import java.util.Collection;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.service.TimetableRepository;

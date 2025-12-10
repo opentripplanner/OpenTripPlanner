@@ -3,8 +3,8 @@ package org.opentripplanner.transit.speed_test.model.testcase.io;
 import java.io.File;
 import java.io.IOException;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.speed_test.model.testcase.TestCaseDefinition;
 
 public class TestCaseDefinitionCsvFile extends AbstractCsvFile<TestCaseDefinition> {

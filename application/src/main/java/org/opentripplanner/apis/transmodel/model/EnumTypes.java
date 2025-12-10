@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.framework.doc.DocumentedEnum;
 import org.opentripplanner.model.plan.VertexType;
+import org.opentripplanner.model.plan.leg.ViaLocationType;
 import org.opentripplanner.model.plan.walkstep.AbsoluteDirection;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.model.transfer.TransferPriority;
@@ -176,6 +177,7 @@ public class EnumTypes {
     .value("funicular", TransitMode.FUNICULAR)
     .value("lift", TransitMode.GONDOLA)
     .value("rail", TransitMode.RAIL)
+    .value("snowAndIce", TransitMode.SNOW_AND_ICE)
     .value("metro", TransitMode.SUBWAY)
     .value("taxi", TransitMode.TAXI)
     .value("tram", TransitMode.TRAM)
@@ -422,6 +424,11 @@ public class EnumTypes {
       "This can include car rentals at fixed locations or free-floating services."
     )
     .value(
+      "carpool",
+      StreetMode.CARPOOL,
+      "Share a car ride with a driver and other passengers going in the same direction."
+    )
+    .value(
       "flexible",
       StreetMode.FLEXIBLE,
       "Walk to an eligible pickup area for " +
@@ -461,6 +468,24 @@ public class EnumTypes {
     .value("bikePark", VertexType.VEHICLEPARKING)
     .value("bikeShare", VertexType.VEHICLERENTAL)
     //TODO QL: .value("parkAndRide", VertexType.PARKANDRIDE)
+    .build();
+
+  public static final GraphQLEnumType VIA_LOCATION_TYPE = GraphQLEnumType.newEnum()
+    .name("ViaLocationType")
+    .description("Categorization for via locations.")
+    .value(
+      "passThrough",
+      ViaLocationType.PASS_THROUGH,
+      "The via stop location must be visited as part of a transit trip as at the " +
+      "boarding stop, the intermediate stop, or the alighting stop."
+    )
+    .value(
+      "visit",
+      ViaLocationType.VISIT,
+      "The location is visited physically by boarding or alighting a transit trip at " +
+      "a given stop, or by traveling via requested coordinate location as part of a access, " +
+      "transfer, egress or direct segment. Intermediate stops visited on-board do not count."
+    )
     .build();
 
   public static final GraphQLEnumType WHEELCHAIR_BOARDING = GraphQLEnumType.newEnum()

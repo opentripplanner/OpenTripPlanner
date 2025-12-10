@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -120,8 +120,7 @@ public class TestHalfEdges {
       .withBack(false)
       .buildAndConnect();
 
-    @SuppressWarnings("unused")
-    StreetEdge topBack = new StreetEdgeBuilder<>()
+    new StreetEdgeBuilder<>()
       .withFromVertex(tr)
       .withToVertex(tl)
       .withGeometry(top.getGeometry().reverse())
@@ -130,8 +129,7 @@ public class TestHalfEdges {
       .withPermission(StreetTraversalPermission.ALL)
       .withBack(true)
       .buildAndConnect();
-    @SuppressWarnings("unused")
-    StreetEdge bottomBack = new StreetEdgeBuilder<>()
+    new StreetEdgeBuilder<>()
       .withFromVertex(br)
       .withToVertex(bl)
       .withGeometry(bottom.getGeometry().reverse())

@@ -7,8 +7,8 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
@@ -28,7 +28,7 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
-import org.opentripplanner.street.model.vertex.ElevatorVertex;
+import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -208,8 +208,8 @@ public class TestStateBuilder {
   public TestStateBuilder elevator() {
     count++;
 
-    var onboard1 = elevator(count, "1", 1.0);
-    var onboard2 = elevator(count, "2", 2.0);
+    var onboard1 = elevator(count, "1");
+    var onboard2 = elevator(count, "2");
     var offboard1 = intersection(count);
     var offboard2 = intersection(count);
 
@@ -336,8 +336,8 @@ public class TestStateBuilder {
     return StreetModelForTest.intersectionVertex(count, count);
   }
 
-  private static ElevatorVertex elevator(int count, String suffix, double level) {
-    return new ElevatorVertex(StreetModelForTest.intersectionVertex(count, count), suffix, level);
+  private static ElevatorHopVertex elevator(int count, String label) {
+    return new ElevatorHopVertex(StreetModelForTest.intersectionVertex(count, count), label);
   }
 
   private TestStateBuilder pickUpRentalVehicle(

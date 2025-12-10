@@ -5262,6 +5262,7 @@ public class GraphQLTypes {
     GONDOLA,
     MONORAIL,
     RAIL,
+    SNOW_AND_ICE,
     SUBWAY,
     TAXI,
     TRAM,
@@ -5691,6 +5692,12 @@ public class GraphQLTypes {
     NORMAL,
     PARKANDRIDE,
     TRANSIT,
+  }
+
+  /** Categorization for via locations. */
+  public enum GraphQLViaLocationType {
+    PASS_THROUGH,
+    VISIT,
   }
 
   public static class GraphQLWalkPreferencesInput {

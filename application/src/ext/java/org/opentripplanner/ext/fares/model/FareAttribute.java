@@ -2,9 +2,9 @@
 package org.opentripplanner.ext.fares.model;
 
 import java.util.Objects;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public final class FareAttribute
   extends AbstractTransitEntity<FareAttribute, FareAttributeBuilder> {

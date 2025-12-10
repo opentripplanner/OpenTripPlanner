@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
@@ -15,11 +15,19 @@ import org.opentripplanner.transit.model.site.StopLocation;
  *  - This also provide explicit documentation on which fields are used during a search and which
  *    are not.
  */
-public class RoutingTripPattern implements DefaultTripPattern, Serializable {
+public class RoutingTripPattern implements RaptorTripPattern, Serializable {
 
   private static final AtomicInteger INDEX_COUNTER = new AtomicInteger(0);
   private final int index;
+
+  @Deprecated
+  /**
+   * @deprecated This create a circular dependency: TripPattern ⇔ RoutingTripPattern, also the
+   *             RoutingTripPattern should be a pure-syntetic-value-object to allow it to be fast
+   *             to create and load from memory - with no concurency risk.
+   */
   private final TripPattern pattern;
+
   private final int[] stopIndexes;
   private final BitSet boardingPossible;
   private final BitSet alightingPossible;
@@ -27,7 +35,7 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
   private final int slackIndex;
   private final int transitReluctanceFactorIndex;
 
-  RoutingTripPattern(TripPattern pattern, TripPatternBuilder builder) {
+  RoutingTripPattern(TripPattern pattern) {
     this.pattern = pattern;
     this.stopIndexes = pattern.getStops().stream().mapToInt(StopLocation::getIndex).toArray();
     this.index = INDEX_COUNTER.getAndIncrement();
@@ -43,8 +51,11 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
       wheelchairAccessible.set(s, pattern.wheelchairAccessible(s));
     }
 
-    this.slackIndex = builder.slackIndex();
-    this.transitReluctanceFactorIndex = builder.transitReluctanceFactorIndex();
+    // This uses a static SlackProvider. Change it to be injectable if required
+    this.slackIndex = slackIndex(pattern.getRoute().getMode());
+
+    // Change the calculation to be injectable if required
+    this.transitReluctanceFactorIndex = pattern.getRoute().getMode().ordinal();
   }
 
   /**
@@ -110,7 +121,6 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
     return transitReluctanceFactorIndex;
   }
 
-  @Override
   public Route route() {
     return pattern.getRoute();
   }
@@ -150,5 +160,13 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
    */
   public static void initIndexCounter(int indexCounter) {
     INDEX_COUNTER.set(indexCounter);
+  }
+
+  /**
+   * Return an index used to look up the slack for a {@link RaptorTripPattern}. OTP support
+   * setting a slack per mode or the same value for all modes.
+   */
+  public static int slackIndex(final TransitMode mode) {
+    return mode.ordinal();
   }
 }

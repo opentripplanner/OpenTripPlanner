@@ -25,7 +25,7 @@ class BuildConfigTest {
 
     // Setup so we get access to the NodeAdapter
     var a = new NodeAdapter(node, SOURCE);
-    var c = new BuildConfig(a, false);
+    new BuildConfig(a, false);
 
     // Test for unused parameters
     var buf = new StringBuilder();

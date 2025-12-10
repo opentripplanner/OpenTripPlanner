@@ -5,9 +5,9 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * An implementation of {@link CalendarService}. Requires a pre-computed {@link CalendarServiceData}

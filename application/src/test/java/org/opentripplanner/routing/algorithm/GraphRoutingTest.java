@@ -11,10 +11,11 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graph.Graph;
@@ -40,7 +41,7 @@ import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
-import org.opentripplanner.street.model.vertex.ElevatorVertex;
+import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -56,7 +57,6 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -199,12 +199,12 @@ public abstract class GraphRoutingTest {
 
     public List<ElevatorEdge> elevator(StreetTraversalPermission permission, Vertex... vertices) {
       List<ElevatorEdge> edges = new ArrayList<>();
-      List<ElevatorVertex> onboardVertices = new ArrayList<>();
+      List<ElevatorHopVertex> onboardVertices = new ArrayList<>();
 
       for (int i = 0; i < vertices.length; i++) {
         Vertex v = vertices[i];
 
-        var onboard = vertexFactory.elevator(v, v.getLabelString(), i);
+        var onboard = vertexFactory.elevator(v, v.getLabelString() + "_" + i);
 
         edges.add(ElevatorBoardEdge.createElevatorBoardEdge(v, onboard));
         edges.add(

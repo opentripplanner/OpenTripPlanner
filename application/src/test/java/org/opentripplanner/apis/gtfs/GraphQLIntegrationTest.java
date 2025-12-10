@@ -26,7 +26,6 @@ import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,15 +41,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.text.I18NStrings;
-import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.ItineraryFaresDecorator;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.RealTimeTripUpdate;
-import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.model.FeedInfoTestFactory;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareOffer;
@@ -62,6 +59,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ViaLocationType;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
@@ -97,7 +95,6 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -106,6 +103,8 @@ import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
+import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
@@ -122,8 +121,10 @@ class GraphQLIntegrationTest {
   private static final Station OMEGA = TEST_MODEL.station("Omega").build();
   private static final Place A = TEST_MODEL.place("A", 5.0, 8.0);
   private static final Place B = TEST_MODEL.place("B", 6.0, 8.5);
-  private static final Place C = TEST_MODEL.place("C", builder ->
-    builder.withParentStation(OMEGA).withCoordinate(7.0, 9.0)
+  private static final Place C = TEST_MODEL.place(
+    "C",
+    builder -> builder.withParentStation(OMEGA).withCoordinate(7.0, 9.0),
+    ViaLocationType.PASS_THROUGH
   );
   private static final Place D = TEST_MODEL.place("D", 8.0, 9.5);
   private static final Place E = TEST_MODEL.place("E", 9.0, 10.0);
@@ -137,7 +138,6 @@ class GraphQLIntegrationTest {
   private static final Route ROUTE = TimetableRepositoryForTest.route("a-route").build();
   private static final String ADDED_TRIP_ID = "ADDED_TRIP";
   private static final String REPLACEMENT_TRIP_ID = "REPLACEMENT_TRIP";
-  public static final ZoneId TIME_ZONE = ZoneIds.BERLIN;
   public static final String FEED_ID = TimetableRepositoryForTest.FEED_ID;
 
   private static final VehicleRentalStation VEHICLE_RENTAL_STATION =
@@ -228,7 +228,7 @@ class GraphQLIntegrationTest {
 
     timetableRepository.addTripPattern(id("pattern-1"), pattern);
 
-    var feedInfo = FeedInfo.dummyForTest(FEED_ID);
+    var feedInfo = FeedInfoTestFactory.dummyForTest(FEED_ID);
     timetableRepository.addFeedInfo(feedInfo);
 
     var agency = Agency.of(new FeedScopedId(FEED_ID, "agency-xx"))

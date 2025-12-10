@@ -3,10 +3,10 @@ package org.opentripplanner.street.model.edge;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.street.model.vertex.ElevatorVertex;
+import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
@@ -24,14 +24,14 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
    */
   private final LineString geometry;
 
-  private ElevatorBoardEdge(Vertex from, ElevatorVertex to) {
+  private ElevatorBoardEdge(Vertex from, ElevatorHopVertex to) {
     super(from, to);
     geometry = GeometryUtils.makeLineString(
       List.of(new Coordinate(from.getX(), from.getY()), new Coordinate(to.getX(), to.getY()))
     );
   }
 
-  public static ElevatorBoardEdge createElevatorBoardEdge(Vertex from, ElevatorVertex to) {
+  public static ElevatorBoardEdge createElevatorBoardEdge(Vertex from, ElevatorHopVertex to) {
     return connectToGraph(new ElevatorBoardEdge(from, to));
   }
 

@@ -9,19 +9,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.annotation.Nullable;
+import org.opentripplanner.utils.lang.StringUtils;
 
 public class DebugRaptorBuilder implements Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DebugRaptorBuilder.class);
-
-  private static final Pattern FIRST_STOP_PATTERN = Pattern.compile("(\\d+)\\*");
+  private static final String DELIMITERS = "[\\s,;*]+";
+  private static final Pattern FIRST_STOP_PATTERN = Pattern.compile("([^\\s,;]*)\\*");
   private static final int FIRST_STOP_INDEX = 0;
   private static final int NOT_SET = -999_999_999;
 
-  private List<Integer> stops;
-  private List<Integer> path;
+  private List<String> stops;
+  private List<String> path;
   private int debugPathFromStopIndex;
   private Set<DebugEventType> eventTypes;
   private final DebugRaptor original;
@@ -90,44 +89,20 @@ public class DebugRaptorBuilder implements Serializable {
     return original.equals(value) ? original : value;
   }
 
-  private static List<Integer> split(String stops) {
-    try {
-      if (stops == null) {
-        return List.of();
-      }
-
-      return Arrays.stream(stops.split("[\\s,;_*]+")).map(Integer::parseInt).toList();
-    } catch (NumberFormatException e) {
-      LOG.error(e.getMessage(), e);
-      // Keep going, we do not want to abort a
-      // request because the debug info is wrong.
+  private static List<String> split(@Nullable String stops) {
+    if (stops == null) {
       return List.of();
     }
+    return Arrays.stream(stops.split(DELIMITERS)).filter(StringUtils::hasValue).toList();
   }
 
-  private static int firstStopIndexToDebug(List<Integer> stops, String text) {
+  private static int firstStopIndexToDebug(List<String> stops, String text) {
     if (text == null) {
       return FIRST_STOP_INDEX;
     }
 
     var m = FIRST_STOP_PATTERN.matcher(text);
-    Integer stop = m.find() ? Integer.parseInt(m.group(1)) : null;
+    String stop = m.find() ? m.group(1) : null;
     return stop == null ? FIRST_STOP_INDEX : stops.indexOf(stop);
-  }
-
-  private static String toString(List<Integer> stops, int fromStopIndex) {
-    if (stops == null || stops.isEmpty()) {
-      return null;
-    }
-
-    var buf = new StringBuilder();
-    for (int i = 0; i < stops.size(); ++i) {
-      buf.append(stops.get(i));
-      if (i > FIRST_STOP_INDEX && i == fromStopIndex) {
-        buf.append("*");
-      }
-      buf.append(", ");
-    }
-    return buf.substring(0, buf.length() - 2);
   }
 }

@@ -9,11 +9,11 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

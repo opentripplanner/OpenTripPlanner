@@ -14,6 +14,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * Time utility methods. See the unit test for examples on how to use this class.
@@ -109,7 +110,10 @@ public class TimeUtils {
    * past midnight.
    */
   public static int[] times(String input) {
-    return Arrays.stream(input.split("[ ,;]+")).mapToInt(TimeUtils::time).toArray();
+    return Arrays.stream(input.split("[\t ,;]+"))
+      .filter(StringUtils::hasValue)
+      .mapToInt(TimeUtils::time)
+      .toArray();
   }
 
   /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */

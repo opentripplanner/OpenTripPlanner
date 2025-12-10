@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 public class StreetSearchRequestBuilder {
@@ -70,12 +69,12 @@ public class StreetSearchRequestBuilder {
     return this;
   }
 
-  public StreetSearchRequestBuilder withFrom(GenericLocation from) {
+  public StreetSearchRequestBuilder withFrom(@Nullable Coordinate from) {
     this.fromEnvelope = createEnvelope(from);
     return this;
   }
 
-  public StreetSearchRequestBuilder withTo(GenericLocation to) {
+  public StreetSearchRequestBuilder withTo(@Nullable Coordinate to) {
     this.toEnvelope = createEnvelope(to);
     return this;
   }
@@ -131,12 +130,7 @@ public class StreetSearchRequestBuilder {
   }
 
   @Nullable
-  private static Envelope createEnvelope(GenericLocation location) {
-    if (location == null) {
-      return null;
-    }
-
-    Coordinate coordinate = location.getCoordinate();
+  private static Envelope createEnvelope(@Nullable Coordinate coordinate) {
     if (coordinate == null) {
       return null;
     }

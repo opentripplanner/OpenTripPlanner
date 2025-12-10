@@ -18,7 +18,7 @@ public class CommandLineParametersTest {
 
   @BeforeEach
   public void setUp() {
-    subject = CommandLineParameters.createCliForTest(BASE_DIR);
+    subject = CommandLineParametersTestFactory.createCliForTest(BASE_DIR);
     subject.port = 13524;
   }
 

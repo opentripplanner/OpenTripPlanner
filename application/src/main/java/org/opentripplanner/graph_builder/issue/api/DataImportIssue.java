@@ -7,7 +7,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 /**
  * Represents noteworthy data import issues that occur during the graph building process. These
  * issues should be passed on the the {@link DataImportIssueStore}
- * fwitch will be responsible for logging, summarizing and reporting the issue.
+ * which will be responsible for logging, summarizing and reporting the issue.
  * <p>
  * Do NOT log the issue in the class where the issue is detected/created.
  *

@@ -186,7 +186,7 @@ public class SplitEdgeTurnRestrictionsTest {
         graph.ellipsoidToGeoidDifference
       );
 
-      var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
+      var itineraries = graphPathToItineraryMapper.mapItineraries(paths, request);
 
       // make sure that we only get CAR legs
       itineraries.forEach(i ->

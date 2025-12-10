@@ -56,7 +56,7 @@ public class PathStringBuilderTest {
 
   @Test
   public void flexNormalCase() {
-    assertEquals("Flex 5m12s 2x", subject.accessEgress(flex(ANY_STOP, D_5_12, 2)).toString());
+    assertEquals("Flex 5m12s Rₙ2", subject.accessEgress(flex(ANY_STOP, D_5_12, 2)).toString());
   }
 
   @Test
@@ -64,7 +64,7 @@ public class PathStringBuilderTest {
     int START_TIME = time(12, 35, 0);
     int END_TIME = time(13, 45, 0);
     assertEquals(
-      "[12:35 13:45 1h10m Tₓ1 C₁1.23 C₂5]",
+      "[12:35 13:45 1h10m Tₙ1 C₁1.23 C₂5]",
       subject.summary(START_TIME, END_TIME, 1, 123, 5).toString()
     );
   }
@@ -78,7 +78,7 @@ public class PathStringBuilderTest {
   public void path() {
     int egressDuration = 3600 + 37 * 60 + 7;
     assertEquals(
-      "Walk 37s ~ 227 ~ BUS 10:46:05 10:55 ~ 112 ~ Walk 1h37m7s [10:44 12:33 1h49m Tₓ0 C₁567 C₂7]",
+      "Walk 37s ~ 227 ~ BUS 10:46:05 10:55 ~ 112 ~ Walk 1h37m7s [10:44 12:33 1h49m Tₙ0 C₁567 C₂7]",
       subject
         .walk(37)
         .stop(227)
@@ -93,7 +93,7 @@ public class PathStringBuilderTest {
   @Test
   public void pathWithoutAccessAndEgress() {
     assertEquals(
-      "227 ~ BUS 10:46:05 10:55 ~ 112 [10:46:05 10:55 8m55s Tₓ0 C₁60 C₂9 3pz]",
+      "227 ~ BUS 10:46:05 10:55 ~ 112 [10:46:05 10:55 8m55s Tₙ0 C₁60 C₂9 3pz]",
       subject
         .accessEgress(free(227))
         .stop(227)

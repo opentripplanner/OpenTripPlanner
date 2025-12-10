@@ -4,7 +4,7 @@ import static java.lang.Boolean.TRUE;
 
 import java.time.ZonedDateTime;
 import java.util.function.Supplier;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.updater.trip.siri.mapping.OccupancyMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;

@@ -15,7 +15,6 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
-import org.opentripplanner.street.model.vertex.ElevatorVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -39,7 +38,6 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
           kColl("spacesFor", spacesFor(v.getVehicleParking())),
           kColl("traversalPermission", traversalPermissions(v.getParkingEntrance()))
         );
-        case ElevatorVertex v -> List.of(kv("level", v.getLevel()));
         default -> List.of();
       };
 

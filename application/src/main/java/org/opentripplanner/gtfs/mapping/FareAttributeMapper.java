@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareAttributeBuilder;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.collection.MapUtils;
 
 /** Responsible for mapping GTFS FareAttribute into the OTP model. */

@@ -12,9 +12,9 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.path.PathBuilder;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 /**
  * Utility to help build paths for testing. The path builder is "reusable", every time the {@code
@@ -46,7 +46,7 @@ public class TestPathBuilder implements RaptorTestConstants {
    * Uses the slacks in {@link RaptorTestConstants}.
    */
   public TestPathBuilder(@Nullable RaptorCostCalculator<TestTripSchedule> costCalculator) {
-    this(new DefaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK), costCalculator);
+    this(new TestSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK), costCalculator);
   }
 
   /** Assign c2 value for path. TODO: Add c2 value for each leg. */

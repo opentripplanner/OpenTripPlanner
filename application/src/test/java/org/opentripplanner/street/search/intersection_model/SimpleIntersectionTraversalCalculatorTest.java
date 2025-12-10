@@ -13,8 +13,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
@@ -370,7 +370,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     StreetEdge toEdge = edge(v, w, 1.0, false);
 
     // 3rd edge prevents inferral of free-flowingness
-    StreetEdge extraEdge = edge(v, u, 1.0, false);
+    edge(v, u, 1.0, false);
 
     float fromSpeed = 1.0f;
     float toSpeed = 1.0f;
@@ -406,7 +406,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     StreetEdge toEdge = edge(v, w, 1.0, false);
 
     // 3rd edge prevents inferral of free-flowingness
-    StreetEdge extraEdge = edge(v, u, 1.0, false);
+    edge(v, u, 1.0, false);
 
     int turnAngle = calculateTurnAngle(fromEdge, toEdge);
     assertTrue(calculator.isSafeTurn(turnAngle));
@@ -446,7 +446,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     StreetEdge toEdge = edge(v, w, 1.0, false);
 
     // 3rd edge prevents inferral of free-flowingness
-    StreetEdge extraEdge = edge(v, u, 1.0, false);
+    edge(v, u, 1.0, false);
 
     int turnAngle = calculateTurnAngle(fromEdge, toEdge);
     assertFalse(calculator.isSafeTurn(turnAngle));

@@ -60,7 +60,7 @@ public class DirectStreetRouter {
         serverContext.graph().streetNotesService,
         serverContext.graph().ellipsoidToGeoidDifference
       );
-      List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
+      List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths, request);
       response = ItinerariesHelper.decorateItinerariesWithRequestData(
         response,
         request.journey().wheelchair(),

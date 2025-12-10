@@ -15,23 +15,24 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
+import org.opentripplanner.transit.model.timetable.Timetable;
+import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
@@ -132,10 +133,26 @@ class TripTimesUpdater {
       }
 
       if (match) {
-        update.stopHeadsign().ifPresent(x -> builder.withStopHeadsign(index, x));
-        update.pickup().ifPresent(x -> updatedPickups.put(index, x));
-        update.dropoff().ifPresent(x -> updatedDropoffs.put(index, x));
-        update.assignedStopId().ifPresent(x -> replacedStopIndices.put(index, x));
+        var scheduledStopId = timetable.getPattern().getStop(i).getId().getId();
+        var scheduledStopHeadsign = tripTimes.getHeadsign(i);
+        var scheduledPickup = timetable.getPattern().getBoardType(i);
+        var scheduledDropoff = timetable.getPattern().getAlightType(i);
+        update
+          .stopHeadsign()
+          .filter(x -> !Objects.equals(x, scheduledStopHeadsign))
+          .ifPresent(x -> builder.withStopHeadsign(index, x));
+        update
+          .pickup()
+          .filter(x -> x != scheduledPickup)
+          .ifPresent(x -> updatedPickups.put(index, x));
+        update
+          .dropoff()
+          .filter(x -> x != scheduledDropoff)
+          .ifPresent(x -> updatedDropoffs.put(index, x));
+        update
+          .assignedStopId()
+          .filter(x -> !Objects.equals(x, scheduledStopId))
+          .ifPresent(x -> replacedStopIndices.put(index, x));
 
         var scheduleRelationship = update.scheduleRelationship();
         // Handle each schedule relationship case

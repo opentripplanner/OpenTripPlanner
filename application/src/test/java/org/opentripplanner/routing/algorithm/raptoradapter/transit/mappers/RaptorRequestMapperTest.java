@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -37,7 +38,6 @@ import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.collection.ListUtils;
 
@@ -262,6 +262,24 @@ class RaptorRequestMapperTest {
       var ex = Assertions.assertThrows(IllegalArgumentException.class, () -> map(r));
       assertEquals(errorMessage, ex.getMessage());
     }
+  }
+
+  @Test
+  void testRaptorDegugRequest() {
+    var request = requestBuilder()
+      .withJourney(jb ->
+        jb.withTransit(tb ->
+          tb.withRaptorDebugging(db -> db.withStops(STOP_A.getId().toString()).withPath("2 3* 4"))
+        )
+      )
+      .buildRequest();
+
+    var result = map(request);
+    var subject = result.debug();
+
+    assertEquals(List.of(STOP_A.getIndex()), subject.stops());
+    assertEquals(List.of(2, 3, 4), subject.path());
+    assertEquals(1, subject.debugPathFromStopIndex());
   }
 
   private static RaptorRequest<TestTripSchedule> map(RouteRequest request) {

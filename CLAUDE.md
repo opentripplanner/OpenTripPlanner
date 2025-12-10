@@ -48,6 +48,10 @@ mvn prettier:check
 
 # Spotless removes unused imports
 # Runs automatically during build (validate phase)
+
+# OpenRewrite for code refactoring and modernization
+# Run with the -Prewrite (or -Drw shortcut):
+mvn validate -Prewrite
 ```
 
 ## Running OTP
@@ -257,3 +261,4 @@ Features not yet part of core OTP can be developed as Sandbox extensions. These 
 - Use feature flags (disabled by default)
 - Have conditional code blocks in core OTP
 - See: http://docs.opentripplanner.org/en/latest/SandboxExtension/
+- Use comments sparingly. Only comment complex code.

@@ -11,20 +11,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Timetable;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Direction;
+import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
@@ -141,7 +141,9 @@ public final class TripPattern
     this.originalTripPattern = builder.getOriginalTripPattern();
 
     this.hopGeometries = builder.hopGeometries();
-    this.routingTripPattern = new RoutingTripPattern(this, builder);
+    this.routingTripPattern = new RoutingTripPattern(this);
+
+    getId().requireSameFeedId(route.getId());
   }
 
   public static TripPatternBuilder of(FeedScopedId id) {
@@ -445,7 +447,7 @@ public final class TripPattern
    */
   public String getFeedId() {
     // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
-    return route.getId().getFeedId();
+    return getId().getFeedId();
   }
 
   public RoutingTripPattern getRoutingTripPattern() {

@@ -136,4 +136,4 @@ config:
     CallSchedule: org.opentripplanner.apis.gtfs.model.CallSchedule#CallSchedule
     CallScheduledTime: org.opentripplanner.apis.gtfs.model.CallScheduledTime#CallScheduledTime
     RentalVehicleFuel: org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel#RentalVehicleFuel
-
+    ViaLocationType: org.opentripplanner.model.plan.leg.ViaLocationType#ViaLocationType

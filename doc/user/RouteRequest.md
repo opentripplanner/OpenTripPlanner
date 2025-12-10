@@ -68,6 +68,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                          | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                                       | *Optional* | `30`             |  2.0  |
 |       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                                       | *Optional* | `"PT30S"`        |  2.0  |
+|       [electricAssistSlopeSensitivity](#rd_bicycle_rental_electricAssistSlopeSensitivity)                    |        `double`        | How sensitive electric-assist rental vehicles are to slopes.                                                                                             | *Optional* | `0.3`            |  2.8  |
 |       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                                 | *Optional* | `0`              |  2.2  |
 |       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                                  | *Optional* | `120`            |  2.0  |
 |       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                                  | *Optional* | `"PT1M"`         |  2.0  |
@@ -103,6 +104,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                          | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                                       | *Optional* | `30`             |  2.0  |
 |       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                                       | *Optional* | `"PT30S"`        |  2.0  |
+|       [electricAssistSlopeSensitivity](#rd_car_rental_electricAssistSlopeSensitivity)                        |        `double`        | How sensitive electric-assist rental vehicles are to slopes.                                                                                             | *Optional* | `0.3`            |  2.8  |
 |       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                                 | *Optional* | `0`              |  2.2  |
 |       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                                  | *Optional* | `120`            |  2.0  |
 |       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                                  | *Optional* | `"PT1M"`         |  2.0  |
@@ -135,6 +137,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                          | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                                       | *Optional* | `30`             |  2.0  |
 |       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                                       | *Optional* | `"PT30S"`        |  2.0  |
+|       [electricAssistSlopeSensitivity](#rd_scooter_rental_electricAssistSlopeSensitivity)                    |        `double`        | How sensitive electric-assist rental vehicles are to slopes.                                                                                             | *Optional* | `0.3`            |  2.8  |
 |       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                                 | *Optional* | `0`              |  2.2  |
 |       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                                  | *Optional* | `120`            |  2.0  |
 |       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                                  | *Optional* | `"PT1M"`         |  2.0  |
@@ -425,7 +428,7 @@ Safety limit to prevent access to and egress from too many stops.
 
 **Since version:** `2.1` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults/accessEgress   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `carpool` | `flexible`
 
 Limit access/egress per street mode.
 
@@ -437,7 +440,7 @@ done because some street modes searches are much more resource intensive than ot
 
 **Since version:** `2.7` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults/accessEgress   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `carpool` | `flexible`
 
 Maximal number of stops collected in access/egress routing for the given mode
 
@@ -449,7 +452,7 @@ Mode-specific version of `maxStopCount`.
 
 **Since version:** `2.4` ∙ **Type:** `enum map of object` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults/accessEgress   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `carpool` | `flexible`
 
 Penalty for access/egress by street mode.
 
@@ -486,7 +489,7 @@ extra cost, while 1.0 will add the same amount to both time and cost.
 
 **Since version:** `2.0` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults   
-**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi`
+**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi` | `snow-and-ice`
 
 How much extra time should be given when alighting a vehicle for each given mode.
 
@@ -550,6 +553,19 @@ Tags without which a vehicle parking will not be used. If empty, no tags are req
 Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
 
 
+<h3 id="rd_bicycle_rental_electricAssistSlopeSensitivity">electricAssistSlopeSensitivity</h3>
+
+**Since version:** `2.8` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.3`   
+**Path:** /routingDefaults/bicycle/rental 
+
+How sensitive electric-assist rental vehicles are to slopes.
+
+A value between 0 and 1 where:
+- 0.0 means the motor fully compensates for slopes (like fully electric vehicles)
+- 1.0 means no motor assistance on slopes (like human-powered vehicles)
+- 0.3 (default) means the motor compensates for 70% of slope difficulty
+
+
 <h3 id="rd_bicycle_rental_allowedNetworks">allowedNetworks</h3>
 
 **Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
@@ -610,7 +626,7 @@ for controlling the duration of those events.
 
 **Since version:** `2.0` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults   
-**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi`
+**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi` | `snow-and-ice`
 
 How much extra time should be given when boarding a vehicle for each given mode.
 
@@ -664,6 +680,19 @@ Vehicle parking tags can originate from different places depending on the origin
 Tags without which a vehicle parking will not be used. If empty, no tags are required.
 
 Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
+
+
+<h3 id="rd_car_rental_electricAssistSlopeSensitivity">electricAssistSlopeSensitivity</h3>
+
+**Since version:** `2.8` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.3`   
+**Path:** /routingDefaults/car/rental 
+
+How sensitive electric-assist rental vehicles are to slopes.
+
+A value between 0 and 1 where:
+- 0.0 means the motor fully compensates for slopes (like fully electric vehicles)
+- 1.0 means no motor assistance on slopes (like human-powered vehicles)
+- 0.3 (default) means the motor compensates for 70% of slope difficulty
 
 
 <h3 id="rd_car_rental_allowedNetworks">allowedNetworks</h3>
@@ -904,7 +933,7 @@ The unit is cost unit per second of time difference.
 
 **Since version:** `2.2` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `carpool` | `flexible`
 
 Limit direct route duration per street mode.
 
@@ -921,6 +950,19 @@ done because some street modes searches are much more resource intensive than ot
 The set of characteristics that the user wants to optimize for.
 
 If the triangle optimization is used, it's enough to just define the triangle parameters
+
+<h3 id="rd_scooter_rental_electricAssistSlopeSensitivity">electricAssistSlopeSensitivity</h3>
+
+**Since version:** `2.8` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.3`   
+**Path:** /routingDefaults/scooter/rental 
+
+How sensitive electric-assist rental vehicles are to slopes.
+
+A value between 0 and 1 where:
+- 0.0 means the motor fully compensates for slopes (like fully electric vehicles)
+- 1.0 means no motor assistance on slopes (like human-powered vehicles)
+- 0.3 (default) means the motor compensates for 70% of slope difficulty
+
 
 <h3 id="rd_scooter_rental_allowedNetworks">allowedNetworks</h3>
 
@@ -1060,7 +1102,7 @@ Unmatched patterns are put in the BASE priority-group.
 
 **Since version:** `2.1` ∙ **Type:** `enum map of double` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults   
-**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi`
+**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi` | `snow-and-ice`
 
 Transit reluctance for a given transport mode
 

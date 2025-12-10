@@ -5,12 +5,14 @@ import static org.opentripplanner.raptor.api.request.Optimization.PARALLEL;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -186,8 +188,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       var debugLogger = new SystemErrDebugLogger(true, false);
 
       debug
-        .withStops(raptorDebugging.stops())
-        .withPath(raptorDebugging.path())
+        .withStops(mapDebugStopList(raptorDebugging.stops()))
+        .withPath(mapDebugStopList(raptorDebugging.path()))
         .withDebugPathFromStopIndex(raptorDebugging.debugPathFromStopIndex())
         .withLogger(debugLogger);
 
@@ -317,5 +319,21 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       case PATTERN_RIDES -> target.withPatternRideDebugListener(logger::patternRideLister);
       case DESTINATION_ARRIVALS -> target.withPathFilteringListener(logger::pathFilteringListener);
     }
+  }
+
+  private List<Integer> mapDebugStopList(List<String> stops) {
+    List<Integer> result = new ArrayList<>();
+    for (String stop : stops) {
+      try {
+        result.add(Integer.parseInt(stop));
+      } catch (NumberFormatException ignore) {
+        var a = lookUpStopIndex.lookupStopLocationIndexes(FeedScopedId.parse(stop)).toArray();
+        if (a.length != 1) {
+          throw new IllegalArgumentException("Unable to parse the input stop id: '" + stop + "'");
+        }
+        result.add(a[0]);
+      }
+    }
+    return result;
   }
 }

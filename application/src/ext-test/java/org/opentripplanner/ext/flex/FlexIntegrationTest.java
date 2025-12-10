@@ -24,6 +24,7 @@ import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
+import org.opentripplanner.gtfs.graphbuilder.GtfsModuleTestFactory;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
@@ -192,7 +193,7 @@ public class FlexIntegrationTest {
   ) {
     // GTFS
     var gtfsBundles = gtfsFiles.stream().map(GtfsBundleTestFactory::forTest).toList();
-    GtfsModule gtfsModule = GtfsModule.forTest(
+    GtfsModule gtfsModule = GtfsModuleTestFactory.forTest(
       gtfsBundles,
       timetableRepository,
       graph,

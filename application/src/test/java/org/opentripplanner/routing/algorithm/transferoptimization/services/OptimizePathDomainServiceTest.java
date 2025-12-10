@@ -8,13 +8,13 @@ import static org.opentripplanner.utils.time.TimeUtils.time;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.api.PathUtils;
 import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TestSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;
@@ -32,10 +32,10 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   private static final int TRANSFER_COST_SEC = 20;
   private static final double WAIT_RELUCTANCE = 1.0;
 
-  private static final RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
-    TRANSFER_SLACK,
+  private static final RaptorSlackProvider SLACK_PROVIDER = new TestSlackProvider(
     BOARD_SLACK,
-    ALIGHT_SLACK
+    ALIGHT_SLACK,
+    TRANSFER_SLACK
   );
 
   public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR =
@@ -121,7 +121,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     // Insert wait-time cost summary info
     var expected = original
       .toStringDetailed(this::stopIndexToName)
-      .replace("C₁2_770]", "C₁2_770 Tₚ3_300 wtC₁3_103.81]");
+      .replace("C₁2_770]", "C₁2_770 Tₚ3_300 Wₜ3_103.81]");
 
     assertEquals(expected, PathUtils.pathsToStringDetailed(result));
   }
@@ -181,7 +181,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     assertEquals(
       "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ BUS T3 10:37 10:49 ~ G " +
-      "[10:01:20 10:49:20 48m Tₓ2 C₁2_950 Tₚ6_600]",
+      "[10:01:20 10:49:20 48m Tₙ2 C₁2_950 Tₚ6_600]",
       PathUtils.pathsToString(result)
     );
 
@@ -198,7 +198,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C " +
       "~ BUS T2 10:15 10:35 ~ F " +
       "~ BUS T3 10:37 10:49 ~ G " +
-      "[10:01:20 10:49:20 48m Tₓ2 C₁2_980 Tₚ6_600 wtC₁3_294.05]",
+      "[10:01:20 10:49:20 48m Tₙ2 C₁2_980 Tₚ6_600 Wₜ3_294.05]",
       PathUtils.pathsToString(result)
     );
   }
@@ -249,7 +249,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var it = result.iterator().next();
 
     assertEquals(
-      "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:01:20 10:30:20 29m Tₓ1 C₁1_750 Tₚ2_300]",
+      "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:01:20 10:30:20 29m Tₙ1 C₁1_750 Tₚ2_300]",
       it.toString(this::stopIndexToName)
     );
     // Verify the attached Transfer is exist and is valid
@@ -307,14 +307,14 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var result = subject.findBestTransitPath(original);
 
     assertEquals(
-      "A ~ BUS T1 10:10 10:10 ~ B ~ BUS T2 10:13 10:30 ~ D [10:09:20 10:30:20 21m Tₓ1 C₁1_300 Tₚ3_300]",
+      "A ~ BUS T1 10:10 10:10 ~ B ~ BUS T2 10:13 10:30 ~ D [10:09:20 10:30:20 21m Tₙ1 C₁1_300 Tₚ3_300]",
       PathUtils.pathsToString(result)
     );
   }
 
   static TestPathBuilder pathBuilder() {
     return new TestPathBuilder(
-      new DefaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK),
+      new TestSlackProvider(BOARD_SLACK, ALIGHT_SLACK, TRANSFER_SLACK),
       COST_CALCULATOR
     );
   }

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.network;
 
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * OTP model for NeTEx GroupOfLines. Not used for GTFS at the moment. This is used to categorize

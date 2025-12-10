@@ -15,10 +15,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedInfoTestFactory;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -39,7 +40,7 @@ public class OtpTransitServiceImplTest {
     OtpTransitServiceBuilder builder = contextBuilder.getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections
-    builder.getFeedInfos().add(FeedInfo.dummyForTest(FEED_ID));
+    builder.getFeedInfos().add(FeedInfoTestFactory.dummyForTest(FEED_ID));
 
     subject = builder.build();
   }

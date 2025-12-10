@@ -4,14 +4,14 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.RealTimeTripUpdate;
-import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.routing.util.ConcurrentPublished;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
+import org.opentripplanner.transit.model.timetable.Timetable;
+import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateSuccess;
@@ -178,7 +178,9 @@ public final class TimetableSnapshotManager {
    * @return whether the update was actually applied
    */
   public Result<UpdateSuccess, UpdateError> updateBuffer(RealTimeTripUpdate realTimeTripUpdate) {
-    return buffer.update(realTimeTripUpdate);
+    buffer.update(realTimeTripUpdate);
+    // The time tables are finished during the commit
+    return Result.success(UpdateSuccess.noWarnings(realTimeTripUpdate.producer()));
   }
 
   /**

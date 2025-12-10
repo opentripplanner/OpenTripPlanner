@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.function.Function;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 

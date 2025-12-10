@@ -53,6 +53,7 @@ class TransportModeMapper {
       case FUNICULAR -> TransitMode.FUNICULAR;
       case METRO -> TransitMode.SUBWAY;
       case RAIL -> TransitMode.RAIL;
+      case SNOW_AND_ICE -> TransitMode.SNOW_AND_ICE;
       case TAXI -> TransitMode.TAXI;
       case TRAM -> TransitMode.TRAM;
       case WATER -> TransitMode.FERRY;
@@ -101,6 +102,11 @@ class TransportModeMapper {
       return new NetexMainAndSubMode(TransitMode.FERRY, submode.getWaterSubmode().value());
     } else if (submode.getTaxiSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.TAXI, submode.getTaxiSubmode().value());
+    } else if (submode.getSnowAndIceSubmode() != null) {
+      return new NetexMainAndSubMode(
+        TransitMode.SNOW_AND_ICE,
+        submode.getSnowAndIceSubmode().value()
+      );
     }
     throw new IllegalArgumentException();
   }

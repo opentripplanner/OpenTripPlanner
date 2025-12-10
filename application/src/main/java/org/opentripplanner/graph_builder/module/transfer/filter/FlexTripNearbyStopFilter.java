@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.module.transfer.filter;
 
 import java.util.Collection;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
