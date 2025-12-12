@@ -172,13 +172,9 @@ public class ViaAccessEgressRouter extends AccessEgressRouter {
     GraphPathFinder graphPathFinder
   ) {
     var nearbyStops = new ArrayList<>(stopsFromFirstLocation);
-    var paths = directRouter.findArriveByPaths(
-      linkingContext,
-      graphPathFinder,
-      directRequest,
-      true,
-      true
-    );
+    var paths = directRouter
+      .findArriveByPaths(linkingContext, graphPathFinder, directRequest, true, true)
+      .reversed();
     var vias = accessEgressRequest.listViaLocationsWithCoordinates();
     var durationLeft = durationLimit;
     var i = 0;
