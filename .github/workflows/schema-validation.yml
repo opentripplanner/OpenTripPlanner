@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - dev-2.x
+    paths:
+      - 'application/src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql'
+      - 'application/src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls'
  
 jobs:
   validate-gtfs-schema:
