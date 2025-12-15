@@ -3,6 +3,7 @@ name: OTP CI Build
 # But triggering on push only will miss pull requests from outside authors.
 # The push event's ref is the name of the pushed branch;
 # The pull_request event's branch name is the merge target branch.
+# The merge_group event's branch name is the merge target branch.
 on:
   push:
     branches:
@@ -10,6 +11,11 @@ on:
       - dev-1.x
       - dev-2.x
   pull_request:
+    branches:
+      - master
+      - dev-1.x
+      - dev-2.x
+  merge_group:
     branches:
       - master
       - dev-1.x
@@ -54,7 +60,7 @@ jobs:
           mvn package -Dmaven.test.skip -P prettierSkip,checkstyleSkip
 
       - name: Send coverage data to codecov.io
-        if: github.repository_owner == 'opentripplanner'
+        if: github.repository_owner == 'opentripplanner' && github.event_name != 'merge_group'
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -62,7 +68,7 @@ jobs:
 
       - name: Upload test results to Codecov
         # always upload test results, even when failed
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() }} && github.event_name != 'merge_group'
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
