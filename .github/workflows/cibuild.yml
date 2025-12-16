@@ -8,17 +8,14 @@ on:
   push:
     branches:
       - master
-      - dev-1.x
       - dev-2.x
   pull_request:
     branches:
       - master
-      - dev-1.x
       - dev-2.x
   merge_group:
     branches:
       - master
-      - dev-1.x
       - dev-2.x
 env:
   # maven default arguments to make the log quieter and colourful
@@ -75,7 +72,7 @@ jobs:
           files: "*TEST-*.xml"
 
       - name: Deploy to Github Package Registry
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-2.x')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip,checkstyleSkip,deployGitHub
