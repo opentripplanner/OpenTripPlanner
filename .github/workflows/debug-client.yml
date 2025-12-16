@@ -39,7 +39,7 @@ jobs:
 
       # for a simple PR where we don't push, we don't need any credentials
       - uses: actions/checkout@v4
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
 
       - uses: actions/setup-node@v4
         with:

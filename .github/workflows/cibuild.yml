@@ -119,14 +119,14 @@ jobs:
 
       - uses: actions/checkout@v4
         # for a simple PR where we don't push, we don't need any credentials
-        if: github.event_name == 'pull_request'
+        if: github.event_name != 'push'
 
       - name: Install Python dependencies
         run: pip install -r doc/user/requirements.txt
         
 
       - name: Build main documentation
-        if: github.event_name == 'pull_request'
+        if: github.event_name != 'push'
         run: mkdocs build
 
       - uses: actions/setup-node@v4
