@@ -8,13 +8,13 @@ import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.rutebanken.netex.model.AccessibilityAssessment;
@@ -49,7 +49,7 @@ public class TripMapperTest {
     var limitations = new AccessibilityLimitations_RelStructure();
     var access = new AccessibilityAssessment();
 
-    var transitBuilder = new OtpTransitServiceBuilder(new SiteRepository(), issueStore);
+    var transitBuilder = new TransitDataImportBuilder(new SiteRepository(), issueStore);
     transitBuilder.getRoutes().add(TimetableRepositoryForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
@@ -78,7 +78,7 @@ public class TripMapperTest {
 
   @Test
   public void mapTrip() {
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+    TransitDataImportBuilder transitBuilder = new TransitDataImportBuilder(
       new SiteRepository(),
       issueStore
     );
@@ -105,7 +105,7 @@ public class TripMapperTest {
 
   @Test
   public void mapTripWithRouteRefViaJourneyPattern() {
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+    TransitDataImportBuilder transitBuilder = new TransitDataImportBuilder(
       new SiteRepository(),
       issueStore
     );

@@ -4,8 +4,8 @@ import static org.opentripplanner.utils.lang.StringUtils.assertHasValue;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 
 /**

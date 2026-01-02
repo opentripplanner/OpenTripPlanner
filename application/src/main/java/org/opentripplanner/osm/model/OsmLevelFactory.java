@@ -9,7 +9,7 @@ import org.opentripplanner.osm.issues.LevelAndLevelRefDifferentSizes;
 
 public class OsmLevelFactory {
 
-  public static final OsmLevel DEFAULT = new OsmLevel(0.0, "default level");
+  public static final OsmLevel DEFAULT = new OsmLevel(0.0, "default level", OsmLevelSource.DEFAULT);
 
   private final DataImportIssueStore issueStore;
 
@@ -34,9 +34,14 @@ public class OsmLevelFactory {
    */
   public List<OsmLevel> createOsmLevelsForEntity(OsmEntity entity) {
     if (entity.hasTag("level")) {
-      return createLevelListFromTag(entity.getTag("level"), entity.getTag("level:ref"), entity);
+      return createLevelListFromTag(
+        entity.getTag("level"),
+        entity.getTag("level:ref"),
+        OsmLevelSource.LEVEL_TAG,
+        entity
+      );
     } else if (entity.hasTag("layer")) {
-      return createLevelListFromTag(entity.getTag("layer"), null, entity);
+      return createLevelListFromTag(entity.getTag("layer"), null, OsmLevelSource.LAYER_TAG, entity);
     }
     return List.of();
   }
@@ -44,6 +49,7 @@ public class OsmLevelFactory {
   private List<OsmLevel> createLevelListFromTag(
     String levelTag,
     @Nullable String nameTag,
+    OsmLevelSource source,
     OsmEntity entity
   ) {
     List<OsmLevel> levels;
@@ -55,15 +61,15 @@ public class OsmLevelFactory {
       // nameTag needs to equal the amount of levels in the levelTag.
       // Otherwise the nameTag data won't be used because the names can't be reliably mapped.
       if (levelArray.length == nameArray.length) {
-        levels = createLevelListFromSubstringArrays(levelArray, nameArray);
+        levels = createLevelListFromSubstringArrays(levelArray, nameArray, source);
       } else {
-        levels = createLevelListFromSubstringArrays(levelArray);
+        levels = createLevelListFromSubstringArrays(levelArray, source);
         issueStore.add(
           new LevelAndLevelRefDifferentSizes(levelArray.length, nameArray.length, entity)
         );
       }
     } else {
-      levels = createLevelListFromSubstringArrays(levelArray);
+      levels = createLevelListFromSubstringArrays(levelArray, source);
     }
 
     if (levelListIsValid(levels)) {
@@ -85,21 +91,25 @@ public class OsmLevelFactory {
 
   private List<OsmLevel> createLevelListFromSubstringArrays(
     String[] levelArray,
-    String[] nameArray
+    String[] nameArray,
+    OsmLevelSource source
   ) {
     List<OsmLevel> levels = new ArrayList<>();
     if (nameArray != null) {
       for (int i = 0; i < levelArray.length; i++) {
-        levels.add(createOsmLevelFromTagSubstrings(levelArray[i], nameArray[i]));
+        levels.add(createOsmLevelFromTagSubstrings(levelArray[i], nameArray[i], source));
       }
     }
     return levels;
   }
 
-  private List<OsmLevel> createLevelListFromSubstringArrays(String[] levelArray) {
+  private List<OsmLevel> createLevelListFromSubstringArrays(
+    String[] levelArray,
+    OsmLevelSource source
+  ) {
     List<OsmLevel> levels = new ArrayList<>();
     for (String level : levelArray) {
-      levels.add(createOsmLevelFromTagSubstrings(level, null));
+      levels.add(createOsmLevelFromTagSubstrings(level, null, source));
     }
     return levels;
   }
@@ -111,14 +121,15 @@ public class OsmLevelFactory {
   @Nullable
   private OsmLevel createOsmLevelFromTagSubstrings(
     String levelString,
-    @Nullable String nameString
+    @Nullable String nameString,
+    OsmLevelSource source
   ) {
     try {
       Double level = Double.parseDouble(levelString);
       if (nameString != null) {
-        return new OsmLevel(level, nameString);
+        return new OsmLevel(level, nameString, source);
       } else {
-        return new OsmLevel(level, levelString);
+        return new OsmLevel(level, levelString, source);
       }
     } catch (NumberFormatException e) {
       return null;

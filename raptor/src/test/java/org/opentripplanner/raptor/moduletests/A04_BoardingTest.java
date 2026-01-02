@@ -1,8 +1,6 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -12,11 +10,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
@@ -47,39 +44,47 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class A04_BoardingTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   @BeforeEach
   void setup() {
-    // There is three possible paths before boarding trip L2
-    data.withRoute(route("L1_1", STOP_A, STOP_B).withTimetable(schedule("0:10 0:18")));
-    data.withRoute(route("L1_2", STOP_A, STOP_C).withTimetable(schedule("0:14 0:18")));
-    data.withRoute(route("L1_3", STOP_A, STOP_D).withTimetable(schedule("0:12 0:18")));
+    data
+      .access("Walk 1m ~ A")
+      .withTimetables(
+        """
+        -- R1
+        A     B
+        0:10  0:18
+        -- R2
+        A           C
+        0:14        0:18
+        -- R3
+        A                 D
+        0:12              0:18
 
-    data.withRoute(
-      route("L2", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G).withTimetable(
-        schedule("0:20 0:21 0:22 0:30 0:31 0:32")
+        -- R4
+              B     C     D     E     F     G
+              0:20  0:21  0:22  0:30  0:31  0:32
+        -- R5
+                                E                 H
+                                0:35              0:42
+        -- R6
+                                      F           H
+                                      0:35        0:40
+        -- R7
+                                            G     H
+                                            0:35  0:44
+        """
       )
-    );
-
-    // There is three possible paths from trip L2 to the destination. These paths are used to test
-    // the reverse search.
-    data.withRoute(route("L3_1", STOP_E, STOP_H).withTimetable(schedule("0:35 0:42")));
-    data.withRoute(route("L3_2", STOP_F, STOP_H).withTimetable(schedule("0:35 0:40")));
-    data.withRoute(route("L3_3", STOP_G, STOP_H).withTimetable(schedule("0:35 0:44")));
+      .egress("H ~ Walk 1m");
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D1m))
-      .addEgressPaths(TestAccessEgress.walk(STOP_H, D1m))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchOneIterationOnly();
-    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {
@@ -92,10 +97,10 @@ public class A04_BoardingTest implements RaptorTestConstants {
         standard().forwardOnly(),
         // Board L2 at first possible stop B (not C) and arrive at F (the earliest arrival time)
         "Walk 1m ~ A " +
-        "~ BUS L1_1 0:10 0:18 ~ B " +
-        "~ BUS L2 0:20 0:31 ~ F " +
-        "~ BUS L3_2 0:35 0:40 ~ H " +
-        "~ Walk 1m [0:09 0:41 32m Tₓ2]"
+        "~ BUS R1 0:10 0:18 ~ B " +
+        "~ BUS R4 0:20 0:31 ~ F " +
+        "~ BUS R6 0:35 0:40 ~ H " +
+        "~ Walk 1m [0:09 0:41 32m Tₙ2]"
       )
       // A reverse test on the standard profile is included to demonstrate
       // that the min-travel-duration and the standard give different results
@@ -105,19 +110,19 @@ public class A04_BoardingTest implements RaptorTestConstants {
         // Searching in REVERSE we will "board" L2 at the first possible stop G and "alight" at the
         // optimal stop C (the best "arrival-time").
         "Walk 1m ~ A " +
-        "~ BUS L1_2 0:14 0:18 ~ C " +
-        "~ BUS L2 0:21 0:32 ~ G " +
-        "~ BUS L3_3 0:35 0:44 ~ H " +
-        "~ Walk 1m [0:13 0:45 32m Tₓ2]"
+        "~ BUS R2 0:14 0:18 ~ C " +
+        "~ BUS R4 0:21 0:32 ~ G " +
+        "~ BUS R7 0:35 0:44 ~ H " +
+        "~ Walk 1m [0:13 0:45 32m Tₙ2]"
       )
       .add(
         multiCriteria(),
         // Board L2 at stop C and alight at stop F
         "Walk 1m ~ A " +
-        "~ BUS L1_2 0:14 0:18 ~ C " +
-        "~ BUS L2 0:21 0:31 ~ F " +
-        "~ BUS L3_2 0:35 0:40 ~ H " +
-        "~ Walk 1m [0:13 0:41 28m Tₓ2 C₁3_600]"
+        "~ BUS R2 0:14 0:18 ~ C " +
+        "~ BUS R4 0:21 0:31 ~ F " +
+        "~ BUS R6 0:35 0:40 ~ H " +
+        "~ Walk 1m [0:13 0:41 28m Tₙ2 C₁3_600]"
       )
       .build();
   }

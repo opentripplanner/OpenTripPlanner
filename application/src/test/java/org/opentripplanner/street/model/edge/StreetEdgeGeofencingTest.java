@@ -17,8 +17,10 @@ import java.util.Collections;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.street.BusinessAreaBorder;
 import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -29,7 +31,6 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class StreetEdgeGeofencingTest {
 
@@ -136,7 +137,12 @@ class StreetEdgeGeofencingTest {
 
       var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
       var editor = new StateEditor(edge1.getFromVertex(), req);
-      editor.beginFloatingVehicleRenting(RentalFormFactor.SCOOTER, NETWORK_TIER, false);
+      editor.beginFloatingVehicleRenting(
+        RentalFormFactor.SCOOTER,
+        PropulsionType.ELECTRIC,
+        NETWORK_TIER,
+        false
+      );
       restrictedEdge.addRentalRestriction(NO_DROP_OFF_TIER);
 
       var results = edge1.traverse(editor.makeState());
@@ -178,7 +184,12 @@ class StreetEdgeGeofencingTest {
       var req = defaultArriveByRequest();
 
       var editor = new StateEditor(restrictedEdge.getToVertex(), req);
-      editor.dropFloatingVehicle(RentalFormFactor.SCOOTER, NETWORK_TIER, true);
+      editor.dropFloatingVehicle(
+        RentalFormFactor.SCOOTER,
+        PropulsionType.ELECTRIC,
+        NETWORK_TIER,
+        true
+      );
 
       var s0 = editor.makeState();
       assertEquals(Set.of(NETWORK_TIER), s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
@@ -457,7 +468,12 @@ class StreetEdgeGeofencingTest {
       .withArriveBy(arriveBy)
       .build();
     var editor = new StateEditor(startVertex, req);
-    editor.beginFloatingVehicleRenting(RentalFormFactor.SCOOTER, network, false);
+    editor.beginFloatingVehicleRenting(
+      RentalFormFactor.SCOOTER,
+      PropulsionType.ELECTRIC,
+      network,
+      false
+    );
     return editor.makeState();
   }
 }

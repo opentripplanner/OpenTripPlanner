@@ -147,6 +147,7 @@ public class OTPMain {
       new SerializedGraphObject(
         app.graph(),
         app.osmInfoGraphBuildRepository(),
+        app.streetDetailsRepository(),
         app.streetRepository(),
         app.timetableRepository(),
         app.worldEnvelopeRepository(),

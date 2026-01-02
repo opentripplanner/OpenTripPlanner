@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
 import java.time.LocalDate;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * Class to use as key in HashMap containing feed id, trip id and service date

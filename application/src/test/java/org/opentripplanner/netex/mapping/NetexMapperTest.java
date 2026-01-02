@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.rutebanken.netex.model.Quay;
@@ -28,7 +28,7 @@ class NetexMapperTest {
   @Test
   void sspWithAssignment() {
     var issueStore = new DefaultDataImportIssueStore();
-    var transitBuilder = new OtpTransitServiceBuilder(SiteRepository.of().build(), issueStore);
+    var transitBuilder = new TransitDataImportBuilder(SiteRepository.of().build(), issueStore);
     transitBuilder.siteRepository().withRegularStop(STOP);
 
     var netexMapper = new NetexMapper(
@@ -58,7 +58,7 @@ class NetexMapperTest {
     var issueStore = new DefaultDataImportIssueStore();
 
     var netexMapper = new NetexMapper(
-      new OtpTransitServiceBuilder(SiteRepository.of().build(), issueStore),
+      new TransitDataImportBuilder(SiteRepository.of().build(), issueStore),
       FEED_ID,
       DEDUPLICATOR,
       issueStore,

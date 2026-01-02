@@ -1,7 +1,6 @@
 package org.opentripplanner.utils.time;
 
 import java.security.SecureRandom;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -14,6 +13,8 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * Time utility methods. See the unit test for examples on how to use this class.
@@ -109,16 +110,15 @@ public class TimeUtils {
    * past midnight.
    */
   public static int[] times(String input) {
-    return Arrays.stream(input.split("[ ,;]+")).mapToInt(TimeUtils::time).toArray();
+    return Arrays.stream(input.split("[\t ,;]+"))
+      .filter(StringUtils::hasValue)
+      .mapToInt(TimeUtils::time)
+      .toArray();
   }
 
   /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */
   public static String timeToStrCompact(int time) {
     return RelativeTime.ofSeconds(time).toCompactStr();
-  }
-
-  public static String durationToStrCompact(Duration duration) {
-    return timeToStrCompact((int) duration.toSeconds());
   }
 
   /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59. */
@@ -149,6 +149,15 @@ public class TimeUtils {
   /** Format string on format HH:MM:SS */
   public static String timeToStrLong(ZonedDateTime time) {
     return RelativeTime.from(time).toLongStr();
+  }
+
+  /** Format string on format HH:MM:SS */
+  public static String timetableToStr(int[] times, String delimiter) {
+    boolean useLongFormat = Arrays.stream(times).anyMatch(t -> t % 60 != 0);
+    return Arrays.stream(times)
+      .mapToObj(t -> RelativeTime.ofSeconds(t))
+      .map(t -> useLongFormat ? t.toLongStr() : t.toTimetableStr())
+      .collect(Collectors.joining(delimiter));
   }
 
   public static String timeToStrLong(LocalTime time) {

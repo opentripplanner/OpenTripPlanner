@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.site;
 
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class FareZoneBuilder extends AbstractEntityBuilder<FareZone, FareZoneBuilder> {
 

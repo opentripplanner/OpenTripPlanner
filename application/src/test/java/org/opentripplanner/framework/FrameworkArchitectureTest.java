@@ -1,5 +1,7 @@
 package org.opentripplanner.framework;
 
+import static org.opentripplanner.OtpArchitectureModules.DOMAIN_CORE_FRAMEWORK;
+import static org.opentripplanner.OtpArchitectureModules.DOMAIN_CORE_MODEL;
 import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK;
 import static org.opentripplanner.OtpArchitectureModules.GEO_JSON;
 import static org.opentripplanner.OtpArchitectureModules.GEO_TOOLS;
@@ -26,10 +28,10 @@ public class FrameworkArchitectureTest {
   private static final Package COLLECTION = FRAMEWORK.subPackage("collection");
   private static final Package FUNCTIONAL = FRAMEWORK.subPackage("functional");
   private static final Package GEOMETRY = FRAMEWORK.subPackage("geometry");
-  private static final Package I18N = FRAMEWORK.subPackage("i18n");
+  private static final Package I18N = DOMAIN_CORE_MODEL.subPackage("i18n");
   private static final Package IO = FRAMEWORK.subPackage("io");
   private static final Package LOGGING = FRAMEWORK.subPackage("logging");
-  private static final Package RESOURCES = FRAMEWORK.subPackage("resources");
+  private static final Package RESOURCES = DOMAIN_CORE_FRAMEWORK.subPackage("resources");
   private static final Package TIME = FRAMEWORK.subPackage("time");
 
   @Test

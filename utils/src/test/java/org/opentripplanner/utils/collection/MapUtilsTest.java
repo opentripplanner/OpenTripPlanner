@@ -12,9 +12,6 @@ import java.util.Collections;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Thomas Gran (Capra) - tgr@capraconsulting.no (30.10.2017)
- */
 public class MapUtilsTest {
 
   @Test

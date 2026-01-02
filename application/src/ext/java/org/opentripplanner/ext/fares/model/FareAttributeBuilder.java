@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.fares.model;
 
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class FareAttributeBuilder
   extends AbstractEntityBuilder<FareAttribute, FareAttributeBuilder> {

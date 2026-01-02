@@ -2,8 +2,8 @@ package org.opentripplanner.osm.wayproperty;
 
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.TranslatedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.note.StreetNoteAndMatcher;

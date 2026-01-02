@@ -3,20 +3,21 @@ package org.opentripplanner.model.plan.legreference;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.OptionalInt;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.Timetable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.leg.LegConstructionSupport;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.collection.TwoWayLinearSearch;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -303,33 +304,11 @@ public record ScheduledTransitLegReference(
   private OptionalInt findStopPositionInPattern(
     TripPattern tripPattern,
     int stopPosition,
-    Function<StopLocation, Boolean> matcher
+    Predicate<StopLocation> matcher
   ) {
-    // Look up for candidate stops before the original stop and after the original stop.
-    // Keep searching until reaching the first stop and the last stop in the pattern.
-    var keepSearchingBackward = true;
-    var keepSearchingForward = true;
-    for (var diff = 0; keepSearchingBackward || keepSearchingForward; ++diff) {
-      var stopPositionAfter = stopPosition + diff;
-      keepSearchingForward = stopPositionAfter < tripPattern.numberOfStops();
-      if (keepSearchingForward && matcher.apply(tripPattern.getStops().get(stopPositionAfter))) {
-        return OptionalInt.of(stopPositionAfter);
-      }
-      var stopPositionBefore = stopPosition - diff;
-      keepSearchingBackward = stopPositionBefore >= 0;
-      // when searching backward, check that the candidate stop is before the last stop.
-      // it could be out of range if the current pattern has fewer stops than the original pattern.
-      boolean stopPositionBeforeIsInRange = stopPositionBefore < tripPattern.numberOfStops();
-      if (
-        diff != 0 &&
-        keepSearchingBackward &&
-        stopPositionBeforeIsInRange &&
-        matcher.apply(tripPattern.getStops().get(stopPositionBefore))
-      ) {
-        return OptionalInt.of(stopPositionBefore);
-      }
-    }
-    return OptionalInt.empty();
+    return TwoWayLinearSearch.findNearest(stopPosition, 0, tripPattern.numberOfStops(), i ->
+      matcher.test(tripPattern.getStops().get(i))
+    );
   }
 
   private void logInvalidLegRef(String message, Object... args) {

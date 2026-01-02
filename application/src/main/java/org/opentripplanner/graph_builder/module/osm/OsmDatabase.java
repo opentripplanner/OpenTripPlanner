@@ -100,8 +100,8 @@ public class OsmDatabase {
    * Track which vertical levels OSM entities belong to.
    * Level information can be set for ways, nodes and relations.
    * An entity only has an entry if at least one level is defined in OSM.
-   * The ordering is important because in the future it will be used for building stairs
-   * and escalators. At the moment, the level is used e.g. for building elevators.
+   * The ordering is important because it is used for building stairs and escalators.
+   * The level is also used e.g. for building elevators and connecting areas.
    */
   private final ArrayListMultimap<OsmEntity, OsmLevel> entityLevels = ArrayListMultimap.create();
 

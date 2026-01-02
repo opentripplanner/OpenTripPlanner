@@ -100,7 +100,12 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.transferIndex = raptorTransitData.getRaptorTransfersForRequest(request);
     this.constrainedTransfers = raptorTransitData.getConstrainedTransfers();
 
-    var mcCostParams = GeneralizedCostParametersMapper.map(request, patternIndex);
+    var mcCostParams = GeneralizedCostParametersMapper.map(
+      request,
+      patternIndex,
+      p -> p.route().getId(),
+      p -> p.route().getAgency().getId()
+    );
 
     this.generalizedCostCalculator = CostCalculatorFactory.createCostCalculator(
       mcCostParams,

@@ -2,8 +2,8 @@ package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Equal to GTFS zone_id or NeTEx TariffZone.

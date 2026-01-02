@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.empiricaldelay.internal.csvinput.delay;
 
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * An empirical dealy trip time csv file row.

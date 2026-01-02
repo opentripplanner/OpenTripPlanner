@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This class is used as a reference to a StopTime wrapping the {@link Trip#getId()} and

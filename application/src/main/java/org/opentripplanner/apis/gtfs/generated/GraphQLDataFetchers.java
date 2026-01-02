@@ -23,6 +23,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRealtimeState
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLVerticalDirection;
 import org.opentripplanner.apis.gtfs.model.CallRealTime;
 import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.apis.gtfs.model.CallScheduledTime;
@@ -46,6 +47,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.LegCallTime;
 import org.opentripplanner.model.plan.leg.LegRealTimeEstimate;
 import org.opentripplanner.model.plan.leg.StopArrival;
+import org.opentripplanner.model.plan.leg.ViaLocationType;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -54,6 +56,7 @@ import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
+import org.opentripplanner.service.streetdetails.model.Level;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
@@ -410,6 +413,15 @@ public class GraphQLDataFetchers {
     public DataFetcher<RiderCategory> riderCategory();
   }
 
+  /** A single use of an elevator. */
+  public interface GraphQLElevatorUse {
+    public DataFetcher<Level> from();
+
+    public DataFetcher<Level> to();
+
+    public DataFetcher<GraphQLVerticalDirection> verticalDirection();
+  }
+
   public interface GraphQLEmissions {
     public DataFetcher<org.opentripplanner.framework.model.Gram> co2();
   }
@@ -425,6 +437,15 @@ public class GraphQLDataFetchers {
     public DataFetcher<
       org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding
     > wheelchairAccessible();
+  }
+
+  /** A single use of an escalator. */
+  public interface GraphQLEscalatorUse {
+    public DataFetcher<Level> from();
+
+    public DataFetcher<Level> to();
+
+    public DataFetcher<GraphQLVerticalDirection> verticalDirection();
   }
 
   /** Real-time estimates for an arrival or departure at a certain place. */
@@ -621,6 +642,13 @@ public class GraphQLDataFetchers {
     public DataFetcher<java.time.OffsetDateTime> scheduledTime();
   }
 
+  /** A level with a name and comparable number. Levels can sometimes contain half levels, e.g. '1.5'. */
+  public interface GraphQLLevel {
+    public DataFetcher<Double> level();
+
+    public DataFetcher<String> name();
+  }
+
   /** A span of time. */
   public interface GraphQLLocalTimeSpan {
     public DataFetcher<Integer> from();
@@ -761,6 +789,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<VehicleRentalStation> vehicleRentalStation();
 
     public DataFetcher<String> vertexType();
+
+    public DataFetcher<ViaLocationType> viaLocationType();
   }
 
   /** Interface for places, e.g. stops, stations, parking areas.. */
@@ -1106,6 +1136,15 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> description();
 
     public DataFetcher<GraphQLInputField> inputField();
+  }
+
+  /** A single use of a set of stairs. */
+  public interface GraphQLStairsUse {
+    public DataFetcher<Level> from();
+
+    public DataFetcher<Level> to();
+
+    public DataFetcher<GraphQLVerticalDirection> verticalDirection();
   }
 
   /** A feature for a step */

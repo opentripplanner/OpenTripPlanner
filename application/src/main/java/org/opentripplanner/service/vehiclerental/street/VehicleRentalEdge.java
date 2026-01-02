@@ -1,10 +1,15 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+import java.time.Instant;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
@@ -63,7 +68,7 @@ public class VehicleRentalEdge extends Edge {
           if (!station.canDropOffFormFactor(formFactor, realtimeAvailability)) {
             return State.empty();
           }
-          s1.dropOffRentedVehicleAtStation(formFactor, network, true);
+          s1.dropOffRentedVehicleAtStation(formFactor, getPropulsionType(station), network, true);
           pickedUp = false;
         }
         case RENTING_FLOATING -> {
@@ -80,7 +85,10 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
-            s1.beginFloatingVehicleRenting(formFactor, network, true);
+            if (!isVehicleAvailableDuringRentalPeriod(s0, station)) {
+              return State.empty();
+            }
+            s1.beginFloatingVehicleRenting(formFactor, getPropulsionType(station), network, true);
             pickedUp = true;
           } else {
             return State.empty();
@@ -104,7 +112,13 @@ public class VehicleRentalEdge extends Edge {
           if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {
             return State.empty();
           }
-          s1.beginVehicleRentingAtStation(formFactor, network, false, true);
+          s1.beginVehicleRentingAtStation(
+            formFactor,
+            getPropulsionType(station),
+            network,
+            false,
+            true
+          );
           pickedUp = true;
         }
         default -> throw new IllegalStateException();
@@ -119,12 +133,21 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
-            s1.beginFloatingVehicleRenting(formFactor, network, false);
+            if (!isVehicleAvailableDuringRentalPeriod(s0, station)) {
+              return State.empty();
+            }
+            s1.beginFloatingVehicleRenting(formFactor, getPropulsionType(station), network, false);
           } else {
             boolean mayKeep =
               request.allowArrivingInRentedVehicleAtDestination() &&
               station.isArrivingInRentalVehicleAtDestinationAllowed();
-            s1.beginVehicleRentingAtStation(formFactor, network, mayKeep, false);
+            s1.beginVehicleRentingAtStation(
+              formFactor,
+              getPropulsionType(station),
+              network,
+              mayKeep,
+              false
+            );
           }
           pickedUp = true;
         }
@@ -138,7 +161,7 @@ public class VehicleRentalEdge extends Edge {
           if (!station.canDropOffFormFactor(formFactor, realtimeAvailability)) {
             return State.empty();
           }
-          s1.dropOffRentedVehicleAtStation(formFactor, network, false);
+          s1.dropOffRentedVehicleAtStation(formFactor, getPropulsionType(station), network, false);
           pickedUp = false;
         }
         default -> throw new IllegalStateException();
@@ -153,6 +176,19 @@ public class VehicleRentalEdge extends Edge {
     );
     s1.setBackMode(null);
     return s1.makeStateArray();
+  }
+
+  private static boolean isVehicleAvailableDuringRentalPeriod(State s0, VehicleRentalPlace place) {
+    if (s0.getRequest().rentalPeriod() != null && place.isCarStation()) {
+      var vehicleRentalVehicle = (VehicleRentalVehicle) place;
+      var availableUntil = vehicleRentalVehicle.availableUntil();
+      if (availableUntil == null) {
+        return true;
+      }
+      Instant rentalEndTime = s0.getRequest().rentalPeriod().end();
+      return !availableUntil.isBefore(rentalEndTime);
+    }
+    return true;
   }
 
   @Override
@@ -178,5 +214,30 @@ public class VehicleRentalEdge extends Edge {
 
   private static boolean isFormFactorAllowed(StreetMode streetMode, RentalFormFactor formFactor) {
     return formFactor.traverseMode == StreetModeToRentalTraverseModeMapper.map(streetMode);
+  }
+
+  /**
+   * Extract the propulsion type from the rental place.
+   * For floating vehicles, this comes from the vehicle type.
+   * For stations, we use the propulsion type of the first matching vehicle type,
+   * defaulting to HUMAN if none is specified.
+   */
+  private PropulsionType getPropulsionType(VehicleRentalPlace place) {
+    if (place instanceof VehicleRentalVehicle vehicle) {
+      var vehicleType = vehicle.vehicleType();
+      return vehicleType != null ? vehicleType.propulsionType() : PropulsionType.HUMAN;
+    }
+    if (place instanceof VehicleRentalStation station) {
+      // For stations, find a matching vehicle type for this form factor
+      return station
+        .vehicleTypesAvailable()
+        .keySet()
+        .stream()
+        .filter(vt -> vt.formFactor() == formFactor)
+        .map(RentalVehicleType::propulsionType)
+        .findFirst()
+        .orElse(PropulsionType.HUMAN);
+    }
+    return PropulsionType.HUMAN;
   }
 }

@@ -7,10 +7,12 @@ public class OsmLevel implements Comparable<OsmLevel> {
 
   private final double level;
   private final String name;
+  private final OsmLevelSource source;
 
-  public OsmLevel(double level, String name) {
+  public OsmLevel(double level, String name, OsmLevelSource source) {
     this.name = Objects.requireNonNull(name);
     this.level = level;
+    this.source = source;
   }
 
   @Override
@@ -24,15 +26,18 @@ public class OsmLevel implements Comparable<OsmLevel> {
   }
 
   @Override
-  public boolean equals(Object object) {
-    if (object instanceof OsmLevel other) {
-      // Levels should be equal if their 0-based number representations are equal.
-      // There should be no need to compare names.
-      // For example, comparing the default level and a ground level with a name should be equal.
-      return this.level == other.level;
-    } else {
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
+    OsmLevel that = (OsmLevel) o;
+    // Levels should be equal if their 0-based number representations are equal.
+    // There should be no need to compare names.
+    // For example, comparing the default level and a ground level with a name should be equal.
+    return this.level == that.level;
   }
 
   /**
@@ -49,6 +54,13 @@ public class OsmLevel implements Comparable<OsmLevel> {
    */
   public String name() {
     return this.name;
+  }
+
+  /**
+   * What is the source of the information for this level.
+   */
+  public OsmLevelSource source() {
+    return this.source;
   }
 
   @Override

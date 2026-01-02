@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.model.framework;
 
+import org.opentripplanner.core.model.id.FeedScopedId;
+
 /**
  * This exception is used by the main OTP business logic to signal that one of the
  * ids passed in is not found. This exception should be handled in a generic way in each

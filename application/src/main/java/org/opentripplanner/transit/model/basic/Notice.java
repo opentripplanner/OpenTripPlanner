@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.basic;
 
 import java.util.Objects;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This is an element that originates from the NeTEx specification and is described as "Text-based

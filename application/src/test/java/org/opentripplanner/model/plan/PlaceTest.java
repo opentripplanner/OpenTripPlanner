@@ -13,13 +13,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.leg.ViaLocationType;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
+import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
 
@@ -106,6 +108,66 @@ public class PlaceTest {
   public void acceptsNullCoordinates() {
     var p = Place.normal(null, null, new NonLocalizedString("Test"));
     assertNull(p.coordinate);
+  }
+
+  @Test
+  public void normalVertex() {
+    var coordinate = new Coordinate(1, 0);
+    var name = new NonLocalizedString("Test");
+    Place place = Place.normal(new TemporaryStreetLocation(coordinate, name), name);
+    assertEquals(coordinate, place.coordinate.asJtsCoordinate());
+    assertEquals(name, place.name);
+    assertEquals(VertexType.NORMAL, place.vertexType);
+    assertNull(place.viaLocationType);
+    assertNull(place.stop);
+    assertNull(place.vehicleRentalPlace);
+    assertNull(place.vehicleParkingWithEntrance);
+  }
+
+  @Test
+  public void normalVertexWithViaCoordinateType() {
+    var coordinate = new Coordinate(1, 0);
+    var name = new NonLocalizedString("Test");
+    var type = ViaLocationType.VISIT;
+    Place place = Place.normal(new TemporaryStreetLocation(coordinate, name), name, type);
+    assertEquals(coordinate, place.coordinate.asJtsCoordinate());
+    assertEquals(name, place.name);
+    assertEquals(VertexType.NORMAL, place.vertexType);
+    assertEquals(type, place.viaLocationType);
+    assertNull(place.stop);
+    assertNull(place.vehicleRentalPlace);
+    assertNull(place.vehicleParkingWithEntrance);
+  }
+
+  @Test
+  public void forStop() {
+    var testModel = TimetableRepositoryForTest.of();
+    var stop = testModel.stop("1").withCoordinate(1.0, 1.0).build();
+
+    Place place = Place.forStop(stop);
+    assertEquals(stop, place.stop);
+    assertEquals(stop.getName(), place.name);
+    assertEquals(VertexType.TRANSIT, place.vertexType);
+    assertEquals(stop.getCoordinate(), place.coordinate);
+    assertNull(place.viaLocationType);
+    assertNull(place.vehicleRentalPlace);
+    assertNull(place.vehicleParkingWithEntrance);
+  }
+
+  @Test
+  public void forStopWithViaLocationType() {
+    var testModel = TimetableRepositoryForTest.of();
+    var stop = testModel.stop("1").withCoordinate(1.0, 1.0).build();
+    var type = ViaLocationType.PASS_THROUGH;
+
+    Place place = Place.forStop(stop, type);
+    assertEquals(stop, place.stop);
+    assertEquals(stop.getName(), place.name);
+    assertEquals(VertexType.TRANSIT, place.vertexType);
+    assertEquals(stop.getCoordinate(), place.coordinate);
+    assertEquals(type, place.viaLocationType);
+    assertNull(place.vehicleRentalPlace);
+    assertNull(place.vehicleParkingWithEntrance);
   }
 
   @Test

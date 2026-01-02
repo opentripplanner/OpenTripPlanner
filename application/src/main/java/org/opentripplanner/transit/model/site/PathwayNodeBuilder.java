@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * A place where a station connects to the street network. Equivalent to GTFS stop location .

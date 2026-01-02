@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -266,6 +267,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return stateData.rentalVehicleFormFactor;
   }
 
+  public PropulsionType rentalVehiclePropulsionType() {
+    return stateData.rentalVehiclePropulsionType;
+  }
+
   public double getWalkDistance() {
     return walkDistance;
   }
@@ -380,12 +385,14 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         if (orig.vertex instanceof VehicleRentalPlaceVertex stationVertex) {
           editor.dropOffRentedVehicleAtStation(
             ((VehicleRentalEdge) edge).formFactor,
+            orig.rentalVehiclePropulsionType(),
             stationVertex.getStation().network(),
             false
           );
         } else {
           editor.dropFloatingVehicle(
             orig.stateData.rentalVehicleFormFactor,
+            orig.rentalVehiclePropulsionType(),
             orig.getVehicleRentalNetwork(),
             false
           );
@@ -395,6 +402,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         if (orig.getBackState().isRentingVehicleFromStation()) {
           editor.beginVehicleRentingAtStation(
             ((VehicleRentalEdge) edge).formFactor,
+            orig.getBackState().rentalVehiclePropulsionType(),
             stationVertex.getStation().network(),
             orig.backState.mayKeepRentedVehicleAtDestination(),
             false
@@ -402,6 +410,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         } else if (orig.getBackState().isRentingFloatingVehicle()) {
           editor.beginFloatingVehicleRenting(
             ((VehicleRentalEdge) edge).formFactor,
+            orig.getBackState().rentalVehiclePropulsionType(),
             stationVertex.getStation().network(),
             false
           );

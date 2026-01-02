@@ -239,7 +239,12 @@ public class RoutingWorker {
     var directBuilder = request.copyOf();
 
     directBuilder.withJourney(jb ->
-      jb.withDirect(new StreetRequest(emptyDirectModeHandler.resolveDirectMode()))
+      jb.withDirect(
+        new StreetRequest(
+          emptyDirectModeHandler.resolveDirectMode(),
+          request.journey().direct().rentalDuration()
+        )
+      )
     );
 
     debugTimingAggregator.startedDirectStreetRouter();

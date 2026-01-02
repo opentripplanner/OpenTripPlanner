@@ -6,11 +6,18 @@ on:
       - dev-2.x
     paths:
       - 'client/**'
+      - 'application/src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql'
   pull_request:
     branches:
       - dev-2.x
     paths:
       - 'client/**'
+      - 'application/src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql'
+  merge_group:
+    branches:
+      - dev-2.x
+    # path filtering not supported https://github.com/orgs/community/discussions/45899
+  workflow_dispatch:
 
 # to avoid conflicts, make sure that only one workflow pushes to Github at the same time
 concurrency:
@@ -25,14 +32,14 @@ jobs:
       # this is necessary so that the correct credentials are put into the git configuration
       # when we push to dev-2.x and push the compiled output to the git repo
       - uses: actions/checkout@v4
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
           fetch-depth: 0
 
       # for a simple PR where we don't push, we don't need any credentials
       - uses: actions/checkout@v4
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
 
       - uses: actions/setup-node@v4
         with:
@@ -49,7 +56,7 @@ jobs:
           npm run coverage
 
       - name: Deploy compiled assets to repo
-        if: github.event_name == 'push'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/dev-2.x'
         env:
           REMOTE: debug-client
           LOCAL_BRANCH: local-assets

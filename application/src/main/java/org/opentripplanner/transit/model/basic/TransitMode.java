@@ -21,7 +21,8 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
   TROLLEYBUS,
   MONORAIL,
   CARPOOL,
-  TAXI;
+  TAXI,
+  SNOW_AND_ICE;
 
   private static final Set<TransitMode> ON_STREET_MODES = EnumSet.of(
     COACH,
@@ -75,11 +76,16 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
       case TROLLEYBUS -> "Used for trolleybus systems which draw power from overhead wires using poles on the roof of the vehicle.";
       case MONORAIL -> "Used for any rail system that runs on a single rail.";
       case CARPOOL -> """
-      Private car trips shared with others.
+      Private car trips shared with others, operating on scheduled routes similar to transit.
 
-      This is currently not specified in GTFS so we use the mode type values 1550-1560 which are in the range of private taxis.
+      Use the _transit mode_, as opposed to the street mode `CARPOOL`, if your data source comes from
+      static GTFS feeds. This is currently not part of the specification, so we use the mode type values 1550-1560
+      which are in the range of private taxis.
+
+      If your data source for the carpool trips is SIRI use the `CARPOOL` street mode instead.
       """;
       case TAXI -> "Using a taxi service";
+      case SNOW_AND_ICE -> "Used for off-road snow and ice vehicles";
     };
   }
 }

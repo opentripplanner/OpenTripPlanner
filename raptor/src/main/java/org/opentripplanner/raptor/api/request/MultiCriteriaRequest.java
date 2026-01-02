@@ -19,19 +19,14 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   @Nullable
   private final RaptorTransitGroupPriorityCalculator transitPriorityCalculator;
 
-  @Nullable
-  private final Double relaxCostAtDestination;
-
   private MultiCriteriaRequest() {
     this.relaxC1 = RelaxFunction.NORMAL;
     this.transitPriorityCalculator = null;
-    this.relaxCostAtDestination = null;
   }
 
   public MultiCriteriaRequest(Builder<T> builder) {
     this.relaxC1 = Objects.requireNonNull(builder.relaxC1());
     this.transitPriorityCalculator = builder.transitPriorityCalculator();
-    this.relaxCostAtDestination = builder.relaxCostAtDestination();
   }
 
   public static <S extends RaptorTripSchedule> Builder<S> of() {
@@ -62,29 +57,6 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return Optional.ofNullable(transitPriorityCalculator);
   }
 
-  /**
-   * Whether to accept non-optimal trips if they are close enough - if and only if they represent
-   * an optimal path for their given iteration. In other words this slack only relaxes the pareto
-   * comparison at the destination.
-   * <p>
-   * Let {@code c} be the existing minimum pareto optimal cost to beat. Then a trip with cost
-   * {@code c'} is accepted if the following is true:
-   * <pre>
-   * c' < Math.round(c * relaxCostAtDestination)
-   * </pre>
-   * If the value is less than 1.0 a normal '<' comparison is performed.
-   * <p>
-   * The default is not set.
-   * <p>
-   * @deprecated This parameter only relax the cost at the destination, not at each stop. This
-   * is replaced by {@link #relaxC1()}. This parameter is ignored if {@link #relaxC1()} exist.
-   */
-  @Deprecated
-  @Nullable
-  public Double relaxCostAtDestination() {
-    return relaxCostAtDestination;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -96,14 +68,13 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     MultiCriteriaRequest<?> that = (MultiCriteriaRequest<?>) o;
     return (
       Objects.equals(relaxC1, that.relaxC1) &&
-      Objects.equals(transitPriorityCalculator, that.transitPriorityCalculator) &&
-      Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination)
+      Objects.equals(transitPriorityCalculator, that.transitPriorityCalculator)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(relaxC1, transitPriorityCalculator, relaxCostAtDestination);
+    return Objects.hash(relaxC1, transitPriorityCalculator);
   }
 
   @Override
@@ -111,7 +82,6 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return ToStringBuilder.of(MultiCriteriaRequest.class)
       .addObj("relaxC1", relaxC1, RelaxFunction.NORMAL)
       .addObj("transitPriorityCalculator", transitPriorityCalculator)
-      .addNum("relaxCostAtDestination", relaxCostAtDestination)
       .toString();
   }
 
@@ -120,13 +90,11 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     private final MultiCriteriaRequest<T> original;
     private RelaxFunction relaxC1;
     private RaptorTransitGroupPriorityCalculator transitPriorityCalculator;
-    private Double relaxCostAtDestination;
 
     public Builder(MultiCriteriaRequest<T> original) {
       this.original = original;
       this.relaxC1 = original.relaxC1;
       this.transitPriorityCalculator = original.transitPriorityCalculator;
-      this.relaxCostAtDestination = original.relaxCostAtDestination;
     }
 
     @Nullable
@@ -149,18 +117,6 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
       return this;
     }
 
-    @Nullable
-    @Deprecated
-    public Double relaxCostAtDestination() {
-      return relaxCostAtDestination;
-    }
-
-    @Deprecated
-    public Builder<T> withRelaxCostAtDestination(Double value) {
-      relaxCostAtDestination = value;
-      return this;
-    }
-
     public MultiCriteriaRequest<T> build() {
       var newInstance = new MultiCriteriaRequest<T>(this);
       return original.equals(newInstance) ? original : newInstance;
@@ -171,7 +127,6 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
       return ToStringBuilder.of(MultiCriteriaRequest.Builder.class)
         .addObj("relaxC1", relaxC1)
         .addObj("transitPriorityCalculator", transitPriorityCalculator)
-        .addNum("relaxCostAtDestination", relaxCostAtDestination)
         .toString();
     }
   }

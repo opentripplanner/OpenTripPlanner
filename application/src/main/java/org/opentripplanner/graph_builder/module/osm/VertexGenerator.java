@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BarrierIntersectingHighway;
 import org.opentripplanner.graph_builder.issues.DifferentLevelsSharingBarrier;
@@ -26,6 +26,8 @@ import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
+import org.opentripplanner.street.model.vertex.OsmElevatorVertex;
+import org.opentripplanner.street.model.vertex.OsmEntityType;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -40,7 +42,9 @@ class VertexGenerator {
 
   private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
 
-  private final HashMap<Long, Map<OsmLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
+  private final HashMap<Long, Map<OsmElevatorKey, OsmElevatorVertex>> elevatorNodes =
+    new HashMap<>();
+  private final HashMap<OsmElevatorKey, OsmLevel> elevatorNodeLevels = new HashMap<>();
 
   /**
    * The map from node to the barrier it belongs to.
@@ -83,9 +87,10 @@ class VertexGenerator {
    * node can appear in several entities at different levels.
    *
    * @param node The node to fetch a label for.
-   * @param entity  The entity it is connected to (for fetching level information).
+   * @param entity The entity it is connected to, e.g. used for fetching level information.
    * @param linearBarrierNodeType How should the node be handled if it is on a linear barrier
-   * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
+   *
+   * @return The graph vertex. This is not always an OSM vertex; it can also be a
    * {@link OsmBoardingLocationVertex}
    */
   IntersectionVertex getVertexForOsmNode(
@@ -93,20 +98,15 @@ class VertexGenerator {
     OsmEntity entity,
     LinearBarrierNodeType linearBarrierNodeType
   ) {
-    // If the node should be decomposed to multiple levels,
-    // use the numeric level because it is unique, the human level may not be (although
-    // it will likely lead to some head-scratching if it is not).
-    IntersectionVertex iv = null;
-    if (node.isMultiLevel()) {
-      // make a separate node for every level
-      return recordLevel(node, entity);
+    if (node.isElevator()) {
+      return getElevatorVertex(node, entity);
     }
-    // make a separate vertex if the node is on a barrier
     boolean isNodeOnLinearBarrier = nodesInBarrierWays.containsKey(node);
     if (linearBarrierNodeType == SPLIT && isNodeOnLinearBarrier) {
       return getSplitVertexOnBarrier(node, entity);
     }
     // single-level case
+    IntersectionVertex iv = null;
     long nid = node.getId();
     iv = intersectionNodes.get(nid);
     if (iv == null) {
@@ -189,7 +189,7 @@ class VertexGenerator {
   }
 
   /**
-   * If a node is on a barrier, a vertex needs to be created for each entity using it.
+   * If a node is on a barrier, a separate vertex needs to be created for each entity using it.
    *
    * @return a vertex for the given node specific to the given entity
    */
@@ -206,6 +206,7 @@ class VertexGenerator {
     var vertex = vertexFactory.osmOnLinearBarrier(
       nodeOnBarrier.getCoordinate(),
       nodeOnBarrier.getId(),
+      getOsmEntityType(entity),
       entity.getId()
     );
     vertices.put(entity, vertex);
@@ -242,8 +243,12 @@ class VertexGenerator {
    * Tracks OSM nodes which are decomposed into multiple graph vertices because they are
    * elevators. They can then be iterated over to build {@link ElevatorEdge} between them.
    */
-  Map<Long, Map<OsmLevel, OsmVertex>> multiLevelNodes() {
-    return multiLevelNodes;
+  Map<Long, Map<OsmElevatorKey, OsmElevatorVertex>> elevatorNodes() {
+    return elevatorNodes;
+  }
+
+  HashMap<OsmElevatorKey, OsmLevel> elevatorNodeLevels() {
+    return elevatorNodeLevels;
   }
 
   void initIntersectionNodes() {
@@ -311,32 +316,38 @@ class VertexGenerator {
   }
 
   /**
-   * Record the level of the entity for this node, e.g. if the entity is at level 5,
-   * mark that this node is active at level 5.
+   * Create a separate elevator vertex for each connected entity and record its level from
+   * the entity's level.
+   * <p>
+   * If the entity is at level 5, mark that this node is active at level 5. If another entity
+   * connected to the node is also at level 5, create a separate vertex for that combination, but
+   * mark the level as the same.
    *
-   * @param entity  the entity that has the level
-   * @param node the node to record for
-   * @author mattwigway
+   * @param entity an entity on a level
+   * @param node the node to create the elevator vertex from
    */
-  private OsmVertex recordLevel(OsmNode node, OsmEntity entity) {
-    Map<OsmLevel, OsmVertex> verticesOnLevel;
-    long nodeId = node.getId();
-    if (multiLevelNodes.containsKey(nodeId)) {
-      verticesOnLevel = multiLevelNodes.get(nodeId);
-    } else {
-      verticesOnLevel = new HashMap<>();
-      multiLevelNodes.put(nodeId, verticesOnLevel);
-    }
-
-    // An OsmVertex on a level requires one level to be defined.
-    // If an OsmEntity has multiple levels, default to the DEFAULT level.
-    OsmLevel level = osmdb.findSingleLevelForEntity(entity);
-    if (!verticesOnLevel.containsKey(level)) {
-      OsmVertex vertex = vertexFactory.levelledOsm(node, level.level());
-      verticesOnLevel.put(level, vertex);
+  private OsmElevatorVertex getElevatorVertex(OsmNode node, OsmEntity entity) {
+    Map<OsmElevatorKey, OsmElevatorVertex> elevatorVertices = getElevatorVertices(node);
+    OsmEntityType osmEntityType = getOsmEntityType(entity);
+    OsmElevatorKey osmElevatorKey = new OsmElevatorKey(node.getId(), osmEntityType, entity.getId());
+    if (!elevatorVertices.containsKey(osmElevatorKey)) {
+      OsmElevatorVertex vertex = vertexFactory.osmElevator(node, osmEntityType, entity.getId());
+      elevatorVertices.put(osmElevatorKey, vertex);
+      // An OsmElevatorVertex requires one level to be defined.
+      elevatorNodeLevels.put(osmElevatorKey, osmdb.findSingleLevelForEntity(entity));
       return vertex;
     }
-    return verticesOnLevel.get(level);
+    return elevatorVertices.get(osmElevatorKey);
+  }
+
+  private Map<OsmElevatorKey, OsmElevatorVertex> getElevatorVertices(OsmNode node) {
+    long nodeId = node.getId();
+    if (elevatorNodes.containsKey(nodeId)) {
+      return elevatorNodes.get(nodeId);
+    }
+    Map<OsmElevatorKey, OsmElevatorVertex> elevatorVertices = new HashMap<>();
+    elevatorNodes.put(nodeId, elevatorVertices);
+    return elevatorVertices;
   }
 
   private void intersectAreaRingNodes(Set<Long> possibleIntersectionNodes, Ring outerRing) {
@@ -360,5 +371,9 @@ class VertexGenerator {
         issueStore.add(new DifferentLevelsSharingBarrier(nodeOnBarrier, levels.size()));
       }
     }
+  }
+
+  private OsmEntityType getOsmEntityType(OsmEntity entity) {
+    return entity instanceof OsmWay ? OsmEntityType.WAY : OsmEntityType.RELATION;
   }
 }

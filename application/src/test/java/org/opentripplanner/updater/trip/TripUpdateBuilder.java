@@ -313,6 +313,27 @@ public class TripUpdateBuilder {
     );
   }
 
+  /**
+   * Add a skipped stop with estimated times to the TripUpdate.
+   */
+  public TripUpdateBuilder addSkippedStop(int stopSequence, String time) {
+    return addStopTime(
+      null,
+      time,
+      time,
+      stopSequence,
+      NO_DELAY,
+      NO_DELAY,
+      StopTimeUpdate.ScheduleRelationship.SKIPPED,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    );
+  }
+
   public TripUpdateBuilder addSkippedStop(String stopId, String time) {
     return addStopTime(
       stopId,

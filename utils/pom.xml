@@ -12,6 +12,15 @@
     <artifactId>utils</artifactId>
     <name>OpenTripPlanner - Utils</name>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.hubspot.maven.plugins</groupId>
+                <artifactId>prettier-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <!-- This is the ONLY allowed dependency -->
         <dependency>

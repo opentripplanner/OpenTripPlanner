@@ -12,6 +12,15 @@
     <artifactId>raptor</artifactId>
     <name>OpenTripPlanner - Raptor</name>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.hubspot.maven.plugins</groupId>
+                <artifactId>prettier-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <!-- project dependencies -->
 

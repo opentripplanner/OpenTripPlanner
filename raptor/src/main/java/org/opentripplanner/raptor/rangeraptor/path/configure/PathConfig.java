@@ -3,10 +3,8 @@ package org.opentripplanner.raptor.rangeraptor.path.configure;
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
 
 import org.opentripplanner.raptor.api.model.DominanceFunction;
-import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
@@ -72,16 +70,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
     ParetoSetCost costConfig,
     DominanceFunction c2Comp
   ) {
-    // This code goes away when the USE_C1_RELAX_DESTINATION is deleted
-    var relaxC1 =
-      switch (costConfig) {
-        case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> ctx.multiCriteria().relaxC1();
-        case USE_C1_RELAX_DESTINATION -> GeneralizedCostRelaxFunction.of(
-          ctx.multiCriteria().relaxCostAtDestination()
-        );
-        default -> RelaxFunction.NORMAL;
-      };
-
+    var relaxC1 = ctx.multiCriteria().relaxC1();
     return paretoComparator(paretoSetTimeConfig(), costConfig, relaxC1, c2Comp);
   }
 

@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.model.Gram;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class NodeAdapterTest {
 

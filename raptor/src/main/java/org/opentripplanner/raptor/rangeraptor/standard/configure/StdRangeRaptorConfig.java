@@ -266,7 +266,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private EgressPaths egressPaths() {
     return Objects.requireNonNull(
-      ctx.legs().getLast().egressPaths(),
+      ctx.segments().getLast().egressPaths(),
       "Last leg must have non-null egressPaths"
     );
   }

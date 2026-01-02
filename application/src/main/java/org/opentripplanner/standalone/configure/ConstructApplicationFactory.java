@@ -39,6 +39,8 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRepositoryModule;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleServiceModule;
+import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
+import org.opentripplanner.service.streetdetails.configure.StreetDetailsServiceModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.configure.VehicleParkingServiceModule;
@@ -75,6 +77,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     EmpiricalDelayServiceModule.class,
     GeocoderModule.class,
     InteractiveLauncherModule.class,
+    StreetDetailsServiceModule.class,
     LinkingServiceModule.class,
     RealtimeVehicleServiceModule.class,
     RealtimeVehicleRepositoryModule.class,
@@ -118,6 +121,8 @@ public interface ConstructApplicationFactory {
 
   @Nullable
   EmissionRepository emissionRepository();
+
+  StreetDetailsRepository streetDetailsRepository();
 
   @Nullable
   EmpiricalDelayRepository empiricalDelayRepository();
@@ -183,6 +188,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder emissionRepository(EmissionRepository emissionRepository);
+
+    @BindsInstance
+    Builder streetDetailsRepository(StreetDetailsRepository streetDetailsRepository);
 
     @BindsInstance
     Builder empiricalDelayRepository(EmpiricalDelayRepository empiricalDelayRepository);

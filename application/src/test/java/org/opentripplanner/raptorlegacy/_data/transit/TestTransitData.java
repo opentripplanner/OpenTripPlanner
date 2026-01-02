@@ -23,7 +23,6 @@ import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParameters;
@@ -304,7 +303,7 @@ public class TestTransitData
     };
   }
 
-  public List<DefaultTripPattern> getPatterns() {
+  public List<TestTripPattern> getPatterns() {
     return routes.stream().map(TestRoute::pattern).toList();
   }
 
