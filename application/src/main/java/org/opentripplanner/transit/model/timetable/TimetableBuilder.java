@@ -1,12 +1,12 @@
 package org.opentripplanner.transit.model.timetable;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.UnaryOperator;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 
@@ -85,17 +85,9 @@ public class TimetableBuilder {
    * trip times.
    * <p>
    */
-  public TimetableBuilder updateAllTripTimes(UnaryOperator<TripTimes> update) {
-    tripTimes.replaceAll((t, tt) -> update.apply(tt));
-    frequencies.replaceAll(it ->
-      new FrequencyEntry(
-        it.startTime,
-        it.endTime,
-        it.headway,
-        it.exactTimes,
-        (ScheduledTripTimes) update.apply(it.tripTimes)
-      )
-    );
+  public TimetableBuilder withAdjustedTimes(Duration timeshift) {
+    tripTimes.replaceAll((t, tt) -> tt.withAdjustedTimes(timeshift));
+    frequencies.replaceAll(it -> it.withAdjustedTimes(timeshift));
     return this;
   }
 

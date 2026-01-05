@@ -9,12 +9,13 @@ import org.opentripplanner.graph_builder.module.AddTransitEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToTimetable;
 import org.opentripplanner.graph_builder.module.TransitWithFutureDateValidator;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -35,6 +36,7 @@ public class NetexModule implements GraphBuilderModule {
   private final DeduplicatorService deduplicator;
   private final TimetableRepository timetableRepository;
   private final VehicleParkingRepository parkingRepository;
+  private final StreetDetailsRepository streetDetailsRepository;
   private final DataImportIssueStore issueStore;
 
   /**
@@ -50,6 +52,7 @@ public class NetexModule implements GraphBuilderModule {
     DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
     VehicleParkingRepository parkingRepository,
+    StreetDetailsRepository streetDetailsRepository,
     DataImportIssueStore issueStore,
     int subwayAccessTime,
     ServiceDateInterval transitPeriodLimit,
@@ -59,6 +62,7 @@ public class NetexModule implements GraphBuilderModule {
     this.deduplicator = deduplicator;
     this.timetableRepository = timetableRepository;
     this.parkingRepository = parkingRepository;
+    this.streetDetailsRepository = streetDetailsRepository;
     this.issueStore = issueStore;
     this.subwayAccessTime = subwayAccessTime;
     this.transitPeriodLimit = transitPeriodLimit;
@@ -73,7 +77,7 @@ public class NetexModule implements GraphBuilderModule {
       for (NetexBundle netexBundle : netexBundles) {
         netexBundle.checkInputs();
 
-        OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(deduplicator, issueStore);
+        TransitDataImportBuilder transitBuilder = netexBundle.loadBundle(deduplicator, issueStore);
         transitBuilder.limitServiceDays(transitPeriodLimit);
         calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
@@ -85,10 +89,15 @@ public class NetexModule implements GraphBuilderModule {
 
         validateStopTimesForEachTrip(transitBuilder.getStopTimesSortedByTrip());
 
-        OtpTransitService otpService = transitBuilder.build();
+        TransitDataImport otpService = transitBuilder.build();
 
         AddTransitEntitiesToTimetable.addToTimetable(otpService, timetableRepository);
-        AddTransitEntitiesToGraph.addToGraph(otpService, subwayAccessTime, graph);
+        AddTransitEntitiesToGraph.addToGraph(
+          otpService,
+          subwayAccessTime,
+          graph,
+          streetDetailsRepository
+        );
 
         var lots = transitBuilder.vehicleParkings();
         parkingRepository.updateVehicleParking(lots, List.of());

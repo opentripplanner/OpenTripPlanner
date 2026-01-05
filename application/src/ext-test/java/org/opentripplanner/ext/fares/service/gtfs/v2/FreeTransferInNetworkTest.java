@@ -2,12 +2,10 @@ package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.groupOfRoutes;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
-import com.google.common.collect.Multimaps;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -35,22 +33,23 @@ class FreeTransferInNetworkTest implements PlanTestConstants {
     Money.euros(5)
   ).build();
 
-  GtfsFaresV2Service service = new GtfsFaresV2Service(
-    List.of(
+  GtfsFaresV2Service service = GtfsFaresV2Service.of()
+    .withLegRules(
       FareLegRule.of(id("6"), REGULAR)
         .withLegGroupId(LEG_GROUP)
         .withNetworkId(NETWORK.getId())
         .build()
-    ),
-    List.of(
-      FareTransferRule.of()
-        .withId(id("transfer"))
-        .withFromLegGroup(LEG_GROUP)
-        .withToLegGroup(LEG_GROUP)
-        .build()
-    ),
-    Multimaps.forMap(Map.of())
-  );
+    )
+    .withTransferRules(
+      List.of(
+        FareTransferRule.of()
+          .withId(id("transfer"))
+          .withFromLegGroup(LEG_GROUP)
+          .withToLegGroup(LEG_GROUP)
+          .build()
+      )
+    )
+    .build();
 
   @Test
   void differentNetwork() {

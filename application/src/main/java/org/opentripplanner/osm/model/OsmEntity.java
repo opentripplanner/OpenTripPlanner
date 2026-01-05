@@ -334,7 +334,10 @@ public abstract class OsmEntity {
     );
   }
 
-  /** @return a tag's value, converted to lower case. */
+  /**
+   * @return Converts a tag to lower case and returns the associated value.
+   * Returns null if tag is not present.
+   */
   @Nullable
   public String getTag(String tag) {
     tag = tag.toLowerCase();
@@ -345,8 +348,8 @@ public abstract class OsmEntity {
   }
 
   /**
-   *
-   * @return A tags value converted to lower case. An empty Optional if tags is not present.
+   * @return Converts a tag to lower case and returns the associated value.
+   * An empty Optional if tag is not present.
    */
   public Optional<String> getTagOpt(String network) {
     return Optional.ofNullable(getTag(network));
@@ -495,7 +498,7 @@ public abstract class OsmEntity {
   }
 
   /**
-   * Checks is a tag contains the specified value.
+   * Checks if a tag contains the specified value.
    */
   public boolean isTag(String tag, String value) {
     tag = tag.toLowerCase();

@@ -14,6 +14,9 @@ import static org.opentripplanner.street.model.RentalFormFactor.CAR;
 import static org.opentripplanner.street.model.RentalFormFactor.MOPED;
 import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,7 +32,9 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model._data.StreetModelForTest;
+import org.opentripplanner.street.search.request.RentalPeriod;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.VehicleRentalState;
 
@@ -239,6 +244,42 @@ class VehicleRentalEdgeTest {
     assertTrue(s1[0].isRentingVehicle());
   }
 
+  @Test
+  void testWithFreeFloatingVehicleWithoutRequiredAvailability() {
+    var tenMinutesLater = Instant.now().plus(10, ChronoUnit.MINUTES);
+    initFreeFloatingEdgeAndRequestForAvailability(tenMinutesLater, Duration.ofMinutes(15), false);
+    var s1 = rent();
+
+    assertTrue(State.isEmpty(s1));
+  }
+
+  @Test
+  void testWithFreeFloatingVehicleAndArrivalWithoutRequiredAvailability() {
+    var tenMinutesLater = Instant.now().minus(10, ChronoUnit.MINUTES);
+    initFreeFloatingEdgeAndRequestForAvailability(tenMinutesLater, Duration.ofMinutes(1), true);
+    var s1 = rent();
+
+    assertTrue(State.isEmpty(s1));
+  }
+
+  @Test
+  void testWithFreeFloatingVehicleWithRequiredAvailabilityInformation() {
+    var tenMinutesLater = Instant.now().plus(10, ChronoUnit.MINUTES);
+    initFreeFloatingEdgeAndRequestForAvailability(tenMinutesLater, Duration.ofMinutes(5), false);
+    var s1 = rent();
+
+    assertFalse(State.isEmpty(s1));
+  }
+
+  @Test
+  void testWithFreeFloatingVehicleAndArrivalWithRequiredAvailabilityInformation() {
+    var tenMinutesLater = Instant.now().plus(1, ChronoUnit.MINUTES);
+    initFreeFloatingEdgeAndRequestForAvailability(tenMinutesLater, Duration.ofMinutes(1), true);
+    var s1 = rent();
+
+    assertFalse(State.isEmpty(s1));
+  }
+
   @Nested
   class StartedReverseSearchInNoGeofencingZone {
 
@@ -376,6 +417,27 @@ class VehicleRentalEdgeTest {
         scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
       )
       .build();
+  }
+
+  private void initFreeFloatingEdgeAndRequestForAvailability(
+    Instant vehicleAvailableUntil,
+    Duration rentalDuration,
+    boolean arriveBy
+  ) {
+    RentalFormFactor formFactor = RentalFormFactor.CAR;
+    this.vertex = StreetModelForTest.rentalVertex(formFactor, vehicleAvailableUntil);
+    this.vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, formFactor);
+    StreetSearchRequestBuilder streetSearchRequestBuilder = StreetSearchRequest.of()
+      .withMode(CAR_RENTAL)
+      .withArriveBy(arriveBy);
+    if (rentalDuration != null) {
+      var now = Instant.now();
+      var rentalPeriod = arriveBy
+        ? RentalPeriod.createFromLatestArrivalTime(now, rentalDuration)
+        : RentalPeriod.createFromEarliestDepartureTime(now, rentalDuration);
+      streetSearchRequestBuilder.withRentalPeriod(rentalPeriod);
+    }
+    this.request = streetSearchRequestBuilder.build();
   }
 
   private State[] rent() {

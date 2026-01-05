@@ -29,14 +29,16 @@ import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesF
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.gtfs.interlining.InterlineProcessor;
-import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.gtfs.mapping.GTFSToTransitDataImportMapper;
+import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
+import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
@@ -67,6 +69,7 @@ public class GtfsModule implements GraphBuilderModule {
   private final FareServiceFactory fareServiceFactory;
 
   private final TimetableRepository timetableRepository;
+  private final StreetDetailsRepository streetDetailsRepository;
   private final Graph graph;
   private final DataImportIssueStore issueStore;
   private final DeduplicatorService deduplicator;
@@ -77,6 +80,7 @@ public class GtfsModule implements GraphBuilderModule {
   public GtfsModule(
     List<GtfsBundle> bundles,
     TimetableRepository timetableRepository,
+    StreetDetailsRepository streetDetailsRepository,
     Graph graph,
     DeduplicatorService deduplicator,
     DataImportIssueStore issueStore,
@@ -87,6 +91,7 @@ public class GtfsModule implements GraphBuilderModule {
   ) {
     this.gtfsBundles = bundles;
     this.timetableRepository = timetableRepository;
+    this.streetDetailsRepository = streetDetailsRepository;
     this.graph = graph;
     this.deduplicator = deduplicator;
     this.issueStore = issueStore;
@@ -108,6 +113,7 @@ public class GtfsModule implements GraphBuilderModule {
     return new GtfsModule(
       bundles,
       timetableRepository,
+      new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),
       DataImportIssueStore.NOOP,
@@ -133,8 +139,8 @@ public class GtfsModule implements GraphBuilderModule {
 
         feedIdsEncountered.put(feedId, gtfsBundle);
 
-        GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
-          new OtpTransitServiceBuilder(timetableRepository.getSiteRepository(), issueStore),
+        GTFSToTransitDataImportMapper mapper = new GTFSToTransitDataImportMapper(
+          new TransitDataImportBuilder(timetableRepository.getSiteRepository(), issueStore),
           feedId,
           issueStore,
           gtfsBundle.parameters().discardMinTransferTimes(),
@@ -142,12 +148,18 @@ public class GtfsModule implements GraphBuilderModule {
         );
         mapper.mapStopTripAndRouteDataIntoBuilder(gtfsDao);
 
-        OtpTransitServiceBuilder builder = mapper.getBuilder();
+        TransitDataImportBuilder builder = mapper.getBuilder();
         var fareRulesData = mapper.fareRulesData();
 
         builder.limitServiceDays(transitPeriodLimit);
 
         calendarServiceData.add(builder.buildCalendarServiceData());
+
+        calendarServiceData
+          .getServiceIds()
+          .forEach(sId ->
+            fareRulesData.putServiceIds(sId, calendarServiceData.getServiceDatesForServiceId(sId))
+          );
 
         if (OTPFeature.FlexRouting.isOn()) {
           builder.getFlexTripsById().addAll(FlexTripsMapper.createFlexTrips(builder, issueStore));
@@ -174,9 +186,14 @@ public class GtfsModule implements GraphBuilderModule {
           issueStore
         );
 
-        OtpTransitService otpTransitService = builder.build();
+        TransitDataImport dataImport = builder.build();
 
-        addTimetableRepositoryToGraph(graph, timetableRepository, otpTransitService);
+        addTimetableRepositoryToGraph(
+          graph,
+          timetableRepository,
+          streetDetailsRepository,
+          dataImport
+        );
 
         if (gtfsBundle.parameters().blockBasedInterlining()) {
           new InterlineProcessor(
@@ -185,10 +202,10 @@ public class GtfsModule implements GraphBuilderModule {
             gtfsBundle.parameters().maxInterlineDistance(),
             issueStore,
             calendarServiceData
-          ).run(otpTransitService.getTripPatterns());
+          ).run(dataImport.getTripPatterns());
         }
 
-        fareServiceFactory.processGtfs(fareRulesData, otpTransitService);
+        fareServiceFactory.processGtfs(fareRulesData);
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -253,7 +270,7 @@ public class GtfsModule implements GraphBuilderModule {
   private void createTripPatterns(
     DeduplicatorService deduplicator,
     TimetableRepository timetableRepository,
-    OtpTransitServiceBuilder builder,
+    TransitDataImportBuilder builder,
     Set<FeedScopedId> calServiceIds,
     GeometryProcessor geometryProcessor,
     DataImportIssueStore issueStore
@@ -277,10 +294,16 @@ public class GtfsModule implements GraphBuilderModule {
   private void addTimetableRepositoryToGraph(
     Graph graph,
     TimetableRepository timetableRepository,
-    OtpTransitService otpTransitService
+    StreetDetailsRepository streetDetailsRepository,
+    TransitDataImport dataImport
   ) {
-    AddTransitEntitiesToTimetable.addToTimetable(otpTransitService, timetableRepository);
-    AddTransitEntitiesToGraph.addToGraph(otpTransitService, subwayAccessTime_s, graph);
+    AddTransitEntitiesToTimetable.addToTimetable(dataImport, timetableRepository);
+    AddTransitEntitiesToGraph.addToGraph(
+      dataImport,
+      subwayAccessTime_s,
+      graph,
+      streetDetailsRepository
+    );
   }
 
   private GtfsRelationalDao loadBundle(GtfsBundle gtfsBundle) throws IOException {

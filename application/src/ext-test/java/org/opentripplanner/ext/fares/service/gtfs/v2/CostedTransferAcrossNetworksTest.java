@@ -2,16 +2,13 @@ package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
-import com.google.common.collect.Multimaps;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.model.FareLegRule;
+import org.opentripplanner.ext.fares.model.FareTestConstants;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
-import org.opentripplanner.ext.fares.service._support.FareTestConstants;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -26,8 +23,8 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
     .withGroupOfRoutes(List.of(NETWORK_B))
     .build();
 
-  private final GtfsFaresV2Service service = new GtfsFaresV2Service(
-    List.of(
+  private final GtfsFaresV2Service service = GtfsFaresV2Service.of()
+    .withLegRules(
       FareLegRule.of(LEG_GROUP_A, FARE_PRODUCT_A)
         .withLegGroupId(LEG_GROUP_A)
         .withNetworkId(NETWORK_A.getId())
@@ -36,36 +33,37 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
         .withLegGroupId(LEG_GROUP_B)
         .withNetworkId(NETWORK_B.getId())
         .build()
-    ),
-    List.of(
-      // transferring from A to A is free
-      FareTransferRule.of()
-        .withId(id("t1"))
-        .withFromLegGroup(LEG_GROUP_A)
-        .withToLegGroup(LEG_GROUP_A)
-        .build(),
-      // transferring from B to B is also free
-      FareTransferRule.of()
-        .withId(id("t2"))
-        .withFromLegGroup(LEG_GROUP_B)
-        .withToLegGroup(LEG_GROUP_B)
-        .build(),
-      // transferring from A to B costs one EUR
-      FareTransferRule.of()
-        .withId(id("t3"))
-        .withFromLegGroup(LEG_GROUP_A)
-        .withToLegGroup(LEG_GROUP_B)
-        .withFareProducts(List.of(TRANSFER_1))
-        .build(),
-      // transferring from B to A is free
-      FareTransferRule.of()
-        .withId(id("t4"))
-        .withFromLegGroup(LEG_GROUP_B)
-        .withToLegGroup(LEG_GROUP_A)
-        .build()
-    ),
-    Multimaps.forMap(Map.of())
-  );
+    )
+    .withTransferRules(
+      List.of(
+        // transferring from A to A is free
+        FareTransferRule.of()
+          .withId(TimetableRepositoryForTest.id("t1"))
+          .withFromLegGroup(LEG_GROUP_A)
+          .withToLegGroup(LEG_GROUP_A)
+          .build(),
+        // transferring from B to B is also free
+        FareTransferRule.of()
+          .withId(TimetableRepositoryForTest.id("t2"))
+          .withFromLegGroup(LEG_GROUP_B)
+          .withToLegGroup(LEG_GROUP_B)
+          .build(),
+        // transferring from A to B costs one EUR
+        FareTransferRule.of()
+          .withId(TimetableRepositoryForTest.id("t3"))
+          .withFromLegGroup(LEG_GROUP_A)
+          .withToLegGroup(LEG_GROUP_B)
+          .withFareProducts(List.of(TRANSFER_1))
+          .build(),
+        // transferring from B to A is free
+        FareTransferRule.of()
+          .withId(TimetableRepositoryForTest.id("t4"))
+          .withFromLegGroup(LEG_GROUP_B)
+          .withToLegGroup(LEG_GROUP_A)
+          .build()
+      )
+    )
+    .build();
 
   @Test
   void AAB() {

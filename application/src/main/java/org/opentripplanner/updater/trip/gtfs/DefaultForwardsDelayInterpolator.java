@@ -26,9 +26,12 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
     StopRealTimeState propagatedState = StopRealTimeState.DEFAULT;
     Integer firstCanceledStop = null;
     boolean updated = false;
+    boolean firstRealUpdateSeen = false;
     for (var i = 0; i < builder.numberOfStops(); ++i) {
-      boolean noTimeGiven =
-        builder.getArrivalTime(i) == null && builder.getDepartureTime(i) == null;
+      boolean noTimeGiven = builder.containsNoRealTimeTimes(i);
+      if (!noTimeGiven) {
+        firstRealUpdateSeen = true;
+      }
       if (noTimeGiven) {
         if (builder.getStopRealTimeState(i) == StopRealTimeState.DEFAULT) {
           builder.withStopRealTimeState(i, propagatedState);
@@ -43,7 +46,10 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
       }
 
       if (builder.getArrivalDelay(i) == null) {
-        if (builder.getStopRealTimeState(i) == StopRealTimeState.NO_DATA) {
+        // only fill in times for NO_DATA stops after the first updated stop
+        // otherwise, it is the job of the backward interpolator to fill in the times backward
+        // see bug https://github.com/opentripplanner/OpenTripPlanner/issues/7097 for details
+        if (builder.getStopRealTimeState(i) == StopRealTimeState.NO_DATA && firstRealUpdateSeen) {
           // for NO_DATA stops, try to use the scheduled time. However, if the schedule time is
           // earlier than the delayed departure of the previous stop, we cannot set an earlier time
           // than that.
@@ -67,7 +73,7 @@ class DefaultForwardsDelayInterpolator implements ForwardsDelayInterpolator {
       delay = builder.getArrivalDelay(i);
 
       if (builder.getDepartureDelay(i) == null) {
-        if (builder.getStopRealTimeState(i) == StopRealTimeState.NO_DATA) {
+        if (builder.getStopRealTimeState(i) == StopRealTimeState.NO_DATA && firstRealUpdateSeen) {
           // for NO_DATA stops, try to use the scheduled time. However, if the schedule time is
           // earlier than the delayed arrival of this stop, we cannot set an earlier time
           // than that.

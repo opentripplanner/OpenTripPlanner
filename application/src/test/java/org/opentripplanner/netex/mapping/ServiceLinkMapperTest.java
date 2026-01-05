@@ -5,8 +5,10 @@ import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import net.opengis.gml._3.DirectPositionListType;
+import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,7 +73,7 @@ class ServiceLinkMapperTest {
         SERVICE_LINKS_COORDINATES[3],
       }
     );
-    ServiceLink serviceLink2 = createServiceLink(
+    ServiceLink serviceLink2 = createAlternativeServiceLink(
       "RUT:ServiceLink:2",
       "RUT:StopPoint:2",
       "RUT:StopPoint:3",
@@ -271,6 +273,31 @@ class ServiceLinkMapperTest {
     JAXBElement<LinkSequenceProjection_VersionStructure> linkSequenceProjection_versionStructure =
       MappingSupport.createJaxbElement(linkSequenceProjection);
     Projections_RelStructure projections_relStructure = new Projections_RelStructure()
+      .withProjectionRefOrProjection(linkSequenceProjection_versionStructure);
+
+    return new ServiceLink()
+      .withId(id)
+      .withFromPointRef(new ScheduledStopPointRefStructure().withRef(from))
+      .withToPointRef(new ScheduledStopPointRefStructure().withRef(to))
+      .withProjections(projections_relStructure);
+  }
+
+  private ServiceLink createAlternativeServiceLink(
+    String id,
+    String from,
+    String to,
+    Double[] coordinates
+  ) {
+    var posOrPoints = new ArrayList<>();
+    for (int i = 0; i < coordinates.length; i += 2) {
+      posOrPoints.add(new DirectPositionType().withValue(coordinates[i], coordinates[i + 1]));
+    }
+    var lineString = new LineStringType().withPosOrPointProperty(posOrPoints);
+    var linkSequenceProjection = new LinkSequenceProjection().withLineString(lineString);
+    var linkSequenceProjection_versionStructure = MappingSupport.createJaxbElement(
+      linkSequenceProjection
+    );
+    var projections_relStructure = new Projections_RelStructure()
       .withProjectionRefOrProjection(linkSequenceProjection_versionStructure);
 
     return new ServiceLink()

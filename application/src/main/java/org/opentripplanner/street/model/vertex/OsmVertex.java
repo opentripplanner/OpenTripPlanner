@@ -9,8 +9,7 @@ import org.opentripplanner.core.model.i18n.I18NString;
  */
 public class OsmVertex extends IntersectionVertex {
 
-  /** The OSM node ID from whence this came */
-  public final long nodeId;
+  private final long nodeId;
 
   public OsmVertex(double x, double y, long nodeId) {
     super(x, y);
@@ -26,6 +25,13 @@ public class OsmVertex extends IntersectionVertex {
   ) {
     super(x, y, hasHighwayTrafficLight, hasCrossingTrafficLight);
     this.nodeId = nodeId;
+  }
+
+  /**
+   * The OSM node ID from whence this came.
+   */
+  public long nodeId() {
+    return this.nodeId;
   }
 
   @Override

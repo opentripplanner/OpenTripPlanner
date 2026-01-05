@@ -362,7 +362,7 @@ class RealtimeVehiclePatternMatcher {
       vehiclePositionWithTripId,
       pattern.getStops(),
       trip,
-      staticTripTimes::stopIndexOfGtfsSequence
+      staticTripTimes::stopPositionForGtfsSequence
     );
 
     return Result.success(new PatternAndRealtimeVehicle(pattern, newVehicle));

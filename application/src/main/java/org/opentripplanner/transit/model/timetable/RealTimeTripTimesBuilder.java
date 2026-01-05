@@ -4,6 +4,7 @@ import static org.opentripplanner.transit.model.timetable.TimetableValidationErr
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.MISSING_DEPARTURE_TIME;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -32,9 +33,9 @@ public class RealTimeTripTimesBuilder {
   private boolean updated;
 
   /**
-   * This constructor take a ScheduledTripTimes (not base TripTimes) to enforce creating a new
+   * This constructor takes a ScheduledTripTimes (not base TripTimes) to enforce creating a new
    * RealTimeTripTimes based on the scheduled info. RT updates are  NOT cumulative and this
-   * enforce copying the scheduled information, not the previous real-time update.
+   * enforces copying the scheduled information, not the previous real-time update.
    * <p>
    * The arrival and departure times are left uninitialized by this constructor, and they need to
    * be set explicitly.
@@ -49,6 +50,13 @@ public class RealTimeTripTimesBuilder {
     stopHeadsigns = new I18NString[numStops];
     occupancyStatus = new OccupancyStatus[numStops];
     Arrays.fill(occupancyStatus, OccupancyStatus.NO_DATA_AVAILABLE);
+  }
+
+  /**
+   * Does this stop have any real-time update on the departure or arrival time?
+   */
+  public boolean containsNoRealTimeTimes(int i) {
+    return getArrivalDelay(i) == null && getDepartureDelay(i) == null;
   }
 
   static RealTimeTripTimesBuilder fromScheduledTimes(ScheduledTripTimes tripTimes) {
@@ -67,6 +75,14 @@ public class RealTimeTripTimesBuilder {
 
   public int numberOfStops() {
     return scheduledTripTimes().getNumStops();
+  }
+
+  /**
+   * Returns a stream of the positions of the stops in these trip times (starting at 0). Useful
+   * for iterating over them.
+   */
+  public IntStream listStopPositions() {
+    return IntStream.range(0, numberOfStops());
   }
 
   public int[] arrivalTimes() {

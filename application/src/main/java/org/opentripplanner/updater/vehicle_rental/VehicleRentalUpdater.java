@@ -35,7 +35,6 @@ import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataS
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.opentripplanner.utils.logging.Throttle;
 import org.opentripplanner.utils.time.DurationUtils;
-import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -238,7 +237,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         var millis = Duration.ofMillis(end - start);
         LOG.info(
           "Geofencing zones computation took {}. Added extension to {} edges. For {}",
-          TimeUtils.durationToStrCompact(millis),
+          DurationUtils.durationToStr(millis),
           latestModifiedEdges.size(),
           nameForLogging
         );

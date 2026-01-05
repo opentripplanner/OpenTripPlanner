@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalInt;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.fare.FareProduct;
@@ -36,19 +39,28 @@ public final class FareLegRule implements Serializable {
   @Nullable
   private final Integer priority;
 
+  @Nullable
+  private final Collection<Timeframe> fromTimeframes;
+
+  @Nullable
+  private final Collection<Timeframe> toTimeframes;
+
   public FareLegRule(FareLegRuleBuilder builder) {
-    if (builder.fareProducts().isEmpty()) {
+    if (builder.fareProducts.isEmpty()) {
       throw new IllegalArgumentException("fareProducts must contain at least one value");
     }
-    builder.fareProducts().forEach(Objects::requireNonNull);
-    this.id = Objects.requireNonNull(builder.id());
-    this.fareProducts = builder.fareProducts();
-    this.legGroupId = builder.legGroupId();
-    this.networkId = builder.networkId();
-    this.fromAreaId = builder.fromAreaId();
-    this.toAreaId = builder.toAreaId();
-    this.fareDistance = builder.fareDistance();
-    this.priority = builder.priority();
+    builder.fareProducts.forEach(Objects::requireNonNull);
+    this.legGroupId = Objects.requireNonNull(builder.legGroupId);
+    this.id = Objects.requireNonNull(builder.id);
+    this.fareProducts = builder.fareProducts;
+    this.networkId = builder.networkId;
+    this.fromAreaId = builder.fromAreaId;
+    this.toAreaId = builder.toAreaId;
+    this.fareDistance = builder.fareDistance;
+    this.priority = builder.priority;
+    // for serialization purposes, make sure that they are immutable lists
+    this.fromTimeframes = List.copyOf(builder.fromTimeframes);
+    this.toTimeframes = List.copyOf(builder.toTimeframes);
   }
 
   public String feedId() {
@@ -101,6 +113,23 @@ public final class FareLegRule implements Serializable {
 
   public Collection<FareProduct> fareProducts() {
     return fareProducts;
+  }
+
+  public Collection<Timeframe> fromTimeframes() {
+    return fromTimeframes;
+  }
+
+  public Collection<Timeframe> toTimeframes() {
+    return toTimeframes;
+  }
+
+  /**
+   * The set of the service ids of all timeframes in this rule.
+   */
+  public Set<FeedScopedId> listTimeframeServiceIds() {
+    return Stream.concat(fromTimeframes.stream(), toTimeframes.stream())
+      .map(s -> s.serviceId())
+      .collect(Collectors.toUnmodifiableSet());
   }
 
   @Override

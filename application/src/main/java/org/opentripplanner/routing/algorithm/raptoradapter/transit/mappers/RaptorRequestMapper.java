@@ -149,15 +149,10 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
     builder.withMultiCriteria(mcBuilder -> {
       var pt = preferences.transit();
-      var r = pt.raptor();
 
       // relax transit group priority can be used with via-visit-stop, but not with pass-through
       if (pt.isRelaxTransitGroupPrioritySet() && !hasPassThroughOnly()) {
         mapRelaxTransitGroupPriority(mcBuilder, pt);
-      } else if (!request.isViaSearch()) {
-        // The deprecated relaxGeneralizedCostAtDestination is only enabled, if there is no
-        // via location and the relaxTransitGroupPriority is not used (Normal).
-        r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
       }
     });
 
@@ -219,13 +214,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     return (
       request.isViaSearch() &&
       request.listViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation)
-    );
-  }
-
-  private boolean hasViaLocationsOnly() {
-    return (
-      request.isViaSearch() &&
-      request.listViaLocations().stream().noneMatch(ViaLocation::isPassThroughLocation)
     );
   }
 

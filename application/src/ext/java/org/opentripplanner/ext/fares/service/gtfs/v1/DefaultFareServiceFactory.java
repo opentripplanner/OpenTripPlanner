@@ -3,6 +3,7 @@ package org.opentripplanner.ext.fares.service.gtfs.v1;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,7 +18,6 @@ import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.ext.fares.service.gtfs.GtfsFaresService;
 import org.opentripplanner.ext.fares.service.gtfs.v2.GtfsFaresV2Service;
-import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -41,19 +41,26 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
   // mapping the stop ids to area ids. one stop can be in several areas.
   private final Multimap<FeedScopedId, FeedScopedId> stopAreas = ArrayListMultimap.create();
+  private final Multimap<FeedScopedId, LocalDate> serviceDates = ArrayListMultimap.create();
 
   @Override
   public FareService makeFareService() {
     DefaultFareService fareService = new DefaultFareService();
     fareService.addFareRules(FareType.regular, regularFareRules.values());
 
-    var faresV2Service = new GtfsFaresV2Service(fareLegRules, fareTransferRules, stopAreas);
+    var faresV2Service = GtfsFaresV2Service.of()
+      .withLegRules(fareLegRules)
+      .withTransferRules(fareTransferRules)
+      .withStopAreas(stopAreas)
+      .withServiceIds(serviceDates)
+      .build();
     return new GtfsFaresService(fareService, faresV2Service);
   }
 
   @Override
-  public void processGtfs(FareRulesData fareRulesData, OtpTransitService transitService) {
+  public void processGtfs(FareRulesData fareRulesData) {
     fillFareRules(fareRulesData.fareAttributes(), fareRulesData.fareRules(), regularFareRules);
+    this.serviceDates.putAll(fareRulesData.timeframeServiceIds());
     this.fareLegRules.addAll(fareRulesData.fareLegRules());
     this.fareTransferRules.addAll(fareRulesData.fareTransferRules());
     this.stopAreas.putAll(fareRulesData.stopAreas());

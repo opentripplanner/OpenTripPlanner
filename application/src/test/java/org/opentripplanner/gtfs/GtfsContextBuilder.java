@@ -7,12 +7,11 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
-import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.gtfs.mapping.GTFSToTransitDataImportMapper;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -26,12 +25,12 @@ public class GtfsContextBuilder {
 
   private final String feedId;
 
-  private final OtpTransitServiceBuilder transitBuilder;
+  private final TransitDataImportBuilder transitBuilder;
   private CalendarService calendarService = null;
   private DataImportIssueStore issueStore = null;
   private Deduplicator deduplicator;
 
-  public GtfsContextBuilder(String feedId, OtpTransitServiceBuilder transitBuilder) {
+  public GtfsContextBuilder(String feedId, TransitDataImportBuilder transitBuilder) {
     this.feedId = feedId;
     this.transitBuilder = transitBuilder;
   }
@@ -42,13 +41,13 @@ public class GtfsContextBuilder {
 
   public static GtfsContextBuilder contextBuilder(@Nullable String defaultFeedId, File path)
     throws IOException {
-    var transitBuilder = new OtpTransitServiceBuilder(
+    var transitBuilder = new TransitDataImportBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP
     );
     GtfsImport gtfsImport = gtfsImport(defaultFeedId, path);
     String feedId = gtfsImport.getFeedId();
-    var mapper = new GTFSToOtpTransitServiceMapper(
+    var mapper = new GTFSToTransitDataImportMapper(
       transitBuilder,
       feedId,
       DataImportIssueStore.NOOP,
@@ -62,7 +61,7 @@ public class GtfsContextBuilder {
     );
   }
 
-  public OtpTransitServiceBuilder getTransitBuilder() {
+  public TransitDataImportBuilder getTransitBuilder() {
     return transitBuilder;
   }
 
@@ -80,7 +79,7 @@ public class GtfsContextBuilder {
    */
   public GtfsContext build() {
     repairStopTimesAndGenerateTripPatterns();
-    return new GtfsContextImpl(feedId, transitBuilder);
+    return new GtfsContextImpl(feedId, transitBuilder.buildCalendarServiceData());
   }
 
   /**
@@ -149,23 +148,16 @@ public class GtfsContextBuilder {
   private static class GtfsContextImpl implements GtfsContext {
 
     private final String feedId;
-    private final OtpTransitService transitService;
     private final CalendarServiceData calendarServiceData;
 
-    private GtfsContextImpl(String feedId, OtpTransitServiceBuilder builder) {
+    private GtfsContextImpl(String feedId, CalendarServiceData calendarServiceData) {
       this.feedId = feedId;
-      this.calendarServiceData = builder.buildCalendarServiceData();
-      this.transitService = builder.build();
+      this.calendarServiceData = calendarServiceData;
     }
 
     @Override
     public String getFeedId() {
       return feedId;
-    }
-
-    @Override
-    public OtpTransitService getTransitService() {
-      return transitService;
     }
 
     @Override

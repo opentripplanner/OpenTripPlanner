@@ -79,8 +79,8 @@ public class TripPatternForDateMapper {
     List<FrequencyEntry> frequencies = timetable
       .getFrequencyEntries()
       .stream()
-      .filter(frequency -> serviceCodesRunning.contains(frequency.tripTimes.getServiceCode()))
-      .sorted(Comparator.comparing(frequencyEntry -> frequencyEntry.startTime))
+      .filter(frequency -> serviceCodesRunning.contains(frequency.tripTimes().getServiceCode()))
+      .sorted(Comparator.comparing(frequencyEntry -> frequencyEntry.startTime()))
       .collect(Collectors.toList());
 
     if (times.isEmpty() && frequencies.isEmpty()) {

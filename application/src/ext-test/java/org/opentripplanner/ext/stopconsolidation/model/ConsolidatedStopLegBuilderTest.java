@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.stopconsolidation.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.ext.fares.service._support.FareModelForTest.ANY_FARE_OFFER;
+import static org.opentripplanner.ext.fares.model.FareModelForTest.ANY_FARE_OFFER;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.ZonedDateTime;

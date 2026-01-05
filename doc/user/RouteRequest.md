@@ -34,7 +34,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | numItineraries                                                                                               |        `integer`       | The maximum number of itineraries to return.                                                                                                             | *Optional* | `50`             |  2.0  |
 | [otherThanPreferredRoutesPenalty](#rd_otherThanPreferredRoutesPenalty)                                       |        `integer`       | Penalty added for using every route that is not preferred if user set any route as preferred.                                                            | *Optional* | `300`            |  2.0  |
 | [relaxTransitGroupPriority](#rd_relaxTransitGroupPriority)                                                   |        `string`        | The relax function for transit-group-priority                                                                                                            | *Optional* | `"0s + 1.00 t"`  |  2.5  |
-| [relaxTransitSearchGeneralizedCostAtDestination](#rd_relaxTransitSearchGeneralizedCostAtDestination)         |        `double`        | Whether non-optimal transit paths at the destination should be returned                                                                                  | *Optional* |                  |  2.3  |
 | [searchWindow](#rd_searchWindow)                                                                             |       `duration`       | The duration of the search-window.                                                                                                                       | *Optional* |                  |  2.0  |
 | [streetRoutingTimeout](#rd_streetRoutingTimeout)                                                             |       `duration`       | The maximum time a street routing request is allowed to take before returning the results.                                                               | *Optional* | `"PT5S"`         |  2.2  |
 | [transferPenalty](#rd_transferPenalty)                                                                       |        `integer`       | An additional penalty added to boardings after the first.                                                                                                | *Optional* | `0`              |  2.0  |
@@ -302,23 +301,6 @@ The relax function for transit-group-priority
 A path is considered optimal if the generalized-cost is less than the generalized-cost of
 another path. If this parameter is set, the comparison is relaxed further if they belong
 to different transit groups.
-
-
-<h3 id="rd_relaxTransitSearchGeneralizedCostAtDestination">relaxTransitSearchGeneralizedCostAtDestination</h3>
-
-**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional`   
-**Path:** /routingDefaults 
-
-Whether non-optimal transit paths at the destination should be returned
-
-Let c be the existing minimum pareto optimal generalized cost to beat. Then a trip
-with cost c' is accepted if the following is true:
-`c' < Math.round(c * relaxRaptorCostCriteria)`.
-
-The parameter is optional. If not set a normal comparison is performed.
-
-Values equals or less than zero is not allowed. Values greater than 2.0 are not
-supported, due to performance reasons.
 
 
 <h3 id="rd_searchWindow">searchWindow</h3>

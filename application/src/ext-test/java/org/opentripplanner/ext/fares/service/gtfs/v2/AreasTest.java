@@ -2,11 +2,9 @@ package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
 import com.google.common.collect.Multimaps;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -28,17 +26,17 @@ class AreasTest implements PlanTestConstants {
   private static final int ID = 100;
 
   private static final FareProduct SINGLE_TO_OUTER = FareProduct.of(
-    new FeedScopedId(FEED_ID, "single_to_outer"),
+    id("single_to_outer"),
     "Single one-way ticket to outer zone",
     Money.euros(1)
   ).build();
   private static final FareProduct SINGLE_FROM_OUTER = FareProduct.of(
-    new FeedScopedId(FEED_ID, "single_from_outer"),
+    id("single_from_outer"),
     "Single one-way ticket from outer zone to anywhere",
     Money.euros(1)
   ).build();
   private static final FareProduct INNER_TO_OUTER_ZONE_SINGLE = FareProduct.of(
-    new FeedScopedId(FEED_ID, "zone_ab_single"),
+    id("zone_ab_single"),
     "Day Pass",
     Money.euros(5)
   ).build();
@@ -52,8 +50,8 @@ class AreasTest implements PlanTestConstants {
   private static final FeedScopedId INNER_ZONE = id("inner-zone");
   private static final FeedScopedId OUTER_ZONE = id("outer-zone");
 
-  private static final GtfsFaresV2Service SERVICE = new GtfsFaresV2Service(
-    List.of(
+  private static final GtfsFaresV2Service SERVICE = GtfsFaresV2Service.of()
+    .withLegRules(
       FareLegRule.of(id("2"), SINGLE_TO_OUTER)
         .withLegGroupId(LEG_GROUP1)
         .withToAreaId(OUTER_ZONE)
@@ -67,12 +65,13 @@ class AreasTest implements PlanTestConstants {
         .withFromAreaId(INNER_ZONE)
         .withToAreaId(OUTER_ZONE)
         .build()
-    ),
-    List.of(),
-    Multimaps.forMap(
-      Map.of(INNER_ZONE_PLACE.stop.getId(), INNER_ZONE, OUTER_ZONE_PLACE.stop.getId(), OUTER_ZONE)
     )
-  );
+    .withStopAreas(
+      Multimaps.forMap(
+        Map.of(INNER_ZONE_PLACE.stop.getId(), INNER_ZONE, OUTER_ZONE_PLACE.stop.getId(), OUTER_ZONE)
+      )
+    )
+    .build();
 
   @Test
   void twoAreaIds() {

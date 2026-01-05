@@ -19,7 +19,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedInfoTestFactory;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -27,17 +27,17 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
-public class OtpTransitServiceImplTest {
+public class DefaultTransitDataImportTest {
 
   private static final FeedScopedId STATION_ID = id("station");
 
   // The subject is used as read only; hence static is ok
-  private static OtpTransitService subject;
+  private static TransitDataImport subject;
 
   @BeforeAll
   public static void setup() throws IOException {
     GtfsContextBuilder contextBuilder = contextBuilder(FEED_ID, ConstantsForTests.SIMPLE_GTFS);
-    OtpTransitServiceBuilder builder = contextBuilder.getTransitBuilder();
+    TransitDataImportBuilder builder = contextBuilder.getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections
     builder.getFeedInfos().add(FeedInfoTestFactory.dummyForTest(FEED_ID));

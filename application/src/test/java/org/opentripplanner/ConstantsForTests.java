@@ -25,7 +25,7 @@ import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.DefaultOsmProvider;
@@ -35,6 +35,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
@@ -110,7 +111,7 @@ public class ConstantsForTests {
       dataSource,
       buildConfig.netexDefaults
     );
-    var transitService = new OtpTransitServiceBuilder(
+    var transitService = new TransitDataImportBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP
     );
@@ -128,7 +129,7 @@ public class ConstantsForTests {
       dataSource,
       buildConfig.netexDefaults
     );
-    var transitService = new OtpTransitServiceBuilder(
+    var transitService = new TransitDataImportBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP
     );
@@ -259,6 +260,7 @@ public class ConstantsForTests {
       var parkingRepository = new DefaultVehicleParkingRepository();
       var graph = new Graph();
       var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
+      var streetDetailsRepository = new DefaultStreetDetailsRepository();
       // Add street data from OSM
       {
         var osmProvider = new DefaultOsmProvider(OSLO_EAST_OSM, false);
@@ -285,6 +287,7 @@ public class ConstantsForTests {
             sources,
             timetableRepository,
             parkingRepository,
+            streetDetailsRepository,
             graph,
             deduplicator,
             DataImportIssueStore.NOOP
@@ -332,6 +335,7 @@ public class ConstantsForTests {
     var module = new GtfsModule(
       List.of(bundle),
       timetableRepository,
+      new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),
       DataImportIssueStore.NOOP,

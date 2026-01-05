@@ -17,8 +17,6 @@ public abstract class StationElement<
 >
   extends AbstractTransitEntity<E, B> {
 
-  public static final StopLevel DEFAULT_LEVEL = new StopLevel("default stop level", 0);
-
   private final I18NString name;
 
   private final String code;

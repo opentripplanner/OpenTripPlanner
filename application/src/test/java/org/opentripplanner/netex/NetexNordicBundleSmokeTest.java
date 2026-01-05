@@ -20,9 +20,9 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -60,13 +60,13 @@ public class NetexNordicBundleSmokeTest {
     netexBundle.checkInputs();
 
     // When
-    OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(
+    TransitDataImportBuilder transitBuilder = netexBundle.loadBundle(
       new Deduplicator(),
       DataImportIssueStore.NOOP
     );
 
     // Then - smoke test model
-    OtpTransitService otpModel = transitBuilder.build();
+    TransitDataImport otpModel = transitBuilder.build();
 
     assertAgencies(otpModel.getAllAgencies());
     assertMultiModalStations(otpModel.siteRepository().listMultiModalStations());

@@ -34,6 +34,6 @@ public class OsmElevatorVertex extends OsmVertex {
 
   @Override
   public VertexLabel getLabel() {
-    return new VertexLabel.VertexWithEntityLabel(nodeId, osmEntityType, entityId);
+    return new VertexLabel.VertexWithEntityLabel(nodeId(), osmEntityType, entityId);
   }
 }

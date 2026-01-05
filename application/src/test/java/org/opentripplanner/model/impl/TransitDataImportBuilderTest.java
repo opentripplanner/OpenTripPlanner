@@ -21,12 +21,12 @@ import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 
-public class OtpTransitServiceBuilderTest {
+public class TransitDataImportBuilderTest {
 
   private static final String FEED_ID = TimetableRepositoryForTest.FEED_ID;
   private static final FeedScopedId SERVICE_WEEKDAYS_ID = TimetableRepositoryForTest.id("weekdays");
 
-  private static OtpTransitServiceBuilder subject;
+  private static TransitDataImportBuilder subject;
 
   @BeforeAll
   public static void setUpClass() throws IOException {
@@ -91,8 +91,8 @@ public class OtpTransitServiceBuilderTest {
 
   /* private methods */
 
-  private static OtpTransitServiceBuilder createBuilder() throws IOException {
-    OtpTransitServiceBuilder builder = contextBuilder(
+  private static TransitDataImportBuilder createBuilder() throws IOException {
+    TransitDataImportBuilder builder = contextBuilder(
       FEED_ID,
       ConstantsForTests.SIMPLE_GTFS
     ).getTransitBuilder();

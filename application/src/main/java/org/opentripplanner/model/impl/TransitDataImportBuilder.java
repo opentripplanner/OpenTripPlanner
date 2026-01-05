@@ -15,8 +15,8 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
@@ -57,13 +57,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for building a {@link OtpTransitService}. The instance returned by the
+ * This class is responsible for building a {@link TransitDataImport}. The instance returned by the
  * {@link #build()} method is read only, and this class provide a mutable collections to construct a
- * {@link OtpTransitService} instance.
+ * {@link TransitDataImport} instance.
  */
-public class OtpTransitServiceBuilder {
+public class TransitDataImportBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OtpTransitServiceBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransitDataImportBuilder.class);
 
   private final EntityById<Agency> agenciesById = new DefaultEntityById<>();
 
@@ -123,7 +123,7 @@ public class OtpTransitServiceBuilder {
 
   private final DataImportIssueStore issueStore;
 
-  public OtpTransitServiceBuilder(SiteRepository siteRepository, DataImportIssueStore issueStore) {
+  public TransitDataImportBuilder(SiteRepository siteRepository, DataImportIssueStore issueStore) {
     this.siteRepositoryBuilder = siteRepository.withContext();
     this.issueStore = issueStore;
   }
@@ -272,8 +272,8 @@ public class OtpTransitServiceBuilder {
     return stopsByScheduledStopPoints;
   }
 
-  public OtpTransitService build() {
-    return new OtpTransitServiceImpl(this);
+  public TransitDataImport build() {
+    return new DefaultTransitDataImport(this);
   }
 
   /**

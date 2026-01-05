@@ -18,9 +18,10 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
  * implementation, and Flex may expose part of the trip as a "scheduled/regular" stop-to-stop
  * trip using this interface. All times are expressed as seconds since midnight (as in
  * GTFS). Unless stated otherwise, accessor methods which take an integer stop parameter refer to
- * the position within the trip's TripPattern (not its GTFS stop sequence for example).
+ * the position within the trip's TripPattern, not its GTFS stop sequence for example or Raptor
+ * stop index. The stop position is 0(zero) based.
  */
-public interface TripTimes extends Serializable, Comparable<TripTimes> {
+public interface TripTimes<T extends TripTimes> extends Serializable, Comparable<TripTimes> {
   /**
    * Create a RealTimeTripTimesBuilder using the information, but not the times, from this
    * TripTimes.
@@ -37,42 +38,46 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   int getServiceCode();
 
   /** Make a copy of the TripTimes with the new service code, for use while adding trips to Timetable */
-  TripTimes withServiceCode(int serviceCode);
+  T withServiceCode(int serviceCode);
 
   /**
    * The time in seconds after midnight at which the vehicle should arrive at the given stop
+   * position according to the original schedule.
+   */
+  int getScheduledArrivalTime(int stopPos);
+
+  /**
+   * The time in seconds after midnight at which the vehicle arrives at each stop position,
+   * accounting for any real-time updates.
+   */
+  int getArrivalTime(int stopPos);
+
+  /**
+   * @return the difference between the scheduled and actual arrival times at this stop position.
+   */
+  int getArrivalDelay(int stopPos);
+
+  /**
+   * The time in seconds after midnight at which the vehicle should leave the given stop position
    * according to the original schedule.
    */
-  int getScheduledArrivalTime(int stop);
+  int getScheduledDepartureTime(int stopPos);
 
   /**
-   * The time in seconds after midnight at which the vehicle arrives at each stop, accounting for
-   * any real-time updates.
+   * The time in seconds after midnight at which the vehicle leaves each stop position, accounting
+   * for any real-time updates.
    */
-  int getArrivalTime(int stop);
-
-  /** @return the difference between the scheduled and actual arrival times at this stop. */
-  int getArrivalDelay(int stop);
+  int getDepartureTime(int stopPos);
 
   /**
-   * The time in seconds after midnight at which the vehicle should leave the given stop according
-   * to the original schedule.
+   * @return the difference between the scheduled and actual departure times at this stop position.
    */
-  int getScheduledDepartureTime(int stop);
+  int getDepartureDelay(int stopPos);
 
   /**
-   * The time in seconds after midnight at which the vehicle leaves each stop, accounting for any
-   * real-time updates.
+   * Whether stop position is considered a GTFS timepoint.
    */
-  int getDepartureTime(int stop);
-
-  /** @return the difference between the scheduled and actual departure times at this stop. */
-  int getDepartureDelay(int stop);
-
-  /**
-   * Whether stopIndex is considered a GTFS timepoint.
-   */
-  boolean isTimepoint(int stopIndex);
+  boolean isTimepoint(int stopPos);
 
   /** The trips whose arrivals and departures are represented by this class */
   Trip getTrip();
@@ -97,9 +102,9 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
     return sortIndex() - other.sortIndex();
   }
 
-  BookingInfo getDropOffBookingInfo(int stop);
+  BookingInfo getDropOffBookingInfo(int stopPos);
 
-  BookingInfo getPickupBookingInfo(int stop);
+  BookingInfo getPickupBookingInfo(int stopPos);
 
   /**
    * Return {@code true} if the trip is unmodified, a scheduled trip from a published timetable.
@@ -126,27 +131,27 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
 
   RealTimeState getRealTimeState();
 
-  boolean isCancelledStop(int stop);
+  boolean isCancelledStop(int stopPos);
 
-  boolean isRecordedStop(int stop);
+  boolean isRecordedStop(int stopPos);
 
-  boolean isNoDataStop(int stop);
+  boolean isNoDataStop(int stopPos);
 
-  boolean isPredictionInaccurate(int stop);
+  boolean isPredictionInaccurate(int stopPos);
 
   /**
-   * Return if trip has been updated and stop has not been given a NO_DATA update.
+   * Return if trip has been updated and stop position has not been given a NO_DATA update.
    */
-  boolean isRealTimeUpdated(int stop);
+  boolean isRealTimeUpdated(int stopPos);
 
   /**
-   * @return the whole trip's headsign. Individual stops can have different headsigns.
+   * @return the whole trip's headsign. Individual stop positions can have different headsigns.
    */
   @Nullable
   I18NString getTripHeadsign();
 
   /**
-   * The headsign displayed by the vehicle, which may change at each stop along the trip.
+   * The headsign displayed by the vehicle, which may change at each stop position along the trip.
    * Both trip_headsign and stop_headsign (per stop on a particular trip) are optional GTFS fields.
    * A trip may not have a headsign, in which case we should fall back on a Timetable or
    * Pattern-level headsign. Such a string will be available when we give TripPatterns or
@@ -154,16 +159,17 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
    * not have a pointer to its enclosing timetable or pattern.
    */
   @Nullable
-  I18NString getHeadsign(int stop);
+  I18NString getHeadsign(int stopPos);
 
   /**
-   * Vias are an additional intermediate destinations between the given stop and the terminus, which
-   * are displayed alongside the terminus headsign. Vias often change or are displayed only at
-   * certain stops along the way. While the concept of Headsigns exists in both GTFS (Headsign) and
-   * Netex (DestinationDisplay), the Via concept is only present in Transmodel.
-   * @return a list of via names visible at the given stop, or an empty list if there are no vias.
+   * Vias are an additional intermediate destinations between the given stop position and the
+   * terminus, which are displayed alongside the terminus headsign. Vias often change or are
+   * displayed only at certain stops along the way. While the concept of Headsigns exists in both
+   * GTFS (Headsign) and Netex (DestinationDisplay), the Via concept is only present in Transmodel.
+   * @return a list of via names visible at the given stop position, or an empty list if there are
+   * no vias.
    */
-  List<String> getHeadsignVias(int stop);
+  List<String> getHeadsignVias(int stopPos);
 
   int getNumStops();
 
@@ -172,7 +178,7 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   /**
    * This is only for API-purposes (does not affect routing).
    */
-  OccupancyStatus getOccupancyStatus(int stop);
+  OccupancyStatus getOccupancyStatus(int stopPos);
 
   /**
    * Returns the GTFS sequence number of the given 0-based stop position within the pattern.
@@ -185,15 +191,15 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
    * effort is made to re-use the sequence number arrays when they are the same across different
    * trips in the same pattern.
    */
-  int gtfsSequenceOfStopIndex(int stop);
+  int gtfsSequenceOfStopIndex(int stopPos);
 
   /**
    * Returns the 0-based stop index of the given GTFS sequence number.
    */
-  OptionalInt stopIndexOfGtfsSequence(int stopSequence);
+  OptionalInt stopPositionForGtfsSequence(int stopSequence);
 
   /**
    * Time-shift all times on this trip. This is used when updating the time zone for the trip.
    */
-  TripTimes adjustTimesToGraphTimeZone(Duration shiftDelta);
+  T withAdjustedTimes(Duration shiftDelta);
 }

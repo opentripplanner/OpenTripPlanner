@@ -17,14 +17,13 @@ public class TestDataFetcherDecorator extends DataFetcherDecorator {
     return new TestDataFetcherDecorator(Map.of(fieldName, value));
   }
 
+  public static TestDataFetcherDecorator of(Map<String, ?> data) {
+    return new TestDataFetcherDecorator(data);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <T> void argument(String name, Consumer<T> consumer) {
-    T value = (T) data.get(name);
-    if (value != null) {
-      consumer.accept(value);
-    } else {
-      System.out.println("No mapping for: " + name);
-    }
+    call((Map<String, T>) data, name, consumer);
   }
 }

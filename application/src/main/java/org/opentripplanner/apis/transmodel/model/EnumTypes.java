@@ -60,6 +60,19 @@ public class EnumTypes {
     .value("both", ArrivalDeparture.BOTH, "Show both arrivals and departures")
     .build();
 
+  public static final GraphQLEnumType VEHICLE_OPTIMISATION_METHOD = GraphQLEnumType.newEnum()
+    .name("VehicleOptimisationMethod")
+    .description("Optimization methods for vehicle routing (bicycle, scooter, etc.).")
+    .value("quick", VehicleRoutingOptimizeType.SHORTEST_DURATION, "Prefer faster routes")
+    .value("safe", VehicleRoutingOptimizeType.SAFE_STREETS, "Prefer safer routes")
+    .value("flat", VehicleRoutingOptimizeType.FLAT_STREETS, "Prefer flat terrain")
+    .value(
+      "triangle",
+      VehicleRoutingOptimizeType.TRIANGLE,
+      "Custom optimization using triangle factors"
+    )
+    .build();
+
   public static final GraphQLEnumType BICYCLE_OPTIMISATION_METHOD = GraphQLEnumType.newEnum()
     .name("BicycleOptimisationMethod")
     .value("quick", VehicleRoutingOptimizeType.SHORTEST_DURATION)

@@ -281,9 +281,6 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (isPassThrough()) {
       return ParetoSetCost.USE_C1_AND_C2;
     }
-    if (context().multiCriteria().relaxCostAtDestination() != null) {
-      return ParetoSetCost.USE_C1_RELAX_DESTINATION;
-    }
     return ParetoSetCost.USE_C1;
   }
 }

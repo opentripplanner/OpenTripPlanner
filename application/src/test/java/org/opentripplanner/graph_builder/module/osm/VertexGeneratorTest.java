@@ -109,7 +109,7 @@ class VertexGeneratorTest {
     assertEquals(vertexForW1NotOnBarrier, vertexForW2NotOnBarrier);
 
     assertInstanceOf(BarrierPassThroughVertex.class, vertexForW2OnBarrier);
-    assertEquals(n3.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).nodeId);
+    assertEquals(n3.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).nodeId());
     assertEquals(w2.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).getEntityId());
     assertFalse(vertexForW2NotOnBarrier instanceof BarrierPassThroughVertex);
 

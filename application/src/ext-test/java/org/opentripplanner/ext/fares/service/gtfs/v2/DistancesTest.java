@@ -2,9 +2,10 @@ package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.time.Duration;
 import java.util.List;
@@ -83,18 +84,22 @@ class DistancesTest {
 
   List<FareLegRule> stopRules = List.of(
     FareLegRule.of(DISTANCE_ID, threeStopProduct)
+      .withLegGroupId(DISTANCE_ID)
       .withFareDistance(new FareDistance.Stops(0, 3))
       .build(),
     FareLegRule.of(DISTANCE_ID, fiveStopProduct)
+      .withLegGroupId(DISTANCE_ID)
       .withFareDistance(new FareDistance.Stops(5, 10))
       .build(),
     FareLegRule.of(DISTANCE_ID, twelveStopProduct)
+      .withLegGroupId(DISTANCE_ID)
       .withFareDistance(new FareDistance.Stops(12, 20))
       .build()
   );
 
   List<FareLegRule> distanceRules = List.of(
     FareLegRule.of(DISTANCE_ID, tenKmProduct)
+      .withLegGroupId(DISTANCE_ID)
       .withFareDistance(
         new FareDistance.LinearDistance(
           Distance.ofKilometersBoxed(7d, ignore -> {}).orElse(null),
@@ -103,6 +108,7 @@ class DistancesTest {
       )
       .build(),
     FareLegRule.of(DISTANCE_ID, threeKmProduct)
+      .withLegGroupId(DISTANCE_ID)
       .withFareDistance(
         new FareDistance.LinearDistance(
           Distance.ofKilometersBoxed(3d, ignore -> {}).orElse(null),
@@ -111,6 +117,7 @@ class DistancesTest {
       )
       .build(),
     FareLegRule.of(DISTANCE_ID, twoKmProduct)
+      .withLegGroupId(DISTANCE_ID)
       .withFareDistance(
         new FareDistance.LinearDistance(
           Distance.ofMetersBoxed(0d, ignore -> {}).orElse(null),
@@ -125,13 +132,14 @@ class DistancesTest {
     var i1 = newItinerary(PlanTestConstants.A, 0)
       .bus(ID, 0, 50, 1, 20, PlanTestConstants.C)
       .build();
-    var faresV2Service = new GtfsFaresV2Service(
-      stopRules,
-      List.of(),
-      Multimaps.forMap(
-        Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
-      )
+    Multimap<FeedScopedId, FeedScopedId> stopAreas = Multimaps.forMap(
+      Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
     );
+    var faresV2Service = GtfsFaresV2Service.of()
+      .withLegRules(stopRules)
+      .withTransferRules(List.of())
+      .withStopAreas(stopAreas)
+      .build();
     assertEquals(
       faresV2Service.calculateFares(i1).offersForLeg(i1.legs().getLast()),
       Set.of(FareOffer.of(i1.listTransitLegs().getFirst().startTime(), twelveStopProduct))
@@ -146,13 +154,14 @@ class DistancesTest {
       PlanTestConstants.A.coordinate.longitude() + SphericalDistanceLibrary.metersToDegrees(5_000)
     );
     var i1 = newItinerary(PlanTestConstants.A, 0).bus(ID, 0, 50, dest).build();
-    var faresV2Service = new GtfsFaresV2Service(
-      distanceRules,
-      List.of(),
-      Multimaps.forMap(
-        Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
-      )
+    Multimap<FeedScopedId, FeedScopedId> stopAreas = Multimaps.forMap(
+      Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
     );
+    var faresV2Service = GtfsFaresV2Service.of()
+      .withLegRules(distanceRules)
+      .withTransferRules(List.of())
+      .withStopAreas(stopAreas)
+      .build();
     assertEquals(
       faresV2Service.calculateFares(i1).offersForLeg(i1.transitLeg(0)),
       Set.of(FareOffer.of(i1.listTransitLegs().getFirst().startTime(), threeKmProduct))

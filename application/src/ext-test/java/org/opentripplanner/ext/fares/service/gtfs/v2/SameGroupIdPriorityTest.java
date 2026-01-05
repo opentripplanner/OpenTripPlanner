@@ -1,8 +1,7 @@
 package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -10,22 +9,19 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareLegRuleBuilder;
-import org.opentripplanner.ext.fares.service._support.FareTestConstants;
-import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.ext.fares.model.FareTestConstants;
+import org.opentripplanner.model.plan.TestTransitLeg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.site.RegularStop;
 
-class FareLookupServiceTest implements FareTestConstants {
+class SameGroupIdPriorityTest implements FareTestConstants {
 
   private static final FeedScopedId A_1 = id("a1");
   private static final Route ROUTE = TimetableRepositoryForTest.route("route1")
@@ -41,12 +37,9 @@ class FareLookupServiceTest implements FareTestConstants {
     STOP2_ID,
     A_1
   );
-  private static final FeedScopedId R_1 = TimetableRepositoryForTest.id("r1");
-  private static final FeedScopedId R_2 = TimetableRepositoryForTest.id("r2");
-
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
-  private final RegularStop STOP_1 = testModel.stop(STOP1_ID.getId()).build();
-  private final RegularStop STOP_2 = testModel.stop(STOP2_ID.getId()).build();
+  private static final FeedScopedId R_1 = id("r1");
+  private static final FeedScopedId R_2 = id("r2");
+  private static final FeedScopedId GROUP_ID = id("group");
 
   private record TestCase(
     String name,
@@ -67,8 +60,8 @@ class FareLookupServiceTest implements FareTestConstants {
     }
   }
 
-  private static Stream<Arguments> cases() {
-    return Stream.of(
+  private static List<TestCase> cases() {
+    return List.of(
       new TestCase(
         "mixed area and network without priority leads to zero results",
         r1 -> r1.withNetworkId(NETWORK_A.getId()),
@@ -111,15 +104,20 @@ class FareLookupServiceTest implements FareTestConstants {
         EMPTY_STOP_AREAS,
         Set.of(R_1, R_2)
       )
-    ).map(Arguments::of);
+    );
   }
 
   @ParameterizedTest
   @MethodSource("cases")
-  void twoRules(TestCase tc) {
+  void priority(TestCase tc) {
     var r1 = tc.rule1Customiser.apply(rule1()).build();
     var r2 = tc.rule2Customiser.apply(rule2()).build();
-    var service = new FareLookupService(List.of(r1, r2), List.of(), tc.stopAreas);
+    var service = new FareLookupService(
+      List.of(r1, r2),
+      List.of(),
+      tc.stopAreas,
+      ImmutableMultimap.of()
+    );
 
     assertThat(service.legRules(leg()).stream().map(FareLegRule::id)).containsExactlyElementsIn(
       tc.expectedResults
@@ -127,17 +125,14 @@ class FareLookupServiceTest implements FareTestConstants {
   }
 
   private static FareLegRuleBuilder rule1() {
-    return FareLegRule.of(R_1, List.of(FARE_PRODUCT_A));
+    return FareLegRule.of(R_1, List.of(FARE_PRODUCT_A)).withLegGroupId(GROUP_ID);
   }
 
   private static FareLegRuleBuilder rule2() {
-    return FareLegRule.of(R_2, List.of(FARE_PRODUCT_B));
+    return FareLegRule.of(R_2, List.of(FARE_PRODUCT_B)).withLegGroupId(GROUP_ID);
   }
 
   private TransitLeg leg() {
-    return newItinerary(Place.forStop(STOP_1))
-      .bus(ROUTE, 100, 100, 160, Place.forStop(STOP_2))
-      .build()
-      .transitLeg(0);
+    return TestTransitLeg.of().withFrom(STOP1_ID).withTo(STOP2_ID).withRoute(ROUTE).build();
   }
 }

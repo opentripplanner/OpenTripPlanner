@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.AllWaysOfElevatorNodeOnSameLevel;
@@ -17,9 +16,12 @@ import org.opentripplanner.graph_builder.issues.CouldNotApplyMultiLevelInfoToEle
 import org.opentripplanner.graph_builder.issues.OnlyOneConnectionToElevatorNode;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmLevelFactory;
+import org.opentripplanner.osm.model.OsmLevelSource;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
+import org.opentripplanner.service.streetdetails.model.Level;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
@@ -92,12 +94,14 @@ class ElevatorProcessor {
   private final VertexFactory vertexFactory;
   private final Consumer<String> osmEntityDurationIssueConsumer;
   private final DataImportIssueStore issueStore;
+  private final StreetDetailsRepository streetDetailsRepository;
 
   public ElevatorProcessor(
     DataImportIssueStore issueStore,
     OsmDatabase osmdb,
     VertexGenerator vertexGenerator,
-    Graph graph
+    Graph graph,
+    StreetDetailsRepository streetDetailsRepository
   ) {
     this.osmdb = osmdb;
     this.vertexGenerator = vertexGenerator;
@@ -111,6 +115,7 @@ class ElevatorProcessor {
         )
       );
     this.issueStore = issueStore;
+    this.streetDetailsRepository = streetDetailsRepository;
   }
 
   /**
@@ -171,7 +176,7 @@ class ElevatorProcessor {
   /**
    * Add way with tag highway=elevator to graph as elevator.
    */
-  public void buildElevatorEdgeFromElevatorWay(OsmWay elevatorWay) {
+  public void buildElevatorEdgesFromElevatorWay(OsmWay elevatorWay) {
     List<OsmLevel> nodeLevels = osmdb.getLevelsForEntity(elevatorWay);
     List<Long> nodes = Arrays.stream(elevatorWay.getNodeRefs().toArray())
       .filter(
@@ -225,13 +230,20 @@ class ElevatorProcessor {
   ) {
     ElevatorHopVertex elevatorHopVertex = vertexFactory.elevator(sourceVertex, label);
 
-    ElevatorBoardEdge.createElevatorBoardEdge(sourceVertex, elevatorHopVertex);
-    ElevatorAlightEdge.createElevatorAlightEdge(
-      elevatorHopVertex,
+    ElevatorBoardEdge elevatorBoardEdge = ElevatorBoardEdge.createElevatorBoardEdge(
       sourceVertex,
-      // TODO this will be removed in a later PR and moved to the StreetDetailsService
-      new NonLocalizedString(level.name())
+      elevatorHopVertex
     );
+    ElevatorAlightEdge elevatorAlightEdge = ElevatorAlightEdge.createElevatorAlightEdge(
+      elevatorHopVertex,
+      sourceVertex
+    );
+
+    if (level.source() != OsmLevelSource.DEFAULT) {
+      Level repositoryLevel = new Level(level.level(), level.name());
+      streetDetailsRepository.addHorizontalEdgeLevelInfo(elevatorBoardEdge, repositoryLevel);
+      streetDetailsRepository.addHorizontalEdgeLevelInfo(elevatorAlightEdge, repositoryLevel);
+    }
 
     // Accumulate ElevatorHopVertices so they can be connected by ElevatorHopEdges later.
     elevatorHopVertices.add(elevatorHopVertex);

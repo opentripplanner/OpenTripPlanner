@@ -13,6 +13,10 @@ on:
     paths:
       - 'client/**'
       - 'application/src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql'
+  merge_group:
+    branches:
+      - dev-2.x
+    # path filtering not supported https://github.com/orgs/community/discussions/45899
   workflow_dispatch:
 
 # to avoid conflicts, make sure that only one workflow pushes to Github at the same time
@@ -35,7 +39,7 @@ jobs:
 
       # for a simple PR where we don't push, we don't need any credentials
       - uses: actions/checkout@v4
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
 
       - uses: actions/setup-node@v4
         with:

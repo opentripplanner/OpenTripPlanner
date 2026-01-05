@@ -29,7 +29,7 @@ public class StreetSearchRequestMapper {
   public static StreetSearchRequestBuilder mapInternal(RouteRequest request) {
     var time = request.dateTime() == null ? RouteRequest.normalizeNow() : request.dateTime();
     final RoutingPreferences preferences = request.preferences();
-    return StreetSearchRequest.of()
+    var streetSearchRequestBuilder = StreetSearchRequest.of()
       .withStartTime(time)
       .withArriveBy(request.arriveBy())
       .withFrom(mapGenericLocation(request.from()))
@@ -43,6 +43,16 @@ public class StreetSearchRequestMapper {
       .withCar(b -> mapCar(b, preferences.car()))
       .withScooter(b -> mapScooter(b, preferences.scooter()))
       .withElevator(b -> mapElevator(b, preferences.street().elevator()));
+
+    var rentalDuration = request.journey().direct().rentalDuration();
+    if (rentalDuration != null) {
+      var rentalPeriod = request.arriveBy()
+        ? RentalPeriod.createFromLatestArrivalTime(time, rentalDuration)
+        : RentalPeriod.createFromEarliestDepartureTime(time, rentalDuration);
+      return streetSearchRequestBuilder.withRentalPeriod(rentalPeriod);
+    }
+
+    return streetSearchRequestBuilder;
   }
 
   public static StreetSearchRequestBuilder mapToTransferRequest(RouteRequest request) {
