@@ -15,7 +15,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.ServiceCalendar;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -46,7 +46,7 @@ import org.rutebanken.netex.model.VersionOfObjectRefStructure;
  * <p>
  * This is the ROOT mapper to map from the Netex domin model into the OTP internal model. This class
  * delegates to type/argegate specific mappers and take the result from each such mapper and add the
- * result to the {@link OtpTransitServiceBuilder}.
+ * result to the {@link TransitDataImportBuilder}.
  * </p>
  * <p>
  * The transit builder is updated with the new OTP model entities, holding ALL entities parsed so
@@ -60,7 +60,7 @@ public class NetexMapper {
   private static final int LEVEL_GROUP = 1;
 
   private final FeedScopedIdFactory idFactory;
-  private final OtpTransitServiceBuilder transitBuilder;
+  private final TransitDataImportBuilder transitBuilder;
   private final DeduplicatorService deduplicator;
   private final DataImportIssueStore issueStore;
   private final CalendarServiceBuilder calendarServiceBuilder;
@@ -89,7 +89,7 @@ public class NetexMapper {
   private int level = LEVEL_SHARED;
 
   public NetexMapper(
-    OtpTransitServiceBuilder transitBuilder,
+    TransitDataImportBuilder transitBuilder,
     String feedId,
     DeduplicatorService deduplicator,
     DataImportIssueStore issueStore,

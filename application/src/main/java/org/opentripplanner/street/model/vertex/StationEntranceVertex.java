@@ -29,7 +29,7 @@ public class StationEntranceVertex extends BarrierVertex {
    * The id of the entrance which may or may not be human-readable.
    */
   public FeedScopedId id() {
-    return new FeedScopedId(FEED_ID, String.valueOf(nodeId));
+    return new FeedScopedId(FEED_ID, String.valueOf(nodeId()));
   }
 
   /**
@@ -44,7 +44,7 @@ public class StationEntranceVertex extends BarrierVertex {
   @Override
   public String toString() {
     return ToStringBuilder.of(StationEntranceVertex.class)
-      .addNum("nodeId", nodeId)
+      .addNum("nodeId", nodeId())
       .addStr("code", code)
       .toString();
   }

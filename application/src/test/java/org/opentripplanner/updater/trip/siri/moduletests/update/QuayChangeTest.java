@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.siri.moduletests.update;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ class QuayChangeTest implements RealtimeTestConstants {
   @Test
   void testChangeQuay() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[SCHEDULED]");
     var siri = SiriTestHelper.of(env);
 
     var updates = siri
@@ -46,5 +48,7 @@ class QuayChangeTest implements RealtimeTestConstants {
       "MODIFIED | A [R] 0:00:15 0:00:15 | C 0:00:33 0:00:33",
       env.tripData(TRIP_1_ID).showTimetable()
     );
+
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[MODIFIED]");
   }
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+import java.time.Instant;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
@@ -84,6 +85,9 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
+            if (!isVehicleAvailableDuringRentalPeriod(s0, station)) {
+              return State.empty();
+            }
             s1.beginFloatingVehicleRenting(formFactor, getPropulsionType(station), network, true);
             pickedUp = true;
           } else {
@@ -129,6 +133,9 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
+            if (!isVehicleAvailableDuringRentalPeriod(s0, station)) {
+              return State.empty();
+            }
             s1.beginFloatingVehicleRenting(formFactor, getPropulsionType(station), network, false);
           } else {
             boolean mayKeep =
@@ -169,6 +176,19 @@ public class VehicleRentalEdge extends Edge {
     );
     s1.setBackMode(null);
     return s1.makeStateArray();
+  }
+
+  private static boolean isVehicleAvailableDuringRentalPeriod(State s0, VehicleRentalPlace place) {
+    if (s0.getRequest().rentalPeriod() != null && place.isCarStation()) {
+      var vehicleRentalVehicle = (VehicleRentalVehicle) place;
+      var availableUntil = vehicleRentalVehicle.availableUntil();
+      if (availableUntil == null) {
+        return true;
+      }
+      Instant rentalEndTime = s0.getRequest().rentalPeriod().end();
+      return !availableUntil.isBefore(rentalEndTime);
+    }
+    return true;
   }
 
   @Override

@@ -58,6 +58,7 @@ public class DirectStreetRouter {
         new TransitServiceResolver(serverContext.transitService()),
         serverContext.transitService().getTimeZone(),
         serverContext.graph().streetNotesService,
+        serverContext.streetDetailsService(),
         serverContext.graph().ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths, request);

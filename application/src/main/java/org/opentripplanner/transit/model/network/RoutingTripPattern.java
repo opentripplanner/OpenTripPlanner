@@ -21,11 +21,6 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
   private final int index;
 
   @Deprecated
-  /**
-   * @deprecated This create a circular dependency: TripPattern ⇔ RoutingTripPattern, also the
-   *             RoutingTripPattern should be a pure-syntetic-value-object to allow it to be fast
-   *             to create and load from memory - with no concurency risk.
-   */
   private final TripPattern pattern;
 
   private final int[] stopIndexes;
@@ -70,6 +65,12 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
     return index;
   }
 
+  /**
+   * @deprecated This create a circular dependency: TripPattern ⇔ RoutingTripPattern, also the
+   *             RoutingTripPattern should be a pure-syntetic-value-object to allow it to be fast
+   *             to create and load from memory - with no concurency risk.
+   */
+  @Deprecated
   public final TripPattern getPattern() {
     return this.pattern;
   }

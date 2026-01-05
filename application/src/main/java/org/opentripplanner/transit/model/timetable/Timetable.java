@@ -80,7 +80,7 @@ public class Timetable implements Serializable {
     // Repeated code... bad sign...
     frequencyEntries = frequencyEntries
       .stream()
-      .map(tt -> tt.withServiceCode(serviceCodes.get(tt.tripTimes.getTrip().getServiceId())))
+      .map(tt -> tt.withServiceCode(serviceCodes.get(tt.tripTimes().getTrip().getServiceId())))
       .toList();
   }
 
@@ -169,7 +169,7 @@ public class Timetable implements Serializable {
     if (!scheduledTripTimes.isEmpty()) {
       return scheduledTripTimes.iterator().next();
     } else if (!frequencies.isEmpty()) {
-      return frequencies.iterator().next().tripTimes;
+      return frequencies.iterator().next().tripTimes();
     } else {
       // Pattern is created only for real-time updates
       return null;

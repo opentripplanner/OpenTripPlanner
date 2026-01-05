@@ -3,7 +3,7 @@ package org.opentripplanner.ext.flex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.ext.fares.service._support.FareModelForTest.ANY_FARE_OFFER;
+import static org.opentripplanner.ext.fares.model.FareModelForTest.ANY_FARE_OFFER;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.Duration;

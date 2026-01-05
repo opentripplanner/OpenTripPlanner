@@ -27,6 +27,9 @@ public class StreetSearchRequestBuilder {
   ScooterRequest scooter;
   ElevatorRequest elevator;
 
+  @Nullable
+  RentalPeriod rentalPeriod;
+
   StreetSearchRequestBuilder(StreetSearchRequest original) {
     this.startTime = original.startTime();
     this.mode = original.mode();
@@ -42,6 +45,7 @@ public class StreetSearchRequestBuilder {
     this.scooter = original.scooter();
     this.wheelchair = original.wheelchair();
     this.elevator = original.elevator();
+    this.rentalPeriod = original.rentalPeriod();
   }
 
   public StreetSearchRequestBuilder withStartTime(Instant startTime) {
@@ -118,6 +122,11 @@ public class StreetSearchRequestBuilder {
 
   public StreetSearchRequestBuilder withElevator(Consumer<ElevatorRequest.Builder> body) {
     this.elevator = this.elevator.copyOf().apply(body).build();
+    return this;
+  }
+
+  public StreetSearchRequestBuilder withRentalPeriod(RentalPeriod rentalPeriod) {
+    this.rentalPeriod = rentalPeriod;
     return this;
   }
 

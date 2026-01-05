@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
+import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUse;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transit.model.site.Entrance;
@@ -46,7 +48,13 @@ public final class WalkStep {
   private final boolean walkingBike;
 
   private final String highwayExit;
+
+  @Nullable
   private final Entrance entrance;
+
+  @Nullable
+  private final VerticalTransportationUse verticalTransportationUse;
+
   private final ElevationProfile elevationProfile;
   private final boolean stayOn;
 
@@ -59,7 +67,8 @@ public final class WalkStep {
     I18NString directionText,
     Set<StreetNote> streetNotes,
     String highwayExit,
-    Entrance entrance,
+    @Nullable Entrance entrance,
+    @Nullable VerticalTransportationUse verticalTransportationUse,
     ElevationProfile elevationProfile,
     boolean nameIsDerived,
     boolean walkingBike,
@@ -81,6 +90,7 @@ public final class WalkStep {
     this.area = area;
     this.highwayExit = highwayExit;
     this.entrance = entrance;
+    this.verticalTransportationUse = verticalTransportationUse;
     this.elevationProfile = elevationProfile;
     this.stayOn = stayOn;
     this.edges = List.copyOf(Objects.requireNonNull(edges));
@@ -140,6 +150,13 @@ public final class WalkStep {
    */
   public Optional<Entrance> entrance() {
     return Optional.ofNullable(entrance);
+  }
+
+  /**
+   * Get information about vertical transportation equipment used.
+   */
+  public Optional<VerticalTransportationUse> verticalTransportationUse() {
+    return Optional.ofNullable(verticalTransportationUse);
   }
 
   /**

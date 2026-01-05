@@ -1,6 +1,6 @@
 package org.opentripplanner.service.vehiclerental.model;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -30,7 +30,7 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
   private final boolean isReserved;
   private final boolean isDisabled;
   private final RentalVehicleFuel fuel;
-  private final OffsetDateTime availableUntil;
+  private final Instant availableUntil;
 
   public VehicleRentalVehicle() {
     this.id = null;
@@ -196,7 +196,7 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
     return system;
   }
 
-  public OffsetDateTime availableUntil() {
+  public Instant availableUntil() {
     return availableUntil;
   }
 
@@ -271,7 +271,7 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
     private boolean isReserved;
     private boolean isDisabled;
     private RentalVehicleFuel fuel;
-    private OffsetDateTime availableUntil;
+    private Instant availableUntil;
 
     private Builder(VehicleRentalVehicle original) {
       this.original = original;
@@ -338,7 +338,7 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
       return this;
     }
 
-    public Builder withAvailableUntil(@Nullable OffsetDateTime availableUntil) {
+    public Builder withAvailableUntil(@Nullable Instant availableUntil) {
       this.availableUntil = availableUntil;
       return this;
     }

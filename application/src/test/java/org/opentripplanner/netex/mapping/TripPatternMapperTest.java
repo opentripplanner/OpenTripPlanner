@@ -26,9 +26,6 @@ import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
-/**
- * @author Thomas Gran (Capra) - tgr@capraconsulting.no (29.11.2017)
- */
 class TripPatternMapperTest {
 
   private static final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("S01");

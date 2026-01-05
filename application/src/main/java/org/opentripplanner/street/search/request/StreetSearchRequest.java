@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.astar.spi.AStarRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -56,6 +57,9 @@ public class StreetSearchRequest implements AStarRequest {
 
   private List<ExtensionRequestContext> extensionRequestContexts;
 
+  @Nullable
+  private final RentalPeriod rentalPeriod;
+
   /**
    * Constructor only used for creating a default instance.
    */
@@ -74,6 +78,7 @@ public class StreetSearchRequest implements AStarRequest {
     this.car = CarRequest.DEFAULT;
     this.wheelchairRequest = WheelchairRequest.DEFAULT;
     this.elevator = ElevatorRequest.DEFAULT;
+    this.rentalPeriod = null;
   }
 
   StreetSearchRequest(StreetSearchRequestBuilder builder) {
@@ -91,6 +96,7 @@ public class StreetSearchRequest implements AStarRequest {
     this.car = requireNonNull(builder.car);
     this.wheelchairRequest = requireNonNull(builder.wheelchair);
     this.elevator = requireNonNull(builder.elevator);
+    this.rentalPeriod = builder.rentalPeriod;
   }
 
   public static StreetSearchRequestBuilder of() {
@@ -142,6 +148,15 @@ public class StreetSearchRequest implements AStarRequest {
 
   public boolean wheelchairEnabled() {
     return wheelchair;
+  }
+
+  /**
+   * An assumed rental period of a car rental trip, to make sure the vehicle is available during this period.
+   * The rentalPeriod only apply to free-floating vehicles in a direct search. Access and egress is not supported.
+   */
+  @Nullable
+  public RentalPeriod rentalPeriod() {
+    return rentalPeriod;
   }
 
   public IntersectionTraversalCalculator intersectionTraversalCalculator() {

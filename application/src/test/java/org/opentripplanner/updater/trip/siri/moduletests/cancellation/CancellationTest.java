@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.siri.moduletests.cancellation;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
@@ -108,6 +109,8 @@ class CancellationTest implements RealtimeTestConstants {
   @Test
   void testChangeQuayAndCancelAddedTrip() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
+
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[SCHEDULED]");
     var siri = SiriTestHelper.of(env);
 
     var creation = new SiriEtBuilder(env.localTimeParser())
@@ -131,6 +134,11 @@ class CancellationTest implements RealtimeTestConstants {
       "ADDED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.tripData(ADDED_TRIP_ID).showTimetable()
     );
+    assertThat(env.raptorData().summarizePatterns()).containsExactly(
+      "F:Pattern1[SCHEDULED]",
+      "F:route-id::001:RT[ADDED]"
+    );
+
     changeQuayAndCancelTrip(siri, ADDED_TRIP_ID);
 
     // the arrival time on first stop is adjusted to the departure time to avoid negative dwell time
@@ -138,6 +146,10 @@ class CancellationTest implements RealtimeTestConstants {
     assertEquals(
       "CANCELED | A 0:00:11 0:00:11 | B 0:00:20 0:00:20",
       env.tripData(ADDED_TRIP_ID).showTimetable()
+    );
+    assertThat(env.raptorData().summarizePatterns()).containsExactly(
+      "F:Pattern1[SCHEDULED]",
+      "F:route-id::001:RT[CANCELED]"
     );
   }
 

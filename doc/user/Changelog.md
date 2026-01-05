@@ -55,6 +55,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix NeTEx graph builder crash on duplicate StopPointInJourneyPattern [#7092](https://github.com/opentripplanner/OpenTripPlanner/pull/7092)
 - Propulsion type aware bike and scooter routing [#7098](https://github.com/opentripplanner/OpenTripPlanner/pull/7098)
 - Add support for the snow and ice NeTEx transport mode [#7114](https://github.com/opentripplanner/OpenTripPlanner/pull/7114)
+- Improve GTFS-RT backwards earliness propagation when update starts with `NO_DATA` [#7106](https://github.com/opentripplanner/OpenTripPlanner/pull/7106)
+-   Add native scooter preference parameters to TransModel GraphQL API [#7035](https://github.com/opentripplanner/OpenTripPlanner/pull/7035)
+- Normalize ServiceJourney/DatedServiceJourney ID prefixes in SIRI updates [#7128](https://github.com/opentripplanner/OpenTripPlanner/pull/7128)
+- Add information about the use of elevators, escalators, and stairs to queries with steps in the GTFS GraphQL API [#6897](https://github.com/opentripplanner/OpenTripPlanner/pull/6897)
+- Support gml:LineString format with list of gml:pos elements [#7135](https://github.com/opentripplanner/OpenTripPlanner/pull/7135)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)

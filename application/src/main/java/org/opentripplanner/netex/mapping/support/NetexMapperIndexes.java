@@ -65,7 +65,7 @@ public class NetexMapperIndexes {
 
   /**
    * This is needed to assign a notice to a stop time. It is not part of the target
-   * OTPTransitService, so we need to temporally cache this here.
+   * TransitDataImport, so we need to temporally cache this here.
    */
   public Map<String, StopTime> getStopTimesByNetexId() {
     return stopTimesByNetexId;

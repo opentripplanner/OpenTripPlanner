@@ -2,15 +2,13 @@ package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
-import com.google.common.collect.Multimaps;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.model.FareLegRule;
+import org.opentripplanner.ext.fares.model.FareTestConstants;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
-import org.opentripplanner.ext.fares.service._support.FareTestConstants;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -25,8 +23,8 @@ class FreeTransferAcrossNetworksTest implements PlanTestConstants, FareTestConst
     .withGroupOfRoutes(List.of(NETWORK_B))
     .build();
 
-  GtfsFaresV2Service service = new GtfsFaresV2Service(
-    List.of(
+  GtfsFaresV2Service service = GtfsFaresV2Service.of()
+    .withLegRules(
       FareLegRule.of(LEG_GROUP_A, FARE_PRODUCT_A)
         .withLegGroupId(LEG_GROUP_A)
         .withNetworkId(NETWORK_A.getId())
@@ -35,16 +33,17 @@ class FreeTransferAcrossNetworksTest implements PlanTestConstants, FareTestConst
         .withLegGroupId(LEG_GROUP_B)
         .withNetworkId(NETWORK_B.getId())
         .build()
-    ),
-    List.of(
-      FareTransferRule.of()
-        .withId(id("transfer"))
-        .withFromLegGroup(LEG_GROUP_A)
-        .withToLegGroup(LEG_GROUP_B)
-        .build()
-    ),
-    Multimaps.forMap(Map.of())
-  );
+    )
+    .withTransferRules(
+      List.of(
+        FareTransferRule.of()
+          .withId(id("transfer"))
+          .withFromLegGroup(LEG_GROUP_A)
+          .withToLegGroup(LEG_GROUP_B)
+          .build()
+      )
+    )
+    .build();
 
   @Test
   void freeTransferAcrossNetwork() {

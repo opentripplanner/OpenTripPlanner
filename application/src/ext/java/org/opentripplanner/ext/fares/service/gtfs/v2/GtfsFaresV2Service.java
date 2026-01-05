@@ -2,6 +2,7 @@ package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,12 +20,22 @@ public final class GtfsFaresV2Service implements Serializable {
 
   private final FareLookupService lookup;
 
-  public GtfsFaresV2Service(
+  GtfsFaresV2Service(
     List<FareLegRule> legRules,
     List<FareTransferRule> fareTransferRules,
-    Multimap<FeedScopedId, FeedScopedId> stopAreas
+    Multimap<FeedScopedId, FeedScopedId> stopAreas,
+    Multimap<FeedScopedId, LocalDate> serviceDatesForServiceId
   ) {
-    this.lookup = new FareLookupService(legRules, fareTransferRules, stopAreas);
+    this.lookup = new FareLookupService(
+      legRules,
+      fareTransferRules,
+      stopAreas,
+      serviceDatesForServiceId
+    );
+  }
+
+  public static GtfsFaresV2ServiceBuilder of() {
+    return new GtfsFaresV2ServiceBuilder();
   }
 
   public FareResult calculateFares(Itinerary itinerary) {

@@ -7,16 +7,16 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
 /**
  * OSM way properties for optimizing distance (not traveling time) in routing.
  */
-class ConstantSpeedFinlandMapper extends FinlandMapper {
+class ConstantSpeedMapper extends FinlandMapper {
 
   private final float speed;
 
-  public ConstantSpeedFinlandMapper() {
+  public ConstantSpeedMapper() {
     super();
     this.speed = 22.22f; // 80 kmph by default
   }
 
-  public ConstantSpeedFinlandMapper(float speed) {
+  public ConstantSpeedMapper(float speed) {
     super();
     this.speed = speed;
   }

@@ -454,14 +454,14 @@ public class OsmModuleTest {
     assertEquals(3, graph.getVerticesOfType(BarrierPassThroughVertex.class).size());
     assertEquals(
       2,
-      graph.getVerticesOfType(OsmVertex.class).stream().filter(v -> v.nodeId == 1).toList().size()
+      graph.getVerticesOfType(OsmVertex.class).stream().filter(v -> v.nodeId() == 1).toList().size()
     );
 
     // check traversal permission starting from node 2
     var v2 = graph
       .getVerticesOfType(OsmVertex.class)
       .stream()
-      .filter(v -> v.nodeId == 2)
+      .filter(v -> v.nodeId() == 2)
       .findFirst()
       .orElseThrow();
     assertEquals(1, v2.getOutgoing().size());

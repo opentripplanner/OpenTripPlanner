@@ -22,7 +22,7 @@ import org.opentripplanner.transit.service.SiteRepository;
 /**
  * Methods for accessing imported entities.
  */
-public interface OtpTransitService {
+public interface TransitDataImport {
   /**
    * @return a list of all Agencies.
    */

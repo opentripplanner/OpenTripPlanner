@@ -97,7 +97,7 @@ union CallStopLocation = Location | LocationGroup | Stop
 union RentalPlace = RentalVehicle | VehicleRentalStation
 
 "A feature for a step"
-union StepFeature = Entrance
+union StepFeature = ElevatorUse | Entrance | EscalatorUse | StairsUse
 
 union StopPosition = PositionAtStop | PositionBetweenStops
 
@@ -525,6 +525,15 @@ type DependentFareProduct implements FareProduct {
   riderCategory: RiderCategory
 }
 
+"A single use of an elevator."
+type ElevatorUse {
+  "The level the use begins at."
+  from: Level
+  "The level the use ends at."
+  to: Level
+  verticalDirection: VerticalDirection!
+}
+
 type Emissions {
   "CO₂ emissions in grams."
   co2: Grams
@@ -540,6 +549,15 @@ type Entrance {
   publicCode: String
   "Whether the entrance or exit is accessible by wheelchair"
   wheelchairAccessible: WheelchairBoarding
+}
+
+"A single use of an escalator."
+type EscalatorUse {
+  "The level the use begins at."
+  from: Level
+  "The level the use ends at."
+  to: Level
+  verticalDirection: VerticalDirection!
 }
 
 "Real-time estimates for an arrival or departure at a certain place."
@@ -900,6 +918,14 @@ type LegTime {
   estimated: RealTimeEstimate
   "The scheduled time of the event."
   scheduledTime: OffsetDateTime!
+}
+
+"A level with a name and comparable number. Levels can sometimes contain half levels, e.g. '1.5'."
+type Level {
+  "0-based comparable number where 0 is the ground level."
+  level: Float!
+  "Name of the level, e.g. 'M', 'P1', or '1'. Can be equal or different to the numerical representation."
+  name: String!
 }
 
 "A span of time."
@@ -2172,6 +2198,15 @@ type RoutingError {
   inputField: InputField
 }
 
+"A single use of a set of stairs."
+type StairsUse {
+  "The level the use begins at."
+  from: Level
+  "The level the use ends at."
+  to: Level
+  verticalDirection: VerticalDirection!
+}
+
 """
 Stop can represent either a single public transport stop, where passengers can
 board and/or disembark vehicles, or a station, which contains multiple stops.
@@ -2978,7 +3013,7 @@ type step {
   elevationProfile: [elevationProfileComponent]
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String
-  "Information about an feature associated with a step e.g. an station entrance or exit"
+  "Information about a feature associated with a step e.g. a station entrance or exit."
   feature: StepFeature
   "The latitude of the start of the step."
   lat: Float
@@ -3929,6 +3964,13 @@ enum VertexType {
   TRANSIT
 }
 
+"The vertical direction e.g. for a set of stairs."
+enum VerticalDirection {
+  DOWN
+  UNKNOWN
+  UP
+}
+
 "Categorization for via locations."
 enum ViaLocationType {
   """
@@ -4168,6 +4210,18 @@ input CarRentalPreferencesInput {
   allowedNetworks: [String!]
   "Rental networks which cannot be used as part of an itinerary."
   bannedNetworks: [String!]
+  """
+  The assumed duration of a car rental trip, used to ensure vehicle availability during the
+  rental period.
+    
+  The rental time is calculated relative to the request search time:
+  - Depart-after search: `request time + rental duration`
+  - Arrive-by search: `request time - rental duration`
+    
+  Note: Rental duration only applies to  free-floating vehicles in direct street searches.
+  This is not supported in access/egress in transit searches.
+  """
+  rentalDuration: Duration
 }
 
 "What criteria should be used when optimizing a cycling route."

@@ -21,7 +21,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -259,7 +259,7 @@ class GeometryProcessorTest {
   @ParameterizedTest
   @MethodSource("testCases")
   void test(List<RegularStop> stops, List<ShapePoint> shapePoints, List<LineString> expected) {
-    var builder = new OtpTransitServiceBuilder(repo, NOOP);
+    var builder = new TransitDataImportBuilder(repo, NOOP);
 
     var trip = TimetableRepositoryForTest.trip("t").withShapeId(SHAPE_ID).build();
 
@@ -278,7 +278,7 @@ class GeometryProcessorTest {
 
   @Test
   void testShapeDistance() {
-    var builder = new OtpTransitServiceBuilder(repo, NOOP);
+    var builder = new TransitDataImportBuilder(repo, NOOP);
 
     var trip = TimetableRepositoryForTest.trip("t").withShapeId(SHAPE_ID).build();
 
@@ -317,7 +317,7 @@ class GeometryProcessorTest {
   @Test
   void ignoreInvalidReference() {
     var issueStore = new DefaultDataImportIssueStore();
-    var builder = new OtpTransitServiceBuilder(repo, issueStore);
+    var builder = new TransitDataImportBuilder(repo, issueStore);
     builder
       .getShapePoints()
       .put(SHAPE_ID, List.of(new ShapePoint(0, 0, 0, 0.0), new ShapePoint(1, 1, 1, 1.0)));

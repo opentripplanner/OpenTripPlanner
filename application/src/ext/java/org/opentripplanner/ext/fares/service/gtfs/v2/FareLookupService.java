@@ -5,6 +5,7 @@ import static org.opentripplanner.utils.collection.ListUtils.partitionIntoOverla
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -30,11 +31,13 @@ class FareLookupService implements Serializable {
   private final List<FareTransferRule> transferRules;
   private final AreaMatcher areaMatcher;
   private final NetworkMatcher networkMatcher;
+  private final TimeframeMatcher timeframeMatcher;
 
   FareLookupService(
     List<FareLegRule> legRules,
     List<FareTransferRule> fareTransferRules,
-    Multimap<FeedScopedId, FeedScopedId> stopAreas
+    Multimap<FeedScopedId, FeedScopedId> stopAreas,
+    Multimap<FeedScopedId, LocalDate> serviceDates
   ) {
     this.legRules = List.copyOf(legRules);
     this.transferRules = stripWildcards(fareTransferRules);
@@ -42,6 +45,7 @@ class FareLookupService implements Serializable {
     var rulePriorityMatcher = new RulePriorityMatcher(legRules);
     this.areaMatcher = new AreaMatcher(rulePriorityMatcher, legRules, stopAreas);
     this.networkMatcher = new NetworkMatcher(rulePriorityMatcher, legRules);
+    this.timeframeMatcher = new TimeframeMatcher(serviceDates);
   }
 
   /**
@@ -229,7 +233,8 @@ class FareLookupService implements Serializable {
       // covers this area
       areaMatcher.matchesFromArea(leg.from().stop, rule.fromAreaId()) &&
       areaMatcher.matchesToArea(leg.to().stop, rule.toAreaId()) &&
-      DistanceMatcher.matchesDistance(leg, rule)
+      DistanceMatcher.matchesDistance(leg, rule) &&
+      timeframeMatcher.matchesTimeframes(leg, rule)
     );
   }
 
@@ -258,7 +263,7 @@ class FareLookupService implements Serializable {
    *
    * @link <a href="https://gtfs.org/documentation/schedule/reference/#fare_leg_rulestxt">spec</a>
    */
-  private static Set<FareLegRule> findHighestPriority(Set<FareLegRule> rules) {
+  private static Set<FareLegRule> findHighestPriority(Collection<FareLegRule> rules) {
     var maxPriority = rules.stream().mapToInt(r -> r.priority().orElse(0)).max().orElse(0);
     return rules
       .stream()

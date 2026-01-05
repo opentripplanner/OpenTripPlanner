@@ -2,7 +2,7 @@ package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import static java.util.Objects.requireNonNullElse;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -89,7 +89,7 @@ class GbfsFreeVehicleStatusMapper {
 
       String availableUntil = vehicle.getAvailableUntil();
       if (StringUtils.hasValue(availableUntil)) {
-        builder.withAvailableUntil(OffsetDateTime.parse(availableUntil));
+        builder.withAvailableUntil(Instant.parse(availableUntil));
       }
 
       GBFSRentalUris rentalUris = vehicle.getRentalUris();

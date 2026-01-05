@@ -1,5 +1,6 @@
 package org.opentripplanner.service.vehiclerental.model;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -20,6 +21,10 @@ public class TestFreeFloatingRentalVehicleBuilder {
   public static final double DEFAULT_LONGITUDE = 19.01;
   public static final double DEFAULT_CURRENT_FUEL_PERCENT = 0.5;
   public static final double DEFAULT_CURRENT_RANGE_METERS = 5500.7;
+  private static final Instant DEFAULT_AVAILABLE_UNTIL = OffsetDateTime.of(
+    LocalDateTime.of(LocalDate.of(2025, 5, 14), LocalTime.MIN),
+    ZoneOffset.UTC
+  ).toInstant();
 
   private double latitude = DEFAULT_LATITUDE;
   private double longitude = DEFAULT_LONGITUDE;
@@ -27,10 +32,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
   private Double currentRangeMeters = DEFAULT_CURRENT_RANGE_METERS;
   private VehicleRentalSystem system = null;
   private String network = NETWORK_1;
-  private static final OffsetDateTime DEFAULT_AVAILABLE_UNTIL = OffsetDateTime.of(
-    LocalDateTime.of(LocalDate.of(2025, 1, 1), LocalTime.MIN),
-    ZoneOffset.UTC
-  );
+  private Instant availableUntil = DEFAULT_AVAILABLE_UNTIL;
 
   private RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(NETWORK_1);
 
@@ -74,6 +76,11 @@ public class TestFreeFloatingRentalVehicleBuilder {
     return this;
   }
 
+  public TestFreeFloatingRentalVehicleBuilder withAvailableUntil(Instant availableUntil) {
+    this.availableUntil = availableUntil;
+    return this;
+  }
+
   public TestFreeFloatingRentalVehicleBuilder withVehicleScooter() {
     return buildVehicleType(RentalFormFactor.SCOOTER);
   }
@@ -101,7 +108,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
           .withRange(Distance.ofMetersBoxed(currentRangeMeters, ignore -> {}).orElse(null))
           .build()
       )
-      .withAvailableUntil(DEFAULT_AVAILABLE_UNTIL)
+      .withAvailableUntil(availableUntil)
       .build();
   }
 

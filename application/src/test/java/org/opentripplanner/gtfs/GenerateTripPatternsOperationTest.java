@@ -19,7 +19,7 @@ import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -45,7 +45,7 @@ class GenerateTripPatternsOperationTest {
 
   private Deduplicator deduplicator;
   private DataImportIssueStore issueStore;
-  private OtpTransitServiceBuilder transitServiceBuilder;
+  private TransitDataImportBuilder transitServiceBuilder;
   private GeometryProcessor geometryProcessor;
 
   @BeforeAll
@@ -120,7 +120,7 @@ class GenerateTripPatternsOperationTest {
   void setup() {
     deduplicator = new Deduplicator();
     issueStore = new DefaultDataImportIssueStore();
-    transitServiceBuilder = new OtpTransitServiceBuilder(siteRepository, issueStore);
+    transitServiceBuilder = new TransitDataImportBuilder(siteRepository, issueStore);
     double maxStopToShapeSnapDistance = 100;
     geometryProcessor = new GeometryProcessor(
       transitServiceBuilder,

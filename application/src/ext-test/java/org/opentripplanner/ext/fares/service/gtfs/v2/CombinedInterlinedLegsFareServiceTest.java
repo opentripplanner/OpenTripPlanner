@@ -2,11 +2,11 @@ package org.opentripplanner.ext.fares.service.gtfs.v2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.ext.fares.service._support.FareModelForTest.AIRPORT_STOP;
-import static org.opentripplanner.ext.fares.service._support.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
-import static org.opentripplanner.ext.fares.service._support.FareModelForTest.CITY_CENTER_A_STOP;
-import static org.opentripplanner.ext.fares.service._support.FareModelForTest.CITY_CENTER_B_STOP;
-import static org.opentripplanner.ext.fares.service._support.FareModelForTest.INSIDE_CITY_CENTER_SET;
+import static org.opentripplanner.ext.fares.model.FareModelForTest.AIRPORT_STOP;
+import static org.opentripplanner.ext.fares.model.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
+import static org.opentripplanner.ext.fares.model.FareModelForTest.CITY_CENTER_A_STOP;
+import static org.opentripplanner.ext.fares.model.FareModelForTest.CITY_CENTER_B_STOP;
+import static org.opentripplanner.ext.fares.model.FareModelForTest.INSIDE_CITY_CENTER_SET;
 import static org.opentripplanner.ext.fares.service.gtfs.v1.custom.CombinedInterlinedLegsFareService.CombinationMode.ALWAYS;
 import static org.opentripplanner.ext.fares.service.gtfs.v1.custom.CombinedInterlinedLegsFareService.CombinationMode.SAME_ROUTE;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;

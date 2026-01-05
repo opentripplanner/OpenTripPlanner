@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -46,7 +46,7 @@ class NetexEpipBundleSmokeTest {
   @Test
   void smokeTestOfNetexEpipLoadData() {
     // Given
-    OtpTransitServiceBuilder transitBuilder;
+    TransitDataImportBuilder transitBuilder;
     try (NetexBundle netexBundle = ConstantsForTests.createMinimalNetexEpipBundle()) {
       // Run the check to make sure it does not throw an exception
       netexBundle.checkInputs();
@@ -58,7 +58,7 @@ class NetexEpipBundleSmokeTest {
     }
 
     // Then - smoke test model
-    OtpTransitService otpModel = transitBuilder.build();
+    TransitDataImport otpModel = transitBuilder.build();
 
     assertAgencies(otpModel.getAllAgencies());
     assertOperators(otpModel.getAllOperators());

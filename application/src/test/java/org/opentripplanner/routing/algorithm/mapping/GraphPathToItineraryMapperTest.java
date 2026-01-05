@@ -11,6 +11,8 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graphfinder.NoopSiteResolver;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
+import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
@@ -37,6 +39,7 @@ class GraphPathToItineraryMapperTest {
       new NoopSiteResolver(),
       ZoneIds.UTC,
       new StreetNotesService(),
+      new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       1
     );
     var itin = mapper.generateItinerary(new GraphPath<>(state), RouteRequest.defaultValue());

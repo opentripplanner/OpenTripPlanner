@@ -12,7 +12,6 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
@@ -358,11 +357,7 @@ class ElevatorTest {
     );
     edgeSet.add(
       convertEdgeToVertexLabelString(
-        ElevatorAlightEdge.createElevatorAlightEdge(
-          elevatorVertex,
-          osmVertex,
-          new NonLocalizedString("0")
-        )
+        ElevatorAlightEdge.createElevatorAlightEdge(elevatorVertex, osmVertex)
       )
     );
   }

@@ -53,11 +53,11 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
   @Override
   public I18NString getName() {
     // TODO: i18n
-    return new NonLocalizedString("Elevator");
+    return new NonLocalizedString("ElevatorBoardEdge");
   }
 
   /**
-   * Since board edges always are called Elevator, the name is utterly and completely bogus but is
+   * Since board edges are always called ElevatorBoardEdge, the name is complete bogus but is
    * never included in plans.
    */
   @Override

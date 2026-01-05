@@ -831,9 +831,11 @@ type QueryType {
     "Parameters for indicating authorities, lines or quays not be used in the trip patterns"
     banned: InputBanned,
     "The set of characteristics that the user wants to optimise for during bicycle searches -- defaults to safe"
-    bicycleOptimisationMethod: BicycleOptimisationMethod = safe,
+    bicycleOptimisationMethod: BicycleOptimisationMethod @deprecated(reason : "Use bikePreferences.optimisationMethod instead"),
+    "Bicycle routing preferences. If not provided, default values from the server configuration will be used. Deprecated top-level bike fields (bikeSpeed, bicycleOptimisationMethod, triangleFactors) take precedence if explicitly provided."
+    bikePreferences: BikePreferencesInput,
     "The maximum bike speed along streets, in meters per second"
-    bikeSpeed: Float = 5.0,
+    bikeSpeed: Float @deprecated(reason : "Use bikePreferences.speed instead"),
     "The boardSlack is the minimum extra time to board a public transport vehicle. This is the same as the 'minimumTransferTime', except that this also applies to to the first transit leg in the trip. This is the default value used, if not overridden by the 'boardSlackList'."
     boardSlackDefault: Int = 0,
     "List of boardSlack for a given set of modes. Defaults: []"
@@ -903,6 +905,8 @@ type QueryType {
     THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!
     """
     relaxTransitGroupPriority: RelaxCostInput = null,
+    "Scooter routing preferences. If not provided, default values from the server configuration will be used."
+    scooterPreferences: ScooterPreferencesInput,
     """
     The length of the search-window in minutes. This parameter is optional.
     
@@ -959,7 +963,7 @@ type QueryType {
     "An expected transfer time (in seconds) that specifies the amount of time that must pass between exiting one public transport vehicle and boarding another. This time is in addition to time it might take to walk between stops."
     transferSlack: Int = 120,
     "When setting the BicycleOptimisationMethod to 'triangle', use these values to tell the routing engine how important each of the factors is compared to the others. All values should add up to 1."
-    triangleFactors: TriangleFactors,
+    triangleFactors: TriangleFactors @deprecated(reason : "Use bikePreferences.triangleFactors or scooterPreferences.triangleFactors instead"),
     "Whether or not bike rental availability information will be used to plan bike rental trips."
     useBikeRentalAvailabilityInformation: Boolean = false,
     """
@@ -2077,6 +2081,18 @@ enum TransportSubmode {
   waterTaxi
 }
 
+"Optimization methods for vehicle routing (bicycle, scooter, etc.)."
+enum VehicleOptimisationMethod {
+  "Prefer flat terrain"
+  flat
+  "Prefer faster routes"
+  quick
+  "Prefer safer routes"
+  safe
+  "Custom optimization using triangle factors"
+  triangle
+}
+
 enum VertexType {
   bikePark
   bikeShare
@@ -2142,6 +2158,18 @@ scalar Long
 
 "Time using the format: `HH:MM:SS`. Example: `18:25:43`"
 scalar Time
+
+"Bicycle routing preferences."
+input BikePreferencesInput {
+  "The set of characteristics that the user wants to optimize for during bicycle routing."
+  optimisationMethod: VehicleOptimisationMethod = safe
+  "A measure of how bad biking is compared to being in transit for equal periods of time. Higher values make routing prefer other modes over biking."
+  reluctance: Float = 2.0
+  "The maximum bike speed along streets, in meters per second."
+  speed: Float = 5.0
+  "When using optimisationMethod 'triangle', these values tell the routing engine how important each factor is compared to the others. All values should add up to 1."
+  triangleFactors: TriangleFactors
+}
 
 "Filter trips by disallowing lines involving certain elements. If both lines and authorities are specified, only one must be valid for each line to be banned. If a line is both banned and whitelisted, it will be counted as banned."
 input InputBanned {
@@ -2276,6 +2304,18 @@ input RelaxCostInput {
   constant: Cost = "0s"
   "The factor to multiply with the 'other cost'. Minimum value is 1.0."
   ratio: Float = 1.0
+}
+
+"Scooter routing preferences."
+input ScooterPreferencesInput {
+  "The set of characteristics that the user wants to optimize for during scooter routing."
+  optimisationMethod: VehicleOptimisationMethod = safe
+  "A measure of how bad scooter travel is compared to being in transit for equal periods of time. Higher values make routing prefer other modes over scooter."
+  reluctance: Float = 2.0
+  "The maximum scooter speed along streets, in meters per second."
+  speed: Float = 5.0
+  "When using optimisationMethod 'triangle', these values tell the routing engine how important each factor is compared to the others. All values should add up to 1."
+  triangleFactors: TriangleFactors
 }
 
 "A combination of street mode and corresponding duration"

@@ -24,7 +24,8 @@ public class BarrierPassThroughVertex extends OsmVertex {
     return entityId;
   }
 
+  @Override
   public VertexLabel getLabel() {
-    return new VertexLabel.VertexWithEntityLabel(nodeId, osmEntityType, entityId);
+    return new VertexLabel.VertexWithEntityLabel(nodeId(), osmEntityType, entityId);
   }
 }

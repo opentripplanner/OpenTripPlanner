@@ -17,7 +17,7 @@ import org.opentripplanner.graph_builder.issues.TripUndefinedService;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.network.Route;
@@ -42,7 +42,7 @@ public class GenerateTripPatternsOperation {
 
   private final Map<String, Integer> tripPatternIdCounters = new HashMap<>();
 
-  private final OtpTransitServiceBuilder transitServiceBuilder;
+  private final TransitDataImportBuilder transitServiceBuilder;
   private final DataImportIssueStore issueStore;
   private final DeduplicatorService deduplicator;
   private final Set<FeedScopedId> calendarServiceIds;
@@ -58,7 +58,7 @@ public class GenerateTripPatternsOperation {
   private int scheduledCount = 0;
 
   public GenerateTripPatternsOperation(
-    OtpTransitServiceBuilder builder,
+    TransitDataImportBuilder builder,
     DataImportIssueStore issueStore,
     DeduplicatorService deduplicator,
     Set<FeedScopedId> calendarServiceIds,

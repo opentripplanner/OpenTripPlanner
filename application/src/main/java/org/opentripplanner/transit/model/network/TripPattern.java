@@ -389,7 +389,7 @@ public final class TripPattern
     var freqTrips = scheduledTimetable
       .getFrequencyEntries()
       .stream()
-      .map(e -> e.tripTimes.getTrip());
+      .map(e -> e.tripTimes().getTrip());
     return Stream.concat(trips, freqTrips).distinct();
   }
 

@@ -15,7 +15,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
@@ -25,7 +25,7 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
  * General mapping code or reusable business logic should be moved into the Builder; hence reusable
  * for other import modules.
  */
-public class GTFSToOtpTransitServiceMapper {
+public class GTFSToTransitDataImportMapper {
 
   private final AgencyMapper agencyMapper;
 
@@ -71,6 +71,8 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final FareProductMapper fareProductMapper;
 
+  private final TimeframeMapper timeframeMapper;
+
   private final FareLegRuleMapper fareLegRuleMapper;
 
   private final FareTransferRuleMapper fareTransferRuleMapper;
@@ -79,7 +81,7 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final DataImportIssueStore issueStore;
 
-  private final OtpTransitServiceBuilder builder;
+  private final TransitDataImportBuilder builder;
 
   private final FareRulesData fareRulesBuilder = new FareRulesData();
 
@@ -88,8 +90,8 @@ public class GTFSToOtpTransitServiceMapper {
   private final TranslationHelper translationHelper;
   private final boolean discardMinTransferTimes;
 
-  public GTFSToOtpTransitServiceMapper(
-    OtpTransitServiceBuilder builder,
+  public GTFSToTransitDataImportMapper(
+    TransitDataImportBuilder builder,
     String feedId,
     DataImportIssueStore issueStore,
     boolean discardMinTransferTimes,
@@ -156,12 +158,18 @@ public class GTFSToOtpTransitServiceMapper {
     fareAttributeMapper = new FareAttributeMapper(idFactory);
     fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);
     fareProductMapper = new FareProductMapper(idFactory);
-    fareLegRuleMapper = new FareLegRuleMapper(idFactory, fareProductMapper, issueStore);
+    timeframeMapper = new TimeframeMapper(idFactory);
+    fareLegRuleMapper = new FareLegRuleMapper(
+      idFactory,
+      fareProductMapper,
+      timeframeMapper,
+      issueStore
+    );
     fareTransferRuleMapper = new FareTransferRuleMapper(idFactory, fareProductMapper);
     stopAreaMapper = new StopAreaMapper(idFactory);
   }
 
-  public OtpTransitServiceBuilder getBuilder() {
+  public TransitDataImportBuilder getBuilder() {
     return builder;
   }
 
@@ -200,9 +208,11 @@ public class GTFSToOtpTransitServiceMapper {
     fareRulesBuilder.fareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
     fareRulesBuilder.fareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
 
-    // we don't want to store the list of fare products if they are not required by a fare rule
-    // or a fare transfer rule, that's why this is not added to the builder
+    // we don't want to store the list of fare products or timeframes if they are not required by
+    // a fare rule or a fare transfer rule, that's why this is not added to the builder
     fareProductMapper.map(data.getAllFareProducts());
+    timeframeMapper.map(data.getAllTimeframes());
+
     fareRulesBuilder.fareLegRules().addAll(fareLegRuleMapper.map(data.getAllFareLegRules()));
     fareRulesBuilder
       .fareTransferRules()

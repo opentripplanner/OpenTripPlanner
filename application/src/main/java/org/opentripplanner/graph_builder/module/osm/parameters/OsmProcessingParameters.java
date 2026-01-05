@@ -13,6 +13,7 @@ import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
  * @param platformEntriesLinking Whether platform entries should be linked
  * @param staticParkAndRide      Whether we should create car P+R stations from OSM data.
  * @param staticBikeParkAndRide  Whether we should create bike P+R stations from OSM data.
+ * @param includeInclinedEdgeLevelInfo Whether level info for inclined edges should be stored.
  * @param includeOsmSubwayEntrances Whether we should create subway entrances from OSM data.
  */
 public record OsmProcessingParameters(
@@ -23,6 +24,7 @@ public record OsmProcessingParameters(
   boolean platformEntriesLinking,
   boolean staticParkAndRide,
   boolean staticBikeParkAndRide,
+  boolean includeInclinedEdgeLevelInfo,
   boolean includeOsmSubwayEntrances
 ) {
   public OsmProcessingParameters {

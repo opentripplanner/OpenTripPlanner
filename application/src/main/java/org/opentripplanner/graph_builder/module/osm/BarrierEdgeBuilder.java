@@ -69,7 +69,7 @@ public class BarrierEdgeBuilder {
                 GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()))
               )
               .withName(
-                name == null ? I18NString.of("barrier crossing at node " + vs[i].nodeId) : name
+                name == null ? I18NString.of("barrier crossing at node " + vs[i].nodeId()) : name
               )
               .withPermission(permission)
               .withWheelchairAccessible(wheelchairAccessible)

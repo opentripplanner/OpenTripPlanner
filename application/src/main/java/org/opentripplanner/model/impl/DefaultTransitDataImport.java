@@ -11,7 +11,7 @@ import java.util.Map;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -27,15 +27,15 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.SiteRepository;
 
 /**
- * A in-memory implementation of {@link OtpTransitService}. It's super fast for most methods, but
- * only if you have enough memory to load your entire {@link OtpTransitService} into memory.
+ * A in-memory implementation of {@link TransitDataImport}. It's super fast for most methods, but
+ * only if you have enough memory to load your entire {@link TransitDataImport} into memory.
  * <p>
  * This class is read only, to enforce consistency after generating indexes and ids. You will get an
  * exception if you try to add entities to one of the collections. If you need to modify a {@link
- * OtpTransitService}, you can create a new {@link OtpTransitServiceBuilder} based on your old data,
+ * TransitDataImport}, you can create a new {@link TransitDataImportBuilder} based on your old data,
  * do your modification and create a new unmodifiable instance.
  */
-class OtpTransitServiceImpl implements OtpTransitService {
+class DefaultTransitDataImport implements TransitDataImport {
 
   private final Collection<Agency> agencies;
 
@@ -67,9 +67,9 @@ class OtpTransitServiceImpl implements OtpTransitService {
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPoint;
 
   /**
-   * Create a read only version of the {@link OtpTransitService}.
+   * Create a read only version of the {@link TransitDataImport}.
    */
-  OtpTransitServiceImpl(OtpTransitServiceBuilder builder) {
+  DefaultTransitDataImport(TransitDataImportBuilder builder) {
     this.agencies = immutableList(builder.getAgenciesById().values());
     this.feedInfos = immutableList(builder.getFeedInfos());
     this.siteRepository = builder.siteRepository().build();

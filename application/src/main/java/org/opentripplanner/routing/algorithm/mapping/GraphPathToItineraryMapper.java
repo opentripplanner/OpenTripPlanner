@@ -31,6 +31,7 @@ import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graphfinder.SiteResolver;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
@@ -57,17 +58,20 @@ public class GraphPathToItineraryMapper {
   private final SiteResolver siteResolver;
   private final ZoneId timeZone;
   private final StreetNotesService streetNotesService;
+  private final StreetDetailsService streetDetailsService;
   private final double ellipsoidToGeoidDifference;
 
   public GraphPathToItineraryMapper(
     SiteResolver siteResolver,
     ZoneId timeZone,
     StreetNotesService streetNotesService,
+    StreetDetailsService streetDetailsService,
     double ellipsoidToGeoidDifference
   ) {
     this.siteResolver = siteResolver;
     this.timeZone = ZoneIdFallback.zoneId(timeZone);
     this.streetNotesService = streetNotesService;
+    this.streetDetailsService = streetDetailsService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
   }
 
@@ -388,6 +392,7 @@ public class GraphPathToItineraryMapper {
       states,
       previousStep,
       streetNotesService,
+      streetDetailsService,
       siteResolver,
       ellipsoidToGeoidDifference
     );

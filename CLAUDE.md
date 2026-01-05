@@ -191,7 +191,7 @@ Each documented component has a `package.md` file in its source directory.
 - **NEVER push directly to these branches:** `dev-2.x`, `main`, `master`, `main_config`
 - Always use feature branches for development work
 - When asked to push changes, always ask which remote to use before pushing
-- Ask witch remote a feature branches should be pushed to for creating PRs to upstream
+- Ask which remote a feature branches should be pushed to for creating PRs to upstream
 
 **Branch Structure:**
 - Main development branch: `dev-2.x`
@@ -203,7 +203,7 @@ Each documented component has a `package.md` file in its source directory.
 **Creating Pull Requests:**
 1. Create a feature branch (e.g., `my-feature`)
 2. Make commits on the feature branch
-3. Ask witch remote to push the feature branch to: `git push -u entur my-feature`
+3. Ask which remote to push the feature branch to: `git push -u entur my-feature`
 4. Create PR in upstream repository (`opentripplanner/OpenTripPlanner`) using `gh pr create --repo opentripplanner/OpenTripPlanner --head entur:my-feature --base dev-2.x`
 
 ## Documentation

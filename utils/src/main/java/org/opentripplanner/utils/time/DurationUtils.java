@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 public class DurationUtils {
 
   private static final Pattern DECIMAL_NUMBER_PATTERN = Pattern.compile("[-+]?\\d+");
+  private static final int THOUSAND = 1000;
 
   private DurationUtils() {}
 
@@ -37,12 +38,15 @@ public class DurationUtils {
    * most parts, but make it a bit more readable: {@code P2DT2H12M40S => 2d2h12m40s}. For negative
    * durations {@code -P2dT3s => -2d3s, not -2d-3s or -(2d3s)} is used.
    */
-  public static String durationToStr(int timeSeconds) {
+  public static String durationToStrMillisescond(long timeMilliseconds) {
     StringBuilder buf = new StringBuilder();
-    if (timeSeconds < 0) {
+
+    if (timeMilliseconds < 0) {
       buf.append("-");
+      timeMilliseconds = -timeMilliseconds;
     }
-    int time = Math.abs(timeSeconds);
+    int millis = (int) timeMilliseconds % THOUSAND;
+    int time = (int) (timeMilliseconds / THOUSAND);
     int sec = time % 60;
     time = time / 60;
     int min = time % 60;
@@ -62,12 +66,18 @@ public class DurationUtils {
     if (sec != 0) {
       buf.append(sec).append('s');
     }
-
+    if (millis != 0) {
+      buf.append(millis).append("ms");
+    }
     return buf.length() == 0 ? "0s" : buf.toString();
   }
 
+  public static String durationToStr(int timeSeconds) {
+    return durationToStrMillisescond(timeSeconds * THOUSAND);
+  }
+
   public static String durationToStr(Duration duration) {
-    return duration == null ? "" : durationToStr((int) duration.toSeconds());
+    return duration == null ? "" : durationToStrMillisescond(duration.toMillis());
   }
 
   public static String durationToStr(int timeSeconds, int notSetValue) {
@@ -186,17 +196,27 @@ public class DurationUtils {
   }
 
   /**
-   * Checks that duration is positive and less than the given {@code maxLimit} (exclusive).
+   * Checks that duration is positive.
    *
    * @param subject used to identify name of the problematic value when throwing an exception.
    */
-  public static Duration requireNonNegative(Duration value, Duration maxLimit, String subject) {
+  public static Duration requireNonNegative(Duration value, String subject) {
     Objects.requireNonNull(value);
     if (value.isNegative()) {
       throw new IllegalArgumentException(
         "Duration %s can't be negative: %s".formatted(subject, value)
       );
     }
+    return value;
+  }
+
+  /**
+   * Checks that duration is positive and less than the given {@code maxLimit} (exclusive).
+   *
+   * @param subject used to identify name of the problematic value when throwing an exception.
+   */
+  public static Duration requireNonNegative(Duration value, Duration maxLimit, String subject) {
+    requireNonNegative(value, subject);
     if (value.compareTo(maxLimit) >= 0) {
       throw new IllegalArgumentException(
         "Duration %s can't be longer or equals too %s: %s".formatted(
