@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
@@ -26,8 +27,7 @@ import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
 import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class GeometryProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(GeometryProcessor.class);
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-  private final OtpTransitServiceBuilder builder;
+  private final TransitDataImportBuilder builder;
   // this is a thread-safe implementation
   private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey =
     new ConcurrentHashMap<>();
@@ -56,7 +56,7 @@ public class GeometryProcessor {
   private final DataImportIssueStore issueStore;
 
   public GeometryProcessor(
-    OtpTransitServiceBuilder builder,
+    TransitDataImportBuilder builder,
     double maxStopToShapeSnapDistance,
     DataImportIssueStore issueStore
   ) {
@@ -73,7 +73,7 @@ public class GeometryProcessor {
    * <p>
    * THREAD SAFETY The geometries for the trip patterns are computed in parallel. The collections
    * needed for this are concurrent implementations and therefore threadsafe but the issue store,
-   * the graph, the OtpTransitService and others are not.
+   * the graph, the TransitDataImport and others are not.
    */
   public List<LineString> createHopGeometries(Trip trip) {
     if (

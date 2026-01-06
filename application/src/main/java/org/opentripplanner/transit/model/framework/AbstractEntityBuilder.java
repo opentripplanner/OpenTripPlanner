@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.framework;
 
 import java.util.Objects;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 public abstract class AbstractEntityBuilder<
   E extends AbstractTransitEntity<E, B>, B extends AbstractEntityBuilder<E, B>

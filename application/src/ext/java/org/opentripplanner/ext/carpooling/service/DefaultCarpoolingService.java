@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling.service;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +19,7 @@ import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -113,6 +115,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
   @Override
   public List<Itinerary> route(RouteRequest request, LinkingContext linkingContext)
     throws RoutingValidationException {
+    if (!StreetMode.CARPOOL.equals(request.journey().direct().mode())) {
+      return Collections.emptyList();
+    }
+
     validateRequest(request);
 
     WgsCoordinate passengerPickup = new WgsCoordinate(request.from().getCoordinate());

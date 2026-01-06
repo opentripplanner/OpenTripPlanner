@@ -26,7 +26,7 @@ class GtfsModuleTest {
     var model = buildTestModel();
 
     var bundle = GtfsBundleTestFactory.forTest(ConstantsForTests.SIMPLE_GTFS);
-    var module = GtfsModule.forTest(
+    var module = GtfsModuleTestFactory.forTest(
       List.of(bundle),
       model.timetableRepository,
       model.graph,
@@ -57,7 +57,7 @@ class GtfsModuleTest {
     var bundles = List.of(bundle("A"), bundle("A"));
     var model = buildTestModel();
 
-    var module = GtfsModule.forTest(
+    var module = GtfsModuleTestFactory.forTest(
       bundles,
       model.timetableRepository,
       model.graph,
@@ -106,7 +106,7 @@ class GtfsModuleTest {
       var feedIds = bundles.stream().map(GtfsBundle::getFeedId).collect(Collectors.toSet());
       assertEquals(bundles.size(), feedIds.size());
 
-      var module = GtfsModule.forTest(
+      var module = GtfsModuleTestFactory.forTest(
         bundles,
         model.timetableRepository,
         model.graph,

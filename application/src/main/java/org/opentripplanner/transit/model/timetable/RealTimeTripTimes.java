@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -22,7 +22,7 @@ import org.opentripplanner.utils.lang.IntUtils;
  * GTFS).
  */
 
-public final class RealTimeTripTimes implements TripTimes {
+public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
 
   private final ScheduledTripTimes scheduledTripTimes;
 
@@ -106,13 +106,13 @@ public final class RealTimeTripTimes implements TripTimes {
    * a pointer to its enclosing timetable or pattern.
    */
   @Nullable
-  public I18NString getHeadsign(final int stop) {
-    return stopHeadsigns[stop] != null ? stopHeadsigns[stop] : tripHeadsign;
+  public I18NString getHeadsign(final int stopPos) {
+    return stopHeadsigns[stopPos] != null ? stopHeadsigns[stopPos] : tripHeadsign;
   }
 
   @Override
-  public List<String> getHeadsignVias(final int stop) {
-    return scheduledTripTimes.getHeadsignVias(stop);
+  public List<String> getHeadsignVias(final int stopPos) {
+    return scheduledTripTimes.getHeadsignVias(stopPos);
   }
 
   /**
@@ -129,8 +129,8 @@ public final class RealTimeTripTimes implements TripTimes {
    * according to the original schedule.
    */
   @Override
-  public int getScheduledArrivalTime(final int stop) {
-    return scheduledTripTimes.getScheduledArrivalTime(stop);
+  public int getScheduledArrivalTime(final int stopPos) {
+    return scheduledTripTimes.getScheduledArrivalTime(stopPos);
   }
 
   /**
@@ -138,8 +138,8 @@ public final class RealTimeTripTimes implements TripTimes {
    * to the original schedule.
    */
   @Override
-  public int getScheduledDepartureTime(final int stop) {
-    return scheduledTripTimes.getScheduledDepartureTime(stop);
+  public int getScheduledDepartureTime(final int stopPos) {
+    return scheduledTripTimes.getScheduledDepartureTime(stopPos);
   }
 
   /**
@@ -156,42 +156,42 @@ public final class RealTimeTripTimes implements TripTimes {
    * real-time updates.
    */
   @Override
-  public int getDepartureTime(final int stop) {
-    return departureTimes[stop];
+  public int getDepartureTime(final int stopPos) {
+    return departureTimes[stopPos];
   }
 
   /** @return the difference between the scheduled and actual arrival times at this stop. */
   @Override
-  public int getArrivalDelay(final int stop) {
-    return getArrivalTime(stop) - scheduledTripTimes.getScheduledArrivalTime(stop);
+  public int getArrivalDelay(final int stopPos) {
+    return getArrivalTime(stopPos) - scheduledTripTimes.getScheduledArrivalTime(stopPos);
   }
 
   /** @return the difference between the scheduled and actual departure times at this stop. */
   @Override
-  public int getDepartureDelay(final int stop) {
-    return getDepartureTime(stop) - scheduledTripTimes.getScheduledDepartureTime(stop);
+  public int getDepartureDelay(final int stopPos) {
+    return getDepartureTime(stopPos) - scheduledTripTimes.getScheduledDepartureTime(stopPos);
   }
 
-  public boolean isCancelledStop(int stop) {
-    return isStopRealTimeStates(stop, StopRealTimeState.CANCELLED);
+  public boolean isCancelledStop(int stopPos) {
+    return isStopRealTimeStates(stopPos, StopRealTimeState.CANCELLED);
   }
 
-  public boolean isRecordedStop(int stop) {
-    return isStopRealTimeStates(stop, StopRealTimeState.RECORDED);
+  public boolean isRecordedStop(int stopPos) {
+    return isStopRealTimeStates(stopPos, StopRealTimeState.RECORDED);
   }
 
-  public boolean isNoDataStop(int stop) {
-    return isStopRealTimeStates(stop, StopRealTimeState.NO_DATA);
+  public boolean isNoDataStop(int stopPos) {
+    return isStopRealTimeStates(stopPos, StopRealTimeState.NO_DATA);
   }
 
-  public boolean isPredictionInaccurate(int stop) {
-    return isStopRealTimeStates(stop, StopRealTimeState.INACCURATE_PREDICTIONS);
+  public boolean isPredictionInaccurate(int stopPos) {
+    return isStopRealTimeStates(stopPos, StopRealTimeState.INACCURATE_PREDICTIONS);
   }
 
-  public boolean isRealTimeUpdated(int stop) {
+  public boolean isRealTimeUpdated(int stopPos) {
     return (
       realTimeState != RealTimeState.SCHEDULED &&
-      !isStopRealTimeStates(stop, StopRealTimeState.NO_DATA)
+      !isStopRealTimeStates(stopPos, StopRealTimeState.NO_DATA)
     );
   }
 
@@ -199,11 +199,11 @@ public final class RealTimeTripTimes implements TripTimes {
    * This is only for API-purposes (does not affect routing).
    */
   @Override
-  public OccupancyStatus getOccupancyStatus(int stop) {
+  public OccupancyStatus getOccupancyStatus(int stopPos) {
     if (this.occupancyStatus == null) {
       return OccupancyStatus.NO_DATA_AVAILABLE;
     }
-    return this.occupancyStatus[stop];
+    return this.occupancyStatus[stopPos];
   }
 
   OccupancyStatus[] copyOccupancyStatus() {
@@ -211,13 +211,13 @@ public final class RealTimeTripTimes implements TripTimes {
   }
 
   @Override
-  public BookingInfo getDropOffBookingInfo(int stop) {
-    return scheduledTripTimes.getDropOffBookingInfo(stop);
+  public BookingInfo getDropOffBookingInfo(int stopPos) {
+    return scheduledTripTimes.getDropOffBookingInfo(stopPos);
   }
 
   @Override
-  public BookingInfo getPickupBookingInfo(int stop) {
-    return scheduledTripTimes.getPickupBookingInfo(stop);
+  public BookingInfo getPickupBookingInfo(int stopPos) {
+    return scheduledTripTimes.getPickupBookingInfo(stopPos);
   }
 
   @Override
@@ -295,23 +295,23 @@ public final class RealTimeTripTimes implements TripTimes {
    * Time-shift all times on this trip. This is used when updating the time zone for the trip.
    */
   @Override
-  public RealTimeTripTimes adjustTimesToGraphTimeZone(Duration shiftDelta) {
+  public RealTimeTripTimes withAdjustedTimes(Duration shiftDelta) {
     return new RealTimeTripTimes(this, (int) shiftDelta.toSeconds());
   }
 
   @Override
-  public int gtfsSequenceOfStopIndex(final int stop) {
-    return scheduledTripTimes.gtfsSequenceOfStopIndex(stop);
+  public int gtfsSequenceOfStopIndex(final int stopPos) {
+    return scheduledTripTimes.gtfsSequenceOfStopIndex(stopPos);
   }
 
   @Override
-  public OptionalInt stopIndexOfGtfsSequence(int stopSequence) {
-    return scheduledTripTimes.stopIndexOfGtfsSequence(stopSequence);
+  public OptionalInt stopPositionForGtfsSequence(int stopSequence) {
+    return scheduledTripTimes.stopPositionForGtfsSequence(stopSequence);
   }
 
   @Override
-  public boolean isTimepoint(final int stopIndex) {
-    return scheduledTripTimes.isTimepoint(stopIndex);
+  public boolean isTimepoint(final int stopPos) {
+    return scheduledTripTimes.isTimepoint(stopPos);
   }
 
   @Override
@@ -341,8 +341,8 @@ public final class RealTimeTripTimes implements TripTimes {
    * <p>
    * This is only for API-purposes (does not affect routing).
    */
-  private boolean isStopRealTimeStates(int stop, StopRealTimeState state) {
-    return stopRealTimeStates != null && stopRealTimeStates[stop] == state;
+  private boolean isStopRealTimeStates(int stopPos, StopRealTimeState state) {
+    return stopRealTimeStates != null && stopRealTimeStates[stopPos] == state;
   }
 
   I18NString[] copyStopHeadsigns() {

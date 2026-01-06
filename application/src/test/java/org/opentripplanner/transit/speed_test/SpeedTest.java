@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -141,6 +141,7 @@ public class SpeedTest {
       TestServerContext.createWorldEnvelopeService(),
       null,
       null,
+      TestServerContext.createStreetDetailsService(),
       null,
       null,
       null,

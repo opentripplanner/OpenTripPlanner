@@ -1675,7 +1675,7 @@
       "filter" : [
         "in",
         "class",
-        "ElevatorVertex"
+        "ElevatorHopVertex"
       ],
       "layout" : {
         "visibility" : "none"

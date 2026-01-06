@@ -16,9 +16,6 @@ import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPlace;
 
-/**
- * @author Thomas Gran (Capra) - tgr@capraconsulting.no (01.12.2017)
- */
 public class NetexEntityIndexTest {
 
   private static final String ID = "ID:A";

@@ -11,6 +11,7 @@ import java.util.Set;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToFormFactorMapper;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -48,6 +49,8 @@ public class StateData implements Cloneable {
 
   public RentalFormFactor rentalVehicleFormFactor;
 
+  public PropulsionType rentalVehiclePropulsionType;
+
   /** This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
   protected boolean enteredNoThroughTrafficArea;
 
@@ -62,7 +65,7 @@ public class StateData implements Cloneable {
       // when cycling all the way or to a stop, you start on your own bike
       case BIKE, BIKE_TO_PARK -> TraverseMode.BICYCLE;
       // when driving (not car rental) you start in your own car or your driver's car
-      case CAR, CAR_TO_PARK, CAR_PICKUP, CAR_HAILING -> TraverseMode.CAR;
+      case CAR, CAR_TO_PARK, CAR_PICKUP, CAR_HAILING, CARPOOL -> TraverseMode.CAR;
     };
   }
 
@@ -92,7 +95,7 @@ public class StateData implements Cloneable {
     var baseCaseDatas =
       switch (request.mode()) {
         case WALK, BIKE, BIKE_TO_PARK, CAR, CAR_TO_PARK, FLEXIBLE, NOT_SET -> stateDatas;
-        case CAR_PICKUP, CAR_HAILING -> stateDatas
+        case CAR_PICKUP, CAR_HAILING, CARPOOL -> stateDatas
           .stream()
           .filter(d -> d.carPickupState == CarPickupState.IN_CAR)
           .toList();

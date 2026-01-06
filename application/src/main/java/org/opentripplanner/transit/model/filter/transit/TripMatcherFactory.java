@@ -3,12 +3,12 @@ package org.opentripplanner.transit.model.filter.transit;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.function.Function;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.filter.expr.ContainsMatcher;
 import org.opentripplanner.transit.model.filter.expr.EqualityMatcher;
 import org.opentripplanner.transit.model.filter.expr.ExpressionBuilder;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**

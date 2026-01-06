@@ -32,6 +32,7 @@ public class EgressModeMapper {
       case SCOOTER_RENTAL -> GraphQLTypes.GraphQLPlanEgressMode.SCOOTER_RENTAL;
       case WALK,
         CAR_HAILING,
+        CARPOOL,
         CAR_TO_PARK,
         BIKE_TO_PARK,
         NOT_SET -> GraphQLTypes.GraphQLPlanEgressMode.WALK;

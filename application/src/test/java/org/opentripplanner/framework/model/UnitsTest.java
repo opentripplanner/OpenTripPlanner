@@ -1,7 +1,6 @@
 package org.opentripplanner.framework.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
@@ -25,12 +24,6 @@ class UnitsTest {
       Units.normalizedFactor(0.999, 1.0, 8.0)
     );
     assertEquals("The value is not in range[1.0, 8.0]: 1.0", ex.getMessage());
-  }
-
-  @Test
-  void normalizedOptionalFactor() {
-    assertNull(Units.normalizedOptionalFactor(null, 0.0, 8.0));
-    assertEquals(1.0, Units.normalizedOptionalFactor(1.0, 0.0, 8.0));
   }
 
   @Test

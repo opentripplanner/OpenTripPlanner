@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model._data;
 
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;

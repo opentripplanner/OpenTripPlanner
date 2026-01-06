@@ -79,7 +79,7 @@
                         <!-- Combine the various ImageN/JAI configuration files into a single one.
                          Required by GeoTools for reading TIFF image during elevation data processing   -->
                         <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                            <resource>META-INF/registryFile.jai</resource>
+                            <resource>META-INF/registryFile.imagen</resource>
                         </transformer>
                     </transformers>
                 </configuration>

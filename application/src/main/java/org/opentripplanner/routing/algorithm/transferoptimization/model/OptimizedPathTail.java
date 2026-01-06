@@ -6,7 +6,7 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
+import org.opentripplanner.raptor.api.model.RaptorValueType;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.path.PathBuilder;
 import org.opentripplanner.raptor.path.PathBuilderLeg;
@@ -148,16 +148,16 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     var builder = ValueObjectToStringBuilder.of().addObj(super.toString()).addText(" [");
 
     if (generalizedCost != RaptorCostCalculator.ZERO_COST) {
-      builder.addObj(RaptorValueFormatter.formatC1(generalizedCost()));
+      builder.addObj(RaptorValueType.C1.format(generalizedCost()));
     }
     if (c2() != RaptorConstants.NOT_SET) {
-      builder.addObj(RaptorValueFormatter.formatC2(c2()));
+      builder.addObj(RaptorValueType.C2.format(c2()));
     }
     if (transferPriorityCost != TransferConstraint.ZERO_COST) {
-      builder.addObj(RaptorValueFormatter.formatTransferPriority(transferPriorityCost));
+      builder.addObj(RaptorValueType.TRANSFER_PRIORITY.format(transferPriorityCost));
     }
     if (waitTimeOptimizedCost != TransferWaitTimeCostCalculator.ZERO_COST) {
-      builder.addObj(RaptorValueFormatter.formatWaitTimeCost(generalizedCostWaitTimeOptimized()));
+      builder.addObj(RaptorValueType.WAIT_TIME_COST.format(generalizedCostWaitTimeOptimized()));
     }
     return builder.addText("]").toString();
   }

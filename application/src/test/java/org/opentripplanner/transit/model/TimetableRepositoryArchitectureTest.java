@@ -4,6 +4,7 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
 import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK;
 import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK_UTILS;
 import static org.opentripplanner.OtpArchitectureModules.GEO_UTILS;
+import static org.opentripplanner.OtpArchitectureModules.GOOGLE_COLLECTIONS;
 import static org.opentripplanner.OtpArchitectureModules.JACKSON_ANNOTATIONS;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_ADAPTER_API;
@@ -74,6 +75,7 @@ public class TimetableRepositoryArchitectureTest {
   @Test
   void enforceTimetablePackageDependencies() {
     TIMETABLE.dependsOn(
+      GOOGLE_COLLECTIONS,
       FRAMEWORK_UTILS,
       TRANSIT_FRAMEWORK,
       BASIC,

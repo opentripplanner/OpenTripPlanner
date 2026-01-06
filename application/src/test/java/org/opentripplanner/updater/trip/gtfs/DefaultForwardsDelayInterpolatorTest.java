@@ -3,8 +3,11 @@ package org.opentripplanner.updater.trip.gtfs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model.timetable.StopRealTimeState.DEFAULT;
+import static org.opentripplanner.transit.model.timetable.StopRealTimeState.NO_DATA;
 
 import java.util.List;
 import java.util.OptionalInt;
@@ -90,7 +93,7 @@ class DefaultForwardsDelayInterpolatorTest {
       // for NO_DATA stop, we assume that they run as scheduled in the internal model
       assertEquals(0, builder.getArrivalDelay(i));
       assertEquals(0, builder.getDepartureDelay(i));
-      assertEquals(StopRealTimeState.NO_DATA, builder.getStopRealTimeState(i));
+      assertEquals(NO_DATA, builder.getStopRealTimeState(i));
     }
     // we need to propagate backwards from stop 3 before building
     assertEquals(
@@ -166,15 +169,38 @@ class DefaultForwardsDelayInterpolatorTest {
       assertEquals(0, builder.getDepartureDelay(i));
     }
     for (var i = 0; i < 5; ++i) {
-      assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(i));
+      assertEquals(DEFAULT, builder.getStopRealTimeState(i));
     }
     assertEquals(StopRealTimeState.CANCELLED, builder.getStopRealTimeState(5));
     // SKIPPED stop does not propagate
-    assertEquals(StopRealTimeState.DEFAULT, builder.getStopRealTimeState(6));
+    assertEquals(DEFAULT, builder.getStopRealTimeState(6));
     for (var i = 7; i < STOP_COUNT; ++i) {
       assertEquals(StopRealTimeState.INACCURATE_PREDICTIONS, builder.getStopRealTimeState(i));
     }
     builder.build();
+  }
+
+  @Test
+  void noDataOnly() {
+    var interpolator = new DefaultForwardsDelayInterpolator();
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withNoData(0)
+      .withNoData(1)
+      .withNoData(2)
+      .withNoData(3)
+      .withNoData(4);
+
+    assertTrue(interpolator.interpolateDelay(builder));
+
+    // NO_DATA should be propagated forward
+    builder
+      .listStopPositions()
+      .forEach(i -> {
+        assertEquals(0, builder.getArrivalDelay(i));
+        assertEquals(0, builder.getDepartureDelay(i));
+        assertEquals(NO_DATA, builder.getStopRealTimeState(i));
+      });
+    assertNotNull(builder.build());
   }
 
   @Test

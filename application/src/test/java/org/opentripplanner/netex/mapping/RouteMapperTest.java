@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
@@ -75,7 +75,7 @@ class RouteMapperTest {
   @Test
   void mapRouteWithAgencySpecified() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+    TransitDataImportBuilder transitBuilder = new TransitDataImportBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP
     );
@@ -190,7 +190,7 @@ class RouteMapperTest {
   @Test
   void mapRouteWithBranding() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+    TransitDataImportBuilder transitBuilder = new TransitDataImportBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP
     );
@@ -224,7 +224,7 @@ class RouteMapperTest {
   @Test
   void mapRouteWithGroupOfRoutes() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+    TransitDataImportBuilder transitBuilder = new TransitDataImportBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP
     );

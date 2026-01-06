@@ -3,10 +3,10 @@ package org.opentripplanner.routing.algorithm.filterchain.framework.groupids;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.GroupId;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This class creates a group identifier for an itinerary based on first or last trip. Two itineraries

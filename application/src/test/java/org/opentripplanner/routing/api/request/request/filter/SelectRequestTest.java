@@ -43,7 +43,7 @@ class SelectRequestTest {
       notModesSelect(TC_BUS, TC_TRAM, TC_FERRY).toString()
     );
     assertEquals(
-      "(transportModes: [AIRPLANE, CABLE_CAR, CARPOOL, COACH, FUNICULAR, GONDOLA, MONORAIL, SUBWAY, TAXI, TROLLEYBUS])",
+      "(transportModes: [AIRPLANE, CABLE_CAR, CARPOOL, COACH, FUNICULAR, GONDOLA, MONORAIL, SNOW_AND_ICE, SUBWAY, TAXI, TROLLEYBUS])",
       notModesSelect(TC_BUS, TC_FERRY, TC_TRAM, TC_RAIL).toString()
     );
     var list = new ArrayList<>(
@@ -51,7 +51,7 @@ class SelectRequestTest {
     );
     list.add(TC_LOCAL_BUS);
     assertEquals(
-      "(transportModes: [AIRPLANE, BUS::LOCAL, CABLE_CAR, CARPOOL, COACH, FERRY, FUNICULAR, GONDOLA, MONORAIL, RAIL, SUBWAY, TAXI, TROLLEYBUS])",
+      "(transportModes: [AIRPLANE, BUS::LOCAL, CABLE_CAR, CARPOOL, COACH, FERRY, FUNICULAR, GONDOLA, MONORAIL, RAIL, SNOW_AND_ICE, SUBWAY, TAXI, TROLLEYBUS])",
       SelectRequest.of().withTransportModes(list).build().toString()
     );
   }

@@ -6,12 +6,14 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.OffsetDateTime;
+import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.transit.service.TransitService;
 
 public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehicle {
 
@@ -27,7 +29,10 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
 
   @Override
   public DataFetcher<OffsetDateTime> availableUntil() {
-    return environment -> getSource(environment).availableUntil();
+    return environment -> {
+      var timeZone = getTransitService(environment).getTimeZone();
+      return OffsetDateTime.ofInstant(getSource(environment).availableUntil(), timeZone);
+    };
   }
 
   @Override
@@ -83,5 +88,9 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
 
   private VehicleRentalVehicle getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
+  }
+
+  private TransitService getTransitService(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().transitService();
   }
 }

@@ -3,8 +3,6 @@ package org.opentripplanner.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 
@@ -18,7 +16,7 @@ import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
@@ -32,16 +30,17 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class G04_EgressWithOpeningHoursMultipleOptionsTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   @BeforeEach
   public void setup() {
-    data.withRoute(
-      route("R1", STOP_B, STOP_C).withTimetable(schedule("00:05 00:15"), schedule("00:10 00:20"))
+    data.withTimetables(
+      """
+      B      C
+      00:05  00:15
+      00:10  00:20
+      """
     );
     requestBuilder
       .searchParams()
@@ -57,7 +56,7 @@ public class G04_EgressWithOpeningHoursMultipleOptionsTest implements RaptorTest
       .searchWindow(Duration.ofMinutes(30))
       .timetable(true);
 
-    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> openInWholeSearchIntervalTestCases() {
@@ -65,13 +64,13 @@ public class G04_EgressWithOpeningHoursMultipleOptionsTest implements RaptorTest
       "Walk 2m 0:03 0:05 C₁240 ~ B 0s " +
       "~ BUS R1 0:05 0:15 10m C₁1_200 ~ C 2m " +
       "~ Walk 1m Open(0:17 0:19) 0:17 0:18 C₁240 " +
-      "[0:03 0:18 15m Tₓ0 C₁1_680]";
+      "[0:03 0:18 15m Tₙ0 C₁1_680]";
 
     var expB =
       "Walk 2m 0:08 0:10 C₁240 ~ B 0s " +
       "~ BUS R1 0:10 0:20 10m C₁1_200 ~ C 2m " +
       "~ Walk 1m Open(0:22 0:24) 0:22 0:23 C₁240 " +
-      "[0:08 0:23 15m Tₓ0 C₁1_680]";
+      "[0:08 0:23 15m Tₙ0 C₁1_680]";
 
     return RaptorModuleTestCase.of()
       .add(TC_STANDARD, withoutCost(expA, expB))

@@ -23,7 +23,8 @@
         "me.fabriciorby:maven-surefire-junit5-tree-reporter", // can be re-enabled after https://github.com/apache/maven-surefire/issues/3203
         "commons-cli:commons-cli",
         "org.processing:core",
-        "edu.ucar:netcdf4"
+        "edu.ucar:netcdf4",
+        "org.opentripplanner:ojp-java-model"
       ],
       "enabled": false
     },
@@ -82,6 +83,7 @@
         "org.apache.maven.plugins:maven-shade-plugin",
         "org.apache.maven.plugins:maven-compiler-plugin",
         "org.apache.maven.plugins:maven-jar-plugin",
+        "org.apache.maven.plugins:maven-resources-plugin",
         "org.openrewrite.maven:rewrite-maven-plugin",
         "org.openrewrite.recipe:rewrite-static-analysis",
         "org.sonatype.plugins:nexus-staging-maven-plugin",

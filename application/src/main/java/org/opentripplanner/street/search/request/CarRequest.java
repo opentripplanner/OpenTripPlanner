@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Units;
-import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -23,7 +22,6 @@ public final class CarRequest {
   public static final CarRequest DEFAULT = new CarRequest();
 
   private final double reluctance;
-  private final Cost boardCost;
   private final ParkingRequest parking;
   private final RentalRequest rental;
   private final Duration pickupTime;
@@ -34,7 +32,6 @@ public final class CarRequest {
   /** Create a new instance with default values. */
   private CarRequest() {
     this.reluctance = 2.0;
-    this.boardCost = Cost.costOfMinutes(10);
     this.parking = ParkingRequest.DEFAULT;
     this.rental = RentalRequest.DEFAULT;
     this.pickupTime = Duration.ofMinutes(1);
@@ -45,7 +42,6 @@ public final class CarRequest {
 
   private CarRequest(Builder builder) {
     this.reluctance = Units.reluctance(builder.reluctance);
-    this.boardCost = builder.boardCost;
     this.parking = builder.parking;
     this.rental = builder.rental;
     this.pickupTime = Duration.ofSeconds(Units.duration(builder.pickupTime));
@@ -64,15 +60,6 @@ public final class CarRequest {
 
   public double reluctance() {
     return reluctance;
-  }
-
-  /**
-   * Separate cost for boarding a vehicle with a car, which is different compared to on foot or with a bicycle. This
-   * is in addition to the cost of the transfer and waiting-time. It is also in addition to
-   * the {@link TransferPreferences#cost()}.
-   */
-  public int boardCost() {
-    return boardCost.toSeconds();
   }
 
   /** Parking preferences that can be different per request */
@@ -122,7 +109,6 @@ public final class CarRequest {
     CarRequest that = (CarRequest) o;
     return (
       DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
-      boardCost.equals(that.boardCost) &&
       parking.equals(that.parking) &&
       rental.equals(that.rental) &&
       Objects.equals(pickupTime, that.pickupTime) &&
@@ -136,7 +122,6 @@ public final class CarRequest {
   public int hashCode() {
     return Objects.hash(
       reluctance,
-      boardCost,
       parking,
       rental,
       pickupTime,
@@ -150,7 +135,6 @@ public final class CarRequest {
   public String toString() {
     return ToStringBuilder.of(CarRequest.class)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
-      .addObj("boardCost", boardCost, DEFAULT.boardCost)
       .addObj("parking", parking, DEFAULT.parking)
       .addObj("rental", rental, DEFAULT.rental)
       .addObj("pickupTime", pickupTime, DEFAULT.pickupTime)
@@ -165,7 +149,6 @@ public final class CarRequest {
 
     private final CarRequest original;
     private double reluctance;
-    private Cost boardCost;
     private ParkingRequest parking;
     private RentalRequest rental;
     private int pickupTime;
@@ -176,7 +159,6 @@ public final class CarRequest {
     public Builder(CarRequest original) {
       this.original = original;
       this.reluctance = original.reluctance;
-      this.boardCost = original.boardCost;
       this.parking = original.parking;
       this.rental = original.rental;
       this.pickupTime = (int) original.pickupTime.toSeconds();
@@ -187,11 +169,6 @@ public final class CarRequest {
 
     public Builder withReluctance(double reluctance) {
       this.reluctance = reluctance;
-      return this;
-    }
-
-    public Builder withBoardCost(int boardCost) {
-      this.boardCost = Cost.costOfSeconds(boardCost);
       return this;
     }
 

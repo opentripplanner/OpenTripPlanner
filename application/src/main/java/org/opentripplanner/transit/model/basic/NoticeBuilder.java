@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.basic;
 
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class NoticeBuilder extends AbstractEntityBuilder<Notice, NoticeBuilder> {
 

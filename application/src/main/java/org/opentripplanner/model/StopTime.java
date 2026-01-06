@@ -4,7 +4,7 @@ package org.opentripplanner.model;
 import static org.opentripplanner.model.PickDrop.NONE;
 
 import java.util.List;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;

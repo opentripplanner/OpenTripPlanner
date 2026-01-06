@@ -52,9 +52,9 @@ class EgressPathsTest {
   void byStopStandard() {
     var byStop = subjectStd.byStop();
     assertEquals("[Walk 1m C₁120 ~ 2]", byStop.get(STOP_A).toString());
-    assertEquals("[Flex 1m C₁120 1x ~ 3]", byStop.get(STOP_B).toString());
-    assertEquals("[Flex 1m C₁120 1x ~ 4]", byStop.get(STOP_C).toString());
-    assertEquals("[Flex 1m C₁120 2x ~ 5]", byStop.get(STOP_D).toString());
+    assertEquals("[Flex 1m C₁120 Rₙ1 ~ 3]", byStop.get(STOP_B).toString());
+    assertEquals("[Flex 1m C₁120 Rₙ1 ~ 4]", byStop.get(STOP_C).toString());
+    assertEquals("[Flex 1m C₁120 Rₙ2 ~ 5]", byStop.get(STOP_D).toString());
     assertEquals(
       "[Walk 2m C₁240 ~ 6, Walk 1m C₁120 Open(10:00 11:45) ~ 6, Walk 1m C₁120 Open(11:30 12:30) ~ 6]",
       byStop.get(STOP_E).toString()
@@ -73,9 +73,9 @@ class EgressPathsTest {
   void listAll() {
     assertEquals(
       """
-      Flex 1m C₁120 1x ~ 3
-      Flex 1m C₁120 1x ~ 4
-      Flex 1m C₁120 2x ~ 5
+      Flex 1m C₁120 Rₙ1 ~ 3
+      Flex 1m C₁120 Rₙ1 ~ 4
+      Flex 1m C₁120 Rₙ2 ~ 5
       Walk 1m C₁120 Open(10:00 11:45) ~ 6
       Walk 1m C₁120 Open(11:30 12:30) ~ 6
       Walk 1m C₁120 ~ 2
@@ -86,9 +86,9 @@ class EgressPathsTest {
 
     assertEquals(
       """
-      Flex 1m C₁120 1x ~ 3
-      Flex 1m C₁120 1x ~ 4
-      Flex 1m C₁120 2x ~ 5
+      Flex 1m C₁120 Rₙ1 ~ 3
+      Flex 1m C₁120 Rₙ1 ~ 4
+      Flex 1m C₁120 Rₙ2 ~ 5
       Walk 1m C₁120 Open(10:00 11:45) ~ 6
       Walk 1m C₁120 Open(11:30 12:30) ~ 6
       Walk 1m C₁120 ~ 2

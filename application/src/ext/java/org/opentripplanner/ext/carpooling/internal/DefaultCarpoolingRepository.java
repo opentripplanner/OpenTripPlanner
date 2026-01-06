@@ -3,9 +3,9 @@ package org.opentripplanner.ext.carpooling.internal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +24,9 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   public void upsertCarpoolTrip(CarpoolTrip trip) {
     CarpoolTrip existingTrip = trips.put(trip.getId(), trip);
     if (existingTrip != null) {
-      LOG.info("Updated carpool trip {} with {} stops", trip.getId(), trip.stops().size());
+      LOG.debug("Updated carpool trip {} with {} stops", trip.getId(), trip.stops().size());
     } else {
-      LOG.info("Added new carpool trip {} with {} stops", trip.getId(), trip.stops().size());
+      LOG.debug("Added new carpool trip {} with {} stops", trip.getId(), trip.stops().size());
     }
   }
 }

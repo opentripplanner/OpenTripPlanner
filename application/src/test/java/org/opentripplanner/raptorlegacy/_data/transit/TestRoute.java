@@ -9,7 +9,6 @@ import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -47,7 +46,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
   }
 
   @Override
-  public DefaultTripPattern pattern() {
+  public TestTripPattern pattern() {
     return pattern;
   }
 

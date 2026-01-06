@@ -2,10 +2,10 @@ package org.opentripplanner.street.model.vertex;
 
 import java.util.Set;
 import org.locationtech.jts.geom.Point;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TransitStopVertexBuilder {
 

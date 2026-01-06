@@ -6,6 +6,7 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -13,7 +14,6 @@ import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class VertexLinkerTest {
 

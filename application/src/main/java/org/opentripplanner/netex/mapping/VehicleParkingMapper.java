@@ -6,7 +6,7 @@ import static org.rutebanken.netex.model.ParkingVehicleEnumeration.PEDAL_CYCLE;
 
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;

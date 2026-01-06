@@ -38,7 +38,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
-import org.opentripplanner.street.model.vertex.ElevatorVertex;
+import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.ExitVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
@@ -795,7 +795,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       if (
         drawStreetVertices &&
         ((v instanceof IntersectionVertex && ((IntersectionVertex) v).hasCyclingTrafficLight()) ||
-          (v instanceof ElevatorVertex ||
+          (v instanceof ElevatorHopVertex ||
             v instanceof ExitVertex ||
             v instanceof TemporaryVertex ||
             v instanceof SplitterVertex ||
