@@ -27,7 +27,7 @@ public enum OsmTagMapperSource {
       case ATLANTA -> new AtlantaMapper();
       case HOUSTON -> new HoustonMapper();
       case PORTLAND -> new PortlandMapper();
-      case CONSTANT_SPEED_FINLAND -> new ConstantSpeedFinlandMapper();
+      case CONSTANT_SPEED_FINLAND -> new ConstantSpeedMapper();
     };
   }
 }

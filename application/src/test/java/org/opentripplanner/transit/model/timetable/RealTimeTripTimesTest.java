@@ -13,13 +13,13 @@ import java.util.LinkedList;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 class RealTimeTripTimesTest {
@@ -363,6 +363,13 @@ class RealTimeTripTimesTest {
     assertFalse(updatedTripTimesA.isRealTimeUpdated(1));
   }
 
+  @Test
+  public void stopPositions() {
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
+    var list = builder.listStopPositions().boxed().toList();
+    assertEquals(List.of(0, 1, 2, 3, 4, 5, 6, 7), list);
+  }
+
   @Nested
   class GtfsStopSequence {
 
@@ -374,14 +381,14 @@ class RealTimeTripTimesTest {
 
     @Test
     void stopIndexOfGtfsSequence() {
-      var stopIndex = createInitialTripTimes().stopIndexOfGtfsSequence(40);
+      var stopIndex = createInitialTripTimes().stopPositionForGtfsSequence(40);
       assertTrue(stopIndex.isPresent());
       assertEquals(4, stopIndex.getAsInt());
     }
 
     @Test
     void unknownGtfsSequence() {
-      var stopIndex = createInitialTripTimes().stopIndexOfGtfsSequence(4);
+      var stopIndex = createInitialTripTimes().stopPositionForGtfsSequence(4);
       assertTrue(stopIndex.isEmpty());
     }
   }

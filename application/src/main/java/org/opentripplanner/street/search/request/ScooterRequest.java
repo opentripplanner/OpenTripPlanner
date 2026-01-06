@@ -8,7 +8,6 @@ import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Units;
-import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -167,7 +166,7 @@ public final class ScooterRequest {
     public Builder withForcedOptimizeTriangle(Consumer<TimeSlopeSafetyTriangle.Builder> body) {
       var builder = TimeSlopeSafetyTriangle.of();
       body.accept(builder);
-      this.optimizeTriangle = builder.buildOrDefault(this.optimizeTriangle);
+      this.optimizeTriangle = builder.build();
       if (!builder.isEmpty()) {
         this.optimizeType = TRIANGLE;
       }
@@ -177,7 +176,7 @@ public final class ScooterRequest {
     public Builder withOptimizeTriangle(Consumer<TimeSlopeSafetyTriangle.Builder> body) {
       var builder = TimeSlopeSafetyTriangle.of();
       body.accept(builder);
-      this.optimizeTriangle = builder.buildOrDefault(this.optimizeTriangle);
+      this.optimizeTriangle = builder.build();
       return this;
     }
 

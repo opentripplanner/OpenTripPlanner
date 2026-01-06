@@ -54,6 +54,7 @@ public class DirectFlexRouter {
     var flexRouter = new FlexRouter(
       serverContext.graph(),
       serverContext.transitService(),
+      serverContext.streetDetailsService(),
       serverContext.flexParameters(),
       FilterMapper.map(request.journey().transit().filters()),
       request.dateTime(),
@@ -64,6 +65,6 @@ public class DirectFlexRouter {
       egressStops
     );
 
-    return new ArrayList<>(flexRouter.createFlexOnlyItineraries(request.arriveBy()));
+    return new ArrayList<>(flexRouter.createFlexOnlyItineraries(request.arriveBy(), request));
   }
 }

@@ -8,12 +8,12 @@ import static org.opentripplanner.ext.empiricaldelay.internal.csvinput.Empirical
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.DataSourceTestFactory;
 import org.opentripplanner.datastore.api.ListCompositeDataSource;
 import org.opentripplanner.ext.empiricaldelay.internal.model.DelayAtStopDto;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class EmpiricalDelayCsvDataReaderTest {
 

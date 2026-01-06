@@ -39,8 +39,5 @@ public class TransitPreferencesMapper {
         RelaxCostType.mapToDomain((Map<String, Object>) it, CostLinearFunction.NORMAL)
       )
     );
-    callWith.argument("relaxTransitSearchGeneralizedCostAtDestination", (Double value) ->
-      transit.withRaptor(it -> it.withRelaxGeneralizedCostAtDestination(value))
-    );
   }
 }

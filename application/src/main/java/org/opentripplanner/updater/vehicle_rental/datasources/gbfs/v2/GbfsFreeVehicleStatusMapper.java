@@ -2,13 +2,14 @@ package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import static java.util.Objects.requireNonNullElse;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSRentalUris;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
@@ -16,7 +17,6 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Ratio;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
@@ -89,7 +89,7 @@ class GbfsFreeVehicleStatusMapper {
 
       String availableUntil = vehicle.getAvailableUntil();
       if (StringUtils.hasValue(availableUntil)) {
-        builder.withAvailableUntil(OffsetDateTime.parse(availableUntil));
+        builder.withAvailableUntil(Instant.parse(availableUntil));
       }
 
       GBFSRentalUris rentalUris = vehicle.getRentalUris();

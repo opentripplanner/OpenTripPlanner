@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParametersTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -45,7 +45,7 @@ class RaptorTransitDataMapperTest {
   public void createStopBoardAlightTransferCosts() {
     int[] result = RaptorTransitDataMapper.createStopBoardAlightTransferCosts(
       new SiteRepositoryMock(STOPS),
-      TransitTuningParameters.FOR_TEST
+      TransitTuningParametersTestFactory.forTest()
     );
 
     assertEquals("[6000, 360000, 6000, 2000, 0]", Arrays.toString(result));

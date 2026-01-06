@@ -5,8 +5,8 @@ import static org.opentripplanner.routing.linking.VertexLinker.getNoThruModes;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
@@ -69,7 +69,7 @@ public class BarrierEdgeBuilder {
                 GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()))
               )
               .withName(
-                name == null ? I18NString.of("barrier crossing at node " + vs[i].nodeId) : name
+                name == null ? I18NString.of("barrier crossing at node " + vs[i].nodeId()) : name
               )
               .withPermission(permission)
               .withWheelchairAccessible(wheelchairAccessible)

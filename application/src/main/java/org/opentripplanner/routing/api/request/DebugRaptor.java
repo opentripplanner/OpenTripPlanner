@@ -46,14 +46,14 @@ public class DebugRaptor implements Serializable {
   );
   private static final DebugRaptor DEFAULT = new DebugRaptor();
 
-  private final List<Integer> stops;
-  private final List<Integer> path;
+  private final List<String> stops;
+  private final List<String> path;
   private final int debugPathFromStopIndex;
   private final Set<DebugEventType> eventTypes;
 
   DebugRaptor(
-    List<Integer> stops,
-    List<Integer> path,
+    List<String> stops,
+    List<String> path,
     int debugPathFromStopIndex,
     Set<DebugEventType> eventTypes
   ) {
@@ -83,11 +83,11 @@ public class DebugRaptor implements Serializable {
     return !stops.isEmpty() || !path.isEmpty();
   }
 
-  public List<Integer> stops() {
+  public List<String> stops() {
     return stops;
   }
 
-  public List<Integer> path() {
+  public List<String> path() {
     return path;
   }
 
@@ -127,7 +127,7 @@ public class DebugRaptor implements Serializable {
       .toString();
   }
 
-  private static String stopsToString(List<Integer> stops, int fromStopIndex) {
+  private static String stopsToString(List<String> stops, int fromStopIndex) {
     if (stops == null || stops.isEmpty()) {
       return null;
     }

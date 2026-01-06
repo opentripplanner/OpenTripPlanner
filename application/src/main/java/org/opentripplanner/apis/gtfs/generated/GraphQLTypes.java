@@ -624,11 +624,13 @@ public class GraphQLTypes {
 
     private List<String> allowedNetworks;
     private List<String> bannedNetworks;
+    private java.time.Duration rentalDuration;
 
     public GraphQLCarRentalPreferencesInput(Map<String, Object> args) {
       if (args != null) {
         this.allowedNetworks = (List<String>) args.get("allowedNetworks");
         this.bannedNetworks = (List<String>) args.get("bannedNetworks");
+        this.rentalDuration = (java.time.Duration) args.get("rentalDuration");
       }
     }
 
@@ -640,12 +642,20 @@ public class GraphQLTypes {
       return this.bannedNetworks;
     }
 
+    public java.time.Duration getGraphQLRentalDuration() {
+      return this.rentalDuration;
+    }
+
     public void setGraphQLAllowedNetworks(List<String> allowedNetworks) {
       this.allowedNetworks = allowedNetworks;
     }
 
     public void setGraphQLBannedNetworks(List<String> bannedNetworks) {
       this.bannedNetworks = bannedNetworks;
+    }
+
+    public void setGraphQLRentalDuration(java.time.Duration rentalDuration) {
+      this.rentalDuration = rentalDuration;
     }
   }
 
@@ -5262,6 +5272,7 @@ public class GraphQLTypes {
     GONDOLA,
     MONORAIL,
     RAIL,
+    SNOW_AND_ICE,
     SUBWAY,
     TAXI,
     TRAM,
@@ -5691,6 +5702,19 @@ public class GraphQLTypes {
     NORMAL,
     PARKANDRIDE,
     TRANSIT,
+  }
+
+  /** The vertical direction e.g. for a set of stairs. */
+  public enum GraphQLVerticalDirection {
+    DOWN,
+    UNKNOWN,
+    UP,
+  }
+
+  /** Categorization for via locations. */
+  public enum GraphQLViaLocationType {
+    PASS_THROUGH,
+    VISIT,
   }
 
   public static class GraphQLWalkPreferencesInput {

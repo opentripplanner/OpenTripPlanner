@@ -16,6 +16,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
@@ -33,7 +34,6 @@ import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class RouteRequestTest {
 

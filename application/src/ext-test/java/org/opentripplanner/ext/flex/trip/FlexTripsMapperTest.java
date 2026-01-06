@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.service.SiteRepository;
 
 class FlexTripsMapperTest {
 
   @Test
   void defaultTimePenalty() {
-    var builder = new OtpTransitServiceBuilder(SiteRepository.of().build(), NOOP);
+    var builder = new TransitDataImportBuilder(SiteRepository.of().build(), NOOP);
     builder
       .getStopTimesSortedByTrip()
       .addAll(List.of(area("10:00", "18:00"), area("10:00", "18:00")));
@@ -34,7 +34,7 @@ class FlexTripsMapperTest {
   @Test
   void tooFewStopTimes() {
     var issueStore = new DefaultDataImportIssueStore();
-    var builder = new OtpTransitServiceBuilder(SiteRepository.of().build(), issueStore);
+    var builder = new TransitDataImportBuilder(SiteRepository.of().build(), issueStore);
     builder.getStopTimesSortedByTrip().addAll(List.of(area("10:00", "18:00")));
     var trips = FlexTripsMapper.createFlexTrips(builder, issueStore);
     assertEquals(0, trips.size());

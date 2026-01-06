@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class StopTimeKeyBuilder extends AbstractEntityBuilder<StopTimeKey, StopTimeKeyBuilder> {
 

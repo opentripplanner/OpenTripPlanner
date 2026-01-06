@@ -38,10 +38,6 @@ public final class FeedInfo implements Serializable {
     this.version = version;
   }
 
-  public static FeedInfo dummyForTest(String id) {
-    return new FeedInfo(id, "publisher", "www.z.org", "en", null, null, null);
-  }
-
   public String getPublisherName() {
     return publisherName;
   }

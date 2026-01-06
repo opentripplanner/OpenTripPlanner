@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
-import org.opentripplanner.framework.i18n.TranslatedString;
+import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;

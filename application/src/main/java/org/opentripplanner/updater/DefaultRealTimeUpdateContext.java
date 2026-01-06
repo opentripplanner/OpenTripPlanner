@@ -1,7 +1,7 @@
 package org.opentripplanner.updater;
 
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;

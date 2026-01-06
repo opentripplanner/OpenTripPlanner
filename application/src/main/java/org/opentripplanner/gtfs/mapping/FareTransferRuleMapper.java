@@ -5,10 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.ext.fares.model.TimeLimitType;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class FareTransferRuleMapper {
 

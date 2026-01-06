@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.utils.collection.MapUtils;

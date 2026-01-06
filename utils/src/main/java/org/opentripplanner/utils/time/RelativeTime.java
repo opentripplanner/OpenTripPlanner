@@ -76,10 +76,21 @@ class RelativeTime {
     return appendDays(timeStrCompact());
   }
 
+  /** Format string on format HH:MM[:SS] */
+  String toTimetableStr() {
+    return appendDays(timeStrTimetable());
+  }
+
   private String timeStrCompact() {
     return time.getSecond() == 0
       ? String.format("%d:%02d", time.getHour(), time.getMinute())
       : String.format("%d:%02d:%02d", time.getHour(), time.getMinute(), time.getSecond());
+  }
+
+  private String timeStrTimetable() {
+    return time.getSecond() == 0
+      ? String.format("%02d:%02d", time.getHour(), time.getMinute())
+      : timeStrLong();
   }
 
   private String timeStrLong() {

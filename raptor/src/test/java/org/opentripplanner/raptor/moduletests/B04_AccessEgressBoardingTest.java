@@ -1,8 +1,6 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -12,11 +10,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
@@ -38,51 +35,52 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
 
   /** Board R1 at first possible stop A (not B) and arrive at stop E (the earliest arrival time) */
   private static final String EXP_PATH_BEST_ARRIVAL_TIME =
-    "Walk 1s ~ A ~ BUS R1 0:10 0:34 ~ E ~ Walk 10s [0:09:59 0:34:10 24m11s Tₓ0]";
+    "Walk 1s ~ A ~ BUS R1 0:10 0:34 ~ E ~ Walk 10s [0:09:59 0:34:10 24m11s Tₙ0]";
 
   /**
    * Searching in REVERSE we will "board" R1 at the first possible stop F and "alight" at the
    * optimal stop B (the best "arrival-time").
    */
   private static final String EXP_PATH_BEST_ARRIVAL_TIME_REVERSE =
-    "Walk 10s ~ B ~ BUS R1 0:14 0:38 ~ F ~ Walk 1s [0:13:50 0:38:01 24m11s Tₓ0]";
+    "Walk 10s ~ B ~ BUS R1 0:14 0:38 ~ F ~ Walk 1s [0:13:50 0:38:01 24m11s Tₙ0]";
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   @BeforeEach
   void setup() {
-    data.withRoute(
-      route("R1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F).withTimetable(
-        schedule("0:10 0:14 0:18 0:30 0:34 0:38")
+    data
+      .access(
+        "Walk 1s ~ A",
+        // Best option
+        "Walk 10s ~ B",
+        "Walk 5m ~ C"
       )
-    );
+      .withTimetables(
+        """
+        A     B     C     D     E     F
+        0:10  0:14  0:18  0:30  0:34  0:38
+        """
+      )
+      .egress(
+        "D ~ Walk 5m",
+        // Best option
+        "E ~ Walk 10s",
+        "F ~ Walk 1s"
+      );
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(
-        TestAccessEgress.walk(STOP_A, D1s),
-        TestAccessEgress.walk(STOP_B, D10s), // Best option
-        TestAccessEgress.walk(STOP_C, D5m)
-      )
-      .addEgressPaths(
-        TestAccessEgress.walk(STOP_D, D5m),
-        TestAccessEgress.walk(STOP_E, D10s), // Best option
-        TestAccessEgress.walk(STOP_F, D1s)
-      )
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchOneIterationOnly();
-    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {
     var expected =
-      "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s Tₓ0 C₁1_840]";
+      "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s Tₙ0 C₁1_840]";
 
     return RaptorModuleTestCase.of()
       .addMinDuration("20m20s", TX_0, T00_00, T01_00)

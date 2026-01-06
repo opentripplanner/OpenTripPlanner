@@ -21,6 +21,8 @@ import org.apache.lucene.codecs.PostingsFormat;
 import org.apache.lucene.codecs.lucene103.Lucene103Codec;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.LatLonDocValuesField;
+import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
@@ -31,19 +33,22 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.PrefixQuery;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.suggest.document.Completion101PostingsFormat;
 import org.apache.lucene.search.suggest.document.CompletionAnalyzer;
-import org.apache.lucene.search.suggest.document.ContextQuery;
 import org.apache.lucene.search.suggest.document.ContextSuggestField;
-import org.apache.lucene.search.suggest.document.FuzzyCompletionQuery;
 import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -52,6 +57,8 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.collection.ListUtils;
 
 public class LuceneIndex implements Serializable {
+
+  private static final int MAX_RESULTS = 25;
 
   private static final String TYPE = "type";
   private static final String ID = "id";
@@ -62,8 +69,8 @@ public class LuceneIndex implements Serializable {
   private static final String CODE = "code";
   private static final String LAT = "latitude";
   private static final String LON = "longitude";
+  private static final String LOCATION = "location";
 
-  private final TransitService transitService;
   private final Analyzer analyzer;
   private final SuggestIndexSearcher searcher;
   private final StopClusterMapper stopClusterMapper;
@@ -87,7 +94,6 @@ public class LuceneIndex implements Serializable {
     TransitService transitService,
     @Nullable StopConsolidationService stopConsolidationService
   ) {
-    this.transitService = transitService;
     this.stopClusterMapper = new StopClusterMapper(transitService, stopConsolidationService);
 
     this.analyzer = new PerFieldAnalyzerWrapper(
@@ -164,18 +170,6 @@ public class LuceneIndex implements Serializable {
     }
   }
 
-  public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
-    return matchingDocuments(StopLocation.class, query, autocomplete).map(document ->
-      transitService.getStopLocation(FeedScopedId.parse(document.get(ID)))
-    );
-  }
-
-  public Stream<StopLocationsGroup> queryStopLocationGroups(String query, boolean autocomplete) {
-    return matchingDocuments(StopLocationsGroup.class, query, autocomplete).map(document ->
-      transitService.getStopLocationsGroup(FeedScopedId.parse(document.get(ID)))
-    );
-  }
-
   /**
    * Return all "stop clusters" for a given query.
    * <p>
@@ -185,8 +179,8 @@ public class LuceneIndex implements Serializable {
    *  - If two stops have the same name *and* are less than 10 meters from each other, only
    *    one of those is chosen at random and returned.
    */
-  public Stream<StopCluster> queryStopClusters(String query) {
-    return matchingDocuments(StopCluster.class, query, false).map(this::toStopCluster);
+  public Stream<StopCluster> queryStopClusters(String query, @Nullable WgsCoordinate focusPoint) {
+    return findDocuments(query, focusPoint).map(this::toStopCluster);
   }
 
   private StopCluster toStopCluster(Document document) {
@@ -241,6 +235,9 @@ public class LuceneIndex implements Serializable {
       document.add(new TextField(NAME_NGRAM, Objects.toString(name), Store.YES));
       document.add(new ContextSuggestField(SUGGEST, Objects.toString(name), 1, typeName));
     }
+
+    document.add(new LatLonPoint(LOCATION, latitude, longitude));
+    document.add(new LatLonDocValuesField(LOCATION, latitude, longitude));
     document.add(new StoredField(LAT, latitude));
     document.add(new StoredField(LON, longitude));
 
@@ -256,82 +253,71 @@ public class LuceneIndex implements Serializable {
     }
   }
 
-  private Stream<Document> matchingDocuments(
-    Class<?> type,
-    String searchTerms,
-    boolean autocomplete
-  ) {
+  private Stream<Document> findDocuments(String searchTerms, @Nullable WgsCoordinate focusPoint) {
     searchTerms = searchTerms.strip();
     try {
-      if (autocomplete) {
-        var completionQuery = new FuzzyCompletionQuery(
-          analyzer,
-          new Term(SUGGEST, analyzer.normalize(SUGGEST, searchTerms)),
-          null,
-          2,
-          true,
-          4,
-          3,
-          true,
-          3
+      var nameParser = new QueryParser(NAME_NGRAM, analyzer);
+      var nameQuery = nameParser.parse(searchTerms);
+
+      var ngramNameQuery = new TermQuery(
+        new Term(NAME_NGRAM, analyzer.normalize(NAME_NGRAM, searchTerms))
+      );
+
+      var fuzzyNameQuery = new FuzzyQuery(new Term(NAME, analyzer.normalize(NAME, searchTerms)));
+      var prefixNameQuery = new PrefixQuery(new Term(NAME, analyzer.normalize(NAME, searchTerms)));
+      var codeQuery = new TermQuery(new Term(CODE, analyzer.normalize(CODE, searchTerms)));
+
+      var prefixCodeQuery = new PrefixQuery(new Term(CODE, analyzer.normalize(CODE, searchTerms)));
+
+      var typeQuery = new TermQuery(
+        new Term(TYPE, analyzer.normalize(TYPE, StopCluster.class.getSimpleName()))
+      );
+
+      var boostedCodeQuery = new BoostQuery(codeQuery, 100.0f);
+
+      var builder = new BooleanQuery.Builder()
+        .setMinimumNumberShouldMatch(1)
+        .add(typeQuery, Occur.MUST)
+        .add(boostedCodeQuery, Occur.SHOULD)
+        .add(prefixCodeQuery, Occur.SHOULD)
+        .add(nameQuery, Occur.SHOULD)
+        .add(fuzzyNameQuery, Occur.SHOULD)
+        .add(prefixNameQuery, Occur.SHOULD)
+        .add(ngramNameQuery, Occur.SHOULD);
+      if (focusPoint != null) {
+        var distanceBoost = LatLonPoint.newDistanceFeatureQuery(
+          LOCATION,
+          10.0f, // boost score
+          focusPoint.latitude(),
+          focusPoint.longitude(),
+          100000.0 // pivot distance in meters
         );
-        var query = new ContextQuery(completionQuery);
-
-        query.addContext(type.getSimpleName());
-
-        var topDocs = searcher.suggest(query, 25, true);
-
-        return Arrays.stream(topDocs.scoreDocs).map(scoreDoc -> {
-          try {
-            return searcher.storedFields().document(scoreDoc.doc);
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-        });
-      } else {
-        var nameParser = new QueryParser(NAME_NGRAM, analyzer);
-        var nameQuery = nameParser.parse(searchTerms);
-
-        var ngramNameQuery = new TermQuery(
-          new Term(NAME_NGRAM, analyzer.normalize(NAME_NGRAM, searchTerms))
-        );
-
-        var fuzzyNameQuery = new FuzzyQuery(new Term(NAME, analyzer.normalize(NAME, searchTerms)));
-        var prefixNameQuery = new PrefixQuery(
-          new Term(NAME, analyzer.normalize(NAME, searchTerms))
-        );
-        var codeQuery = new TermQuery(new Term(CODE, analyzer.normalize(CODE, searchTerms)));
-
-        var prefixCodeQuery = new PrefixQuery(
-          new Term(CODE, analyzer.normalize(CODE, searchTerms))
-        );
-
-        var typeQuery = new TermQuery(
-          new Term(TYPE, analyzer.normalize(TYPE, type.getSimpleName()))
-        );
-
-        var builder = new BooleanQuery.Builder()
-          .setMinimumNumberShouldMatch(1)
-          .add(typeQuery, Occur.MUST)
-          .add(codeQuery, Occur.SHOULD)
-          .add(prefixCodeQuery, Occur.SHOULD)
-          .add(nameQuery, Occur.SHOULD)
-          .add(fuzzyNameQuery, Occur.SHOULD)
-          .add(prefixNameQuery, Occur.SHOULD)
-          .add(ngramNameQuery, Occur.SHOULD);
-
-        var query = builder.build();
-
-        var topDocs = searcher.search(query, 25);
-
-        return Arrays.stream(topDocs.scoreDocs).map(scoreDoc -> {
-          try {
-            return searcher.storedFields().document(scoreDoc.doc);
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-        });
+        builder.add(distanceBoost, Occur.SHOULD);
       }
+      var query = builder.build();
+
+      TopDocs topDocs;
+      if (focusPoint != null) {
+        Sort sort = new Sort(
+          new SortField("_score", SortField.Type.SCORE),
+          LatLonDocValuesField.newDistanceSort(
+            LOCATION,
+            focusPoint.latitude(),
+            focusPoint.longitude()
+          )
+        );
+        topDocs = searcher.search(query, MAX_RESULTS, sort);
+      } else {
+        topDocs = searcher.search(query, MAX_RESULTS);
+      }
+
+      return Arrays.stream(topDocs.scoreDocs).map(scoreDoc -> {
+        try {
+          return searcher.storedFields().document(scoreDoc.doc);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      });
     } catch (IOException | ParseException ex) {
       throw new RuntimeException(ex);
     }

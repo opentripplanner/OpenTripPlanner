@@ -6,7 +6,6 @@ import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.N
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1_AND_C2;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1_RELAXED_IF_C2_IS_OPTIMAL;
-import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1_RELAX_DESTINATION;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_ARRIVAL_TIME;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_DEPARTURE_TIME;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_TIMETABLE;
@@ -52,19 +51,16 @@ public class PathParetoSetComparatorsTest {
       Arguments.of(USE_ARRIVAL_TIME, USE_C1_AND_C2, NO_RELAX_FN, DOMINANCE_FN),
       // TODO: This is failing, error in implementation
       Arguments.of(USE_ARRIVAL_TIME, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN),
-      Arguments.of(USE_ARRIVAL_TIME, USE_C1_RELAX_DESTINATION, RELAX_FN, NO_COMP),
       // Departure time
       Arguments.of(USE_DEPARTURE_TIME, NONE, NO_RELAX_FN, NO_COMP),
       Arguments.of(USE_DEPARTURE_TIME, USE_C1_AND_C2, NO_RELAX_FN, DOMINANCE_FN),
       // TODO: This is failing, error in implementation
       Arguments.of(USE_DEPARTURE_TIME, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN),
-      Arguments.of(USE_DEPARTURE_TIME, USE_C1_RELAX_DESTINATION, RELAX_FN, NO_COMP),
       // Timetable
       Arguments.of(USE_TIMETABLE, NONE, NO_RELAX_FN, NO_COMP),
       Arguments.of(USE_TIMETABLE, USE_C1_AND_C2, NO_RELAX_FN, DOMINANCE_FN),
       // TODO: This is failing, error in implementation
-      Arguments.of(USE_TIMETABLE, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN),
-      Arguments.of(USE_TIMETABLE, USE_C1_RELAX_DESTINATION, RELAX_FN, NO_COMP)
+      Arguments.of(USE_TIMETABLE, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN)
     );
   }
 
@@ -101,9 +97,6 @@ public class PathParetoSetComparatorsTest {
         break;
       case USE_C1_RELAXED_IF_C2_IS_OPTIMAL:
         verifyRelaxedC1IfC2Optimal(comparator);
-        break;
-      case USE_C1_RELAX_DESTINATION:
-        verifyRelaxedC1Comparator(comparator);
         break;
       case NONE:
       default:
@@ -194,26 +187,6 @@ public class PathParetoSetComparatorsTest {
   }
 
   /**
-   * Verify that lower duration always wins
-   */
-  private void verifyDurationComparator(
-    ParetoComparator<RaptorPath<RaptorTripSchedule>> comparator
-  ) {
-    assertTrue(
-      comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, NORMAL, ANY, ANY, ANY),
-        new TestRaptorPath(ANY, ANY, ANY, LARGE, ANY, ANY, ANY)
-      )
-    );
-    assertFalse(
-      comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, NORMAL, ANY, ANY, ANY),
-        new TestRaptorPath(ANY, ANY, ANY, SMALL, ANY, ANY, ANY)
-      )
-    );
-  }
-
-  /**
    * Verify that lower c1 always wins
    */
   private void verifyC1Comparator(ParetoComparator<RaptorPath<RaptorTripSchedule>> comparator) {
@@ -227,26 +200,6 @@ public class PathParetoSetComparatorsTest {
       comparator.leftDominanceExist(
         new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, ANY),
         new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, SMALL, ANY)
-      )
-    );
-  }
-
-  /**
-   * Verify that relax function is used in a comparator. This method operates on assumption that ratio is 1.5 and slack is 0
-   */
-  private void verifyRelaxedC1Comparator(
-    ParetoComparator<RaptorPath<RaptorTripSchedule>> comparator
-  ) {
-    assertTrue(
-      comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, RELAXED, ANY),
-        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, ANY)
-      )
-    );
-    assertFalse(
-      comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, LARGE, ANY),
-        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, ANY)
       )
     );
   }

@@ -1,11 +1,7 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
-import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
@@ -21,7 +17,7 @@ import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
@@ -35,17 +31,23 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   @BeforeEach
   public void setup() {
     data
-      .withRoute(route(pattern("R1", STOP_A, STOP_B)).withTimetable(schedule().times("0:05 0:08")))
-      .withRoute(route(pattern("R2", STOP_B, STOP_C)).withTimetable(schedule().times("0:12 0:15")))
+      .access("Walk 1m ~ A")
+      .withTimetables(
+        """
+        A     B
+        0:05  0:08
+        --
+        B     C
+        0:12  0:15
+        """
+      )
+      .egress("C ~ Walk 1m")
       // We add a transfer here which arrive at C before R2, but it should not be used.
       .withTransfer(STOP_B, transfer(STOP_C, D1m));
 
@@ -55,12 +57,7 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D10m);
 
-    requestBuilder
-      .searchParams()
-      .addAccessPaths(walk(STOP_A, D1m))
-      .addEgressPaths(walk(STOP_C, D1m));
-
-    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {
@@ -69,7 +66,7 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       "BUS R1 0:05 0:08 ~ B ~ " +
       "BUS R2 0:12 0:15 ~ C ~ " +
       "Walk 1m " +
-      "[0:04 0:16 12m Tₓ1 C₁2_040]";
+      "[0:04 0:16 12m Tₙ1 C₁2_040]";
 
     return RaptorModuleTestCase.of()
       // Zero transfers is wrong, it is caused by the egress stop(C) being reached by transfer
@@ -81,8 +78,8 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       // stops (at least egress stops) or we can compute paths during the search. The last
       // solution is probably the one which give the best performance, but the first will make
       // mc-raptor perform better (tighter heuristics).
-      .add(TC_MIN_DURATION, "[0:00 0:09 9m Tₓ0]")
-      .add(TC_MIN_DURATION_REV, "[0:21 0:30 9m Tₓ1]")
+      .add(TC_MIN_DURATION, "[0:00 0:09 9m Tₙ0]")
+      .add(TC_MIN_DURATION_REV, "[0:21 0:30 9m Tₙ1]")
       .add(standard(), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)
       .build();

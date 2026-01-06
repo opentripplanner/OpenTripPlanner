@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.service.SiteRepository;
 

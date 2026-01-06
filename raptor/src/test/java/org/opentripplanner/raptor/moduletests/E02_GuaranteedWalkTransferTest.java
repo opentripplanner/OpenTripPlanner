@@ -1,8 +1,6 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -13,12 +11,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.api.PathUtils;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
@@ -34,11 +31,8 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   /**
    * Schedule
@@ -53,13 +47,22 @@ public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
    */
   @BeforeEach
   public void setup() {
-    var r1 = route("R1", STOP_A, STOP_B).withTimetable(schedule("0:02 0:05"));
-    var r2 = route("R2", STOP_C, STOP_D).withTimetable(schedule("0:05 0:10"));
+    data
+      .access("Walk 30s ~ A")
+      .withTimetables(
+        """
+        A     B
+        0:02  0:05
+        --
+        C     D
+        0:05  0:10
+        """
+      )
+      .egress("D ~ Walk 30s");
 
-    var tripA = r1.timetable().getTripSchedule(0);
-    var tripB = r2.timetable().getTripSchedule(0);
+    var tripA = data.getRoute(0).getTripSchedule(0);
+    var tripB = data.getRoute(1).getTripSchedule(0);
 
-    data.withRoutes(r1, r2);
     data.withGuaranteedTransfer(tripA, STOP_B, tripB, STOP_C);
     data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, 30));
     data.withTransferCost(100);
@@ -68,8 +71,6 @@ public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
     requestBuilder
       .searchParams()
       .constrainedTransfers(true)
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_D, D30s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .timetable(true);
@@ -78,13 +79,13 @@ public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
     // The test scenario have zero seconds to transfer and a 30s walk leg, so any slack will do.
     data.withSlackProvider(new TestSlackProvider(D30s, D20s, D10s));
 
-    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {
     var path =
       "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ Walk 30s ~ C ~ BUS R2 0:05 0:10 ~ D ~ Walk 30s " +
-      "[0:01:10 0:10:40 9m30s Tₓ1 C₁1_260]";
+      "[0:01:10 0:10:40 9m30s Tₙ1 C₁1_260]";
     return RaptorModuleTestCase.of()
       // BUG! 10 minutes is wrong, it should be 9m30s - Raptor may drop optimal paths,
       // because of this!

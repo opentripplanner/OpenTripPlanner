@@ -4,6 +4,7 @@ import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -73,6 +74,31 @@ class RouteRequestMapperCarTest {
     var carRentalPreferences = routeRequest.preferences().car().rental();
     assertEquals(allowed, carRentalPreferences.allowedNetworks());
     assertEquals(banned, carRentalPreferences.bannedNetworks());
+  }
+
+  @Test
+  void testRentalDurationInCarRentalPreferences() {
+    var carArgs = testCtx.basicRequest();
+    Duration rentalDuration = Duration.ofHours(1);
+    carArgs.put("modes", Map.ofEntries(entry("direct", List.of("CAR_RENTAL", "WALK"))));
+    carArgs.put(
+      "preferences",
+      Map.ofEntries(
+        entry(
+          "street",
+          Map.ofEntries(
+            entry(
+              "car",
+              Map.ofEntries(entry("rental", Map.ofEntries(entry("rentalDuration", rentalDuration))))
+            )
+          )
+        )
+      )
+    );
+    var env = testCtx.executionContext(carArgs);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
+    var rentalDurationOfJourney = routeRequest.journey().direct().rentalDuration();
+    assertEquals(rentalDuration, rentalDurationOfJourney);
   }
 
   @Test

@@ -10,7 +10,6 @@ import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.util.IntIterators;
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyAlightSearch;
@@ -28,7 +27,7 @@ public class TripPatternForDates
   implements
     RaptorRoute<TripSchedule>,
     RaptorTimeTable<TripSchedule>,
-    DefaultTripPattern,
+    RaptorTripPattern,
     TripSearchTimetable<TripSchedule> {
 
   private static final int FIRST_STOP_POS_IN_PATTERN = 0;
@@ -236,7 +235,6 @@ public class TripPatternForDates
     return numberOfTripSchedules;
   }
 
-  @Override
   public Route route() {
     return tripPattern.route();
   }

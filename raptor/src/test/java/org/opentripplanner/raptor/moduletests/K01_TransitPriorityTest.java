@@ -6,9 +6,7 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_C;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T00_00;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_A;
 import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_B;
 import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_C;
@@ -24,7 +22,7 @@ import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator;
 
 /**
@@ -39,11 +37,8 @@ public class K01_TransitPriorityTest {
   private static final int C1_SLACK_90s = RaptorCostConverter.toRaptorCost(90);
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   /**
    * Each pattern departs at the same time, but arrives at different times. They may belong to
@@ -54,20 +49,25 @@ public class K01_TransitPriorityTest {
    */
   @BeforeEach
   void prepareRequest() {
-    data.withRoutes(
-      route(TestTripPattern.of("L1", STOP_B, STOP_C).priorityGroup(GROUP_A).build()).withTimetable(
-        schedule("00:02 00:12")
-      ),
-      route(TestTripPattern.of("U1", STOP_B, STOP_C).priorityGroup(GROUP_A).build()).withTimetable(
-        schedule("00:02 00:12:01")
-      ),
-      route(TestTripPattern.of("L2", STOP_B, STOP_C).priorityGroup(GROUP_B).build()).withTimetable(
-        schedule("00:02 00:13")
-      ),
-      route(TestTripPattern.of("L3", STOP_B, STOP_C).priorityGroup(GROUP_C).build()).withTimetable(
-        schedule("00:02 00:14")
+    data
+      // Add 1 second access paths
+      .access("Walk 1s ~ B")
+      .withRoutes(
+        route(
+          TestTripPattern.of("L1", STOP_B, STOP_C).priorityGroup(GROUP_A).build()
+        ).withTimetable("00:02 00:12"),
+        route(
+          TestTripPattern.of("U1", STOP_B, STOP_C).priorityGroup(GROUP_A).build()
+        ).withTimetable("00:02 00:12:01"),
+        route(
+          TestTripPattern.of("L2", STOP_B, STOP_C).priorityGroup(GROUP_B).build()
+        ).withTimetable("00:02 00:13"),
+        route(
+          TestTripPattern.of("L3", STOP_B, STOP_C).priorityGroup(GROUP_C).build()
+        ).withTimetable("00:02 00:14")
       )
-    );
+      // Add 1 second egress paths
+      .egress("C ~ Walk 1s");
 
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
@@ -88,8 +88,6 @@ public class K01_TransitPriorityTest {
         .withRelaxC1(value -> value + C1_SLACK_90s)
         .withTransitPriorityCalculator(PRIORITY_GROUP_CALCULATOR)
     );
-    // Add 1 second access/egress paths
-    requestBuilder.searchParams().addAccessPaths(walk(STOP_B, 1)).addEgressPaths(walk(STOP_C, 1));
   }
 
   @Test
@@ -97,8 +95,8 @@ public class K01_TransitPriorityTest {
     // We expect L1 & L2 but not L3, since the cost of L3 is > $90.00.
     assertEquals(
       """
-      Walk 1s ~ B ~ BUS L1 0:02 0:12 ~ C ~ Walk 1s [0:01:59 0:12:01 10m2s Tₓ0 C₁1_204 C₂1]
-      Walk 1s ~ B ~ BUS L2 0:02 0:13 ~ C ~ Walk 1s [0:01:59 0:13:01 11m2s Tₓ0 C₁1_264 C₂2]
+      Walk 1s ~ B ~ BUS L1 0:02 0:12 ~ C ~ Walk 1s [0:01:59 0:12:01 10m2s Tₙ0 C₁1_204 C₂1]
+      Walk 1s ~ B ~ BUS L2 0:02 0:13 ~ C ~ Walk 1s [0:01:59 0:13:01 11m2s Tₙ0 C₁1_264 C₂2]
       """.trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );

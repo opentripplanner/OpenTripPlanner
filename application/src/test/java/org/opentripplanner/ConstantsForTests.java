@@ -8,11 +8,12 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
@@ -24,7 +25,7 @@ import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.DefaultOsmProvider;
@@ -34,6 +35,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
@@ -48,7 +50,6 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -110,7 +111,7 @@ public class ConstantsForTests {
       dataSource,
       buildConfig.netexDefaults
     );
-    var transitService = new OtpTransitServiceBuilder(
+    var transitService = new TransitDataImportBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP
     );
@@ -128,7 +129,7 @@ public class ConstantsForTests {
       dataSource,
       buildConfig.netexDefaults
     );
-    var transitService = new OtpTransitServiceBuilder(
+    var transitService = new TransitDataImportBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP
     );
@@ -259,6 +260,7 @@ public class ConstantsForTests {
       var parkingRepository = new DefaultVehicleParkingRepository();
       var graph = new Graph();
       var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
+      var streetDetailsRepository = new DefaultStreetDetailsRepository();
       // Add street data from OSM
       {
         var osmProvider = new DefaultOsmProvider(OSLO_EAST_OSM, false);
@@ -285,6 +287,7 @@ public class ConstantsForTests {
             sources,
             timetableRepository,
             parkingRepository,
+            streetDetailsRepository,
             graph,
             deduplicator,
             DataImportIssueStore.NOOP
@@ -332,6 +335,7 @@ public class ConstantsForTests {
     var module = new GtfsModule(
       List.of(bundle),
       timetableRepository,
+      new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),
       DataImportIssueStore.NOOP,

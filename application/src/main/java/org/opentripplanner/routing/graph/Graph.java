@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -26,7 +27,6 @@ import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

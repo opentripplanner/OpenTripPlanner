@@ -1,8 +1,8 @@
 package org.opentripplanner.service.vehicleparking.model;
 
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class VehicleParkingGroupBuilder {
 

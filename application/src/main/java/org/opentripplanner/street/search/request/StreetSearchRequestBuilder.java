@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 public class StreetSearchRequestBuilder {
@@ -28,6 +27,9 @@ public class StreetSearchRequestBuilder {
   ScooterRequest scooter;
   ElevatorRequest elevator;
 
+  @Nullable
+  RentalPeriod rentalPeriod;
+
   StreetSearchRequestBuilder(StreetSearchRequest original) {
     this.startTime = original.startTime();
     this.mode = original.mode();
@@ -43,6 +45,7 @@ public class StreetSearchRequestBuilder {
     this.scooter = original.scooter();
     this.wheelchair = original.wheelchair();
     this.elevator = original.elevator();
+    this.rentalPeriod = original.rentalPeriod();
   }
 
   public StreetSearchRequestBuilder withStartTime(Instant startTime) {
@@ -70,12 +73,12 @@ public class StreetSearchRequestBuilder {
     return this;
   }
 
-  public StreetSearchRequestBuilder withFrom(GenericLocation from) {
+  public StreetSearchRequestBuilder withFrom(@Nullable Coordinate from) {
     this.fromEnvelope = createEnvelope(from);
     return this;
   }
 
-  public StreetSearchRequestBuilder withTo(GenericLocation to) {
+  public StreetSearchRequestBuilder withTo(@Nullable Coordinate to) {
     this.toEnvelope = createEnvelope(to);
     return this;
   }
@@ -122,6 +125,11 @@ public class StreetSearchRequestBuilder {
     return this;
   }
 
+  public StreetSearchRequestBuilder withRentalPeriod(RentalPeriod rentalPeriod) {
+    this.rentalPeriod = rentalPeriod;
+    return this;
+  }
+
   Instant startTimeOrNow() {
     return startTime == null ? Instant.now() : startTime;
   }
@@ -131,12 +139,7 @@ public class StreetSearchRequestBuilder {
   }
 
   @Nullable
-  private static Envelope createEnvelope(GenericLocation location) {
-    if (location == null) {
-      return null;
-    }
-
-    Coordinate coordinate = location.getCoordinate();
+  private static Envelope createEnvelope(@Nullable Coordinate coordinate) {
     if (coordinate == null) {
       return null;
     }

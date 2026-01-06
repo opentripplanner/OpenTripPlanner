@@ -18,6 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -61,7 +62,7 @@ public class StreetEdgeRentalTraversalTest {
     var req = StreetSearchRequest.of().withMode(streetMode).withArriveBy(false).build();
 
     var editor = new StateEditor(v0, req);
-    editor.beginFloatingVehicleRenting(formFactor, "network", false);
+    editor.beginFloatingVehicleRenting(formFactor, PropulsionType.ELECTRIC, "network", false);
     var state = editor.makeState();
 
     assertEquals(state.currentMode(), formFactor.traverseMode);
@@ -91,7 +92,7 @@ public class StreetEdgeRentalTraversalTest {
     var req = StreetSearchRequest.of().withMode(streetMode).withArriveBy(false).build();
 
     var editor = new StateEditor(v0, req);
-    editor.beginFloatingVehicleRenting(formFactor, "network", false);
+    editor.beginFloatingVehicleRenting(formFactor, PropulsionType.ELECTRIC, "network", false);
     var state = editor.makeState();
 
     assertEquals(state.currentMode(), formFactor.traverseMode);

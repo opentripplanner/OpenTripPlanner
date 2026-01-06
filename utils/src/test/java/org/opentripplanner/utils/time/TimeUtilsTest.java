@@ -50,6 +50,21 @@ public class TimeUtilsTest {
   }
 
   @Test
+  public void timetableToStr() {
+    assertEquals(
+      "00:00:01, 00:01:00, 01:00:00, 23:59:59-1d, 09:31:00, 13:33:57, 10:26:03-1d",
+      TimeUtils.timetableToStr(
+        new int[] { T00_00_01, T00_01_00, T01_00_00, -T00_00_01, T09_31_00, T13_33_57, -T13_33_57 },
+        ", "
+      )
+    );
+    assertEquals(
+      "00:01 ~ 14:29-1d ~ 01:00",
+      TimeUtils.timetableToStr(new int[] { T00_01_00, -T09_31_00, T01_00_00 }, " ~ ")
+    );
+  }
+
+  @Test
   public void timeToStrLong() {
     assertEquals("00:00:01", TimeUtils.timeToStrLong(T00_00_01));
     assertEquals("00:01:00", TimeUtils.timeToStrLong(T00_01_00));
@@ -112,6 +127,7 @@ public class TimeUtilsTest {
     assertEquals("[120]", Arrays.toString(TimeUtils.times("0:2")));
     assertEquals("[3]", Arrays.toString(TimeUtils.times("0:0:3")));
     assertEquals("[3723]", Arrays.toString(TimeUtils.times("01:02:03")));
+    assertEquals("[3600, 60]", Arrays.toString(TimeUtils.times(" 1   0:1 ")));
     assertEquals("[3600, 60, 1]", Arrays.toString(TimeUtils.times("1 0:1 0:0:1")));
     assertEquals("[3600, 60, 1, 7200]", Arrays.toString(TimeUtils.times("1,0:1;0:0:1,; 2")));
   }

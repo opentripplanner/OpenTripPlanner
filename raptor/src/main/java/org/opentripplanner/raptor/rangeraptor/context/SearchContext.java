@@ -70,7 +70,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   @Nullable
   private final IntPredicate acceptC2AtDestination;
 
-  private final List<SearchContextViaLeg<T>> legs;
+  private final List<SearchContextViaSegments<T>> segments;
 
   /** Lazy initialized */
   private RaptorCostCalculator<T> costCalculator = null;
@@ -96,7 +96,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     );
     this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     this.acceptC2AtDestination = acceptC2AtDestination;
-    this.legs = initLegs(accessPaths, viaConnections, egressPaths);
+    this.segments = initSegments(accessPaths, viaConnections, egressPaths);
   }
 
   /**
@@ -112,8 +112,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return new SearchContextBuilder<>(request, tuningParameters, transit, acceptC2AtDestination);
   }
 
-  public List<SearchContextViaLeg<T>> legs() {
-    return legs;
+  public List<SearchContextViaSegments<T>> segments() {
+    return segments;
   }
 
   public SearchParams searchParams() {
@@ -228,7 +228,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
   public TimeBasedBoardingSupport<T> createTimeBasedBoardingSupport() {
     return new TimeBasedBoardingSupport<>(
-      legs.getFirst().accessPaths().hasTimeDependentAccess(),
+      segments.getFirst().accessPaths().hasTimeDependentAccess(),
       slackProvider(),
       calculator(),
       lifeCycle()
@@ -317,19 +317,19 @@ public class SearchContext<T extends RaptorTripSchedule> {
       : p -> slackProvider.alightSlack(p.slackIndex());
   }
 
-  private List<SearchContextViaLeg<T>> initLegs(
+  private List<SearchContextViaSegments<T>> initSegments(
     AccessPaths accessPaths,
     List<ViaConnections> viaConnections,
     EgressPaths egressPaths
   ) {
     if (viaConnections.isEmpty()) {
-      return List.of(new SearchContextViaLeg<>(this, accessPaths, null, egressPaths));
+      return List.of(new SearchContextViaSegments<>(this, accessPaths, null, egressPaths));
     }
     var accessEmpty = accessPaths.copyEmpty();
-    var list = new ArrayList<SearchContextViaLeg<T>>();
+    var list = new ArrayList<SearchContextViaSegments<T>>();
     for (ViaConnections c : viaConnections) {
       list.add(
-        new SearchContextViaLeg<>(
+        new SearchContextViaSegments<>(
           this,
           c == viaConnections.getFirst() ? accessPaths : accessEmpty,
           c,
@@ -337,7 +337,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         )
       );
     }
-    list.add(new SearchContextViaLeg<>(this, accessEmpty, null, egressPaths));
+    list.add(new SearchContextViaSegments<>(this, accessEmpty, null, egressPaths));
 
     return List.copyOf(list);
   }

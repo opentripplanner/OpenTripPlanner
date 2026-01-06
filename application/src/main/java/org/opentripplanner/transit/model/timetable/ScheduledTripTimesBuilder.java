@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.timetable;
 import java.util.BitSet;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.time.TimeUtils;

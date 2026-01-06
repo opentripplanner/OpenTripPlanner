@@ -4,13 +4,13 @@ import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
 
 import java.util.Collection;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;

@@ -6,10 +6,10 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Set;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 

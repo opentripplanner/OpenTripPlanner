@@ -2,7 +2,10 @@ package org.opentripplanner.gtfs.mapping;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.onebusaway.gtfs.model.AgencyAndIdFactory.obaId;
 
+import java.time.LocalTime;
+import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,6 +14,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareLegRule;
 import org.onebusaway.gtfs.model.FareMedium;
 import org.onebusaway.gtfs.model.FareProduct;
+import org.onebusaway.gtfs.model.Timeframe;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareDistance.LinearDistance;
 import org.opentripplanner.ext.fares.model.FareDistance.Stops;
@@ -50,7 +54,12 @@ class FareLegRuleMapperTest {
   @MethodSource("testCases")
   void mapDistance(TestCase tc) {
     var productMapper = new FareProductMapper(ID_FACTORY);
-    var ruleMapper = new FareLegRuleMapper(ID_FACTORY, productMapper, DataImportIssueStore.NOOP);
+    var ruleMapper = new FareLegRuleMapper(
+      ID_FACTORY,
+      productMapper,
+      timeframeMapper(),
+      DataImportIssueStore.NOOP
+    );
     var productId = new AgencyAndId("1", "1");
     var fp = new FareProduct();
     fp.setAmount(10);
@@ -59,7 +68,7 @@ class FareLegRuleMapperTest {
     fp.setFareProductId(productId);
     var internalProduct = productMapper.map(fp);
 
-    var obaRule = new FareLegRule();
+    final var obaRule = baseRule();
     obaRule.setFareProductId(fp.getFareProductId());
     obaRule.setDistanceType(tc.distanceType);
     obaRule.setMinDistance(tc.minDistance);
@@ -76,7 +85,12 @@ class FareLegRuleMapperTest {
   @Test
   void multipleProducts() {
     var productMapper = new FareProductMapper(ID_FACTORY);
-    var ruleMapper = new FareLegRuleMapper(ID_FACTORY, productMapper, DataImportIssueStore.NOOP);
+    var ruleMapper = new FareLegRuleMapper(
+      ID_FACTORY,
+      productMapper,
+      timeframeMapper(),
+      DataImportIssueStore.NOOP
+    );
 
     var cashMedium = new FareMedium();
     cashMedium.setId(new AgencyAndId("1", "cash"));
@@ -94,7 +108,7 @@ class FareLegRuleMapperTest {
     final var creditProduct = cashProduct(cashMedium);
     var internalCreditProduct = productMapper.map(creditProduct);
 
-    var obaRule = new FareLegRule();
+    var obaRule = baseRule();
     obaRule.setFareProductId(cashProduct.getFareProductId());
 
     var mappedRules = List.copyOf(ruleMapper.map(List.of(obaRule)));
@@ -107,11 +121,16 @@ class FareLegRuleMapperTest {
   @Test
   void priority() {
     var productMapper = new FareProductMapper(ID_FACTORY);
-    var ruleMapper = new FareLegRuleMapper(ID_FACTORY, productMapper, DataImportIssueStore.NOOP);
+    var ruleMapper = new FareLegRuleMapper(
+      ID_FACTORY,
+      productMapper,
+      timeframeMapper(),
+      DataImportIssueStore.NOOP
+    );
     var product = cashProduct(null);
     productMapper.map(product);
 
-    var obaRule = new FareLegRule();
+    final var obaRule = baseRule();
     obaRule.setFareProductId(product.getFareProductId());
     obaRule.setRulePriority(55);
 
@@ -123,10 +142,15 @@ class FareLegRuleMapperTest {
   @Test
   void noProductFound() {
     var issues = new DefaultDataImportIssueStore();
-    var ruleMapper = new FareLegRuleMapper(ID_FACTORY, new FareProductMapper(ID_FACTORY), issues);
+    var ruleMapper = new FareLegRuleMapper(
+      ID_FACTORY,
+      new FareProductMapper(ID_FACTORY),
+      timeframeMapper(),
+      issues
+    );
 
     var obaRule = new FareLegRule();
-    obaRule.setFareProductId(new AgencyAndId("1", "notfound"));
+    obaRule.setFareProductId(obaId("notfound"));
     obaRule.setRulePriority(55);
 
     var mapped = ruleMapper.map(List.of(obaRule));
@@ -135,6 +159,45 @@ class FareLegRuleMapperTest {
     assertThat(issues.listIssues().stream().map(DataImportIssue::getType)).containsExactly(
       "UnknownFareProductId"
     );
+  }
+
+  @Test
+  void timeframes() {
+    var timeframeMapper = timeframeMapper();
+    var productMapper = new FareProductMapper(ID_FACTORY);
+    var ruleMapper = new FareLegRuleMapper(
+      ID_FACTORY,
+      productMapper,
+      timeframeMapper,
+      DataImportIssueStore.NOOP
+    );
+
+    var product = cashProduct(null);
+    productMapper.map(product);
+
+    var tfId = new AgencyAndId("1", "tf1");
+    var tf = new Timeframe();
+    tf.setTimeframeGroupId(tfId);
+    tf.setStartTime(LocalTime.NOON);
+    tf.setEndTime(LocalTime.NOON.plusHours(1));
+    tf.setServiceId("s1");
+    timeframeMapper.map(tf);
+
+    var obaRule = baseRule();
+    obaRule.setFareProductId(product.getFareProductId());
+    obaRule.setFromTimeframeGroupId(tfId);
+    obaRule.setToTimeframeGroupId(tfId);
+
+    var mapped = List.copyOf(ruleMapper.map(List.of(obaRule))).getFirst();
+
+    assertEquals("[[12:00-13:00,A:s1]]", toStr(mapped.fromTimeframes()));
+    assertEquals("[[12:00-13:00,A:s1]]", toStr(mapped.toTimeframes()));
+  }
+
+  private static String toStr(
+    Collection<org.opentripplanner.ext.fares.model.Timeframe> timeframes
+  ) {
+    return timeframes.stream().map(t -> t.toString()).toList().toString();
   }
 
   private static FareProduct cashProduct(FareMedium creditMedium) {
@@ -146,5 +209,15 @@ class FareLegRuleMapperTest {
     cashProduct.setFareMedium(creditMedium);
     cashProduct.setFareProductId(productId);
     return cashProduct;
+  }
+
+  private static TimeframeMapper timeframeMapper() {
+    return new TimeframeMapper(ID_FACTORY);
+  }
+
+  private static FareLegRule baseRule() {
+    var obaRule = new FareLegRule();
+    obaRule.setLegGroupId(obaId("1"));
+    return obaRule;
   }
 }

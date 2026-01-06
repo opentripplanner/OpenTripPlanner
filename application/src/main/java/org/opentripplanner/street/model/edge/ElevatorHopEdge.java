@@ -2,7 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import java.time.Duration;
 import java.util.Optional;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -18,7 +18,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTraversalInformation {
 
   private static final double DEFAULT_LEVELS = 1;
-  private static final int DEFAULT_TRAVEL_TIME = 0;
+  private static final int DEFAULT_TRAVEL_TIME = -1;
 
   private final StreetTraversalPermission permission;
 
@@ -56,21 +56,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Vertex to,
     StreetTraversalPermission permission,
     Accessibility wheelchairBoarding,
-    int levels,
+    double levels,
     int travelTime
   ) {
     createElevatorHopEdge(from, to, permission, wheelchairBoarding, levels, travelTime);
     createElevatorHopEdge(to, from, permission, wheelchairBoarding, levels, travelTime);
-  }
-
-  public static void bidirectional(
-    Vertex from,
-    Vertex to,
-    StreetTraversalPermission permission,
-    Accessibility wheelchairBoarding
-  ) {
-    createElevatorHopEdge(from, to, permission, wheelchairBoarding);
-    createElevatorHopEdge(to, from, permission, wheelchairBoarding);
   }
 
   public static ElevatorHopEdge createElevatorHopEdge(
@@ -100,7 +90,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   }
 
   /**
-   * The number of levels that the elevator travels
+   * The number of levels that the ElevatorHopEdge travels.
    */
   public double getLevels() {
     return levels;
@@ -108,7 +98,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   /**
    * Returns the travel time of the elevator.
-   * If travelTime is 0, returns an empty Optional.
+   * If travelTime is 0 or below, returns an empty Optional.
    */
   public Optional<Duration> getTravelTime() {
     return travelTime > 0 ? Optional.of(Duration.ofSeconds(travelTime)) : Optional.empty();
@@ -147,13 +137,23 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
       return State.empty();
     }
 
+    // Elevators with ways on the same level might not have a cost. The board cost still applies.
+    // Using an elevator to get to the same level usually doesn't make sense, but in case the
+    // data is bad this is supported. ElevatorHopEdges on the same level should not have a
+    // cost so that routing from one level to another doesn't incur extra costs. For example:
+    //
+    // level   0     2     2     3
+    //         X --- X --- X --- X
+    // levels     2     0     1
+    //
+    // X   ElevatorHopVertex
+    // --- ElevatorHopEdge
     s1.incrementWeight(
       this.travelTime > 0 ? this.travelTime : (request.elevator().hopCost() * this.levels)
     );
-    int seconds = this.travelTime > 0
-      ? this.travelTime
-      : (int) (request.elevator().hopTime() * this.levels);
-    s1.incrementTimeInSeconds(seconds);
+    s1.incrementTimeInSeconds(
+      this.travelTime > 0 ? this.travelTime : (int) (request.elevator().hopTime() * this.levels)
+    );
     return s1.makeStateArray();
   }
 

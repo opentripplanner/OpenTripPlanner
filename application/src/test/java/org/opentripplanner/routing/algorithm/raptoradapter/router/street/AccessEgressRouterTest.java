@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.module.nearbystops.SiteRepositoryResolver;
 import org.opentripplanner.model.GenericLocation;
@@ -23,7 +24,6 @@ import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 

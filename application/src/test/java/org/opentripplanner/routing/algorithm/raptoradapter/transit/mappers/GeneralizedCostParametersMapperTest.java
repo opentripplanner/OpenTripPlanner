@@ -10,11 +10,11 @@ import com.google.common.collect.Multimap;
 import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptorlegacy._data.transit.TestRoute;
 import org.opentripplanner.raptorlegacy._data.transit.TestTransitData;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GeneralizedCostParametersMapperTest {
 
@@ -46,7 +46,9 @@ class GeneralizedCostParametersMapperTest {
 
     BitSet unpreferredPatterns = GeneralizedCostParametersMapper.map(
       routingRequest,
-      data.getPatterns()
+      data.getPatterns(),
+      p -> p.route().getId(),
+      p -> p.route().getAgency().getId()
     ).unpreferredPatterns();
 
     for (var pattern : data.getPatterns()) {
@@ -67,7 +69,12 @@ class GeneralizedCostParametersMapperTest {
 
     assertEquals(
       new BitSet(),
-      GeneralizedCostParametersMapper.map(routingRequest, data.getPatterns()).unpreferredPatterns()
+      GeneralizedCostParametersMapper.map(
+        routingRequest,
+        data.getPatterns(),
+        p -> p.route().getId(),
+        p -> p.route().getAgency().getId()
+      ).unpreferredPatterns()
     );
   }
 

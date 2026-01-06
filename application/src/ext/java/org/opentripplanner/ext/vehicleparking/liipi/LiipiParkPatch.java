@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.liipi;
 
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * Contains updates to a {@link LiipiParkUpdater} park.

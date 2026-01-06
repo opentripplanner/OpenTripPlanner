@@ -204,12 +204,13 @@ class QualifiedModeSetTest {
       FUNICULAR,
       TROLLEYBUS,
       MONORAIL,
-      TransitMode.TAXI
+      TransitMode.TAXI,
+      TransitMode.SNOW_AND_ICE
     );
 
     var mainModes = Set.copyOf(modeSet.getTransitModes());
 
-    assertEquals(mainModes, expected);
+    assertEquals(expected, mainModes);
   }
 
   @Test
@@ -230,12 +231,13 @@ class QualifiedModeSetTest {
       TROLLEYBUS,
       CARPOOL,
       MONORAIL,
-      TransitMode.TAXI
+      TransitMode.TAXI,
+      TransitMode.SNOW_AND_ICE
     );
 
     var mainModes = Set.copyOf(modeSet.getTransitModes());
 
-    assertEquals(mainModes, expected);
+    assertEquals(expected, mainModes);
   }
 
   @Test

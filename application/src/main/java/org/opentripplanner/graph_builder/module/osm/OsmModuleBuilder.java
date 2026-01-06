@@ -9,6 +9,7 @@ import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.model.StreetConstants;
@@ -21,8 +22,10 @@ public class OsmModuleBuilder {
   private final Collection<OsmProvider> providers;
   private final Graph graph;
   private final VehicleParkingRepository parkingRepository;
+  private final StreetDetailsRepository streetDetailsRepository;
   private final StreetRepository streetRepository;
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
+
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
   private EdgeNamer edgeNamer = new DefaultNamer();
@@ -30,18 +33,21 @@ public class OsmModuleBuilder {
   private boolean platformEntriesLinking = false;
   private boolean staticParkAndRide = false;
   private boolean staticBikeParkAndRide = false;
+  private boolean includeInclinedEdgeLevelInfo = false;
   private boolean includeOsmSubwayEntrances = false;
   private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
 
   public OsmModuleBuilder(
     Collection<OsmProvider> providers,
     Graph graph,
+    StreetDetailsRepository streetDetailsRepository,
     StreetRepository streetRepository,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     VehicleParkingRepository parkingRepository
   ) {
     this.providers = providers;
     this.graph = graph;
+    this.streetDetailsRepository = streetDetailsRepository;
     this.streetRepository = streetRepository;
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
     this.parkingRepository = parkingRepository;
@@ -82,6 +88,11 @@ public class OsmModuleBuilder {
     return this;
   }
 
+  public OsmModuleBuilder withIncludeInclinedEdgeLevelInfo(boolean includeInclinedEdgeLevelInfo) {
+    this.includeInclinedEdgeLevelInfo = includeInclinedEdgeLevelInfo;
+    return this;
+  }
+
   public OsmModuleBuilder withMaxAreaNodes(int maxAreaNodes) {
     this.maxAreaNodes = maxAreaNodes;
     return this;
@@ -97,6 +108,7 @@ public class OsmModuleBuilder {
       providers,
       graph,
       osmInfoGraphBuildRepository,
+      streetDetailsRepository,
       parkingRepository,
       streetRepository,
       issueStore,
@@ -108,6 +120,7 @@ public class OsmModuleBuilder {
         platformEntriesLinking,
         staticParkAndRide,
         staticBikeParkAndRide,
+        includeInclinedEdgeLevelInfo,
         includeOsmSubwayEntrances
       )
     );

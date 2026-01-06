@@ -39,7 +39,7 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule>
           earliestBoardTime - offset
         );
         if (departureTime != -1) {
-          int headway = frequency.exactTimes ? 0 : frequency.headway;
+          int headway = frequency.routingSlack();
           TripTimes tripTimes = frequency.materialize(
             stopPositionInPattern,
             departureTime - headway,

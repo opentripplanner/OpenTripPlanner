@@ -3,8 +3,8 @@ package org.opentripplanner.transit.api.request;
 import java.time.LocalDate;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.api.model.FilterValues;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TripRequestBuilder {
 

@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.edgenaming;
 
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;

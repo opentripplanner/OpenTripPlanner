@@ -13,18 +13,18 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
-import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
+import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 class TimetableRepositoryTest {

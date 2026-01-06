@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.framework;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 class EntityNotFoundExceptionTest {
 

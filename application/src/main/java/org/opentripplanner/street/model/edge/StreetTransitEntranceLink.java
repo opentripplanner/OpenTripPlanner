@@ -1,8 +1,8 @@
 package org.opentripplanner.street.model.edge;
 
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This represents the connection between a street vertex and a transit vertex belonging the street

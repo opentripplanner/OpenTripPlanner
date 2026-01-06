@@ -3,8 +3,8 @@ package org.opentripplanner.model.transfer;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

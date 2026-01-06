@@ -184,8 +184,6 @@ public class StreetEdgeScooterTraversalTest {
 
     SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
     double trueLength = costs.lengthMultiplier * length;
-    double slopeWorkLength = testStreet.getEffectiveBikeDistanceForWorkCost();
-    double slopeSpeedLength = testStreet.getEffectiveBikeDistance();
 
     var request = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL);
 
@@ -204,7 +202,8 @@ public class StreetEdgeScooterTraversalTest {
     var startState = link.traverse(rentedState[0])[0];
 
     State result = testStreet.traverse(startState)[0];
-    double expectedTimeWeight = slopeSpeedLength / SPEED;
+    // Electric scooters use flat distance (no slope effect) for time calculation
+    double expectedTimeWeight = length / SPEED;
     assertEquals(TraverseMode.SCOOTER, result.currentMode());
     assertEquals(expectedTimeWeight, result.getWeight() - startState.getWeight(), DELTA);
 
@@ -214,10 +213,9 @@ public class StreetEdgeScooterTraversalTest {
 
     result = testStreet.traverse(startState)[0];
     double slopeWeight = result.getWeight();
-    double expectedSlopeWeight = slopeWorkLength / SPEED;
+    // Electric scooters use flat distance (motor does the work) for slope/work calculation
+    double expectedSlopeWeight = length / SPEED;
     assertEquals(expectedSlopeWeight, slopeWeight - startState.getWeight(), DELTA);
-    assertTrue((length * 1.5) / SPEED < slopeWeight);
-    assertTrue((length * 1.5 * 10) / SPEED > slopeWeight);
 
     request.withScooter(scooter -> scooter.withOptimizeTriangle(it -> it.withSafety(1)));
     rentedState = vehicleRentalEdge.traverse(new State(rentalVertex, request.build()));

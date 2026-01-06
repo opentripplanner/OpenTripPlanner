@@ -4,9 +4,9 @@ import static org.opentripplanner.utils.time.DurationUtils.durationToStr;
 
 import java.util.List;
 import java.util.Optional;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.RouteStationTransferPoint;
 import org.opentripplanner.model.transfer.RouteStopTransferPoint;

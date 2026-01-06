@@ -161,6 +161,7 @@
                 time
               }
             }
+            viaLocationType
             departureTime
             arrivalTime
           }
@@ -182,6 +183,7 @@
                 time
               }
             }
+            viaLocationType
             departureTime
             arrivalTime
           }

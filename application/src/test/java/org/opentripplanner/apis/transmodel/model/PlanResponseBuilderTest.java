@@ -9,7 +9,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.SortOrder;

@@ -1,5 +1,6 @@
 package org.opentripplanner.model.plan;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +11,10 @@ import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.leg.LegCallTime;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * Many methods in this class throw {@link NotImplementedException}. Please implement them when
@@ -17,12 +22,34 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  */
 public class TestTransitLeg implements TransitLeg {
 
+  private final StopLocation from;
+  private final StopLocation to;
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
+  private final Trip trip;
 
   public TestTransitLeg(TestTransitLegBuilder builder) {
+    this.from = builder.from;
+    this.to = builder.to;
     this.startTime = builder.startTime;
     this.endTime = builder.endTime;
+    this.trip = builder.trip;
+  }
+
+  @Override
+  public Agency agency() {
+    return trip.getRoute().getAgency();
+  }
+
+  @Override
+  public Route route() {
+    return trip.getRoute();
+  }
+
+  @Nullable
+  @Override
+  public Trip trip() {
+    return trip;
   }
 
   @Override
@@ -42,12 +69,12 @@ public class TestTransitLeg implements TransitLeg {
 
   @Override
   public LegCallTime start() {
-    throw new NotImplementedException();
+    return LegCallTime.ofStatic(startTime);
   }
 
   @Override
   public LegCallTime end() {
-    throw new NotImplementedException();
+    return LegCallTime.ofStatic(endTime);
   }
 
   @Override
@@ -67,12 +94,12 @@ public class TestTransitLeg implements TransitLeg {
 
   @Override
   public Place from() {
-    throw new NotImplementedException();
+    return Place.forStop(from);
   }
 
   @Override
   public Place to() {
-    throw new NotImplementedException();
+    return Place.forStop(to);
   }
 
   @Override
@@ -98,6 +125,11 @@ public class TestTransitLeg implements TransitLeg {
   @Override
   public int generalizedCost() {
     return 0;
+  }
+
+  @Override
+  public LocalDate serviceDate() {
+    return startTime.toLocalDate();
   }
 
   @Override

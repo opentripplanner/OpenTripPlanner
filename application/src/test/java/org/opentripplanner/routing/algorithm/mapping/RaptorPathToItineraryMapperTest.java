@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -54,10 +55,11 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultC
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
+import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -279,7 +281,7 @@ public class RaptorPathToItineraryMapperTest {
       stopTimes.add(stopTime);
     }
 
-    var builder = TripPattern.of(new FeedScopedId("TestFeed", "TestId"))
+    var builder = TripPattern.of(new FeedScopedId(pattern.route().getId().getFeedId(), "TestId"))
       .withRoute(pattern.route())
       .withStopPattern(new StopPattern(stopTimes));
     return builder.build();
@@ -299,6 +301,7 @@ public class RaptorPathToItineraryMapperTest {
     return new RaptorPathToItineraryMapper<>(
       new Graph(),
       new DefaultTransitService(timetableRepository),
+      new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       getRaptorTransitData(),
       dateTime.atZone(ZoneIds.CET),
       RouteRequest.defaultValue()
