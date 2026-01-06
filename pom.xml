@@ -58,10 +58,10 @@
 
 
     <properties>
-        <otp.serialization.version.id>219</otp.serialization.version.id>
+        <otp.serialization.version.id>230</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>34.0</geotools.version>
+        <geotools.version>34.1</geotools.version>
         <google.dagger.version>2.57.2</google.dagger.version>
         <jackson.version>2.20.1</jackson.version>
         <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
@@ -69,12 +69,12 @@
         <junit.version>6.0.1</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.20</logback.version>
-        <lucene.version>10.3.0</lucene.version>
-        <micrometer.version>1.16.0</micrometer.version>
+        <logback.version>1.5.21</logback.version>
+        <lucene.version>10.3.2</lucene.version>
+        <micrometer.version>1.16.1</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.33.0</protobuf.version>
+        <protobuf.version>4.33.2</protobuf.version>
         <siri-java-model.version>2.0.1</siri-java-model.version>
         <slf4j.version>2.0.17</slf4j.version>
         <!-- Other properties -->
@@ -102,6 +102,7 @@
         <module>application</module>
         <module>otp-shaded</module>
         <module>test/integration</module>
+        <module>domain-core</module>
     </modules>
 
 
@@ -117,6 +118,24 @@
                     <groupId>com.hubspot.maven.plugins</groupId>
                     <artifactId>prettier-maven-plugin</artifactId>
                     <version>${plugin.prettier.version}</version>
+                    <configuration>
+                        <skip>${plugin.prettier.skip}</skip>
+                        <prettierJavaVersion>2.6.8</prettierJavaVersion>
+                        <inputGlobs>
+                            <inputGlob>src/main/java/**/*.java</inputGlob>
+                            <inputGlob>src/test/java/**/*.java</inputGlob>
+                            <inputGlob>src/test-fixtures/java/**/*.java</inputGlob>
+                        </inputGlobs>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>prettier-format</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>${plugin.prettier.goal}</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -163,7 +182,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -179,7 +198,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <configuration>
                     <propertiesEncoding>UTF-8</propertiesEncoding>
                 </configuration>
@@ -312,7 +331,7 @@
             <plugin>
                 <groupId>org.openrewrite.maven</groupId>
                 <artifactId>rewrite-maven-plugin</artifactId>
-                <version>6.24.0</version>
+                <version>6.26.0</version>
                 <configuration>
                     <exportDatatables>true</exportDatatables>
                     <activeRecipes>
@@ -331,17 +350,9 @@
                     <dependency>
                         <groupId>org.openrewrite.recipe</groupId>
                         <artifactId>rewrite-static-analysis</artifactId>
-                        <version>2.22.0</version>
+                        <version>2.24.0</version>
                     </dependency>
                 </dependencies>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -363,7 +374,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>12.1.2</version>
+                        <version>12.3.0</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -372,28 +383,6 @@
                         <phase>validate</phase>
                         <goals>
                             <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
-                <configuration>
-                    <skip>${plugin.prettier.skip}</skip>
-                    <prettierJavaVersion>2.6.8</prettierJavaVersion>
-                    <inputGlobs>
-                        <inputGlob>src/main/java/**/*.java</inputGlob>
-                        <inputGlob>src/test/java/**/*.java</inputGlob>
-                        <inputGlob>src/test-fixtures/java/**/*.java</inputGlob>
-                    </inputGlobs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>${plugin.prettier.goal}</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -477,7 +466,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.71.0</version>
+                <version>26.72.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -574,7 +563,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.20.0</version>
+                <version>5.21.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.origin-energy</groupId>
@@ -630,8 +619,8 @@
             <activation>
                 <property>
                     <!--
-                      This works as a short alias to enable this from the command line. To skip
-                      rewrite, set the 'rw' system property with the '-D rw' parameter.
+                      This works as a short alias to enable this from the command line.
+                      To run rewrite, set the 'rw' system property with the '-Drw' parameter.
                     -->
                     <name>rw</name>
                     <value/>
@@ -641,6 +630,23 @@
                 <plugin.rewrite.skip>false</plugin.rewrite.skip>
                 <plugin.checkstyle.skip>true</plugin.checkstyle.skip>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openrewrite.maven</groupId>
+                        <artifactId>rewrite-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>rewrite-run</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>clean-test-snapshots</id>

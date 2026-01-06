@@ -11,20 +11,24 @@ import org.junit.jupiter.api.Test;
 
 class DebugRaptorTest {
 
+  private final DebugRaptorBuilder subject() {
+    return DebugRaptor.of();
+  }
+
   @Test
   void withStops() {
     assertEquals(List.of(), subject().withStops(null).build().stops());
-    assertEquals(List.of(1), subject().withStops("1").build().stops());
-    assertEquals(List.of(1, 2), subject().withStops("1 2").build().stops());
-    assertEquals(List.of(6, 2, 55, 6, 7), subject().withStops("6,2;55 6_7").build().stops());
+    assertEquals(List.of("1"), subject().withStops("1").build().stops());
+    assertEquals(List.of("F:1", "F:2"), subject().withStops("F:1 F:2").build().stops());
+    assertEquals(List.of("6", "2", "55", "6"), subject().withStops("\t6,2;55 6").build().stops());
   }
 
   @Test
   void withPath() {
     assertEquals(List.of(), subject().withPath(null).build().path());
-    assertEquals(List.of(1), subject().withPath("1").build().path());
-    assertEquals(List.of(1, 2), subject().withPath("1 2").build().path());
-    assertEquals(List.of(1, 2, 55, 55, 6, 7), subject().withPath("1,2;55 55 6_7").build().path());
+    assertEquals(List.of("1"), subject().withPath("1").build().path());
+    assertEquals(List.of("F:1", "F:2"), subject().withPath("F:1 F:2").build().path());
+    assertEquals(List.of("1", "2", "5", "5"), subject().withPath("1,2;5  5 \t").build().path());
   }
 
   @Test
@@ -65,9 +69,5 @@ class DebugRaptorTest {
       "DebugRaptor{stops: 12, eventType: [STOP_ARRIVALS]}",
       subject().withEventTypes(Set.of(STOP_ARRIVALS)).withStops("12").build().toString()
     );
-  }
-
-  private DebugRaptorBuilder subject() {
-    return DebugRaptor.of();
   }
 }

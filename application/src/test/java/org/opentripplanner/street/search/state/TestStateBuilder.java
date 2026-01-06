@@ -7,8 +7,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
@@ -28,7 +27,7 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
-import org.opentripplanner.street.model.vertex.ElevatorVertex;
+import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -122,11 +121,7 @@ public class TestStateBuilder {
     var to = StreetModelForTest.intersectionVertex(count, count);
 
     var edge = StreetModelForTest.streetEdge(from, to);
-    var states = edge.traverse(currentState);
-    if (states.length != 1) {
-      throw new IllegalStateException("Only single state transitions are supported.");
-    }
-    currentState = states[0];
+    currentState = requireSingleState(edge.traverse(currentState));
     return this;
   }
 
@@ -143,11 +138,39 @@ public class TestStateBuilder {
       .withName(name)
       .buildAndConnect();
 
-    var states = edge.traverse(currentState);
-    if (states.length != 1) {
-      throw new IllegalStateException("Only single state transitions are supported.");
-    }
-    currentState = states[0];
+    currentState = requireSingleState(edge.traverse(currentState));
+    return this;
+  }
+
+  /**
+   * Traverse a very plain street edge with stairs with no special characteristics.
+   */
+  public TestStateBuilder stairsEdge() {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = StreetModelForTest.intersectionVertex(count, count);
+    var edge = StreetModelForTest.streetEdgeBuilder(
+      from,
+      to,
+      30,
+      StreetTraversalPermission.PEDESTRIAN,
+      true
+    ).buildAndConnect();
+
+    currentState = requireSingleState(edge.traverse(currentState));
+    return this;
+  }
+
+  /**
+   * Traverse a very plain escalator edge with no special characteristics.
+   */
+  public TestStateBuilder escalatorEdge() {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = StreetModelForTest.intersectionVertex(count, count);
+    var edge = StreetModelForTest.escalatorEdge(from, to, 30, null);
+
+    currentState = requireSingleState(edge.traverse(currentState));
     return this;
   }
 
@@ -156,11 +179,7 @@ public class TestStateBuilder {
     var from = (StreetVertex) currentState.vertex;
     var to = StreetModelForTest.intersectionVertex(count, count);
     var area = StreetModelForTest.areaEdge(from, to, name, StreetTraversalPermission.PEDESTRIAN);
-    var states = area.traverse(currentState);
-    if (states.length != 1) {
-      throw new IllegalStateException("Only single state transitions are supported.");
-    }
-    currentState = states[0];
+    currentState = requireSingleState(area.traverse(currentState));
     return this;
   }
 
@@ -208,8 +227,8 @@ public class TestStateBuilder {
   public TestStateBuilder elevator() {
     count++;
 
-    var onboard1 = elevator(count, "1", 1.0);
-    var onboard2 = elevator(count, "2", 2.0);
+    var onboard1 = elevator(count, "1");
+    var onboard2 = elevator(count, "2");
     var offboard1 = intersection(count);
     var offboard2 = intersection(count);
 
@@ -225,11 +244,7 @@ public class TestStateBuilder {
       Accessibility.POSSIBLE
     );
 
-    var alightEdge = ElevatorAlightEdge.createElevatorAlightEdge(
-      onboard2,
-      offboard2,
-      new NonLocalizedString("1")
-    );
+    var alightEdge = ElevatorAlightEdge.createElevatorAlightEdge(onboard2, offboard2);
 
     currentState = EdgeTraverser.traverseEdges(
       currentState,
@@ -324,11 +339,7 @@ public class TestStateBuilder {
     } else {
       edge = StreetTransitStopLink.createStreetTransitStopLink(from, to);
     }
-    var states = edge.traverse(currentState);
-    if (states.length != 1) {
-      throw new IllegalStateException("Only single state transitions are supported.");
-    }
-    currentState = states[0];
+    currentState = requireSingleState(edge.traverse(currentState));
     return this;
   }
 
@@ -336,8 +347,8 @@ public class TestStateBuilder {
     return StreetModelForTest.intersectionVertex(count, count);
   }
 
-  private static ElevatorVertex elevator(int count, String suffix, double level) {
-    return new ElevatorVertex(StreetModelForTest.intersectionVertex(count, count), suffix, level);
+  private static ElevatorHopVertex elevator(int count, String label) {
+    return new ElevatorHopVertex(StreetModelForTest.intersectionVertex(count, count), label);
   }
 
   private TestStateBuilder pickUpRentalVehicle(
@@ -369,6 +380,13 @@ public class TestStateBuilder {
     currentState = linkBack.traverse(currentState)[0];
 
     return this;
+  }
+
+  private State requireSingleState(State[] states) {
+    if (states.length != 1) {
+      throw new IllegalStateException("Only single state transitions are supported.");
+    }
+    return states[0];
   }
 
   public State build() {

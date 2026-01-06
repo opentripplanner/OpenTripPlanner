@@ -18,6 +18,7 @@ public class PtModeMapper {
       case FUNICULAR -> VehicleModesOfTransportEnumeration.FUNICULAR;
       case TROLLEYBUS -> VehicleModesOfTransportEnumeration.TROLLEY_BUS;
       case CARPOOL, TAXI -> VehicleModesOfTransportEnumeration.TAXI;
+      case SNOW_AND_ICE -> VehicleModesOfTransportEnumeration.SNOW_AND_ICE;
     };
   }
 

@@ -12,8 +12,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareOffer;
@@ -77,6 +77,12 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final TripOnServiceDate tripOnServiceDate;
   private final double distanceMeters;
 
+  @Nullable
+  private final ViaLocationType fromViaLocationType;
+
+  @Nullable
+  private final ViaLocationType toViaLocationType;
+
   // Sandbox fields
   private final Float accessibilityScore;
   private final Emission emissionPerPerson;
@@ -125,6 +131,8 @@ public class ScheduledTransitLeg implements TransitLeg {
       Objects.requireNonNull(builder.distanceMeters(), "distanceMeters")
     );
     this.transitAlerts = Set.copyOf(builder.alerts());
+    this.fromViaLocationType = builder.fromViaLocationType();
+    this.toViaLocationType = builder.toViaLocationType();
 
     // Sandbox
     this.accessibilityScore = builder.accessibilityScore();
@@ -294,12 +302,12 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   public Place from() {
-    return Place.forStop(tripPattern.getStop(boardStopPosInPattern));
+    return Place.forStop(tripPattern.getStop(boardStopPosInPattern), fromViaLocationType);
   }
 
   @Override
   public Place to() {
-    return Place.forStop(tripPattern.getStop(alightStopPosInPattern));
+    return Place.forStop(tripPattern.getStop(alightStopPosInPattern), toViaLocationType);
   }
 
   @Override
@@ -467,8 +475,20 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
       .addObj("transferToNextLeg", transferToNextLeg)
       .addColSize("transitAlerts", transitAlerts)
+      .addObj("fromViaLocationType", fromViaLocationType)
+      .addObj("toViaLocationType", toViaLocationType)
       .addObj("emissionPerPerson", emissionPerPerson)
       .addColSize("fareProducts", fareOffers)
       .toString();
+  }
+
+  @Nullable
+  ViaLocationType fromViaLocationType() {
+    return fromViaLocationType;
+  }
+
+  @Nullable
+  ViaLocationType toViaLocationType() {
+    return toViaLocationType;
   }
 }

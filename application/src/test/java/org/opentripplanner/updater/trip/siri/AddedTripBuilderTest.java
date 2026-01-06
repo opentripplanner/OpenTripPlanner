@@ -16,13 +16,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -52,6 +52,9 @@ class AddedTripBuilderTest {
     .build();
   private static final String LINE_REF = "ROUTE_ID";
   private static final FeedScopedId TRIP_ID = TimetableRepositoryForTest.id("TRIP_ID");
+  private static final FeedScopedId DATED_SERVICE_JOURNEY_ID = TimetableRepositoryForTest.id(
+    "DATED_SERVICE_JOURNEY_ID"
+  );
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 2, 17);
   private static final TransitMode TRANSIT_MODE = TransitMode.RAIL;
   private static final String SUB_MODE = "replacementRailService";
@@ -120,6 +123,7 @@ class AddedTripBuilderTest {
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
+      DATED_SERVICE_JOURNEY_ID,
       OPERATOR,
       LINE_REF,
       REPLACED_ROUTE,
@@ -232,6 +236,7 @@ class AddedTripBuilderTest {
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
+      DATED_SERVICE_JOURNEY_ID,
       OPERATOR,
       LINE_REF,
       REPLACED_ROUTE,
@@ -254,12 +259,14 @@ class AddedTripBuilderTest {
     var firstTrip = firstAddedTrip.successValue().tripTimes().getTrip();
 
     var tripId2 = TimetableRepositoryForTest.id("TRIP_ID_2");
+    var datedServiceJourneyId2 = TimetableRepositoryForTest.id("DATED_SERVICE_JOURNEY_ID_2");
 
     var secondAddedTrip = new AddedTripBuilder(
       transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       tripId2,
+      datedServiceJourneyId2,
       OPERATOR,
       LINE_REF,
       REPLACED_ROUTE,
@@ -302,6 +309,7 @@ class AddedTripBuilderTest {
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
+      DATED_SERVICE_JOURNEY_ID,
       OPERATOR,
       REPLACED_ROUTE.getId().getId(),
       REPLACED_ROUTE,
@@ -336,6 +344,7 @@ class AddedTripBuilderTest {
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
+      DATED_SERVICE_JOURNEY_ID,
       OPERATOR,
       LINE_REF,
       null,
@@ -380,6 +389,7 @@ class AddedTripBuilderTest {
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
+      DATED_SERVICE_JOURNEY_ID,
       OPERATOR,
       LINE_REF,
       REPLACED_ROUTE,
@@ -432,6 +442,7 @@ class AddedTripBuilderTest {
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
+      DATED_SERVICE_JOURNEY_ID,
       OPERATOR,
       LINE_REF,
       REPLACED_ROUTE,
@@ -470,6 +481,7 @@ class AddedTripBuilderTest {
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
+      DATED_SERVICE_JOURNEY_ID,
       OPERATOR,
       LINE_REF,
       REPLACED_ROUTE,
@@ -515,6 +527,7 @@ class AddedTripBuilderTest {
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
+      DATED_SERVICE_JOURNEY_ID,
       OPERATOR,
       LINE_REF,
       REPLACED_ROUTE,

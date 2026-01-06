@@ -146,12 +146,6 @@ public class CommandLineParameters {
   @Parameter(validateWith = ReadableDirectory.class, description = "/graph/or/inputs/directory")
   public List<File> baseDirectory;
 
-  public static CommandLineParameters createCliForTest(File baseDir) {
-    CommandLineParameters params = new CommandLineParameters();
-    params.baseDirectory = List.of(baseDir);
-    return params;
-  }
-
   /**
    * Set some convenience parameters based on other parameters' values. Default values are validated
    * even when no command line option is specified, and we will not bind ports unless a server is

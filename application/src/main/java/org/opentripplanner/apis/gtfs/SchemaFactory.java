@@ -25,7 +25,9 @@ import org.opentripplanner.apis.gtfs.datafetchers.CurrencyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DefaultFareProductImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DepartureRowImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DependentFareProductImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.ElevatorUseImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.EntranceImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.EscalatorUseImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.EstimatedTimeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductUseImpl;
@@ -55,6 +57,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.RiderCategoryImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RouteImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RouteTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RoutingErrorImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.StairsUseImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StepFeatureTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.StopCallImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopGeometriesImpl;
@@ -209,6 +212,9 @@ public class SchemaFactory {
         .type(typeWiring.build(EstimatedTimeImpl.class))
         .type(typeWiring.build(EntranceImpl.class))
         .type(typeWiring.build(RentalVehicleFuelImpl.class))
+        .type(typeWiring.build(EscalatorUseImpl.class))
+        .type(typeWiring.build(StairsUseImpl.class))
+        .type(typeWiring.build(ElevatorUseImpl.class))
         .type(typeWiring.build(RiderCategoryImpl.class))
         .build();
 

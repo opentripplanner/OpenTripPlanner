@@ -6,10 +6,10 @@ import static org.opentripplanner._support.asserts.AssertString.assertEqualsIgno
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class JourneyRequestTest {
 

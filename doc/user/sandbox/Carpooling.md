@@ -107,7 +107,7 @@ Carpooling results are available through the standard OTP GraphQL API. Carpool l
 
 ### Short Term
 - Improved time window handling (including arrive by constraints)
-- Add a street mode for carpooling (car_pool) for filtering carpooling searches
+- Add a street mode for carpooling (carpool) for filtering carpooling searches
 - Access/Egress searches for carpooling in order to integrate with transit searches
 - Establish an exchange mechanism for deviation budget and occupancy
 

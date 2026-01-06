@@ -2,7 +2,7 @@ package org.opentripplanner.transit.service;
 
 import java.time.LocalDate;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**

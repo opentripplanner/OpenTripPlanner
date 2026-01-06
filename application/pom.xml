@@ -33,6 +33,11 @@
             <artifactId>astar</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>domain-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 
         <!-- 3rd party dependencies -->
@@ -178,7 +183,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.20.0</version>
+            <version>5.21.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -301,7 +306,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>11.0.0</version>
+            <version>11.2.2</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
@@ -319,7 +324,7 @@
         <dependency>
             <groupId>org.openstreetmap.pbf</groupId>
             <artifactId>osmpbf</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1</version>
         </dependency>
         <!-- Command line parameter parsing -->
         <dependency>
@@ -462,6 +467,7 @@
                             <sources>
                                 <source>src/main/java</source>
                                 <source>src/ext/java</source>
+                                <source>${project.build.directory}/generated-sources/annotations</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -520,15 +526,12 @@
                 <groupId>com.hubspot.maven.plugins</groupId>
                 <artifactId>prettier-maven-plugin</artifactId>
                 <configuration>
-                    <inputGlobs>
-                        <inputGlob>src/main/java/**/*.java</inputGlob>
+                    <inputGlobs combine.children="append">
+                        <!-- Additional patterns specific to the application module -->
                         <inputGlob>src/ext/java/**/*.java</inputGlob>
-                        <inputGlob>src/test/java/**/*.java</inputGlob>
-                        <inputGlob>src/test-fixtures/java/**/*.java</inputGlob>
                         <inputGlob>src/ext-test/java/**/*.java</inputGlob>
                         <inputGlob>src/**/*.json</inputGlob>
                         <inputGlob>src/test/resources/org/opentripplanner/apis/**/*.graphql</inputGlob>
-                        <!-- Ignore patterns. -->
                         <inputGlob>!src/test/resources/org/opentripplanner/apis/vectortiles/style.json</inputGlob>
                     </inputGlobs>
                 </configuration>

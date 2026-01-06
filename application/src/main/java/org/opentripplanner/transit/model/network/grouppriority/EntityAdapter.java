@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.network.grouppriority;
 
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * These are the keys used to group transit trips and trip-patterns. This is used to calculate a

@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * The purpose of this class is to provide a map from id to the corresponding entity. It is simply

@@ -22,6 +22,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
@@ -32,13 +33,15 @@ import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayRepo
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 import org.opentripplanner.ext.empiricaldelay.model.TripDelays;
 import org.opentripplanner.ext.empiricaldelay.model.calendar.EmpiricalDelayCalendar;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
+import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
@@ -49,7 +52,6 @@ import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.model.StreetModelDetails;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
@@ -92,6 +94,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
     var streetRepository = createStreetRepository();
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
+    var streetDetailsRepository = new DefaultStreetDetailsRepository();
     var weRepo = new DefaultWorldEnvelopeRepository();
     var emissionRepository = createEmissionRepository();
     var empiricalDelayRepository = empiricalDelayRepository();
@@ -99,6 +102,7 @@ public class GraphSerializationTest {
     testRoundTrip(
       model.graph(),
       osmGraphBuildRepository,
+      streetDetailsRepository,
       streetRepository,
       model.timetableRepository(),
       weRepo,
@@ -122,6 +126,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
     var streetRepository = createStreetRepository();
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
+    var streetDetailsRepository = new DefaultStreetDetailsRepository();
     var worldEnvelopeRepository = new DefaultWorldEnvelopeRepository();
     var emissionRepository = createEmissionRepository();
     var empiricalDelayRepository = empiricalDelayRepository();
@@ -129,6 +134,7 @@ public class GraphSerializationTest {
     testRoundTrip(
       model.graph(),
       osmGraphBuildRepository,
+      streetDetailsRepository,
       streetRepository,
       model.timetableRepository(),
       worldEnvelopeRepository,
@@ -235,6 +241,7 @@ public class GraphSerializationTest {
   private void testRoundTrip(
     Graph originalGraph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    StreetDetailsRepository streetDetailsRepository,
     StreetRepository streetRepository,
     TimetableRepository originalTimetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
@@ -248,6 +255,7 @@ public class GraphSerializationTest {
     SerializedGraphObject serializedObj = new SerializedGraphObject(
       originalGraph,
       osmInfoGraphBuildRepository,
+      streetDetailsRepository,
       streetRepository,
       originalTimetableRepository,
       worldEnvelopeRepository,

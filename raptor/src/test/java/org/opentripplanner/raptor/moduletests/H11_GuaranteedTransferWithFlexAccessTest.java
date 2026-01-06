@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
@@ -22,7 +20,7 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
@@ -38,21 +36,23 @@ public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
   private static final int C1_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   @BeforeEach
   public void setup() {
-    var r1 = route("R1", STOP_B, STOP_C).withTimetable(schedule("0:30 0:45"));
-    var r2 = route("R2", STOP_C, STOP_D).withTimetable(schedule("0:45 0:55"));
+    data.withTimetables(
+      """
+      B     C
+      0:30  0:45
+      --
+            C     D
+            0:45  0:55
+      """
+    );
+    var tripA = data.getRoute(0).getTripSchedule(0);
+    var tripB = data.getRoute(1).getTripSchedule(0);
 
-    var tripA = r1.timetable().getTripSchedule(0);
-    var tripB = r2.timetable().getTripSchedule(0);
-
-    data.withRoutes(r1, r2);
     data.withGuaranteedTransfer(tripA, STOP_C, tripB, STOP_C);
     data.withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D10m));
     data.withTransferCost(100);
@@ -68,21 +68,21 @@ public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
       .latestArrivalTime(T01_00)
       .constrainedTransfers(true);
 
-    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {
     var expected =
-      "Flex 3m 1x ~ A " +
+      "Flex 3m Rₙ1 ~ A " +
       "~ Walk 10m ~ B " +
       "~ BUS R1 0:30 0:45 ~ C " +
       "~ BUS R2 0:45 0:55 ~ D " +
       "~ Walk 1m " +
-      "[0:16 0:56 40m Tₓ2 C₁3_820]";
+      "[0:16 0:56 40m Tₙ2 C₁3_820]";
 
     return RaptorModuleTestCase.of()
-      .add(TC_MIN_DURATION, "[0:00 0:40 40m Tₓ2]")
-      .add(TC_MIN_DURATION_REV, "[0:20 1:00 40m Tₓ2]")
+      .add(TC_MIN_DURATION, "[0:00 0:40 40m Tₙ2]")
+      .add(TC_MIN_DURATION_REV, "[0:20 1:00 40m Tₙ2]")
       .add(standard(), withoutCost(expected))
       .add(multiCriteria(), expected)
       .build();

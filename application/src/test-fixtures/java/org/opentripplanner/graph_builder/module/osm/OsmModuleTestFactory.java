@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 
@@ -15,6 +16,7 @@ public class OsmModuleTestFactory {
   private DefaultOsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
   private DefaultStreetRepository streetRepository;
   private DefaultVehicleParkingRepository vehicleParkingRepository;
+  private DefaultStreetDetailsRepository streetDetailsRepository;
   private List<OsmProvider> providers;
 
   private OsmModuleTestFactory(Collection<OsmProvider> providers) {
@@ -53,11 +55,19 @@ public class OsmModuleTestFactory {
     return this;
   }
 
+  public OsmModuleTestFactory withStreetDetailsRepository(
+    DefaultStreetDetailsRepository streetDetailsRepository
+  ) {
+    this.streetDetailsRepository = streetDetailsRepository;
+    return this;
+  }
+
   public OsmModuleBuilder builder() {
     return OsmModule.of(
       providers,
       getOrElse(graph, Graph::new),
       getOrElse(osmInfoGraphBuildRepository, DefaultOsmInfoGraphBuildRepository::new),
+      getOrElse(streetDetailsRepository, DefaultStreetDetailsRepository::new),
       getOrElse(streetRepository, DefaultStreetRepository::new),
       getOrElse(vehicleParkingRepository, DefaultVehicleParkingRepository::new)
     );

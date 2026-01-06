@@ -3,6 +3,7 @@ package org.opentripplanner.model.plan.leg;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Emission;
@@ -59,6 +60,8 @@ class ScheduledTransitLegTest {
         TRIP_TIMES.getScheduledDepartureTime(BOARD_STOP_INDEX_IN_PATTERN) + (int) DELAY.toSeconds()
       )
       .build();
+  private static final ViaLocationType FROM_VIA_LOCATION_TYPE = ViaLocationType.PASS_THROUGH;
+  private static final ViaLocationType TO_VIA_LOCATION_TYPE = ViaLocationType.VISIT;
 
   private static final Set<TransitAlert> ALERTS = Set.of(
     TransitAlert.of(id("alert")).withDescriptionText(I18NString.of("alert")).build()
@@ -83,6 +86,8 @@ class ScheduledTransitLegTest {
     .withAlerts(ALERTS)
     .withEmissionPerPerson(EMISSION)
     .withFareProducts(FARE_PRODUCTS)
+    .withFromViaLocationType(FROM_VIA_LOCATION_TYPE)
+    .withToViaLocationType(TO_VIA_LOCATION_TYPE)
     .build();
 
   @Test
@@ -113,6 +118,8 @@ class ScheduledTransitLegTest {
     assertFalse(subject.isRealTimeUpdated());
     assertEquals(Set.of(), subject.listTransitAlerts());
     assertEquals(List.of(), subject.fareOffers());
+    assertNull(subject.fromViaLocationType());
+    assertNull(subject.toViaLocationType());
   }
 
   @Test
@@ -127,6 +134,10 @@ class ScheduledTransitLegTest {
     assertEquals(GENERALIZED_COST, subject.generalizedCost());
     assertEquals(DISTANCE, subject.distanceMeters());
     assertEquals(ALERTS, subject.listTransitAlerts());
+    assertEquals(FROM_VIA_LOCATION_TYPE, subject.fromViaLocationType());
+    assertEquals(FROM_VIA_LOCATION_TYPE, subject.from().viaLocationType);
+    assertEquals(TO_VIA_LOCATION_TYPE, subject.toViaLocationType());
+    assertEquals(TO_VIA_LOCATION_TYPE, subject.to().viaLocationType);
     assertTrue(subject.isRealTimeUpdated());
     assertEquals(DELAY, subject.start().estimated().delay());
     assertNotNull(subject.end().estimated());
@@ -149,6 +160,8 @@ class ScheduledTransitLegTest {
     assertEquals(ZONE_ID, copy.zoneId());
     assertEquals(GENERALIZED_COST, copy.generalizedCost());
     assertEquals(ALERTS, copy.listTransitAlerts());
+    assertEquals(FROM_VIA_LOCATION_TYPE, copy.fromViaLocationType());
+    assertEquals(TO_VIA_LOCATION_TYPE, copy.toViaLocationType());
     assertEquals(EMISSION, copy.emissionPerPerson());
     assertEquals(FARE_PRODUCTS, copy.fareOffers());
 
@@ -160,8 +173,8 @@ class ScheduledTransitLegTest {
   void testToString() {
     assertEquals(
       "ScheduledTransitLeg{" +
-      "from: Place{name: Stop_0, stop: RegularStop{F:Stop_0 Stop_0}, coordinate: (60.0, 10.0), vertexType: TRANSIT}, " +
-      "to: Place{name: Stop_2, stop: RegularStop{F:Stop_2 Stop_2}, coordinate: (60.0, 10.0), vertexType: TRANSIT}, " +
+      "from: Place{name: Stop_0, stop: RegularStop{F:Stop_0 Stop_0}, coordinate: (60.0, 10.0), vertexType: TRANSIT, viaLocationType: PASS_THROUGH}, " +
+      "to: Place{name: Stop_2, stop: RegularStop{F:Stop_2 Stop_2}, coordinate: (60.0, 10.0), vertexType: TRANSIT, viaLocationType: VISIT}, " +
       "startTime: 2023-04-17T17:49:06, " +
       "endTime: 2023-04-17T17:59:06, " +
       "realTime: true, " +
@@ -174,6 +187,8 @@ class ScheduledTransitLegTest {
       "boardRule: SCHEDULED, " +
       "alightRule: SCHEDULED, " +
       "transitAlerts: 1 items, " +
+      "fromViaLocationType: PASS_THROUGH, " +
+      "toViaLocationType: VISIT, " +
       "emissionPerPerson: Emission{CO₂: 23g}, " +
       "fareProducts: 1 items" +
       "}",

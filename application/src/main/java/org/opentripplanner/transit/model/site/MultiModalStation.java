@@ -2,10 +2,10 @@ package org.opentripplanner.transit.model.site;
 
 import java.util.Collection;
 import java.util.Objects;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * The next level grouping of stops above Station. Equivalent to NeTEx multimodal StopPlace. As a

@@ -1,8 +1,8 @@
 package org.opentripplanner.model.fare;
 
 import java.time.Duration;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Builder for {@link FareProduct}.

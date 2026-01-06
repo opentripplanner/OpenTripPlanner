@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.config.IgnorableFeature;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.netex.index.NetexEntityIndex;
@@ -20,7 +21,6 @@ import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.validation.Validator;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,7 @@ public class NetexBundle implements Closeable {
   private final CompositeDataSource source;
 
   private final NetexDataSourceHierarchy hierarchy;
-  private final OtpTransitServiceBuilder transitBuilder;
+  private final TransitDataImportBuilder transitBuilder;
 
   private final String feedId;
   private final Set<String> ferryIdsNotAllowedForBicycle;
@@ -62,7 +62,7 @@ public class NetexBundle implements Closeable {
     String feedId,
     CompositeDataSource source,
     NetexDataSourceHierarchy hierarchy,
-    OtpTransitServiceBuilder transitBuilder,
+    TransitDataImportBuilder transitBuilder,
     Set<String> ferryIdsNotAllowedForBicycle,
     Collection<FeedScopedId> routeToCentroidStopPlaceIds,
     double maxStopToShapeSnapDistance,
@@ -81,7 +81,7 @@ public class NetexBundle implements Closeable {
   }
 
   /** load the bundle, map it to the OTP transit model and return */
-  public OtpTransitServiceBuilder loadBundle(
+  public TransitDataImportBuilder loadBundle(
     DeduplicatorService deduplicator,
     DataImportIssueStore issueStore
   ) {

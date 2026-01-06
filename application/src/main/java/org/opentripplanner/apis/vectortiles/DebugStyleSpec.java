@@ -34,7 +34,7 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
-import org.opentripplanner.street.model.vertex.ElevatorVertex;
+import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.utils.collection.ListUtils;
 
@@ -280,7 +280,7 @@ public class DebugStyleSpec {
         .group(ELEVATORS_GROUP)
         .typeCircle()
         .vectorSourceLayer(vertices)
-        .vertexFilter(ElevatorVertex.class)
+        .vertexFilter(ElevatorHopVertex.class)
         .circleStroke(BLACK, CIRCLE_STROKE)
         .circleRadius(
           new ZoomDependentNumber(List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 7)))

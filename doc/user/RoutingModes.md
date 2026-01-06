@@ -40,6 +40,15 @@ This can be combined with transit, where will return routes with a [Kiss & Ride]
 This means that the car is not parked in a permanent parking area but rather the passenger is dropped off (for example, at an airport) and the driver continues driving the car away from the drop off location.
 
 
+<h4 id="CARPOOL">CARPOOL</h4>
+
+Carpool or rideshare with other passengers going in the same direction.
+
+This is the request mode for enabling carpooling in street route searches.
+
+Use this _street_ mode, if your data source for trips is SIRI, not GTFS static.
+
+
 <h4 id="CAR_HAILING">CAR_HAILING</h4>
 
 Using a car hailing app like Uber or Lyft to get to a train station or all the way to the destination.
@@ -108,9 +117,13 @@ Used for street-level rail cars where the cable runs beneath the vehicle.
 
 <h4 id="CARPOOL">CARPOOL</h4>
 
-Private car trips shared with others.
+Private car trips shared with others, operating on scheduled routes similar to transit.
 
-This is currently not specified in GTFS so we use the mode type values 1550-1560 which are in the range of private taxis.
+Use the _transit mode_, as opposed to the street mode `CARPOOL`, if your data source comes from
+static GTFS feeds. This is currently not part of the specification, so we use the mode type values 1550-1560
+which are in the range of private taxis.
+
+If your data source for the carpool trips is SIRI use the `CARPOOL` street mode instead.
 
 
 <h4 id="COACH">COACH</h4>
@@ -136,6 +149,10 @@ Used for any rail system that runs on a single rail.
 <h4 id="RAIL">RAIL</h4>
 
 Used for intercity or long-distance travel.
+
+<h4 id="SNOW_AND_ICE">SNOW_AND_ICE</h4>
+
+Used for off-road snow and ice vehicles
 
 <h4 id="SUBWAY">SUBWAY</h4>
 

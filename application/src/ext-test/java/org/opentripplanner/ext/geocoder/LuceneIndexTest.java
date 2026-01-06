@@ -11,20 +11,19 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -166,31 +165,6 @@ class LuceneIndexTest {
     mapper = new StopClusterMapper(transitService, stopConsolidationService);
   }
 
-  @Test
-  void stopLocations() {
-    var result1 = index.queryStopLocations("lich", true).toList();
-    assertEquals(1, result1.size());
-    assertEquals(LICHTERFELDE_OST_1.getName().toString(), result1.getFirst().getName().toString());
-
-    var result2 = index.queryStopLocations("alexan", true).collect(Collectors.toSet());
-    assertEquals(Set.of(ALEXANDERPLATZ_BUS, ALEXANDERPLATZ_RAIL), result2);
-  }
-
-  @Test
-  void stopLocationGroups() {
-    var result1 = index.queryStopLocationGroups("alex", true).toList();
-    assertEquals(List.of(ALEXANDERPLATZ_STATION), result1);
-
-    var result2 = index.queryStopLocationGroups("haupt", true).toList();
-    assertEquals(List.of(BERLIN_HAUPTBAHNHOF_STATION), result2);
-  }
-
-  @Test
-  void stopLocationGroupsWithSpace() {
-    var result1 = index.queryStopLocationGroups("five points", true).toList();
-    assertEquals(List.of(FIVE_POINTS_STATION), result1);
-  }
-
   @Nested
   class StopClusters {
 
@@ -216,20 +190,20 @@ class LuceneIndexTest {
       }
     )
     void stopClustersWithTypos(String searchTerm) {
-      var results = index.queryStopClusters(searchTerm).toList();
+      var results = index.queryStopClusters(searchTerm, null).toList();
       var ids = results.stream().map(primaryId()).toList();
       assertEquals(List.of(ALEXANDERPLATZ_STATION.getId()), ids);
     }
 
     @Test
     void fuzzyStopClusters() {
-      var result1 = index.queryStopClusters("arts").map(primaryId()).toList();
+      var result1 = index.queryStopClusters("arts", null).map(primaryId()).toList();
       assertEquals(List.of(ARTS_CENTER.getId()), result1);
     }
 
     @Test
     void deduplicatedStopClusters() {
-      var result = index.queryStopClusters("lich").toList();
+      var result = index.queryStopClusters("lich", null).toList();
       assertEquals(1, result.size());
       assertEquals(LICHTERFELDE_OST_1.getName().toString(), result.getFirst().primary().name());
     }
@@ -263,21 +237,21 @@ class LuceneIndexTest {
       }
     )
     void stopClustersWithSpace(String query) {
-      var result = index.queryStopClusters(query).map(primaryId()).toList();
+      var result = index.queryStopClusters(query, null).map(primaryId()).toList();
       assertEquals(List.of(FIVE_POINTS_STATION.getId()), result);
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "4456", "445" })
     void fuzzyStopCode(String query) {
-      var result = index.queryStopClusters(query).toList();
+      var result = index.queryStopClusters(query, null).toList();
       assertEquals(1, result.size());
       assertEquals(ARTS_CENTER.getName().toString(), result.getFirst().primary().name());
     }
 
     @Test
     void modes() {
-      var result = index.queryStopClusters("westh").toList();
+      var result = index.queryStopClusters("westh", null).toList();
       assertEquals(1, result.size());
       var cluster = result.getFirst();
       assertEquals(WESTHAFEN.getName().toString(), cluster.primary().name());
@@ -286,7 +260,7 @@ class LuceneIndexTest {
 
     @Test
     void agenciesAndFeedPublisher() {
-      var cluster = index.queryStopClusters("alexanderplatz").toList().getFirst();
+      var cluster = index.queryStopClusters("alexanderplatz", null).toList().getFirst();
       assertEquals(ALEXANDERPLATZ_STATION.getName().toString(), cluster.primary().name());
       assertEquals(List.of(StopClusterMapper.toAgency(BVG)), cluster.primary().agencies());
       assertEquals("A Publisher", cluster.primary().feedPublisher().name());
@@ -308,7 +282,7 @@ class LuceneIndexTest {
       }
     )
     void numericAdjectives(String query) {
-      var names = index.queryStopClusters(query).map(c -> c.primary().name()).toList();
+      var names = index.queryStopClusters(query, null).map(c -> c.primary().name()).toList();
       assertEquals(
         Stream.of(MERIDIAN_AVE, MERIDIAN_N2, MERIDIAN_N1).map(s -> s.getName().toString()).toList(),
         names

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.empiricaldelay.internal.csvinput.calendar.CalendarCsvParser;
@@ -18,7 +19,6 @@ import org.opentripplanner.framework.csv.HeadersDoNotMatch;
 import org.opentripplanner.framework.csv.OtpCsvReader;
 import org.opentripplanner.framework.error.OtpError;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

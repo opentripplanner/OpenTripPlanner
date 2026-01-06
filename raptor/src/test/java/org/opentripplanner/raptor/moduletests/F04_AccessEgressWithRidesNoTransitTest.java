@@ -19,7 +19,7 @@ import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
@@ -43,32 +43,35 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   @BeforeEach
   public void setup() {
+    // The transit must exist for data to be valid, but it is not routed on or used by the test
     data
-      // The transit must exist for data to be valid, but it is not routed on or used by the test
-      .withTransit("Any", "12:00 13:00", STOP_A, STOP_D)
+      .withTimetables(
+        """
+        A      D
+        12:00  13:00
+        """
+      )
       .withTransfer(STOP_B, transfer(STOP_C, D5m));
+
     requestBuilder
       .searchParams()
       .earliestDepartureTime(T00_10)
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D10m);
 
-    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   /* Flex ~ B ~ Walk ~ C ~ Flex */
 
   static List<RaptorModuleTestCase> flexTransferFlexTestCases() {
-    var path = "Flex 2m 1x ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:10 0:20 10m Tₓ1 C₁1_140]";
-    var stdPathRev = "Flex 2m 1x ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:20 0:30 10m Tₓ1]";
+    var path = "Flex 2m Rₙ1 ~ B ~ Walk 5m ~ C ~ Flex 2m Rₙ1 [0:10 0:20 10m Tₙ1 C₁1_140]";
+    var stdPathRev = "Flex 2m Rₙ1 ~ B ~ Walk 5m ~ C ~ Flex 2m Rₙ1 [0:20 0:30 10m Tₙ1]";
     return RaptorModuleTestCase.of()
       .withRequest(requestBuilder ->
         requestBuilder
@@ -93,9 +96,9 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
 
   static List<RaptorModuleTestCase> flexOpeningHoursTransferFlexTestCases() {
     var path =
-      "Flex 2m 1x Open(0:12 0:16) ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:12 0:22 10m Tₓ1 C₁1_140]";
+      "Flex 2m Rₙ1 Open(0:12 0:16) ~ B ~ Walk 5m ~ C ~ Flex 2m Rₙ1 [0:12 0:22 10m Tₙ1 C₁1_140]";
     var stdPathRev =
-      "Flex 2m 1x Open(0:12 0:16) ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:16 0:26 10m Tₓ1]";
+      "Flex 2m Rₙ1 Open(0:12 0:16) ~ B ~ Walk 5m ~ C ~ Flex 2m Rₙ1 [0:16 0:26 10m Tₙ1]";
     return RaptorModuleTestCase.of()
       .withRequest(requestBuilder ->
         requestBuilder
@@ -119,7 +122,7 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
   /* Flex ~ B ~ Walk ~ C ~ Flex(Open 0:24-0:28) */
 
   static List<RaptorModuleTestCase> flexTransferFlexOpeningHoursTestCases() {
-    var path = "Flex 2m 1x ~ B ~ Walk 5m ~ C ~ Flex 2m 1x Open(0:22 0:26) ";
+    var path = "Flex 2m Rₙ1 ~ B ~ Walk 5m ~ C ~ Flex 2m Rₙ1 Open(0:22 0:26) ";
     return RaptorModuleTestCase.of()
       .withRequest(requestBuilder ->
         requestBuilder
@@ -128,10 +131,10 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
           .addEgressPaths(flex(STOP_C, D2m).openingHours("0:22", "0:26"))
       )
       .addMinDuration("10m", TX_1, T00_10, T00_30)
-      .add(TC_STANDARD, path + "[0:14 0:24 10m Tₓ1]")
-      .add(TC_STANDARD_ONE, path + "[0:10 0:24 14m Tₓ1]")
-      .add(standard().reverseOnly(), path + "[0:18 0:28 10m Tₓ1]")
-      .add(multiCriteria(), path + "[0:14 0:24 10m Tₓ1 C₁1_140]")
+      .add(TC_STANDARD, path + "[0:14 0:24 10m Tₙ1]")
+      .add(TC_STANDARD_ONE, path + "[0:10 0:24 14m Tₙ1]")
+      .add(standard().reverseOnly(), path + "[0:18 0:28 10m Tₙ1]")
+      .add(multiCriteria(), path + "[0:14 0:24 10m Tₙ1 C₁1_140]")
       .build();
   }
 
@@ -144,8 +147,8 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
   /* Flex+Walk ~ C ~ Flex  (No transfer) */
 
   static List<RaptorModuleTestCase> flexAndWalkToFlexTestCases() {
-    var path = "Flex+Walk 7m 1x ~ C ~ Flex 2m 1x [0:10 0:20 10m Tₓ1 C₁1_140]";
-    var stdPathRev = "Flex+Walk 7m 1x ~ C ~ Flex 2m 1x [0:20 0:30 10m Tₓ1]";
+    var path = "Flex+Walk 7m Rₙ1 ~ C ~ Flex 2m Rₙ1 [0:10 0:20 10m Tₙ1 C₁1_140]";
+    var stdPathRev = "Flex+Walk 7m Rₙ1 ~ C ~ Flex 2m Rₙ1 [0:20 0:30 10m Tₙ1]";
     return RaptorModuleTestCase.of()
       .withRequest(requestBuilder ->
         requestBuilder
@@ -169,8 +172,8 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
   /* Flex ~ C ~ Walk+Flex  (No transfer) */
 
   static List<RaptorModuleTestCase> flexToFlexAndWalkTestCases() {
-    var path = "Flex 2m 1x ~ C ~ Flex+Walk 7m 1x [0:10 0:20 10m Tₓ1 C₁1_140]";
-    var stdPathRev = "Flex 2m 1x ~ C ~ Flex+Walk 7m 1x [0:20 0:30 10m Tₓ1]";
+    var path = "Flex 2m Rₙ1 ~ C ~ Flex+Walk 7m Rₙ1 [0:10 0:20 10m Tₙ1 C₁1_140]";
+    var stdPathRev = "Flex 2m Rₙ1 ~ C ~ Flex+Walk 7m Rₙ1 [0:20 0:30 10m Tₙ1]";
     return RaptorModuleTestCase.of()
       .withRequest(requestBuilder ->
         requestBuilder

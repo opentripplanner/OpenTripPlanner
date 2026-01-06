@@ -61,6 +61,18 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
   CAR_HAILING(Feature.ACCESS, Feature.EGRESS, Feature.DRIVING, Feature.PICKUP),
 
   /**
+   * Carpool or rideshare with other passengers traveling in the same direction.
+   * <p>
+   * Use this mode in routing requests to enable carpooling. Itineraries returned will use
+   * {@link org.opentripplanner.transit.model.basic.TransitMode#CARPOOL} for carpool legs.
+   * <p>
+   * Carpooling is a hybrid mode: like transit, it operates on scheduled trips with set departure
+   * times; like street modes, it uses private vehicles traveling on the road network. This street
+   * mode is the input for requesting carpool routing, while the transit mode appears in responses.
+   */
+  CARPOOL(Feature.WALKING, Feature.DRIVING, Feature.PICKUP),
+
+  /**
    * Encompasses all types of on-demand and flexible transportation.
    */
   FLEXIBLE(Feature.ACCESS, Feature.EGRESS, Feature.WALKING);
@@ -182,6 +194,13 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
       Using a car hailing app like Uber or Lyft to get to a train station or all the way to the destination.
 
       See [the sandbox documentation](sandbox/RideHailing.md) on how to configure it.
+      """;
+      case CARPOOL -> """
+      Carpool or rideshare with other passengers going in the same direction.
+
+      This is the request mode for enabling carpooling in street route searches.
+
+      Use this _street_ mode, if your data source for trips is SIRI, not GTFS static.
       """;
       case FLEXIBLE -> "Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTEx Flexible Stop Places.";
     };

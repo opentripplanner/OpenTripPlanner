@@ -66,6 +66,7 @@ public class OsmTagMapper {
     /* PEDESTRIAN */
     props.setProperties("highway=corridor", pedestrianWayProperties);
     props.setProperties("highway=steps", pedestrianWayProperties);
+    props.setProperties("highway=elevator", pedestrianWayProperties);
     props.setProperties("highway=crossing", pedestrianWayProperties);
     props.setProperties("highway=platform", pedestrianWayProperties);
     props.setProperties("public_transport=platform", pedestrianWayProperties);

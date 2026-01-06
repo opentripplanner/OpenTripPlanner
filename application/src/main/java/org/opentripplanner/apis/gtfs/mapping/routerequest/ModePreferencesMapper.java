@@ -5,8 +5,10 @@ import static org.opentripplanner.apis.gtfs.mapping.routerequest.StreetModeMappe
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.StreetModeMapper.validateStreetModes;
 
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -17,6 +19,7 @@ import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.utils.collection.CollectionUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class ModePreferencesMapper {
 
@@ -37,7 +40,8 @@ public class ModePreferencesMapper {
         throw new IllegalArgumentException("Direct modes must not be empty.");
       }
       var streetModes = direct.stream().map(DirectModeMapper::map).toList();
-      journey.withDirect(new StreetRequest(getStreetModeForRouting(streetModes)));
+      var rentalDuration = getRentalDurationByQueryArgs(args);
+      journey.withDirect(new StreetRequest(getStreetModeForRouting(streetModes), rentalDuration));
     }
 
     var transit = modesInput.getGraphQLTransit();
@@ -128,5 +132,29 @@ public class ModePreferencesMapper {
         .build();
       journey.withTransit(b -> b.withFilters(List.of(filter)));
     }
+  }
+
+  /**
+   * return car rental duration, if it was set in graphql query.
+   * This method exist, to handle all the null checks.
+   */
+  @Nullable
+  private static Duration getRentalDurationByQueryArgs(
+    GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args
+  ) {
+    var graphQLStreet = args.getGraphQLPreferences().getGraphQLStreet();
+    if (graphQLStreet != null) {
+      var graphQLCar = graphQLStreet.getGraphQLCar();
+      if (graphQLCar != null) {
+        var graphQLRental = graphQLCar.getGraphQLRental();
+        if (graphQLRental != null) {
+          var rentalDuration = graphQLRental.getGraphQLRentalDuration();
+          if (rentalDuration != null) {
+            return DurationUtils.requireNonNegative(rentalDuration, "rentalDuration");
+          }
+        }
+      }
+    }
+    return null;
   }
 }

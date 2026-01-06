@@ -71,16 +71,12 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     if (hasFrequencies()) {
       this.startOfRunningPeriod = ServiceDateUtils.asDateTime(
         serviceDate,
-        frequencies
-          .stream()
-          .mapToInt(frequencyEntry -> frequencyEntry.startTime)
-          .min()
-          .orElseThrow()
+        frequencies.stream().mapToInt(FrequencyEntry::startTime).min().orElseThrow()
       ).toLocalDate();
 
       this.endOfRunningPeriod = ServiceDateUtils.asDateTime(
         serviceDate,
-        frequencies.stream().mapToInt(frequencyEntry -> frequencyEntry.endTime).max().orElseThrow()
+        frequencies.stream().mapToInt(FrequencyEntry::endTime).max().orElseThrow()
       ).toLocalDate();
     } else {
       // These depend on the tripTimes array being sorted
@@ -200,7 +196,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
     List<FrequencyEntry> filteredFrequencies = new ArrayList<>(frequencies.length);
     for (FrequencyEntry frequencyEntry : frequencies) {
-      if (filter.test(frequencyEntry.tripTimes)) {
+      if (filter.test(frequencyEntry.tripTimes())) {
         filteredFrequencies.add(frequencyEntry);
       }
     }

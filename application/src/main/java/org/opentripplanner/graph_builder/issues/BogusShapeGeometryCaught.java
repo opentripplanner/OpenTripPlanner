@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.issues;
 
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public record BogusShapeGeometryCaught(FeedScopedId shapeId, StopTime stA, StopTime stB)
   implements DataImportIssue {

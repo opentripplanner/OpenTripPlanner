@@ -1,6 +1,6 @@
 package org.opentripplanner.model.fare;
 
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 public class RiderCategoryBuilder {
 

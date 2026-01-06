@@ -40,6 +40,7 @@ class ModeMapper {
       case MONORAIL -> "MONORAIL";
       case CARPOOL -> "CARPOOL";
       case TAXI -> "TAXI";
+      case SNOW_AND_ICE -> "SNOW_AND_ICE";
     };
   }
 }

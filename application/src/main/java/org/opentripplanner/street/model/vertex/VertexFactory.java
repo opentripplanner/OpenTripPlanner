@@ -3,8 +3,8 @@ package org.opentripplanner.street.model.vertex;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
@@ -45,8 +45,19 @@ public class VertexFactory {
     );
   }
 
-  public ElevatorVertex elevator(Vertex sourceVertex, String label, double level) {
-    return addToGraph(new ElevatorVertex(sourceVertex, label, level));
+  public ElevatorHopVertex elevator(Vertex sourceVertex, String label) {
+    return addToGraph(new ElevatorHopVertex(sourceVertex, label));
+  }
+
+  public OsmElevatorVertex osmElevator(OsmNode node, OsmEntityType osmEntityType, long entityId) {
+    return addToGraph(
+      new OsmElevatorVertex(
+        node.getId(),
+        new WgsCoordinate(node.getCoordinate()),
+        osmEntityType,
+        entityId
+      )
+    );
   }
 
   public IntersectionVertex intersection(Coordinate edgeCoordinate) {
@@ -117,8 +128,15 @@ public class VertexFactory {
     );
   }
 
-  public OsmVertex osmOnLinearBarrier(Coordinate coordinate, long nid, long routableWayId) {
-    return addToGraph(new BarrierPassThroughVertex(coordinate.x, coordinate.y, nid, routableWayId));
+  public OsmVertex osmOnLinearBarrier(
+    Coordinate coordinate,
+    long nid,
+    OsmEntityType osmEntityType,
+    long entityId
+  ) {
+    return addToGraph(
+      new BarrierPassThroughVertex(coordinate.x, coordinate.y, nid, osmEntityType, entityId)
+    );
   }
 
   public TransitStopVertex transitStop(TransitStopVertexBuilder builder) {
@@ -158,12 +176,6 @@ public class VertexFactory {
         entrance.getName(),
         entrance.getWheelchairAccessibility()
       )
-    );
-  }
-
-  public OsmVertex levelledOsm(OsmNode node, double level) {
-    return addToGraph(
-      new OsmVertexOnLevel(node.getId(), new WgsCoordinate(node.getCoordinate()), level)
     );
   }
 

@@ -1,6 +1,6 @@
 package org.opentripplanner.api.model.transit;
 
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * An id mapper that passes input and output ids through with the feed id.

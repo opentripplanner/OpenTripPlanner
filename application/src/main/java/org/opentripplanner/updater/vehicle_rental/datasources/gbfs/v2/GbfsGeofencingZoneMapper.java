@@ -5,8 +5,8 @@ import java.util.Objects;
 import org.geojson.MultiPolygon;
 import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSFeature;
 import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 
 /**

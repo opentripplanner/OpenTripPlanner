@@ -5,12 +5,13 @@ import java.util.List;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
@@ -38,7 +39,8 @@ public class NetexConfigure {
   public NetexModule createNetexModule(
     Iterable<ConfiguredCompositeDataSource<NetexFeedParameters>> netexSources,
     TimetableRepository timetableRepository,
-    VehicleParkingRepository parkingRepsitory,
+    VehicleParkingRepository parkingRepository,
+    StreetDetailsRepository streetDetailsRepository,
     Graph graph,
     DeduplicatorService deduplicator,
     DataImportIssueStore issueStore
@@ -46,7 +48,7 @@ public class NetexConfigure {
     List<NetexBundle> netexBundles = new ArrayList<>();
 
     for (ConfiguredCompositeDataSource<NetexFeedParameters> it : netexSources) {
-      var transitServiceBuilder = new OtpTransitServiceBuilder(
+      var transitServiceBuilder = new TransitDataImportBuilder(
         timetableRepository.getSiteRepository(),
         issueStore
       );
@@ -57,7 +59,8 @@ public class NetexConfigure {
       graph,
       deduplicator,
       timetableRepository,
-      parkingRepsitory,
+      parkingRepository,
+      streetDetailsRepository,
       issueStore,
       buildParams.getSubwayAccessTimeSeconds(),
       buildParams.getTransitServicePeriod(),
@@ -67,7 +70,7 @@ public class NetexConfigure {
 
   /** public to enable testing */
   public NetexBundle netexBundle(
-    OtpTransitServiceBuilder transitServiceBuilder,
+    TransitDataImportBuilder transitServiceBuilder,
     ConfiguredCompositeDataSource<NetexFeedParameters> configuredDataSource
   ) {
     var source = configuredDataSource.dataSource();

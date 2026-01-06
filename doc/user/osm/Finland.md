@@ -98,6 +98,7 @@ For details, see [#6782](https://github.com/opentripplanner/OpenTripPlanner/pull
 | `highway=bridleway`                                                             | `NONE`                   | 1.3                                                   |             |
 | `highway=corridor`                                                              | `PEDESTRIAN`             |                                                       |             |
 | `highway=steps`                                                                 | `PEDESTRIAN`             |                                                       |             |
+| `highway=elevator`                                                              | `PEDESTRIAN`             |                                                       |             |
 | `highway=crossing`                                                              | `PEDESTRIAN`             |                                                       |             |
 | `highway=platform`                                                              | `PEDESTRIAN`             |                                                       |             |
 | `public_transport=platform`                                                     | `PEDESTRIAN`             |                                                       |             |

@@ -31,6 +31,7 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
@@ -74,6 +75,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Nullable
   private final ItineraryDecorator emissionItineraryDecorator;
+
+  private final StreetDetailsService streetDetailsService;
 
   @Nullable
   private final EmpiricalDelayService empiricalDelayService;
@@ -137,6 +140,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     WorldEnvelopeService worldEnvelopeService,
     @Nullable CarpoolingService carpoolingService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
+    StreetDetailsService streetDetailsService,
     @Nullable EmpiricalDelayService empiricalDelayService,
     @Nullable LuceneIndex luceneIndex,
     @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
@@ -172,6 +176,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     // Optional fields
     this.carpoolingService = carpoolingService;
     this.emissionItineraryDecorator = emissionItineraryDecorator;
+    this.streetDetailsService = streetDetailsService;
     this.empiricalDelayService = empiricalDelayService;
     this.luceneIndex = luceneIndex;
     this.gtfsSchema = gtfsSchema;
@@ -323,6 +328,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public ItineraryDecorator emissionItineraryDecorator() {
     return emissionItineraryDecorator;
+  }
+
+  @Override
+  public StreetDetailsService streetDetailsService() {
+    return streetDetailsService;
   }
 
   @Override
