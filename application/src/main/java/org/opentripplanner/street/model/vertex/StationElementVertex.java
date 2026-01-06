@@ -1,8 +1,8 @@
 package org.opentripplanner.street.model.vertex;
 
 import java.util.Objects;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 public abstract class StationElementVertex extends Vertex {
 

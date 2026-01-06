@@ -12,17 +12,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -45,7 +45,7 @@ class GenerateTripPatternsOperationTest {
 
   private Deduplicator deduplicator;
   private DataImportIssueStore issueStore;
-  private OtpTransitServiceBuilder transitServiceBuilder;
+  private TransitDataImportBuilder transitServiceBuilder;
   private GeometryProcessor geometryProcessor;
 
   @BeforeAll
@@ -120,7 +120,7 @@ class GenerateTripPatternsOperationTest {
   void setup() {
     deduplicator = new Deduplicator();
     issueStore = new DefaultDataImportIssueStore();
-    transitServiceBuilder = new OtpTransitServiceBuilder(siteRepository, issueStore);
+    transitServiceBuilder = new TransitDataImportBuilder(siteRepository, issueStore);
     double maxStopToShapeSnapDistance = 100;
     geometryProcessor = new GeometryProcessor(
       transitServiceBuilder,

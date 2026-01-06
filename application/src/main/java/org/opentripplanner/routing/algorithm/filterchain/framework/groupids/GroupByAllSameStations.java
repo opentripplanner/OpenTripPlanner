@@ -2,10 +2,10 @@ package org.opentripplanner.routing.algorithm.filterchain.framework.groupids;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.GroupId;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This creates a group identifier based on all origin and destination stations, or stops if there

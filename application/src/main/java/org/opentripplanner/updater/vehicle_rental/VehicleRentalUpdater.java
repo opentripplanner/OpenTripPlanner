@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
@@ -26,7 +27,6 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
@@ -35,7 +35,6 @@ import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataS
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.opentripplanner.utils.logging.Throttle;
 import org.opentripplanner.utils.time.DurationUtils;
-import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -238,7 +237,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         var millis = Duration.ofMillis(end - start);
         LOG.info(
           "Geofencing zones computation took {}. Added extension to {} edges. For {}",
-          TimeUtils.durationToStrCompact(millis),
+          DurationUtils.durationToStr(millis),
           latestModifiedEdges.size(),
           nameForLogging
         );

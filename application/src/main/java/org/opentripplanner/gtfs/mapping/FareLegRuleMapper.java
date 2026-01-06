@@ -1,32 +1,38 @@
 package org.opentripplanner.gtfs.mapping;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Area;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
+import org.opentripplanner.ext.fares.model.Timeframe;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.basic.Distance;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class FareLegRuleMapper {
+class FareLegRuleMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(FareLegRuleMapper.class);
 
   private final IdFactory idFactory;
   private final FareProductMapper fareProductMapper;
+  private final TimeframeMapper timeframeMapper;
   private final DataImportIssueStore issueStore;
 
   public FareLegRuleMapper(
     IdFactory idFactory,
     FareProductMapper fareProductMapper,
+    TimeframeMapper timeframeMapper,
     DataImportIssueStore issueStore
   ) {
     this.idFactory = idFactory;
     this.fareProductMapper = fareProductMapper;
+    this.timeframeMapper = timeframeMapper;
     this.issueStore = issueStore;
   }
 
@@ -49,7 +55,9 @@ final class FareLegRuleMapper {
         .withNetworkId(idFactory.createNullableId(r.getNetworkId()))
         .withFromAreaId(areaId(r.getFromArea()))
         .withToAreaId(areaId(r.getToArea()))
-        .withFareDistance(fareDistance);
+        .withFareDistance(fareDistance)
+        .withFromTimeframes(mapTimeframe(r.getFromTimeframeGroupId()))
+        .withToTimeframes(mapTimeframe(r.getToTimeframeGroupId()));
       r.getRulePriorityOption().ifPresent(builder::withPriority);
       return builder.build();
     } else {
@@ -101,5 +109,13 @@ final class FareLegRuleMapper {
       );
       default -> null;
     };
+  }
+
+  private Collection<Timeframe> mapTimeframe(@Nullable AgencyAndId id) {
+    if (id == null) {
+      return List.of();
+    }
+    var groupId = idFactory.createId(id, "fare leg rule's timeframe group id");
+    return timeframeMapper.findTimeframes(groupId);
   }
 }

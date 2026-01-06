@@ -1,10 +1,10 @@
 package org.opentripplanner.netex.mapping;
 
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Maps NeTEx notice to OTP notice.

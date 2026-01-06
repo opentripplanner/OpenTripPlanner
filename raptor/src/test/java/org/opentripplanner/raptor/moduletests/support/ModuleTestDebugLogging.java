@@ -1,8 +1,6 @@
 package org.opentripplanner.raptor.moduletests.support;
 
 import org.opentripplanner.raptor._data.transit.TestTransitData;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 
 /**
  * The static {@code setupDebugLogging(...)} method is used to setup Raptor debugging. To enable
@@ -43,16 +41,13 @@ public final class ModuleTestDebugLogging {
 
   private static final boolean DEBUG = false;
 
-  public static void setupDebugLogging(
-    TestTransitData data,
-    RaptorRequestBuilder<TestTripSchedule> requestBuilder
-  ) {
+  public static void setupDebugLogging(TestTransitData data) {
     // We always run with debugging enabled, but be skip logging(dryRun=true).
     // We do this to make sure the logging works for all test-cases, and do not throw exceptions.
     boolean sysDebug = System.getProperties().containsKey("debugRaptor");
     boolean envDebug = System.getenv().containsKey("debugRaptor");
 
     var dryRun = !(DEBUG || sysDebug || envDebug);
-    data.debugToStdErr(requestBuilder, dryRun);
+    data.debugToStdErr(data.requestBuilder(), dryRun);
   }
 }

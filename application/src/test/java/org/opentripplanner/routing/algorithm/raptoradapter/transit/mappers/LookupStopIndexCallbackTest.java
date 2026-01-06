@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class LookupStopIndexCallbackTest {
 

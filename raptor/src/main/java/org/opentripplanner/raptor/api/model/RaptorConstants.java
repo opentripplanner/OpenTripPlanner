@@ -73,4 +73,12 @@ public class RaptorConstants {
 
   /** Alias for {@link #UNREACHED_HIGH} */
   public static final int N_TRANSFERS_UNREACHED = UNREACHED_HIGH;
+
+  public static boolean isSet(int value) {
+    return value != NOT_SET;
+  }
+
+  public static boolean isTimeSet(int time) {
+    return time != TIME_NOT_SET;
+  }
 }

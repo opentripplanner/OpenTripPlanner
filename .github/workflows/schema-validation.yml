@@ -4,10 +4,14 @@ on:
   pull_request:
     branches:
       - dev-2.x
+  # We have to run this on merge_group despite it doing nothing since otherwise this required check isn't "successful"
+  merge_group:
+    branches:
+      - dev-2.x
  
 jobs:
   validate-gtfs-schema:
-    if: github.repository_owner == 'opentripplanner'
+    if: github.repository_owner == 'opentripplanner' && github.event_name == 'pull_request'
     name: Validate GTFS GraphQL schema changes
     runs-on: ubuntu-latest
 
@@ -32,7 +36,7 @@ jobs:
           graphql-inspector diff 'git:origin/dev-2.x:application/src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls' 'application/src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls'
 
   validate-transmodel-schema:
-    if: github.repository_owner == 'opentripplanner'
+    if: github.repository_owner == 'opentripplanner' && github.event_name == 'pull_request'
     name: Validate Transmodel GraphQL schema changes
     runs-on: ubuntu-latest
 

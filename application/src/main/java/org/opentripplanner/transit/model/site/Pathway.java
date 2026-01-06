@@ -2,8 +2,8 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public final class Pathway extends AbstractTransitEntity<Pathway, PathwayBuilder> {
 

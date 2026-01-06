@@ -1,12 +1,17 @@
 package org.opentripplanner.raptor.api.path;
 
+import static org.opentripplanner.raptor.api.model.RaptorValueType.C1;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.C2;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.TRANSFERS;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.TRANSFER_PRIORITY;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.WAIT_TIME_COST;
+
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
-import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -78,28 +83,28 @@ public class PathStringBuilder {
     if (c1 == RaptorCostCalculator.ZERO_COST) {
       return this;
     }
-    return text(RaptorValueFormatter.formatC1(c1));
+    return text(C1.format(c1));
   }
 
   public PathStringBuilder c2(int c2) {
     if (c2 == RaptorConstants.NOT_SET) {
       return this;
     }
-    return text(RaptorValueFormatter.formatC2(c2));
+    return text(C2.format(c2));
   }
 
   public PathStringBuilder waitTimeCost(int wtc, int defaultValue) {
     if (wtc == defaultValue) {
       return this;
     }
-    return text(RaptorValueFormatter.formatWaitTimeCost(wtc));
+    return text(WAIT_TIME_COST.format(wtc));
   }
 
   public PathStringBuilder transferPriority(int transferPriorityCost, int defaultValue) {
     if (transferPriorityCost == defaultValue) {
       return this;
     }
-    return text(RaptorValueFormatter.formatTransferPriority(transferPriorityCost));
+    return text(TRANSFER_PRIORITY.format(transferPriorityCost));
   }
 
   public PathStringBuilder duration(int duration) {
@@ -115,9 +120,7 @@ public class PathStringBuilder {
   }
 
   public PathStringBuilder numberOfTransfers(int nTransfers) {
-    return nTransfers != RaptorConstants.NOT_SET
-      ? text(RaptorValueFormatter.formatNumOfTransfers(nTransfers))
-      : this;
+    return nTransfers != RaptorConstants.NOT_SET ? text(TRANSFERS.format(nTransfers)) : this;
   }
 
   public PathStringBuilder summary(int c1, int c2) {

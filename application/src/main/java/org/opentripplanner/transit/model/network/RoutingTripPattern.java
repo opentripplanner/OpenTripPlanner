@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -16,11 +15,14 @@ import org.opentripplanner.transit.model.site.StopLocation;
  *  - This also provide explicit documentation on which fields are used during a search and which
  *    are not.
  */
-public class RoutingTripPattern implements DefaultTripPattern, Serializable {
+public class RoutingTripPattern implements RaptorTripPattern, Serializable {
 
   private static final AtomicInteger INDEX_COUNTER = new AtomicInteger(0);
   private final int index;
+
+  @Deprecated
   private final TripPattern pattern;
+
   private final int[] stopIndexes;
   private final BitSet boardingPossible;
   private final BitSet alightingPossible;
@@ -28,7 +30,7 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
   private final int slackIndex;
   private final int transitReluctanceFactorIndex;
 
-  RoutingTripPattern(TripPattern pattern, TripPatternBuilder builder) {
+  RoutingTripPattern(TripPattern pattern) {
     this.pattern = pattern;
     this.stopIndexes = pattern.getStops().stream().mapToInt(StopLocation::getIndex).toArray();
     this.index = INDEX_COUNTER.getAndIncrement();
@@ -63,6 +65,12 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
     return index;
   }
 
+  /**
+   * @deprecated This create a circular dependency: TripPattern ⇔ RoutingTripPattern, also the
+   *             RoutingTripPattern should be a pure-syntetic-value-object to allow it to be fast
+   *             to create and load from memory - with no concurency risk.
+   */
+  @Deprecated
   public final TripPattern getPattern() {
     return this.pattern;
   }
@@ -114,7 +122,6 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
     return transitReluctanceFactorIndex;
   }
 
-  @Override
   public Route route() {
     return pattern.getRoute();
   }

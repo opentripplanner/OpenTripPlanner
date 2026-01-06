@@ -31,6 +31,7 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=bridleway`                                     | `NONE`                   | 1.3                                                   |             |
 | `highway=corridor`                                      | `PEDESTRIAN`             |                                                       |             |
 | `highway=steps`                                         | `PEDESTRIAN`             |                                                       |             |
+| `highway=elevator`                                      | `PEDESTRIAN`             |                                                       |             |
 | `highway=crossing`                                      | `PEDESTRIAN`             |                                                       |             |
 | `highway=platform`                                      | `PEDESTRIAN`             |                                                       |             |
 | `public_transport=platform`                             | `PEDESTRIAN`             |                                                       |             |

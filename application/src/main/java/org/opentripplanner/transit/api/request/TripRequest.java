@@ -2,8 +2,8 @@ package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.api.model.FilterValues;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

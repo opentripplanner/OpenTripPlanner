@@ -5,9 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
+import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUse;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transit.model.site.Entrance;
@@ -27,7 +28,13 @@ public class WalkStepBuilder {
   private RelativeDirection relativeDirection;
   private ElevationProfile elevationProfile;
   private String exit;
+
+  @Nullable
   private Entrance entrance;
+
+  @Nullable
+  private VerticalTransportationUse verticalTransportationUse;
+
   private boolean stayOn = false;
   private boolean crossing;
   /**
@@ -80,6 +87,13 @@ public class WalkStepBuilder {
 
   public WalkStepBuilder withEntrance(@Nullable Entrance entrance) {
     this.entrance = entrance;
+    return this;
+  }
+
+  public WalkStepBuilder withVerticalTransportationUse(
+    @Nullable VerticalTransportationUse verticalTransportationUse
+  ) {
+    this.verticalTransportationUse = verticalTransportationUse;
     return this;
   }
 
@@ -149,6 +163,11 @@ public class WalkStepBuilder {
     return entrance != null;
   }
 
+  @Nullable
+  public VerticalTransportationUse verticalTransportationUse() {
+    return verticalTransportationUse;
+  }
+
   public WalkStepBuilder addStreetNotes(Set<StreetNote> notes) {
     this.streetNotes.addAll(notes);
     return this;
@@ -182,6 +201,7 @@ public class WalkStepBuilder {
       streetNotes,
       exit,
       entrance,
+      verticalTransportationUse,
       elevationProfile,
       nameIsDerived,
       walkingBike,

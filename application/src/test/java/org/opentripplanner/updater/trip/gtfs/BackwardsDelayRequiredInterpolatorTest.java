@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -27,10 +28,7 @@ class BackwardsDelayRequiredInterpolatorTest {
   void noPropagation() {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
       .withArrivalDelay(0, -3);
-    assertEquals(
-      OptionalInt.empty(),
-      new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)
-    );
+    assertThat(new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)).isEmpty();
     // nothing after the first given update should be touched, so it should be left null
     assertNull(builder.getDepartureDelay(0));
   }
@@ -167,7 +165,7 @@ class BackwardsDelayRequiredInterpolatorTest {
   void noUpdatesAtAll() {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes();
     Assertions.assertThrows(IllegalArgumentException.class, () ->
-      new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)
+      new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
     );
   }
 }

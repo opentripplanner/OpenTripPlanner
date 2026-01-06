@@ -1,10 +1,13 @@
 package org.opentripplanner.street.search.request;
 
+import static org.opentripplanner.utils.lang.DoubleUtils.doubleEquals;
+
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -26,6 +29,7 @@ public final class RentalRequest {
 
   private final Set<String> allowedNetworks;
   private final Set<String> bannedNetworks;
+  private final double electricAssistSlopeSensitivity;
 
   private RentalRequest() {
     this.pickupTime = Duration.ofMinutes(1);
@@ -37,6 +41,8 @@ public final class RentalRequest {
     this.allowArrivingInRentedVehicleAtDestination = false;
     this.allowedNetworks = Set.of();
     this.bannedNetworks = Set.of();
+    this.electricAssistSlopeSensitivity =
+      VehicleRentalPreferences.DEFAULT_ELECTRIC_ASSIST_SLOPE_SENSITIVITY;
   }
 
   private RentalRequest(Builder builder) {
@@ -51,6 +57,7 @@ public final class RentalRequest {
       builder.allowArrivingInRentedVehicleAtDestination;
     this.allowedNetworks = builder.allowedNetworks;
     this.bannedNetworks = builder.bannedNetworks;
+    this.electricAssistSlopeSensitivity = builder.electricAssistSlopeSensitivity;
   }
 
   public static Builder of() {
@@ -119,6 +126,14 @@ public final class RentalRequest {
     return bannedNetworks;
   }
 
+  /**
+   * Slope sensitivity for electric-assist rental vehicles (0-1).
+   * @see VehicleRentalPreferences#electricAssistSlopeSensitivity()
+   */
+  public double electricAssistSlopeSensitivity() {
+    return electricAssistSlopeSensitivity;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -140,7 +155,8 @@ public final class RentalRequest {
       ) &&
       allowArrivingInRentedVehicleAtDestination == that.allowArrivingInRentedVehicleAtDestination &&
       allowedNetworks.equals(that.allowedNetworks) &&
-      bannedNetworks.equals(that.bannedNetworks)
+      bannedNetworks.equals(that.bannedNetworks) &&
+      doubleEquals(electricAssistSlopeSensitivity, that.electricAssistSlopeSensitivity)
     );
   }
 
@@ -155,7 +171,8 @@ public final class RentalRequest {
       arrivingInRentalVehicleAtDestinationCost,
       allowArrivingInRentedVehicleAtDestination,
       allowedNetworks,
-      bannedNetworks
+      bannedNetworks,
+      electricAssistSlopeSensitivity
     );
   }
 
@@ -178,6 +195,11 @@ public final class RentalRequest {
       )
       .addCol("allowedNetworks", allowedNetworks, DEFAULT.allowedNetworks)
       .addCol("bannedNetworks", bannedNetworks, DEFAULT.bannedNetworks)
+      .addNum(
+        "electricAssistSlopeSensitivity",
+        electricAssistSlopeSensitivity,
+        DEFAULT.electricAssistSlopeSensitivity
+      )
       .toString();
   }
 
@@ -193,6 +215,7 @@ public final class RentalRequest {
     private boolean allowArrivingInRentedVehicleAtDestination;
     private Set<String> allowedNetworks;
     private Set<String> bannedNetworks;
+    private double electricAssistSlopeSensitivity;
 
     private Builder(RentalRequest original) {
       this.original = original;
@@ -207,6 +230,7 @@ public final class RentalRequest {
         original.allowArrivingInRentedVehicleAtDestination;
       this.allowedNetworks = original.allowedNetworks;
       this.bannedNetworks = original.bannedNetworks;
+      this.electricAssistSlopeSensitivity = original.electricAssistSlopeSensitivity;
     }
 
     public Builder withPickupTime(Duration pickupTime) {
@@ -255,6 +279,11 @@ public final class RentalRequest {
 
     public Builder withBannedNetworks(Set<String> bannedNetworks) {
       this.bannedNetworks = bannedNetworks;
+      return this;
+    }
+
+    public Builder withElectricAssistSlopeSensitivity(double electricAssistSlopeSensitivity) {
+      this.electricAssistSlopeSensitivity = electricAssistSlopeSensitivity;
       return this;
     }
 

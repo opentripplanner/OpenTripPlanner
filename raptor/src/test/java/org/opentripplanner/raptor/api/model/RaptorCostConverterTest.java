@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.api.model;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.C1;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,6 +41,6 @@ public class RaptorCostConverterTest {
 
   @Test
   public void testToString() {
-    assertEquals("C₁120", RaptorCostConverter.toString(12_000));
+    assertEquals("C₁120", C1.format(12_000));
   }
 }

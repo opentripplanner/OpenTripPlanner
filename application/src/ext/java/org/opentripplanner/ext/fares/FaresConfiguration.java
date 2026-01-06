@@ -1,13 +1,13 @@
 package org.opentripplanner.ext.fares;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.ext.fares.impl.AtlantaFareServiceFactory;
-import org.opentripplanner.ext.fares.impl.HSLFareServiceFactory;
-import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareServiceFactory;
-import org.opentripplanner.ext.fares.impl.NoopFareServiceFactory;
-import org.opentripplanner.ext.fares.impl.OrcaFareFactory;
-import org.opentripplanner.ext.fares.impl.gtfs.CombineInterlinedLegsFactory;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.NoopFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.custom.AtlantaFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.custom.CombineInterlinedLegsFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.custom.HSLFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.custom.HighestFareInFreeTransferWindowFareServiceFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v1.custom.OrcaFareFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;

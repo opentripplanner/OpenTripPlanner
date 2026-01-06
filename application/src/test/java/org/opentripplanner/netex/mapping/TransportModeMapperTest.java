@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -30,6 +31,7 @@ import org.rutebanken.netex.model.CoachSubmodeEnumeration;
 import org.rutebanken.netex.model.FunicularSubmodeEnumeration;
 import org.rutebanken.netex.model.MetroSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
+import org.rutebanken.netex.model.SnowAndIceSubmodeEnumeration;
 import org.rutebanken.netex.model.TaxiSubmodeEnumeration;
 import org.rutebanken.netex.model.TelecabinSubmodeEnumeration;
 import org.rutebanken.netex.model.TramSubmodeEnumeration;
@@ -41,28 +43,52 @@ class TransportModeMapperTest {
   private static final Map<
     AllVehicleModesOfTransportEnumeration,
     TransportSubmodeStructure
-  > VALID_SUBMODE_STRUCTURES = Map.of(
-    AllVehicleModesOfTransportEnumeration.AIR,
-    new TransportSubmodeStructure().withAirSubmode(AirSubmodeEnumeration.DOMESTIC_FLIGHT),
-    AllVehicleModesOfTransportEnumeration.BUS,
-    new TransportSubmodeStructure().withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS),
-    AllVehicleModesOfTransportEnumeration.CABLEWAY,
-    new TransportSubmodeStructure().withTelecabinSubmode(TelecabinSubmodeEnumeration.TELECABIN),
-    AllVehicleModesOfTransportEnumeration.COACH,
-    new TransportSubmodeStructure().withCoachSubmode(CoachSubmodeEnumeration.NATIONAL_COACH),
-    AllVehicleModesOfTransportEnumeration.FUNICULAR,
-    new TransportSubmodeStructure().withFunicularSubmode(FunicularSubmodeEnumeration.FUNICULAR),
-    AllVehicleModesOfTransportEnumeration.METRO,
-    new TransportSubmodeStructure().withMetroSubmode(MetroSubmodeEnumeration.METRO),
-    AllVehicleModesOfTransportEnumeration.RAIL,
-    new TransportSubmodeStructure().withRailSubmode(RailSubmodeEnumeration.LONG_DISTANCE),
-    AllVehicleModesOfTransportEnumeration.TAXI,
-    new TransportSubmodeStructure().withTaxiSubmode(TaxiSubmodeEnumeration.COMMUNAL_TAXI),
-    AllVehicleModesOfTransportEnumeration.TRAM,
-    new TransportSubmodeStructure().withTramSubmode(TramSubmodeEnumeration.CITY_TRAM),
-    AllVehicleModesOfTransportEnumeration.WATER,
-    new TransportSubmodeStructure()
-      .withWaterSubmode(WaterSubmodeEnumeration.INTERNATIONAL_PASSENGER_FERRY)
+  > VALID_SUBMODE_STRUCTURES = Map.ofEntries(
+    entry(
+      AllVehicleModesOfTransportEnumeration.AIR,
+      new TransportSubmodeStructure().withAirSubmode(AirSubmodeEnumeration.DOMESTIC_FLIGHT)
+    ),
+    entry(
+      AllVehicleModesOfTransportEnumeration.BUS,
+      new TransportSubmodeStructure().withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
+    ),
+    entry(
+      AllVehicleModesOfTransportEnumeration.CABLEWAY,
+      new TransportSubmodeStructure().withTelecabinSubmode(TelecabinSubmodeEnumeration.TELECABIN)
+    ),
+    entry(
+      AllVehicleModesOfTransportEnumeration.COACH,
+      new TransportSubmodeStructure().withCoachSubmode(CoachSubmodeEnumeration.NATIONAL_COACH)
+    ),
+    entry(
+      AllVehicleModesOfTransportEnumeration.FUNICULAR,
+      new TransportSubmodeStructure().withFunicularSubmode(FunicularSubmodeEnumeration.FUNICULAR)
+    ),
+    entry(
+      AllVehicleModesOfTransportEnumeration.METRO,
+      new TransportSubmodeStructure().withMetroSubmode(MetroSubmodeEnumeration.METRO)
+    ),
+    entry(
+      AllVehicleModesOfTransportEnumeration.RAIL,
+      new TransportSubmodeStructure().withRailSubmode(RailSubmodeEnumeration.LONG_DISTANCE)
+    ),
+    entry(
+      AllVehicleModesOfTransportEnumeration.SNOW_AND_ICE,
+      new TransportSubmodeStructure().withSnowAndIceSubmode(SnowAndIceSubmodeEnumeration.SNOW_COACH)
+    ),
+    entry(
+      AllVehicleModesOfTransportEnumeration.TAXI,
+      new TransportSubmodeStructure().withTaxiSubmode(TaxiSubmodeEnumeration.COMMUNAL_TAXI)
+    ),
+    entry(
+      AllVehicleModesOfTransportEnumeration.TRAM,
+      new TransportSubmodeStructure().withTramSubmode(TramSubmodeEnumeration.CITY_TRAM)
+    ),
+    entry(
+      AllVehicleModesOfTransportEnumeration.WATER,
+      new TransportSubmodeStructure()
+        .withWaterSubmode(WaterSubmodeEnumeration.INTERNATIONAL_PASSENGER_FERRY)
+    )
   );
 
   private static final EnumSet<AllVehicleModesOfTransportEnumeration> SUPPORTED_MODES =

@@ -5,18 +5,21 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
+import java.util.function.Function;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class GeneralizedCostParametersMapper {
 
-  public static GeneralizedCostParameters map(
+  public static <T extends RaptorTripPattern> GeneralizedCostParameters map(
     RouteRequest request,
-    List<? extends DefaultTripPattern> patternIndex
+    List<T> patternIndex,
+    Function<T, FeedScopedId> resolveRouteId,
+    Function<T, FeedScopedId> resolveAgencyId
   ) {
     var builder = GeneralizedCostParameters.of();
     var preferences = request.preferences();
@@ -52,8 +55,8 @@ public class GeneralizedCostParametersMapper {
       for (var pattern : patternIndex) {
         if (
           pattern != null &&
-          (unpreferredRoutes.contains(pattern.route().getId()) ||
-            unpreferredAgencies.contains(pattern.route().getAgency().getId()))
+          (unpreferredRoutes.contains(resolveRouteId.apply(pattern)) ||
+            unpreferredAgencies.contains(resolveAgencyId.apply(pattern)))
         ) {
           unpreferredPatterns.set(pattern.patternIndex());
         }

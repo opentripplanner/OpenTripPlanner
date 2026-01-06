@@ -2,8 +2,6 @@ package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
@@ -18,7 +16,7 @@ import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
 /**
@@ -31,16 +29,20 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class F05_OnBoardAccessEgressAndTransfersTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   @BeforeEach
   public void setup() {
     data
-      .withTransit("R1", "0:10 0:20", STOP_B, STOP_C)
+      .withTimetables(
+        """
+        B     C
+        0:10  0:20
+        """
+      )
+      .access("Flex+Walk 2m Rₙ1 ~ A", "Flex 5m Rₙ1 ~ A")
+      .egress("D ~ Flex+Walk 2m Rₙ1", "D ~ Flex 5m Rₙ1")
       .withTransfer(STOP_A, transfer(STOP_B, D10s))
       .withTransfer(STOP_C, transfer(STOP_D, D10s));
 
@@ -49,16 +51,11 @@ public class F05_OnBoardAccessEgressAndTransfersTest implements RaptorTestConsta
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D10m);
-
-    requestBuilder
-      .searchParams()
-      .addAccessPaths(flexAndWalk(STOP_A, D2m), flex(STOP_A, D5m))
-      .addEgressPaths(flexAndWalk(STOP_D, D2m), flex(STOP_D, D5m));
   }
 
   static List<RaptorModuleTestCase> testCases() {
     var path =
-      "Flex 5m 1x ~ A ~ Walk 10s ~ B ~ BUS R1 0:10 0:20 ~ C ~ Walk 10s ~ D ~ Flex 5m 1x [0:03:50 0:26:10 22m20s Tₓ2 C₁2_560]";
+      "Flex 5m Rₙ1 ~ A ~ Walk 10s ~ B ~ BUS R1 0:10 0:20 ~ C ~ Walk 10s ~ D ~ Flex 5m Rₙ1 [0:03:50 0:26:10 22m20s Tₙ2 C₁2_560]";
 
     return RaptorModuleTestCase.of()
       .addMinDuration("22m20s", 2, T00_00, T00_30)

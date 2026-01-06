@@ -15,13 +15,6 @@ public enum ParetoSetCost {
    */
   USE_C1,
   /**
-   * Same as {@link #USE_C1}, but the relax function is used to relax the cost at the destination.
-   * DO not use this! This will be removed as soon as the Vy, Entur, Norway has migrated off
-   * this feature.
-   */
-  @Deprecated
-  USE_C1_RELAX_DESTINATION,
-  /**
    * Use both c1 and c2 in the pareto function. A small value is better than a large one.
    */
   USE_C1_AND_C2,

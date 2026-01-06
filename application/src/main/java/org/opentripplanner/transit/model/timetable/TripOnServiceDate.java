@@ -3,8 +3,8 @@ package org.opentripplanner.transit.model.timetable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Class for holding data about a certain trip on a certain day. Essentially a DatedServiceJourney

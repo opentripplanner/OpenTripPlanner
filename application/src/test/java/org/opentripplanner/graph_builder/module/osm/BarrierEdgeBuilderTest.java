@@ -23,6 +23,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
+import org.opentripplanner.street.model.vertex.OsmEntityType;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -42,7 +43,7 @@ class BarrierEdgeBuilderTest {
 
   @Test
   void connectOneVertexWithoutBarrier() {
-    var v1 = new BarrierPassThroughVertex(0, 0, 0, 1);
+    var v1 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 1);
     connectToOutsideWorld(v1);
     subject.build(new OsmNode(), List.of(v1), List.of());
     assertEquals(1, v1.getDegreeIn());
@@ -51,7 +52,7 @@ class BarrierEdgeBuilderTest {
 
   @Test
   void connectOneVertexWithBarrier() {
-    var v1 = new BarrierPassThroughVertex(0, 0, 0, 1);
+    var v1 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 1);
     connectToOutsideWorld(v1);
     subject.build(new OsmNode(), List.of(v1), List.of(WALL));
     assertEquals(1, v1.getDegreeIn());
@@ -60,9 +61,9 @@ class BarrierEdgeBuilderTest {
 
   @Test
   void connectThreeVerticesWithoutBarrier() {
-    var v1 = new BarrierPassThroughVertex(0, 0, 0, 1);
-    var v2 = new BarrierPassThroughVertex(0, 0, 0, 2);
-    var v3 = new BarrierPassThroughVertex(0, 0, 0, 3);
+    var v1 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 1);
+    var v2 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 2);
+    var v3 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 3);
     connectToOutsideWorld(v1, v2, v3);
     subject.build(new OsmNode(), List.of(v1, v2, v3), List.of());
     assertEquals(3, v1.getDegreeIn());
@@ -79,9 +80,9 @@ class BarrierEdgeBuilderTest {
 
   @Test
   void connectThreeVerticesWithWall() {
-    var v1 = new BarrierPassThroughVertex(0, 0, 0, 1);
-    var v2 = new BarrierPassThroughVertex(0, 0, 0, 2);
-    var v3 = new BarrierPassThroughVertex(0, 0, 0, 3);
+    var v1 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 1);
+    var v2 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 2);
+    var v3 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 3);
     connectToOutsideWorld(v1, v2, v3);
 
     // a wall can't be passed with any means so no edges should be created
@@ -96,9 +97,9 @@ class BarrierEdgeBuilderTest {
 
   @Test
   void connectThreeVerticesWithChain() {
-    var v1 = new BarrierPassThroughVertex(0, 0, 0, 1);
-    var v2 = new BarrierPassThroughVertex(0, 0, 0, 2);
-    var v3 = new BarrierPassThroughVertex(0, 0, 0, 3);
+    var v1 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 1);
+    var v2 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 2);
+    var v3 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 3);
     connectToOutsideWorld(v1, v2, v3);
 
     // a chain is passable by pedestrians so edges should be created
@@ -126,9 +127,9 @@ class BarrierEdgeBuilderTest {
 
   @Test
   void connectThreeVerticesWithKerb() {
-    var v1 = new BarrierPassThroughVertex(0, 0, 0, 1);
-    var v2 = new BarrierPassThroughVertex(0, 0, 0, 2);
-    var v3 = new BarrierPassThroughVertex(0, 0, 0, 3);
+    var v1 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 1);
+    var v2 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 2);
+    var v3 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 3);
     connectToOutsideWorld(v1, v2, v3);
 
     // a kerb allows everything to get across but may pose a problem for wheelchair
@@ -148,9 +149,9 @@ class BarrierEdgeBuilderTest {
 
   @Test
   void connectThreeVerticesWithKerbAndHandrail() {
-    var v1 = new BarrierPassThroughVertex(0, 0, 0, 1);
-    var v2 = new BarrierPassThroughVertex(0, 0, 0, 2);
-    var v3 = new BarrierPassThroughVertex(0, 0, 0, 3);
+    var v1 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 1);
+    var v2 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 2);
+    var v3 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 3);
     connectToOutsideWorld(v1, v2, v3);
 
     // a handrail intersects with a kerb, therefore only pedestrians can pass this barrier
@@ -171,9 +172,9 @@ class BarrierEdgeBuilderTest {
 
   @Test
   void connectThreeVerticesWithKerbAndFence() {
-    var v1 = new BarrierPassThroughVertex(0, 0, 0, 1);
-    var v2 = new BarrierPassThroughVertex(0, 0, 0, 2);
-    var v3 = new BarrierPassThroughVertex(0, 0, 0, 3);
+    var v1 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 1);
+    var v2 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 2);
+    var v3 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 3);
     connectToOutsideWorld(v1, v2, v3);
 
     // a fence intersects with a kerb, nothing can get through it
@@ -203,9 +204,9 @@ class BarrierEdgeBuilderTest {
     OsmNode node,
     StreetTraversalPermission expectedPermission
   ) {
-    var v1 = new BarrierPassThroughVertex(0, 0, 0, 1);
-    var v2 = new BarrierPassThroughVertex(0, 0, 0, 2);
-    var v3 = new BarrierPassThroughVertex(0, 0, 0, 3);
+    var v1 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 1);
+    var v2 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 2);
+    var v3 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 3);
     connectToOutsideWorld(v1, v2, v3);
 
     subject.build(node, List.of(v1, v2, v3), List.of(WALL));
@@ -224,8 +225,8 @@ class BarrierEdgeBuilderTest {
   @Test
   void throughOneWayTraffic() {
     var v0 = new OsmVertex(0, 0, 1);
-    var v1 = new BarrierPassThroughVertex(0, 0, 0, 1);
-    var v2 = new BarrierPassThroughVertex(0, 0, 0, 2);
+    var v1 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 1);
+    var v2 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 2);
     var v3 = new OsmVertex(0, 0, 2);
     connect(v0, v1);
     connect(v2, v3);
@@ -247,8 +248,8 @@ class BarrierEdgeBuilderTest {
   @Test
   void noThroughOneWayTraffic() {
     var v0 = new OsmVertex(0, 0, 1);
-    var v1 = new BarrierPassThroughVertex(0, 0, 0, 1);
-    var v2 = new BarrierPassThroughVertex(0, 0, 0, 2);
+    var v1 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 1);
+    var v2 = new BarrierPassThroughVertex(0, 0, 0, OsmEntityType.WAY, 2);
     var v3 = new OsmVertex(0, 0, 2);
     connect(v0, v1, WALK);
     connect(v2, v3, BICYCLE);

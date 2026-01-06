@@ -57,7 +57,15 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
   @Override
   public DataFetcher<Object> feature() {
-    return environment -> getSource(environment).entrance().orElse(null);
+    return environment -> {
+      WalkStep walkStep = getSource(environment);
+      if (walkStep.entrance().isPresent()) {
+        return walkStep.entrance().get();
+      } else if (walkStep.verticalTransportationUse().isPresent()) {
+        return walkStep.verticalTransportationUse().get();
+      }
+      return null;
+    };
   }
 
   @Override

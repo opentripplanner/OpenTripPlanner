@@ -13,8 +13,8 @@ import static org.opentripplanner.street.model.edge.StreetEdge.WALK_NOTHRUTRAFFI
 import static org.opentripplanner.street.model.edge.StreetEdge.WHEELCHAIR_ACCESSIBLE_FLAG_INDEX;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;

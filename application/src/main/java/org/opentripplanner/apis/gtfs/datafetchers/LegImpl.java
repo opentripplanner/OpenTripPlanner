@@ -112,6 +112,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
         source.start(),
         source.boardStopPosInPattern(),
         source.boardingGtfsStopSequence(),
+        source.from().viaLocationType,
         boardRule != null && boardRule.isNotRoutable()
       );
     };
@@ -275,6 +276,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
         source.end(),
         source.alightStopPosInPattern(),
         source.alightGtfsStopSequence(),
+        source.to().viaLocationType,
         alightRule != null && alightRule.isNotRoutable()
       );
     };

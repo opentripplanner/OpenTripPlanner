@@ -166,7 +166,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
      * Create a route with the given stop-pattern and schedule parsing the given {@code timetable}.
      * The format of the timetable is:
      * <pre>
-     *   A      B      C      F
+     * A      B      C      F
      * 10:00  10:20  10:25  10:45
      * 11:00  11:20  11:25  11:45
      * 12:00  12:20  12:25  12:45
@@ -179,7 +179,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     public TestRoute timetable(String timetable) {
       timetable = timetable.trim();
       int end = timetable.indexOf('\n');
-      var stopIndexes = Arrays.stream(timetable.substring(0, end).split("\\s+"))
+      var stopIndexes = Arrays.stream(timetable.substring(0, end).split("[ \t,;]+"))
         .mapToInt(RaptorTestConstants::stopNameToIndex)
         .toArray();
       return route(name, stopIndexes).withTimetable(timetable.substring(end + 1));

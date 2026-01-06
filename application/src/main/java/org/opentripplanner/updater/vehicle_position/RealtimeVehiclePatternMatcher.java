@@ -28,12 +28,12 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopStatus;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -362,7 +362,7 @@ class RealtimeVehiclePatternMatcher {
       vehiclePositionWithTripId,
       pattern.getStops(),
       trip,
-      staticTripTimes::stopIndexOfGtfsSequence
+      staticTripTimes::stopPositionForGtfsSequence
     );
 
     return Result.success(new PatternAndRealtimeVehicle(pattern, newVehicle));

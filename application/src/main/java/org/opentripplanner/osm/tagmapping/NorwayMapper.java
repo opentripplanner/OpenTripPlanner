@@ -401,6 +401,7 @@ class NorwayMapper extends OsmTagMapper {
     props.setProperties("highway=bridleway", withModes(PEDESTRIAN_AND_BICYCLE));
     props.setProperties("highway=path", withModes(PEDESTRIAN_AND_BICYCLE));
     props.setProperties("highway=steps", withModes(PEDESTRIAN));
+    props.setProperties("highway=elevator", withModes(PEDESTRIAN));
     props.setProperties("highway=corridor", withModes(PEDESTRIAN));
     props.setProperties("highway=footway;indoor=yes", withModes(PEDESTRIAN));
     props.setProperties("highway=platform", withModes(PEDESTRIAN));

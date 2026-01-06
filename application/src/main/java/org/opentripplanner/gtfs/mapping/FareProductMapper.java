@@ -6,11 +6,11 @@ import java.util.Currency;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class FareProductMapper {
 

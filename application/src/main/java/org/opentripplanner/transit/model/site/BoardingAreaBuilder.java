@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.site;
 
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 public final class BoardingAreaBuilder
   extends StationElementBuilder<BoardingArea, BoardingAreaBuilder> {

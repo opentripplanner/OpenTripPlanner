@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class TripDelaysDtoTest {
 

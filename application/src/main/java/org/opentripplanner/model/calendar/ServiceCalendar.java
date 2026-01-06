@@ -3,7 +3,7 @@ package org.opentripplanner.model.calendar;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * Note that I decided to call this class ServiceCalendar instead of Calendar, so as to avoid

@@ -1,10 +1,10 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.gbfs.v2;
 
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.street.model.RentalFormFactor;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GbfsVehicleTypeMapper {
 

@@ -2,10 +2,10 @@ package org.opentripplanner.graph_builder.module;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class RouteToCentroidStationIdsValidator implements GraphBuilderModule {

@@ -76,7 +76,7 @@ class StopArrivalByTypeFilterTest {
   private static List<StopArrival> stopArrivals(Collection<StopLocation> stops) {
     return stops
       .stream()
-      .map(s -> new StopArrival(Place.forStop(s), null, null, 0, 1, false))
+      .map(s -> new StopArrival(Place.forStop(s), null, null, 0, 1, null, false))
       .toList();
   }
 }

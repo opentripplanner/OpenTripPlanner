@@ -70,6 +70,7 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
         ),
         i,
         tripTimes().gtfsSequenceOfStopIndex(i),
+        null,
         tripTimes().isCanceled() || tripTimes().isCancelledStop(i)
       );
       visits.add(visit);

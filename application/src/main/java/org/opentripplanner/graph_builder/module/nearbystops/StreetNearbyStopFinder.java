@@ -16,6 +16,7 @@ import java.util.Set;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.MaxCountTerminationStrategy;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -34,7 +35,6 @@ import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 
 public class StreetNearbyStopFinder implements NearbyStopFinder {

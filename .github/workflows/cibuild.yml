@@ -3,16 +3,19 @@ name: OTP CI Build
 # But triggering on push only will miss pull requests from outside authors.
 # The push event's ref is the name of the pushed branch;
 # The pull_request event's branch name is the merge target branch.
+# The merge_group event's branch name is the merge target branch.
 on:
   push:
     branches:
       - master
-      - dev-1.x
       - dev-2.x
   pull_request:
     branches:
       - master
-      - dev-1.x
+      - dev-2.x
+  merge_group:
+    branches:
+      - master
       - dev-2.x
 env:
   # maven default arguments to make the log quieter and colourful
@@ -54,7 +57,7 @@ jobs:
           mvn package -Dmaven.test.skip -P prettierSkip,checkstyleSkip
 
       - name: Send coverage data to codecov.io
-        if: github.repository_owner == 'opentripplanner'
+        if: github.repository_owner == 'opentripplanner' && github.event_name != 'merge_group'
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -62,14 +65,14 @@ jobs:
 
       - name: Upload test results to Codecov
         # always upload test results, even when failed
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() }} && github.event_name != 'merge_group'
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: "*TEST-*.xml"
 
       - name: Deploy to Github Package Registry
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-2.x')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip,checkstyleSkip,deployGitHub
@@ -116,14 +119,14 @@ jobs:
 
       - uses: actions/checkout@v4
         # for a simple PR where we don't push, we don't need any credentials
-        if: github.event_name == 'pull_request'
+        if: github.event_name != 'push'
 
       - name: Install Python dependencies
         run: pip install -r doc/user/requirements.txt
         
 
       - name: Build main documentation
-        if: github.event_name == 'pull_request'
+        if: github.event_name != 'push'
         run: mkdocs build
 
       - uses: actions/setup-node@v4
