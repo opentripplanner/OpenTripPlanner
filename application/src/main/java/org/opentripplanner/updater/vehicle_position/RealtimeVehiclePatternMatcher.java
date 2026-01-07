@@ -146,12 +146,21 @@ class RealtimeVehiclePatternMatcher {
    * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
    */
   protected static LocalDate inferServiceDate(
-    TripTimes staticTripTimes,
+    TripTimes<?> staticTripTimes,
     ZoneId zoneId,
     Instant now
   ) {
-    var start = staticTripTimes.getScheduledDepartureTime(0);
-    var end = staticTripTimes.getScheduledDepartureTime(staticTripTimes.getNumStops() - 1);
+    int start;
+    int end;
+    if (staticTripTimes != null) {
+      start = staticTripTimes.getScheduledDepartureTime(0);
+      end = staticTripTimes.getScheduledDepartureTime(staticTripTimes.getNumStops() - 1);
+    } else {
+      // Create a fake trip starting at 6am and ending around midnight to make the logic below
+      // gravitate toward the most likely day, including late night trips past midnight.
+      start = (int) Duration.ofHours(6).toSeconds();
+      end = (int) Duration.ofHours(24).toSeconds();
+    }
 
     var today = now.atZone(zoneId).toLocalDate();
     var yesterday = today.minusDays(1);
