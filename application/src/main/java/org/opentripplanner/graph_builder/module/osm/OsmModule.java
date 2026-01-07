@@ -487,6 +487,7 @@ public class OsmModule implements GraphBuilderModule {
             );
           }
         } else if (elevatorProcessor.isElevatorWay(way)) {
+          System.out.println(way);
           elevatorProcessor.buildElevatorEdgesFromElevatorWay(way);
         } else {
           StreetEdgePair streets = getEdgesForStreet(

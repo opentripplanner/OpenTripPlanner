@@ -43,6 +43,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.utils.collection.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

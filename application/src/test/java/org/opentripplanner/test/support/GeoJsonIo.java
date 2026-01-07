@@ -34,7 +34,14 @@ public class GeoJsonIo {
     List<Geometry> edges = graph
       .getEdges()
       .stream()
-      .map(Edge::getGeometry)
+      .map(e -> {
+        var g = e.getGeometry();
+        if(g == null){
+          return GeometryUtils.makeLineString(e.getFromVertex().getCoordinate(), e.getToVertex().getCoordinate());
+        }else {
+          return g;
+        }
+      })
       .map(Geometry.class::cast)
       .toList();
     var vertices = graph

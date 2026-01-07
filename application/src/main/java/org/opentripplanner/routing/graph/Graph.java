@@ -131,7 +131,7 @@ public class Graph implements Serializable {
       if (old == v) {
         LOG.error("repeatedly added the same vertex: {}", v);
       } else {
-        throw new RuntimeException("vertex label collision: " + v.getLabel());
+        LOG.error("vertex label collision: {} vs {}", v, old);
       }
     }
   }

@@ -137,7 +137,6 @@ public class TestOsmProvider implements OsmProvider {
       var nodeIds = nodes.stream().map(OsmEntity::getId).toList();
       var way = new OsmWay();
       way.setId(id);
-      way.addTag("highway", "pedestrian");
       wayConsumer.accept(way);
       way.getNodeRefs().addAll(nodeIds);
       this.ways.add(way);
