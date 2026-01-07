@@ -324,15 +324,18 @@ public class RealtimeVehicleMatcherTest {
 
   static Stream<Arguments> inferenceTestCases() {
     return Stream.of(
-      Arguments.of("2022-04-05T15:26:04+02:00", "2022-04-05"),
-      Arguments.of("2022-04-06T00:26:04+02:00", "2022-04-05"),
-      Arguments.of("2022-04-06T10:26:04+02:00", "2022-04-06")
+      Arguments.of("2022-04-05T15:26:04+02:00", true, "2022-04-05"),
+      Arguments.of("2022-04-06T00:26:04+02:00", true, "2022-04-05"),
+      Arguments.of("2022-04-06T10:26:04+02:00", true, "2022-04-06"),
+      Arguments.of("2022-04-05T15:26:04+02:00", false, "2022-04-05"),
+      Arguments.of("2022-04-06T00:26:04+02:00", false, "2022-04-05"),
+      Arguments.of("2022-04-06T10:26:04+02:00", false, "2022-04-06")
     );
   }
 
-  @ParameterizedTest(name = "{0} should resolve to {1}")
+  @ParameterizedTest(name = "{0} + staticTripTimes included={1} should resolve to {2}")
   @MethodSource("inferenceTestCases")
-  void inferServiceDayOfTripAt6(String time, String expectedDate) {
+  void inferServiceDayOfTripAt6(String time, boolean hasStopTime, String expectedDate) {
     var trip = TimetableRepositoryForTest.trip(tripId).build();
 
     var sixOclock = (int) Duration.ofHours(18).toSeconds();
@@ -346,7 +349,11 @@ public class RealtimeVehicleMatcherTest {
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
     var instant = OffsetDateTime.parse(time).toInstant();
-    var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(tripTimes, zoneId, instant);
+    var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(
+      hasStopTime ? tripTimes : null,
+      zoneId,
+      instant
+    );
 
     assertEquals(LocalDate.parse(expectedDate), inferredDate);
   }
@@ -369,6 +376,17 @@ public class RealtimeVehicleMatcherTest {
     // because the trip "crosses" midnight and we are already on the next day, we infer the service date to be
     // yesterday
     var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(tripTimes, zoneId, time);
+
+    assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
+  }
+
+  @Test
+  void inferServiceDateCloseToMidnightIfNoStaticSchedule() {
+    var time = OffsetDateTime.parse("2022-04-05T00:04:00+02:00").toInstant();
+
+    // because the trip "crosses" midnight and we are already on the next day, we infer the service date to be
+    // yesterday
+    var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(null, zoneId, time);
 
     assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
   }
