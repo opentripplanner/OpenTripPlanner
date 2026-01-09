@@ -335,7 +335,7 @@ public class RealtimeVehicleMatcherTest {
 
   @ParameterizedTest(name = "{0} + staticTripTimes included={1} should resolve to {2}")
   @MethodSource("inferenceTestCases")
-  void inferServiceDayOfTripAt6(String time, boolean hasStopTime, String expectedDate) {
+  void inferServiceDayOfTripAt6(String time, boolean hasTripTimes, String expectedDate) {
     var trip = TimetableRepositoryForTest.trip(tripId).build();
 
     var sixOclock = (int) Duration.ofHours(18).toSeconds();
