@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
@@ -266,13 +267,19 @@ public class RoutingWorker {
     }
     debugTimingAggregator.startedDirectFlexRouter();
     try {
-      return RoutingResult.ok(
+      return performRouting(() -> RoutingResult.ok(
         DirectFlexRouter.route(serverContext, request, additionalSearchDays, linkingContext())
-      );
-    } catch (RoutingValidationException e) {
-      return RoutingResult.failed(e.getRoutingErrors());
+      ));
     } finally {
       debugTimingAggregator.finishedDirectFlexRouter();
+    }
+  }
+
+  static RoutingResult performRouting(Supplier<RoutingResult> router) {
+    try {
+      return router.get();
+    } catch (RoutingValidationException e) {
+      return RoutingResult.failed(e.getRoutingErrors());
     }
   }
 
