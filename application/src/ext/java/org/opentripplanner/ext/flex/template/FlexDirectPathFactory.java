@@ -4,11 +4,11 @@ import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -24,20 +24,20 @@ public class FlexDirectPathFactory {
   private final FlexAccessEgressCallbackAdapter callbackService;
   private final FlexPathCalculator accessPathCalculator;
   private final FlexPathCalculator egressPathCalculator;
-  private final Duration maxTransferDuration;
   private final Matcher<Trip> matcher;
+  private final FlexParameters flexParameters;
 
   public FlexDirectPathFactory(
     FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator accessPathCalculator,
     FlexPathCalculator egressPathCalculator,
-    Duration maxTransferDuration,
+    FlexParameters flexParameters,
     Matcher<Trip> matcher
   ) {
     this.callbackService = callbackService;
     this.accessPathCalculator = accessPathCalculator;
     this.egressPathCalculator = egressPathCalculator;
-    this.maxTransferDuration = maxTransferDuration;
+    this.flexParameters = flexParameters;
     this.matcher = matcher;
   }
 
@@ -53,14 +53,14 @@ public class FlexDirectPathFactory {
     var flexAccessTemplates = new FlexAccessFactory(
       callbackService,
       accessPathCalculator,
-      maxTransferDuration,
+      flexParameters,
       matcher
     ).calculateFlexAccessTemplates(streetAccesses, dates);
 
     var flexEgressTemplates = new FlexEgressFactory(
       callbackService,
       egressPathCalculator,
-      maxTransferDuration,
+      flexParameters,
       matcher
     ).calculateFlexEgressTemplates(streetEgresses, dates);
 

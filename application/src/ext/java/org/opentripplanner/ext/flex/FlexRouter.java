@@ -135,7 +135,7 @@ public class FlexRouter {
       callbackService,
       accessFlexPathCalculator,
       egressFlexPathCalculator,
-      flexParameters.maxTransferDuration(),
+      flexParameters,
       matcher
     ).calculateDirectFlexPaths(streetAccesses, streetEgresses, dates, requestedTime, arriveBy);
 
@@ -160,7 +160,7 @@ public class FlexRouter {
     return new FlexAccessFactory(
       callbackService,
       accessFlexPathCalculator,
-      flexParameters.maxTransferDuration(),
+      flexParameters,
       matcher
     ).createFlexAccesses(streetAccesses, dates);
   }
@@ -170,7 +170,7 @@ public class FlexRouter {
     return new FlexEgressFactory(
       callbackService,
       egressFlexPathCalculator,
-      flexParameters.maxTransferDuration(),
+      flexParameters,
       matcher
     ).createFlexEgresses(streetEgresses, dates);
   }
