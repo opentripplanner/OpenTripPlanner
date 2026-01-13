@@ -9,8 +9,8 @@ import org.opentripplanner.framework.transaction.Transaction;
 
 public class DefaultRepositoryTransactionManager implements RepositoryTransactionManager {
 
-  private final AtomicReference<RedBlueTransaction> currentTransaction = new AtomicReference<>(
-    RedBlueTransaction.RED
+  private final AtomicReference<DefaultTransaction> currentTransaction = new AtomicReference<>(
+    DefaultTransaction.next()
   );
 
   private final List<DefaultTransactionalRepository<?, ?>> repositories = new ArrayList<>();
@@ -35,7 +35,7 @@ public class DefaultRepositoryTransactionManager implements RepositoryTransactio
     repositories.add(repository);
   }
 
-  Supplier<RedBlueTransaction> currentTransaction() {
+  Supplier<DefaultTransaction> currentTransaction() {
     return () -> currentTransaction.get();
   }
 }

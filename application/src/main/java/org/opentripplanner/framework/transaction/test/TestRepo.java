@@ -1,7 +1,6 @@
 package org.opentripplanner.framework.transaction.test;
 
 import java.util.function.Supplier;
-import org.opentripplanner.framework.transaction.RepositoryLifecycle;
 import org.opentripplanner.framework.transaction.RepositoryTransactionManager;
 import org.opentripplanner.framework.transaction.TransactionalRepository;
 import org.opentripplanner.framework.transaction.internal.DefaultRepositoryTransactionManager;
@@ -12,13 +11,14 @@ public class TestRepo {
 
   public static void main(String[] args) {
     RepositoryTransactionManager repoManager = new DefaultRepositoryTransactionManager();
-    TransactionalRepository<ReadOnlyRepo, EditableRepo> repo = new DefaultTransactionalRepository<>(
-      new ReadOnlyRepo("start"),
-      new RepoLifecycle(),
+    TransactionalRepository<ReadOnlyTestSnapshot, MutableTestSnapshot> repo = new DefaultTransactionalRepository<>(
+      new ReadOnlyTestSnapshot("start"),
+      new TestSnapshotLifecycle(),
       (DefaultRepositoryTransactionManager) repoManager
     );
 
     var tx = repoManager.requestScopedTransaction();
+
     var serviceA = new ServiceRequestScope("A", repo.snapshot(tx));
     System.out.println("-------------------------------------------------- [ service A created ]");
     serviceA.doWork();
@@ -56,9 +56,9 @@ public class TestRepo {
 
   static class ServiceRequestScope {
     private final String name;
-    private ReadOnlyRepo repo;
+    private ReadOnlyTestSnapshot repo;
 
-    public ServiceRequestScope(String name, ReadOnlyRepo repo) {
+    public ServiceRequestScope(String name, ReadOnlyTestSnapshot repo) {
       this.name = name;
       this.repo = repo;
     }
@@ -70,9 +70,9 @@ public class TestRepo {
 
   static class Updater {
     private int counter = 0;
-    private Supplier<EditableRepo> repo;
+    private Supplier<MutableTestSnapshot> repo;
 
-    public Updater(Supplier<EditableRepo> repo) {
+    public Updater(Supplier<MutableTestSnapshot> repo) {
       this.repo = repo;
     }
 
@@ -81,43 +81,4 @@ public class TestRepo {
     }
   }
 
-  static class ReadOnlyRepo {
-    private final String state;
-
-    public String state() {
-      return state;
-    }
-
-    public ReadOnlyRepo(String state) {
-      this.state = state;
-    }
-  }
-
-  static class EditableRepo {
-    private String state;
-
-    public EditableRepo(String state) {
-      this.state = state;
-    }
-
-    public String state() {
-      return state;
-    }
-
-    public void setState(String state) {
-      this.state = state;
-    }
-  }
-
-  static class RepoLifecycle implements RepositoryLifecycle<ReadOnlyRepo, EditableRepo> {
-    @Override
-    public EditableRepo copyOnWrite(ReadOnlyRepo readOnlyRepository) {
-      return new EditableRepo(readOnlyRepository.state());
-    }
-
-    @Override
-    public ReadOnlyRepo freeze(EditableRepo editableReopsitory) {
-      return new ReadOnlyRepo(editableReopsitory.state());
-    }
-  }
 }

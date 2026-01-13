@@ -1,7 +1,8 @@
 package org.opentripplanner.framework.transaction.internal;
 
-import java.util.EnumMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.WeakHashMap;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.transaction.RepositoryLifecycle;
 import org.opentripplanner.framework.transaction.Transaction;
@@ -10,27 +11,25 @@ import org.opentripplanner.framework.transaction.TransactionalRepository;
 public class DefaultTransactionalRepository<S, T> implements TransactionalRepository<S, T> {
 
   private final RepositoryLifecycle<S, T> lifecycle;
-  private final Supplier<RedBlueTransaction> currentTransactionProvider;
-  private final EnumMap<RedBlueTransaction, S> currentSnapshot = new EnumMap<>(
-    RedBlueTransaction.class
-  );
+  private final Supplier<DefaultTransaction> transactionProvider;
+  private final Map<DefaultTransaction, S> snapshotsCashe = new WeakHashMap<>();
   private T mutableSnapshot;
 
   public DefaultTransactionalRepository(
-    S currentSnapshot,
+    S inisialSnapshot,
     RepositoryLifecycle<S, T> lifecycle,
     DefaultRepositoryTransactionManager manager
   ) {
     this.lifecycle = lifecycle;
-    this.currentTransactionProvider = manager.currentTransaction();
-    setSnapshot(currentSnapshot, this.currentTransactionProvider.get());
+    this.transactionProvider = manager.currentTransaction();
+    setSnapshot(inisialSnapshot, this.transactionProvider.get());
     manager.regester(this);
   }
 
   @Override
   public S snapshot(Transaction transaction) {
-    synchronized (currentSnapshot) {
-      return currentSnapshot.get(transaction);
+    synchronized (snapshotsCashe) {
+      return snapshotsCashe.get(transaction);
     }
   }
 
@@ -39,13 +38,13 @@ public class DefaultTransactionalRepository<S, T> implements TransactionalReposi
     return () -> currentMutableSnapshot();
   }
 
-  void commit(RedBlueTransaction currentTransaction, RedBlueTransaction nextTransaction) {
+  void commit(DefaultTransaction currentTransaction, DefaultTransaction nextTransaction) {
     if (mutableSnapshot != null) {
       setSnapshot(lifecycle.freeze(mutableSnapshot), nextTransaction);
     } else {
       // If there are no modifications, then we will copy over the previous snapshot
-      synchronized (currentSnapshot) {
-        currentSnapshot.put(nextTransaction, currentSnapshot.get(currentTransaction));
+      synchronized (snapshotsCashe) {
+        snapshotsCashe.put(nextTransaction, snapshotsCashe.get(currentTransaction));
       }
     }
     mutableSnapshot = null;
@@ -53,15 +52,15 @@ public class DefaultTransactionalRepository<S, T> implements TransactionalReposi
 
   private T currentMutableSnapshot() {
     if (mutableSnapshot == null) {
-      this.mutableSnapshot = lifecycle.copyOnWrite(snapshot(currentTransactionProvider.get()));
+      this.mutableSnapshot = lifecycle.copyOnWrite(snapshot(transactionProvider.get()));
     }
     return mutableSnapshot;
   }
 
-  private void setSnapshot(S snapshot, RedBlueTransaction transaction) {
+  private void setSnapshot(S snapshot, DefaultTransaction transaction) {
     Objects.requireNonNull(snapshot);
-    synchronized (currentSnapshot) {
-      currentSnapshot.put(transaction, snapshot);
+    synchronized (snapshotsCashe) {
+      snapshotsCashe.put(transaction, snapshot);
     }
   }
 }
