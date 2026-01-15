@@ -1127,7 +1127,8 @@ public class StreetEdge
       ? req.bike().optimizeType()
       : req.scooter().optimizeType();
     switch (optimizeType) {
-      case SAFEST_STREETS -> weight = // we exaggerate the safety for this preference
+      // we exaggerate the safety for this preference
+      case SAFEST_STREETS -> weight =
         (getSafetyForSafestStreet(bicycleSafetyFactor) * getDistanceMeters()) / speed;
       case SAFE_STREETS -> weight = getEffectiveBicycleSafetyDistance() / speed;
       case FLAT_STREETS -> /* see notes in StreetVertex on speed overhead */weight =
