@@ -29,6 +29,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.transfer.TransferRepository;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -55,6 +56,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Map<StreetMode, TransferParameters> transferParametersForMode;
   private final Graph graph;
   private final TimetableRepository timetableRepository;
+  private final TransferRepository transferRepository;
   private final DataImportIssueStore issueStore;
 
   /**
@@ -63,6 +65,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   public DirectTransferGenerator(
     Graph graph,
     TimetableRepository timetableRepository,
+    TransferRepository transferRepository,
     DataImportIssueStore issueStore,
     Duration defaultMaxTransferDuration,
     List<RouteRequest> transferRequests
@@ -72,12 +75,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
     this.transferRequests = transferRequests;
+    this.transferRepository = transferRepository;
     this.transferParametersForMode = Map.of();
   }
 
   public DirectTransferGenerator(
     Graph graph,
     TimetableRepository timetableRepository,
+    TransferRepository transferRepository,
     DataImportIssueStore issueStore,
     Duration defaultMaxTransferDuration,
     List<RouteRequest> transferRequests,
@@ -89,6 +94,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
     this.transferRequests = transferRequests;
     this.transferParametersForMode = transferParametersForMode;
+    this.transferRepository = transferRepository;
   }
 
   @Override
@@ -204,7 +210,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         progress.step(m -> LOG.info(m));
       });
 
-    timetableRepository.addAllTransfersByStops(transfersByStop);
+    transferRepository.addAllTransfersByStops(transfersByStop);
 
     LOG.info(progress.completeMessage());
     LOG.info(
@@ -219,7 +225,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       .forEach(mode ->
         LOG.info(
           "Created {} transfers for mode {}.",
-          timetableRepository.findTransfers(mode).size(),
+          transferRepository.findTransfersByMode(mode).size(),
           mode
         )
       );

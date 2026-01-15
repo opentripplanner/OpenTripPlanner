@@ -21,6 +21,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternFo
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
+import org.opentripplanner.transfer.TransferRepository;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -47,17 +48,25 @@ public class RaptorTransitDataMapper {
 
   private final TransitService transitService;
   private final SiteRepository siteRepository;
+  private final TransferRepository transferRepository;
 
-  private RaptorTransitDataMapper(TimetableRepository timetableRepository) {
+  private RaptorTransitDataMapper(
+    TimetableRepository timetableRepository,
+    TransferRepository transferRepository
+  ) {
     this.transitService = new DefaultTransitService(timetableRepository);
     this.siteRepository = timetableRepository.getSiteRepository();
+    this.transferRepository = transferRepository;
   }
 
   public static RaptorTransitData map(
     TransitTuningParameters tuningParameters,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    TransferRepository transferRepository
   ) {
-    return new RaptorTransitDataMapper(timetableRepository).map(tuningParameters);
+    return new RaptorTransitDataMapper(timetableRepository, transferRepository).map(
+      tuningParameters
+    );
   }
 
   private RaptorTransitData map(TransitTuningParameters tuningParameters) {
@@ -71,7 +80,7 @@ public class RaptorTransitDataMapper {
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns);
 
-    transfersByStopIndex = mapTransfers(siteRepository, transitService);
+    transfersByStopIndex = mapTransfers(siteRepository, transferRepository);
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {

@@ -69,11 +69,13 @@ class ScooterPreferencesMapperTest {
     var callWith = TestDataFetcherDecorator.of(
       Map.of(
         "triangleFactors",
-        Map.of("time", 0.5, "slope", 0.3, "safety", 0.2), // Deprecated - ignored because wrapper exists
+        // Deprecated - ignored because wrapper exists
+        Map.of("time", 0.5, "slope", 0.3, "safety", 0.2),
         "scooterPreferences",
         Map.of(
           "triangleFactors",
-          Map.of("time", 0.3, "slope", 0.4, "safety", 0.3) // Wrapper wins
+          // Wrapper wins
+          Map.of("time", 0.3, "slope", 0.4, "safety", 0.3)
         )
       )
     );
@@ -118,7 +120,8 @@ class ScooterPreferencesMapperTest {
     );
     mapScooterPreferences(preferences, callWith);
     var result = preferences.build();
-    assertEquals(11, result.speed()); // Due to rounding in Units.speed
+    // Due to rounding in Units.speed
+    assertEquals(11, result.speed());
     assertEquals(4.0, result.reluctance());
     assertEquals(VehicleRoutingOptimizeType.TRIANGLE, result.optimizeType());
     assertEquals(0.5, result.optimizeTriangle().time());
@@ -130,9 +133,12 @@ class ScooterPreferencesMapperTest {
     var callWith = TestDataFetcherDecorator.of("scooterPreferences", Map.of("speed", 11.0));
     mapScooterPreferences(preferences, callWith);
     var result = preferences.build();
-    assertEquals(11.0, result.speed()); // Provided
-    assertEquals(ScooterPreferences.DEFAULT.reluctance(), result.reluctance()); // Default
-    assertEquals(ScooterPreferences.DEFAULT.optimizeType(), result.optimizeType()); // Default
+    // Provided
+    assertEquals(11.0, result.speed());
+    // Default
+    assertEquals(ScooterPreferences.DEFAULT.reluctance(), result.reluctance());
+    // Default
+    assertEquals(ScooterPreferences.DEFAULT.optimizeType(), result.optimizeType());
   }
 
   @Test

@@ -87,6 +87,7 @@ public abstract class SnapshotTestBase {
       serverContext = TestServerContext.createServerContext(
         model.graph(),
         model.timetableRepository(),
+        model.transferRepository(),
         model.fareServiceFactory().makeFareService()
       );
     }

@@ -67,7 +67,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   private static final DecimalFormat latFormatter = new DecimalFormat("00.0000°N ; 00.0000°S");
   private static final DecimalFormat lonFormatter = new DecimalFormat("000.0000°E ; 000.0000°W");
   /* Layer constants */
-  static final int DRAW_MINIMAL = 0; // XY coordinates
+  // XY coordinates
+  static final int DRAW_MINIMAL = 0;
   static final int DRAW_HIGHLIGHTED = 1;
   static final int DRAW_SPT = 2;
   static final int DRAW_VERTICES = 3;
@@ -426,7 +427,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   public void highlightGraphPath(GraphPath gp) {
     highlightedGraphPath = gp;
     // drawLevel = DRAW_ALL;
-    drawLevel = DRAW_TRANSIT; // leave streets in grey
+    // leave streets in grey
+    drawLevel = DRAW_TRANSIT;
   }
 
   public void setHighlightedVertices(Set<Vertex> vertices) {
@@ -596,7 +598,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       vertex((float) toScreenX(coord.x), (float) toScreenY(coord.y));
     }
     endShape();
-    return coords.length; // should be used to count segments, not edges drawn
+    // should be used to count segments, not edges drawn
+    return coords.length;
   }
 
   /* use endpoints instead of geometry for quick updating */
@@ -738,7 +741,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   private void drawNewEdges() {
     if (drawEdges) {
       strokeWeight(1);
-      stroke(255, 255, 255); //white
+      // white
+      stroke(255, 255, 255);
       noFill();
       while (!newSPTEdges.isEmpty()) {
         State leaf = newSPTEdges.poll();
@@ -781,7 +785,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
           v instanceof TransitEntranceVertex ||
           v instanceof TransitBoardingAreaVertex)
       ) {
-        fill(60, 60, 200); // Make transit stops blue dots
+        // Make transit stops blue dots
+        fill(60, 60, 200);
         drawVertex(v, 7);
       }
       if (
@@ -789,7 +794,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         closeEnough &&
         (v instanceof VehicleParkingEntranceVertex || v instanceof VehicleRentalPlace)
       ) {
-        fill(255, 70, 255); // Make B+R/P+R pink
+        // Make B+R/P+R pink
+        fill(255, 70, 255);
         drawVertex(v, 7);
       }
       if (
@@ -802,7 +808,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             v instanceof StreetLocation))
       ) {
         if (v instanceof IntersectionVertex && ((IntersectionVertex) v).hasCyclingTrafficLight()) {
-          fill(120, 60, 60); // Make traffic lights red dots
+          // Make traffic lights red dots
+          fill(120, 60, 60);
           drawVertex(v, 5);
         }
       }
@@ -819,7 +826,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   private void drawHighlighted() {
     /* Draw highlighted edges in another color */
     noFill();
-    stroke(200, 200, 000, 16); // yellow transparent edge highlight
+    // yellow transparent edge highlight
+    stroke(200, 200, 000, 16);
     strokeWeight(8);
     if (drawHighlighted && highlightedEdges != null) {
       try {
@@ -841,7 +849,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       drawEdge(highlightedEdge);
     }
     /* Draw highlighted vertices */
-    fill(255, 127, 0); // orange fill
+    // orange fill
+    fill(255, 127, 0);
     noStroke();
     if (highlightedVertices != null) {
       for (Vertex v : highlightedVertices) {
@@ -858,7 +867,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
   private boolean drawTransit(int startMillis) {
     if (drawTransitEdges) {
-      stroke(40, 40, 128, 30); // transparent blue
+      // transparent blue
+      stroke(40, 40, 128, 30);
       strokeWeight(4);
       noFill();
       // for (Edge e : visibleTransitEdges) {
@@ -878,7 +888,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
   private boolean drawLinks(int startMillis) {
     if (drawLinkEdges) {
-      stroke(256, 165, 0, 30); // transparent blue
+      // transparent orange
+      stroke(256, 165, 0, 30);
       strokeWeight(3);
       noFill();
       // for (Edge e : visibleTransitEdges) {
@@ -902,7 +913,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       background(15);
     }
     if (drawStreetEdges) {
-      stroke(30, 128, 30); // dark green
+      // dark green
+      stroke(30, 128, 30);
       strokeWeight(1);
       noFill();
       while (drawOffset < visibleStreetEdges.size()) {
@@ -955,7 +967,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     // rect(0,0,this.width, this.height);
     desaturate();
     noFill();
-    stroke(256, 0, 0, 128); // , 8);
+    stroke(256, 0, 0, 128);
     strokeWeight(6);
     while (!newHighlightedEdges.isEmpty()) {
       Edge de = newHighlightedEdges.poll();
@@ -1196,9 +1208,12 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       int RAMPLEN = NHUES * HUELEN;
       int BRIGHTNESS = 220;
 
-      aa = aa % RAMPLEN; //make sure aa fits within the color ramp
-      int hueIndex = aa / HUELEN; //establish the hue
-      int hue = hueIndex * (HUELEN / NHUES); //convert that to a hue value
+      // make sure aa fits within the color ramp
+      aa = aa % RAMPLEN;
+      // establish the hue
+      int hueIndex = aa / HUELEN;
+      // convert that to a hue value
+      int hue = hueIndex * (HUELEN / NHUES);
       int saturation = HUELEN - (aa % HUELEN);
 
       return color(hue, saturation, BRIGHTNESS);

@@ -2,14 +2,14 @@ package org.opentripplanner.graph_builder.module.osm.moduletests.walkablearea;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.graph_builder.module.osm.moduletests._support.NodeBuilder.node;
+import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
-import org.opentripplanner.graph_builder.module.osm.moduletests._support.RelationBuilder;
-import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
+import org.opentripplanner.osm.TestOsmProvider;
+import org.opentripplanner.osm.model.RelationBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;

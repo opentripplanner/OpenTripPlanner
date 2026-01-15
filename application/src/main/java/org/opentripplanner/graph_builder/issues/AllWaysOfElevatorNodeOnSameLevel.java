@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.osm.model.OsmNode;
 
@@ -22,5 +24,10 @@ public record AllWaysOfElevatorNodeOnSameLevel(OsmNode node) implements DataImpo
   @Override
   public String getHTMLMessage() {
     return String.format(HTMLFMT, node.url(), node.getId());
+  }
+
+  @Override
+  public Geometry getGeometry() {
+    return GeometryUtils.getGeometryFactory().createPoint(node.getCoordinate());
   }
 }

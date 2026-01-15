@@ -31,7 +31,8 @@ class NorwayMapper extends OsmTagMapper {
   @Override
   public void populateProperties(WayPropertySet props) {
     var hasSidewalk = new Condition.OneOf("sidewalk", "yes", "left", "right", "both");
-    var hasPrefixSidewalk = new Condition.Equals("sidewalk", "yes"); // e.g sidewalk:left=yes
+    // e.g sidewalk:left=yes
+    var hasPrefixSidewalk = new Condition.Equals("sidewalk", "yes");
     props.setDefaultWalkSafetyForPermission((permission, speedLimit, way) ->
       switch (permission) {
         case ALL, PEDESTRIAN_AND_CAR -> {
@@ -564,15 +565,18 @@ class NorwayMapper extends OsmTagMapper {
      * Legal speed limit for pedestrian and living streets is walking pace.
      */
 
+    // 110 km/h
     props.setCarSpeed(
       new ExactMatchSpecifier(new Condition.OneOf("highway", "motorway", "motorway_link")),
-      30.56f // 110 km/t
+      30.56f
     );
 
+    // 90 km/h
     props.setCarSpeed(
       new ExactMatchSpecifier(new Condition.Equals("motorroad", "yes"), isTrunkOrPrimary),
-      25.f // 90 km/t
+      25.f
     );
+    // 80 km/h
     props.setCarSpeed(
       new ExactMatchSpecifier(
         new Condition.OneOf(
@@ -590,8 +594,9 @@ class NorwayMapper extends OsmTagMapper {
           "busway"
         )
       ),
-      22.22f // 80 km/t
+      22.22f
     );
+    // 50 km/h
     props.setCarSpeed(
       new ExactMatchSpecifier(
         new Condition.OneOf("sidewalk", "yes", "both", "left", "right", "separate"),
@@ -610,22 +615,27 @@ class NorwayMapper extends OsmTagMapper {
           "busway"
         )
       ),
-      13.89f // 50 km/t
+      13.89f
     );
 
-    props.setCarSpeed("highway=residential", 13.89f); // 50 km/h
-    props.setCarSpeed("highway=service", 13.89f); // 50 km/h
+    // 50 km/h
+    props.setCarSpeed("highway=residential", 13.89f);
+    props.setCarSpeed("highway=service", 13.89f);
 
-    props.setCarSpeed("highway=service;service=driveway", 8.33f); // 30 km/h
+    // 30 km/h
+    props.setCarSpeed("highway=service;service=driveway", 8.33f);
     props.setCarSpeed("highway=service;service=parking_aisle", 8.33f);
     props.setCarSpeed("highway=track", 8.33f);
 
-    props.setCarSpeed("highway=living_street", 1.94f); // 7 km/h
-    props.setCarSpeed("highway=pedestrian", 1.94f); // 7 km/h
-    props.setCarSpeed("highway=footway", 1.94f); // 7 km/h
+    // 7 km/h
+    props.setCarSpeed("highway=living_street", 1.94f);
+    props.setCarSpeed("highway=pedestrian", 1.94f);
+    props.setCarSpeed("highway=footway", 1.94f);
 
-    props.defaultCarSpeed = 22.22f; // 80 km/h
-    props.maxPossibleCarSpeed = 30.56f; // 110 km/h
+    // 80 km/h
+    props.defaultCarSpeed = 22.22f;
+    // 110 km/h
+    props.maxPossibleCarSpeed = 30.56f;
 
     super.populateNotesAndNames(props);
 

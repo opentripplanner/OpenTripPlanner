@@ -74,7 +74,7 @@ class SiriAzureUpdaterTest {
     when(mockConfig.getTopicName()).thenReturn("testTopic");
     when(mockConfig.getDataInitializationUrl()).thenReturn("http://testurl.com");
     when(mockConfig.getTimeout()).thenReturn(5000);
-    when(mockConfig.getStartupTimeout()).thenReturn(Duration.ofSeconds(30)); // 30 seconds for tests
+    when(mockConfig.getStartupTimeout()).thenReturn(Duration.ofSeconds(30));
     when(mockConfig.feedId()).thenReturn("testFeedId");
     when(mockConfig.getAutoDeleteOnIdle()).thenReturn(Duration.ofHours(1));
     when(mockConfig.getPrefetchCount()).thenReturn(10);
@@ -122,8 +122,10 @@ class SiriAzureUpdaterTest {
    */
   @Test
   void testExecuteWithRetry_FullBackoffSequence() throws Throwable {
-    final int totalRunCalls = 10; // 9 failures + 1 success
-    final int totalSleepCalls = 9; // 9 retries
+    // 9 failures + 1 success
+    final int totalRunCalls = 10;
+    // 9 retries
+    final int totalSleepCalls = 9;
 
     doNothing().when(updater).sleep(anyInt());
 
@@ -137,13 +139,15 @@ class SiriAzureUpdaterTest {
       .doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY))
       .doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY))
       .doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY))
-      .doNothing() // Succeed on the 10th attempt
+      // Succeed on the 10th attempt
+      .doNothing()
       .when(task)
       .run();
 
     // Use longer timeout for this test since it does many retries with exponential backoff
     // Test still runs fast since sleep() is mocked, but timeout logic needs headroom
-    updater.executeWithRetry(task, "Test Task", 300_000L); // 5 minutes
+    // Timeout is 5 minutes
+    updater.executeWithRetry(task, "Test Task", 300_000L);
 
     verify(updater, times(totalSleepCalls)).sleep(anyInt());
 
@@ -441,8 +445,10 @@ class SiriAzureUpdaterTest {
       timeoutUpdater.executeWithRetry(task, "Test Task", mockConfig.getStartupTimeout().toMillis())
     );
 
-    verify(task, times(3)).run(); // 2 failures + 1 success
-    verify(timeoutUpdater, times(2)).sleep(anyInt()); // 2 sleep calls for retries
+    // 2 failures + 1 success
+    verify(task, times(3)).run();
+    // 2 sleep calls for retries
+    verify(timeoutUpdater, times(2)).sleep(anyInt());
   }
 
   /**
@@ -689,8 +695,10 @@ class SiriAzureUpdaterTest {
       )
     );
 
-    verify(task, times(3)).run(); // 2 failures + 1 success
-    verify(updater, times(2)).sleep(anyInt()); // 2 retries
+    // 2 failures + 1 success
+    verify(task, times(3)).run();
+    // 2 retries
+    verify(updater, times(2)).sleep(anyInt());
   }
 
   /**
@@ -715,8 +723,10 @@ class SiriAzureUpdaterTest {
     );
 
     assertEquals(ServiceBusFailureReason.MESSAGE_SIZE_EXCEEDED, thrown.getReason());
-    verify(task, times(1)).run(); // Only one attempt
-    verify(updater, never()).sleep(anyInt()); // No retries
+    // Only one attempt
+    verify(task, times(1)).run();
+    // No retries
+    verify(updater, never()).sleep(anyInt());
   }
 
   /**
@@ -844,7 +854,8 @@ class SiriAzureUpdaterTest {
    */
   @Test
   void testDurationTimeoutConfiguration() throws Exception {
-    Duration testTimeout = Duration.ofMillis(100); // Short timeout for fast test
+    // Short timeout for fast test
+    Duration testTimeout = Duration.ofMillis(100);
     when(mockConfig.getStartupTimeout()).thenReturn(testTimeout);
 
     SiriAzureUpdater durationUpdater = spy(createUpdater(mockConfig));

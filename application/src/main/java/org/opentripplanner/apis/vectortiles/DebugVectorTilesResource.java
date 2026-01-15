@@ -184,7 +184,11 @@ public class DebugVectorTilesResource {
         context.transitService().listGroupStops()
       );
       case GeofencingZones -> new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
-      case Edge -> new EdgeLayerBuilder(context.graph(), layerParameters);
+      case Edge -> new EdgeLayerBuilder(
+        context.graph(),
+        layerParameters,
+        context.streetDetailsService()
+      );
       case Vertex -> new VertexLayerBuilder(context.graph(), layerParameters);
       case Rental -> new RentalLayerBuilder(context.vehicleRentalService(), layerParameters);
     };

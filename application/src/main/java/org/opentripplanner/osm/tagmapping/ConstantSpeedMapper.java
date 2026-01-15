@@ -13,7 +13,8 @@ class ConstantSpeedMapper extends FinlandMapper {
 
   public ConstantSpeedMapper() {
     super();
-    this.speed = 22.22f; // 80 kmph by default
+    // 80 km/h by default
+    this.speed = 22.22f;
   }
 
   public ConstantSpeedMapper(float speed) {

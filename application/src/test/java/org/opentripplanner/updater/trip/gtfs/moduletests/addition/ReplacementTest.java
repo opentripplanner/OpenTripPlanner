@@ -36,7 +36,8 @@ public class ReplacementTest implements RealtimeTestConstants {
       .tripUpdate(TRIP_1_ID, REPLACEMENT)
       .withTripProperties(
         "New Headsign",
-        "SW1234" // we can't change trip short name at real-time yet
+        // we can't change trip short name at real-time yet
+        "SW1234"
       )
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:45", "Changed Headsign")

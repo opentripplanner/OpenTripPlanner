@@ -21,9 +21,10 @@ public class TransitModeMapper {
     if (routeType >= 100 && routeType < 200) {
       // Railway Service
       return TransitMode.RAIL;
-    } else if (routeType >= 200 && routeType < 300) { //Coach Service
+    } else if (routeType >= 200 && routeType < 300) {
       return TransitMode.COACH;
-    } else if (routeType >= 300 && routeType < 500) { //Suburban Railway Service and Urban Railway service
+    } else if (routeType >= 300 && routeType < 500) {
+      // Suburban Railway Service and Urban Railway service
       if (routeType >= 401 && routeType <= 402) {
         return TransitMode.SUBWAY;
       }

@@ -92,7 +92,7 @@ public class TimetableSnapshot {
    * include ones from the scheduled GTFS, as well as ones added by realtime messages and
    * tracked by the TripPatternCache. <p>
    * Note that the keys do not include all scheduled TripPatterns, only those for which we have at
-   * least one update.<p>
+   * least one update, and those for which we had updates before but just recently cleared.<p>
    * The members of the SortedSet (the Timetable for a particular day) are treated as copy-on-write
    * when we're updating them. If an update will modify the timetable for a particular day, that
    * timetable is replicated before any modifications are applied to avoid affecting any previous
@@ -391,8 +391,8 @@ public class TimetableSnapshot {
       updatesEventListener.update(dirtyTimetables.values(), timetables::get);
     }
 
-    this.dirtyTimetables.clear();
-    this.dirty = false;
+    dirtyTimetables.clear();
+    dirty = false;
 
     return ret;
   }
@@ -555,7 +555,25 @@ public class TimetableSnapshot {
    * @return true if the timetable changed as a result of the call
    */
   private boolean clearTimetables(String feedId) {
-    return timetables.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
+    var entriesToBeRemoved = timetables
+      .entrySet()
+      .stream()
+      .filter(entry -> feedId.equals(entry.getKey().getFeedId()))
+      .collect(Collectors.toSet());
+    for (var entry : entriesToBeRemoved) {
+      SortedSet<Timetable> timetablesOfPattern = entry.getValue();
+      FeedScopedId patternId = entry.getKey();
+      for (var timetable : timetablesOfPattern) {
+        var serviceDate = timetable.getServiceDate();
+        var patternAndServiceDate = new TripPatternAndServiceDate(patternId, serviceDate);
+        var scheduledTimetable = timetable
+          .getPattern()
+          .getScheduledTimetable()
+          .copyForServiceDate(serviceDate);
+        dirtyTimetables.put(patternAndServiceDate, scheduledTimetable);
+      }
+    }
+    return timetables.entrySet().removeAll(entriesToBeRemoved);
   }
 
   /**
@@ -635,7 +653,10 @@ public class TimetableSnapshot {
     // if the timetable was already modified by a previous real-time update in the same snapshot
     // and for the same service date,
     // then the previously updated timetable is superseded by the new one
-    dirtyTimetables.put(new TripPatternAndServiceDate(pattern, updated.getServiceDate()), updated);
+    dirtyTimetables.put(
+      new TripPatternAndServiceDate(pattern.getId(), updated.getServiceDate()),
+      updated
+    );
 
     dirty = true;
   }
@@ -685,7 +706,7 @@ public class TimetableSnapshot {
   }
 
   /**
-   * A pair made of a TripPattern and one of the service dates it is running on.
+   * A pair made of a TripPattern id and one of the service dates it is running on.
    */
-  private record TripPatternAndServiceDate(TripPattern tripPattern, LocalDate serviceDate) {}
+  private record TripPatternAndServiceDate(FeedScopedId patternId, LocalDate serviceDate) {}
 }

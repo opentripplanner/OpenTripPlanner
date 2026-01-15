@@ -53,6 +53,7 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.transfer.TransferServiceTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -75,7 +76,11 @@ public abstract class GraphRoutingTest {
     builder.build();
     Graph graph = builder.graph();
     TimetableRepository timetableRepository = builder.timetableRepository();
-    return new TestOtpModel(graph, timetableRepository).index();
+    return new TestOtpModel(
+      graph,
+      timetableRepository,
+      TransferServiceTestFactory.defaultTransferRepository()
+    ).index();
   }
 
   public abstract static class Builder {
