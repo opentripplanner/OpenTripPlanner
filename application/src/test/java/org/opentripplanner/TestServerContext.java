@@ -44,6 +44,8 @@ import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transfer.TransferRepository;
+import org.opentripplanner.transfer.TransferServiceTestFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -58,15 +60,24 @@ public class TestServerContext {
   public static OtpServerRequestContext createServerContext(
     Graph graph,
     TimetableRepository timetableRepository,
+    TransferRepository transferRepository,
     FareService fareService
   ) {
-    return createServerContext(graph, timetableRepository, fareService, null, null);
+    return createServerContext(
+      graph,
+      timetableRepository,
+      transferRepository,
+      fareService,
+      null,
+      null
+    );
   }
 
   /** Create a context for unit testing */
   public static OtpServerRequestContext createServerContext(
     Graph graph,
     TimetableRepository timetableRepository,
+    TransferRepository transferRepository,
     FareService fareService,
     @Nullable TimetableSnapshotManager snapshotManager,
     @Nullable RouteRequest request
@@ -85,7 +96,11 @@ public class TestServerContext {
     }
 
     timetableRepository.index();
-    createRaptorTransitData(timetableRepository, routerConfig.transitTuningConfig());
+    createRaptorTransitData(
+      timetableRepository,
+      transferRepository,
+      routerConfig.transitTuningConfig()
+    );
 
     snapshotManager.purgeAndCommit();
 
@@ -113,6 +128,7 @@ public class TestServerContext {
       List.of(),
       request,
       createStreetLimitationParametersService(),
+      TransferServiceTestFactory.transferService(transferRepository),
       routerConfig.transitTuningConfig(),
       transitService,
       routerConfig.triasApiParameters(),

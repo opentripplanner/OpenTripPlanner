@@ -400,7 +400,8 @@ public class ElevationModule implements GraphBuilderModule {
     // with this method avoids potentially waiting for a lock to be released for calculating the thread-specific
     // coverage.
     if (ee.hasElevationExtension()) {
-      return;/* already set up */
+      // already set up
+      return;
     }
 
     // first try to find a cached value if possible

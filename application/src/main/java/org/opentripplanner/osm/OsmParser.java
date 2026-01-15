@@ -93,7 +93,8 @@ class OsmParser extends BinaryParser {
         } else if (i.getTypes(j) == Osmformat.Relation.MemberType.RELATION) {
           relMember.setType(OsmMemberType.RELATION);
         } else {
-          assert false; // TODO; Illegal file?
+          // TODO; Illegal file?
+          assert false;
         }
 
         tmp.addMember(relMember);
@@ -108,7 +109,8 @@ class OsmParser extends BinaryParser {
     long lastId = 0;
     long lastLat = 0;
     long lastLon = 0;
-    int j = 0; // Index into the keysvals array.
+    // Index into the keysvals array.
+    int j = 0;
 
     if (parsePhase != OsmParserPhase.Nodes) {
       return;
@@ -144,7 +146,8 @@ class OsmParser extends BinaryParser {
           tag.setV(value);
           tmp.addTag(tag);
         }
-        j++; // Skip over the '0' delimiter.
+        // Skip over the '0' delimiter.
+        j++;
       }
 
       osmdb.addNode(tmp);
@@ -212,10 +215,12 @@ class OsmParser extends BinaryParser {
   public void parse(Osmformat.HeaderBlock block) {
     for (String s : block.getRequiredFeaturesList()) {
       if (s.equals("OsmSchema-V0.6")) {
-        continue; // We can parse this.
+        // We can parse this.
+        continue;
       }
       if (s.equals("DenseNodes")) {
-        continue; // We can parse this.
+        // We can parse this.
+        continue;
       }
       throw new IllegalStateException("File requires unknown feature: " + s);
     }

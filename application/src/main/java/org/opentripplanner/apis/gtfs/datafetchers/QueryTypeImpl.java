@@ -426,7 +426,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
               .findAny()
               .orElse(null);
         case "Cluster":
-          return null; //TODO
+          // TODO
+          return null;
         case "DepartureRow":
           return PatternAtStop.fromId(transitService, id);
         case "Pattern":
@@ -451,7 +452,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         case "Stop":
           return transitService.getRegularStop(FeedScopedId.parse(id));
         case "Stoptime":
-          return null; //TODO
+          // TODO
+          return null;
         case "stopAtDistance": {
           String[] parts = id.split(";");
           var stop = transitService.getRegularStop(FeedScopedId.parse(parts[1]));
@@ -460,7 +462,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null);
         }
         case "TicketType":
-          return null; //TODO
+          // TODO
+          return null;
         case "Trip":
           var scopedId = FeedScopedId.parse(id);
           return transitService.getTrip(scopedId);

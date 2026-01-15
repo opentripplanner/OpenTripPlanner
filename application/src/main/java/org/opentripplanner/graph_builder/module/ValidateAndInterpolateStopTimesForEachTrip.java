@@ -193,7 +193,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
         );
       }
       st0 = st1;
-    } // END for loop over stop times
+    }
     return true;
   }
 

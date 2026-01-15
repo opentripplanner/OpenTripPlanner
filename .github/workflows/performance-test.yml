@@ -60,6 +60,11 @@ jobs:
             jfr-delay: "20s"
             profile: extended
 
+          - location: helsinki
+            iterations: 1
+            jfr-delay: "50s"
+            profile: extended
+
     steps:
       - uses: actions/checkout@v4
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'

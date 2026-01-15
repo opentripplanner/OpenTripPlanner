@@ -6,6 +6,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.model.edge.Edge;
 
 /**
@@ -15,8 +16,16 @@ public class EdgeLayerBuilder extends LayerBuilder<Edge> {
 
   private final Graph graph;
 
-  public EdgeLayerBuilder(Graph graph, LayerParameters layerParameters) {
-    super(new EdgePropertyMapper(), layerParameters.name(), layerParameters.expansionFactor());
+  public EdgeLayerBuilder(
+    Graph graph,
+    LayerParameters layerParameters,
+    StreetDetailsService streetDetailsService
+  ) {
+    super(
+      new EdgePropertyMapper(streetDetailsService),
+      layerParameters.name(),
+      layerParameters.expansionFactor()
+    );
     this.graph = graph;
   }
 

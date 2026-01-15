@@ -24,23 +24,28 @@ public class DirectionUtilsTest {
 
     // Add fixed points
     from.add(new Coordinate(0, 45));
-    to.add(new Coordinate(0, 45)); // Undefined: 180 deg
+    // Undefined: 180 deg
+    to.add(new Coordinate(0, 45));
     assertEquals(180, DirectionUtils.getAzimuth(from.get(0), to.get(0)));
 
     from.add(new Coordinate(0, 45));
-    to.add(new Coordinate(0.1, 45)); // East: 90 deg
+    // East: 90 deg
+    to.add(new Coordinate(0.1, 45));
     assertEquals(90, DirectionUtils.getAzimuth(from.get(1), to.get(1)));
 
     from.add(new Coordinate(0, 45));
-    to.add(new Coordinate(0, 45.1)); // North: 0 deg
+    // North: 0 deg
+    to.add(new Coordinate(0, 45.1));
     assertEquals(0, DirectionUtils.getAzimuth(from.get(2), to.get(2)));
 
     from.add(new Coordinate(0, 45));
-    to.add(new Coordinate(-0.1, 45)); // West: -90 deg
+    // West: -90 deg
+    to.add(new Coordinate(-0.1, 45));
     assertEquals(-90, DirectionUtils.getAzimuth(from.get(3), to.get(3)));
 
     from.add(new Coordinate(0, 45));
-    to.add(new Coordinate(0, 44.9)); // South: 180 deg
+    // South: 180 deg
+    to.add(new Coordinate(0, 44.9));
     assertEquals(180, DirectionUtils.getAzimuth(from.get(4), to.get(4)));
 
     for (int i = 0; i < N_RUN; i++) {
@@ -75,7 +80,8 @@ public class DirectionUtilsTest {
 
     double maxError = 0.0;
     for (int i = 0; i < exactAzimuths.length; i++) {
-      double error = (exactAzimuths[i] - approxAzimuths[i]); // Degrees
+      // Degrees
+      double error = (exactAzimuths[i] - approxAzimuths[i]);
       if (error > 360) {
         error -= 360;
       }

@@ -16,7 +16,7 @@ export function GeometryPropertyPopup({
       longitude={coordinates.lng}
       closeButton={true}
       onClose={() => onClose()}
-      maxWidth="350px"
+      maxWidth="500px"
     >
       <Table bordered>
         <tbody>

@@ -128,7 +128,8 @@ public class GenerateTripPatternsOperation {
     // TODO: move to a validator module
     if (!calendarServiceIds.contains(trip.getServiceId())) {
       issueStore.add(new TripUndefinedService(trip));
-      return; // Invalid trip, skip it, it will break later
+      // Invalid trip, skip it, it will break later
+      return;
     }
 
     List<StopTime> stopTimes = transitServiceBuilder.getStopTimesSortedByTrip().get(trip);

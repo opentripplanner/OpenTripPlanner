@@ -29,7 +29,7 @@ public final class ServiceCalendar implements Serializable {
 
   private int sunday;
 
-  private ServiceDateInterval period;
+  private LocalDateInterval period;
 
   public FeedScopedId getServiceId() {
     return serviceId;
@@ -113,11 +113,11 @@ public final class ServiceCalendar implements Serializable {
     setWeekend(value);
   }
 
-  public ServiceDateInterval getPeriod() {
+  public LocalDateInterval getPeriod() {
     return period;
   }
 
-  public void setPeriod(ServiceDateInterval period) {
+  public void setPeriod(LocalDateInterval period) {
     this.period = period;
   }
 

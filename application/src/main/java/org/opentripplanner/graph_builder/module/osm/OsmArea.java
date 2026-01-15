@@ -220,7 +220,8 @@ class OsmArea {
         closedRings.add(newRing);
         // if we're out of endpoints, then we have succeeded
         if (waysByEndpoint.size() == 0) {
-          return true; // success
+          // success
+          return true;
         }
 
         // otherwise, we need to start a new partial ring

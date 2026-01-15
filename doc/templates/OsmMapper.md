@@ -45,8 +45,13 @@ For details, see [#6782](https://github.com/opentripplanner/OpenTripPlanner/pull
 
 ### Safety mixins
 
-Mixins are selectors that have only an effect on the bicycle and walk safety factors but not on the
-permission of an OSM way. Their safety values are multiplied with the base values from the selected
-way properties. Multiple mixins can apply to the same way and their effects compound.
+Mixins are selectors that have an effect on the bicycle and walk safety factors. 
+Their safety values are multiplied with the base values from the selected way properties.
+
+Mixins can also add or remove permissions on an OSM way, which will be further overridden with
+explicitly set permission tags. If two mixins add and remove the same permission on the same way,
+the behavior is unspecified which usually indicates a tagging error on the way.
+
+Multiple mixins can apply to the same way and their effects compound.
 
 <!-- INSERT: mixins -->

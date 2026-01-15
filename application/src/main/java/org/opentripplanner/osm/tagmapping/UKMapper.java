@@ -32,62 +32,6 @@ class UKMapper extends OsmTagMapper {
     // reduce trunk safety compared to default mapper
     props.setProperties("highway=trunk", withModes(ALL).walkSafety(2.5).bicycleSafety(2.5));
     props.setProperties("highway=trunk_link", withModes(ALL).walkSafety(2.5).bicycleSafety(2.06));
-    props.setProperties(
-      "highway=trunk;cycleway=lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.5)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.15)
-    );
-    props.setProperties(
-      "highway=trunk;cycleway=share_busway",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.75)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=share_busway",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.25)
-    );
-    props.setProperties(
-      "highway=trunk;cycleway=opposite_lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.5)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=opposite_lane",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.06),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.15)
-    );
-    props.setProperties(
-      "highway=trunk;cycleway=track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(0.95)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(0.85)
-    );
-    props.setProperties(
-      "highway=trunk;cycleway=opposite_track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(0.95)
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=opposite_track",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(2.5),
-      withModes(ALL).walkSafety(2.5).bicycleSafety(0.85)
-    );
-    props.setProperties(
-      "highway=trunk;bicycle=designated",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.75)
-    );
-    props.setProperties(
-      "highway=trunk_link;bicycle=designated",
-      withModes(ALL).walkSafety(2.5).bicycleSafety(1.75)
-    );
 
     props.setMixinProperties(
       "expressway=yes",
@@ -101,15 +45,24 @@ class UKMapper extends OsmTagMapper {
      */
     // Max speed limit is 70 mph ~113kmh ~31.3m/s
     props.maxPossibleCarSpeed = 31.4f;
-    props.setCarSpeed("highway=motorway", 30.4f); // ~=68mph
-    props.setCarSpeed("highway=motorway_link", 22.4f); // ~= 50mph
-    props.setCarSpeed("highway=trunk", 22.4f); // ~=50mph
-    props.setCarSpeed("highway=trunk_link", 17.9f); // ~= 40mph
-    props.setCarSpeed("highway=primary", 22.4f); // ~=50mph
-    props.setCarSpeed("highway=primary_link", 17.9f); // ~= 40mph
-    props.setCarSpeed("highway=secondary", 17.9f); // ~= 40mph
-    props.setCarSpeed("highway=secondary_link", 13.4f); // ~= 30mph
-    props.setCarSpeed("highway=tertiary", 15.7f); // ~= 35mph
+    // ~=68mph
+    props.setCarSpeed("highway=motorway", 30.4f);
+    // ~= 50mph
+    props.setCarSpeed("highway=motorway_link", 22.4f);
+    // ~=50mph
+    props.setCarSpeed("highway=trunk", 22.4f);
+    // ~= 40mph
+    props.setCarSpeed("highway=trunk_link", 17.9f);
+    // ~=50mph
+    props.setCarSpeed("highway=primary", 22.4f);
+    // ~= 40mph
+    props.setCarSpeed("highway=primary_link", 17.9f);
+    // ~= 40mph
+    props.setCarSpeed("highway=secondary", 17.9f);
+    // ~= 30mph
+    props.setCarSpeed("highway=secondary_link", 13.4f);
+    // ~= 35mph
+    props.setCarSpeed("highway=tertiary", 15.7f);
 
     super.populateProperties(props);
   }

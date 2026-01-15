@@ -373,7 +373,7 @@ class AddedTripBuilder {
     List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
 
     // VehicleJourneyRef is the reference to the serviceJourney being replaced.
-    VehicleJourneyRef vehicleJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef(); // getVehicleJourneyRef
+    VehicleJourneyRef vehicleJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef();
     if (vehicleJourneyRef != null) {
       var replacedDatedServiceJourney = entityResolver.resolveTripOnServiceDate(
         vehicleJourneyRef.getValue()

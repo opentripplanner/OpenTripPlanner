@@ -436,11 +436,16 @@ public class LinkStopToPlatformTest {
   @Test
   void boundaryTest() {
     Coordinate[] platform = {
-      new Coordinate(-0.7360985, 51.9962091), // northwest
-      new Coordinate(-0.7360355, 51.9962165), // northeast
-      new Coordinate(-0.7357519, 51.9953057), // east exit
-      new Coordinate(-0.7356841, 51.9950911), // southeast
-      new Coordinate(-0.7357458, 51.9950836), // southwest
+      // northwest
+      new Coordinate(-0.7360985, 51.9962091),
+      // northeast
+      new Coordinate(-0.7360355, 51.9962165),
+      // east exit
+      new Coordinate(-0.7357519, 51.9953057),
+      // southeast
+      new Coordinate(-0.7356841, 51.9950911),
+      // southwest
+      new Coordinate(-0.7357458, 51.9950836),
     };
 
     // 1 visibility point at eastern exit

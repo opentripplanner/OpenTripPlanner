@@ -1021,7 +1021,8 @@ public class StreetEdge
       final boolean arriveBy = s0.getRequest().arriveBy();
 
       double backSpeed = backPSE.calculateSpeed(request, backMode, s0.isBackWalkingBike());
-      final double turnDuration; // Units are seconds.
+      // Units are seconds.
+      final double turnDuration;
 
       /*
        * This is a subtle piece of code. Turn costs are evaluated differently during
@@ -1036,7 +1037,8 @@ public class StreetEdge
        */
       var intersectionMode = arriveBy ? backMode : traverseMode;
       boolean walkingBikeThroughIntersection = arriveBy ? s0.isBackWalkingBike() : walkingBike;
-      if (arriveBy && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
+      if (arriveBy && tov instanceof IntersectionVertex traversedVertex) {
+        // arrive-by search
         turnDuration = s0
           .intersectionTraversalCalculator()
           .computeTraversalDuration(
@@ -1047,7 +1049,8 @@ public class StreetEdge
             (float) speed,
             (float) backSpeed
           );
-      } else if (!arriveBy && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
+      } else if (!arriveBy && fromv instanceof IntersectionVertex traversedVertex) {
+        // depart-after search
         turnDuration = s0
           .intersectionTraversalCalculator()
           .computeTraversalDuration(

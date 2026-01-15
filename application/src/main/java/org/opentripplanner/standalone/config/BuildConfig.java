@@ -38,7 +38,7 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParamet
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.calendar.LocalDateInterval;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -718,8 +718,8 @@ public class BuildConfig implements OtpDataStoreConfig {
     return root.isEmpty() ? "" : root.toJson();
   }
 
-  public ServiceDateInterval getTransitServicePeriod() {
-    return new ServiceDateInterval(transitServiceStart, transitServiceEnd);
+  public LocalDateInterval getTransitServicePeriod() {
+    return new LocalDateInterval(transitServiceStart, transitServiceEnd);
   }
 
   public List<FeedScopedId> transitRouteToStationCentroid() {

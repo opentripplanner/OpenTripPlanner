@@ -41,7 +41,8 @@ public class VerticalDatum {
     double lowerLeftLatitude = stream.readDouble();
     double lowerLeftLongitude = stream.readDouble();
     if (lowerLeftLongitude > 180) {
-      lowerLeftLongitude -= 360; //convert to standard coordinates
+      // convert to standard coordinates
+      lowerLeftLongitude -= 360;
     }
     double deltaLatitude = stream.readDouble();
     double deltaLongitude = stream.readDouble();
@@ -71,8 +72,8 @@ public class VerticalDatum {
       // then lowerLeftLongitude must be left of 180
       if (longitude < lowerLeftLongitude) {
         // lowerLeftLongitude is right of 180 (probablY)
-        lowerLeftAdjusted -= 360; // this transforms lowerLeft so that interpolation will
-        // work
+        // this transforms lowerLeft so that interpolation will work
+        lowerLeftAdjusted -= 360;
         if (longitude < lowerLeftLongitude) {
           throw new RuntimeException("longitude out of range");
         }
@@ -111,8 +112,8 @@ public class VerticalDatum {
       // then lowerLeftLongitude must be left of 180
       if (longitude < lowerLeftLongitude) {
         // lowerLeftLongitude is right of 180 (probablY)
-        lowerLeftAdjusted -= 360; // this transforms lowerLeft so that interpolation will
-        // work
+        // this transforms lowerLeft so that interpolation will work
+        lowerLeftAdjusted -= 360;
         if (longitude < lowerLeftLongitude) {
           return false;
         }

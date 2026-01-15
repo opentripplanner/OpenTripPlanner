@@ -15,7 +15,6 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
@@ -338,8 +337,6 @@ public interface TransitService {
   TripOnServiceDate getTripOnServiceDate(FeedScopedId id);
 
   Collection<TripOnServiceDate> listTripsOnServiceDate();
-
-  Collection<PathTransfer> findPathTransfers(StopLocation stop);
 
   RaptorTransitData getRaptorTransitData();
 

@@ -50,6 +50,7 @@ import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.transfer.TransferRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -251,11 +252,13 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     TimetableRepository timetableRepository,
+    TransferRepository transferRepository,
     DataImportIssueStore issueStore
   ) {
     return new DirectTransferGenerator(
       graph,
       timetableRepository,
+      transferRepository,
       issueStore,
       config.maxTransferDuration,
       config.transferRequests,

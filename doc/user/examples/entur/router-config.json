@@ -4,10 +4,12 @@
     "numItineraries": 12,
     "transferPenalty": 0,
     "turnReluctance": 1.0,
-    "elevatorBoardTime": 90,
-    "elevatorBoardCost": 90,
-    "elevatorHopTime": 20,
-    "elevatorHopCost": 20,
+    "elevator": {
+      "boardCost": 15,
+      "boardSlack": "90s",
+      "hopTime": "20s",
+      "reluctance": 2.0
+    },
     "bicycle": {
       "speed": 5,
       "reluctance": 5.0,

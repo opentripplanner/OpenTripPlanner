@@ -42,6 +42,8 @@ import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangl
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transfer.TransferRepository;
+import org.opentripplanner.transfer.TransferServiceTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -65,6 +67,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   private static final Graph graph = new Graph();
   private static final TimetableRepository timetableRepository;
+  private static final TransferRepository transferRepository;
   private static final Map.Entry<String, Object> ARGUMENT_FROM = entry(
     "from",
     Map.of("place", "F:Quay:1")
@@ -89,6 +92,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .withRegularStop(stop3)
       .build();
 
+    transferRepository = TransferServiceTestFactory.defaultTransferRepository();
     timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     timetableRepository.initTimeZone(ZoneIds.STOCKHOLM);
     var calendarServiceData = new CalendarServiceData();
@@ -127,6 +131,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
     var otpServerRequestContext = TestServerContext.createServerContext(
       graph,
       timetableRepository,
+      transferRepository,
       new DefaultFareService(),
       null,
       defaultRequest

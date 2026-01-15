@@ -135,9 +135,9 @@ public class DefaultRouteRequestType {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("elevatorBoardTime")
-          .description("How long does it take to get on an elevator, on average.")
+          .description("How long it takes to get on an elevator, on average.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.street().elevator().boardTime())
+          .dataFetcher(env -> preferences.street().elevator().boardSlack().toSeconds())
           .build()
       )
       .field(
@@ -151,17 +151,26 @@ public class DefaultRouteRequestType {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("elevatorHopTime")
-          .description("How long does it take to advance one floor on an elevator?")
+          .description("How long it takes to advance one floor on an elevator, on average.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.street().elevator().hopTime())
+          .dataFetcher(env -> preferences.street().elevator().hopTime().toSeconds())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("elevatorHopCost")
+          .deprecate("Use elevatorReluctance to set cost instead.")
           .description("What is the cost of travelling one floor on an elevator?")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.street().elevator().hopCost())
+          .dataFetcher(env -> -1)
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("elevatorReluctance")
+          .description("A multiplier to specify how bad using an elevator is.")
+          .type(Scalars.GraphQLFloat)
+          .dataFetcher(env -> preferences.street().elevator().reluctance())
           .build()
       )
       .field(

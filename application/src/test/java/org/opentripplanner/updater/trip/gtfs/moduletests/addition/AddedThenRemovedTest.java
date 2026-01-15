@@ -6,7 +6,6 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertNoFai
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
@@ -33,9 +32,6 @@ class AddedThenRemovedTest implements RealtimeTestConstants {
   private final GtfsRtTestHelper rt = GtfsRtTestHelper.of(env);
 
   @Test
-  @Disabled(
-    "Can be enabled when https://github.com/opentripplanner/OpenTripPlanner/pull/6280 is merged"
-  )
   void addedThenRemoved() {
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[SCHEDULED]");
 
