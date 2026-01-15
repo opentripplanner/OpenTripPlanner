@@ -30,32 +30,47 @@ public class DlugoszVarLenIntPacker {
         // 10xx xxxx + 8 -> 14 bits value
         // i+8192 between 0 and 16383
         int ui = i + 8192;
-        baos.write(0x80 | (ui >> 8)); // 6b MSB
-        baos.write(ui & 0xFF); // 8b LSB
+        // 6b MSB
+        baos.write(0x80 | (ui >> 8));
+        // 8b LSB
+        baos.write(ui & 0xFF);
       } else if (i >= -1048576 && i <= 1048575) {
         // 110 xxxx + 2x8 -> 21 bits value
         // i + 1048576 between 0 and 2097151
         int ui = i + 1048576;
-        baos.write(0xC0 | (ui >> 16)); // 5b MSB
-        baos.write((ui >> 8) & 0xFF); // 8b
-        baos.write(ui & 0xFF); // 8b
+        // 5b MSB
+        baos.write(0xC0 | (ui >> 16));
+        // 8b
+        baos.write((ui >> 8) & 0xFF);
+        // 8b
+        baos.write(ui & 0xFF);
       } else if (i >= -67108864 && i <= 67108863) {
         // 1110 0xxx + 3x8 -> 27 bits value
         // i + 67108864 between 0 and 134217727
         int ui = i + 67108864;
-        baos.write(0xE0 | (ui >> 24)); // 3b MSB
-        baos.write((ui >> 16) & 0xFF); // 8b
-        baos.write((ui >> 8) & 0xFF); // 8b
-        baos.write(ui & 0xFF); // 8b
-      } else { // int can't have more than 32 bits
+        // 3b MSB
+        baos.write(0xE0 | (ui >> 24));
+        // 8b
+        baos.write((ui >> 16) & 0xFF);
+        // 8b
+        baos.write((ui >> 8) & 0xFF);
+        // 8b
+        baos.write(ui & 0xFF);
+      } else {
+        // int can't have more than 32 bits
         // 1110 1xxx + 4x8 -> 35 bits value
         // i + 0x80000000 fits in 35 bits for sure
         long ui = (long) i + 2147483648L;
-        baos.write((int) (0xE8 | (ui >> 32))); // 3b MSB
-        baos.write((int) ((ui >> 24) & 0xFF)); // 8b
-        baos.write((int) ((ui >> 16) & 0xFF)); // 8b
-        baos.write((int) ((ui >> 8) & 0xFF)); // 8b
-        baos.write((int) (ui & 0xFF)); // 8b
+        // 3b MSB
+        baos.write((int) (0xE8 | (ui >> 32)));
+        // 8b
+        baos.write((int) ((ui >> 24) & 0xFF));
+        // 8b
+        baos.write((int) ((ui >> 16) & 0xFF));
+        // 8b
+        baos.write((int) ((ui >> 8) & 0xFF));
+        // 8b
+        baos.write((int) (ui & 0xFF));
       }
     }
     return baos.toByteArray();

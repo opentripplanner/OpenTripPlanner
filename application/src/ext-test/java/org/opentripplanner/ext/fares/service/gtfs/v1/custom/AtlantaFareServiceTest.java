@@ -309,7 +309,8 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         case "102" -> DEFAULT_TEST_RIDE_PRICE.plus(usDollars(2));
         case "atlsc" -> DEFAULT_TEST_RIDE_PRICE.minus(usDollars(1));
         case "blue" -> Money.ZERO_USD;
-        default -> DEFAULT_TEST_RIDE_PRICE; // free circulator
+        // free circulator
+        default -> DEFAULT_TEST_RIDE_PRICE;
       };
     }
   }

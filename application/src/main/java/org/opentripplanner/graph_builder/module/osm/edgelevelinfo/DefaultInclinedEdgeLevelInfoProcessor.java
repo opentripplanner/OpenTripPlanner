@@ -45,7 +45,13 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
       inclineInfo != null &&
       levelInfo.lowerVertexInfo() != inclineInfo.lowerVertexInfo()
     ) {
-      issueStore.add(new ContradictoryLevelAndInclineInfoForWay(way));
+      issueStore.add(
+        new ContradictoryLevelAndInclineInfoForWay(
+          way,
+          osmdb.getNode(firstNodeRef).getCoordinate(),
+          osmdb.getNode(lastNodeRef).getCoordinate()
+        )
+      );
       // Default to level info in case of contradictory information. Ideally this should be from
       // the tag that is more reliable.
       return Optional.of(levelInfo);
@@ -122,7 +128,17 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
         streetDetailsRepository.addInclinedEdgeLevelInfo(backwardEdge, inclinedEdgeLevelInfo);
       }
     } else {
-      issueStore.add(new CouldNotApplyMultiLevelInfoToWay(way, way.getNodeRefs().size()));
+      var nodeRefs = way.getNodeRefs();
+      long firstNodeRef = nodeRefs.get(0);
+      long lastNodeRef = nodeRefs.get(nodeRefs.size() - 1);
+      issueStore.add(
+        new CouldNotApplyMultiLevelInfoToWay(
+          way,
+          osmdb.getNode(firstNodeRef).getCoordinate(),
+          osmdb.getNode(lastNodeRef).getCoordinate(),
+          way.getNodeRefs().size()
+        )
+      );
     }
   }
 }

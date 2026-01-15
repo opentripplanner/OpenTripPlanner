@@ -3,7 +3,7 @@ package org.opentripplanner.gtfs.graphbuilder;
 import java.util.List;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.calendar.LocalDateInterval;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -15,7 +15,7 @@ public class GtfsModuleTestFactory {
     List<GtfsBundle> bundles,
     TimetableRepository timetableRepository,
     Graph graph,
-    ServiceDateInterval transitPeriodLimit
+    LocalDateInterval transitPeriodLimit
   ) {
     return new GtfsModule(
       bundles,

@@ -33,7 +33,7 @@ public class TimetableSnapshotTest {
   private static final ZoneId timeZone = ZoneIds.GMT;
   public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
   private static Map<FeedScopedId, TripPattern> patternIndex;
-  static String feedId;
+  private static String feedId;
 
   @BeforeAll
   public static void setUp() throws Exception {

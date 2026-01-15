@@ -86,7 +86,8 @@ class StopTimeToScheduledTripTimesMapper {
       }
     }
     if (!useStopHeadsigns) {
-      return null; //defer to trip_headsign
+      // defer to trip_headsign
+      return null;
     }
     boolean allNull = true;
     int i = 0;

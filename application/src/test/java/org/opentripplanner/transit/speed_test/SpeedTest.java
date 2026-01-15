@@ -32,6 +32,8 @@ import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
+import org.opentripplanner.transfer.TransferRepository;
+import org.opentripplanner.transfer.TransferServiceTestFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
@@ -76,7 +78,8 @@ public class SpeedTest {
     SpeedTestCmdLineOpts opts,
     SpeedTestConfig config,
     Graph graph,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    TransferRepository transferRepository
   ) {
     this.opts = opts;
     this.config = config;
@@ -129,6 +132,7 @@ public class SpeedTest {
       List.of(),
       config.request,
       TestServerContext.createStreetLimitationParametersService(),
+      TransferServiceTestFactory.transferService(transferRepository),
       config.transitRoutingParams,
       new DefaultTransitService(timetableRepository),
       null,
@@ -153,7 +157,7 @@ public class SpeedTest {
     );
     // Creating raptor transit data should be integrated into the TimetableRepository, but for now
     // we do it manually here
-    createRaptorTransitData(timetableRepository, config.transitRoutingParams);
+    createRaptorTransitData(timetableRepository, transferRepository, config.transitRoutingParams);
 
     initializeTransferCache(config.transitRoutingParams, timetableRepository);
 
@@ -166,18 +170,19 @@ public class SpeedTest {
 
   public static void main(String[] args) {
     try {
-      OtpStartupInfo.logInfo("Run Speed Test");
       // Given the following setup
       SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
-      var config = SpeedTestConfig.config(opts.rootDir());
       SetupHelper.loadOtpFeatures(opts);
+      var config = SpeedTestConfig.config(opts.rootDir());
+      OtpStartupInfo.logInfo("Run Speed Test");
       var model = SetupHelper.loadGraph(opts.rootDir(), config.graph);
       var timetableRepository = model.timetableRepository();
+      var transferRepository = model.transferRepository();
       var buildConfig = model.buildConfig();
       var graph = model.graph();
 
       // create a new test
-      var speedTest = new SpeedTest(opts, config, graph, timetableRepository);
+      var speedTest = new SpeedTest(opts, config, graph, timetableRepository, transferRepository);
 
       assertTestDateHasData(timetableRepository, config, buildConfig);
 

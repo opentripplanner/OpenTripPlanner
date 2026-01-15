@@ -421,7 +421,8 @@ class ScheduledTransitLegReferenceTest {
     ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
       SIMPLE_TRIP_ID,
       SERVICE_DATE,
-      15, // Way beyond the 3 stops in the pattern
+      // Way beyond the 3 stops in the pattern
+      15,
       16,
       STOP_1_ID,
       STOP_2_ID,
@@ -442,7 +443,8 @@ class ScheduledTransitLegReferenceTest {
       SIMPLE_TRIP_ID,
       SERVICE_DATE,
       0,
-      15, // Way beyond the 3 stops in the pattern
+      // Way beyond the 3 stops in the pattern
+      15,
       STOP_1_ID,
       STOP_2_ID,
       null

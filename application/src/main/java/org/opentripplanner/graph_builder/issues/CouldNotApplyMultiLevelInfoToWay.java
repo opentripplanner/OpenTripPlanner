@@ -1,9 +1,19 @@
 package org.opentripplanner.graph_builder.issues;
 
+import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.osm.model.OsmWay;
 
-public record CouldNotApplyMultiLevelInfoToWay(OsmWay way, int nodes) implements DataImportIssue {
+public record CouldNotApplyMultiLevelInfoToWay(
+  OsmWay way,
+  Coordinate from,
+  Coordinate to,
+  int nodes
+)
+  implements DataImportIssue {
   private static final String FMT =
     "Multi-level info for way %s can not be used because node references did not match. " +
     "This is probably caused by more than 2 intersection nodes in the way. " +
@@ -22,5 +32,10 @@ public record CouldNotApplyMultiLevelInfoToWay(OsmWay way, int nodes) implements
   @Override
   public String getHTMLMessage() {
     return String.format(HTMLFMT, way.url(), way.getId(), nodes);
+  }
+
+  @Override
+  public Geometry getGeometry() {
+    return GeometryUtils.makeLineString(List.of(from, to));
   }
 }

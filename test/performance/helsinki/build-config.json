@@ -1,0 +1,52 @@
+{
+  "dataImportReport": true,
+  "areaVisibility": true,
+  "staticParkAndRide": false,
+  "includeInclinedEdgeLevelInfo": true,
+  "subwayAccessTime": 0,
+  "maxAreaNodes": 50,
+  "maxTransferDuration": "26m",
+  "multiThreadElevationCalculations": true,
+  "transitServiceStart": "2026-01-01",
+  "transitServiceEnd": "2026-01-31",
+  "transitModelTimeZone": "Europe/Helsinki",
+  "fares": "hsl",
+  "transferRequests": [
+    { "modes": "WALK" },
+    {
+      "modes": "WALK",
+      "wheelchairAccessibility": {
+        "enabled": true,
+        "maxSlope": 0.125
+      }
+    },
+    { "modes": "BICYCLE" }
+  ],
+  "gtfsDefaults": {
+    "stationTransferPreference": "recommended"
+  },
+  "osmDefaults": {
+    "timeZone": "Europe/Helsinki",
+    "osmTagMapping": "finland",
+    "includeOsmSubwayEntrances": true
+  },
+  "demDefaults": {
+    "elevationUnitMultiplier": 0.1
+  },
+  "emission": {
+    "carAvgCo2PerKm": 170,
+    "carAvgOccupancy": 1.3
+  },
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/helsinki/hsl-gtfs-2026-01-12.zip",
+      "feedId": "HSL"
+    }
+  ],
+  "osm": [
+    {
+      "source": "https://otp-performance.leonard.io/data/helsinki/hsl-2026-01-12.osm.pbf"
+    }
+  ]
+}

@@ -191,7 +191,7 @@ public class AStar<
     long abortTime = DateUtils.absoluteTimeout(timeout);
 
     /* the core of the A* algorithm */
-    while (!pq.empty()) { // Until the priority queue is empty:
+    while (!pq.empty()) {
       /*
        * Terminate based on timeout. We don't check the termination on every round, as it is
        * expensive to fetch the current time, compared to just running one more round.

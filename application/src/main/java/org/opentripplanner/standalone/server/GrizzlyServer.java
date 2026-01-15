@@ -35,8 +35,8 @@ public class GrizzlyServer {
   private final Duration httpTransactionTimeout;
 
   static {
-    // Remove existing handlers attached to the j.u.l root logger
-    SLF4JBridgeHandler.removeHandlersForRootLogger(); // (since SLF4J 1.6.5)
+    // Remove existing handlers attached to the j.u.l root logger (since SLF4J 1.6.5)
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
     // Bridge j.u.l (used by Jersey) to the SLF4J root logger
     SLF4JBridgeHandler.install();
   }

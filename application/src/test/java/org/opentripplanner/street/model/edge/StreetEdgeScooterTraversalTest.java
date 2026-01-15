@@ -171,9 +171,11 @@ public class StreetEdgeScooterTraversalTest {
       .buildAndConnect();
 
     Coordinate[] profile = new Coordinate[] {
-      new Coordinate(0, 0), // slope = 0.1
+      // slope = 0.1
+      new Coordinate(0, 0),
       new Coordinate(length / 2, length / 20.0),
-      new Coordinate(length, 0), // slope = -0.1
+      // slope = -0.1
+      new Coordinate(length, 0),
     };
     PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
     StreetElevationExtensionBuilder.of(testStreet)

@@ -148,12 +148,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     //
     // X   ElevatorHopVertex
     // --- ElevatorHopEdge
-    s1.incrementWeight(
-      this.travelTime > 0 ? this.travelTime : (request.elevator().hopCost() * this.levels)
-    );
-    s1.incrementTimeInSeconds(
-      this.travelTime > 0 ? this.travelTime : (int) (request.elevator().hopTime() * this.levels)
-    );
+    int time = this.travelTime > 0
+      ? this.travelTime
+      : (int) (request.elevator().hopTime().toSeconds() * this.levels);
+    s1.incrementWeight(request.elevator().reluctance() * time);
+    s1.incrementTimeInSeconds(time);
     return s1.makeStateArray();
   }
 
