@@ -1,7 +1,7 @@
 package org.opentripplanner.api.common;
 
 import java.util.Locale;
-import org.opentripplanner.framework.resources.ResourceBundleAdaptor;
+import org.opentripplanner.core.framework.resources.ResourceBundleAdaptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

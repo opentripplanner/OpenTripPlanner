@@ -4,6 +4,8 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class TransitModeMapper {
 
+  private static final int RAIL_REPLACEMENT_BUS_SERVICE = 714;
+
   /**
    * Return an OTP TransitMode matching a routeType. If no good match is found, it returns null.
    *
@@ -19,9 +21,10 @@ public class TransitModeMapper {
     if (routeType >= 100 && routeType < 200) {
       // Railway Service
       return TransitMode.RAIL;
-    } else if (routeType >= 200 && routeType < 300) { //Coach Service
+    } else if (routeType >= 200 && routeType < 300) {
       return TransitMode.COACH;
-    } else if (routeType >= 300 && routeType < 500) { //Suburban Railway Service and Urban Railway service
+    } else if (routeType >= 300 && routeType < 500) {
+      // Suburban Railway Service and Urban Railway service
       if (routeType >= 401 && routeType <= 402) {
         return TransitMode.SUBWAY;
       }
@@ -85,5 +88,9 @@ public class TransitModeMapper {
       case 12 -> TransitMode.MONORAIL;
       default -> throw new IllegalArgumentException("unknown gtfs route type " + routeType);
     };
+  }
+
+  public static boolean isRailReplacementBusService(int routeType) {
+    return routeType == RAIL_REPLACEMENT_BUS_SERVICE;
   }
 }

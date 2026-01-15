@@ -5,14 +5,18 @@ export function ItineraryPaginationControl({
   nextPageCursor,
   onPagination,
   loading,
+  comparisonSelectedIndexes,
+  onCompare,
 }: {
   previousPageCursor?: string | null;
   nextPageCursor?: string | null;
   onPagination: (cursor: string) => void;
   loading: boolean;
+  comparisonSelectedIndexes?: number[];
+  onCompare?: () => void;
 }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+    <div className="pagination-controls-container">
       <Button
         variant="outline-primary"
         size="sm"
@@ -24,7 +28,14 @@ export function ItineraryPaginationControl({
         }}
       >
         Previous page
-      </Button>{' '}
+      </Button>
+      <div style={{ textAlign: 'center' }}>
+        {comparisonSelectedIndexes?.length === 2 && onCompare && (
+          <Button variant="primary" size="sm" onClick={onCompare}>
+            Compare selected
+          </Button>
+        )}
+      </div>
       <Button
         variant="outline-primary"
         size="sm"

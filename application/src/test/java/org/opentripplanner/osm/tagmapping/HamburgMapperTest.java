@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.osm.model.OsmEntity;
+import org.opentripplanner.osm.model.OsmEntityForTest;
 
 /**
  * @author Maintained by HBT (geofox-team@hbt.de)
@@ -23,7 +24,7 @@ public class HamburgMapperTest {
 
   @Test
   public void shouldAllowThroughTraffic_WhenAccessCustomers_AndCustomersHVV() {
-    OsmEntity way = new OsmEntity();
+    OsmEntity way = new OsmEntityForTest();
     way.addTag("access", "customers");
     way.addTag("customers", "HVV");
 
@@ -38,7 +39,7 @@ public class HamburgMapperTest {
   @ParameterizedTest
   @ValueSource(strings = { "no", "destination", "private", "customers", "delivery" })
   public void shouldDisallowThroughTraffic_WhenNoCustomersHVV(String access) {
-    OsmEntity way = new OsmEntity();
+    OsmEntity way = new OsmEntityForTest();
     way.addTag("access", access);
 
     boolean generalNoThroughTraffic = mapper.isGeneralNoThroughTraffic(way);

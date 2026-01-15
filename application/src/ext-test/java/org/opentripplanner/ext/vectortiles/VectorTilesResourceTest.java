@@ -6,9 +6,10 @@ import org.glassfish.grizzly.http.server.Request;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.HttpForTest;
+import org.opentripplanner.transfer.TransferServiceTestFactory;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 class VectorTilesResourceTest {
@@ -21,6 +22,7 @@ class VectorTilesResourceTest {
       TestServerContext.createServerContext(
         new Graph(),
         new TimetableRepository(),
+        TransferServiceTestFactory.defaultTransferRepository(),
         new DefaultFareService()
       ),
       grizzlyRequest,

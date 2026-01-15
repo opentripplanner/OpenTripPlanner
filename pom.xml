@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp-root</artifactId>
-    <version>2.8.1</version>
+    <version>2.9.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenTripPlanner - Root</name>
@@ -58,23 +58,23 @@
 
 
     <properties>
-        <otp.serialization.version.id>203</otp.serialization.version.id>
+        <otp.serialization.version.id>232</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>33.2</geotools.version>
-        <google.dagger.version>2.57.1</google.dagger.version>
-        <jackson.version>2.20.0</jackson.version>
-        <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
+        <geotools.version>34.1</geotools.version>
+        <google.dagger.version>2.57.2</google.dagger.version>
+        <jackson.version>2.20.1</jackson.version>
+        <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
-        <junit.version>5.13.4</junit.version>
+        <junit.version>6.0.1</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.18</logback.version>
-        <lucene.version>10.2.2</lucene.version>
-        <micrometer.version>1.15.4</micrometer.version>
+        <logback.version>1.5.23</logback.version>
+        <lucene.version>10.3.2</lucene.version>
+        <micrometer.version>1.16.2</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.32.1</protobuf.version>
+        <protobuf.version>4.33.4</protobuf.version>
         <siri-java-model.version>2.0.1</siri-java-model.version>
         <slf4j.version>2.0.17</slf4j.version>
         <!-- Other properties -->
@@ -84,9 +84,11 @@
              When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
         -->
         <argLine/>
+        <plugin.checkstyle.skip>false</plugin.checkstyle.skip>
         <plugin.prettier.version>0.22</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
         <plugin.prettier.skip>false</plugin.prettier.skip>
+        <plugin.rewrite.skip>true</plugin.rewrite.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
         <tests.excludedGroups>integration</tests.excludedGroups>
         <tests.includedGroups></tests.includedGroups>
@@ -95,10 +97,12 @@
     <modules>
         <module>utils</module>
         <module>raptor</module>
+        <module>astar</module>
         <module>gtfs-realtime-protobuf</module>
         <module>application</module>
         <module>otp-shaded</module>
         <module>test/integration</module>
+        <module>domain-core</module>
     </modules>
 
 
@@ -108,12 +112,30 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.hubspot.maven.plugins</groupId>
                     <artifactId>prettier-maven-plugin</artifactId>
                     <version>${plugin.prettier.version}</version>
+                    <configuration>
+                        <skip>${plugin.prettier.skip}</skip>
+                        <prettierJavaVersion>2.6.8</prettierJavaVersion>
+                        <inputGlobs>
+                            <inputGlob>src/main/java/**/*.java</inputGlob>
+                            <inputGlob>src/test/java/**/*.java</inputGlob>
+                            <inputGlob>src/test-fixtures/java/**/*.java</inputGlob>
+                        </inputGlobs>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>prettier-format</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>${plugin.prettier.goal}</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -121,7 +143,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>3.14.1</version>
                 <configuration>
                     <!-- Target Java version -->
                     <release>21</release>
@@ -130,7 +152,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
+                <version>3.5.0</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -160,7 +182,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -176,7 +198,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <configuration>
                     <propertiesEncoding>UTF-8</propertiesEncoding>
                 </configuration>
@@ -184,7 +206,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.4</version>
+                <version>3.5.3</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
@@ -251,11 +273,31 @@
                     <excludedGroups>${tests.excludedGroups}</excludedGroups>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>build-helper-generate-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java</source>
+                                <source>src/test-fixtures/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- code coverage report -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.13</version>
+                <version>0.8.14</version>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -286,23 +328,61 @@
                     </includeOnlyProperties>
                 </configuration>
             </plugin>
-
             <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
+                <groupId>org.openrewrite.maven</groupId>
+                <artifactId>rewrite-maven-plugin</artifactId>
+                <version>6.26.0</version>
                 <configuration>
-                    <skip>${plugin.prettier.skip}</skip>
-                    <prettierJavaVersion>2.6.8</prettierJavaVersion>
-                    <inputGlobs>
-                        <inputGlob>src/main/java/**/*.java</inputGlob>
-                        <inputGlob>src/test/java/**/*.java</inputGlob>
-                    </inputGlobs>
+                    <exportDatatables>true</exportDatatables>
+                    <activeRecipes>
+                        <recipe>org.opentripplanner.CodeStyle</recipe>
+                    </activeRecipes>
+                    <exclusions>
+                        <exclusion>**/package-info-template.java</exclusion>
+                        <exclusion>**/test-fixtures/**/*</exclusion>
+                    </exclusions>
+                    <sizeThresholdMb>0</sizeThresholdMb>
+                    <runPerSubmodule>true</runPerSubmodule>
+                    <configLocation>${maven.multiModuleProjectDirectory}/openrewrite.yml</configLocation>
+                    <rewriteSkip>${plugin.rewrite.skip}</rewriteSkip>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.openrewrite.recipe</groupId>
+                        <artifactId>rewrite-static-analysis</artifactId>
+                        <version>2.24.0</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <configLocation>${maven.multiModuleProjectDirectory}/checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                    <skip>${plugin.checkstyle.skip}</skip>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <sourceDirectories>
+                        <sourceDirectory>src/main/java</sourceDirectory>
+                        <sourceDirectory>src/test-fixtures/java</sourceDirectory>
+                    </sourceDirectories>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>12.3.0</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
+                        <id>validate</id>
                         <phase>validate</phase>
                         <goals>
-                            <goal>${plugin.prettier.goal}</goal>
+                            <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -310,7 +390,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.6</version>
+                <version>3.5.1</version>
                 <configuration>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
@@ -386,7 +466,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.68.0</version>
+                <version>26.72.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -400,7 +480,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.4.8-jre</version>
+                <version>33.5.0-jre</version>
             </dependency>
 
             <!-- Logging API -->
@@ -426,8 +506,12 @@
                 <version>3.0.3</version>
             </dependency>
 
-            <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
-            <!-- GEOTOOLS includes JTS as a transitive dependency. -->
+            <!--
+             GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections.
+             GEOTOOLS includes JTS as a transitive dependency. It also includes Eclipse ImageN as a
+             transitive dependency, but its use should be limited to input/output for geotools
+             usage.
+            -->
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-coverage</artifactId>
@@ -479,7 +563,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.19.0</version>
+                <version>5.21.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.origin-energy</groupId>
@@ -491,6 +575,22 @@
     </dependencyManagement>
 
     <profiles>
+        <profile>
+            <id>checkstyleSkip</id>
+            <activation>
+                <property>
+                    <!--
+                      This works as a short alias to enable this from the command line. To skip
+                      prettier, set the 'ps' system property with the '-D cs' parameter.
+                    -->
+                    <name>cs</name>
+                    <value/>
+                </property>
+            </activation>
+            <properties>
+                <plugin.checkstyle.skip>true</plugin.checkstyle.skip>
+            </properties>
+        </profile>
         <profile>
             <id>prettierCheck</id>
             <properties>
@@ -504,8 +604,7 @@
                 <property>
                     <!--
                       This works as a short alias to enable this from the command line. To skip
-                      prettier, set the 'ps' system property with the '-D ps' parameter:
-                      # mvn test -D ps
+                      prettier, set the 'ps' system property with the '-D ps' parameter.
                     -->
                     <name>ps</name>
                     <value/>
@@ -514,6 +613,40 @@
             <properties>
                 <plugin.prettier.skip>true</plugin.prettier.skip>
             </properties>
+        </profile>
+        <profile>
+            <id>rewrite</id>
+            <activation>
+                <property>
+                    <!--
+                      This works as a short alias to enable this from the command line.
+                      To run rewrite, set the 'rw' system property with the '-Drw' parameter.
+                    -->
+                    <name>rw</name>
+                    <value/>
+                </property>
+            </activation>
+            <properties>
+                <plugin.rewrite.skip>false</plugin.rewrite.skip>
+                <plugin.checkstyle.skip>true</plugin.checkstyle.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openrewrite.maven</groupId>
+                        <artifactId>rewrite-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>rewrite-run</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>clean-test-snapshots</id>
@@ -599,7 +732,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.8.0</version>
+                        <version>0.9.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <!-- if someone else other than Leonard deploys to Maven Central this might need to change -->

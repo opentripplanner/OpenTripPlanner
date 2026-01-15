@@ -84,7 +84,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
       .withTo(p2)
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 
   @DisplayName("Direct BIKE")
@@ -124,7 +124,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
       .buildRequest();
 
     try {
-      expectArriveByToMatchDepartAtAndSnapshot(request);
+      expectRequestResponseToMatchSnapshot(request);
     } catch (CompletionException e) {
       RoutingValidationException.unwrapAndRethrowCompletionException(e);
     }
@@ -139,7 +139,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
       .withTo(p1)
       .buildRequest();
 
-    expectArriveByToMatchDepartAtAndSnapshot(request);
+    expectRequestResponseToMatchSnapshot(request);
   }
 
   @Override

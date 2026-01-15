@@ -6,10 +6,10 @@ import static org.opentripplanner._support.asserts.AssertString.assertEqualsIgno
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class JourneyRequestTest {
 
@@ -72,7 +72,7 @@ class JourneyRequestTest {
 
   @Test
   void setAllModes() {
-    var subject = JourneyRequest.of().setAllModes(StreetMode.BIKE).build();
+    var subject = JourneyRequest.of().withAllModes(StreetMode.BIKE).build();
     assertEquals(StreetMode.BIKE, subject.access().mode());
     assertEquals(StreetMode.BIKE, subject.egress().mode());
     assertEquals(StreetMode.BIKE, subject.transfer().mode());
@@ -81,7 +81,7 @@ class JourneyRequestTest {
 
   @Test
   void testMappingInOutOfRequestMode() {
-    var subject = JourneyRequest.of().setModes(REQUEST_MODES).build();
+    var subject = JourneyRequest.of().withModes(REQUEST_MODES).build();
     assertEquals(REQUEST_MODES.accessMode, subject.access().mode());
     assertEquals(REQUEST_MODES.egressMode, subject.egress().mode());
     assertEquals(REQUEST_MODES.transferMode, subject.transfer().mode());

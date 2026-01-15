@@ -1,6 +1,6 @@
 package org.opentripplanner.service.vehiclerental.internal;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,6 @@ import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVeh
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class DefaultVehicleRentalServiceTest {
 

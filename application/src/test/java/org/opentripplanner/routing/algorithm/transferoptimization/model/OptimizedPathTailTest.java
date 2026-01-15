@@ -92,7 +92,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
       "~ BUS L21 11:00 11:23 ~ D " +
       "~ BUS L31 11:40 11:52 ~ E " +
       "~ Walk 7m45s " +
-      "[C₁7_989 Tₚ4_600 wtC₁-93_137]";
+      "[C₁7_989 Tₚ4_600 Wₜ-93_137]";
 
     assertEquals(exp, subject.toString());
   }
@@ -106,8 +106,8 @@ class OptimizedPathTailTest implements RaptorTestConstants {
       "Walk 3m ~ A " +
       "~ BUS L11 10:04 10:35 ~ B " +
       "~ Walk 3m45s ~ E " +
-      "~ Flex 7m45s 1x " +
-      "[C₁3_906 wtC₁3_966]";
+      "~ Flex 7m45s Rₙ1 " +
+      "[C₁3_906 Wₜ3_966]";
 
     assertEquals(exp, subject.toString());
   }
@@ -154,7 +154,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
       "~ BUS L21 11:00 11:23 23m C₁2_724 ~ D 17m (staySeated) " +
       "~ BUS L31 11:40 11:52 12m C₁1_737 ~ E 15s " +
       "~ Walk 7m45s 11:52:15 12:00 C₁930 " +
-      "[10:00:15 12:00 1h59m45s Tₓ1 C₁7_989 Tₚ4_600 wtC₁-93_137]";
+      "[10:00:15 12:00 1h59m45s Tₙ1 C₁7_989 Tₚ4_600 Wₜ-93_137]";
 
     assertEquals(expPath, path.toStringDetailed(this::stopIndexToName));
   }

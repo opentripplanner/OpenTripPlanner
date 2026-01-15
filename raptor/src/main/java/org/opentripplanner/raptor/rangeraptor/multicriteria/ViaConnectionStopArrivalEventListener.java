@@ -13,7 +13,6 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArriv
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
-import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * This class is used to listen for stop arrivals in one raptor state and then copy

@@ -100,7 +100,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
       return pattern(TestTripPattern.pattern(name, stops));
     }
 
-    /** @param times departure and arrival times per stop. Example: "0:10, 0:20, 0:45 .." */
+    /** @param times departure and arrival times per stop. Example: "0:10  0:20  0:45 .." */
     public TestTripSchedule.Builder times(String times) {
       return times(TimeUtils.times(times));
     }
@@ -112,7 +112,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
       return this;
     }
 
-    /** @param arrivalTimes arrival times per stop. Example: "0:10, 0:20, 0:45 .. */
+    /** @param arrivalTimes arrival times per stop. Example: "0:10  0:20  0:45 .. */
     public TestTripSchedule.Builder arrivals(String arrivalTimes) {
       return this.arrivals(TimeUtils.times(arrivalTimes));
     }
@@ -123,7 +123,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
       return this;
     }
 
-    /** @param departureTimes departure times per stop. Example: "0:10, 0:20, 0:45 .. */
+    /** @param departureTimes departure times per stop. Example: "0:10  0:20  0:45 .. */
     public TestTripSchedule.Builder departures(String departureTimes) {
       return this.departures(TimeUtils.times(departureTimes));
     }

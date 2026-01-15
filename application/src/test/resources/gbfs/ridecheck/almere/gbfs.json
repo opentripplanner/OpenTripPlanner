@@ -1,0 +1,25 @@
+{
+  "data": {
+    "feeds": [
+      {
+        "name": "system_information",
+        "url": "file:src/test/resources/gbfs/ridecheck/almere/system_information.json"
+      },
+      {
+        "name": "vehicle_types",
+        "url": "file:src/test/resources/gbfs/ridecheck/almere/vehicle_types.json"
+      },
+      {
+        "name": "vehicle_status",
+        "url": "file:src/test/resources/gbfs/ridecheck/almere/vehicle_status.json"
+      },
+      {
+        "name": "geofencing_zones",
+        "url": "file:src/test/resources/gbfs/ridecheck/almere/geofencing_zones.json"
+      }
+    ]
+  },
+  "last_updated": "2025-05-21T07:47:43.124370+00:00",
+  "ttl": 600,
+  "version": "3.0"
+}

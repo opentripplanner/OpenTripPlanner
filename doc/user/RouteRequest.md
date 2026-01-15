@@ -19,10 +19,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | arriveBy                                                                                                     |        `boolean`       | Whether the trip should depart or arrive at the specified date and time.                                                                                 | *Optional* | `false`          |  2.0  |
 | [boardSlack](#rd_boardSlack)                                                                                 |       `duration`       | The time safety margin when boarding a vehicle.                                                                                                          | *Optional* | `"PT0S"`         |  2.0  |
 | [drivingDirection](#rd_drivingDirection)                                                                     |         `enum`         | The driving direction to use in the intersection traversal calculation                                                                                   | *Optional* | `"right"`        |  2.2  |
-| elevatorBoardCost                                                                                            |        `integer`       | What is the cost of boarding a elevator?                                                                                                                 | *Optional* | `90`             |  2.0  |
-| elevatorBoardTime                                                                                            |        `integer`       | How long does it take to get on an elevator, on average.                                                                                                 | *Optional* | `90`             |  2.0  |
-| elevatorHopCost                                                                                              |        `integer`       | What is the cost of travelling one floor on an elevator?                                                                                                 | *Optional* | `20`             |  2.0  |
-| elevatorHopTime                                                                                              |        `integer`       | How long does it take to advance one floor on an elevator?                                                                                               | *Optional* | `20`             |  2.0  |
 | geoidElevation                                                                                               |        `boolean`       | If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query.                                                     | *Optional* | `false`          |  2.0  |
 | ignoreRealtimeUpdates                                                                                        |        `boolean`       | When true, real-time updates are ignored during this search.                                                                                             | *Optional* | `false`          |  2.0  |
 | [intersectionTraversalModel](#rd_intersectionTraversalModel)                                                 |         `enum`         | The model that computes the costs of turns.                                                                                                              | *Optional* | `"simple"`       |  2.2  |
@@ -34,7 +30,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | numItineraries                                                                                               |        `integer`       | The maximum number of itineraries to return.                                                                                                             | *Optional* | `50`             |  2.0  |
 | [otherThanPreferredRoutesPenalty](#rd_otherThanPreferredRoutesPenalty)                                       |        `integer`       | Penalty added for using every route that is not preferred if user set any route as preferred.                                                            | *Optional* | `300`            |  2.0  |
 | [relaxTransitGroupPriority](#rd_relaxTransitGroupPriority)                                                   |        `string`        | The relax function for transit-group-priority                                                                                                            | *Optional* | `"0s + 1.00 t"`  |  2.5  |
-| [relaxTransitSearchGeneralizedCostAtDestination](#rd_relaxTransitSearchGeneralizedCostAtDestination)         |        `double`        | Whether non-optimal transit paths at the destination should be returned                                                                                  | *Optional* |                  |  2.3  |
 | [searchWindow](#rd_searchWindow)                                                                             |       `duration`       | The duration of the search-window.                                                                                                                       | *Optional* |                  |  2.0  |
 | [streetRoutingTimeout](#rd_streetRoutingTimeout)                                                             |       `duration`       | The maximum time a street routing request is allowed to take before returning the results.                                                               | *Optional* | `"PT5S"`         |  2.2  |
 | [transferPenalty](#rd_transferPenalty)                                                                       |        `integer`       | An additional penalty added to boardings after the first.                                                                                                | *Optional* | `0`              |  2.0  |
@@ -68,6 +63,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                          | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                                       | *Optional* | `30`             |  2.0  |
 |       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                                       | *Optional* | `"PT30S"`        |  2.0  |
+|       [electricAssistSlopeSensitivity](#rd_bicycle_rental_electricAssistSlopeSensitivity)                    |        `double`        | How sensitive electric-assist rental vehicles are to slopes.                                                                                             | *Optional* | `0.3`            |  2.8  |
 |       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                                 | *Optional* | `0`              |  2.2  |
 |       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                                  | *Optional* | `120`            |  2.0  |
 |       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                                  | *Optional* | `"PT1M"`         |  2.0  |
@@ -83,7 +79,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [mountDismountTime](#rd_bicycle_walk_mountDismountTime)                                                |       `duration`       | The time it takes the user to hop on or off a vehicle.                                                                                                   | *Optional* | `"PT0S"`         |  2.0  |
 |       reluctance                                                                                             |        `double`        | A multiplier for how bad walking with a vehicle is, compared to being in transit for equal lengths of time.                                              | *Optional* | `5.0`            |  2.1  |
 |       speed                                                                                                  |        `double`        | The user's vehicle walking speed in meters/second. Defaults to approximately 3 MPH.                                                                      | *Optional* | `1.33`           |  2.1  |
-|       stairsReluctance                                                                                       |        `double`        | How bad is it to walk the vehicle up/down a flight of stairs compared to taking a detour.                                                                | *Optional* | `10.0`           |  2.3  |
+|       stairsReluctance                                                                                       |        `double`        | How bad is it to walk the vehicle up/down a flight of stairs, on top of the reluctance parameter.                                                        | *Optional* | `2.0`            |  2.3  |
 | [boardSlackForMode](#rd_boardSlackForMode)                                                                   | `enum map of duration` | How much extra time should be given when boarding a vehicle for each given mode.                                                                         | *Optional* |                  |  2.0  |
 | car                                                                                                          |        `object`        | Car preferences.                                                                                                                                         | *Optional* |                  |  2.5  |
 |    accelerationSpeed                                                                                         |        `double`        | The acceleration speed of an automobile, in meters per second per second.                                                                                | *Optional* | `2.9`            |  2.0  |
@@ -103,12 +99,18 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                          | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                                       | *Optional* | `30`             |  2.0  |
 |       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                                       | *Optional* | `"PT30S"`        |  2.0  |
+|       [electricAssistSlopeSensitivity](#rd_car_rental_electricAssistSlopeSensitivity)                        |        `double`        | How sensitive electric-assist rental vehicles are to slopes.                                                                                             | *Optional* | `0.3`            |  2.8  |
 |       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                                 | *Optional* | `0`              |  2.2  |
 |       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                                  | *Optional* | `120`            |  2.0  |
 |       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                                  | *Optional* | `"PT1M"`         |  2.0  |
 |       useAvailabilityInformation                                                                             |        `boolean`       | Whether or not vehicle rental availability information will be used to plan vehicle rental trips.                                                        | *Optional* | `false`          |  2.0  |
 |       [allowedNetworks](#rd_car_rental_allowedNetworks)                                                      |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                                        | *Optional* |                  |  2.1  |
 |       [bannedNetworks](#rd_car_rental_bannedNetworks)                                                        |       `string[]`       | The vehicle rental networks which may not be used. If empty, no networks are banned.                                                                     | *Optional* |                  |  2.1  |
+| elevator                                                                                                     |        `object`        | Elevator preferences.                                                                                                                                    | *Optional* |                  |  2.9  |
+|    boardCost                                                                                                 |        `integer`       | What is the cost of boarding a elevator?                                                                                                                 | *Optional* | `15`             |  2.9  |
+|    boardSlack                                                                                                |       `duration`       | How long it takes to get on an elevator, on average.                                                                                                     | *Optional* | `"PT1M30S"`      |  2.9  |
+|    hopTime                                                                                                   |       `duration`       | How long it takes to advance one floor on an elevator, on average.                                                                                       | *Optional* | `"PT20S"`        |  2.9  |
+|    reluctance                                                                                                |        `double`        | A multiplier to specify how bad using an elevator is.                                                                                                    | *Optional* | `2.0`            |  2.9  |
 | [itineraryFilters](#rd_itineraryFilters)                                                                     |        `object`        | Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results.                                             | *Optional* |                  |  2.0  |
 |    [accessibilityScore](#rd_if_accessibilityScore)                                                           |        `boolean`       | An experimental feature contributed by IBI which adds a sandbox accessibility *score* between 0 and 1 for each leg and itinerary.                        | *Optional* | `false`          |  2.2  |
 |    [bikeRentalDistanceRatio](#rd_if_bikeRentalDistanceRatio)                                                 |        `double`        | Filter routes that consist of bike-rental and walking by the minimum fraction of the bike-rental leg using _distance_.                                   | *Optional* | `0.0`            |  2.1  |
@@ -135,6 +137,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                          | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                                       | *Optional* | `30`             |  2.0  |
 |       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                                       | *Optional* | `"PT30S"`        |  2.0  |
+|       [electricAssistSlopeSensitivity](#rd_scooter_rental_electricAssistSlopeSensitivity)                    |        `double`        | How sensitive electric-assist rental vehicles are to slopes.                                                                                             | *Optional* | `0.3`            |  2.8  |
 |       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                                 | *Optional* | `0`              |  2.2  |
 |       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                                  | *Optional* | `120`            |  2.0  |
 |       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                                  | *Optional* | `"PT1M"`         |  2.0  |
@@ -160,7 +163,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [reluctance](#rd_walk_reluctance)                                                                         |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                                             | *Optional* | `2.0`            |  2.0  |
 |    [safetyFactor](#rd_walk_safetyFactor)                                                                     |        `double`        | Factor for how much the walk safety is considered in routing.                                                                                            | *Optional* | `1.0`            |  2.2  |
 |    speed                                                                                                     |        `double`        | The user's walking speed in meters/second.                                                                                                               | *Optional* | `1.33`           |  2.0  |
-|    stairsReluctance                                                                                          |        `double`        | Used instead of walkReluctance for stairs.                                                                                                               | *Optional* | `2.0`            |  2.0  |
+|    stairsReluctance                                                                                          |        `double`        | A multiplier to specify how bad walking on stairs is, on top of the reluctance parameter.                                                                | *Optional* | `2.0`            |  2.0  |
 |    [stairsTimeFactor](#rd_walk_stairsTimeFactor)                                                             |        `double`        | How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.                                              | *Optional* | `3.0`            |  2.1  |
 |    escalator                                                                                                 |        `object`        | Escalator preferences.                                                                                                                                   | *Optional* |                  |  2.7  |
 |       reluctance                                                                                             |        `double`        | A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time                                                 | *Optional* | `1.5`            |  2.4  |
@@ -301,23 +304,6 @@ another path. If this parameter is set, the comparison is relaxed further if the
 to different transit groups.
 
 
-<h3 id="rd_relaxTransitSearchGeneralizedCostAtDestination">relaxTransitSearchGeneralizedCostAtDestination</h3>
-
-**Since version:** `2.3` ∙ **Type:** `double` ∙ **Cardinality:** `Optional`   
-**Path:** /routingDefaults 
-
-Whether non-optimal transit paths at the destination should be returned
-
-Let c be the existing minimum pareto optimal generalized cost to beat. Then a trip
-with cost c' is accepted if the following is true:
-`c' < Math.round(c * relaxRaptorCostCriteria)`.
-
-The parameter is optional. If not set a normal comparison is performed.
-
-Values equals or less than zero is not allowed. Values greater than 2.0 are not
-supported, due to performance reasons.
-
-
 <h3 id="rd_searchWindow">searchWindow</h3>
 
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
@@ -425,7 +411,7 @@ Safety limit to prevent access to and egress from too many stops.
 
 **Since version:** `2.1` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults/accessEgress   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `carpool` | `flexible`
 
 Limit access/egress per street mode.
 
@@ -437,7 +423,7 @@ done because some street modes searches are much more resource intensive than ot
 
 **Since version:** `2.7` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults/accessEgress   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `carpool` | `flexible`
 
 Maximal number of stops collected in access/egress routing for the given mode
 
@@ -449,7 +435,7 @@ Mode-specific version of `maxStopCount`.
 
 **Since version:** `2.4` ∙ **Type:** `enum map of object` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults/accessEgress   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `carpool` | `flexible`
 
 Penalty for access/egress by street mode.
 
@@ -486,7 +472,7 @@ extra cost, while 1.0 will add the same amount to both time and cost.
 
 **Since version:** `2.0` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults   
-**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi`
+**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi` | `snow-and-ice`
 
 How much extra time should be given when alighting a vehicle for each given mode.
 
@@ -550,6 +536,19 @@ Tags without which a vehicle parking will not be used. If empty, no tags are req
 Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
 
 
+<h3 id="rd_bicycle_rental_electricAssistSlopeSensitivity">electricAssistSlopeSensitivity</h3>
+
+**Since version:** `2.8` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.3`   
+**Path:** /routingDefaults/bicycle/rental 
+
+How sensitive electric-assist rental vehicles are to slopes.
+
+A value between 0 and 1 where:
+- 0.0 means the motor fully compensates for slopes (like fully electric vehicles)
+- 1.0 means no motor assistance on slopes (like human-powered vehicles)
+- 0.3 (default) means the motor compensates for 70% of slope difficulty
+
+
 <h3 id="rd_bicycle_rental_allowedNetworks">allowedNetworks</h3>
 
 **Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
@@ -610,7 +609,7 @@ for controlling the duration of those events.
 
 **Since version:** `2.0` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults   
-**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi`
+**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi` | `snow-and-ice`
 
 How much extra time should be given when boarding a vehicle for each given mode.
 
@@ -664,6 +663,19 @@ Vehicle parking tags can originate from different places depending on the origin
 Tags without which a vehicle parking will not be used. If empty, no tags are required.
 
 Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
+
+
+<h3 id="rd_car_rental_electricAssistSlopeSensitivity">electricAssistSlopeSensitivity</h3>
+
+**Since version:** `2.8` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.3`   
+**Path:** /routingDefaults/car/rental 
+
+How sensitive electric-assist rental vehicles are to slopes.
+
+A value between 0 and 1 where:
+- 0.0 means the motor fully compensates for slopes (like fully electric vehicles)
+- 1.0 means no motor assistance on slopes (like human-powered vehicles)
+- 0.3 (default) means the motor compensates for 70% of slope difficulty
 
 
 <h3 id="rd_car_rental_allowedNetworks">allowedNetworks</h3>
@@ -904,7 +916,7 @@ The unit is cost unit per second of time difference.
 
 **Since version:** `2.2` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `carpool` | `flexible`
 
 Limit direct route duration per street mode.
 
@@ -921,6 +933,19 @@ done because some street modes searches are much more resource intensive than ot
 The set of characteristics that the user wants to optimize for.
 
 If the triangle optimization is used, it's enough to just define the triangle parameters
+
+<h3 id="rd_scooter_rental_electricAssistSlopeSensitivity">electricAssistSlopeSensitivity</h3>
+
+**Since version:** `2.8` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.3`   
+**Path:** /routingDefaults/scooter/rental 
+
+How sensitive electric-assist rental vehicles are to slopes.
+
+A value between 0 and 1 where:
+- 0.0 means the motor fully compensates for slopes (like fully electric vehicles)
+- 1.0 means no motor assistance on slopes (like human-powered vehicles)
+- 0.3 (default) means the motor compensates for 70% of slope difficulty
+
 
 <h3 id="rd_scooter_rental_allowedNetworks">allowedNetworks</h3>
 
@@ -1060,7 +1085,7 @@ Unmatched patterns are put in the BASE priority-group.
 
 **Since version:** `2.1` ∙ **Type:** `enum map of double` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults   
-**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi`
+**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi` | `snow-and-ice`
 
 Transit reluctance for a given transport mode
 
@@ -1189,10 +1214,12 @@ include stairs as a last result.
     "numItineraries" : 12,
     "transferPenalty" : 0,
     "turnReluctance" : 1.0,
-    "elevatorBoardTime" : 90,
-    "elevatorBoardCost" : 90,
-    "elevatorHopTime" : 20,
-    "elevatorHopCost" : 20,
+    "elevator" : {
+      "boardCost" : 15,
+      "boardSlack" : "90s",
+      "hopTime" : "20s",
+      "reluctance" : 2.0
+    },
     "bicycle" : {
       "speed" : 5,
       "reluctance" : 5.0,

@@ -13,11 +13,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
@@ -28,7 +28,10 @@ import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.leg.StreetLegBuilder;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.graphfinder.SiteResolver;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
@@ -52,17 +55,23 @@ import org.opentripplanner.street.search.state.State;
  */
 public class GraphPathToItineraryMapper {
 
+  private final SiteResolver siteResolver;
   private final ZoneId timeZone;
   private final StreetNotesService streetNotesService;
+  private final StreetDetailsService streetDetailsService;
   private final double ellipsoidToGeoidDifference;
 
   public GraphPathToItineraryMapper(
+    SiteResolver siteResolver,
     ZoneId timeZone,
     StreetNotesService streetNotesService,
+    StreetDetailsService streetDetailsService,
     double ellipsoidToGeoidDifference
   ) {
+    this.siteResolver = siteResolver;
     this.timeZone = ZoneIdFallback.zoneId(timeZone);
     this.streetNotesService = streetNotesService;
+    this.streetDetailsService = streetDetailsService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
   }
 
@@ -94,10 +103,13 @@ public class GraphPathToItineraryMapper {
   /**
    * Generates a TripPlan from a set of paths
    */
-  public List<Itinerary> mapItineraries(List<GraphPath<State, Edge, Vertex>> paths) {
+  public List<Itinerary> mapItineraries(
+    List<GraphPath<State, Edge, Vertex>> paths,
+    RouteRequest request
+  ) {
     List<Itinerary> itineraries = new LinkedList<>();
     for (GraphPath<State, Edge, Vertex> path : paths) {
-      Itinerary itinerary = generateItinerary(path);
+      Itinerary itinerary = generateItinerary(path, request);
       if (itinerary.legs().isEmpty()) {
         continue;
       }
@@ -114,7 +126,7 @@ public class GraphPathToItineraryMapper {
    * @param path The graph path to base the itinerary on
    * @return The generated itinerary
    */
-  public Itinerary generateItinerary(GraphPath<State, Edge, Vertex> path) {
+  public Itinerary generateItinerary(GraphPath<State, Edge, Vertex> path, RouteRequest request) {
     List<Leg> legs = new ArrayList<>();
     WalkStep previousStep = null;
     for (List<State> legStates : sliceStates(path.states)) {
@@ -123,7 +135,7 @@ public class GraphPathToItineraryMapper {
         previousStep = null;
         continue;
       }
-      StreetLeg leg = generateLeg(legStates, previousStep);
+      StreetLeg leg = generateLeg(legStates, previousStep, request);
       legs.add(leg);
 
       List<WalkStep> walkSteps = leg.listWalkSteps();
@@ -204,7 +216,7 @@ public class GraphPathToItineraryMapper {
   /**
    * Calculate the elevationGained and elevationLost fields of an {@link Itinerary}.
    *
-   * @param itinerary The itinerary to calculate the elevation changes for
+   * @param builder   The itinerary builder to calculate the elevation changes for
    * @param edges     The edges that go with the itinerary
    */
   private static void calculateElevations(ItineraryBuilder builder, List<Edge> edges) {
@@ -214,9 +226,13 @@ public class GraphPathToItineraryMapper {
       }
       PackedCoordinateSequence coordinates = edgeWithElevation.getElevationProfile();
 
-      if (coordinates == null) continue;
+      if (coordinates == null) {
+        continue;
+      }
       // TODO Check the test below, AFAIU current elevation profile has 3 dimensions.
-      if (coordinates.getDimension() != 2) continue;
+      if (coordinates.getDimension() != 2) {
+        continue;
+      }
 
       for (int i = 0; i < coordinates.size() - 1; i++) {
         double change = coordinates.getOrdinate(i + 1, 1) - coordinates.getOrdinate(i, 1);
@@ -297,7 +313,7 @@ public class GraphPathToItineraryMapper {
    * @param state The {@link State}.
    * @return The resulting {@link Place} object.
    */
-  private static Place makePlace(State state) {
+  private Place makePlace(State state, RouteRequest request) {
     Vertex vertex = state.getVertex();
     I18NString name = vertex.getName();
 
@@ -308,12 +324,19 @@ public class GraphPathToItineraryMapper {
       name = ((StreetVertex) vertex).getIntersectionName();
     }
 
-    if (vertex instanceof TransitStopVertex) {
-      return Place.forStop(((TransitStopVertex) vertex).getStop());
+    if (vertex instanceof TransitStopVertex tsv) {
+      var stop = Objects.requireNonNull(siteResolver.getStop(tsv.getId()));
+      return Place.forStop(stop, ViaLocationTypeMapper.map(request, stop));
     } else if (vertex instanceof VehicleRentalPlaceVertex) {
       return Place.forVehicleRentalPlace((VehicleRentalPlaceVertex) vertex);
     } else if (vertex instanceof VehicleParkingEntranceVertex) {
       return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, state);
+    } else if (vertex instanceof TemporaryStreetLocation temporaryStreetLocation) {
+      return Place.normal(
+        vertex,
+        name,
+        ViaLocationTypeMapper.map(request, temporaryStreetLocation)
+      );
     } else {
       return Place.normal(vertex, name);
     }
@@ -346,7 +369,7 @@ public class GraphPathToItineraryMapper {
    *                     calculated correctly
    * @return The generated leg
    */
-  private StreetLeg generateLeg(List<State> states, WalkStep previousStep) {
+  private StreetLeg generateLeg(List<State> states, WalkStep previousStep, RouteRequest request) {
     List<Edge> edges = states
       .stream()
       // The first back edge is part of the previous leg, skip it
@@ -369,6 +392,8 @@ public class GraphPathToItineraryMapper {
       states,
       previousStep,
       streetNotesService,
+      streetDetailsService,
+      siteResolver,
       ellipsoidToGeoidDifference
     );
     List<WalkStep> walkSteps = statesToWalkStepsMapper.generateWalkSteps();
@@ -387,14 +412,12 @@ public class GraphPathToItineraryMapper {
       .withMode(resolveMode(states))
       .withStartTime(startTimeState.getTime().atZone(timeZone))
       .withEndTime(lastState.getTime().atZone(timeZone))
-      .withFrom(makePlace(firstState))
-      .withTo(makePlace(lastState))
+      .withFrom(makePlace(firstState, request))
+      .withTo(makePlace(lastState, request))
       .withDistanceMeters(distanceMeters)
       .withGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
       .withGeometry(geometry)
-      .withElevationProfile(
-        makeElevation(edges, firstState.getPreferences().system().geoidElevation())
-      )
+      .withElevationProfile(makeElevation(edges, firstState.getRequest().geoidElevation()))
       .withWalkSteps(walkSteps)
       .withRentedVehicle(firstState.isRentingVehicle())
       .withWalkingBike(false);

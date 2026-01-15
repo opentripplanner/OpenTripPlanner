@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR;
 
-import java.io.File;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,8 +20,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
@@ -33,7 +30,6 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TriangleInequalityTest {
 
@@ -47,18 +43,16 @@ public class TriangleInequalityTest {
 
   @BeforeAll
   public static void onlyOnce() {
-    graph = new Graph(new Deduplicator());
+    graph = new Graph();
 
-    File file = ResourceLoader.of(TriangleInequalityTest.class).file("NYC_small.osm.pbf");
-    DefaultOsmProvider provider = new DefaultOsmProvider(file, true);
-    OsmModule osmModule = OsmModule.of(
-      provider,
-      graph,
-      new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultVehicleParkingRepository()
-    )
+    var file = ResourceLoader.of(TriangleInequalityTest.class).file("NYC_small.osm.pbf");
+    var provider = new DefaultOsmProvider(file, true);
+    var osmModule = OsmModuleTestFactory.of(provider)
+      .withGraph(graph)
+      .builder()
       .withAreaVisibility(true)
       .build();
+
     osmModule.buildGraph();
   }
 
@@ -162,12 +156,12 @@ public class TriangleInequalityTest {
     Vertex v
   ) {
     return StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setOriginBackEdge(startBackEdge)
-      .setRequest(options)
-      .setFrom(u)
-      .setTo(v)
-      .setIntersectionTraversalCalculator(calculator)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withOriginBackEdge(startBackEdge)
+      .withRequest(options)
+      .withFrom(u)
+      .withTo(v)
+      .withIntersectionTraversalCalculator(calculator)
       .getShortestPathTree()
       .getPath(v);
   }
@@ -192,21 +186,21 @@ public class TriangleInequalityTest {
       )
       .withJourney(jb -> {
         if (modes != null) {
-          jb.setModes(modes);
+          jb.withModes(modes);
         }
         if (!filters.isEmpty()) {
-          jb.withTransit(b -> b.setFilters(filters));
+          jb.withTransit(b -> b.withFilters(filters));
         }
       })
       .buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-      .setRequest(request)
-      .setFrom(start)
-      .setTo(end)
-      .setIntersectionTraversalCalculator(calculator)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withDominanceFunction(new DominanceFunctions.EarliestArrival())
+      .withRequest(request)
+      .withFrom(start)
+      .withTo(end)
+      .withIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
 
     GraphPath<State, Edge, Vertex> path = tree.getPath(end);

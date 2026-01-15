@@ -28,8 +28,8 @@ public class VehicleWalkingPreferences implements Serializable {
     this.reluctance = 5.0;
     this.mountDismountTime = Duration.ZERO;
     this.mountDismountCost = Cost.ZERO;
-    // very high reluctance to carry the bike up/down a flight of stairs
-    this.stairsReluctance = 10;
+    // multiplicative factor to carry the bike up/down a flight of stairs on top of the walk reluctance
+    this.stairsReluctance = 2;
   }
 
   /**
@@ -82,15 +82,19 @@ public class VehicleWalkingPreferences implements Serializable {
     return mountDismountCost;
   }
 
-  /** Reluctance of walking carrying a vehicle up a flight of stairs. */
+  /** Reluctance of carrying a vehicle up a flight of stairs on top of walking the vehicle. */
   public double stairsReluctance() {
     return stairsReluctance;
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     VehicleWalkingPreferences that = (VehicleWalkingPreferences) o;
     return (
       speed == that.speed &&

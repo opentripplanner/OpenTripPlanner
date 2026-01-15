@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
@@ -13,8 +12,9 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
 public class FlexAccessEgressRouter {
@@ -23,44 +23,47 @@ public class FlexAccessEgressRouter {
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
     RouteRequest request,
-    TemporaryVerticesContainer verticesContainer,
+    AccessEgressRouter accessEgressRouter,
     OtpServerRequestContext serverContext,
     AdditionalSearchDays searchDays,
     FlexParameters config,
-    DataOverlayContext dataOverlayContext,
-    AccessEgressType accessOrEgress
+    Collection<ExtensionRequestContext> extensionRequestContexts,
+    AccessEgressType accessOrEgress,
+    LinkingContext linkingContext
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
     TransitService transitService = serverContext.transitService();
 
     Collection<NearbyStop> accessStops = accessOrEgress.isAccess()
-      ? AccessEgressRouter.findAccessEgresses(
+      ? accessEgressRouter.findAccessEgresses(
         request,
-        verticesContainer,
         new StreetRequest(StreetMode.WALK),
-        dataOverlayContext,
+        extensionRequestContexts,
         AccessEgressType.ACCESS,
         serverContext.flexParameters().maxAccessWalkDuration(),
-        0
+        0,
+        linkingContext
       )
       : List.of();
 
     Collection<NearbyStop> egressStops = accessOrEgress.isEgress()
-      ? AccessEgressRouter.findAccessEgresses(
+      ? accessEgressRouter.findAccessEgresses(
         request,
-        verticesContainer,
         new StreetRequest(StreetMode.WALK),
-        dataOverlayContext,
+        extensionRequestContexts,
         AccessEgressType.EGRESS,
         serverContext.flexParameters().maxEgressWalkDuration(),
-        0
+        0,
+        linkingContext
       )
       : List.of();
 
     FlexRouter flexRouter = new FlexRouter(
       serverContext.graph(),
       transitService,
+      serverContext.transferService(),
+      serverContext.streetDetailsService(),
       config,
       FilterMapper.map(request.journey().transit().filters()),
       request.dateTime(),

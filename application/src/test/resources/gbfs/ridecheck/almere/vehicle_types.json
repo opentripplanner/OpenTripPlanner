@@ -1,0 +1,15 @@
+{
+  "data": {
+    "vehicle_types": [
+      {
+        "form_factor": "moped",
+        "max_range_meters": 60000.0,
+        "propulsion_type": "electric",
+        "vehicle_type_id": "check_moped_almere_60"
+      }
+    ]
+  },
+  "last_updated": "2025-05-21T07:47:43.343377+00:00",
+  "ttl": 600,
+  "version": "3.0"
+}

@@ -2,7 +2,6 @@ package org.opentripplanner.osm.wayproperty.specifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import javax.annotation.Nullable;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.TraverseDirection;
 

@@ -3,6 +3,7 @@ package org.opentripplanner.routing.linking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 import static org.opentripplanner.routing.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
 
 import java.util.ArrayList;
@@ -13,10 +14,9 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.LocalizedString;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;
@@ -48,7 +48,7 @@ public class LinkStopToPlatformTest {
   private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    Graph graph = new Graph(deduplicator);
+    Graph graph = new Graph();
     var vertexFactory = new VertexFactory(graph);
 
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
@@ -115,7 +115,7 @@ public class LinkStopToPlatformTest {
     graph.index();
 
     for (RegularStop s : transitStops) {
-      vertexFactory.transitStop(TransitStopVertex.of().withStop(s));
+      vertexFactory.transitStop(ofStop(s));
     }
 
     return graph;
@@ -249,7 +249,7 @@ public class LinkStopToPlatformTest {
 
     var vertexFactory = new VertexFactory(graph);
     var v = vertexFactory.intersection("boardingLocation", 10.00000001, 60.00000001);
-    TestVertexLinker.of(graph).addPermanentAreaVertex(v, ag);
+    VertexLinkerTestFactory.of(graph).addPermanentAreaVertex(v, ag);
 
     // vertex links to the single visibility point with 2 edges
     assertEquals(10, graph.getEdges().size());
@@ -425,6 +425,51 @@ public class LinkStopToPlatformTest {
     Vertex far = graph.getVertex("4");
     assertNotNull(far);
     assertTrue(v.isConnected(far) == false);
+  }
+
+  /**
+   * Test that edge split point connects to other visibility points.
+   * This used to occasionally fail due to jts geometry.contains accuracy limitations.
+   * The test geometry is taken from Bletchley station platform 6, where
+   * the problem was easy to duplicate.
+   */
+  @Test
+  void boundaryTest() {
+    Coordinate[] platform = {
+      // northwest
+      new Coordinate(-0.7360985, 51.9962091),
+      // northeast
+      new Coordinate(-0.7360355, 51.9962165),
+      // east exit
+      new Coordinate(-0.7357519, 51.9953057),
+      // southeast
+      new Coordinate(-0.7356841, 51.9950911),
+      // southwest
+      new Coordinate(-0.7357458, 51.9950836),
+    };
+
+    // 1 visibility point at eastern exit
+    int[] visibilityPoints = { 2 };
+
+    // stop at western boundary splits the visibility edge pair
+    Coordinate[] stops = { new Coordinate(-0.73577352323178, 51.995172067528664) };
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+    linkStops(graph, 20, true);
+
+    // Edge split points become visibility points
+    var aEdges = graph.getEdgesOfType(AreaEdge.class);
+    assertEquals(3, aEdges.getFirst().getArea().visibilityVertices().size());
+
+    // platform is a loop of 6 points, which adds 5 area edge pairs
+    // western boundary splitting adds an edge pair
+    // visibility edge connection from split points to exit adds two pairs more
+    // Transit stop linking adds 2 pairs more
+    assertEquals(
+      20,
+      graph.getEdges().size(),
+      "Incorrect number of edges, check %s".formatted(GeoJsonIo.toUrl(graph))
+    );
   }
 
   private void linkStops(Graph graph, int maxAreaNodes, boolean permanent) {

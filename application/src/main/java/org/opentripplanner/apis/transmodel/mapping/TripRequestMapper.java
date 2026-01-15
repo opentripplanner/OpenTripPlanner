@@ -12,6 +12,7 @@ import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 
 public class TripRequestMapper {
 
@@ -30,9 +31,16 @@ public class TripRequestMapper {
   }
 
   /**
+   * Create a RouteRequestBuilder from the input fields of the trip query arguments.
+   */
+  public RouteRequest createRequest(DataFetchingEnvironment dataFetchingEnvironment) {
+    return createRequestBuilder(dataFetchingEnvironment).buildRequest();
+  }
+
+  /**
    * Create a RouteRequest from the input fields of the trip query arguments.
    */
-  public RouteRequest createRequest(DataFetchingEnvironment environment) {
+  public RouteRequestBuilder createRequestBuilder(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
     var serverContext = context.getServerContext();
     var requestBuilder = serverContext.defaultRouteRequest().copyOf();
@@ -84,7 +92,7 @@ public class TripRequestMapper {
         );
 
         if (GqlUtil.hasArgument(environment, "filters")) {
-          transitBuilder.setFilters(
+          transitBuilder.withFilters(
             transitFilterNewWayMapper.mapFilter(environment.getArgument("filters"))
           );
         } else {
@@ -93,7 +101,7 @@ public class TripRequestMapper {
       });
 
       if (GqlUtil.hasArgument(environment, "modes")) {
-        journeyBuilder.setModes(
+        journeyBuilder.withModes(
           RequestStreetModesMapper.mapRequestStreetModes(environment.getArgument("modes"))
         );
       }
@@ -103,6 +111,6 @@ public class TripRequestMapper {
       PreferencesMapper.mapPreferences(environment, callWith, preferences)
     );
 
-    return requestBuilder.buildRequest();
+    return requestBuilder;
   }
 }

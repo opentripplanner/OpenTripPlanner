@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vectortiles.layers.stations;
 
+import static org.opentripplanner.inspector.vector.KeyValue.kv;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
@@ -7,10 +9,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
-import org.opentripplanner.framework.i18n.I18NStringMapper;
+import org.opentripplanner.core.model.i18n.I18NStringMapper;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.inspector.vector.KeyValue;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
@@ -38,7 +40,8 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
     try {
       var childStops = station.getChildStops();
       return List.of(
-        new KeyValue("gtfsId", station.getId().toString()),
+        kv("gtfsId", station.getId()),
+        kv("code", station.getCode()),
         new KeyValue("name", i18NStringMapper.mapNonnullToApi(station.getName())),
         new KeyValue(
           "type",

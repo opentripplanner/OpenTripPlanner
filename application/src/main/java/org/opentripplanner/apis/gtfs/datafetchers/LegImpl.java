@@ -14,6 +14,7 @@ import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
 import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.filter.StopArrivalByTypeFilter;
+import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -109,7 +110,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
         source.start(),
         source.start(),
         source.boardStopPosInPattern(),
-        source.boardingGtfsStopSequence()
+        source.boardingGtfsStopSequence(),
+        source.from().viaLocationType
       );
     };
   }
@@ -173,6 +175,9 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       }
       if (leg instanceof TransitLeg s) {
         return s.mode().name();
+      }
+      if (leg instanceof CarpoolLeg cl) {
+        return cl.mode().name();
       }
       throw new IllegalStateException("Unhandled leg type: " + leg);
     };
@@ -267,7 +272,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
         source.end(),
         source.end(),
         source.alightStopPosInPattern(),
-        source.alightGtfsStopSequence()
+        source.alightGtfsStopSequence(),
+        source.to().viaLocationType
       );
     };
   }
@@ -336,7 +342,9 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
           .map(Leg.class::cast)
           .toList();
         return res;
-      } else return null;
+      } else {
+        return null;
+      }
     };
   }
 

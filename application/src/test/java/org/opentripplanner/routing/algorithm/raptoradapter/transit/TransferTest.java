@@ -47,7 +47,7 @@ class TransferTest {
       var edge = StreetModelForTest.streetEdge(BERLIN_V, BRANDENBURG_GATE_V);
       var transfer = new Transfer(0, List.of(edge), EnumSet.of(StreetMode.WALK));
       assertTrue(transfer.getDistanceMeters() < 4000);
-      final Optional<RaptorTransfer> raptorTransfer = transfer.asRaptorTransfer(
+      final Optional<DefaultRaptorTransfer> raptorTransfer = transfer.asRaptorTransfer(
         StreetSearchRequest.of().build()
       );
       // cost is below max limit and included as is in RAPTOR unchanged
@@ -80,7 +80,7 @@ class TransferTest {
     @Test
     void allowLowCost() {
       var transfer = new Transfer(0, 200, EnumSet.of(StreetMode.WALK));
-      final Optional<RaptorTransfer> raptorTransfer = transfer.asRaptorTransfer(
+      final Optional<DefaultRaptorTransfer> raptorTransfer = transfer.asRaptorTransfer(
         StreetSearchRequest.of().build()
       );
       // cost is below max limit and should be included as is in RAPTOR

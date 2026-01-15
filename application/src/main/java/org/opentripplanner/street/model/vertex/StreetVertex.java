@@ -8,12 +8,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.LocalizedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.LocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model.site.AreaStop;
 
 /**
  * Abstract base class for vertices in the street layer of the graph. This includes both vertices
@@ -21,9 +21,9 @@ import org.opentripplanner.transit.model.site.AreaStop;
  */
 public abstract class StreetVertex extends Vertex {
 
-  private static final Set<AreaStop> EMPTY_SET = Set.of();
+  private static final Set<FeedScopedId> EMPTY_SET = Set.of();
   /** All locations for flex transit, which this vertex is part of */
-  private Set<AreaStop> areaStops = EMPTY_SET;
+  private Set<FeedScopedId> areaStops = EMPTY_SET;
 
   StreetVertex(double x, double y) {
     super(x, y);
@@ -87,14 +87,14 @@ public abstract class StreetVertex extends Vertex {
    * Returns the list of area stops that this vertex is inside.
    */
   @Override
-  public Set<AreaStop> areaStops() {
+  public Set<FeedScopedId> areaStops() {
     return areaStops;
   }
 
   /**
    * Add a collection of area stops to this vertex.
    */
-  public void addAreaStops(Collection<AreaStop> toBeAdded) {
+  public void addAreaStops(Collection<FeedScopedId> toBeAdded) {
     Objects.requireNonNull(toBeAdded);
     synchronized (this) {
       if (areaStops == EMPTY_SET) {

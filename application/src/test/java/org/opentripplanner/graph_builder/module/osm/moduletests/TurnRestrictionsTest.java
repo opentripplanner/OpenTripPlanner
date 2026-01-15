@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm.moduletests;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.graph_builder.module.osm.moduletests._support.NodeBuilder.node;
+import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -11,14 +11,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
-import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.graph_builder.module.osm.moduletests._support.RelationBuilder;
-import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
+import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
+import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmNode;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
-import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.osm.model.RelationBuilder;
 
 /**
  * Checks that turn restrictions are processed even if they don't strictly adhere to their
@@ -73,18 +69,9 @@ class TurnRestrictionsTest {
       .addRelation(turnRestriction)
       .build();
 
-    var graph = new Graph(new Deduplicator());
-
     var issueStore = new DefaultDataImportIssueStore();
 
-    var osmModule = OsmModule.of(
-      provider,
-      graph,
-      new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultVehicleParkingRepository()
-    )
-      .withIssueStore(issueStore)
-      .build();
+    var osmModule = OsmModuleTestFactory.of(provider).builder().withIssueStore(issueStore).build();
 
     osmModule.buildGraph();
 

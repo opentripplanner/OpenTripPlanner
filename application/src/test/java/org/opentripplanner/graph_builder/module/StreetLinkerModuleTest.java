@@ -37,7 +37,6 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -203,8 +202,8 @@ class StreetLinkerModuleTest {
       graph.addVertex(from);
       graph.addVertex(to);
 
-      var walkableEdge = StreetModelForTest.streetEdge(from, to, PEDESTRIAN);
-      var drivableEdge = StreetModelForTest.streetEdge(from, to, CAR);
+      StreetModelForTest.streetEdge(from, to, PEDESTRIAN);
+      StreetModelForTest.streetEdge(from, to, CAR);
       var builder = SiteRepository.of();
       stop = builder
         .regularStop(id("platform-1"))
@@ -214,7 +213,11 @@ class StreetLinkerModuleTest {
 
       timetableRepository = new TimetableRepository(builder.build(), new Deduplicator());
 
-      stopVertex = TransitStopVertex.of().withStop(stop).build();
+      stopVertex = TransitStopVertex.of()
+        .withId(stop.getId())
+        .withPoint(stop.getGeometry())
+        .withWheelchairAccessiblity(stop.getWheelchairAccessibility())
+        .build();
       graph.addVertex(stopVertex);
       graph.hasStreets = true;
 

@@ -1,6 +1,6 @@
 import { Mode } from '../../gql/graphql.ts';
 import { LegTime } from './LegTime.tsx';
-import { formatDistance } from '../../util/formatDistance.ts';
+import { formatDistance } from '../../util/distanceUtils.ts';
 import { formatDuration } from '../../util/formatDuration.ts';
 import { InterchangeInfo } from './InterchangeInfo.tsx';
 import { ItineraryGraphiQLLineLink } from './ItineraryGraphiQLLineLink.tsx';
@@ -13,7 +13,7 @@ import { Leg } from '../../static/query/tripQueryTypes';
  */
 function legName(leg: Leg): string {
   if (leg.line?.publicCode) {
-    return leg.line.publicCode + ' ' + leg.toEstimatedCall?.destinationDisplay?.frontText;
+    return leg.line.publicCode + ' ' + leg.fromEstimatedCall?.destinationDisplay?.frontText;
   } else {
     return leg.line?.name || 'unknown';
   }

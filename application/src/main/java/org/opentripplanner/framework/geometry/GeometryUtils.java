@@ -220,7 +220,9 @@ public class GeometryUtils {
       int i = 0;
       for (List<List<LngLatAlt>> geoJsonRings : geoJsonMultiPolygon.getCoordinates()) {
         org.geojson.Polygon geoJsonPoly = new org.geojson.Polygon();
-        for (List<LngLatAlt> geoJsonRing : geoJsonRings) geoJsonPoly.add(geoJsonRing);
+        for (List<LngLatAlt> geoJsonRing : geoJsonRings) {
+          geoJsonPoly.add(geoJsonRing);
+        }
         jtsPolygons[i++] = (Polygon) convertGeoJsonToJtsGeometry(geoJsonPoly);
       }
       return gf.createMultiPolygon(jtsPolygons);
@@ -291,6 +293,16 @@ public class GeometryUtils {
     double distance = 0;
     for (int i = 1; i < coordinates.size(); i++) {
       distance += SphericalDistanceLibrary.distance(coordinates.get(i - 1), coordinates.get(i));
+    }
+    return distance;
+  }
+
+  /// Returns the sum of the distances in between the pairs of coordinates in meters.
+  /// If the number of coordinates is empty or just one(a point), then `0` is returned.
+  public static double sumDistances(Coordinate[] coordinates) {
+    double distance = 0;
+    for (int i = 1; i < coordinates.length; i++) {
+      distance += SphericalDistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
     }
     return distance;
   }

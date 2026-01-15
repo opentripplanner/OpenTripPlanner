@@ -1,10 +1,9 @@
 
 # Files
 .classpath
+.claude
 .externalToolBuilders
 .gradle
-.project
-.pydevproject
 .settings
 .sonar
 .nvmrc

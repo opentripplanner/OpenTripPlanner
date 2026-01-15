@@ -12,7 +12,7 @@ import org.opentripplanner.utils.lang.OtpNumberFormat;
  * <p>
  * This is an immutable, thread-safe value-object.
  */
-public final class Cost implements Serializable, Comparable<Cost> {
+public sealed class Cost implements Serializable, Comparable<Cost> permits NormalizedCost {
 
   private static final int CENTI_FACTOR = 100;
 
@@ -23,12 +23,12 @@ public final class Cost implements Serializable, Comparable<Cost> {
   /** The unit is centi-seconds (1/100 of a second) */
   private final int value;
 
-  private Cost(int value) {
+  Cost(int value) {
     this.value = IntUtils.requireNotNegative(value);
   }
 
   public static Cost costOfSeconds(int valueInTransitSeconds) {
-    return new Cost(valueInTransitSeconds * CENTI_FACTOR);
+    return new Cost(toCentiSeconds(valueInTransitSeconds));
   }
 
   public static Cost costOfSeconds(double valueInTransitSeconds) {
@@ -39,6 +39,10 @@ public final class Cost implements Serializable, Comparable<Cost> {
     return new Cost(valueInTransitCentiSeconds);
   }
 
+  public static NormalizedCost normalizedCost(int valueInTransitSeconds) {
+    return costOfSeconds(valueInTransitSeconds).normalize();
+  }
+
   public static Cost costOfMinutes(int value) {
     return costOfSeconds(value * 60);
   }
@@ -47,8 +51,11 @@ public final class Cost implements Serializable, Comparable<Cost> {
     return costOfSeconds(value.toMillis() / 1000.0);
   }
 
+  /**
+   * Returns the cost in seconds. The value is rounded to the nearest second.
+   */
   public int toSeconds() {
-    return IntUtils.round(value / CENTI_FACTOR);
+    return roundToSeconds(value);
   }
 
   public int toCentiSeconds() {
@@ -97,6 +104,13 @@ public final class Cost implements Serializable, Comparable<Cost> {
     return this.value <= other.value;
   }
 
+  /**
+   * This method round the cost to the nearest second, dropping any centi-seconds.
+   */
+  public NormalizedCost normalize() {
+    return new NormalizedCost(value);
+  }
+
   @Override
   public String toString() {
     return OtpNumberFormat.formatCostCenti(value);
@@ -107,11 +121,10 @@ public final class Cost implements Serializable, Comparable<Cost> {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (o == null) {
       return false;
     }
-    var that = (Cost) o;
-    return value == that.value;
+    return (o instanceof Cost c) ? value == c.value : false;
   }
 
   @Override
@@ -122,5 +135,13 @@ public final class Cost implements Serializable, Comparable<Cost> {
   @Override
   public int compareTo(Cost o) {
     return value - o.value;
+  }
+
+  static int roundToSeconds(int centiSeconds) {
+    return (centiSeconds + CENTI_FACTOR / 2) / CENTI_FACTOR;
+  }
+
+  static int toCentiSeconds(int seconds) {
+    return seconds * CENTI_FACTOR;
   }
 }

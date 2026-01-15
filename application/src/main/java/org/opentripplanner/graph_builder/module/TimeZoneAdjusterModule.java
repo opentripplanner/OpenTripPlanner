@@ -26,7 +26,7 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
   public void buildGraph() {
     // TODO: We assume that all time zones follow the same DST rules. In reality we need to split up
     //  the services for each DST transition
-    final Instant serviceStart = timetableRepository.getTransitServiceStarts().toInstant();
+    final Instant serviceStart = timetableRepository.getTransitServiceStarts();
     var graphOffset = Duration.ofSeconds(
       timetableRepository.getTimeZone().getRules().getOffset(serviceStart).getTotalSeconds()
     );
@@ -48,9 +48,7 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
 
         TripPattern updatedPattern = pattern
           .copy()
-          .withScheduledTimeTableBuilder(builder ->
-            builder.updateAllTripTimes(tt -> tt.adjustTimesToGraphTimeZone(timeShift))
-          )
+          .withScheduledTimeTableBuilder(builder -> builder.withAdjustedTimes(timeShift))
           .build();
         // replace the original pattern with the updated pattern in the transit model
         timetableRepository.addTripPattern(updatedPattern.getId(), updatedPattern);

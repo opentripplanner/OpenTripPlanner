@@ -21,7 +21,7 @@ public class DataFetcherDecorator {
     call(environment, name, consumer);
   }
 
-  private static <T> void call(Map<String, T> m, String name, Consumer<T> consumer) {
+  protected static <T> void call(Map<String, T> m, String name, Consumer<T> consumer) {
     if (!name.contains(".")) {
       if (hasArgument(m, name)) {
         T v = m.get(name);

@@ -4,8 +4,7 @@ import static java.lang.Boolean.TRUE;
 
 import java.time.ZonedDateTime;
 import java.util.function.Supplier;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.updater.trip.siri.mapping.OccupancyMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -115,8 +114,8 @@ class TimetableHelper {
       );
     }
 
-    if (call.getDestinationDisplaies() != null && !call.getDestinationDisplaies().isEmpty()) {
-      NaturalLanguageStringStructure destinationDisplay = call.getDestinationDisplaies().get(0);
+    if (call.getDestinationDisplays() != null && !call.getDestinationDisplays().isEmpty()) {
+      NaturalLanguageStringStructure destinationDisplay = call.getDestinationDisplays().get(0);
       tripTimesBuilder.withStopHeadsign(
         index,
         new NonLocalizedString(destinationDisplay.getValue())

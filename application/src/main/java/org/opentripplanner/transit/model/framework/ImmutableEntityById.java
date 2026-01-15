@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.framework;
 
 import java.util.Collection;
 import java.util.Map;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * The purpose of this class is to provide a map from id to the corresponding entity. It is simply

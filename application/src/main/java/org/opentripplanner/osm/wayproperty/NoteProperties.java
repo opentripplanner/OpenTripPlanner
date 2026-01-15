@@ -2,8 +2,8 @@ package org.opentripplanner.osm.wayproperty;
 
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.TranslatedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
@@ -28,7 +28,7 @@ public class NoteProperties {
     if (patternMatcher.matcher(notePattern).matches()) {
       //This gets language -> translation of notePattern and all tags (which can have translations name:en for example)
       Map<String, String> noteText = way.generateI18NForPattern(notePattern);
-      text = TranslatedString.getI18NString(noteText, true, false);
+      text = TranslatedString.getDeduplicatedI18NString(noteText, false);
     } else {
       text = LocalizedStringMapper.getInstance().map(notePattern, way);
     }

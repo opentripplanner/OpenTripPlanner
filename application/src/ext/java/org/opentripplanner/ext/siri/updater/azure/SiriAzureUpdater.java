@@ -20,18 +20,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nullable;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -234,7 +229,8 @@ public class SiriAzureUpdater implements GraphUpdater {
       registerShutdownHook();
     } catch (InterruptedException e) {
       log.info("Startup interrupted, aborting updater initialization");
-      Thread.currentThread().interrupt(); // Preserve interrupt status
+      // Preserve interrupt status
+      Thread.currentThread().interrupt();
       // Don't set primed, don't register shutdown hook - just exit
     }
   }
@@ -381,7 +377,8 @@ public class SiriAzureUpdater implements GraphUpdater {
         "REALTIME_STARTUP_ALERT component={} status=INTERRUPTED error=\"Aborting startup due to interrupt\"",
         stepDescription
       );
-      Thread.currentThread().interrupt(); // Preserve interrupt status
+      // Preserve interrupt status
+      Thread.currentThread().interrupt();
       throw e;
     } catch (Exception e) {
       String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
@@ -499,7 +496,8 @@ public class SiriAzureUpdater implements GraphUpdater {
       .topicName(topicName)
       .subscriptionName(subscriptionName)
       .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-      .disableAutoComplete() // Receive and delete does not need autocomplete
+      // Receive and delete does not need autocomplete
+      .disableAutoComplete()
       .prefetchCount(prefetchCount)
       .processError(this::errorConsumer)
       .processMessage(this::handleMessage)
@@ -576,7 +574,7 @@ public class SiriAzureUpdater implements GraphUpdater {
         new HttpGet(dataInitializationUrl),
         Duration.ofMillis(timeout),
         headers,
-        SiriXml::parseXml
+        response -> SiriXml.parseXml(response.body())
       );
       var t2 = System.currentTimeMillis();
       log.info("Fetched initial data in {} ms", (t2 - t1));
@@ -623,7 +621,9 @@ public class SiriAzureUpdater implements GraphUpdater {
 
     if (
       reason == ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED ||
-      reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND // should this be recoverable?
+      // should this be recoverable?
+      reason ==
+      ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND
     ) {
       log.error(
         "An unrecoverable error occurred. Stopping processing with reason {} {}",

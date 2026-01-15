@@ -1,9 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
@@ -16,7 +13,6 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
  */
 class EscalatorProcessor {
 
-  private final Map<Long, IntersectionVertex> intersectionNodes;
   private final DataImportIssueStore issueStore;
 
   // If an escalator is tagged as moving less than 5 cm/s, or more than 5 m/s,
@@ -24,22 +20,16 @@ class EscalatorProcessor {
   private static final double SLOW_ESCALATOR_ERROR_CUTOFF = 0.05;
   private static final double FAST_ESCALATOR_ERROR_CUTOFF = 5.0;
 
-  public EscalatorProcessor(
-    Map<Long, IntersectionVertex> intersectionNodes,
-    DataImportIssueStore issueStore
-  ) {
-    this.intersectionNodes = intersectionNodes;
+  public EscalatorProcessor(DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
   }
 
-  public void buildEscalatorEdge(OsmWay escalatorWay, double length) {
-    List<Long> nodes = Arrays.stream(escalatorWay.getNodeRefs().toArray())
-      .filter(
-        nodeRef -> intersectionNodes.containsKey(nodeRef) && intersectionNodes.get(nodeRef) != null
-      )
-      .boxed()
-      .toList();
-
+  public EscalatorEdgePair buildEscalatorEdge(
+    OsmWay escalatorWay,
+    double length,
+    IntersectionVertex fromVertex,
+    IntersectionVertex toVertex
+  ) {
     Optional<Duration> duration = escalatorWay.getDuration(v ->
       issueStore.add(
         Issue.issue(
@@ -64,36 +54,21 @@ class EscalatorProcessor {
         );
       }
     }
-    for (int i = 0; i < nodes.size() - 1; i++) {
-      if (escalatorWay.isForwardEscalator()) {
-        EscalatorEdge.createEscalatorEdge(
-          intersectionNodes.get(nodes.get(i)),
-          intersectionNodes.get(nodes.get(i + 1)),
-          length,
-          duration.orElse(null)
-        );
-      } else if (escalatorWay.isBackwardEscalator()) {
-        EscalatorEdge.createEscalatorEdge(
-          intersectionNodes.get(nodes.get(i + 1)),
-          intersectionNodes.get(nodes.get(i)),
-          length,
-          duration.orElse(null)
-        );
-      } else {
-        EscalatorEdge.createEscalatorEdge(
-          intersectionNodes.get(nodes.get(i)),
-          intersectionNodes.get(nodes.get(i + 1)),
-          length,
-          duration.orElse(null)
-        );
-
-        EscalatorEdge.createEscalatorEdge(
-          intersectionNodes.get(nodes.get(i + 1)),
-          intersectionNodes.get(nodes.get(i)),
-          length,
-          duration.orElse(null)
-        );
-      }
+    if (escalatorWay.isForwardEscalator()) {
+      return new EscalatorEdgePair(
+        EscalatorEdge.createEscalatorEdge(fromVertex, toVertex, length, duration.orElse(null)),
+        null
+      );
     }
+    if (escalatorWay.isBackwardEscalator()) {
+      return new EscalatorEdgePair(
+        null,
+        EscalatorEdge.createEscalatorEdge(toVertex, fromVertex, length, duration.orElse(null))
+      );
+    }
+    return new EscalatorEdgePair(
+      EscalatorEdge.createEscalatorEdge(fromVertex, toVertex, length, duration.orElse(null)),
+      EscalatorEdge.createEscalatorEdge(toVertex, fromVertex, length, duration.orElse(null))
+    );
   }
 }

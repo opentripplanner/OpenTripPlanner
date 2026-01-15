@@ -22,9 +22,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.i18n.TranslatedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -34,7 +34,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * A base class for OSM entities containing common methods.
  */
-public class OsmEntity {
+public abstract class OsmEntity {
 
   /**
    * highway=* values that we don't want to even consider when building the graph.
@@ -56,9 +56,6 @@ public class OsmEntity {
   );
 
   private static final Set<String> INDOOR_ROUTABLE_VALUES = Set.of("corridor", "area");
-
-  private static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
-  private static final Set<String> DEFAULT_LEVEL = Set.of("0");
 
   protected static final Map<String, StreetTraversalPermission> BARRIER_PERMISSIONS = Map.ofEntries(
     // refer to https://wiki.openstreetmap.org/wiki/Key:barrier for meanings
@@ -193,7 +190,9 @@ public class OsmEntity {
    * Adds a tag.
    */
   public void addTag(OsmTag tag) {
-    if (tags == null) tags = new HashMap<>();
+    if (tags == null) {
+      tags = new HashMap<>();
+    }
 
     tags.put(tag.getK().toLowerCase(), tag.getV());
   }
@@ -335,7 +334,10 @@ public class OsmEntity {
     );
   }
 
-  /** @return a tag's value, converted to lower case. */
+  /**
+   * @return Converts a tag to lower case and returns the associated value.
+   * Returns null if tag is not present.
+   */
   @Nullable
   public String getTag(String tag) {
     tag = tag.toLowerCase();
@@ -346,8 +348,8 @@ public class OsmEntity {
   }
 
   /**
-   *
-   * @return A tags value converted to lower case. An empty Optional if tags is not present.
+   * @return Converts a tag to lower case and returns the associated value.
+   * An empty Optional if tag is not present.
    */
   public Optional<String> getTagOpt(String network) {
     return Optional.ofNullable(getTag(network));
@@ -496,7 +498,7 @@ public class OsmEntity {
   }
 
   /**
-   * Checks is a tag contains the specified value.
+   * Checks if a tag contains the specified value.
    */
   public boolean isTag(String tag, String value) {
     tag = tag.toLowerCase();
@@ -524,7 +526,10 @@ public class OsmEntity {
       return null;
     }
     if (tags.containsKey("name")) {
-      return TranslatedString.getI18NString(this.generateI18NForPattern("{name}"), true, false);
+      return TranslatedString.getDeduplicatedI18NString(
+        this.generateI18NForPattern("{name}"),
+        false
+      );
     }
     if (tags.containsKey("otp:route_name")) {
       return new NonLocalizedString(tags.get("otp:route_name"));
@@ -558,7 +563,9 @@ public class OsmEntity {
     int lastEnd = 0;
     while (matcher.find()) {
       // add the stuff before the match
-      for (StringBuffer sb : i18n.values()) sb.append(pattern, lastEnd, matcher.start());
+      for (StringBuffer sb : i18n.values()) {
+        sb.append(pattern, lastEnd, matcher.start());
+      }
       lastEnd = matcher.end();
       // and then the value for the match
       String defKey = matcher.group(1);
@@ -567,7 +574,9 @@ public class OsmEntity {
       for (Map.Entry<String, String> kv : i18nTags.entrySet()) {
         if (!kv.getKey().equals(defKey)) {
           String lang = kv.getKey().substring(defKey.length() + 1);
-          if (!i18n.containsKey(lang)) i18n.put(lang, new StringBuffer(i18n.get(null)));
+          if (!i18n.containsKey(lang)) {
+            i18n.put(lang, new StringBuffer(i18n.get(null)));
+          }
         }
       }
       // get the simple value (eg: description=...)
@@ -581,12 +590,13 @@ public class OsmEntity {
         i18n.get(lang).append(i18nTag != null ? i18nTag : (defTag != null ? defTag : ""));
       }
     }
-    for (StringBuffer sb : i18n.values()) sb.append(pattern, lastEnd, pattern.length());
+    for (StringBuffer sb : i18n.values()) {
+      sb.append(pattern, lastEnd, pattern.length());
+    }
     Map<String, String> out = new HashMap<>(i18n.size());
-    for (Map.Entry<String, StringBuffer> kv : i18n.entrySet()) out.put(
-      kv.getKey(),
-      kv.getValue().toString()
-    );
+    for (Map.Entry<String, StringBuffer> kv : i18n.entrySet()) {
+      out.put(kv.getKey(), kv.getValue().toString());
+    }
     return out;
   }
 
@@ -747,12 +757,11 @@ public class OsmEntity {
    * from being linked to transit stops that are underneath it.
    **/
   public boolean isPlatform() {
-    var isPlatform = isTag("public_transport", "platform") || isRailwayPlatform();
+    var isPlatform =
+      isTag("public_transport", "platform") ||
+      isTag("railway", "platform") ||
+      isTag("railway", "platform_edge");
     return isPlatform && !isTag("usage", "tourism");
-  }
-
-  public boolean isRailwayPlatform() {
-    return isTag("railway", "platform");
   }
 
   /**
@@ -923,19 +932,6 @@ public class OsmEntity {
    */
   private boolean isExplicitlyDenied(String key) {
     return isOneOfTags(key, NO_ACCESS_TAGS);
-  }
-
-  /**
-   * Returns level tag (i.e. building floor) or layer tag values, defaults to "0"
-   * Some entities can have a semicolon separated list of levels (e.g. elevators)
-   */
-  public Set<String> getLevels() {
-    var levels = getMultiTagValues(LEVEL_TAGS);
-    if (levels.isEmpty()) {
-      // default
-      return DEFAULT_LEVEL;
-    }
-    return levels;
   }
 
   public StreetTraversalPermission getPermission() {

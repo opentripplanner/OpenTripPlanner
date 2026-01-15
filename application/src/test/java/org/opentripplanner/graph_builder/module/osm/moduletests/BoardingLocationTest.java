@@ -7,14 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
+import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
+import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 class BoardingLocationTest {
 
@@ -29,14 +27,13 @@ class BoardingLocationTest {
     way.addTag("oneway", "yes");
     var provider = TestOsmProvider.of().addWay(way).build();
 
-    var graph = new Graph(new Deduplicator());
+    var graph = new Graph();
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmModule = OsmModule.of(
-      provider,
-      graph,
-      osmInfoRepository,
-      new DefaultVehicleParkingRepository()
-    )
+
+    var osmModule = OsmModuleTestFactory.of(provider)
+      .withGraph(graph)
+      .withOsmInfoGraphBuildRepository(osmInfoRepository)
+      .builder()
       .withBoardingAreaRefTags(Set.of("ref"))
       .build();
 
@@ -56,14 +53,12 @@ class BoardingLocationTest {
     way.addTag("public_transport", "platform");
     var provider = TestOsmProvider.of().addWay(way).build();
 
-    var graph = new Graph(new Deduplicator());
+    var graph = new Graph();
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmModule = OsmModule.of(
-      provider,
-      graph,
-      osmInfoRepository,
-      new DefaultVehicleParkingRepository()
-    )
+    var osmModule = OsmModuleTestFactory.of(provider)
+      .withGraph(graph)
+      .withOsmInfoGraphBuildRepository(osmInfoRepository)
+      .builder()
       .withBoardingAreaRefTags(Set.of("ref"))
       .build();
 
@@ -80,16 +75,15 @@ class BoardingLocationTest {
     var way = new OsmWay();
     way.addTag("highway", "platform");
     way.addTag("ref", "1");
+
+    var graph = new Graph();
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var provider = TestOsmProvider.of().addWay(way).build();
 
-    var graph = new Graph(new Deduplicator());
-    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmModule = OsmModule.of(
-      provider,
-      graph,
-      osmInfoRepository,
-      new DefaultVehicleParkingRepository()
-    )
+    var osmModule = OsmModuleTestFactory.of(provider)
+      .withGraph(graph)
+      .withOsmInfoGraphBuildRepository(osmInfoRepository)
+      .builder()
       .withBoardingAreaRefTags(Set.of("ref"))
       .build();
 

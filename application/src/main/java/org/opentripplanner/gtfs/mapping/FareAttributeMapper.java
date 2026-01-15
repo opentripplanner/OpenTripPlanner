@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareAttributeBuilder;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.collection.MapUtils;
 
 /** Responsible for mapping GTFS FareAttribute into the OTP model. */
@@ -38,20 +38,20 @@ class FareAttributeMapper {
     FareAttributeBuilder builder = FareAttribute.of(
       idFactory.createId(rhs.getId(), "fare attribute")
     )
-      .setPrice(price)
-      .setPaymentMethod(rhs.getPaymentMethod());
+      .withPrice(price)
+      .withPaymentMethod(rhs.getPaymentMethod());
 
     if (rhs.getId().getAgencyId() != null && rhs.getAgencyId() != null) {
-      builder.setAgency(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getAgencyId()));
+      builder.withAgency(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getAgencyId()));
     }
     if (rhs.isTransfersSet()) {
-      builder.setTransfers(rhs.getTransfers());
+      builder.withTransfers(rhs.getTransfers());
     }
     if (rhs.isTransferDurationSet()) {
-      builder.setTransferDuration(rhs.getTransferDuration());
+      builder.withTransferDuration(rhs.getTransferDuration());
     }
     if (rhs.isJourneyDurationSet()) {
-      builder.setJourneyDuration(rhs.getJourneyDuration());
+      builder.withJourneyDuration(rhs.getJourneyDuration());
     }
 
     return builder.build();

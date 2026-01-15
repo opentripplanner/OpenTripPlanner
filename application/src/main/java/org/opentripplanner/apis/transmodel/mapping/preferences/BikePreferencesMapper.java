@@ -14,31 +14,29 @@ public class BikePreferencesMapper {
     BikePreferences.Builder bike,
     DataFetcherDecorator callWith
   ) {
+    // First, apply deprecated fields (only present if user explicitly provided them)
     callWith.argument("bikeSpeed", bike::withSpeed);
-
-    // These are not supported on the Transmodel API
-    // callWith.argument("bikeSwitchTime", bike::withSwitchTime);
-    // callWith.argument("bikeSwitchCost", bike::withSwitchCost);
-
     callWith.argument("bicycleOptimisationMethod", bike::withOptimizeType);
 
-    // WALK reluctance is used for backwards compatibility, then overridden
-    callWith.argument("walkReluctance", r -> {
-      bike.withReluctance((double) r);
-      bike.withWalking(w -> w.withReluctance(WALK_BIKE_RELATIVE_RELUCTANCE * (double) r));
+    // Then, apply values from bikePreferences wrapper (takes precedence over deprecated)
+    callWith.argument("bikePreferences.speed", bike::withSpeed);
+    callWith.argument("bikePreferences.reluctance", (Double reluctance) -> {
+      bike.withReluctance(reluctance);
+      bike.withWalking(w -> w.withReluctance(WALK_BIKE_RELATIVE_RELUCTANCE * reluctance));
     });
+    callWith.argument("bikePreferences.optimisationMethod", bike::withOptimizeType);
 
-    // TODO: Override WALK reluctance with BIKE reluctance
-    // callWith.argument("bike.reluctance", r -> {
-    //  bike.withReluctance((double)r);
-    //  bike.withWalkingReluctance(WALK_BIKE_RELATIVE_RELUCTANCE * (double)r );
-    //});
-
+    // Handle triangle factors - wrapper takes precedence over deprecated
     if (bike.optimizeType() == VehicleRoutingOptimizeType.TRIANGLE) {
       bike.withOptimizeTriangle(triangle -> {
+        // First apply deprecated top-level if provided
         callWith.argument("triangleFactors.time", triangle::withTime);
         callWith.argument("triangleFactors.slope", triangle::withSlope);
         callWith.argument("triangleFactors.safety", triangle::withSafety);
+        // Then apply from bikePreferences (takes precedence)
+        callWith.argument("bikePreferences.triangleFactors.time", triangle::withTime);
+        callWith.argument("bikePreferences.triangleFactors.slope", triangle::withSlope);
+        callWith.argument("bikePreferences.triangleFactors.safety", triangle::withSafety);
       });
     }
 

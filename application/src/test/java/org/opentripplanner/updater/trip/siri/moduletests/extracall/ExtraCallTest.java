@@ -5,87 +5,98 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailu
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
-import org.opentripplanner.updater.trip.TripInput;
+import org.opentripplanner.updater.trip.SiriTestHelper;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
 class ExtraCallTest implements RealtimeTestConstants {
 
-  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private final String ROUTE_ID = "route-id";
+
+  private final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
   private final RegularStop STOP_A = ENV_BUILDER.stopAtStation(STOP_A_ID, "A");
   private final RegularStop STOP_B = ENV_BUILDER.stopAtStation(STOP_B_ID, "B");
   private final RegularStop STOP_C = ENV_BUILDER.stopAtStation(STOP_C_ID, "C");
   private final RegularStop STOP_D = ENV_BUILDER.stopAtStation(STOP_D_ID, "D");
+  private final Route ROUTE = ENV_BUILDER.route(ROUTE_ID);
 
   private final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
+    .withWithTripOnServiceDate(TRIP_1_ID)
+    .withRoute(ROUTE)
     .addStop(STOP_A, "0:00:10", "0:00:11")
-    .addStop(STOP_B, "0:00:20", "0:00:21")
-    .build();
+    .addStop(STOP_B, "0:00:20", "0:00:21");
 
   @Test
   void testExtraCall() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = updateWithExtraCall(env);
+    var updates = updateWithExtraCall(siri);
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
     assertEquals(
       "MODIFIED | A [R] 0:00:15 0:00:15 | D 0:00:20 0:00:25 | B 0:00:33 0:00:33",
-      env.getRealtimeTimetable(TRIP_1_ID)
+      env.tripData(TRIP_1_ID).showTimetable()
     );
   }
 
   @Test
   void testExtraCallMultipleTimes() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = updateWithExtraCall(env);
-    env.applyEstimatedTimetable(updates);
-    var result = env.applyEstimatedTimetable(updates);
+    var updates = updateWithExtraCall(siri);
+    siri.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
     assertEquals(
       "MODIFIED | A [R] 0:00:15 0:00:15 | D 0:00:20 0:00:25 | B 0:00:33 0:00:33",
-      env.getRealtimeTimetable(TRIP_1_ID)
+      env.tripData(TRIP_1_ID).showTimetable()
     );
   }
 
   @Test
   void testExtraCallAndCancellation() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = updateWithExtraCall(env);
-    env.applyEstimatedTimetable(updates);
-    var result = env.applyEstimatedTimetable(updates);
+    var updates = updateWithExtraCall(siri);
+    siri.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
-    var cancellation = new SiriEtBuilder(env.getDateTimeHelper())
+    var cancellation = new SiriEtBuilder(env.localTimeParser())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withCancellation(true)
       .buildEstimatedTimetableDeliveries();
 
-    var cancellationResult = env.applyEstimatedTimetable(cancellation);
+    var cancellationResult = siri.applyEstimatedTimetable(cancellation);
 
     assertEquals(1, cancellationResult.successful());
 
     assertEquals(1, result.successful());
     assertEquals(
       "CANCELED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
-      env.getRealtimeTimetable(TRIP_1_ID)
+      env.tripData(TRIP_1_ID).showTimetable()
     );
   }
 
   @Test
   void testExtraUnknownStop() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
@@ -100,7 +111,7 @@ class ExtraCallTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertFailure(UpdateError.UpdateErrorType.TOO_MANY_STOPS, result);
   }
@@ -108,8 +119,10 @@ class ExtraCallTest implements RealtimeTestConstants {
   @Test
   void testExtraCallSameNumberOfStops() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
@@ -122,7 +135,7 @@ class ExtraCallTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertFailure(UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE, result);
   }
@@ -130,8 +143,10 @@ class ExtraCallTest implements RealtimeTestConstants {
   @Test
   void testExtraCallAndIllegalChangeOfOtherStops() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
+    var siri = SiriTestHelper.of(env);
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
@@ -147,17 +162,16 @@ class ExtraCallTest implements RealtimeTestConstants {
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
+    var result = siri.applyEstimatedTimetable(updates);
 
     assertFailure(UpdateError.UpdateErrorType.STOP_MISMATCH, result);
   }
 
-  private List<EstimatedTimetableDeliveryStructure> updateWithExtraCall(
-    RealtimeTestEnvironment env
-  ) {
-    return new SiriEtBuilder(env.getDateTimeHelper())
+  private List<EstimatedTimetableDeliveryStructure> updateWithExtraCall(SiriTestHelper siri) {
+    return siri
+      .etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withLineRef(TRIP_1_INPUT.routeId())
+      .withLineRef(ROUTE_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:15"))
       .withEstimatedCalls(builder ->
         builder

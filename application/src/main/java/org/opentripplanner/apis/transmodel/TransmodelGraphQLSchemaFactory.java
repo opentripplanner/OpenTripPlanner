@@ -66,6 +66,7 @@ import org.opentripplanner.apis.transmodel.model.framework.RentalVehicleTypeType
 import org.opentripplanner.apis.transmodel.model.framework.ServerInfoType;
 import org.opentripplanner.apis.transmodel.model.framework.StreetModeDurationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.SystemNoticeType;
+import org.opentripplanner.apis.transmodel.model.framework.TransitInfoType;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.framework.ValidityPeriodType;
@@ -89,6 +90,7 @@ import org.opentripplanner.apis.transmodel.model.plan.legacyvia.ViaSegmentInputT
 import org.opentripplanner.apis.transmodel.model.plan.legacyvia.ViaTripQuery;
 import org.opentripplanner.apis.transmodel.model.plan.legacyvia.ViaTripType;
 import org.opentripplanner.apis.transmodel.model.siri.et.EstimatedCallType;
+import org.opentripplanner.apis.transmodel.model.siri.et.SJEstimatedCallsType;
 import org.opentripplanner.apis.transmodel.model.siri.sx.AffectsType;
 import org.opentripplanner.apis.transmodel.model.siri.sx.PtSituationElementType;
 import org.opentripplanner.apis.transmodel.model.stop.BikeParkType;
@@ -104,11 +106,13 @@ import org.opentripplanner.apis.transmodel.model.stop.TariffZoneType;
 import org.opentripplanner.apis.transmodel.model.timetable.BookingArrangementType;
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyQuery;
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyType;
+import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.model.timetable.InterchangeType;
 import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyType;
 import org.opentripplanner.apis.transmodel.model.timetable.TimetabledPassingTimeType;
 import org.opentripplanner.apis.transmodel.model.timetable.TripMetadataType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -125,7 +129,6 @@ import org.opentripplanner.transit.api.request.FindRoutesRequest;
 import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.lang.StringUtils;
@@ -217,6 +220,7 @@ public class TransmodelGraphQLSchemaFactory {
     GraphQLOutputType systemNoticeType = SystemNoticeType.create();
     GraphQLOutputType linkGeometryType = PointsOnLinkType.create();
     GraphQLOutputType serverInfoType = ServerInfoType.create();
+    GraphQLOutputType transitInfoType = TransitInfoType.create(validityPeriodType);
     GraphQLOutputType authorityType = authorityTypeFactory.create(
       LineType.REF,
       PtSituationElementType.REF
@@ -292,7 +296,8 @@ public class TransmodelGraphQLSchemaFactory {
       DatedServiceJourneyType.REF
     );
 
-    // Timetable
+    /* Timetable */
+
     GraphQLNamedOutputType ptSituationElementType = PtSituationElementType.create(
       authorityType,
       quayType,
@@ -315,6 +320,10 @@ public class TransmodelGraphQLSchemaFactory {
       stopToStopGeometryType,
       ptSituationElementType
     );
+    GraphQLOutputType empiricalDelay = EmpiricalDelayType.create();
+
+    GraphQLOutputType sjEstimatedCallsType = SJEstimatedCallsType.create();
+
     GraphQLOutputType estimatedCallType = EstimatedCallType.create(
       bookingArrangementType,
       noticeType,
@@ -322,7 +331,9 @@ public class TransmodelGraphQLSchemaFactory {
       destinationDisplayType,
       ptSituationElementType,
       ServiceJourneyType.REF,
+      sjEstimatedCallsType,
       DatedServiceJourneyType.REF,
+      empiricalDelay,
       dateTimeScalar
     );
 
@@ -897,8 +908,6 @@ public class TransmodelGraphQLSchemaFactory {
             List<FeedScopedId> filterByStations = null;
             List<FeedScopedId> filterByRoutes = null;
             List<String> filterByBikeRentalStations = null;
-            List<String> filterByBikeParks = null;
-            List<String> filterByCarParks = null;
             List<String> filterByNetwork = null;
             @SuppressWarnings("rawtypes")
             Map filterByIds = environment.getArgument("filterByIds");
@@ -909,12 +918,6 @@ public class TransmodelGraphQLSchemaFactory {
               );
               filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null
                 ? (List<String>) filterByIds.get("bikeRentalStations")
-                : List.of();
-              filterByBikeParks = filterByIds.get("bikeParks") != null
-                ? (List<String>) filterByIds.get("bikeParks")
-                : List.of();
-              filterByCarParks = filterByIds.get("carParks") != null
-                ? (List<String>) filterByIds.get("carParks")
                 : List.of();
             }
 
@@ -1522,6 +1525,14 @@ public class TransmodelGraphQLSchemaFactory {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(serverInfoType))
           .dataFetcher(e -> projectInfo())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("transitInfo")
+          .description("Get information about the transit data available in the system.")
+          .type(new GraphQLNonNull(transitInfoType))
+          .dataFetcher(e -> new Object())
           .build()
       )
       .field(datedServiceJourneyQueryFactory.createGetById(datedServiceJourneyType))

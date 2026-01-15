@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.api.PathUtils.withoutCost;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_ONE;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_STANDARD_REV;
@@ -24,7 +22,7 @@ import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ExpectedList;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
@@ -57,27 +55,26 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   private static final String EXP_24_25 = " ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m ";
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   @BeforeEach
   public void setup() {
-    data.withRoute(
-      route("R1", STOP_B, STOP_E).withTimetable(
-        schedule("00:15 00:30"),
-        schedule("00:20 00:35"),
-        schedule("00:25 00:40"),
-        schedule("00:30 00:45"),
-        schedule("24:15 24:30"),
-        schedule("24:20 24:35"),
+    data
+      .withTimetables(
+        """
+        B      E
+        00:15  00:30
+        00:20  00:35
+        00:25  00:40
+        00:30  00:45
+        24:15  24:30
+        24:20  24:35
+        """ +
         // Not within time-limit 24:42 (need 2 min for egress)
-        schedule("24:25 24:40")
+        "24:25  24:40"
       )
-    );
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_E, D1m));
+      .egress("E ~ Walk 1m");
 
     requestBuilder
       .searchParams()
@@ -86,17 +83,17 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       .searchWindow(Duration.ofMinutes(30))
       .timetable(true);
 
-    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   private static List<RaptorModuleTestCase> openInSearchIntervalCases(String access) {
     var expected = new ExpectedList(
-      access + EXP_00_15 + "[0:13 0:31 18m Tₓ0 C₁1_860]",
-      access + EXP_00_20 + "[0:18 0:36 18m Tₓ0 C₁1_860]",
-      access + EXP_00_25 + "[0:23 0:41 18m Tₓ0 C₁1_860]",
-      access + EXP_00_30 + "[0:28 0:46 18m Tₓ0 C₁1_860]",
-      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m Tₓ0 C₁1_860]",
-      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₓ0 C₁1_860]"
+      access + EXP_00_15 + "[0:13 0:31 18m Tₙ0 C₁1_860]",
+      access + EXP_00_20 + "[0:18 0:36 18m Tₙ0 C₁1_860]",
+      access + EXP_00_25 + "[0:23 0:41 18m Tₙ0 C₁1_860]",
+      access + EXP_00_30 + "[0:28 0:46 18m Tₙ0 C₁1_860]",
+      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m Tₙ0 C₁1_860]",
+      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₙ0 C₁1_860]"
     );
 
     return tcBuilderWithMinDuration(T00_00, T24_40)
@@ -120,7 +117,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("openAllDayTestCases")
   void openAllDayTest(RaptorModuleTestCase testCase) {
-    requestBuilder.searchParams().addAccessPaths(walk(STOP_B, D2m));
+    data.access("Walk 2m ~ B");
     assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
@@ -138,8 +135,8 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   private static List<RaptorModuleTestCase> openInSearchIntervalStartSearchNextDayTestCase() {
     String access = "Walk 2m Open(0:00 1:00)";
     var expected = new ExpectedList(
-      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m Tₓ0 C₁1_860]",
-      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₓ0 C₁1_860]"
+      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m Tₙ0 C₁1_860]",
+      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₙ0 C₁1_860]"
     );
 
     return tcBuilderWithMinDuration(T24_10, T24_40)
@@ -165,10 +162,10 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   private static List<RaptorModuleTestCase> openInSecondHalfTodayTestCase() {
     String access = "Walk 2m Open(0:23 1:00)";
     var expected = new ExpectedList(
-      access + EXP_00_25 + "[0:23 0:41 18m Tₓ0 C₁1_860]",
-      access + EXP_00_30 + "[0:28 0:46 18m Tₓ0 C₁1_860]",
-      access + EXP_24_15 + "[1:00 0:31+1d 23h31m Tₓ0 C₁85_440]",
-      access + EXP_24_20 + "[1:00 0:36+1d 23h36m Tₓ0 C₁0_000]"
+      access + EXP_00_25 + "[0:23 0:41 18m Tₙ0 C₁1_860]",
+      access + EXP_00_30 + "[0:28 0:46 18m Tₙ0 C₁1_860]",
+      access + EXP_24_15 + "[1:00 0:31+1d 23h31m Tₙ0 C₁85_440]",
+      access + EXP_24_20 + "[1:00 0:36+1d 23h36m Tₙ0 C₁0_000]"
     );
 
     return tcBuilderWithMinDuration(T00_00, T24_40)
@@ -195,12 +192,12 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   private static List<RaptorModuleTestCase> openInFirstHalfIntervalTestCase() {
     String access = "Walk 2m Open(0:00 0:20)";
     var expected = new ExpectedList(
-      access + EXP_00_15 + "[0:13 0:31 18m Tₓ0 C₁1_860]",
-      access + EXP_00_20 + "[0:18 0:36 18m Tₓ0 C₁1_860]",
-      access + EXP_00_25 + "[0:20 0:41 21m Tₓ0 C₁2_040]",
-      access + EXP_00_30 + "[0:20 0:46 26m Tₓ0 C₁0_000]",
-      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m Tₓ0 C₁1_860]",
-      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₓ0 C₁1_860]"
+      access + EXP_00_15 + "[0:13 0:31 18m Tₙ0 C₁1_860]",
+      access + EXP_00_20 + "[0:18 0:36 18m Tₙ0 C₁1_860]",
+      access + EXP_00_25 + "[0:20 0:41 21m Tₙ0 C₁2_040]",
+      access + EXP_00_30 + "[0:20 0:46 26m Tₙ0 C₁0_000]",
+      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m Tₙ0 C₁1_860]",
+      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₙ0 C₁1_860]"
     );
 
     return tcBuilderWithMinDuration(T00_00, T24_40)
@@ -231,8 +228,8 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   private static List<RaptorModuleTestCase> partiallyOpenIntervalTestNextDayTestCase() {
     String access = "Walk 2m Open(0:18 0:20)";
     var expected = new ExpectedList(
-      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₓ0 C₁1_860]",
-      access + EXP_24_25 + "[0:20+1d 0:41+1d 21m Tₓ0 C₁2_040]"
+      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₙ0 C₁1_860]",
+      access + EXP_24_25 + "[0:20+1d 0:41+1d 21m Tₙ0 C₁2_040]"
     );
 
     return tcBuilderWithMinDuration(T24_10, T25_00)

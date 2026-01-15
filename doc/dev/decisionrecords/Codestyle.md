@@ -1,7 +1,5 @@
 # Code Style
 
-We use the following code conventions for [Java](#Java) and [JavaScript](#JavaScript).
-
 ## Java
 
 The OpenTripPlanner Java code style is revised in OTP v2.2. We use the
@@ -9,12 +7,54 @@ The OpenTripPlanner Java code style is revised in OTP v2.2. We use the
 run `prettier-maven-plugin`. A check is run in the CI build, which fails the build preventing
 merging a PR if the code style is incorrect.
 
+Additionally since OTP v2.9, we are using Checkstyle to check for code style issues with a
+Maven plugin. There is also a checkstyle plugin for IntelliJ IDEA which can be used to spot and
+fix issues. We also have an OpenRewrite Maven plugin available that can be used to automatically
+fix some of the issues that are pointed out by Checkstyle. Comparison of different tools we
+considered can be found in [#6913](https://github.com/opentripplanner/OpenTripPlanner/issues/6913).
+
+### How to Use Checkstyle
+
+Checkstyle can be configured to be in use in IntelliJ with
+[a plugin](https://plugins.jetbrains.com/plugin/1065-checkstyle-idea). Additionally, we have
+configured it to run by default as part of our Maven build. We also have OpenRewrite configured
+in maven to fix some issues automatically, but it is not run by default as it takes a bit longer
+to run.
+
+Checkstyle will check for code style issues in the Maven "validate" phase, which runs before the
+test, package, and install phases. So checkstyle will happen for example when you run:
+
+```shell
+% mvn test
+```
+
+You can manually run _only_ the checkstyle with:
+
+```shell
+% mvn checkstyle:check
+```
+
+The check is run by the CI server and will fail the build if the code has code style issues.
+
+To skip Checkstyle, use the profile `checkstyleSkip`:
+
+```shell
+% mvn test -P checkstyleSkip
+```
+
+OpenRewrite can be used to fix some of the checkstyle issues automatically. The following command
+runs OpenRewrite and Prettier, but not checkstyle:
+
+```shell
+% mvn rewrite:run prettier:write -P rewrite
+```
+
+### How to Run Prettier
+
 There are two ways to format the code before checking it in. You may run a normal build with
 Maven; it takes a bit of time, but it reformats the entire codebase. Only code you have changed
 should be formatted, since the existing code is already formatted. The second way is to set up
-Prettier and run it manually or hick it into your IDE, so it runs every time a file is changed.
-
-### How to Run Prettier with Maven
+Prettier and run it manually or hook it into your IDE, so it runs every time a file is changed.
 
 Prettier will automatically format all code in the Maven "validate" phase, which runs before the
 test, package, and install phases. So formatting will happen for example when you run:
@@ -169,31 +209,3 @@ Use of `@Nonnull` annotation is not allowed. It should be assumed methods/parame
 non-null if they are not marked as `@Nullable`. However, there are places where the `@Nullable`
 annotation is missing even if it should have been used. Those can be updated to use the `@Nullable`
 annotation.
-
-## JavaScript
-
-As of [#206](https://github.com/opentripplanner/OpenTripPlanner/issues/206), we follow
-[Crockford's JavaScript code conventions](http://javascript.crockford.com/code.html). Further
-guidelines include:
-
-* All .js source files should contain one class only
-* Capitalize the class name, as well as the source file name (a la Java).
-* Include the namespace definition in each and every file: `otp.namespace("otp.configure");`.
-* Include a class comment. For example,
-
-```javascript
-/**
- * Configure Class
- *
- * Purpose is to allow a generic configuration object to be read via AJAX/JSON, and inserted into an
- * Ext Store
- * The implementation is TriMet route map-specific...but replacing ConfigureStore object (or member
- * variables) with another implementation will give this widget flexibility for other uses beyond
- * the iMap.
- *
- * @class
- */
-```
-
-> **Note:** There is still a lot of code following other style conventions, but please adhere to
-> consistent style when you write new code, and help clean up and reformat code as you refactor.

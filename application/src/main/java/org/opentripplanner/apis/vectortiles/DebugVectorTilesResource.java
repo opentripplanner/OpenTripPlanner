@@ -141,6 +141,7 @@ public class DebugVectorTilesResource {
       GROUP_STOPS.toVectorSourceLayer(stopsSource),
       EDGES.toVectorSourceLayer(streetSource),
       VERTICES.toVectorSourceLayer(streetSource),
+      GEOFENCING_ZONES.toVectorSourceLayer(streetSource),
       RENTAL.toVectorSourceLayer(rentalSource),
       serverContext.debugUiConfig().additionalBackgroundLayers()
     );
@@ -183,7 +184,11 @@ public class DebugVectorTilesResource {
         context.transitService().listGroupStops()
       );
       case GeofencingZones -> new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
-      case Edge -> new EdgeLayerBuilder(context.graph(), layerParameters);
+      case Edge -> new EdgeLayerBuilder(
+        context.graph(),
+        layerParameters,
+        context.streetDetailsService()
+      );
       case Vertex -> new VertexLayerBuilder(context.graph(), layerParameters);
       case Rental -> new RentalLayerBuilder(context.vehicleRentalService(), layerParameters);
     };

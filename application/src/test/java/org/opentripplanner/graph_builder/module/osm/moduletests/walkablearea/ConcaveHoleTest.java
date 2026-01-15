@@ -2,21 +2,18 @@ package org.opentripplanner.graph_builder.module.osm.moduletests.walkablearea;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.graph_builder.module.osm.moduletests._support.NodeBuilder.node;
+import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.graph_builder.module.osm.moduletests._support.RelationBuilder;
-import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
+import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
+import org.opentripplanner.osm.TestOsmProvider;
+import org.opentripplanner.osm.model.RelationBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.GeoJsonIo;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 /**
  * Checks that concave areas of inner rings/holes in multipolygons are connected to the outer ring.
@@ -74,13 +71,10 @@ class ConcaveHoleTest {
       .addRelation(relation)
       .build();
 
-    var graph = new Graph(new Deduplicator());
-    var osmModule = OsmModule.of(
-      provider,
-      graph,
-      new DefaultOsmInfoGraphBuildRepository(),
-      new DefaultVehicleParkingRepository()
-    )
+    var graph = new Graph();
+    var osmModule = OsmModuleTestFactory.of(provider)
+      .withGraph(graph)
+      .builder()
       .withAreaVisibility(true)
       .withMaxAreaNodes(10)
       .build();

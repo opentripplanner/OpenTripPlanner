@@ -9,18 +9,18 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -67,12 +67,14 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     tripPatternsForDates.add(new TripPatternForDate(tripPattern1, tripTimes, List.of(), third));
     tripPatternsForDates.add(new TripPatternForDate(tripPattern3, tripTimes, List.of(), third));
 
+    var noOpFilter = DefaultTransitDataProviderFilter.ofRequest(RouteRequest.defaultValue());
+
     // Patterns containing trip schedules for all 3 days. Trip schedules for later days are offset
     // in time when requested.
     List<TripPatternForDates> combinedTripPatterns = RaptorRoutingRequestTransitDataCreator.merge(
       startOfTime,
       tripPatternsForDates,
-      new TestTransitDataProviderFilter(),
+      noOpFilter,
       TransitGroupPriorityService.empty()
     );
 
@@ -149,7 +151,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     var result = subject.createTripPatterns(
       2,
       0,
-      new TestTransitDataProviderFilter(),
+      DefaultTransitDataProviderFilter.ofRequest(RouteRequest.defaultValue()),
       TransitGroupPriorityService.empty()
     );
     var expectedDates = List.of(
@@ -202,35 +204,5 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
       .withStopPattern(new StopPattern(List.of(createStopTime(), createStopTime())))
       .build()
       .getRoutingTripPattern();
-  }
-
-  /**
-   * Filter that always return true.
-   */
-  private static class TestTransitDataProviderFilter implements TransitDataProviderFilter {
-
-    @Override
-    public boolean tripPatternPredicate(TripPatternForDate tripPatternForDate) {
-      return true;
-    }
-
-    @Override
-    public boolean tripTimesPredicate(TripTimes tripTimes, boolean withFilters) {
-      return true;
-    }
-
-    @Override
-    public boolean hasSubModeFilters() {
-      return true;
-    }
-
-    @Override
-    public BitSet filterAvailableStops(
-      RoutingTripPattern tripPattern,
-      BitSet boardingPossible,
-      BoardAlight boardAlight
-    ) {
-      return boardingPossible;
-    }
   }
 }

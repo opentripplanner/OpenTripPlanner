@@ -2,6 +2,7 @@ package org.opentripplanner.osm.model;
 
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
+import java.util.Optional;
 import java.util.Set;
 
 public class OsmWay extends OsmEntity {
@@ -53,15 +54,22 @@ public class OsmWay extends OsmEntity {
   }
 
   /**
-   * Returns true if these are steps.
+   * @return true if these are steps.
    */
   public boolean isSteps() {
     return isTag("highway", "steps");
   }
 
   /**
-   * Checks the wheelchair-accessibility of this way. Stairs are by default inaccessible but
-   * can be made accessible if they explicitly set wheelchair=true.
+   * @return true if these are stairs.
+   */
+  public boolean isStairs() {
+    return isTag("highway", "steps") && !isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS);
+  }
+
+  /**
+   * Checks the wheelchair-accessibility of this way. Stairs and escalators are by default
+   * inaccessible but can be made accessible if they explicitly set wheelchair=true.
    */
   public boolean isWheelchairAccessible() {
     if (isSteps()) {
@@ -72,15 +80,23 @@ public class OsmWay extends OsmEntity {
   }
 
   public boolean isEscalator() {
-    return (isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS));
+    return isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS);
   }
 
   public boolean isForwardEscalator() {
-    return isEscalator() && "forward".equals(this.getTag("conveying"));
+    return isEscalator() && isTag("conveying", "forward");
   }
 
   public boolean isBackwardEscalator() {
-    return isEscalator() && "backward".equals(this.getTag("conveying"));
+    return isEscalator() && isTag("conveying", "backward");
+  }
+
+  public boolean isInclineUp() {
+    return isTag("incline", "up");
+  }
+
+  public boolean isInclineDown() {
+    return isTag("incline", "down");
   }
 
   /**
@@ -102,6 +118,55 @@ public class OsmWay extends OsmEntity {
 
   public boolean isBarrier() {
     return hasTag("barrier");
+  }
+
+  public boolean isFootway() {
+    return isTag("highway", "footway");
+  }
+
+  public boolean isCrossing() {
+    return isFootway() && isTag("footway", "crossing");
+  }
+
+  public boolean isServiceRoad() {
+    return isTag("highway", "service");
+  }
+
+  /**
+   * Whether a way is an entrance or an exit of a freeway/motorway or similar access-controlled, car-only road.
+   */
+  public boolean isMotorwayRamp() {
+    return isTag("highway", "motorway_link");
+  }
+
+  public boolean isTurnLane() {
+    Optional<TraverseDirection> oneWayCar = isOneWay("motorcar");
+    boolean oneWay = oneWayCar.isPresent();
+    return (
+      !isNamed() &&
+      oneWay &&
+      (!isMotorwayRamp() || isTag("turn:lanes", "right") || isTag("turn:lanes", "left"))
+    );
+  }
+
+  /** Whether this way is connected to the given way through their extremities. */
+  public boolean isAdjacentTo(OsmWay way) {
+    if (nodes.isEmpty() || way.nodes.isEmpty()) {
+      return false;
+    }
+
+    long wayFirstNode = way.nodes.get(0);
+    long wayLastNode = way.nodes.get(way.nodes.size() - 1);
+
+    long firstNode = nodes.get(0);
+    long lastNode = nodes.get(nodes.size() - 1);
+
+    return (
+      (firstNode == wayFirstNode && lastNode != wayLastNode) ||
+      (firstNode == wayLastNode && lastNode != wayFirstNode) ||
+      (lastNode == wayFirstNode && firstNode != wayLastNode) ||
+      (lastNode == wayLastNode && firstNode != wayFirstNode)
+    );
   }
 
   @Override

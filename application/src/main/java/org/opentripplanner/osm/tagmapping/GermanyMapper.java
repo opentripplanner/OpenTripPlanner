@@ -26,12 +26,18 @@ class GermanyMapper extends OsmTagMapper {
     // For motorways, there (currently still) is no limit. Nevertheless 120kph is assumed to reflect varying
     // traffic conditions.
     props.maxPossibleCarSpeed = 33.34f;
-    props.setCarSpeed("highway=motorway", 33.33f); // = 120kph. Varies between 80 - 120 kph depending on road and season.
-    props.setCarSpeed("highway=motorway_link", 15); // = 54kph
-    props.setCarSpeed("highway=trunk", 27.27f); // 100kph
-    props.setCarSpeed("highway=trunk_link", 15); // = 54kph
-    props.setCarSpeed("highway=primary", 27.27f); // 100kph
-    props.setCarSpeed("highway=primary_link", 15); // = 54kph
+    // = 120 km/h. Varies between 80 - 120 km/h depending on road and season.
+    props.setCarSpeed("highway=motorway", 33.33f);
+    // = 54 km/h
+    props.setCarSpeed("highway=motorway_link", 15);
+    // = 100 km/h
+    props.setCarSpeed("highway=trunk", 27.27f);
+    // = 54 km/h
+    props.setCarSpeed("highway=trunk_link", 15);
+    // = 100 km/h
+    props.setCarSpeed("highway=primary", 27.27f);
+    // = 54 km/h
+    props.setCarSpeed("highway=primary_link", 15);
 
     // you should only use parking aisle if there is no other options
     // ideally they would be set to noThruTraffic but that would mean the parking lots are inaccessible
@@ -57,10 +63,7 @@ class GermanyMapper extends OsmTagMapper {
       withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.8)
     );
     // Default was 2.5, we want to favor using mixed footways somewhat
-    props.setProperties(
-      "footway=sidewalk;highway=footway;bicycle=yes",
-      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.2)
-    );
+    props.setMixinProperties("footway=sidewalk;highway=footway;bicycle=yes", ofBicycleSafety(0.6));
 
     props.setMixinProperties("highway=tertiary", ofBicycleSafety(1.2));
     props.setMixinProperties("maxspeed=70", ofBicycleSafety(1.5));

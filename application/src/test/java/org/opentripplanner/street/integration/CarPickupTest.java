@@ -28,7 +28,11 @@ public class CarPickupTest extends GraphRoutingTest {
 
   private TransitStopVertex S1;
   private TransitEntranceVertex E1;
-  private StreetVertex A, B, C, D, E;
+  private StreetVertex A;
+  private StreetVertex B;
+  private StreetVertex C;
+  private StreetVertex D;
+  private StreetVertex E;
 
   @Test
   public void testCarPickupCarOnly() {
@@ -179,11 +183,11 @@ public class CarPickupTest extends GraphRoutingTest {
       .buildDefault();
 
     var tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(new StreetRequest(StreetMode.CAR_PICKUP))
-      .setFrom(fromVertex)
-      .setTo(toVertex)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withStreetRequest(new StreetRequest(StreetMode.CAR_PICKUP))
+      .withFrom(fromVertex)
+      .withTo(toVertex)
       .getShortestPathTree();
     var path = tree.getPath(arriveBy ? fromVertex : toVertex);
 

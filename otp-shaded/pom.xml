@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>otp-root</artifactId>
-        <version>2.8.1</version>
+        <version>2.9.0-SNAPSHOT</version>
     </parent>
     <artifactId>otp-shaded</artifactId>
     <name>OpenTripPlanner - Shaded Jar</name>
@@ -75,6 +75,11 @@
                                 </Implementation-Vendor>
                                 <Extension-Name>com.sun.media.imageio</Extension-Name>
                             </manifestEntries>
+                        </transformer>
+                        <!-- Combine the various ImageN/JAI configuration files into a single one.
+                         Required by GeoTools for reading TIFF image during elevation data processing   -->
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                            <resource>META-INF/registryFile.imagen</resource>
                         </transformer>
                     </transformers>
                 </configuration>

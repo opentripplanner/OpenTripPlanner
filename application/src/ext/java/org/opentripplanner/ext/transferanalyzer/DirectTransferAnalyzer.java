@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferCouldNotBeRouted;
@@ -16,7 +17,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.StreetGraphFinder;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -74,7 +77,11 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(
       timetableRepository.getSiteRepository()::findRegularStops
     );
-    StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(graph, linker);
+    var linkingContextFactory = new LinkingContextFactory(graph, new VertexCreationService(linker));
+    StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(
+      linkingContextFactory,
+      timetableRepository.getSiteRepository()::getRegularStop
+    );
 
     int stopsAnalyzed = 0;
 
@@ -101,7 +108,9 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
           .forEach(t -> stopsStreets.putIfAbsent((RegularStop) t.stop, t));
       } catch (Exception ignored) {}
 
-      RegularStop originStop = originStopVertex.getStop();
+      RegularStop originStop = Objects.requireNonNull(
+        timetableRepository.getSiteRepository().getRegularStop(originStopVertex.getId())
+      );
 
       /* Get stops found by both street and euclidean search */
       List<RegularStop> stopsConnected = stopsEuclidean

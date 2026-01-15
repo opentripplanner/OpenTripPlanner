@@ -11,9 +11,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.RentalFormFactor;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.collection.SetUtils;
 
 /**
@@ -109,12 +109,10 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     return new VehicleRentalStationBuilder(this);
   }
 
-  @Nullable
   public FeedScopedId id() {
     return id;
   }
 
-  @Nullable
   public I18NString name() {
     return name;
   }
@@ -334,8 +332,12 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     VehicleRentalStation that = (VehicleRentalStation) o;
     return (
       Double.compare(that.longitude, longitude) == 0 &&

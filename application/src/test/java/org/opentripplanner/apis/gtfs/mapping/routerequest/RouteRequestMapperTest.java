@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class RouteRequestMapperTest {
 
@@ -253,13 +253,13 @@ class RouteRequestMapperTest {
     );
     assertEquals(
       "[PassThroughViaLocation{label: a label, stopLocationIds: [F:stop1]}]",
-      routeRequest.getViaLocations().toString()
+      routeRequest.listViaLocations().toString()
     );
 
     var noParamsReq = RouteRequestMapper.toRouteRequest(
       testCtx.executionContext(testCtx.basicRequest()),
       testCtx.context()
     );
-    assertEquals(List.of(), noParamsReq.getViaLocations());
+    assertEquals(List.of(), noParamsReq.listViaLocations());
   }
 }

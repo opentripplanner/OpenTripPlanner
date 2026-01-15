@@ -3,9 +3,11 @@ package org.opentripplanner.routing.graphfinder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -15,7 +17,6 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
@@ -105,7 +106,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     Vertex vertex = state.getVertex();
     double distance = state.getWalkDistance();
     if (vertex instanceof TransitStopVertex transitVertex) {
-      RegularStop stop = transitVertex.getStop();
+      var stop = Objects.requireNonNull(transitService.getRegularStop(transitVertex.getId()));
       handleStop(stop, distance);
       handlePatternsAtStop(stop, distance);
     } else if (vertex instanceof VehicleRentalPlaceVertex rentalVertex) {
@@ -240,7 +241,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
         .filter(
           pattern -> filterByRoutes.isEmpty() || filterByRoutes.contains(pattern.getRoute().getId())
         )
-        .filter(pattern -> pattern.canBoard(stop))
+        .filter(pattern -> pattern.boardingExist(stop))
         .toList();
 
       for (TripPattern pattern : patterns) {

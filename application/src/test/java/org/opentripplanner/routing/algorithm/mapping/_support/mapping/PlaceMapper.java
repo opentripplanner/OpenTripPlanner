@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.opentripplanner.framework.i18n.I18NStringMapper;
+import org.opentripplanner.core.model.i18n.I18NStringMapper;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.VehicleParkingWithEntrance;
 import org.opentripplanner.model.plan.leg.StopArrival;

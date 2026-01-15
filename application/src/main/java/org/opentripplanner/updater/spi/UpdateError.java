@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.spi;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 
 /**
@@ -57,6 +57,8 @@ public record UpdateError(
     // since they do not belong to the same station.
     STOP_MISMATCH,
     NO_SERVICE_ON_DATE,
+    // an extra/added trip has a service date which is before or after any schedule data
+    OUTSIDE_SERVICE_PERIOD,
     INVALID_ARRIVAL_TIME,
     INVALID_DEPARTURE_TIME,
     NEGATIVE_DWELL_TIME,

@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.configure;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
+import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -10,11 +11,13 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.transfer.TransferRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
@@ -38,7 +41,9 @@ public class LoadApplication {
    */
   public LoadApplication(CommandLineParameters commandLineParameters) {
     this.cli = commandLineParameters;
-    this.factory = DaggerLoadApplicationFactory.builder().commandLineParameters(cli).build();
+    this.factory = org.opentripplanner.standalone.configure.DaggerLoadApplicationFactory.builder()
+      .commandLineParameters(cli)
+      .build();
   }
 
   public void validateConfigAndDataSources() {
@@ -58,13 +63,16 @@ public class LoadApplication {
     return createAppConstruction(
       obj.graph,
       obj.osmInfoGraphBuildRepository,
+      obj.streetDetailsRepository,
       obj.timetableRepository,
+      obj.transferRepository,
       obj.worldEnvelopeRepository,
       obj.parkingRepository,
       obj.issueSummary,
       obj.emissionRepository,
+      obj.empiricalDelayRepository,
       obj.stopConsolidationRepository,
-      obj.streetLimitationParameters,
+      obj.streetRepository,
       obj.fareServiceFactory
     );
   }
@@ -74,13 +82,16 @@ public class LoadApplication {
     return createAppConstruction(
       factory.emptyGraph(),
       factory.emptyOsmInfoGraphBuildRepository(),
+      factory.emptyStreetDetailsRepository(),
       factory.emptyTimetableRepository(),
+      factory.emptyTransferRepository(),
       factory.emptyWorldEnvelopeRepository(),
       factory.emptyVehicleParkingRepository(),
       DataImportIssueSummary.empty(),
       factory.emptyEmissionsDataModel(),
+      factory.emptyEmpiricalDelayRepository(),
       factory.emptyStopConsolidationRepository(),
-      factory.emptyStreetLimitationParameters(),
+      factory.emptyStreetRepository(),
       factory.emptyFareServiceFactory()
     );
   }
@@ -99,28 +110,34 @@ public class LoadApplication {
   private ConstructApplication createAppConstruction(
     Graph graph,
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    StreetDetailsRepository streetDetailsRepository,
     TimetableRepository timetableRepository,
+    TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
+    @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
-    StreetLimitationParameters streetLimitationParameters,
+    StreetRepository streetRepository,
     FareServiceFactory fareServiceFactory
   ) {
     return new ConstructApplication(
       cli,
       graph,
       osmInfoGraphBuildRepository,
+      streetDetailsRepository,
       timetableRepository,
+      transferRepository,
       worldEnvelopeRepository,
       config(),
       graphBuilderDataSources(),
       issueSummary,
       emissionRepository,
+      empiricalDelayRepository,
       parkingRepository,
       stopConsolidationRepository,
-      streetLimitationParameters,
+      streetRepository,
       fareServiceFactory
     );
   }

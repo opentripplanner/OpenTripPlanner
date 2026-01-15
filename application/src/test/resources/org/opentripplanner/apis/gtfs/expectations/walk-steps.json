@@ -19,7 +19,18 @@
                     "area": false,
                     "relativeDirection": "ELEVATOR",
                     "absoluteDirection": null,
-                    "feature": null
+                    "feature": {
+                      "__typename": "ElevatorUse",
+                      "from": {
+                        "level": -2.0,
+                        "name": "-2"
+                      },
+                      "verticalDirection": "UP",
+                      "to": {
+                        "level": -1.0,
+                        "name": "-1"
+                      }
+                    }
                   },
                   {
                     "streetName": "entrance",
@@ -31,6 +42,42 @@
                       "publicCode": "A",
                       "entranceId": "osm:123",
                       "wheelchairAccessible": "POSSIBLE"
+                    }
+                  },
+                  {
+                    "streetName": "stairs",
+                    "area": false,
+                    "relativeDirection": "CONTINUE",
+                    "absoluteDirection": null,
+                    "feature": {
+                      "__typename": "StairsUse",
+                      "from": {
+                        "level": 2.0,
+                        "name": "2"
+                      },
+                      "verticalDirection": "DOWN",
+                      "to": {
+                        "level": 1.0,
+                        "name": "1"
+                      }
+                    }
+                  },
+                  {
+                    "streetName": "escalator",
+                    "area": false,
+                    "relativeDirection": "CONTINUE",
+                    "absoluteDirection": null,
+                    "feature": {
+                      "__typename": "EscalatorUse",
+                      "from": {
+                        "level": 2.0,
+                        "name": "2"
+                      },
+                      "verticalDirection": "DOWN",
+                      "to": {
+                        "level": 1.0,
+                        "name": "1"
+                      }
                     }
                   }
                 ]

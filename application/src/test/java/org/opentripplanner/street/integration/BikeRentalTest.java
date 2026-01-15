@@ -39,11 +39,18 @@ public class BikeRentalTest extends GraphRoutingTest {
 
   private final String NON_NETWORK = "non network";
   private TransitStopVertex S1;
-  private TemporaryStreetLocation T1, T2;
+  private TemporaryStreetLocation T1;
+  private TemporaryStreetLocation T2;
   private TransitEntranceVertex E1;
-  private StreetVertex A, B, C, D;
-  private VehicleRentalPlaceVertex B1, B2;
-  private StreetEdge SE1, SE2, SE3;
+  private StreetVertex A;
+  private StreetVertex B;
+  private StreetVertex C;
+  private StreetVertex D;
+  private VehicleRentalPlaceVertex B1;
+  private VehicleRentalPlaceVertex B2;
+  private StreetEdge SE1;
+  private StreetEdge SE2;
+  private StreetEdge SE3;
 
   @BeforeEach
   public void setUp() {
@@ -668,11 +675,11 @@ public class BikeRentalTest extends GraphRoutingTest {
     StreetMode streetMode
   ) {
     var tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(options)
-      .setStreetRequest(new StreetRequest(streetMode))
-      .setFrom(fromVertex)
-      .setTo(toVertex)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(options)
+      .withStreetRequest(new StreetRequest(streetMode))
+      .withFrom(fromVertex)
+      .withTo(toVertex)
       .getShortestPathTree();
 
     var path = tree.getPath(arriveBy ? fromVertex : toVertex);

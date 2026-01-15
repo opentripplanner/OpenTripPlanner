@@ -4,9 +4,9 @@ import java.time.Duration;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -27,19 +27,21 @@ public class EscalatorEdge extends Edge {
   @Override
   public State[] traverse(State s0) {
     // Only allow traversal by walking
-    if (s0.currentMode() == TraverseMode.WALK && !s0.getRequest().wheelchair()) {
+    if (s0.currentMode() == TraverseMode.WALK && !s0.getRequest().wheelchairEnabled()) {
       var s1 = s0.edit(this);
       double time;
       if (duration == null) {
-        time = getDistanceMeters() / s0.getPreferences().walk().escalator().speed();
+        time = getDistanceMeters() / s0.getRequest().walk().escalator().speed();
       } else {
         time = duration.toSeconds();
       }
-      s1.incrementWeight(s0.getPreferences().walk().escalator().reluctance() * time);
+      s1.incrementWeight(s0.getRequest().walk().escalator().reluctance() * time);
       s1.incrementTimeInSeconds((long) time);
       s1.incrementWalkDistance(getDistanceMeters());
       return s1.makeStateArray();
-    } else return State.empty();
+    } else {
+      return State.empty();
+    }
   }
 
   @Override

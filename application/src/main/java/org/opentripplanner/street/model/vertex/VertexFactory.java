@@ -3,7 +3,8 @@ package org.opentripplanner.street.model.vertex;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
@@ -33,12 +34,30 @@ public class VertexFactory {
     this.graph = graph;
   }
 
-  public TransitBoardingAreaVertex transitBoardingArea(BoardingArea boardingArea) {
-    return addToGraph(new TransitBoardingAreaVertex(boardingArea));
+  public TransitBoardingAreaVertex transitBoardingArea(BoardingArea ba) {
+    return addToGraph(
+      new TransitBoardingAreaVertex(
+        ba.getId(),
+        ba.getCoordinate(),
+        ba.getName(),
+        ba.getWheelchairAccessibility()
+      )
+    );
   }
 
-  public ElevatorVertex elevator(Vertex sourceVertex, String label, String levelName) {
-    return addToGraph(new ElevatorVertex(sourceVertex, label, levelName));
+  public ElevatorHopVertex elevator(Vertex sourceVertex, String label) {
+    return addToGraph(new ElevatorHopVertex(sourceVertex, label));
+  }
+
+  public OsmElevatorVertex osmElevator(OsmNode node, OsmEntityType osmEntityType, long entityId) {
+    return addToGraph(
+      new OsmElevatorVertex(
+        node.getId(),
+        new WgsCoordinate(node.getCoordinate()),
+        osmEntityType,
+        entityId
+      )
+    );
   }
 
   public IntersectionVertex intersection(Coordinate edgeCoordinate) {
@@ -109,16 +128,26 @@ public class VertexFactory {
     );
   }
 
-  public OsmVertex osmOnLinearBarrier(Coordinate coordinate, long nid, long routableWayId) {
-    return addToGraph(new BarrierPassThroughVertex(coordinate.x, coordinate.y, nid, routableWayId));
+  public OsmVertex osmOnLinearBarrier(
+    Coordinate coordinate,
+    long nid,
+    OsmEntityType osmEntityType,
+    long entityId
+  ) {
+    return addToGraph(
+      new BarrierPassThroughVertex(coordinate.x, coordinate.y, nid, osmEntityType, entityId)
+    );
   }
 
-  public TransitStopVertex transitStop(TransitStopVertexBuilder transitStopVertexBuilder) {
-    return addToGraph(transitStopVertexBuilder.build());
+  public TransitStopVertex transitStop(TransitStopVertexBuilder builder) {
+    var v = builder.build();
+    return addToGraph(v);
   }
 
   public StationCentroidVertex stationCentroid(Station station) {
-    return addToGraph(new StationCentroidVertex(station));
+    return addToGraph(
+      new StationCentroidVertex(station.getId(), station.getName(), station.getCoordinate())
+    );
   }
 
   public VehicleParkingEntranceVertex vehicleParkingEntrance(VehicleParking vehicleParking) {
@@ -134,15 +163,20 @@ public class VertexFactory {
   }
 
   public TransitPathwayNodeVertex transitPathwayNode(PathwayNode node) {
-    return addToGraph(new TransitPathwayNodeVertex(node));
+    return addToGraph(
+      new TransitPathwayNodeVertex(node.getId(), node.getCoordinate(), node.getName())
+    );
   }
 
   public TransitEntranceVertex transitEntrance(Entrance entrance) {
-    return addToGraph(new TransitEntranceVertex(entrance));
-  }
-
-  public OsmVertex levelledOsm(OsmNode node, String level) {
-    return addToGraph(new OsmVertexOnLevel(node, level));
+    return addToGraph(
+      new TransitEntranceVertex(
+        entrance.getId(),
+        entrance.getCoordinate(),
+        entrance.getName(),
+        entrance.getWheelchairAccessibility()
+      )
+    );
   }
 
   private <T extends Vertex> T addToGraph(T vertex) {

@@ -7,12 +7,12 @@ import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
@@ -30,7 +30,7 @@ import org.opentripplanner.utils.lang.StringUtils;
  * by its service id and can be looked up with
  * {@link org.opentripplanner.model.calendar.CalendarService}.
  * <p>Trips that follow the same sequence of stops are grouped under a {@link org.opentripplanner.transit.model.network.TripPattern}
- * via a {@link org.opentripplanner.model.Timetable}
+ * via a {@link Timetable}
  * <p>A Trip is equivalent to the TransModel concept of SERVICE JOURNEY.
  */
 public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> implements LogInfo {

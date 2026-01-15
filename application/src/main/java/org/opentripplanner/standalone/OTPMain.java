@@ -147,19 +147,20 @@ public class OTPMain {
       new SerializedGraphObject(
         app.graph(),
         app.osmInfoGraphBuildRepository(),
+        app.streetDetailsRepository(),
+        app.streetRepository(),
         app.timetableRepository(),
+        app.transferRepository(),
         app.worldEnvelopeRepository(),
         app.vehicleParkingRepository(),
         config.buildConfig(),
         config.routerConfig(),
         DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),
         app.emissionRepository(),
+        app.empiricalDelayRepository(),
         app.stopConsolidationRepository(),
-        app.streetLimitationParameters(),
         app.fareServiceFactory()
       ).save(app.graphOutputDataSource());
-      // Log size info for the deduplicator
-      LOG.info("Memory optimized {}", app.graph().deduplicator.toString());
     }
 
     if (!graphAvailable) {
@@ -186,6 +187,7 @@ public class OTPMain {
   private static void startOtpWebServer(CommandLineParameters params, ConstructApplication app) {
     // Index graph for travel search
     app.timetableRepository().index();
+    app.transferRepository().index();
     app.graph().index();
 
     // publishing the config version info make it available to the APIs

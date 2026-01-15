@@ -71,16 +71,12 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     if (hasFrequencies()) {
       this.startOfRunningPeriod = ServiceDateUtils.asDateTime(
         serviceDate,
-        frequencies
-          .stream()
-          .mapToInt(frequencyEntry -> frequencyEntry.startTime)
-          .min()
-          .orElseThrow()
+        frequencies.stream().mapToInt(FrequencyEntry::startTime).min().orElseThrow()
       ).toLocalDate();
 
       this.endOfRunningPeriod = ServiceDateUtils.asDateTime(
         serviceDate,
-        frequencies.stream().mapToInt(frequencyEntry -> frequencyEntry.endTime).max().orElseThrow()
+        frequencies.stream().mapToInt(FrequencyEntry::endTime).max().orElseThrow()
       ).toLocalDate();
     } else {
       // These depend on the tripTimes array being sorted
@@ -158,16 +154,17 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     return serviceDate.compareTo(other.serviceDate);
   }
 
+  /**
+   * The natural key of a TripPatternForDate is the pair (routing trip pattern id, service date).
+   */
   @Override
   public int hashCode() {
-    return Objects.hash(
-      tripPattern,
-      serviceDate,
-      Arrays.hashCode(tripTimes),
-      Arrays.hashCode(frequencies)
-    );
+    return Objects.hash(tripPattern, serviceDate);
   }
 
+  /**
+   * The natural key of a TripPatternForDate is the pair (routing trip pattern id, service date).
+   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -178,12 +175,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     }
     TripPatternForDate that = (TripPatternForDate) o;
 
-    return (
-      tripPattern.equals(that.tripPattern) &&
-      serviceDate.equals(that.serviceDate) &&
-      Arrays.equals(tripTimes, that.tripTimes) &&
-      Arrays.equals(frequencies, that.frequencies)
-    );
+    return (tripPattern.equals(that.tripPattern) && serviceDate.equals(that.serviceDate));
   }
 
   @Override
@@ -204,7 +196,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
     List<FrequencyEntry> filteredFrequencies = new ArrayList<>(frequencies.length);
     for (FrequencyEntry frequencyEntry : frequencies) {
-      if (filter.test(frequencyEntry.tripTimes)) {
+      if (filter.test(frequencyEntry.tripTimes())) {
         filteredFrequencies.add(frequencyEntry);
       }
     }

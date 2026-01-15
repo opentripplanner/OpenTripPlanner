@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.entur.siri21.util.SiriXml;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.spi.DataSource;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_parking.AvailabiltyUpdate;
@@ -44,8 +44,8 @@ public class SiriFmDataSource implements DataSource<AvailabiltyUpdate> {
 
   @Override
   public boolean update() {
-    updates = httpClient.getAndMap(params.url(), headers, resp -> {
-      var siri = SiriXml.parseXml(resp);
+    updates = httpClient.getAndMap(params.url(), headers, response -> {
+      var siri = SiriXml.parseXml(response.body());
 
       return Stream.ofNullable(siri.getServiceDelivery())
         .flatMap(sd -> sd.getFacilityMonitoringDeliveries().stream())

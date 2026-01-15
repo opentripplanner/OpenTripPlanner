@@ -1,7 +1,7 @@
 package org.opentripplanner._support.text;
 
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.TranslatedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.TranslatedString;
 
 public class I18NStrings {
 

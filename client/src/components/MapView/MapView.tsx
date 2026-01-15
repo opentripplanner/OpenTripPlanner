@@ -18,27 +18,30 @@ import { ContextMenuPopup } from './ContextMenuPopup.tsx';
 import { GeometryPropertyPopup } from './GeometryPropertyPopup.tsx';
 import RightMenu from './RightMenu.tsx';
 import { findSelectedDebugLayers } from '../../util/map.ts';
+import { FeatureSelectPopup } from './FeatureSelectPopup.tsx';
 
 const styleUrl = import.meta.env.VITE_DEBUG_STYLE_URL;
 
 type PopupData = { coordinates: LngLat; feature: MapGeoJSONFeature };
+type FeatureSelectData = { coordinates: LngLat; features: MapGeoJSONFeature[] };
 
 export function MapView({
   tripQueryVariables,
   setTripQueryVariables,
   tripQueryResult,
-  selectedTripPatternIndex,
+  selectedTripPatternIndexes,
   loading,
 }: {
   tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (variables: TripQueryVariables) => void;
   tripQueryResult: TripQuery | null;
-  selectedTripPatternIndex: number;
+  selectedTripPatternIndexes: number[];
   loading: boolean;
 }) {
   const onMapDoubleClick = useMapDoubleClick({ tripQueryVariables, setTripQueryVariables });
   const [showContextPopup, setShowContextPopup] = useState<LngLat | null>(null);
   const [showPropsPopup, setShowPropsPopup] = useState<PopupData | null>(null);
+  const [showFeatureSelectPopup, setShowFeatureSelectPopup] = useState<FeatureSelectData | null>(null);
   const [interactiveLayerIds, setInteractiveLayerIds] = useState<string[]>([]);
   const [cursor, setCursor] = useState<string>('auto');
   const onMouseEnter = useCallback(() => setCursor('pointer'), []);
@@ -49,11 +52,14 @@ export function MapView({
     },
   ) => {
     if (e.features) {
-      // if you click on a cluster of map features it's possible that there are multiple
-      // to select from. we are using the first one instead of presenting a selection UI.
-      // you can always zoom in closer if you want to make a more specific click.
-      const feature = e.features[0];
-      setShowPropsPopup({ coordinates: e.lngLat, feature: feature });
+      // if there are more than one feature, show a selection popup
+      if (e.features.length == 1) {
+        const feature = e.features[0];
+        setShowPropsPopup({ coordinates: e.lngLat, feature: feature });
+      }
+      if (e.features.length > 1) {
+        setShowFeatureSelectPopup({ coordinates: e.lngLat, features: e.features });
+      }
     }
   };
   const panToWorldEnvelopeIfRequired = (e: MapEvent) => {
@@ -119,9 +125,13 @@ export function MapView({
         />
 
         <RightMenu position="top-right" setInteractiveLayerIds={setInteractiveLayerIds} mapRef={mapRef?.current} />
-        {tripQueryResult?.trip.tripPatterns.length && (
-          <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
-        )}
+        {tripQueryResult?.trip.tripPatterns.length &&
+          selectedTripPatternIndexes.map((index) => {
+            const tripPattern = tripQueryResult.trip.tripPatterns[index];
+            return tripPattern ? (
+              <LegLines key={`trippattern-${index}`} tripPattern={tripPattern as TripPattern} />
+            ) : null;
+          })}
         {showContextPopup && (
           <ContextMenuPopup
             tripQueryVariables={tripQueryVariables}
@@ -135,6 +145,13 @@ export function MapView({
             coordinates={showPropsPopup?.coordinates}
             properties={showPropsPopup?.feature?.properties}
             onClose={() => setShowPropsPopup(null)}
+          />
+        )}
+        {showFeatureSelectPopup && (
+          <FeatureSelectPopup
+            {...showFeatureSelectPopup}
+            setShowPropsPopup={setShowPropsPopup}
+            onClose={() => setShowFeatureSelectPopup(null)}
           />
         )}
       </Map>

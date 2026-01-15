@@ -3,8 +3,8 @@ package org.opentripplanner.routing.api.request.via;
 import java.time.Duration;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Defines a via location which the journey must route through. At least one stop location or

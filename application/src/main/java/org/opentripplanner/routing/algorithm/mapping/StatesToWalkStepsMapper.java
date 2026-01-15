@@ -10,17 +10,24 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
+import org.opentripplanner.model.plan.walkstep.verticaltransportation.ElevatorUse;
+import org.opentripplanner.model.plan.walkstep.verticaltransportation.EscalatorUse;
+import org.opentripplanner.model.plan.walkstep.verticaltransportation.StairsUse;
+import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUseFactory;
+import org.opentripplanner.routing.graphfinder.EntranceResolver;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
+import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -45,10 +52,12 @@ public class StatesToWalkStepsMapper {
 
   private final double ellipsoidToGeoidDifference;
   private final StreetNotesService streetNotesService;
+  private final VerticalTransportationUseFactory verticalTransportationUseFactory;
 
   private final List<State> states;
   private final WalkStep previous;
   private final List<WalkStepBuilder> steps = new ArrayList<>();
+  private final EntranceResolver entranceResolver;
 
   private WalkStepBuilder current = null;
   private double lastAngle = 0;
@@ -74,17 +83,24 @@ public class StatesToWalkStepsMapper {
     List<State> states,
     WalkStep previousStep,
     StreetNotesService streetNotesService,
+    StreetDetailsService streetDetailsService,
+    EntranceResolver entranceResolver,
     double ellipsoidToGeoidDifference
   ) {
     this.states = states;
     this.previous = previousStep;
     this.streetNotesService = streetNotesService;
+    this.entranceResolver = entranceResolver;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
+    this.verticalTransportationUseFactory = new VerticalTransportationUseFactory(
+      streetDetailsService
+    );
   }
 
   public static String getNormalizedName(String streetName) {
     if (streetName == null) {
-      return null; //Avoid null reference exceptions with pathways which don't have names
+      // Avoid null reference exceptions with pathways which don't have names
+      return null;
     }
     int idx = streetName.indexOf('(');
     if (idx > 0) {
@@ -157,7 +173,8 @@ public class StatesToWalkStepsMapper {
       return;
     } else if (edge instanceof StreetTransitEntranceLink link) {
       var direction = relativeDirectionForTransitLink(link);
-      createAndSaveStep(backState, forwardState, link.getName(), direction, edge, link.entrance());
+      var entrance = entranceResolver.getEntrance(link.entrance());
+      createAndSaveStep(backState, forwardState, link.getName(), direction, edge, entrance);
       return;
     }
 
@@ -171,11 +188,17 @@ public class StatesToWalkStepsMapper {
 
     // generate a step for getting off an elevator (all elevator narrative generation occurs
     // when alighting). We don't need to know what came before or will come after
-    if (edge instanceof ElevatorAlightEdge) {
-      addStep(createElevatorWalkStep(backState, forwardState, edge));
+    if (edge instanceof ElevatorAlightEdge elevatorAlightEdge) {
+      createAndSaveElevatorWalkStep(backState, forwardState, elevatorAlightEdge);
+      return;
+    } else if (edge instanceof EscalatorEdge) {
+      createAndSaveEscalatorWalkStep(backState, forwardState, edge, geom);
+      return;
+    } else if (edge instanceof StreetEdge streetEdge && streetEdge.isStairs()) {
+      createAndSaveStairsWalkStep(backState, forwardState, edge, geom);
       return;
     } else if (backState.getVertex() instanceof StationEntranceVertex stationEntranceVertex) {
-      addStep(createStationEntranceWalkStep(backState, forwardState, stationEntranceVertex));
+      createAndSaveStationEntranceWalkStep(backState, forwardState, stationEntranceVertex);
       return;
     } else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
       createAndSaveStep(
@@ -272,14 +295,12 @@ public class StatesToWalkStepsMapper {
         WalkStepBuilder threeBack = steps.get(lastIndex - 2);
         WalkStepBuilder twoBack = steps.get(lastIndex - 1);
         WalkStepBuilder lastStep = steps.get(lastIndex);
-        boolean isOnSameStreet = lastStep
-          .directionTextNoParens()
-          .equals(threeBack.directionTextNoParens());
-        if (twoBack.distance() < MAX_ZAG_DISTANCE && isOnSameStreet && !twoBack.hasEntrance()) {
+        boolean isOnSameStreet = isOnSameStreet(lastStep, twoBack, threeBack);
+        if (twoBack.distance() < MAX_ZAG_DISTANCE && isOnSameStreet && canZagBeRemoved(twoBack)) {
           if (isUTurn(twoBack, lastStep)) {
             steps.remove(lastIndex - 1);
             processUTurn(lastStep, twoBack);
-          } else if (!lastStep.hasEntrance()) {
+          } else if (canZagBeRemoved(lastStep)) {
             // total hack to remove zags.
             steps.remove(lastIndex);
             steps.remove(lastIndex - 1);
@@ -303,6 +324,32 @@ public class StatesToWalkStepsMapper {
     current.addEdge(edge);
   }
 
+  /**
+   * Determines whether a set of three consecutive instances of {@link WalkStepBuilder} refer to the same street.
+   * The purposes of this check are (i) to give a separate instruction when crossing to the other side of the same street, if a crosswalk namer is iin use
+   * (an instruction can be given to cross at a particular location because others may not be accessible, practical, etc.),
+   * and (ii) to remove trivial turns when a given street briefly merges with another.
+   * @return true if the walk steps refer to the same street, false otherwise.
+   */
+  public static boolean isOnSameStreet(
+    WalkStepBuilder lastStep,
+    WalkStepBuilder twoBack,
+    WalkStepBuilder threeBack
+  ) {
+    String lastStepName = lastStep.directionTextNoParens();
+    String twoBackStepName = twoBack.directionTextNoParens();
+    String threeBackStepName = threeBack.directionTextNoParens();
+    if (lastStepName == null || twoBackStepName == null || threeBackStepName == null) {
+      return false;
+    }
+
+    return (
+      (!lastStep.isCrossing() || lastStep.nameIsDerived()) &&
+      (!twoBack.isCrossing() || twoBack.nameIsDerived()) &&
+      lastStepName.equals(threeBackStepName)
+    );
+  }
+
   private static RelativeDirection relativeDirectionForTransitLink(StreetTransitEntranceLink link) {
     if (link.isExit()) {
       return EXIT_STATION;
@@ -321,7 +368,7 @@ public class StatesToWalkStepsMapper {
     ElevationProfile p = encodeElevationProfile(
       edge,
       distance,
-      backState.getPreferences().system().geoidElevation() ? -ellipsoidToGeoidDifference : 0
+      backState.getRequest().geoidElevation() ? -ellipsoidToGeoidDifference : 0
     );
     current.addElevation(p);
   }
@@ -348,6 +395,15 @@ public class StatesToWalkStepsMapper {
         current.addElevation(twoBack.elevationProfile().transformX(current.distance()));
       }
     }
+  }
+
+  private boolean canZagBeRemoved(WalkStepBuilder walkStepBuilder) {
+    return (
+      !walkStepBuilder.hasEntrance() &&
+      !(walkStepBuilder.verticalTransportationUse() instanceof ElevatorUse) &&
+      !(walkStepBuilder.verticalTransportationUse() instanceof EscalatorUse) &&
+      !(walkStepBuilder.verticalTransportationUse() instanceof StairsUse)
+    );
   }
 
   private void processUTurn(WalkStepBuilder lastStep, WalkStepBuilder twoBack) {
@@ -506,40 +562,80 @@ public class StatesToWalkStepsMapper {
     steps.add(current);
   }
 
-  private WalkStepBuilder createElevatorWalkStep(State backState, State forwardState, Edge edge) {
+  private void createAndSaveElevatorWalkStep(
+    State backState,
+    State forwardState,
+    ElevatorAlightEdge elevatorAlightEdge
+  ) {
     // don't care what came before or comes after
-    var step = createWalkStep(forwardState, backState);
-
-    // tell the user where to get off the elevator using the exit notation, so the
-    // i18n interface will say 'Elevator to <exit>'
-    // what happens is that the webapp sees name == null and ignores that, and it sees
-    // exit != null and uses to <exit>
-    // the floor name is the AlightEdge name
-    // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-    step.withDirectionText(edge.getName());
-
-    step.withRelativeDirection(RelativeDirection.ELEVATOR);
-
-    return step;
+    addStep(
+      createWalkStep(forwardState, backState)
+        .withRelativeDirection(RelativeDirection.ELEVATOR)
+        .withVerticalTransportationUse(
+          verticalTransportationUseFactory.createElevatorUse(backState, elevatorAlightEdge)
+        )
+    );
   }
 
-  private WalkStepBuilder createStationEntranceWalkStep(
+  private void createAndSaveStairsWalkStep(
+    State backState,
+    State forwardState,
+    Edge edge,
+    Geometry geom
+  ) {
+    addStep(
+      createWalkStep(forwardState, backState)
+        .withRelativeDirection(RelativeDirection.CONTINUE)
+        .withAbsoluteDirection(DirectionUtils.getFirstAngle(geom))
+        .addDistance(edge.getDistanceMeters())
+        .withVerticalTransportationUse(verticalTransportationUseFactory.createStairsUse(edge))
+    );
+
+    lastAngle = DirectionUtils.getLastAngle(geom);
+    distance = edge.getDistanceMeters();
+    current.addEdge(edge);
+  }
+
+  private void createAndSaveEscalatorWalkStep(
+    State backState,
+    State forwardState,
+    Edge edge,
+    Geometry geom
+  ) {
+    addStep(
+      createWalkStep(forwardState, backState)
+        .withRelativeDirection(RelativeDirection.CONTINUE)
+        .withAbsoluteDirection(DirectionUtils.getFirstAngle(geom))
+        .addDistance(edge.getDistanceMeters())
+        .withVerticalTransportationUse(verticalTransportationUseFactory.createEscalatorUse(edge))
+    );
+
+    lastAngle = DirectionUtils.getLastAngle(geom);
+    distance = edge.getDistanceMeters();
+    current.addEdge(edge);
+  }
+
+  private void createAndSaveStationEntranceWalkStep(
     State backState,
     State forwardState,
     StationEntranceVertex vertex
   ) {
-    Entrance entrance = Entrance.of(vertex.id())
+    // don't care what came before or comes after
+    addStep(
+      createWalkStep(forwardState, backState)
+        // There is not a way to definitively determine if a user is entering or exiting the
+        // station, since the doors might be between or inside stations.
+        .withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
+        .withEntrance(getEntrance(vertex))
+    );
+  }
+
+  private Entrance getEntrance(StationEntranceVertex vertex) {
+    return Entrance.of(vertex.id())
       .withCode(vertex.code())
       .withCoordinate(new WgsCoordinate(vertex.getCoordinate()))
       .withWheelchairAccessibility(vertex.wheelchairAccessibility())
       .build();
-
-    // don't care what came before or comes after
-    return createWalkStep(forwardState, backState)
-      // There is not a way to definitively determine if a user is entering or exiting the station,
-      // since the doors might be between or inside stations.
-      .withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
-      .withEntrance(entrance);
   }
 
   private void createAndSaveStep(
@@ -566,20 +662,21 @@ public class StatesToWalkStepsMapper {
   }
 
   private WalkStepBuilder createWalkStep(State forwardState, State backState) {
-    Edge en = forwardState.getBackEdge();
+    Edge backEdge = forwardState.getBackEdge();
 
     return WalkStep.builder()
-      .withDirectionText(en.getName())
+      .withDirectionText(backEdge.getName())
       .withStartLocation(new WgsCoordinate(backState.getVertex().getCoordinate()))
-      .withNameIsDerived(en.nameIsDerived())
-      .withAngle(DirectionUtils.getFirstAngle(forwardState.getBackEdge().getGeometry()))
+      .withNameIsDerived(backEdge.nameIsDerived())
+      .withAngle(DirectionUtils.getFirstAngle(backEdge.getGeometry()))
       .withWalkingBike(forwardState.isBackWalkingBike())
-      .withArea(forwardState.getBackEdge() instanceof AreaEdge)
+      .withArea(backEdge instanceof AreaEdge)
+      .withCrossing(backEdge.isCrossing())
       .addElevation(
         encodeElevationProfile(
-          forwardState.getBackEdge(),
+          backEdge,
           0,
-          forwardState.getPreferences().system().geoidElevation() ? -ellipsoidToGeoidDifference : 0
+          forwardState.getRequest().geoidElevation() ? -ellipsoidToGeoidDifference : 0
         )
       )
       .addStreetNotes(streetNotesService.getNotes(forwardState));

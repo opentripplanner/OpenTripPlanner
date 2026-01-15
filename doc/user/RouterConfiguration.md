@@ -73,7 +73,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [triasApi](sandbox/TriasApi.md)                                                           |        `object`       | Configuration for the TRIAS API.                                                                                                                                                                                     | *Optional* |               |  2.8  |
 | [updaters](Realtime-Updaters.md)                                                          |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                                                                                                                                           | *Optional* |               |  1.5  |
 | [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | Vector tile configuration                                                                                                                                                                                            | *Optional* |               |   na  |
-| [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory.                                                                                                                                                              | *Optional* |               |  2.0  |
+| [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory using GBFS v3 manifest.                                                                                                                                       | *Optional* |               |  2.0  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -495,10 +495,12 @@ Used to group requests when monitoring OTP.
     "numItineraries" : 12,
     "transferPenalty" : 0,
     "turnReluctance" : 1.0,
-    "elevatorBoardTime" : 90,
-    "elevatorBoardCost" : 90,
-    "elevatorHopTime" : 20,
-    "elevatorHopCost" : 20,
+    "elevator" : {
+      "boardCost" : 15,
+      "boardSlack" : "90s",
+      "hopTime" : "20s",
+      "reluctance" : 2.0
+    },
     "bicycle" : {
       "speed" : 5,
       "reluctance" : 5.0,
@@ -675,10 +677,7 @@ Used to group requests when monitoring OTP.
     ]
   },
   "vehicleRentalServiceDirectory" : {
-    "url" : "https://entur.no/bikeRentalServiceDirectory",
-    "sourcesName" : "systems",
-    "updaterUrlName" : "url",
-    "updaterNetworkName" : "id",
+    "url" : "https://entur.no/bikeRentalServiceDirectory/manifest.json",
     "headers" : {
       "ET-Client-Name" : "MY_ORG_CLIENT_NAME"
     }
@@ -926,6 +925,19 @@ Used to group requests when monitoring OTP.
       "type" : "siri-sx-lite",
       "feedId" : "sta",
       "url" : "https://example.com/siri-lite/situation-exchange/xml"
+    },
+    {
+      "type" : "siri-et-mqtt",
+      "user" : "user",
+      "password" : "pwd",
+      "host" : "localhost",
+      "port" : 1883,
+      "feedId" : "1",
+      "topic" : "trip/updates/#",
+      "qos" : 1,
+      "fuzzyTripMatching" : true,
+      "numberOfPrimingWorkers" : 4,
+      "maxPrimingIdleTime" : "1s"
     }
   ],
   "rideHailingServices" : [

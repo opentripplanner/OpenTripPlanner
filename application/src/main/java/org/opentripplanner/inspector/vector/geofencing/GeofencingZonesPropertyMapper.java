@@ -1,38 +1,42 @@
 package org.opentripplanner.inspector.vector.geofencing;
 
-import static org.opentripplanner.street.model.RentalRestrictionExtension.RestrictionType.BUSINESS_AREA_BORDER;
-import static org.opentripplanner.street.model.RentalRestrictionExtension.RestrictionType.NO_DROP_OFF;
-import static org.opentripplanner.street.model.RentalRestrictionExtension.RestrictionType.NO_TRAVERSAL;
+import static org.opentripplanner.inspector.vector.KeyValue.kv;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
-import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 
 /**
  * A {@link PropertyMapper} for the {@link GeofencingZonesLayerBuilder} for the OTP debug client.
  */
-public class GeofencingZonesPropertyMapper extends PropertyMapper<Vertex> {
+public class GeofencingZonesPropertyMapper extends PropertyMapper<GeofencingZone> {
+
+  public static final String GEOFENCING_ZONE_TYPE_BUSINESS_AREA = "business-area";
+  public static final String GEOFENCING_ZONE_TYPE_NO_TRAVERSAL = "no-traversal";
+  public static final String GEOFENCING_ZONE_TYPE_NO_DROP_OFF = "no-drop-off";
+  public static final String GEOFENCING_ZONE_TYPE = "type";
+  public static final String GEOFENCING_ZONE_ID = "id";
+  public static final String GEOFENCING_ZONE_NAME = "name";
+  public static final String GEOFENCING_ZONE_NETWORK = "network";
 
   @Override
-  protected Collection<KeyValue> map(Vertex input) {
-    var ext = input.rentalRestrictions();
+  protected Collection<KeyValue> map(GeofencingZone zone) {
+    var properties = new ArrayList<KeyValue>();
 
-    // this logic does a best effort attempt at a simple mapping
-    // once you have several networks on the same vertex it breaks down.
-    // for that you would really need several layers.
-    // still, for a quick visualization it is useful
-    var debug = ext.debugTypes();
-    var networks = new KeyValue("networks", String.join(",", ext.networks()));
-    if (debug.contains(BUSINESS_AREA_BORDER)) {
-      return List.of(new KeyValue("type", "business-area-border"), networks);
-    } else if (debug.contains(NO_TRAVERSAL)) {
-      return List.of(new KeyValue("type", "traversal-banned"), networks);
-    } else if (debug.contains(NO_DROP_OFF)) {
-      return List.of(new KeyValue("type", "drop-off-banned"), networks);
-    } else {
-      return List.of();
+    properties.add(kv(GEOFENCING_ZONE_ID, zone.id()));
+    properties.add(kv(GEOFENCING_ZONE_NAME, zone.name()));
+    properties.add(kv(GEOFENCING_ZONE_NETWORK, zone.id().getFeedId()));
+
+    if (zone.isBusinessArea()) {
+      properties.add(kv(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_BUSINESS_AREA));
+    } else if (zone.traversalBanned()) {
+      properties.add(kv(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_NO_TRAVERSAL));
+    } else if (zone.dropOffBanned()) {
+      properties.add(kv(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_NO_DROP_OFF));
     }
+
+    return properties;
   }
 }

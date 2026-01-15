@@ -11,21 +11,22 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -35,6 +36,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 /**
  * Load a small NeTEx file set without failing. This is just a smoke test and should be excluded
@@ -58,13 +60,13 @@ public class NetexNordicBundleSmokeTest {
     netexBundle.checkInputs();
 
     // When
-    OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(
+    TransitDataImportBuilder transitBuilder = netexBundle.loadBundle(
       new Deduplicator(),
       DataImportIssueStore.NOOP
     );
 
     // Then - smoke test model
-    OtpTransitService otpModel = transitBuilder.build();
+    TransitDataImport otpModel = transitBuilder.build();
 
     assertAgencies(otpModel.getAllAgencies());
     assertMultiModalStations(otpModel.siteRepository().listMultiModalStations());
@@ -73,6 +75,7 @@ public class NetexNordicBundleSmokeTest {
     assertStations(otpModel.siteRepository().listStations());
     assertTripPatterns(otpModel.getTripPatterns());
     assertTrips(otpModel.getAllTrips());
+    assertTripsOnServiceDate(otpModel.getTripOnServiceDates());
     assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());
     assertNoticeAssignments(otpModel.getNoticeAssignments());
 
@@ -180,7 +183,14 @@ public class NetexNordicBundleSmokeTest {
     assertEquals("Ruter", t.getOperator().getName());
     assertEquals(BikeAccess.UNKNOWN, t.getBikesAllowed());
     assertEquals(Accessibility.NO_INFORMATION, t.getWheelchairBoarding());
-    assertEquals(4, trips.size());
+    assertEquals(5, trips.size());
+  }
+
+  private void assertTripsOnServiceDate(Collection<TripOnServiceDate> tripsOnServiceDate) {
+    assertEquals(1, tripsOnServiceDate.size());
+    var tripOnServiceDate = tripsOnServiceDate.iterator().next();
+    assertEquals(fId("RUT:DatedServiceJourney:1"), tripOnServiceDate.getId());
+    assertEquals(LocalDate.of(2018, 11, 1), tripOnServiceDate.getServiceDate());
   }
 
   private void assertNoticeAssignments(Multimap<AbstractTransitEntity, Notice> map) {
@@ -237,30 +247,25 @@ public class NetexNordicBundleSmokeTest {
 
   private void assetServiceCalendar(CalendarServiceData cal) {
     ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());
-    assertEquals(2, sIds.size());
-    FeedScopedId serviceId1 = sIds.get(0);
-    FeedScopedId serviceId2 = sIds.get(1);
+    assertEquals(3, sIds.size());
 
-    List<LocalDate> dates1 = cal.getServiceDatesForServiceId(serviceId1);
-    List<LocalDate> dates2 = cal.getServiceDatesForServiceId(serviceId2);
+    var dates = sIds
+      .stream()
+      .map(cal::getServiceDatesForServiceId)
+      .sorted(Comparator.comparing(List::size))
+      .toList();
 
-    if (dates1.size() > dates2.size()) {
-      var datesTemp = dates1;
-      dates1 = dates2;
-      dates2 = datesTemp;
-    }
-
+    assertEquals("[2018-11-01]", dates.get(0).toString());
     assertEquals(
       "[2017-12-21, 2017-12-22, 2017-12-25, 2017-12-26, 2017-12-27, 2017-12-28, " +
       "2017-12-29, 2018-01-02, 2018-01-03, 2018-01-04]",
-      dates1.toString()
+      dates.get(1).toString()
     );
     assertEquals(
       "[2017-12-21, 2017-12-22, 2017-12-23, 2017-12-24, 2017-12-25, 2017-12-26, " +
       "2017-12-27, 2017-12-28, 2017-12-29, 2017-12-30, 2017-12-31, 2018-01-02, " +
       "2018-01-03, 2018-01-04]",
-      dates2.toString()
+      dates.get(2).toString()
     );
-    assertEquals(2, cal.getServiceIds().size());
   }
 }

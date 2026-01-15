@@ -8,10 +8,11 @@ import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transfer.TransferServiceTestFactory;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 class VectorTileResponseFactoryTest {
@@ -20,6 +21,7 @@ class VectorTileResponseFactoryTest {
     TestServerContext.createServerContext(
       new Graph(),
       new TimetableRepository(),
+      TransferServiceTestFactory.defaultTransferRepository(),
       new DefaultFareService()
     );
 

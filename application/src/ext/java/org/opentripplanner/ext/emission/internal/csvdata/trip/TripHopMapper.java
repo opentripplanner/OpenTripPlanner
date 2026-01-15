@@ -3,9 +3,9 @@ package org.opentripplanner.ext.emission.internal.csvdata.trip;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class TripHopMapper {

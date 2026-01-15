@@ -34,9 +34,10 @@ import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapp
 import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
-import org.opentripplanner.ext.fares.impl.gtfs.GtfsFaresService;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
+import org.opentripplanner.ext.fares.service.gtfs.GtfsFaresService;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -62,7 +63,6 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -298,9 +298,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       List<FeedScopedId> filterByStations = null;
       List<FeedScopedId> filterByRoutes = null;
       List<String> filterByBikeRentalStations = null;
-      // TODO implement
-      List<String> filterByBikeParks = null;
-      List<String> filterByCarParks = null;
 
       GraphQLTypes.GraphQLQueryTypeNearestArgs args = new GraphQLTypes.GraphQLQueryTypeNearestArgs(
         environment.getArguments()
@@ -319,8 +316,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           ? filterByIds.getGraphQLRoutes().stream().map(FeedScopedId::parse).toList()
           : null;
         filterByBikeRentalStations = filterByIds.getGraphQLBikeRentalStations();
-        filterByBikeParks = filterByIds.getGraphQLBikeParks();
-        filterByCarParks = filterByIds.getGraphQLCarParks();
       }
 
       List<TransitMode> filterByModes = args.getGraphQLFilterByModes() != null
@@ -431,7 +426,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
               .findAny()
               .orElse(null);
         case "Cluster":
-          return null; //TODO
+          // TODO
+          return null;
         case "DepartureRow":
           return PatternAtStop.fromId(transitService, id);
         case "Pattern":
@@ -456,7 +452,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         case "Stop":
           return transitService.getRegularStop(FeedScopedId.parse(id));
         case "Stoptime":
-          return null; //TODO
+          // TODO
+          return null;
         case "stopAtDistance": {
           String[] parts = id.split(";");
           var stop = transitService.getRegularStop(FeedScopedId.parse(parts[1]));
@@ -465,7 +462,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null);
         }
         case "TicketType":
-          return null; //TODO
+          // TODO
+          return null;
         case "Trip":
           var scopedId = FeedScopedId.parse(id);
           return transitService.getTrip(scopedId);

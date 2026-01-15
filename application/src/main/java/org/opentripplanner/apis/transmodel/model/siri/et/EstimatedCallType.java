@@ -16,16 +16,19 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.ToIntFunction;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.transmodel.mapping.OccupancyStatusMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
+import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
@@ -43,19 +46,21 @@ public class EstimatedCallType {
     GraphQLOutputType destinationDisplayType,
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType serviceJourneyType,
+    GraphQLOutputType sjEstimatedCallType,
     GraphQLOutputType datedServiceJourneyType,
+    GraphQLOutputType empiricalDelayType,
     GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType.newObject()
       .name("EstimatedCall")
       .description(
-        "List of visits to quays as part of vehicle journeys. Updated with real time information where available"
+        "List of calls on quays as part of vehicle journeys. Updated with real time information where available"
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("quay")
           .type(new GraphQLNonNull(quayType))
-          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStop())
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).getStop())
           .build()
       )
       .field(
@@ -63,12 +68,7 @@ public class EstimatedCallType {
           .name("aimedArrivalTime")
           .description("Scheduled time of arrival at quay. Not affected by read time updated")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(
-            environment ->
-              1000 *
-              (((TripTimeOnDate) environment.getSource()).getServiceDayMidnight() +
-                ((TripTimeOnDate) environment.getSource()).getScheduledArrival())
-          )
+          .dataFetcher(env -> calcTime(env, TripTimeOnDate::getScheduledArrival))
           .build()
       )
       .field(
@@ -76,14 +76,9 @@ public class EstimatedCallType {
           .name("expectedArrivalTime")
           .type(new GraphQLNonNull(dateTimeScalar))
           .description(
-            "Expected time of arrival at quay. Updated with real time information if available. Will be null if an actualArrivalTime exists"
+            "Expected time of arrival at quay. Updated with real time information if available."
           )
-          .dataFetcher(environment -> {
-            TripTimeOnDate tripTimeOnDate = environment.getSource();
-            return (
-              1000 * (tripTimeOnDate.getServiceDayMidnight() + tripTimeOnDate.getRealtimeArrival())
-            );
-          })
+          .dataFetcher(env -> calcTime(env, TripTimeOnDate::getRealtimeArrival))
           .build()
       )
       .field(
@@ -93,15 +88,7 @@ public class EstimatedCallType {
           .description(
             "Actual time of arrival at quay. Updated from real time information if available."
           )
-          .dataFetcher(environment -> {
-            TripTimeOnDate tripTimeOnDate = environment.getSource();
-            if (tripTimeOnDate.getActualArrival() == -1) {
-              return null;
-            }
-            return (
-              1000 * (tripTimeOnDate.getServiceDayMidnight() + tripTimeOnDate.getActualArrival())
-            );
-          })
+          .dataFetcher(env -> calcTimeOptional(env, TripTimeOnDate::getActualArrival))
           .build()
       )
       .field(
@@ -109,12 +96,7 @@ public class EstimatedCallType {
           .name("aimedDepartureTime")
           .description("Scheduled time of departure from quay. Not affected by read time updated")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(
-            environment ->
-              1000 *
-              (((TripTimeOnDate) environment.getSource()).getServiceDayMidnight() +
-                ((TripTimeOnDate) environment.getSource()).getScheduledDeparture())
-          )
+          .dataFetcher(env -> calcTime(env, TripTimeOnDate::getScheduledDeparture))
           .build()
       )
       .field(
@@ -122,15 +104,9 @@ public class EstimatedCallType {
           .name("expectedDepartureTime")
           .type(new GraphQLNonNull(dateTimeScalar))
           .description(
-            "Expected time of departure from quay. Updated with real time information if available. Will be null if an actualDepartureTime exists"
+            "Expected time of departure from quay. Updated with real time information if available."
           )
-          .dataFetcher(environment -> {
-            TripTimeOnDate tripTimeOnDate = environment.getSource();
-            return (
-              1000 *
-              (tripTimeOnDate.getServiceDayMidnight() + tripTimeOnDate.getRealtimeDeparture())
-            );
-          })
+          .dataFetcher(env -> calcTime(env, TripTimeOnDate::getRealtimeDeparture))
           .build()
       )
       .field(
@@ -140,15 +116,17 @@ public class EstimatedCallType {
           .description(
             "Actual time of departure from quay. Updated with real time information if available."
           )
-          .dataFetcher(environment -> {
-            TripTimeOnDate tripTimeOnDate = environment.getSource();
-            if (tripTimeOnDate.getActualDeparture() == -1) {
-              return null;
-            }
-            return (
-              1000 * (tripTimeOnDate.getServiceDayMidnight() + tripTimeOnDate.getActualDeparture())
-            );
-          })
+          .dataFetcher(env -> calcTimeOptional(env, TripTimeOnDate::getActualDeparture))
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("empiricalDelay")
+          .type(empiricalDelayType)
+          .description(
+            "The typical delay for this trip on this day for this stop based on historical data."
+          )
+          .dataFetcher(EmpiricalDelayType::dataFetcherForTripTimeOnDate)
           .build()
       )
       .field(
@@ -158,7 +136,7 @@ public class EstimatedCallType {
           .description(
             "Whether this is a timing point or not. Boarding and alighting is not allowed at timing points."
           )
-          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).isTimepoint())
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isTimepoint())
           .build()
       )
       .field(
@@ -166,7 +144,7 @@ public class EstimatedCallType {
           .name("realtime")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description("Whether this call has been updated with real time information.")
-          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).isRealtime())
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isRealtime())
           .build()
       )
       .field(
@@ -174,26 +152,22 @@ public class EstimatedCallType {
           .name("predictionInaccurate")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description("Whether the updated estimates are expected to be inaccurate.")
-          .dataFetcher(environment ->
-            ((TripTimeOnDate) environment.getSource()).isPredictionInaccurate()
-          )
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isPredictionInaccurate())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("realtimeState")
           .type(new GraphQLNonNull(EnumTypes.REALTIME_STATE))
-          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getRealTimeState())
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).getRealTimeState())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("occupancyStatus")
           .type(new GraphQLNonNull(EnumTypes.OCCUPANCY_STATUS))
-          .dataFetcher(environment ->
-            OccupancyStatusMapper.mapStatus(
-              ((TripTimeOnDate) environment.getSource()).getOccupancyStatus()
-            )
+          .dataFetcher(env ->
+            OccupancyStatusMapper.mapStatus(((TripTimeOnDate) env.getSource()).getOccupancyStatus())
           )
           .build()
       )
@@ -201,7 +175,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("stopPositionInPattern")
           .type(new GraphQLNonNull(Scalars.GraphQLInt))
-          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStopIndex())
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).getStopPosition())
           .build()
       )
       .field(
@@ -209,9 +183,7 @@ public class EstimatedCallType {
           .name("forBoarding")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description("Whether vehicle may be boarded at quay.")
-          .dataFetcher(environment ->
-            ((TripTimeOnDate) environment.getSource()).getPickupType().isRoutable()
-          )
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).getPickupType().isRoutable())
           .build()
       )
       .field(
@@ -219,9 +191,7 @@ public class EstimatedCallType {
           .name("forAlighting")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description("Whether vehicle may be alighted at quay.")
-          .dataFetcher(environment ->
-            ((TripTimeOnDate) environment.getSource()).getDropoffType().isRoutable()
-          )
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).getDropoffType().isRoutable())
           .build()
       )
       .field(
@@ -230,8 +200,7 @@ public class EstimatedCallType {
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description("Whether vehicle will only stop on request.")
           .dataFetcher(
-            environment ->
-              ((TripTimeOnDate) environment.getSource()).getDropoffType() == COORDINATE_WITH_DRIVER
+            env -> ((TripTimeOnDate) env.getSource()).getDropoffType() == COORDINATE_WITH_DRIVER
           )
           .build()
       )
@@ -246,9 +215,7 @@ public class EstimatedCallType {
             "cancelled. This also means that both boarding and alighting has been " +
             "cancelled."
           )
-          .dataFetcher(environment ->
-            ((TripTimeOnDate) environment.getSource()).isCanceledEffectively()
-          )
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isCanceledEffectively())
           .build()
       )
       .field(
@@ -256,25 +223,33 @@ public class EstimatedCallType {
           .name("date")
           .type(new GraphQLNonNull(TransmodelScalars.DATE_SCALAR))
           .description("The date the estimated call is valid for.")
-          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getServiceDay())
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).getServiceDay())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("serviceJourneyEstimatedCalls")
+          .type(new GraphQLNonNull(sjEstimatedCallType))
+          .description("Estimated calls for the ServiceJourney on this date.")
+          .dataFetcher(DataFetchingEnvironment::getSource)
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("serviceJourney")
           .type(new GraphQLNonNull(serviceJourneyType))
-          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getTrip())
+          .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).getTrip())
           .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("datedServiceJourney")
           .type(datedServiceJourneyType)
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment).getTripOnServiceDate(
+          .dataFetcher(env ->
+            GqlUtil.getTransitService(env).getTripOnServiceDate(
               new TripIdAndServiceDate(
-                environment.<TripTimeOnDate>getSource().getTrip().getId(),
-                environment.<TripTimeOnDate>getSource().getServiceDay()
+                env.<TripTimeOnDate>getSource().getTrip().getId(),
+                env.<TripTimeOnDate>getSource().getServiceDay()
               )
             )
           )
@@ -291,11 +266,9 @@ public class EstimatedCallType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("notices")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
-          .dataFetcher(environment -> {
-            TripTimeOnDate tripTimeOnDate = environment.getSource();
-            return GqlUtil.getTransitService(environment).findNotices(
-              tripTimeOnDate.getStopTimeKey()
-            );
+          .dataFetcher(env -> {
+            TripTimeOnDate tripTimeOnDate = env.getSource();
+            return GqlUtil.getTransitService(env).findNotices(tripTimeOnDate.getStopTimeKey());
           })
           .build()
       )
@@ -305,9 +278,7 @@ public class EstimatedCallType {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .description("Get all relevant situations for this EstimatedCall.")
-          .dataFetcher(environment ->
-            getAllRelevantAlerts(environment.getSource(), GqlUtil.getTransitService(environment))
-          )
+          .dataFetcher(env -> getAllRelevantAlerts(env.getSource(), GqlUtil.getTransitService(env)))
           .build()
       )
       .field(
@@ -315,9 +286,7 @@ public class EstimatedCallType {
           .name("bookingArrangements")
           .description("Booking arrangements for this EstimatedCall.")
           .type(bookingArrangementType)
-          .dataFetcher(environment ->
-            environment.<TripTimeOnDate>getSource().getPickupBookingInfo()
-          )
+          .dataFetcher(env -> env.<TripTimeOnDate>getSource().getPickupBookingInfo())
           .build()
       )
       //                .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -325,9 +294,34 @@ public class EstimatedCallType {
       //                        .type(Scalars.GraphQLBoolean)
       //                        .description("Whether this call is part of a flexible trip. This means that arrival or departure " +
       //                                "times are not scheduled but estimated within specified operating hours.")
-      //                        .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).isFlexible())
+      //                        .dataFetcher(env -> ((TripTimeShort) env.getSource()).isFlexible())
       //                        .build())
       .build();
+  }
+
+  /// Same as [#calcTime(TripTimeOnDate, ToIntFunction)]. If the offset is `-1`, this
+  /// method returns `null`.
+  @Nullable
+  private static Long calcTimeOptional(
+    DataFetchingEnvironment env,
+    ToIntFunction<TripTimeOnDate> offsetProvider
+  ) {
+    TripTimeOnDate instance = env.getSource();
+    int offset = offsetProvider.applyAsInt(instance);
+    return (offset == -1) ? null : calcTime(instance, offset);
+  }
+
+  /// Calculate the Epoch time in milliseconds from the given `instance` and `timeOffsetProvider`.
+  private static long calcTime(
+    DataFetchingEnvironment env,
+    ToIntFunction<TripTimeOnDate> timeOffsetProvider
+  ) {
+    TripTimeOnDate instance = env.getSource();
+    return calcTime(instance, timeOffsetProvider.applyAsInt(instance));
+  }
+
+  private static long calcTime(TripTimeOnDate instance, int offset) {
+    return 1000L * (instance.getServiceDayMidnight() + offset);
   }
 
   /**

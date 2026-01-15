@@ -27,7 +27,7 @@ import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.framework.geometry.PolylineEncoder;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ElevationFlattened;
@@ -268,7 +268,7 @@ public class ElevationModule implements GraphBuilderModule {
       HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
       for (StreetEdge streetEdge : edgesWithCalculatedElevations) {
         newCachedElevations.put(
-          EncodedPolyline.encode(streetEdge.getGeometry()).points(),
+          PolylineEncoder.encodeGeometry(streetEdge.getGeometry()).points(),
           streetEdge.getElevationProfile()
         );
       }
@@ -400,14 +400,15 @@ public class ElevationModule implements GraphBuilderModule {
     // with this method avoids potentially waiting for a lock to be released for calculating the thread-specific
     // coverage.
     if (ee.hasElevationExtension()) {
-      return;/* already set up */
+      // already set up
+      return;
     }
 
     // first try to find a cached value if possible
     Geometry edgeGeometry = ee.getGeometry();
     if (cachedElevations != null) {
       PackedCoordinateSequence coordinateSequence = cachedElevations.get(
-        EncodedPolyline.encode(edgeGeometry).points()
+        PolylineEncoder.encodeGeometry(edgeGeometry).points()
       );
       if (coordinateSequence != null) {
         // found a cached value! Set the elevation profile with the pre-calculated data.
@@ -436,7 +437,10 @@ public class ElevationModule implements GraphBuilderModule {
       double edgeLenM = 0;
       double sampleDistance = distanceBetweenSamplesM;
       double previousDistance = 0;
-      double x1 = coords[0].x, y1 = coords[0].y, x2, y2;
+      double x1 = coords[0].x;
+      double y1 = coords[0].y;
+      double x2;
+      double y2;
       for (int i = 0; i < coords.length - 1; i++) {
         x2 = coords[i + 1].x;
         y2 = coords[i + 1].y;

@@ -6,7 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class ObjectUtilsTest {
 
@@ -62,5 +66,21 @@ class ObjectUtilsTest {
   void toStringTest() {
     assertEquals("1", ObjectUtils.toString(1));
     assertEquals("", ObjectUtils.toString(null));
+  }
+
+  private static Stream<Arguments> oneOfCases() {
+    Object object = new Object();
+    return Stream.of(
+      Arguments.argumentSet("both are null", null, null, false),
+      Arguments.argumentSet("only a is non-null", object, null, true),
+      Arguments.argumentSet("only b is non-null", null, object, true),
+      Arguments.argumentSet("both are non-null", object, object, false)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("oneOfCases")
+  void oneOf(Object a, Object b, boolean expected) {
+    assertEquals(expected, ObjectUtils.oneOf(a, b));
   }
 }

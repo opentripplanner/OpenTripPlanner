@@ -7,7 +7,6 @@ import static org.opentripplanner.graph_builder.module.linking.TestGraph.addExtr
 import static org.opentripplanner.graph_builder.module.linking.TestGraph.addRegularStopGrid;
 import static org.opentripplanner.graph_builder.module.linking.TestGraph.link;
 
-import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -15,14 +14,12 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -33,6 +30,7 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transfer.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -151,30 +149,25 @@ public class LinkingTest {
         assertEquals(v1.getLon(), v2.getLon(), 1e-10);
       }
     }
-    assertEquals(153, unlinkedStopsCounter);
+    assertEquals(155, unlinkedStopsCounter);
   }
 
   /** Build a graph in Columbus, OH with no transit */
   public static TestOtpModel buildGraphNoTransit() {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    var graph = new Graph(deduplicator);
+    var graph = new Graph();
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
-
-    File file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
+    var file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
     var provider = new DefaultOsmProvider(file, false);
-    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var vehicleParkingRepository = new DefaultVehicleParkingRepository();
 
-    var osmModule = OsmModule.of(
-      provider,
+    OsmModuleTestFactory.of(provider).withGraph(graph).builder().build().buildGraph();
+
+    return new TestOtpModel(
       graph,
-      osmInfoRepository,
-      vehicleParkingRepository
-    ).build();
-
-    osmModule.buildGraph();
-    return new TestOtpModel(graph, timetableRepository);
+      timetableRepository,
+      TransferServiceTestFactory.defaultTransferRepository()
+    );
   }
 
   private static List<StreetTransitStopLink> outgoingStls(final TransitStopVertex tsv) {

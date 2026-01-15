@@ -37,16 +37,20 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(HashGridSpatialIndex.class);
 
-  /* Computation done based on geographical coordinates. */
-  // private static final double DEFAULT_Y_BIN_SIZE = 0.010; // ~1km
-  private static final double DEFAULT_Y_BIN_SIZE = 0.005; // ~500m
+  /**
+   * Computation done based on geographical coordinates. Default value is ~500 meters.
+   */
+  private static final double DEFAULT_Y_BIN_SIZE = 0.005;
 
-  /* Computation done based on geographical coordinates at ~45 degree lat */
-  // private static final double DEFAULT_X_BIN_SIZE = 0.007; // ~1km
-  private static final double DEFAULT_X_BIN_SIZE = 0.0035; // ~500m
+  /**
+   * Computation done based on geographical coordinates at ~45 degree lat. Default value is ~500
+   * meters.
+   */
+  private static final double DEFAULT_X_BIN_SIZE = 0.0035;
 
   /* Size of bin in X and Y direction, in coordinates units. */
-  private final double xBinSize, yBinSize;
+  private final double xBinSize;
+  private final double yBinSize;
 
   /* The map of all bins. Please see visit() and xKey/yKey for details on the key. */
   private final TLongObjectHashMap<ArrayList<T>> bins;
@@ -58,9 +62,9 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   private int nEntries = 0;
 
   public HashGridSpatialIndex(double xBinSize, double yBinSize) {
-    if (xBinSize <= 0 || yBinSize <= 0) throw new IllegalStateException(
-      "bin size must be positive."
-    );
+    if (xBinSize <= 0 || yBinSize <= 0) {
+      throw new IllegalStateException("bin size must be positive.");
+    }
     this.xBinSize = xBinSize;
     this.yBinSize = yBinSize;
     // For 200m bins, 500x500 = 100x100km = 250000 bins

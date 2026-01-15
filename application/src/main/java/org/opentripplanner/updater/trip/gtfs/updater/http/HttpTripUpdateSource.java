@@ -48,8 +48,8 @@ class HttpTripUpdateSource {
     updateIncrementality = FULL_DATASET;
     try {
       // Decode message
-      feedMessage = otpHttpClient.getAndMap(URI.create(url), this.headers.asMap(), is ->
-        FeedMessage.parseFrom(is, registry)
+      feedMessage = otpHttpClient.getAndMap(URI.create(url), this.headers.asMap(), response ->
+        FeedMessage.parseFrom(response.body(), registry)
       );
       feedEntityList = feedMessage.getEntityList();
 
@@ -68,7 +68,9 @@ class HttpTripUpdateSource {
       // Create List of TripUpdates
       updates = new ArrayList<>(feedEntityList.size());
       for (FeedEntity feedEntity : feedEntityList) {
-        if (feedEntity.hasTripUpdate()) updates.add(feedEntity.getTripUpdate());
+        if (feedEntity.hasTripUpdate()) {
+          updates.add(feedEntity.getTripUpdate());
+        }
       }
     } catch (Exception e) {
       LOG.error("Failed to process GTFS-RT TripUpdates feed from {}", url, e);

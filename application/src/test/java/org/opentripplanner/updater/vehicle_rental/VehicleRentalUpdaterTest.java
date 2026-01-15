@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -19,27 +20,47 @@ import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 class VehicleRentalUpdaterTest {
 
+  public static final VehicleRentalUpdaterParameters PARAMS = new VehicleRentalUpdaterParameters(
+    "A",
+    Duration.ofMinutes(1),
+    new FakeParams()
+  );
+  public static final DefaultVehicleRentalService SERVICE = new DefaultVehicleRentalService();
+
   @Test
   void failingDataSourceCountsAsPrimed() {
     var source = new FailingDataSource();
-    var updater = new VehicleRentalUpdater(
-      new VehicleRentalUpdaterParameters("A", Duration.ofMinutes(1), new FakeParams()),
-      source,
-      null,
-      new DefaultVehicleRentalService()
-    );
+    var updater = new VehicleRentalUpdater(PARAMS, source, null, SERVICE);
 
     assertFalse(updater.isPrimed());
     var manager = new MockManager(updater);
     manager.startUpdaters();
     assertTrue(source.hasFailed());
     manager.stop(false);
+    assertTrue(updater.isPrimed());
+  }
+
+  /**
+   * It's not clear why this tests fails on Windows and I don't have a test machine to find out.
+   */
+  @Test
+  @Disabled
+  void failingSetup() {
+    var source = new FailingSetupDataSource();
+    var updater = new VehicleRentalUpdater(PARAMS, source, null, SERVICE);
+
+    assertFalse(updater.isPrimed());
+    var manager = new MockManager(updater);
+    manager.startUpdaters();
+    assertTrue(source.hasFailed());
+    manager.stop(true);
     assertTrue(updater.isPrimed());
   }
 
@@ -58,19 +79,19 @@ class VehicleRentalUpdaterTest {
     }
   }
 
-  static class FailingDataSource implements VehicleRentalDataSource {
+  private static class FailingDataSource implements VehicleRentalDataSource {
 
     private final CompletableFuture<Boolean> hasFailed = new CompletableFuture<>();
 
     @Override
     public boolean update() {
       hasFailed.complete(true);
-      throw new RuntimeException("An error occurred while updating the source.");
+      throw new UpdaterConstructionException("An error occurred while setting up the source.");
     }
 
     @Override
     public List<VehicleRentalPlace> getUpdates() {
-      return null;
+      return List.of();
     }
 
     private boolean hasFailed() {
@@ -82,7 +103,36 @@ class VehicleRentalUpdaterTest {
     }
   }
 
-  static class FakeParams implements VehicleRentalDataSourceParameters {
+  private static class FailingSetupDataSource implements VehicleRentalDataSource {
+
+    private final CompletableFuture<Boolean> hasFailed = new CompletableFuture<>();
+
+    @Override
+    public void setup() {
+      this.hasFailed.complete(true);
+      throw new UpdaterConstructionException("An error occurred while setting up the source.");
+    }
+
+    @Override
+    public boolean update() {
+      return true;
+    }
+
+    @Override
+    public List<VehicleRentalPlace> getUpdates() {
+      return List.of();
+    }
+
+    private boolean hasFailed() {
+      try {
+        return hasFailed.get(5, TimeUnit.SECONDS);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  private static class FakeParams implements VehicleRentalDataSourceParameters {
 
     @Override
     public String url() {

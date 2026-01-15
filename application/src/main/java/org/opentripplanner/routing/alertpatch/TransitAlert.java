@@ -9,9 +9,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 
 /**
@@ -177,7 +177,8 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       .stream()
       .map(timePeriod -> timePeriod.startTime)
       .min(Comparator.naturalOrder())
-      .filter(startTime -> startTime > 0) //If 0, null should be returned
+      // If 0, null should be returned
+      .filter(startTime -> startTime > 0)
       .map(Instant::ofEpochSecond)
       .orElse(null);
   }
@@ -194,7 +195,8 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       .stream()
       .map(timePeriod -> timePeriod.endTime)
       .max(Comparator.naturalOrder())
-      .filter(endTime -> endTime < TimePeriod.OPEN_ENDED) //If open-ended, null should be returned
+      // If open-ended, null should be returned
+      .filter(endTime -> endTime < TimePeriod.OPEN_ENDED)
       .map(Instant::ofEpochSecond)
       .orElse(null);
   }

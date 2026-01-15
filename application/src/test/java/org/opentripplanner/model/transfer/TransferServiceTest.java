@@ -30,16 +30,26 @@ public class TransferServiceTest {
 
   @Test
   public void findTransfer() {
-    // Given:                                                               // Ranking
-    var A = transfer(TRIP_POINT_11_1, TRIP_POINT_21_3); // 84
-    var B = transfer(TRIP_POINT_11_1, ROUTE_POINT_2B); // 74
-    var C = transfer(TRIP_POINT_11_1, ROUTE_POINT_2S); // 64
-    var D = transfer(STOP_POINT_A, TRIP_POINT_21_3); // 51
-    var E = transfer(ROUTE_POINT_1A, STOP_POINT_B); // 43
-    var F = transfer(ROUTE_POINT_1S, STOP_POINT_B); // 32
-    var G = transfer(STATION_POINT, ROUTE_POINT_2B); // 30
-    var H = transfer(STATION_POINT, ROUTE_POINT_2S); // 20
-    var I = transfer(STATION_POINT, STATION_POINT); // 11
+    // Given:
+    // Ranking
+    // 84
+    var A = transfer(TRIP_POINT_11_1, TRIP_POINT_21_3);
+    // 74
+    var B = transfer(TRIP_POINT_11_1, ROUTE_POINT_2B);
+    // 64
+    var C = transfer(TRIP_POINT_11_1, ROUTE_POINT_2S);
+    // 51
+    var D = transfer(STOP_POINT_A, TRIP_POINT_21_3);
+    // 43
+    var E = transfer(ROUTE_POINT_1A, STOP_POINT_B);
+    // 32
+    var F = transfer(ROUTE_POINT_1S, STOP_POINT_B);
+    // 30
+    var G = transfer(STATION_POINT, ROUTE_POINT_2B);
+    // 20
+    var H = transfer(STATION_POINT, ROUTE_POINT_2S);
+    // 11
+    var I = transfer(STATION_POINT, STATION_POINT);
 
     // When: all transfers is added to service
     subject.addAll(List.of(A, B, C, D, E, F, G, H, I));

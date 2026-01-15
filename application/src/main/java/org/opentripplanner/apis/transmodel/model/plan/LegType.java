@@ -20,13 +20,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.leg.StopArrival;
@@ -67,7 +68,11 @@ public class LegType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .description(
-            "An identifier for the leg, which can be used to re-fetch transit leg information."
+            """
+            An identifier for the leg, which can be used to re-fetch transit leg information. The
+            identifier is valid for a maximum of 2 years, but sometimes it will fail after a few hours.
+            We do not recommend storing IDs for a long time.
+            """
           )
           .type(Scalars.GraphQLID)
           .dataFetcher(env -> LegReferenceSerializer.encode(leg(env).legReference()))
@@ -80,7 +85,7 @@ public class LegType {
           .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(env ->
             // startTime is already adjusted for real-time - need to subtract delay to get aimed time
-            leg(env).startTime().minusSeconds(leg(env).departureDelay()).toInstant().toEpochMilli()
+            leg(env).startTime().minusSeconds(leg(env).departureDelay())
           )
           .build()
       )
@@ -89,7 +94,7 @@ public class LegType {
           .name("expectedStartTime")
           .description("The expected, real-time adjusted date and time this leg starts.")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(env -> leg(env).startTime().toInstant().toEpochMilli())
+          .dataFetcher(env -> leg(env).startTime())
           .build()
       )
       .field(
@@ -97,9 +102,10 @@ public class LegType {
           .name("aimedEndTime")
           .description("The aimed date and time this leg ends.")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(env -> // endTime is already adjusted for real-time - need to subtract delay to get aimed time
-            leg(env).endTime().minusSeconds(leg(env).arrivalDelay()).toInstant().toEpochMilli()
-          )
+          .dataFetcher(env -> {
+            // endTime is already adjusted for real-time - need to subtract delay to get aimed time
+            return leg(env).endTime().minusSeconds(leg(env).arrivalDelay());
+          })
           .build()
       )
       .field(
@@ -107,7 +113,7 @@ public class LegType {
           .name("expectedEndTime")
           .description("The expected, real-time adjusted date and time this leg ends.")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(env -> leg(env).endTime().toInstant().toEpochMilli())
+          .dataFetcher(env -> leg(env).endTime())
           .build()
       )
       .field(
@@ -157,7 +163,7 @@ public class LegType {
           .name("pointsOnLink")
           .description("The leg's geometry.")
           .type(linkGeometryType)
-          .dataFetcher(env -> EncodedPolyline.encode(leg(env).legGeometry()))
+          .dataFetcher(env -> EncodedPolyline.of(leg(env).legGeometry()))
           .build()
       )
       .field(
@@ -509,6 +515,9 @@ public class LegType {
     }
     if (leg instanceof TransitLeg tl) {
       return transitLegAccessor.apply(tl);
+    }
+    if (leg instanceof CarpoolLeg cl) {
+      return cl.mode();
     }
     throw new IllegalStateException("Unhandled leg type: " + leg);
   }

@@ -2,8 +2,8 @@ package org.opentripplanner.apis.transmodel.mapping;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.apis.transmodel.model.framework.EncodedPolylineBeanWithStops;
-import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 public class GeometryMapper {
@@ -19,7 +19,7 @@ public class GeometryMapper {
     for (int i = 0; i < tripPattern.numberOfStops() - 1; i++) {
       var startLocation = tripPattern.getStop(i);
       var endLocation = tripPattern.getStop(i + 1);
-      var geometry = EncodedPolyline.encode(tripPattern.getHopGeometry(i));
+      var geometry = EncodedPolyline.of(tripPattern.getHopGeometry(i));
 
       var stopToStopGeometry = new EncodedPolylineBeanWithStops(
         startLocation,

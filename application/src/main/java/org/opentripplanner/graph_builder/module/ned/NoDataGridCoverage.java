@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import it.geosolutions.jaiext.range.NoDataContainer;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.eclipse.imagen.media.range.NoDataContainer;
 import org.geotools.api.coverage.CannotEvaluateException;
 import org.geotools.api.coverage.PointOutsideCoverageException;
 import org.geotools.api.coverage.SampleDimension;

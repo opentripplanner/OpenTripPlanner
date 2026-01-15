@@ -9,6 +9,7 @@ import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_AZURE_SX_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_ET_GOOGLE_PUBSUB_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_ET_LITE;
+import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_ET_MQTT;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_ET_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_SX_LITE;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_SX_UPDATER;
@@ -25,6 +26,7 @@ import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
+import org.opentripplanner.ext.siri.updater.mqtt.MqttSiriETUpdaterParameters;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -33,6 +35,7 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.MqttGtfsRealt
 import org.opentripplanner.standalone.config.routerconfig.updaters.PollingTripUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETGooglePubsubUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETLiteUpdaterConfig;
+import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETMqttUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXLiteUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXUpdaterConfig;
@@ -49,7 +52,7 @@ import org.opentripplanner.updater.alert.siri.SiriSXUpdaterParameters;
 import org.opentripplanner.updater.alert.siri.lite.SiriSXLiteUpdaterParameters;
 import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdaterParameters;
 import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.updater.trip.siri.updater.SiriETUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.updater.lite.SiriETLiteUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -173,8 +176,13 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<SiriETUpdaterParameters> getSiriETUpdaterParameters() {
+  public List<DefaultSiriETUpdaterParameters> getSiriETUpdaterParameters() {
     return getParameters(SIRI_ET_UPDATER);
+  }
+
+  @Override
+  public List<DefaultSiriETUpdaterParameters> getSiriETCarpoolingUpdaterParameters() {
+    return getParameters(Type.SIRI_ET_CARPOOLING_UPDATER);
   }
 
   @Override
@@ -217,6 +225,11 @@ public class UpdatersConfig implements UpdatersParameters {
     return getParameters(SIRI_AZURE_SX_UPDATER);
   }
 
+  @Override
+  public List<MqttSiriETUpdaterParameters> getMqttSiriETUpdaterParameters() {
+    return getParameters(SIRI_ET_MQTT);
+  }
+
   private <T> List<T> getParameters(Type key) {
     return (List<T>) configList.get(key);
   }
@@ -233,12 +246,14 @@ public class UpdatersConfig implements UpdatersParameters {
     REAL_TIME_ALERTS(GtfsRealtimeAlertsUpdaterConfig::create),
     VEHICLE_POSITIONS(VehiclePositionsUpdaterConfig::create),
     SIRI_ET_UPDATER(SiriETUpdaterConfig::create),
+    SIRI_ET_CARPOOLING_UPDATER(SiriETUpdaterConfig::create),
     SIRI_ET_LITE(SiriETLiteUpdaterConfig::create),
     SIRI_ET_GOOGLE_PUBSUB_UPDATER(SiriETGooglePubsubUpdaterConfig::create),
     SIRI_SX_UPDATER(SiriSXUpdaterConfig::create),
     SIRI_SX_LITE(SiriSXLiteUpdaterConfig::create),
     SIRI_AZURE_ET_UPDATER(SiriAzureETUpdaterConfig::create),
-    SIRI_AZURE_SX_UPDATER(SiriAzureSXUpdaterConfig::create);
+    SIRI_AZURE_SX_UPDATER(SiriAzureSXUpdaterConfig::create),
+    SIRI_ET_MQTT(SiriETMqttUpdaterConfig::create);
 
     private final BiFunction<String, NodeAdapter, ?> factory;
 

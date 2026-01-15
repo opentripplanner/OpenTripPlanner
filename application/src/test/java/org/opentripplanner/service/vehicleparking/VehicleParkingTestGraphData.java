@@ -11,7 +11,8 @@ import org.opentripplanner.transit.service.TimetableRepository;
 
 public class VehicleParkingTestGraphData {
 
-  protected IntersectionVertex A, B;
+  protected IntersectionVertex A;
+  protected IntersectionVertex B;
 
   protected Graph graph;
 
@@ -20,7 +21,7 @@ public class VehicleParkingTestGraphData {
   public void initGraph() {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    graph = new Graph(deduplicator);
+    graph = new Graph();
     timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     graph.hasStreets = true;
 

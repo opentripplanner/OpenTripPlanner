@@ -61,11 +61,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
 
     this.recordMetrics = BatchTripUpdateMetrics.batch(parameters);
 
-    LOG.info(
-      "Creating stop time updater running every {} seconds : {}",
-      pollingPeriod(),
-      updateSource
-    );
+    LOG.info("Creating stop time updater running every {} : {}", pollingPeriod(), updateSource);
   }
 
   /**

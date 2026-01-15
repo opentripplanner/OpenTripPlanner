@@ -1,16 +1,19 @@
 package org.opentripplanner.ext.fares;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class FareRuleSetTest {
 
@@ -21,10 +24,10 @@ class FareRuleSetTest {
   void setUp() {
     FeedScopedId id = new FeedScopedId("feed", "fare1");
     FareAttribute fareAttribute = FareAttribute.of(id)
-      .setPrice(TWO_FIFTY)
-      .setPaymentMethod(1)
-      .setTransfers(1)
-      .setTransferDuration(7200)
+      .withPrice(TWO_FIFTY)
+      .withPaymentMethod(1)
+      .withTransfers(1)
+      .withTransferDuration(7200)
       .build();
     fareRuleSet = new FareRuleSet(fareAttribute);
   }
@@ -175,9 +178,9 @@ class FareRuleSetTest {
   @Test
   void testMatchesWithJourneyDuration() {
     FareAttribute journeyFare = FareAttribute.of(new FeedScopedId("feed", "journey"))
-      .setPrice(Money.usDollars(3.00f))
-      .setPaymentMethod(1)
-      .setJourneyDuration(7200)
+      .withPrice(Money.usDollars(3.00f))
+      .withPaymentMethod(1)
+      .withJourneyDuration(7200)
       .build();
     FareRuleSet journeyRuleSet = new FareRuleSet(journeyFare);
 

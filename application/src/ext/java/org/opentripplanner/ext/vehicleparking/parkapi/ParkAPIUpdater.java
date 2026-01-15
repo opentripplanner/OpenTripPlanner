@@ -8,17 +8,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.TranslatedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.osm.OsmOpeningHoursParser;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.spi.GenericJsonDataSource;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -66,7 +66,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
         var noteFiled = noteFieldIterator.next();
         noteLocalizations.put(noteFiled.getKey(), noteFiled.getValue().asText());
       }
-      note = TranslatedString.getI18NString(noteLocalizations, true, false);
+      note = TranslatedString.getI18NString(noteLocalizations, false);
     }
 
     var vehicleParkId = createIdForNode(jsonNode);

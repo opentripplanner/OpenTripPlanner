@@ -1,6 +1,6 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -10,7 +10,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  *             module. Use the OTP model entities instead.
  */
 @Deprecated
-public class TestTripPattern implements DefaultTripPattern {
+public class TestTripPattern implements RaptorTripPattern {
 
   public static final byte BOARDING_MASK = 0b0001;
   public static final byte ALIGHTING_MASK = 0b0010;
@@ -136,7 +136,6 @@ public class TestTripPattern implements DefaultTripPattern {
     return stopIndexes.length;
   }
 
-  @Override
   public Route route() {
     return route;
   }

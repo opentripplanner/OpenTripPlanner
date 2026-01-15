@@ -1,6 +1,9 @@
 package org.opentripplanner.raptor.api.model;
 
 import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.C1;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.RIDES;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.TIME_PENALTY;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -96,7 +99,7 @@ public interface RaptorAccessEgress {
   }
 
   default boolean hasTimePenalty() {
-    return timePenalty() != RaptorConstants.TIME_NOT_SET;
+    return RaptorConstants.isTimeSet(timePenalty());
   }
 
   /* TIME-DEPENDENT ACCESS/TRANSFER/EGRESS */
@@ -122,6 +125,20 @@ public interface RaptorAccessEgress {
    * is not possible before the requested arrival time.
    */
   int latestArrivalTime(int requestedArrivalTime);
+
+  /**
+   * In a via-search (both pass-through and visit-via) the access/egress may contain one
+   * ore more via-locations. If so Raptor needs to know how many via-locations are included
+   * so it can skip these.
+   * <p>
+   * If the access/egress {@code stop} is a via-location then this method should include
+   * it in the count.
+   * <p>
+   * The default is zero via-lcations visited.
+   */
+  default int numberOfViaLocationsVisited() {
+    return RaptorConstants.ZERO;
+  }
 
   /**
    * This method should return {@code true} if, and only if the instance has restricted
@@ -257,10 +274,13 @@ public interface RaptorAccessEgress {
     }
     buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
     if (includeCost && c1() > 0) {
-      buf.append(' ').append(RaptorValueFormatter.formatC1(c1()));
+      buf.append(' ').append(C1.format(c1()));
     }
     if (hasRides()) {
-      buf.append(' ').append(numberOfRides()).append('x');
+      buf.append(' ').append(RIDES.format(numberOfRides()));
+    }
+    if (hasTimePenalty()) {
+      buf.append(' ').append(TIME_PENALTY.format(timePenalty()));
     }
     if (hasOpeningHours()) {
       buf.append(' ').append(openingHoursToString());

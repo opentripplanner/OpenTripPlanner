@@ -1,8 +1,9 @@
 package org.opentripplanner.service.vehiclerental.model;
 
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * A geometry that describes descriptions about traversing with a rental vehicle or dropping it off
@@ -10,7 +11,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public record GeofencingZone(
   FeedScopedId id,
-  I18NString name,
+  @Nullable I18NString name,
   Geometry geometry,
   boolean dropOffBanned,
   boolean traversalBanned

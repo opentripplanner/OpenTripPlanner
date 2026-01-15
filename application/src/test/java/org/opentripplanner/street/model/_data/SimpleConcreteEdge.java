@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model._data;
 
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -25,7 +25,7 @@ public class SimpleConcreteEdge extends Edge {
   public State[] traverse(State s0) {
     double d = getDistanceMeters();
     TraverseMode mode = s0.currentMode();
-    int t = (int) ((1000.0 * d) / s0.getPreferences().getSpeed(mode, false));
+    int t = (int) ((1000.0 * d) / TemporaryConcreteEdge.getSpeed(mode, s0.getRequest(), false));
     StateEditor s1 = s0.edit(this);
     s1.incrementTimeInMilliseconds(t);
     s1.incrementWeight(d);

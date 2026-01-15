@@ -1,7 +1,8 @@
 package org.opentripplanner.street.model.edge;
 
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import java.time.Duration;
+import java.util.Optional;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -17,7 +18,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTraversalInformation {
 
   private static final double DEFAULT_LEVELS = 1;
-  private static final int DEFAULT_TRAVEL_TIME = 0;
+  private static final int DEFAULT_TRAVEL_TIME = -1;
 
   private final StreetTraversalPermission permission;
 
@@ -55,21 +56,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Vertex to,
     StreetTraversalPermission permission,
     Accessibility wheelchairBoarding,
-    int levels,
+    double levels,
     int travelTime
   ) {
     createElevatorHopEdge(from, to, permission, wheelchairBoarding, levels, travelTime);
     createElevatorHopEdge(to, from, permission, wheelchairBoarding, levels, travelTime);
-  }
-
-  public static void bidirectional(
-    Vertex from,
-    Vertex to,
-    StreetTraversalPermission permission,
-    Accessibility wheelchairBoarding
-  ) {
-    createElevatorHopEdge(from, to, permission, wheelchairBoarding);
-    createElevatorHopEdge(to, from, permission, wheelchairBoarding);
   }
 
   public static ElevatorHopEdge createElevatorHopEdge(
@@ -98,26 +89,37 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     return permission;
   }
 
-  public int getTravelTime() {
-    return travelTime;
+  /**
+   * The number of levels that the ElevatorHopEdge travels.
+   */
+  public double getLevels() {
+    return levels;
+  }
+
+  /**
+   * Returns the travel time of the elevator.
+   * If travelTime is 0 or below, returns an empty Optional.
+   */
+  public Optional<Duration> getTravelTime() {
+    return travelTime > 0 ? Optional.of(Duration.ofSeconds(travelTime)) : Optional.empty();
   }
 
   @Override
   public State[] traverse(State s0) {
-    RoutingPreferences preferences = s0.getPreferences();
+    var request = s0.getRequest();
 
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
 
-    if (s0.getRequest().wheelchair()) {
+    if (s0.getRequest().wheelchairEnabled()) {
       if (
         wheelchairAccessibility != Accessibility.POSSIBLE &&
-        preferences.wheelchair().elevator().onlyConsiderAccessible()
+        request.wheelchair().elevator().onlyConsiderAccessible()
       ) {
         return State.empty();
       } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
-        s1.incrementWeight(preferences.wheelchair().elevator().unknownCost());
+        s1.incrementWeight(request.wheelchair().elevator().unknownCost());
       } else if (wheelchairAccessibility == Accessibility.NOT_POSSIBLE) {
-        s1.incrementWeight(preferences.wheelchair().elevator().inaccessibleCost());
+        s1.incrementWeight(request.wheelchair().elevator().inaccessibleCost());
       }
     }
 
@@ -135,15 +137,22 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
       return State.empty();
     }
 
-    s1.incrementWeight(
-      this.travelTime > 0
-        ? this.travelTime
-        : (preferences.street().elevator().hopCost() * this.levels)
-    );
-    int seconds = this.travelTime > 0
+    // Elevators with ways on the same level might not have a cost. The board cost still applies.
+    // Using an elevator to get to the same level usually doesn't make sense, but in case the
+    // data is bad this is supported. ElevatorHopEdges on the same level should not have a
+    // cost so that routing from one level to another doesn't incur extra costs. For example:
+    //
+    // level   0     2     2     3
+    //         X --- X --- X --- X
+    // levels     2     0     1
+    //
+    // X   ElevatorHopVertex
+    // --- ElevatorHopEdge
+    int time = this.travelTime > 0
       ? this.travelTime
-      : (int) (preferences.street().elevator().hopTime() * this.levels);
-    s1.incrementTimeInSeconds(seconds);
+      : (int) (request.elevator().hopTime().toSeconds() * this.levels);
+    s1.incrementWeight(request.elevator().reluctance() * time);
+    s1.incrementTimeInSeconds(time);
     return s1.makeStateArray();
   }
 

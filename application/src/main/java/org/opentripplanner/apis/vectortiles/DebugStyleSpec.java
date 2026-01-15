@@ -1,6 +1,10 @@
 package org.opentripplanner.apis.vectortiles;
 
 import static org.opentripplanner.inspector.vector.edge.EdgePropertyMapper.streetPermissionAsString;
+import static org.opentripplanner.inspector.vector.geofencing.GeofencingZonesPropertyMapper.GEOFENCING_ZONE_TYPE;
+import static org.opentripplanner.inspector.vector.geofencing.GeofencingZonesPropertyMapper.GEOFENCING_ZONE_TYPE_BUSINESS_AREA;
+import static org.opentripplanner.inspector.vector.geofencing.GeofencingZonesPropertyMapper.GEOFENCING_ZONE_TYPE_NO_DROP_OFF;
+import static org.opentripplanner.inspector.vector.geofencing.GeofencingZonesPropertyMapper.GEOFENCING_ZONE_TYPE_NO_TRAVERSAL;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,12 +19,13 @@ import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
-import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.standalone.config.debuguiconfig.BackgroundTileLayer;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
+import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
@@ -31,6 +36,10 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
+import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
+import org.opentripplanner.street.model.vertex.OsmElevatorVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.utils.collection.ListUtils;
 
@@ -67,6 +76,12 @@ public class DebugStyleSpec {
   private static final String RED = "#fc0f2a";
   private static final String PURPLE = "#BC55F2";
   private static final String BLACK = "#140d0e";
+  private static final String LIGHT_RED = "#ff6b6b";
+  private static final String DARK_RED = "#cc0000";
+  private static final String ORANGE = "#ffa500";
+  private static final String DARK_ORANGE = "#ff8c00";
+  private static final String LIGHT_BLUE = "#4a9eff";
+  private static final String DARK_BLUE = "#0066cc";
 
   private static final int MAX_ZOOM = 23;
   private static final ZoomDependentNumber LARGE_CIRCLE_LINE_WIDTH = new ZoomDependentNumber(
@@ -97,6 +112,8 @@ public class DebugStyleSpec {
     EscalatorEdge.class,
     PathwayEdge.class,
     ElevatorHopEdge.class,
+    ElevatorBoardEdge.class,
+    ElevatorAlightEdge.class,
     TemporaryPartialStreetEdge.class,
     TemporaryFreeEdge.class,
   };
@@ -109,6 +126,7 @@ public class DebugStyleSpec {
   private static final String RENTAL_GROUP = "Rental";
   private static final String PERMISSIONS_GROUP = "Permissions";
   private static final String NO_THRU_TRAFFIC_GROUP = "No-thru traffic";
+  private static final String VERTICAL_TRANSPORTATION_GROUP = "Vertical transportation";
 
   private static final StreetTraversalPermission[] streetModes = new StreetTraversalPermission[] {
     StreetTraversalPermission.PEDESTRIAN,
@@ -123,10 +141,17 @@ public class DebugStyleSpec {
     VectorSourceLayer groupStops,
     VectorSourceLayer edges,
     VectorSourceLayer vertices,
+    VectorSourceLayer geofencingZones,
     VectorSourceLayer rental,
     List<BackgroundTileLayer> extraLayers
   ) {
-    List<TileSource> vectorSources = Stream.of(regularStops, edges, vertices, rental)
+    List<TileSource> vectorSources = Stream.of(
+      regularStops,
+      edges,
+      vertices,
+      geofencingZones,
+      rental
+    )
       .map(VectorSourceLayer::vectorSource)
       .map(TileSource.class::cast)
       .toList();
@@ -149,7 +174,7 @@ public class DebugStyleSpec {
       allSources,
       ListUtils.combine(
         backgroundLayers(extraRasterSources),
-        rental(rental),
+        rental(rental, geofencingZones),
         wheelchair(edges),
         noThruTraffic(edges),
         bicycleSafety(edges),
@@ -157,6 +182,7 @@ public class DebugStyleSpec {
         traversalPermissions(edges),
         edges(edges),
         elevation(edges, vertices),
+        elevators(edges, vertices),
         vertices(vertices),
         stops(regularStops, areaStops, groupStops)
       )
@@ -240,16 +266,127 @@ public class DebugStyleSpec {
         .circleColor(DARK_GREEN)
         .minZoom(13)
         .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("barrier-vertex")
+        .group(VERTICES_GROUP)
+        .typeCircle()
+        .vectorSourceLayer(vertices)
+        .vertexFilter(BarrierVertex.class)
+        .circleStroke(BLACK, CIRCLE_STROKE)
+        .circleRadius(MEDIUM_CIRCLE_RADIUS)
+        .circleColor(DARK_RED)
+        .minZoom(13)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("barrier-passthrough-vertex")
+        .group(VERTICES_GROUP)
+        .typeCircle()
+        .vectorSourceLayer(vertices)
+        .vertexFilter(BarrierPassThroughVertex.class)
+        .circleStroke(BLACK, CIRCLE_STROKE)
+        .circleRadius(MEDIUM_CIRCLE_RADIUS)
+        .circleColor(DARK_BLUE)
+        .minZoom(13)
+        .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );
   }
 
-  private static List<StyleBuilder> rental(VectorSourceLayer layer) {
+  private static List<StyleBuilder> elevators(VectorSourceLayer edges, VectorSourceLayer vertices) {
+    return List.of(
+      StyleBuilder.ofId("elevator-hop-edge")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .edgeFilter(ElevatorHopEdge.class)
+        .lineColor(ORANGE)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("elevator-board-edge")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .edgeFilter(ElevatorBoardEdge.class)
+        .lineColor(ORANGE)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("elevator-alight-edge")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .edgeFilter(ElevatorAlightEdge.class)
+        .lineColor(ORANGE)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("elevator-hop-vertex")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeCircle()
+        .vectorSourceLayer(vertices)
+        .vertexFilter(ElevatorHopVertex.class)
+        .circleStroke(BLACK, CIRCLE_STROKE)
+        .circleRadius(
+          new ZoomDependentNumber(List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 7)))
+        )
+        .circleColor(ORANGE)
+        .minZoom(15)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("osm-elevator-vertex")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeCircle()
+        .vectorSourceLayer(vertices)
+        .vertexFilter(OsmElevatorVertex.class)
+        .circleStroke(BLACK, CIRCLE_STROKE)
+        .circleRadius(
+          new ZoomDependentNumber(List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 7)))
+        )
+        .circleColor(ORANGE)
+        .minZoom(15)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("escalator-edge")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .edgeFilter(EscalatorEdge.class)
+        .lineColor(ORANGE)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("stairs-edge")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .booleanFilter("isStairs", true)
+        .lineColor(ORANGE)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
+  }
+
+  private static List<StyleBuilder> rental(
+    VectorSourceLayer rentalLayer,
+    VectorSourceLayer geofencingZones
+  ) {
     return List.of(
       StyleBuilder.ofId("rental-vehicle")
         .group(RENTAL_GROUP)
         .typeCircle()
-        .vectorSourceLayer(layer)
+        .vectorSourceLayer(rentalLayer)
         .classFilter(VehicleRentalVehicle.class)
         .circleStroke(BLACK, CIRCLE_STROKE)
         .circleRadius(MEDIUM_CIRCLE_RADIUS)
@@ -260,12 +397,45 @@ public class DebugStyleSpec {
       StyleBuilder.ofId("rental-station")
         .group(RENTAL_GROUP)
         .typeCircle()
-        .vectorSourceLayer(layer)
+        .vectorSourceLayer(rentalLayer)
         .classFilter(VehicleRentalStation.class)
         .circleStroke(BLACK, LARGE_CIRCLE_LINE_WIDTH)
         .circleRadius(LARGE_CIRCLE_RADIUS)
         .circleColor(TURQUOISE)
         .minZoom(13)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("geofencing-zones-no-drop-off")
+        .group(RENTAL_GROUP)
+        .typeFill()
+        .vectorSourceLayer(geofencingZones)
+        .filterValueInProperty(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_NO_DROP_OFF)
+        .fillColor(LIGHT_RED)
+        .fillOpacity(0.3f)
+        .fillOutlineColor(DARK_RED)
+        .minZoom(10)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("geofencing-zones-no-traversal")
+        .group(RENTAL_GROUP)
+        .typeFill()
+        .vectorSourceLayer(geofencingZones)
+        .filterValueInProperty(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_NO_TRAVERSAL)
+        .fillColor(ORANGE)
+        .fillOpacity(0.3f)
+        .fillOutlineColor(DARK_ORANGE)
+        .minZoom(10)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("geofencing-zones-business-area")
+        .group(RENTAL_GROUP)
+        .typeFill()
+        .vectorSourceLayer(geofencingZones)
+        .filterValueInProperty(GEOFENCING_ZONE_TYPE, GEOFENCING_ZONE_TYPE_BUSINESS_AREA)
+        .fillColor(LIGHT_BLUE)
+        .fillOpacity(0.2f)
+        .fillOutlineColor(DARK_BLUE)
+        .minZoom(10)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );

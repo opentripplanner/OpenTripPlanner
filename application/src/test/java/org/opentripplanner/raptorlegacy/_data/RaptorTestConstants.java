@@ -3,10 +3,10 @@ package org.opentripplanner.raptorlegacy._data;
 import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.utils.time.TimeUtils.hm2time;
 
-import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TestSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 
 /**
@@ -70,18 +70,18 @@ public interface RaptorTestConstants {
   int TRANSFER_COST = 120;
   double WAIT_RELUCTANCE = 0.8;
 
-  RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
-    TRANSFER_SLACK,
-    BOARD_SLACK,
-    ALIGHT_SLACK
-  );
-
   RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
     BOARD_COST,
     TRANSFER_COST,
     WAIT_RELUCTANCE,
     null,
     null
+  );
+
+  RaptorSlackProvider SLACK_PROVIDER = new TestSlackProvider(
+    BOARD_SLACK,
+    ALIGHT_SLACK,
+    TRANSFER_SLACK
   );
 
   default String stopIndexToName(int index) {

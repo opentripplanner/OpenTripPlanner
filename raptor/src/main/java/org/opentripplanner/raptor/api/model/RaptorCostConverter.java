@@ -44,13 +44,6 @@ public final class RaptorCostConverter {
   }
 
   /**
-   * Convert Raptor internal cost to a string with format $###.## (in seconds)
-   */
-  public static String toString(int raptorCost) {
-    return RaptorValueFormatter.formatC1(raptorCost);
-  }
-
-  /**
    * Convert OTP domain model cost(seconds) to Raptor internal cost(centi-seconds).
    */
   public static int toRaptorCost(double domainCost) {

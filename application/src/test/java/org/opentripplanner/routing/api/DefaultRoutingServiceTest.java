@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.GtfsTest;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -46,8 +46,8 @@ public class DefaultRoutingServiceTest extends GtfsTest {
   public void testIdLookup() {
     /* Graph vertices */
     for (Vertex vertex : graph.getVertices()) {
-      if (vertex instanceof TransitStopVertex) {
-        RegularStop stop = ((TransitStopVertex) vertex).getStop();
+      if (vertex instanceof TransitStopVertex tsv) {
+        RegularStop stop = timetableRepository.getSiteRepository().getRegularStop(tsv.getId());
         Vertex index_vertex = graph.getStopVertex(stop.getId());
         assertEquals(index_vertex, vertex);
       }
@@ -104,9 +104,6 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     var stopL = transitService.getRegularStop(idL);
     FeedScopedId idM = new FeedScopedId(feedId, "M");
     var stopM = transitService.getRegularStop(idM);
-    TransitStopVertex stopvJ = graph.getStopVertex(idJ);
-    TransitStopVertex stopvL = graph.getStopVertex(idL);
-    TransitStopVertex stopvM = graph.getStopVertex(idM);
     // There are a two other stops within 100 meters of stop J.
     Envelope env = new Envelope(new Coordinate(stopJ.getLon(), stopJ.getLat()));
     env.expandBy(
@@ -117,6 +114,7 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     assertTrue(stops.contains(stopJ));
     assertTrue(stops.contains(stopL));
     assertTrue(stops.contains(stopM));
-    assertTrue(stops.size() >= 3); // Query can overselect
+    // Query can overselect
+    assertTrue(stops.size() >= 3);
   }
 }

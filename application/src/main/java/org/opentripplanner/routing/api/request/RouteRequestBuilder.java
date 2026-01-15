@@ -49,7 +49,7 @@ public class RouteRequestBuilder implements Serializable {
     this.original = original;
     this.from = original.from();
     this.to = original.to();
-    this.via = original.getViaLocations();
+    this.via = original.listViaLocations();
     this.dateTime = original.dateTime();
     this.arriveBy = original.arriveBy();
     this.timetableView = original.timetableView();
@@ -94,6 +94,14 @@ public class RouteRequestBuilder implements Serializable {
 
   public Instant dateTime() {
     return dateTime;
+  }
+
+  public GenericLocation from() {
+    return from;
+  }
+
+  public GenericLocation to() {
+    return to;
   }
 
   /**

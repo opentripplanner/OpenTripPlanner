@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.BookingRule;
 import org.opentripplanner.transit.model.organization.ContactInfo;
@@ -50,26 +51,47 @@ class BookingRuleMapper {
     return null;
   }
 
+  @Nullable
   private BookingTime earliestBookingTime(BookingRule rule) {
-    return new BookingTime(
-      LocalTime.ofSecondOfDay(rule.getPriorNoticeStartTime()),
-      rule.getPriorNoticeStartDay()
-    );
+    return resolveBookingTime(rule.getPriorNoticeStartTime(), rule.getPriorNoticeStartDay());
   }
 
+  @Nullable
   private BookingTime latestBookingTime(BookingRule rule) {
-    return new BookingTime(
-      LocalTime.ofSecondOfDay(rule.getPriorNoticeLastTime()),
-      rule.getPriorNoticeLastDay()
-    );
+    return resolveBookingTime(rule.getPriorNoticeLastTime(), rule.getPriorNoticeLastDay());
   }
 
+  /**
+   * If GTFS does not specify the latest booking time/day, the underlying values default to NO_VALUE.
+   * In that case, we do not set the booking time so that min/max booking notice can apply.
+   *
+   * @return null if either timeSeconds or day are NO_VALUE, otherwise a BookingTime instance
+   */
+  @Nullable
+  private BookingTime resolveBookingTime(int timeSeconds, int day) {
+    if (timeSeconds == BookingRule.NO_VALUE || day == BookingRule.NO_VALUE) {
+      return null;
+    }
+
+    return new BookingTime(LocalTime.ofSecondOfDay(timeSeconds), day);
+  }
+
+  @Nullable
   private Duration minimumBookingNotice(BookingRule rule) {
-    return Duration.ofSeconds(rule.getPriorNoticeDurationMin());
+    return resolveNoticePeriod(rule.getPriorNoticeDurationMin());
   }
 
+  @Nullable
   private Duration maximumBookingNotice(BookingRule rule) {
-    return Duration.ofSeconds(rule.getPriorNoticeDurationMax());
+    return resolveNoticePeriod(rule.getPriorNoticeDurationMax());
+  }
+
+  @Nullable
+  private static Duration resolveNoticePeriod(int minutes) {
+    if (minutes == BookingRule.NO_VALUE) {
+      return null;
+    }
+    return Duration.ofMinutes(minutes);
   }
 
   private String message(BookingRule rule) {

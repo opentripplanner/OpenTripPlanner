@@ -1,7 +1,6 @@
 package org.opentripplanner.utils.time;
 
 import java.security.SecureRandom;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -14,6 +13,9 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * Time utility methods. See the unit test for examples on how to use this class.
@@ -23,6 +25,7 @@ public class TimeUtils {
   public static final Integer ONE_DAY_SECONDS = 24 * 60 * 60;
   private static final Pattern DAYS_SUFFIX = Pattern.compile("([-+])(\\d+)d");
   private static final AtomicLong BUSY_WAIT_GRACE_PERIOD_TIMEOUT = new AtomicLong(0);
+  private static final int NANOS_IN_SECOND = 1_000_000_000;
 
   /** This is a utility class. Do not instantiate this class. It should have only static methods. */
   private TimeUtils() {}
@@ -108,16 +111,15 @@ public class TimeUtils {
    * past midnight.
    */
   public static int[] times(String input) {
-    return Arrays.stream(input.split("[ ,;]+")).mapToInt(TimeUtils::time).toArray();
+    return Arrays.stream(input.split("[\t ,;]+"))
+      .filter(StringUtils::hasValue)
+      .mapToInt(TimeUtils::time)
+      .toArray();
   }
 
   /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */
   public static String timeToStrCompact(int time) {
     return RelativeTime.ofSeconds(time).toCompactStr();
-  }
-
-  public static String durationToStrCompact(Duration duration) {
-    return timeToStrCompact((int) duration.toSeconds());
   }
 
   /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59. */
@@ -150,6 +152,15 @@ public class TimeUtils {
     return RelativeTime.from(time).toLongStr();
   }
 
+  /** Format string on format HH:MM:SS */
+  public static String timetableToStr(int[] times, String delimiter) {
+    boolean useLongFormat = Arrays.stream(times).anyMatch(t -> t % 60 != 0);
+    return Arrays.stream(times)
+      .mapToObj(t -> RelativeTime.ofSeconds(t))
+      .map(t -> useLongFormat ? t.toLongStr() : t.toTimetableStr())
+      .collect(Collectors.joining(delimiter));
+  }
+
   public static String timeToStrLong(LocalTime time) {
     return time.toString();
   }
@@ -167,6 +178,12 @@ public class TimeUtils {
    */
   public static ZonedDateTime zonedDateTime(LocalDate date, int seconds, ZoneId zoneId) {
     return RelativeTime.ofSeconds(seconds).toZonedDateTime(date, zoneId);
+  }
+
+  /// Round the given `value` to the closest second value.
+  /// Throws [NullPointerException] if `value` is `null`
+  public static ZonedDateTime normalize(ZonedDateTime value) {
+    return value.plusNanos(NANOS_IN_SECOND / 2).truncatedTo(ChronoUnit.SECONDS);
   }
 
   /**
@@ -256,5 +273,15 @@ public class TimeUtils {
    */
   public static int toTransitTimeSeconds(ZonedDateTime transitSearchTimeZero, Instant time) {
     return (int) ChronoUnit.SECONDS.between(transitSearchTimeZero.toInstant(), time);
+  }
+
+  /**
+
+   * Truncates the time to the nearest second. If the given {@code dateTime} is {@code null},
+   * then {@code null} is returned
+   */
+  @Nullable
+  public static Instant truncateToSeconds(@Nullable Instant dateTime) {
+    return dateTime == null ? null : dateTime.truncatedTo(ChronoUnit.SECONDS);
   }
 }

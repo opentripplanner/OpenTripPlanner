@@ -4,9 +4,9 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import gnu.trove.set.TIntSet;
 import java.text.ParseException;
 import java.time.LocalDate;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
@@ -88,7 +88,9 @@ public class GtfsRealtimeFuzzyTripMatcher {
   ) {
     TIntSet servicesRunningForDate = transitService.getServiceCodesRunningForDate(date);
     for (TripPattern pattern : transitService.findPatterns(route)) {
-      if (pattern.getDirection() != direction) continue;
+      if (pattern.getDirection() != direction) {
+        continue;
+      }
       for (TripTimes times : pattern.getScheduledTimetable().getTripTimes()) {
         if (
           times.getScheduledDepartureTime(0) == startTime &&

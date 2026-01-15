@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   changelog-entry:
-    if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner' && !contains(github.event.pull_request.labels.*.name, 'skip changelog')
+    if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner' && !contains(github.event.pull_request.labels.*.name, '+Skip Changelog')
     runs-on: ubuntu-latest
     steps:
 
@@ -47,7 +47,7 @@ jobs:
     # if you have a dependent job that is skipped (ie. you want to bump the version but not have a changelog entry) you must add
     # always() before your actual condition you want for the job
     #   https://github.com/actions/runner/issues/491#issuecomment-660122693
-    if: always() && github.event.pull_request.merged && github.repository_owner == 'opentripplanner' && contains(github.event.pull_request.labels.*.name, 'bump serialization id')
+    if: always() && github.event.pull_request.merged && github.repository_owner == 'opentripplanner' && contains(github.event.pull_request.labels.*.name, '+Bump Serialization Id')
     runs-on: ubuntu-latest
     needs: [changelog-entry]
     steps:

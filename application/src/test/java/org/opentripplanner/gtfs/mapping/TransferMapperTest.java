@@ -90,6 +90,7 @@ public class TransferMapperTest {
     ROUTE_MAPPER = new RouteMapper(
       ID_FACTORY,
       new AgencyMapper(ID_FACTORY),
+      new RouteNetworkAssignmentMapper(ID_FACTORY),
       ISSUE_STORE,
       new TranslationHelper()
     );
@@ -113,7 +114,13 @@ public class TransferMapperTest {
       LOCATION_GROUP_MAPPER,
       new TripMapper(
         ID_FACTORY,
-        new RouteMapper(ID_FACTORY, new AgencyMapper(ID_FACTORY), ISSUE_STORE, TRANSLATION_HELPER),
+        new RouteMapper(
+          ID_FACTORY,
+          new AgencyMapper(ID_FACTORY),
+          new RouteNetworkAssignmentMapper(ID_FACTORY),
+          ISSUE_STORE,
+          TRANSLATION_HELPER
+        ),
         new DirectionMapper(ISSUE_STORE),
         TRANSLATION_HELPER
       ),

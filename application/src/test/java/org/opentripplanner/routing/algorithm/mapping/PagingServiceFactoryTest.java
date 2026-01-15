@@ -11,7 +11,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParametersTestFactory;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -54,7 +54,7 @@ class PagingServiceFactoryTest {
   void createPagingService() {
     var subject = PagingServiceFactory.createPagingService(
       TRANSIT_START_TIME,
-      TransitTuningParameters.FOR_TEST,
+      TransitTuningParametersTestFactory.forTest(),
       new RaptorTuningParameters() {},
       RouteRequest.defaultValue(),
       SEARCH_PARAMS_ALL,
@@ -63,7 +63,7 @@ class PagingServiceFactoryTest {
     );
     assertEquals(
       "PagingService{" +
-      "searchWindowUsed: 2h30m, " +
+      "raptorSearchWindowUsed: 2h30m, " +
       "earliestDepartureTime: 2023-11-11T10:00:00Z, " +
       "latestArrivalTime: 2023-11-11T11:30:00Z, " +
       "itinerariesSortOrder: STREET_AND_ARRIVAL_TIME, " +

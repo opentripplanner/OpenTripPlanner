@@ -16,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.geometry.Polygons;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -43,8 +44,8 @@ class AreaStopsToVerticesMapperTest {
 
   static List<TestCase> testCases() {
     return List.of(
-      new TestCase(BERLIN, ALL, Set.of(BERLIN_AREA_STOP)),
-      new TestCase(BERLIN, PEDESTRIAN_AND_CAR, Set.of(BERLIN_AREA_STOP)),
+      new TestCase(BERLIN, ALL, Set.of(BERLIN_AREA_STOP.getId())),
+      new TestCase(BERLIN, PEDESTRIAN_AND_CAR, Set.of(BERLIN_AREA_STOP.getId())),
       new TestCase(BERLIN, BICYCLE_AND_CAR, Set.of()),
       new TestCase(HAMBURG, ALL, Set.of()),
       new TestCase(BERLIN, PEDESTRIAN, Set.of()),
@@ -79,6 +80,6 @@ class AreaStopsToVerticesMapperTest {
   private record TestCase(
     Coordinate coordinate,
     StreetTraversalPermission permission,
-    Set<AreaStop> expectedAreaStops
+    Set<FeedScopedId> expectedAreaStops
   ) {}
 }

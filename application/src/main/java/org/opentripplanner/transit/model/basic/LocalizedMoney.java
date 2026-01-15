@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.basic;
 
 import java.util.Locale;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 
 public record LocalizedMoney(Money money) implements I18NString {
   @Override

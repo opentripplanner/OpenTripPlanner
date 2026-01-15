@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -69,15 +68,18 @@ import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.VisibilityMode;
+import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.slf4j.Logger;
@@ -476,7 +478,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     // TODO: This should use the configured defaults, not the code defaults
     RouteRequestBuilder builder = RouteRequest.of();
     QualifiedModeSet qualifiedModeSet = new QualifiedModeSet(modes.toArray(String[]::new));
-    builder.withJourney(b -> b.setModes(qualifiedModeSet.getRequestModes()));
+    builder.withJourney(b -> b.withModes(qualifiedModeSet.getRequestModes()));
 
     builder.withArriveBy(arriveByCheckBox.isSelected());
     builder.withDateTime(when);
@@ -486,7 +488,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     builder.withPreferences(preferences -> {
       preferences.withWalk(walk -> {
-        walk.withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
+        // override low 2-4 minute values
+        walk.withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60);
         walk.withSpeed(Float.parseFloat(walkSpeed.getText()));
       });
       preferences.withBike(bike ->
@@ -514,24 +517,22 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     var request = builder.buildRequest();
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)
-    try (
-      var temporaryVertices = new TemporaryVerticesContainer(
+    try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
+      var linkingContextFactory = new LinkingContextFactory(
         graph,
-        new VertexLinker(
-          graph,
-          VisibilityMode.TRAVERSE_AREA_EDGES,
-          StreetConstants.DEFAULT_MAX_AREA_NODES
-        ),
-        id -> Set.of(),
-        request.from(),
-        request.to(),
-        request.journey().direct().mode(),
-        request.journey().direct().mode()
-      )
-    ) {
+        new VertexCreationService(
+          new VertexLinker(
+            graph,
+            VisibilityMode.TRAVERSE_AREA_EDGES,
+            StreetConstants.DEFAULT_MAX_AREA_NODES
+          )
+        )
+      );
+      var linkingRequest = LinkingContextRequestMapper.map(request);
+      var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       List<GraphPath<State, Edge, Vertex>> paths = finder.graphPathFinderEntryPoint(
         request,
-        temporaryVertices
+        linkingContext
       );
       long dt = System.currentTimeMillis() - t0;
       searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");
@@ -956,7 +957,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           String result = JOptionPane.showInputDialog("Enter the location (lat lon)");
-          if (result == null || result.length() == 0) return;
+          if (result == null || result.length() == 0) {
+            return;
+          }
           String[] tokens = result.split("[\\s,]+");
           double lat = Double.parseDouble(tokens[0]);
           double lon = Double.parseDouble(tokens[1]);
@@ -1150,9 +1153,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     if (!vertices.contains(v)) {
       vertices.add(v);
       nearbyModel = new VertexList(vertices);
-      nearbyVertices.setModel(nearbyModel); // this should just be an event, but for
-      // some reason, JList doesn't implement
-      // the right event.
+      nearbyVertices.setModel(nearbyModel);
+      // this should just be an event, but for  some reason, JList doesn't implement the right event.
     }
 
     /* set up metadata tab */

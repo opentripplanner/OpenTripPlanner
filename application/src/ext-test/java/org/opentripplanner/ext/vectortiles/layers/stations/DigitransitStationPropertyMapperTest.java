@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.ext.vectortiles.layers.TestTransitService;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.Station;
@@ -16,6 +16,8 @@ import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class DigitransitStationPropertyMapperTest {
+
+  private static final String CODE = "ABC";
 
   @Test
   void map() {
@@ -28,6 +30,7 @@ public class DigitransitStationPropertyMapperTest {
 
     var station = Station.of(id("a-station"))
       .withCoordinate(1, 1)
+      .withCode(CODE)
       .withName(I18NString.of("A station"))
       .build();
 
@@ -38,6 +41,7 @@ public class DigitransitStationPropertyMapperTest {
 
     assertEquals("F:a-station", map.get("gtfsId"));
     assertEquals("A station", map.get("name"));
+    assertEquals(CODE, map.get("code"));
     assertEquals("", map.get("type"));
     assertEquals("[{\"mode\":\"RAIL\",\"gtfsType\":100,\"shortName\":\"R1\"}]", map.get("routes"));
     assertEquals("[\"F:stop-1\"]", map.get("stops"));

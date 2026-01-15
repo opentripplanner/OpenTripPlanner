@@ -8,7 +8,7 @@ import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -20,7 +20,7 @@ public class FlexTripsMapper {
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripsMapper.class);
 
   public static List<FlexTrip<?, ?>> createFlexTrips(
-    OtpTransitServiceBuilder builder,
+    TransitDataImportBuilder builder,
     DataImportIssueStore store
   ) {
     List<FlexTrip<?, ?>> result = new ArrayList<>();

@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.WalkRequest;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.utils.logging.Throttle;
@@ -80,13 +79,11 @@ public class Transfer {
     return modes.contains(mode);
   }
 
-  public Optional<RaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
-    WalkPreferences walkPreferences = request.preferences().walk();
+  public Optional<DefaultRaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
+    WalkRequest walkReq = request.walk();
     if (edges == null || edges.isEmpty()) {
-      double durationSeconds = distanceMeters / walkPreferences.speed();
-      final double domainCost = costLimitSanityCheck(
-        durationSeconds * walkPreferences.reluctance()
-      );
+      double durationSeconds = distanceMeters / walkReq.speed();
+      final double domainCost = costLimitSanityCheck(durationSeconds * walkReq.reluctance());
       return Optional.of(
         new DefaultRaptorTransfer(
           this.toStop,

@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
@@ -393,7 +393,9 @@ class StopTimesMapper {
 
       if (areaStop != null) {
         stopLocation = areaStop;
-      } else stopLocation = groupStop;
+      } else {
+        stopLocation = groupStop;
+      }
     }
 
     if (stopLocation == null) {

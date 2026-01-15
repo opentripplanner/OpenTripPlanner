@@ -15,12 +15,37 @@ public final class DirectionUtils {
    */
   public static double getAzimuth(Coordinate a, Coordinate b) {
     double cosLat = Math.cos(Math.toRadians((a.y + b.y) / 2.0));
-    double dY = (b.y - a.y); // in degrees, we do not care about the units
-    double dX = (b.x - a.x) * cosLat; // same
+    // in degrees, we do not care about the units
+    double dY = (b.y - a.y);
+    // same
+    double dX = (b.x - a.x) * cosLat;
     if (Math.abs(dX) < 1e-10 && Math.abs(dY) < 1e-10) {
       return 180;
     }
     return Math.toDegrees(Math.atan2(dX, dY));
+  }
+
+  /**
+   * Calculates the angular difference between two bearings in degrees.
+   * <p>
+   * Returns the smallest angle between the two bearings, accounting for the circular nature
+   * of angles (e.g., 10° and -170° are only 20° apart, not 180°).
+   * <p>
+   * Works with any degree range (e.g., [0, 360) or [-180, 180]).
+   *
+   * @param bearing1 First bearing in degrees
+   * @param bearing2 Second bearing in degrees
+   * @return Smallest angular difference in degrees [0, 180]
+   */
+  public static double bearingDifference(double bearing1, double bearing2) {
+    double diff = Math.abs(bearing1 - bearing2);
+
+    // Take the smaller angle (handle wrap-around)
+    if (diff > 180.0) {
+      diff = 360.0 - diff;
+    }
+
+    return diff;
   }
 
   /**
@@ -41,8 +66,8 @@ public final class DirectionUtils {
     Coordinate coord0 = line.getCoordinateN(numPoints - 2);
     Coordinate coord1 = line.getCoordinateN(numPoints - 1);
     int i = numPoints - 3;
-    int minDistance = 10; // Meters
-    while (SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance && i >= 0) {
+    int minDistance_m = 10;
+    while (SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance_m && i >= 0) {
       coord0 = line.getCoordinateN(i--);
     }
 
@@ -68,9 +93,10 @@ public final class DirectionUtils {
     Coordinate coord0 = line.getCoordinateN(0);
     Coordinate coord1 = line.getCoordinateN(1);
     int i = 2;
-    int minDistance = 10; // Meters
+    int minDistance_m = 10;
     while (
-      SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance && i < line.getNumPoints()
+      SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance_m &&
+      i < line.getNumPoints()
     ) {
       coord1 = line.getCoordinateN(i++);
     }

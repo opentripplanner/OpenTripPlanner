@@ -7,6 +7,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -19,11 +20,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.datastore.gs.config.GsConfig;
+import org.opentripplanner.ext.edgenaming.EdgeNamerFactory;
 import org.opentripplanner.ext.emission.config.EmissionConfig;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
+import org.opentripplanner.ext.empiricaldelay.config.EmpiricalDelayConfig;
+import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameters;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.module.TransferParameters;
@@ -33,7 +38,7 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParamet
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.calendar.LocalDateInterval;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -50,7 +55,6 @@ import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.opentripplanner.street.model.StreetConstants;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +151,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   /**
    * A custom OSM namer to use.
    */
-  public final EdgeNamer edgeNamer;
+  public final EdgeNamer.EdgeNamerType edgeNamer;
 
   public final boolean osmCacheDataInMem;
 
@@ -172,9 +176,11 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
   public final EmissionParameters emission;
+  public final EmpiricalDelayParameters empiricalDelay;
   public final TransitFeeds transitFeeds;
   public final boolean staticParkAndRide;
   public final boolean staticBikeParkAndRide;
+  public final boolean includeInclinedEdgeLevelInfo;
   public final double distanceBetweenElevationSamples;
   public final double maxElevationPropagationMeters;
   public final boolean readCachedElevations;
@@ -342,16 +348,23 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asBoolean(true);
-    staticBikeParkAndRide = root
-      .of("staticBikeParkAndRide")
-      .since(V1_5)
-      .summary("Whether we should create bike P+R stations from OSM data.")
-      .asBoolean(false);
     staticParkAndRide = root
       .of("staticParkAndRide")
       .since(V1_5)
       .summary("Whether we should create car P+R stations from OSM data.")
       .asBoolean(true);
+    staticBikeParkAndRide = root
+      .of("staticBikeParkAndRide")
+      .since(V1_5)
+      .summary("Whether we should create bike P+R stations from OSM data.")
+      .asBoolean(false);
+    includeInclinedEdgeLevelInfo = root
+      .of("includeInclinedEdgeLevelInfo")
+      .since(V2_9)
+      .summary(
+        "Whether level info for inclined edges should be stored in the graph for use during runtime."
+      )
+      .asBoolean(false);
     subwayAccessTime = root
       .of("subwayAccessTime")
       .since(V1_5)
@@ -594,7 +607,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
     emission = EmissionConfig.mapEmissionsConfig("emission", root);
-
+    empiricalDelay = EmpiricalDelayConfig.mapEmissionsConfig("empiricalDelay", root);
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
     transitFeeds = TransitFeedConfig.mapTransitFeeds(
@@ -606,7 +619,7 @@ public class BuildConfig implements OtpDataStoreConfig {
 
     // List of complex parameters
     fareConfig = FaresConfiguration.fromConfig(root, "fares");
-    edgeNamer = EdgeNamer.EdgeNamerFactory.fromConfig(root, "osmNaming");
+    edgeNamer = EdgeNamerFactory.fromConfig(root, "osmNaming");
     dataOverlay = DataOverlayConfigMapper.map(root, "dataOverlay");
 
     transferRequests = TransferRequestConfig.map(root, "transferRequests");
@@ -651,6 +664,11 @@ public class BuildConfig implements OtpDataStoreConfig {
   @Override
   public List<URI> emissionFiles() {
     return emission.emissionFiles();
+  }
+
+  @Override
+  public List<URI> empiricalDelayFiles() {
+    return empiricalDelay.listFiles();
   }
 
   @Override
@@ -700,8 +718,8 @@ public class BuildConfig implements OtpDataStoreConfig {
     return root.isEmpty() ? "" : root.toJson();
   }
 
-  public ServiceDateInterval getTransitServicePeriod() {
-    return new ServiceDateInterval(transitServiceStart, transitServiceEnd);
+  public LocalDateInterval getTransitServicePeriod() {
+    return new LocalDateInterval(transitServiceStart, transitServiceEnd);
   }
 
   public List<FeedScopedId> transitRouteToStationCentroid() {

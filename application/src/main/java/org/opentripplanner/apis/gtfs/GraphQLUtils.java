@@ -8,7 +8,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -19,7 +19,9 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 public class GraphQLUtils {
 
   public static GraphQLWheelchairBoarding toGraphQL(Accessibility boarding) {
-    if (boarding == null) return null;
+    if (boarding == null) {
+      return null;
+    }
     return switch (boarding) {
       case NO_INFORMATION -> GraphQLWheelchairBoarding.NO_INFORMATION;
       case POSSIBLE -> GraphQLWheelchairBoarding.POSSIBLE;
@@ -28,7 +30,9 @@ public class GraphQLUtils {
   }
 
   public static GraphQLRoutingErrorCode toGraphQL(RoutingErrorCode code) {
-    if (code == null) return null;
+    if (code == null) {
+      return null;
+    }
     return switch (code) {
       case LOCATION_NOT_FOUND -> GraphQLRoutingErrorCode.LOCATION_NOT_FOUND;
       case NO_STOPS_IN_RANGE -> GraphQLRoutingErrorCode.NO_STOPS_IN_RANGE;
@@ -41,16 +45,21 @@ public class GraphQLUtils {
   }
 
   public static GraphQLInputField toGraphQL(InputField inputField) {
-    if (inputField == null) return null;
+    if (inputField == null) {
+      return null;
+    }
     return switch (inputField) {
       case DATE_TIME -> GraphQLInputField.DATE_TIME;
       case FROM_PLACE -> GraphQLInputField.FROM;
-      case TO_PLACE, INTERMEDIATE_PLACE -> GraphQLInputField.TO;
+      case TO_PLACE -> GraphQLInputField.TO;
+      case INTERMEDIATE_PLACE -> GraphQLInputField.VIA;
     };
   }
 
   public static RentalFormFactor toModel(GraphQLFormFactor formFactor) {
-    if (formFactor == null) return null;
+    if (formFactor == null) {
+      return null;
+    }
     return switch (formFactor) {
       case BICYCLE -> RentalFormFactor.BICYCLE;
       case SCOOTER -> RentalFormFactor.SCOOTER;
@@ -64,7 +73,9 @@ public class GraphQLUtils {
   }
 
   public static PlaceType toModel(GraphQLFilterPlaceType type) {
-    if (type == null) return null;
+    if (type == null) {
+      return null;
+    }
     return switch (type) {
       case BICYCLE_RENT, VEHICLE_RENT -> PlaceType.VEHICLE_RENT;
       case BIKE_PARK -> PlaceType.BIKE_PARK;

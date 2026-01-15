@@ -3,10 +3,8 @@ package org.opentripplanner.updater.trip.siri.updater;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
-import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
-import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -35,7 +33,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
   private final Consumer<UpdateResult> metricsConsumer;
 
   public SiriETUpdater(
-    Parameters config,
+    SiriETUpdaterParameters config,
     SiriRealTimeTripUpdateAdapter adapter,
     EstimatedTimetableSource source,
     Consumer<UpdateResult> metricsConsumer
@@ -96,13 +94,5 @@ public class SiriETUpdater extends PollingGraphUpdater {
       .addStr("source", updateSource.toString())
       .addDuration("frequency", pollingPeriod())
       .toString();
-  }
-
-  public interface Parameters extends UrlUpdaterParameters, PollingGraphUpdaterParameters {
-    String url();
-
-    boolean blockReadinessUntilInitialized();
-
-    boolean fuzzyTripMatching();
   }
 }

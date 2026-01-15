@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.framework.i18n.LocalizedStringFormat;
+import org.opentripplanner.core.model.i18n.LocalizedStringFormat;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -24,13 +24,35 @@ class MissingElevationHandlerTest {
 
   private static final DataImportIssueStore issueStore = DefaultDataImportIssueStore.NOOP;
 
-  private StreetEdge AB, BC, CA, AB2, AD, ED, AF, FG, GB, FH, CJ, JI, AI, BJ;
+  private StreetEdge AB;
+  private StreetEdge BC;
+  private StreetEdge CA;
+  private StreetEdge AB2;
+  private StreetEdge AD;
+  private StreetEdge ED;
+  private StreetEdge AF;
+  private StreetEdge FG;
+  private StreetEdge GB;
+  private StreetEdge FH;
+  private StreetEdge CJ;
+  private StreetEdge JI;
+  private StreetEdge AI;
+  private StreetEdge BJ;
 
   private Map<Vertex, Double> elevations;
 
   @BeforeEach
   void setUp() {
-    IntersectionVertex A, B, C, D, E, F, G, H, I, J;
+    IntersectionVertex A;
+    IntersectionVertex B;
+    IntersectionVertex C;
+    IntersectionVertex D;
+    IntersectionVertex E;
+    IntersectionVertex F;
+    IntersectionVertex G;
+    IntersectionVertex H;
+    IntersectionVertex I;
+    IntersectionVertex J;
 
     A = vertex("A");
     B = vertex("B");

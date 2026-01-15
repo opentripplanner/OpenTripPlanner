@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.linking.Scope;
@@ -16,7 +17,6 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,7 +153,7 @@ class StreetIndex {
     var vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var map = new HashMap<FeedScopedId, TransitStopVertex>();
     for (TransitStopVertex it : vertices) {
-      map.put(it.getStop().getId(), it);
+      map.put(it.getId(), it);
     }
     return Map.copyOf(map);
   }
@@ -162,7 +162,6 @@ class StreetIndex {
     return graph
       .getVerticesOfType(StationCentroidVertex.class)
       .stream()
-      .filter(vertex -> vertex.getStation().shouldRouteToCentroid())
-      .collect(Collectors.toUnmodifiableMap(v -> v.getStation().getId(), v -> v));
+      .collect(Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v));
   }
 }

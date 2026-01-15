@@ -3,8 +3,6 @@ package org.opentripplanner.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -19,7 +17,7 @@ import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
@@ -31,15 +29,17 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class G06_ClosedEgressOpeningHoursTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   @BeforeEach
   public void setup() {
-    data.withRoute(route("R1", STOP_A, STOP_E).withTimetable(schedule("00:05 00:10")));
+    data.withTimetables(
+      """
+      A     E
+      00:05 00:10
+      """
+    );
 
     requestBuilder
       .searchParams()
@@ -50,11 +50,11 @@ public class G06_ClosedEgressOpeningHoursTest implements RaptorTestConstants {
       .addAccessPaths(free(STOP_A))
       .addEgressPaths(walk(STOP_E, D1m).openingHoursClosed(), walk(STOP_E, D5m));
 
-    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data);
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var expected = "A ~ BUS R1 0:05 0:10 ~ E ~ Walk 5m [0:05 0:15 10m Tₓ0 C₁1_500]";
+    var expected = "A ~ BUS R1 0:05 0:10 ~ E ~ Walk 5m [0:05 0:15 10m Tₙ0 C₁1_500]";
 
     return RaptorModuleTestCase.of()
       .withRequest(r -> r.searchParams().addAccessPaths(walk(STOP_B, D2m)))

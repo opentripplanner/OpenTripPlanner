@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.NORMAL;
 import static org.opentripplanner.graph_builder.module.osm.LinearBarrierNodeType.SPLIT;
-import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -110,8 +109,8 @@ class VertexGeneratorTest {
     assertEquals(vertexForW1NotOnBarrier, vertexForW2NotOnBarrier);
 
     assertInstanceOf(BarrierPassThroughVertex.class, vertexForW2OnBarrier);
-    assertEquals(n3.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).nodeId);
-    assertEquals(w2.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).wayId);
+    assertEquals(n3.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).nodeId());
+    assertEquals(w2.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).getEntityId());
     assertFalse(vertexForW2NotOnBarrier instanceof BarrierPassThroughVertex);
 
     Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers =
@@ -137,11 +136,10 @@ class VertexGeneratorTest {
     assertFalse(barrierVertexNotOnBarrier instanceof BarrierVertex);
 
     subject.getVertexForOsmNode(n4, w1, SPLIT);
-    var issues = getBarrierLevelIssues(issueStore);
-    assertEquals(1, issues.length);
-    assertEquals(3, issues[0].node().getId());
     subject.getVertexForOsmNode(n4, w2, SPLIT);
-    issues = getBarrierLevelIssues(issueStore);
+
+    subject.createDifferentLevelsSharingBarrierIssues();
+    var issues = getBarrierLevelIssues(issueStore);
     assertEquals(2, issues.length);
     assertEquals(3, issues[0].node().getId());
     assertEquals(4, issues[1].node().getId());

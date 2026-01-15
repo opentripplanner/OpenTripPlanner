@@ -28,15 +28,12 @@ class FrequencyMapper {
   }
 
   private Frequency doMap(org.onebusaway.gtfs.model.Frequency rhs) {
-    Frequency lhs = new Frequency();
-
-    lhs.setTrip(tripMapper.map(rhs.getTrip()));
-    lhs.setStartTime(rhs.getStartTime());
-    lhs.setEndTime(rhs.getEndTime());
-    lhs.setHeadwaySecs(rhs.getHeadwaySecs());
-    lhs.setExactTimes(rhs.getExactTimes());
-    lhs.setLabelOnly(rhs.getLabelOnly());
-
-    return lhs;
+    return new Frequency(
+      tripMapper.map(rhs.getTrip()),
+      rhs.getStartTime(),
+      rhs.getEndTime(),
+      rhs.getHeadwaySecs(),
+      rhs.getExactTimes() != 0
+    );
   }
 }

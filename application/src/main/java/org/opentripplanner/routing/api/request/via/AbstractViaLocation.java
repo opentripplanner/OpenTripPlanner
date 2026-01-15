@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 public abstract class AbstractViaLocation implements ViaLocation {
 
@@ -29,8 +29,12 @@ public abstract class AbstractViaLocation implements ViaLocation {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     AbstractViaLocation that = (AbstractViaLocation) o;
     return (
       Objects.equals(label, that.label) && Objects.equals(stopLocationIds, that.stopLocationIds)

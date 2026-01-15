@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
-import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static java.util.Map.entry;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,15 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
-import graphql.ExecutionInput;
-import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -30,9 +26,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
+import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -46,6 +42,8 @@ import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangl
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transfer.TransferRepository;
+import org.opentripplanner.transfer.TransferServiceTestFactory;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -69,6 +67,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   private static final Graph graph = new Graph();
   private static final TimetableRepository timetableRepository;
+  private static final TransferRepository transferRepository;
   private static final Map.Entry<String, Object> ARGUMENT_FROM = entry(
     "from",
     Map.of("place", "F:Quay:1")
@@ -93,6 +92,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .withRegularStop(stop3)
       .build();
 
+    transferRepository = TransferServiceTestFactory.defaultTransferRepository();
     timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     timetableRepository.initTimeZone(ZoneIds.STOCKHOLM);
     var calendarServiceData = new CalendarServiceData();
@@ -108,11 +108,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
+    timetableRepository.updateCalendarServiceData(calendarServiceData);
     timetableRepository.index();
   }
 
@@ -135,6 +131,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
     var otpServerRequestContext = TestServerContext.createServerContext(
       graph,
       timetableRepository,
+      transferRepository,
       new DefaultFareService(),
       null,
       defaultRequest
@@ -143,7 +140,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
     context = new TransmodelRequestContext(
       otpServerRequestContext,
       otpServerRequestContext.routingService(),
-      otpServerRequestContext.transitService()
+      otpServerRequestContext.transitService(),
+      otpServerRequestContext.empiricalDelayService()
     );
   }
 
@@ -326,7 +324,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
     final List<ViaLocation> viaLocations = MAPPER.createRequest(
       executionContext(arguments)
-    ).getViaLocations();
+    ).listViaLocations();
     assertEquals(
       "PassThroughViaLocation{label: PTP1, stopLocationIds: [F:ST:stop1, F:ST:stop2, F:ST:stop3]}",
       viaLocations.get(0).toString()
@@ -422,17 +420,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
-    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
-      .query("")
-      .operationName("trip")
-      .context(context)
-      .locale(Locale.ENGLISH)
-      .build();
-
-    var executionContext = newExecutionContextBuilder()
-      .executionInput(executionInput)
-      .executionId(ExecutionId.from(this.getClass().getName()))
-      .build();
+    var executionContext = DataFetchingSupport.executionContext();
 
     var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .context(context)

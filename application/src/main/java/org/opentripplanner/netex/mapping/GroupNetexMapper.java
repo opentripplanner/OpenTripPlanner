@@ -1,13 +1,12 @@
 package org.opentripplanner.netex.mapping;
 
-import com.google.common.collect.ArrayListMultimap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
@@ -21,7 +20,7 @@ class GroupNetexMapper {
 
   private final FeedScopedIdFactory idFactory;
   private final DataImportIssueStore issueStore;
-  private final OtpTransitServiceBuilder transitBuilder;
+  private final TransitDataImportBuilder transitBuilder;
   private final List<ServiceJourneyInterchange> interchanges = new ArrayList<>();
 
   /**
@@ -32,7 +31,7 @@ class GroupNetexMapper {
   GroupNetexMapper(
     FeedScopedIdFactory idFactory,
     DataImportIssueStore issueStore,
-    OtpTransitServiceBuilder transitBuilder
+    TransitDataImportBuilder transitBuilder
   ) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;

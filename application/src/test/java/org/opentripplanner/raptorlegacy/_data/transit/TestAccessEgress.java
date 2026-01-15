@@ -3,7 +3,7 @@ package org.opentripplanner.raptorlegacy._data.transit;
 import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
 
 import org.opentripplanner._support.geometry.Coordinates;
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;

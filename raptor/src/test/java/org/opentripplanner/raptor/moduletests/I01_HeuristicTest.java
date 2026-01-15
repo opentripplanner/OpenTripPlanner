@@ -3,14 +3,10 @@ package org.opentripplanner.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -18,6 +14,7 @@ import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.service.RangeRaptorDynamicSearch;
 
@@ -41,46 +38,27 @@ public class I01_HeuristicTest implements RaptorTestConstants {
   };
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-    new RaptorRequestBuilder<>();
-  private final RaptorConfig<TestTripSchedule> config = RaptorConfig.defaultConfigForTest();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
+  private final RaptorConfig<TestTripSchedule> config = RaptorTestFactory.configForTest();
 
-  /**
-   * <pre>
-   * Stops: 0..4
-   *
-   * Stop on route (stop indexes):
-   *   R1:  1 - 2
-   *   R2:  3 - 4
-   *
-   * Schedule:
-   *   R1: 00:01 - 00:03
-   *   R2: 00:05 - 00:08
-   *
-   * Access (toStop & duration):
-   *   1  30s
-   *
-   * Egress (fromStop & duration):
-   *   3  20s
-   *
-   * Transfers:
-   *   2 -> 3 30s
-   * </pre>
-   */
   @BeforeEach
   public void setup() {
-    data.withRoute(route(pattern("R1", STOP_A, STOP_B)).withTimetable(schedule("00:01, 00:03")));
-
-    data.withRoute(route(pattern("R1", STOP_C, STOP_D)).withTimetable(schedule("00:05, 00:08")));
+    data
+      .access("Walk 30s ~ A")
+      .withTimetables(
+        """
+        A      B
+        00:01  00:03
+        --
+        C      D
+        00:05  00:08
+        """
+      )
+      .egress("D ~ Walk 20s");
 
     data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D30s));
 
-    requestBuilder
-      .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_D, D20s))
-      .earliestDepartureTime(T00_00)
-      .timetable(true);
+    requestBuilder.searchParams().earliestDepartureTime(T00_00).timetable(true);
 
     requestBuilder.profile(RaptorProfile.MULTI_CRITERIA);
 

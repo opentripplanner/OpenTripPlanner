@@ -6,16 +6,17 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
@@ -224,10 +225,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
       (stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING &&
         !stateData.insideNoRentalDropOffArea) ||
-      (getRequest()
-          .preferences()
-          .rental(getRequest().mode())
-          .allowArrivingInRentedVehicleAtDestination() &&
+      (getRequest().allowsArrivingInRentalAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
         stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION)
     );
@@ -267,6 +265,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public RentalFormFactor vehicleRentalFormFactor() {
     return stateData.rentalVehicleFormFactor;
+  }
+
+  public PropulsionType rentalVehiclePropulsionType() {
+    return stateData.rentalVehiclePropulsionType;
   }
 
   public double getWalkDistance() {
@@ -315,10 +317,6 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public StreetSearchRequest getRequest() {
     return request;
-  }
-
-  public RoutingPreferences getPreferences() {
-    return request.preferences();
   }
 
   /**
@@ -387,12 +385,14 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         if (orig.vertex instanceof VehicleRentalPlaceVertex stationVertex) {
           editor.dropOffRentedVehicleAtStation(
             ((VehicleRentalEdge) edge).formFactor,
+            orig.rentalVehiclePropulsionType(),
             stationVertex.getStation().network(),
             false
           );
         } else {
           editor.dropFloatingVehicle(
             orig.stateData.rentalVehicleFormFactor,
+            orig.rentalVehiclePropulsionType(),
             orig.getVehicleRentalNetwork(),
             false
           );
@@ -402,6 +402,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         if (orig.getBackState().isRentingVehicleFromStation()) {
           editor.beginVehicleRentingAtStation(
             ((VehicleRentalEdge) edge).formFactor,
+            orig.getBackState().rentalVehiclePropulsionType(),
             stationVertex.getStation().network(),
             orig.backState.mayKeepRentedVehicleAtDestination(),
             false
@@ -409,6 +410,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         } else if (orig.getBackState().isRentingFloatingVehicle()) {
           editor.beginFloatingVehicleRenting(
             ((VehicleRentalEdge) edge).formFactor,
+            orig.getBackState().rentalVehiclePropulsionType(),
             stationVertex.getStation().network(),
             false
           );
@@ -438,8 +440,15 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return request.intersectionTraversalCalculator();
   }
 
-  public DataOverlayContext dataOverlayContext() {
-    return request.dataOverlayContext();
+  public <T extends ExtensionRequestContext> Optional<T> getExtensionRequestContext(
+    Class<T> ofType
+  ) {
+    for (var it : request.listExtensionRequestContexts()) {
+      if (ofType.isAssignableFrom(it.getClass())) {
+        return Optional.of((T) it);
+      }
+    }
+    return Optional.empty();
   }
 
   public boolean isInsideNoRentalDropOffArea() {
@@ -527,10 +536,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     // depend on arriveBy
     StreetSearchRequest reversedRequest = request
       .copyOfReversed(getTime())
-      .withPreferences(p -> {
-        p.withCar(c -> c.withRental(r -> r.withUseAvailabilityInformation(false)));
-        p.withBike(b -> b.withRental(r -> r.withUseAvailabilityInformation(false)));
-      })
+      .withUseRentalAvailability(false)
       .build();
     StateData newStateData = stateData.clone();
     newStateData.backMode = null;

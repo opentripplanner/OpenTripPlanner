@@ -13,15 +13,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
+import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
+import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.framework.application.OtpAppException;
-import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -31,6 +32,8 @@ import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
+import org.opentripplanner.transfer.TransferRepository;
+import org.opentripplanner.transfer.TransferServiceTestFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
@@ -75,7 +78,8 @@ public class SpeedTest {
     SpeedTestCmdLineOpts opts,
     SpeedTestConfig config,
     Graph graph,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    TransferRepository transferRepository
   ) {
     this.opts = opts;
     this.config = config;
@@ -96,11 +100,12 @@ public class SpeedTest {
 
     UpdaterConfigurator.configure(
       graph,
-      TestVertexLinker.of(graph),
+      VertexLinkerTestFactory.of(graph),
       new DefaultRealtimeVehicleService(transitService),
       new DefaultVehicleRentalService(),
       new DefaultVehicleParkingRepository(),
       timetableRepository,
+      new DefaultCarpoolingRepository(),
       new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, LocalDate::now),
       config.updatersConfig
     );
@@ -113,17 +118,21 @@ public class SpeedTest {
       RaptorEnvironmentFactory.create(config.transitRoutingParams.searchThreadPoolSize())
     );
 
+    var vertexLinker = VertexLinkerTestFactory.of(graph);
+
     this.serverContext = new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
       new DefaultFareService(),
       config.flexConfig,
       graph,
+      TestServerContext.createLinkingContextFactory(graph, vertexLinker, transitService),
       timer.getRegistry(),
       raptorConfig,
       TestServerContext.createRealtimeVehicleService(transitService),
       List.of(),
       config.request,
       TestServerContext.createStreetLimitationParametersService(),
+      TransferServiceTestFactory.transferService(transferRepository),
       config.transitRoutingParams,
       new DefaultTransitService(timetableRepository),
       null,
@@ -131,9 +140,12 @@ public class SpeedTest {
       VectorTileConfig.DEFAULT,
       TestServerContext.createVehicleParkingService(),
       TestServerContext.createVehicleRentalService(),
-      TestVertexLinker.of(graph),
+      vertexLinker,
       TestServerContext.createViaTransferResolver(graph, transitService),
       TestServerContext.createWorldEnvelopeService(),
+      null,
+      null,
+      TestServerContext.createStreetDetailsService(),
       null,
       null,
       null,
@@ -145,7 +157,7 @@ public class SpeedTest {
     );
     // Creating raptor transit data should be integrated into the TimetableRepository, but for now
     // we do it manually here
-    createRaptorTransitData(timetableRepository, config.transitRoutingParams);
+    createRaptorTransitData(timetableRepository, transferRepository, config.transitRoutingParams);
 
     initializeTransferCache(config.transitRoutingParams, timetableRepository);
 
@@ -158,18 +170,19 @@ public class SpeedTest {
 
   public static void main(String[] args) {
     try {
-      OtpStartupInfo.logInfo("Run Speed Test");
       // Given the following setup
       SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
-      var config = SpeedTestConfig.config(opts.rootDir());
       SetupHelper.loadOtpFeatures(opts);
+      var config = SpeedTestConfig.config(opts.rootDir());
+      OtpStartupInfo.logInfo("Run Speed Test");
       var model = SetupHelper.loadGraph(opts.rootDir(), config.graph);
       var timetableRepository = model.timetableRepository();
+      var transferRepository = model.transferRepository();
       var buildConfig = model.buildConfig();
       var graph = model.graph();
 
       // create a new test
-      var speedTest = new SpeedTest(opts, config, graph, timetableRepository);
+      var speedTest = new SpeedTest(opts, config, graph, timetableRepository, transferRepository);
 
       assertTestDateHasData(timetableRepository, config, buildConfig);
 

@@ -12,8 +12,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareOffer;
@@ -42,6 +42,7 @@ import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.time.ServiceDateUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -75,7 +76,12 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final ZoneId zoneId;
   private final TripOnServiceDate tripOnServiceDate;
   private final double distanceMeters;
-  private final double directDistanceMeters;
+
+  @Nullable
+  private final ViaLocationType fromViaLocationType;
+
+  @Nullable
+  private final ViaLocationType toViaLocationType;
 
   // Sandbox fields
   private final Float accessibilityScore;
@@ -102,8 +108,8 @@ public class ScheduledTransitLeg implements TransitLeg {
       "alightStopPosInPattern"
     );
 
-    this.startTime = Objects.requireNonNull(builder.startTime());
-    this.endTime = Objects.requireNonNull(builder.endTime());
+    this.startTime = TimeUtils.normalize(builder.startTime());
+    this.endTime = TimeUtils.normalize(builder.endTime());
     this.serviceDate = Objects.requireNonNull(builder.serviceDate());
     this.zoneId = Objects.requireNonNull(builder.zoneId());
 
@@ -124,15 +130,18 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.distanceMeters = DoubleUtils.roundTo2Decimals(
       Objects.requireNonNull(builder.distanceMeters(), "distanceMeters")
     );
-    this.directDistanceMeters = GeometryUtils.sumDistances(
-      List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
-    );
     this.transitAlerts = Set.copyOf(builder.alerts());
+    this.fromViaLocationType = builder.fromViaLocationType();
+    this.toViaLocationType = builder.toViaLocationType();
 
     // Sandbox
     this.accessibilityScore = builder.accessibilityScore();
     this.emissionPerPerson = builder.emissionPerPerson();
     this.fareOffers = builder.fareOffers().stream().sorted(FARE_OFFER_COMPARATOR).toList();
+  }
+
+  public static ScheduledTransitLegBuilder of() {
+    return new ScheduledTransitLegBuilder<>();
   }
 
   public ScheduledTransitLegBuilder copyOf() {
@@ -270,10 +279,6 @@ public class ScheduledTransitLeg implements TransitLeg {
     return distanceMeters;
   }
 
-  public double directDistanceMeters() {
-    return directDistanceMeters;
-  }
-
   @Override
   public Integer routeType() {
     return trip().getRoute().getGtfsType();
@@ -297,12 +302,12 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   public Place from() {
-    return Place.forStop(tripPattern.getStop(boardStopPosInPattern));
+    return Place.forStop(tripPattern.getStop(boardStopPosInPattern), fromViaLocationType);
   }
 
   @Override
   public Place to() {
-    return Place.forStop(tripPattern.getStop(alightStopPosInPattern));
+    return Place.forStop(tripPattern.getStop(alightStopPosInPattern), toViaLocationType);
   }
 
   @Override
@@ -470,8 +475,20 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
       .addObj("transferToNextLeg", transferToNextLeg)
       .addColSize("transitAlerts", transitAlerts)
+      .addObj("fromViaLocationType", fromViaLocationType)
+      .addObj("toViaLocationType", toViaLocationType)
       .addObj("emissionPerPerson", emissionPerPerson)
       .addColSize("fareProducts", fareOffers)
       .toString();
+  }
+
+  @Nullable
+  ViaLocationType fromViaLocationType() {
+    return fromViaLocationType;
+  }
+
+  @Nullable
+  ViaLocationType toViaLocationType() {
+    return toViaLocationType;
   }
 }

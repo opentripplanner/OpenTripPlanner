@@ -15,10 +15,12 @@
     "numItineraries": 12,
     "transferPenalty": 0,
     "turnReluctance": 1.0,
-    "elevatorBoardTime": 90,
-    "elevatorBoardCost": 90,
-    "elevatorHopTime": 20,
-    "elevatorHopCost": 20,
+    "elevator": {
+      "boardCost": 15,
+      "boardSlack": "90s",
+      "hopTime": "20s",
+      "reluctance": 2.0
+    },
     "bicycle": {
       "speed": 5,
       "reluctance": 5.0,
@@ -193,10 +195,7 @@
     ]
   },
   "vehicleRentalServiceDirectory": {
-    "url": "https://entur.no/bikeRentalServiceDirectory",
-    "sourcesName": "systems",
-    "updaterUrlName": "url",
-    "updaterNetworkName": "id",
+    "url": "https://entur.no/bikeRentalServiceDirectory/manifest.json",
     "headers": {
       "ET-Client-Name": "MY_ORG_CLIENT_NAME"
     }
@@ -452,6 +451,20 @@
       "type": "siri-sx-lite",
       "feedId": "sta",
       "url": "https://example.com/siri-lite/situation-exchange/xml"
+    },
+    // SIRI-ET MQTT trip updater
+    {
+      "type": "siri-et-mqtt",
+      "user": "user",
+      "password": "pwd",
+      "host": "localhost",
+      "port": 1883,
+      "feedId": "1",
+      "topic": "trip/updates/#",
+      "qos": 1,
+      "fuzzyTripMatching": true,
+      "numberOfPrimingWorkers": 4,
+      "maxPrimingIdleTime": "1s"
     }
   ],
   "rideHailingServices": [

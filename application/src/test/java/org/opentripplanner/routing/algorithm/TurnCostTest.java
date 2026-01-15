@@ -62,24 +62,24 @@ public class TurnCostTest {
     StreetVertex broad3 = vertex("broad_3rd", 0.0, 0.0);
 
     // Each block along the main streets has unit length and is one-way
-    StreetEdge maple1_2 = edge(maple1, maple2, 100.0, false);
-    StreetEdge maple2_3 = edge(maple2, maple3, 100.0, false);
+    edge(maple1, maple2, 100.0, false);
+    edge(maple2, maple3, 100.0, false);
 
     StreetEdge main1_2 = edge(main1, main2, 100.0, false);
     StreetEdge main2_3 = edge(main2, main3, 100.0, false);
 
-    StreetEdge broad1_2 = edge(broad1, broad2, 100.0, false);
+    edge(broad1, broad2, 100.0, false);
     StreetEdge broad2_3 = edge(broad2, broad3, 100.0, false);
 
     // Each cross-street connects
     StreetEdge maple_main1 = edge(maple1, main1, 50.0, false);
-    StreetEdge main_broad1 = edge(main1, broad1, 100.0, false);
+    edge(main1, broad1, 100.0, false);
 
     StreetEdge maple_main2 = edge(maple2, main2, 50.0, false);
     StreetEdge main_broad2 = edge(main2, broad2, 50.0, false);
 
-    StreetEdge maple_main3 = edge(maple3, main3, 100.0, false);
-    StreetEdge main_broad3 = edge(main3, broad3, 100.0, false);
+    edge(maple3, main3, 100.0, false);
+    edge(main3, broad3, 100.0, false);
 
     var osmInfoGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     // Turn restrictions are only for driving modes.
@@ -149,10 +149,14 @@ public class TurnCostTest {
     assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
 
     assertEquals(0, states.get(0).getElapsedTimeSeconds());
-    assertEquals(50, states.get(1).getElapsedTimeSeconds()); // maple_main1 = 50
-    assertEquals(160, states.get(2).getElapsedTimeSeconds()); // main1_2 = 100
-    assertEquals(220, states.get(3).getElapsedTimeSeconds()); // main_broad2 = 50
-    assertEquals(330, states.get(4).getElapsedTimeSeconds()); // broad2_3 = 100
+    // maple_main1 = 50
+    assertEquals(50, states.get(1).getElapsedTimeSeconds());
+    // main1_2 = 100
+    assertEquals(160, states.get(2).getElapsedTimeSeconds());
+    // main_broad2 = 50
+    assertEquals(220, states.get(3).getElapsedTimeSeconds());
+    // broad2_3 = 100
+    assertEquals(330, states.get(4).getElapsedTimeSeconds());
   }
 
   @Test
@@ -200,10 +204,14 @@ public class TurnCostTest {
     assertEquals("broad_3rd", getParentLabelString(states.get(4).getVertex()));
 
     assertEquals(0, states.get(0).getElapsedTimeSeconds());
-    assertEquals(50, states.get(1).getElapsedTimeSeconds()); // maple_main1 = 50
-    assertEquals(160, states.get(2).getElapsedTimeSeconds()); // main1_2 = 100
-    assertEquals(270, states.get(3).getElapsedTimeSeconds()); // broad1_2 = 100
-    assertEquals(380, states.get(4).getElapsedTimeSeconds()); // broad2_3 = 100
+    // maple_main1 = 50
+    assertEquals(50, states.get(1).getElapsedTimeSeconds());
+    // main1_2 = 100
+    assertEquals(160, states.get(2).getElapsedTimeSeconds());
+    // broad1_2 = 100
+    assertEquals(270, states.get(3).getElapsedTimeSeconds());
+    // broad2_3 = 100
+    assertEquals(380, states.get(4).getElapsedTimeSeconds());
   }
 
   private GraphPath<State, Edge, Vertex> checkForwardRouteDuration(
@@ -214,12 +222,12 @@ public class TurnCostTest {
     int expectedDuration
   ) {
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(new StreetRequest(streetMode))
-      .setFrom(from)
-      .setTo(to)
-      .setIntersectionTraversalCalculator(calculator)
+      .withHeuristic(new EuclideanRemainingWeightHeuristic())
+      .withRequest(request)
+      .withStreetRequest(new StreetRequest(streetMode))
+      .withFrom(from)
+      .withTo(to)
+      .withIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
     GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
     assertNotNull(path);

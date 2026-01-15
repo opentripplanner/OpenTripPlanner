@@ -9,13 +9,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.street.model.RentalFormFactor;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 @Singleton
 public class DefaultVehicleRentalService implements VehicleRentalService, VehicleRentalRepository {

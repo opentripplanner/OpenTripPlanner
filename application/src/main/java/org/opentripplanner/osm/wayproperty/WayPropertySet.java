@@ -15,8 +15,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
@@ -194,13 +194,13 @@ public class WayPropertySet {
     return result;
   }
 
-  public I18NString getCreativeNameForWay(OsmEntity way) {
+  public I18NString getCreativeName(OsmEntity entity) {
     CreativeNamer bestNamer = null;
     int bestScore = 0;
     for (CreativeNamerPicker picker : creativeNamers) {
       OsmSpecifier specifier = picker.specifier;
       CreativeNamer namer = picker.namer;
-      int score = specifier.matchScore(way, DIRECTIONLESS);
+      int score = specifier.matchScore(entity, DIRECTIONLESS);
       if (score > bestScore) {
         bestNamer = namer;
         bestScore = score;
@@ -209,7 +209,7 @@ public class WayPropertySet {
     if (bestNamer == null) {
       return null;
     }
-    return bestNamer.generateCreativeName(way);
+    return bestNamer.generateCreativeName(entity);
   }
 
   /**
@@ -243,9 +243,9 @@ public class WayPropertySet {
       }
     }
 
-    if (way.hasTag("maxspeed") && speed == null) speed = getMetersSecondFromSpeed(
-      way.getTag("maxspeed")
-    );
+    if (way.hasTag("maxspeed") && speed == null) {
+      speed = getMetersSecondFromSpeed(way.getTag("maxspeed"));
+    }
 
     if (speed != null) {
       // Too low (less than 5 km/h) or too high speed limit indicates an error in the data,
@@ -394,7 +394,9 @@ public class WayPropertySet {
     }
 
     String units = m.group(2);
-    if (units == null || units.isEmpty()) units = "kmh";
+    if (units == null || units.isEmpty()) {
+      units = "kmh";
+    }
 
     // we'll be doing quite a few string comparisons here
     units = units.intern();
@@ -547,11 +549,20 @@ public class WayPropertySet {
   ) {
     double bicycle = result.bicycleSafety();
     double walk = result.walkSafety();
+    StreetTraversalPermission permission = result.getPermission();
     for (var mixin : mixins) {
       var properties = mixin.getDirectionalProperties(direction);
       bicycle *= properties.bicycleSafety();
       walk *= properties.walkSafety();
+      permission = permission
+        .add(properties.addedPermission())
+        .remove(properties.removedPermission());
     }
-    return result.mutate().bicycleSafety(bicycle).walkSafety(walk).build();
+    return result
+      .mutate()
+      .bicycleSafety(bicycle)
+      .walkSafety(walk)
+      .withPermission(permission)
+      .build();
   }
 }

@@ -20,7 +20,7 @@ public abstract class SiriAzureUpdaterParameters {
    * Maximum time to wait for real-time services during startup.
    * If exceeded, OTP starts without real-time data for graceful degradation.
    */
-  private Duration startupTimeout = Duration.ofMinutes(5); // 5 minutes default
+  private Duration startupTimeout = Duration.ofMinutes(5);
 
   private boolean fuzzyTripMatching;
   private Duration autoDeleteOnIdle;

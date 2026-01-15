@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,32 +75,6 @@ public class LegReferenceSerializer {
     }
   }
 
-  static void writeScheduledTransitLegV1(LegReference ref, ObjectOutputStream out)
-    throws IOException {
-    if (ref instanceof ScheduledTransitLegReference s) {
-      out.writeUTF(s.tripId().toString());
-      out.writeUTF(s.serviceDate().toString());
-      out.writeInt(s.fromStopPositionInPattern());
-      out.writeInt(s.toStopPositionInPattern());
-    } else {
-      throw new IllegalArgumentException("Invalid LegReference type");
-    }
-  }
-
-  static void writeScheduledTransitLegV2(LegReference ref, ObjectOutputStream out)
-    throws IOException {
-    if (ref instanceof ScheduledTransitLegReference s) {
-      out.writeUTF(s.tripId().toString());
-      out.writeUTF(s.serviceDate().toString());
-      out.writeInt(s.fromStopPositionInPattern());
-      out.writeInt(s.toStopPositionInPattern());
-      out.writeUTF(s.fromStopId().toString());
-      out.writeUTF(s.toStopId().toString());
-    } else {
-      throw new IllegalArgumentException("Invalid LegReference type");
-    }
-  }
-
   static void writeScheduledTransitLegV3(LegReference ref, ObjectOutputStream out)
     throws IOException {
     if (ref instanceof ScheduledTransitLegReference s) {
@@ -114,32 +88,6 @@ public class LegReferenceSerializer {
     } else {
       throw new IllegalArgumentException("Invalid LegReference type");
     }
-  }
-
-  static LegReference readScheduledTransitLegV1(ObjectInputStream objectInputStream)
-    throws IOException {
-    return new ScheduledTransitLegReference(
-      FeedScopedId.parse(objectInputStream.readUTF()),
-      LocalDate.parse(objectInputStream.readUTF(), DateTimeFormatter.ISO_LOCAL_DATE),
-      objectInputStream.readInt(),
-      objectInputStream.readInt(),
-      null,
-      null,
-      null
-    );
-  }
-
-  static LegReference readScheduledTransitLegV2(ObjectInputStream objectInputStream)
-    throws IOException {
-    return new ScheduledTransitLegReference(
-      FeedScopedId.parse(objectInputStream.readUTF()),
-      LocalDate.parse(objectInputStream.readUTF(), DateTimeFormatter.ISO_LOCAL_DATE),
-      objectInputStream.readInt(),
-      objectInputStream.readInt(),
-      FeedScopedId.parse(objectInputStream.readUTF()),
-      FeedScopedId.parse(objectInputStream.readUTF()),
-      null
-    );
   }
 
   static LegReference readScheduledTransitLegV3(ObjectInputStream objectInputStream)

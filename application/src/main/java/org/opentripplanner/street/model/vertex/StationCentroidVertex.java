@@ -1,31 +1,34 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 
 /**
  * A vertex representing a station centroid. This can be used as a source/destination for routing.
  */
 public class StationCentroidVertex extends Vertex {
 
-  private final Station station;
+  private final FeedScopedId id;
+  private final I18NString name;
 
-  public StationCentroidVertex(Station station) {
-    super(station.getLon(), station.getLat());
-    this.station = station;
+  public StationCentroidVertex(FeedScopedId id, I18NString name, WgsCoordinate coordinate) {
+    super(coordinate.longitude(), coordinate.latitude());
+    this.id = id;
+    this.name = name;
   }
 
-  public Station getStation() {
-    return this.station;
+  public FeedScopedId getId() {
+    return this.id;
   }
 
   @Override
   public I18NString getName() {
-    return station.getName();
+    return name;
   }
 
   @Override
   public VertexLabel getLabel() {
-    return VertexLabel.feedScopedId(station.getId());
+    return VertexLabel.feedScopedId(id);
   }
 }
