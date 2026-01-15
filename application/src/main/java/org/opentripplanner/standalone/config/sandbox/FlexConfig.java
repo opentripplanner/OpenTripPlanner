@@ -21,6 +21,11 @@ public class FlexConfig implements FlexParameters {
     if you can walk 45 minutes to a flex stop/zone you're unlikely to be the target audience for those
     services.
     """;
+  public static final String AREA_STOP_DESCRIPTION =
+    """
+    Area stops is the internal OTP name. In GTFS they are called "locations" and
+    NeTEx FlexibleArea.
+    """;
 
   private final Duration maxTransferDuration;
   private final Duration maxFlexTripDuration;
@@ -91,10 +96,18 @@ public class FlexConfig implements FlexParameters {
       )
       .asObject();
     areaStopBoardCost = Cost.costOfSeconds(
-      areaStop.of("boardCost").asInt(DEFAULT.areaStopBoardCost().toSeconds())
+      areaStop
+        .of("boardCost")
+        .summary("Cost to board an area stop, in seconds.")
+        .description(AREA_STOP_DESCRIPTION)
+        .asInt(DEFAULT.areaStopBoardCost().toSeconds())
     );
     areaStopAlightCost = Cost.costOfSeconds(
-      areaStop.of("alightCost").asInt(DEFAULT.areaStopAlightCost().toSeconds())
+      areaStop
+        .of("alightCost")
+        .summary("Cost to alight an area stop, in seconds.")
+        .description(AREA_STOP_DESCRIPTION)
+        .asInt(DEFAULT.areaStopAlightCost().toSeconds())
     );
   }
 

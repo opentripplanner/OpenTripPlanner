@@ -27,9 +27,13 @@ public interface FlexParameters {
    * See {@link org.opentripplanner.standalone.config.sandbox.FlexConfig}
    */
   Duration maxEgressWalkDuration();
-
+  /**
+   * See {@link org.opentripplanner.standalone.config.sandbox.FlexConfig}
+   */
   Cost areaStopBoardCost();
-
+  /**
+   * See {@link org.opentripplanner.standalone.config.sandbox.FlexConfig}
+   */
   Cost areaStopAlightCost();
 
   /**
