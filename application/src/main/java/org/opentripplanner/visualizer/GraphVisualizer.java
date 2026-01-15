@@ -488,7 +488,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     builder.withPreferences(preferences -> {
       preferences.withWalk(walk -> {
-        walk.withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
+        // override low 2-4 minute values
+        walk.withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60);
         walk.withSpeed(Float.parseFloat(walkSpeed.getText()));
       });
       preferences.withBike(bike ->
@@ -1152,9 +1153,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     if (!vertices.contains(v)) {
       vertices.add(v);
       nearbyModel = new VertexList(vertices);
-      nearbyVertices.setModel(nearbyModel); // this should just be an event, but for
-      // some reason, JList doesn't implement
-      // the right event.
+      nearbyVertices.setModel(nearbyModel);
+      // this should just be an event, but for  some reason, JList doesn't implement the right event.
     }
 
     /* set up metadata tab */

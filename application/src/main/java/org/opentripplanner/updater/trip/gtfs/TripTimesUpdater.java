@@ -328,7 +328,8 @@ class TripTimesUpdater {
         }
         stopTime.setDepartureTime((int) departureTime);
       }
-      stopTime.setTimepoint(1); // Exact time
+      // Exact time
+      stopTime.setTimepoint(1);
       stopSequence.ifPresent(stopTime::setStopSequence);
       stopTime.setPickupType(update.effectivePickup());
       stopTime.setDropOffType(update.effectiveDropoff());

@@ -90,7 +90,13 @@ public class SpeedIntegrationTest {
   private static void runProfile(SpeedTestProfile profile) {
     var opts = speedTestOptions(profile);
     var config = SpeedTestConfig.config(opts.rootDir());
-    var speedTest = new SpeedTest(opts, config, model.graph(), model.timetableRepository());
+    var speedTest = new SpeedTest(
+      opts,
+      config,
+      model.graph(),
+      model.timetableRepository(),
+      model.transferRepository()
+    );
 
     // We want to validate the Raptor paths without changes done by the OptimizeTransfers
     // and itinerary filter chain(set to debug in config)

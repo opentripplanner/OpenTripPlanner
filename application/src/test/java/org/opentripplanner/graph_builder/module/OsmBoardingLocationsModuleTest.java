@@ -133,7 +133,9 @@ class OsmBoardingLocationsModuleTest {
     ).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
-    assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module
+    // 3 nodes connected to the street network, plus one "floating" and one area centroid created by
+    // the module
+    assertEquals(5, boardingLocations.size());
 
     assertEquals(1, platformVertex.getIncoming().size());
     assertEquals(1, platformVertex.getOutgoing().size());

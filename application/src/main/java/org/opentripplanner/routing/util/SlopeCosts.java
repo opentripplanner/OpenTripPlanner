@@ -3,11 +3,26 @@ package org.opentripplanner.routing.util;
 public class SlopeCosts {
 
   public final boolean flattened;
-  public final double slopeSpeedFactor; // The slope speed factor multiplier, w/o units
-  public final double slopeWorkFactor; // The slope work factor in joules per meters at 5 m/s
-  public final double maxSlope; // Max{abs(slope)}
-  public final double slopeSafetyCost; // An additional safety cost caused by the slope
-  public final double lengthMultiplier; // Multiplier to get true length based on flat (projected) length
+  /**
+   * The slope speed factor multiplier, w/o units
+   */
+  public final double slopeSpeedFactor;
+  /**
+   * The slope work factor in joules per meters at 5 m/s
+   */
+  public final double slopeWorkFactor;
+  /**
+   * Max{abs(slope)}
+   */
+  public final double maxSlope;
+  /**
+   * An additional safety cost caused by the slope
+   */
+  public final double slopeSafetyCost;
+  /**
+   * Multiplier to get true length based on flat (projected) length
+   */
+  public final double lengthMultiplier;
 
   /**
    * The distance adjusted to incorporate the effect of the slope. Let say the distance is 1000 m

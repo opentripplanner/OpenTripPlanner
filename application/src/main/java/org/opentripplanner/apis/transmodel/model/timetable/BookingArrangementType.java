@@ -22,7 +22,7 @@ public class BookingArrangementType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("contactPerson")
           .description("Name of person to contact")
-          .type(Scalars.GraphQLString) //
+          .type(Scalars.GraphQLString)
           .dataFetcher(environment -> ((contactInfo(environment)).getContactPerson()))
           .build()
       )
@@ -30,7 +30,7 @@ public class BookingArrangementType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("email")
           .description("Email adress for contact")
-          .type(Scalars.GraphQLString) //
+          .type(Scalars.GraphQLString)
           .dataFetcher(environment -> ((contactInfo(environment)).geteMail()))
           .build()
       )
@@ -38,7 +38,7 @@ public class BookingArrangementType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("url")
           .description("Url for contact")
-          .type(Scalars.GraphQLString) //
+          .type(Scalars.GraphQLString)
           .dataFetcher(environment -> ((contactInfo(environment)).getBookingUrl()))
           .build()
       )
@@ -46,7 +46,7 @@ public class BookingArrangementType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("phone")
           .description("Phone number for contact")
-          .type(Scalars.GraphQLString) //
+          .type(Scalars.GraphQLString)
           .dataFetcher(environment -> ((contactInfo(environment)).getPhoneNumber()))
           .build()
       )
@@ -54,7 +54,7 @@ public class BookingArrangementType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("furtherDetails")
           .description("Textual description of how to get in contact")
-          .type(Scalars.GraphQLString) //
+          .type(Scalars.GraphQLString)
           .dataFetcher(environment -> ((contactInfo(environment)).getAdditionalDetails()))
           .build()
       )

@@ -92,7 +92,7 @@ public class TripPatternNamer implements GraphBuilderModule {
       }
 
       /* Do the patterns within this Route have a unique start, end, or via Stop? */
-      Multimap<String, TripPattern> signs = ArrayListMultimap.create(); // prefer headsigns
+      Multimap<String, TripPattern> signs = ArrayListMultimap.create();
       Multimap<StopLocation, TripPattern> starts = ArrayListMultimap.create();
       Multimap<StopLocation, TripPattern> ends = ArrayListMultimap.create();
       Multimap<StopLocation, TripPattern> vias = ArrayListMultimap.create();
@@ -130,7 +130,8 @@ public class TripPatternNamer implements GraphBuilderModule {
         sb.append(" to ").append(stopNameAndId(end));
         if (ends.get(end).size() == 1) {
           pattern.initName(sb.toString());
-          continue; // only pattern with this last stop
+          // only pattern with this last stop
+          continue;
         }
 
         /* Then try to name with origin. */
@@ -138,13 +139,15 @@ public class TripPatternNamer implements GraphBuilderModule {
         sb.append(" from ").append(stopNameAndId(start));
         if (starts.get(start).size() == 1) {
           pattern.initName((sb.toString()));
-          continue; // only pattern with this first stop
+          // only pattern with this first stop
+          continue;
         }
 
         /* Check whether (end, start) is unique. */
         Collection<TripPattern> tripPatterns = starts.get(start);
         Set<TripPattern> remainingPatterns = new HashSet<>(tripPatterns);
-        remainingPatterns.retainAll(ends.get(end)); // set intersection
+        // set intersection
+        remainingPatterns.retainAll(ends.get(end));
         if (remainingPatterns.size() == 1) {
           pattern.initName((sb.toString()));
           continue;
@@ -177,8 +180,8 @@ public class TripPatternNamer implements GraphBuilderModule {
             .ifPresent(value -> sb.append(" like trip ").append(value.getId()));
         }
         pattern.initName((sb.toString()));
-      } // END foreach PATTERN
-    } // END foreach ROUTE
+      }
+    }
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("Done generating unique names for stop patterns on each route.");

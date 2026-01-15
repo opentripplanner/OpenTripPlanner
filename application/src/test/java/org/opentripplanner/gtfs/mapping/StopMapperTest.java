@@ -133,7 +133,8 @@ public class StopMapperTest {
   @Test
   void testMapWithInvalidLocationType() {
     Stop input = createBasicStop();
-    input.setLocationType(Stop.LOCATION_TYPE_STATION); // Invalid - should be STOP
+    // Invalid - should be STOP
+    input.setLocationType(Stop.LOCATION_TYPE_STATION);
 
     var ex = assertThrows(IllegalArgumentException.class, () -> subject.map(input));
     assertEquals(

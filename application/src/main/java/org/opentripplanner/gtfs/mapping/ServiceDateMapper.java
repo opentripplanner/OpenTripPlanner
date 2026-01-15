@@ -1,7 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import java.time.LocalDate;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.calendar.LocalDateInterval;
 
 /** Responsible for mapping GTFS ServiceDate into the OTP model. */
 class ServiceDateMapper {
@@ -13,10 +13,10 @@ class ServiceDateMapper {
       : LocalDate.of(orginal.getYear(), orginal.getMonth(), orginal.getDay());
   }
 
-  static ServiceDateInterval mapServiceDateInterval(
+  static LocalDateInterval mapServiceDateInterval(
     org.onebusaway.gtfs.model.calendar.ServiceDate start,
     org.onebusaway.gtfs.model.calendar.ServiceDate end
   ) {
-    return new ServiceDateInterval(mapLocalDate(start), mapLocalDate(end));
+    return new LocalDateInterval(mapLocalDate(start), mapLocalDate(end));
   }
 }

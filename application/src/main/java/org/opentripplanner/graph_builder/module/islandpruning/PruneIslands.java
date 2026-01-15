@@ -189,8 +189,8 @@ public class PruneIslands implements GraphBuilderModule {
     /* collect unreachable edges to a map */
     processIslands(islands, isolated, true, traverseMode);
 
-    extgraphs = new HashMap<>(); // let old map go
-    islands = new ArrayList<>(); // reset this too
+    extgraphs = new HashMap<>();
+    islands = new ArrayList<>();
 
     /* Recompute expanded subgraphs by accepting noThruTraffic edges in graph expansion.
        However, expansion is not allowed to jump from an original island to another one
@@ -343,10 +343,13 @@ public class PruneIslands implements GraphBuilderModule {
 
   private int collectSubGraphs(
     Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
-    Map<Vertex, Subgraph> newgraphs, // put new subgraphs here
-    Map<Vertex, Subgraph> subgraphs, // optional isolation map from a previous round
+    // put new subgraphs here
+    Map<Vertex, Subgraph> newgraphs,
+    // optional isolation map from a previous round
+    Map<Vertex, Subgraph> subgraphs,
+    // final list of islands or null
     ArrayList<Subgraph> islands
-  ) { // final list of islands or null
+  ) {
     int count = 0;
     for (Vertex gv : graph.getVertices()) {
       if (!(gv instanceof StreetVertex)) {
@@ -357,7 +360,8 @@ public class PruneIslands implements GraphBuilderModule {
         // do not start new graph generation from non-classified vertex
         continue;
       }
-      if (newgraphs.containsKey(gv)) { // already processed
+      // already processed
+      if (newgraphs.containsKey(gv)) {
         continue;
       }
       if (!neighborsForVertex.containsKey(gv)) {
@@ -515,7 +519,8 @@ public class PruneIslands implements GraphBuilderModule {
         if (!subgraph.contains(neighbor) && !alreadyMapped.containsKey(neighbor)) {
           if (anchor != null) {
             Subgraph compare = anchors.get(neighbor);
-            if (compare != null && compare != anchor) { // do not enter a new island
+            if (compare != null && compare != anchor) {
+              // do not enter a new island
               continue;
             }
           }

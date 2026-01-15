@@ -22,7 +22,8 @@ public record HopSpeedFast(
 
   @Override
   public String getMessage() {
-    int kph = (int) (3.6 * metersPerSecond); // convert meters per second to kph
+    // convert meters per second to kph
+    int kph = (int) (3.6 * metersPerSecond);
     return String.format(
       FMT,
       kph,
