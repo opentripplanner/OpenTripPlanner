@@ -33,7 +33,7 @@ import org.opentripplanner.gtfs.mapping.GTFSToTransitDataImportMapper;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.calendar.LocalDateInterval;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -64,7 +64,7 @@ public class GtfsModule implements GraphBuilderModule {
    * @see BuildConfig#transitServiceStart
    * @see BuildConfig#transitServiceEnd
    */
-  private final ServiceDateInterval transitPeriodLimit;
+  private final LocalDateInterval transitPeriodLimit;
   private final List<GtfsBundle> gtfsBundles;
   private final FareServiceFactory fareServiceFactory;
 
@@ -84,7 +84,7 @@ public class GtfsModule implements GraphBuilderModule {
     Graph graph,
     DeduplicatorService deduplicator,
     DataImportIssueStore issueStore,
-    ServiceDateInterval transitPeriodLimit,
+    LocalDateInterval transitPeriodLimit,
     FareServiceFactory fareServiceFactory,
     double maxStopToShapeSnapDistance,
     int subwayAccessTime_s
@@ -108,7 +108,7 @@ public class GtfsModule implements GraphBuilderModule {
     List<GtfsBundle> bundles,
     TimetableRepository timetableRepository,
     Graph graph,
-    ServiceDateInterval transitPeriodLimit
+    LocalDateInterval transitPeriodLimit
   ) {
     return new GtfsModule(
       bundles,

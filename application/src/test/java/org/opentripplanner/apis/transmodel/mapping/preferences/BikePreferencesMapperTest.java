@@ -17,9 +17,11 @@ class BikePreferencesMapperTest {
     var callWith = TestDataFetcherDecorator.of(
       Map.of(
         "bikeSpeed",
-        10.0, // Deprecated - ignored because wrapper exists
+        // Deprecated - ignored because wrapper exists
+        10.0,
         "bikePreferences",
-        Map.of("speed", 7.0) // Wrapper wins
+        // Wrapper wins
+        Map.of("speed", 7.0)
       )
     );
     mapBikePreferences(preferences, callWith);
@@ -65,9 +67,11 @@ class BikePreferencesMapperTest {
     var callWith = TestDataFetcherDecorator.of(
       Map.of(
         "bicycleOptimisationMethod",
-        VehicleRoutingOptimizeType.FLAT_STREETS, // Deprecated - ignored because wrapper exists
+        // Deprecated - ignored because wrapper exists
+        VehicleRoutingOptimizeType.FLAT_STREETS,
         "bikePreferences",
-        Map.of("optimisationMethod", VehicleRoutingOptimizeType.TRIANGLE) // Wrapper wins
+        // Wrapper wins
+        Map.of("optimisationMethod", VehicleRoutingOptimizeType.TRIANGLE)
       )
     );
     mapBikePreferences(preferences, callWith);
@@ -100,9 +104,11 @@ class BikePreferencesMapperTest {
     var callWith = TestDataFetcherDecorator.of(
       Map.of(
         "triangleFactors",
-        Map.of("time", 0.5, "slope", 0.3, "safety", 0.2), // Deprecated - ignored because wrapper exists
+        // Deprecated - ignored because wrapper exists
+        Map.of("time", 0.5, "slope", 0.3, "safety", 0.2),
         "bikePreferences",
-        Map.of("triangleFactors", Map.of("time", 0.3, "slope", 0.4, "safety", 0.3)) // Wrapper wins
+        // Wrapper wins
+        Map.of("triangleFactors", Map.of("time", 0.3, "slope", 0.4, "safety", 0.3))
       )
     );
     mapBikePreferences(preferences, callWith);
@@ -158,23 +164,30 @@ class BikePreferencesMapperTest {
     var callWith = TestDataFetcherDecorator.of(
       Map.of(
         "bikeSpeed",
-        10.0, // Deprecated - ignored because wrapper exists
+        // Deprecated - ignored because wrapper exists
+        10.0,
         "bikePreferences",
         Map.of(
           "speed",
-          7.0, // Wrapper wins
+          // Wrapper wins
+          7.0,
           "reluctance",
-          3.5, // Wrapper wins
+          // Wrapper wins
+          3.5,
           "optimisationMethod",
-          VehicleRoutingOptimizeType.TRIANGLE // Wrapper wins
+          // Wrapper wins
+          VehicleRoutingOptimizeType.TRIANGLE
         )
       )
     );
     mapBikePreferences(preferences, callWith);
     var result = preferences.build();
-    assertEquals(7.0, result.speed()); // Wrapper wins
-    assertEquals(3.5, result.reluctance()); // Wrapper wins
-    assertEquals(VehicleRoutingOptimizeType.TRIANGLE, result.optimizeType()); // Wrapper wins
+    // Wrapper wins
+    assertEquals(7.0, result.speed());
+    // Wrapper wins
+    assertEquals(3.5, result.reluctance());
+    // Wrapper wins
+    assertEquals(VehicleRoutingOptimizeType.TRIANGLE, result.optimizeType());
   }
 
   @Test
@@ -206,8 +219,10 @@ class BikePreferencesMapperTest {
     );
     mapBikePreferences(preferences, callWith);
     var result = preferences.build();
-    assertEquals(7.0, result.speed()); // Wrapper value
-    assertEquals(VehicleRoutingOptimizeType.TRIANGLE, result.optimizeType()); // Wrapper value
+    // Wrapper value
+    assertEquals(7.0, result.speed());
+    // Wrapper value
+    assertEquals(VehicleRoutingOptimizeType.TRIANGLE, result.optimizeType());
     // Values may be slightly different due to rounding in Units class
     assertEquals(0.3, result.optimizeTriangle().time());
     assertEquals(0.4, result.optimizeTriangle().slope());

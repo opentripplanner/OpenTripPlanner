@@ -79,7 +79,8 @@ class FlexAccessEgressBookingTest {
     var flex = buildFlexAccessEgress(List.of(st0, st1), 0, 1, T10_00);
 
     int askedDeparture = T10_00 + 5 * 60;
-    int expectedEarliest = T10_00 + noticeSec; // 10:30
+    // 10:30
+    int expectedEarliest = T10_00 + noticeSec;
     assertEquals(expectedEarliest, flex.earliestDepartureTime(askedDeparture));
   }
 

@@ -9,13 +9,18 @@ If you need to run the test locally you
 need to download the fixed datasets (OSM, transit) listed below and build a graph from them first.
 
 After the graph is built, copy it into `./test/performance/${location}` and execute the following
-command to run the speed test:
+command to run the speed test (also make sure the tests are compiled with e.g. `mvn test-compile`):
 
 ```
-mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${location} -p md -n 4 -i 3 -0"
+mvn --projects application exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${location} -p md -n 4 -i 3 -0"
 ```
 
-The results will be displayed on the console.
+The results will be displayed in the console.
+
+## CI
+
+The test is run after every merge to dev-2.x. Its GitHub Actions workflow is defined
+in [performance-test.yml](/.github/workflows/performance-test.yml).
 
 ## Instrumentation
 
@@ -69,7 +74,17 @@ Data used:
 Contact: [Geofox Team](mailto:Geofox-team@hbt.de)
 
 [build-config](hamburg/build-config.json)
- 
+
+### Helsinki, Finland
+
+[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=transit&var-branch_fixed=dev-2.x&var-location=helsinki&var-branch=dev-2.x&from=1658872800000&to=now)
+
+Data used:
+- HSL GTFS data
+- Helsinki metropolitan area OSM data
+
+[build-config](helsinki/build-config.json)
+
 ### Germany
 
 [📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=transit&var-branch_fixed=dev-2.x&var-location=germany&var-branch=dev-2.x&from=1661292000000&to=now)

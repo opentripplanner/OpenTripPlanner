@@ -25,6 +25,7 @@ public class TransferCacheTest {
       SetupHelper.loadOtpFeatures(opts);
       var model = SetupHelper.loadGraph(opts.rootDir(), config.graph);
       var timetableRepository = model.timetableRepository();
+      var transferRepository = model.transferRepository();
       var buildConfig = model.buildConfig();
 
       var timer = new SpeedTestTimer();
@@ -32,7 +33,7 @@ public class TransferCacheTest {
 
       // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
       // we do it manually here
-      createRaptorTransitData(timetableRepository, config.transitRoutingParams);
+      createRaptorTransitData(timetableRepository, transferRepository, config.transitRoutingParams);
 
       assertTestDateHasData(timetableRepository, config, buildConfig);
 

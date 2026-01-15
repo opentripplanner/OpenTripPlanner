@@ -1,10 +1,16 @@
 package org.opentripplanner.graph_builder.issues;
 
+import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.osm.model.OsmWay;
 
 public record CouldNotApplyMultiLevelInfoToElevatorWay(
   OsmWay way,
+  Coordinate from,
+  Coordinate to,
   int levels,
   int intersectionNodes
 )
@@ -30,5 +36,10 @@ public record CouldNotApplyMultiLevelInfoToElevatorWay(
   @Override
   public String getHTMLMessage() {
     return String.format(HTMLFMT, way.url(), way.getId(), levels, intersectionNodes);
+  }
+
+  @Override
+  public Geometry getGeometry() {
+    return GeometryUtils.makeLineString(List.of(from, to));
   }
 }

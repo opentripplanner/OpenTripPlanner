@@ -150,7 +150,8 @@ public class WalkStepBuilder {
   public String directionTextNoParens() {
     var str = directionText.toString();
     if (str == null) {
-      return null; //Avoid null reference exceptions with pathways which don't have names
+      // Avoid null reference exceptions with pathways which don't have names
+      return null;
     }
     int idx = str.indexOf('(');
     if (idx > 0) {

@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>230</otp.serialization.version.id>
+        <otp.serialization.version.id>232</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>34.1</geotools.version>
@@ -71,10 +71,10 @@
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.23</logback.version>
         <lucene.version>10.3.2</lucene.version>
-        <micrometer.version>1.16.1</micrometer.version>
+        <micrometer.version>1.16.2</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.33.2</protobuf.version>
+        <protobuf.version>4.33.4</protobuf.version>
         <siri-java-model.version>2.0.1</siri-java-model.version>
         <slf4j.version>2.0.17</slf4j.version>
         <!-- Other properties -->

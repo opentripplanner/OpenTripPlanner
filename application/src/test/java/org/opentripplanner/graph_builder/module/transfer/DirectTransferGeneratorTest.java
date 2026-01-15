@@ -37,7 +37,7 @@ class DirectTransferGeneratorTest {
     var repository = DirectTransferGeneratorTestData.of()
       .withTransferRequests(REQUEST_WITH_WALK_TRANSFER)
       .build();
-    assertEquals("<Empty>", pathToString(repository.getAllPathTransfers()));
+    assertEquals("<Empty>", pathToString(repository.listPathTransfers()));
   }
 
   @Test
@@ -87,7 +87,7 @@ class DirectTransferGeneratorTest {
         S23 - S13, 751m
         S23 - S21, 4448m
         S23 - S22, 2224m""",
-        pathToString(repository.getAllPathTransfers())
+        pathToString(repository.listPathTransfers())
       );
     });
   }
@@ -110,7 +110,7 @@ class DirectTransferGeneratorTest {
       S12 - S11, 2224m
       S12 - S22, 751m
       S22 - S11, 2347m""",
-      pathToString(repository.getAllPathTransfers())
+      pathToString(repository.listPathTransfers())
     );
   }
 
@@ -129,7 +129,7 @@ class DirectTransferGeneratorTest {
       """
        S0 - S21, 1829m
       S12 - S22, 751m""",
-      pathToString(repository.getAllPathTransfers())
+      pathToString(repository.listPathTransfers())
     );
   }
 
@@ -141,7 +141,7 @@ class DirectTransferGeneratorTest {
       .withTransferRequests(REQUEST_WITH_WALK_TRANSFER)
       .build();
 
-    assertEquals("<Empty>", pathToString(repository.getAllPathTransfers()));
+    assertEquals("<Empty>", pathToString(repository.listPathTransfers()));
   }
 
   @Test
@@ -170,7 +170,7 @@ class DirectTransferGeneratorTest {
         S13 - S22, 210m
         S13 - S23, 310m
         S22 - S23, 100m""",
-        pathToString(repository.getAllPathTransfers())
+        pathToString(repository.listPathTransfers())
       );
     });
   }
@@ -191,7 +191,7 @@ class DirectTransferGeneratorTest {
        S0 - S11, 100m
        S0 - S21, 100m
       S12 - S22, 110m""",
-      pathToString(repository.getAllPathTransfers())
+      pathToString(repository.listPathTransfers())
     );
   }
 
@@ -218,7 +218,7 @@ class DirectTransferGeneratorTest {
         S13 - S22, 210m
         S13 - S23, 310m
         S22 - S23, 100m""",
-        pathToString(repository.getAllPathTransfers())
+        pathToString(repository.listPathTransfers())
       );
     });
   }
@@ -231,9 +231,9 @@ class DirectTransferGeneratorTest {
       .withTransferRequests(REQUEST_WITH_WALK_TRANSFER, REQUEST_WITH_BIKE_TRANSFER)
       .build();
 
-    var walkTransfers = repository.findTransfers(StreetMode.WALK);
-    var bikeTransfers = repository.findTransfers(StreetMode.BIKE);
-    var carTransfers = repository.findTransfers(StreetMode.CAR);
+    var walkTransfers = repository.findTransfersByMode(StreetMode.WALK);
+    var bikeTransfers = repository.findTransfersByMode(StreetMode.BIKE);
+    var carTransfers = repository.findTransfersByMode(StreetMode.CAR);
 
     // Best transfers between patterns; Hence S0 - S22 removed
     // S11, S13, S21 -> *   No patterns alight here
@@ -272,7 +272,7 @@ class DirectTransferGeneratorTest {
         S13 - S22, 210m
         S13 - S23, 310m
         S22 - S23, 100m""",
-        pathToString(repository.getAllPathTransfers())
+        pathToString(repository.listPathTransfers())
       );
     });
   }
@@ -287,7 +287,7 @@ class DirectTransferGeneratorTest {
         .addTransferParameters(StreetMode.BIKE, TX_BIKES_ALLOWED_1H)
         .build();
 
-      var bikeTransfers = repository.findTransfers(StreetMode.BIKE);
+      var bikeTransfers = repository.findTransfersByMode(StreetMode.BIKE);
       assertEquals(
         """
         S13 - S22, 210m
@@ -308,7 +308,7 @@ class DirectTransferGeneratorTest {
         .addTransferParameters(StreetMode.BIKE, TX_BIKES_ALLOWED_1H)
         .build();
 
-      var bikeTransfers = repository.findTransfers(StreetMode.BIKE);
+      var bikeTransfers = repository.findTransfersByMode(StreetMode.BIKE);
       assertEquals(
         """
         S13 - S22, 210m

@@ -79,7 +79,8 @@ class PortlandCustomNamer implements EdgeNamer {
       .asIterable()
       .forEach(edge -> {
         if (!edge.nameIsDerived()) {
-          return; // this edge already has a real name so there is nothing to do
+          // this edge already has a real name so there is nothing to do
+          return;
         }
         if (isHighwayLink) {
           if (edge.isBack()) {

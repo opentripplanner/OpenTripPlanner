@@ -218,7 +218,8 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
           .map(TripTimes::getTrip)
           .collect(Collectors.toList());
       } catch (ParseException e) {
-        return null; // Invalid date format
+        // Invalid date format
+        return null;
       }
     };
   }

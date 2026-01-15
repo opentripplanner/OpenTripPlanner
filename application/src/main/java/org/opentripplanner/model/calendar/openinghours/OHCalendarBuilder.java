@@ -13,11 +13,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 
 public class OHCalendarBuilder {
 
-  private final Deduplicator deduplicator;
+  private final DeduplicatorService deduplicator;
   private final LocalDate startOfPeriod;
   private final LocalDate endOfPeriod;
   private final int daysInPeriod;
@@ -25,7 +25,7 @@ public class OHCalendarBuilder {
   private final List<OpeningHours> openingHours = new ArrayList<>();
 
   public OHCalendarBuilder(
-    Deduplicator deduplicator,
+    DeduplicatorService deduplicator,
     LocalDate startOfPeriod,
     int daysInPeriod,
     ZoneId zoneId

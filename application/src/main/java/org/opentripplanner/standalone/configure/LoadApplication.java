@@ -17,6 +17,7 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.transfer.TransferRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
@@ -64,6 +65,7 @@ public class LoadApplication {
       obj.osmInfoGraphBuildRepository,
       obj.streetDetailsRepository,
       obj.timetableRepository,
+      obj.transferRepository,
       obj.worldEnvelopeRepository,
       obj.parkingRepository,
       obj.issueSummary,
@@ -82,6 +84,7 @@ public class LoadApplication {
       factory.emptyOsmInfoGraphBuildRepository(),
       factory.emptyStreetDetailsRepository(),
       factory.emptyTimetableRepository(),
+      factory.emptyTransferRepository(),
       factory.emptyWorldEnvelopeRepository(),
       factory.emptyVehicleParkingRepository(),
       DataImportIssueSummary.empty(),
@@ -109,6 +112,7 @@ public class LoadApplication {
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     StreetDetailsRepository streetDetailsRepository,
     TimetableRepository timetableRepository,
+    TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueSummary issueSummary,
@@ -124,6 +128,7 @@ public class LoadApplication {
       osmInfoGraphBuildRepository,
       streetDetailsRepository,
       timetableRepository,
+      transferRepository,
       worldEnvelopeRepository,
       config(),
       graphBuilderDataSources(),

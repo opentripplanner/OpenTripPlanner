@@ -6,9 +6,12 @@
 <module name="Checker">
     <module name="TreeWalker">
         <module name="AvoidStarImport"/>
+        <module name="NeedBraces"/>
         <module name="RedundantImport"/>
+        <module name="TrailingComment">
+            <property name="format" value="^\s*$"/>
+        </module>
         <module name="UnusedImports"/>
         <module name="UnusedLocalVariable"/>
-        <module name="NeedBraces"/>
     </module>
 </module>

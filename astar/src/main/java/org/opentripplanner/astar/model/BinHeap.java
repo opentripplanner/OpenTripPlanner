@@ -21,10 +21,13 @@ public class BinHeap<T> {
       capacity = 10;
     }
     this.capacity = capacity;
-    elem = (T[]) new Object[capacity + 1]; // erasure voodoo
-    prio = new double[capacity + 1]; // 1-based indexing
+    // erasure voodoo
+    elem = (T[]) new Object[capacity + 1];
+    // 1-based indexing
+    prio = new double[capacity + 1];
     size = 0;
-    prio[0] = Double.NEGATIVE_INFINITY; // set sentinel
+    // set sentinel
+    prio[0] = Double.NEGATIVE_INFINITY;
   }
 
   public int size() {

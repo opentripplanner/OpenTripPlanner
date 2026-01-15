@@ -50,7 +50,8 @@ class CorsFilter implements ContainerRequestFilter, ContainerResponseFilter {
   @Override
   public void filter(ContainerRequestContext request, ContainerResponseContext response)
     throws IOException {
-    String origin = request.getHeaderString("Origin"); // case insensitive
+    // case-insensitive
+    String origin = request.getHeaderString("Origin");
     MultivaluedMap<String, Object> headers = response.getHeaders();
     headers.add("Access-Control-Allow-Origin", origin);
     boolean secureTransport = request.getSecurityContext().isSecure();

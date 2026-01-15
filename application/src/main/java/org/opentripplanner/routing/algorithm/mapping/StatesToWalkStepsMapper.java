@@ -99,7 +99,8 @@ public class StatesToWalkStepsMapper {
 
   public static String getNormalizedName(String streetName) {
     if (streetName == null) {
-      return null; //Avoid null reference exceptions with pathways which don't have names
+      // Avoid null reference exceptions with pathways which don't have names
+      return null;
     }
     int idx = streetName.indexOf('(');
     if (idx > 0) {

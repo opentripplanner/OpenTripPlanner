@@ -16,14 +16,22 @@ import org.opentripplanner.street.model.vertex.Vertex;
 public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
 
   private static final Color[] colors = {
-    new Color(200, 200, 200), // no limitations = light gray
-    new Color(200, 200, 0), // no walk thru traffic = yellow
-    new Color(0, 200, 200), // no bike thru = cyan
-    new Color(0, 200, 0), // no walk & bike thru = green
-    new Color(0, 0, 200), // no car thru = blue
-    new Color(200, 100, 0), // no car & walk thru = orange
-    new Color(200, 0, 200), // no car & bike thru = purple
-    new Color(200, 0, 0), // no for all = red
+    // no limitations = light gray
+    new Color(200, 200, 200),
+    // no walk thru traffic = yellow
+    new Color(200, 200, 0),
+    // no bike thru = cyan
+    new Color(0, 200, 200),
+    // no walk & bike thru = green
+    new Color(0, 200, 0),
+    // no car thru = blue
+    new Color(0, 0, 200),
+    // no car & walk thru = orange
+    new Color(200, 100, 0),
+    // no car & bike thru = purple
+    new Color(200, 0, 200),
+    // no for all = red
+    new Color(200, 0, 0),
   };
 
   public NoThruTrafficEdgeRenderer() {}

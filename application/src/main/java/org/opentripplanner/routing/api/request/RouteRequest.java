@@ -5,7 +5,6 @@ import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +23,7 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.utils.collection.ListSection;
+import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,9 +94,12 @@ public class RouteRequest implements Serializable {
     this.to = builder.to;
     this.via = builder.via;
 
+    // The given dateTime will be set to a whole number of seconds. We don't do sub-second
+    // accuracy, and if we set the millisecond part to a non-zero value, rounding will not be
+    // guaranteed to be the same for departAt and arriveBy queries.
     this.dateTime = (!builder.defaultRequest && builder.dateTime == null)
       ? normalizeNow()
-      : normalizeDateTime(builder.dateTime);
+      : TimeUtils.truncateToSeconds(builder.dateTime);
 
     this.arriveBy = builder.arriveBy;
     this.timetableView = builder.timetableView;
@@ -120,20 +123,8 @@ public class RouteRequest implements Serializable {
     return DEFAULT;
   }
 
-  /**
-   * The given {@code dateTime} will be set to a whole number of seconds. We don't do sub-second
-   * accuracy, and if we set the millisecond part to a non-zero value, rounding will not be
-   * guaranteed to be the same for departAt and arriveBy queries.
-   *
-   * If the given {@code dateTime} is {@code null}, then {@code null} is returned
-   */
-  @Nullable
-  public static Instant normalizeDateTime(@Nullable Instant dateTime) {
-    return dateTime == null ? null : dateTime.truncatedTo(ChronoUnit.SECONDS);
-  }
-
   public static Instant normalizeNow() {
-    return normalizeDateTime(Instant.now());
+    return TimeUtils.truncateToSeconds(Instant.now());
   }
 
   public RouteRequestBuilder copyOf() {

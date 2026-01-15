@@ -8,6 +8,7 @@ import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
+import org.opentripplanner.transfer.TransferRepository;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -24,6 +25,7 @@ import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 public final class TransitTestEnvironment {
 
   private final TimetableRepository timetableRepository;
+  private final TransferRepository transferRepository;
   private final TimetableSnapshotManager snapshotManager;
   private final LocalDate defaultServiceDate;
 
@@ -39,12 +41,20 @@ public final class TransitTestEnvironment {
     return new TransitTestEnvironmentBuilder(timeZone, serviceDate);
   }
 
-  TransitTestEnvironment(TimetableRepository timetableRepository, LocalDate defaultServiceDate) {
+  TransitTestEnvironment(
+    TimetableRepository timetableRepository,
+    TransferRepository transferRepository,
+    LocalDate defaultServiceDate
+  ) {
     this.timetableRepository = timetableRepository;
 
     this.timetableRepository.index();
     this.timetableRepository.setRaptorTransitData(
-        RaptorTransitDataMapper.map(new TestTransitTuningParameters(), timetableRepository)
+        RaptorTransitDataMapper.map(
+          new TestTransitTuningParameters(),
+          timetableRepository,
+          transferRepository
+        )
       );
     this.timetableRepository.setRealtimeRaptorTransitData(
         new RaptorTransitData(timetableRepository.getRaptorTransitData())
@@ -55,6 +65,7 @@ public final class TransitTestEnvironment {
       () -> defaultServiceDate
     );
     this.defaultServiceDate = defaultServiceDate;
+    this.transferRepository = transferRepository;
   }
 
   /**

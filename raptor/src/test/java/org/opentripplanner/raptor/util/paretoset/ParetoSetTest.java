@@ -54,11 +54,12 @@ public class ParetoSetTest {
 
   @Test
   public void addVector() {
+    // Pareto set is compared by 3 criteria:
+    // 1. Less than on v1
+    // 2. Different on v2
+    // 3. At least 2 less than on v3
     ParetoSet<TestVector> set = new ParetoSet<>(
-      (l, r) ->
-        l.v1 < r.v1 || // less than
-        l.v2 != r.v2 || // different dominates
-        l.v3 + 2 < r.v3 // at least 2 less than
+      (l, r) -> l.v1 < r.v1 || l.v2 != r.v2 || l.v3 + 2 < r.v3
     );
 
     // When one element is added

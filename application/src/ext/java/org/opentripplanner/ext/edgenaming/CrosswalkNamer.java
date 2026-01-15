@@ -37,7 +37,7 @@ class CrosswalkNamer implements EdgeNamer {
 
   private static final Logger LOG = LoggerFactory.getLogger(CrosswalkNamer.class);
   private static final int BUFFER_METERS = 25;
-  private final BufferedEdgeProcessor processor; //=
+  private final BufferedEdgeProcessor processor;
 
   private StreetEdgeIndex streetIndex = new StreetEdgeIndex();
   private StreetEdgeIndex sidewalkIndex = new StreetEdgeIndex();
