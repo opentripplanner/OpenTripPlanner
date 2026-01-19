@@ -95,7 +95,7 @@ class SiriTripPatternCache {
         .withMode(trip.getMode())
         .withNetexSubmode(trip.getNetexSubMode())
         .withStopPattern(stopPattern)
-        .withCreatedByRealtimeUpdater(true)
+        .withRealTimeStopPatternChanged()
         .withOriginalTripPattern(originalTripPattern)
         .build();
       // TODO: Add pattern to timetableRepository index?

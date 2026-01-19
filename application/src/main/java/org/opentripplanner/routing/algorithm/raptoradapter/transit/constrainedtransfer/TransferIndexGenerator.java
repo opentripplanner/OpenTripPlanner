@@ -240,13 +240,18 @@ public class TransferIndexGenerator {
     var patterns = patternsByTrip.get(trip);
     var patternsByRealtimeOrScheduled = patterns
       .stream()
-      .collect(Collectors.groupingBy(pattern -> pattern.getPattern().isCreatedByRealtimeUpdater()));
+      .collect(Collectors.groupingBy(pattern -> pattern.getPattern().isRealTimeTripPattern()));
+
+    var scheduledPatterns = patternsByRealtimeOrScheduled.get(Boolean.FALSE);
 
     // Process first the pattern for which stopPosInPattern was calculated for
-    List<RoutingTripPattern> scheduledPatterns = patternsByRealtimeOrScheduled.get(Boolean.FALSE);
     if (scheduledPatterns == null || scheduledPatterns.size() != 1) {
+      // This could happen for ADDED TRIPS/EXTRA JOURNEY. But we would like to know the size of
+      // this problem, before we try to fix the code below. So we just log a warning. Note!
+      // Realtime added trips can only have constrained transfers, if the constraint is defined on
+      // the stop or route level.
       LOG.warn(
-        "Trip {} does not have exactly one scheduled trip pattern, found: {}. " +
+        "Trip {} does not have zero or one scheduled trip pattern, found: {}. " +
         "Skipping transfer generation.",
         trip,
         scheduledPatterns

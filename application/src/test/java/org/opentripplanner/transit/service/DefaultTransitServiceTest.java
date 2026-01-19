@@ -81,7 +81,7 @@ class DefaultTransitServiceTest {
   );
   private static final TripPattern REAL_TIME_PATTERN = TEST_MODEL.pattern(BUS)
     .withStopPattern(REAL_TIME_STOP_PATTERN)
-    .withCreatedByRealtimeUpdater(true)
+    .withRealTimeStopPatternChanged()
     .build();
 
   static FeedScopedId CALENDAR_ID = id("CAL_1");

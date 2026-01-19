@@ -86,7 +86,7 @@ class DefaultRealtimeVehicleServiceTest {
     var realtimePattern = tripPattern("realtime-added", ROUTE)
       .withStopPattern(STOP_PATTERN)
       .withOriginalTripPattern(PATTERN1)
-      .withCreatedByRealtimeUpdater(true)
+      .withRealTimeStopPatternChanged()
       .build();
     service.setRealtimeVehiclesForFeed(FEED_ID, ImmutableListMultimap.of(realtimePattern, VEHICLE));
     var updates = service.getRealtimeVehicles(PATTERN1);
