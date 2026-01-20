@@ -21,8 +21,7 @@ public class FlexConfig implements FlexParameters {
     if you can walk 45 minutes to a flex stop/zone you're unlikely to be the target audience for those
     services.
     """;
-  public static final String AREA_STOP_DESCRIPTION =
-    """
+  public static final String AREA_STOP_DESCRIPTION = """
     Area stops is the internal OTP name. In GTFS they are called "locations" and
     NeTEx FlexibleArea.
     """;
