@@ -277,6 +277,8 @@ public class OsmTagMapper {
         "highway=trunk_link;sidewalk=right",
         "highway=trunk_link;sidewalk=both"
       ),
+      // reduce trunk walk safety value with sidewalk because a trunk road has a high safety value
+      // by default
       ofWalkSafety(0.4)
     );
 
