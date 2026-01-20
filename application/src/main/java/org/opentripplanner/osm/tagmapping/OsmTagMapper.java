@@ -212,9 +212,7 @@ public class OsmTagMapper {
     props.setMixinProperties(
       new ExactMatchSpecifier(
         new Equals("foot", "designated"),
-        new Not(new Equals("highway", "footway")),
-        new Not(new Equals("highway", "pedestrian")),
-        new Not(new Equals("highway", "path"))
+        new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path"))
       ),
       ofWalkSafety(0.9)
     );
