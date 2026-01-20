@@ -259,19 +259,7 @@ public class OsmTagMapper {
     props.setMixinProperties(
       new LogicalOrSpecifier(
         new ExactMatchSpecifier(
-          new Equals("sidewalk", "yes"),
-          new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path", "trunk"))
-        ),
-        new ExactMatchSpecifier(
-          new Equals("sidewalk", "left"),
-          new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path", "trunk"))
-        ),
-        new ExactMatchSpecifier(
-          new Equals("sidewalk", "right"),
-          new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path", "trunk"))
-        ),
-        new ExactMatchSpecifier(
-          new Equals("sidewalk", "both"),
+          new Condition.OneOf("sidewalk", "yes", "left", "right", "both"),
           new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path", "trunk"))
         )
       ),
