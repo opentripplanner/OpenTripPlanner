@@ -714,7 +714,10 @@ public class OsmModule implements GraphBuilderModule {
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
     I18NString name = params.edgeNamer().getName(way, label);
-    float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, direction);
+    float carSpeed = way
+      .getOsmProvider()
+      .getOsmTagMapper()
+      .getCarSpeedForWay(way, direction, issueStore);
 
     StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
       .withFromVertex(fromVertex)
@@ -738,10 +741,12 @@ public class OsmModule implements GraphBuilderModule {
 
   private float getMaxCarSpeed() {
     float maxSpeed = 0f;
-    for (var provider : providers) {
-      var carSpeed = provider.getOsmTagMapper().getMaxUsedCarSpeed(provider.getWayPropertySet());
-      if (carSpeed > maxSpeed) {
-        maxSpeed = carSpeed;
+    for (var e : graph.getEdges()) {
+      if (e instanceof StreetEdge se) {
+        var carSpeed = se.getCarSpeed();
+        if (carSpeed > maxSpeed) {
+          maxSpeed = carSpeed;
+        }
       }
     }
     return maxSpeed;

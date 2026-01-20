@@ -74,6 +74,10 @@ public class EgressPaths {
     return filterPathsAndGetStops(RaptorAccessEgress::stopReachedOnBoard);
   }
 
+  public EgressPaths filterOnSegment(int segment) {
+    return new EgressPaths(AccessEgressFunctions.filterOnSegment(pathsByStop, segment));
+  }
+
   /**
    * Decorate egress to implement time-penalty. This decoration will do the necessary
    * adjustments to apply the penalty in the raptor algorithm. See the decorator class for more

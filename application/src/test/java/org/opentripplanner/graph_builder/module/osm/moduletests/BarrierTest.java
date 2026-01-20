@@ -19,7 +19,6 @@ import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
@@ -123,7 +122,6 @@ public class BarrierTest {
       List.of(path, chain, barrier),
       List.of(n1, n2, n3, n4, n5, n6)
     );
-    new OsmTagMapper().populateProperties(osmProvider.getWayPropertySet());
 
     var graph = new Graph();
 

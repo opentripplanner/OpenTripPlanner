@@ -5,7 +5,6 @@ import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctio
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForStandardRaptor;
 
 import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -87,16 +86,6 @@ public class AccessPaths {
     );
   }
 
-  public AccessPaths copyEmpty() {
-    return new AccessPaths(
-      iterationStep,
-      iterationOp,
-      new TIntObjectHashMap<>(),
-      new TIntObjectHashMap<>(),
-      maxTimePenalty
-    );
-  }
-
   /**
    * Return the transfer arriving at the stop on-street(walking) grouped by Raptor round. The Raptor
    * round is calculated from the number of rides in the transfer.
@@ -160,6 +149,16 @@ public class AccessPaths {
     return (
       hasTimeDependentAccess(arrivedOnBoardByNumOfRides) ||
       hasTimeDependentAccess(arrivedOnStreetByNumOfRides)
+    );
+  }
+
+  public AccessPaths filterOnSegment(int segment) {
+    return new AccessPaths(
+      iterationStep,
+      iterationOp,
+      AccessEgressFunctions.filterOnSegment(arrivedOnStreetByNumOfRides, segment),
+      AccessEgressFunctions.filterOnSegment(arrivedOnBoardByNumOfRides, segment),
+      maxTimePenalty
     );
   }
 

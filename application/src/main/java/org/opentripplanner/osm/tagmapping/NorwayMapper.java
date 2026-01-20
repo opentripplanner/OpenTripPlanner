@@ -29,7 +29,8 @@ import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
 class NorwayMapper extends OsmTagMapper {
 
   @Override
-  public void populateProperties(WayPropertySet props) {
+  public WayPropertySet buildWayPropertySet() {
+    var props = WayPropertySet.of();
     var hasSidewalk = new Condition.OneOf("sidewalk", "yes", "left", "right", "both");
     // e.g sidewalk:left=yes
     var hasPrefixSidewalk = new Condition.Equals("sidewalk", "yes");
@@ -633,9 +634,9 @@ class NorwayMapper extends OsmTagMapper {
     props.setCarSpeed("highway=footway", 1.94f);
 
     // 80 km/h
-    props.defaultCarSpeed = 22.22f;
+    props.setDefaultCarSpeed(22.22f);
     // 110 km/h
-    props.maxPossibleCarSpeed = 30.56f;
+    props.setMaxPossibleCarSpeed(30.56f);
 
     super.populateNotesAndNames(props);
 
@@ -644,5 +645,7 @@ class NorwayMapper extends OsmTagMapper {
     props.setSlopeOverride(new BestMatchSpecifier("tunnel=*"), true);
     props.setSlopeOverride(new BestMatchSpecifier("location=underground"), true);
     props.setSlopeOverride(new BestMatchSpecifier("indoor=yes"), true);
+
+    return props.build();
   }
 }

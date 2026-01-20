@@ -58,7 +58,7 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
   }
 
   public Collection<RaptorPath<T>> extractPaths() {
-    ParetoSet<RaptorPath<T>> paths = new ParetoSet<>(comparator);
+    ParetoSet<RaptorPath<T>> paths = ParetoSet.of(comparator);
     for (RaptorAccessEgress egress : egressPaths) {
       createNewPath(egress).ifPresent(paths::add);
     }

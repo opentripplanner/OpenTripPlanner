@@ -1,13 +1,16 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.configure;
 
+import gnu.trove.map.TIntObjectMap;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
 import org.opentripplanner.raptor.api.request.RaptorViaLocation;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaSegments;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
@@ -16,12 +19,13 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsServi
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ViaConnectionStopArrivalEventListener;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalsEventListenerMapper;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.StopArrivalFactoryC1;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2.StopArrivalFactoryC2;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
@@ -36,6 +40,7 @@ import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
+import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 
 /**
  * Configure and create multi-criteria worker, state and child classes.
@@ -48,10 +53,11 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private final PathConfig<T> pathConfig;
   private final PassThroughPointsService passThroughPointsService;
   private DestinationArrivalPaths<T> paths;
+  private ParetoComparator<RaptorPath<T>> comparator;
   private McRangeRaptorWorkerState<T> state;
   private Heuristics heuristics;
   private McStopArrivals<T> arrivals;
-  private McStopArrivals<T> nextLegArrivals = null;
+  private McStopArrivals<T> nextSegmentArrivals = null;
   private McStopArrivalFactory<T> stopArrivalFactory = null;
 
   public McRangeRaptorConfig(
@@ -87,13 +93,14 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Sets the next leg state. This is used to connect the state created by this config with the
-   * next leg. If this is the last leg, the next leg should be {@code null}. This is optional.
+   * Sets the next segment state. This is used to connect the state created by this config with the
+   * next segment. If this is the last segment, the next segment should be {@code null}. This is
+   * optional.
    */
-  public McRangeRaptorConfig<T> connectWithNextLegArrivals(
-    @Nullable McStopArrivals<T> nextLegArrivals
+  public McRangeRaptorConfig<T> connectWithNextSegmentArrivals(
+    @Nullable McStopArrivals<T> nextSegmentArrivals
   ) {
-    this.nextLegArrivals = nextLegArrivals;
+    this.nextSegmentArrivals = nextSegmentArrivals;
     return this;
   }
 
@@ -113,16 +120,30 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
    */
   public McStopArrivals<T> stopArrivals() {
     if (arrivals == null) {
+      // Glue arrivals to next-connection, egress/destination events, and debug-event on stops.
+      var listeners = ArrivalsEventListenerMapper.<T>map(
+        context().debugFactory(),
+        createViaConnectionListeners(),
+        contextSegment.egressPaths(),
+        createDestinationArrivalPaths()
+      );
+
       this.arrivals = new McStopArrivals<>(
         context().nStops(),
-        contextSegment.egressPaths(),
-        createViaConnectionListeners(),
-        createDestinationArrivalPaths(),
+        listeners,
         createFactoryParetoComparator(),
         context().debugFactory()
       );
     }
     return arrivals;
+  }
+
+  public ParetoComparator<RaptorPath<T>> createPathParetoComparator() {
+    if (comparator == null) {
+      var c2Comp = includeC2() ? dominanceFunctionC2() : null;
+      comparator = pathConfig.createPathParetoComparator(resolveCostConfig(), c2Comp);
+    }
+    return comparator;
   }
 
   /* private factory methods */
@@ -202,13 +223,12 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private <R extends PatternRide<T>> ParetoSet<R> createPatternRideParetoSet(
     ParetoComparator<R> comparator
   ) {
-    return new ParetoSet<>(comparator, context().debugFactory().paretoSetPatternRideListener());
+    return ParetoSet.of(comparator, context().debugFactory().paretoSetPatternRideListener());
   }
 
   private DestinationArrivalPaths<T> createDestinationArrivalPaths() {
     if (paths == null) {
-      var c2Comp = includeC2() ? dominanceFunctionC2() : null;
-      paths = pathConfig.createDestArrivalPaths(resolveCostConfig(), c2Comp);
+      paths = pathConfig.createDestArrivalPaths(resolveCostConfig(), createPathParetoComparator());
     }
     return paths;
   }
@@ -217,11 +237,11 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     return ArrivalParetoSetComparatorFactory.factory(mcRequest().relaxC1(), dominanceFunctionC2());
   }
 
-  private List<ViaConnectionStopArrivalEventListener<T>> createViaConnectionListeners() {
+  private TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> createViaConnectionListeners() {
     return ViaConnectionStopArrivalEventListener.createEventListeners(
       contextSegment.viaConnections(),
       createStopArrivalFactory(),
-      nextLegArrivals,
+      nextSegmentArrivals,
       context().lifeCycle()::onTransfersForRoundComplete
     );
   }

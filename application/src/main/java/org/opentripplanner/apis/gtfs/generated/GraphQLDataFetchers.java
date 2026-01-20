@@ -34,6 +34,7 @@ import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
+import org.opentripplanner.framework.graphql.CountedConnection;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -903,7 +904,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations();
 
-    public DataFetcher<Connection<TripOnServiceDate>> canceledTrips();
+    public DataFetcher<CountedConnection<TripOnServiceDate>> canceledTrips();
 
     public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes();
 
@@ -1425,6 +1426,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<Edge<TripOnServiceDate>>> edges();
 
     public DataFetcher<Object> pageInfo();
+
+    public DataFetcher<Integer> totalCount();
   }
 
   /**

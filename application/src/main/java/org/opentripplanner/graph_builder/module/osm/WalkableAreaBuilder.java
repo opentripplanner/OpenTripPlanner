@@ -501,7 +501,7 @@ class WalkableAreaBuilder {
     float carSpeed = parent
       .getOsmProvider()
       .getOsmTagMapper()
-      .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS);
+      .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS, issueStore);
 
     I18NString name = namer.getName(parent, label);
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()

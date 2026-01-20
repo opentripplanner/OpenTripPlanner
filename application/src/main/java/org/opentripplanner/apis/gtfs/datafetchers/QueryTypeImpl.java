@@ -30,6 +30,7 @@ import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
+import org.opentripplanner.apis.gtfs.mapping.CanceledTripsFilterMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
@@ -38,6 +39,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.service.gtfs.GtfsFaresService;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
+import org.opentripplanner.framework.graphql.CountedConnection;
+import org.opentripplanner.framework.graphql.SimpleCountedListConnection;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -818,10 +821,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   @Override
-  public DataFetcher<Connection<TripOnServiceDate>> canceledTrips() {
+  public DataFetcher<CountedConnection<TripOnServiceDate>> canceledTrips() {
     return environment -> {
-      var trips = getTransitService(environment).listCanceledTrips();
-      return new SimpleListConnection<>(trips).get(environment);
+      var request = CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment);
+      var trips = getTransitService(environment).findCanceledTrips(request);
+      return new SimpleCountedListConnection<>(trips).get(environment);
     };
   }
 

@@ -26,7 +26,7 @@ public class PortlandMapperTest {
 
   static double delta = 0.1;
 
-  static WayPropertySet wps = new WayPropertySet();
+  static final WayPropertySet wps = new PortlandMapper().buildWayPropertySet();
 
   static Stream<Arguments> cases() {
     return Stream.of(
@@ -44,11 +44,6 @@ public class PortlandMapperTest {
       Arguments.of(fiveLanes(), 1.584),
       Arguments.of(noSidewalkHighSpeed(), 7.19)
     );
-  }
-
-  static {
-    var source = new PortlandMapper();
-    source.populateProperties(wps);
   }
 
   @ParameterizedTest(name = "way {0} should have walk safety factor {1}")

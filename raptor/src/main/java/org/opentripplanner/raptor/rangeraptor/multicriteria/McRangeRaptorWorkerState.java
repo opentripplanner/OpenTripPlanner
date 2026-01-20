@@ -11,6 +11,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;

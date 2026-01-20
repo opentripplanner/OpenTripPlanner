@@ -66,6 +66,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix elevator ways with multiple intersection nodes [#7181](https://github.com/opentripplanner/OpenTripPlanner/pull/7181)
 - Improve indoor routing information in debug UI [#7174](https://github.com/opentripplanner/OpenTripPlanner/pull/7174)
 - Clear timetables after withdrawn NEW trips [#6280](https://github.com/opentripplanner/OpenTripPlanner/pull/6280)
+- Undeprecate car/bikepark nearest filters which were deprecated by accident [#7209](https://github.com/opentripplanner/OpenTripPlanner/pull/7209)
+- Fix SIRI-SX affects resolver [#7210](https://github.com/opentripplanner/OpenTripPlanner/pull/7210)
+- Add support for via-location visits in Raptor access and egress paths [#7101](https://github.com/opentripplanner/OpenTripPlanner/pull/7101)
+- Fix car routing using stations or multi-modal stations as locations [#7151](https://github.com/opentripplanner/OpenTripPlanner/pull/7151)
+- Add modes filter and totalCount to the canceled trips query in the GTFS API [#7200](https://github.com/opentripplanner/OpenTripPlanner/pull/7200)
+- Make sure flex transfers are indexed exactly once [#7218](https://github.com/opentripplanner/OpenTripPlanner/pull/7218)
+- Fix SIRI ET ExtraJourney trips not appearing in departure/arrival boards [#7052](https://github.com/opentripplanner/OpenTripPlanner/pull/7052)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)

@@ -116,8 +116,8 @@ public class EnumTypes {
     .value("quay", TransmodelPlaceType.QUAY, "Quay")
     .value("stopPlace", TransmodelPlaceType.STOP_PLACE, "StopPlace")
     .value("bicycleRent", TransmodelPlaceType.BICYCLE_RENT, "Bicycle rent stations")
-    .value("bikePark", TransmodelPlaceType.BIKE_PARK, "Bike parks", "Not supported")
-    .value("carPark", TransmodelPlaceType.CAR_PARK, "Car parks", "Not supported")
+    .value("bikePark", TransmodelPlaceType.BIKE_PARK, "Bike parks")
+    .value("carPark", TransmodelPlaceType.CAR_PARK, "Car parks")
     .build();
 
   public static final GraphQLEnumType INPUT_FIELD = GraphQLEnumType.newEnum()

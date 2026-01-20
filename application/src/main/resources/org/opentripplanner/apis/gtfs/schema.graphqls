@@ -1305,6 +1305,8 @@ type QueryType {
     and should be used together with the `last` parameter.
     """
     before: String,
+    "Can be used to filter the results. When paging, the filter should not be changed between pages."
+    filters: CanceledTripsFilterInput,
     """
     Limits how many trips are returned. This parameter is part of the
     [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm) and can be used together with
@@ -2699,6 +2701,13 @@ type TripOnServiceDateConnection {
   Part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
   """
   pageInfo: PageInfo!
+  """
+  The total number of trips on service dates in this connection at the time of query execution (including the current and previous
+  pages). 
+  Note, this number might not stay the same throughout the paging as trips might be added or
+  removed.
+  """
+  totalCount: Int!
 }
 
 """
@@ -3222,9 +3231,9 @@ enum FilterPlaceType {
   "Old value for VEHICLE_RENT"
   BICYCLE_RENT @deprecated(reason : "Use VEHICLE_RENT instead as it's clearer that it also returns rental scooters, cars...")
   "Parking lots (not rental stations) that contain spaces for bicycles"
-  BIKE_PARK @deprecated(reason : "Not supported.")
+  BIKE_PARK
   "Parking lots that contain spaces for cars"
-  CAR_PARK @deprecated(reason : "Not supported.")
+  CAR_PARK
   "Departure rows"
   DEPARTURE_ROW
   """
@@ -4167,6 +4176,34 @@ input BoardPreferencesInput {
   slack: Duration
   "A multiplier for how bad waiting at a stop is compared to being in transit for equal lengths of time."
   waitReluctance: Reluctance
+}
+
+"""
+A collection of selectors for including or excluding trips from canceled trips search. Currently,
+you can only use either include or exclude filter (as filtering is only supported with transit modes).
+"""
+input CanceledTripsFilterInput @oneOf {
+  """
+  A list of selectors for excluding canceled trips.
+    
+  An empty list or a list containing `null` is forbidden.
+  """
+  exclude: [CanceledTripsFilterSelectInput!]
+  """
+  A list of selectors for including canceled trips.
+    
+  An empty list or a list containing `null` is forbidden.
+  """
+  include: [CanceledTripsFilterSelectInput!]
+}
+
+"""
+A list of selectors for including or excluding trips from canceled trips search. Null
+means everything is allowed to be returned and empty lists are not allowed.
+"""
+input CanceledTripsFilterSelectInput {
+  "Canceled trips from these transit modes should be included/excluded."
+  modes: [TransitMode!]
 }
 
 "Preferences for car parking facilities used during the routing."

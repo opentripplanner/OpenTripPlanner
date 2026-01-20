@@ -19,6 +19,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
@@ -44,6 +45,10 @@ public class LinkingContextFactory {
   private final Graph graph;
   private final VertexCreationService vertexCreationService;
   private final Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds;
+  /**
+   * This can be either a station, a multi-modal station or a group of stations.
+   */
+  private final Function<FeedScopedId, Optional<WgsCoordinate>> findStopLocationsGroupCentroid;
 
   /**
    * Construct a factory when stop locations are potentially used for locations.
@@ -51,18 +56,20 @@ public class LinkingContextFactory {
   public LinkingContextFactory(
     Graph graph,
     VertexCreationService vertexCreationService,
-    Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds
+    Function<FeedScopedId, Collection<FeedScopedId>> resolveSiteIds,
+    Function<FeedScopedId, Optional<WgsCoordinate>> findStopLocationsGroupCentroid
   ) {
     this.graph = graph;
     this.vertexCreationService = vertexCreationService;
     this.resolveSiteIds = resolveSiteIds;
+    this.findStopLocationsGroupCentroid = findStopLocationsGroupCentroid;
   }
 
   /**
    * Construct a factory when stop locations are not used for locations.
    */
   public LinkingContextFactory(Graph graph, VertexCreationService vertexCreationService) {
-    this(graph, vertexCreationService, id -> Set.of());
+    this(graph, vertexCreationService, id -> Set.of(), id -> Optional.empty());
   }
 
   /**
@@ -340,6 +347,19 @@ public class LinkingContextFactory {
           c.latitude(),
           c.longitude()
         );
+      } else {
+        // For car routing, we use station's coordinate instead of child stops' if stop location is
+        // a station.
+        var coordinate = findStopLocationsGroupCentroid.apply(location.stopId);
+        if (coordinate.isPresent()) {
+          var c = coordinate.get();
+          location = new GenericLocation(
+            location.label,
+            location.stopId,
+            c.latitude(),
+            c.longitude()
+          );
+        }
       }
     }
     return location.getCoordinate() != null

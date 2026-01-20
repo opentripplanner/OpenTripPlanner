@@ -88,9 +88,11 @@ class TripOnServiceDateMatcherFactoryTest {
 
   @Test
   void testMatchOperatingDays() {
-    TripOnServiceDateRequest request = TripOnServiceDateRequest.of(
-      FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 2, 22)))
-    ).build();
+    TripOnServiceDateRequest request = TripOnServiceDateRequest.of()
+      .withIncludeServiceDates(
+        FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 2, 22)))
+      )
+      .build();
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
 
@@ -101,21 +103,23 @@ class TripOnServiceDateMatcherFactoryTest {
 
   @Test
   void testMatchMultiple() {
-    TripOnServiceDateRequest request = TripOnServiceDateRequest.of(
-      FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 2, 22)))
-    )
-      .withAgencies(
+    TripOnServiceDateRequest request = TripOnServiceDateRequest.of()
+      .withIncludeServiceDates(
+        FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 2, 22)))
+      )
+      .withIncludeAgencies(
         FilterValues.ofEmptyIsEverything("agencies", List.of(new FeedScopedId("F", "RUT:1")))
       )
-      .withRoutes(
+      .withIncludeRoutes(
         FilterValues.ofEmptyIsEverything("routes", List.of(new FeedScopedId("F", "RUT:route:1")))
       )
-      .withServiceJourneys(
+      .withIncludeServiceJourneys(
         FilterValues.ofEmptyIsEverything(
           "serviceJourneys",
           List.of(new FeedScopedId("F", "RUT:route:trip:1"))
         )
       )
+      .withIncludeModes(FilterValues.ofEmptyIsEverything("modes", List.of(TransitMode.BUS)))
       .build();
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
@@ -127,22 +131,23 @@ class TripOnServiceDateMatcherFactoryTest {
 
   @Test
   void testMatchMultipleServiceJourneyMatchers() {
-    TripOnServiceDateRequest request = TripOnServiceDateRequest.of(
-      FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 2, 22)))
-    )
-      .withAgencies(
+    TripOnServiceDateRequest request = TripOnServiceDateRequest.of()
+      .withIncludeServiceDates(
+        FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 2, 22)))
+      )
+      .withIncludeAgencies(
         FilterValues.ofEmptyIsEverything(
           "agencies",
           List.of(new FeedScopedId("F", "RUT:1"), new FeedScopedId("F", "RUT:2"))
         )
       )
-      .withRoutes(
+      .withIncludeRoutes(
         FilterValues.ofEmptyIsEverything(
           "routes",
           List.of(new FeedScopedId("F", "RUT:route:1"), new FeedScopedId("F", "RUT:route:2"))
         )
       )
-      .withServiceJourneys(
+      .withIncludeServiceJourneys(
         FilterValues.ofEmptyIsEverything(
           "serviceJourneys",
           List.of(
@@ -157,6 +162,24 @@ class TripOnServiceDateMatcherFactoryTest {
 
     assertTrue(matcher.match(tripOnServiceDateRut));
     assertTrue(matcher.match(tripOnServiceDateRut2));
+    assertFalse(matcher.match(tripOnServiceDateAkt));
+  }
+
+  @Test
+  void testIncludeExcludeOrder() {
+    // Exclude should negate include
+    TripOnServiceDateRequest request = TripOnServiceDateRequest.of()
+      .withIncludeServiceDates(
+        FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 2, 22)))
+      )
+      .withIncludeModes(FilterValues.ofEmptyIsEverything("modes", List.of(TransitMode.BUS)))
+      .withExcludeModes(FilterValues.ofEmptyIsEverything("excludeModes", List.of(TransitMode.BUS)))
+      .build();
+
+    Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
+
+    assertFalse(matcher.match(tripOnServiceDateRut));
+    assertFalse(matcher.match(tripOnServiceDateRut2));
     assertFalse(matcher.match(tripOnServiceDateAkt));
   }
 }

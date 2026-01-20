@@ -32,6 +32,8 @@ import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.AreaStopBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.MultiModalStationBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
@@ -167,6 +169,14 @@ public class TimetableRepositoryForTest {
       .withCoordinate(60.0, 10.0)
       .withDescription(new NonLocalizedString("Station " + idAndName))
       .withPriority(StopTransferPriority.ALLOWED);
+  }
+
+  public MultiModalStationBuilder multiModalStation(String idAndName) {
+    return MultiModalStation.of(new FeedScopedId(FEED_ID, idAndName))
+      .withName(new NonLocalizedString(idAndName))
+      .withCode(idAndName)
+      .withCoordinate(new WgsCoordinate(60.0, 10.0))
+      .withDescription("MultiModalStation " + idAndName);
   }
 
   public GroupStop groupStop(String idAndName, RegularStop... stops) {

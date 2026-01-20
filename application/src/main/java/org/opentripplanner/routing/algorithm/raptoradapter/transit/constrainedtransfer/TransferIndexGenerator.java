@@ -240,7 +240,9 @@ public class TransferIndexGenerator {
     var patterns = patternsByTrip.get(trip);
     var patternsByRealtimeOrScheduled = patterns
       .stream()
-      .collect(Collectors.groupingBy(pattern -> pattern.getPattern().isCreatedByRealtimeUpdater()));
+      .collect(
+        Collectors.groupingBy(pattern -> pattern.getPattern().isStopPatternModifiedInRealTime())
+      );
 
     // Process first the pattern for which stopPosInPattern was calculated for
     List<RoutingTripPattern> scheduledPatterns = patternsByRealtimeOrScheduled.get(Boolean.FALSE);

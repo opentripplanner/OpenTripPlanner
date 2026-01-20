@@ -202,6 +202,11 @@ public interface TransitService {
   List<TripOnServiceDate> listCanceledTrips();
 
   /**
+   * Lists all canceled trips which match the filtering criteria in the request.
+   */
+  List<TripOnServiceDate> findCanceledTrips(TripOnServiceDateRequest request);
+
+  /**
    * Return all routes, including those created by real-time updates.
    */
   Collection<Route> listRoutes();

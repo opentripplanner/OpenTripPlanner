@@ -60,8 +60,7 @@ public class DefaultOsmProvider implements OsmProvider {
     this.source = dataSource;
     this.zoneId = zoneId;
     this.osmTagMapper = tagMapperSource.getInstance();
-    this.wayPropertySet = new WayPropertySet(issueStore);
-    osmTagMapper.populateProperties(wayPropertySet);
+    this.wayPropertySet = osmTagMapper.buildWayPropertySet();
     this.cacheDataInMem = cacheDataInMem;
   }
 

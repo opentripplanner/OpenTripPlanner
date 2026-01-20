@@ -318,5 +318,24 @@ public class SearchParams {
       viaLocations.isEmpty() || isVisitViaSearch() || isPassThroughSearch(),
       "Combining pass-through and regular via-vist it is not allowed: " + viaLocations + "."
     );
+
+    // Validate via-visit access and egress paths
+    validateViaVisitAccessEgress();
+  }
+
+  /**
+   * Validates that access and egress paths via-visit locations. Note! At the moment only
+   * via-visit searches can have via-locations, not pass-through searches.
+   */
+  private void validateViaVisitAccessEgress() {
+    int numberOfViaVisits = isPassThroughSearch() ? 0 : this.viaLocations.size();
+
+    // Validate individual access and egress paths
+    for (var access : accessPaths) {
+      access.validateAccessEgressVisitVia("Access", numberOfViaVisits);
+    }
+    for (var egress : egressPaths) {
+      egress.validateAccessEgressVisitVia("Egress", numberOfViaVisits);
+    }
   }
 }

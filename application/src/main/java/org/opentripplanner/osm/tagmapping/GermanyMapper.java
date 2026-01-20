@@ -19,13 +19,14 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
 class GermanyMapper extends OsmTagMapper {
 
   @Override
-  public void populateProperties(WayPropertySet props) {
+  public WayPropertySet buildWayPropertySet() {
+    var props = WayPropertySet.of();
     // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
 
     // Automobile speeds in Germany. General speed limit is 50kph in settlements, 100kph outside settlements.
     // For motorways, there (currently still) is no limit. Nevertheless 120kph is assumed to reflect varying
     // traffic conditions.
-    props.maxPossibleCarSpeed = 33.34f;
+    props.setMaxPossibleCarSpeed(33.34f);
     // = 120 km/h. Varies between 80 - 120 km/h depending on road and season.
     props.setCarSpeed("highway=motorway", 33.33f);
     // = 54 km/h
@@ -90,6 +91,7 @@ class GermanyMapper extends OsmTagMapper {
 
     props.setProperties("highway=unclassified;cycleway=lane", withModes(ALL).bicycleSafety(0.87));
 
-    super.populateProperties(props);
+    props.addPickers(super.buildWayPropertySet());
+    return props.build();
   }
 }

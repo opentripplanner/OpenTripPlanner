@@ -23,7 +23,9 @@ public enum RaptorValueType {
   /// Transfer priority
   TRANSFER_PRIORITY("Tₚ"),
   /// Number of rides
-  RIDES("Rₙ");
+  RIDES("Rₙ"),
+  /// Number of via locations visited
+  VIAS("Vₙ");
 
   private final String prefix;
 

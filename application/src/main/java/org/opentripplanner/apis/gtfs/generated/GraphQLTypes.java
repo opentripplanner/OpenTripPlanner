@@ -497,6 +497,69 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLCanceledTripsFilterInput {
+
+    private List<GraphQLCanceledTripsFilterSelectInput> exclude;
+    private List<GraphQLCanceledTripsFilterSelectInput> include;
+
+    public GraphQLCanceledTripsFilterInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("exclude") != null) {
+          this.exclude = ((List<Map<String, Object>>) args.get("exclude")).stream()
+            .map(o -> o == null ? null : new GraphQLCanceledTripsFilterSelectInput(o))
+            .collect(Collectors.toList());
+        }
+        if (args.get("include") != null) {
+          this.include = ((List<Map<String, Object>>) args.get("include")).stream()
+            .map(o -> o == null ? null : new GraphQLCanceledTripsFilterSelectInput(o))
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLCanceledTripsFilterSelectInput> getGraphQLExclude() {
+      return this.exclude;
+    }
+
+    public List<GraphQLCanceledTripsFilterSelectInput> getGraphQLInclude() {
+      return this.include;
+    }
+
+    public void setGraphQLExclude(List<GraphQLCanceledTripsFilterSelectInput> exclude) {
+      this.exclude = exclude;
+    }
+
+    public void setGraphQLInclude(List<GraphQLCanceledTripsFilterSelectInput> include) {
+      this.include = include;
+    }
+  }
+
+  public static class GraphQLCanceledTripsFilterSelectInput {
+
+    private List<GraphQLTransitMode> modes;
+
+    public GraphQLCanceledTripsFilterSelectInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("modes") != null) {
+          this.modes = ((List<Object>) args.get("modes")).stream()
+            .map(item ->
+              item instanceof GraphQLTransitMode ? item : GraphQLTransitMode.valueOf((String) item)
+            )
+            .map(GraphQLTransitMode.class::cast)
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLTransitMode> getGraphQLModes() {
+      return this.modes;
+    }
+
+    public void setGraphQLModes(List<GraphQLTransitMode> modes) {
+      this.modes = modes;
+    }
+  }
+
   public static class GraphQLCarParkNameArgs {
 
     private String language;
@@ -2590,6 +2653,7 @@ public class GraphQLTypes {
 
     private String after;
     private String before;
+    private GraphQLCanceledTripsFilterInput filters;
     private Integer first;
     private Integer last;
 
@@ -2597,6 +2661,9 @@ public class GraphQLTypes {
       if (args != null) {
         this.after = (String) args.get("after");
         this.before = (String) args.get("before");
+        this.filters = new GraphQLCanceledTripsFilterInput(
+          (Map<String, Object>) args.get("filters")
+        );
         this.first = (Integer) args.get("first");
         this.last = (Integer) args.get("last");
       }
@@ -2608,6 +2675,10 @@ public class GraphQLTypes {
 
     public String getGraphQLBefore() {
       return this.before;
+    }
+
+    public GraphQLCanceledTripsFilterInput getGraphQLFilters() {
+      return this.filters;
     }
 
     public Integer getGraphQLFirst() {
@@ -2624,6 +2695,10 @@ public class GraphQLTypes {
 
     public void setGraphQLBefore(String before) {
       this.before = before;
+    }
+
+    public void setGraphQLFilters(GraphQLCanceledTripsFilterInput filters) {
+      this.filters = filters;
     }
 
     public void setGraphQLFirst(Integer first) {

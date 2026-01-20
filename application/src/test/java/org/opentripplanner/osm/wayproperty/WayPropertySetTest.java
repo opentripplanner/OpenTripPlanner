@@ -2,267 +2,196 @@ package org.opentripplanner.osm.wayproperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.osm.model.TraverseDirection.BACKWARD;
 import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 import static org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
-import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
-import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmEntityForTest;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.tagmapping.OsmTagMapper;
-import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
-import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
-import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
+import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
 
 class WayPropertySetTest {
 
-  @Nested
-  class ConditionSpecificity {
+  private static final float EPSILON = 0.01f;
 
-    @Test
-    public void carTunnel() {
-      var tunnel = WayTestData.carTunnel();
-      WayPropertySet wps = wps();
-      assertEquals(CAR, wps.getDataForWay(tunnel).forward().getPermission());
-    }
+  @Test
+  public void mixin() {
+    var builder = WayPropertySet.of();
+    builder.setProperties("tag=imaginary", withModes(CAR).bicycleSafety(2));
+    builder.setMixinProperties("foo=bar", ofBicycleSafety(0.5));
+    var wps = builder.build();
 
-    @Test
-    public void carMaxSpeed() {
-      var delta = 0.001f;
-      var motorWaySpeed = 35f;
-      WayPropertySet wps = wps();
-      wps.setCarSpeed("highway=motorway", motorWaySpeed);
+    var withoutFoo = new OsmEntityForTest();
+    withoutFoo.addTag("tag", "imaginary");
+    assertEquals(2, wps.getDataForEntity(withoutFoo).bicycleSafety());
 
-      // Test that there are default values
-      assertEquals(38f, wps.maxPossibleCarSpeed, delta);
-      assertEquals(0f, wps.maxUsedCarSpeed, delta);
-
-      // Speed limit that is within limits should be used as the max used car speed
-      OsmEntity streetWithSpeedLimit = new OsmEntityForTest();
-      streetWithSpeedLimit.addTag("highway", "motorway");
-      streetWithSpeedLimit.addTag("maxspeed", "120");
-      var waySpeed = wps.getCarSpeedForWay(streetWithSpeedLimit, FORWARD);
-      assertEquals(33.33336, waySpeed, delta);
-      assertEquals(33.33336, wps.maxUsedCarSpeed, delta);
-
-      // Speed limit that is higher than maxPossibleCarSpeed should be ignored and regular motorway
-      // speed limit should be used instead
-      OsmEntity streetWithTooHighSpeedLimit = new OsmEntityForTest();
-      streetWithTooHighSpeedLimit.addTag("highway", "motorway");
-      streetWithTooHighSpeedLimit.addTag("maxspeed", "200");
-      waySpeed = wps.getCarSpeedForWay(streetWithTooHighSpeedLimit, FORWARD);
-      assertEquals(motorWaySpeed, waySpeed, delta);
-      assertEquals(motorWaySpeed, wps.maxUsedCarSpeed, delta);
-
-      // Speed limit that is too low should be ignored and regular motorway speed limit should
-      // be used instead
-      OsmEntity streetWithTooLowSpeedLimit = new OsmEntityForTest();
-      streetWithTooLowSpeedLimit.addTag("highway", "motorway");
-      streetWithTooLowSpeedLimit.addTag("maxspeed", "0");
-      waySpeed = wps.getCarSpeedForWay(streetWithTooLowSpeedLimit, FORWARD);
-      assertEquals(motorWaySpeed, waySpeed, delta);
-      assertEquals(motorWaySpeed, wps.maxUsedCarSpeed, delta);
-    }
-
-    @Test
-    void pedestrianTunnelSpecificity() {
-      var tunnel = WayTestData.pedestrianTunnel();
-      WayPropertySet wps = wps();
-      assertEquals(NONE, wps.getDataForEntity(tunnel).getPermission());
-    }
-
-    @Test
-    void mixinLeftSide() {
-      var cycleway = WayTestData.cyclewayLeft();
-      WayPropertySet wps = wps();
-      assertEquals(1, wps.getDataForWay(cycleway).forward().bicycleSafety());
-      assertEquals(5, wps.getDataForWay(cycleway).backward().bicycleSafety());
-    }
-
-    private static WayPropertySet wps() {
-      var wps = new WayPropertySet();
-      var source = new OsmTagMapper() {
-        @Override
-        public void populateProperties(WayPropertySet props) {
-          props.setProperties("highway=primary", withModes(CAR));
-          props.setProperties(
-            new ExactMatchSpecifier("highway=footway;layer=-1;tunnel=yes;indoor=yes"),
-            withModes(NONE)
-          );
-          props.setMixinProperties("cycleway=lane", ofBicycleSafety(5));
-        }
-      };
-      source.populateProperties(wps);
-      return wps;
-    }
+    // the mixin for foo=bar reduces the bike safety factor
+    var withFoo = new OsmEntityForTest();
+    withFoo.addTag("tag", "imaginary");
+    withFoo.addTag("foo", "bar");
+    assertEquals(1, wps.getDataForEntity(withFoo).bicycleSafety());
   }
 
-  @Nested
-  class NoMapper {
+  @Test
+  void speedPicker() {
+    // test with no maxspeed tags
+    var builder = WayPropertySet.of();
+    builder.addSpeedPicker(getSpeedPicker("highway=motorway", kmhAsMs(100)));
+    builder.addSpeedPicker(getSpeedPicker("highway=*", kmhAsMs(35)));
+    builder.addSpeedPicker(getSpeedPicker("surface=gravel", kmhAsMs(10)));
+    builder.setDefaultCarSpeed(kmhAsMs(25));
+    var wps = builder.build();
 
-    /**
-     * Tests if cars can drive on unclassified highways with bicycleDesignated
-     * <p>
-     * Check for bug #1878 and PR #1880
-     */
-    @Test
-    void testCarPermission() {
-      OsmWay way = new OsmWay();
-      way.addTag("highway", "unclassified");
+    var way = new OsmEntityForTest();
 
-      var permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
+    // test default speeds
+    assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, FORWARD)));
+    assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, BACKWARD)));
 
-      way.addTag("bicycle", "designated");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
-    }
+    way.addTag("highway", "tertiary");
+    assertTrue(within(kmhAsMs(35), wps.getCarSpeedForWay(way, FORWARD)));
+    assertTrue(within(kmhAsMs(35), wps.getCarSpeedForWay(way, BACKWARD)));
 
-    /**
-     * Tests that motorcar/bicycle/foot private don't add permissions but yes add permission if access
-     * is no
-     */
-    @Test
-    void testMotorCarTagAllowedPermissions() {
-      OsmWay way = new OsmWay();
-      way.addTag("highway", "residential");
-      var permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
+    way = new OsmEntityForTest();
+    way.addTag("surface", "gravel");
+    assertTrue(within(kmhAsMs(10), wps.getCarSpeedForWay(way, FORWARD)));
+    assertTrue(within(kmhAsMs(10), wps.getCarSpeedForWay(way, BACKWARD)));
 
-      way.addTag("access", "no");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allowsNothing());
+    way = new OsmEntityForTest();
+    way.addTag("highway", "motorway");
+    assertTrue(within(kmhAsMs(100), wps.getCarSpeedForWay(way, FORWARD)));
+    assertTrue(within(kmhAsMs(100), wps.getCarSpeedForWay(way, BACKWARD)));
 
-      way.addTag("motorcar", "private");
-      way.addTag("bicycle", "private");
-      way.addTag("foot", "private");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allowsNothing());
+    // make sure that 0-speed ways can't exist
+    way = new OsmEntityForTest();
+    way.addTag("maxspeed", "0");
+    assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, FORWARD)));
+    assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, BACKWARD)));
+  }
 
-      way.addTag("motorcar", "yes");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.CAR));
+  @Test
+  public void testWayDataSet() {
+    OsmWay way = new OsmWay();
+    way.addTag("highway", "footway");
+    way.addTag("cycleway", "lane");
+    way.addTag("surface", "gravel");
 
-      way.addTag("bicycle", "yes");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.BICYCLE_AND_CAR));
+    WayPropertySetBuilder builder = WayPropertySet.of();
 
-      way.addTag("foot", "yes");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
-    }
+    // where there are no way specifiers, the default is used
+    var wayPropertySet = builder.build();
+    var wayData = wayPropertySet.getDataForWay(way);
+    assertEquals(ALL, wayData.forward().getPermission());
+    assertEquals(1.0, wayData.forward().walkSafety());
+    assertEquals(1.0, wayData.backward().walkSafety());
+    assertEquals(1.0, wayData.forward().bicycleSafety());
+    assertEquals(1.0, wayData.backward().bicycleSafety());
 
-    /**
-     * Tests that motorcar/bicycle/foot private don't add permissions but no remove permission if
-     * access is yes
-     */
-    @Test
-    void testMotorCarTagDeniedPermissions() {
-      OsmWay way = new OsmWay();
-      way.addTag("highway", "residential");
-      var permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
+    // add two equal matches: lane only...
+    OsmSpecifier lane_only = new BestMatchSpecifier("cycleway=lane");
 
-      way.addTag("motorcar", "no");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE));
+    WayProperties lane_is_safer = withModes(ALL).bicycleSafety(1.5).walkSafety(1.0).build();
 
-      way.addTag("bicycle", "no");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.PEDESTRIAN));
+    builder.addProperties(lane_only, lane_is_safer);
 
-      way.addTag("foot", "no");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allowsNothing());
-      //normal road with specific mode of transport private only is doubtful
-      /*way.addTag("motorcar", "private");
-        way.addTag("bicycle", "private");
-        way.addTag("foot", "private");
-        permissionPair = getWayProperties(way);
-        assertTrue(permissionPair.main().allowsNothing());*/
-    }
+    // and footway only
+    OsmSpecifier footway_only = new BestMatchSpecifier("highway=footway");
 
-    /**
-     * Tests that motor_vehicle/bicycle/foot private don't add permissions but yes add permission if
-     * access is no
-     * <p>
-     * Support for motor_vehicle was added in #1881
-     */
-    @Test
-    void testMotorVehicleTagAllowedPermissions() {
-      OsmWay way = new OsmWay();
-      way.addTag("highway", "residential");
-      var permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
+    WayProperties footways_allow_peds = new WayPropertiesBuilder(PEDESTRIAN).build();
 
-      way.addTag("access", "no");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allowsNothing());
+    builder.addProperties(footway_only, footways_allow_peds);
 
-      way.addTag("motor_vehicle", "private");
-      way.addTag("bicycle", "private");
-      way.addTag("foot", "private");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allowsNothing());
+    wayPropertySet = builder.build();
+    var dataForWay = wayPropertySet.getDataForWay(way);
+    // the first one is found
+    assertEquals(lane_is_safer, dataForWay.forward());
+    assertEquals(lane_is_safer, dataForWay.backward());
 
-      way.addTag("motor_vehicle", "yes");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.CAR));
+    // add a better match
+    OsmSpecifier lane_and_footway = new BestMatchSpecifier("cycleway=lane;highway=footway");
 
-      way.addTag("bicycle", "yes");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.BICYCLE_AND_CAR));
+    WayProperties safer_and_peds = new WayPropertiesBuilder(PEDESTRIAN)
+      .bicycleSafety(0.75)
+      .walkSafety(1.0)
+      .build();
 
-      way.addTag("foot", "yes");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
-    }
+    builder.addProperties(lane_and_footway, safer_and_peds);
+    wayPropertySet = builder.build();
+    dataForWay = wayPropertySet.getDataForWay(way);
+    assertEquals(new WayPropertiesPair(safer_and_peds, safer_and_peds), dataForWay);
 
-    /**
-     * Tests that motor_vehicle/bicycle/foot private don't add permissions but no remove permission if
-     * access is yes
-     * <p>
-     * Support for motor_vehicle was added in #1881
-     */
-    @Test
-    void testMotorVehicleTagDeniedPermissions() {
-      OsmWay way = new OsmWay();
-      way.addTag("highway", "residential");
-      var permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
+    // add a mixin
+    BestMatchSpecifier gravel = new BestMatchSpecifier("surface=gravel");
+    var gravel_is_dangerous = MixinPropertiesBuilder.ofBicycleSafety(2);
+    builder.setMixinProperties(gravel, gravel_is_dangerous);
 
-      way.addTag("motor_vehicle", "no");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE));
+    wayPropertySet = builder.build();
+    dataForWay = wayPropertySet.getDataForWay(way);
+    assertEquals(1.5, dataForWay.forward().bicycleSafety());
 
-      way.addTag("bicycle", "no");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allows(StreetTraversalPermission.PEDESTRIAN));
+    // test a left-right distinction
+    way = new OsmWay();
+    way.addTag("highway", "footway");
+    way.addTag("cycleway", "lane");
+    way.addTag("cycleway:right", "track");
 
-      way.addTag("foot", "no");
-      permissionPair = getWayProperties(way);
-      assertTrue(permissionPair.main().allowsNothing());
-      //normal road with specific mode of transport private only is doubtful
-      /*way.addTag("motor_vehicle", "private");
-        way.addTag("bicycle", "private");
-        way.addTag("foot", "private");
-        permissionPair = getWayProperties(way);
-        assertTrue(permissionPair.main().allowsNothing());*/
-    }
+    OsmSpecifier track_only = new BestMatchSpecifier("highway=footway;cycleway=track");
+    WayProperties track_is_safest = new WayPropertiesBuilder(ALL)
+      .bicycleSafety(0.25)
+      .walkSafety(1.0)
+      .build();
 
-    private StreetTraversalPermissionPair getWayProperties(OsmWay way) {
-      WayPropertySet wayPropertySet = new WayPropertySet();
-      WayPropertiesPair wayData = wayPropertySet.getDataForWay(way);
+    builder.addProperties(track_only, track_is_safest);
+    wayPropertySet = builder.build();
+    dataForWay = wayPropertySet.getDataForWay(way);
+    // right (with traffic) comes from track
+    assertEquals(0.25, dataForWay.forward().bicycleSafety());
+    // left comes from lane
+    assertEquals(0.75, dataForWay.backward().bicycleSafety());
 
-      return new StreetTraversalPermissionPair(
-        wayData.forward().getPermission(),
-        wayData.backward().getPermission()
-      );
-    }
+    way = new OsmWay();
+    way.addTag("highway", "footway");
+    way.addTag("footway", "sidewalk");
+    way.addTag("RLIS:reviewed", "no");
+    WayPropertySetBuilder builder2 = WayPropertySet.of();
+    CreativeNamer namer = new CreativeNamer("platform");
+    builder2.addCreativeNamer(
+      new BestMatchSpecifier("railway=platform;highway=footway;footway=sidewalk"),
+      namer
+    );
+    namer = new CreativeNamer("sidewalk");
+    builder2.addCreativeNamer(new BestMatchSpecifier("highway=footway;footway=sidewalk"), namer);
+    WayPropertySet propset = builder2.build();
+    assertEquals("sidewalk", propset.getCreativeName(way).toString());
+  }
+
+  /**
+   * Test that two values are within epsilon of each other.
+   */
+  private boolean within(float val1, float val2) {
+    return (Math.abs(val1 - val2) < EPSILON);
+  }
+
+  /**
+   * Convert kilometers per hour to meters per second
+   */
+  private float kmhAsMs(float kmh) {
+    return (kmh * 1000) / 3600;
+  }
+
+  /**
+   * Convenience function to get a speed picker for a given specifier and speed.
+   *
+   * @param specifier The OSM specifier, e.g. highway=motorway
+   * @param speed     The speed, in meters per second
+   */
+  private SpeedPicker getSpeedPicker(String specifier, float speed) {
+    return new SpeedPicker(new BestMatchSpecifier(specifier), speed);
   }
 }

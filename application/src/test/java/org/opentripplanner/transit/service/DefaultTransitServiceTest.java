@@ -23,6 +23,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.transit.api.model.FilterValues;
+import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -79,7 +81,7 @@ class DefaultTransitServiceTest {
   );
   private static final TripPattern REAL_TIME_PATTERN = TEST_MODEL.pattern(BUS)
     .withStopPattern(REAL_TIME_STOP_PATTERN)
-    .withCreatedByRealtimeUpdater(true)
+    .withRealTimeStopPatternModified()
     .build();
 
   static FeedScopedId CALENDAR_ID = id("CAL_1");
@@ -251,6 +253,31 @@ class DefaultTransitServiceTest {
   void listCanceledTrips() {
     var canceledTrips = service.listCanceledTrips();
     assertEquals("[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]", canceledTrips.toString());
+  }
+
+  @Test
+  void findAllCanceledTrips() {
+    // No filters, should return all canceled trips
+    var canceledTrips = service.findCanceledTrips(TripOnServiceDateRequest.of().build());
+    assertEquals("[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]", canceledTrips.toString());
+  }
+
+  @Test
+  void findCanceledBusTrips() {
+    var busFilter = FilterValues.ofEmptyIsEverything("modesToInclude", List.of(BUS));
+    var busRequest = TripOnServiceDateRequest.of().withIncludeModes(busFilter).build();
+    var busTrips = service.findCanceledTrips(busRequest);
+    assertEquals("[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]", busTrips.toString());
+  }
+
+  @Test
+  void findCanceledNonBusTrips() {
+    var busExcludeFilter = FilterValues.ofEmptyIsEverything("modesToExclude", List.of(BUS));
+    var busExcludeRequest = TripOnServiceDateRequest.of()
+      .withExcludeModes(busExcludeFilter)
+      .build();
+    var excludedBusTrips = service.findCanceledTrips(busExcludeRequest);
+    assertThat(excludedBusTrips).isEmpty();
   }
 
   @Test

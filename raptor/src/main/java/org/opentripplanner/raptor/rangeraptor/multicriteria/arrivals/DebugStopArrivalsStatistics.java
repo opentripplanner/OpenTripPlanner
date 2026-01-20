@@ -1,9 +1,10 @@
-package org.opentripplanner.raptor.rangeraptor.multicriteria;
+package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
 import static java.util.Locale.ROOT;
 
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.debug.DebugTopic;
+import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
 /**
  * Utility class to print some statistics about stop arrivals.
@@ -16,7 +17,7 @@ class DebugStopArrivalsStatistics {
     this.debugLogger = debugLogger;
   }
 
-  void debugStatInfo(StopArrivalParetoSet<?>[] stops) {
+  void debugStatInfo(ParetoSet<?>[] stops) {
     if (!debugLogger.isEnabled()) {
       return;
     }
@@ -26,7 +27,7 @@ class DebugStopArrivalsStatistics {
     long numOfStops = 0;
     int max = 0;
 
-    for (StopArrivalParetoSet<?> stop : stops) {
+    for (ParetoSet<?> stop : stops) {
       if (stop != null) {
         ++numOfStops;
         total += stop.size();

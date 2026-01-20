@@ -33,8 +33,8 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
 /**
  * FEATURE UNDER TEST
  *
- * Raptor should be able to handle route request with one or more via locations using transfers
- * . The via point is a coordinate/node in the street map, but Raptor only see this as a special
+ * Raptor should be able to handle route request with one or more via locations using transfers.
+ * The via point is a coordinate/node in the street map, but Raptor only see this as a special
  * kind of transfer. If a stop is specified as via location in the request, then all the results
  * returned from raptor should include the stop. The stop should be a alight, board or intermediate
  * stop of one of the trips in the path.

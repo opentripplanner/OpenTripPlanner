@@ -4,51 +4,51 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 
 class SearchParamsTest {
 
+  private static final int EARLIEST_DEPARTURE_TIME = 200;
+  private static final int LATEST_ARRIVAL_TIME = 1200;
+
   @Test
   void earliestDepartureTimeOrLatestArrivalTimeIsRequired() {
-    var p = new RaptorRequestBuilder<TestTripSchedule>().searchParams();
-    p.addAccessPaths(TestAccessEgress.walk(1, 30));
-    p.addEgressPaths(TestAccessEgress.walk(2, 20));
+    var p = new RaptorRequestBuilder<TestTripSchedule>()
+      .searchParams()
+      .addAccessPaths(walk(1, 30))
+      .addEgressPaths(walk(2, 20));
 
     assertParamNotValid(p, "'earliestDepartureTime' or 'latestArrivalTime' is required.");
   }
 
   @Test
   void accessPathIsRequired() {
-    var p = new RaptorRequestBuilder<TestTripSchedule>().searchParams();
-    p.earliestDepartureTime(200);
-    p.latestArrivalTime(600);
-    p.addEgressPaths(TestAccessEgress.walk(2, 20));
+    var p = searchParamBuilder();
+    p.addEgressPaths(walk(2, 20));
 
     assertParamNotValid(p, "At least one 'accessPath' is required.");
   }
 
   @Test
   void egressPathIsRequired() {
-    var p = new RaptorRequestBuilder<TestTripSchedule>().searchParams();
-    p.earliestDepartureTime(200);
-    p.latestArrivalTime(600);
-    p.addAccessPaths(TestAccessEgress.walk(1, 30));
+    var p = searchParamBuilder().addAccessPaths(walk(1, 30));
 
     assertParamNotValid(p, "At least one 'egressPath' is required.");
   }
 
   @Test
   void latestArrivalTimeRequiredWhenDepartAsLateAsPossibleEnabled() {
-    var p = new RaptorRequestBuilder<TestTripSchedule>().searchParams();
-    p.earliestDepartureTime(200);
-    p.addAccessPaths(TestAccessEgress.walk(1, 30));
-    p.addEgressPaths(TestAccessEgress.walk(2, 20));
+    var p = new RaptorRequestBuilder<TestTripSchedule>()
+      .searchParams()
+      .earliestDepartureTime(200)
+      .addAccessPaths(walk(1, 30))
+      .addEgressPaths(walk(2, 20));
 
     p.preferLateArrival(true);
 
@@ -60,13 +60,11 @@ class SearchParamsTest {
 
   @Test
   void departAsLateAsPossibleAndTimetableEnabled() {
-    var p = new RaptorRequestBuilder<TestTripSchedule>().searchParams();
-    p.latestArrivalTime(200);
-    p.addAccessPaths(TestAccessEgress.walk(1, 30));
-    p.addEgressPaths(TestAccessEgress.walk(2, 20));
-
-    p.timetable(true);
-    p.preferLateArrival(true);
+    var p = searchParamBuilder()
+      .addAccessPaths(walk(1, 30))
+      .addEgressPaths(walk(2, 20))
+      .timetable(true)
+      .preferLateArrival(true);
 
     assertParamNotValid(
       p,
@@ -76,13 +74,11 @@ class SearchParamsTest {
 
   @Test
   void viaAndPassThrough() {
-    var noVia = new RaptorRequestBuilder<TestTripSchedule>().searchParams().buildSearchParam();
-    var via = new RaptorRequestBuilder<TestTripSchedule>()
-      .searchParams()
+    var noVia = searchParamBuilder().buildSearchParam();
+    var via = searchParamBuilder()
       .addViaLocation(RaptorViaLocation.via("Via").addViaStop(5).build())
       .buildSearchParam();
-    var passThrough = new RaptorRequestBuilder<TestTripSchedule>()
-      .searchParams()
+    var passThrough = searchParamBuilder()
       .addViaLocation(RaptorViaLocation.passThrough("Via").addPassThroughStop(5).build())
       .buildSearchParam();
 
@@ -105,12 +101,9 @@ class SearchParamsTest {
   @Test
   void addBothViaAndPassThroughIsNotSupported() {
     var ex = assertThrows(IllegalArgumentException.class, () ->
-      new RaptorRequestBuilder<TestTripSchedule>()
-        .searchParams()
-        .earliestDepartureTime(1)
-        .latestArrivalTime(1200)
-        .addAccessPaths(TestAccessEgress.walk(1, 30))
-        .addEgressPaths(TestAccessEgress.walk(7, 30))
+      searchParamBuilder()
+        .addAccessPaths(walk(1, 30))
+        .addEgressPaths(walk(7, 30))
         .addViaLocations(
           List.of(
             RaptorViaLocation.via("Via").addViaStop(5).build(),
@@ -128,6 +121,42 @@ class SearchParamsTest {
     );
   }
 
+  @Test
+  void viaVisitAccessWithNegativeViaVisitsIsRejected() {
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      searchParamBuilder()
+        .addAccessPaths(walk(1, 30).withViaLocationsVisited(-1))
+        .addEgressPaths(walk(7, 30))
+        .addViaLocation(RaptorViaLocation.via("Via").addViaStop(5).build())
+        .build()
+    );
+    assertEquals("Access cannot have negative via visits: -1", ex.getMessage());
+  }
+
+  @Test
+  void viaVisitAccessExceedingTotalViaLocationsIsRejected() {
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      searchParamBuilder()
+        .addAccessPaths(walk(1, 30).withViaLocationsVisited(2))
+        .addEgressPaths(walk(7, 30))
+        .addViaLocation(RaptorViaLocation.via("Via").addViaStop(5).build())
+        .build()
+    );
+    assertEquals("Access visits 2 via locations, but only 1 are defined", ex.getMessage());
+  }
+
+  @Test
+  void viaVisitEgressExceedingTotalViaLocationsIsRejected() {
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      searchParamBuilder()
+        .addAccessPaths(walk(1, 30))
+        .addEgressPaths(walk(7, 30).withViaLocationsVisited(2))
+        .addViaLocation(RaptorViaLocation.via("Via").addViaStop(5).build())
+        .build()
+    );
+    assertEquals("Egress visits 2 via locations, but only 1 are defined", ex.getMessage());
+  }
+
   void assertParamNotValid(SearchParamsBuilder<TestTripSchedule> p, String msg) {
     assertThrows(IllegalArgumentException.class, p::build, msg);
   }
@@ -138,5 +167,12 @@ class SearchParamsTest {
       .map(it -> it.toString(RaptorTestConstants::stopIndexToName))
       .toList()
       .toString();
+  }
+
+  private static SearchParamsBuilder searchParamBuilder() {
+    return new RaptorRequestBuilder<TestTripSchedule>()
+      .searchParams()
+      .earliestDepartureTime(EARLIEST_DEPARTURE_TIME)
+      .latestArrivalTime(LATEST_ARRIVAL_TIME);
   }
 }

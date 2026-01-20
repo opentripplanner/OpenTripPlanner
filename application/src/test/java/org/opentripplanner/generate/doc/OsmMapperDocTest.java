@@ -50,8 +50,7 @@ public class OsmMapperDocTest {
   @MethodSource("mappers")
   public void updateDocs(OsmTagMapperSource source) {
     var mapper = source.getInstance();
-    var wps = new WayPropertySet();
-    mapper.populateProperties(wps);
+    var wps = mapper.buildWayPropertySet();
 
     var outFile = outputFile(mapper);
 
@@ -77,7 +76,7 @@ public class OsmMapperDocTest {
     var propTable = new TableBuilder();
     propTable.withHeaders("specifier", "permission", "bike safety", "walk safety");
 
-    for (var prop : wps.getWayProperties()) {
+    for (var prop : wps.listWayProperties()) {
       propTable.addRow(
         "`%s`".formatted(prop.specifier().toDocString()),
         "`%s`".formatted(prop.properties().getPermission()),
@@ -106,7 +105,7 @@ public class OsmMapperDocTest {
       "walk safety"
     );
 
-    for (var prop : wps.getMixins()) {
+    for (var prop : wps.listMixins()) {
       propTable.addRow(
         "`%s`".formatted(prop.specifier().toDocString()),
         tableValues(
