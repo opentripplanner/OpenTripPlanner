@@ -14,19 +14,19 @@ class PortlandMapper extends OsmTagMapper {
   @Override
   public WayPropertySet buildWayPropertySet() {
     var props = WayPropertySet.of();
-    props.setMixinProperties("highway=footway", ofWalkSafety(1 / 0.8));
+    props.setDefaultWalkSafetyForPermission((permission, maxSpeed, way) -> 1.0);
     props.setMixinProperties("footway=sidewalk", ofWalkSafety(1.1));
     props.setMixinProperties(new ExactMatchSpecifier(new Absent("name")), ofWalkSafety(1.2));
-    props.setMixinProperties("highway=trunk", ofWalkSafety(1.2 / 7.47));
-    props.setMixinProperties("highway=trunk_link", ofWalkSafety(1.2 / 7.47));
-    props.setMixinProperties("highway=primary", ofWalkSafety(1.2 / 2.06));
-    props.setMixinProperties("highway=primary_link", ofWalkSafety(1.2 / 2.06));
-    props.setMixinProperties("highway=secondary", ofWalkSafety(1.1 / 1.5));
-    props.setMixinProperties("highway=secondary_link", ofWalkSafety(1.1 / 1.5));
-    props.setMixinProperties("highway=tertiary", ofWalkSafety(1.1));
-    props.setMixinProperties("highway=tertiary_link", ofWalkSafety(1.1));
-    props.setMixinProperties("highway=residential", ofWalkSafety(1 / 0.98));
-    props.setMixinProperties("highway=residential_link", ofWalkSafety(1 / 0.98));
+    props.setMixinProperties("highway=trunk", ofWalkSafety(1.2 / 9.3));
+    props.setMixinProperties("highway=trunk_link", ofWalkSafety(1.2 / 9.3));
+    props.setMixinProperties("highway=primary", ofWalkSafety(1.2 / 2.6));
+    props.setMixinProperties("highway=primary_link", ofWalkSafety(1.2 / 2.6));
+    props.setMixinProperties("highway=secondary", ofWalkSafety(1.1 / 1.9));
+    props.setMixinProperties("highway=secondary_link", ofWalkSafety(1.1 / 1.9));
+    props.setMixinProperties("highway=tertiary", ofWalkSafety(1.1 / 1.25));
+    props.setMixinProperties("highway=tertiary_link", ofWalkSafety(1.1 / 1.25));
+    props.setMixinProperties("highway=residential", ofWalkSafety(1 / 1.2));
+    props.setMixinProperties("highway=residential_link", ofWalkSafety(1 / 1.2));
     props.setMixinProperties(
       new ExactMatchSpecifier(new GreaterThan("lanes", 4)),
       ofWalkSafety(1.1)

@@ -29,12 +29,18 @@ class UKMapper extends OsmTagMapper {
   @Override
   public WayPropertySet buildWayPropertySet() {
     var props = WayPropertySet.of();
-    props.setProperties("highway=cycleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.6));
-    props.setProperties("highway=bridleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.3));
+    props.setProperties(
+      "highway=cycleway",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.2).bicycleSafety(0.6)
+    );
+    props.setProperties(
+      "highway=bridleway",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.2).bicycleSafety(1.3)
+    );
 
     // reduce trunk safety compared to default mapper
-    props.setProperties("highway=trunk", withModes(ALL).walkSafety(2.5).bicycleSafety(2.5));
-    props.setProperties("highway=trunk_link", withModes(ALL).walkSafety(2.5).bicycleSafety(2.06));
+    props.setProperties("highway=trunk", withModes(ALL).walkSafety(3.8).bicycleSafety(2.5));
+    props.setProperties("highway=trunk_link", withModes(ALL).walkSafety(3.8).bicycleSafety(2.06));
 
     // cancel out the effect of the reduced safety mixin for walking on trunk roads with pavement
     props.setMixinProperties(

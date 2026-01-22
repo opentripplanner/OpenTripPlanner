@@ -28,13 +28,13 @@ public class WayPropertySetBuilder {
     Float,
     OsmEntity,
     Double
-  > defaultWalkSafetyForPermission = WayPropertySet.DEFAULT_SAFETY_RESOLVER;
+  > defaultWalkSafetyForPermission = WayPropertySet.DEFAULT_WALK_SAFETY_RESOLVER;
   FunctionUtils.TriFunction<
     StreetTraversalPermission,
     Float,
     OsmEntity,
     Double
-  > defaultBicycleSafetyForPermission = WayPropertySet.DEFAULT_SAFETY_RESOLVER;
+  > defaultBicycleSafetyForPermission = WayPropertySet.DEFAULT_BICYCLE_SAFETY_RESOLVER;
 
   WayPropertySetBuilder() {}
 
@@ -92,7 +92,7 @@ public class WayPropertySetBuilder {
       Double
     > defaultWalkSafetyForPermission
   ) {
-    if (!this.defaultWalkSafetyForPermission.equals(WayPropertySet.DEFAULT_SAFETY_RESOLVER)) {
+    if (!this.defaultWalkSafetyForPermission.equals(WayPropertySet.DEFAULT_WALK_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default walk safety resolver was already set");
     }
     this.defaultWalkSafetyForPermission = defaultWalkSafetyForPermission;
@@ -106,7 +106,9 @@ public class WayPropertySetBuilder {
       Double
     > defaultBicycleSafetyForPermission
   ) {
-    if (!this.defaultBicycleSafetyForPermission.equals(WayPropertySet.DEFAULT_SAFETY_RESOLVER)) {
+    if (
+      !this.defaultBicycleSafetyForPermission.equals(WayPropertySet.DEFAULT_BICYCLE_SAFETY_RESOLVER)
+    ) {
       throw new IllegalStateException("A custom default cycling safety resolver was already set");
     }
     this.defaultBicycleSafetyForPermission = defaultBicycleSafetyForPermission;

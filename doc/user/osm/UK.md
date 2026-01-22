@@ -24,46 +24,46 @@ Lower safety values make an OSM way more desirable and higher values less desira
 
 | specifier                   | permission               | bike safety | walk safety |
 |-----------------------------|--------------------------|-------------|-------------|
-| `highway=cycleway`          | `PEDESTRIAN_AND_BICYCLE` | 0.6         |             |
-| `highway=bridleway`         | `PEDESTRIAN_AND_BICYCLE` | 1.3         |             |
-| `highway=trunk`             | `ALL`                    | 2.5         | 2.5         |
-| `highway=trunk_link`        | `ALL`                    | 2.06        | 2.5         |
+| `highway=cycleway`          | `PEDESTRIAN_AND_BICYCLE` | 0.6         | 1.2         |
+| `highway=bridleway`         | `PEDESTRIAN_AND_BICYCLE` | 1.3         | 1.2         |
+| `highway=trunk`             | `ALL`                    | 2.5         | 3.8         |
+| `highway=trunk_link`        | `ALL`                    | 2.06        | 3.8         |
 | `mtb:scale=3`               | `NONE`                   |             |             |
 | `mtb:scale=4`               | `NONE`                   |             |             |
 | `mtb:scale=5`               | `NONE`                   |             |             |
 | `mtb:scale=6`               | `NONE`                   |             |             |
-| `highway=bridleway`         | `NONE`                   | 1.3         | 1.3         |
-| `highway=corridor`          | `PEDESTRIAN`             |             | 0.9         |
-| `highway=steps`             | `PEDESTRIAN`             |             |             |
-| `highway=crossing`          | `PEDESTRIAN`             |             | 0.9         |
-| `highway=platform`          | `PEDESTRIAN`             |             |             |
-| `public_transport=platform` | `PEDESTRIAN`             |             |             |
-| `railway=platform`          | `PEDESTRIAN`             |             |             |
-| `highway=pedestrian`        | `PEDESTRIAN`             | 0.9         | 0.8         |
-| `highway=footway`           | `PEDESTRIAN`             | 1.1         | 0.8         |
-| `mtb:scale=1`               | `PEDESTRIAN`             | 1.5         | 1.5         |
-| `mtb:scale=2`               | `PEDESTRIAN`             | 3.0         | 3.0         |
-| `indoor=area`               | `PEDESTRIAN`             |             |             |
-| `indoor=corridor`           | `PEDESTRIAN`             |             |             |
-| `highway=cycleway`          | `BICYCLE`                | 0.6         | 2.0         |
-| `mtb:scale=0`               | `PEDESTRIAN_AND_BICYCLE` |             |             |
-| `highway=path`              | `PEDESTRIAN_AND_BICYCLE` | 0.75        | 0.85        |
-| `highway=living_street`     | `ALL`                    | 0.9         | 0.95        |
-| `highway=unclassified`      | `ALL`                    |             |             |
-| `highway=road`              | `ALL`                    |             |             |
-| `highway=byway`             | `ALL`                    | 1.3         | 1.3         |
-| `highway=track`             | `ALL`                    | 1.3         | 1.3         |
-| `highway=service`           | `ALL`                    | 1.1         | 1.1         |
-| `highway=residential`       | `ALL`                    | 0.98        | 0.98        |
-| `highway=residential_link`  | `ALL`                    | 0.98        | 0.98        |
-| `highway=tertiary`          | `ALL`                    |             |             |
-| `highway=tertiary_link`     | `ALL`                    |             |             |
-| `highway=secondary`         | `ALL`                    | 1.5         | 1.5         |
-| `highway=secondary_link`    | `ALL`                    | 1.5         | 1.5         |
-| `highway=primary`           | `ALL`                    | 2.06        | 2.06        |
-| `highway=primary_link`      | `ALL`                    | 2.06        | 2.06        |
-| `highway=trunk`             | `ALL`                    | 7.47        | 7.47        |
-| `highway=trunk_link`        | `ALL`                    | 2.06        | 7.47        |
+| `highway=bridleway`         | `NONE`                   | 1.3         | 1.6         |
+| `highway=corridor`          | `PEDESTRIAN`             |             | 1.1         |
+| `highway=steps`             | `PEDESTRIAN`             |             | 1.2         |
+| `highway=crossing`          | `PEDESTRIAN`             |             | 1.1         |
+| `highway=platform`          | `PEDESTRIAN`             |             | 1.2         |
+| `public_transport=platform` | `PEDESTRIAN`             |             | 1.2         |
+| `railway=platform`          | `PEDESTRIAN`             |             | 1.2         |
+| `highway=pedestrian`        | `PEDESTRIAN`             | 0.9         |             |
+| `highway=footway`           | `PEDESTRIAN`             | 1.1         |             |
+| `mtb:scale=1`               | `PEDESTRIAN`             | 1.5         | 1.9         |
+| `mtb:scale=2`               | `PEDESTRIAN`             | 3.0         | 3.8         |
+| `indoor=area`               | `PEDESTRIAN`             |             | 1.1         |
+| `indoor=corridor`           | `PEDESTRIAN`             |             | 1.1         |
+| `highway=cycleway`          | `BICYCLE`                | 0.6         | 2.5         |
+| `mtb:scale=0`               | `PEDESTRIAN_AND_BICYCLE` |             | 1.2         |
+| `highway=path`              | `PEDESTRIAN_AND_BICYCLE` | 0.75        | 1.05        |
+| `highway=living_street`     | `ALL`                    | 0.9         | 1.15        |
+| `highway=unclassified`      | `ALL`                    |             | 1.25        |
+| `highway=road`              | `ALL`                    |             | 1.25        |
+| `highway=byway`             | `ALL`                    | 1.3         | 1.7         |
+| `highway=track`             | `ALL`                    | 1.3         | 1.7         |
+| `highway=service`           | `ALL`                    | 1.1         | 1.3         |
+| `highway=residential`       | `ALL`                    | 0.98        | 1.2         |
+| `highway=residential_link`  | `ALL`                    | 0.98        | 1.2         |
+| `highway=tertiary`          | `ALL`                    |             | 1.25        |
+| `highway=tertiary_link`     | `ALL`                    |             | 1.25        |
+| `highway=secondary`         | `ALL`                    | 1.5         | 1.9         |
+| `highway=secondary_link`    | `ALL`                    | 1.5         | 1.9         |
+| `highway=primary`           | `ALL`                    | 2.06        | 2.6         |
+| `highway=primary_link`      | `ALL`                    | 2.06        | 2.6         |
+| `highway=trunk`             | `ALL`                    | 7.47        | 9.3         |
+| `highway=trunk_link`        | `ALL`                    | 2.06        | 9.3         |
 | `highway=motorway_link`     | `CAR`                    | 2.06        |             |
 | `highway=motorway`          | `CAR`                    | 8.0         |             |
 
@@ -95,7 +95,7 @@ Multiple mixins can apply to the same way and their effects compound.
 | `cycleway=opposite_track; not(highway=cycleway)`                                                                                                                                                                                                              | backward: BICYCLE |                        | no direction: 1.0 <br> forward: 1.0 <br> back: 0.75 |             |
 | `cycleway=shared_lane; not(highway=cycleway)`                                                                                                                                                                                                                 | BICYCLE           |                        | 0.77                                                |             |
 | `cycleway=opposite; not(highway=cycleway)`                                                                                                                                                                                                                    | backward: BICYCLE |                        | no direction: 1.0 <br> forward: 1.0 <br> back: 1.4  |             |
-| `foot=designated; not(highway one of [footway, pedestrian, path])`                                                                                                                                                                                            |                   |                        |                                                     | 0.9         |
+| `foot=designated; not(highway one of [footway, pedestrian, path])`                                                                                                                                                                                            |                   |                        |                                                     | 0.95        |
 | `footway=sidewalk`                                                                                                                                                                                                                                            |                   |                        | 2.5                                                 |             |
 | `footway=crossing`                                                                                                                                                                                                                                            |                   |                        | 1.5                                                 |             |
 | `bicycle=designated; cycleway not one of [no, none] or absent; not(highway=cycleway); not(lcn=yes); not(rcn=yes); not(ncn=yes); not(bicycle_road=yes); not(cyclestreet=yes)`                                                                                  |                   |                        | 0.8                                                 |             |
