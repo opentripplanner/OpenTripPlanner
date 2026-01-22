@@ -254,11 +254,9 @@ public class OsmTagMapper {
 
     // prefer walking on sidewalks
     props.setMixinProperties(
-      new LogicalOrSpecifier(
-        new ExactMatchSpecifier(
-          new Condition.OneOf("sidewalk", "yes", "left", "right", "both"),
-          new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path", "trunk"))
-        )
+      new ExactMatchSpecifier(
+        new Condition.OneOf("sidewalk", "yes", "left", "right", "both"),
+        new Not(new Condition.OneOf("highway", "footway", "pedestrian", "path", "trunk"))
       ),
       ofWalkSafety(0.9)
     );
