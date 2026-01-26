@@ -61,17 +61,17 @@ public class AccessEgressPreferencesTest {
     assertEquals("StreetPreferences{}", StreetPreferences.DEFAULT.toString());
     assertEquals(
       "AccessEgressPreferences{" +
-      "penalty: TimeAndCostPenaltyForEnum{" +
-      "CAR_TO_PARK: " +
-      CAR_TO_PARK_PENALTY +
-      ", " +
-      "CAR_PICKUP: (timePenalty: 20m + 2.0 t, costFactor: 1.50), " +
-      "CAR_RENTAL: (timePenalty: 20m + 2.0 t, costFactor: 1.50), " +
-      "CAR_HAILING: (timePenalty: 20m + 2.0 t, costFactor: 1.50), " +
-      "FLEXIBLE: (timePenalty: 10m + 1.30 t, costFactor: 1.30)}, " +
-      "maxDuration: DurationForStreetMode{default:5m}, " +
-      "maxStopCount: MaxStopCountLimit{defaultLimit: 245, limitsForModes: {CAR=0}}" +
-      "}",
+        "penalty: TimeAndCostPenaltyForEnum{" +
+        "CAR_TO_PARK: " +
+        CAR_TO_PARK_PENALTY +
+        ", " +
+        "CAR_PICKUP: (timePenalty: 20m + 2.0 t, costFactor: 1.50), " +
+        "CAR_RENTAL: (timePenalty: 20m + 2.0 t, costFactor: 1.50), " +
+        "CAR_HAILING: (timePenalty: 20m + 2.0 t, costFactor: 1.50), " +
+        "FLEXIBLE: (timePenalty: 10m + 1.30 t, costFactor: 1.30)}, " +
+        "maxDuration: DurationForStreetMode{default:5m}, " +
+        "maxStopCount: MaxStopCountLimit{defaultLimit: 245, limitsForModes: {CAR=0}}" +
+        "}",
       subject.toString()
     );
   }

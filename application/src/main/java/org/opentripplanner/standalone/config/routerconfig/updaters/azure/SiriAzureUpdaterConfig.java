@@ -95,7 +95,7 @@ public abstract class SiriAzureUpdaterConfig {
         .summary("Maximum time to wait for real-time services during startup.")
         .description(
           "Maximum time to wait for real-time services during startup. " +
-          "If real-time services are unavailable, OTP will start without real-time data after this timeout."
+            "If real-time services are unavailable, OTP will start without real-time data after this timeout."
         )
         .asDuration(parameters.getStartupTimeout())
     );

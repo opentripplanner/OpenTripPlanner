@@ -208,7 +208,11 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     assertTrue(fares.getLegProducts().isEmpty());
     var itineraryProducts = fares.getItineraryProducts();
     assertFalse(itineraryProducts.isEmpty());
-    var fp = itineraryProducts.stream().filter(p -> p.name().equals("regular")).findAny().get();
+    var fp = itineraryProducts
+      .stream()
+      .filter(p -> p.name().equals("regular"))
+      .findAny()
+      .get();
     assertEquals(Money.usDollars(3.49f), fp.price());
   }
 

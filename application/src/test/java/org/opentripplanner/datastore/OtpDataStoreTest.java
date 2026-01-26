@@ -200,12 +200,12 @@ public class OtpDataStoreTest {
     // added to the same temp-data-dir.
     assertEquals(
       "CONFIG base:build-config.json, " +
-      "EMPIRICAL_DATA data:empirical_delay, " +
-      "GRAPH data:graph.obj, " +
-      "GTFS data:gtfs.zip, " +
-      "OSM data:osm.pbf, " +
-      "REPORT data:report, " +
-      "UNKNOWN base:unknown.txt",
+        "EMPIRICAL_DATA data:empirical_delay, " +
+        "GRAPH data:graph.obj, " +
+        "GTFS data:gtfs.zip, " +
+        "OSM data:osm.pbf, " +
+        "REPORT data:report, " +
+        "UNKNOWN base:unknown.txt",
       result
     );
   }

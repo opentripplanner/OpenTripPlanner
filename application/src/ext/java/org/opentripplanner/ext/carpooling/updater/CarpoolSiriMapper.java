@@ -99,7 +99,9 @@ public class CarpoolSiriMapper {
   ) {
     String stopId = isFirst
       ? tripId + "_trip_origin"
-      : isLast ? tripId + "_trip_destination" : tripId + "_stop_" + sequenceNumber;
+      : isLast
+        ? tripId + "_trip_destination"
+        : tripId + "_stop_" + sequenceNumber;
 
     var areaStop = buildAreaStop(call, stopId);
 

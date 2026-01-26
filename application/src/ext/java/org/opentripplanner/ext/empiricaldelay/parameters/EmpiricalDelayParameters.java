@@ -29,7 +29,10 @@ public class EmpiricalDelayParameters implements Serializable {
    * List all empirical delay composite datasources/feeds(file directory/cloud bucket/zip).
    */
   public List<URI> listFiles() {
-    return feeds.stream().map(f -> f.source()).toList();
+    return feeds
+      .stream()
+      .map(f -> f.source())
+      .toList();
   }
 
   private EmpiricalDelayParameters.Builder copyOf() {

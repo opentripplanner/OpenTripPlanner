@@ -195,7 +195,10 @@ public class TransitDataImportBuilderLimitPeriodTest {
 
   private TripPattern createTripPattern(Collection<Trip> trips) {
     FeedScopedId patternId = TimetableRepositoryForTest.id(
-      trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
+      trips
+        .stream()
+        .map(t -> t.getId().getId())
+        .collect(Collectors.joining(":"))
     );
     TripPatternBuilder tpb = TripPattern.of(patternId)
       .withRoute(route)

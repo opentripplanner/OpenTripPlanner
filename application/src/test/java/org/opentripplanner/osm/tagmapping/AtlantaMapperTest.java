@@ -9,12 +9,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 
 class AtlantaMapperTest {
 
-  static WayPropertySet wps = new WayPropertySet();
-
-  static {
-    AtlantaMapper source = new AtlantaMapper();
-    source.populateProperties(wps);
-  }
+  private static final WayPropertySet wps = new AtlantaMapper().buildWayPropertySet();
 
   // Most OSM trunk roads in Atlanta are (large) city roads that are permitted for all modes.
   // (The default TagMapper implementation is car-only.)

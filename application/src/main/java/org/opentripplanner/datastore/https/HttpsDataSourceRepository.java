@@ -71,8 +71,8 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
     } else {
       throw new UnsupportedOperationException(
         "Only ZIP archives are supported as composite sources for the HTTPS data source. URL: %s".formatted(
-            uri
-          )
+          uri
+        )
       );
     }
   }

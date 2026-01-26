@@ -66,10 +66,10 @@ public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
     return oneIterationOnly()
       ? IntIterators.singleValueIterator(earliestDepartureTime)
       : IntIterators.intDecIterator(
-        earliestDepartureTime + searchWindowInSeconds,
-        earliestDepartureTime,
-        iterationStep
-      );
+          earliestDepartureTime + searchWindowInSeconds,
+          earliestDepartureTime,
+          iterationStep
+        );
   }
 
   @Override

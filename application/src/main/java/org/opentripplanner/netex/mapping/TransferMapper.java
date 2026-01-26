@@ -144,11 +144,10 @@ public class TransferMapper {
     String errorMessage;
 
     if (scheduledStopPoints != null) {
-      var index =
-        switch (label) {
-          case Label.TO -> scheduledStopPoints.indexOf(sspId);
-          case Label.FROM -> scheduledStopPoints.lastIndexOf(sspId);
-        };
+      var index = switch (label) {
+        case Label.TO -> scheduledStopPoints.indexOf(sspId);
+        case Label.FROM -> scheduledStopPoints.lastIndexOf(sspId);
+      };
       if (index >= 0) {
         return index;
       }

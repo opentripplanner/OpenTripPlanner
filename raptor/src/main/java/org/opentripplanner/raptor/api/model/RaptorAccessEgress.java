@@ -4,6 +4,7 @@ import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.C1;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.RIDES;
 import static org.opentripplanner.raptor.api.model.RaptorValueType.TIME_PENALTY;
+import static org.opentripplanner.raptor.api.model.RaptorValueType.VIAS;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -128,7 +129,7 @@ public interface RaptorAccessEgress {
 
   /**
    * In a via-search (both pass-through and visit-via) the access/egress may contain one
-   * ore more via-locations. If so Raptor needs to know how many via-locations are included
+   * or more via-locations. If so, Raptor needs to know how many via-locations are included
    * so it can skip these.
    * <p>
    * If the access/egress {@code stop} is a via-location then this method should include
@@ -138,6 +139,33 @@ public interface RaptorAccessEgress {
    */
   default int numberOfViaLocationsVisited() {
     return RaptorConstants.ZERO;
+  }
+
+  /**
+   * Validate that this access or egress path visits via locations correctly.
+   * The number of via locations visited must not exceed the total number of via locations
+   * defined in the search.
+   *
+   * @param numberOfViaLocations the total number of via locations in the search
+   * @throws IllegalArgumentException if the via visits are invalid
+   */
+  default void validateAccessEgressVisitVia(String type, int numberOfViaLocations) {
+    int viaVisits = numberOfViaLocationsVisited();
+
+    if (viaVisits < 0) {
+      throw new IllegalArgumentException(type + " cannot have negative via visits: " + viaVisits);
+    }
+
+    if (viaVisits > numberOfViaLocations) {
+      throw new IllegalArgumentException(
+        type +
+          " visits " +
+          viaVisits +
+          " via locations, but only " +
+          numberOfViaLocations +
+          " are defined"
+      );
+    }
   }
 
   /**
@@ -278,6 +306,9 @@ public interface RaptorAccessEgress {
     }
     if (hasRides()) {
       buf.append(' ').append(RIDES.format(numberOfRides()));
+    }
+    if (numberOfViaLocationsVisited() > 0) {
+      buf.append(' ').append(VIAS.format(numberOfViaLocationsVisited()));
     }
     if (hasTimePenalty()) {
       buf.append(' ').append(TIME_PENALTY.format(timePenalty()));

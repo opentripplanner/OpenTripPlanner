@@ -63,11 +63,11 @@ class ParkingRequestTest {
     assertEquals("ParkingRequest{}", ParkingRequest.DEFAULT.toString());
     assertEquals(
       "ParkingRequest{" +
-      "unpreferredVehicleParkingTagCost: $360, " +
-      "filter: ParkingFilter{not: [tags=[not]], select: [tags=[bar]]}, " +
-      "preferred: ParkingFilter{not: [tags=[bar]], select: [tags=[foo]]}, " +
-      "cost: $240, " +
-      "time: PT2M}",
+        "unpreferredVehicleParkingTagCost: $360, " +
+        "filter: ParkingFilter{not: [tags=[not]], select: [tags=[bar]]}, " +
+        "preferred: ParkingFilter{not: [tags=[bar]], select: [tags=[foo]]}, " +
+        "cost: $240, " +
+        "time: PT2M}",
       subject.toString()
     );
   }

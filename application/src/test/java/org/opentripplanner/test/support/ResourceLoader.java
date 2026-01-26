@@ -164,12 +164,11 @@ public class ResourceLoader {
    * test).
    */
   private File resourceFile(String resourceDir, String path) {
-    var fullPath =
-      "src/%s/resources/%s/%s".formatted(
-          resourceDir,
-          clazz.getPackage().getName().replace(".", "/"),
-          path
-        );
+    var fullPath = "src/%s/resources/%s/%s".formatted(
+      resourceDir,
+      clazz.getPackage().getName().replace(".", "/"),
+      path
+    );
     File file = new File(fullPath);
     assertFileExists(file);
     return file;

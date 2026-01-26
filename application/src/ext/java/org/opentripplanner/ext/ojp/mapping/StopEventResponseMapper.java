@@ -117,10 +117,8 @@ public class StopEventResponseMapper {
   }
 
   private String eventId(TripTimeOnDate tripTimeOnDate) {
-    var bytes =
-      (tripTimeOnDate.getStopTimeKey().toString() + tripTimeOnDate.getServiceDay()).getBytes(
-          StandardCharsets.UTF_8
-        );
+    var bytes = (tripTimeOnDate.getStopTimeKey().toString() +
+      tripTimeOnDate.getServiceDay()).getBytes(StandardCharsets.UTF_8);
     return UUID.nameUUIDFromBytes(bytes).toString();
   }
 
@@ -186,8 +184,9 @@ public class StopEventResponseMapper {
   }
 
   private ServiceDepartureStructure serviceDeparture(TripTimeOnDate tripTimeOnDate) {
-    var departure = new ServiceDepartureStructure()
-      .withTimetabledTime(new XmlDateTime(tripTimeOnDate.scheduledDeparture().atZone(zoneId)));
+    var departure = new ServiceDepartureStructure().withTimetabledTime(
+      new XmlDateTime(tripTimeOnDate.scheduledDeparture().atZone(zoneId))
+    );
     tripTimeOnDate
       .realtimeDeparture()
       .filter(d -> optionalFeatures.contains(REALTIME_DATA))
@@ -196,8 +195,9 @@ public class StopEventResponseMapper {
   }
 
   private ServiceArrivalStructure serviceArrival(TripTimeOnDate tripTimeOnDate) {
-    var arrival = new ServiceArrivalStructure()
-      .withTimetabledTime(new XmlDateTime(tripTimeOnDate.scheduledArrival().atZone(zoneId)));
+    var arrival = new ServiceArrivalStructure().withTimetabledTime(
+      new XmlDateTime(tripTimeOnDate.scheduledArrival().atZone(zoneId))
+    );
 
     tripTimeOnDate
       .realtimeArrival()
@@ -222,8 +222,9 @@ public class StopEventResponseMapper {
     if (string == null) {
       return null;
     } else {
-      return new InternationalTextStructure()
-        .withText(new DefaultedTextStructure().withValue(string).withLang(lang));
+      return new InternationalTextStructure().withText(
+        new DefaultedTextStructure().withValue(string).withLang(lang)
+      );
     }
   }
 

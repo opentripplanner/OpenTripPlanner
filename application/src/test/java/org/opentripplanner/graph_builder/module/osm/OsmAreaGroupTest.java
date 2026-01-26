@@ -15,7 +15,6 @@ import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmLevelSource;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 
 class OsmAreaGroupTest {
 
@@ -176,10 +175,6 @@ class OsmAreaGroupTest {
     ),
     nodes.valueCollection().stream().toList()
   );
-
-  static {
-    new OsmTagMapper().populateProperties(osmProvider.getWayPropertySet());
-  }
 
   @Test
   void shouldGroupWithTwoConsecutiveNodes() {

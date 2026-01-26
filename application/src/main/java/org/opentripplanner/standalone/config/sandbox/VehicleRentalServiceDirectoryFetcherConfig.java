@@ -34,7 +34,7 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
         .summary("URL or file path to the GBFS v3 manifest.json")
         .description(
           "Can be either a remote URL (http/https) or a local file path (file://). " +
-          "The manifest must conform to the GBFS v3.0 specification."
+            "The manifest must conform to the GBFS v3.0 specification."
         )
         .asUri(),
       c.of("language").since(V2_1).summary("Language code for GBFS feeds.").asString(null),
@@ -52,8 +52,8 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
       .since(V2_4)
       .summary(
         "List all networks to include. Use \"network\": \"" +
-        VehicleRentalServiceDirectoryFetcherParameters.DEFAULT_NETWORK_NAME +
-        "\" to set defaults."
+          VehicleRentalServiceDirectoryFetcherParameters.DEFAULT_NETWORK_NAME +
+          "\" to set defaults."
       )
       .description(
         """

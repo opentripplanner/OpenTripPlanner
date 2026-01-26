@@ -259,6 +259,7 @@ public class GeometryProcessor {
         for (
           Iterator<IndexedLineSegment> it = possibleSegmentsForStop.get(j).iterator();
           it.hasNext();
+
         ) {
           IndexedLineSegment segment = it.next();
           if (segment.index > maxSegmentIndex) {
@@ -531,8 +532,8 @@ public class GeometryProcessor {
         // therefore this just a safety check to detect a programmer error.
         throw new IllegalStateException(
           "Shape %s is not sorted in order of sequence. This indicates a bug in OTP.".formatted(
-              shapeId
-            )
+            shapeId
+          )
         );
       }
       if (last == null || last.sequence() != sp.sequence()) {

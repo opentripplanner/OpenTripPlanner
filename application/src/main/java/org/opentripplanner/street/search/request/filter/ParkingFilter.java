@@ -86,6 +86,9 @@ public class ParkingFilter {
   }
 
   private static ParkingSelect[] makeFilter(Collection<ParkingSelect> select) {
-    return select.stream().filter(f -> !f.isEmpty()).toArray(ParkingSelect[]::new);
+    return select
+      .stream()
+      .filter(f -> !f.isEmpty())
+      .toArray(ParkingSelect[]::new);
   }
 }

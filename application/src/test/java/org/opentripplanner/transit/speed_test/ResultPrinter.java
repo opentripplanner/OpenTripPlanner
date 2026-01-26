@@ -80,24 +80,24 @@ class ResultPrinter {
 
     System.err.println(
       "\n" +
-      headerLine("SUMMARY " + profile) +
-      "\n" +
-      String.join("\n", listResults(timer)) +
-      "\n" +
-      logLine("Test case ids", "[%s]", summary.get(0)) +
-      logLine("Number of paths", "[%s]", summary.get(1)) +
-      logLine("Transit times(ms)", "[%s]", summary.get(2)) +
-      logLine("Total times(ms)", "[%s]", summary.get(3)) +
-      logLine("Successful searches", "%d / %d", nTestCasesSuccess, nTestCases) +
-      logLine(nSamples > 1, "Sample", "%d / %d", sample, nSamples) +
-      logLine("Time total", "%s", totalTimeSec) +
-      logLine(
-        nTestCasesSuccess != nTestCases,
-        "!!! UNEXPECTED RESULTS",
-        "%d OF %d FAILED. SEE LOG ABOVE FOR ERRORS !!!",
-        nTestCases - nTestCasesSuccess,
-        nTestCases
-      )
+        headerLine("SUMMARY " + profile) +
+        "\n" +
+        String.join("\n", listResults(timer)) +
+        "\n" +
+        logLine("Test case ids", "[%s]", summary.get(0)) +
+        logLine("Number of paths", "[%s]", summary.get(1)) +
+        logLine("Transit times(ms)", "[%s]", summary.get(2)) +
+        logLine("Total times(ms)", "[%s]", summary.get(3)) +
+        logLine("Successful searches", "%d / %d", nTestCasesSuccess, nTestCases) +
+        logLine(nSamples > 1, "Sample", "%d / %d", sample, nSamples) +
+        logLine("Time total", "%s", totalTimeSec) +
+        logLine(
+          nTestCasesSuccess != nTestCases,
+          "!!! UNEXPECTED RESULTS",
+          "%d OF %d FAILED. SEE LOG ABOVE FOR ERRORS !!!",
+          nTestCases - nTestCasesSuccess,
+          nTestCases
+        )
     );
   }
 
@@ -112,7 +112,12 @@ class ResultPrinter {
   ) {
     System.err.println();
     System.err.println(header);
-    int labelMaxLen = result.keySet().stream().mapToInt(it -> it.name().length()).max().orElse(20);
+    int labelMaxLen = result
+      .keySet()
+      .stream()
+      .mapToInt(it -> it.name().length())
+      .max()
+      .orElse(20);
     for (SpeedTestProfile p : profiles) {
       List<Integer> v = result.get(p);
       if (v != null) {
@@ -203,9 +208,17 @@ class ResultPrinter {
     if (!v.isEmpty()) {
       String values =
         "[ " +
-        v.stream().map(it -> String.format("%4d", it)).reduce((a, b) -> a + ", " + b).orElse("") +
+        v
+          .stream()
+          .map(it -> String.format("%4d", it))
+          .reduce((a, b) -> a + ", " + b)
+          .orElse("") +
         " ]";
-      double avg = v.stream().mapToInt(it -> it).average().orElse(0d);
+      double avg = v
+        .stream()
+        .mapToInt(it -> it)
+        .average()
+        .orElse(0d);
 
       System.err.printf(
         " ==> %-" + labelMaxLen + "s : %s Avg: %4.1f  (σ=%.1f)%n",

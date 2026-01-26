@@ -23,15 +23,14 @@ public class PolylineEncoderTest {
 
   @Test
   public void testPolygon() {
-    var polygon = GeometryUtils.getGeometryFactory()
-      .createPolygon(
-        new Coordinate[] {
-          new Coordinate(0, 0),
-          new Coordinate(1, 1),
-          new Coordinate(2, 2),
-          new Coordinate(0, 0),
-        }
-      );
+    var polygon = GeometryUtils.getGeometryFactory().createPolygon(
+      new Coordinate[] {
+        new Coordinate(0, 0),
+        new Coordinate(1, 1),
+        new Coordinate(2, 2),
+        new Coordinate(0, 0),
+      }
+    );
     var polyline = PolylineEncoder.encodeGeometry(polygon);
 
     assertEquals("??_ibE_ibE_ibE_ibE~reK~reK", polyline.points());

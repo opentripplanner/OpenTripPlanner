@@ -342,6 +342,15 @@ public class DefaultTransitService implements TransitEditorService {
     return canceledTrips;
   }
 
+  /**
+   * TODO This only supports realtime cancelled trips for now.
+   */
+  @Override
+  public List<TripOnServiceDate> findCanceledTrips(TripOnServiceDateRequest request) {
+    Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
+    return listCanceledTrips().stream().filter(matcher::match).toList();
+  }
+
   @Override
   public Collection<Trip> listTrips() {
     OTPRequestTimeoutException.checkForTimeout();

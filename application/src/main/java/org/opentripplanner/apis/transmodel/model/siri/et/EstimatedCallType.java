@@ -210,10 +210,10 @@ public class EstimatedCallType {
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description(
             "Whether stop is cancelled. This means that either the " +
-            "ServiceJourney has a planned cancellation, the ServiceJourney has been " +
-            "cancelled by real-time data, or this particular StopPoint has been " +
-            "cancelled. This also means that both boarding and alighting has been " +
-            "cancelled."
+              "ServiceJourney has a planned cancellation, the ServiceJourney has been " +
+              "cancelled by real-time data, or this particular StopPoint has been " +
+              "cancelled. This also means that both boarding and alighting has been " +
+              "cancelled."
           )
           .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isCanceledEffectively())
           .build()

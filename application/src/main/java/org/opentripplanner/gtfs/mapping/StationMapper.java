@@ -45,10 +45,10 @@ class StationMapper {
     if (rhs.getLocationType() != Stop.LOCATION_TYPE_STATION) {
       throw new IllegalArgumentException(
         "Expected location_type %s, but got %s for stops.txt entry %s".formatted(
-            Stop.LOCATION_TYPE_STATION,
-            rhs.getLocationType(),
-            rhs
-          )
+          Stop.LOCATION_TYPE_STATION,
+          rhs.getLocationType(),
+          rhs
+        )
       );
     }
     StationBuilder builder = Station.of(idFactory.createId(rhs.getId(), "station"))

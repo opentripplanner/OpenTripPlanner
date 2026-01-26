@@ -265,8 +265,8 @@ public class GraphBuilder implements Runnable {
     if (hasTransitData() && !timetableRepository.hasTransit()) {
       throw new OtpAppException(
         "The provided transit data have no trips within the configured transit service period. " +
-        "There is something wrong with your data - see the log above. Another possibility is that the " +
-        "'transitServiceStart' and 'transitServiceEnd' are not correctly configured."
+          "There is something wrong with your data - see the log above. Another possibility is that the " +
+          "'transitServiceStart' and 'transitServiceEnd' are not correctly configured."
       );
     }
   }

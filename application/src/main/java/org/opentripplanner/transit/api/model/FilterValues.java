@@ -94,8 +94,8 @@ public abstract class FilterValues<E> {
     if (includeEverything()) {
       throw new NoSuchElementException(
         "Filter values for filter %s effectively don't filter, use includeEverything() before calling this method.".formatted(
-            name
-          )
+          name
+        )
       );
     }
     return values;

@@ -6,8 +6,8 @@ import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.utils.time.TimeUtils;
 
-record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTime)
-  implements RaptorBoardOrAlightEvent<T> {
+record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTime) implements
+  RaptorBoardOrAlightEvent<T> {
   @Override
   public int tripIndex() {
     return RaptorConstants.NOT_FOUND;

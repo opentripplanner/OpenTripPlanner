@@ -93,10 +93,10 @@ public class EnvironmentVariableReplacer {
   private static void errorVariableNameNotFound(String variableName, String source) {
     throw new OtpAppException(
       "Environment variable name '" +
-      variableName +
-      "' in config '" +
-      source +
-      "' not found in the system environment variables."
+        variableName +
+        "' in config '" +
+        source +
+        "' not found in the system environment variables."
     );
   }
 }

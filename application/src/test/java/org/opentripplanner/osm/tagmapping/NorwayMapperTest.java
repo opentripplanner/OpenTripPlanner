@@ -17,12 +17,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class NorwayMapperTest {
 
-  static WayPropertySet wps = new WayPropertySet();
-
-  static {
-    var source = new NorwayMapper();
-    source.populateProperties(wps);
-  }
+  static final WayPropertySet wps = new NorwayMapper().buildWayPropertySet();
 
   static int[] expectedMaxspeeds = { 90, 80, 70, 60, 50, 40, 30 };
 

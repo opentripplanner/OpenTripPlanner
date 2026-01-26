@@ -77,8 +77,8 @@ public class RaptorSearchWindowCalculatorTest {
     assertEquals(3_000, subject.getLatestArrivalTime());
     assertTrue(
       minTransitTime >
-      subject.getLatestArrivalTime() -
-      (subject.getSearchWindowSeconds() + subject.getEarliestDepartureTime())
+        subject.getLatestArrivalTime() -
+        (subject.getSearchWindowSeconds() + subject.getEarliestDepartureTime())
     );
   }
 
@@ -102,7 +102,7 @@ public class RaptorSearchWindowCalculatorTest {
     assertEquals(
       minTransitTime,
       subject.getLatestArrivalTime() -
-      (subject.getSearchWindowSeconds() + subject.getEarliestDepartureTime())
+        (subject.getSearchWindowSeconds() + subject.getEarliestDepartureTime())
     );
   }
 

@@ -576,10 +576,10 @@ public class NetexMapper {
       issueStore.add(
         "NetexImportTimeZone",
         "No timezone set for the current NeTEx input data file. The import " +
-        "start-of-period is set to " +
-        time +
-        " UTC, used to check entity validity " +
-        "periods."
+          "start-of-period is set to " +
+          time +
+          " UTC, used to check entity validity " +
+          "periods."
       );
       return time;
     }

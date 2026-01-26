@@ -121,27 +121,27 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
       var trip = timetable().getTripSchedule(i);
       if (toTrip == trip) {
         this.transferConstraintsForwardSearch.addConstraintTransfers(
-            fromTrip,
-            fromStopPos,
-            trip,
-            i,
-            toStopPos,
-            trip.arrival(toStopPos),
-            constraint
-          );
+          fromTrip,
+          fromStopPos,
+          trip,
+          i,
+          toStopPos,
+          trip.arrival(toStopPos),
+          constraint
+        );
       }
       // Reverse search transfer, the {@code source/target} is the trips in order of the
       // reverse search, which is opposite from {@code from/to} in the result path.
       if (fromTrip == trip) {
         this.transferConstraintsReverseSearch.addConstraintTransfers(
-            toTrip,
-            toStopPos,
-            trip,
-            i,
-            fromStopPos,
-            trip.departure(fromStopPos),
-            constraint
-          );
+          toTrip,
+          toStopPos,
+          trip,
+          i,
+          fromStopPos,
+          trip.departure(fromStopPos),
+          constraint
+        );
       }
     }
   }

@@ -14,5 +14,4 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.SOURCE)
 @Inherited
-public @interface HttpRequestScoped {
-}
+public @interface HttpRequestScoped {}

@@ -54,9 +54,9 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     this.stopPriorityCostCalculator = (stopBoardAlightTransferCosts != null &&
         extraStopBoardAlightCostsFactor > 0.01)
       ? new StopPriorityCostCalculator(
-        extraStopBoardAlightCostsFactor,
-        stopBoardAlightTransferCosts
-      )
+          extraStopBoardAlightCostsFactor,
+          stopBoardAlightTransferCosts
+        )
       : null;
   }
 

@@ -127,8 +127,9 @@ public class AlertsUpdateHandlerTest {
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
 
-    List<Entry<String, String>> translations =
-      ((TranslatedString) transitAlert.url().get()).getTranslations();
+    List<Entry<String, String>> translations = ((TranslatedString) transitAlert
+        .url()
+        .get()).getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("https://www.opentripplanner.org/", translations.get(0).getValue());
@@ -163,8 +164,9 @@ public class AlertsUpdateHandlerTest {
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
 
-    List<Entry<String, String>> translations =
-      ((TranslatedString) transitAlert.headerText().get()).getTranslations();
+    List<Entry<String, String>> translations = ((TranslatedString) transitAlert
+        .headerText()
+        .get()).getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("Title", translations.get(0).getValue());
@@ -205,8 +207,9 @@ public class AlertsUpdateHandlerTest {
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
 
-    List<Entry<String, String>> translations =
-      ((TranslatedString) transitAlert.descriptionText().get()).getTranslations();
+    List<Entry<String, String>> translations = ((TranslatedString) transitAlert
+        .descriptionText()
+        .get()).getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("Description", translations.get(0).getValue());
@@ -307,8 +310,9 @@ public class AlertsUpdateHandlerTest {
   public void testTripSelectorWithTripId() {
     GtfsRealtime.Alert alert = Alert.newBuilder()
       .addInformedEntity(
-        GtfsRealtime.EntitySelector.newBuilder()
-          .setTrip(TripDescriptor.newBuilder().setTripId("1").build())
+        GtfsRealtime.EntitySelector.newBuilder().setTrip(
+          TripDescriptor.newBuilder().setTripId("1").build()
+        )
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);

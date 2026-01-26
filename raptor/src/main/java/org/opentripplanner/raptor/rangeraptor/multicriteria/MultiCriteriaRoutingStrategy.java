@@ -69,7 +69,8 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
   public void prepareForNextStop(int stopIndex, int stopPos) {
     // If no pass-through service exist, this block will be removed by the JIT compiler
     if (passThroughPointsService.isPassThroughPoint(stopIndex)) {
-      for (R ride : patternRides) {
+      for (int i = 0; i < patternRides.size(); ++i) {
+        R ride = patternRides.get(i);
         // Replace existing ride with same ride with the C2 value updated. This only happens if
         // the stop is a pass-through point and the path has visited the pass-through points in the
         // correct order.
@@ -83,7 +84,8 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
 
   @Override
   public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {
-    for (R ride : patternRides) {
+    for (int i = 0; i < patternRides.size(); ++i) {
+      R ride = patternRides.get(i);
       state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
     }
   }

@@ -105,9 +105,9 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
     if (SLACK_RANGE.isOutside(slack)) {
       throw new IllegalArgumentException(
         "Cost slack is not in range: %d not in %s".formatted(
-            slack,
-            SLACK_RANGE.toString(v -> DurationUtils.durationToStr(v / SLACK_PRECISSION))
-          )
+          slack,
+          SLACK_RANGE.toString(v -> DurationUtils.durationToStr(v / SLACK_PRECISSION))
+        )
       );
     }
   }

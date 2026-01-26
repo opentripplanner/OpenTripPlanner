@@ -10,11 +10,13 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.osm.wayproperty.WayPropertySetBuilder;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.Condition;
 import org.opentripplanner.osm.wayproperty.specifier.Condition.Equals;
@@ -52,7 +54,8 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 public class OsmTagMapper {
 
   /* Populate properties on existing WayPropertySet */
-  public void populateProperties(WayPropertySet props) {
+  public WayPropertySet buildWayPropertySet() {
+    var props = WayPropertySet.of();
     WayProperties allWayProperties = withModes(ALL).build();
     WayProperties noneWayProperties = withModes(NONE).build();
     /* no bicycle tags */
@@ -140,10 +143,9 @@ public class OsmTagMapper {
         new Equals("cycleway", "opposite_lane"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      new MixinPropertiesBuilder()
-        .directional(TraverseDirection.BACKWARD, builder ->
-          builder.withBicycleSafety(0.87).addPermission(BICYCLE)
-        )
+      new MixinPropertiesBuilder().directional(TraverseDirection.BACKWARD, builder ->
+        builder.withBicycleSafety(0.87).addPermission(BICYCLE)
+      )
     );
 
     /* cycleway=track */
@@ -161,10 +163,9 @@ public class OsmTagMapper {
         new Equals("cycleway", "opposite_track"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      new MixinPropertiesBuilder()
-        .directional(TraverseDirection.BACKWARD, builder ->
-          builder.withBicycleSafety(0.75).addPermission(BICYCLE)
-        )
+      new MixinPropertiesBuilder().directional(TraverseDirection.BACKWARD, builder ->
+        builder.withBicycleSafety(0.75).addPermission(BICYCLE)
+      )
     );
 
     /* cycleway=shared_lane a.k.a. bike boulevards or neighborhood greenways */
@@ -182,10 +183,9 @@ public class OsmTagMapper {
         new Equals("cycleway", "opposite"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      new MixinPropertiesBuilder()
-        .directional(TraverseDirection.BACKWARD, builder ->
-          builder.withBicycleSafety(1.4).addPermission(BICYCLE)
-        )
+      new MixinPropertiesBuilder().directional(TraverseDirection.BACKWARD, builder ->
+        builder.withBicycleSafety(1.4).addPermission(BICYCLE)
+      )
     );
 
     /* sidewalk and crosswalk */
@@ -282,9 +282,9 @@ public class OsmTagMapper {
     props.setCarSpeed("highway=road", 11.2f);
 
     // default ~= 25 mph
-    props.defaultCarSpeed = 11.2f;
+    props.setDefaultCarSpeed(11.2f);
     // 38 m/s ~= 85 mph ~= 137 kph
-    props.maxPossibleCarSpeed = 38f;
+    props.setMaxPossibleCarSpeed(38f);
 
     /* special situations */
 
@@ -352,9 +352,11 @@ public class OsmTagMapper {
     props.setSlopeOverride(new BestMatchSpecifier("tunnel=*"), true);
     props.setSlopeOverride(new BestMatchSpecifier("location=underground"), true);
     props.setSlopeOverride(new BestMatchSpecifier("indoor=yes"), true);
+
+    return props.build();
   }
 
-  static void populateNotesAndNames(WayPropertySet props) {
+  static void populateNotesAndNames(WayPropertySetBuilder props) {
     /* and the notes */
     // TODO: The curly brackets in the string below mean that the CreativeNamer should substitute in OSM tag values.
     // However they are not taken into account when passed to the translation function.
@@ -468,12 +470,12 @@ public class OsmTagMapper {
     );
   }
 
-  public float getCarSpeedForWay(OsmEntity way, TraverseDirection direction) {
-    return way.getOsmProvider().getWayPropertySet().getCarSpeedForWay(way, direction);
-  }
-
-  public Float getMaxUsedCarSpeed(WayPropertySet wayPropertySet) {
-    return wayPropertySet.maxUsedCarSpeed;
+  public float getCarSpeedForWay(
+    OsmEntity way,
+    TraverseDirection direction,
+    DataImportIssueStore issueStore
+  ) {
+    return way.getOsmProvider().getWayPropertySet().getCarSpeedForWay(way, direction, issueStore);
   }
 
   public boolean isGeneralNoThroughTraffic(OsmEntity way) {

@@ -23,8 +23,9 @@ class TemporaryPartialStreetEdgeBuilderTest {
     StreetTraversalPermission.ALL;
 
   private static final I18NString NAME = I18NString.of("temporary-partial-street-edge-name");
-  private static final LineString GEOMETRY = GeometryUtils.getGeometryFactory()
-    .createLineString(new Coordinate[] { FROM_VERTEX.getCoordinate(), TO_VERTEX.getCoordinate() });
+  private static final LineString GEOMETRY = GeometryUtils.getGeometryFactory().createLineString(
+    new Coordinate[] { FROM_VERTEX.getCoordinate(), TO_VERTEX.getCoordinate() }
+  );
 
   @Test
   void buildAndConnect() {

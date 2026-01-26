@@ -289,7 +289,12 @@ public class TripPatternForDates
   ) {
     var departureTimes = Arrays.stream(tripPatternForDates)
       .map(TripPatternForDate::tripTimes)
-      .map(l -> l.stream().mapToInt(t -> t.getDepartureTime(FIRST_STOP_POS_IN_PATTERN)).toArray())
+      .map(l ->
+        l
+          .stream()
+          .mapToInt(t -> t.getDepartureTime(FIRST_STOP_POS_IN_PATTERN))
+          .toArray()
+      )
       .toList();
     return TripTimesForDaysIndex.ofTripTimesForDay(departureTimes, offsets);
   }

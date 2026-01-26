@@ -69,7 +69,8 @@ public class FaresConfiguration {
     return switch (type) {
       case "default" -> new DefaultFareServiceFactory();
       case "off" -> new NoopFareServiceFactory();
-      case "highest-fare-in-free-transfer-window",
+      case
+        "highest-fare-in-free-transfer-window",
         "highestFareInFreeTransferWindow" -> new HighestFareInFreeTransferWindowFareServiceFactory();
       case "hsl" -> new HSLFareServiceFactory();
       case "atlanta" -> new AtlantaFareServiceFactory();

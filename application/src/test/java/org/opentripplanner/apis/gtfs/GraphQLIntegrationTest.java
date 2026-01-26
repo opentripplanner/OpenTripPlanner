@@ -283,7 +283,11 @@ class GraphQLIntegrationTest {
       )
       .toList();
 
-    var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
+    var busRoute = routes
+      .stream()
+      .filter(r -> r.getMode().equals(BUS))
+      .findFirst()
+      .get();
 
     final Trip addedTrip = Trip.of(new FeedScopedId(FEED_ID, ADDED_TRIP_ID))
       .withRoute(busRoute)
@@ -300,7 +304,7 @@ class GraphQLIntegrationTest {
           TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
             .withRoute(t.getRoute())
             .withStopPattern(TimetableRepositoryForTest.stopPattern(A.stop, B.stop, C.stop, D.stop))
-            .withCreatedByRealtimeUpdater(true)
+            .withRealTimeStopPatternModified()
             .build(),
           realTimeTripTimes,
           SERVICE_DATE,

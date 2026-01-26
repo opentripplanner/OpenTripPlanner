@@ -63,10 +63,10 @@ class OHCalendarTest {
 
     assertEquals(
       "OHCalendar{" +
-      "zoneId: Europe/Paris, " +
-      "openingHours: [18th May 0:00-2:00, OCT-25 1:00-3:00, " +
-      "1-3. April 8:00-16:30, 17th May 22:00-23:59:59]" +
-      "}",
+        "zoneId: Europe/Paris, " +
+        "openingHours: [18th May 0:00-2:00, OCT-25 1:00-3:00, " +
+        "1-3. April 8:00-16:30, 17th May 22:00-23:59:59]" +
+        "}",
       c.toString()
     );
 

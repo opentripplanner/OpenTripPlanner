@@ -133,7 +133,8 @@ public class OrcaFareService extends DefaultFareService {
      */
     public boolean permitsFreeTransfers(ZonedDateTime startTime) {
       return switch (this) {
-        case WASHINGTON_STATE_FERRIES,
+        case
+          WASHINGTON_STATE_FERRIES,
           SKAGIT_TRANSIT,
           WHATCOM_LOCAL,
           WHATCOM_CROSS_COUNTY,
@@ -328,7 +329,8 @@ public class OrcaFareService extends DefaultFareService {
       );
       case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(2.50f);
       case EVERETT_TRANSIT, PIERCE_COUNTY_TRANSIT -> optionalUSD(2.00f);
-      case WHATCOM_LOCAL,
+      case
+        WHATCOM_LOCAL,
         WHATCOM_CROSS_COUNTY,
         SKAGIT_LOCAL,
         SKAGIT_CROSS_COUNTY -> fareType.equals(FareType.electronicRegular)
@@ -350,7 +352,8 @@ public class OrcaFareService extends DefaultFareService {
     return switch (rideType) {
       case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
       case KC_WATER_TAXI_VASHON_ISLAND, KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(1.00f);
-      case KC_METRO,
+      case
+        KC_METRO,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
@@ -365,7 +368,8 @@ public class OrcaFareService extends DefaultFareService {
         getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
       );
       case KITSAP_TRANSIT_FAST_FERRY -> defaultFare.map(Money::half);
-      case SKAGIT_LOCAL,
+      case
+        SKAGIT_LOCAL,
         SKAGIT_CROSS_COUNTY,
         WHATCOM_CROSS_COUNTY,
         WHATCOM_LOCAL -> Optional.empty();
@@ -391,7 +395,8 @@ public class OrcaFareService extends DefaultFareService {
       case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
       case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
       case EVERETT_TRANSIT -> optionalUSD(0.5f);
-      case SOUND_TRANSIT,
+      case
+        SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
         SOUND_TRANSIT_SOUNDER,

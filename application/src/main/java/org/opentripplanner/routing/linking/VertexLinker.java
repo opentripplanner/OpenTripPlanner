@@ -251,7 +251,10 @@ public class VertexLinker {
       direction,
       Scope.PERMANENT,
       null,
-      edges.stream().map(e -> new DistanceTo<>(e, distance(vertex, e, xscale))).toList(),
+      edges
+        .stream()
+        .map(e -> new DistanceTo<>(e, distance(vertex, e, xscale)))
+        .toList(),
       xscale
     );
   }

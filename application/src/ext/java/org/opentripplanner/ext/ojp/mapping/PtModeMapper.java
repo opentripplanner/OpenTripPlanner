@@ -24,7 +24,8 @@ public class PtModeMapper {
 
   public static TransitMode map(VehicleModesOfTransportEnumeration mode) {
     return switch (mode) {
-      case RAIL,
+      case
+        RAIL,
         RAILWAY_SERVICE,
         LIGHT_RAILWAY_SERVICE,
         URBAN_RAILWAY_SERVICE,

@@ -50,15 +50,15 @@ public final class TransitTestEnvironment {
 
     this.timetableRepository.index();
     this.timetableRepository.setRaptorTransitData(
-        RaptorTransitDataMapper.map(
-          new TestTransitTuningParameters(),
-          timetableRepository,
-          transferRepository
-        )
-      );
+      RaptorTransitDataMapper.map(
+        new TestTransitTuningParameters(),
+        timetableRepository,
+        transferRepository
+      )
+    );
     this.timetableRepository.setRealtimeRaptorTransitData(
-        new RaptorTransitData(timetableRepository.getRaptorTransitData())
-      );
+      new RaptorTransitData(timetableRepository.getRaptorTransitData())
+    );
     this.snapshotManager = new TimetableSnapshotManager(
       new RealTimeRaptorTransitDataUpdater(timetableRepository),
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,

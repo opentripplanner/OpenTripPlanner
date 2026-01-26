@@ -134,12 +134,12 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     } catch (IllegalArgumentException e) {
       throw new OtpAppException(
         "The file URI is invalid for file type " +
-        type +
-        ". " +
-        "URI: '" +
-        uri +
-        "', details: " +
-        e.getMessage()
+          type +
+          ". " +
+          "URI: '" +
+          uri +
+          "', details: " +
+          e.getMessage()
       );
     }
   }
@@ -157,11 +157,11 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     }
     throw new IllegalArgumentException(
       "The " +
-      file +
-      " is not recognized as a zip-file or " +
-      "directory. Unable to create composite data source for file type " +
-      type +
-      "."
+        file +
+        " is not recognized as a zip-file or " +
+        "directory. Unable to create composite data source for file type " +
+        type +
+        "."
     );
   }
 

@@ -14,11 +14,11 @@ public record GbfsVehicleRentalDataSourceParameters(
   boolean geofencingZones,
   boolean overloadingAllowed,
   Set<RentalPickupType> rentalPickupTypes
-)
-  implements VehicleRentalDataSourceParameters {
+) implements VehicleRentalDataSourceParameters {
   public GbfsVehicleRentalDataSourceParameters {
     Objects.requireNonNull(rentalPickupTypes);
   }
+
   @Override
   public VehicleRentalSourceType sourceType() {
     return VehicleRentalSourceType.GBFS;

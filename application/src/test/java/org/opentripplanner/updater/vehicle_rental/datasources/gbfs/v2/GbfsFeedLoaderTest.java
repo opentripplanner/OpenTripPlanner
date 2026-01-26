@@ -42,8 +42,9 @@ class GbfsFeedLoaderTest {
 
   public static final String LANGUAGE_NB = "nb";
   public static final String LANGUAGE_EN = "en";
-  private static final OtpHttpClient otpHttpClient = new OtpHttpClientFactory()
-    .create(LoggerFactory.getLogger(GbfsFeedLoaderTest.class));
+  private static final OtpHttpClient otpHttpClient = new OtpHttpClientFactory().create(
+    LoggerFactory.getLogger(GbfsFeedLoaderTest.class)
+  );
 
   @Test
   void getV22FeedWithExplicitLanguage() {
@@ -233,10 +234,34 @@ class GbfsFeedLoaderTest {
       .getData()
       .getStations();
     assertEquals(10, stationStatuses.size());
-    assertEquals(1, stationStatuses.stream().filter(s -> s.getNumBikesAvailable() == 0).count());
-    assertEquals(10, stationStatuses.stream().filter(s -> s.getNumBikesDisabled() == 0).count());
-    assertEquals(1, stationStatuses.stream().filter(s -> !s.getIsRenting()).count());
-    assertEquals(1, stationStatuses.stream().filter(s -> !s.getIsReturning()).count());
+    assertEquals(
+      1,
+      stationStatuses
+        .stream()
+        .filter(s -> s.getNumBikesAvailable() == 0)
+        .count()
+    );
+    assertEquals(
+      10,
+      stationStatuses
+        .stream()
+        .filter(s -> s.getNumBikesDisabled() == 0)
+        .count()
+    );
+    assertEquals(
+      1,
+      stationStatuses
+        .stream()
+        .filter(s -> !s.getIsRenting())
+        .count()
+    );
+    assertEquals(
+      1,
+      stationStatuses
+        .stream()
+        .filter(s -> !s.getIsReturning())
+        .count()
+    );
 
     assertNull(loader.getFeed(GBFSFreeBikeStatus.class));
     assertNull(loader.getFeed(GBFSSystemHours.class));

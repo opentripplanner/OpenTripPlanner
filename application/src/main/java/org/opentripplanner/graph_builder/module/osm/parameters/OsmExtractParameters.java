@@ -16,8 +16,7 @@ public record OsmExtractParameters(
   OsmTagMapperSource osmTagMapper,
   ZoneId timeZone,
   boolean includeOsmSubwayEntrances
-)
-  implements DataSourceConfig {
+) implements DataSourceConfig {
   public static final OsmTagMapperSource DEFAULT_OSM_TAG_MAPPER = OsmTagMapperSource.DEFAULT;
 
   public static final ZoneId DEFAULT_TIME_ZONE = null;

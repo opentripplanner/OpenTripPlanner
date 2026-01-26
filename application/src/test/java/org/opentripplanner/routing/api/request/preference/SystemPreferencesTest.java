@@ -74,11 +74,11 @@ class SystemPreferencesTest {
     assertEquals("SystemPreferences{}", SystemPreferences.DEFAULT.toString());
     assertEquals(
       "SystemPreferences{" +
-      "tags: [TestCaseCategory: rental], " +
-      "dataOverlay: DataOverlayParameters{LEAD_PENALTY: 17.3}, " +
-      "geoidElevation, " +
-      "maxJourneyDuration: 5h" +
-      "}",
+        "tags: [TestCaseCategory: rental], " +
+        "dataOverlay: DataOverlayParameters{LEAD_PENALTY: 17.3}, " +
+        "geoidElevation, " +
+        "maxJourneyDuration: 5h" +
+        "}",
       subject.toString()
     );
   }

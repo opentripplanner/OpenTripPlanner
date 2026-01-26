@@ -43,7 +43,11 @@ public class ViaRoutingWorker {
 
   public ViaRoutingResponse route() {
     //Loop over Via, for each cycle change from/to and JourneyRequest.
-    var result = viaRequest.viaSegment().stream().map(v -> routeSegment(v)).toList();
+    var result = viaRequest
+      .viaSegment()
+      .stream()
+      .map(v -> routeSegment(v))
+      .toList();
 
     return combineRoutingResponse(result);
   }
@@ -76,8 +80,8 @@ public class ViaRoutingWorker {
 
     this.currentSegmentRequest.withFrom(v.viaLocation().point());
     this.currentSegmentRequest.withDateTime(
-        firstArrival.plus(v.viaLocation().minSlack()).toInstant()
-      );
+      firstArrival.plus(v.viaLocation().minSlack()).toInstant()
+    );
     this.currentSegmentRequest.withSearchWindow(searchWindow);
     this.currentSegmentRequest.withNumItineraries(MAX_NUMBER_OF_ITINERARIES);
 

@@ -13,8 +13,7 @@ public record HopZeroTime(
   int seq,
   StopLocation fromStop,
   StopLocation toStop
-)
-  implements DataImportIssue {
+) implements DataImportIssue {
   private static final String FMT =
     "Zero-time hop over %fm on route %s trip %s stop sequence %d between %s and %s.";
 

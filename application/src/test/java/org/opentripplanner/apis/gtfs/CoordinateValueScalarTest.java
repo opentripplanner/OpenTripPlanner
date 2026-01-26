@@ -26,11 +26,13 @@ class CoordinateValueScalarTest {
 
   @Test
   void testSerialize() {
-    var coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing()
-      .serialize(COORDINATE);
+    var coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().serialize(
+      COORDINATE
+    );
     assertEquals(COORDINATE, coordinate, DELTA);
-    coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing()
-      .serialize(COORDINATE.floatValue());
+    coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().serialize(
+      COORDINATE.floatValue()
+    );
     assertEquals(COORDINATE, coordinate, DELTA);
     assertThrows(CoercingSerializeException.class, () ->
       GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().serialize(TEXT)
@@ -39,17 +41,21 @@ class CoordinateValueScalarTest {
 
   @Test
   void testParseValue() {
-    var coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing()
-      .parseValue(COORDINATE);
+    var coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseValue(
+      COORDINATE
+    );
     assertEquals(COORDINATE, coordinate, DELTA);
-    coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing()
-      .parseValue(COORDINATE_MIN);
+    coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseValue(
+      COORDINATE_MIN
+    );
     assertEquals(COORDINATE_MIN, coordinate, DELTA);
-    coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing()
-      .parseValue(COORDINATE_MAX);
+    coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseValue(
+      COORDINATE_MAX
+    );
     assertEquals(COORDINATE_MAX, coordinate, DELTA);
-    coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing()
-      .parseValue(COORDINATE_INT);
+    coordinate = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseValue(
+      COORDINATE_INT
+    );
     assertEquals(COORDINATE_INT, coordinate, DELTA);
     assertThrows(CoercingParseValueException.class, () ->
       GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseValue(TEXT)
@@ -64,22 +70,27 @@ class CoordinateValueScalarTest {
 
   @Test
   void testParseLiteral() {
-    var coordinateDouble = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing()
-      .parseLiteral(new FloatValue(BigDecimal.valueOf(COORDINATE)));
+    var coordinateDouble =
+      (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseLiteral(
+        new FloatValue(BigDecimal.valueOf(COORDINATE))
+      );
     assertEquals(COORDINATE, coordinateDouble, DELTA);
-    var coordinateInt = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing()
-      .parseLiteral(new IntValue(BigInteger.valueOf(COORDINATE.intValue())));
+    var coordinateInt = (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseLiteral(
+      new IntValue(BigInteger.valueOf(COORDINATE.intValue()))
+    );
     assertEquals(COORDINATE, coordinateInt, DELTA);
     assertThrows(CoercingParseLiteralException.class, () ->
       GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseLiteral(new StringValue(TEXT))
     );
     assertThrows(CoercingParseLiteralException.class, () ->
-      GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing()
-        .parseLiteral(new FloatValue(BigDecimal.valueOf(TOO_HIGH)))
+      GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseLiteral(
+        new FloatValue(BigDecimal.valueOf(TOO_HIGH))
+      )
     );
     assertThrows(CoercingParseLiteralException.class, () ->
-      GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing()
-        .parseLiteral(new FloatValue(BigDecimal.valueOf(TOO_LOW)))
+      GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseLiteral(
+        new FloatValue(BigDecimal.valueOf(TOO_LOW))
+      )
     );
   }
 }

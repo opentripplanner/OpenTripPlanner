@@ -16,8 +16,7 @@ public record SmooveBikeRentalDataSourceParameters(
   boolean overloadingAllowed,
   HttpHeaders httpHeaders,
   Set<RentalPickupType> rentalPickupTypes
-)
-  implements VehicleRentalDataSourceParameters {
+) implements VehicleRentalDataSourceParameters {
   /**
    * Each updater can be assigned a unique network ID in the configuration to prevent returning
    * bikes at stations for another network.

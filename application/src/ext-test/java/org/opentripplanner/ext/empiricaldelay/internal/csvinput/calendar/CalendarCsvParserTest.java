@@ -15,9 +15,9 @@ class CalendarCsvParserTest {
     String.join(", ", CalendarCsvParser.HEADERS) +
     "\n" +
     """
-    WEEKDAYS,1,1,1,1,1,0,0,2025-01-01, 2025-12-31
-    WEEKEND,0,0,0,0,0,1,1,2025-02-03, 2025-11-20
-    """;
+      WEEKDAYS,1,1,1,1,1,0,0,2025-01-01, 2025-12-31
+      WEEKEND,0,0,0,0,0,1,1,2025-02-03, 2025-11-20
+      """;
   private final CalendarCsvParser subject = new CalendarCsvParser(
     DataImportIssueStore.NOOP,
     CsvReader.parse(DEFAUT_INPUT)

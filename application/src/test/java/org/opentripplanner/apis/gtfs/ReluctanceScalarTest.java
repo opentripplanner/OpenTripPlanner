@@ -26,8 +26,9 @@ class ReluctanceScalarTest {
   void testSerialize() {
     var reluctance = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().serialize(HALF);
     assertEquals(HALF, reluctance, DELTA);
-    reluctance = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing()
-      .serialize(HALF.floatValue());
+    reluctance = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().serialize(
+      HALF.floatValue()
+    );
     assertEquals(HALF, reluctance, DELTA);
     assertThrows(CoercingSerializeException.class, () ->
       GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().serialize(TEXT)
@@ -53,22 +54,26 @@ class ReluctanceScalarTest {
 
   @Test
   void testParseLiteral() {
-    var reluctanceDouble = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing()
-      .parseLiteral(new FloatValue(BigDecimal.valueOf(HALF)));
+    var reluctanceDouble = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseLiteral(
+      new FloatValue(BigDecimal.valueOf(HALF))
+    );
     assertEquals(HALF, reluctanceDouble, DELTA);
-    var reluctanceInt = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing()
-      .parseLiteral(new IntValue(BigInteger.valueOf(ONE)));
+    var reluctanceInt = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseLiteral(
+      new IntValue(BigInteger.valueOf(ONE))
+    );
     assertEquals(ONE, reluctanceInt, DELTA);
     assertThrows(CoercingParseLiteralException.class, () ->
       GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseLiteral(new StringValue(TEXT))
     );
     assertThrows(CoercingParseLiteralException.class, () ->
-      GraphQLScalars.RELUCTANCE_SCALAR.getCoercing()
-        .parseLiteral(new FloatValue(BigDecimal.valueOf(TOO_HIGH)))
+      GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseLiteral(
+        new FloatValue(BigDecimal.valueOf(TOO_HIGH))
+      )
     );
     assertThrows(CoercingParseLiteralException.class, () ->
-      GraphQLScalars.RELUCTANCE_SCALAR.getCoercing()
-        .parseLiteral(new FloatValue(BigDecimal.valueOf(TOO_LOW)))
+      GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseLiteral(
+        new FloatValue(BigDecimal.valueOf(TOO_LOW))
+      )
     );
   }
 }

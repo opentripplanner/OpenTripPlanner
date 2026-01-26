@@ -101,7 +101,7 @@ public class ServerConfig implements OTPWebApplicationParameters {
             .since(V2_4)
             .summary(
               "If `true` a unique value is generated if no http request header is provided, or " +
-              "the value is missing."
+                "the value is missing."
             )
             .asBoolean(false)
         )
@@ -128,10 +128,10 @@ public class ServerConfig implements OTPWebApplicationParameters {
     ) {
       throw new OtpAppException(
         "streetRoutingTimeout (" +
-        streetRoutingTimeout +
-        ") must be shorter than apiProcessingTimeout (" +
-        apiProcessingTimeout +
-        ')'
+          streetRoutingTimeout +
+          ") must be shorter than apiProcessingTimeout (" +
+          apiProcessingTimeout +
+          ')'
       );
     }
   }

@@ -97,6 +97,9 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
   ) {
     var transferRequest = request.journey().transfer();
     var r = finder.findNearbyStops(viaVertex, request, transferRequest, reverseDirection);
-    return r.stream().filter(it -> !it.stop.transfersNotAllowed()).toList();
+    return r
+      .stream()
+      .filter(it -> !it.stop.transfersNotAllowed())
+      .toList();
   }
 }

@@ -204,8 +204,9 @@ public class Station
       stationPoint = getGeometryFactory().createPoint(coordinate.asJtsCoordinate());
       childGeometries.add(stationPoint);
     }
-    var geometryCollection = getGeometryFactory()
-      .createGeometryCollection(childGeometries.toArray(new Geometry[] {}));
+    var geometryCollection = getGeometryFactory().createGeometryCollection(
+      childGeometries.toArray(new Geometry[] {})
+    );
     var convexHull = new ConvexHull(geometryCollection).getConvexHull();
 
     var geometries = stationPoint != null

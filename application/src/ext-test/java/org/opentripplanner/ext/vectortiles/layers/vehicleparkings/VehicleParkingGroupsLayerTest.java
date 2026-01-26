@@ -88,8 +88,7 @@ public class VehicleParkingGroupsLayerTest {
     var repository = new DefaultVehicleParkingRepository();
     repository.updateVehicleParking(List.of(vehicleParking), List.of());
 
-    var config =
-      """
+    var config = """
       {
         "vectorTiles": {
           "layers" :[

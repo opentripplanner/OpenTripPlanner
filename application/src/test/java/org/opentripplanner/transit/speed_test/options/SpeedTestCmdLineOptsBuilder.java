@@ -128,7 +128,13 @@ public class SpeedTestCmdLineOptsBuilder {
   }
 
   private void addOptInts(String flag, List<Integer> values) {
-    addOptStrings(flag, values.stream().map(v -> Integer.toString(v)).toList());
+    addOptStrings(
+      flag,
+      values
+        .stream()
+        .map(v -> Integer.toString(v))
+        .toList()
+    );
   }
 
   private void addOptStrings(String flag, List<String> values) {

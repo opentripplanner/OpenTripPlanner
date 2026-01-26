@@ -258,7 +258,11 @@ class ElevatorTest {
     assertEquals(
       edgeSet,
       new HashSet<>(
-        graph.getEdges().stream().map(edge -> convertEdgeToVertexLabelString(edge)).toList()
+        graph
+          .getEdges()
+          .stream()
+          .map(edge -> convertEdgeToVertexLabelString(edge))
+          .toList()
       )
     );
     assertEquals(edgeSet.size(), graph.getEdges().size());
@@ -301,7 +305,11 @@ class ElevatorTest {
     assertEquals(
       edgeSet,
       new HashSet<>(
-        graph.getEdges().stream().map(edge -> convertEdgeToVertexLabelString(edge)).toList()
+        graph
+          .getEdges()
+          .stream()
+          .map(edge -> convertEdgeToVertexLabelString(edge))
+          .toList()
       )
     );
     assertEquals(edgeSet.size(), graph.getEdges().size());
@@ -343,7 +351,12 @@ class ElevatorTest {
 
     assertEquals(
       graph.getVertices().size(),
-      graph.getVertices().stream().map(vertex -> vertex.getLabel()).distinct().count()
+      graph
+        .getVertices()
+        .stream()
+        .map(vertex -> vertex.getLabel())
+        .distinct()
+        .count()
     );
   }
 

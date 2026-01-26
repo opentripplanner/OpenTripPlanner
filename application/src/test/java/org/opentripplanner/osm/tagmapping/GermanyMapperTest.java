@@ -16,13 +16,8 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class GermanyMapperTest {
 
-  static WayPropertySet wps = new WayPropertySet();
+  static final WayPropertySet wps = new GermanyMapper().buildWayPropertySet();
   static float epsilon = 0.01f;
-
-  static {
-    var source = new GermanyMapper();
-    source.populateProperties(wps);
-  }
 
   /**
    * Test that bike safety factors are calculated accurately

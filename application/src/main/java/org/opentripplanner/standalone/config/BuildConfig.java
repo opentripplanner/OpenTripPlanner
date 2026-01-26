@@ -239,7 +239,7 @@ public class BuildConfig implements OtpDataStoreConfig {
       .summary("The distance between elevation samples in meters.")
       .description(
         "The default is the approximate resolution of 1/3 arc-second NED data. This should not " +
-        "be smaller than the horizontal resolution of the height data used."
+          "be smaller than the horizontal resolution of the height data used."
       )
       .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     elevationBucket = S3BucketConfig.fromConfig(root, "elevationBucket");
@@ -248,7 +248,7 @@ public class BuildConfig implements OtpDataStoreConfig {
       .since(V2_0)
       .summary(
         "Embed the Router config in the graph, which allows it to be sent to a server fully " +
-        "configured over the wire."
+          "configured over the wire."
       )
       .asBoolean(true);
     includeEllipsoidToGeoidDifference = root
@@ -256,7 +256,7 @@ public class BuildConfig implements OtpDataStoreConfig {
       .since(V2_0)
       .summary(
         "Include the Ellipsoid to Geoid difference in the calculations of every point along " +
-        "every StreetWithElevationEdge."
+          "every StreetWithElevationEdge."
       )
       .description(
         """

@@ -16,5 +16,4 @@ import java.lang.annotation.Retention;
 @Qualifier
 @Documented
 @Retention(RUNTIME)
-public @interface EmissionDecorator {
-}
+public @interface EmissionDecorator {}

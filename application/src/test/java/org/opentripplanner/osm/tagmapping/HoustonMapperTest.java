@@ -15,12 +15,7 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
 
 class HoustonMapperTest {
 
-  static WayPropertySet wps = new WayPropertySet();
-
-  static {
-    var source = new HoustonMapper();
-    source.populateProperties(wps);
-  }
+  static final WayPropertySet wps = new HoustonMapper().buildWayPropertySet();
 
   @Test
   public void lamarTunnel() {

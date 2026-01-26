@@ -198,9 +198,9 @@ public class Money implements Comparable<Money>, Serializable {
     if (!currency.equals(other.currency)) {
       throw new IllegalArgumentException(
         "Cannot perform operations on %s and %s because they have unequal currency.".formatted(
-            this,
-            other
-          )
+          this,
+          other
+        )
       );
     }
   }

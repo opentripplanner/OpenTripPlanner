@@ -173,8 +173,9 @@ public class Deduplicator implements DeduplicatorService, Serializable {
       return null;
     }
 
-    Map<List<?>, List<?>> canonicalLists =
-      this.canonicalLists.computeIfAbsent(clazz, key -> new HashMap<>());
+    Map<List<?>, List<?>> canonicalLists = this.canonicalLists.computeIfAbsent(clazz, key ->
+      new HashMap<>()
+    );
 
     @SuppressWarnings("unchecked")
     List<T> canonical = (List<T>) canonicalLists.get(original);

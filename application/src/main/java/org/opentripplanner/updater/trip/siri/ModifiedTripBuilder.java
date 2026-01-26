@@ -216,9 +216,9 @@ class ModifiedTripBuilder {
       if (matchingCall == null) {
         throw new IllegalStateException(
           "The stop at index %d on the trip %s cannot be matched with any call. This implies a bug.".formatted(
-              stopIndex,
-              builder.getTrip().getId()
-            )
+            stopIndex,
+            builder.getTrip().getId()
+          )
         );
       }
 

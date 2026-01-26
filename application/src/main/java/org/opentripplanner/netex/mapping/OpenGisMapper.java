@@ -40,9 +40,9 @@ class OpenGisMapper {
   private static CoordinateSequence mapCoordinateSequence(
     AbstractRingPropertyType abstractRingPropertyType
   ) {
-    List<Double> posList =
-      ((LinearRingType) abstractRingPropertyType.getAbstractRing().getValue()).getPosList()
-        .getValue();
+    List<Double> posList = ((LinearRingType) abstractRingPropertyType
+        .getAbstractRing()
+        .getValue()).getPosList().getValue();
 
     // Convert a single list of alternating lat/lon values into coordinates
     ArrayList<Coordinate> coordinates = new ArrayList<>();

@@ -95,7 +95,7 @@ class Subgraph {
 
     Envelope envelope = new Envelope();
 
-    for (Iterator<Vertex> vIter = streetIterator(); vIter.hasNext();) {
+    for (Iterator<Vertex> vIter = streetIterator(); vIter.hasNext(); ) {
       Vertex vx = vIter.next();
       envelope.expandToInclude(vx.getCoordinate());
     }

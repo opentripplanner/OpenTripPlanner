@@ -325,20 +325,20 @@ public class SearchContext<T extends RaptorTripSchedule> {
     if (viaConnections.isEmpty()) {
       return List.of(new SearchContextViaSegments<>(this, accessPaths, null, egressPaths));
     }
-    var accessEmpty = accessPaths.copyEmpty();
     var list = new ArrayList<SearchContextViaSegments<T>>();
-    for (ViaConnections c : viaConnections) {
+    int nConnections = viaConnections.size();
+
+    for (int i = 0; i <= nConnections; ++i) {
+      var viaConnection = i == nConnections ? null : viaConnections.get(i);
       list.add(
         new SearchContextViaSegments<>(
           this,
-          c == viaConnections.getFirst() ? accessPaths : accessEmpty,
-          c,
-          null
+          accessPaths.filterOnSegment(i),
+          viaConnection,
+          egressPaths.filterOnSegment(nConnections - i)
         )
       );
     }
-    list.add(new SearchContextViaSegments<>(this, accessEmpty, null, egressPaths));
-
     return List.copyOf(list);
   }
 

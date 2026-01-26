@@ -10,8 +10,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 class RouteParserTest {
 
-  private static final String DATA =
-    """
+  private static final String DATA = """
     route_id, avg_co2_per_vehicle_per_km, avg_passenger_count
     R:1, 2.0, 20.0
     R:2, 3.0, 24.0

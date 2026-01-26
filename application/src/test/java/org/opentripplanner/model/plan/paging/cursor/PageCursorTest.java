@@ -104,19 +104,19 @@ class PageCursorTest implements PlanTestConstants {
   public void testToString() {
     assertEquals(
       "PageCursor{type: NEXT_PAGE, sortOrder: STREET_AND_ARRIVAL_TIME, " +
-      "edt: " +
-      EDT_STR +
-      ", searchWindow: 2h}",
+        "edt: " +
+        EDT_STR +
+        ", searchWindow: 2h}",
       subjectDepartAfter.toString()
     );
     assertEquals(
       "PageCursor{type: PREVIOUS_PAGE, sortOrder: STREET_AND_DEPARTURE_TIME, " +
-      "edt: " +
-      EDT_STR +
-      ", lat: " +
-      LAT_STR +
-      ", searchWindow: 2h, generalizedCostMaxLimit: $200, " +
-      "itineraryPageCut: [2020-02-02T00:00:00Z, 2020-02-02T00:00:50Z, $194, Tx0, transit]}",
+        "edt: " +
+        EDT_STR +
+        ", lat: " +
+        LAT_STR +
+        ", searchWindow: 2h, generalizedCostMaxLimit: $200, " +
+        "itineraryPageCut: [2020-02-02T00:00:00Z, 2020-02-02T00:00:50Z, $194, Tx0, transit]}",
       subjectArriveBy.toString()
     );
   }

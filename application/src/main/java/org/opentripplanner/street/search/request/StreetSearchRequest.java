@@ -237,7 +237,8 @@ public class StreetSearchRequest implements AStarRequest {
       case BIKE_RENTAL -> bike.rental();
       case SCOOTER_RENTAL -> scooter.rental();
       case CAR_RENTAL -> car.rental();
-      case NOT_SET,
+      case
+        NOT_SET,
         WALK,
         BIKE,
         BIKE_TO_PARK,

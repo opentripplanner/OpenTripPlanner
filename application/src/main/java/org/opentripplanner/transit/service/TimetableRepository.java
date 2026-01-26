@@ -473,7 +473,10 @@ public class TimetableRepository implements Serializable {
   }
 
   public Optional<Agency> findAgencyById(FeedScopedId id) {
-    return agencies.stream().filter(a -> a.getId().equals(id)).findAny();
+    return agencies
+      .stream()
+      .filter(a -> a.getId().equals(id))
+      .findAny();
   }
 
   /**

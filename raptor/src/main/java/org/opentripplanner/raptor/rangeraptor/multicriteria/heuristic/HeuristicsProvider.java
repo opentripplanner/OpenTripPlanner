@@ -79,8 +79,8 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
           arrival,
           null,
           "The element is rejected because the destination is not reachable within the limit " +
-          "based on heuristic. Details: " +
-          details
+            "based on heuristic. Details: " +
+            details
         );
     }
   }

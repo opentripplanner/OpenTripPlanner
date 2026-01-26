@@ -69,10 +69,10 @@ public final class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
     return oneIterationOnly()
       ? IntIterators.singleValueIterator(latestArrivalTime)
       : IntIterators.intIncIterator(
-        latestArrivalTime - searchWindowInSeconds,
-        latestArrivalTime,
-        iterationStep
-      );
+          latestArrivalTime - searchWindowInSeconds,
+          latestArrivalTime,
+          iterationStep
+        );
   }
 
   @Override

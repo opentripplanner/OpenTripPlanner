@@ -20,8 +20,7 @@ public record PatternRideC2<T extends RaptorTripSchedule>(
   int c2,
   int tripSortIndex,
   T trip
-)
-  implements PatternRide<T> {
+) implements PatternRide<T> {
   /**
    * This is the function used to compare {@link PatternRideC2}s for a given pattern.
    * <p>

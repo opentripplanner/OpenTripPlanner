@@ -21,12 +21,12 @@ import org.rutebanken.netex.model.ValidBetween;
 
 class NetexVersionHelperTest {
 
-  private static final EntityInVersionStructure E_VER_1 = new EntityInVersionStructure()
-    .withVersion("1");
-  private static final EntityInVersionStructure E_VER_2 = new EntityInVersionStructure()
-    .withVersion("2");
-  private static final EntityInVersionStructure E_VER_ANY = new EntityInVersionStructure()
-    .withVersion("any");
+  private static final EntityInVersionStructure E_VER_1 =
+    new EntityInVersionStructure().withVersion("1");
+  private static final EntityInVersionStructure E_VER_2 =
+    new EntityInVersionStructure().withVersion("2");
+  private static final EntityInVersionStructure E_VER_ANY =
+    new EntityInVersionStructure().withVersion("any");
 
   @Test
   void versionOfTest() {
@@ -55,8 +55,9 @@ class NetexVersionHelperTest {
     // Given a comparator (subject under test)
     Comparator<EntityInVersionStructure> subject = comparingVersion();
     // And a entity with version as the E_VER_1 entity
-    EntityInVersionStructure sameVersionAs_E_VER_1 = new EntityInVersionStructure()
-      .withVersion("1");
+    EntityInVersionStructure sameVersionAs_E_VER_1 = new EntityInVersionStructure().withVersion(
+      "1"
+    );
 
     // Then expect equals versions to return zero
     assertEquals(0, subject.compare(E_VER_1, sameVersionAs_E_VER_1));

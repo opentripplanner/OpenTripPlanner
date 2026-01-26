@@ -285,7 +285,11 @@ public class TurnRestrictionModuleTest {
     assertEquals(10, graph.countVertices());
     assertEquals(15, graph.countEdges());
 
-    var Bs = graph.getVertices().stream().filter(v -> v.sameLocation(B) && v != B).toList();
+    var Bs = graph
+      .getVertices()
+      .stream()
+      .filter(v -> v.sameLocation(B) && v != B)
+      .toList();
     var newE = graph
       .getVertices()
       .stream()
@@ -349,7 +353,9 @@ public class TurnRestrictionModuleTest {
 
     var streetRequest = new StreetRequest(StreetMode.CAR);
 
-    var request = RouteRequest.of().withJourney(j -> j.withDirect(streetRequest)).buildDefault();
+    var request = RouteRequest.of()
+      .withJourney(j -> j.withDirect(streetRequest))
+      .buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .withRequest(request)
@@ -425,7 +431,9 @@ public class TurnRestrictionModuleTest {
     assertEquals(11, graph.countEdges());
 
     var streetRequest = new StreetRequest(StreetMode.CAR);
-    var request = RouteRequest.of().withJourney(j -> j.withDirect(streetRequest)).buildDefault();
+    var request = RouteRequest.of()
+      .withJourney(j -> j.withDirect(streetRequest))
+      .buildDefault();
 
     assertNull(
       StreetSearchBuilder.of()

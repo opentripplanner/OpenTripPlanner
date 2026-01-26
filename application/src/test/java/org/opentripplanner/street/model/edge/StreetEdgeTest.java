@@ -56,7 +56,12 @@ public class StreetEdgeTest {
     this.proto = StreetSearchRequest.of()
       .withTurnReluctance(1.0)
       .withWalk(it -> it.withSpeed(1.0).withReluctance(1.0).withStairsReluctance(1.0))
-      .withBike(it -> it.withSpeed(5.0f).withReluctance(1.0).withWalking(w -> w.withSpeed(0.8)))
+      .withBike(it ->
+        it
+          .withSpeed(5.0f)
+          .withReluctance(1.0)
+          .withWalking(w -> w.withSpeed(0.8))
+      )
       .withCar(c -> c.withReluctance(1.0))
       .build();
   }

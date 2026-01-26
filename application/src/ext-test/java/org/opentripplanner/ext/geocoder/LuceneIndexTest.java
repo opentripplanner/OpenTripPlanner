@@ -282,9 +282,14 @@ class LuceneIndexTest {
       }
     )
     void numericAdjectives(String query) {
-      var names = index.queryStopClusters(query, null).map(c -> c.primary().name()).toList();
+      var names = index
+        .queryStopClusters(query, null)
+        .map(c -> c.primary().name())
+        .toList();
       assertEquals(
-        Stream.of(MERIDIAN_AVE, MERIDIAN_N2, MERIDIAN_N1).map(s -> s.getName().toString()).toList(),
+        Stream.of(MERIDIAN_AVE, MERIDIAN_N2, MERIDIAN_N1)
+          .map(s -> s.getName().toString())
+          .toList(),
         names
       );
     }

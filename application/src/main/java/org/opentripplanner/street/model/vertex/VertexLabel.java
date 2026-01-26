@@ -61,8 +61,8 @@ public sealed interface VertexLabel {
    * <p>
    * Used for elevator vertices and split vertices.
    */
-  record VertexWithEntityLabel(long nodeId, OsmEntityType osmEntityType, long entityId)
-    implements VertexLabel {
+  record VertexWithEntityLabel(long nodeId, OsmEntityType osmEntityType, long entityId) implements
+    VertexLabel {
     private static final String TEMPLATE = "osm:node:%s:%s:%s";
 
     @Override

@@ -79,7 +79,7 @@ public class VehicleRentalSourceFactory {
       .summary("The name of the network to override the one derived from the source data.")
       .description(
         "GBFS feeds must include a system_id which will be used as the default `network`. These " +
-        "ids are sometimes not helpful so setting this property will override it."
+          "ids are sometimes not helpful so setting this property will override it."
       )
       .asString(null);
   }

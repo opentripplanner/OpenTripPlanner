@@ -129,8 +129,8 @@ public class ServiceJourneyType {
           .name("serviceAlteration")
           .deprecate(
             "The service journey alteration will be moved out of SJ and grouped " +
-            "together with the SJ and date. In Netex this new type is called " +
-            "DatedServiceJourney. We will create artificial DSJs for the old SJs."
+              "together with the SJ and date. In Netex this new type is called " +
+              "DatedServiceJourney. We will create artificial DSJs for the old SJs."
           )
           .type(EnumTypes.SERVICE_ALTERATION)
           .dataFetcher(environment -> trip(environment).getNetexAlteration())
@@ -156,7 +156,7 @@ public class ServiceJourneyType {
           .name("journeyPattern")
           .description(
             "JourneyPattern for the service journey, according to scheduled data. If the " +
-            "ServiceJourney is not included in the scheduled data, null is returned."
+              "ServiceJourney is not included in the scheduled data, null is returned."
           )
           .type(journeyPatternType)
           .dataFetcher(env -> GqlUtil.getTransitService(env).findPattern(trip(env)))
@@ -167,7 +167,7 @@ public class ServiceJourneyType {
           .name("quays")
           .description(
             "Quays visited by service journey, according to scheduled data. If the " +
-            "ServiceJourney is not included in the scheduled data, an empty list is returned."
+              "ServiceJourney is not included in the scheduled data, an empty list is returned."
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
           .argument(
@@ -232,8 +232,8 @@ public class ServiceJourneyType {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "Returns scheduled passingTimes for this ServiceJourney for a given date, updated with real-time-updates (if available). " +
-            "NB! This takes a date as argument (default=today) and returns estimatedCalls for that date and should only be used if the date is " +
-            "known when creating the request. For fetching estimatedCalls for a given trip.leg, use leg.serviceJourneyEstimatedCalls instead."
+              "NB! This takes a date as argument (default=today) and returns estimatedCalls for that date and should only be used if the date is " +
+              "known when creating the request. For fetching estimatedCalls for a given trip.leg, use leg.serviceJourneyEstimatedCalls instead."
           )
           .argument(
             GraphQLArgument.newArgument()

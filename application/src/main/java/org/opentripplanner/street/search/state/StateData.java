@@ -92,28 +92,27 @@ public class StateData implements Cloneable {
       request.allowsArrivingInRentalAtDestination()
     );
 
-    var baseCaseDatas =
-      switch (request.mode()) {
-        case WALK, BIKE, BIKE_TO_PARK, CAR, CAR_TO_PARK, FLEXIBLE, NOT_SET -> stateDatas;
-        case CAR_PICKUP, CAR_HAILING, CARPOOL -> stateDatas
-          .stream()
-          .filter(d -> d.carPickupState == CarPickupState.IN_CAR)
-          .toList();
-        case BIKE_RENTAL, SCOOTER_RENTAL, CAR_RENTAL -> {
-          if (request.arriveBy()) {
-            yield stateDatas
-              .stream()
-              .filter(
-                d ->
-                  d.vehicleRentalState == RENTING_FROM_STATION ||
-                  d.vehicleRentalState == RENTING_FLOATING
-              )
-              .toList();
-          } else {
-            yield stateDatas;
-          }
+    var baseCaseDatas = switch (request.mode()) {
+      case WALK, BIKE, BIKE_TO_PARK, CAR, CAR_TO_PARK, FLEXIBLE, NOT_SET -> stateDatas;
+      case CAR_PICKUP, CAR_HAILING, CARPOOL -> stateDatas
+        .stream()
+        .filter(d -> d.carPickupState == CarPickupState.IN_CAR)
+        .toList();
+      case BIKE_RENTAL, SCOOTER_RENTAL, CAR_RENTAL -> {
+        if (request.arriveBy()) {
+          yield stateDatas
+            .stream()
+            .filter(
+              d ->
+                d.vehicleRentalState == RENTING_FROM_STATION ||
+                d.vehicleRentalState == RENTING_FLOATING
+            )
+            .toList();
+        } else {
+          yield stateDatas;
         }
-      };
+      }
+    };
 
     if (baseCaseDatas.size() != 1) {
       throw new IllegalStateException(
@@ -188,7 +187,9 @@ public class StateData implements Cloneable {
       parkAndRideStateData.vehicleParked = arriveBy;
       parkAndRideStateData.currentMode = parkAndRideStateData.vehicleParked
         ? TraverseMode.WALK
-        : requestMode.includesBiking() ? TraverseMode.BICYCLE : TraverseMode.CAR;
+        : requestMode.includesBiking()
+          ? TraverseMode.BICYCLE
+          : TraverseMode.CAR;
       res.add(parkAndRideStateData);
     } else {
       res.add(proto.clone());

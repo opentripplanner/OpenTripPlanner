@@ -84,13 +84,13 @@ class CarRequestTest {
     assertEquals("CarRequest{}", CarRequest.DEFAULT.toString());
     assertEquals(
       "CarRequest{" +
-      "reluctance: 5.1, " +
-      "parking: ParkingRequest{cost: $30}, " +
-      "rental: RentalRequest{pickupTime: 30s}, " +
-      "pickupTime: PT10M, " +
-      "pickupCost: $500, " +
-      "accelerationSpeed: 3.1, decelerationSpeed: 3.5" +
-      "}",
+        "reluctance: 5.1, " +
+        "parking: ParkingRequest{cost: $30}, " +
+        "rental: RentalRequest{pickupTime: 30s}, " +
+        "pickupTime: PT10M, " +
+        "pickupCost: $500, " +
+        "accelerationSpeed: 3.1, decelerationSpeed: 3.5" +
+        "}",
       subject.toString()
     );
   }

@@ -16,8 +16,7 @@ import org.opentripplanner.utils.time.OffsetDateTimeParser;
 
 public final class DateTimeScalarFactory {
 
-  private static final String DOCUMENTATION =
-    """
+  private static final String DOCUMENTATION = """
     DateTime format accepting ISO 8601 dates with time zone offset.
 
     Format:  `YYYY-MM-DD'T'hh:mm[:ss](Z|±01:00)`

@@ -105,31 +105,27 @@ class GbfsStationInformationMapperTest {
       argumentSet("Empty station name list", validStation().withName(List.of())),
       argumentSet(
         "Station name list contains null name",
-        validStation()
-          .withName(
-            List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withText(null))
-          )
+        validStation().withName(
+          List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withText(null))
+        )
       ),
       argumentSet(
         "Station name list contains empty name",
-        validStation()
-          .withName(
-            List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withText(""))
-          )
+        validStation().withName(
+          List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withText(""))
+        )
       ),
       argumentSet(
         "Station name list contains null language",
-        validStation()
-          .withName(
-            List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withLanguage(null))
-          )
+        validStation().withName(
+          List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withLanguage(null))
+        )
       ),
       argumentSet(
         "Station name list contains empty language",
-        validStation()
-          .withName(
-            List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withLanguage(""))
-          )
+        validStation().withName(
+          List.of(new GBFSName().withText(TEST_STATION_NAME), new GBFSName().withLanguage(""))
+        )
       )
     );
   }

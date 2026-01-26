@@ -31,15 +31,15 @@ public final class TripUpdate {
   }
 
   public Optional<I18NString> tripHeadsign() {
-    return tripProperties()
-      .flatMap(p ->
-        p.hasTripHeadsign() ? Optional.of(I18NString.of(p.getTripHeadsign())) : Optional.empty()
-      );
+    return tripProperties().flatMap(p ->
+      p.hasTripHeadsign() ? Optional.of(I18NString.of(p.getTripHeadsign())) : Optional.empty()
+    );
   }
 
   public Optional<String> tripShortName() {
-    return tripProperties()
-      .flatMap(p -> p.hasTripShortName() ? Optional.of(p.getTripShortName()) : Optional.empty());
+    return tripProperties().flatMap(p ->
+      p.hasTripShortName() ? Optional.of(p.getTripShortName()) : Optional.empty()
+    );
   }
 
   private Optional<GtfsRealtime.TripUpdate.TripProperties> tripProperties() {

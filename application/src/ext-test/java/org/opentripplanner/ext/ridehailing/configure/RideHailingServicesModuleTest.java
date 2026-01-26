@@ -14,8 +14,7 @@ class RideHailingServicesModuleTest {
   @Test
   void buildServices() throws JsonProcessingException {
     var module = new RideHailingServicesModule();
-    var json =
-      """
+    var json = """
       {
           "rideHailingServices": [
             {

@@ -224,7 +224,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
       //   (https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity)
       throw new RuntimeException(
         "Unable to initialize Google Pubsub-updater: System.getenv('GOOGLE_APPLICATION_CREDENTIALS') = " +
-        System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+          System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
       );
     }
   }

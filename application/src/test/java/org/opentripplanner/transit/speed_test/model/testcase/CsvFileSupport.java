@@ -77,14 +77,17 @@ public class CsvFileSupport {
     if (!tcIds.isEmpty()) {
       LOG.warn(
         "No results file written, at least one test-case is not run or returned without any result!" +
-        " Test-Cases: " +
-        tcIds
+          " Test-Cases: " +
+          tcIds
       );
       return;
     }
 
     new ResultCsvFile(resultsFileByProfile.get(profile)).write(
-      testCases.stream().flatMap(it -> it.actualResults().stream()).toList()
+      testCases
+        .stream()
+        .flatMap(it -> it.actualResults().stream())
+        .toList()
     );
   }
 

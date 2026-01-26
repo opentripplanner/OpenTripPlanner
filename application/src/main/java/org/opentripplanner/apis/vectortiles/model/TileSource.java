@@ -40,8 +40,7 @@ public sealed interface TileSource {
     int maxzoom,
     int tileSize,
     String attribution
-  )
-    implements TileSource {
+  ) implements TileSource {
     @Override
     public String type() {
       return "raster";

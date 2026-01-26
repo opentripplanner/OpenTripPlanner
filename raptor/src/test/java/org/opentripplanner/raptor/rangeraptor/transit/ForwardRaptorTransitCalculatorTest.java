@@ -74,8 +74,10 @@ public class ForwardRaptorTransitCalculatorTest {
   @Test
   public void getTransfers() {
     var subject = create();
-    var transitData = new TestTransitData()
-      .withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D1m));
+    var transitData = new TestTransitData().withTransfer(
+      STOP_A,
+      TestTransfer.transfer(STOP_B, D1m)
+    );
 
     // Expect transfer from stop A to stop B
     var transfersFromStopA = subject.getTransfers(transitData, STOP_A);

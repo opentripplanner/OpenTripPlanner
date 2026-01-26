@@ -1,23 +1,20 @@
-package org.opentripplanner.raptor.rangeraptor.multicriteria;
+package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
+import gnu.trove.map.TIntObjectMap;
 import java.util.BitSet;
 import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
-import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
+import org.opentripplanner.raptor.util.paretoset.ParetoSet;
+import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 
 /**
  * This class serve as a wrapper for all stop arrival pareto set, one set for each stop. It also
@@ -28,7 +25,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  */
 public final class McStopArrivals<T extends RaptorTripSchedule> {
 
-  private final StopArrivalParetoSet<T>[] arrivals;
+  private final ParetoSet<McStopArrival<T>>[] arrivals;
   private final BitSet touchedStops;
 
   private final DebugHandlerFactory<T> debugHandlerFactory;
@@ -44,42 +41,33 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    */
   public McStopArrivals(
     int nStops,
-    @Nullable EgressPaths egressPaths,
-    List<ViaConnectionStopArrivalEventListener<T>> viaConnectionListeners,
-    DestinationArrivalPaths<T> paths,
+    TIntObjectMap<ParetoSetEventListener<ArrivalView<T>>> arrivalListeners,
     ArrivalParetoSetComparatorFactory<McStopArrival<T>> comparatorFactory,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
-    // Assert only-one-of next or egressPaths is set
-    if (viaConnectionListeners.isEmpty()) {
-      Objects.requireNonNull(egressPaths);
-    } else if (egressPaths != null) {
-      throw new IllegalArgumentException(
-        "Can not delegate to next-leg and at the same have egress paths."
-      );
-    }
-
     //noinspection unchecked
-    this.arrivals = (StopArrivalParetoSet<T>[]) new StopArrivalParetoSet[nStops];
+    this.arrivals = (ParetoSet<McStopArrival<T>>[]) new ParetoSet[nStops];
     this.touchedStops = new BitSet(nStops);
     this.comparator = comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival();
     this.debugHandlerFactory = debugHandlerFactory;
     this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
-    initViaConnections(viaConnectionListeners);
-    initEgressStopAndGlueItToDestinationArrivals(egressPaths, paths);
+    for (int stop : arrivalListeners.keys()) {
+      this.arrivals[stop] = ParetoSet.of(comparator, arrivalListeners.get(stop));
+    }
   }
 
-  boolean reached(int stopIndex) {
+  public boolean reached(int stopIndex) {
     return arrivals[stopIndex] != null && !arrivals[stopIndex].isEmpty();
   }
 
   /** Slow! do not use during routing! */
-  int bestArrivalTime(int stopIndex) {
+  public int bestArrivalTime(int stopIndex) {
     return minInt(arrivals[stopIndex].stream(), McStopArrival::arrivalTime);
   }
 
-  boolean reachedByTransit(int stopIndex) {
+  /** Slow! do not use during routing! */
+  public boolean reachedByTransit(int stopIndex) {
     return (
       arrivals[stopIndex] != null &&
       arrivals[stopIndex].stream().anyMatch(a -> a.arrivedBy(TRANSIT))
@@ -87,24 +75,24 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   /** Slow! do not use during routing! */
-  int bestTransitArrivalTime(int stopIndex) {
+  public int bestTransitArrivalTime(int stopIndex) {
     return transitStopArrivalsMinInt(stopIndex, McStopArrival::arrivalTime);
   }
 
   /** Slow! do not use during routing! */
-  int smallestNumberOfTransfers(int stopIndex) {
+  public int smallestNumberOfTransfers(int stopIndex) {
     return transitStopArrivalsMinInt(stopIndex, McStopArrival::numberOfTransfers);
   }
 
-  boolean updateExist() {
+  public boolean updateExist() {
     return !touchedStops.isEmpty();
   }
 
-  IntIterator stopsTouchedIterator() {
+  public IntIterator stopsTouchedIterator() {
     return new BitSetIterator(touchedStops);
   }
 
-  void addStopArrival(McStopArrival<T> arrival) {
+  public void addStopArrival(McStopArrival<T> arrival) {
     boolean added = findOrCreateSet(arrival.stop()).add(arrival);
 
     if (added) {
@@ -112,23 +100,23 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     }
   }
 
-  void debugStateInfo() {
+  public void debugStateInfo() {
     debugStats.debugStatInfo(arrivals);
   }
 
-  boolean hasArrivalsAfterMarker(int stop) {
+  public boolean hasArrivalsAfterMarker(int stop) {
     var it = arrivals[stop];
     return it != null && it.hasElementsAfterMarker();
   }
 
   /** List all transits arrived this round. */
-  Iterable<McStopArrival<T>> listArrivalsAfterMarker(final int stop) {
+  public Iterable<McStopArrival<T>> listArrivalsAfterMarker(final int stop) {
     var it = arrivals[stop];
     // Avoid creating new objects in a tight loop
     return it == null ? Collections::emptyIterator : it.elementsAfterMarker();
   }
 
-  void clearTouchedStopsAndSetStopMarkers() {
+  public void clearTouchedStopsAndSetStopMarkers() {
     IntIterator it = stopsTouchedIterator();
     while (it.hasNext()) {
       arrivals[it.next()].markAtEndOfSet();
@@ -138,49 +126,14 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   /* private methods */
 
-  private StopArrivalParetoSet<T> findOrCreateSet(final int stop) {
+  private ParetoSet<McStopArrival<T>> findOrCreateSet(final int stop) {
     if (arrivals[stop] == null) {
-      arrivals[stop] = StopArrivalParetoSet.of(comparator)
-        .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
-        .build();
+      arrivals[stop] = ParetoSet.of(
+        comparator,
+        debugHandlerFactory.paretoSetStopArrivalListener(stop)
+      );
     }
     return arrivals[stop];
-  }
-
-  private void initViaConnections(
-    List<ViaConnectionStopArrivalEventListener<T>> viaConnectionListeners
-  ) {
-    for (ViaConnectionStopArrivalEventListener<T> it : viaConnectionListeners) {
-      int stop = it.fromStop();
-      this.arrivals[stop] = StopArrivalParetoSet.of(comparator)
-        .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
-        .withNextLegListener(it)
-        .build();
-    }
-  }
-
-  /**
-   * This method creates a ParetoSet for the given egress stop. When arrivals are added to the stop,
-   * the "glue" make sure new destination arrivals are added to the destination arrivals.
-   */
-  private void initEgressStopAndGlueItToDestinationArrivals(
-    @Nullable EgressPaths egressPaths,
-    DestinationArrivalPaths<T> paths
-  ) {
-    if (egressPaths == null) {
-      return;
-    }
-
-    egressPaths
-      .byStop()
-      .forEachEntry((stop, list) -> {
-        // The factory is creating the actual "glue"
-        this.arrivals[stop] = StopArrivalParetoSet.of(comparator)
-          .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
-          .withEgressListener(list, paths)
-          .build();
-        return true;
-      });
   }
 
   private int transitStopArrivalsMinInt(int stopIndex, Function<McStopArrival<T>, Integer> mapper) {

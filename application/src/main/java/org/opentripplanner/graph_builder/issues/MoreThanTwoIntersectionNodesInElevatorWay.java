@@ -12,8 +12,7 @@ public record MoreThanTwoIntersectionNodesInElevatorWay(
   Coordinate from,
   Coordinate to,
   int intersectionNodes
-)
-  implements DataImportIssue {
+) implements DataImportIssue {
   private static final String FMT =
     "Elevator way %s has more than two intersection nodes: %s. " +
     "This is likely a tagging mistake, but can be correct in rare cases. " +

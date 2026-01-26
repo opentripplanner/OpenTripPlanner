@@ -565,7 +565,7 @@ public class TransmodelGraphQLSchemaFactory {
               .type(MULTI_MODAL_MODE)
               .description(
                 "MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response." +
-                " Does not affect mono modal stop places that do not belong to a multi modal stop place."
+                  " Does not affect mono modal stop places that do not belong to a multi modal stop place."
               )
               .defaultValue("parent")
               .build()
@@ -731,8 +731,8 @@ public class TransmodelGraphQLSchemaFactory {
           .name("quaysByRadius")
           .description(
             "Get all quays within the specified walking radius from a location. There are no maximum " +
-            "limits for the input parameters, but the query will timeout and return if the parameters " +
-            "are too high."
+              "limits for the input parameters, but the query will timeout and return if the parameters " +
+              "are too high."
           )
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(
@@ -897,7 +897,7 @@ public class TransmodelGraphQLSchemaFactory {
               .type(MULTI_MODAL_MODE)
               .description(
                 "MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response." +
-                " Does not affect mono modal stop places that do not belong to a multi modal stop place. Only applicable for placeType StopPlace"
+                  " Does not affect mono modal stop places that do not belong to a multi modal stop place. Only applicable for placeType StopPlace"
               )
               .defaultValue("parent")
               .build()

@@ -90,14 +90,14 @@ class CarPreferencesTest {
     assertEquals("CarPreferences{}", CarPreferences.DEFAULT.toString());
     assertEquals(
       "CarPreferences{" +
-      "reluctance: 5.1, " +
-      "boardCost: $550, " +
-      "parking: VehicleParkingPreferences{cost: $30}, " +
-      "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
-      "pickupTime: PT10M, " +
-      "pickupCost: $500, " +
-      "accelerationSpeed: 3.1, decelerationSpeed: 3.5" +
-      "}",
+        "reluctance: 5.1, " +
+        "boardCost: $550, " +
+        "parking: VehicleParkingPreferences{cost: $30}, " +
+        "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
+        "pickupTime: PT10M, " +
+        "pickupCost: $500, " +
+        "accelerationSpeed: 3.1, decelerationSpeed: 3.5" +
+        "}",
       subject.toString()
     );
   }

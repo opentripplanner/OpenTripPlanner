@@ -55,11 +55,11 @@ class VehicleWalkingRequestTest {
     assertEquals("VehicleWalkingRequest{}", VehicleWalkingRequest.DEFAULT.toString());
     assertEquals(
       "VehicleWalkingRequest{" +
-      "speed: 1.45, " +
-      "reluctance: 5.5, " +
-      "mountDismountTime: PT15S, " +
-      "mountDismountCost: $20, " +
-      "stairsReluctance: 11.0}",
+        "speed: 1.45, " +
+        "reluctance: 5.5, " +
+        "mountDismountTime: PT15S, " +
+        "mountDismountCost: $20, " +
+        "stairsReluctance: 11.0}",
       subject.toString()
     );
   }

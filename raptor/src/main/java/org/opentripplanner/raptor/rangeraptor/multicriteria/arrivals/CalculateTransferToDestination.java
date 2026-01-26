@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.multicriteria;
+package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;

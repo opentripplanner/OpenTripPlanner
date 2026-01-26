@@ -3,8 +3,8 @@ package org.opentripplanner.osm.issues;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.osm.model.OsmEntity;
 
-public record FloorNumberUnknownAssumedGroundLevel(String level, OsmEntity entity)
-  implements DataImportIssue {
+public record FloorNumberUnknownAssumedGroundLevel(String level, OsmEntity entity) implements
+  DataImportIssue {
   private static final String FMT =
     "%s : could not determine level from 'level' or 'layer' tag '%s', assumed to be ground-level.";
 

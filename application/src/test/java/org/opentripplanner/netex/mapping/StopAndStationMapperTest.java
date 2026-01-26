@@ -367,11 +367,13 @@ class StopAndStationMapperTest {
   private AccessibilityAssessment createAccessibilityAssessment(
     LimitationStatusEnumeration wheelChairAccess
   ) {
-    var accessibilityLimitation = new AccessibilityLimitation()
-      .withWheelchairAccess(wheelChairAccess);
+    var accessibilityLimitation = new AccessibilityLimitation().withWheelchairAccess(
+      wheelChairAccess
+    );
 
-    var limitations = new AccessibilityLimitations_RelStructure()
-      .withAccessibilityLimitation(accessibilityLimitation);
+    var limitations = new AccessibilityLimitations_RelStructure().withAccessibilityLimitation(
+      accessibilityLimitation
+    );
 
     return new AccessibilityAssessment().withLimitations(limitations);
   }

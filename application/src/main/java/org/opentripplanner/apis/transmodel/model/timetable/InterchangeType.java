@@ -40,9 +40,9 @@ public class InterchangeType {
           .name("priority")
           .description(
             "The transfer priority is used to decide where a transfer should " +
-            "happen, at the highest prioritized location. If the guaranteed " +
-            "flag is set it take precedence priority. A guaranteed ALLOWED " +
-            "transfer is preferred over a PREFERRED none-guaranteed transfer."
+              "happen, at the highest prioritized location. If the guaranteed " +
+              "flag is set it take precedence priority. A guaranteed ALLOWED " +
+              "transfer is preferred over a PREFERRED none-guaranteed transfer."
           )
           .type(EnumTypes.INTERCHANGE_PRIORITY)
           .dataFetcher(env -> constraint(env).getPriority())
@@ -53,8 +53,8 @@ public class InterchangeType {
           .name("maximumWaitTime")
           .description(
             "Maximum time after scheduled departure time the connecting " +
-            "transport is guaranteed to wait for the delayed trip. [NOT " +
-            "RESPECTED DURING ROUTING, JUST PASSED THROUGH]"
+              "transport is guaranteed to wait for the delayed trip. [NOT " +
+              "RESPECTED DURING ROUTING, JUST PASSED THROUGH]"
           )
           .type(Scalars.GraphQLInt)
           .dataFetcher(env -> constraint(env).getMaxWaitTime())

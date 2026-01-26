@@ -19,8 +19,7 @@ public record SiriFmUpdaterParameters(
   String feedId,
   Duration frequency,
   HttpHeaders httpHeaders
-)
-  implements VehicleParkingUpdaterParameters {
+) implements VehicleParkingUpdaterParameters {
   @Override
   public VehicleParkingSourceType sourceType() {
     return SIRI_FM;

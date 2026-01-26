@@ -12,8 +12,7 @@ public record CouldNotApplyMultiLevelInfoToWay(
   Coordinate from,
   Coordinate to,
   int nodes
-)
-  implements DataImportIssue {
+) implements DataImportIssue {
   private static final String FMT =
     "Multi-level info for way %s can not be used because node references did not match. " +
     "This is probably caused by more than 2 intersection nodes in the way. " +

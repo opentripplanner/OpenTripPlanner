@@ -136,17 +136,16 @@ public class SiriRealTimeTripUpdateAdapter {
     SiriUpdateType siriUpdateType = null;
     try {
       siriUpdateType = updateType(journey, callWrappers, entityResolver);
-      Result<TripUpdate, UpdateError> result =
-        switch (siriUpdateType) {
-          case REPLACEMENT_DEPARTURE -> new AddedTripBuilder(
-            journey,
-            transitService,
-            entityResolver,
-            tripPatternIdGenerator::generateUniqueTripPatternId
-          ).build();
-          case EXTRA_CALL -> handleExtraCall(fuzzyTripMatcher, entityResolver, journey);
-          case TRIP_UPDATE -> handleModifiedTrip(fuzzyTripMatcher, entityResolver, journey);
-        };
+      Result<TripUpdate, UpdateError> result = switch (siriUpdateType) {
+        case REPLACEMENT_DEPARTURE -> new AddedTripBuilder(
+          journey,
+          transitService,
+          entityResolver,
+          tripPatternIdGenerator::generateUniqueTripPatternId
+        ).build();
+        case EXTRA_CALL -> handleExtraCall(fuzzyTripMatcher, entityResolver, journey);
+        case TRIP_UPDATE -> handleModifiedTrip(fuzzyTripMatcher, entityResolver, journey);
+      };
 
       if (result.isFailure()) {
         return result.toFailureResult();

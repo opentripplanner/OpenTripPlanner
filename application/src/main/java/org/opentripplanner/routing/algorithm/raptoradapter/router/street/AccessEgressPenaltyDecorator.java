@@ -56,9 +56,9 @@ public class AccessEgressPenaltyDecorator {
       return penaltyWalking.isEmpty()
         ? input
         : input
-          .stream()
-          .map(it -> it.withPenalty(penaltyWalking.calculate(it.durationInSeconds())))
-          .toList();
+            .stream()
+            .map(it -> it.withPenalty(penaltyWalking.calculate(it.durationInSeconds())))
+            .toList();
     }
 
     // The request mode is NOT WALK, and we need to apply a penalty to the access/egress based on

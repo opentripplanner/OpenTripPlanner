@@ -146,7 +146,14 @@ class ElevatorProcessor {
       }
 
       List<OsmElevatorKey> osmElevatorKeys = new ArrayList<>(vertices.keySet());
-      if (osmElevatorKeys.stream().map(key -> verticeLevels.get(key)).distinct().count() == 1) {
+      if (
+        osmElevatorKeys
+          .stream()
+          .map(key -> verticeLevels.get(key))
+          .distinct()
+          .count() ==
+        1
+      ) {
         issueStore.add(new AllWaysOfElevatorNodeOnSameLevel(node));
       }
       // Sort to make logic correct and create a deterministic order.
@@ -174,7 +181,10 @@ class ElevatorProcessor {
         .orElse(-1L);
       createElevatorHopEdges(
         elevatorHopVertices,
-        osmElevatorKeys.stream().map(key -> verticeLevels.get(key)).toList(),
+        osmElevatorKeys
+          .stream()
+          .map(key -> verticeLevels.get(key))
+          .toList(),
         wheelchair,
         !node.isBicycleDenied(),
         (int) travelTime

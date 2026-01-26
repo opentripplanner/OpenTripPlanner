@@ -117,12 +117,8 @@ public class OsmOpeningHoursParser {
    * Builds a {@link OHCalendar} by parsing rules from OSM format opening hours.
    * Currently, doesn't have support for all types of rules.
    */
-  public OHCalendar parseOpeningHours(
-    String openingHoursTag,
-    String id,
-    String link,
-    ZoneId zoneId
-  ) throws OpeningHoursParseException {
+  public OHCalendar parseOpeningHours(String openingHoursTag, String id, String link, ZoneId zoneId)
+    throws OpeningHoursParseException {
     var calendarBuilder = openingHoursCalendarService.newBuilder(zoneId);
     var parser = new OpeningHoursParser(new ByteArrayInputStream(openingHoursTag.getBytes()));
     var rules = parser.rules(false);
@@ -476,7 +472,10 @@ public class OsmOpeningHoursParser {
   private boolean hasTimes(Rule rule) {
     return (
       rule.getTimes() != null &&
-      rule.getTimes().stream().anyMatch(timeSpan -> timeSpan.getStart() > 0)
+      rule
+        .getTimes()
+        .stream()
+        .anyMatch(timeSpan -> timeSpan.getStart() > 0)
     );
   }
 
@@ -504,18 +503,18 @@ public class OsmOpeningHoursParser {
   private void logUnhandled(Rule rule, String ohTag, String id, String link) {
     var message = link != null
       ? String.format(
-        "Rule %s is unhandled in the opening hours definition %s for %s (%s)",
-        rule,
-        ohTag,
-        id,
-        link
-      )
+          "Rule %s is unhandled in the opening hours definition %s for %s (%s)",
+          rule,
+          ohTag,
+          id,
+          link
+        )
       : String.format(
-        "Rule %s is unhandled in the opening hours definition %s for %s",
-        rule,
-        ohTag,
-        id
-      );
+          "Rule %s is unhandled in the opening hours definition %s for %s",
+          rule,
+          ohTag,
+          id
+        );
     if (issueStore != null) {
       issueStore.add("UnhandledOHRule", message);
     } else {

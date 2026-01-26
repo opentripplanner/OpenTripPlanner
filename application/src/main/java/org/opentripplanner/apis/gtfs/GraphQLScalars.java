@@ -71,8 +71,8 @@ public class GraphQLScalars {
           } else {
             throw new CoercingSerializeException(
               "Cannot serialize object of class %s".formatted(
-                  dataFetcherResult.getClass().getSimpleName()
-                )
+                dataFetcherResult.getClass().getSimpleName()
+              )
             );
           }
         }
@@ -86,9 +86,9 @@ public class GraphQLScalars {
               int errorOffset = e.getErrorOffset();
               throw new CoercingParseValueException(
                 "Cannot parse %s into an OffsetDateTime. Error at character index %s".formatted(
-                    input,
-                    errorOffset
-                  )
+                  input,
+                  errorOffset
+                )
               );
             }
           }
@@ -127,8 +127,8 @@ public class GraphQLScalars {
           } else {
             throw new CoercingSerializeException(
               "Cannot serialize object of class %s as a coordinate number".formatted(
-                  dataFetcherResult.getClass().getSimpleName()
-                )
+                dataFetcherResult.getClass().getSimpleName()
+              )
             );
           }
         }
@@ -194,8 +194,8 @@ public class GraphQLScalars {
           } else {
             throw new CoercingSerializeException(
               "Cannot serialize object of class %s as a cost".formatted(
-                  dataFetcherResult.getClass().getSimpleName()
-                )
+                dataFetcherResult.getClass().getSimpleName()
+              )
             );
           }
         }
@@ -363,8 +363,8 @@ public class GraphQLScalars {
           } else {
             throw new CoercingSerializeException(
               "Cannot serialize object of class %s as a ratio".formatted(
-                  dataFetcherResult.getClass().getSimpleName()
-                )
+                dataFetcherResult.getClass().getSimpleName()
+              )
             );
           }
         }
@@ -431,8 +431,8 @@ public class GraphQLScalars {
           } else {
             throw new CoercingSerializeException(
               "Cannot serialize object of class %s as a reluctance".formatted(
-                  dataFetcherResult.getClass().getSimpleName()
-                )
+                dataFetcherResult.getClass().getSimpleName()
+              )
             );
           }
         }

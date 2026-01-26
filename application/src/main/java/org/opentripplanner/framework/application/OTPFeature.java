@@ -69,8 +69,8 @@ public enum OTPFeature {
     false,
     false,
     "If the minimum transfer time is a lower bound (default) or the definitive time for the " +
-    "transfer. Set this to `true` if you want to set a transfer time lower than what OTP derives " +
-    "from OSM data."
+      "transfer. Set this to `true` if you want to set a transfer time lower than what OTP derives " +
+      "from OSM data."
   ),
 
   OnDemandRaptorTransfer(
@@ -115,7 +115,7 @@ public enum OTPFeature {
     true,
     false,
     "Make all polling updaters wait for graph updates to complete before finishing. " +
-    "If this is not enabled, the updaters will finish after submitting the task to update the graph."
+      "If this is not enabled, the updaters will finish after submitting the task to update the graph."
   ),
   CarPooling(false, true, "Enable the carpooling sandbox module."),
   Emission(false, true, "Enable the emission sandbox module."),
@@ -133,9 +133,9 @@ public enum OTPFeature {
     false,
     false,
     "Keep the best itinerary with respect to each criteria used in the transit-routing search. " +
-    "For example the itinerary with the lowest cost, fewest transfers, and each unique transit-group " +
-    "(transit-group-priority) is kept, even if the max-limit is exceeded. This is turned off by default " +
-    "for now, until this feature is well tested."
+      "For example the itinerary with the lowest cost, fewest transfers, and each unique transit-group " +
+      "(transit-group-priority) is kept, even if the max-limit is exceeded. This is turned off by default " +
+      "for now, until this feature is well tested."
   ),
   RealtimeResolver(
     false,

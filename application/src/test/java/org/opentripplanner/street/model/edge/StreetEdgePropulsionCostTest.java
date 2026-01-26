@@ -58,8 +58,10 @@ class StreetEdgePropulsionCostTest {
     from = intersectionVertex("from", c1.y, c1.x);
     to = intersectionVertex("to", c2.y, c2.x);
 
-    var geometry = org.opentripplanner.framework.geometry.GeometryUtils.getGeometryFactory()
-      .createLineString(new Coordinate[] { c1, c2 });
+    var geometry =
+      org.opentripplanner.framework.geometry.GeometryUtils.getGeometryFactory().createLineString(
+        new Coordinate[] { c1, c2 }
+      );
 
     hillyEdge = new StreetEdgeBuilder<>()
       .withFromVertex(from)

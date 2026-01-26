@@ -63,7 +63,9 @@ public final class CompositeRentalRestrictionExtension implements RentalRestrict
   }
 
   public static RentalRestrictionExtension of(RentalRestrictionExtension... exts) {
-    var set = Arrays.stream(exts).flatMap(e -> e.toList().stream()).collect(Collectors.toSet());
+    var set = Arrays.stream(exts)
+      .flatMap(e -> e.toList().stream())
+      .collect(Collectors.toSet());
     if (set.size() == 1) {
       return List.copyOf(set).get(0);
     } else {
@@ -104,6 +106,8 @@ public final class CompositeRentalRestrictionExtension implements RentalRestrict
 
   @Override
   public List<String> networks() {
-    return Arrays.stream(extensions).flatMap(e -> e.networks().stream()).toList();
+    return Arrays.stream(extensions)
+      .flatMap(e -> e.networks().stream())
+      .toList();
   }
 }

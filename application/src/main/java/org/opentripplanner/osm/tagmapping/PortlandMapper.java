@@ -12,7 +12,8 @@ import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 class PortlandMapper extends OsmTagMapper {
 
   @Override
-  public void populateProperties(WayPropertySet props) {
+  public WayPropertySet buildWayPropertySet() {
+    var props = WayPropertySet.of();
     props.setMixinProperties("footway=sidewalk", ofWalkSafety(1.1));
     props.setMixinProperties(new ExactMatchSpecifier(new Absent("name")), ofWalkSafety(1.2));
     props.setMixinProperties("highway=trunk", ofWalkSafety(1.2 / 7.47));
@@ -55,8 +56,9 @@ class PortlandMapper extends OsmTagMapper {
     props.setMixinProperties("CCGIS:bicycle:left=caution_area", ofBicycleSafety(1, 1, 1.45));
 
     // Max speed limit in Oregon is 70 mph ~= 113kmh ~= 31.3m/s
-    props.maxPossibleCarSpeed = 31.4f;
+    props.setMaxPossibleCarSpeed(31.4f);
 
-    super.populateProperties(props);
+    props.addPickers(super.buildWayPropertySet());
+    return props.build();
   }
 }

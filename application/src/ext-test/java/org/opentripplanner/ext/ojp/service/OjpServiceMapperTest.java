@@ -54,18 +54,17 @@ class OjpServiceMapperTest {
   @Test
   void maxDistance() {
     var params = SERVICE.extractStopEventParams(
-      new OJPStopEventRequestStructure()
-        .withLocation(
-          new PlaceContextStructure()
-            .withDepArrTime(new XmlDateTime(ZDT))
-            .withIndividualTransportOption(
-              new IndividualTransportOptionStructure()
-                .withItModeAndModeOfOperation(
-                  new ItModesStructure().withPersonalMode(PersonalModesEnumeration.FOOT)
-                )
-                .withMaxDistance(BigInteger.TEN)
-            )
-        )
+      new OJPStopEventRequestStructure().withLocation(
+        new PlaceContextStructure()
+          .withDepArrTime(new XmlDateTime(ZDT))
+          .withIndividualTransportOption(
+            new IndividualTransportOptionStructure()
+              .withItModeAndModeOfOperation(
+                new ItModesStructure().withPersonalMode(PersonalModesEnumeration.FOOT)
+              )
+              .withMaxDistance(BigInteger.TEN)
+          )
+      )
     );
     assertEquals(10, params.maximumWalkDistance());
   }
@@ -82,11 +81,11 @@ class OjpServiceMapperTest {
   void lineFilterImplicitExclude() {
     var params = SERVICE.extractStopEventParams(
       lineFilter(
-        new LineDirectionFilterStructure()
-          .withLine(
-            new LineDirectionStructure()
-              .withLineRef(new LineRefStructure().withValue(LINE_ID.toString()))
+        new LineDirectionFilterStructure().withLine(
+          new LineDirectionStructure().withLineRef(
+            new LineRefStructure().withValue(LINE_ID.toString())
           )
+        )
       )
     );
     assertThat(params.includedAgencies()).isEmpty();
@@ -104,8 +103,9 @@ class OjpServiceMapperTest {
         new LineDirectionFilterStructure()
           .withExclude(true)
           .withLine(
-            new LineDirectionStructure()
-              .withLineRef(new LineRefStructure().withValue(LINE_ID.toString()))
+            new LineDirectionStructure().withLineRef(
+              new LineRefStructure().withValue(LINE_ID.toString())
+            )
           )
       )
     );
@@ -124,8 +124,9 @@ class OjpServiceMapperTest {
         new LineDirectionFilterStructure()
           .withExclude(false)
           .withLine(
-            new LineDirectionStructure()
-              .withLineRef(new LineRefStructure().withValue(LINE_ID.toString()))
+            new LineDirectionStructure().withLineRef(
+              new LineRefStructure().withValue(LINE_ID.toString())
+            )
           )
       )
     );
@@ -141,14 +142,12 @@ class OjpServiceMapperTest {
   void modeFilter() {
     var params = SERVICE.extractStopEventParams(
       stopEvent(
-        new StopEventParamStructure()
-          .withModeFilter(
-            new ModeFilterStructure()
-              .withPtMode(
-                VehicleModesOfTransportEnumeration.BUS,
-                VehicleModesOfTransportEnumeration.FERRY
-              )
+        new StopEventParamStructure().withModeFilter(
+          new ModeFilterStructure().withPtMode(
+            VehicleModesOfTransportEnumeration.BUS,
+            VehicleModesOfTransportEnumeration.FERRY
           )
+        )
       )
     );
     assertThat(params.includedAgencies()).isEmpty();
@@ -163,12 +162,11 @@ class OjpServiceMapperTest {
   void modeFilterExclude() {
     var params = SERVICE.extractStopEventParams(
       stopEvent(
-        new StopEventParamStructure()
-          .withModeFilter(
-            new ModeFilterStructure()
-              .withExclude(false)
-              .withPtMode(VehicleModesOfTransportEnumeration.BUS)
-          )
+        new StopEventParamStructure().withModeFilter(
+          new ModeFilterStructure()
+            .withExclude(false)
+            .withPtMode(VehicleModesOfTransportEnumeration.BUS)
+        )
       )
     );
     assertThat(params.includedAgencies()).isEmpty();

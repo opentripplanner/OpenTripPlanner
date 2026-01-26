@@ -1,18 +1,17 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.transit.model.site;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.site.StopType;
 
-class TestStopLocation implements StopLocation {
+public class TestStopLocation implements StopLocation {
 
   private final FeedScopedId id;
 
-  TestStopLocation(FeedScopedId id) {
+  public TestStopLocation(FeedScopedId id) {
     this.id = id;
   }
 
@@ -23,7 +22,7 @@ class TestStopLocation implements StopLocation {
 
   @Override
   public int getIndex() {
-    return -999;
+    throw new NotImplementedException("Implementation doesn't support getIndex().");
   }
 
   @Override

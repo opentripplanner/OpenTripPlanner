@@ -374,36 +374,36 @@ public class BasicPathTestCase implements RaptorTestConstants {
       durationToStr(TRIP_DURATION),
       durationToStr(
         ACCESS_DURATION +
-        L11_DURATION +
-        L11_WAIT_DURATION +
-        TX_DURATION +
-        L21_DURATION +
-        L21_WAIT_DURATION +
-        L31_DURATION +
-        L31_WAIT_DURATION +
-        EGRESS_DURATION
+          L11_DURATION +
+          L11_WAIT_DURATION +
+          TX_DURATION +
+          L21_DURATION +
+          L21_WAIT_DURATION +
+          L31_DURATION +
+          L31_WAIT_DURATION +
+          EGRESS_DURATION
       ),
       "Access: " +
-      durationToStr(ACCESS_DURATION) +
-      ", Line 11: " +
-      durationToStr(L11_DURATION) +
-      " (wait " +
-      durationToStr(L11_WAIT_DURATION) +
-      ")" +
-      ", Tx: " +
-      durationToStr(TX_DURATION) +
-      ", Line 21: " +
-      durationToStr(L21_DURATION) +
-      " (wait " +
-      durationToStr(L21_WAIT_DURATION) +
-      ")" +
-      ", Line 31: " +
-      durationToStr(L31_DURATION) +
-      " (wait " +
-      durationToStr(L31_WAIT_DURATION) +
-      ")" +
-      ", Egress: " +
-      durationToStr(EGRESS_DURATION)
+        durationToStr(ACCESS_DURATION) +
+        ", Line 11: " +
+        durationToStr(L11_DURATION) +
+        " (wait " +
+        durationToStr(L11_WAIT_DURATION) +
+        ")" +
+        ", Tx: " +
+        durationToStr(TX_DURATION) +
+        ", Line 21: " +
+        durationToStr(L21_DURATION) +
+        " (wait " +
+        durationToStr(L21_WAIT_DURATION) +
+        ")" +
+        ", Line 31: " +
+        durationToStr(L31_DURATION) +
+        " (wait " +
+        durationToStr(L31_WAIT_DURATION) +
+        ")" +
+        ", Egress: " +
+        durationToStr(EGRESS_DURATION)
     );
 
     // The calculator is not under test here, so we assert everything is as expected

@@ -59,10 +59,10 @@ public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
   private Cost getWaitTimeCost(Itinerary a, Itinerary b) {
     return Cost.costOfSeconds(
       intervalRelaxFactor *
-      Math.min(
-        Math.abs(ChronoUnit.SECONDS.between(a.startTime(), b.startTime())),
-        Math.abs(ChronoUnit.SECONDS.between(a.endTime(), b.endTime()))
-      )
+        Math.min(
+          Math.abs(ChronoUnit.SECONDS.between(a.startTime(), b.startTime())),
+          Math.abs(ChronoUnit.SECONDS.between(a.endTime(), b.endTime()))
+        )
     );
   }
 }

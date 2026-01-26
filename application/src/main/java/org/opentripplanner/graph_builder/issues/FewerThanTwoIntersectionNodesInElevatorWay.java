@@ -12,8 +12,7 @@ public record FewerThanTwoIntersectionNodesInElevatorWay(
   Coordinate from,
   Coordinate to,
   int intersectionNodes
-)
-  implements DataImportIssue {
+) implements DataImportIssue {
   private static final String FMT =
     "Elevator way %s has fewer than two intersection nodes: %s. " +
     "This makes the elevator unusable. " +

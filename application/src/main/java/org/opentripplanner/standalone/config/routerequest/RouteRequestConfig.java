@@ -234,7 +234,7 @@ public class RouteRequestConfig {
               )
               .description(
                 "Sometimes there is a need to configure a longer alighting times for specific " +
-                "modes, such as airplanes or ferries."
+                  "modes, such as airplanes or ferries."
               )
               .asEnumMap(TransitMode.class, Duration.class)
           )
@@ -390,7 +390,7 @@ public class RouteRequestConfig {
           )
           .description(
             "This is the cost that is used when boarding while cycling. " +
-            "This is usually higher that walkBoardCost."
+              "This is usually higher that walkBoardCost."
           )
           .asInt(dft.boardCost())
       )
@@ -606,7 +606,7 @@ public class RouteRequestConfig {
           .since(V2_2)
           .summary(
             "The maximum time a street routing request is allowed to take before returning the " +
-            "results."
+              "results."
           )
           .description(
             """
@@ -653,7 +653,7 @@ public class RouteRequestConfig {
           )
           .description(
             "This is the cost that is used when boarding while driving. " +
-            "This can be different compared to the boardCost while walking or cycling."
+              "This can be different compared to the boardCost while walking or cycling."
           )
           .asInt(dft.boardCost())
       )
@@ -765,7 +765,7 @@ public class RouteRequestConfig {
             .of("dataOverlay")
             .since(V2_1)
             .summary("The filled request parameters for penalties and thresholds values")
-            .description(/*TODO DOC*/"TODO")
+            .description(/*TODO DOC*/ "TODO")
             .asObject()
         )
       );

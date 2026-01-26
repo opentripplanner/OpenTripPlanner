@@ -11,8 +11,7 @@ public record GraphIsland(
   int restricted,
   int removed,
   String traversalMode
-)
-  implements DataImportIssue {
+) implements DataImportIssue {
   private static final String FMT =
     "Pruned %s subgraph %s containing vertex '%s' at (%f, %f) of %d street vertices and %d stops. Edge changes: %d to nothru, %d to no traversal, %d erased";
   private static final String HTMLFMT =

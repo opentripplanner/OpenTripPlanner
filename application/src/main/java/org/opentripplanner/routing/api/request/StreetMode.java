@@ -141,8 +141,7 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
     return "Routing modes on streets, including walking, biking, driving, and car-sharing.";
   }
 
-  private static String GBFS_PREREQ =
-    """
+  private static String GBFS_PREREQ = """
 
     _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
     See [Configuring GBFS](GBFS-Config.md) on how to add one.

@@ -416,9 +416,15 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       );
     }
     // We need to timeshift the toLegs
-    long toDuration = toLegs.stream().mapToLong(l -> l.duration().toSeconds()).sum();
+    long toDuration = toLegs
+      .stream()
+      .mapToLong(l -> l.duration().toSeconds())
+      .sum();
 
-    toLegs = toLegs.stream().map(l -> l.withTimeShift(Duration.ofSeconds(-toDuration))).toList();
+    toLegs = toLegs
+      .stream()
+      .map(l -> l.withTimeShift(Duration.ofSeconds(-toDuration)))
+      .toList();
 
     return ListUtils.combine(fromLegs, toLegs);
   }

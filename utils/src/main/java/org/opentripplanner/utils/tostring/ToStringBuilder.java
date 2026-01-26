@@ -245,7 +245,14 @@ public class ToStringBuilder {
     if (array == null) {
       return this;
     }
-    return addIt(name, Arrays.stream(array).filter(t -> t != notSet).count() + "/" + array.length);
+    return addIt(
+      name,
+      Arrays.stream(array)
+          .filter(t -> t != notSet)
+          .count() +
+        "/" +
+        array.length
+    );
   }
 
   /** Add the BitSet: name : {cardinality}/{logical size}/{size} */

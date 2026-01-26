@@ -10,11 +10,10 @@ import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 public class UKMapperTest {
 
-  static WayPropertySet wps = new WayPropertySet();
+  static final WayPropertySet wps;
 
   static {
-    var source = new UKMapper();
-    source.populateProperties(wps);
+    wps = new UKMapper().buildWayPropertySet();
   }
 
   @Test

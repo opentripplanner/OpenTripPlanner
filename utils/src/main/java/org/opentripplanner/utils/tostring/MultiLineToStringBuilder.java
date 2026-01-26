@@ -84,7 +84,11 @@ public class MultiLineToStringBuilder {
 
   public String toString() {
     var buf = new StringBuilder(name).append(" {");
-    int labelSize = items.stream().mapToInt(it -> it.key.length()).max().orElse(0);
+    int labelSize = items
+      .stream()
+      .mapToInt(it -> it.key.length())
+      .max()
+      .orElse(0);
 
     for (Item item : items) {
       var labelTxt = padRight(item.key(), labelSize);

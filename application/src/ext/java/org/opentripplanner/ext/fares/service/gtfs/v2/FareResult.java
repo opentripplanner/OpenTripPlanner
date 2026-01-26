@@ -16,6 +16,7 @@ public record FareResult(Set<FareProduct> itineraryProducts, Multimap<Leg, FareO
   public FareResult {
     legProducts = ImmutableSetMultimap.copyOf(legProducts);
   }
+
   public Collection<FareOffer> offersForLeg(Leg leg) {
     return legProducts.get(leg);
   }

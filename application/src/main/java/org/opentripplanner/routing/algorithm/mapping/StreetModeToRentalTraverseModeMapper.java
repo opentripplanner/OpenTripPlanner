@@ -13,7 +13,8 @@ public class StreetModeToRentalTraverseModeMapper {
       case BIKE_RENTAL -> TraverseMode.BICYCLE;
       case SCOOTER_RENTAL -> TraverseMode.SCOOTER;
       case CAR_RENTAL -> TraverseMode.CAR;
-      case NOT_SET,
+      case
+        NOT_SET,
         WALK,
         BIKE,
         BIKE_TO_PARK,

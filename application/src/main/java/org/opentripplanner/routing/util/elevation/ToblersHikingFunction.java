@@ -92,8 +92,8 @@ public class ToblersHikingFunction {
     if (walkDistMultiplierMaxLimit < 1.0) {
       throw new IllegalArgumentException(
         "The 'walkDistMultiplierMaxLimit' is " +
-        walkDistMultiplierMaxLimit +
-        ", but must be greater then 1."
+          walkDistMultiplierMaxLimit +
+          ", but must be greater then 1."
       );
     }
     this.walkDistMultiplierMaxLimit = walkDistMultiplierMaxLimit;

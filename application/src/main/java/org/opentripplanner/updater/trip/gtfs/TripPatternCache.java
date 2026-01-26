@@ -63,7 +63,7 @@ class TripPatternCache {
         .withMode(trip.getMode())
         .withNetexSubmode(trip.getNetexSubMode())
         .withStopPattern(stopPattern)
-        .withCreatedByRealtimeUpdater(true)
+        .withRealTimeStopPatternModified()
         .withOriginalTripPattern(originalTripPattern)
         .build();
 

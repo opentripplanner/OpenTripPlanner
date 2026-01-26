@@ -36,7 +36,10 @@ public class QualifiedModeSet implements Serializable {
   }
 
   public List<TransitMode> getTransitModes() {
-    return qModes.stream().flatMap(qMode -> qMode.mode.getTransitModes().stream()).toList();
+    return qModes
+      .stream()
+      .flatMap(qMode -> qMode.mode.getTransitModes().stream())
+      .toList();
   }
 
   public RequestModes getRequestModes() {

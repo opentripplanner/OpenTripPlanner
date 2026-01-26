@@ -235,8 +235,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
       to.coordinate.longitude()
     );
 
-    var flexPath = new DirectFlexPathCalculator()
-      .calculateFlexPath(fromv, tov, fromStopPos, toStopPos);
+    var flexPath = new DirectFlexPathCalculator().calculateFlexPath(
+      fromv,
+      tov,
+      fromStopPos,
+      toStopPos
+    );
 
     var edge = new FlexTripEdge(
       fromv,

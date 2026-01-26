@@ -173,25 +173,25 @@ class ScheduledTransitLegTest {
   void testToString() {
     assertEquals(
       "ScheduledTransitLeg{" +
-      "from: Place{name: Stop_0, stop: RegularStop{F:Stop_0 Stop_0}, coordinate: (60.0, 10.0), vertexType: TRANSIT, viaLocationType: PASS_THROUGH}, " +
-      "to: Place{name: Stop_2, stop: RegularStop{F:Stop_2 Stop_2}, coordinate: (60.0, 10.0), vertexType: TRANSIT, viaLocationType: VISIT}, " +
-      "startTime: 2023-04-17T17:49:06, " +
-      "endTime: 2023-04-17T17:59:06, " +
-      "realTime: true, " +
-      "distance: 900.0m, " +
-      "generalizedCost: $980, " +
-      "agencyId: F:A1, " +
-      "routeId: F:Rtrip1, " +
-      "tripId: F:trip1, " +
-      "serviceDate: 2023-04-17, " +
-      "boardRule: SCHEDULED, " +
-      "alightRule: SCHEDULED, " +
-      "transitAlerts: 1 items, " +
-      "fromViaLocationType: PASS_THROUGH, " +
-      "toViaLocationType: VISIT, " +
-      "emissionPerPerson: Emission{CO₂: 23g}, " +
-      "fareProducts: 1 items" +
-      "}",
+        "from: Place{name: Stop_0, stop: RegularStop{F:Stop_0 Stop_0}, coordinate: (60.0, 10.0), vertexType: TRANSIT, viaLocationType: PASS_THROUGH}, " +
+        "to: Place{name: Stop_2, stop: RegularStop{F:Stop_2 Stop_2}, coordinate: (60.0, 10.0), vertexType: TRANSIT, viaLocationType: VISIT}, " +
+        "startTime: 2023-04-17T17:49:06, " +
+        "endTime: 2023-04-17T17:59:06, " +
+        "realTime: true, " +
+        "distance: 900.0m, " +
+        "generalizedCost: $980, " +
+        "agencyId: F:A1, " +
+        "routeId: F:Rtrip1, " +
+        "tripId: F:trip1, " +
+        "serviceDate: 2023-04-17, " +
+        "boardRule: SCHEDULED, " +
+        "alightRule: SCHEDULED, " +
+        "transitAlerts: 1 items, " +
+        "fromViaLocationType: PASS_THROUGH, " +
+        "toViaLocationType: VISIT, " +
+        "emissionPerPerson: Emission{CO₂: 23g}, " +
+        "fareProducts: 1 items" +
+        "}",
       subject.toString()
     );
   }

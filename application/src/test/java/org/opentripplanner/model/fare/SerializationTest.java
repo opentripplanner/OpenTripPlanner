@@ -26,10 +26,11 @@ class SerializationTest {
   );
 
   static Stream<Class<?>> cases() {
-    var fields = CLASSES.stream()
-      .flatMap(c ->
-        Arrays.stream(c.getDeclaredFields()).map(Field::getType).filter(type -> !type.isPrimitive())
-      );
+    var fields = CLASSES.stream().flatMap(c ->
+      Arrays.stream(c.getDeclaredFields())
+        .map(Field::getType)
+        .filter(type -> !type.isPrimitive())
+    );
 
     return Stream.concat(CLASSES.stream(), fields)
       .filter(c -> !c.isRecord())

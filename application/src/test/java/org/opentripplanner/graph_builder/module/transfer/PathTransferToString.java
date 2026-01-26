@@ -14,10 +14,10 @@ class PathTransferToString {
       .stream()
       .map(tx ->
         "%3s - %3s, %dm".formatted(
-            tx.from.getName(),
-            tx.to.getName(),
-            Math.round(tx.getDistanceMeters())
-          )
+          tx.from.getName(),
+          tx.to.getName(),
+          Math.round(tx.getDistanceMeters())
+        )
       )
       .sorted()
       .collect(Collectors.joining("\n"));

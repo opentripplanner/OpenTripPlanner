@@ -60,11 +60,11 @@ class VehicleParkingPreferencesTest {
     assertEquals("VehicleParkingPreferences{}", VehicleParkingPreferences.DEFAULT.toString());
     assertEquals(
       "VehicleParkingPreferences{" +
-      "unpreferredVehicleParkingTagCost: $360, " +
-      "filter: VehicleParkingFilter{not: [tags=[not]], select: [tags=[bar]]}, " +
-      "preferred: VehicleParkingFilter{not: [tags=[bar]], select: [tags=[foo]]}, " +
-      "cost: $240, " +
-      "time: PT2M}",
+        "unpreferredVehicleParkingTagCost: $360, " +
+        "filter: VehicleParkingFilter{not: [tags=[not]], select: [tags=[bar]]}, " +
+        "preferred: VehicleParkingFilter{not: [tags=[bar]], select: [tags=[foo]]}, " +
+        "cost: $240, " +
+        "time: PT2M}",
       subject.toString()
     );
   }

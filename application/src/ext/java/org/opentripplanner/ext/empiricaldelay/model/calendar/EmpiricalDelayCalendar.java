@@ -39,6 +39,11 @@ public class EmpiricalDelayCalendar implements Serializable {
    * Return a set of all service ids in the calendar.
    */
   public List<String> listServiceIds() {
-    return calendarForDays.values().stream().map(c -> c.serviceId()).distinct().toList();
+    return calendarForDays
+      .values()
+      .stream()
+      .map(c -> c.serviceId())
+      .distinct()
+      .toList();
   }
 }

@@ -79,11 +79,11 @@ public class LiipiParkUpdaterTest {
     assertNull(first.getAvailability().getBicycleSpaces());
     assertEquals(
       "OHCalendar{" +
-      "zoneId: Europe/Helsinki, " +
-      "openingHours: [Business days 0:00-23:59:59, " +
-      "Saturday 0:00-23:59:59, " +
-      "Sunday 0:00-23:59:59]" +
-      "}",
+        "zoneId: Europe/Helsinki, " +
+        "openingHours: [Business days 0:00-23:59:59, " +
+        "Saturday 0:00-23:59:59, " +
+        "Sunday 0:00-23:59:59]" +
+        "}",
       first.getOpeningHours().toString()
     );
     assertEquals(
@@ -115,9 +115,9 @@ public class LiipiParkUpdaterTest {
 
     assertEquals(
       "OHCalendar{" +
-      "zoneId: Europe/Helsinki, " +
-      "openingHours: [Business days 6:00-17:30]" +
-      "}",
+        "zoneId: Europe/Helsinki, " +
+        "openingHours: [Business days 6:00-17:30]" +
+        "}",
       second.getOpeningHours().toString()
     );
     assertEquals(firstVehicleParkingGroup, second.getVehicleParkingGroup());
@@ -140,11 +140,11 @@ public class LiipiParkUpdaterTest {
     assertEquals(0, fourth.getTags().size());
     assertEquals(
       "OHCalendar{" +
-      "zoneId: Europe/Helsinki, " +
-      "openingHours: [Saturday 7:00-18:00, " +
-      "Business days 7:00-21:00, " +
-      "Sunday 12:00-21:00]" +
-      "}",
+        "zoneId: Europe/Helsinki, " +
+        "openingHours: [Saturday 7:00-18:00, " +
+        "Business days 7:00-21:00, " +
+        "Sunday 12:00-21:00]" +
+        "}",
       fourth.getOpeningHours().toString()
     );
     assertNull(fourth.getVehicleParkingGroup());

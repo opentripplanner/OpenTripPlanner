@@ -136,7 +136,7 @@ public class SpeedTestCmdLineOpts {
       "profiles",
       true,
       "A coma separated list of configuration profiles:\n" +
-      String.join("\n", SpeedTestProfile.options())
+        String.join("\n", SpeedTestProfile.options())
     );
     options.addOption(
       TEST_CASES,
@@ -155,7 +155,7 @@ public class SpeedTestCmdLineOpts {
       "groupResultsByCategory",
       false,
       "By default the results are aggregated for each metric. Set this flag to print" +
-      "metric results for each test-case category."
+        "metric results for each test-case category."
     );
     options.addOption(
       NUM_OF_SAMPLES,
@@ -178,7 +178,7 @@ public class SpeedTestCmdLineOpts {
       "replaceResultsExpectedFiles",
       false,
       "If result differ, replace the 'expected-results' files instead of creating 'results' " +
-      "files. This is especially useful if the expected files are under version control."
+        "files. This is especially useful if the expected files are under version control."
     );
     // Debug options
     options.addOption(DEBUG_STOPS, "debugStops", true, "A coma separated list of stops to debug.");
@@ -187,8 +187,8 @@ public class SpeedTestCmdLineOpts {
       "debugPath",
       true,
       "A coma separated list of stops representing a trip/path to debug. " +
-      "Use a '*' to indicate where to start debugging. For example '1,*2,3' will print event at stop 2 and 3, " +
-      "but not stop 1 for all trips starting with the given stop sequence."
+        "Use a '*' to indicate where to start debugging. For example '1,*2,3' will print event at stop 2 and 3, " +
+        "but not stop 1 for all trips starting with the given stop sequence."
     );
     return options;
   }

@@ -48,19 +48,22 @@ class CostScalarTest {
 
   @Test
   void testParseLiteral() {
-    var cost = GraphQLScalars.COST_SCALAR.getCoercing()
-      .parseLiteral(new IntValue(BigInteger.valueOf(THIRTY)));
+    var cost = GraphQLScalars.COST_SCALAR.getCoercing().parseLiteral(
+      new IntValue(BigInteger.valueOf(THIRTY))
+    );
     assertEquals(COST_THIRTY, cost);
     assertThrows(CoercingParseLiteralException.class, () ->
       GraphQLScalars.COST_SCALAR.getCoercing().parseLiteral(new StringValue(TEXT))
     );
     assertThrows(CoercingParseLiteralException.class, () ->
-      GraphQLScalars.COST_SCALAR.getCoercing()
-        .parseLiteral(new IntValue(BigInteger.valueOf(NEGATIVE_THIRTY)))
+      GraphQLScalars.COST_SCALAR.getCoercing().parseLiteral(
+        new IntValue(BigInteger.valueOf(NEGATIVE_THIRTY))
+      )
     );
     assertThrows(CoercingParseLiteralException.class, () ->
-      GraphQLScalars.COST_SCALAR.getCoercing()
-        .parseLiteral(new IntValue(BigInteger.valueOf(TOO_HIGH)))
+      GraphQLScalars.COST_SCALAR.getCoercing().parseLiteral(
+        new IntValue(BigInteger.valueOf(TOO_HIGH))
+      )
     );
   }
 }

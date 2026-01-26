@@ -597,8 +597,8 @@ class UnscheduledTripTest {
         .addObj(
           "expected",
           expectedDescription +
-          ": " +
-          TimeUtils.timeToStrCompact(expectedTime, MISSING_VALUE, "MISSING")
+            ": " +
+            TimeUtils.timeToStrCompact(expectedTime, MISSING_VALUE, "MISSING")
         )
         .addServiceTime("requested", requestedTime)
         .addDurationSec("duration", tripDuration)

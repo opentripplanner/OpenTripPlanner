@@ -71,8 +71,9 @@ public class SpeedTestRequest {
       if (tModes.isEmpty()) {
         journeyBuilder.withTransit(b -> b.disable());
       } else {
-        var fb = TransitFilterRequest.of()
-          .addSelect(SelectRequest.of().withTransportModes(tModes).build());
+        var fb = TransitFilterRequest.of().addSelect(
+          SelectRequest.of().withTransportModes(tModes).build()
+        );
         journeyBuilder.withTransit(b -> b.withFilters(List.of(fb.build())));
       }
 

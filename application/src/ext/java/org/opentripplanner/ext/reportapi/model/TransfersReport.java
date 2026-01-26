@@ -79,12 +79,12 @@ public class TransfersReport {
       var dist = (from.coordinate == null || to.coordinate == null)
         ? ""
         : String.format(
-          "%.0fm",
-          SphericalDistanceLibrary.fastDistance(
-            from.coordinate.asJtsCoordinate(),
-            to.coordinate.asJtsCoordinate()
-          )
-        );
+            "%.0fm",
+            SphericalDistanceLibrary.fastDistance(
+              from.coordinate.asJtsCoordinate(),
+              to.coordinate.asJtsCoordinate()
+            )
+          );
       var duration = (from.time == NOT_SET || to.time == NOT_SET)
         ? ""
         : durationToStr(to.time - from.time);
@@ -195,7 +195,9 @@ public class TransfersReport {
   }
 
   private static String getName(Operator operator) {
-    return Optional.ofNullable(operator).map(o -> o.getId().getId()).orElse("");
+    return Optional.ofNullable(operator)
+      .map(o -> o.getId().getId())
+      .orElse("");
   }
 
   static class TxPoint {

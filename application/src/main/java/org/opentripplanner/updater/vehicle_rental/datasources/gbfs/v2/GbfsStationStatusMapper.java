@@ -49,10 +49,10 @@ class GbfsStationStatusMapper {
     Map<RentalVehicleType, Integer> vehicleTypesAvailable = status.getVehicleTypesAvailable() !=
       null
       ? status
-        .getVehicleTypesAvailable()
-        .stream()
-        .filter(e -> containsVehicleType(e, status))
-        .collect(Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> e.getCount()))
+          .getVehicleTypesAvailable()
+          .stream()
+          .filter(e -> containsVehicleType(e, status))
+          .collect(Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> e.getCount()))
       : Map.of(RentalVehicleType.getDefaultType(station.network()), vehiclesAvailable);
 
     int vehiclesDisabled = status.getNumBikesDisabled() != null ? status.getNumBikesDisabled() : 0;

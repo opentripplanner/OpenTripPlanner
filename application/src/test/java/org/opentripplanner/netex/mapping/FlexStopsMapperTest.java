@@ -119,12 +119,11 @@ class FlexStopsMapperTest {
     10.878374152208456
   );
   private static final KeyListStructure KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS =
-    new KeyListStructure()
-      .withKeyValue(
-        new KeyValueStructure()
-          .withKey("FlexibleStopAreaType")
-          .withValue("UnrestrictedPublicTransportAreas")
-      );
+    new KeyListStructure().withKeyValue(
+      new KeyValueStructure()
+        .withKey("FlexibleStopAreaType")
+        .withValue("UnrestrictedPublicTransportAreas")
+    );
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
   private final SiteRepositoryBuilder siteRepositoryBuilder = testModel.siteRepositoryBuilder();
@@ -296,16 +295,13 @@ class FlexStopsMapperTest {
     return new FlexibleArea()
       .withId(flexibleAreaId)
       .withPolygon(
-        new PolygonType()
-          .withExterior(
-            new AbstractRingPropertyType()
-              .withAbstractRing(
-                MappingSupport.createJaxbElement(
-                  new LinearRingType()
-                    .withPosList(new DirectPositionListType().withValue(areaPosList))
-                )
-              )
+        new PolygonType().withExterior(
+          new AbstractRingPropertyType().withAbstractRing(
+            MappingSupport.createJaxbElement(
+              new LinearRingType().withPosList(new DirectPositionListType().withValue(areaPosList))
+            )
           )
+        )
       );
   }
 

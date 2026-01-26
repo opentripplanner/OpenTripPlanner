@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
@@ -65,7 +66,11 @@ class _RouteRequestTestContext {
     var linkingContextFactory = new LinkingContextFactory(
       graph,
       vertexCreationService,
-      transitService::findStopOrChildIds
+      transitService::findStopOrChildIds,
+      id -> {
+        var group = transitService.getStopLocationsGroup(id);
+        return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
+      }
     );
     this.context = new GraphQLRequestContext(
       new TestRoutingService(List.of()),

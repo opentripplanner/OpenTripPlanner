@@ -91,7 +91,7 @@ class Ring {
     List<Polygon> polygonHoles = new ArrayList<>();
     for (Ring ring : holes) {
       Polygon polygon = factory.createPolygon(ring.shell, new LinearRing[0]);
-      for (Iterator<Polygon> it = polygonHoles.iterator(); it.hasNext();) {
+      for (Iterator<Polygon> it = polygonHoles.iterator(); it.hasNext(); ) {
         Polygon otherHole = it.next();
         if (otherHole.relate(polygon, "F***1****")) {
           polygon = (Polygon) polygon.union(otherHole);

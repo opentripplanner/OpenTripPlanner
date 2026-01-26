@@ -21,6 +21,7 @@ public record UpdateError(
   public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType, Integer stopIndex) {
     this(tripId, errorType, stopIndex, null);
   }
+
   public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType, String producer) {
     this(tripId, errorType, null, producer);
   }

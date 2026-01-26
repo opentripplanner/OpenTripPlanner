@@ -124,17 +124,17 @@ class VehicleRentalPreferencesTest {
     assertEquals("VehicleRentalPreferences{}", VehicleRentalPreferences.DEFAULT.toString());
     assertEquals(
       "VehicleRentalPreferences{" +
-      "pickupTime: 25s, " +
-      "pickupCost: $250, " +
-      "dropOffTime: 45s, " +
-      "dropOffCost: $450, " +
-      "useAvailabilityInformation, " +
-      "arrivingInRentalVehicleAtDestinationCost: $500, " +
-      "allowArrivingInRentedVehicleAtDestination, " +
-      "allowedNetworks: [foo], " +
-      "bannedNetworks: [bar], " +
-      "electricAssistSlopeSensitivity: 0.5" +
-      "}",
+        "pickupTime: 25s, " +
+        "pickupCost: $250, " +
+        "dropOffTime: 45s, " +
+        "dropOffCost: $450, " +
+        "useAvailabilityInformation, " +
+        "arrivingInRentalVehicleAtDestinationCost: $500, " +
+        "allowArrivingInRentedVehicleAtDestination, " +
+        "allowedNetworks: [foo], " +
+        "bannedNetworks: [bar], " +
+        "electricAssistSlopeSensitivity: 0.5" +
+        "}",
       subject.toString()
     );
   }

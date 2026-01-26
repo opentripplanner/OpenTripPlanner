@@ -191,7 +191,7 @@ public abstract class SphericalDistanceLibrary {
 
     double y = sqrt(
       p2(cos(lat2) * sin(deltaLon)) +
-      p2(cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(deltaLon))
+        p2(cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(deltaLon))
     );
     double x = sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(deltaLon);
 

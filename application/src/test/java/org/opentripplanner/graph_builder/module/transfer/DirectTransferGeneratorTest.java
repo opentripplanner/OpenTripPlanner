@@ -238,8 +238,7 @@ class DirectTransferGeneratorTest {
     // Best transfers between patterns; Hence S0 - S22 removed
     // S11, S13, S21 -> *   No patterns alight here
     // * -> S0, S12, S23    No patterns board here
-    String expectedWalkAndBike =
-      """
+    String expectedWalkAndBike = """
        S0 - S11, 100m
        S0 - S21, 100m
       S12 - S22, 110m""";

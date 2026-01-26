@@ -211,7 +211,7 @@ public class LegacyRouteRequestMapper {
               .map(transportMode ->
                 new QualifiedMode(
                   transportMode.get("mode") +
-                  (transportMode.get("qualifier") == null
+                    (transportMode.get("qualifier") == null
                       ? ""
                       : "_" + transportMode.get("qualifier"))
                 )

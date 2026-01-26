@@ -143,7 +143,7 @@ public class DatedServiceJourneyType {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "Returns scheduled passingTimes for this dated service journey, " +
-            "updated with real-time-updates (if available). "
+              "updated with real-time-updates (if available). "
           )
           .dataFetcher(environment -> {
             TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);

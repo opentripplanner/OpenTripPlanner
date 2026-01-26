@@ -94,18 +94,27 @@ class DurationForEnumTest {
   @Test
   void copyOf() {
     // with new default, keep map
-    var copy = subject.copyOf().apply(b3 -> b3.withDefaultSec(10)).build();
+    var copy = subject
+      .copyOf()
+      .apply(b3 -> b3.withDefaultSec(10))
+      .build();
     assertEquals(D10s, copy.valueOf(StreetMode.BIKE));
     assertEquals(WALK_VALUE, copy.valueOf(StreetMode.WALK));
 
     // with new map values, keep walk and default
-    copy = subject.copyOf().apply(b2 -> b2.with(StreetMode.BIKE, D10s)).build();
+    copy = subject
+      .copyOf()
+      .apply(b2 -> b2.with(StreetMode.BIKE, D10s))
+      .build();
     assertEquals(WALK_VALUE, copy.valueOf(StreetMode.WALK));
     assertEquals(D10s, copy.valueOf(StreetMode.BIKE));
     assertEquals(DEFAULT, copy.valueOf(StreetMode.CAR));
 
     // with override map value
-    copy = subject.copyOf().apply(b1 -> b1.with(StreetMode.WALK, D10s)).build();
+    copy = subject
+      .copyOf()
+      .apply(b1 -> b1.with(StreetMode.WALK, D10s))
+      .build();
     assertEquals(D10s, copy.valueOf(StreetMode.WALK));
 
     // with no "real" changes -> return original

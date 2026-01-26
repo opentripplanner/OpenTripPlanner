@@ -12,5 +12,4 @@ public record GtfsRealtimeAlertsUpdaterParameters(
   boolean fuzzyTripMatching,
   Duration frequency,
   HttpHeaders headers
-)
-  implements PollingGraphUpdaterParameters {}
+) implements PollingGraphUpdaterParameters {}

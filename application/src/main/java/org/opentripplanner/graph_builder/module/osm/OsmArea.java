@@ -172,8 +172,9 @@ class OsmArea {
     for (Ring ring : outermostRings) {
       polygons.add(ring.jtsPolygon);
     }
-    MultiPolygon jtsMultiPolygon = GeometryUtils.getGeometryFactory()
-      .createMultiPolygon(polygons.toArray(new Polygon[0]));
+    MultiPolygon jtsMultiPolygon = GeometryUtils.getGeometryFactory().createMultiPolygon(
+      polygons.toArray(new Polygon[0])
+    );
     var validOp = new IsValidOp(jtsMultiPolygon);
     if (!validOp.isValid()) {
       var validationError = validOp.getValidationError();

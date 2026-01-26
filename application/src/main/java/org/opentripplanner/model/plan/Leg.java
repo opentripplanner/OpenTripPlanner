@@ -511,7 +511,9 @@ public interface Leg {
     var start = fareZones(this.from());
     var end = fareZones(this.to());
 
-    return Stream.of(intermediate, start, end).flatMap(s -> s).collect(Collectors.toSet());
+    return Stream.of(intermediate, start, end)
+      .flatMap(s -> s)
+      .collect(Collectors.toSet());
   }
 
   /**

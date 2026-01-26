@@ -165,7 +165,7 @@ public class ItineraryTest implements PlanTestConstants {
 
     assertEquals(
       "A ~ Walk 2m ~ B ~ BUS 55 11:04 11:14 ~ C ~ BUS 21 11:16 11:20 ~ D " +
-      "~ Walk 3m ~ E ~ RAIL R2 11:30 11:50 ~ F ~ Walk 1m ~ G [C₁3_648]",
+        "~ Walk 3m ~ E ~ RAIL R2 11:30 11:50 ~ F ~ Walk 1m ~ G [C₁3_648]",
       result.toStr()
     );
   }

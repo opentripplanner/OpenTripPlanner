@@ -149,7 +149,8 @@ public class BookingInfoMapper {
 
     private static BookingTime mapEarliestBookingTime(PurchaseWhenEnumeration purchaseWhen) {
       return switch (purchaseWhen) {
-        case UNTIL_PREVIOUS_DAY,
+        case
+          UNTIL_PREVIOUS_DAY,
           ADVANCE_ONLY,
           ADVANCE_AND_DAY_OF_TRAVEL,
           TIME_OF_TRAVEL_ONLY -> null;
@@ -210,7 +211,7 @@ public class BookingInfoMapper {
           issueStore.add(
             "BookingInfoPeriodIgnored",
             "MinimumBookingPeriod cannot be set if latestBookingTime is set. " +
-            "MinimumBookingPeriod will be ignored for: %s, entities: %s",
+              "MinimumBookingPeriod will be ignored for: %s, entities: %s",
             contactStructure,
             entityRefs
           );

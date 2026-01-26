@@ -35,6 +35,13 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
     C1_LOW
   );
   private static final RaptorAccessEgress WALK_8m = TestAccessEgress.walk(STOP, D8m, C1);
+
+  private static final RaptorAccessEgress WALK_10m_VIA_1 = TestAccessEgress.walk(
+    STOP,
+    D10m,
+    C1
+  ).withViaLocationsVisited(1);
+
   private static final RaptorAccessEgress FLEX_1x_10m = flex(STOP, D10m, 1, C1);
   private static final RaptorAccessEgress FLEX_1x_8m = flex(STOP, D8m, 1, C1);
   private static final RaptorAccessEgress FLEX_2x_8m = flex(STOP, D8m, 2, C1);
@@ -69,6 +76,12 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
     assertElements(
       List.of(FLEX_1x_8m),
       removeNonOptimalPathsForStandardRaptor(List.of(FLEX_1x_8m, FLEX_2x_8m))
+    );
+
+    // Number of via locations visited, higher is better
+    assertElements(
+      List.of(WALK_10m_VIA_1, WALK_8m),
+      removeNonOptimalPathsForStandardRaptor(List.of(WALK_10m, WALK_10m_VIA_1, WALK_8m))
     );
 
     // Arriving at the stop on-board, and by-foot.

@@ -1009,9 +1009,9 @@ public class OsmDatabase {
       if (area == null) {
         throw new RuntimeException(
           "Could not process public transport relation '%s' (%s)".formatted(
-              relation,
-              relation.url()
-            )
+            relation,
+            relation.url()
+          )
         );
       }
       // single platform area presumably contains only one level in most cases

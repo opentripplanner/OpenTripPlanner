@@ -45,8 +45,8 @@ class ParetoSetEventListenerCompositeTest {
     assertEquals(
       subject.toString(),
       "ParetoSetEventListenerComposite{listeners=[" +
-      "TestParetoSetEventListener, TestParetoSetEventListener" +
-      "]}"
+        "TestParetoSetEventListener, TestParetoSetEventListener" +
+        "]}"
     );
   }
 

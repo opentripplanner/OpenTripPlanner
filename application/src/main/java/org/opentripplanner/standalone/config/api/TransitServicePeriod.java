@@ -9,5 +9,4 @@ import javax.inject.Qualifier;
  */
 @Qualifier
 @Target({ ElementType.METHOD, ElementType.PARAMETER })
-public @interface TransitServicePeriod {
-}
+public @interface TransitServicePeriod {}

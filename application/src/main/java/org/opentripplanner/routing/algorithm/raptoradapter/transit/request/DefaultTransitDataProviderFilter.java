@@ -144,11 +144,10 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
       result = new BitSet(nStops);
 
       for (int i = 0; i < nStops; i++) {
-        PickDrop pickDrop =
-          switch (boardAlight) {
-            case BOARD -> pattern.getBoardType(i);
-            case ALIGHT -> pattern.getAlightType(i);
-          };
+        PickDrop pickDrop = switch (boardAlight) {
+          case BOARD -> pattern.getBoardType(i);
+          case ALIGHT -> pattern.getAlightType(i);
+        };
         result.set(i, pickDrop.isRoutable() || pickDrop.is(PickDrop.CANCELLED));
       }
     }

@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>232</otp.serialization.version.id>
+        <otp.serialization.version.id>233</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>34.1</geotools.version>
@@ -66,7 +66,7 @@
         <jackson.version>2.20.1</jackson.version>
         <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <jersey.version>3.1.11</jersey.version>
-        <junit.version>6.0.1</junit.version>
+        <junit.version>6.0.2</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.23</logback.version>
@@ -120,7 +120,7 @@
                     <version>${plugin.prettier.version}</version>
                     <configuration>
                         <skip>${plugin.prettier.skip}</skip>
-                        <prettierJavaVersion>2.6.8</prettierJavaVersion>
+                        <prettierJavaVersion>2.7.7</prettierJavaVersion>
                         <inputGlobs>
                             <inputGlob>src/main/java/**/*.java</inputGlob>
                             <inputGlob>src/test/java/**/*.java</inputGlob>

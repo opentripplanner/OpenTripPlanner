@@ -76,8 +76,8 @@ public class S3BucketConfig {
     } catch (OtpAppException ex) {
       LOG.error(
         "You must specify an accessKey, a secretKey, and a bucketName when " +
-        "configuring S3 download. " +
-        ex.getMessage()
+          "configuring S3 download. " +
+          ex.getMessage()
       );
       throw ex;
     }

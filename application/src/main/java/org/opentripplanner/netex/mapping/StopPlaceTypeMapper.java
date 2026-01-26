@@ -36,7 +36,8 @@ class StopPlaceTypeMapper {
       case RAIL -> TransitMode.RAIL;
       case TRAM -> TransitMode.TRAM;
       case WATER, FERRY -> TransitMode.FERRY;
-      case LIFT,
+      case
+        LIFT,
         OTHER,
         SNOW_AND_ICE,
         TAXI,

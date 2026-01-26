@@ -131,7 +131,7 @@ public class UnconnectedAreasTest {
     // the node that has already been injected into the way. So either of these cases are valid.
     assertTrue(
       connections.contains(VertexLabel.osm(-102266)) ||
-      connections.contains(VertexLabel.osm(-102267))
+        connections.contains(VertexLabel.osm(-102267))
     );
   }
 

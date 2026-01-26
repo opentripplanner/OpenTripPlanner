@@ -181,7 +181,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     assertEquals(
       "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ BUS T3 10:37 10:49 ~ G " +
-      "[10:01:20 10:49:20 48m Tₙ2 C₁2_950 Tₚ6_600]",
+        "[10:01:20 10:49:20 48m Tₙ2 C₁2_950 Tₚ6_600]",
       PathUtils.pathsToString(result)
     );
 
@@ -196,9 +196,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     assertEquals(
       "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C " +
-      "~ BUS T2 10:15 10:35 ~ F " +
-      "~ BUS T3 10:37 10:49 ~ G " +
-      "[10:01:20 10:49:20 48m Tₙ2 C₁2_980 Tₚ6_600 Wₜ3_294.05]",
+        "~ BUS T2 10:15 10:35 ~ F " +
+        "~ BUS T3 10:37 10:49 ~ G " +
+        "[10:01:20 10:49:20 48m Tₙ2 C₁2_980 Tₚ6_600 Wₜ3_294.05]",
       PathUtils.pathsToString(result)
     );
   }

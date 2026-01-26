@@ -59,7 +59,11 @@ public class ZipFileDataSource
   @Override
   public DataSource entry(String name) {
     loadContent();
-    return content.stream().filter(it -> it.name().equals(name)).findFirst().orElse(null);
+    return content
+      .stream()
+      .filter(it -> it.name().equals(name))
+      .findFirst()
+      .orElse(null);
   }
 
   @Override
@@ -110,9 +114,9 @@ public class ZipFileDataSource
       // discussion on this.
       LOG.info(
         "Failed to read {}: {}\n" +
-        "Retrying with cp437 charset just in case it was 'bad entry name'.\n" +
-        "Consider sticking to ASCII characters for file names.\n" +
-        "See https://github.com/opentripplanner/OpenTripPlanner/pull/4835 for a discussion on this.",
+          "Retrying with cp437 charset just in case it was 'bad entry name'.\n" +
+          "Consider sticking to ASCII characters for file names.\n" +
+          "See https://github.com/opentripplanner/OpenTripPlanner/pull/4835 for a discussion on this.",
         path(),
         ze.getLocalizedMessage(),
         ze

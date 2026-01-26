@@ -166,7 +166,12 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   private Collection<TransitAlert> findMatchingAlerts(EntitySelector entitySelector) {
     Set<TransitAlert> result = new HashSet<>();
     for (TransitAlert alert : alerts.get(entitySelector.key())) {
-      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
+      if (
+        alert
+          .entities()
+          .stream()
+          .anyMatch(selector -> selector.matches(entitySelector))
+      ) {
         result.add(alert);
       }
     }

@@ -45,7 +45,10 @@ public class EmissionParameters {
    * List "standalone" emission files, except files part of a GTFS feed.
    */
   public List<URI> emissionFiles() {
-    return feeds.stream().map(f -> f.source()).toList();
+    return feeds
+      .stream()
+      .map(f -> f.source())
+      .toList();
   }
 
   @Override

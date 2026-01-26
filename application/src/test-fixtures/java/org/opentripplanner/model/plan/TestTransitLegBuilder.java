@@ -11,6 +11,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.TestStopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TestTransitLegBuilder {

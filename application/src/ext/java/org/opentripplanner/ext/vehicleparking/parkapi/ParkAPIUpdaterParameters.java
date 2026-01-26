@@ -22,8 +22,7 @@ public record ParkAPIUpdaterParameters(
   List<String> tags,
   VehicleParkingSourceType sourceType,
   ZoneId timeZone
-)
-  implements VehicleParkingUpdaterParameters {
+) implements VehicleParkingUpdaterParameters {
   @Override
   public UpdateType updateType() {
     return FULL;

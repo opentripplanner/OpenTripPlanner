@@ -138,20 +138,20 @@ class ItineraryFilterPreferencesTest {
     );
     assertEquals(
       "ItineraryFilterPreferences{" +
-      "accessibilityScore, " +
-      "bikeRentalDistanceRatio: 0.37, " +
-      "debug: LIST_ALL, " +
-      "filterItinerariesWithSameFirstOrLastTrip, " +
-      "groupedOtherThanSameLegsMaxCostMultiplier: 4.0, " +
-      "groupSimilarityKeepOne: 0.8, " +
-      "groupSimilarityKeepThree: 0.5, " +
-      "minBikeParkingDistance: 2,000.0, " +
-      "nonTransitGeneralizedCostLimit: 4s + 5.0 t, " +
-      "parkAndRideDurationRatio: 0.44, " +
-      "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=4s + 5.0 t, intervalRelaxFactor=3.0], " +
-      "removeTransitWithHigherCostThanBestOnStreetOnly: 30s + 1.30 t, " +
-      "filterDirectFlexBySearchWindow" +
-      "}",
+        "accessibilityScore, " +
+        "bikeRentalDistanceRatio: 0.37, " +
+        "debug: LIST_ALL, " +
+        "filterItinerariesWithSameFirstOrLastTrip, " +
+        "groupedOtherThanSameLegsMaxCostMultiplier: 4.0, " +
+        "groupSimilarityKeepOne: 0.8, " +
+        "groupSimilarityKeepThree: 0.5, " +
+        "minBikeParkingDistance: 2,000.0, " +
+        "nonTransitGeneralizedCostLimit: 4s + 5.0 t, " +
+        "parkAndRideDurationRatio: 0.44, " +
+        "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=4s + 5.0 t, intervalRelaxFactor=3.0], " +
+        "removeTransitWithHigherCostThanBestOnStreetOnly: 30s + 1.30 t, " +
+        "filterDirectFlexBySearchWindow" +
+        "}",
       subject.toString()
     );
   }

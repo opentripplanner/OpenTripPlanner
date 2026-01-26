@@ -81,16 +81,16 @@ class StreetPreferencesTest {
     assertEquals("StreetPreferences{}", StreetPreferences.DEFAULT.toString());
     assertEquals(
       "StreetPreferences{" +
-      "turnReluctance: 2.0, " +
-      "drivingDirection: LEFT, " +
-      "routingTimeout: 3s, " +
-      "elevator: ElevatorPreferences{boardSlack: 2m}, " +
-      "intersectionTraversalModel: CONSTANT, " +
-      "accessEgress: AccessEgressPreferences{" +
-      "maxDuration: DurationForStreetMode{default:5m}" +
-      "}, " +
-      "maxDirectDuration: DurationForStreetMode{default:10m}" +
-      "}",
+        "turnReluctance: 2.0, " +
+        "drivingDirection: LEFT, " +
+        "routingTimeout: 3s, " +
+        "elevator: ElevatorPreferences{boardSlack: 2m}, " +
+        "intersectionTraversalModel: CONSTANT, " +
+        "accessEgress: AccessEgressPreferences{" +
+        "maxDuration: DurationForStreetMode{default:5m}" +
+        "}, " +
+        "maxDirectDuration: DurationForStreetMode{default:10m}" +
+        "}",
       subject.toString()
     );
   }

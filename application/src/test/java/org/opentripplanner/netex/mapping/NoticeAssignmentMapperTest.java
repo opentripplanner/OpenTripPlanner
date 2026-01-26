@@ -80,14 +80,12 @@ public class NoticeAssignmentMapperTest {
     HierarchicalMapById<Notice> noticesById = new HierarchicalMapById<>();
 
     Collection<ServiceJourney> serviceJourneys = List.of(
-      new ServiceJourney()
-        .withPassingTimes(
-          new TimetabledPassingTimes_RelStructure()
-            .withTimetabledPassingTime(
-              createTimetabledPassingTime(TIMETABLED_PASSING_TIME1, STOP_POINT_ID),
-              createTimetabledPassingTime(TIMETABLED_PASSING_TIME2, STOP_POINT_ID)
-            )
+      new ServiceJourney().withPassingTimes(
+        new TimetabledPassingTimes_RelStructure().withTimetabledPassingTime(
+          createTimetabledPassingTime(TIMETABLED_PASSING_TIME1, STOP_POINT_ID),
+          createTimetabledPassingTime(TIMETABLED_PASSING_TIME2, STOP_POINT_ID)
         )
+      )
     );
 
     var trip = TimetableRepositoryForTest.trip("1").build();

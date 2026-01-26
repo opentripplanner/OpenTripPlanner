@@ -25,7 +25,8 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
 class UKMapper extends OsmTagMapper {
 
   @Override
-  public void populateProperties(WayPropertySet props) {
+  public WayPropertySet buildWayPropertySet() {
+    var props = WayPropertySet.of();
     props.setProperties("highway=cycleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.6));
     props.setProperties("highway=bridleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.3));
 
@@ -44,7 +45,7 @@ class UKMapper extends OsmTagMapper {
      *
      */
     // Max speed limit is 70 mph ~113kmh ~31.3m/s
-    props.maxPossibleCarSpeed = 31.4f;
+    props.setMaxPossibleCarSpeed(31.4f);
     // ~=68mph
     props.setCarSpeed("highway=motorway", 30.4f);
     // ~= 50mph
@@ -64,6 +65,7 @@ class UKMapper extends OsmTagMapper {
     // ~= 35mph
     props.setCarSpeed("highway=tertiary", 15.7f);
 
-    super.populateProperties(props);
+    props.addPickers(super.buildWayPropertySet());
+    return props.build();
   }
 }

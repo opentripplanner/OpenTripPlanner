@@ -240,14 +240,16 @@ public class TransferIndexGenerator {
     var patterns = patternsByTrip.get(trip);
     var patternsByRealtimeOrScheduled = patterns
       .stream()
-      .collect(Collectors.groupingBy(pattern -> pattern.getPattern().isCreatedByRealtimeUpdater()));
+      .collect(
+        Collectors.groupingBy(pattern -> pattern.getPattern().isStopPatternModifiedInRealTime())
+      );
 
     // Process first the pattern for which stopPosInPattern was calculated for
     List<RoutingTripPattern> scheduledPatterns = patternsByRealtimeOrScheduled.get(Boolean.FALSE);
     if (scheduledPatterns == null || scheduledPatterns.size() != 1) {
       LOG.warn(
         "Trip {} does not have exactly one scheduled trip pattern, found: {}. " +
-        "Skipping transfer generation.",
+          "Skipping transfer generation.",
         trip,
         scheduledPatterns
       );
@@ -289,7 +291,7 @@ public class TransferIndexGenerator {
       }
       LOG.info(
         "Updated pattern for trip {}, does not match original for stop {} at pos {}. " +
-        "Skipping transfer generation.",
+          "Skipping transfer generation.",
         trip,
         scheduledStop,
         stopPosInPattern
@@ -367,17 +369,17 @@ public class TransferIndexGenerator {
         forwardTransfers[to.pattern.patternIndex()] = new TransferForPatternByStopPos();
       }
       forwardTransfers[to.pattern.patternIndex()].add(
-          to.stopPosition,
-          new TransferForPattern(sourcePoint, to.trip, rank, c)
-        );
+        to.stopPosition,
+        new TransferForPattern(sourcePoint, to.trip, rank, c)
+      );
       // Reverse search
       if (reverseTransfers[pattern.patternIndex()] == null) {
         reverseTransfers[pattern.patternIndex()] = new TransferForPatternByStopPos();
       }
       reverseTransfers[pattern.patternIndex()].add(
-          stopPosition,
-          new TransferForPattern(to.sourcePoint, trip, rank, c)
-        );
+        stopPosition,
+        new TransferForPattern(to.sourcePoint, trip, rank, c)
+      );
     }
   }
 }

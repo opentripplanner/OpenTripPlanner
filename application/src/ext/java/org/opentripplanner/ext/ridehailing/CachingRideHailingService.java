@@ -36,10 +36,8 @@ public abstract class CachingRideHailingService implements RideHailingService {
     );
   }
 
-  protected abstract List<ArrivalTime> queryArrivalTimes(
-    WgsCoordinate position,
-    boolean wheelchair
-  ) throws IOException;
+  protected abstract List<ArrivalTime> queryArrivalTimes(WgsCoordinate position, boolean wheelchair)
+    throws IOException;
 
   /**
    * Get the ride estimate for a specific start and end pair.

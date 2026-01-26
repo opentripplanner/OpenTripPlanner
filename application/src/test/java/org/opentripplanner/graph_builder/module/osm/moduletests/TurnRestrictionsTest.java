@@ -76,7 +76,11 @@ class TurnRestrictionsTest {
     osmModule.buildGraph();
 
     assertThat(
-      issueStore.listIssues().stream().filter(i -> i instanceof TurnRestrictionBad).toList()
+      issueStore
+        .listIssues()
+        .stream()
+        .filter(i -> i instanceof TurnRestrictionBad)
+        .toList()
     ).hasSize(shouldWarn ? 1 : 0);
   }
 }

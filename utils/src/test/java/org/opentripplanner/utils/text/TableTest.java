@@ -20,8 +20,7 @@ public class TableTest {
       .addRow("\nNL Before", "NL\nin middle", "NL after\n")
       .addRow(null, "Short", 123);
 
-    var expected =
-      """
+    var expected = """
       LEFT      |    CENTER    |    RIGHT
       SPACE     |  Long-value  |        2
       NL Before | NL in middle | NL after

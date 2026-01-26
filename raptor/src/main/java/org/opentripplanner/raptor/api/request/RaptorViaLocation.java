@@ -124,7 +124,13 @@ public final class RaptorViaLocation {
     }
     buf
       .append(connections.size() <= 10 ? ": " : "(10/" + connections.size() + "): ")
-      .append(connections.stream().limit(10).map(it -> it.toString(stopNameResolver)).toList());
+      .append(
+        connections
+          .stream()
+          .limit(10)
+          .map(it -> it.toString(stopNameResolver))
+          .toList()
+      );
     return buf.append("}").toString();
   }
 

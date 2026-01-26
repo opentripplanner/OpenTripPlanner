@@ -296,7 +296,10 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   }
 
   private static <S extends RaptorTripSchedule> EgressPathLeg<S> findEgressLeg(PathLeg<S> leg) {
-    return (EgressPathLeg<S>) leg.stream().reduce((a, b) -> b).orElseThrow();
+    return (EgressPathLeg<S>) leg
+      .stream()
+      .reduce((a, b) -> b)
+      .orElseThrow();
   }
 
   /* private methods */

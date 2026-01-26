@@ -50,7 +50,12 @@ public class PathDiff<T extends RaptorTripSchedule> {
       .filter(l -> l.isAccessLeg() || l.isTransferLeg() || l.isEgressLeg())
       .mapToInt(PathLeg::duration)
       .sum();
-    this.routes.addAll(path.transitLegs().map(l -> l.trip().pattern().debugInfo()).toList());
+    this.routes.addAll(
+      path
+        .transitLegs()
+        .map(l -> l.trip().pattern().debugInfo())
+        .toList()
+    );
     this.stops.addAll(path.listStops());
   }
 

@@ -184,7 +184,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
       .since(NA)
       .summary(
         "The provided array of durations is used to increase the search-window for the " +
-        "next/previous page."
+          "next/previous page."
       )
       .description(
         """
@@ -326,7 +326,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         .summary("The coefficient to multiply with `minTransitTime`.")
         .description(
           "Use a value between `0.0` and `3.0`. Using `0.0` will eliminate the `minTransitTime` " +
-          "from the dynamic raptor-search-window calculation."
+            "from the dynamic raptor-search-window calculation."
         )
         .asDouble(dsWinDft.minTransitTimeCoefficient());
       this.minWaitTimeCoefficient = dsWin
@@ -335,7 +335,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         .summary("The coefficient to multiply with `minWaitTime`.")
         .description(
           "Use a value between `0.0` and `1.0`. Using `0.0` will eliminate the `minWaitTime` " +
-          "from the dynamic raptor-search-window calculation."
+            "from the dynamic raptor-search-window calculation."
         )
         .asDouble(dsWinDft.minWaitTimeCoefficient());
       this.minWindow = dsWin

@@ -27,5 +27,4 @@ import org.junit.jupiter.api.condition.EnabledIf;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @EnabledIf("org.opentripplanner.generate.doc.framework.DocsTestConstants#docsExistOrWarn")
-public @interface GeneratesDocumentation {
-}
+public @interface GeneratesDocumentation {}
