@@ -352,8 +352,8 @@ public class StyleBuilder {
       "line-color",
       List.of(
         "rgb",
-        List.of("min", 255, valueSpecifier),
-        List.of("max", 0, List.of("-", 255, valueSpecifier)),
+        List.of("min", 255, List.of("max", 0, valueSpecifier)),
+        List.of("min", 255, List.of("max", 0, List.of("-", 255, valueSpecifier))),
         // we add a small amount of blue so that the colours don't look too neon
         60
       )
