@@ -65,21 +65,27 @@ class EuclideanRemainingWeightHeuristicTest {
         "slow walk",
         StreetModelDetails.DEFAULT,
         StreetMode.WALK,
-        RoutingPreferences.of().withWalk(w -> w.withSpeed(1)).build(),
+        RoutingPreferences.of()
+          .withWalk(w -> w.withSpeed(1))
+          .build(),
         200
       ),
       Arguments.argumentSet(
         "slow preferred walk",
         StreetModelDetails.DEFAULT,
         StreetMode.WALK,
-        RoutingPreferences.of().withWalk(w -> w.withSpeed(1).withReluctance(0.5)).build(),
+        RoutingPreferences.of()
+          .withWalk(w -> w.withSpeed(1).withReluctance(0.5))
+          .build(),
         50
       ),
       Arguments.argumentSet(
         "slow preferred safe walk",
         safeStreets,
         StreetMode.WALK,
-        RoutingPreferences.of().withWalk(w -> w.withSpeed(1).withReluctance(0.5)).build(),
+        RoutingPreferences.of()
+          .withWalk(w -> w.withSpeed(1).withReluctance(0.5))
+          .build(),
         40
       ),
       Arguments.argumentSet(
@@ -95,7 +101,9 @@ class EuclideanRemainingWeightHeuristicTest {
         "slow preferred unsafe walk",
         unsafeStreets,
         StreetMode.WALK,
-        RoutingPreferences.of().withWalk(w -> w.withSpeed(1).withReluctance(0.5)).build(),
+        RoutingPreferences.of()
+          .withWalk(w -> w.withSpeed(1).withReluctance(0.5))
+          .build(),
         100
       ),
       // safe bike
