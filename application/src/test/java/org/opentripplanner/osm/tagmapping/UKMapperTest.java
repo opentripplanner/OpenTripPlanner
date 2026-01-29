@@ -36,11 +36,11 @@ public class UKMapperTest {
   void trunk() {
     var way = WayTestData.highwayTrunk();
     assertEquals(ALL, wps.getDataForWay(way).forward().getPermission());
-    assertEquals(2.5, wps.getDataForWay(way).forward().walkSafety());
+    assertEquals(3.8, wps.getDataForWay(way).forward().walkSafety());
     assertEquals(2.5, wps.getDataForWay(way).forward().bicycleSafety());
     way.addTag("oneway", "yes");
     way.addTag("expressway", "yes");
-    assertEquals(12.5, wps.getDataForWay(way).forward().walkSafety());
+    assertEquals(19, wps.getDataForWay(way).forward().walkSafety());
     assertEquals(12.5, wps.getDataForWay(way).forward().bicycleSafety());
   }
 }

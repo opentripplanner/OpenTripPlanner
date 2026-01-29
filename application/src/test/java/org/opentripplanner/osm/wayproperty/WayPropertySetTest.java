@@ -88,8 +88,8 @@ class WayPropertySetTest {
     var wayPropertySet = builder.build();
     var wayData = wayPropertySet.getDataForWay(way);
     assertEquals(ALL, wayData.forward().getPermission());
-    assertEquals(1.0, wayData.forward().walkSafety());
-    assertEquals(1.0, wayData.backward().walkSafety());
+    assertEquals(1.25, wayData.forward().walkSafety());
+    assertEquals(1.25, wayData.backward().walkSafety());
     assertEquals(1.0, wayData.forward().bicycleSafety());
     assertEquals(1.0, wayData.backward().bicycleSafety());
 
