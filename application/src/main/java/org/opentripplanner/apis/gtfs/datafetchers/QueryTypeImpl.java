@@ -1,8 +1,6 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
-import static org.opentripplanner.apis.gtfs.mapping.AlertCauseMapper.getGraphQLCause;
-import static org.opentripplanner.apis.gtfs.mapping.AlertEffectMapper.getGraphQLEffect;
-import static org.opentripplanner.apis.gtfs.mapping.SeverityMapper.getGraphQLSeverity;
+import static org.opentripplanner.apis.gtfs.support.filter.AlertsFilter.filterAlerts;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimaps;
@@ -56,7 +54,6 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.place.api.PatternAtStop;
 import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.place.api.PlaceType;
-import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -1023,48 +1020,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       .data(res)
       .localContext(Map.of("locale", request.preferences().locale()))
       .build();
-  }
-
-  protected static List<TransitAlert> filterAlerts(
-    Collection<TransitAlert> alerts,
-    GraphQLTypes.GraphQLQueryTypeAlertsArgs args
-  ) {
-    var severities = args.getGraphQLSeverityLevel();
-    var effects = args.getGraphQLEffect();
-    var causes = args.getGraphQLCause();
-    return alerts
-      .stream()
-      .filter(
-        alert ->
-          args.getGraphQLFeeds() == null ||
-          args.getGraphQLFeeds().contains(alert.getId().getFeedId())
-      )
-      .filter(
-        alert -> severities == null || severities.contains(getGraphQLSeverity(alert.severity()))
-      )
-      .filter(alert -> effects == null || effects.contains(getGraphQLEffect(alert.effect())))
-      .filter(alert -> causes == null || causes.contains(getGraphQLCause(alert.cause())))
-      .filter(
-        alert ->
-          args.getGraphQLRoute() == null ||
-          alert
-            .entities()
-            .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
-            .map(EntitySelector.Route.class::cast)
-            .anyMatch(route -> args.getGraphQLRoute().contains(route.routeId().toString()))
-      )
-      .filter(
-        alert ->
-          args.getGraphQLStop() == null ||
-          alert
-            .entities()
-            .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
-            .map(EntitySelector.Stop.class::cast)
-            .anyMatch(stop -> args.getGraphQLStop().contains(stop.stopId().toString()))
-      )
-      .toList();
   }
 
   /// Parse a string as a feed scoped id and apply a mapping function to the id.
