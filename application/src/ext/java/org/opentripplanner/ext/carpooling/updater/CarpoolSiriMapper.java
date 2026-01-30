@@ -17,9 +17,11 @@ import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolStopType;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
-import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.org.siri.siri21.AimedFlexibleArea;
+import uk.org.siri.siri21.CircularAreaStructure;
 import uk.org.siri.siri21.EstimatedCall;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 
@@ -42,7 +44,6 @@ public class CarpoolSiriMapper {
     }
 
     var tripId = journey.getEstimatedVehicleJourneyCode();
-
     validateEstimatedCallOrder(calls);
 
     List<CarpoolStop> stops = new ArrayList<>();
@@ -52,19 +53,19 @@ public class CarpoolSiriMapper {
       boolean isFirst = (i == 0);
       boolean isLast = (i == calls.size() - 1);
 
-      CarpoolStop stop = buildCarpoolStopForPosition(call, tripId, i, isFirst, isLast);
+      var stop = buildCarpoolStopForPosition(call, tripId, i, isFirst, isLast);
       stops.add(stop);
     }
 
     // Extract start/end times from first/last stops
-    CarpoolStop firstStop = stops.getFirst();
-    CarpoolStop lastStop = stops.getLast();
+    var firstStop = stops.getFirst();
+    var lastStop = stops.getLast();
 
-    ZonedDateTime startTime = firstStop.getExpectedDepartureTime() != null
+    var startTime = firstStop.getExpectedDepartureTime() != null
       ? firstStop.getExpectedDepartureTime()
       : firstStop.getAimedDepartureTime();
 
-    ZonedDateTime endTime = lastStop.getExpectedArrivalTime() != null
+    var endTime = lastStop.getExpectedArrivalTime() != null
       ? lastStop.getExpectedArrivalTime()
       : lastStop.getAimedArrivalTime();
 
@@ -97,50 +98,11 @@ public class CarpoolSiriMapper {
     boolean isFirst,
     boolean isLast
   ) {
-    String stopId = isFirst
+    var stopId = isFirst
       ? tripId + "_trip_origin"
       : isLast ? tripId + "_trip_destination" : tripId + "_stop_" + sequenceNumber;
 
-    var areaStop = buildAreaStop(call, stopId);
-
-    // Extract all four timing fields
-    ZonedDateTime expectedArrivalTime = call.getExpectedArrivalTime();
-    ZonedDateTime aimedArrivalTime = call.getAimedArrivalTime();
-    ZonedDateTime expectedDepartureTime = call.getExpectedDepartureTime();
-    ZonedDateTime aimedDepartureTime = call.getAimedDepartureTime();
-
-    // Special handling for first and last stops
-    CarpoolStopType stopType;
-    int passengerDelta;
-
-    if (isFirst) {
-      // Origin: PICKUP_ONLY, no passengers initially, only departure times
-      stopType = CarpoolStopType.PICKUP_ONLY;
-      passengerDelta = 0;
-      expectedArrivalTime = null;
-      aimedArrivalTime = null;
-    } else if (isLast) {
-      // Destination: DROP_OFF_ONLY, no passengers remain, only arrival times
-      stopType = CarpoolStopType.DROP_OFF_ONLY;
-      passengerDelta = 0;
-      expectedDepartureTime = null;
-      aimedDepartureTime = null;
-    } else {
-      // Intermediate stop: determine from call data
-      stopType = determineCarpoolStopType(call);
-      passengerDelta = calculatePassengerDelta(call, stopType);
-    }
-
-    return new CarpoolStop(
-      areaStop,
-      stopType,
-      passengerDelta,
-      sequenceNumber,
-      expectedArrivalTime,
-      aimedArrivalTime,
-      expectedDepartureTime,
-      aimedDepartureTime
-    );
+    return toCarpoolStop(call, stopId, isFirst, isLast);
   }
 
   /**
@@ -236,14 +198,47 @@ public class CarpoolSiriMapper {
     }
   }
 
-  private AreaStop buildAreaStop(EstimatedCall call, String id) {
-    var stopAssignments = call.getDepartureStopAssignments();
+  private CarpoolStop toCarpoolStop(EstimatedCall et, String id, boolean isFirst, boolean isLast) {
+    var flexibleArea = toFlexibleArea(et);
+
+    var circleLocation = flexibleArea.getCircularArea();
+    var legacyGeometry = flexibleArea.getPolygon();
+    if (circleLocation == null && legacyGeometry == null) {
+      throw new IllegalArgumentException("Expected exactly location for call: " + et);
+    }
+
+    var centroid = circleLocation == null
+      ? toWgsCoordinate(toPolygon(legacyGeometry))
+      : toWgsCoordinate(circleLocation);
+    CarpoolStopType stopType;
+    if (isFirst) {
+      stopType = CarpoolStopType.PICKUP_ONLY;
+    } else if (isLast) {
+      stopType = CarpoolStopType.DROP_OFF_ONLY;
+    } else {
+      stopType = determineCarpoolStopType(et);
+    }
+
+    return CarpoolStop.of(new FeedScopedId(FEED_ID, id), COUNTER::getAndIncrement)
+      .withName(I18NString.of(et.getStopPointNames().getFirst().getValue()))
+      .withCentroid(centroid)
+      .withCarpoolStopType(stopType)
+      .withAimedDepartureTime(isLast ? null : et.getAimedDepartureTime())
+      .withExpectedDepartureTime(isLast ? null : et.getExpectedDepartureTime())
+      .withAimedArrivalTime(isFirst ? null : et.getAimedArrivalTime())
+      .withExpectedArrivalTime(isFirst ? null : et.getExpectedArrivalTime())
+      .withPassengerDelta(isLast ? 0 : calculatePassengerDelta(et, stopType))
+      .build();
+  }
+
+  private AimedFlexibleArea toFlexibleArea(EstimatedCall et) {
+    var stopAssignments = et.getDepartureStopAssignments();
     if (stopAssignments == null || stopAssignments.isEmpty()) {
-      stopAssignments = call.getArrivalStopAssignments();
+      stopAssignments = et.getArrivalStopAssignments();
     }
 
     if (stopAssignments == null || stopAssignments.size() != 1) {
-      throw new IllegalArgumentException("Expected exactly one stop assignment for call: " + call);
+      throw new IllegalArgumentException("Expected exactly one stop assignment for call: " + et);
     }
     var flexibleArea = stopAssignments.getFirst().getExpectedFlexibleArea();
 
@@ -251,15 +246,10 @@ public class CarpoolSiriMapper {
       throw new IllegalArgumentException("Missing flexible area for stop");
     }
 
-    var polygon = createPolygonFromGml(flexibleArea.getPolygon());
-
-    return AreaStop.of(new FeedScopedId(FEED_ID, id), COUNTER::getAndIncrement)
-      .withName(I18NString.of(call.getStopPointNames().getFirst().getValue()))
-      .withGeometry(polygon)
-      .build();
+    return flexibleArea;
   }
 
-  private Polygon createPolygonFromGml(PolygonType gmlPolygon) {
+  private Polygon toPolygon(PolygonType gmlPolygon) {
     var abstractRing = gmlPolygon.getExterior().getAbstractRing().getValue();
 
     if (!(abstractRing instanceof LinearRingType linearRing)) {
@@ -276,5 +266,21 @@ public class CarpoolSiriMapper {
 
     LinearRing shell = GEOMETRY_FACTORY.createLinearRing(coords);
     return GEOMETRY_FACTORY.createPolygon(shell);
+  }
+
+  private WgsCoordinate toWgsCoordinate(CircularAreaStructure circle) {
+    double lat = circle.getLatitude().doubleValue();
+    double lon = circle.getLongitude().doubleValue();
+
+    return new WgsCoordinate(lat, lon);
+  }
+
+  private WgsCoordinate toWgsCoordinate(Polygon geometry) {
+    var centroid = geometry.getCentroid();
+
+    double lon = centroid.getX();
+    double lat = centroid.getY();
+
+    return new WgsCoordinate(lat, lon);
   }
 }
