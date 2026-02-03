@@ -20,13 +20,12 @@ class MeterRegistrySetup {
   public static final String influxPasswordEnvVariable = "PERFORMANCE_INFLUX_DB_PASSWORD";
 
   public static Optional<MeterRegistry> getRegistry() {
-    return influxPassword()
-      .map(password -> {
-        System.err.println(
-          "Selecting InfluxDB as metrics registry. Sending data at end of speed test."
-        );
-        return MeterRegistrySetup.influxRegistry(password);
-      });
+    return influxPassword().map(password -> {
+      System.err.println(
+        "Selecting InfluxDB as metrics registry. Sending data at end of speed test."
+      );
+      return MeterRegistrySetup.influxRegistry(password);
+    });
   }
 
   static Optional<String> influxPassword() {

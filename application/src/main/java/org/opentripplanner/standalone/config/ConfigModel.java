@@ -138,7 +138,7 @@ public class ConfigModel {
     ) {
       throw new OtpAppException(
         "Configuration contains unknown parameters (see above for details). " +
-        "Please fix your configuration or remove --abortOnUnknownConfig from your OTP CLI parameters."
+          "Please fix your configuration or remove --abortOnUnknownConfig from your OTP CLI parameters."
       );
     }
   }

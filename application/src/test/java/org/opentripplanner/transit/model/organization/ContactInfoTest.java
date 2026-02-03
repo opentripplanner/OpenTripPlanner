@@ -51,14 +51,14 @@ class ContactInfoTest {
   void testToString() {
     assertEquals(
       "ContactInfo{" +
-      "contactPerson: 'name', " +
-      "phoneNumber: '+47 95566333', " +
-      "eMail: 'email@aaa.com', " +
-      "faxNumber: '+47 99966001', " +
-      "infoUrl: 'http://info.aaa.com', " +
-      "bookingUrl: 'http://book.aaa.com', " +
-      "additionalDetails: 'Extra info'" +
-      "}",
+        "contactPerson: 'name', " +
+        "phoneNumber: '+47 95566333', " +
+        "eMail: 'email@aaa.com', " +
+        "faxNumber: '+47 99966001', " +
+        "infoUrl: 'http://info.aaa.com', " +
+        "bookingUrl: 'http://book.aaa.com', " +
+        "additionalDetails: 'Extra info'" +
+        "}",
       subject.toString()
     );
   }

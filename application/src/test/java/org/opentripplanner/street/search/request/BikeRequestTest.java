@@ -83,12 +83,12 @@ class BikeRequestTest {
     assertEquals("BikeRequest{}", BikeRequest.DEFAULT.toString());
     assertEquals(
       "BikeRequest{" +
-      "speed: 2.0, " +
-      "reluctance: 1.2, " +
-      "parking: ParkingRequest{cost: $30}, " +
-      "rental: RentalRequest{pickupTime: 30s}, " +
-      "optimizeType: TRIANGLE, " +
-      "optimizeTriangle: [time: 0.0, slope: 1.0, safety: 0.0]}",
+        "speed: 2.0, " +
+        "reluctance: 1.2, " +
+        "parking: ParkingRequest{cost: $30}, " +
+        "rental: RentalRequest{pickupTime: 30s}, " +
+        "optimizeType: TRIANGLE, " +
+        "optimizeTriangle: [time: 0.0, slope: 1.0, safety: 0.0]}",
       subject.toString()
     );
   }

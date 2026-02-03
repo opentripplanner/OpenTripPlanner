@@ -1,0 +1,7 @@
+{
+  "configVersion": "Performance Test Washington State",
+  "flex": {
+    "maxAccessWalkDuration": "10m",
+    "maxEgressWalkDuration": "10m"
+  }
+}

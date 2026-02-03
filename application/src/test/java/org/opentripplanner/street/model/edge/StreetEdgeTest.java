@@ -49,14 +49,19 @@ public class StreetEdgeTest {
 
   @BeforeEach
   void before() {
-    v0 = intersectionVertex("maple_0th", 0.0, 0.0); // label, X, Y
+    v0 = intersectionVertex("maple_0th", 0.0, 0.0);
     v1 = intersectionVertex("maple_1st", 2.0, 2.0);
     v2 = intersectionVertex("maple_2nd", 2.0, 1.0);
 
     this.proto = StreetSearchRequest.of()
       .withTurnReluctance(1.0)
       .withWalk(it -> it.withSpeed(1.0).withReluctance(1.0).withStairsReluctance(1.0))
-      .withBike(it -> it.withSpeed(5.0f).withReluctance(1.0).withWalking(w -> w.withSpeed(0.8)))
+      .withBike(it ->
+        it
+          .withSpeed(5.0f)
+          .withReluctance(1.0)
+          .withWalking(w -> w.withSpeed(0.8))
+      )
       .withCar(c -> c.withReluctance(1.0))
       .build();
   }
@@ -336,9 +341,11 @@ public class StreetEdgeTest {
       .buildAndConnect();
 
     Coordinate[] profile = new Coordinate[] {
-      new Coordinate(0, 0), // slope = 0.1
+      // slope = 0.1
+      new Coordinate(0, 0),
       new Coordinate(length / 2, length / 20.0),
-      new Coordinate(length, 0), // slope = -0.1
+      // slope = -0.1
+      new Coordinate(length, 0),
     };
     PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
     StreetElevationExtensionBuilder.of(testStreet)

@@ -16,13 +16,8 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class GermanyMapperTest {
 
-  static WayPropertySet wps = new WayPropertySet();
+  static final WayPropertySet wps = new GermanyMapper().buildWayPropertySet();
   static float epsilon = 0.01f;
-
-  static {
-    var source = new GermanyMapper();
-    source.populateProperties(wps);
-  }
 
   /**
    * Test that bike safety factors are calculated accurately
@@ -107,8 +102,8 @@ public class GermanyMapperTest {
     way.addTag("highway", "track");
     way.addTag("tracktype", "grade1");
     assertEquals(
-      wps.getDataForEntity(way).getPermission(),
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      wps.getDataForEntity(way).getPermission()
     );
 
     // https://www.openstreetmap.org/way/5155805

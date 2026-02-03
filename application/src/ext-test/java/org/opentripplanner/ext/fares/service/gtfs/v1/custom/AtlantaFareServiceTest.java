@@ -208,7 +208,11 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     assertTrue(fares.getLegProducts().isEmpty());
     var itineraryProducts = fares.getItineraryProducts();
     assertFalse(itineraryProducts.isEmpty());
-    var fp = itineraryProducts.stream().filter(p -> p.name().equals("regular")).findAny().get();
+    var fp = itineraryProducts
+      .stream()
+      .filter(p -> p.name().equals("regular"))
+      .findAny()
+      .get();
     assertEquals(Money.usDollars(3.49f), fp.price());
   }
 
@@ -309,7 +313,8 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         case "102" -> DEFAULT_TEST_RIDE_PRICE.plus(usDollars(2));
         case "atlsc" -> DEFAULT_TEST_RIDE_PRICE.minus(usDollars(1));
         case "blue" -> Money.ZERO_USD;
-        default -> DEFAULT_TEST_RIDE_PRICE; // free circulator
+        // free circulator
+        default -> DEFAULT_TEST_RIDE_PRICE;
       };
     }
   }

@@ -24,6 +24,8 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
+import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
@@ -34,7 +36,10 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
+import org.opentripplanner.street.model.vertex.OsmElevatorVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.utils.collection.ListUtils;
 
@@ -107,6 +112,8 @@ public class DebugStyleSpec {
     EscalatorEdge.class,
     PathwayEdge.class,
     ElevatorHopEdge.class,
+    ElevatorBoardEdge.class,
+    ElevatorAlightEdge.class,
     TemporaryPartialStreetEdge.class,
     TemporaryFreeEdge.class,
   };
@@ -119,7 +126,7 @@ public class DebugStyleSpec {
   private static final String RENTAL_GROUP = "Rental";
   private static final String PERMISSIONS_GROUP = "Permissions";
   private static final String NO_THRU_TRAFFIC_GROUP = "No-thru traffic";
-  private static final String ELEVATORS_GROUP = "Elevators";
+  private static final String VERTICAL_TRANSPORTATION_GROUP = "Vertical transportation";
 
   private static final StreetTraversalPermission[] streetModes = new StreetTraversalPermission[] {
     StreetTraversalPermission.PEDESTRIAN,
@@ -259,6 +266,28 @@ public class DebugStyleSpec {
         .circleColor(DARK_GREEN)
         .minZoom(13)
         .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("barrier-vertex")
+        .group(VERTICES_GROUP)
+        .typeCircle()
+        .vectorSourceLayer(vertices)
+        .vertexFilter(BarrierVertex.class)
+        .circleStroke(BLACK, CIRCLE_STROKE)
+        .circleRadius(MEDIUM_CIRCLE_RADIUS)
+        .circleColor(DARK_RED)
+        .minZoom(13)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("barrier-passthrough-vertex")
+        .group(VERTICES_GROUP)
+        .typeCircle()
+        .vectorSourceLayer(vertices)
+        .vertexFilter(BarrierPassThroughVertex.class)
+        .circleStroke(BLACK, CIRCLE_STROKE)
+        .circleRadius(MEDIUM_CIRCLE_RADIUS)
+        .circleColor(DARK_BLUE)
+        .minZoom(13)
+        .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );
   }
@@ -266,7 +295,7 @@ public class DebugStyleSpec {
   private static List<StyleBuilder> elevators(VectorSourceLayer edges, VectorSourceLayer vertices) {
     return List.of(
       StyleBuilder.ofId("elevator-hop-edge")
-        .group(ELEVATORS_GROUP)
+        .group(VERTICAL_TRANSPORTATION_GROUP)
         .typeLine()
         .vectorSourceLayer(edges)
         .edgeFilter(ElevatorHopEdge.class)
@@ -276,8 +305,30 @@ public class DebugStyleSpec {
         .minZoom(6)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
-      StyleBuilder.ofId("elevator-vertex")
-        .group(ELEVATORS_GROUP)
+      StyleBuilder.ofId("elevator-board-edge")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .edgeFilter(ElevatorBoardEdge.class)
+        .lineColor(ORANGE)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("elevator-alight-edge")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .edgeFilter(ElevatorAlightEdge.class)
+        .lineColor(ORANGE)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("elevator-hop-vertex")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
         .typeCircle()
         .vectorSourceLayer(vertices)
         .vertexFilter(ElevatorHopVertex.class)
@@ -287,6 +338,41 @@ public class DebugStyleSpec {
         )
         .circleColor(ORANGE)
         .minZoom(15)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("osm-elevator-vertex")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeCircle()
+        .vectorSourceLayer(vertices)
+        .vertexFilter(OsmElevatorVertex.class)
+        .circleStroke(BLACK, CIRCLE_STROKE)
+        .circleRadius(
+          new ZoomDependentNumber(List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 7)))
+        )
+        .circleColor(ORANGE)
+        .minZoom(15)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("escalator-edge")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .edgeFilter(EscalatorEdge.class)
+        .lineColor(ORANGE)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("stairs-edge")
+        .group(VERTICAL_TRANSPORTATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .booleanFilter("isStairs", true)
+        .lineColor(ORANGE)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );

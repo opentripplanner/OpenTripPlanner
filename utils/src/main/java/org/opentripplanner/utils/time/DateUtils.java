@@ -53,7 +53,8 @@ public class DateUtils {
     if (date != null) {
       LocalDate localDate = parseDate(date);
       if (localDate == null) {
-        return null; //unparseable date
+        //unparseable date
+        return null;
       }
       boolean timed = false;
       if (time != null) {

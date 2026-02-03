@@ -83,6 +83,9 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
   private static Collection<NearbyStop> removeTransferNotAllowedStops(
     Collection<NearbyStop> nearbyStops
   ) {
-    return nearbyStops.stream().filter(s -> !s.stop.transfersNotAllowed()).toList();
+    return nearbyStops
+      .stream()
+      .filter(s -> !s.stop.transfersNotAllowed())
+      .toList();
   }
 }

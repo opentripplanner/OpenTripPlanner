@@ -59,6 +59,16 @@ public class ReverseRaptorTransitCalculatorTest {
   }
 
   @Test
+  public void isInIteration() {
+    var subject = create();
+
+    assertFalse(subject.isInIteration(60, 120));
+    assertTrue(subject.isInIteration(61, 120));
+    assertTrue(subject.isInIteration(120, 120));
+    assertFalse(subject.isInIteration(121, 120));
+  }
+
+  @Test
   public void rangeRaptorMinutes() {
     latestArrivalTime = 500;
     searchWindowSizeInSeconds = 200;
@@ -75,8 +85,10 @@ public class ReverseRaptorTransitCalculatorTest {
   @Test
   public void getTransfers() {
     var subject = create();
-    var transitData = new TestTransitData()
-      .withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D1m));
+    var transitData = new TestTransitData().withTransfer(
+      STOP_A,
+      TestTransfer.transfer(STOP_B, D1m)
+    );
 
     // Expect transfer from stop A to stop B (reversed)
     var transfersFromStopB = subject.getTransfers(transitData, STOP_B);

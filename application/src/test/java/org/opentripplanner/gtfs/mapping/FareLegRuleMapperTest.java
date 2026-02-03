@@ -197,7 +197,11 @@ class FareLegRuleMapperTest {
   private static String toStr(
     Collection<org.opentripplanner.ext.fares.model.Timeframe> timeframes
   ) {
-    return timeframes.stream().map(t -> t.toString()).toList().toString();
+    return timeframes
+      .stream()
+      .map(t -> t.toString())
+      .toList()
+      .toString();
   }
 
   private static FareProduct cashProduct(FareMedium creditMedium) {

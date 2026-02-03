@@ -178,16 +178,20 @@ public abstract class SphericalDistanceLibrary {
 
   public static double distance(double lat1, double lon1, double lat2, double lon2, double radius) {
     // http://en.wikipedia.org/wiki/Great-circle_distance
-    lat1 = toRadians(lat1); // Theta-s
-    lon1 = toRadians(lon1); // Lambda-s
-    lat2 = toRadians(lat2); // Theta-f
-    lon2 = toRadians(lon2); // Lambda-f
+    // Theta-s
+    lat1 = toRadians(lat1);
+    // Lambda-s
+    lon1 = toRadians(lon1);
+    // Theta-f
+    lat2 = toRadians(lat2);
+    // Lambda-f
+    lon2 = toRadians(lon2);
 
     double deltaLon = lon2 - lon1;
 
     double y = sqrt(
       p2(cos(lat2) * sin(deltaLon)) +
-      p2(cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(deltaLon))
+        p2(cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(deltaLon))
     );
     double x = sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(deltaLon);
 

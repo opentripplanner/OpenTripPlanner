@@ -79,7 +79,7 @@ mvn test -Dtest=ClassName
 mvn test -Dtest=ClassName#methodName
 
 # Speed test (requires pre-built graph)
-mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" \
+mvn --projects application exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" \
   -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/norway -p md -n 4 -i 3 -0"
 ```
 
@@ -226,7 +226,7 @@ Performance is critical. The SpeedTest runs automatically after each merged PR.
 
 ```bash
 # Run speed test locally (requires pre-built graph in test/performance/<location>)
-mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" \
+mvn --projects application exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" \
   -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/norway -p md -n 4 -i 3 -0"
 ```
 

@@ -1306,6 +1306,13 @@ type QueryType {
     """
     before: String,
     """
+    Can be used to filter the results. When paging, the filter should not be changed between pages.
+        
+    An empty list of filters or no value means that all trips should be included. Only one filter
+    is allowed for now. Once new filtering criteria is introduced, this limitation will be removed.
+    """
+    filters: [CanceledTripsFilterInput!],
+    """
     Limits how many trips are returned. This parameter is part of the
     [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm) and can be used together with
     the `after` parameter.
@@ -1788,6 +1795,8 @@ type QueryType {
     in the first search).
     """
     first: Int,
+    "Parameters that affect flexible transport routing per request."
+    flex: FlexRequest,
     """
     Settings that control the behavior of itinerary filtering. These are advanced settings and
     should not be set by a user through user preferences.
@@ -2043,6 +2052,24 @@ type RentalVehicleTypeCount {
   vehicleType: RentalVehicleType!
 }
 
+"""
+Relation for indicating the TripOnServiceDate which is replacing an older one. Exists as a
+place to put additional information on the replacement when we get SIRI 2.1 support.
+"""
+type ReplacedByRelation {
+  "The replacing TripOnServiceDate."
+  tripOnServiceDate: TripOnServiceDate
+}
+
+"""
+Relation for indicating the TripOnServiceDate which is being replaced by a newer one. Exists
+as a place to put additional information on the replacement when we get SIRI 2.1 support.
+"""
+type ReplacementForRelation {
+  "The TripOnServiceDate being replaced."
+  tripOnServiceDate: TripOnServiceDate
+}
+
 "An estimate for a ride on a hailed vehicle, like an Uber car."
 type RideHailingEstimate {
   "The estimated time it takes for the vehicle to arrive."
@@ -2111,6 +2138,14 @@ type Route implements Node {
   gtfsId: String!
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
   id: ID!
+  """
+  Is this a replacement route.
+  Only true for GTFS-sourced data if set by the extended GTFS route type, because GTFS does not implement
+  replacement links, so replacement trips in GTFS cannot mechanically state their original trip.
+  In NeTEx/SIRI-sourced data this can be set by either a replacement submode, or a replacement
+  link in a DatedServiceJourney.
+  """
+  isReplacement: Boolean!
   "Long name of the route, e.g. Helsinki-Leppävaara"
   longName(
     """
@@ -2132,6 +2167,12 @@ type Route implements Node {
     """
     serviceDates: LocalDateRangeInput
   ): [Pattern]
+  """
+  Do any trips of this route have any linked replacements.
+  Only ever true with NeTEx or SIRI, because GTFS does not implement replacement
+  links, so replacement trips in GTFS cannot mechanically state their original trip.
+  """
+  replacementsExist: Boolean!
   "Short name of the route, usually a line number, e.g. 550"
   shortName: String
   """
@@ -2612,12 +2653,26 @@ type Trip implements Node {
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
   id: ID!
   """
+  Is this a replacement trip.
+  Only true for GTFS-sourced data if set by the extended GTFS route type, because GTFS does not implement
+  replacement links, so replacement trips in GTFS cannot mechanically state their original trip.
+  In NeTEx/SIRI-sourced data this can be set by either a replacement submode, or a replacement
+  link in a DatedServiceJourney.
+  """
+  isReplacement: Boolean!
+  """
   The latest real-time occupancy information for the latest occurance of this
   trip.
   """
   occupancy: TripOccupancy
   "The pattern the trip is running on"
   pattern: Pattern
+  """
+  Does this trip have any linked replacements.
+  Only ever true with NeTEx or SIRI, because GTFS does not implement replacement
+  links, so replacement trips in GTFS cannot mechanically state their original trip.
+  """
+  replacementsExist: Boolean!
   "The route the trip is running on"
   route: Route!
   "Short name of the route this trip is running. See field `shortName` of Route."
@@ -2668,6 +2723,12 @@ type TripOccupancy {
 type TripOnServiceDate {
   "Information related to trip's scheduled arrival to the final stop location. Can contain real-time information."
   end: StopCall!
+  "Is this TripOnServiceDate a replacement? For GTFS-sourced data this might be all we know."
+  isReplacement: Boolean
+  "Replaced by these TripOnServiceDates."
+  replacedByRelation: [ReplacedByRelation!]!
+  "Replacement for these TripOnServiceDates."
+  replacementForRelation: [ReplacementForRelation!]!
   """
   The service date when the trip occurs.
     
@@ -2699,6 +2760,13 @@ type TripOnServiceDateConnection {
   Part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
   """
   pageInfo: PageInfo!
+  """
+  The total number of trips on service dates in this connection at the time of query execution (including the current and previous
+  pages).
+  Note, this number might not stay the same throughout the paging as trips might be added or
+  removed.
+  """
+  totalCount: Int!
 }
 
 """
@@ -3222,9 +3290,9 @@ enum FilterPlaceType {
   "Old value for VEHICLE_RENT"
   BICYCLE_RENT @deprecated(reason : "Use VEHICLE_RENT instead as it's clearer that it also returns rental scooters, cars...")
   "Parking lots (not rental stations) that contain spaces for bicycles"
-  BIKE_PARK @deprecated(reason : "Not supported.")
+  BIKE_PARK
   "Parking lots that contain spaces for cars"
-  CAR_PARK @deprecated(reason : "Not supported.")
+  CAR_PARK
   "Departure rows"
   DEPARTURE_ROW
   """
@@ -4169,6 +4237,34 @@ input BoardPreferencesInput {
   waitReluctance: Reluctance
 }
 
+"""
+A collection of selectors for including or excluding trips from canceled trips search. Currently,
+you can only use either include or exclude filter (as filtering is only supported with transit modes).
+"""
+input CanceledTripsFilterInput @oneOf {
+  """
+  A list of selectors for excluding canceled trips.
+    
+  An empty list or a list containing `null` is forbidden.
+  """
+  exclude: [CanceledTripsFilterSelectInput!]
+  """
+  A list of selectors for including canceled trips.
+    
+  An empty list or a list containing `null` is forbidden.
+  """
+  include: [CanceledTripsFilterSelectInput!]
+}
+
+"""
+A list of selectors for including or excluding trips from canceled trips search. Null
+means everything is allowed to be returned and empty lists are not allowed.
+"""
+input CanceledTripsFilterSelectInput {
+  "Canceled trips from these transit modes should be included/excluded."
+  modes: [TransitMode!]
+}
+
 "Preferences for car parking facilities used during the routing."
 input CarParkingPreferencesInput {
   """
@@ -4260,6 +4356,19 @@ input DestinationScooterPolicyInput {
   scooter.
   """
   keepingCost: Cost
+}
+
+"Parameters that affect flexible transport routing per request."
+input FlexRequest {
+  """
+  The date and time for the latest time the user is expected to book the journey.
+  Normally this is when the search is performed (now), plus a small grace period to
+  complete the booking. Services which must be booked before this time are excluded. The
+  `latestBookingTime` and `minimumBookingPeriod` in `BookingArrangement` (flexible
+  services only) are used to enforce this. If this parameter is _not set_, no booking-time
+  restrictions are applied - all journeys are listed.
+  """
+  bookingTime: OffsetDateTime
 }
 
 input InputBanned {

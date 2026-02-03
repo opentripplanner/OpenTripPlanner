@@ -12,7 +12,7 @@ import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesF
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.calendar.LocalDateInterval;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
@@ -43,7 +43,7 @@ public class NetexModule implements GraphBuilderModule {
    * @see BuildConfig#transitServiceStart
    * @see BuildConfig#transitServiceEnd
    */
-  private final ServiceDateInterval transitPeriodLimit;
+  private final LocalDateInterval transitPeriodLimit;
 
   private final List<NetexBundle> netexBundles;
 
@@ -55,7 +55,7 @@ public class NetexModule implements GraphBuilderModule {
     StreetDetailsRepository streetDetailsRepository,
     DataImportIssueStore issueStore,
     int subwayAccessTime,
-    ServiceDateInterval transitPeriodLimit,
+    LocalDateInterval transitPeriodLimit,
     List<NetexBundle> netexBundles
   ) {
     this.graph = graph;

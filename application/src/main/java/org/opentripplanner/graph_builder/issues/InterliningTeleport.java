@@ -13,8 +13,7 @@ public record InterliningTeleport(
   int distance,
   StopLocation fromStop,
   StopLocation toStop
-)
-  implements DataImportIssue {
+) implements DataImportIssue {
   private static final String FMT =
     "Interlining trip '%s' on block '%s' between %s and %s implies teleporting %d meters.";
 

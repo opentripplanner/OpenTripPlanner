@@ -75,7 +75,10 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
     if (service.isPartOfConsolidatedStop(last.from().stop) && isShortWalkLeg(last)) {
       legs.removeLast();
     }
-    var filteredLegs = legs.stream().filter(l -> !isTransferWithinConsolidatedStop(l)).toList();
+    var filteredLegs = legs
+      .stream()
+      .filter(l -> !isTransferWithinConsolidatedStop(l))
+      .toList();
     builder.withLegs(filteredLegs);
   }
 

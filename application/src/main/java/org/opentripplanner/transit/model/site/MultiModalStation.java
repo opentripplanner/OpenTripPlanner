@@ -59,7 +59,9 @@ public class MultiModalStation
   }
 
   public Collection<StopLocation> getChildStops() {
-    return this.childStations.stream().flatMap(s -> s.getChildStops().stream()).toList();
+    return this.childStations.stream()
+      .flatMap(s -> s.getChildStops().stream())
+      .toList();
   }
 
   @Override

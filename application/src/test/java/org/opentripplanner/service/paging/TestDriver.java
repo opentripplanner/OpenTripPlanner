@@ -147,7 +147,10 @@ final class TestDriver {
 
     // Simulate Raptor - apply LAT filtering done by raptor
     if (lat != null) {
-      kept = kept.stream().filter(it -> !lat.isBefore(it.endTime().toInstant())).toList();
+      kept = kept
+        .stream()
+        .filter(it -> !lat.isBefore(it.endTime().toInstant()))
+        .toList();
     }
 
     //Page filter

@@ -42,6 +42,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [server](#server)                                                                         |        `object`       | Configuration for router server.                                                                                                                                                                                     | *Optional* |               |  2.4  |
 |    [apiDocumentationProfile](#server_apiDocumentationProfile)                             |         `enum`        | List of available custom documentation profiles. A profile is used to inject custom documentation like type and field description or a deprecated reason.  Currently, ONLY the Transmodel API supports this feature. | *Optional* | `"default"`   |  2.7  |
 |    [apiProcessingTimeout](#server_apiProcessingTimeout)                                   |       `duration`      | Maximum processing time for an API request                                                                                                                                                                           | *Optional* | `"PT-1S"`     |  2.4  |
+|    [httpResponseTimeMetrics](#server_httpResponseTimeMetrics)                             |        `object`       | Configuration for HTTP response time metrics.                                                                                                                                                                        | *Optional* |               |  2.9  |
 |    [traceParameters](#server_traceParameters)                                             |       `object[]`      | Trace OTP request using HTTP request/response parameter(s) combined with logging.                                                                                                                                    | *Optional* |               |  2.4  |
 |          generateIdIfMissing                                                              |       `boolean`       | If `true` a unique value is generated if no http request header is provided, or the value is missing.                                                                                                                | *Optional* | `false`       |  2.4  |
 |          httpRequestHeader                                                                |        `string`       | The header-key to use when fetching the trace parameter value                                                                                                                                                        | *Optional* |               |  2.4  |
@@ -146,6 +147,19 @@ This timeout limits the server-side processing time for a given API request. Thi
 network latency nor waiting time in the HTTP server thread pool. The default value is
 `-1s`(no timeout). The timeout is applied to all APIs (Transmodel & GTFS GraphQL).
 The timeout is not enforced when the parallel routing OTP feature is in use.
+
+
+<h3 id="server_httpResponseTimeMetrics">httpResponseTimeMetrics</h3>
+
+**Since version:** `2.9` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /server 
+
+Configuration for HTTP response time metrics.
+
+When enabled, records response time metrics per client. The client is identified by a
+configurable HTTP header (`clientHeader`). Only clients in the `monitoredClients` list are
+tracked individually; unknown clients are grouped under "other" to prevent metric
+cardinality explosion. Requires the ActuatorAPI feature to be enabled.
 
 
 <h3 id="server_traceParameters">traceParameters</h3>
@@ -495,10 +509,12 @@ Used to group requests when monitoring OTP.
     "numItineraries" : 12,
     "transferPenalty" : 0,
     "turnReluctance" : 1.0,
-    "elevatorBoardTime" : 90,
-    "elevatorBoardCost" : 90,
-    "elevatorHopTime" : 20,
-    "elevatorHopCost" : 20,
+    "elevator" : {
+      "boardCost" : 15,
+      "boardSlack" : "90s",
+      "hopTime" : "20s",
+      "reluctance" : 2.0
+    },
     "bicycle" : {
       "speed" : 5,
       "reluctance" : 5.0,
@@ -640,6 +656,12 @@ Used to group requests when monitoring OTP.
       "maxSlope" : 0.083,
       "slopeExceededReluctance" : 1,
       "stairsReluctance" : 100
+    },
+    "directTransitSearch" : {
+      "enabled" : false,
+      "costRelaxFunction" : "15m + 1.5t",
+      "maxAccessEgressDuration" : "5m",
+      "extraAccessEgressReluctance" : 2
     }
   },
   "flex" : {

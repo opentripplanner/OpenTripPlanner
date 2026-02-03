@@ -68,7 +68,7 @@ public class DistanceBasedFilter implements TripFilter {
       ) {
         LOG.debug(
           "Trip {} accepted by distance filter: passenger journey close to segment {} ({} to {}). " +
-          "Pickup distance: {:.0f}m, Dropoff distance: {:.0f}m (max: {:.0f}m)",
+            "Pickup distance: {:.0f}m, Dropoff distance: {:.0f}m (max: {:.0f}m)",
           trip.getId(),
           i,
           segmentStart,

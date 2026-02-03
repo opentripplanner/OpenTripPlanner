@@ -23,6 +23,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
@@ -270,11 +271,10 @@ public class LegacyTimetableSnapshotIntegrationTest {
     LocalDate serviceDate
   ) {
     final Timetable scheduledTimetable = pattern.getScheduledTimetable();
-    var result = TripTimesUpdater.createUpdatedTripTimesFromGtfsRt(
+    var ttUpdater = new TripTimesUpdater(timeZone, new Deduplicator());
+    var result = ttUpdater.createUpdatedTripTimesFromGtfsRt(
       scheduledTimetable,
-      new TripUpdate(tripUpdate),
-      timeZone,
-      serviceDate,
+      new TripUpdate(feedId, tripUpdate, () -> serviceDate),
       ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );

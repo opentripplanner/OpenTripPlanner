@@ -254,8 +254,9 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   }
 
   private void timeShiftAllStreetLegs() {
-    legsAsStream()
-      .forEach(leg -> leg.timeShiftThisAndNextLeg(slackProvider, iterationDepartureTime));
+    legsAsStream().forEach(leg ->
+      leg.timeShiftThisAndNextLeg(slackProvider, iterationDepartureTime)
+    );
   }
 
   private void insertConstrainedTransfers() {

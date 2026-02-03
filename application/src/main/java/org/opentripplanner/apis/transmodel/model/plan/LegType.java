@@ -102,7 +102,10 @@ public class LegType {
           .name("aimedEndTime")
           .description("The aimed date and time this leg ends.")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(env -> leg(env).endTime().minusSeconds(leg(env).arrivalDelay())) // endTime is already adjusted for real-time - need to subtract delay to get aimed time
+          .dataFetcher(env -> {
+            // endTime is already adjusted for real-time - need to subtract delay to get aimed time
+            return leg(env).endTime().minusSeconds(leg(env).arrivalDelay());
+          })
           .build()
       )
       .field(
@@ -133,8 +136,8 @@ public class LegType {
           .dataFetcher(environment ->
             ((Leg) environment.getSource()).trip() != null
               ? TransmodelTransportSubmode.fromValue(
-                ((Leg) environment.getSource()).trip().getNetexSubMode()
-              )
+                  ((Leg) environment.getSource()).trip().getNetexSubMode()
+                )
               : null
           )
           .build()

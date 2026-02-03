@@ -116,7 +116,7 @@ class CalendarRowTest {
   void testToString() {
     assertEquals(
       "CalendarRow[serviceId=MON, monday=true, tuesday=false, wednesday=false, thursday=false, " +
-      "friday=false, saturday=false, sunday=false, startDate=2025-01-01, endDate=2025-12-31]",
+        "friday=false, saturday=false, sunday=false, startDate=2025-01-01, endDate=2025-12-31]",
       MON.toString()
     );
   }

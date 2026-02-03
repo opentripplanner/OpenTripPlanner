@@ -9,15 +9,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
 import org.opentripplanner.osm.DefaultOsmProvider;
+import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmMemberType;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.utils.collection.ListUtils;
 
 public class OsmDatabaseTest {
 
@@ -181,12 +181,12 @@ public class OsmDatabaseTest {
     multipolygon.addMember(innerMember);
     multipolygon.addMember(innerBarrierMember);
 
-    var provider = new TestOsmProvider(
+    var provider = TestOsmProvider.of().build();
+    ListUtils.combine(
       List.of(multipolygon),
       List.of(simpleArea, outerRing, innerRing, innerRingWithBarrier),
       List.of(n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15)
-    );
-    new OsmTagMapper().populateProperties(provider.getWayPropertySet());
+    ).forEach(e -> e.setOsmProvider(provider));
 
     var osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
     osmdb.addRelation(multipolygon);

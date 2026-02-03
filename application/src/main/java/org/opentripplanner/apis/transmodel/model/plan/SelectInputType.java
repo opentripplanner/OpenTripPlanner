@@ -12,10 +12,10 @@ public class SelectInputType {
     .name("TripFilterSelectInput")
     .description(
       "A list of selectors for filter allow-list / exclude-list. " +
-      "An empty list means that everything is allowed. " +
-      "A trip/line will match with selectors if it matches with all non-empty lists. " +
-      "The `select` is always applied first, then `not`. If only `not` not is present, the exclude " +
-      "is applied to the existing set of lines. "
+        "An empty list means that everything is allowed. " +
+        "A trip/line will match with selectors if it matches with all non-empty lists. " +
+        "The `select` is always applied first, then `not`. If only `not` not is present, the exclude " +
+        "is applied to the existing set of lines. "
     )
     .field(
       GraphQLInputObjectField.newInputObjectField()
@@ -45,8 +45,8 @@ public class SelectInputType {
         .name("transportModes")
         .description(
           "The allowed modes for the transit part of the trip. Use an empty list to " +
-          "disallow transit for this search. If the element is not present or null, it will " +
-          "default to all transport modes."
+            "disallow transit for this search. If the element is not present or null, it will " +
+            "default to all transport modes."
         )
         .type(new GraphQLList(new GraphQLNonNull(ModeAndSubModeInputType.INPUT_TYPE)))
         .build()

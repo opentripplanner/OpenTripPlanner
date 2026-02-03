@@ -71,8 +71,8 @@ public class OtpDataStore {
   public OtpDataStore(OtpDataStoreConfig config, List<DataSourceRepository> repositories) {
     this.config = config;
     this.repositoryDescriptions.addAll(
-        repositories.stream().map(DataSourceRepository::description).toList()
-      );
+      repositories.stream().map(DataSourceRepository::description).toList()
+    );
     this.allRepositories = repositories;
     this.localRepository = getLocalDataSourceRepo(repositories);
   }

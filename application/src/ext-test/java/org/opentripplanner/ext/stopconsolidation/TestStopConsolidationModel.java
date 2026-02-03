@@ -3,7 +3,6 @@ package org.opentripplanner.ext.stopconsolidation;
 import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -45,6 +44,6 @@ class TestStopConsolidationModel {
   static TimetableRepository buildTimetableRepository() {
     var siteRepositoryBuilder = testModel.siteRepositoryBuilder();
     List.of(STOP_A, STOP_B, STOP_C, STOP_D).forEach(siteRepositoryBuilder::withRegularStop);
-    return new TimetableRepository(siteRepositoryBuilder.build(), new Deduplicator());
+    return new TimetableRepository(siteRepositoryBuilder.build());
   }
 }

@@ -78,8 +78,9 @@ public final class NetexTestDataSupport {
     DayType dayType = new DayType().withId(id);
     if (daysOfWeek != null && daysOfWeek.length > 0) {
       dayType.setProperties(
-        new PropertiesOfDay_RelStructure()
-          .withPropertyOfDay(new PropertyOfDay().withDaysOfWeek(daysOfWeek))
+        new PropertiesOfDay_RelStructure().withPropertyOfDay(
+          new PropertyOfDay().withDaysOfWeek(daysOfWeek)
+        )
       );
     }
     return dayType;
@@ -117,8 +118,9 @@ public final class NetexTestDataSupport {
     Boolean isAvailable
   ) {
     return createDayTypeAssignment(dayTypeId, isAvailable).withOperatingPeriodRef(
-      new ObjectFactory()
-        .createOperatingPeriodRef(new OperatingPeriodRefStructure().withRef(opPeriodId))
+      new ObjectFactory().createOperatingPeriodRef(
+        new OperatingPeriodRefStructure().withRef(opPeriodId)
+      )
     );
   }
 
@@ -217,8 +219,9 @@ public final class NetexTestDataSupport {
 
     if (quay != null) {
       Collection<JAXBElement<?>> jaxbQuays = List.of(OBJECT_FACTORY.createQuay(quay));
-      Quays_RelStructure quays = OBJECT_FACTORY.createQuays_RelStructure()
-        .withQuayRefOrQuay(jaxbQuays);
+      Quays_RelStructure quays = OBJECT_FACTORY.createQuays_RelStructure().withQuayRefOrQuay(
+        jaxbQuays
+      );
       stopPlace.withQuays(quays);
     }
 
@@ -277,9 +280,8 @@ public final class NetexTestDataSupport {
   }
 
   private static SimplePoint_VersionStructure createSimplePoint(Double lat, Double lon) {
-    return new SimplePoint_VersionStructure()
-      .withLocation(
-        new LocationStructure().withLatitude(new BigDecimal(lat)).withLongitude(new BigDecimal(lon))
-      );
+    return new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure().withLatitude(new BigDecimal(lat)).withLongitude(new BigDecimal(lon))
+    );
   }
 }

@@ -103,9 +103,9 @@ public interface DataSource {
   default InputStream asInputStream() {
     throw new UnsupportedOperationException(
       "This datasource type " +
-      getClass().getSimpleName() +
-      " do not support READING. Can not read from: " +
-      path()
+        getClass().getSimpleName() +
+        " do not support READING. Can not read from: " +
+        path()
     );
   }
 
@@ -126,9 +126,9 @@ public interface DataSource {
   default OutputStream asOutputStream() {
     throw new UnsupportedOperationException(
       "This datasource type " +
-      getClass().getSimpleName() +
-      " do not support WRITING. Can not write to: " +
-      path()
+        getClass().getSimpleName() +
+        " do not support WRITING. Can not write to: " +
+        path()
     );
   }
 

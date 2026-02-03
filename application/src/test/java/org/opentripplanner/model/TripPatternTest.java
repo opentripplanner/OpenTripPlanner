@@ -131,8 +131,9 @@ public class TripPatternTest {
     coordinates.add(coordinate);
     coordinates.add(new Coordinate(destination.getLon(), destination.getLat()));
 
-    var l1 = GeometryUtils.getGeometryFactory()
-      .createLineString(coordinates.toArray(Coordinate[]::new));
+    var l1 = GeometryUtils.getGeometryFactory().createLineString(
+      coordinates.toArray(Coordinate[]::new)
+    );
 
     return List.of(l1);
   }

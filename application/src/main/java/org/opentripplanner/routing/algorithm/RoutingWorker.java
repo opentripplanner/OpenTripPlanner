@@ -154,7 +154,11 @@ public class RoutingWorker {
     if (LOG.isDebugEnabled()) {
       LOG.debug(
         "Return TripPlan with {} filtered itineraries out of {} total.",
-        result.itineraries().stream().filter(it -> !it.isFlaggedForDeletion()).count(),
+        result
+          .itineraries()
+          .stream()
+          .filter(it -> !it.isFlaggedForDeletion())
+          .count(),
         result.itineraries().size()
       );
     }

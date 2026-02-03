@@ -145,7 +145,10 @@ public class CarpoolItineraryMapper {
     Vertex fromVertex = firstSegment.states.getFirst().getVertex();
     Vertex toVertex = lastSegment.states.getLast().getVertex();
 
-    var allEdges = sharedSegments.stream().flatMap(seg -> seg.edges.stream()).toList();
+    var allEdges = sharedSegments
+      .stream()
+      .flatMap(seg -> seg.edges.stream())
+      .toList();
 
     CarpoolLeg carpoolLeg = CarpoolLeg.of()
       .withStartTime(startTime)

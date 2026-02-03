@@ -275,7 +275,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
       .searchParams()
       .latestArrivalTime(
         transitData.getValidTransitDataEndTime() +
-        originalRequest.searchParams().accessEgressMaxDurationSeconds()
+          originalRequest.searchParams().accessEgressMaxDurationSeconds()
       )
       .build();
   }

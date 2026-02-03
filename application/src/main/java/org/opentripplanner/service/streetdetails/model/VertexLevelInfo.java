@@ -22,6 +22,7 @@ public class VertexLevelInfo implements Serializable {
     this.osmNodeId = osmNodeId;
   }
 
+  @Nullable
   public Level level() {
     return this.level;
   }

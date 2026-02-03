@@ -20,8 +20,7 @@ public record PatternRideC1<T extends RaptorTripSchedule>(
   int relativeC1,
   int tripSortIndex,
   T trip
-)
-  implements PatternRide<T> {
+) implements PatternRide<T> {
   // Pareto vector: [relativeCost, tripSortIndex]
 
   public static <T extends RaptorTripSchedule> PatternRideFactory<T, PatternRideC1<T>> factory() {

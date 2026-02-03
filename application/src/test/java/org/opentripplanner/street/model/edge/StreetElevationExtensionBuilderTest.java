@@ -29,13 +29,12 @@ class StreetElevationExtensionBuilderTest {
   private static final PackedCoordinateSequence ELEVATION_PROFILE_TWO_POINTS =
     new PackedCoordinateSequence.Double(COORDINATES_TWO_POINTS, 2);
 
-  private static final LineString GEOMETRY = GeometryUtils.getGeometryFactory()
-    .createLineString(
-      new Coordinate[] {
-        StreetModelForTest.V1.getCoordinate(),
-        StreetModelForTest.V2.getCoordinate(),
-      }
-    );
+  private static final LineString GEOMETRY = GeometryUtils.getGeometryFactory().createLineString(
+    new Coordinate[] {
+      StreetModelForTest.V1.getCoordinate(),
+      StreetModelForTest.V2.getCoordinate(),
+    }
+  );
   private StreetEdgeBuilder<?> streetEdgeBuilder;
 
   @BeforeEach

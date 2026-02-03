@@ -9,13 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmLevelSource;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 
 class OsmAreaGroupTest {
 
@@ -176,10 +175,6 @@ class OsmAreaGroupTest {
     ),
     nodes.valueCollection().stream().toList()
   );
-
-  static {
-    new OsmTagMapper().populateProperties(osmProvider.getWayPropertySet());
-  }
 
   @Test
   void shouldGroupWithTwoConsecutiveNodes() {

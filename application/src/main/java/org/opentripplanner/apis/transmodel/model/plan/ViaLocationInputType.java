@@ -20,20 +20,17 @@ public class ViaLocationInputType {
   private static final String INPUT_VISIT_VIA_LOCATION = "TripVisitViaLocationInput";
   private static final String INPUT_PASS_THROUGH_VIA_LOCATION = "TripPassThroughViaLocationInput";
 
-  private static final String DOC_VISIT_VIA_LOCATION =
-    """
+  private static final String DOC_VISIT_VIA_LOCATION = """
     A visit-via-location is a physical visit to one of the stop locations or coordinates listed. An
     on-board visit does not count, the traveler must alight or board at the given stop for it to to
     be accepted. To visit a coordinate, the traveler must walk (bike or drive) to the closest point
     in the street network from a stop and back to another stop to join the transit network.
     """;
-  private static final String DOC_PASS_THROUGH_VIA_LOCATION =
-    """
+  private static final String DOC_PASS_THROUGH_VIA_LOCATION = """
     One of the listed stop locations must be visited on-board a transit vehicle or the journey must
     alight or board at the location.
     """;
-  private static final String DOC_VIA_LOCATION =
-    """
+  private static final String DOC_VIA_LOCATION = """
     A via-location is used to specifying a location as an intermediate place the router must
     route through. The via-location is either a pass-through-location or a visit-via-location.
     """;
@@ -55,13 +52,11 @@ public class ViaLocationInputType {
   private static final String DOC_LABEL =
     "The label/name of the location. This is pass-through " +
     "information and is not used in routing.";
-  private static final String DOC_MINIMUM_WAIT_TIME =
-    """
+  private static final String DOC_MINIMUM_WAIT_TIME = """
     The minimum wait time is used to force the trip to stay the given duration at the
     via-location before the trip is continued.
     """;
-  private static final String DOC_STOP_LOCATION_IDS =
-    """
+  private static final String DOC_STOP_LOCATION_IDS = """
     A list of stop locations. A stop location can be a quay, a stop place, a multimodal
     stop place or a group of stop places. It is enough to visit ONE of the locations
     listed.

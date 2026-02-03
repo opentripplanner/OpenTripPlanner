@@ -37,13 +37,16 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(HashGridSpatialIndex.class);
 
-  /* Computation done based on geographical coordinates. */
-  // private static final double DEFAULT_Y_BIN_SIZE = 0.010; // ~1km
-  private static final double DEFAULT_Y_BIN_SIZE = 0.005; // ~500m
+  /**
+   * Computation done based on geographical coordinates. Default value is ~500 meters.
+   */
+  private static final double DEFAULT_Y_BIN_SIZE = 0.005;
 
-  /* Computation done based on geographical coordinates at ~45 degree lat */
-  // private static final double DEFAULT_X_BIN_SIZE = 0.007; // ~1km
-  private static final double DEFAULT_X_BIN_SIZE = 0.0035; // ~500m
+  /**
+   * Computation done based on geographical coordinates at ~45 degree lat. Default value is ~500
+   * meters.
+   */
+  private static final double DEFAULT_X_BIN_SIZE = 0.0035;
 
   /* Size of bin in X and Y direction, in coordinates units. */
   private final double xBinSize;

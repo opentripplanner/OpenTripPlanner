@@ -14,7 +14,8 @@ public class StreetModeToFormFactorMapper {
       case SCOOTER_RENTAL -> RentalFormFactor.SCOOTER;
       case CAR_RENTAL -> RentalFormFactor.CAR;
       // there is no default here, so you get a compiler error when you add a new value to the enum
-      case NOT_SET,
+      case
+        NOT_SET,
         WALK,
         BIKE,
         BIKE_TO_PARK,

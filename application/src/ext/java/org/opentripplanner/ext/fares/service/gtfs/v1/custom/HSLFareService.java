@@ -130,15 +130,26 @@ public class HSLFareService extends DefaultFareService {
         }
       }
 
-      if (ruleZones != null) { // the special case
+      if (ruleZones != null) {
         // evaluate boolean ride.zones AND rule.zones
         Set<String> zoneIntersection = new HashSet<String>(
-          leg.fareZones().stream().map(z -> z.getId().getId()).toList()
+          leg
+            .fareZones()
+            .stream()
+            .map(z -> z.getId().getId())
+            .toList()
         );
-        zoneIntersection.retainAll(ruleZones); // don't add temporarily visited zones
+        // don't add temporarily visited zones
+        zoneIntersection.retainAll(ruleZones);
         zones.addAll(zoneIntersection);
       } else {
-        zones.addAll(leg.fareZones().stream().map(z -> z.getId().getId()).toList());
+        zones.addAll(
+          leg
+            .fareZones()
+            .stream()
+            .map(z -> z.getId().getId())
+            .toList()
+        );
       }
     }
 
@@ -155,11 +166,12 @@ public class HSLFareService extends DefaultFareService {
         ) {
           continue;
         }
-        /* another HSL specific change: We do not set rules for every possible zone combination,
-                but for the largest zone set allowed for a certain ticket type.
-                This way we need only a few rules instead of hundreds of rules. Good for speed!
-                */
-        if (ruleSet.getContains().containsAll(zones)) { // contains, not equals !!
+        // another HSL specific change: We do not set rules for every possible zone combination,
+        // but for the largest zone set allowed for a certain ticket type.
+        // This way we need only a few rules instead of hundreds of rules. Good for speed!
+
+        // contains, not equals !!
+        if (ruleSet.getContains().containsAll(zones)) {
           FareAttribute attribute = ruleSet.getFareAttribute();
           // transfers are evaluated at boarding time
           if (attribute.isTransferDurationSet()) {

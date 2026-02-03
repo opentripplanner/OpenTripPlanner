@@ -1,5 +1,6 @@
 package org.opentripplanner.osm.tagmapping;
 
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.TraverseDirection;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
@@ -13,7 +14,8 @@ class ConstantSpeedMapper extends FinlandMapper {
 
   public ConstantSpeedMapper() {
     super();
-    this.speed = 22.22f; // 80 kmph by default
+    // 80 km/h by default
+    this.speed = 22.22f;
   }
 
   public ConstantSpeedMapper(float speed) {
@@ -22,25 +24,24 @@ class ConstantSpeedMapper extends FinlandMapper {
   }
 
   @Override
-  public void populateProperties(WayPropertySet props) {
+  public WayPropertySet buildWayPropertySet() {
+    var props = WayPropertySet.of();
     props.setCarSpeed("highway=*", speed);
-    super.populateProperties(props);
-    props.maxPossibleCarSpeed = speed;
+    var s = super.buildWayPropertySet();
+    props.addPickers(s);
+    props.setMaxPossibleCarSpeed(speed);
+    return props.build();
   }
 
   @Override
-  public float getCarSpeedForWay(OsmEntity way, TraverseDirection direction) {
+  public float getCarSpeedForWay(
+    OsmEntity way,
+    TraverseDirection direction,
+    DataImportIssueStore issueStore
+  ) {
     /*
      * Set the same 80 km/h speed for all roads, so that car routing finds shortest path
      */
-    return speed;
-  }
-
-  @Override
-  public Float getMaxUsedCarSpeed(WayPropertySet wayPropertySet) {
-    // This is needed because the way property set uses normal speed limits from Finland mapper
-    // to set the walk safety limits which resets the maximum used car speed to be something else
-    // than what is used for the street edge car speeds.
     return speed;
   }
 }

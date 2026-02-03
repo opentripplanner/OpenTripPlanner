@@ -21,6 +21,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -68,13 +69,16 @@ class AddedTripBuilder {
   private final String headsign;
   private final List<TripOnServiceDate> replacedTrips;
   private final StopTimesMapper stopTimesMapper;
+  private final DeduplicatorService deduplicator;
 
   AddedTripBuilder(
     EstimatedVehicleJourney estimatedVehicleJourney,
     TransitEditorService transitService,
+    DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId
   ) {
+    this.deduplicator = deduplicator;
     // Verifying values required in SIRI Profile
     // Added ServiceJourneyId
     String estimatedVehicleJourneyCode = estimatedVehicleJourney.getEstimatedVehicleJourneyCode();
@@ -126,6 +130,7 @@ class AddedTripBuilder {
 
   AddedTripBuilder(
     TransitEditorService transitService,
+    DeduplicatorService deduplicator,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId,
     FeedScopedId tripId,
@@ -146,6 +151,7 @@ class AddedTripBuilder {
     String dataSource
   ) {
     this.transitService = transitService;
+    this.deduplicator = deduplicator;
     this.entityResolver = entityResolver;
     this.timeZone = transitService.getTimeZone();
     this.getTripPatternId = getTripPatternId;
@@ -225,11 +231,9 @@ class AddedTripBuilder {
     // they are in general superseded by real-time trip times
     // but in case of trip cancellation, OTP will fall back to scheduled trip times
     // therefore they must be valid
-    var tripTimes = TripTimesFactory.tripTimes(
-      trip,
-      aimedStopTimes,
-      transitService.getDeduplicator()
-    ).withServiceCode(transitService.getServiceCode(trip.getServiceId()));
+    var tripTimes = TripTimesFactory.tripTimes(trip, aimedStopTimes, deduplicator).withServiceCode(
+      transitService.getServiceCode(trip.getServiceId())
+    );
     tripTimes.validateNonIncreasingTimes();
 
     TripPattern pattern = TripPattern.of(getTripPatternId.apply(trip))
@@ -237,6 +241,7 @@ class AddedTripBuilder {
       .withMode(trip.getMode())
       .withNetexSubmode(trip.getNetexSubMode())
       .withStopPattern(stopPattern)
+      .withRealTimeAddedTrip()
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
 
@@ -373,7 +378,7 @@ class AddedTripBuilder {
     List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
 
     // VehicleJourneyRef is the reference to the serviceJourney being replaced.
-    VehicleJourneyRef vehicleJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef(); // getVehicleJourneyRef
+    VehicleJourneyRef vehicleJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef();
     if (vehicleJourneyRef != null) {
       var replacedDatedServiceJourney = entityResolver.resolveTripOnServiceDate(
         vehicleJourneyRef.getValue()

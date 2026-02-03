@@ -2,11 +2,11 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
+import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TransitService;
 
 class TransfersMapper {
 
@@ -16,7 +16,7 @@ class TransfersMapper {
    */
   static List<List<Transfer>> mapTransfers(
     SiteRepository siteRepository,
-    TransitService transitService
+    TransferRepository transferRepository
   ) {
     List<List<Transfer>> transfersByStopIndex = new ArrayList<>();
 
@@ -29,7 +29,7 @@ class TransfersMapper {
 
       ArrayList<Transfer> list = new ArrayList<>();
 
-      for (PathTransfer pathTransfer : transitService.findPathTransfers(stop)) {
+      for (PathTransfer pathTransfer : transferRepository.findTransfersByStop(stop)) {
         if (pathTransfer.to instanceof RegularStop) {
           int toStopIndex = pathTransfer.to.getIndex();
           Transfer newTransfer;

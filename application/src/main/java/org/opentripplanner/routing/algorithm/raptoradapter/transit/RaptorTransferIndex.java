@@ -31,10 +31,10 @@ public interface RaptorTransferIndex {
     return OTPFeature.OnDemandRaptorTransfer.isOn()
       ? new OnDemandRaptorTransferIndex(transfersByStopIndex, request)
       : new PreCachedRaptorTransferIndex(
-        transfersByStopIndex,
-        request,
-        OTPFeature.ParallelRouting.isOn()
-      );
+          transfersByStopIndex,
+          request,
+          OTPFeature.ParallelRouting.isOn()
+        );
   }
 
   static Collection<DefaultRaptorTransfer> getRaptorTransfers(

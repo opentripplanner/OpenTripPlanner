@@ -18,10 +18,11 @@ class IntrospectionTypeWiring {
 
   private static final Predicate<Method> isMethodPublic = method ->
     Modifier.isPublic(method.getModifiers());
-  private static final Predicate<Method> isMethodReturnTypeDataFetcher =
-    ((Predicate<Method>) method -> method.getReturnType().equals(DataFetcher.class)).or(method ->
-        Arrays.asList(method.getReturnType().getInterfaces()).contains(DataFetcher.class)
-      );
+  private static final Predicate<Method> isMethodReturnTypeDataFetcher = ((Predicate<
+      Method
+    >) method -> method.getReturnType().equals(DataFetcher.class)).or(method ->
+    Arrays.asList(method.getReturnType().getInterfaces()).contains(DataFetcher.class)
+  );
 
   private final TypeDefinitionRegistry typeRegistry;
 

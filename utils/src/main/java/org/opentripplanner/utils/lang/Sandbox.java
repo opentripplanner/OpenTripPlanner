@@ -15,5 +15,4 @@ import java.lang.annotation.Target;
  */
 @Target({ FIELD, METHOD, CONSTRUCTOR, TYPE })
 @Retention(RetentionPolicy.SOURCE)
-public @interface Sandbox {
-}
+public @interface Sandbox {}

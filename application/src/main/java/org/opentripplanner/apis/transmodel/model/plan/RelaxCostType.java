@@ -44,8 +44,8 @@ public class RelaxCostType {
         .name(CONSTANT)
         .description(
           "The constant value to add to the limit. Must be a positive number. The value is " +
-          "equivalent to transit-cost-seconds. Integers are treated as seconds, but you may use " +
-          "the duration format. Example: '3665 = 'DT1h1m5s' = '1h1m5s'."
+            "equivalent to transit-cost-seconds. Integers are treated as seconds, but you may use " +
+            "the duration format. Example: '3665 = 'DT1h1m5s' = '1h1m5s'."
         )
         .defaultValueProgrammatic("0s")
         .type(CostScalarFactory.costScalar())

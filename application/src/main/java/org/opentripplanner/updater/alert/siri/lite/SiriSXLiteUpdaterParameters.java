@@ -13,8 +13,7 @@ public record SiriSXLiteUpdaterParameters(
   Duration earlyStart,
   Duration timeout,
   HttpHeaders requestHeaders
-)
-  implements SiriSXUpdater.Parameters {
+) implements SiriSXUpdater.Parameters {
   @Override
   public String requestorRef() {
     return "OpenTripPlanner";

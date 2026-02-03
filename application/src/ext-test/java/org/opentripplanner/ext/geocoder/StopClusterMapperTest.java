@@ -8,7 +8,6 @@ import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidati
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -26,8 +25,7 @@ class StopClusterMapperTest {
     .withRegularStops(STOPS)
     .build();
   private static final TimetableRepository TIMETABLE_REPOSITORY = new TimetableRepository(
-    SITE_REPOSITORY,
-    new Deduplicator()
+    SITE_REPOSITORY
   );
   private static final List<StopLocation> LOCATIONS = STOPS.stream()
     .map(StopLocation.class::cast)

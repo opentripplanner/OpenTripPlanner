@@ -103,10 +103,10 @@ public class StreetModeDurationInputType {
     if (defaultValue.minus(value).isNegative()) {
       throw new IllegalArgumentException(
         "Invalid duration for mode %s. The value %s is not greater than the default %s.".formatted(
-            key,
-            DurationUtils.durationToStr(value),
-            DurationUtils.durationToStr(defaultValue)
-          )
+          key,
+          DurationUtils.durationToStr(value),
+          DurationUtils.durationToStr(defaultValue)
+        )
       );
     }
   }

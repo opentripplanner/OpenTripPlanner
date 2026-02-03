@@ -36,7 +36,6 @@ import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -88,9 +87,8 @@ class OsmBoardingLocationsModuleTest {
       .withRegularStops(List.of(platform, busStop, floatingBusStop))
       .build();
 
-    var deduplicator = new Deduplicator();
     var graph = new Graph();
-    var timetableRepository = new TimetableRepository(siteRepo, deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepo);
     var factory = new VertexFactory(graph);
 
     var provider = new DefaultOsmProvider(file, false);
@@ -133,7 +131,9 @@ class OsmBoardingLocationsModuleTest {
     ).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
-    assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module
+    // 3 nodes connected to the street network, plus one "floating" and one area centroid created by
+    // the module
+    assertEquals(5, boardingLocations.size());
 
     assertEquals(1, platformVertex.getIncoming().size());
     assertEquals(1, platformVertex.getOutgoing().size());
@@ -303,7 +303,7 @@ class OsmBoardingLocationsModuleTest {
       .build();
     new OsmBoardingLocationsModule(
       graph,
-      new TimetableRepository(siteRepo, new Deduplicator()),
+      new TimetableRepository(siteRepo),
       VertexLinkerTestFactory.of(graph),
       new DefaultOsmInfoGraphBuildService(osmInfoRepository)
     ).buildGraph();
@@ -389,7 +389,7 @@ class OsmBoardingLocationsModuleTest {
 
     assertTrue(
       (getEdge(beginning, vertex).isPresent() && getEdge(vertex, end).isPresent()) ||
-      (getEdge(end, vertex).isPresent() && getEdge(vertex, beginning).isPresent())
+        (getEdge(end, vertex).isPresent() && getEdge(vertex, beginning).isPresent())
     );
   }
 

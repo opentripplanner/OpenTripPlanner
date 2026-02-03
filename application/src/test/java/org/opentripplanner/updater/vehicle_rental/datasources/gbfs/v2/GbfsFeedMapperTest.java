@@ -40,8 +40,9 @@ class GbfsFeedMapperTest {
       false,
       RentalPickupType.ALL
     );
-    var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var otpHttpClient = new OtpHttpClientFactory().create(
+      LoggerFactory.getLogger(GbfsFeedMapperTest.class)
+    );
     var loader = new GbfsFeedLoader(
       params.url(),
       params.httpHeaders(),
@@ -197,8 +198,9 @@ class GbfsFeedMapperTest {
       true,
       RentalPickupType.ALL
     );
-    var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var otpHttpClient = new OtpHttpClientFactory().create(
+      LoggerFactory.getLogger(GbfsFeedMapperTest.class)
+    );
     var loader = new GbfsFeedLoader(
       params.url(),
       params.httpHeaders(),
@@ -258,8 +260,9 @@ class GbfsFeedMapperTest {
       false,
       RentalPickupType.ALL
     );
-    var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var otpHttpClient = new OtpHttpClientFactory().create(
+      LoggerFactory.getLogger(GbfsFeedMapperTest.class)
+    );
     var loader = new GbfsFeedLoader(
       params.url(),
       params.httpHeaders(),
@@ -287,8 +290,9 @@ class GbfsFeedMapperTest {
       false,
       RentalPickupType.ALL
     );
-    var otpHttpClient = new OtpHttpClientFactory()
-      .create(LoggerFactory.getLogger(GbfsFeedMapperTest.class));
+    var otpHttpClient = new OtpHttpClientFactory().create(
+      LoggerFactory.getLogger(GbfsFeedMapperTest.class)
+    );
     var loader = new GbfsFeedLoader(
       params.url(),
       params.httpHeaders(),

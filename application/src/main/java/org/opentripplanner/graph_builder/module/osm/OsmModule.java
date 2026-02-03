@@ -232,7 +232,7 @@ public class OsmModule implements GraphBuilderModule {
       parkingRepository.updateVehicleParking(parkingLots, List.of());
     }
 
-    elevatorProcessor.buildElevatorEdgesFromElevatorNodes();
+    elevatorProcessor.buildElevatorEdges();
 
     TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore, osmInfoGraphBuildRepository);
 
@@ -355,7 +355,7 @@ public class OsmModule implements GraphBuilderModule {
       double lastLat = -1;
       double lastLon = -1;
       String lastLevel = null;
-      for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext();) {
+      for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext(); ) {
         long nodeId = iter.next();
         OsmNode node = osmdb.getNode(nodeId);
         if (node == null) {
@@ -438,8 +438,9 @@ public class OsmModule implements GraphBuilderModule {
         ) {
           segmentCoordinates.add(osmEndNode.getCoordinate());
 
-          geometry = GeometryUtils.getGeometryFactory()
-            .createLineString(segmentCoordinates.toArray(new Coordinate[0]));
+          geometry = GeometryUtils.getGeometryFactory().createLineString(
+            segmentCoordinates.toArray(new Coordinate[0])
+          );
           segmentCoordinates.clear();
         } else {
           segmentCoordinates.add(osmEndNode.getCoordinate());
@@ -447,7 +448,8 @@ public class OsmModule implements GraphBuilderModule {
         }
 
         /* generate endpoints */
-        if (fromVertex == null) { // first iteration on this way
+        if (fromVertex == null) {
+          // first iteration on this way
           // make or get a shared vertex for flat intersections,
           // one vertex per level for multilevel nodes like elevators
           fromVertex = vertexGenerator.getVertexForOsmNode(osmStartNode, way, NORMAL);
@@ -458,7 +460,8 @@ public class OsmModule implements GraphBuilderModule {
               elevationData.put(fromVertex, elevation);
             }
           }
-        } else { // subsequent iterations
+        } else {
+          // subsequent iterations
           fromVertex = toVertex;
         }
 
@@ -470,7 +473,11 @@ public class OsmModule implements GraphBuilderModule {
             elevationData.put(toVertex, elevation);
           }
         }
-        if (way.isEscalator()) {
+        if (elevatorProcessor.isElevatorWay(way)) {
+          // Elevator way processing is done after the basic graph has been built.
+          // However, intersection vertices are created in this loop.
+          continue;
+        } else if (way.isEscalator()) {
           var length = getGeometryLengthMeters(geometry);
           EscalatorEdgePair escalatorEdgePair = escalatorProcessor.buildEscalatorEdge(
             way,
@@ -486,8 +493,6 @@ public class OsmModule implements GraphBuilderModule {
               way
             );
           }
-        } else if (elevatorProcessor.isElevatorWay(way)) {
-          elevatorProcessor.buildElevatorEdgesFromElevatorWay(way);
         } else {
           StreetEdgePair streets = getEdgesForStreet(
             fromVertex,
@@ -535,7 +540,7 @@ public class OsmModule implements GraphBuilderModule {
       //Keep lambda! A method-ref would log incorrect class and line number
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
-    } // END loop over OSM ways
+    }
 
     LOG.info(progress.completeMessage());
   }
@@ -710,7 +715,10 @@ public class OsmModule implements GraphBuilderModule {
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
     I18NString name = params.edgeNamer().getName(way, label);
-    float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, direction);
+    float carSpeed = way
+      .getOsmProvider()
+      .getOsmTagMapper()
+      .getCarSpeedForWay(way, direction, issueStore);
 
     StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
       .withFromVertex(fromVertex)
@@ -734,10 +742,12 @@ public class OsmModule implements GraphBuilderModule {
 
   private float getMaxCarSpeed() {
     float maxSpeed = 0f;
-    for (var provider : providers) {
-      var carSpeed = provider.getOsmTagMapper().getMaxUsedCarSpeed(provider.getWayPropertySet());
-      if (carSpeed > maxSpeed) {
-        maxSpeed = carSpeed;
+    for (var e : graph.getEdges()) {
+      if (e instanceof StreetEdge se) {
+        var carSpeed = se.getCarSpeed();
+        if (carSpeed > maxSpeed) {
+          maxSpeed = carSpeed;
+        }
       }
     }
     return maxSpeed;

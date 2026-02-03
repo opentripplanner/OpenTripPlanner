@@ -13,7 +13,11 @@ public class Module implements ArchComponent {
   }
 
   public static Module of(ArchComponent... components) {
-    return new Module(Arrays.stream(components).flatMap(c -> c.packages().stream()).toList());
+    return new Module(
+      Arrays.stream(components)
+        .flatMap(c -> c.packages().stream())
+        .toList()
+    );
   }
 
   @Override

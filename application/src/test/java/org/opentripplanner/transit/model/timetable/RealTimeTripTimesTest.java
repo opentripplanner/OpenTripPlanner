@@ -318,7 +318,8 @@ class RealTimeTripTimesTest {
   public void testNonIncreasingUpdateCrossingMidnight() {
     var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
-    builder.withArrivalTime(0, -300); //"Yesterday"
+    // "Yesterday"
+    builder.withArrivalTime(0, -300);
     builder.withDepartureTime(0, 50);
 
     builder.build();

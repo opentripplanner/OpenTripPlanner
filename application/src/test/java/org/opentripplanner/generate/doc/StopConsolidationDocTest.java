@@ -41,8 +41,7 @@ public class StopConsolidationDocTest {
 
     var joined = String.join("\n", lines);
 
-    var csvExample =
-      """
+    var csvExample = """
       ```
       %s
       ```

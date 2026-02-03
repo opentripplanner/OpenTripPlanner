@@ -17,6 +17,7 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
@@ -49,6 +50,7 @@ import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataS
 public class UpdaterConfigurator {
 
   private final Graph graph;
+  private final DeduplicatorService deduplicator;
   private final VertexLinker linker;
   private final TimetableRepository timetableRepository;
   private final UpdatersParameters updatersParameters;
@@ -60,6 +62,7 @@ public class UpdaterConfigurator {
 
   private UpdaterConfigurator(
     Graph graph,
+    DeduplicatorService deduplicator,
     VertexLinker linker,
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
@@ -70,6 +73,7 @@ public class UpdaterConfigurator {
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
+    this.deduplicator = deduplicator;
     this.linker = linker;
     this.realtimeVehicleRepository = realtimeVehicleRepository;
     this.vehicleRentalRepository = vehicleRentalRepository;
@@ -82,6 +86,7 @@ public class UpdaterConfigurator {
 
   public static void configure(
     Graph graph,
+    DeduplicatorService deduplicator,
     VertexLinker linker,
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
@@ -93,6 +98,7 @@ public class UpdaterConfigurator {
   ) {
     new UpdaterConfigurator(
       graph,
+      deduplicator,
       linker,
       realtimeVehicleRepository,
       vehicleRentalRepository,
@@ -242,12 +248,15 @@ public class UpdaterConfigurator {
   }
 
   private SiriRealTimeTripUpdateAdapter provideSiriAdapter() {
-    return new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
+    return new SiriRealTimeTripUpdateAdapter(timetableRepository, deduplicator, snapshotManager);
   }
 
   private GtfsRealTimeTripUpdateAdapter provideGtfsAdapter() {
-    return new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
-      LocalDate.now(timetableRepository.getTimeZone())
+    return new GtfsRealTimeTripUpdateAdapter(
+      timetableRepository,
+      deduplicator,
+      snapshotManager,
+      () -> LocalDate.now(timetableRepository.getTimeZone())
     );
   }
 

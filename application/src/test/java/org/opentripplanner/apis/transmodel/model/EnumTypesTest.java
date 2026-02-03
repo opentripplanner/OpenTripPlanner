@@ -97,7 +97,10 @@ class EnumTypesTest {
   void assertAllRoutingErrorCodesAreMapped() {
     var expected = EnumSet.allOf(RoutingErrorCode.class);
     var values = EnumSet.copyOf(
-      ROUTING_ERROR_CODE.getValues().stream().map(it -> (RoutingErrorCode) it.getValue()).toList()
+      ROUTING_ERROR_CODE.getValues()
+        .stream()
+        .map(it -> (RoutingErrorCode) it.getValue())
+        .toList()
     );
     assertEquals(expected, values);
   }

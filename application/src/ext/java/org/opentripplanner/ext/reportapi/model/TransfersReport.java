@@ -7,14 +7,14 @@ import java.util.Optional;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.model.transfer.RouteStationTransferPoint;
-import org.opentripplanner.model.transfer.RouteStopTransferPoint;
-import org.opentripplanner.model.transfer.StationTransferPoint;
-import org.opentripplanner.model.transfer.StopTransferPoint;
-import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.model.transfer.TransferPoint;
-import org.opentripplanner.model.transfer.TripTransferPoint;
+import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
+import org.opentripplanner.transfer.constrained.model.RouteStationTransferPoint;
+import org.opentripplanner.transfer.constrained.model.RouteStopTransferPoint;
+import org.opentripplanner.transfer.constrained.model.StationTransferPoint;
+import org.opentripplanner.transfer.constrained.model.StopTransferPoint;
+import org.opentripplanner.transfer.constrained.model.TransferConstraint;
+import org.opentripplanner.transfer.constrained.model.TransferPoint;
+import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.Station;
@@ -79,12 +79,12 @@ public class TransfersReport {
       var dist = (from.coordinate == null || to.coordinate == null)
         ? ""
         : String.format(
-          "%.0fm",
-          SphericalDistanceLibrary.fastDistance(
-            from.coordinate.asJtsCoordinate(),
-            to.coordinate.asJtsCoordinate()
-          )
-        );
+            "%.0fm",
+            SphericalDistanceLibrary.fastDistance(
+              from.coordinate.asJtsCoordinate(),
+              to.coordinate.asJtsCoordinate()
+            )
+          );
       var duration = (from.time == NOT_SET || to.time == NOT_SET)
         ? ""
         : durationToStr(to.time - from.time);
@@ -195,7 +195,9 @@ public class TransfersReport {
   }
 
   private static String getName(Operator operator) {
-    return Optional.ofNullable(operator).map(o -> o.getId().getId()).orElse("");
+    return Optional.ofNullable(operator)
+      .map(o -> o.getId().getId())
+      .orElse("");
   }
 
   static class TxPoint {

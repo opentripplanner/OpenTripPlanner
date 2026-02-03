@@ -156,9 +156,9 @@ public class StateEditor {
     if (Double.isInfinite(weight) || Double.isNaN(weight)) {
       LOG.warn(
         "A state's weight is being incremented by " +
-        weight +
-        " while traversing edge " +
-        child.backEdge
+          weight +
+          " while traversing edge " +
+          child.backEdge
       );
       defectiveTraversal = true;
       return;
@@ -166,7 +166,7 @@ public class StateEditor {
     if (weight < 0) {
       LOG.warn(
         "A state's weight is being incremented by a negative amount while traversing edge " +
-        child.backEdge
+          child.backEdge
       );
       defectiveTraversal = true;
       return;
@@ -183,7 +183,7 @@ public class StateEditor {
     if (milliseconds < 0) {
       LOG.warn(
         "A state's time is being incremented by a negative amount while traversing edge " +
-        child.getBackEdge()
+          child.getBackEdge()
       );
       defectiveTraversal = true;
       return;

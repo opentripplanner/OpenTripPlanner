@@ -125,17 +125,17 @@ class TransitPreferencesTest {
   void testToString() {
     assertEquals(
       "TransitPreferences{" +
-      "boardSlack: DurationForTransitMode{default:45s, AIRPLANE:35m}, " +
-      "alightSlack: DurationForTransitMode{default:15s, AIRPLANE:25m}, " +
-      "reluctanceForMode: {AIRPLANE=2.1}, " +
-      "otherThanPreferredRoutesPenalty: $350, " +
-      "unpreferredCost: 5m + 1.15 t, " +
-      "relaxTransitGroupPriority: 5m + 1.50 t, " +
-      "ignoreRealtimeUpdates, " +
-      "includePlannedCancellations, " +
-      "includeRealtimeCancellations, " +
-      "raptor: RaptorPreferences{searchDirection: REVERSE}" +
-      "}",
+        "boardSlack: DurationForTransitMode{default:45s, AIRPLANE:35m}, " +
+        "alightSlack: DurationForTransitMode{default:15s, AIRPLANE:25m}, " +
+        "reluctanceForMode: {AIRPLANE=2.1}, " +
+        "otherThanPreferredRoutesPenalty: $350, " +
+        "unpreferredCost: 5m + 1.15 t, " +
+        "relaxTransitGroupPriority: 5m + 1.50 t, " +
+        "ignoreRealtimeUpdates, " +
+        "includePlannedCancellations, " +
+        "includeRealtimeCancellations, " +
+        "raptor: RaptorPreferences{searchDirection: REVERSE}" +
+        "}",
       subject.toString()
     );
   }

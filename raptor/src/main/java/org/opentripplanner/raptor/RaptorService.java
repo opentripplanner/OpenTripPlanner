@@ -1,11 +1,15 @@
 package org.opentripplanner.raptor;
 
+import java.util.Collection;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.direct.api.RaptorDirectTransitRequest;
+import org.opentripplanner.raptor.direct.configure.DirectTransitSearchFactory;
 import org.opentripplanner.raptor.service.DefaultStopArrivals;
 import org.opentripplanner.raptor.service.HeuristicSearchTask;
 import org.opentripplanner.raptor.service.RangeRaptorDynamicSearch;
@@ -56,6 +60,18 @@ public class RaptorService<T extends RaptorTripSchedule> {
     }
     logResponse(transitData, response);
     return response;
+  }
+
+  /**
+   * Find all transit options for the given request. The result should contain ALL options,
+   * not just the parato-optimal result return by the {@link #route(RaptorRequest, RaptorTransitDataProvider)}
+   * method.
+   */
+  public Collection<RaptorPath<T>> findAllDirectTransit(
+    RaptorDirectTransitRequest request,
+    RaptorTransitDataProvider<T> transitData
+  ) {
+    return DirectTransitSearchFactory.createSearch(request, transitData).route();
   }
 
   /**

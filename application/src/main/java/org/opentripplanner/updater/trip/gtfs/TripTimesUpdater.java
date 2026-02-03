@@ -4,11 +4,9 @@ import static org.opentripplanner.transit.model.framework.Result.success;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,16 +14,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.OptionalInt;
-import javax.annotation.Nullable;
-import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -48,10 +40,18 @@ class TripTimesUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripTimesUpdater.class);
 
+  private final ZoneId timeZone;
+  private final DeduplicatorService deduplicator;
+
   /**
    * Maximum time in seconds since midnight for arrivals and departures
    */
   private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
+
+  TripTimesUpdater(ZoneId timeZone, DeduplicatorService deduplicator) {
+    this.timeZone = timeZone;
+    this.deduplicator = deduplicator;
+  }
 
   /**
    * Apply the TripUpdate to the appropriate TripTimes from a Timetable. The existing TripTimes
@@ -62,8 +62,6 @@ class TripTimesUpdater {
    * all trips in a timetable are from the same feed, which should always be the case.
    *
    * @param tripUpdate                    GTFS-RT trip update
-   * @param timeZone                      time zone of trip update
-   * @param updateServiceDate             service date of trip update
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag
    * @return {@link Result < TripTimesPatch ,    UpdateError   >} contains either a new copy of updated
@@ -71,30 +69,18 @@ class TripTimesUpdater {
    * trip descriptor of the TripUpdate and a list of stop indices that have been skipped with the
    * realtime update; or an error if something went wrong
    */
-  public static Result<TripTimesPatch, UpdateError> createUpdatedTripTimesFromGtfsRt(
+  public Result<TripTimesPatch, UpdateError> createUpdatedTripTimesFromGtfsRt(
     Timetable timetable,
     TripUpdate tripUpdate,
-    ZoneId timeZone,
-    LocalDate updateServiceDate,
     ForwardsDelayPropagationType forwardsDelayPropagationType,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
-    var optionalTripId = tripUpdate.tripDescriptor().tripId();
-    if (optionalTripId.isEmpty()) {
-      // I don't think it should happen here as an empty trip id was already rejected in the adapter
-      LOG.debug("TripDescriptor object has no TripId field");
-      return Result.failure(UpdateError.noTripId(TRIP_NOT_FOUND));
-    }
-    var tripId = optionalTripId.get();
+    var tripId = tripUpdate.tripId();
 
-    var feedScopedTripId = new FeedScopedId(timetable.getPattern().getFeedId(), tripId);
-
-    var tripTimes = timetable.getTripTimes(feedScopedTripId);
+    var tripTimes = timetable.getTripTimes(tripId);
     if (tripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", tripId);
-      return Result.failure(new UpdateError(feedScopedTripId, TRIP_NOT_FOUND_IN_PATTERN));
-    } else {
-      LOG.trace("tripId {} found in timetable.", tripId);
+      return Result.failure(new UpdateError(tripId, TRIP_NOT_FOUND_IN_PATTERN));
     }
 
     RealTimeTripTimesBuilder builder = tripTimes.createRealTimeWithoutScheduledTimes();
@@ -117,7 +103,7 @@ class TripTimesUpdater {
     int numStops = tripTimes.getNumStops();
 
     final long today = ServiceDateUtils.asStartOfService(
-      updateServiceDate,
+      tripUpdate.serviceDate(),
       timeZone
     ).toEpochSecond();
 
@@ -173,7 +159,7 @@ class TripTimesUpdater {
               i,
               tripId
             );
-            return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME, i));
+            return Result.failure(new UpdateError(tripId, INVALID_ARRIVAL_TIME, i));
           }
           if (!update.isDepartureValid()) {
             LOG.debug(
@@ -181,7 +167,7 @@ class TripTimesUpdater {
               i,
               tripId
             );
-            return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME, i));
+            return Result.failure(new UpdateError(tripId, INVALID_DEPARTURE_TIME, i));
           }
           setArrivalAndDeparture(builder, i, update, today);
         }
@@ -198,7 +184,7 @@ class TripTimesUpdater {
         "Part of a TripUpdate object could not be applied successfully to trip {}.",
         tripId
       );
-      return Result.failure(new UpdateError(feedScopedTripId, INVALID_STOP_SEQUENCE));
+      return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE));
     }
 
     // Interpolate missing times for stops which don't have times associated. Note: Currently for
@@ -216,7 +202,7 @@ class TripTimesUpdater {
       LOG.debug("Propagated delay from stop index {} backwards on trip {}.", index, tripId)
     );
 
-    getWheelchairAccessibility(tripUpdate).ifPresent(builder::withWheelchairAccessibility);
+    tripUpdate.wheelchairAccessibility().ifPresent(builder::withWheelchairAccessibility);
 
     // Make sure that updated trip times have the correct real time state
     builder.withRealTimeState(RealTimeState.UPDATED);
@@ -224,10 +210,6 @@ class TripTimesUpdater {
     // Validate for non-increasing times. Log error if present.
     try {
       var result = builder.build();
-      LOG.trace(
-        "A valid TripUpdate object was applied to trip {} using the Timetable class update method.",
-        tripId
-      );
       return success(
         new TripTimesPatch(result, updatedPickups, updatedDropoffs, replacedStopIndices)
       );
@@ -240,64 +222,32 @@ class TripTimesUpdater {
    * Add a new or replacement trip to the snapshot
    *
    * @param trip              trip
-   * @param wheelchairAccessibility accessibility information of the vehicle
-   * @param serviceDate       service date of trip
+   * @param tripUpdate        information about the trip
    * @param realTimeState     real-time state of new trip
    * @return empty Result if successful or one containing an error
    */
-  public static Result<TripTimesWithStopPattern, UpdateError> createNewTripTimesFromGtfsRt(
+  public Result<TripTimesWithStopPattern, UpdateError> createNewTripTimesFromGtfsRt(
     Trip trip,
-    @Nullable Accessibility wheelchairAccessibility,
+    TripUpdate tripUpdate,
     List<StopAndStopTimeUpdate> stopAndStopTimeUpdates,
-    ZoneId timeZone,
-    LocalDate serviceDate,
     RealTimeState realTimeState,
-    @Nullable I18NString tripHeadsign,
-    Deduplicator deduplicator,
     int serviceCode
   ) {
     // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
     final long midnightSecondsSinceEpoch = ServiceDateUtils.asStartOfService(
-      serviceDate,
+      tripUpdate.serviceDate(),
       timeZone
     ).toEpochSecond();
 
     // Create StopTimes based on the scheduled times
     final List<StopTime> stopTimes = new ArrayList<>(stopAndStopTimeUpdates.size());
-    var lastStopSequence = -1;
     for (final StopAndStopTimeUpdate item : stopAndStopTimeUpdates) {
       final var update = item.stopTimeUpdate();
-      final var stop = item.stop();
-
-      // validate stop sequence
-      OptionalInt stopSequence = update.stopSequence();
-      if (stopSequence.isPresent()) {
-        var seq = stopSequence.getAsInt();
-        if (seq < 0) {
-          LOG.debug(
-            "{} trip {} on {} contains negative stop sequence, skipping.",
-            realTimeState,
-            trip.getId(),
-            serviceDate
-          );
-          return UpdateError.result(trip.getId(), INVALID_STOP_SEQUENCE);
-        }
-        if (seq <= lastStopSequence) {
-          LOG.debug(
-            "{} trip {} on {} contains decreasing stop sequence, skipping.",
-            realTimeState,
-            trip.getId(),
-            serviceDate
-          );
-          return UpdateError.result(trip.getId(), INVALID_STOP_SEQUENCE);
-        }
-        lastStopSequence = seq;
-      }
 
       // Create stop time
       final StopTime stopTime = new StopTime();
       stopTime.setTrip(trip);
-      stopTime.setStop(stop);
+      stopTime.setStop(item.stop());
       // Set arrival time
       final var arrival = update.scheduledArrivalTimeWithRealTimeFallback();
       if (arrival.isPresent()) {
@@ -305,9 +255,9 @@ class TripTimesUpdater {
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           LOG.debug(
             "NEW trip {} on {} has invalid arrival time (compared to start date in " +
-            "TripDescriptor), skipping.",
+              "TripDescriptor), skipping.",
             trip.getId(),
-            serviceDate
+            tripUpdate.serviceDate()
           );
           return UpdateError.result(trip.getId(), INVALID_ARRIVAL_TIME);
         }
@@ -320,16 +270,17 @@ class TripTimesUpdater {
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           LOG.debug(
             "NEW trip {} on {} has invalid departure time (compared to start date in " +
-            "TripDescriptor), skipping.",
+              "TripDescriptor), skipping.",
             trip.getId(),
-            serviceDate
+            tripUpdate.serviceDate()
           );
           return UpdateError.result(trip.getId(), INVALID_DEPARTURE_TIME);
         }
         stopTime.setDepartureTime((int) departureTime);
       }
-      stopTime.setTimepoint(1); // Exact time
-      stopSequence.ifPresent(stopTime::setStopSequence);
+      // Exact time
+      stopTime.setTimepoint(1);
+      update.stopSequence().ifPresent(stopTime::setStopSequence);
       stopTime.setPickupType(update.effectivePickup());
       stopTime.setDropOffType(update.effectiveDropoff());
       update.stopHeadsign().ifPresent(stopTime::setStopHeadsign);
@@ -343,9 +294,6 @@ class TripTimesUpdater {
       stopTimes,
       deduplicator
     ).createRealTimeFromScheduledTimes();
-    if (tripHeadsign != null) {
-      builder.withTripHeadsign(tripHeadsign);
-    }
 
     // Update all times to mark trip times as realtime
     for (int stopIndex = 0; stopIndex < builder.numberOfStops(); stopIndex++) {
@@ -365,14 +313,10 @@ class TripTimesUpdater {
     }
 
     // Set service code of new trip times
-    builder.withServiceCode(serviceCode);
+    builder.withServiceCode(serviceCode).withRealTimeState(realTimeState);
 
-    // Make sure that updated trip times have the correct real time state
-    builder.withRealTimeState(realTimeState);
-
-    if (wheelchairAccessibility != null) {
-      builder.withWheelchairAccessibility(wheelchairAccessibility);
-    }
+    tripUpdate.tripHeadsign().ifPresent(builder::withTripHeadsign);
+    tripUpdate.wheelchairAccessibility().ifPresent(builder::withWheelchairAccessibility);
 
     RealTimeTripTimes tripTimes = builder.build();
 
@@ -401,15 +345,5 @@ class TripTimesUpdater {
       () ->
         departureDelay.ifPresent(delay -> builder.withDepartureDelay(stopPositionInPattern, delay))
     );
-  }
-
-  static Optional<Accessibility> getWheelchairAccessibility(TripUpdate tripUpdate) {
-    return tripUpdate
-      .vehicle()
-      .flatMap(vehicleDescriptor ->
-        vehicleDescriptor.hasWheelchairAccessible()
-          ? GtfsRealtimeMapper.mapWheelchairAccessible(vehicleDescriptor.getWheelchairAccessible())
-          : Optional.empty()
-      );
   }
 }

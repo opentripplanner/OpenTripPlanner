@@ -13,8 +13,7 @@ public record SiriETLiteUpdaterParameters(
   Duration timeout,
   boolean fuzzyTripMatching,
   HttpHeaders httpRequestHeaders
-)
-  implements SiriETUpdaterParameters, SiriETLiteHttpTripUpdateSource.Parameters {
+) implements SiriETUpdaterParameters, SiriETLiteHttpTripUpdateSource.Parameters {
   @Override
   public String url() {
     return uri.toString();

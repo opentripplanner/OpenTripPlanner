@@ -38,8 +38,8 @@ public final class AddedRoute {
     return routeLongName;
   }
 
-  public static AddedRoute ofTripDescriptor(TripDescriptor tripDescriptor) {
-    var rawTripDescriptor = tripDescriptor.original();
+  public static AddedRoute ofTripDescriptor(TripUpdate tripDescriptor) {
+    var rawTripDescriptor = tripDescriptor.descriptor().original();
     if (rawTripDescriptor.hasExtension(MfdzRealtimeExtensions.tripDescriptor)) {
       var ext = rawTripDescriptor.getExtension(MfdzRealtimeExtensions.tripDescriptor);
       var url = ext.getRouteUrl();

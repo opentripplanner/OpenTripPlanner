@@ -204,8 +204,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     Instant latestRemovedDeparture,
     ItinerarySortKey pageCut,
     Cost generalizedCostMaxLimit
-  )
-    implements PageCursorInput {
+  ) implements PageCursorInput {
     public TestPageCursorInput(Itinerary removedItinerary, Cost generalizedCostMaxLimit) {
       this(
         removedItinerary.startTimeAsInstant(),
@@ -214,6 +213,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
         generalizedCostMaxLimit
       );
     }
+
     public TestPageCursorInput() {
       this(null, null, null, null);
     }

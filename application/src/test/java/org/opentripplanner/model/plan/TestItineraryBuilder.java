@@ -30,10 +30,10 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
-import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
+import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -235,8 +235,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
       to.coordinate.longitude()
     );
 
-    var flexPath = new DirectFlexPathCalculator()
-      .calculateFlexPath(fromv, tov, fromStopPos, toStopPos);
+    var flexPath = new DirectFlexPathCalculator().calculateFlexPath(
+      fromv,
+      tov,
+      fromStopPos,
+      toStopPos
+    );
 
     var edge = new FlexTripEdge(
       fromv,

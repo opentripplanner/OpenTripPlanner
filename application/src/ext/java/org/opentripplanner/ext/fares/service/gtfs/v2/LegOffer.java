@@ -54,8 +54,8 @@ sealed interface LegOffer {
   /**
    * A time-limited implementation of the {@link LegOffer} interface that provides fare offer details.
    */
-  record TimeLimitedOffer(FareOffer offer, TimeLimit timeLimit, TransitLeg startLeg)
-    implements LegOffer {
+  record TimeLimitedOffer(FareOffer offer, TimeLimit timeLimit, TransitLeg startLeg) implements
+    LegOffer {
     public TimeLimitedOffer {
       Objects.requireNonNull(timeLimit);
     }

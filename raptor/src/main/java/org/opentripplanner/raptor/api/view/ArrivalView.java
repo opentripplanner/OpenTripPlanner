@@ -153,6 +153,10 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
 
   boolean arrivedOnBoard();
 
+  default TripScheduleStopPosition subsequentBoardingConstraint() {
+    throw new UnsupportedOperationException();
+  }
+
   /** Use this to create a {@code toString()} implementation. */
   default String asString() {
     String arrival =

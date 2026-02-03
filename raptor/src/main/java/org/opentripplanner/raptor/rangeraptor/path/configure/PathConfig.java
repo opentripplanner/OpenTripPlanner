@@ -38,7 +38,10 @@ public class PathConfig<T extends RaptorTripSchedule> {
   }
 
   public DestinationArrivalPaths<T> createDestArrivalPathsStdSearch() {
-    return createDestArrivalPaths(ParetoSetCost.NONE, DominanceFunction.noop());
+    return createDestArrivalPaths(
+      ParetoSetCost.NONE,
+      createPathParetoComparator(ParetoSetCost.NONE, DominanceFunction.noop())
+    );
   }
 
   /**
@@ -49,10 +52,10 @@ public class PathConfig<T extends RaptorTripSchedule> {
    */
   public DestinationArrivalPaths<T> createDestArrivalPaths(
     ParetoSetCost costConfig,
-    DominanceFunction c2Comp
+    ParetoComparator<RaptorPath<T>> comparator
   ) {
     return new DestinationArrivalPaths<>(
-      createPathParetoComparator(costConfig, c2Comp),
+      comparator,
       ctx.calculator(),
       costConfig.includeC1() ? ctx.costCalculator() : null,
       ctx.acceptC2AtDestination(),
@@ -64,15 +67,15 @@ public class PathConfig<T extends RaptorTripSchedule> {
     );
   }
 
-  /* private members */
-
-  private ParetoComparator<RaptorPath<T>> createPathParetoComparator(
+  public ParetoComparator<RaptorPath<T>> createPathParetoComparator(
     ParetoSetCost costConfig,
     DominanceFunction c2Comp
   ) {
     var relaxC1 = ctx.multiCriteria().relaxC1();
     return paretoComparator(paretoSetTimeConfig(), costConfig, relaxC1, c2Comp);
   }
+
+  /* private members */
 
   private ParetoSetTime paretoSetTimeConfig() {
     boolean preferLatestDeparture =
@@ -107,20 +110,20 @@ public class PathConfig<T extends RaptorTripSchedule> {
   ) {
     return searchDirection.isForward()
       ? new ForwardPathMapper<>(
-        slackProvider,
-        costCalculator,
-        stopNameResolver,
-        txConstraintsSearch,
-        lifeCycle,
-        profile.useApproximateTripSearch()
-      )
+          slackProvider,
+          costCalculator,
+          stopNameResolver,
+          txConstraintsSearch,
+          lifeCycle,
+          profile.useApproximateTripSearch()
+        )
       : new ReversePathMapper<>(
-        slackProvider,
-        costCalculator,
-        stopNameResolver,
-        txConstraintsSearch,
-        lifeCycle,
-        profile.useApproximateTripSearch()
-      );
+          slackProvider,
+          costCalculator,
+          stopNameResolver,
+          txConstraintsSearch,
+          lifeCycle,
+          profile.useApproximateTripSearch()
+        );
   }
 }

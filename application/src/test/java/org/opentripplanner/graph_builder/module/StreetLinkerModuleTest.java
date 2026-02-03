@@ -30,7 +30,7 @@ import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -82,8 +82,11 @@ class StreetLinkerModuleTest {
   void linkFlexStop() {
     OTPFeature.FlexRouting.testOn(() -> {
       var model = new TestModel();
-      var flexTrip = TimetableRepositoryForTest.of()
-        .unscheduledTrip("flex", model.stop(), model.stop());
+      var flexTrip = TimetableRepositoryForTest.of().unscheduledTrip(
+        "flex",
+        model.stop(),
+        model.stop()
+      );
       model.withFlexTrip(flexTrip);
 
       var module = model.streetLinkerModule();
@@ -112,8 +115,11 @@ class StreetLinkerModuleTest {
   void linkFlexStopWithBoardingLocation() {
     OTPFeature.FlexRouting.testOn(() -> {
       var model = new TestModel().withStopLinkedToBoardingLocation();
-      var flexTrip = TimetableRepositoryForTest.of()
-        .unscheduledTrip("flex", model.stop(), model.stop());
+      var flexTrip = TimetableRepositoryForTest.of().unscheduledTrip(
+        "flex",
+        model.stop(),
+        model.stop()
+      );
       model.withFlexTrip(flexTrip);
 
       var module = model.streetLinkerModule();
@@ -211,7 +217,7 @@ class StreetLinkerModuleTest {
         .build();
       builder.withRegularStop(stop);
 
-      timetableRepository = new TimetableRepository(builder.build(), new Deduplicator());
+      timetableRepository = new TimetableRepository(builder.build());
 
       stopVertex = TransitStopVertex.of()
         .withId(stop.getId())
@@ -267,11 +273,7 @@ class StreetLinkerModuleTest {
         })
         .toList();
       StopPattern stopPattern = new StopPattern(stopTimes);
-      var tripTimes = TripTimesFactory.tripTimes(
-        trip,
-        stopTimes,
-        timetableRepository.getDeduplicator()
-      );
+      var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DeduplicatorService.NOOP);
       TripPattern tripPattern = TimetableRepositoryForTest.tripPattern(
         "carsAllowedTripPattern",
         route

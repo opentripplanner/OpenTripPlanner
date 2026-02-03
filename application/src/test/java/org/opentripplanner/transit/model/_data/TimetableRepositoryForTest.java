@@ -32,6 +32,8 @@ import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.AreaStopBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.MultiModalStationBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
@@ -64,15 +66,14 @@ public class TimetableRepositoryForTest {
   public static final WgsCoordinate ANY_COORDINATE = new WgsCoordinate(60.0, 10.0);
 
   // This is used to create valid objects - do not use it for verification
-  private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory()
-    .createPolygon(
-      new Coordinate[] {
-        Coordinates.of(61.0, 10.0),
-        Coordinates.of(61.0, 12.0),
-        Coordinates.of(60.0, 11.0),
-        Coordinates.of(61.0, 10.0),
-      }
-    );
+  private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory().createPolygon(
+    new Coordinate[] {
+      Coordinates.of(61.0, 10.0),
+      Coordinates.of(61.0, 12.0),
+      Coordinates.of(60.0, 11.0),
+      Coordinates.of(61.0, 10.0),
+    }
+  );
 
   public static final Agency AGENCY = Agency.of(id("A1"))
     .withName("Agency Test")
@@ -167,6 +168,14 @@ public class TimetableRepositoryForTest {
       .withCoordinate(60.0, 10.0)
       .withDescription(new NonLocalizedString("Station " + idAndName))
       .withPriority(StopTransferPriority.ALLOWED);
+  }
+
+  public MultiModalStationBuilder multiModalStation(String idAndName) {
+    return MultiModalStation.of(new FeedScopedId(FEED_ID, idAndName))
+      .withName(new NonLocalizedString(idAndName))
+      .withCode(idAndName)
+      .withCoordinate(new WgsCoordinate(60.0, 10.0))
+      .withDescription("MultiModalStation " + idAndName);
   }
 
   public GroupStop groupStop(String idAndName, RegularStop... stops) {

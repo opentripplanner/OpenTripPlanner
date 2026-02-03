@@ -76,10 +76,7 @@ class AddedTripBuilderTest {
     .build();
 
   private final Deduplicator DEDUPLICATOR = new Deduplicator();
-  private final TimetableRepository TRANSIT_MODEL = new TimetableRepository(
-    SITE_REPOSITORY,
-    DEDUPLICATOR
-  );
+  private final TimetableRepository TRANSIT_MODEL = new TimetableRepository(SITE_REPOSITORY);
   private TransitEditorService transitService;
   private EntityResolver ENTITY_RESOLVER;
 
@@ -120,6 +117,7 @@ class AddedTripBuilderTest {
   void testAddedTrip() {
     var addedTrip = new AddedTripBuilder(
       transitService,
+      DEDUPLICATOR,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -233,6 +231,7 @@ class AddedTripBuilderTest {
   void testAddedTripOnAddedRoute() {
     var firstAddedTrip = new AddedTripBuilder(
       transitService,
+      DEDUPLICATOR,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -263,6 +262,7 @@ class AddedTripBuilderTest {
 
     var secondAddedTrip = new AddedTripBuilder(
       transitService,
+      DEDUPLICATOR,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       tripId2,
@@ -306,6 +306,7 @@ class AddedTripBuilderTest {
   void testAddedTripOnExistingRoute() {
     var addedTrip = new AddedTripBuilder(
       transitService,
+      DEDUPLICATOR,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -341,6 +342,7 @@ class AddedTripBuilderTest {
   void testAddedTripWithoutReplacedRoute() {
     var addedTrip = new AddedTripBuilder(
       transitService,
+      DEDUPLICATOR,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -386,6 +388,7 @@ class AddedTripBuilderTest {
   void testAddedTripFailOnMissingServiceId() {
     var addedTrip = new AddedTripBuilder(
       transitService,
+      DEDUPLICATOR,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -439,6 +442,7 @@ class AddedTripBuilderTest {
 
     var addedTrip = new AddedTripBuilder(
       transitService,
+      DEDUPLICATOR,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -478,6 +482,7 @@ class AddedTripBuilderTest {
     );
     var addedTrip = new AddedTripBuilder(
       transitService,
+      DEDUPLICATOR,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -524,6 +529,7 @@ class AddedTripBuilderTest {
     );
     var addedTrip = new AddedTripBuilder(
       transitService,
+      DEDUPLICATOR,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,

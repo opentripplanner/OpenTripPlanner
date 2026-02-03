@@ -39,8 +39,7 @@ public record NodeInfo(
   @Nullable String defaultValue,
   boolean required,
   boolean skipChild
-)
-  implements Comparable<NodeInfo> {
+) implements Comparable<NodeInfo> {
   static final String EXPERIMENTAL_FEATURE =
     "**THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!**";
 

@@ -255,7 +255,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     }
 
     if (!primed && (primingMessageCounter.get() + liveMessageCounter.get()) % 1000 == 0) {
-      logMessageRates(); // ToDo: Better as metric and not log
+      // TODO: Better as metric and not log
+      logMessageRates();
       LOG.info(
         "Retained message queue size: {}, live message queue size: {}",
         primingMessageQueue.size(),

@@ -72,12 +72,12 @@ class ScooterPreferencesTest {
     assertEquals("ScooterPreferences{}", ScooterPreferences.DEFAULT.toString());
     assertEquals(
       "ScooterPreferences{" +
-      "speed: 2.0, " +
-      "reluctance: 1.2, " +
-      "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
-      "optimizeType: TRIANGLE, " +
-      "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +
-      "}",
+        "speed: 2.0, " +
+        "reluctance: 1.2, " +
+        "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
+        "optimizeType: TRIANGLE, " +
+        "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +
+        "}",
       subject.toString()
     );
   }

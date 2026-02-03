@@ -47,12 +47,12 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
       if (feedUpdaters.containsKey(feedName)) {
         throw new UpdaterConstructionException(
           "Feed contains duplicate url for feed " +
-          feedName +
-          ". " +
-          "Urls: " +
-          feed.getUrl() +
-          ", " +
-          feedUpdaters.get(feedName).url
+            feedName +
+            ". " +
+            "Urls: " +
+            feed.getUrl() +
+            ", " +
+            feedUpdaters.get(feedName).url
         );
       }
 

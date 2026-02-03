@@ -187,7 +187,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
     LOG.info(
       "Done analyzing transfers. {} transfers could not be routed and {} transfers had a too long routing" +
-      " distance.",
+        " distance.",
       directTransfersNotFound.size(),
       directTransfersTooLong.size()
     );

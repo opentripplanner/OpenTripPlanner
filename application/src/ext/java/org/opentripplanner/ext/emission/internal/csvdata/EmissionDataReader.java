@@ -48,9 +48,9 @@ public class EmissionDataReader {
   public void read(DataSource emissionDataSource, String resolvedFeedId) {
     LOG.info(
       "Reading EMISSION data: %s (feedId: %s)".formatted(
-          emissionDataSource.detailedInfo(),
-          resolvedFeedId
-        )
+        emissionDataSource.detailedInfo(),
+        resolvedFeedId
+      )
     );
 
     if (!emissionDataSource.exists()) {
@@ -73,15 +73,15 @@ public class EmissionDataReader {
       tripHopMapper.setCurrentFeedId(resolvedFeedId);
       var tripReader = new TripDataReader(emissionDataSource, issueStore);
       this.emissionRepository.addTripPatternEmissions(
-          tripHopMapper.map(tripReader.read(m -> LOG.info(m)))
-        );
+        tripHopMapper.map(tripReader.read(m -> LOG.info(m)))
+      );
       return;
     } catch (HeadersDoNotMatch ignore) {}
 
     LOG.error(
       "No emission data read from: " +
-      emissionDataSource.detailedInfo() +
-      ". Do the header columns match?"
+        emissionDataSource.detailedInfo() +
+        ". Do the header columns match?"
     );
   }
 }

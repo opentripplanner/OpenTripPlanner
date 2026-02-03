@@ -2,9 +2,12 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 
+import java.util.Iterator;
 import java.util.Objects;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorOnBoardAccess;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
@@ -69,7 +72,8 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
   public void prepareForNextStop(int stopIndex, int stopPos) {
     // If no pass-through service exist, this block will be removed by the JIT compiler
     if (passThroughPointsService.isPassThroughPoint(stopIndex)) {
-      for (R ride : patternRides) {
+      for (int i = 0; i < patternRides.size(); ++i) {
+        R ride = patternRides.get(i);
         // Replace existing ride with same ride with the C2 value updated. This only happens if
         // the stop is a pass-through point and the path has visited the pass-through points in the
         // correct order.
@@ -83,7 +87,8 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
 
   @Override
   public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {
-    for (R ride : patternRides) {
+    for (int i = 0; i < patternRides.size(); ++i) {
+      R ride = patternRides.get(i);
       state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
     }
   }
@@ -112,6 +117,40 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
     for (McStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
       boardWithConstrainedTransfer(prevArrival, stopIndex, stopPos, boardSlack, txSearch);
     }
+  }
+
+  @Override
+  public void registerOnBoardAccessStopArrival(RaptorOnBoardAccess access, int boardTime) {
+    state.addOnBoardAccessStopArrival(access, boardTime);
+  }
+
+  @Override
+  public Iterator<? extends McStopArrival<T>> consumeOnBoardStopArrivals() {
+    return state.listOnBoardStopArrivals().iterator();
+  }
+
+  @Override
+  public boolean boardAsOnBoardAccess(
+    ArrivalView<T> prevArrival,
+    int stopPositionInPattern,
+    T trip
+  ) {
+    if (!(prevArrival instanceof McStopArrival<T> prevMcArrival)) {
+      throw new UnsupportedOperationException();
+    }
+
+    var boarding = boardingSupport.searchRegularTransfer(
+      prevArrival.arrivalTime(),
+      stopPositionInPattern,
+      slackProvider.boardSlack(trip.pattern().slackIndex())
+    );
+
+    if (boarding.empty()) {
+      return false;
+    }
+
+    board(prevMcArrival, prevArrival.stop(), boarding);
+    return true;
   }
 
   private void board(

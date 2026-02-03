@@ -69,7 +69,11 @@ class StopArrivalByTypeFilterTest {
   @MethodSource("filterCases")
   void filter(List<StopLocation> stops, Set<GraphQLStopType> include, List<StopLocation> expected) {
     var filter = new StopArrivalByTypeFilter(include);
-    var filtered = filter.filter(stopArrivals(stops)).stream().map(sa -> sa.place.stop).toList();
+    var filtered = filter
+      .filter(stopArrivals(stops))
+      .stream()
+      .map(sa -> sa.place.stop)
+      .toList();
     assertThat(filtered).containsExactlyElementsIn(expected);
   }
 

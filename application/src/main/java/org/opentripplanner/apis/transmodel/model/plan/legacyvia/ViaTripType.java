@@ -20,8 +20,8 @@ public class ViaTripType {
       .name("ViaTripPatternSegment")
       .description(
         "A segment of the via search. The first segment is from the start location to the first " +
-        "entry in the locations list and the last is from the last entry in the locations list " +
-        "to the end location."
+          "entry in the locations list and the last is from the last entry in the locations list " +
+          "to the end location."
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
@@ -64,15 +64,15 @@ public class ViaTripType {
       .name("ViaTrip")
       .description(
         "Description of a trip via one or more intermediate locations. " +
-        "For example from A, via B, then C to D."
+          "For example from A, via B, then C to D."
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("tripPatternsPerSegment")
           .description(
             "A list of segments of the via search. The first segment is from the start location " +
-            "to the first entry in the locations list and the last is from the last entry in the " +
-            "locations list to the end location."
+              "to the first entry in the locations list and the last is from the last entry in the " +
+              "locations list to the end location."
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(viaTripPatternSegment))))
           .dataFetcher(env -> ((ViaRoutingResponse) env.getSource()).getItineraries())
@@ -83,7 +83,7 @@ public class ViaTripType {
           .name("tripPatternCombinations")
           .description(
             "A list of the acceptable combinations of the trip patterns in this segment and the " +
-            "next segment."
+              "next segment."
           )
           .type(
             new GraphQLNonNull(

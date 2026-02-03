@@ -13,8 +13,7 @@ public class TemplateUtilTest {
 
   @Test
   public void replaceSectionTest() {
-    var body =
-      """
+    var body = """
       Expected line 1.
       Expected line 2.
       """;

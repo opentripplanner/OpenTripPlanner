@@ -10,8 +10,8 @@ public interface CarPickupableEdge {
       state.getRequest().mode().includesPickup() &&
       state.getCarPickupState() ==
       (state.getRequest().arriveBy()
-          ? CarPickupState.WALK_FROM_DROP_OFF
-          : CarPickupState.WALK_TO_PICKUP)
+        ? CarPickupState.WALK_FROM_DROP_OFF
+        : CarPickupState.WALK_TO_PICKUP)
     );
   }
 

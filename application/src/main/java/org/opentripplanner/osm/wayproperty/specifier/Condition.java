@@ -108,6 +108,26 @@ public sealed interface Condition {
   }
 
   /**
+   * Negates the condition
+   */
+  record Not(Condition condition) implements Condition {
+    @Override
+    public String key() {
+      return condition.key();
+    }
+
+    @Override
+    public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
+      return !condition.isExtendedKeyMatch(way, exKey);
+    }
+
+    @Override
+    public String toString() {
+      return "not(%s)".formatted(condition.toString());
+    }
+  }
+
+  /**
    * Selects tags where a given key/value matches.
    */
   record Equals(String key, String value) implements Condition {
@@ -130,6 +150,7 @@ public sealed interface Condition {
     public MatchResult matchType() {
       return WILDCARD;
     }
+
     @Override
     public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
       return way.hasTag(exKey);

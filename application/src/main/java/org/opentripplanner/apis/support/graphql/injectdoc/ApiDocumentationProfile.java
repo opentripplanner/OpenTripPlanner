@@ -6,8 +6,7 @@ public enum ApiDocumentationProfile implements DocumentedEnum<ApiDocumentationPr
   DEFAULT,
   ENTUR;
 
-  private static final String TYPE_DOC =
-    """
+  private static final String TYPE_DOC = """
     List of available custom documentation profiles. A profile is used to inject custom
     documentation like type and field description or a deprecated reason.
 

@@ -18,10 +18,9 @@ public class ElevationUtils {
 
   static {
     try {
-      mt = new DefaultMathTransformFactory()
-        .createParameterizedTransform(
-          new EarthGravitationalModel.Provider().getParameters().createValue()
-        );
+      mt = new DefaultMathTransformFactory().createParameterizedTransform(
+        new EarthGravitationalModel.Provider().getParameters().createValue()
+      );
     } catch (FactoryException e) {
       e.printStackTrace();
     }

@@ -9,8 +9,8 @@ import java.awt.Color;
  *
  * @author laurent
  */
-public record DefaultScalarColorPalette(double min, double max, double maxMax)
-  implements ScalarColorPalette {
+public record DefaultScalarColorPalette(double min, double max, double maxMax) implements
+  ScalarColorPalette {
   @Override
   public Color getColor(double value) {
     if (value > max) {

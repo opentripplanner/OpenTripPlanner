@@ -5,8 +5,8 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
 
-public record ParkAndRideEntranceRemoved(VehicleParkingEntrance vehicleParkingEntrance)
-  implements DataImportIssue {
+public record ParkAndRideEntranceRemoved(VehicleParkingEntrance vehicleParkingEntrance) implements
+  DataImportIssue {
   private static final String FMT =
     "Park and ride entrance '%s' is removed because it's StreetVertex ('%s') is removed in a previous step.";
 
@@ -21,7 +21,8 @@ public record ParkAndRideEntranceRemoved(VehicleParkingEntrance vehicleParkingEn
 
   @Override
   public Geometry getGeometry() {
-    return GeometryUtils.getGeometryFactory()
-      .createPoint(vehicleParkingEntrance.getVertex().getCoordinate());
+    return GeometryUtils.getGeometryFactory().createPoint(
+      vehicleParkingEntrance.getVertex().getCoordinate()
+    );
   }
 }

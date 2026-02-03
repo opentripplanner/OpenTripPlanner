@@ -55,7 +55,7 @@ class IdFactory {
 
   private static String idErrorMessage(String entityName) {
     return "Error during GTFS processing: id of %s is null or consists of whitespace only".formatted(
-        entityName
-      );
+      entityName
+    );
   }
 }

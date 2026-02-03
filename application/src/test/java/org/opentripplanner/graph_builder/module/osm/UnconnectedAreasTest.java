@@ -18,7 +18,6 @@ import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -131,7 +130,7 @@ public class UnconnectedAreasTest {
     // the node that has already been injected into the way. So either of these cases are valid.
     assertTrue(
       connections.contains(VertexLabel.osm(-102266)) ||
-      connections.contains(VertexLabel.osm(-102267))
+        connections.contains(VertexLabel.osm(-102267))
     );
   }
 
@@ -156,10 +155,9 @@ public class UnconnectedAreasTest {
   }
 
   private Graph buildOsmGraph(String osmFileName, DataImportIssueStore issueStore) {
-    var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
     var graph = new Graph();
-    var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepository);
     DefaultOsmProvider provider = new DefaultOsmProvider(RESOURCE_LOADER.file(osmFileName), false);
 
     var osmModule = OsmModuleTestFactory.of(provider)

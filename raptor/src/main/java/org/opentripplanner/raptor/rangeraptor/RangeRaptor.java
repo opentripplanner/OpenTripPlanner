@@ -125,6 +125,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
   private void runRaptorForMinute(int iterationDepartureTime) {
     setupIteration(iterationDepartureTime);
     worker.findAccessOnStreetForRound();
+    worker.findOnBoardAccessForRound(iterationDepartureTime);
 
     while (hasMoreRounds()) {
       lifeCycle.prepareForNextRound(roundTracker.nextRound());
@@ -132,6 +133,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
       // NB since we have transfer limiting not bothering to cut off search when there are no
       // more transfers as that will be rare and complicates the code
       worker.findTransitForRound();
+      worker.findOnBoardAccessTransitForRound();
       lifeCycle.transitsForRoundComplete();
 
       worker.findAccessOnBoardForRound();

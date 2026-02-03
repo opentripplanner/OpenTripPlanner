@@ -1,7 +1,11 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
+import java.util.Collections;
+import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorOnBoardAccess;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
@@ -71,4 +75,32 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     int boardSlack,
     RaptorConstrainedBoardingSearch<T> txSearch
   );
+
+  default void registerOnBoardAccessStopArrival(RaptorOnBoardAccess access, int boardTime) {
+    throw new UnsupportedOperationException(
+      "On-board access is not yet supported for this routing strategy"
+    );
+  }
+
+  /**
+   * @return an iterator over all on-board stop-arrivals currently in the state.
+   * The iterator allows removal and this is the expected way to remove or a stop-arrival. When
+   * removed is when we consider a stop-arrival to be "consumed".
+   */
+  default Iterator<? extends ArrivalView<T>> consumeOnBoardStopArrivals() {
+    return Collections.emptyIterator();
+  }
+
+  /**
+   * @return true if boarding successful, false otherwise
+   */
+  default boolean boardAsOnBoardAccess(
+    ArrivalView<T> prevArrival,
+    int stopPositionInPattern,
+    T trip
+  ) {
+    throw new UnsupportedOperationException(
+      "On-board access is not yet supported for this routing strategy"
+    );
+  }
 }

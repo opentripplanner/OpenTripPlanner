@@ -25,7 +25,7 @@ public class BikePreferencesInputType {
           .name("reluctance")
           .description(
             "A measure of how bad biking is compared to being in transit for equal periods of time. " +
-            "Higher values make routing prefer other modes over biking."
+              "Higher values make routing prefer other modes over biking."
           )
           .type(Scalars.GraphQLFloat)
           .defaultValue(dft.reluctance())
@@ -46,7 +46,7 @@ public class BikePreferencesInputType {
           .name("triangleFactors")
           .description(
             "When using optimisationMethod 'triangle', these values tell the routing engine " +
-            "how important each factor is compared to the others. All values should add up to 1."
+              "how important each factor is compared to the others. All values should add up to 1."
           )
           .type(TriangleFactorsInputType.INPUT_TYPE)
           .build()

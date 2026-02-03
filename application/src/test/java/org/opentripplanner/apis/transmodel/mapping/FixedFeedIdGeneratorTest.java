@@ -22,10 +22,10 @@ class FixedFeedIdGeneratorTest {
     );
     assertTrue(
       "AB".contains(
-          FixedFeedIdGenerator.generate(
-            List.of(agency("A", 1), agency("A", 2), agency("B", 1), agency("B", 2))
-          )
-        ),
+        FixedFeedIdGenerator.generate(
+          List.of(agency("A", 1), agency("A", 2), agency("B", 1), agency("B", 2))
+        )
+      ),
       "In case of a tie, A or B should be used"
     );
   }

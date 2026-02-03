@@ -16,7 +16,7 @@ public class ParetoSetEventListenerTest {
   >();
 
   @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-  private final ParetoSet<TestVector> subject = new ParetoSet<>(
+  private final ParetoSet<TestVector> subject = ParetoSet.of(
     (l, r) -> l.v1 < r.v1 || l.v2 < r.v2,
     listener
   );

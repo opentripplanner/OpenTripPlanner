@@ -215,15 +215,15 @@ public class DeduplicatorTest {
 
     assertEquals(
       "Deduplicator{" +
-      "BitSet: 1(1), " +
-      "int[]: 1(1), " +
-      "String: 2(2), " +
-      "String[]: 1(1), " +
-      "LocalDate: 1(2), " +
-      "LocalTime: 1(1), " +
-      "LocalTime[]: 1(2), " +
-      "List<LocalDate>: 1(1)" +
-      "}",
+        "BitSet: 1(1), " +
+        "int[]: 1(1), " +
+        "String: 2(2), " +
+        "String[]: 1(1), " +
+        "LocalDate: 1(2), " +
+        "LocalTime: 1(1), " +
+        "LocalTime[]: 1(2), " +
+        "List<LocalDate>: 1(1)" +
+        "}",
       subject.toString()
     );
   }

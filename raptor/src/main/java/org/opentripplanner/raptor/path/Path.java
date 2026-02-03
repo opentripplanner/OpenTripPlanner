@@ -44,13 +44,14 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   private final AccessPathLeg<T> accessLeg;
   private final EgressPathLeg<T> egressLeg;
 
-  /** @see #dummyPath(int, int, int, int, int) */
+  /** @see #dummyPath(int, int, int, int, int, int) */
   private Path(
     int iterationDepartureTime,
     int startTime,
     int endTime,
     int numberOfTransfers,
-    int c1
+    int c1,
+    int c2
   ) {
     this.iterationDepartureTime = iterationDepartureTime;
     this.startTime = startTime;
@@ -61,7 +62,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     this.c1 = c1;
     this.accessLeg = null;
     this.egressLeg = null;
-    this.c2 = RaptorConstants.NOT_SET;
+    this.c2 = c2;
   }
 
   public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int c1, int c2) {
@@ -106,9 +107,10 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     int startTime,
     int endTime,
     int numberOfTransfers,
-    int cost
+    int cost,
+    int c2
   ) {
-    return new Path<>(iteration, startTime, endTime, numberOfTransfers, cost);
+    return new Path<>(iteration, startTime, endTime, numberOfTransfers, cost, c2);
   }
 
   @Override
@@ -296,7 +298,10 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   }
 
   private static <S extends RaptorTripSchedule> EgressPathLeg<S> findEgressLeg(PathLeg<S> leg) {
-    return (EgressPathLeg<S>) leg.stream().reduce((a, b) -> b).orElseThrow();
+    return (EgressPathLeg<S>) leg
+      .stream()
+      .reduce((a, b) -> b)
+      .orElseThrow();
   }
 
   /* private methods */

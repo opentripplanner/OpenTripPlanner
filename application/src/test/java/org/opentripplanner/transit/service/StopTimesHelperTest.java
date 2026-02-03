@@ -85,7 +85,13 @@ class StopTimesHelperTest {
       SORT_ORDER
     );
 
-    assertEquals(3, result.stream().mapToLong(s -> s.times.size()).sum());
+    assertEquals(
+      3,
+      result
+        .stream()
+        .mapToLong(s -> s.times.size())
+        .sum()
+    );
     var stopTimesForPattern = result
       .stream()
       .filter(s -> s.pattern.getRoute().getId().getId().equals("5"))
@@ -120,7 +126,13 @@ class StopTimesHelperTest {
       SORT_ORDER
     );
 
-    assertEquals(5, result.stream().mapToLong(s -> s.times.size()).sum());
+    assertEquals(
+      5,
+      result
+        .stream()
+        .mapToLong(s -> s.times.size())
+        .sum()
+    );
     assertTrue(hasCancelledTrips(result));
   }
 
@@ -136,7 +148,13 @@ class StopTimesHelperTest {
       SORT_ORDER
     );
 
-    assertEquals(4, result.stream().mapToLong(s -> s.times.size()).sum());
+    assertEquals(
+      4,
+      result
+        .stream()
+        .mapToLong(s -> s.times.size())
+        .sum()
+    );
     assertFalse(hasCancelledTrips(result));
   }
 
@@ -155,7 +173,13 @@ class StopTimesHelperTest {
       SORT_ORDER
     );
 
-    assertEquals(0, result.stream().mapToLong(s -> s.times.size()).sum());
+    assertEquals(
+      0,
+      result
+        .stream()
+        .mapToLong(s -> s.times.size())
+        .sum()
+    );
   }
 
   /**
@@ -173,7 +197,13 @@ class StopTimesHelperTest {
       SORT_ORDER
     );
 
-    assertEquals(9, result.stream().mapToLong(s -> s.times.size()).sum());
+    assertEquals(
+      9,
+      result
+        .stream()
+        .mapToLong(s -> s.times.size())
+        .sum()
+    );
 
     var stopTimesForPattern = result
       .stream()
@@ -289,7 +319,13 @@ class StopTimesHelperTest {
       true
     );
 
-    assertEquals(5, result.stream().mapToLong(s -> s.times.size()).sum());
+    assertEquals(
+      5,
+      result
+        .stream()
+        .mapToLong(s -> s.times.size())
+        .sum()
+    );
     var stopTimesForPattern = result
       .stream()
       .filter(s -> s.pattern.getRoute().getId().getId().equals("5"))

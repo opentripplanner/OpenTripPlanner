@@ -44,9 +44,9 @@ class PathwayNodeMapper {
     if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE) {
       throw new IllegalArgumentException(
         "Expected type " +
-        org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE +
-        ", but got " +
-        gtfsStop.getLocationType()
+          org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE +
+          ", but got " +
+          gtfsStop.getLocationType()
       );
     }
 

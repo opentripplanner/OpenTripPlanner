@@ -156,7 +156,9 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
   private List<TestCase> parseTestCases(String tokensAsText) {
     var tokens = tokensAsText.split("\\s+");
     var sequence = new StringBuilder();
-    return Arrays.stream(tokens).map(token -> parseToken(token, sequence)).toList();
+    return Arrays.stream(tokens)
+      .map(token -> parseToken(token, sequence))
+      .toList();
   }
 
   private TestCase parseToken(String token, StringBuilder sequence) {

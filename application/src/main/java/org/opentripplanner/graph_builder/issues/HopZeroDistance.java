@@ -12,8 +12,7 @@ public record HopZeroDistance(
   int seq,
   StopLocation fromStop,
   StopLocation toStop
-)
-  implements DataImportIssue {
+) implements DataImportIssue {
   private static final String FMT =
     "Zero-distance hop in %s on trip %s stop sequence %d between %s and %s.";
 

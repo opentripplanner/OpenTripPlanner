@@ -91,7 +91,9 @@ public class LocalizedString implements I18NString, Serializable {
       translation = patternMatcher.matcher(translation).replaceAll("%s");
       return String.format(
         translation,
-        Arrays.stream(params).map(i -> i.toString(locale)).toArray(Object[]::new)
+        Arrays.stream(params)
+          .map(i -> i.toString(locale))
+          .toArray(Object[]::new)
       );
     } else {
       return translation;

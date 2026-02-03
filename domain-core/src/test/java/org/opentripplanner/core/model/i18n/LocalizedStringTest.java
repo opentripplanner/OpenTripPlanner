@@ -60,4 +60,15 @@ class LocalizedStringTest {
       ).toString(new Locale("hu"))
     );
   }
+
+  @Test
+  public void testLocalizedString() {
+    LocalizedString localizedString = new LocalizedString(
+      "corner",
+      new NonLocalizedString("first"),
+      new NonLocalizedString("second")
+    );
+
+    assertEquals("Kreuzung first mit second", localizedString.toString(new Locale("de")));
+  }
 }

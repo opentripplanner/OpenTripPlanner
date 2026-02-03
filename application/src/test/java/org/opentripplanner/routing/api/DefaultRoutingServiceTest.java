@@ -114,6 +114,7 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     assertTrue(stops.contains(stopJ));
     assertTrue(stops.contains(stopL));
     assertTrue(stops.contains(stopM));
-    assertTrue(stops.size() >= 3); // Query can overselect
+    // Query can overselect
+    assertTrue(stops.size() >= 3);
   }
 }

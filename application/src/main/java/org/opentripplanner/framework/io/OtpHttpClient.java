@@ -257,11 +257,8 @@ public class OtpHttpClient {
    * close the stream in order to release resources. Use preferably the provided getAndMapXXX
    * methods in this class, since they provide automatic resource management.
    */
-  public InputStream getAsInputStream(
-    URI uri,
-    Duration timeout,
-    Map<String, String> requestHeaders
-  ) throws IOException {
+  public InputStream getAsInputStream(URI uri, Duration timeout, Map<String, String> requestHeaders)
+    throws IOException {
     Objects.requireNonNull(uri);
     Objects.requireNonNull(timeout);
     Objects.requireNonNull(requestHeaders);
@@ -274,11 +271,11 @@ public class OtpHttpClient {
     if (isFailedRequest(response)) {
       throw new IOException(
         "Service unavailable: " +
-        uri +
-        ". HTTP status code: " +
-        response.getCode() +
-        " - " +
-        response.getReasonPhrase()
+          uri +
+          ". HTTP status code: " +
+          response.getCode() +
+          " - " +
+          response.getReasonPhrase()
       );
     }
     HttpEntity entity = response.getEntity();

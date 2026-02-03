@@ -40,9 +40,9 @@ class GsHelper {
     }
     throw new IllegalArgumentException(
       "The '" +
-      uri +
-      "' is not a legal Google Cloud Storage " +
-      "URL on format: 'gs://bucket-name/object-name'."
+        uri +
+        "' is not a legal Google Cloud Storage " +
+        "URL on format: 'gs://bucket-name/object-name'."
     );
   }
 

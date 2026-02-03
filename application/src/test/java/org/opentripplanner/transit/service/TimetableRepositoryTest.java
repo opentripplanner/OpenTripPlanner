@@ -20,7 +20,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
@@ -38,10 +37,9 @@ class TimetableRepositoryTest {
   @Test
   void validateTimeZones() {
     // First GTFS bundle should be added successfully
-    var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
     var graph = new Graph();
-    var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepository);
     ConstantsForTests.addGtfsToGraph(
       graph,
       timetableRepository,
@@ -79,10 +77,9 @@ class TimetableRepositoryTest {
 
   @Test
   void validateTimeZonesWithExplicitTimeZone() {
-    var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
     var graph = new Graph();
-    var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepository);
 
     // Whit explicit time zone
     timetableRepository.initTimeZone(ZoneIds.CHICAGO);

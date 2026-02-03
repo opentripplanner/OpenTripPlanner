@@ -55,22 +55,26 @@ class RatioScalarTest {
 
   @Test
   void testParseLiteral() {
-    var ratioDouble = (Double) GraphQLScalars.RATIO_SCALAR.getCoercing()
-      .parseLiteral(new FloatValue(BigDecimal.valueOf(HALF)));
+    var ratioDouble = (Double) GraphQLScalars.RATIO_SCALAR.getCoercing().parseLiteral(
+      new FloatValue(BigDecimal.valueOf(HALF))
+    );
     assertEquals(HALF, ratioDouble, DELTA);
-    var ratioInt = (Double) GraphQLScalars.RATIO_SCALAR.getCoercing()
-      .parseLiteral(new IntValue(BigInteger.valueOf(HALF.intValue())));
+    var ratioInt = (Double) GraphQLScalars.RATIO_SCALAR.getCoercing().parseLiteral(
+      new IntValue(BigInteger.valueOf(HALF.intValue()))
+    );
     assertEquals(HALF.intValue(), ratioInt, DELTA);
     assertThrows(CoercingParseLiteralException.class, () ->
       GraphQLScalars.RATIO_SCALAR.getCoercing().parseLiteral(new StringValue(TEXT))
     );
     assertThrows(CoercingParseLiteralException.class, () ->
-      GraphQLScalars.RATIO_SCALAR.getCoercing()
-        .parseLiteral(new FloatValue(BigDecimal.valueOf(TOO_HIGH)))
+      GraphQLScalars.RATIO_SCALAR.getCoercing().parseLiteral(
+        new FloatValue(BigDecimal.valueOf(TOO_HIGH))
+      )
     );
     assertThrows(CoercingParseLiteralException.class, () ->
-      GraphQLScalars.RATIO_SCALAR.getCoercing()
-        .parseLiteral(new FloatValue(BigDecimal.valueOf(TOO_LOW)))
+      GraphQLScalars.RATIO_SCALAR.getCoercing().parseLiteral(
+        new FloatValue(BigDecimal.valueOf(TOO_LOW))
+      )
     );
   }
 }

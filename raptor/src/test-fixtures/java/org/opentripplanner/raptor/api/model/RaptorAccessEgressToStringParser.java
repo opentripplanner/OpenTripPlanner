@@ -81,7 +81,10 @@ public final class RaptorAccessEgressToStringParser {
   }
 
   public Optional<RaptorValue> getField(RaptorValueType type) {
-    return fields.stream().filter(it -> it.type() == type).findFirst();
+    return fields
+      .stream()
+      .filter(it -> it.type() == type)
+      .findFirst();
   }
 
   private RaptorAccessEgressToStringParser parse() {

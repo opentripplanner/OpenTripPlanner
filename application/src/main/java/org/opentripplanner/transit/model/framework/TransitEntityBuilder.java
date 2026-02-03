@@ -1,7 +1,8 @@
 package org.opentripplanner.transit.model.framework;
 
 public interface TransitEntityBuilder<
-  E extends TransitObject<E, B>, B extends TransitEntityBuilder<E, B>
+  E extends TransitObject<E, B>,
+  B extends TransitEntityBuilder<E, B>
 >
   extends TransitBuilder<E, B> {
   /**

@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  *             the thread-safety, but just by looking at a few lines of code I see problems - a strategy needs to be
  *             analysed, designed and documented.
  */
-class SiriTripPatternCache {
+public class SiriTripPatternCache {
 
   /**
    * We cache the trip pattern based on the stop pattern only in order to de-duplicate them.
@@ -80,7 +80,7 @@ class SiriTripPatternCache {
     // TODO RT_AB: Verify implementation, which is different than the GTFS-RT version.
     //   It can return a TripPattern from the scheduled data, but protective copies are handled in
     //   TimetableSnapshot.update. Better document this aspect of the contract in this method's Javadoc.
-    if (originalTripPattern.getStopPattern().equals(stopPattern)) {
+    if (originalTripPattern != null && originalTripPattern.getStopPattern().equals(stopPattern)) {
       return originalTripPattern;
     }
 
@@ -95,7 +95,7 @@ class SiriTripPatternCache {
         .withMode(trip.getMode())
         .withNetexSubmode(trip.getNetexSubMode())
         .withStopPattern(stopPattern)
-        .withCreatedByRealtimeUpdater(true)
+        .withRealTimeStopPatternModified()
         .withOriginalTripPattern(originalTripPattern)
         .build();
       // TODO: Add pattern to timetableRepository index?

@@ -223,6 +223,36 @@ public class LineType {
           .dataFetcher(environment -> (getSource(environment)).getGroupsOfRoutes())
           .build()
       )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("isReplacement")
+          .description(
+            """
+            Is this a replacement Line? In NeTEx/SIRI-sourced data this can be set by either
+            a replacement submode, or a replacement link in a DatedServiceJourney. Only true
+            for GTFS-sourced data if set by the extended GTFS type.
+            """
+          )
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+          .dataFetcher(environment ->
+            GqlUtil.getTransitService(environment)
+              .getReplacementHelper()
+              .isReplacementRoute(getSource(environment))
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("replacementsExist")
+          .description("Are there replacement DatedServiceJourneys for this Line?")
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+          .dataFetcher(environment ->
+            GqlUtil.getTransitService(environment)
+              .getReplacementHelper()
+              .replacementsExist(getSource(environment))
+          )
+          .build()
+      )
       .build();
   }
 

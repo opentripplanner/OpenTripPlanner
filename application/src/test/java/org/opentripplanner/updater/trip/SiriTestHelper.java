@@ -5,6 +5,7 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL
 import java.util.List;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
@@ -21,6 +22,7 @@ public class SiriTestHelper {
     this.transitTestEnvironment = transitTestEnvironment;
     this.siriAdapter = new SiriRealTimeTripUpdateAdapter(
       transitTestEnvironment.timetableRepository(),
+      DeduplicatorService.NOOP,
       transitTestEnvironment.timetableSnapshotManager()
     );
   }

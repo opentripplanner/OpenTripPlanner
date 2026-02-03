@@ -28,3 +28,9 @@ c287575df6798810a69fafc54c8c4e1867b71367
 
 # Move Timetable & Snapshot to timetable domain package
 d688305e9b7756e4c720498c7e0449c520cfb423
+
+# move/remove trailing comments
+beeac076c0b9f0a8aaa1424ef1d6df3a6fa8f6ab
+
+# update prettier version
+34026d19232608f9e6a8841a7c6ac5e5c99abbd4

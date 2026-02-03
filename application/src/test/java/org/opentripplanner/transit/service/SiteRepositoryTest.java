@@ -24,8 +24,9 @@ class SiteRepositoryTest {
 
   private static final WgsCoordinate COOR_A = new WgsCoordinate(60.0, 11.0);
   private static final WgsCoordinate COOR_B = new WgsCoordinate(62.0, 12.0);
-  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory()
-    .createPoint(COOR_A.asJtsCoordinate());
+  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory().createPoint(
+    COOR_A.asJtsCoordinate()
+  );
   public static final NonLocalizedString NAME = NonLocalizedString.ofNullable("Name");
   private static final FeedScopedId ID = TimetableRepositoryForTest.id("A");
   private static final Station STATION = Station.of(ID)

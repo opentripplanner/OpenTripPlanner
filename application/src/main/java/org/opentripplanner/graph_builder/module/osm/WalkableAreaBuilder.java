@@ -101,12 +101,12 @@ class WalkableAreaBuilder {
     this.boardingLocationRefTags = boardingLocationRefTags;
     this.platformLinkingPoints = platformEntriesLinking
       ? graph
-        .getVertices()
-        .stream()
-        .filter(OsmVertex.class::isInstance)
-        .map(OsmVertex.class::cast)
-        .filter(this::isPlatformLinkingPoint)
-        .collect(Collectors.toList())
+          .getVertices()
+          .stream()
+          .filter(OsmVertex.class::isInstance)
+          .map(OsmVertex.class::cast)
+          .filter(this::isPlatformLinkingPoint)
+          .collect(Collectors.toList())
       : List.of();
   }
 
@@ -501,7 +501,7 @@ class WalkableAreaBuilder {
     float carSpeed = parent
       .getOsmProvider()
       .getOsmTagMapper()
-      .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS);
+      .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS, issueStore);
 
     I18NString name = namer.getName(parent, label);
     AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()

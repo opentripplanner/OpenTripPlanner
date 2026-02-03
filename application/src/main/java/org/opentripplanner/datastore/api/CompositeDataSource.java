@@ -36,9 +36,9 @@ public interface CompositeDataSource extends DataSource, Closeable {
   default void delete() {
     throw new UnsupportedOperationException(
       "This datasource type " +
-      getClass().getSimpleName() +
-      " do not support DELETE. Can not delete: " +
-      path()
+        getClass().getSimpleName() +
+        " do not support DELETE. Can not delete: " +
+        path()
     );
   }
 }

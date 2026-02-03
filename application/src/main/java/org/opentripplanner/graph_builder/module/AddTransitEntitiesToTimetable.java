@@ -62,7 +62,7 @@ public class AddTransitEntitiesToTimetable {
   }
 
   private void addTransfers(TimetableRepository timetableRepository) {
-    timetableRepository.getTransferService().addAll(dataImport.getAllTransfers());
+    timetableRepository.getConstrainedTransferService().addAll(dataImport.getAllTransfers());
   }
 
   private void addServices(TimetableRepository timetableRepository) {

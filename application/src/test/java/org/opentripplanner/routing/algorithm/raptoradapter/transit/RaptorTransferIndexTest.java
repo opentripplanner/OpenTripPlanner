@@ -127,7 +127,10 @@ class RaptorTransferIndexTest {
   ) {
     return Arrays.stream(transfers)
       .flatMap(t ->
-        t.asRaptorTransfer(streetSearchRequest).map(x -> x.reverseOf(fromStopIndex)).stream()
+        t
+          .asRaptorTransfer(streetSearchRequest)
+          .map(x -> x.reverseOf(fromStopIndex))
+          .stream()
       )
       .toList();
   }

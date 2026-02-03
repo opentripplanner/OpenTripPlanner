@@ -181,8 +181,8 @@ class OsmAreaGroup {
         for (OsmArea area : areaSet) {
           LOG.debug(
             "Failed to create merged area for " +
-            area +
-            ".  This area might not be at fault; it might be one of the other areas in this list."
+              area +
+              ".  This area might not be at fault; it might be one of the other areas in this list."
           );
           out.add(new OsmAreaGroup(Arrays.asList(area)));
         }

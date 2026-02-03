@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.osm.moduletests;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.graph_builder.module.osm.moduletests._support.NodeBuilder.node;
+import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -13,8 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.FewerThanTwoIntersectionNodesInElevatorWay;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
-import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
+import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -240,23 +242,27 @@ class ElevatorTest {
     var osmVertex1 = new OsmVertex(0, 1, 1);
     var osmVertex2 = new OsmVertex(0, 2, 2);
 
-    var elevatorVertex1 = vertexFactory.elevator(
+    var elevatorHopVertex1 = vertexFactory.elevator(
       osmVertex1,
       elevatorWay.getId() + "_" + 0 + "_" + osmVertex1.getLabelString()
     );
-    var elevatorVertex2 = vertexFactory.elevator(
+    var elevatorHopVertex2 = vertexFactory.elevator(
       osmVertex2,
       elevatorWay.getId() + "_" + 1 + "_" + osmVertex2.getLabelString()
     );
 
-    addElevatorBoardAndAlightEdges(edgeSet, osmVertex1, elevatorVertex1);
-    addElevatorBoardAndAlightEdges(edgeSet, osmVertex2, elevatorVertex2);
-    addElevatorHopEdges(elevatorVertex1, elevatorVertex2, 2.5, edgeSet, null);
+    addElevatorBoardAndAlightEdges(edgeSet, osmVertex1, elevatorHopVertex1);
+    addElevatorBoardAndAlightEdges(edgeSet, osmVertex2, elevatorHopVertex2);
+    addElevatorHopEdges(elevatorHopVertex1, elevatorHopVertex2, 2.5, edgeSet, null);
 
     assertEquals(
       edgeSet,
       new HashSet<>(
-        graph.getEdges().stream().map(edge -> convertEdgeToVertexLabelString(edge)).toList()
+        graph
+          .getEdges()
+          .stream()
+          .map(edge -> convertEdgeToVertexLabelString(edge))
+          .toList()
       )
     );
     assertEquals(edgeSet.size(), graph.getEdges().size());
@@ -283,23 +289,27 @@ class ElevatorTest {
     var osmVertex1 = new OsmVertex(0, 1, 1);
     var osmVertex2 = new OsmVertex(0, 2, 2);
 
-    var elevatorVertex1 = vertexFactory.elevator(
+    var elevatorHopVertex1 = vertexFactory.elevator(
       osmVertex1,
       elevatorWay.getId() + "_" + 0 + "_" + osmVertex1.getLabelString()
     );
-    var elevatorVertex2 = vertexFactory.elevator(
+    var elevatorHopVertex2 = vertexFactory.elevator(
       osmVertex2,
       elevatorWay.getId() + "_" + 1 + "_" + osmVertex2.getLabelString()
     );
 
-    addElevatorBoardAndAlightEdges(edgeSet, osmVertex1, elevatorVertex1);
-    addElevatorBoardAndAlightEdges(edgeSet, osmVertex2, elevatorVertex2);
-    addElevatorHopEdges(elevatorVertex1, elevatorVertex2, 0, edgeSet, null);
+    addElevatorBoardAndAlightEdges(edgeSet, osmVertex1, elevatorHopVertex1);
+    addElevatorBoardAndAlightEdges(edgeSet, osmVertex2, elevatorHopVertex2);
+    addElevatorHopEdges(elevatorHopVertex1, elevatorHopVertex2, 0, edgeSet, null);
 
     assertEquals(
       edgeSet,
       new HashSet<>(
-        graph.getEdges().stream().map(edge -> convertEdgeToVertexLabelString(edge)).toList()
+        graph
+          .getEdges()
+          .stream()
+          .map(edge -> convertEdgeToVertexLabelString(edge))
+          .toList()
       )
     );
     assertEquals(edgeSet.size(), graph.getEdges().size());
@@ -341,8 +351,80 @@ class ElevatorTest {
 
     assertEquals(
       graph.getVertices().size(),
-      graph.getVertices().stream().map(vertex -> vertex.getLabel()).distinct().count()
+      graph
+        .getVertices()
+        .stream()
+        .map(vertex -> vertex.getLabel())
+        .distinct()
+        .count()
     );
+  }
+
+  /**
+   * If an elevator way has three intersection nodes, it is is probably a tagging error.
+   * OTP supports it anyway. We need to make sure that the middle intersection node is not created
+   * twice, otherwise we get an error during deserialization.
+   */
+  @Test
+  void elevatorWayWithThreeIntersectionNodes() {
+    var n1 = node(1, new WgsCoordinate(1, 1));
+    var n2 = node(2, new WgsCoordinate(2, 2));
+    var n3 = node(3, new WgsCoordinate(3, 3));
+    var n4 = node(4, new WgsCoordinate(4, 4));
+    var n5 = node(5, new WgsCoordinate(5, 5));
+
+    var provider = TestOsmProvider.of()
+      .addWayFromNodes(way -> way.addTag("highway", "elevator"), n1, n2, n3)
+      .addWayFromNodes(way -> way.addTag("public_transport", "platform"), n4, n2, n5)
+      .build();
+    var graph = new Graph();
+
+    OsmModuleTestFactory.of(provider).withGraph(graph).builder().build().buildGraph();
+
+    var elevatorHopEdges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    assertThat(elevatorHopEdges).hasSize(4);
+    var elevatorHopVertices = graph
+      .getVerticesOfType(ElevatorHopVertex.class)
+      .stream()
+      .map(vertex -> vertex.getLabelString());
+    assertThat(elevatorHopVertices).containsNoDuplicates();
+  }
+
+  /**
+   * If the connected nodes of an elevator way have been modeled as elevators, they do not appear
+   * as intersection nodes. OTP should create an issue, but it should not cause errors.
+   */
+  @Test
+  void elevatorWayWithFewerThanTwoIntersectionNodes() {
+    var n1 = node(1, new WgsCoordinate(1, 1));
+    n1.addTag("highway", "elevator");
+    var n2 = node(2, new WgsCoordinate(2, 2));
+    n2.addTag("highway", "elevator");
+
+    var provider = TestOsmProvider.of()
+      .addWayFromNodes(way -> way.addTag("highway", "elevator"), n1, n2)
+      .build();
+    var graph = new Graph();
+    var issueStore = new DefaultDataImportIssueStore();
+
+    OsmModuleTestFactory.of(provider)
+      .withGraph(graph)
+      .builder()
+      .withIssueStore(issueStore)
+      .build()
+      .buildGraph();
+
+    var elevatorHopEdges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    assertThat(elevatorHopEdges).hasSize(0);
+
+    var issues = issueStore
+      .listIssues()
+      .stream()
+      .filter(issue -> issue instanceof FewerThanTwoIntersectionNodesInElevatorWay)
+      .map(FewerThanTwoIntersectionNodesInElevatorWay.class::cast)
+      .toList();
+    assertEquals(1, issues.size());
+    assertEquals(0, issues.getFirst().intersectionNodes());
   }
 
   private void addElevatorBoardAndAlightEdges(

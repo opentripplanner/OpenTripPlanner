@@ -49,7 +49,11 @@ final class TripTimesForDaysIndex {
   TripTimesForDaysIndex(List<int[]> firstStopDepartureTimesPerDay) {
     // 'list' is an alias to make the logic below easier to read
     final List<int[]> list = firstStopDepartureTimesPerDay;
-    this.tripIndex = new int[list.stream().mapToInt(a -> a.length).sum() * 2];
+    this.tripIndex = new int[list
+      .stream()
+      .mapToInt(a -> a.length)
+      .sum() *
+    2];
     int[] a;
 
     // 'day' is the current day index

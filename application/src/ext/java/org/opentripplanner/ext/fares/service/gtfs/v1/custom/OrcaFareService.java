@@ -5,7 +5,6 @@ import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import com.google.common.collect.Lists;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,7 +72,7 @@ public class OrcaFareService extends DefaultFareService {
   public static final String SKAGIT_TRANSIT_AGENCY_ID = "e0e4541a-2714-487b-b30c-f5c6cb4a310f";
   public static final String SEATTLE_STREET_CAR_AGENCY_ID = "23";
   public static final String WASHINGTON_STATE_FERRIES_AGENCY_ID = "95";
-  public static final String KITSAP_TRANSIT_AGENCY_ID = "kt";
+  public static final String KITSAP_TRANSIT_AGENCY_ID = "20";
   public static final String WHATCOM_AGENCY_ID = "14";
 
   public static final String MONORAIL_AGENCY_ID = "96";
@@ -87,8 +86,6 @@ public class OrcaFareService extends DefaultFareService {
     new FeedScopedId(FEED_ID, "cash"),
     "cash"
   );
-
-  private static final LocalDate KITSAP_FAST_FERRY_CHANGE_DATE = LocalDate.of(2025, 10, 1);
 
   protected enum TransferType {
     ORCA_INTERAGENCY_TRANSFER,
@@ -105,8 +102,7 @@ public class OrcaFareService extends DefaultFareService {
     KC_WATER_TAXI_WEST_SEATTLE,
     KC_METRO,
     KITSAP_TRANSIT,
-    KITSAP_TRANSIT_FAST_FERRY_EASTBOUND,
-    KITSAP_TRANSIT_FAST_FERRY_WESTBOUND,
+    KITSAP_TRANSIT_FAST_FERRY,
     PIERCE_COUNTY_TRANSIT,
     SKAGIT_TRANSIT,
     SEATTLE_STREET_CAR,
@@ -137,15 +133,13 @@ public class OrcaFareService extends DefaultFareService {
      */
     public boolean permitsFreeTransfers(ZonedDateTime startTime) {
       return switch (this) {
-        case WASHINGTON_STATE_FERRIES,
+        case
+          WASHINGTON_STATE_FERRIES,
           SKAGIT_TRANSIT,
           WHATCOM_LOCAL,
           WHATCOM_CROSS_COUNTY,
+          KITSAP_TRANSIT_FAST_FERRY,
           SKAGIT_CROSS_COUNTY -> false;
-        case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND,
-          KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> !startTime.isAfter(
-          KITSAP_FAST_FERRY_CHANGE_DATE.atStartOfDay(startTime.getZone())
-        );
         default -> true;
       };
     }
@@ -199,13 +193,13 @@ public class OrcaFareService extends DefaultFareService {
   static RideType getRideType(Leg leg) {
     var agencyId = leg.agency().getId().getId();
     var route = leg.route();
-    var tripId = leg.trip().getId().getId();
     return switch (agencyId) {
       case COMM_TRANS_AGENCY_ID, COMM_TRANS_FLEX_AGENCY_ID -> {
         try {
           int routeId = Integer.parseInt(route.getShortName());
           if (routeId >= 500 && routeId < 600) {
-            yield RideType.SOUND_TRANSIT_BUS; // CommTrans operates some ST routes.
+            // CommTrans operates some ST routes.
+            yield RideType.SOUND_TRANSIT_BUS;
           }
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         } catch (NumberFormatException e) {
@@ -251,12 +245,7 @@ public class OrcaFareService extends DefaultFareService {
       case T_LINK_AGENCY_ID -> RideType.SOUND_TRANSIT_T_LINK;
       case KITSAP_TRANSIT_AGENCY_ID -> {
         if (route.getGtfsType() == ROUTE_TYPE_FERRY) {
-          // Additional trip id checks are required to distinguish Kitsap fast ferry routes.
-          if (tripId.contains("east")) {
-            yield RideType.KITSAP_TRANSIT_FAST_FERRY_EASTBOUND;
-          } else if (tripId.contains("west")) {
-            yield RideType.KITSAP_TRANSIT_FAST_FERRY_WESTBOUND;
-          }
+          yield RideType.KITSAP_TRANSIT_FAST_FERRY;
         }
         yield RideType.KITSAP_TRANSIT;
       }
@@ -332,12 +321,6 @@ public class OrcaFareService extends DefaultFareService {
       case KC_WATER_TAXI_WEST_SEATTLE -> usesOrca(fareType)
         ? optionalUSD(5.25f)
         : optionalUSD(6.25f);
-      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> optionalUSD(2f);
-      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> leg
-          .startTime()
-          .isBefore(KITSAP_FAST_FERRY_CHANGE_DATE.atStartOfDay(leg.startTime().getZone()))
-        ? optionalUSD(12.00f)
-        : optionalUSD(13.00f);
       case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
         getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
       );
@@ -346,7 +329,8 @@ public class OrcaFareService extends DefaultFareService {
       );
       case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(2.50f);
       case EVERETT_TRANSIT, PIERCE_COUNTY_TRANSIT -> optionalUSD(2.00f);
-      case WHATCOM_LOCAL,
+      case
+        WHATCOM_LOCAL,
         WHATCOM_CROSS_COUNTY,
         SKAGIT_LOCAL,
         SKAGIT_CROSS_COUNTY -> fareType.equals(FareType.electronicRegular)
@@ -368,7 +352,8 @@ public class OrcaFareService extends DefaultFareService {
     return switch (rideType) {
       case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
       case KC_WATER_TAXI_VASHON_ISLAND, KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(1.00f);
-      case KC_METRO,
+      case
+        KC_METRO,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
@@ -382,13 +367,9 @@ public class OrcaFareService extends DefaultFareService {
       case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
         getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
       );
-      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> optionalUSD((1f));
-      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> leg
-          .startTime()
-          .isBefore(KITSAP_FAST_FERRY_CHANGE_DATE.atStartOfDay(leg.startTime().getZone()))
-        ? optionalUSD(6.00f)
-        : optionalUSD(6.50f);
-      case SKAGIT_LOCAL,
+      case KITSAP_TRANSIT_FAST_FERRY -> defaultFare.map(Money::half);
+      case
+        SKAGIT_LOCAL,
         SKAGIT_CROSS_COUNTY,
         WHATCOM_CROSS_COUNTY,
         WHATCOM_LOCAL -> Optional.empty();
@@ -414,7 +395,7 @@ public class OrcaFareService extends DefaultFareService {
       case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
       case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
       case EVERETT_TRANSIT -> optionalUSD(0.5f);
-      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND,
+      case
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
@@ -427,11 +408,7 @@ public class OrcaFareService extends DefaultFareService {
       case MONORAIL -> Optional.empty();
       case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(3f);
       case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(2.5f);
-      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> leg
-          .startTime()
-          .isBefore(KITSAP_FAST_FERRY_CHANGE_DATE.atStartOfDay(leg.startTime().getZone()))
-        ? optionalUSD(6.00f)
-        : optionalUSD(6.50f);
+      case KITSAP_TRANSIT_FAST_FERRY -> defaultFare.map(Money::half);
       // Discount specific to Skagit transit and not Orca.
       case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
         getWashingtonStateFerriesFare(route.getLongName(), fareType, df)

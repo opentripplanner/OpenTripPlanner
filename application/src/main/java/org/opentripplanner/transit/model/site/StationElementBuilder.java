@@ -13,7 +13,8 @@ import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
  * used as from and to.
  */
 public abstract class StationElementBuilder<
-  E extends StationElement<E, B>, B extends StationElementBuilder<E, B>
+  E extends StationElement<E, B>,
+  B extends StationElementBuilder<E, B>
 >
   extends AbstractEntityBuilder<E, B> {
 

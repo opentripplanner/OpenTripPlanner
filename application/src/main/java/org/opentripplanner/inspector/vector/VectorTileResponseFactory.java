@@ -41,9 +41,9 @@ public class VectorTileResponseFactory {
         .header(HttpHeaders.CONTENT_TYPE, HttpUtils.TEXT_PLAIN)
         .entity(
           "Could not find vector tile layer(s). Requested layers: %s. Available layers: %s.".formatted(
-              requestedLayers,
-              availableLayerNames
-            )
+            requestedLayers,
+            availableLayerNames
+          )
         )
         .build();
     }

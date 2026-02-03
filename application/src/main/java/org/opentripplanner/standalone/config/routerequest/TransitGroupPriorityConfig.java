@@ -38,8 +38,8 @@ public class TransitGroupPriorityConfig {
         c,
         "byAgency",
         "All groups here are split by agency. For example if you list mode " +
-        "[RAIL, COACH] then all rail and coach services run by an agency get the same " +
-        "group-id."
+          "[RAIL, COACH] then all rail and coach services run by an agency get the same " +
+          "group-id."
       )
     );
     transit.addPriorityGroupsGlobal(
@@ -47,7 +47,7 @@ public class TransitGroupPriorityConfig {
         c,
         "global",
         "All services matching a 'global' group will get the same group-id. Use this " +
-        "to assign the same id to a specific mode/sub-mode/route."
+          "to assign the same id to a specific mode/sub-mode/route."
       )
     );
   }

@@ -35,7 +35,10 @@ public class ExpectedList {
   }
 
   public String[] get(int... indexes) {
-    return Arrays.stream(indexes).mapToObj(i -> items[i]).toList().toArray(new String[0]);
+    return Arrays.stream(indexes)
+      .mapToObj(i -> items[i])
+      .toList()
+      .toArray(new String[0]);
   }
 
   public String[] range(int startInclusive, int endExclusive) {

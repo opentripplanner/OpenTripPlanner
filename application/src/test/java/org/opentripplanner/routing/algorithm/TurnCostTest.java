@@ -149,10 +149,14 @@ public class TurnCostTest {
     assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
 
     assertEquals(0, states.get(0).getElapsedTimeSeconds());
-    assertEquals(50, states.get(1).getElapsedTimeSeconds()); // maple_main1 = 50
-    assertEquals(160, states.get(2).getElapsedTimeSeconds()); // main1_2 = 100
-    assertEquals(220, states.get(3).getElapsedTimeSeconds()); // main_broad2 = 50
-    assertEquals(330, states.get(4).getElapsedTimeSeconds()); // broad2_3 = 100
+    // maple_main1 = 50
+    assertEquals(50, states.get(1).getElapsedTimeSeconds());
+    // main1_2 = 100
+    assertEquals(160, states.get(2).getElapsedTimeSeconds());
+    // main_broad2 = 50
+    assertEquals(220, states.get(3).getElapsedTimeSeconds());
+    // broad2_3 = 100
+    assertEquals(330, states.get(4).getElapsedTimeSeconds());
   }
 
   @Test
@@ -200,10 +204,14 @@ public class TurnCostTest {
     assertEquals("broad_3rd", getParentLabelString(states.get(4).getVertex()));
 
     assertEquals(0, states.get(0).getElapsedTimeSeconds());
-    assertEquals(50, states.get(1).getElapsedTimeSeconds()); // maple_main1 = 50
-    assertEquals(160, states.get(2).getElapsedTimeSeconds()); // main1_2 = 100
-    assertEquals(270, states.get(3).getElapsedTimeSeconds()); // broad1_2 = 100
-    assertEquals(380, states.get(4).getElapsedTimeSeconds()); // broad2_3 = 100
+    // maple_main1 = 50
+    assertEquals(50, states.get(1).getElapsedTimeSeconds());
+    // main1_2 = 100
+    assertEquals(160, states.get(2).getElapsedTimeSeconds());
+    // broad1_2 = 100
+    assertEquals(270, states.get(3).getElapsedTimeSeconds());
+    // broad2_3 = 100
+    assertEquals(380, states.get(4).getElapsedTimeSeconds());
   }
 
   private GraphPath<State, Edge, Vertex> checkForwardRouteDuration(

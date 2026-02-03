@@ -25,8 +25,9 @@ import org.slf4j.LoggerFactory;
  */
 class GbfsFeedLoaderTest {
 
-  private static final OtpHttpClient otpHttpClient = new OtpHttpClientFactory()
-    .create(LoggerFactory.getLogger(GbfsFeedLoaderTest.class));
+  private static final OtpHttpClient otpHttpClient = new OtpHttpClientFactory().create(
+    LoggerFactory.getLogger(GbfsFeedLoaderTest.class)
+  );
 
   @Test
   void getV30Feed() {

@@ -117,12 +117,12 @@ public enum SpeedTestProfile {
       }
       throw new IllegalArgumentException(
         "Profile is not valid: '" +
-        value +
-        "'\nProfiles:\n\t" +
-        Arrays.stream(values())
-          .map(SpeedTestProfile::description)
-          .collect(Collectors.joining("\n\t"))
-          .replace('.', ' ')
+          value +
+          "'\nProfiles:\n\t" +
+          Arrays.stream(values())
+            .map(SpeedTestProfile::description)
+            .collect(Collectors.joining("\n\t"))
+            .replace('.', ' ')
       );
     }
   }

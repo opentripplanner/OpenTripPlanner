@@ -31,8 +31,9 @@ public class RentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> {
       .getVehicleRentalPlacesForEnvelope(env)
       .stream()
       .map(place -> {
-        Geometry geometry = GeometryUtils.getGeometryFactory()
-          .createPoint(new Coordinate(place.longitude(), place.latitude()));
+        Geometry geometry = GeometryUtils.getGeometryFactory().createPoint(
+          new Coordinate(place.longitude(), place.latitude())
+        );
         geometry.setUserData(place);
         return geometry;
       })

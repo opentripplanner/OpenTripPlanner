@@ -14,8 +14,7 @@ public record HopSpeedSlow(
   int seq,
   StopLocation fromStop,
   StopLocation toStop
-)
-  implements DataImportIssue {
+) implements DataImportIssue {
   private static final String FMT =
     "Very slow speed of %.2f kph over %.1fm on route %s trip %s " +
     "stop sequence %d between %s and %s.";

@@ -18,8 +18,7 @@ public record BikeepUpdaterParameters(
   String feedId,
   Duration frequency,
   HttpHeaders httpHeaders
-)
-  implements VehicleParkingUpdaterParameters {
+) implements VehicleParkingUpdaterParameters {
   @Override
   public VehicleParkingSourceType sourceType() {
     return VehicleParkingSourceType.BIKEEP;

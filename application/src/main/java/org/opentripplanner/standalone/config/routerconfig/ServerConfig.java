@@ -7,6 +7,8 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import java.time.Duration;
 import java.util.List;
 import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
+import org.opentripplanner.ext.httpresponsetimemetrics.HttpResponseTimeMetricsConfig;
+import org.opentripplanner.ext.httpresponsetimemetrics.HttpResponseTimeMetricsParameters;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.server.OTPWebApplicationParameters;
@@ -17,6 +19,7 @@ public class ServerConfig implements OTPWebApplicationParameters {
   private final Duration apiProcessingTimeout;
   private final List<RequestTraceParameter> traceParameters;
   private final ApiDocumentationProfile apiDocumentationProfile;
+  private final HttpResponseTimeMetricsParameters httpResponseTimeMetrics;
 
   public ServerConfig(String parameterName, NodeAdapter root) {
     NodeAdapter c = root
@@ -101,11 +104,16 @@ public class ServerConfig implements OTPWebApplicationParameters {
             .since(V2_4)
             .summary(
               "If `true` a unique value is generated if no http request header is provided, or " +
-              "the value is missing."
+                "the value is missing."
             )
             .asBoolean(false)
         )
       );
+
+    this.httpResponseTimeMetrics = HttpResponseTimeMetricsConfig.mapHttpResponseTimeMetrics(
+      "httpResponseTimeMetrics",
+      c
+    );
   }
 
   public Duration apiProcessingTimeout() {
@@ -121,6 +129,11 @@ public class ServerConfig implements OTPWebApplicationParameters {
     return apiDocumentationProfile;
   }
 
+  @Override
+  public HttpResponseTimeMetricsParameters httpResponseTimeMetricsParameters() {
+    return httpResponseTimeMetrics;
+  }
+
   public void validate(Duration streetRoutingTimeout) {
     if (
       !apiProcessingTimeout.isNegative() &&
@@ -128,10 +141,10 @@ public class ServerConfig implements OTPWebApplicationParameters {
     ) {
       throw new OtpAppException(
         "streetRoutingTimeout (" +
-        streetRoutingTimeout +
-        ") must be shorter than apiProcessingTimeout (" +
-        apiProcessingTimeout +
-        ')'
+          streetRoutingTimeout +
+          ") must be shorter than apiProcessingTimeout (" +
+          apiProcessingTimeout +
+          ')'
       );
     }
   }

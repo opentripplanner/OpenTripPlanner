@@ -51,9 +51,9 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
     assertEquals(accessEgressCost + transitCost, path.c1());
     assertEquals(
       "Walk 1m 10:00:15 10:01:15 C₁120 ~ A 45s " +
-      "~ BUS L1 10:02 10:07 5m C₁438 ~ B 15s " +
-      "~ Walk 2m 10:07:15 10:09:15 C₁210 " +
-      "[10:00:15 10:09:15 9m Tₙ0 C₁768]",
+        "~ BUS L1 10:02 10:07 5m C₁438 ~ B 15s " +
+        "~ Walk 2m 10:07:15 10:09:15 C₁210 " +
+        "[10:00:15 10:09:15 9m Tₙ0 C₁768]",
       path.toStringDetailed(RaptorTestConstants::stopIndexToName)
     );
   }

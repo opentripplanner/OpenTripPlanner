@@ -33,7 +33,8 @@ public class HSLFareServiceTest implements PlanTestConstants {
   @ParameterizedTest(name = "[{index}] {0}")
   @MethodSource("createTestCases")
   public void canCalculateHSLFares(
-    String testCaseName, // used to create parameterized test name
+    // used to create parameterized test name
+    String testCaseName,
     FareService fareService,
     Itinerary i,
     List<String> expectedFareIds

@@ -27,15 +27,14 @@ public class SiteRepositoryTestBuilder {
   private final SiteRepositoryBuilder siteRepositoryBuilder;
 
   private static final WgsCoordinate ANY_COORDINATE = new WgsCoordinate(60.0, 10.0);
-  private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory()
-    .createPolygon(
-      new Coordinate[] {
-        Coordinates.of(61.0, 10.0),
-        Coordinates.of(61.0, 12.0),
-        Coordinates.of(60.0, 11.0),
-        Coordinates.of(61.0, 10.0),
-      }
-    );
+  private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory().createPolygon(
+    new Coordinate[] {
+      Coordinates.of(61.0, 10.0),
+      Coordinates.of(61.0, 12.0),
+      Coordinates.of(60.0, 11.0),
+      Coordinates.of(61.0, 10.0),
+    }
+  );
 
   public SiteRepositoryTestBuilder(SiteRepositoryBuilder siteRepositoryBuilder) {
     this.siteRepositoryBuilder = siteRepositoryBuilder;

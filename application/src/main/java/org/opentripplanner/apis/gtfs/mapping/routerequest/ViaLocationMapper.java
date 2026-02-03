@@ -39,7 +39,7 @@ class ViaLocationMapper {
         visit.getGraphQLLabel(),
         visit.getGraphQLMinimumWaitTime(),
         mapStopLocationIds(visit.getGraphQLStopLocationIds()),
-        mapCoordinate(visit.getGraphQLCoordinate()).map(List::of).orElse(List.of())
+        mapCoordinate(visit.getGraphQLCoordinate()).orElse(null)
       );
     } else {
       throw new IllegalArgumentException("ViaLocation must define either pass-through or visit.");

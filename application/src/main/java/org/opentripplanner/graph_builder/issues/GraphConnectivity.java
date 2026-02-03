@@ -11,8 +11,7 @@ public record GraphConnectivity(
   long removed,
   long restricted,
   long nothru
-)
-  implements DataImportIssue {
+) implements DataImportIssue {
   private static final String FMT =
     "%s graph connectivity: found %d islands, %d islands with stops, modified %d islands with stops, removed %d isolated edges, removed traverse mode from %d edges, converted %d edges to no through traffic";
 

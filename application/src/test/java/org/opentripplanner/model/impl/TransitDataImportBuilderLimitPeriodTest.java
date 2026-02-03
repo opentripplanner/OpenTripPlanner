@@ -14,9 +14,9 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.calendar.LocalDateInterval;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.EntityById;
@@ -117,7 +117,7 @@ public class TransitDataImportBuilderLimitPeriodTest {
     assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
 
     // Limit service to last half of month
-    subject.limitServiceDays(new ServiceDateInterval(D2, D3));
+    subject.limitServiceDays(new LocalDateInterval(D2, D3));
 
     // Verify calendar
     List<ServiceCalendar> calendars = subject.getCalendars();
@@ -173,7 +173,7 @@ public class TransitDataImportBuilderLimitPeriodTest {
     LocalDate end
   ) {
     ServiceCalendar calendar = new ServiceCalendar();
-    calendar.setPeriod(new ServiceDateInterval(start, end));
+    calendar.setPeriod(new LocalDateInterval(start, end));
     calendar.setAllDays(1);
     calendar.setServiceId(serviceId);
     return calendar;
@@ -195,7 +195,10 @@ public class TransitDataImportBuilderLimitPeriodTest {
 
   private TripPattern createTripPattern(Collection<Trip> trips) {
     FeedScopedId patternId = TimetableRepositoryForTest.id(
-      trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
+      trips
+        .stream()
+        .map(t -> t.getId().getId())
+        .collect(Collectors.joining(":"))
     );
     TripPatternBuilder tpb = TripPattern.of(patternId)
       .withRoute(route)

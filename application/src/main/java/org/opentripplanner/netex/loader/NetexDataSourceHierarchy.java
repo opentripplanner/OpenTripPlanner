@@ -130,8 +130,8 @@ public class NetexDataSourceHierarchy {
       } catch (IndexOutOfBoundsException e) {
         throw new IllegalStateException(
           "Netex file patten '" +
-          filePattern +
-          "' is missing a group pattern like: '(\\w+)' in '(\\w+)-.*\\.xml' "
+            filePattern +
+            "' is missing a group pattern like: '(\\w+)' in '(\\w+)-.*\\.xml' "
         );
       }
       groupEntries.computeIfAbsent(currentGroup, GroupEntries::new);

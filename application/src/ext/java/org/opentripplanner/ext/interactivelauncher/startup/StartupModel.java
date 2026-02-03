@@ -63,7 +63,7 @@ public class StartupModel {
       if (path.length() <= length) {
         LOG.warn(
           "The root directory contains a config file, choose " +
-          "the parent directory or delete the config file."
+            "the parent directory or delete the config file."
         );
         continue;
       }

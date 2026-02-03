@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.utils.lang.StringUtils;
 
 /**
@@ -272,5 +273,15 @@ public class TimeUtils {
    */
   public static int toTransitTimeSeconds(ZonedDateTime transitSearchTimeZero, Instant time) {
     return (int) ChronoUnit.SECONDS.between(transitSearchTimeZero.toInstant(), time);
+  }
+
+  /**
+
+   * Truncates the time to the nearest second. If the given {@code dateTime} is {@code null},
+   * then {@code null} is returned
+   */
+  @Nullable
+  public static Instant truncateToSeconds(@Nullable Instant dateTime) {
+    return dateTime == null ? null : dateTime.truncatedTo(ChronoUnit.SECONDS);
   }
 }

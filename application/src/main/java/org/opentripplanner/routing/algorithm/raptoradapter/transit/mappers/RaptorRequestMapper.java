@@ -76,7 +76,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     this.linkingContext = Objects.requireNonNull(linkingContext);
   }
 
-  public static <T extends RaptorTripSchedule> RaptorRequest<T> mapRequest(
+  public static <T extends RaptorTripSchedule> RaptorRequestMapper<T> of(
     RouteRequest request,
     ZonedDateTime transitSearchTimeZero,
     boolean isMultiThreaded,
@@ -97,10 +97,10 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       viaTransferResolver,
       lookUpStopIndex,
       linkingContext
-    ).doMap();
+    );
   }
 
-  private RaptorRequest<T> doMap() {
+  public RaptorRequest<T> mapRaptorRequest() {
     var builder = new RaptorRequestBuilder<T>();
     var searchParams = builder.searchParams();
     var preferences = request.preferences();
@@ -246,17 +246,20 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         builder.addViaStop(stopIndex);
         viaStops.add(stopIndex);
       }
-      for (var coordinate : input.coordinates()) {
+      if (input.coordinate().isPresent()) {
         var vertices = linkingContext.findVertices(((VisitViaLocation) input).coordinateLocation());
         if (vertices.isEmpty()) {
           LOG.warn(
             "Found no vertices for the visit via location {} which indicates a problem.",
             input
           );
-          continue;
         }
         for (var vertex : vertices) {
-          var viaTransfers = viaTransferResolver.createViaTransfers(request, vertex, coordinate);
+          var viaTransfers = viaTransferResolver.createViaTransfers(
+            request,
+            vertex,
+            input.coordinate().get()
+          );
           for (var it : viaTransfers) {
             // If via-stop and via-transfers are used together then walking from a stop
             // to the coordinate and back is not pareto optimal, using just the stop

@@ -20,7 +20,8 @@ public class TransferModeMapper {
     return switch (mode) {
       case BIKE -> GraphQLTypes.GraphQLPlanTransferMode.BICYCLE;
       case CAR -> GraphQLTypes.GraphQLPlanTransferMode.CAR;
-      case WALK,
+      case
+        WALK,
         BIKE_RENTAL,
         CAR_HAILING,
         CAR_RENTAL,

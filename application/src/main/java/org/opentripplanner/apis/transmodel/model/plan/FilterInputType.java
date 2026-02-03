@@ -17,8 +17,8 @@ public class FilterInputType {
         .name("select")
         .description(
           "A list of selectors for what lines/trips should be allowed during search. " +
-          "In order to be accepted a trip/line has to match with at least one selector. " +
-          "An empty list means that everything should be allowed. "
+            "In order to be accepted a trip/line has to match with at least one selector. " +
+            "An empty list means that everything should be allowed. "
         )
         .type(new GraphQLList(new GraphQLNonNull(SelectInputType.INPUT_TYPE)))
         .build()
@@ -28,7 +28,7 @@ public class FilterInputType {
         .name("not")
         .description(
           "A list of selectors for what lines/trips should be excluded during the search. " +
-          "If line/trip matches with at least one selector it will be excluded."
+            "If line/trip matches with at least one selector it will be excluded."
         )
         .type(new GraphQLList(new GraphQLNonNull(SelectInputType.INPUT_TYPE)))
         .build()

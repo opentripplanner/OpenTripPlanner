@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -44,6 +45,14 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  *   details shared across all trips in the TripPattern; it reflects business practices outside
  *   routing; it is essential to optimizations in routing algorithms like Raptor. We may be
  *   conflating a domain model grouping with an internal routing grouping.
+ * TODO RT_TG In addition to AB comment: this does not map cleanly to NeTEx JourneyPattern, the
+ *   concept does not exist in GTFS. The TripPattern ID is unfortunatly exposed in the OTP APIs.
+ *   This class has a 1-to-1 relationship with RoutingTripPattern. To support a more flexible
+ *   system and more use-cases we should consider keeping "routing-tables" apart from the bussiness
+ *   domain model. One example, if the wheelchair accessability differ between trips within the
+ *   same pattern, then we can not support it - wheelchair is not part of the TripPattern key.
+ *   Putting everything into the key is not a good options either, the fragmentation will have a
+ *   negative performance impact.
  * <p>
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel
  * JOURNEY a "trip", thus TripPattern.
@@ -94,23 +103,11 @@ public final class TripPattern
    */
   private final byte[][] hopGeometries;
 
-  /**
-   * The original TripPattern this replaces at least for one modified trip.
-   *
-   * Currently this seems to only be set (via TripPatternBuilder) from TripPatternCache and
-   * SiriTripPatternCache.
-   *
-   * FIXME RT_AB: Revise comments to make it clear how this is used (it is only used rarely).
-   */
+  @Nullable
   private final TripPattern originalTripPattern;
 
-  /**
-   * When a trip is added or rerouted by a realtime update, this may give rise to a new TripPattern
-   * that did not exist in the scheduled data. For such TripPatterns this field will be true. If on
-   * the other hand this TripPattern instance was created from the schedule data, this field will be
-   * false.
-   */
-  private final boolean createdByRealtimeUpdater;
+  private final boolean realTimeTripPattern;
+  private final boolean stopPatternModifiedInRealTime;
 
   private final RoutingTripPattern routingTripPattern;
 
@@ -119,7 +116,8 @@ public final class TripPattern
     this.name = builder.getName();
     this.route = builder.getRoute();
     this.stopPattern = requireNonNull(builder.getStopPattern());
-    this.createdByRealtimeUpdater = builder.isCreatedByRealtimeUpdate();
+    this.realTimeTripPattern = builder.isRealTimeTripPattern();
+    this.stopPatternModifiedInRealTime = builder.isStopPatternModifiedInRealTime();
     this.mode = requireNonNull(builder.getMode());
     this.netexSubMode = requireNonNull(builder.getNetexSubmode());
     this.containsMultipleModes = builder.getContainsMultipleModes();
@@ -144,10 +142,23 @@ public final class TripPattern
     this.routingTripPattern = new RoutingTripPattern(this);
 
     getId().requireSameFeedId(route.getId());
+
+    if (stopPatternModifiedInRealTime && !realTimeTripPattern) {
+      throw new IllegalStateException();
+    }
   }
 
   public static TripPatternBuilder of(FeedScopedId id) {
     return new TripPatternBuilder(id);
+  }
+
+  /**
+   * Use this to alter an existing pattern BEFORE it is added to the model. This method will keep
+   * all fields as is.
+   */
+  @Override
+  public TripPatternBuilder copy() {
+    return new TripPatternBuilder(this);
   }
 
   /** The human-readable, unique name for this trip pattern. */
@@ -185,13 +196,12 @@ public final class TripPattern
     if (hopGeometries != null) {
       return CompactLineStringUtils.uncompactLineString(hopGeometries[stopPosInPattern], false);
     } else {
-      return GeometryUtils.getGeometryFactory()
-        .createLineString(
-          new Coordinate[] {
-            coordinate(stopPattern.getStop(stopPosInPattern)),
-            coordinate(stopPattern.getStop(stopPosInPattern + 1)),
-          }
-        );
+      return GeometryUtils.getGeometryFactory().createLineString(
+        new Coordinate[] {
+          coordinate(stopPattern.getStop(stopPosInPattern)),
+          coordinate(stopPattern.getStop(stopPosInPattern + 1)),
+        }
+      );
     }
   }
 
@@ -403,16 +413,45 @@ public final class TripPattern
   }
 
   /**
-   * Has the TripPattern been created by a real-time update.
+   * The original TripPattern this replaces at least for one modified trip.
+   *
+   * Currently this seems to only be set (via TripPatternBuilder) from TripPatternCache and
+   * SiriTripPatternCache.
+   *
+   * FIXME RT_AB: Revise comments to make it clear how this is used (it is only used rarely).
    */
-  public boolean isCreatedByRealtimeUpdater() {
-    return createdByRealtimeUpdater;
-  }
-
+  @Nullable
   public TripPattern getOriginalTripPattern() {
     return originalTripPattern;
   }
 
+  /**
+   * When a trip is added or rerouted by a realtime update, this may give rise to a new StopPattern
+   * (and also a new TripPattern) that did not exist in the scheduled data. For such cases, this
+   * field will be {@code true}.
+   * <p>
+   * Returns {@code true} if this TripPattern is a modified version of a scheduled TripPattern.
+   * If this method returns {@code false}, this TripPattern is either a scheduled TripPattern or
+   * a TripPattern generated from scratch in real-time (GTFS ADDED/NeTEx ExtraJourney).
+   */
+  public boolean isStopPatternModifiedInRealTime() {
+    return stopPatternModifiedInRealTime;
+  }
+
+  /**
+   * Returns {@code true} if this TripPattern is created in real time, {@code false} if the
+   * TripPattern is created from planned/scheduled data. Note! This trip pattern can represent a
+   * new trip (GTFS ADDED or NeTEx Extra Journey) or a modification of a scheduled trip.
+   */
+  public boolean isRealTimeTripPattern() {
+    return realTimeTripPattern;
+  }
+
+  /**
+   * @deprecated This method is not clearly defined. Use {@link #isStopPatternModifiedInRealTime()}
+   * or {@link #isRealTimeTripPattern()} if possible, or clarify what this is needed for.
+   */
+  @Deprecated
   public boolean isModified() {
     return originalTripPattern != null;
   }
@@ -492,11 +531,6 @@ public final class TripPattern
       Objects.equals(this.stopPattern, other.stopPattern) &&
       Objects.equals(this.scheduledTimetable, other.scheduledTimetable)
     );
-  }
-
-  @Override
-  public TripPatternBuilder copy() {
-    return new TripPatternBuilder(this);
   }
 
   /**

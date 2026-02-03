@@ -99,38 +99,38 @@ class MissingElevationHandler {
 
     elevations.forEach(
       ((vertex, elevation) -> {
-          vertex
-            .getIncoming()
-            .forEach(edge -> {
-              if (edge.getDistanceMeters() < maxElevationPropagationMeters) {
-                pq.insert(
-                  new ElevationRepairState(
-                    vertex,
-                    elevation,
-                    edge.getFromVertex(),
-                    edge.getDistanceMeters()
-                  ),
+        vertex
+          .getIncoming()
+          .forEach(edge -> {
+            if (edge.getDistanceMeters() < maxElevationPropagationMeters) {
+              pq.insert(
+                new ElevationRepairState(
+                  vertex,
+                  elevation,
+                  edge.getFromVertex(),
                   edge.getDistanceMeters()
-                );
-              }
-            });
+                ),
+                edge.getDistanceMeters()
+              );
+            }
+          });
 
-          vertex
-            .getOutgoing()
-            .forEach(edge -> {
-              if (edge.getDistanceMeters() < maxElevationPropagationMeters) {
-                pq.insert(
-                  new ElevationRepairState(
-                    vertex,
-                    elevation,
-                    edge.getToVertex(),
-                    edge.getDistanceMeters()
-                  ),
+        vertex
+          .getOutgoing()
+          .forEach(edge -> {
+            if (edge.getDistanceMeters() < maxElevationPropagationMeters) {
+              pq.insert(
+                new ElevationRepairState(
+                  vertex,
+                  elevation,
+                  edge.getToVertex(),
                   edge.getDistanceMeters()
-                );
-              }
-            });
-        })
+                ),
+                edge.getDistanceMeters()
+              );
+            }
+          });
+      })
     );
 
     return pq;

@@ -74,7 +74,7 @@ public class DemConfig {
           .since(V2_3)
           .summary(
             "Specify a multiplier to convert elevation units from source to meters." +
-            documentationAddition
+              documentationAddition
           )
           .description(
             """

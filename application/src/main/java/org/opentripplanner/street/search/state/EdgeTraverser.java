@@ -21,9 +21,9 @@ public class EdgeTraverser {
       if (afterTraversal.length > 1) {
         throw new IllegalStateException(
           "Expected only a single state returned from edge %s but received %s".formatted(
-              e,
-              afterTraversal.length
-            )
+            e,
+            afterTraversal.length
+          )
         );
       }
       if (State.isEmpty(afterTraversal)) {

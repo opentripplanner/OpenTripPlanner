@@ -42,14 +42,16 @@ public class Model implements Serializable {
 
   private static Model readFromFile() {
     try {
-      var mapper = new ObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      var mapper = new ObjectMapper().configure(
+        DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+        false
+      );
       return mapper.readValue(MODEL_FILE, Model.class).initSubModels();
     } catch (IOException e) {
       System.err.println(
         "Unable to read the InteractiveOtpMain state cache. If the model changed this " +
-        "is expected, and it will work next time. Cause: " +
-        e.getMessage()
+          "is expected, and it will work next time. Cause: " +
+          e.getMessage()
       );
       return createNew();
     }

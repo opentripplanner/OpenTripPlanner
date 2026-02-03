@@ -5,10 +5,18 @@
   "https://checkstyle.org/dtds/configuration_1_3.dtd">
 <module name="Checker">
     <module name="TreeWalker">
+        <module name="ArrayTypeStyle"/>
         <module name="AvoidStarImport"/>
+        <module name="DefaultComesLast"/>
+        <module name="EmptyStatement"/>
+        <module name="NeedBraces"/>
         <module name="RedundantImport"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StringLiteralEquality"/>
+        <module name="TrailingComment">
+            <property name="format" value="^\s*$"/>
+        </module>
         <module name="UnusedImports"/>
         <module name="UnusedLocalVariable"/>
-        <module name="NeedBraces"/>
     </module>
 </module>

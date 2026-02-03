@@ -15,7 +15,7 @@ public class AssertSpeedTestSetup {
   ) {
     int numberOfPatternForTestDate = timetableRepository
       .getRaptorTransitData()
-      .getTripPatternsForRunningDate(config.testDate)
+      .getTripPatternsForRunningDate(config.testDate())
       .size();
 
     if (numberOfPatternForTestDate < 10) {
@@ -32,7 +32,7 @@ public class AssertSpeedTestSetup {
 
         """.formatted(
             numberOfPatternForTestDate,
-            config.testDate,
+            config.testDate(),
             buildConfig.transitServiceStart,
             OtpFileNames.BUILD_CONFIG_FILENAME,
             buildConfig.transitServiceEnd,

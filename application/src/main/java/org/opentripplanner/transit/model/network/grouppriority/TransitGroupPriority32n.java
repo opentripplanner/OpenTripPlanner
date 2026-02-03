@@ -51,10 +51,10 @@ class TransitGroupPriority32n {
     if (priorityGroupIndex > MAX_SEQ_NO) {
       throw new IllegalArgumentException(
         "Transit group priority exceeds max number of groups: " +
-        priorityGroupIndex +
-        " (MAX=" +
-        MAX_SEQ_NO +
-        ")"
+          priorityGroupIndex +
+          " (MAX=" +
+          MAX_SEQ_NO +
+          ")"
       );
     }
   }

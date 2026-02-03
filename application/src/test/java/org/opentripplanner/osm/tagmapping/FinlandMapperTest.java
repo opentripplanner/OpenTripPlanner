@@ -8,7 +8,6 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.WayProperties;
@@ -17,16 +16,9 @@ import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 class FinlandMapperTest {
 
-  private WayPropertySet wps;
-  private OsmTagMapper mapper;
-  static float epsilon = 0.01f;
-
-  @BeforeEach
-  void setup() {
-    this.wps = new WayPropertySet();
-    this.mapper = new FinlandMapper();
-    this.mapper.populateProperties(this.wps);
-  }
+  private final OsmTagMapper mapper = new FinlandMapper();
+  private final WayPropertySet wps = mapper.buildWayPropertySet();
+  private static final float EPSILON = 0.01f;
 
   /**
    * Test that bike and walk safety factors are calculated accurately
@@ -91,54 +83,54 @@ class FinlandMapperTest {
     cyclewaySegregatedFootwayCrossingWithTrafficLights.addTag("segregated", "yes");
     cyclewaySegregatedFootwayCrossingWithTrafficLights.addTag("highway", "cycleway");
     cyclewaySegregatedFootwayCrossingWithTrafficLights.addTag("crossing", "traffic_signals");
-    assertEquals(2.06, wps.getDataForWay(primaryWay).forward().bicycleSafety(), epsilon);
+    assertEquals(2.06, wps.getDataForWay(primaryWay).forward().bicycleSafety(), EPSILON);
     // way with high speed limit, has higher walk safety factor
-    assertEquals(1.8, wps.getDataForWay(primaryWay).forward().walkSafety(), epsilon);
-    assertEquals(1.8, wps.getDataForWay(primaryWay).backward().walkSafety(), epsilon);
+    assertEquals(1.8, wps.getDataForWay(primaryWay).forward().walkSafety(), EPSILON);
+    assertEquals(1.8, wps.getDataForWay(primaryWay).backward().walkSafety(), EPSILON);
     // way with low speed limit, has lower walk safety factor
-    assertEquals(1.45, wps.getDataForWay(livingStreetWay).forward().walkSafety(), epsilon);
-    assertEquals(1.1, wps.getDataForWay(footway).forward().walkSafety(), epsilon);
-    assertEquals(1.1, wps.getDataForWay(sidewalk).forward().walkSafety(), epsilon);
-    assertEquals(1.1, wps.getDataForWay(segregatedCycleway).forward().walkSafety(), epsilon);
-    assertEquals(1.0, wps.getDataForWay(tunnel).forward().walkSafety(), epsilon);
-    assertEquals(1.0, wps.getDataForWay(bridge).forward().walkSafety(), epsilon);
-    assertEquals(1.2, wps.getDataForWay(footwayCrossing).forward().walkSafety(), epsilon);
+    assertEquals(1.45, wps.getDataForWay(livingStreetWay).forward().walkSafety(), EPSILON);
+    assertEquals(1.1, wps.getDataForWay(footway).forward().walkSafety(), EPSILON);
+    assertEquals(1.1, wps.getDataForWay(sidewalk).forward().walkSafety(), EPSILON);
+    assertEquals(1.1, wps.getDataForWay(segregatedCycleway).forward().walkSafety(), EPSILON);
+    assertEquals(1.0, wps.getDataForWay(tunnel).forward().walkSafety(), EPSILON);
+    assertEquals(1.0, wps.getDataForWay(bridge).forward().walkSafety(), EPSILON);
+    assertEquals(1.2, wps.getDataForWay(footwayCrossing).forward().walkSafety(), EPSILON);
     assertEquals(
       1.1,
       wps.getDataForWay(footwayCrossingWithTrafficLights).forward().walkSafety(),
-      epsilon
+      EPSILON
     );
-    assertEquals(1.25, wps.getDataForWay(cyclewayCrossing).forward().walkSafety(), epsilon);
-    assertEquals(1.25, wps.getDataForWay(cyclewayFootwayCrossing).forward().walkSafety(), epsilon);
+    assertEquals(1.25, wps.getDataForWay(cyclewayCrossing).forward().walkSafety(), EPSILON);
+    assertEquals(1.25, wps.getDataForWay(cyclewayFootwayCrossing).forward().walkSafety(), EPSILON);
     assertEquals(
       1.15,
       wps.getDataForWay(cyclewayCrossingWithTrafficLights).forward().walkSafety(),
-      epsilon
+      EPSILON
     );
     assertEquals(
       1.15,
       wps.getDataForWay(cyclewayFootwayCrossingWithTrafficLights).forward().walkSafety(),
-      epsilon
+      EPSILON
     );
     assertEquals(
       1.2,
       wps.getDataForWay(cyclewaySegregatedCrossing).forward().walkSafety(),
-      epsilon
+      EPSILON
     );
     assertEquals(
       1.2,
       wps.getDataForWay(cyclewaySegregatedFootwayCrossing).forward().walkSafety(),
-      epsilon
+      EPSILON
     );
     assertEquals(
       1.1,
       wps.getDataForWay(cyclewaySegregatedCrossingWithTrafficLights).forward().walkSafety(),
-      epsilon
+      EPSILON
     );
     assertEquals(
       1.1,
       wps.getDataForWay(cyclewaySegregatedFootwayCrossingWithTrafficLights).forward().walkSafety(),
-      epsilon
+      EPSILON
     );
   }
 
@@ -150,9 +142,9 @@ class FinlandMapperTest {
     // surface has mixin bicycle safety of 1.3 but no walk safety
     wayWithMixins.addTag("surface", "metal");
     // 1.0 * 1.3 = 1.3
-    assertEquals(1.3, wps.getDataForWay(wayWithMixins).forward().bicycleSafety(), epsilon);
+    assertEquals(1.3, wps.getDataForWay(wayWithMixins).forward().bicycleSafety(), EPSILON);
     // 1.6 is the default walk safety for a way with ALL permissions and speed limit > 35 and <= 60 kph
-    assertEquals(1.6, wps.getDataForWay(wayWithMixins).forward().walkSafety(), epsilon);
+    assertEquals(1.6, wps.getDataForWay(wayWithMixins).forward().walkSafety(), EPSILON);
 
     var wayWithMixinsAndCustomSafety = new OsmWay();
     // highway=service has custom bicycle safety of 1.1 but no custom walk safety
@@ -163,21 +155,30 @@ class FinlandMapperTest {
     assertEquals(
       1.43,
       wps.getDataForWay(wayWithMixinsAndCustomSafety).forward().bicycleSafety(),
-      epsilon
+      EPSILON
     );
     // 1.6 is the default walk safety for a way with ALL permissions and speed limit <= 35 kph
     assertEquals(
       1.45,
       wps.getDataForWay(wayWithMixinsAndCustomSafety).forward().walkSafety(),
-      epsilon
+      EPSILON
     );
+  }
 
+  @Test
+  void testUseSidePath() {
     var wayWithBicycleSidePath = new OsmWay();
     wayWithBicycleSidePath.addTag("bicycle", "use_sidepath");
-    assertEquals(8, wps.getDataForWay(wayWithBicycleSidePath).forward().walkSafety(), epsilon);
+    assertEquals(9, wps.getDataForWay(wayWithBicycleSidePath).forward().walkSafety(), EPSILON);
     var wayWithFootSidePath = new OsmWay();
     wayWithFootSidePath.addTag("foot", "use_sidepath");
-    assertEquals(8, wps.getDataForWay(wayWithFootSidePath).forward().walkSafety(), epsilon);
+    assertEquals(9, wps.getDataForWay(wayWithFootSidePath).forward().walkSafety(), EPSILON);
+  }
+
+  @Test
+  void testMaxCarSpeed() {
+    assertEquals(33.34, wps.maxPossibleCarSpeed(), EPSILON);
+    assertEquals(22.21, wps.defaultCarSpeed(), EPSILON);
   }
 
   @Test
@@ -252,9 +253,6 @@ class FinlandMapperTest {
 
   @Test
   void motorroad() {
-    OsmTagMapper osmTagMapper = new FinlandMapper();
-    WayPropertySet wps = new WayPropertySet();
-    osmTagMapper.populateProperties(wps);
     var way = WayTestData.carTunnel();
     assertEquals(ALL, wps.getDataForWay(way).forward().getPermission());
     way.addTag("motorroad", "yes");

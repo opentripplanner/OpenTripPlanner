@@ -17,14 +17,14 @@ class StreetPreferencesTest {
   private static final Duration MAX_DIRECT = Duration.ofMinutes(10);
   private static final Duration ROUTING_TIMEOUT = Duration.ofSeconds(3);
   private static final DrivingDirection DRIVING_DIRECTION = DrivingDirection.LEFT;
-  private static final int ELEVATOR_BOARD_TIME = (int) Duration.ofMinutes(2).toSeconds();
+  private static final Duration ELEVATOR_BOARD_SLACK = Duration.ofMinutes(2);
   private static final IntersectionTraversalModel INTERSECTION_TRAVERSAL_MODEL =
     IntersectionTraversalModel.CONSTANT;
 
   private final StreetPreferences subject = StreetPreferences.of()
     .withDrivingDirection(DRIVING_DIRECTION)
     .withTurnReluctance(TURN_RELUCTANCE)
-    .withElevator(it -> it.withBoardTime(ELEVATOR_BOARD_TIME))
+    .withElevator(it -> it.withBoardSlack(ELEVATOR_BOARD_SLACK))
     .withIntersectionTraversalModel(INTERSECTION_TRAVERSAL_MODEL)
     .withAccessEgress(it -> it.withMaxDuration(MAX_ACCESS_EGRESS, Map.of()))
     .withMaxDirectDuration(MAX_DIRECT, Map.of())
@@ -33,7 +33,7 @@ class StreetPreferencesTest {
 
   @Test
   void elevator() {
-    assertEquals(ELEVATOR_BOARD_TIME, subject.elevator().boardTime());
+    assertEquals(ELEVATOR_BOARD_SLACK, subject.elevator().boardSlack());
   }
 
   @Test
@@ -81,16 +81,16 @@ class StreetPreferencesTest {
     assertEquals("StreetPreferences{}", StreetPreferences.DEFAULT.toString());
     assertEquals(
       "StreetPreferences{" +
-      "turnReluctance: 2.0, " +
-      "drivingDirection: LEFT, " +
-      "routingTimeout: 3s, " +
-      "elevator: ElevatorPreferences{boardTime: 2m}, " +
-      "intersectionTraversalModel: CONSTANT, " +
-      "accessEgress: AccessEgressPreferences{" +
-      "maxDuration: DurationForStreetMode{default:5m}" +
-      "}, " +
-      "maxDirectDuration: DurationForStreetMode{default:10m}" +
-      "}",
+        "turnReluctance: 2.0, " +
+        "drivingDirection: LEFT, " +
+        "routingTimeout: 3s, " +
+        "elevator: ElevatorPreferences{boardSlack: 2m}, " +
+        "intersectionTraversalModel: CONSTANT, " +
+        "accessEgress: AccessEgressPreferences{" +
+        "maxDuration: DurationForStreetMode{default:5m}" +
+        "}, " +
+        "maxDirectDuration: DurationForStreetMode{default:10m}" +
+        "}",
       subject.toString()
     );
   }

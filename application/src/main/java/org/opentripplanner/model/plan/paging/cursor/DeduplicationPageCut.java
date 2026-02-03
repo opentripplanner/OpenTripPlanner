@@ -17,8 +17,7 @@ record DeduplicationPageCut(
   NormalizedCost generalizedCost,
   int numOfTransfers,
   boolean onStreet
-)
-  implements ItinerarySortKey {
+) implements ItinerarySortKey {
   @Override
   public Instant startTimeAsInstant() {
     return departureTime;

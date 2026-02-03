@@ -41,6 +41,7 @@ public class DebugTimingAggregator {
   private final Timer tripPatternFilterTimer;
   private final Timer accessEgressTimer;
   private final Timer raptorSearchTimer;
+  private final Timer directTransitSearchTimer;
   private final Timer itineraryCreationTimer;
   private final Timer transitRouterTimer;
   private final Timer filteringTimer;
@@ -58,11 +59,12 @@ public class DebugTimingAggregator {
   private long directCarpoolRouterTime;
   private Timer.Sample finishedPatternFiltering;
   private Timer.Sample finishedAccessEgress;
-  private Timer.Sample finishedRaptorSearch;
   private Timer.Sample finishedRouters;
   private Timer.Sample finishedFiltering;
   private Timer.Sample startedAccessCalculating;
   private Timer.Sample startedEgressCalculating;
+  private Timer.Sample startedDirectTransitSearch;
+  private Timer.Sample startedItineraryCreation;
   private long accessTime;
   private long egressTime;
   private int numAccesses;
@@ -72,6 +74,7 @@ public class DebugTimingAggregator {
   private long tripPatternFilterTime;
   private long accessEgressTime;
   private long raptorSearchTime;
+  private long directTransitSearchTime;
   private long itineraryCreationTime;
   private long transitRouterTime;
   private long filteringTime;
@@ -96,6 +99,7 @@ public class DebugTimingAggregator {
       .tags(tags)
       .register(registry);
     raptorSearchTimer = Timer.builder(ROUTING_RAPTOR).tags(tags).register(registry);
+    directTransitSearchTimer = Timer.builder("routing.directTransit").tags(tags).register(registry);
     accessEgressTimer = Timer.builder("routing.accessEgress").tags(tags).register(registry);
     tripPatternFilterTimer = Timer.builder("routing.tripPatternFiltering")
       .tags(tags)
@@ -227,21 +231,38 @@ public class DebugTimingAggregator {
    * Record the time when we are finished with the raptor search.
    */
   public void finishedRaptorSearch() {
-    finishedRaptorSearch = Timer.start(clock);
     if (finishedAccessEgress == null) {
       return;
     }
     raptorSearchTime = finishedAccessEgress.stop(raptorSearchTimer);
   }
 
+  public void startedDirectTransitSearch() {
+    startedDirectTransitSearch = Timer.start(clock);
+  }
+
+  /**
+   * Record the time when we are finished with the direct transit search.
+   */
+  public void finishedDirectTransitSearch() {
+    if (startedDirectTransitSearch == null) {
+      return;
+    }
+    directTransitSearchTime = startedDirectTransitSearch.stop(directTransitSearchTimer);
+  }
+
+  public void startedItineraryCreation() {
+    startedItineraryCreation = Timer.start(clock);
+  }
+
   /**
    * Record the time when we have created internal itinerary objects from the raptor responses.
    */
   public void finishedItineraryCreation() {
-    if (finishedRaptorSearch == null) {
+    if (startedItineraryCreation == null) {
       return;
     }
-    itineraryCreationTime = finishedRaptorSearch.stop(itineraryCreationTimer);
+    itineraryCreationTime = startedItineraryCreation.stop(itineraryCreationTimer);
   }
 
   /** Record the time when we finished the transit router search */
@@ -272,6 +293,9 @@ public class DebugTimingAggregator {
       log("│├ Egress routing (" + numEgresses + " egresses)", egressTime);
       log("││ Access/Egress routing", accessEgressTime);
       log("│├ Main routing", raptorSearchTime);
+      if (directTransitSearchTime > 0) {
+        log("│├ Direct transit routing", directTransitSearchTime);
+      }
       log("│├ Creating itineraries", itineraryCreationTime);
       log("├┴ Transit routing total", transitRouterTime);
     }

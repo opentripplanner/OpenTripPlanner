@@ -150,7 +150,8 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
       sb.append("car,");
     }
     if (sb.length() > 0) {
-      sb.setLength(sb.length() - 1); // Remove last comma
+      // Remove last comma
+      sb.setLength(sb.length() - 1);
     } else {
       sb.append("none");
     }

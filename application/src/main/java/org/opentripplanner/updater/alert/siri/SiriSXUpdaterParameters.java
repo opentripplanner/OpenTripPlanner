@@ -13,5 +13,4 @@ public record SiriSXUpdaterParameters(
   Duration timeout,
   boolean blockReadinessUntilInitialized,
   HttpHeaders requestHeaders
-)
-  implements SiriSXUpdater.Parameters {}
+) implements SiriSXUpdater.Parameters {}

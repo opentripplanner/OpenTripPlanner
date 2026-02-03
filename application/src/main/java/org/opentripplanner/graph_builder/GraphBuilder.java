@@ -29,6 +29,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
@@ -80,6 +81,7 @@ public class GraphBuilder implements Runnable {
     FareServiceFactory fareServiceFactory,
     StreetRepository streetRepository,
     TimetableRepository timetableRepository,
+    TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
     @Nullable EmissionRepository emissionRepository,
@@ -103,6 +105,7 @@ public class GraphBuilder implements Runnable {
       .streetDetailsRepository(streetDetailsRepository)
       .streetRepository(streetRepository)
       .timetableRepository(timetableRepository)
+      .transferRepository(transferRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingService)
       .stopConsolidationRepository(stopConsolidationRepository)
@@ -262,8 +265,8 @@ public class GraphBuilder implements Runnable {
     if (hasTransitData() && !timetableRepository.hasTransit()) {
       throw new OtpAppException(
         "The provided transit data have no trips within the configured transit service period. " +
-        "There is something wrong with your data - see the log above. Another possibility is that the " +
-        "'transitServiceStart' and 'transitServiceEnd' are not correctly configured."
+          "There is something wrong with your data - see the log above. Another possibility is that the " +
+          "'transitServiceStart' and 'transitServiceEnd' are not correctly configured."
       );
     }
   }
@@ -287,7 +290,9 @@ public class GraphBuilder implements Runnable {
     var f = new OtpNumberFormat();
     var nStops = f.formatNumber(timetableRepository.getSiteRepository().stopIndexSize());
     var nPatterns = f.formatNumber(timetableRepository.getAllTripPatterns().size());
-    var nTransfers = f.formatNumber(timetableRepository.getTransferService().listAll().size());
+    var nTransfers = f.formatNumber(
+      timetableRepository.getConstrainedTransferService().listAll().size()
+    );
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());
 

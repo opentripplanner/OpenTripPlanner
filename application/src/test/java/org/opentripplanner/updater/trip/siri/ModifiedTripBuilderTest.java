@@ -120,10 +120,7 @@ class ModifiedTripBuilderTest {
     .withRegularStop(STOP_C_1)
     .withRegularStop(STOP_D)
     .build();
-  private final TimetableRepository timetableRepository = new TimetableRepository(
-    siteRepository,
-    DEDUPLICATOR
-  );
+  private final TimetableRepository timetableRepository = new TimetableRepository(siteRepository);
   private EntityResolver entityResolver;
 
   @BeforeEach

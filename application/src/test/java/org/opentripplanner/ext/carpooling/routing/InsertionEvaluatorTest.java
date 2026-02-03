@@ -309,7 +309,7 @@ class InsertionEvaluatorTest {
     assertTrue(
       result.additionalDuration().isNegative(),
       "Additional duration should be negative (insertion is faster), got " +
-      result.additionalDuration()
+        result.additionalDuration()
     );
 
     // Routing was called at least 4 times (1 baseline + 3 new segments minimum)

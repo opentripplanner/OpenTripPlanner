@@ -144,7 +144,7 @@ class StopTimesMapper {
         issueStore.add(
           "JourneyPatternStopNotFound",
           "Stop with id %s not found for StopPoint %s in JourneyPattern %s. " +
-          "Trip %s will not be mapped.",
+            "Trip %s will not be mapped.",
           stopPoint != null && stopPoint.getScheduledStopPointRef() != null
             ? stopPoint.getScheduledStopPointRef().getValue().getRef()
             : "null",

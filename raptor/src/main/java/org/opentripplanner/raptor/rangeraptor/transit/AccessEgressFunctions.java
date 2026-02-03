@@ -39,6 +39,9 @@ public final class AccessEgressFunctions {
    *         number of rides is lower
    *     </li>
    *     <li>
+   *         number of via locations is higher
+   *     </li>
+   *     <li>
    *         reached the stop on-board, and not on foot. This is optimal because arriving on foot
    *         limits your options, you are not allowed to continue on foot and transfer(walk) to
    *         a nearby stop.
@@ -47,7 +50,7 @@ public final class AccessEgressFunctions {
    *         No opening hours is better than being restricted
    *     </li>
    *     <li>
-   *         If Both have opening hours, both need to be accepted
+   *         If both have opening hours, both need to be accepted
    *     </li>
    * </ol>
    */
@@ -55,7 +58,8 @@ public final class AccessEgressFunctions {
     ((l.stopReachedOnBoard() && !r.stopReachedOnBoard()) ||
       r.hasOpeningHours() ||
       l.numberOfRides() < r.numberOfRides() ||
-      l.durationInSeconds() < r.durationInSeconds());
+      l.durationInSeconds() < r.durationInSeconds() ||
+      l.numberOfViaLocationsVisited() > r.numberOfViaLocationsVisited());
 
   /**
    * Filter Multi-criteria Raptor access and egress paths. This can be used to wash
@@ -98,15 +102,15 @@ public final class AccessEgressFunctions {
       // See https://github.com/opentripplanner/OpenTripPlanner/issues/5601
       LOG.warn(
         "Duplicate access/egress paths passed into raptor:\n\t" +
-        duplicates.stream().map(Objects::toString).collect(Collectors.joining("\n\t"))
+          duplicates.stream().map(Objects::toString).collect(Collectors.joining("\n\t"))
       );
     }
     return result;
   }
 
   /**
-   * Filter the given input keeping all elements satisfying the given include predicate. If the
-   * {@code keepOne} flag is set only one raptor transfer is kept for each group of numOfRides.
+   * Filter the given input keeping all elements satisfying the given include predicate and
+   * then group them by number-of-rides.
    */
   static TIntObjectMap<List<RaptorAccessEgress>> groupByRound(
     Collection<RaptorAccessEgress> input,
@@ -122,18 +126,45 @@ public final class AccessEgressFunctions {
     return groupBy(input, RaptorAccessEgress::stop);
   }
 
+  static <T extends RaptorAccessEgress> TIntObjectMap<List<T>> filterOnSegment(
+    TIntObjectMap<List<T>> map,
+    int segment
+  ) {
+    TIntObjectMap<List<T>> result = new TIntObjectHashMap<>();
+    for (int nRides : map.keys()) {
+      for (var it : map.get(nRides)) {
+        if (it != null && it.numberOfViaLocationsVisited() == segment) {
+          var list = result.get(nRides);
+          if (list == null) {
+            list = new ArrayList<>();
+            result.put(nRides, list);
+          }
+          list.add(it);
+        }
+      }
+    }
+    return result;
+  }
+
+  static <T extends RaptorAccessEgress> List<T> filterOnSegment(List<T> list, int segment) {
+    return list
+      .stream()
+      .filter(it -> it.numberOfViaLocationsVisited() == segment)
+      .toList();
+  }
+
   /* private methods */
 
   /**
    * Remove relevant access/egress paths. The given set of paths are grouped by stop and
    * the filtered based on the given pareto comparator.
    */
-  static Collection<RaptorAccessEgress> removeNonOptimalPaths(
+  private static Collection<RaptorAccessEgress> removeNonOptimalPaths(
     Collection<RaptorAccessEgress> paths,
     ParetoComparator<RaptorAccessEgress> comparator
   ) {
     var mapByStop = groupByStop(paths);
-    var set = new ParetoSet<>(comparator);
+    var set = ParetoSet.of(comparator);
     var result = new ArrayList<RaptorAccessEgress>();
 
     for (int stop : mapByStop.keys()) {

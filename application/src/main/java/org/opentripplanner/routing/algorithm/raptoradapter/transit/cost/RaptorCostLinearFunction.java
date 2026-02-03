@@ -74,8 +74,8 @@ class RaptorCostLinearFunction {
     return isZero()
       ? "ZERO FUNCTION"
       : LinearFunctionSerialization.serialize(
-        RaptorCostConverter.raptorCostToDuration(constant),
-        RaptorCostConverter.toOtpDomainFactor(coefficient)
-      );
+          RaptorCostConverter.raptorCostToDuration(constant),
+          RaptorCostConverter.toOtpDomainFactor(coefficient)
+        );
   }
 }

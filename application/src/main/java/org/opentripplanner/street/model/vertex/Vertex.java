@@ -289,7 +289,8 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
       }
       copy[i] = existing[i];
     }
-    copy[i] = e; // append the new edge to the copy of the existing array
+    // append the new edge to the copy of the existing array
+    copy[i] = e;
     return copy;
   }
 

@@ -17,6 +17,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This class contains all information from the {@link RouteRequest} class required for an A* search
@@ -82,7 +83,7 @@ public class StreetSearchRequest implements AStarRequest {
   }
 
   StreetSearchRequest(StreetSearchRequestBuilder builder) {
-    this.startTime = RouteRequest.normalizeDateTime(builder.startTimeOrNow());
+    this.startTime = TimeUtils.truncateToSeconds(builder.startTimeOrNow());
     this.mode = builder.mode;
     this.arriveBy = builder.arriveBy;
     this.wheelchair = builder.wheelchairEnabled;
@@ -236,7 +237,8 @@ public class StreetSearchRequest implements AStarRequest {
       case BIKE_RENTAL -> bike.rental();
       case SCOOTER_RENTAL -> scooter.rental();
       case CAR_RENTAL -> car.rental();
-      case NOT_SET,
+      case
+        NOT_SET,
         WALK,
         BIKE,
         BIKE_TO_PARK,

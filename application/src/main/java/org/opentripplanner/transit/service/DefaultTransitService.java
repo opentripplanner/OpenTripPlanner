@@ -25,13 +25,12 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
 import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
@@ -47,7 +46,6 @@ import org.opentripplanner.transit.model.filter.transit.StopLocationMatcherFacto
 import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateMatcherFactory;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -95,6 +93,8 @@ public class DefaultTransitService implements TransitEditorService {
    */
   private final StopTimesHelper stopTimesHelper;
 
+  private final ReplacementHelper replacementHelper;
+
   /**
    * Create a service without a real-time snapshot (and therefore without any real-time data).
    */
@@ -111,6 +111,7 @@ public class DefaultTransitService implements TransitEditorService {
     this.timetableRepositoryIndex = timetableRepository.getTimetableRepositoryIndex();
     this.timetableSnapshot = timetableSnapshot;
     this.stopTimesHelper = new StopTimesHelper(this);
+    this.replacementHelper = new ReplacementHelper(this, timetableRepository, timetableSnapshot);
   }
 
   @Override
@@ -341,6 +342,15 @@ public class DefaultTransitService implements TransitEditorService {
     List<TripOnServiceDate> canceledTrips = timetableSnapshot.listCanceledTrips();
     canceledTrips.sort(new TripOnServiceDateComparator());
     return canceledTrips;
+  }
+
+  /**
+   * TODO This only supports realtime cancelled trips for now.
+   */
+  @Override
+  public List<TripOnServiceDate> findCanceledTrips(TripOnServiceDateRequest request) {
+    Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
+    return listCanceledTrips().stream().filter(matcher::match).toList();
   }
 
   @Override
@@ -625,11 +635,6 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<PathTransfer> findPathTransfers(StopLocation stop) {
-    return this.timetableRepository.getTransfersByStop(stop);
-  }
-
-  @Override
   public RaptorTransitData getRaptorTransitData() {
     OTPRequestTimeoutException.checkForTimeout();
     return this.timetableRepository.getRaptorTransitData();
@@ -716,11 +721,6 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Deduplicator getDeduplicator() {
-    return timetableRepository.getDeduplicator();
-  }
-
-  @Override
   public Set<LocalDate> listServiceDates() {
     return Collections.unmodifiableSet(
       timetableRepositoryIndex.getServiceCodesRunningForDate().keySet()
@@ -733,8 +733,8 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public TransferService getTransferService() {
-    return timetableRepository.getTransferService();
+  public ConstrainedTransferService getConstrainedTransferService() {
+    return timetableRepository.getConstrainedTransferService();
   }
 
   @Override
@@ -745,6 +745,11 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop) {
     return timetableRepositoryIndex.hasScheduledServicesAfter(date, stop);
+  }
+
+  @Override
+  public ReplacementHelper getReplacementHelper() {
+    return replacementHelper;
   }
 
   /**

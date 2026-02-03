@@ -27,8 +27,9 @@ import org.opentripplanner.transit.service.SiteRepository;
 
 public class PlaceTest {
 
-  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory()
-    .createPoint(new Coordinate(11, 60));
+  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory().createPoint(
+    new Coordinate(11, 60)
+  );
   private static final NonLocalizedString DEFAULT_PLACE_NAME = NonLocalizedString.ofNullable(
     "defaultName"
   );

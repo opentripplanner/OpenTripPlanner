@@ -21,7 +21,6 @@ import org.opentripplanner.ext.flex.template.FlexEgressFactory;
 import org.opentripplanner.ext.flex.template.FlexServiceDate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -30,6 +29,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.TransitServiceResolver;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
@@ -45,6 +46,7 @@ public class FlexRouter {
 
   private final Graph graph;
   private final TransitService transitService;
+  private final RegularTransferService transferService;
   private final FlexParameters flexParameters;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
@@ -64,6 +66,7 @@ public class FlexRouter {
   public FlexRouter(
     Graph graph,
     TransitService transitService,
+    RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
     FlexParameters flexParameters,
     TripRequest filterRequest,
@@ -76,6 +79,7 @@ public class FlexRouter {
   ) {
     this.graph = graph;
     this.transitService = transitService;
+    this.transferService = transferService;
     this.flexParameters = flexParameters;
     this.streetAccesses = streetAccesses;
     this.streetEgresses = streetEgresses;
@@ -209,12 +213,12 @@ public class FlexRouter {
 
     @Override
     public Collection<PathTransfer> getTransfersFromStop(StopLocation stop) {
-      return transitService.getFlexIndex().getTransfersFromStop(stop);
+      return transferService.findWalkTransfersFromStop(stop);
     }
 
     @Override
     public Collection<PathTransfer> getTransfersToStop(StopLocation stop) {
-      return transitService.getFlexIndex().getTransfersToStop(stop);
+      return transferService.findWalkTransfersToStop(stop);
     }
 
     @Override

@@ -14,7 +14,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * usage pattern is not enforced due to differing needs in tests.
  * The ID generation is threadsafe, even if that is probably not needed.
  */
-class SiriTripPatternIdGenerator {
+public class SiriTripPatternIdGenerator {
 
   private final AtomicInteger counter = new AtomicInteger(0);
 

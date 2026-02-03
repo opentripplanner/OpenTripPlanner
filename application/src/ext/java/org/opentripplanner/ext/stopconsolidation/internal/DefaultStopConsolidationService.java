@@ -46,7 +46,10 @@ public class DefaultStopConsolidationService implements StopConsolidationService
           );
           return Stream.empty();
         } else {
-          return group.secondaries().stream().map(r -> new StopReplacement(primaryStop, r));
+          return group
+            .secondaries()
+            .stream()
+            .map(r -> new StopReplacement(primaryStop, r));
         }
       })
       .toList();
@@ -59,12 +62,18 @@ public class DefaultStopConsolidationService implements StopConsolidationService
 
   @Override
   public boolean isPrimaryStop(StopLocation stop) {
-    return repo.groups().stream().anyMatch(r -> r.primary().equals(stop.getId()));
+    return repo
+      .groups()
+      .stream()
+      .anyMatch(r -> r.primary().equals(stop.getId()));
   }
 
   @Override
   public boolean isSecondaryStop(StopLocation stop) {
-    return repo.groups().stream().anyMatch(r -> r.secondaries().contains(stop.getId()));
+    return repo
+      .groups()
+      .stream()
+      .anyMatch(r -> r.secondaries().contains(stop.getId()));
   }
 
   @Override

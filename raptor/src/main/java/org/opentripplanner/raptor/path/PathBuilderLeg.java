@@ -632,10 +632,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   ) {
     return new IllegalStateException(
       "Unable to reconstruct path. Transit does not arrive in time to board flex access." +
-      " Arrived: " +
-      TimeUtils.timeToStrCompact(arrivalTime) +
-      " Egress: " +
-      egressPath
+        " Arrived: " +
+        TimeUtils.timeToStrCompact(arrivalTime) +
+        " Egress: " +
+        egressPath
     );
   }
 

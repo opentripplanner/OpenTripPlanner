@@ -18,7 +18,7 @@ class LinkingContextRequestMapperTest {
   private static final GenericLocation FROM = new GenericLocation("from", null, 1.0, 0.0);
   private static final GenericLocation TO = new GenericLocation("to", null, 0.0, 1.0);
   private static final List<ViaLocation> VIA = List.of(
-    new VisitViaLocation("via", null, List.of(), List.of(WgsCoordinate.GREENWICH))
+    new VisitViaLocation("via", null, List.of(), WgsCoordinate.GREENWICH)
   );
   private static final StreetMode DIRECT_MODE = StreetMode.CAR;
   private static final StreetMode ACCESS_MODE = StreetMode.BIKE_TO_PARK;
@@ -44,7 +44,7 @@ class LinkingContextRequestMapperTest {
     assertEquals(TO, subject.to());
     assertThat(subject.viaLocationsWithCoordinates()).hasSize(1);
     assertEquals(
-      VIA.getFirst().coordinates().getFirst().asJtsCoordinate(),
+      VIA.getFirst().coordinate().map(WgsCoordinate::asJtsCoordinate).get(),
       subject.viaLocationsWithCoordinates().getFirst().getCoordinate()
     );
     assertEquals(DIRECT_MODE, subject.directMode());

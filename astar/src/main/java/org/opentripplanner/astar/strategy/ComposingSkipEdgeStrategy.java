@@ -10,9 +10,9 @@ import org.opentripplanner.astar.spi.SkipEdgeStrategy;
  * SkipEdgeStrategy#shouldSkipEdge(State, Edge)} to return null.
  */
 public record ComposingSkipEdgeStrategy<
-  State extends AStarState<State, Edge, ?>, Edge extends AStarEdge<State, Edge, ?>
->(SkipEdgeStrategy<State, Edge>... strategies)
-  implements SkipEdgeStrategy<State, Edge> {
+  State extends AStarState<State, Edge, ?>,
+  Edge extends AStarEdge<State, Edge, ?>
+>(SkipEdgeStrategy<State, Edge>... strategies) implements SkipEdgeStrategy<State, Edge> {
   @Override
   public boolean shouldSkipEdge(State current, Edge edge) {
     for (var strategy : strategies) {

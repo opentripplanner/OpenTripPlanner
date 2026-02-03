@@ -5,7 +5,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -19,9 +18,8 @@ class IslandPruningUtils {
     int adaptivePruningDistance
   ) {
     try {
-      var deduplicator = new Deduplicator();
       var graph = new Graph();
-      var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
+      var timetableRepository = new TimetableRepository(new SiteRepository());
       // Add street data from OSM
       var osmProvider = new DefaultOsmProvider(osmFile, true);
 

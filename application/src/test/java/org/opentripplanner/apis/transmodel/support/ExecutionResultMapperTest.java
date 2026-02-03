@@ -17,21 +17,21 @@ class ExecutionResultMapperTest {
 
   private static String RESULT_SERIALIZED = quoteReplace(
     "{" +
-    "'errors':[" +
-    "{'message':'Error','locations':[],'extensions':{'classification':'DataFetchingException'}}" +
-    "]," +
-    "'data':'Test'" +
-    "}"
+      "'errors':[" +
+      "{'message':'Error','locations':[],'extensions':{'classification':'DataFetchingException'}}" +
+      "]," +
+      "'data':'Test'" +
+      "}"
   );
 
   private static String TIMEOUT_RESPONSE = quoteReplace(
     "{" +
-    "'errors':[{" +
-    "'message':'TIMEOUT! The request is too resource intensive.'," +
-    "'locations':[]," +
-    "'extensions':{'classification':'ApiProcessingTimeout'}" +
-    "}]" +
-    "}"
+      "'errors':[{" +
+      "'message':'TIMEOUT! The request is too resource intensive.'," +
+      "'locations':[]," +
+      "'extensions':{'classification':'ApiProcessingTimeout'}" +
+      "}]" +
+      "}"
   );
 
   public static final String TOO_LARGE_MESSAGE =
@@ -39,28 +39,28 @@ class ExecutionResultMapperTest {
 
   private static final String TOO_LARGE_RESPONSE = quoteReplace(
     "{'" +
-    "errors':[{" +
-    "'message':'" +
-    TOO_LARGE_MESSAGE +
-    "'," +
-    "'locations':[]," +
-    "'extensions':{'classification':'ResponseTooLarge'}" +
-    "}]" +
-    "}"
+      "errors':[{" +
+      "'message':'" +
+      TOO_LARGE_MESSAGE +
+      "'," +
+      "'locations':[]," +
+      "'extensions':{'classification':'ResponseTooLarge'}" +
+      "}]" +
+      "}"
   );
 
   public static final String SYSTEM_ERROR_MESSAGE = "A system error!";
 
   public static final String SYSTEM_ERROR_RESPONSE = quoteReplace(
     "{" +
-    "'errors':[{" +
-    "'message':'" +
-    SYSTEM_ERROR_MESSAGE +
-    "'," +
-    "'locations':[]," +
-    "'extensions':{'classification':'InternalServerError'}" +
-    "}]" +
-    "}"
+      "'errors':[{" +
+      "'message':'" +
+      SYSTEM_ERROR_MESSAGE +
+      "'," +
+      "'locations':[]," +
+      "'extensions':{'classification':'InternalServerError'}" +
+      "}]" +
+      "}"
   );
 
   @Test

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -20,18 +21,20 @@ import org.opentripplanner.transit.model.timetable.TimetableBuilder;
 public final class TripPatternBuilder
   extends AbstractEntityBuilder<TripPattern, TripPatternBuilder> {
 
+  private String name;
+  private boolean realTimeTripPattern;
+  private boolean stopPatternModifiedInRealTime;
+  private boolean containsMultipleModes;
   private Route route;
   private TransitMode mode;
   private SubMode netexSubMode;
-  private boolean containsMultipleModes;
   private StopPattern stopPattern;
   private Timetable scheduledTimetable;
   private TimetableBuilder scheduledTimetableBuilder;
-  private String name;
 
-  private boolean createdByRealtimeUpdate;
-
+  @Nullable
   private TripPattern originalTripPattern;
+
   private List<LineString> hopGeometries;
 
   TripPatternBuilder(FeedScopedId id) {
@@ -48,13 +51,14 @@ public final class TripPatternBuilder
     this.containsMultipleModes = original.getContainsMultipleModes();
     this.stopPattern = original.getStopPattern();
     this.scheduledTimetable = original.getScheduledTimetable();
-    this.createdByRealtimeUpdate = original.isCreatedByRealtimeUpdater();
+    this.stopPatternModifiedInRealTime = original.isStopPatternModifiedInRealTime();
+    this.realTimeTripPattern = original.isRealTimeTripPattern();
     this.originalTripPattern = original.getOriginalTripPattern();
     this.hopGeometries = original.getGeometry() == null
       ? null
       : IntStream.range(0, original.numberOfStops() - 1)
-        .mapToObj(original::getHopGeometry)
-        .toList();
+          .mapToObj(original::getHopGeometry)
+          .toList();
   }
 
   public TripPatternBuilder withName(String name) {
@@ -100,8 +104,8 @@ public final class TripPatternBuilder
   public TripPatternBuilder withScheduledTimeTableBuilder(
     UnaryOperator<TimetableBuilder> producer
   ) {
-    // create a builder for the scheduled timetable only if it needs to be modified.
-    // otherwise reuse the existing timetable
+    // Create a builder for the scheduled timetable only if it needs to be modified.
+    // Otherwise reuse the existing timetable
     if (scheduledTimetableBuilder == null) {
       scheduledTimetableBuilder = scheduledTimetable.copyOf();
       scheduledTimetable = null;
@@ -110,12 +114,43 @@ public final class TripPatternBuilder
     return this;
   }
 
-  public TripPatternBuilder withCreatedByRealtimeUpdater(boolean createdByRealtimeUpdate) {
-    this.createdByRealtimeUpdate = createdByRealtimeUpdate;
+  /**
+   * Indicate that this TripPattern is created in RealTime, and that the stop pattern of the
+   * original scheduled trip is changed.
+   * <p>
+   *  TODO - ENCAPSULATE realTimeTripPattern & stopPatternModifiedInRealTime initialization
+   *    The next 2 methods (withRealTimeTripPattern() and withStopPatternModifiedInRealTime()) are
+   *    internal domain business rules, and should be enforced by the aggregate root, not delegated
+   *    to the creators(updaters) and unit-tests. A better solution to this would be to make static
+   *    factory methods, but it does not make the problem go away. If, e.g. the Route is chosen as
+   *    the aggregate root, then the logic would be in the Route class - totally hidden for all
+   *    users of Route/TripPattern/Trip and so on.
+   *
+   * @see #withRealTimeAddedTrip() as an alternative
+   * @see TripPattern#isRealTimeTripPattern()
+   * @see TripPattern#isStopPatternModifiedInRealTime()
+   *
+   */
+  public TripPatternBuilder withRealTimeStopPatternModified() {
+    this.realTimeTripPattern = true;
+    this.stopPatternModifiedInRealTime = true;
     return this;
   }
 
-  public TripPatternBuilder withOriginalTripPattern(TripPattern originalTripPattern) {
+  /**
+   * Indicate that this TripPattern is created in RealTime for a new trip (GTFS ADDED trip/NeTEx
+   * ExtraJourney).
+   * @see #withRealTimeStopPatternModified() as an alternative
+   * @see TripPattern#isRealTimeTripPattern()
+   * @see TripPattern#isStopPatternModifiedInRealTime()
+   */
+  public TripPatternBuilder withRealTimeAddedTrip() {
+    this.realTimeTripPattern = true;
+    this.stopPatternModifiedInRealTime = false;
+    return this;
+  }
+
+  public TripPatternBuilder withOriginalTripPattern(@Nullable TripPattern originalTripPattern) {
     this.originalTripPattern = originalTripPattern;
     return this;
   }
@@ -169,12 +204,17 @@ public final class TripPatternBuilder
     return name;
   }
 
+  @Nullable
   public TripPattern getOriginalTripPattern() {
     return originalTripPattern;
   }
 
-  boolean isCreatedByRealtimeUpdate() {
-    return createdByRealtimeUpdate;
+  boolean isRealTimeTripPattern() {
+    return realTimeTripPattern;
+  }
+
+  boolean isStopPatternModifiedInRealTime() {
+    return stopPatternModifiedInRealTime;
   }
 
   public byte[][] hopGeometries() {
@@ -196,8 +236,8 @@ public final class TripPatternBuilder
   /**
    * This will copy the geometry from another TripPattern to this one. It checks if each hop is
    * between the same stops before copying that hop geometry. If the stops are different but lie
-   * within same station, old geometry will be used with overwrite on first and last point (to match
-   * new stop places). Otherwise, it will default to straight lines between hops.
+   * within the same station, old geometry will be used with overwriting the first and last point
+   * (to match new stop places). Otherwise, it will default to straight lines between hops.
    */
   private List<LineString> generateHopGeometriesFromOriginalTripPattern() {
     // This accounts for the new TripPattern provided by a real-time update and the one that is
@@ -229,13 +269,12 @@ public final class TripPatternBuilder
       } else {
         // Create new straight-line geometry for hop
         hopGeometries.add(
-          GeometryUtils.getGeometryFactory()
-            .createLineString(
-              new Coordinate[] {
-                stopPattern.getStop(i).getCoordinate().asJtsCoordinate(),
-                stopPattern.getStop(i + 1).getCoordinate().asJtsCoordinate(),
-              }
-            )
+          GeometryUtils.getGeometryFactory().createLineString(
+            new Coordinate[] {
+              stopPattern.getStop(i).getCoordinate().asJtsCoordinate(),
+              stopPattern.getStop(i + 1).getCoordinate().asJtsCoordinate(),
+            }
+          )
         );
       }
     }

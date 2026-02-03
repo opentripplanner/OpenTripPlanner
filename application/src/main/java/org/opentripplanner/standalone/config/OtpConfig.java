@@ -18,8 +18,7 @@ public class OtpConfig {
   /**
    * This description is shared for otp-config, build-config and router-config.
    */
-  public static final String CONFIG_VERSION_DESCRIPTION =
-    """
+  public static final String CONFIG_VERSION_DESCRIPTION = """
     The config-version is a parameter which each OTP deployment may set to be able to query the
     OTP server and verify that it uses the correct version of the config. The version should be
     injected into the config in the (continuous) deployment pipeline. How this is done, is up to

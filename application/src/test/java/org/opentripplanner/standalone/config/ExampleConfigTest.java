@@ -26,6 +26,7 @@ public class ExampleConfigTest {
   @FilePatternSource(
     pattern = {
       "doc/user/examples/**/" + ROUTER_CONFIG_FILENAME,
+      "test/performance/**/" + ROUTER_CONFIG_FILENAME,
       "application/src/test/resources/standalone/config/**/" + ROUTER_CONFIG_FILENAME,
       "application/src/ext-test/resources/**/" + ROUTER_CONFIG_FILENAME,
     }
@@ -50,7 +51,7 @@ public class ExampleConfigTest {
   @FilePatternSource(pattern = "test/performance/**/speed-test-config.json")
   @ParameterizedTest(name = "Check validity of {0}")
   void speedTestConfig(Path filename) {
-    testConfig(filename, SpeedTestConfig::new);
+    testConfig(filename, SpeedTestConfig::createFromConfig);
   }
 
   @FilePatternSource(

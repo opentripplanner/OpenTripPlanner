@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.filter.transit;
 import java.time.LocalDate;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.ContainsMatcher;
 import org.opentripplanner.transit.model.filter.expr.EqualityMatcher;
 import org.opentripplanner.transit.model.filter.expr.ExpressionBuilder;
@@ -28,19 +29,27 @@ public class TripOnServiceDateMatcherFactory {
   public static Matcher<TripOnServiceDate> of(TripOnServiceDateRequest request) {
     ExpressionBuilder<TripOnServiceDate> expr = ExpressionBuilder.of();
 
-    expr.atLeastOneMatch(request.serviceDates(), TripOnServiceDateMatcherFactory::serviceDate);
-    expr.atLeastOneMatch(request.agencies(), TripOnServiceDateMatcherFactory::agencyId);
-    expr.atLeastOneMatch(request.routes(), TripOnServiceDateMatcherFactory::routeId);
     expr.atLeastOneMatch(
-      request.serviceJourneys(),
+      request.includeServiceDates(),
+      TripOnServiceDateMatcherFactory::serviceDate
+    );
+    expr.atLeastOneMatch(request.includeAgencies(), TripOnServiceDateMatcherFactory::agencyId);
+    expr.atLeastOneMatch(request.includeRoutes(), TripOnServiceDateMatcherFactory::routeId);
+    expr.atLeastOneMatch(
+      request.includeServiceJourneys(),
       TripOnServiceDateMatcherFactory::serviceJourneyId
     );
-    expr.atLeastOneMatch(request.replacementFor(), TripOnServiceDateMatcherFactory::replacementFor);
     expr.atLeastOneMatch(
-      request.netexInternalPlanningCodes(),
+      request.includeReplacementFor(),
+      TripOnServiceDateMatcherFactory::replacementFor
+    );
+    expr.atLeastOneMatch(
+      request.includeNetexInternalPlanningCodes(),
       TripOnServiceDateMatcherFactory::netexInternalPlanningCode
     );
-    expr.atLeastOneMatch(request.alterations(), TripOnServiceDateMatcherFactory::alteration);
+    expr.atLeastOneMatch(request.includeAlterations(), TripOnServiceDateMatcherFactory::alteration);
+    expr.atLeastOneMatch(request.includeModes(), TripOnServiceDateMatcherFactory::mode);
+    expr.matchesNone(request.excludeModes(), TripOnServiceDateMatcherFactory::mode);
     return expr.build();
   }
 
@@ -76,5 +85,9 @@ public class TripOnServiceDateMatcherFactory {
 
   static Matcher<TripOnServiceDate> alteration(TripAlteration alteration) {
     return new EqualityMatcher<>("alteration", alteration, TripOnServiceDate::getTripAlteration);
+  }
+
+  static Matcher<TripOnServiceDate> mode(TransitMode mode) {
+    return new EqualityMatcher<>("mode", mode, t -> t.getTrip().getMode());
   }
 }

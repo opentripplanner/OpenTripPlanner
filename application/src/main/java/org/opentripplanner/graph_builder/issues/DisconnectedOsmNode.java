@@ -6,8 +6,8 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 
-public record DisconnectedOsmNode(OsmNode node, OsmEntity way, OsmEntity area)
-  implements DataImportIssue {
+public record DisconnectedOsmNode(OsmNode node, OsmEntity way, OsmEntity area) implements
+  DataImportIssue {
   private static final String FMT = "Node %s in way %s is coincident but disconnected with area %s";
   private static final String HTMLFMT =
     "Node<a href='%s'>'%s'</a> in way <a href='%s'>'%s'</a> is coincident but disconnected with area <a href='%s'>'%s'</a>";

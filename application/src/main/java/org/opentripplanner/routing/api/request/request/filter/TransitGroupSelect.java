@@ -99,11 +99,11 @@ public class TransitGroupSelect {
     return isEmpty()
       ? "EMPTY"
       : ToStringBuilder.ofEmbeddedType()
-        .addCol("modes", modes)
-        .addCol("subModeRegexp", subModeRegexp)
-        .addCol("agencyIds", agencyIds)
-        .addCol("routeIds", routeIds)
-        .toString();
+          .addCol("modes", modes)
+          .addCol("subModeRegexp", subModeRegexp)
+          .addCol("agencyIds", agencyIds)
+          .addCol("routeIds", routeIds)
+          .toString();
   }
 
   public static class Builder {

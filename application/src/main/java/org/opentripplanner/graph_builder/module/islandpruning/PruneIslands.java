@@ -189,8 +189,8 @@ public class PruneIslands implements GraphBuilderModule {
     /* collect unreachable edges to a map */
     processIslands(islands, isolated, true, traverseMode);
 
-    extgraphs = new HashMap<>(); // let old map go
-    islands = new ArrayList<>(); // reset this too
+    extgraphs = new HashMap<>();
+    islands = new ArrayList<>();
 
     /* Recompute expanded subgraphs by accepting noThruTraffic edges in graph expansion.
        However, expansion is not allowed to jump from an original island to another one
@@ -248,7 +248,7 @@ public class PruneIslands implements GraphBuilderModule {
         if (!onlyFerry && island.streetSize() < pruningThresholdWithStops * adaptivePruningFactor) {
           double sizeCoeff = (adaptivePruningFactor > 1.0)
             ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
-            adaptivePruningDistance
+              adaptivePruningDistance
             : 1.0;
 
           if (island.streetSize() * sizeCoeff < pruningThresholdWithStops) {
@@ -263,7 +263,7 @@ public class PruneIslands implements GraphBuilderModule {
         if (island.streetSize() < pruningThresholdWithoutStops * adaptivePruningFactor) {
           double sizeCoeff = (adaptivePruningFactor > 1.0)
             ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
-            adaptivePruningDistance
+              adaptivePruningDistance
             : 1.0;
           if (island.streetSize() * sizeCoeff < pruningThresholdWithoutStops) {
             if (restrictOrRemove(island, isolated, stats, markIsolated, traverseMode)) {
@@ -301,13 +301,12 @@ public class PruneIslands implements GraphBuilderModule {
     TraverseMode traverseMode,
     boolean shouldMatchNoThruType
   ) {
-    StreetMode streetMode =
-      switch (traverseMode) {
-        case WALK -> StreetMode.WALK;
-        case BICYCLE -> StreetMode.BIKE;
-        case CAR -> StreetMode.CAR;
-        default -> throw new IllegalArgumentException();
-      };
+    StreetMode streetMode = switch (traverseMode) {
+      case WALK -> StreetMode.WALK;
+      case BICYCLE -> StreetMode.BIKE;
+      case CAR -> StreetMode.CAR;
+      default -> throw new IllegalArgumentException();
+    };
 
     StreetSearchRequest request = StreetSearchRequest.of().withMode(streetMode).build();
 
@@ -343,10 +342,13 @@ public class PruneIslands implements GraphBuilderModule {
 
   private int collectSubGraphs(
     Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
-    Map<Vertex, Subgraph> newgraphs, // put new subgraphs here
-    Map<Vertex, Subgraph> subgraphs, // optional isolation map from a previous round
+    // put new subgraphs here
+    Map<Vertex, Subgraph> newgraphs,
+    // optional isolation map from a previous round
+    Map<Vertex, Subgraph> subgraphs,
+    // final list of islands or null
     ArrayList<Subgraph> islands
-  ) { // final list of islands or null
+  ) {
     int count = 0;
     for (Vertex gv : graph.getVertices()) {
       if (!(gv instanceof StreetVertex)) {
@@ -357,14 +359,15 @@ public class PruneIslands implements GraphBuilderModule {
         // do not start new graph generation from non-classified vertex
         continue;
       }
-      if (newgraphs.containsKey(gv)) { // already processed
+      // already processed
+      if (newgraphs.containsKey(gv)) {
         continue;
       }
       if (!neighborsForVertex.containsKey(gv)) {
         continue;
       }
       Subgraph subgraph = computeConnectedSubgraph(neighborsForVertex, gv, subgraphs, newgraphs);
-      for (Iterator<Vertex> vIter = subgraph.streetIterator(); vIter.hasNext();) {
+      for (Iterator<Vertex> vIter = subgraph.streetIterator(); vIter.hasNext(); ) {
         Vertex subnode = vIter.next();
         newgraphs.put(subnode, subgraph);
       }
@@ -387,7 +390,7 @@ public class PruneIslands implements GraphBuilderModule {
     int removed = 0;
     int restricted = 0;
     //iterate over the street vertex of the subgraph
-    for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {
+    for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext(); ) {
       Vertex v = vIter.next();
       Collection<Edge> outgoing = new ArrayList<>(v.getOutgoing());
       for (Edge e : outgoing) {
@@ -468,7 +471,7 @@ public class PruneIslands implements GraphBuilderModule {
       // note: do not unlink stop if only CAR mode is pruned
       // maybe this needs more logic for flex routing cases
       List<VertexLabel> stopLabels = new ArrayList<>();
-      for (Iterator<TransitStopVertex> vIter = island.stopIterator(); vIter.hasNext();) {
+      for (Iterator<TransitStopVertex> vIter = island.stopIterator(); vIter.hasNext(); ) {
         TransitStopVertex v = vIter.next();
         stopLabels.add(v.getLabel());
         Collection<Edge> edges = new ArrayList<>(v.getOutgoing());
@@ -515,7 +518,8 @@ public class PruneIslands implements GraphBuilderModule {
         if (!subgraph.contains(neighbor) && !alreadyMapped.containsKey(neighbor)) {
           if (anchor != null) {
             Subgraph compare = anchors.get(neighbor);
-            if (compare != null && compare != anchor) { // do not enter a new island
+            if (compare != null && compare != anchor) {
+              // do not enter a new island
               continue;
             }
           }

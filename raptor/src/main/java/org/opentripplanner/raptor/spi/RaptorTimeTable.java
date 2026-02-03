@@ -19,6 +19,7 @@ public interface RaptorTimeTable<T extends RaptorTripSchedule> {
    * This method needs to be FAST - it is in the most critical line of execution in Raptor.
    *
    * @param index the trip schedule index in pattern starting at 0.
+   * @throws IndexOutOfBoundsException if index not found
    */
   T getTripSchedule(int index);
 

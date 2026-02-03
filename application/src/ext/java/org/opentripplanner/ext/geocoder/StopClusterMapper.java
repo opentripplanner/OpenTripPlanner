@@ -91,7 +91,10 @@ class StopClusterMapper {
 
         return new LuceneStopCluster(
           primary.getId().toString(),
-          secondaryIds.stream().map(id -> id.toString()).toList(),
+          secondaryIds
+            .stream()
+            .map(id -> id.toString())
+            .toList(),
           names,
           codes,
           toCoordinate(primary.getCoordinate())
@@ -133,7 +136,10 @@ class StopClusterMapper {
 
   private static LuceneStopCluster map(StopLocationsGroup g) {
     var childStops = g.getChildStops();
-    var ids = childStops.stream().map(s -> s.getId().toString()).toList();
+    var ids = childStops
+      .stream()
+      .map(s -> s.getId().toString())
+      .toList();
     var childNames = getNames(childStops);
     var codes = getCodes(childStops);
 
@@ -156,7 +162,11 @@ class StopClusterMapper {
 
   private static Optional<LuceneStopCluster> map(List<StopLocation> stopLocations) {
     var primary = stopLocations.getFirst();
-    var secondaryIds = stopLocations.stream().skip(1).map(sl -> sl.getId().toString()).toList();
+    var secondaryIds = stopLocations
+      .stream()
+      .skip(1)
+      .map(sl -> sl.getId().toString())
+      .toList();
     var names = getNames(stopLocations);
     var codes = getCodes(stopLocations);
 

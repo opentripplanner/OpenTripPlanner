@@ -287,10 +287,12 @@ public class LuceneIndex implements Serializable {
       if (focusPoint != null) {
         var distanceBoost = LatLonPoint.newDistanceFeatureQuery(
           LOCATION,
-          10.0f, // boost score
+          // boost score
+          10.0f,
           focusPoint.latitude(),
           focusPoint.longitude(),
-          100000.0 // pivot distance in meters
+          // pivot distance in meters
+          100000.0
         );
         builder.add(distanceBoost, Occur.SHOULD);
       }

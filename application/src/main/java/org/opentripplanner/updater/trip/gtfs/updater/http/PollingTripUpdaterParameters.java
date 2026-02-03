@@ -17,5 +17,4 @@ public record PollingTripUpdaterParameters(
   String feedId,
   String url,
   HttpHeaders headers
-)
-  implements PollingGraphUpdaterParameters, UrlUpdaterParameters {}
+) implements PollingGraphUpdaterParameters, UrlUpdaterParameters {}

@@ -61,7 +61,7 @@ config:
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
     StopCall: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     TripOnServiceDate: org.opentripplanner.transit.model.timetable.TripOnServiceDate#TripOnServiceDate
-    TripOnServiceDateConnection: graphql.relay.Connection#Connection<TripOnServiceDate>
+    TripOnServiceDateConnection: org.opentripplanner.framework.graphql.CountedConnection#CountedConnection<TripOnServiceDate>
     TripOnServiceDateEdge: graphql.relay.Edge#Edge<TripOnServiceDate>
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
@@ -91,6 +91,8 @@ config:
     PlanPageInfo: org.opentripplanner.apis.gtfs.model.PlanPageInfo#PlanPageInfo
     RealtimeState: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRealtimeState#GraphQLRealtimeState
     RelativeDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection#GraphQLRelativeDirection
+    ReplacedByRelation: org.opentripplanner.transit.model.network.ReplacedByRelation#ReplacedByRelation
+    ReplacementForRelation: org.opentripplanner.transit.model.network.ReplacementForRelation#ReplacementForRelation
     Route: org.opentripplanner.transit.model.network.Route#Route
     RoutingError: org.opentripplanner.routing.api.response.RoutingError#RoutingError
     RoutingErrorCode: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode#GraphQLRoutingErrorCode

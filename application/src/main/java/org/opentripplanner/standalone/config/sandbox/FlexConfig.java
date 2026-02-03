@@ -11,8 +11,7 @@ public class FlexConfig implements FlexParameters {
 
   private static final FlexParameters DEFAULT = FlexParameters.defaultValues();
 
-  public static final String ACCESS_EGRESS_DESCRIPTION =
-    """
+  public static final String ACCESS_EGRESS_DESCRIPTION = """
     If you have multiple overlapping flex zones the high default value can lead to performance problems.
     A lower value means faster routing.
 
@@ -46,7 +45,7 @@ public class FlexConfig implements FlexParameters {
       .since(V2_3)
       .summary(
         "How long should a passenger be allowed to walk after getting out of a flex vehicle " +
-        "and transferring to a flex or transit one."
+          "and transferring to a flex or transit one."
       )
       .description(
         """
@@ -66,8 +65,8 @@ public class FlexConfig implements FlexParameters {
       .summary("How long can a non-scheduled flex trip at maximum be.")
       .description(
         "This is used for all trips which are of type `UnscheduledTrip`. The value includes " +
-        "the access/egress duration to the boarding/alighting of the flex trip, as well as the " +
-        "connection to the transit stop."
+          "the access/egress duration to the boarding/alighting of the flex trip, as well as the " +
+          "connection to the transit stop."
       )
       .asDuration(DEFAULT.maxFlexTripDuration());
 

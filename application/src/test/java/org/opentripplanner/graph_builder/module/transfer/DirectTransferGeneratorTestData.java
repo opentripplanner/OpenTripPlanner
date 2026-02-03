@@ -14,6 +14,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -22,7 +23,6 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
-import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * <img src="DirectTransferGeneratorTest.drawio.png" />
@@ -83,20 +83,21 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
     return this;
   }
 
-  public TimetableRepository build() {
+  public TransferRepository build() {
     var model = modelOf(new Builder());
     model.graph().hasStreets = graphHasStreets;
 
     new DirectTransferGenerator(
       model.graph(),
       model.timetableRepository(),
+      model.transferRepository(),
       DataImportIssueStore.NOOP,
       maxTransferDuration,
       transferRequests,
       transferParametersForMode
     ).buildGraph();
 
-    return model.timetableRepository();
+    return model.transferRepository();
   }
 
   static DirectTransferGeneratorTestData of() {

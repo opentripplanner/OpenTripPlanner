@@ -165,8 +165,9 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testNoBikesAvailable() {
     // Replace B1 with a station that has no bikes available
-    var stationWithNoBikes =
-      ((VehicleRentalStation) B1.getStation()).copyOf().withVehiclesAvailable(0).build();
+    var stationWithNoBikes = ((VehicleRentalStation) B1.getStation()).copyOf()
+      .withVehiclesAvailable(0)
+      .build();
     B1.setStation(stationWithNoBikes);
 
     assertPath(
@@ -191,11 +192,10 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testNoSpacesAvailable() {
     // Replace B2 with a station that has no spaces available
-    var stationWithNoSpaces =
-      ((VehicleRentalStation) B2.getStation()).copyOf()
-        .withSpacesAvailable(0)
-        .withVehicleSpacesAvailable(Map.of())
-        .build();
+    var stationWithNoSpaces = ((VehicleRentalStation) B2.getStation()).copyOf()
+      .withSpacesAvailable(0)
+      .withVehicleSpacesAvailable(Map.of())
+      .build();
     B2.setStation(stationWithNoSpaces);
 
     assertPath(
@@ -220,8 +220,9 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testIgnoreAvailabilityNoBikesAvailable() {
     // Replace B1 with a station that has no bikes available
-    var stationWithNoBikes =
-      ((VehicleRentalStation) B1.getStation()).copyOf().withVehiclesAvailable(0).build();
+    var stationWithNoBikes = ((VehicleRentalStation) B1.getStation()).copyOf()
+      .withVehiclesAvailable(0)
+      .build();
     B1.setStation(stationWithNoBikes);
 
     assertPath(
@@ -238,8 +239,9 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testIgnoreAvailabilityNoSpacesAvailable() {
     // Replace B2 with a station that has no spaces available
-    var stationWithNoSpaces =
-      ((VehicleRentalStation) B2.getStation()).copyOf().withSpacesAvailable(0).build();
+    var stationWithNoSpaces = ((VehicleRentalStation) B2.getStation()).copyOf()
+      .withSpacesAvailable(0)
+      .build();
     B2.setStation(stationWithNoSpaces);
 
     assertPath(
@@ -296,10 +298,9 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testBikeRentalFromStationWantToKeepCantKeep() {
     // Replace B1 with a station that doesn't allow keeping vehicles at destination
-    var stationCantKeep =
-      ((VehicleRentalStation) B1.getStation()).copyOf()
-        .withIsArrivingInRentalVehicleAtDestinationAllowed(false)
-        .build();
+    var stationCantKeep = ((VehicleRentalStation) B1.getStation()).copyOf()
+      .withIsArrivingInRentalVehicleAtDestinationAllowed(false)
+      .build();
     B1.setStation(stationCantKeep);
 
     assertPath(
@@ -336,10 +337,9 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testBikeRentalFromStationWantToKeepCanKeep() {
     // Replace B1 with a station that allows keeping vehicles at destination
-    var stationCanKeep =
-      ((VehicleRentalStation) B1.getStation()).copyOf()
-        .withIsArrivingInRentalVehicleAtDestinationAllowed(true)
-        .build();
+    var stationCanKeep = ((VehicleRentalStation) B1.getStation()).copyOf()
+      .withIsArrivingInRentalVehicleAtDestinationAllowed(true)
+      .build();
     B1.setStation(stationCanKeep);
 
     assertPath(
@@ -376,10 +376,9 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testBikeRentalFromStationWantToKeepCanKeepButCostly() {
     // Replace B1 with a station that allows keeping vehicles at destination
-    var stationCanKeep =
-      ((VehicleRentalStation) B1.getStation()).copyOf()
-        .withIsArrivingInRentalVehicleAtDestinationAllowed(true)
-        .build();
+    var stationCanKeep = ((VehicleRentalStation) B1.getStation()).copyOf()
+      .withIsArrivingInRentalVehicleAtDestinationAllowed(true)
+      .build();
     B1.setStation(stationCanKeep);
     int keepRentedBicycleAtDestinationCost = 1000;
 

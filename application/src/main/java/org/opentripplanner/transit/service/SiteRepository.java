@@ -328,8 +328,8 @@ public class SiteRepository implements Serializable {
     if (main.stopIndexCounter != child.stopIndexCounter) {
       throw new IllegalArgumentException(
         "Two Stop repositories can only be merged if they are created with the same stopIndexCounter. " +
-        "This is archived by using the 'SiteRepository.withContext()' method. We do this to avoid " +
-        "duplicates/gaps in the stopIndex."
+          "This is archived by using the 'SiteRepository.withContext()' method. We do this to avoid " +
+          "duplicates/gaps in the stopIndex."
       );
     }
     return main.stopIndexCounter;

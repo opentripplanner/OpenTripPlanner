@@ -72,7 +72,9 @@ class McMaxLimitFilterTest {
 
   static List<List<TestRow>> filterTestCases() {
     return List.of(
-      List.of(/* Should not fail for an empty list of itineraries*/),
+      List.of(
+        /* Should not fail for an empty list of itineraries*/
+      ),
       List.of(
         // Test minNumItinerariesLimit = 2
         row(EXP_KEEP, COST_LOW, TX_1, GROUP_A, "Best in everything"),
@@ -159,10 +161,10 @@ class McMaxLimitFilterTest {
       .stream()
       .map(i ->
         "[ %d %d %s ]".formatted(
-            i.generalizedCost(),
-            i.numberOfTransfers(),
-            groupsToString(i.generalizedCost2().orElse(-1))
-          )
+          i.generalizedCost(),
+          i.numberOfTransfers(),
+          groupsToString(i.generalizedCost2().orElse(-1))
+        )
       )
       .collect(Collectors.joining(", "));
   }
@@ -191,11 +193,11 @@ class McMaxLimitFilterTest {
     public String toString() {
       // The red-x is a unicode character(U+274C) and should be visible in most IDEs.
       return "%s %d %d %s".formatted(
-          expected ? "" : "❌",
-          c1,
-          nTransfers,
-          groupsToString(transitGroupIds)
-        );
+        expected ? "" : "❌",
+        c1,
+        nTransfers,
+        groupsToString(transitGroupIds)
+      );
     }
   }
 }

@@ -11,14 +11,14 @@ import org.opentripplanner.framework.model.Cost;
 class CarPreferencesTest {
 
   private static final double RELUCTANCE = 5.111;
-  public static final int BOARD_COST = 550;
+  private static final int BOARD_COST = 550;
   private static final double EXPECTED_RELUCTANCE = 5.1;
   private static final int PICKUP_TIME = 600;
   private static final int PICKUP_COST = 500;
   private static final double ACCELERATION_SPEED = 3.1;
   private static final double DECELERATION_SPEED = 3.5;
-  public static final int RENTAL_PICKUP_TIME = 30;
-  public static final int PARK_COST = 30;
+  private static final int RENTAL_PICKUP_TIME = 30;
+  private static final int PARK_COST = 30;
 
   private final CarPreferences subject = CarPreferences.of()
     .withReluctance(RELUCTANCE)
@@ -90,14 +90,14 @@ class CarPreferencesTest {
     assertEquals("CarPreferences{}", CarPreferences.DEFAULT.toString());
     assertEquals(
       "CarPreferences{" +
-      "reluctance: 5.1, " +
-      "boardCost: $550, " +
-      "parking: VehicleParkingPreferences{cost: $30}, " +
-      "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
-      "pickupTime: PT10M, " +
-      "pickupCost: $500, " +
-      "accelerationSpeed: 3.1, decelerationSpeed: 3.5" +
-      "}",
+        "reluctance: 5.1, " +
+        "boardCost: $550, " +
+        "parking: VehicleParkingPreferences{cost: $30}, " +
+        "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
+        "pickupTime: PT10M, " +
+        "pickupCost: $500, " +
+        "accelerationSpeed: 3.1, decelerationSpeed: 3.5" +
+        "}",
       subject.toString()
     );
   }

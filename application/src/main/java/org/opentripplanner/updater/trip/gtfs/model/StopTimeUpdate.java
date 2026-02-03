@@ -29,10 +29,9 @@ public final class StopTimeUpdate {
         p.hasPickupType() ? Optional.of(p.getPickupType().getNumber()) : Optional.empty()
       )
       .or(() ->
-        stopTimePropertiesExtension()
-          .flatMap(p ->
-            p.hasPickupType() ? Optional.of(p.getPickupType().getNumber()) : Optional.empty()
-          )
+        stopTimePropertiesExtension().flatMap(p ->
+          p.hasPickupType() ? Optional.of(p.getPickupType().getNumber()) : Optional.empty()
+        )
       )
       .map(PickDropMapper::map);
   }
@@ -43,10 +42,9 @@ public final class StopTimeUpdate {
         p.hasDropOffType() ? Optional.of(p.getDropOffType().getNumber()) : Optional.empty()
       )
       .or(() ->
-        stopTimePropertiesExtension()
-          .flatMap(p ->
-            p.hasDropoffType() ? Optional.of(p.getDropoffType().getNumber()) : Optional.empty()
-          )
+        stopTimePropertiesExtension().flatMap(p ->
+          p.hasDropoffType() ? Optional.of(p.getDropoffType().getNumber()) : Optional.empty()
+        )
       )
       .map(PickDropMapper::map);
   }
@@ -172,8 +170,9 @@ public final class StopTimeUpdate {
   }
 
   public Optional<String> assignedStopId() {
-    return stopTimeProperties()
-      .flatMap(p -> p.hasAssignedStopId() ? Optional.of(p.getAssignedStopId()) : Optional.empty());
+    return stopTimeProperties().flatMap(p ->
+      p.hasAssignedStopId() ? Optional.of(p.getAssignedStopId()) : Optional.empty()
+    );
   }
 
   private PickDrop getEffectivePickDrop(
@@ -204,12 +203,11 @@ public final class StopTimeUpdate {
   private Optional<
     MfdzRealtimeExtensions.StopTimePropertiesExtension
   > stopTimePropertiesExtension() {
-    return stopTimeProperties()
-      .map(stopTimeProperties ->
-        stopTimeProperties.hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
-          ? stopTimeProperties.getExtension(MfdzRealtimeExtensions.stopTimeProperties)
-          : null
-      );
+    return stopTimeProperties().map(stopTimeProperties ->
+      stopTimeProperties.hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
+        ? stopTimeProperties.getExtension(MfdzRealtimeExtensions.stopTimeProperties)
+        : null
+    );
   }
 
   private OptionalLong getTime(StopTimeEvent stopTimeEvent) {
@@ -226,9 +224,9 @@ public final class StopTimeUpdate {
     return stopTimeEvent.hasScheduledTime()
       ? OptionalLong.of(stopTimeEvent.getScheduledTime())
       : getTime(stopTimeEvent)
-        .stream()
-        .map(time -> time - getDelay(stopTimeEvent).orElse(0))
-        .findFirst();
+          .stream()
+          .map(time -> time - getDelay(stopTimeEvent).orElse(0))
+          .findFirst();
   }
 
   private OptionalInt getDelay(StopTimeEvent stopTimeEvent) {

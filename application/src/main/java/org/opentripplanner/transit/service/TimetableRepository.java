@@ -2,7 +2,9 @@ package org.opentripplanner.transit.service;
 
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -28,19 +30,17 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.model.transfer.DefaultTransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.util.ConcurrentPublished;
+import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
+import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -88,11 +88,10 @@ public class TimetableRepository implements Serializable {
   private final Map<String, FeedInfo> feedInfoForId = new HashMap<>();
 
   private final Multimap<AbstractTransitEntity, Notice> noticesByElement = HashMultimap.create();
-  private final DefaultTransferService transferService = new DefaultTransferService();
+  private final ConstrainedTransferService constrainedTransferService =
+    new DefaultConstrainedTransferService();
 
   private final Map<FeedScopedId, Integer> serviceCodes = new HashMap<>();
-
-  private final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
   private SiteRepository siteRepository;
 
@@ -109,8 +108,6 @@ public class TimetableRepository implements Serializable {
   private final transient ConcurrentPublished<RaptorTransitData> realtimeRaptorTransitData =
     new ConcurrentPublished<>();
 
-  private final transient Deduplicator deduplicator;
-
   private final CalendarServiceData calendarServiceData = new CalendarServiceData();
 
   private transient TimetableRepositoryIndex index;
@@ -124,6 +121,8 @@ public class TimetableRepository implements Serializable {
 
   private final Map<FeedScopedId, TripPattern> tripPatternForId = new HashMap<>();
   private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = new HashMap<>();
+  private final ListMultimap<FeedScopedId, TripOnServiceDate> replacedByTripOnServiceDates =
+    ArrayListMultimap.create();
 
   private final Map<FeedScopedId, FlexTrip<?, ?>> flexTripsById = new HashMap<>();
 
@@ -132,14 +131,13 @@ public class TimetableRepository implements Serializable {
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPointRefs = new HashMap<>();
 
   @Inject
-  public TimetableRepository(SiteRepository siteRepository, Deduplicator deduplicator) {
+  public TimetableRepository(SiteRepository siteRepository) {
     this.siteRepository = Objects.requireNonNull(siteRepository);
-    this.deduplicator = deduplicator;
   }
 
   /** No-argument constructor, required for deserialization. */
   public TimetableRepository() {
-    this(new SiteRepository(), new Deduplicator());
+    this(new SiteRepository());
   }
 
   /**
@@ -187,8 +185,8 @@ public class TimetableRepository implements Serializable {
     return realtimeRaptorTransitData != null;
   }
 
-  public DefaultTransferService getTransferService() {
-    return transferService;
+  public ConstrainedTransferService getConstrainedTransferService() {
+    return constrainedTransferService;
   }
 
   /**
@@ -396,6 +394,13 @@ public class TimetableRepository implements Serializable {
   public void addTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
     invalidateIndex();
     tripOnServiceDates.put(tripOnServiceDate.getId(), tripOnServiceDate);
+    for (var replacementFor : tripOnServiceDate.getReplacementFor()) {
+      replacedByTripOnServiceDates.put(replacementFor.getId(), tripOnServiceDate);
+    }
+  }
+
+  public List<TripOnServiceDate> getReplacedByTripOnServiceDate(FeedScopedId id) {
+    return replacedByTripOnServiceDates.get(id);
   }
 
   /**
@@ -405,20 +410,6 @@ public class TimetableRepository implements Serializable {
    */
   public Map<FeedScopedId, Integer> getServiceCodes() {
     return serviceCodes;
-  }
-
-  /** Pre-generated transfers between all stops. */
-  public Collection<PathTransfer> getTransfersByStop(StopLocation stop) {
-    return transfersByStop.get(stop);
-  }
-
-  /** Pre-generated transfers between all stops filtered based on the modes in the PathTransfer. */
-  public List<PathTransfer> findTransfers(StreetMode mode) {
-    return transfersByStop
-      .values()
-      .stream()
-      .filter(pathTransfer -> pathTransfer.getModes().contains(mode))
-      .toList();
   }
 
   public SiteRepository getSiteRepository() {
@@ -478,14 +469,6 @@ public class TimetableRepository implements Serializable {
     return updaterManager;
   }
 
-  public Deduplicator getDeduplicator() {
-    return deduplicator;
-  }
-
-  public Collection<PathTransfer> getAllPathTransfers() {
-    return transfersByStop.values();
-  }
-
   public Collection<FlexTrip<?, ?>> getAllFlexTrips() {
     return flexTripsById.values();
   }
@@ -496,7 +479,10 @@ public class TimetableRepository implements Serializable {
   }
 
   public Optional<Agency> findAgencyById(FeedScopedId id) {
-    return agencies.stream().filter(a -> a.getId().equals(id)).findAny();
+    return agencies
+      .stream()
+      .filter(a -> a.getId().equals(id))
+      .findAny();
   }
 
   /**
@@ -523,11 +509,6 @@ public class TimetableRepository implements Serializable {
   public void setUpdaterManager(GraphUpdaterManager updaterManager) {
     this.updaterManager = updaterManager;
     this.transitAlertService = null;
-  }
-
-  public void addAllTransfersByStops(Multimap<StopLocation, PathTransfer> transfersByStop) {
-    invalidateIndex();
-    this.transfersByStop.putAll(transfersByStop);
   }
 
   /**

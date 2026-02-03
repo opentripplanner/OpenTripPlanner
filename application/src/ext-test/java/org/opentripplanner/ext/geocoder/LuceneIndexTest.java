@@ -23,7 +23,6 @@ import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidati
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -112,7 +111,7 @@ class LuceneIndexTest {
     List.of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION, FIVE_POINTS_STATION).forEach(
       siteRepository::withStation
     );
-    var timetableRepository = new TimetableRepository(siteRepository.build(), new Deduplicator());
+    var timetableRepository = new TimetableRepository(siteRepository.build());
     timetableRepository.index();
     var transitService = new DefaultTransitService(timetableRepository) {
       private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap.<
@@ -282,9 +281,14 @@ class LuceneIndexTest {
       }
     )
     void numericAdjectives(String query) {
-      var names = index.queryStopClusters(query, null).map(c -> c.primary().name()).toList();
+      var names = index
+        .queryStopClusters(query, null)
+        .map(c -> c.primary().name())
+        .toList();
       assertEquals(
-        Stream.of(MERIDIAN_AVE, MERIDIAN_N2, MERIDIAN_N1).map(s -> s.getName().toString()).toList(),
+        Stream.of(MERIDIAN_AVE, MERIDIAN_N2, MERIDIAN_N1)
+          .map(s -> s.getName().toString())
+          .toList(),
         names
       );
     }

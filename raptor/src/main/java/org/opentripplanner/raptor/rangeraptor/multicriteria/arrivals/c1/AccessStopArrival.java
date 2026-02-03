@@ -6,8 +6,10 @@ import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorOnBoardAccess;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.AccessPathView;
+import org.opentripplanner.raptor.api.view.TripScheduleStopPosition;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 
 /**
@@ -72,5 +74,17 @@ final class AccessStopArrival<T extends RaptorTripSchedule> extends McStopArriva
   @Override
   public McStopArrival<T> addSlackToArrivalTime(int slack) {
     return new AccessStopArrival<>(departureTime, accessEgressWithExtraSlack(access, slack));
+  }
+
+  @Override
+  public TripScheduleStopPosition subsequentBoardingConstraint() {
+    if (access instanceof RaptorOnBoardAccess onBoardAccess) {
+      return new TripScheduleStopPosition(
+        onBoardAccess.routeIndex(),
+        onBoardAccess.tripScheduleIndex(),
+        onBoardAccess.stopPositionInPattern()
+      );
+    }
+    throw new UnsupportedOperationException();
   }
 }

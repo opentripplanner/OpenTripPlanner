@@ -5,10 +5,10 @@ import java.util.List;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public enum ApiRequestMode {
-  WALK(),
-  BICYCLE(),
-  SCOOTER(),
-  CAR(),
+  WALK,
+  BICYCLE,
+  SCOOTER,
+  CAR,
   TRAM(TransitMode.TRAM),
   SUBWAY(TransitMode.SUBWAY),
   RAIL(TransitMode.RAIL),
@@ -24,7 +24,7 @@ public enum ApiRequestMode {
   MONORAIL(TransitMode.MONORAIL),
   CARPOOL(TransitMode.CARPOOL),
   TAXI(TransitMode.TAXI),
-  FLEX();
+  FLEX;
 
   private final List<TransitMode> transitModes;
 

@@ -35,7 +35,6 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.GeoJsonIo;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -46,12 +45,11 @@ public class LinkStopToPlatformTest {
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
-    var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
     Graph graph = new Graph();
     var vertexFactory = new VertexFactory(graph);
 
-    var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepository);
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
     Coordinate[] closedGeom = new Coordinate[platform.length + 1];
 
@@ -436,11 +434,16 @@ public class LinkStopToPlatformTest {
   @Test
   void boundaryTest() {
     Coordinate[] platform = {
-      new Coordinate(-0.7360985, 51.9962091), // northwest
-      new Coordinate(-0.7360355, 51.9962165), // northeast
-      new Coordinate(-0.7357519, 51.9953057), // east exit
-      new Coordinate(-0.7356841, 51.9950911), // southeast
-      new Coordinate(-0.7357458, 51.9950836), // southwest
+      // northwest
+      new Coordinate(-0.7360985, 51.9962091),
+      // northeast
+      new Coordinate(-0.7360355, 51.9962165),
+      // east exit
+      new Coordinate(-0.7357519, 51.9953057),
+      // southeast
+      new Coordinate(-0.7356841, 51.9950911),
+      // southwest
+      new Coordinate(-0.7357458, 51.9950836),
     };
 
     // 1 visibility point at eastern exit

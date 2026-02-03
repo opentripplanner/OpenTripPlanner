@@ -603,11 +603,10 @@ public class ItineraryListFilterChainBuilder {
     List<ItineraryListFilter> groupByFilters = new ArrayList<>();
 
     for (GroupBySimilarity group : groupBy) {
-      String tag =
-        "similar-legs-filter-%.0fp-%dx".formatted(
-            100d * group.groupByP,
-            group.maxNumOfItinerariesPerGroup
-          );
+      String tag = "similar-legs-filter-%.0fp-%dx".formatted(
+        100d * group.groupByP,
+        group.maxNumOfItinerariesPerGroup
+      );
       sysTags.add(tag);
 
       List<ItineraryListFilter> nested = new ArrayList<>();

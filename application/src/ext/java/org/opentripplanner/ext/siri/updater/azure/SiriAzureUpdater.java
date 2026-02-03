@@ -229,7 +229,8 @@ public class SiriAzureUpdater implements GraphUpdater {
       registerShutdownHook();
     } catch (InterruptedException e) {
       log.info("Startup interrupted, aborting updater initialization");
-      Thread.currentThread().interrupt(); // Preserve interrupt status
+      // Preserve interrupt status
+      Thread.currentThread().interrupt();
       // Don't set primed, don't register shutdown hook - just exit
     }
   }
@@ -376,7 +377,8 @@ public class SiriAzureUpdater implements GraphUpdater {
         "REALTIME_STARTUP_ALERT component={} status=INTERRUPTED error=\"Aborting startup due to interrupt\"",
         stepDescription
       );
-      Thread.currentThread().interrupt(); // Preserve interrupt status
+      // Preserve interrupt status
+      Thread.currentThread().interrupt();
       throw e;
     } catch (Exception e) {
       String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
@@ -448,8 +450,9 @@ public class SiriAzureUpdater implements GraphUpdater {
     }
 
     // Set options
-    CreateSubscriptionOptions options = new CreateSubscriptionOptions()
-      .setAutoDeleteOnIdle(autoDeleteOnIdle);
+    CreateSubscriptionOptions options = new CreateSubscriptionOptions().setAutoDeleteOnIdle(
+      autoDeleteOnIdle
+    );
 
     // Make sure there is no old subscription on serviceBus
     if (serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName)) {
@@ -494,7 +497,8 @@ public class SiriAzureUpdater implements GraphUpdater {
       .topicName(topicName)
       .subscriptionName(subscriptionName)
       .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-      .disableAutoComplete() // Receive and delete does not need autocomplete
+      // Receive and delete does not need autocomplete
+      .disableAutoComplete()
       .prefetchCount(prefetchCount)
       .processError(this::errorConsumer)
       .processMessage(this::handleMessage)
@@ -618,7 +622,9 @@ public class SiriAzureUpdater implements GraphUpdater {
 
     if (
       reason == ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED ||
-      reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND // should this be recoverable?
+      // should this be recoverable?
+      reason ==
+      ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND
     ) {
       log.error(
         "An unrecoverable error occurred. Stopping processing with reason {} {}",

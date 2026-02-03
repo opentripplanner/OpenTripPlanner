@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -39,6 +40,12 @@ public class TripInput {
 
   @Nullable
   private String tripOnServiceDateId;
+
+  @Nullable
+  private TransitMode mode;
+
+  @Nullable
+  private String netexSubmode;
 
   private final boolean isFlex;
 
@@ -87,6 +94,16 @@ public class TripInput {
   @Nullable
   public String tripOnServiceDateId() {
     return tripOnServiceDateId;
+  }
+
+  @Nullable
+  public TransitMode mode() {
+    return mode;
+  }
+
+  @Nullable
+  public String netexSubmode() {
+    return netexSubmode;
   }
 
   public boolean isFlex() {
@@ -145,6 +162,16 @@ public class TripInput {
     return this;
   }
 
+  public TripInput withMode(TransitMode mode) {
+    this.mode = mode;
+    return this;
+  }
+
+  public TripInput withNetexSubmode(String netexSubmode) {
+    this.netexSubmode = netexSubmode;
+    return this;
+  }
+
   private interface StopCallInput {
     StopTime toStopTime(Trip trip, int stopSequence);
     StopLocation stopLocation();
@@ -155,8 +182,7 @@ public class TripInput {
     int arrivalTime,
     int departureTime,
     @Nullable String headsign
-  )
-    implements StopCallInput {
+  ) implements StopCallInput {
     public StopTime toStopTime(Trip trip, int stopSequence) {
       var st = new StopTime();
       st.setTrip(trip);
@@ -169,13 +195,14 @@ public class TripInput {
       }
       return st;
     }
+
     public StopLocation stopLocation() {
       return stop;
     }
   }
 
-  private record FlexStopCallInput(AreaStop stop, int windowStart, int windowEnd)
-    implements StopCallInput {
+  private record FlexStopCallInput(AreaStop stop, int windowStart, int windowEnd) implements
+    StopCallInput {
     public StopTime toStopTime(Trip trip, int stopSequence) {
       var st = new StopTime();
       st.setTrip(trip);
@@ -185,6 +212,7 @@ public class TripInput {
       st.setFlexWindowEnd(windowEnd);
       return st;
     }
+
     public StopLocation stopLocation() {
       return stop;
     }

@@ -247,7 +247,7 @@ public class ElevationModule implements GraphBuilderModule {
         );
         LOG.warn(
           "Elevation is missing at a large number of points. DEM may be for the wrong region. " +
-          "If it is unprojected, perhaps the axes are not in (longitude, latitude) order."
+            "If it is unprojected, perhaps the axes are not in (longitude, latitude) order."
         );
       }
     }
@@ -314,7 +314,7 @@ public class ElevationModule implements GraphBuilderModule {
       } else {
         LOG.warn(
           "No cached elevations file found at {} or read access not allowed! Unable " +
-          "to load in cached elevations. This could take a while...",
+            "to load in cached elevations. This could take a while...",
           cachedElevationsFile.toPath().toAbsolutePath()
         );
       }
@@ -400,7 +400,8 @@ public class ElevationModule implements GraphBuilderModule {
     // with this method avoids potentially waiting for a lock to be released for calculating the thread-specific
     // coverage.
     if (ee.hasElevationExtension()) {
-      return;/* already set up */
+      // already set up
+      return;
     }
 
     // first try to find a cached value if possible
@@ -560,7 +561,9 @@ public class ElevationModule implements GraphBuilderModule {
     try {
       return getElevation(coverage, c.x, c.y);
     } catch (
-      ArrayIndexOutOfBoundsException | PointOutsideCoverageException | TransformException e
+      ArrayIndexOutOfBoundsException
+      | PointOutsideCoverageException
+      | TransformException e
     ) {
       // Each of the above exceptions can occur when finding the elevation at a coordinate.
       // - The ArrayIndexOutOfBoundsException seems to occur at the edges of some elevation tiles that

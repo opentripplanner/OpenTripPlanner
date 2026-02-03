@@ -22,7 +22,10 @@ public class TestAStarBuilder
 
   @Override
   protected Collection<TestState> createInitialStates(Set<TestVertex> originVertices) {
-    return originVertices.stream().map(v -> new TestState(v, 0)).toList();
+    return originVertices
+      .stream()
+      .map(v -> new TestState(v, 0))
+      .toList();
   }
 
   @Override

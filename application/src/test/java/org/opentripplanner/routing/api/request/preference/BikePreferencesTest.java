@@ -87,14 +87,14 @@ class BikePreferencesTest {
     assertEquals("BikePreferences{}", BikePreferences.DEFAULT.toString());
     assertEquals(
       "BikePreferences{" +
-      "speed: 2.0, " +
-      "reluctance: 1.2, " +
-      "boardCost: $660, " +
-      "parking: VehicleParkingPreferences{cost: $30}, " +
-      "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
-      "optimizeType: TRIANGLE, " +
-      "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +
-      "}",
+        "speed: 2.0, " +
+        "reluctance: 1.2, " +
+        "boardCost: $660, " +
+        "parking: VehicleParkingPreferences{cost: $30}, " +
+        "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
+        "optimizeType: TRIANGLE, " +
+        "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +
+        "}",
       subject.toString()
     );
   }

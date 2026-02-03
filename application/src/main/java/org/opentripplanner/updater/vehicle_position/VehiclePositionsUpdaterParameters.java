@@ -16,8 +16,7 @@ public record VehiclePositionsUpdaterParameters(
   HttpHeaders headers,
   boolean fuzzyTripMatching,
   Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures
-)
-  implements PollingGraphUpdaterParameters {
+) implements PollingGraphUpdaterParameters {
   public VehiclePositionsUpdaterParameters {
     Objects.requireNonNull(feedId, "feedId is required");
     Objects.requireNonNull(url, "url is required");

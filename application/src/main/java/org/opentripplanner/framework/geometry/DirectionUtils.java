@@ -15,8 +15,10 @@ public final class DirectionUtils {
    */
   public static double getAzimuth(Coordinate a, Coordinate b) {
     double cosLat = Math.cos(Math.toRadians((a.y + b.y) / 2.0));
-    double dY = (b.y - a.y); // in degrees, we do not care about the units
-    double dX = (b.x - a.x) * cosLat; // same
+    // in degrees, we do not care about the units
+    double dY = (b.y - a.y);
+    // same
+    double dX = (b.x - a.x) * cosLat;
     if (Math.abs(dX) < 1e-10 && Math.abs(dY) < 1e-10) {
       return 180;
     }
@@ -64,8 +66,8 @@ public final class DirectionUtils {
     Coordinate coord0 = line.getCoordinateN(numPoints - 2);
     Coordinate coord1 = line.getCoordinateN(numPoints - 1);
     int i = numPoints - 3;
-    int minDistance = 10; // Meters
-    while (SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance && i >= 0) {
+    int minDistance_m = 10;
+    while (SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance_m && i >= 0) {
       coord0 = line.getCoordinateN(i--);
     }
 
@@ -91,9 +93,10 @@ public final class DirectionUtils {
     Coordinate coord0 = line.getCoordinateN(0);
     Coordinate coord1 = line.getCoordinateN(1);
     int i = 2;
-    int minDistance = 10; // Meters
+    int minDistance_m = 10;
     while (
-      SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance && i < line.getNumPoints()
+      SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance_m &&
+      i < line.getNumPoints()
     ) {
       coord1 = line.getCoordinateN(i++);
     }

@@ -40,10 +40,9 @@ class DateScalarFactoryTest {
   }
 
   static Stream<Arguments> invalidCases() {
-    return INVALID_DATES.stream()
-      .flatMap(date ->
-        Stream.of(Arguments.of(GTFS_SCALAR, date), Arguments.of(TRANSMODEL_SCALAR, date))
-      );
+    return INVALID_DATES.stream().flatMap(date ->
+      Stream.of(Arguments.of(GTFS_SCALAR, date), Arguments.of(TRANSMODEL_SCALAR, date))
+    );
   }
 
   @ParameterizedTest

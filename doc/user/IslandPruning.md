@@ -48,7 +48,7 @@ can be reached using any of the traverse modes. Instead, pruning removes travers
 
 Pruning uses four parameters and some heuristics to decide if a disconnected sub graph is a real island to be retained, or a harmful data error:
 
-- `islandWithStopsMaxSize` defines the threshold for graph islands, which include public transit stops. All stop islands which have less graph edges than this get pruned. Default value is 2.  
+- `islandWithStopsMaxSize` defines the threshold for graph islands, which include public transit stops. All stop islands which have fewer graph edges than this get pruned. Default value is 2.  
 - `islandWithoutStopsMaxSize` defines the threshold for graph islands, which do not have public transit stops. All stopless islands which have less edges than this get pruned. Defaults to 10.  
 - `adaptivePruningFactor` defines the maximal value for a distance based multiplier for the two thresholds defined above (default value 20).  
 - `adaptivePruningDistance` defines the search radius as meters when estimating distance between graphs (default value 250).  
