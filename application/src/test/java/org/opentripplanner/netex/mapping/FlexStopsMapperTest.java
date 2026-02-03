@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
@@ -283,8 +283,8 @@ class FlexStopsMapperTest {
 
     return new FlexibleStopPlace()
       .withId(FLEXIBLE_STOP_PLACE_ID)
-      .withName(new MultilingualString().withValue(FLEXIBLE_STOP_PLACE_NAME))
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+      .withName(new MultilingualString().withContent(FLEXIBLE_STOP_PLACE_NAME))
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS)
       .withAreas(areas);
   }
 

@@ -22,12 +22,13 @@ class OperatorToAgencyMapper {
 
   Operator mapOperator(org.rutebanken.netex.model.Operator source) {
     final String name;
-    if (source.getName() == null || StringUtils.hasNoValue(source.getName().getValue())) {
+    String sourceName = MultilingualStringMapper.getStringValue(source.getName());
+    if (source.getName() == null || StringUtils.hasNoValue(sourceName)) {
       issueStore.add("MissingOperatorName", "Missing name for operator %s", source.getId());
       // fall back to NeTEx id when the operator name is missing
       name = source.getId();
     } else {
-      name = source.getName().getValue();
+      name = sourceName;
     }
     var target = Operator.of(idFactory.createId(source.getId())).withName(name);
 
