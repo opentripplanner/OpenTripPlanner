@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Notice;
+import org.rutebanken.netex.model.PublicCodeStructure;
 
 public class NoticeMapperTest {
 
@@ -22,8 +23,8 @@ public class NoticeMapperTest {
     // And
     Notice netexNotice = new Notice();
     netexNotice.setId(NOTICE_ID);
-    netexNotice.setText(new MultilingualString().withValue(NOTICE_TEXT));
-    netexNotice.setPublicCode(PUBLIC_CODE);
+    netexNotice.setText(new MultilingualString().withContent(NOTICE_TEXT));
+    netexNotice.setPublicCode(new PublicCodeStructure().withValue(PUBLIC_CODE));
 
     // When
     otpNotice = mapper.map(netexNotice);
@@ -38,8 +39,8 @@ public class NoticeMapperTest {
     otpNotice = mapper.map(
       new Notice()
         .withId(NOTICE_ID)
-        .withPublicCode("Albatross")
-        .withText(new MultilingualString().withValue("Different text"))
+        .withPublicCode(new PublicCodeStructure().withValue("Albatross"))
+        .withText(new MultilingualString().withContent("Different text"))
     );
 
     // Then

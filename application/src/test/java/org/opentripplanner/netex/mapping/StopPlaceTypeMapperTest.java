@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.rutebanken.netex.model.StopPlace;
@@ -24,7 +24,7 @@ class StopPlaceTypeMapperTest {
   @Test
   void mapWithTransportModeOnly() {
     var transitMode = stopPlaceTypeMapper.map(
-      new StopPlace().withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
+      new StopPlace().withTransportMode(AllPublicTransportModesEnumeration.RAIL)
     );
     assertEquals(TransitMode.RAIL, transitMode.mainMode());
     assertNull(transitMode.subMode());
@@ -33,7 +33,7 @@ class StopPlaceTypeMapperTest {
   @Test
   void mapCableway() {
     var transitMode = stopPlaceTypeMapper.map(
-      new StopPlace().withTransportMode(AllVehicleModesOfTransportEnumeration.CABLEWAY)
+      new StopPlace().withTransportMode(AllPublicTransportModesEnumeration.CABLEWAY)
     );
     assertEquals(TransitMode.GONDOLA, transitMode.mainMode());
     assertNull(transitMode.subMode());
@@ -43,7 +43,7 @@ class StopPlaceTypeMapperTest {
   void mapWithSubMode() {
     var transitMode = stopPlaceTypeMapper.map(
       new StopPlace()
-        .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
+        .withTransportMode(AllPublicTransportModesEnumeration.RAIL)
         .withRailSubmode(RailSubmodeEnumeration.REGIONAL_RAIL)
     );
     assertEquals(TransitMode.RAIL, transitMode.mainMode());
@@ -63,7 +63,7 @@ class StopPlaceTypeMapperTest {
   void checkSubModePrecedenceOverMainMode() {
     var transitMode = stopPlaceTypeMapper.map(
       new StopPlace()
-        .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
+        .withTransportMode(AllPublicTransportModesEnumeration.RAIL)
         .withBusSubmode(BusSubmodeEnumeration.SIGHTSEEING_BUS)
     );
     assertEquals(TransitMode.BUS, transitMode.mainMode());

@@ -21,7 +21,9 @@ class HeadsignMapper {
   @Nullable
   I18NString map(DestinationDisplay destinationDisplay) {
     if (destinationDisplay.getFrontText() != null) {
-      return I18NString.of(destinationDisplay.getFrontText().getValue());
+      return I18NString.of(
+        MultilingualStringMapper.getStringValue(destinationDisplay.getFrontText())
+      );
     }
 
     // Swiss profile
@@ -39,6 +41,8 @@ class HeadsignMapper {
 
   @SwissProfile
   private static Optional<I18NString> ofName(DestinationDisplay destinationDisplay) {
-    return Optional.ofNullable(destinationDisplay.getName()).map(n -> I18NString.of(n.getValue()));
+    return Optional.ofNullable(destinationDisplay.getName()).map(n ->
+      I18NString.of(MultilingualStringMapper.getStringValue(n))
+    );
   }
 }

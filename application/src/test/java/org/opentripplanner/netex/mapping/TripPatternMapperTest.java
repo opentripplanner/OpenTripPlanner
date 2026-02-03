@@ -131,11 +131,11 @@ class TripPatternMapperTest {
     DatedServiceJourney dsjReplacing = sample.getDatedServiceJourneyById(
       NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_2
     );
-    ReplacedJourneys_RelStructure replacedJourneys = new ReplacedJourneys_RelStructure();
-    replacedJourneys
-      .getDatedVehicleJourneyRefOrNormalDatedVehicleJourneyRef()
-      .add(MappingSupport.createWrappedRef(dsjReplaced.getId(), VehicleJourneyRefStructure.class));
-    dsjReplacing.withReplacedJourneys(replacedJourneys);
+    dsjReplacing.withReplacedJourneys(
+      new ReplacedJourneys_RelStructure().withDatedVehicleJourneyRefOrNormalDatedVehicleJourneyRef(
+        MappingSupport.createWrappedRef(dsjReplaced.getId(), VehicleJourneyRefStructure.class)
+      )
+    );
     Optional<TripPatternMapperResult> res = mapTripPattern(sample);
 
     assertTrue(res.isPresent());

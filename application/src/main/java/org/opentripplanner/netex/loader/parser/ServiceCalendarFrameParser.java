@@ -73,7 +73,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     if (element == null) {
       return;
     }
-    for (JAXBElement<?> dt : element.getDayType_()) {
+    for (JAXBElement<?> dt : element.getDayType_Dummy()) {
       parseDayType(dt);
     }
   }
@@ -82,7 +82,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     if (dayTypes == null) {
       return;
     }
-    for (JAXBElement<?> dt : dayTypes.getDayTypeRefOrDayType_()) {
+    for (JAXBElement<?> dt : dayTypes.getDayTypeRefOrDayType_Dummy()) {
       parseDayType(dt);
     }
   }

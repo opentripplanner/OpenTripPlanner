@@ -86,8 +86,8 @@ public class AuthorityToAgencyMapperTest {
   ) {
     return new Authority()
       .withId(id)
-      .withShortName(new MultilingualString().withValue(shortName))
-      .withName(new MultilingualString().withValue(name))
+      .withShortName(new MultilingualString().withContent(shortName))
+      .withName(new MultilingualString().withContent(name))
       .withContactDetails(new ContactStructure().withUrl(url).withPhone(phone));
   }
 }

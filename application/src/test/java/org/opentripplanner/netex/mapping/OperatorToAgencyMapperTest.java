@@ -23,7 +23,7 @@ public class OperatorToAgencyMapperTest {
     // Given
     Operator operator = new Operator()
       .withId(ID)
-      .withName(new MultilingualString().withValue(NAME))
+      .withName(new MultilingualString().withContent(NAME))
       .withContactDetails(new ContactStructure().withUrl(URL).withPhone(PHONE));
 
     // When mapped
@@ -45,7 +45,7 @@ public class OperatorToAgencyMapperTest {
     // Given
     Operator operator = new Operator()
       .withId(ID)
-      .withName(new MultilingualString().withValue(NAME));
+      .withName(new MultilingualString().withContent(NAME));
 
     // When mapped
     org.opentripplanner.transit.model.organization.Operator o;

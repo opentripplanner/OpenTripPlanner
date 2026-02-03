@@ -20,7 +20,7 @@ import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.BrandingRefStructure;
 import org.rutebanken.netex.model.FlexibleLine_VersionStructure;
 import org.rutebanken.netex.model.GroupOfLinesRefStructure;
@@ -79,9 +79,11 @@ class RouteMapper {
     builder.withAgency(findOrCreateAuthority(line));
     builder.withOperator(findOperator(line));
     builder.withBranding(findBranding(line));
-    NonLocalizedString longName = NonLocalizedString.ofNullable(line.getName().getValue());
+    NonLocalizedString longName = NonLocalizedString.ofNullable(
+      MultilingualStringMapper.nullableValueOf(line.getName())
+    );
     builder.withLongName(longName);
-    builder.withShortName(line.getPublicCode());
+    builder.withShortName(line.getPublicCode() != null ? line.getPublicCode().getValue() : null);
 
     NetexMainAndSubMode mode;
     try {
@@ -124,7 +126,7 @@ class RouteMapper {
     // but currently it doesn't look it is being parsed.
     // until there is better information from the operators we assume that all ferries allow
     // bicycles on board.
-    if (line.getTransportMode().equals(AllVehicleModesOfTransportEnumeration.WATER)) {
+    if (line.getTransportMode().equals(AllPublicTransportModesEnumeration.WATER)) {
       if (ferryIdsNotAllowedForBicycle.contains(line.getId())) {
         builder.withBikesAllowed(BikeAccess.NOT_ALLOWED);
       } else {
