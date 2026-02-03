@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayOfWeekEnumeration;
 import org.rutebanken.netex.model.DayType;
@@ -26,6 +26,7 @@ import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.OperatingPeriodRefStructure;
 import org.rutebanken.netex.model.PropertiesOfDay_RelStructure;
 import org.rutebanken.netex.model.PropertyOfDay;
+import org.rutebanken.netex.model.PublicCodeStructure;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
@@ -47,8 +48,8 @@ public final class NetexTestDataSupport {
   public static final String STOP_PLACE_VERSION = "TEST_STOP_PLACE_VERSION";
   public static final double STOP_PLACE_LAT = 0.11;
   public static final double STOP_PLACE_LON = 0.22;
-  public static final AllVehicleModesOfTransportEnumeration STOP_PLACE_TRANSPORT_MODE =
-    AllVehicleModesOfTransportEnumeration.BUS;
+  public static final AllPublicTransportModesEnumeration STOP_PLACE_TRANSPORT_MODE =
+    AllPublicTransportModesEnumeration.BUS;
 
   private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
 
@@ -212,7 +213,7 @@ public final class NetexTestDataSupport {
     String version,
     Double lat,
     Double lon,
-    AllVehicleModesOfTransportEnumeration transportMode,
+    AllPublicTransportModesEnumeration transportMode,
     Quay quay
   ) {
     StopPlace stopPlace = new StopPlace()
@@ -239,7 +240,7 @@ public final class NetexTestDataSupport {
     String version,
     Double lat,
     Double lon,
-    AllVehicleModesOfTransportEnumeration transportMode
+    AllPublicTransportModesEnumeration transportMode
   ) {
     return createStopPlace(id, name, version, lat, lon, transportMode, null);
   }
@@ -272,7 +273,7 @@ public final class NetexTestDataSupport {
       .withName(createMLString(name))
       .withId(id)
       .withVersion(version)
-      .withPublicCode(platformCode)
+      .withPublicCode(new PublicCodeStructure().withValue(platformCode))
       .withCentroid(createSimplePoint(lat, lon));
   }
 
@@ -281,7 +282,7 @@ public final class NetexTestDataSupport {
   }
 
   private static MultilingualString createMLString(String name) {
-    return new MultilingualString().withValue(name);
+    return new MultilingualString().withContent(name);
   }
 
   private static SimplePoint_VersionStructure createSimplePoint(Double lat, Double lon) {

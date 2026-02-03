@@ -13,8 +13,8 @@ import org.rutebanken.netex.model.MultilingualString;
 
 class HeadsignMapperTest {
 
-  private static final MultilingualString AAA = new MultilingualString().withValue("AAA");
-  private static final MultilingualString BBB = new MultilingualString().withValue("BBB");
+  private static final MultilingualString AAA = new MultilingualString().withContent("AAA");
+  private static final MultilingualString BBB = new MultilingualString().withContent("BBB");
 
   @Test
   void onlyFrontText() {

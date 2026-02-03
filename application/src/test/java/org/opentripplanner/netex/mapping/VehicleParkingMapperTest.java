@@ -89,8 +89,7 @@ class VehicleParkingMapperTest {
   }
 
   private static Parking parking(Set<ParkingVehicleEnumeration> vehicleTypes) {
-    var name = new MultilingualString();
-    name.setValue("A name");
+    var name = new MultilingualString().withContent("A name");
     var point = new SimplePoint_VersionStructure();
     var loc = new LocationStructure();
     loc.setLatitude(new BigDecimal(10));
