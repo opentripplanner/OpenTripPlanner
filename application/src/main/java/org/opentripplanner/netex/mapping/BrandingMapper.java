@@ -24,15 +24,15 @@ public class BrandingMapper {
     var builder = Branding.of(idFactory.createId(branding.getId()));
 
     if (branding.getShortName() != null) {
-      builder.withShortName(branding.getShortName().getValue());
+      builder.withShortName(MultilingualStringMapper.getStringValue(branding.getShortName()));
     }
 
     if (branding.getName() != null) {
-      builder.withName(branding.getName().getValue());
+      builder.withName(MultilingualStringMapper.getStringValue(branding.getName()));
     }
 
     if (branding.getDescription() != null) {
-      builder.withDescription(branding.getDescription().getValue());
+      builder.withDescription(MultilingualStringMapper.getStringValue(branding.getDescription()));
     }
 
     builder.withUrl(branding.getUrl());

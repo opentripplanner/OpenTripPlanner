@@ -56,7 +56,7 @@ class TariffZoneMapper {
     }
 
     FeedScopedId id = idFactory.createId(tariffZone.getId());
-    String name = tariffZone.getName().getValue();
+    String name = MultilingualStringMapper.getStringValue(tariffZone.getName());
     return deduplicate(FareZone.of(id).withName(name).build());
   }
 

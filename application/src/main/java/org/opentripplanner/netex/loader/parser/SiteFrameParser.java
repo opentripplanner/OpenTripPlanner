@@ -52,7 +52,7 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
   @Override
   public void parse(Site_VersionFrameStructure frame) {
     if (frame.getStopPlaces() != null) {
-      parseStopPlaces(frame.getStopPlaces().getStopPlace_());
+      parseStopPlaces(frame.getStopPlaces().getStopPlace());
     }
     if (frame.getGroupsOfStopPlaces() != null) {
       parseGroupsOfStopPlaces(frame.getGroupsOfStopPlaces().getGroupOfStopPlaces());
@@ -66,7 +66,7 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     }
 
     if (!ignoredFeatures.contains(PARKING) && frame.getParkings() != null) {
-      parseParkings(frame.getParkings().getParking());
+      parseParkings(frame.getParkings().getParking_Dummy());
     }
     // Keep list sorted alphabetically
     warnOnMissingMapping(LOG, frame.getAccesses());
@@ -106,13 +106,16 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     groupsOfStopPlaces.addAll(groupsOfStopPlacesList);
   }
 
-  private void parseParkings(List<Parking> parking) {
-    parkings.addAll(parking);
+  private void parseParkings(List<JAXBElement<? extends Site_VersionStructure>> parkingList) {
+    for (JAXBElement<? extends Site_VersionStructure> jaxbParking : parkingList) {
+      if (jaxbParking.getValue() instanceof Parking parking) {
+        parkings.add(parking);
+      }
+    }
   }
 
-  private void parseStopPlaces(List<JAXBElement<? extends Site_VersionStructure>> stopPlaceList) {
-    for (JAXBElement<? extends Site_VersionStructure> jaxBStopPlace : stopPlaceList) {
-      StopPlace stopPlace = (StopPlace) jaxBStopPlace.getValue();
+  private void parseStopPlaces(List<StopPlace> stopPlaceList) {
+    for (StopPlace stopPlace : stopPlaceList) {
       if (isMultiModalStopPlace(stopPlace)) {
         multiModalStopPlaces.add(stopPlace);
       } else {

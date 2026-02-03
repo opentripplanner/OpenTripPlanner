@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.netex.NetexTestDataSupport.createQuay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
-import static org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration.TRAM;
+import static org.rutebanken.netex.model.AllPublicTransportModesEnumeration.TRAM;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
 import org.rutebanken.netex.model.ObjectFactory;
@@ -49,7 +49,7 @@ class StopAndStationMapperTest {
       "1",
       55.707005,
       13.186816,
-      AllVehicleModesOfTransportEnumeration.BUS
+      AllPublicTransportModesEnumeration.BUS
     );
 
     // Create on quay with access, one without, and one with NULL
@@ -114,7 +114,7 @@ class StopAndStationMapperTest {
       "2",
       59.909584,
       10.755165,
-      AllVehicleModesOfTransportEnumeration.TRAM
+      AllPublicTransportModesEnumeration.TRAM
     );
 
     StopPlace stopPlaceOld = createStopPlace(
@@ -123,7 +123,7 @@ class StopAndStationMapperTest {
       "1",
       59.909584,
       10.755165,
-      AllVehicleModesOfTransportEnumeration.TRAM
+      AllPublicTransportModesEnumeration.TRAM
     );
 
     stopPlaces.add(stopPlaceNew);
@@ -219,7 +219,7 @@ class StopAndStationMapperTest {
       "1",
       59.909584,
       10.755165,
-      AllVehicleModesOfTransportEnumeration.TRAM
+      AllPublicTransportModesEnumeration.TRAM
     );
 
     stopPlace.withLimitedUse(LimitedUseTypeEnumeration.ISOLATED);
@@ -255,7 +255,7 @@ class StopAndStationMapperTest {
       "1",
       55.707005,
       13.186816,
-      AllVehicleModesOfTransportEnumeration.BUS
+      AllPublicTransportModesEnumeration.BUS
     );
 
     // Create on quay with access, one without, and one with NULL
