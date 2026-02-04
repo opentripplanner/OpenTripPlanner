@@ -45,8 +45,7 @@ public final class CompositeRentalRestrictionExtension implements RentalRestrict
 
   /**
    * Find the highest-priority restriction that applies to the given state.
-   * When zones overlap, the one with the lowest priority value wins (GBFS spec:
-   * "earlier listed zones take precedence").
+   * When zones overlap, the one with the lowest priority value wins.
    */
   private Optional<RentalRestrictionExtension> getHighestPriorityApplicable(State state) {
     RentalRestrictionExtension best = null;
