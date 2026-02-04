@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
@@ -30,22 +31,34 @@ public final class CompositeRentalRestrictionExtension implements RentalRestrict
 
   @Override
   public boolean traversalBanned(State state) {
-    for (var ext : extensions) {
-      if (ext.traversalBanned(state)) {
-        return true;
-      }
-    }
-    return false;
+    return getHighestPriorityApplicable(state)
+      .map(ext -> ext.traversalBanned(state))
+      .orElse(false);
   }
 
   @Override
   public boolean dropOffBanned(State state) {
+    return getHighestPriorityApplicable(state)
+      .map(ext -> ext.dropOffBanned(state))
+      .orElse(false);
+  }
+
+  /**
+   * Find the highest-priority restriction that applies to the given state.
+   * When zones overlap, the one with the lowest priority value wins (GBFS spec:
+   * "earlier listed zones take precedence").
+   */
+  private Optional<RentalRestrictionExtension> getHighestPriorityApplicable(State state) {
+    RentalRestrictionExtension best = null;
+    int bestPriority = Integer.MAX_VALUE;
+
     for (var ext : extensions) {
-      if (ext.dropOffBanned(state)) {
-        return true;
+      if (ext.appliesTo(state) && ext.priority() <= bestPriority) {
+        best = ext;
+        bestPriority = ext.priority();
       }
     }
-    return false;
+    return Optional.ofNullable(best);
   }
 
   @Override
