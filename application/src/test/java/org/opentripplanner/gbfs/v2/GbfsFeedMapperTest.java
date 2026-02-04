@@ -185,6 +185,49 @@ class GbfsFeedMapperTest {
     assertEquals("tieroslo:4640262c", businessAreas.get(0).id().toString());
   }
 
+  /**
+   * Test that geofencing zones are assigned correct priorities based on their
+   * position in the GBFS array. Earlier zones get lower priority values (higher precedence).
+   */
+  @Test
+  void geofencingZonePriority() {
+    var dataSource = new GbfsVehicleRentalDataSource(
+      new GbfsVehicleRentalDataSourceParameters(
+        "file:src/test/resources/gbfs/tieroslo/gbfs.json",
+        "en",
+        false,
+        HttpHeaders.empty(),
+        null,
+        true,
+        false,
+        RentalPickupType.ALL
+      ),
+      new OtpHttpClientFactory()
+    );
+
+    dataSource.setup();
+    assertTrue(dataSource.update());
+    dataSource.getUpdates();
+
+    var zones = dataSource.getGeofencingZones();
+
+    // First zone ("OSLO Summer 2021") should have priority 0
+    var osloZone = zones
+      .stream()
+      .filter(z -> z.name().toString().equals("OSLO Summer 2021"))
+      .findFirst()
+      .get();
+    assertEquals(0, osloZone.priority());
+
+    // Second zone ("NP Frogner og vigelandsparken") should have priority 1000
+    var frognerPark = zones
+      .stream()
+      .filter(z -> z.name().toString().equals("NP Frogner og vigelandsparken"))
+      .findFirst()
+      .get();
+    assertEquals(1000, frognerPark.priority());
+  }
+
   @Test
   void makeStationFromV10() {
     var network = "helsinki_gbfs";
