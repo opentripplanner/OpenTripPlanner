@@ -349,11 +349,7 @@ public class RealtimeVehicleMatcherTest {
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
     var instant = OffsetDateTime.parse(time).toInstant();
-    var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(
-      hasStopTime ? tripTimes : null,
-      zoneId,
-      instant
-    );
+    var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(tripTimes, zoneId, instant);
 
     assertEquals(LocalDate.parse(expectedDate), inferredDate);
   }
