@@ -1,41 +1,66 @@
-# Basic Snapshop Implementation
+# Snapshot Implementation Prototype
 
-This is a very basic implementation without any tweaks for performance improvements:
+This is a prototype for a multi repository snapshot implementation that satisfies the following requirements:
+- atomic updates
+- support for mutable repositories
+- support for synchronous domain events
 
-- immutable repositories
-- every update copies previous data (this can be optimized by sharing data structures between copies)
+To have a working prototype, I also implemented a basic domain event system. Unfortunately the `DomainEventHandler` depends on the complete `TransitWorld` at the moment, which leads to the `NewStopHandler` inside the transfer package also having access to the whole `TransitWorld`. I am not quite sure how to solve this, but I think that is mainly a domain event problem and not a snapshot problem, so this is might be out of scope here.
 
-This should be the least complex solution and therefore easiest to maintain. I think we should only deviate from this if we have a good reason:
+## Design Ideas
 
-- performance not fast enough
-- important functionality missing
+### Persistence is not part of the business domain
 
-We can then try to tweak this to fix the specific issue.
+The persistence is not part of the business logic, that's why it does not live in the domain package. (Think databases, a database would also not be part of the domain). That also means that there should be absolutely **no business logic inside the repositories**, only simple find/add/update/delete operations. This has the added benefit that business logic is clearly encapsulated from any persistence logic/indexing/... and should be much more clear. 
 
-**Simplifications**:
-- no need to maintain only one update thread, the while loop ensures that each update is always applied to the expected previous snapshot version
-- no need to implement a rollback functionality (if we do a commit for separate repositories, then the changes have to be rolled back whenever one repository fails)
-- no need to have a central point holding all currently used snapshots
+### All access to the data goes through `StateAccess`
 
-**possible performance bottlenecks:**
-- too many and/or too expensive updates might result in excessive update retries
-- using only immutable repositories could slow down applying updates
+`StateAcces` functions a bit like a database connection. All read and write operations go through it. It's responsible to create new snapshots after a write operation and also to always read from the most recent snapshot. It can be used like the following:
 
-## Encapsulation of Updates
+```java
+String tripId = stateAccess.read(snapshot -> snapshot.timetables().getTripId());
+stateAccess.write(ctx -> ctx.timetable().setTripId("123"));
+```
 
-Every update to the transit data is its own class. The update needs to know about the repositories in the `TransitSnapshot`, since it has to decide which of those repositories need to be updated. One update could also hold some sort of batch update, like modifying a list of trips and not only one trip.
+Multiple read operations that depend on the state not changing in between reads will have to be submitted in one operation. For example:
 
-The `TransitSnapshot apply(TransitSnapshot snapshot) {...}` method has to be a pure function, since it might be called multiple times for the same update.
+```java
+String result = stateAccess.read(snapshot -> {
+    String id = snapshot.timetables().getTripId();
+    // do calculations, routing,...
+    id += "xyz";
+    // read more stuff
+    int numberOfRecalculations = snapshot.transfers().getNumberOfRecalculations();
+    return id + numberOfRecalculations;
+});
+```
 
-## Workflow
+All operations are non-blocking.
 
-### Read Operation for Request
-1. Call `SnapshotManager.snapshot()` to get the current transit data
-2. Use respective repository from the snapshot whenever necessary to instantiate data fetchers
+More complex write operations with domain events, like trip updates, are also possible. `StateAccess#write` allows the use of the current write context, this context provides a `publish` method that can be used to publish domain events.
 
-### Write Operation for Updaters
-1. Create instance of specific update implementing `SnapshotUpdate`
-2. Call `SnapshotManager.apply(update)`
+```java
+TripUpdate update = new TripUpdate("newTrip", true);
+stateAccess.write(ctx -> {
+  TimetableRepo timetableRepo = ctx.timetable();
+  var tripUpdateService = new TripUpdateService(timetableRepo, ctx::publish);
+  tripUpdateService.doTripUpdate(update);
+});
+```
 
-## Dependencies
-The code is located in framework at the moment, but the dependency is the 'wrong' way for a framework: The snapshot mechanic depends on the repositories and not the other way around. I think the implementation is easier this way and more straight forward. I don't think we have a strong reason to flip the dependencies and write a more generic snapshot implementation, in my opinion we won't gain much but only complicate things. We can discuss on where to best locate this code.
+### `TransitWorld` is only meant to be a container for all repositories eligible for snapshotting
+
+There needs to be a simple way of telling the snapshot mechanic which data to consider while creating snapshots. The `TransitWorld` object is a way of doing that. I don't intend there to be any business logic inside. In fact, the interface in the domain model is only needed for the domain events.
+
+### Dependencies
+
+This is according to hexagonal architecture or clean architecture. `Persistence` is in the boundary or adapter layer, `Application` and `Event` is the application layer and `Domain` is the core, or the domain model. Dependencies only go from the outside to the inside, meaning the domain has the least dependencies and focuses solely on the business logic. Any changes in the outer layers will never lead to the business logic having to be adapted.
+
+```mermaid
+flowchart
+    Persistence --> Domain
+    Event --> Domain
+    Application --> Domain
+    Persistence --> Application
+    Persistence --> Event
+```
