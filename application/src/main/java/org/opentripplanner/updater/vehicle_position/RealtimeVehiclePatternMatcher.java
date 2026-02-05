@@ -147,6 +147,26 @@ class RealtimeVehiclePatternMatcher {
    * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
    */
   protected static LocalDate inferServiceDate(
+    TripTimes<?> tripTimes,
+    Set<LocalDate> applicableCalendarDates,
+    ZoneId zoneId,
+    Instant now
+  ) {
+    if (tripTimes != null) {
+      return inferServiceDate(tripTimes, zoneId, now);
+    } else if (applicableCalendarDates.size() == 1) {
+      return applicableCalendarDates.stream().toList().getFirst();
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * When a vehicle position doesn't state the service date of its trip then we need to infer it.
+   * <p>
+   * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
+   */
+  protected static LocalDate inferServiceDate(
     TripTimes<?> staticTripTimes,
     ZoneId zoneId,
     Instant now

@@ -17,6 +17,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -324,18 +325,25 @@ public class RealtimeVehicleMatcherTest {
 
   static Stream<Arguments> inferenceTestCases() {
     return Stream.of(
-      Arguments.of("2022-04-05T15:26:04+02:00", true, "2022-04-05"),
-      Arguments.of("2022-04-06T00:26:04+02:00", true, "2022-04-05"),
-      Arguments.of("2022-04-06T10:26:04+02:00", true, "2022-04-06"),
-      Arguments.of("2022-04-05T15:26:04+02:00", false, "2022-04-05"),
-      Arguments.of("2022-04-06T00:26:04+02:00", false, "2022-04-05"),
-      Arguments.of("2022-04-06T10:26:04+02:00", false, "2022-04-06")
+      Arguments.of("2022-04-05T15:26:04+02:00", true, Set.of(), "2022-04-05"),
+      Arguments.of("2022-04-06T00:26:04+02:00", true, Set.of("2022-04-08"), "2022-04-05"),
+      Arguments.of("2022-04-06T10:26:04+02:00", true, Set.of(), "2022-04-06"),
+      Arguments.of("2022-04-05T15:26:04+02:00", false, Set.of("2022-04-05"), "2022-04-05"),
+      Arguments.of("2022-04-06T00:26:04+02:00", false, Set.of(), null),
+      Arguments.of("2022-04-06T00:26:04+02:00", false, Set.of("2022-04-05"), "2022-04-05"),
+      Arguments.of("2022-04-06T00:26:04+02:00", false, Set.of("2022-04-05", "2022-04-06"), null),
+      Arguments.of("2022-04-06T00:26:04+02:00", false, Set.of("2022-04-06"), "2022-04-06")
     );
   }
 
-  @ParameterizedTest(name = "{0} + staticTripTimes included={1} should resolve to {2}")
+  @ParameterizedTest(name = "{0} + staticTripTimes included={1} and serviceDates={2} should resolve to {3}")
   @MethodSource("inferenceTestCases")
-  void inferServiceDayOfTripAt6(String time, boolean hasTripTimes, String expectedDate) {
+  void inferServiceDayOfTripAt6(
+    String time,
+    boolean hasTripTimes,
+    Set<String> serviceDateStrings,
+    String expectedDate
+  ) {
     var trip = TimetableRepositoryForTest.trip(tripId).build();
 
     var sixOclock = (int) Duration.ofHours(18).toSeconds();
@@ -347,11 +355,16 @@ public class RealtimeVehicleMatcherTest {
     );
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
-
     var instant = OffsetDateTime.parse(time).toInstant();
-    var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(tripTimes, zoneId, instant);
+    var serviceDates = serviceDateStrings.stream().map(LocalDate::parse).collect(Collectors.toSet());
+    var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(
+      hasTripTimes ? tripTimes : null,
+      serviceDates,
+      zoneId,
+      instant
+    );
 
-    assertEquals(LocalDate.parse(expectedDate), inferredDate);
+    assertEquals(expectedDate == null ? null : LocalDate.parse(expectedDate), inferredDate);
   }
 
   @Test
