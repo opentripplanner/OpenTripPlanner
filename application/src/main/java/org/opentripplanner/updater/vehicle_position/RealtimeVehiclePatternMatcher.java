@@ -67,6 +67,7 @@ class RealtimeVehiclePatternMatcher {
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
+  private Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId;
 
   public RealtimeVehiclePatternMatcher(
     String feedId,
@@ -86,6 +87,21 @@ class RealtimeVehiclePatternMatcher {
     this.timeZoneId = timeZoneId;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
     this.vehiclePositionFeatures = vehiclePositionFeatures;
+  }
+
+  public RealtimeVehiclePatternMatcher(
+    String feedId,
+    Function<FeedScopedId, Trip> getTripForId,
+    Function<Trip, TripPattern> getStaticPattern,
+    BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
+    Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId,
+    RealtimeVehicleRepository repository,
+    ZoneId timeZoneId,
+    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures
+  ) {
+    this(feedId, getTripForId, getStaticPattern, getRealtimePattern, repository, timeZoneId, fuzzyTripMatcher, vehiclePositionFeatures);
+    this.getServiceDatesForServiceId = getServiceDatesForServiceId;
   }
 
   /**
@@ -138,7 +154,8 @@ class RealtimeVehiclePatternMatcher {
   private LocalDate inferServiceDate(Trip trip) {
     // Use real-time timetable data, it is an overlay on the static data.
     var tripTimes = getRealtimePattern.apply(trip, LocalDate.now(timeZoneId)).getScheduledTimetable().getTripTimes(trip);
-    return inferServiceDate(tripTimes, timeZoneId, Instant.now());
+    var dates = getServiceDatesForServiceId.apply(trip.getServiceId());
+    return inferServiceDate(tripTimes, dates, timeZoneId, Instant.now());
   }
 
   /**

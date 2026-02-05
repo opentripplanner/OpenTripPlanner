@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -83,8 +84,9 @@ public class RealtimeVehicleMatcherTest {
     testVehiclePositions(posWithoutServiceDate);
   }
 
-  @Test
-  public void tripNotFoundInPattern() {
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  void tripNotFoundInPattern(boolean hasStopTimes) {
     var service = new DefaultRealtimeVehicleService(null);
 
     final String secondTripId = "trip2";
@@ -92,7 +94,9 @@ public class RealtimeVehicleMatcherTest {
     var trip1 = TimetableRepositoryForTest.trip(tripId).build();
     var trip2 = TimetableRepositoryForTest.trip(secondTripId).build();
 
-    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip1, "11:00");
+    List<StopTime> stopTimes = hasStopTimes
+      ? testModel.stopTimesEvery5Minutes(3, trip1, "11:00")
+      : List.of();
     var pattern = tripPattern(trip1, stopTimes);
 
     // Map positions to trips in feed
@@ -101,13 +105,16 @@ public class RealtimeVehicleMatcherTest {
       ignored -> trip2,
       ignored -> pattern,
       (id, time) -> pattern,
+      ignored -> Set.of(),
       service,
       zoneId,
       null,
       FEATURES
     );
 
-    var positions = List.of(vehiclePosition(secondTripId));
+    var positions = hasStopTimes
+      ? List.of(vehiclePosition(secondTripId))
+      : List.of(vehiclePosition(secondTripId, null));
     var result = matcher.applyRealtimeVehicleUpdates(positions);
 
     assertEquals(1, result.failed());
@@ -407,23 +414,32 @@ public class RealtimeVehicleMatcherTest {
 
   private static TripPattern tripPattern(Trip trip, List<StopTime> stopTimes) {
     var stopPattern = new StopPattern(stopTimes);
-    var pattern = TripPattern.of(trip.getId())
+    return TripPattern.of(trip.getId())
       .withStopPattern(stopPattern)
       .withRoute(ROUTE)
       .withScheduledTimeTableBuilder(builder ->
-        builder.addTripTimes(TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator()))
+        stopTimes.isEmpty()
+          ? builder
+          : builder.addTripTimes(TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator()))
       )
       .build();
-    return pattern;
   }
 
-  private static VehiclePosition vehiclePosition(String tripId1) {
+  private static VehiclePosition vehiclePosition(String tripId1, String startDate) {
+    TripDescriptor.Builder tripBuilder = TripDescriptor.newBuilder().setTripId(tripId1);
+    if (startDate != null) {
+      tripBuilder.setStartDate(startDate);
+    }
     return VehiclePosition.newBuilder()
-      .setTrip(TripDescriptor.newBuilder().setTripId(tripId1).setStartDate("20220314").build())
+      .setTrip(tripBuilder.build())
       .setStopId("stop-1")
       .setPosition(
         GtfsRealtime.Position.newBuilder().setLatitude(1).setLongitude(1).setBearing(30).build()
       )
       .build();
+  }
+
+  private static VehiclePosition vehiclePosition(String tripId1) {
+    return vehiclePosition(tripId1, "20220314");
   }
 }
