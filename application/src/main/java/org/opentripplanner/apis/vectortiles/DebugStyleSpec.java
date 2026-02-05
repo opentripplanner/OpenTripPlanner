@@ -69,6 +69,7 @@ public class DebugStyleSpec {
     POSITRON_BACKGROUND
   );
   private static final String MAGENTA = "#f21d52";
+  private static final String LIGHT_MAGENTA = "#f783a0";
   private static final String BRIGHT_GREEN = "#22DD9E";
   private static final String DARK_GREEN = "#136b04";
   private static final String TEAL = "#277eb5";
@@ -103,12 +104,14 @@ public class DebugStyleSpec {
   private static final ZoomDependentNumber LINE_HALF_WIDTH = new ZoomDependentNumber(
     List.of(new ZoomStop(LINE_DETAIL_ZOOM, 0.1f), new ZoomStop(MAX_ZOOM, 6))
   );
+  private static final ZoomDependentNumber LINE_QUARTER_WIDTH = new ZoomDependentNumber(
+    List.of(new ZoomStop(LINE_DETAIL_ZOOM, 0.01f), new ZoomStop(MAX_ZOOM, 3))
+  );
   private static final ZoomDependentNumber CIRCLE_STROKE = new ZoomDependentNumber(
     List.of(new ZoomStop(15, 0.2f), new ZoomStop(MAX_ZOOM, 3))
   );
   private static final Class<Edge>[] EDGES_TO_DISPLAY = new Class[] {
     StreetEdge.class,
-    AreaEdge.class,
     EscalatorEdge.class,
     PathwayEdge.class,
     ElevatorHopEdge.class,
@@ -443,6 +446,18 @@ public class DebugStyleSpec {
 
   private static List<StyleBuilder> edges(VectorSourceLayer edges) {
     return List.of(
+      StyleBuilder.ofId("area-edge")
+        .group(EDGES_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .edgeFilter(AreaEdge.class)
+        .lineColor(LIGHT_MAGENTA)
+        .lineWidth(LINE_QUARTER_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .lineOpacity(0.5f)
+        .minZoom(15)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
       StyleBuilder.ofId("edge")
         .group(EDGES_GROUP)
         .typeLine()

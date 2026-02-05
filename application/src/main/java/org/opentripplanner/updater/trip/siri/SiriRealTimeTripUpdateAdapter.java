@@ -31,6 +31,8 @@ import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
+import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
+import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +50,12 @@ public class SiriRealTimeTripUpdateAdapter {
    * Use an id generator to generate TripPattern ids for new TripPatterns created by RealTime
    * updates.
    */
-  private final SiriTripPatternIdGenerator tripPatternIdGenerator =
-    new SiriTripPatternIdGenerator();
+  private final TripPatternIdGenerator tripPatternIdGenerator = new TripPatternIdGenerator();
   /**
    * A synchronized cache of trip patterns that are added to the graph due to GTFS-real-time
    * messages.
    */
-  private final SiriTripPatternCache tripPatternCache;
+  private final TripPatternCache tripPatternCache;
 
   /**
    * Long-lived transit editor service that has access to the timetable snapshot buffer.
@@ -77,7 +78,7 @@ public class SiriRealTimeTripUpdateAdapter {
       timetableRepository,
       snapshotManager.getTimetableSnapshotBuffer()
     );
-    this.tripPatternCache = new SiriTripPatternCache(
+    this.tripPatternCache = new TripPatternCache(
       tripPatternIdGenerator,
       transitEditorService::findPattern
     );
