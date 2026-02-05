@@ -41,6 +41,9 @@ class OjpToTriasTransformerTest {
     var actual = OjpToTriasTransformer.ojpToTrias(ojp);
     var file = LOADER.extTestResourceFile("error.xml");
     var original = readFile(file);
+
+    // normalize to LF, JAXB_FORMATTED_OUTPUT cannot be overridden with line.separator
+    actual = actual.replace("\r\n", "\n").replace("\r", "\n");
     writeFile(file, actual);
     assertEqualStrings(original, actual);
   }
