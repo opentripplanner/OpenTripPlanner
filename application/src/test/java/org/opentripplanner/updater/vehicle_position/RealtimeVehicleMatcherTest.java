@@ -85,7 +85,7 @@ public class RealtimeVehicleMatcherTest {
   }
 
   @ParameterizedTest
-  @ValueSource(booleans = {true, false})
+  @ValueSource(booleans = { true, false })
   void tripNotFoundInPattern(boolean hasStopTimes) {
     var service = new DefaultRealtimeVehicleService(null);
 
@@ -350,11 +350,7 @@ public class RealtimeVehicleMatcherTest {
 
   @ParameterizedTest(name = "{0} + serviceDates={1} should resolve to {2}")
   @MethodSource("inferenceTestCases")
-  void inferServiceDayOfTripAt6(
-    String time,
-    Set<String> serviceDateStrings,
-    String expectedDate
-  ) {
+  void inferServiceDayOfTripAt6(String time, Set<String> serviceDateStrings, String expectedDate) {
     var trip = TimetableRepositoryForTest.trip(tripId).build();
     var hasTripTimes = serviceDateStrings == null;
 

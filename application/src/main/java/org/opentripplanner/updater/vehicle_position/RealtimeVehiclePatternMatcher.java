@@ -140,7 +140,10 @@ class RealtimeVehiclePatternMatcher {
 
   private LocalDate inferServiceDate(Trip trip) {
     // Use real-time timetable data, it is an overlay on the static data.
-    var tripTimes = getRealtimePattern.apply(trip, LocalDate.now(timeZoneId)).getScheduledTimetable().getTripTimes(trip);
+    var tripTimes = getRealtimePattern
+      .apply(trip, LocalDate.now(timeZoneId))
+      .getScheduledTimetable()
+      .getTripTimes(trip);
     var dates = getServiceDatesForServiceId.apply(trip.getServiceId());
     return inferServiceDate(tripTimes, dates, timeZoneId, Instant.now());
   }
