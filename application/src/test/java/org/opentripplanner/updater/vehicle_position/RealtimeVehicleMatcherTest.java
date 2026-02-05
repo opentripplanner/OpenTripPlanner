@@ -36,6 +36,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
+import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
@@ -325,40 +326,44 @@ public class RealtimeVehicleMatcherTest {
 
   static Stream<Arguments> inferenceTestCases() {
     return Stream.of(
-      Arguments.of("2022-04-05T15:26:04+02:00", true, Set.of(), "2022-04-05"),
-      Arguments.of("2022-04-06T00:26:04+02:00", true, Set.of("2022-04-08"), "2022-04-05"),
-      Arguments.of("2022-04-06T10:26:04+02:00", true, Set.of(), "2022-04-06"),
-      Arguments.of("2022-04-05T15:26:04+02:00", false, Set.of("2022-04-05"), "2022-04-05"),
-      Arguments.of("2022-04-06T00:26:04+02:00", false, Set.of(), null),
-      Arguments.of("2022-04-06T00:26:04+02:00", false, Set.of("2022-04-05"), "2022-04-05"),
-      Arguments.of("2022-04-06T00:26:04+02:00", false, Set.of("2022-04-05", "2022-04-06"), null),
-      Arguments.of("2022-04-06T00:26:04+02:00", false, Set.of("2022-04-06"), "2022-04-06")
+      Arguments.of("2022-04-05T15:26:04+02:00", null, "2022-04-05"),
+      Arguments.of("2022-04-06T00:26:04+02:00", null, "2022-04-05"),
+      Arguments.of("2022-04-06T10:26:04+02:00", null, "2022-04-06"),
+      Arguments.of("2022-04-05T15:26:04+02:00", Set.of("2022-04-05"), "2022-04-05"),
+      Arguments.of("2022-04-06T00:26:04+02:00", Set.of(), null),
+      Arguments.of("2022-04-06T00:26:04+02:00", Set.of("2022-04-05"), "2022-04-05"),
+      Arguments.of("2022-04-06T00:26:04+02:00", Set.of("2022-04-05", "2022-04-06"), null),
+      Arguments.of("2022-04-06T00:26:04+02:00", Set.of("2022-04-06"), "2022-04-06")
     );
   }
 
-  @ParameterizedTest(name = "{0} + staticTripTimes included={1} and serviceDates={2} should resolve to {3}")
+  @ParameterizedTest(name = "{0} + serviceDates={1} should resolve to {2}")
   @MethodSource("inferenceTestCases")
   void inferServiceDayOfTripAt6(
     String time,
-    boolean hasTripTimes,
     Set<String> serviceDateStrings,
     String expectedDate
   ) {
     var trip = TimetableRepositoryForTest.trip(tripId).build();
+    var hasTripTimes = serviceDateStrings == null;
 
-    var sixOclock = (int) Duration.ofHours(18).toSeconds();
-    var fivePast6 = sixOclock + 300;
-
-    var stopTimes = List.of(
-      testModel.stopTime(trip, 0, sixOclock),
-      testModel.stopTime(trip, 1, fivePast6)
-    );
-
-    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
+    ScheduledTripTimes tripTimes = null;
+    Set<LocalDate> serviceDates = null;
+    if (hasTripTimes) {
+      var sixOclock = (int) Duration.ofHours(18).toSeconds();
+      var fivePast6 = sixOclock + 300;
+      var stopTimes = List.of(
+        testModel.stopTime(trip, 0, sixOclock),
+        testModel.stopTime(trip, 1, fivePast6)
+      );
+      tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
+    } else {
+      serviceDates = serviceDateStrings.stream().map(LocalDate::parse).collect(Collectors.toSet());
+    }
     var instant = OffsetDateTime.parse(time).toInstant();
-    var serviceDates = serviceDateStrings.stream().map(LocalDate::parse).collect(Collectors.toSet());
+
     var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(
-      hasTripTimes ? tripTimes : null,
+      tripTimes,
       serviceDates,
       zoneId,
       instant
