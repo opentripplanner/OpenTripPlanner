@@ -74,6 +74,7 @@ class RealtimeVehiclePatternMatcher {
     Function<FeedScopedId, Trip> getTripForId,
     Function<Trip, TripPattern> getStaticPattern,
     BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
+    Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId,
     RealtimeVehicleRepository repository,
     ZoneId timeZoneId,
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
@@ -87,20 +88,6 @@ class RealtimeVehiclePatternMatcher {
     this.timeZoneId = timeZoneId;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
     this.vehiclePositionFeatures = vehiclePositionFeatures;
-  }
-
-  public RealtimeVehiclePatternMatcher(
-    String feedId,
-    Function<FeedScopedId, Trip> getTripForId,
-    Function<Trip, TripPattern> getStaticPattern,
-    BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
-    Function<FeedScopedId, Set<LocalDate>> getServiceDatesForServiceId,
-    RealtimeVehicleRepository repository,
-    ZoneId timeZoneId,
-    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
-    Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures
-  ) {
-    this(feedId, getTripForId, getStaticPattern, getRealtimePattern, repository, timeZoneId, fuzzyTripMatcher, vehiclePositionFeatures);
     this.getServiceDatesForServiceId = getServiceDatesForServiceId;
   }
 

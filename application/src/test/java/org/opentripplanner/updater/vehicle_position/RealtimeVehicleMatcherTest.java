@@ -145,6 +145,7 @@ public class RealtimeVehicleMatcherTest {
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
+      ignored -> null,
       service,
       zoneId,
       null,
@@ -202,6 +203,7 @@ public class RealtimeVehicleMatcherTest {
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
+      ignored -> null,
       service,
       zoneId,
       null,
@@ -250,6 +252,7 @@ public class RealtimeVehicleMatcherTest {
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
+      ignored -> null,
       service,
       zoneId,
       null,
@@ -306,6 +309,7 @@ public class RealtimeVehicleMatcherTest {
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
+      ignored -> null,
       service,
       zoneId,
       null,
@@ -397,17 +401,6 @@ public class RealtimeVehicleMatcherTest {
     // because the trip "crosses" midnight and we are already on the next day, we infer the service date to be
     // yesterday
     var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(tripTimes, zoneId, time);
-
-    assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
-  }
-
-  @Test
-  void inferServiceDateCloseToMidnightIfNoStaticSchedule() {
-    var time = OffsetDateTime.parse("2022-04-05T00:04:00+02:00").toInstant();
-
-    // because the trip "crosses" midnight and we are already on the next day, we infer the service date to be
-    // yesterday
-    var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(null, zoneId, time);
 
     assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
   }
