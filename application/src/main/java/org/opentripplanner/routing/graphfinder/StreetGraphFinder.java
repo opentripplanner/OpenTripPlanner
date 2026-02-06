@@ -15,6 +15,8 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.LinkingContextRequest;
 import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
+import org.opentripplanner.street.model.PropulsionType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
@@ -60,6 +62,8 @@ public class StreetGraphFinder implements GraphFinder {
     List<FeedScopedId> filterByStations,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
+    List<RentalFormFactor> filterByVehicleFormFactor,
+    List<PropulsionType> filterByVehiclePropulsionType,
     List<String> filterByNetwork,
     TransitService transitService
   ) {
@@ -71,6 +75,8 @@ public class StreetGraphFinder implements GraphFinder {
       filterByStations,
       filterByRoutes,
       filterByBikeRentalStations,
+      filterByVehicleFormFactor,
+      filterByVehiclePropulsionType,
       filterByNetwork,
       maxResults,
       radiusMeters

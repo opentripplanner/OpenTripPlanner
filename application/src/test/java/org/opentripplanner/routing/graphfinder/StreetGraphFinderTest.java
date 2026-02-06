@@ -14,6 +14,8 @@ import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.PropulsionType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -37,6 +39,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
   private IntersectionVertex D;
   private VehicleRentalPlaceVertex BR1;
   private VehicleRentalPlaceVertex BR2;
+  private VehicleRentalPlaceVertex BR3;
 
   private TransitService transitService;
   private StreetGraphFinder graphFinder;
@@ -65,6 +68,13 @@ class StreetGraphFinderTest extends GraphRoutingTest {
 
           BR1 = vehicleRentalStation("BR1", 47.500, 18.999);
           BR2 = vehicleRentalStation("BR2", 47.520, 18.999);
+          BR3 = vehicleRentalVehicle(
+            "BR3",
+            47.540,
+            18.999,
+            RentalFormFactor.SCOOTER,
+            PropulsionType.ELECTRIC
+          );
 
           A = intersection("A", 47.500, 19.00);
           B = intersection("B", 47.510, 19.00);
@@ -103,6 +113,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
           biLink(B, S2);
           biLink(C, S3);
           biLink(C, BR2);
+          biLink(D, BR3);
 
           street(A, B, 100, StreetTraversalPermission.ALL);
           street(B, C, 100, StreetTraversalPermission.ALL);
@@ -173,6 +184,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
+        null,
+        null,
         transitService
       )
     );
@@ -197,6 +210,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
+        null,
+        null,
         transitService
       )
     );
@@ -210,6 +225,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         3,
         null,
         List.of(PlaceType.STOP, PlaceType.PATTERN_AT_STOP, PlaceType.VEHICLE_RENT),
+        null,
+        null,
         null,
         null,
         null,
@@ -240,6 +257,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
+        null,
+        null,
         transitService
       )
     );
@@ -253,6 +272,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         100,
         List.of(TransitMode.BUS),
         List.of(PlaceType.STOP),
+        null,
+        null,
         null,
         null,
         null,
@@ -284,6 +305,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
+        null,
+        null,
         transitService
       )
     );
@@ -298,6 +321,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         List.of(PlaceType.STOP, PlaceType.PATTERN_AT_STOP),
         List.of(stop(S2).getId()),
+        null,
+        null,
         null,
         null,
         null,
@@ -328,6 +353,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
+        null,
+        null,
         transitService
       )
     );
@@ -344,6 +371,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         List.of(S2.getId()),
         null,
         List.of(R1.getId()),
+        null,
+        null,
         null,
         null,
         transitService
@@ -373,6 +402,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
+        null,
+        null,
         transitService
       )
     );
@@ -391,6 +422,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         List.of(R2.getId()),
         null,
         null,
+        null,
+        null,
         transitService
       )
     );
@@ -400,9 +433,10 @@ class StreetGraphFinderTest extends GraphRoutingTest {
   void findClosestPlacesWithAVehicleRentalFilter() {
     var br1 = new PlaceAtDistance(BR1.getStation(), 0);
     var br2 = new PlaceAtDistance(BR2.getStation(), 200);
+    var br3 = new PlaceAtDistance(BR3.getStation(), 300);
 
     assertEquals(
-      List.of(br1, br2),
+      List.of(br1, br2, br3),
       graphFinder.findClosestPlaces(
         47.500,
         19.000,
@@ -410,6 +444,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         100,
         null,
         List.of(PlaceType.VEHICLE_RENT),
+        null,
+        null,
         null,
         null,
         null,
@@ -433,6 +469,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         List.of("BR2"),
         null,
+        null,
+        null,
         transitService
       )
     );
@@ -451,6 +489,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         100,
         null,
         List.of(PlaceType.BIKE_PARK),
+        null,
+        null,
         null,
         null,
         null,
@@ -478,6 +518,85 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
+        null,
+        null,
+        null,
+        transitService
+      )
+    );
+  }
+
+  @Test
+  void findClosestPlacesWithAScooterFilter() {
+    var scooters = List.of(new PlaceAtDistance(BR3.getStation(), 300));
+
+    assertEquals(
+      scooters,
+      graphFinder.findClosestPlaces(
+        47.500,
+        19.000,
+        300.0,
+        100,
+        null,
+        List.of(PlaceType.VEHICLE_RENT),
+        null,
+        null,
+        null,
+        null,
+        List.of(RentalFormFactor.SCOOTER),
+        null,
+        null,
+        transitService
+      )
+    );
+  }
+
+  @Test
+  void findClosestPlacesWithABikeFilter() {
+    var br1 = new PlaceAtDistance(BR1.getStation(), 0);
+    var br2 = new PlaceAtDistance(BR2.getStation(), 200);
+    var bikeRentalStations = List.of(br1, br2);
+
+    assertEquals(
+      bikeRentalStations,
+      graphFinder.findClosestPlaces(
+        47.500,
+        19.000,
+        300.0,
+        100,
+        null,
+        List.of(PlaceType.VEHICLE_RENT),
+        null,
+        null,
+        null,
+        null,
+        List.of(RentalFormFactor.BICYCLE),
+        null,
+        null,
+        transitService
+      )
+    );
+  }
+
+  @Test
+  void findClosestPlacesWithAnElectricPropulsionFilter() {
+    var scooters = List.of(new PlaceAtDistance(BR3.getStation(), 300));
+
+    assertEquals(
+      scooters,
+      graphFinder.findClosestPlaces(
+        47.500,
+        19.000,
+        300.0,
+        100,
+        null,
+        List.of(PlaceType.VEHICLE_RENT),
+        null,
+        null,
+        null,
+        null,
+        null,
+        List.of(PropulsionType.ELECTRIC),
         null,
         transitService
       )

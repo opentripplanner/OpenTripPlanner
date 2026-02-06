@@ -9,6 +9,7 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
+import org.opentripplanner.street.model.PropulsionType;
 import org.opentripplanner.street.model.RentalFormFactor;
 
 class GbfsFreeVehicleStatusMapperTest {
@@ -28,7 +29,7 @@ class GbfsFreeVehicleStatusMapperTest {
         new FeedScopedId("1", "scooter"),
         I18NString.of("Scooter"),
         RentalFormFactor.SCOOTER,
-        RentalVehicleType.PropulsionType.COMBUSTION,
+        PropulsionType.COMBUSTION,
         null
       )
     )

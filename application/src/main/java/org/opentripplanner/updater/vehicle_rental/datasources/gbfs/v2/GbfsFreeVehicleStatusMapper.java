@@ -15,6 +15,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.street.model.PropulsionType;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Ratio;
 import org.opentripplanner.utils.lang.StringUtils;
@@ -64,8 +65,7 @@ class GbfsFreeVehicleStatusMapper {
       if (
         vehicle.getVehicleTypeId() != null &&
         vehicleTypes.get(vehicle.getVehicleTypeId()) != null &&
-        vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType() !=
-        RentalVehicleType.PropulsionType.HUMAN &&
+        vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType() != PropulsionType.HUMAN &&
         rangeMeters == null
       ) {
         return null;

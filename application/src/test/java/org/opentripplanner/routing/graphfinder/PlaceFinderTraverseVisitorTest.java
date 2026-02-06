@@ -13,7 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
+import org.opentripplanner.street.model.PropulsionType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -97,6 +100,8 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
+      null,
       1,
       500
     );
@@ -121,6 +126,8 @@ public class PlaceFinderTraverseVisitorTest {
       transitService,
       List.of(TransitMode.BUS),
       List.of(PlaceType.STATION),
+      null,
+      null,
       null,
       null,
       null,
@@ -155,6 +162,8 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
+      null,
       1,
       500
     );
@@ -184,6 +193,8 @@ public class PlaceFinderTraverseVisitorTest {
       List.of(PlaceType.STOP, PlaceType.STATION),
       List.of(STOP2.getId(), STOP3.getId()),
       List.of(STATION1.getId()),
+      null,
+      null,
       null,
       null,
       null,
@@ -222,6 +233,8 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
+      null,
       1,
       500
     );
@@ -253,6 +266,8 @@ public class PlaceFinderTraverseVisitorTest {
       List.of(PlaceType.STOP, PlaceType.STATION),
       List.of(STOP4.getId()),
       List.of(STATION1.getId()),
+      null,
+      null,
       null,
       null,
       null,
@@ -292,12 +307,14 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
+      null,
       1,
       500
     );
     var station = new TestVehicleRentalStationBuilder().build();
     assertEquals(List.of(), visitor.placesFound);
-    var state1 = TestStateBuilder.ofWalking().rentalStation(station).build();
+    var state1 = TestStateBuilder.ofWalking().vehicleRentalPlace(station).build();
     visitor.visitVertex(state1);
 
     var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
@@ -315,13 +332,15 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
+      null,
       List.of("Network-1"),
       1,
       500
     );
     var station = new TestVehicleRentalStationBuilder().build();
     assertEquals(List.of(), visitor.placesFound);
-    var state1 = TestStateBuilder.ofWalking().rentalStation(station).build();
+    var state1 = TestStateBuilder.ofWalking().vehicleRentalPlace(station).build();
     visitor.visitVertex(state1);
 
     var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
@@ -336,17 +355,121 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
+      null,
       List.of("Network-2"),
       1,
       500
     );
 
     assertEquals(List.of(), visitor.placesFound);
-    state1 = TestStateBuilder.ofWalking().rentalStation(station).build();
+    state1 = TestStateBuilder.ofWalking().vehicleRentalPlace(station).build();
     visitor.visitVertex(state1);
 
     res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
 
+    assertEquals(List.of(), res);
+  }
+
+  @Test
+  void rentalVehicleWithFormFactorFilter() {
+    var visitor = new PlaceFinderTraverseVisitor(
+      transitService,
+      null,
+      List.of(PlaceType.VEHICLE_RENT),
+      null,
+      null,
+      null,
+      null,
+      List.of(RentalFormFactor.SCOOTER),
+      null,
+      null,
+      1,
+      500
+    );
+    var scooter = new TestFreeFloatingRentalVehicleBuilder().withVehicleScooter().build();
+    assertEquals(List.of(), visitor.placesFound);
+    var state1 = TestStateBuilder.ofWalking().vehicleRentalPlace(scooter).build();
+    visitor.visitVertex(state1);
+
+    var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
+
+    // There is a scooter in the test data
+    assertEquals(List.of(scooter), res);
+
+    visitor = new PlaceFinderTraverseVisitor(
+      transitService,
+      null,
+      List.of(PlaceType.VEHICLE_RENT),
+      null,
+      null,
+      null,
+      null,
+      List.of(RentalFormFactor.BICYCLE),
+      null,
+      null,
+      1,
+      500
+    );
+
+    assertEquals(List.of(), visitor.placesFound);
+    state1 = TestStateBuilder.ofWalking().vehicleRentalPlace(scooter).build();
+    visitor.visitVertex(state1);
+
+    res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
+
+    // There are no bicycles in the test data
+    assertEquals(List.of(), res);
+  }
+
+  @Test
+  void rentalVehicleWithPropulsionFilter() {
+    var visitor = new PlaceFinderTraverseVisitor(
+      transitService,
+      null,
+      List.of(PlaceType.VEHICLE_RENT),
+      null,
+      null,
+      null,
+      null,
+      null,
+      List.of(PropulsionType.ELECTRIC),
+      null,
+      1,
+      500
+    );
+    var scooter = new TestFreeFloatingRentalVehicleBuilder().withVehicleScooter().build();
+    assertEquals(List.of(), visitor.placesFound);
+    var state1 = TestStateBuilder.ofWalking().vehicleRentalPlace(scooter).build();
+    visitor.visitVertex(state1);
+
+    var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
+
+    // There is an electric vehicle (scooter) in the test data
+    assertEquals(List.of(scooter), res);
+
+    visitor = new PlaceFinderTraverseVisitor(
+      transitService,
+      null,
+      List.of(PlaceType.VEHICLE_RENT),
+      null,
+      null,
+      null,
+      null,
+      null,
+      List.of(PropulsionType.HUMAN),
+      null,
+      1,
+      500
+    );
+
+    assertEquals(List.of(), visitor.placesFound);
+    state1 = TestStateBuilder.ofWalking().vehicleRentalPlace(scooter).build();
+    visitor.visitVertex(state1);
+
+    res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
+
+    // There are no human-powered vehicles in the test data
     assertEquals(List.of(), res);
   }
 }

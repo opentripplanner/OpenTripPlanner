@@ -25,9 +25,12 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.PropulsionType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
@@ -411,6 +414,49 @@ public abstract class GraphRoutingTest {
       double longitude
     ) {
       return vehicleRentalStation(id, latitude, longitude, TEST_VEHICLE_RENTAL_NETWORK);
+    }
+
+    public VehicleRentalPlace vehicleRentalVehicleEntity(
+      String id,
+      double latitude,
+      double longitude,
+      String network,
+      RentalFormFactor formFactor,
+      PropulsionType propulsionType
+    ) {
+      final RentalVehicleType vehicleType = RentalVehicleType.of()
+        .withId(new FeedScopedId(network, id))
+        .withFormFactor(formFactor)
+        .withPropulsionType(propulsionType)
+        .build();
+      return VehicleRentalVehicle.of()
+        .withId(new FeedScopedId(network, id))
+        .withName(new NonLocalizedString(id))
+        .withLongitude(longitude)
+        .withLatitude(latitude)
+        .withVehicleType(vehicleType)
+        .build();
+    }
+
+    public VehicleRentalPlaceVertex vehicleRentalVehicle(
+      String id,
+      double latitude,
+      double longitude,
+      RentalFormFactor formFactor,
+      PropulsionType propulsionType
+    ) {
+      var vertex = new VehicleRentalPlaceVertex(
+        vehicleRentalVehicleEntity(
+          id,
+          latitude,
+          longitude,
+          TEST_VEHICLE_RENTAL_NETWORK,
+          formFactor,
+          propulsionType
+        )
+      );
+      VehicleRentalEdge.createVehicleRentalEdge(vertex, formFactor);
+      return vertex;
     }
 
     public StreetVehicleRentalLink link(StreetVertex from, VehicleRentalPlaceVertex to) {

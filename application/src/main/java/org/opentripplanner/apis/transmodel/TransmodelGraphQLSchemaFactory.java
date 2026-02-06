@@ -5,6 +5,8 @@ import static java.util.Collections.emptyList;
 import static org.opentripplanner.apis.transmodel.mapping.SeverityMapper.getTransmodelSeverity;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.FILTER_PLACE_TYPE_ENUM;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.MULTI_MODAL_MODE;
+import static org.opentripplanner.apis.transmodel.model.EnumTypes.PROPULSION_TYPE;
+import static org.opentripplanner.apis.transmodel.model.EnumTypes.RENTAL_FORM_FACTOR;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.TRANSPORT_MODE;
 import static org.opentripplanner.apis.transmodel.model.scalars.DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
@@ -125,6 +127,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.street.model.PropulsionType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
@@ -904,6 +908,24 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .argument(
             GraphQLArgument.newArgument()
+              .name("filterByVehicleFormFactor")
+              .description(
+                "Only include rental vehicles with a form factor that matches one in this list. Only checked for places with a vehicle type."
+              )
+              .type(new GraphQLList(new GraphQLNonNull(RENTAL_FORM_FACTOR)))
+              .build()
+          )
+          .argument(
+            GraphQLArgument.newArgument()
+              .name("filterByVehiclePropulsionType")
+              .description(
+                "Only include rental vehicles with a propulsion type that matches one in this list. Only checked for places with a vehicle type."
+              )
+              .type(new GraphQLList(new GraphQLNonNull(PROPULSION_TYPE)))
+              .build()
+          )
+          .argument(
+            GraphQLArgument.newArgument()
               .name("multiModalMode")
               .type(MULTI_MODAL_MODE)
               .description(
@@ -939,6 +961,13 @@ public class TransmodelGraphQLSchemaFactory {
             }
             List<PlaceType> filterByPlaceTypes = PlaceMapper.mapToDomain(placeTypes);
 
+            List<RentalFormFactor> filterByVehicleFormFactor = environment.getArgument(
+              "filterByVehicleFormFactor"
+            );
+            List<PropulsionType> filterByVehiclePropulsionType = environment.getArgument(
+              "filterByVehiclePropulsionType"
+            );
+
             // Need to fetch more than requested no of places if stopPlaces are allowed, as this requires fetching potentially multiple quays for the same stop place and mapping them to unique stop places.
             int orgMaxResults = environment.getArgument("maximumResults");
             int maxResults = orgMaxResults;
@@ -958,6 +987,8 @@ public class TransmodelGraphQLSchemaFactory {
               filterByStations,
               filterByRoutes,
               filterByBikeRentalStations,
+              filterByVehicleFormFactor,
+              filterByVehiclePropulsionType,
               filterByNetwork,
               GqlUtil.getTransitService(environment)
             );

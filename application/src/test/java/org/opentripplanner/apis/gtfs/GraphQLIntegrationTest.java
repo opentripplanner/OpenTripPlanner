@@ -94,6 +94,8 @@ import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationB
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
+import org.opentripplanner.street.model.PropulsionType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.search.state.TestStateBuilder;
@@ -666,6 +668,8 @@ class GraphQLIntegrationTest {
       List<FeedScopedId> filterByStations,
       List<FeedScopedId> filterByRoutes,
       List<String> filterByBikeRentalStations,
+      List<RentalFormFactor> filterByVehicleFormFactor,
+      List<PropulsionType> filterByVehiclePropulsionType,
       List<String> filterByNetwork,
       TransitService transitService
     ) {

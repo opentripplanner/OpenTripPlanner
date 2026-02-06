@@ -65,6 +65,8 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.street.model.PropulsionType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -335,9 +337,25 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             .filter(Objects::nonNull)
             .toList()
         : null;
+
       List<PlaceType> filterByPlaceTypes = args.getGraphQLFilterByPlaceTypes() != null
         ? args.getGraphQLFilterByPlaceTypes().stream().map(GraphQLUtils::toModel).toList()
         : DEFAULT_PLACE_TYPES;
+
+      List<RentalFormFactor> filterByVehicleFormFactor =
+        args.getGraphQLFilterByVehicleFormFactor() != null
+          ? args.getGraphQLFilterByVehicleFormFactor().stream().map(GraphQLUtils::toModel).toList()
+          : null;
+
+      List<PropulsionType> filterByVehiclePropulsionType =
+        args.getGraphQLFilterByVehiclePropulsionType() != null
+          ? args
+              .getGraphQLFilterByVehiclePropulsionType()
+              .stream()
+              .map(GraphQLUtils::toModel)
+              .toList()
+          : null;
+
       List<String> filterByNetwork = args.getGraphQLFilterByNetwork();
 
       List<PlaceAtDistance> places;
@@ -354,6 +372,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             filterByStations,
             filterByRoutes,
             filterByBikeRentalStations,
+            filterByVehicleFormFactor,
+            filterByVehiclePropulsionType,
             filterByNetwork,
             getTransitService(environment)
           )

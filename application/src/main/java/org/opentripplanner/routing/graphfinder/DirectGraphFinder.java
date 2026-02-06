@@ -8,6 +8,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.model.PropulsionType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
@@ -63,6 +65,8 @@ public class DirectGraphFinder implements GraphFinder {
     List<FeedScopedId> filterByStations,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
+    List<RentalFormFactor> filterByVehicleFormFactor,
+    List<PropulsionType> filterByVehiclePropulsionType,
     List<String> filterByNetwork,
     TransitService transitService
   ) {

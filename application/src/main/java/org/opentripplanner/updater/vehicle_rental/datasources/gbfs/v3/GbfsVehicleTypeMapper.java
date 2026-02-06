@@ -6,6 +6,7 @@ import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSName;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.street.model.PropulsionType;
 import org.opentripplanner.street.model.RentalFormFactor;
 
 class GbfsVehicleTypeMapper {
@@ -26,18 +27,16 @@ class GbfsVehicleTypeMapper {
     );
   }
 
-  public static RentalVehicleType.PropulsionType fromGbfs(
-    GBFSVehicleType.PropulsionType propulsionType
-  ) {
+  public static PropulsionType fromGbfs(GBFSVehicleType.PropulsionType propulsionType) {
     return switch (propulsionType) {
-      case HUMAN -> RentalVehicleType.PropulsionType.HUMAN;
-      case ELECTRIC_ASSIST -> RentalVehicleType.PropulsionType.ELECTRIC_ASSIST;
-      case ELECTRIC -> RentalVehicleType.PropulsionType.ELECTRIC;
-      case COMBUSTION -> RentalVehicleType.PropulsionType.COMBUSTION;
-      case COMBUSTION_DIESEL -> RentalVehicleType.PropulsionType.COMBUSTION_DIESEL;
-      case HYBRID -> RentalVehicleType.PropulsionType.HYBRID;
-      case PLUG_IN_HYBRID -> RentalVehicleType.PropulsionType.PLUG_IN_HYBRID;
-      case HYDROGEN_FUEL_CELL -> RentalVehicleType.PropulsionType.HYDROGEN_FUEL_CELL;
+      case HUMAN -> PropulsionType.HUMAN;
+      case ELECTRIC_ASSIST -> PropulsionType.ELECTRIC_ASSIST;
+      case ELECTRIC -> PropulsionType.ELECTRIC;
+      case COMBUSTION -> PropulsionType.COMBUSTION;
+      case COMBUSTION_DIESEL -> PropulsionType.COMBUSTION_DIESEL;
+      case HYBRID -> PropulsionType.HYBRID;
+      case PLUG_IN_HYBRID -> PropulsionType.PLUG_IN_HYBRID;
+      case HYDROGEN_FUEL_CELL -> PropulsionType.HYDROGEN_FUEL_CELL;
     };
   }
 

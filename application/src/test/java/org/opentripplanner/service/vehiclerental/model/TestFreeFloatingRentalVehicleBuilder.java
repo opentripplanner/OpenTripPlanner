@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.street.model.PropulsionType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Ratio;
@@ -119,7 +120,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
       )
       .withName(I18NString.of(rentalFormFactor.name()))
       .withFormFactor(rentalFormFactor)
-      .withPropulsionType(RentalVehicleType.PropulsionType.ELECTRIC)
+      .withPropulsionType(PropulsionType.ELECTRIC)
       .withMaxRangeMeters(100000d)
       .build();
     return this;

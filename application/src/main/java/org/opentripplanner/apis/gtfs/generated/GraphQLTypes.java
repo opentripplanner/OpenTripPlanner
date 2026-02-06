@@ -2992,6 +2992,8 @@ public class GraphQLTypes {
     private List<GraphQLMode> filterByModes;
     private List<String> filterByNetwork;
     private List<GraphQLFilterPlaceType> filterByPlaceTypes;
+    private List<GraphQLFormFactor> filterByVehicleFormFactor;
+    private List<GraphQLPropulsionType> filterByVehiclePropulsionType;
     private Integer first;
     private Integer last;
     private Double lat;
@@ -3021,6 +3023,28 @@ public class GraphQLTypes {
                 : GraphQLFilterPlaceType.valueOf((String) item)
             )
             .map(GraphQLFilterPlaceType.class::cast)
+            .collect(Collectors.toList());
+        }
+        if (args.get("filterByVehicleFormFactor") != null) {
+          this.filterByVehicleFormFactor = ((List<Object>) args.get(
+              "filterByVehicleFormFactor"
+            )).stream()
+            .map(item ->
+              item instanceof GraphQLFormFactor ? item : GraphQLFormFactor.valueOf((String) item)
+            )
+            .map(GraphQLFormFactor.class::cast)
+            .collect(Collectors.toList());
+        }
+        if (args.get("filterByVehiclePropulsionType") != null) {
+          this.filterByVehiclePropulsionType = ((List<Object>) args.get(
+              "filterByVehiclePropulsionType"
+            )).stream()
+            .map(item ->
+              item instanceof GraphQLPropulsionType
+                ? item
+                : GraphQLPropulsionType.valueOf((String) item)
+            )
+            .map(GraphQLPropulsionType.class::cast)
             .collect(Collectors.toList());
         }
         this.first = (Integer) args.get("first");
@@ -3054,6 +3078,14 @@ public class GraphQLTypes {
 
     public List<GraphQLFilterPlaceType> getGraphQLFilterByPlaceTypes() {
       return this.filterByPlaceTypes;
+    }
+
+    public List<GraphQLFormFactor> getGraphQLFilterByVehicleFormFactor() {
+      return this.filterByVehicleFormFactor;
+    }
+
+    public List<GraphQLPropulsionType> getGraphQLFilterByVehiclePropulsionType() {
+      return this.filterByVehiclePropulsionType;
     }
 
     public Integer getGraphQLFirst() {
@@ -3102,6 +3134,18 @@ public class GraphQLTypes {
 
     public void setGraphQLFilterByPlaceTypes(List<GraphQLFilterPlaceType> filterByPlaceTypes) {
       this.filterByPlaceTypes = filterByPlaceTypes;
+    }
+
+    public void setGraphQLFilterByVehicleFormFactor(
+      List<GraphQLFormFactor> filterByVehicleFormFactor
+    ) {
+      this.filterByVehicleFormFactor = filterByVehicleFormFactor;
+    }
+
+    public void setGraphQLFilterByVehiclePropulsionType(
+      List<GraphQLPropulsionType> filterByVehiclePropulsionType
+    ) {
+      this.filterByVehiclePropulsionType = filterByVehiclePropulsionType;
     }
 
     public void setGraphQLFirst(Integer first) {

@@ -5,6 +5,7 @@ import java.util.Map;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.street.model.PropulsionType;
 import org.opentripplanner.street.model.RentalFormFactor;
 
 public class TestVehicleRentalStationBuilder {
@@ -59,12 +60,7 @@ public class TestVehicleRentalStationBuilder {
   }
 
   public TestVehicleRentalStationBuilder withVehicleTypeBicycle(int numAvailable, int numSpaces) {
-    return withVehicleType(
-      RentalFormFactor.BICYCLE,
-      RentalVehicleType.PropulsionType.HUMAN,
-      numAvailable,
-      numSpaces
-    );
+    return withVehicleType(RentalFormFactor.BICYCLE, PropulsionType.HUMAN, numAvailable, numSpaces);
   }
 
   public TestVehicleRentalStationBuilder withVehicleTypeElectricBicycle(
@@ -73,24 +69,19 @@ public class TestVehicleRentalStationBuilder {
   ) {
     return withVehicleType(
       RentalFormFactor.BICYCLE,
-      RentalVehicleType.PropulsionType.ELECTRIC,
+      PropulsionType.ELECTRIC,
       numAvailable,
       numSpaces
     );
   }
 
   public TestVehicleRentalStationBuilder withVehicleTypeCar(int numAvailable, int numSpaces) {
-    return withVehicleType(
-      RentalFormFactor.CAR,
-      RentalVehicleType.PropulsionType.ELECTRIC,
-      numAvailable,
-      numSpaces
-    );
+    return withVehicleType(RentalFormFactor.CAR, PropulsionType.ELECTRIC, numAvailable, numSpaces);
   }
 
   public TestVehicleRentalStationBuilder withVehicleType(
     RentalFormFactor rentalFormFactor,
-    RentalVehicleType.PropulsionType propulsionType,
+    PropulsionType propulsionType,
     int numAvailable,
     int numSpaces
   ) {

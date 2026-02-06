@@ -19,6 +19,8 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
+import org.opentripplanner.street.model.PropulsionType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
@@ -109,6 +111,8 @@ class OjpServiceTest {
         List<FeedScopedId> filterByStations,
         List<FeedScopedId> filterByRoutes,
         List<String> filterByBikeRentalStations,
+        List<RentalFormFactor> filterByVehicleFormFactor,
+        List<PropulsionType> filterByVehiclePropulsionType,
         List<String> filterByNetwork,
         TransitService transitService
       ) {

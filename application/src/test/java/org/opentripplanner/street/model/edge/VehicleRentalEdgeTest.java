@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
-import static org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType.ELECTRIC;
-import static org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType.HUMAN;
+import static org.opentripplanner.street.model.PropulsionType.ELECTRIC;
+import static org.opentripplanner.street.model.PropulsionType.HUMAN;
 import static org.opentripplanner.street.model.RentalFormFactor.BICYCLE;
 import static org.opentripplanner.street.model.RentalFormFactor.CAR;
 import static org.opentripplanner.street.model.RentalFormFactor.MOPED;
@@ -30,6 +30,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.PropulsionType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.request.RentalPeriod;
@@ -298,7 +299,7 @@ class VehicleRentalEdgeTest {
           .withId(new FeedScopedId(NETWORK, "scooter"))
           .withName(I18NString.of("scooter"))
           .withFormFactor(RentalFormFactor.SCOOTER)
-          .withPropulsionType(RentalVehicleType.PropulsionType.ELECTRIC)
+          .withPropulsionType(PropulsionType.ELECTRIC)
           .withMaxRangeMeters(100000d)
           .build()
       )
@@ -368,7 +369,7 @@ class VehicleRentalEdgeTest {
   private void initEdgeAndRequest(
     StreetMode mode,
     RentalFormFactor formFactor,
-    RentalVehicleType.PropulsionType propulsionType,
+    PropulsionType propulsionType,
     int vehicles,
     int spaces,
     boolean overloadingAllowed,

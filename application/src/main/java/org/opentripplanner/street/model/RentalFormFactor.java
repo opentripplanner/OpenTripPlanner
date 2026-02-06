@@ -2,6 +2,9 @@ package org.opentripplanner.street.model;
 
 import org.opentripplanner.street.search.TraverseMode;
 
+/**
+ * The form factor of a rental vehicle
+ */
 public enum RentalFormFactor {
   BICYCLE(TraverseMode.BICYCLE),
   CARGO_BICYCLE(TraverseMode.BICYCLE),

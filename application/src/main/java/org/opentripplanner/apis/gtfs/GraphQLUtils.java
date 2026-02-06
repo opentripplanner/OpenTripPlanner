@@ -3,6 +3,7 @@ package org.opentripplanner.apis.gtfs;
 import java.time.Instant;
 import java.util.Locale;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFilterPlaceType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
@@ -13,6 +14,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.graphfinder.PlaceType;
+import org.opentripplanner.street.model.PropulsionType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
@@ -69,6 +71,22 @@ public class GraphQLUtils {
       case OTHER -> RentalFormFactor.OTHER;
       case SCOOTER_SEATED -> RentalFormFactor.SCOOTER_SEATED;
       case SCOOTER_STANDING -> RentalFormFactor.SCOOTER_STANDING;
+    };
+  }
+
+  public static PropulsionType toModel(GraphQLTypes.GraphQLPropulsionType propulsionType) {
+    if (propulsionType == null) {
+      return null;
+    }
+    return switch (propulsionType) {
+      case COMBUSTION -> PropulsionType.COMBUSTION;
+      case COMBUSTION_DIESEL -> PropulsionType.COMBUSTION_DIESEL;
+      case ELECTRIC -> PropulsionType.ELECTRIC;
+      case ELECTRIC_ASSIST -> PropulsionType.ELECTRIC_ASSIST;
+      case HUMAN -> PropulsionType.HUMAN;
+      case HYBRID -> PropulsionType.HYBRID;
+      case HYDROGEN_FUEL_CELL -> PropulsionType.HYDROGEN_FUEL_CELL;
+      case PLUG_IN_HYBRID -> PropulsionType.PLUG_IN_HYBRID;
     };
   }
 

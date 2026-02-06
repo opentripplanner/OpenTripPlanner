@@ -1424,6 +1424,16 @@ type QueryType {
     filterByNetwork: [String!],
     "Only return places that are one of these types, e.g. `STOP` or `VEHICLE_RENT`"
     filterByPlaceTypes: [FilterPlaceType],
+    """
+    Only include rental vehicles with a form factor that matches one in this list. Only checked
+    for places with a vehicle type.
+    """
+    filterByVehicleFormFactor: [FormFactor!],
+    """
+    Only include rental vehicles with a propulsion type that matches one in this list. Only checked
+    for places with a vehicle type.
+    """
+    filterByVehiclePropulsionType: [PropulsionType!],
     first: Int,
     last: Int,
     "Latitude of the location (WGS 84)"

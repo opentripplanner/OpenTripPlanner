@@ -17,6 +17,8 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugPr
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
+import org.opentripplanner.street.model.PropulsionType;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transfer.constrained.model.TransferPriority;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -115,7 +117,17 @@ public class EnumTypes {
     .name("FilterPlaceType")
     .value("quay", TransmodelPlaceType.QUAY, "Quay")
     .value("stopPlace", TransmodelPlaceType.STOP_PLACE, "StopPlace")
-    .value("bicycleRent", TransmodelPlaceType.BICYCLE_RENT, "Bicycle rent stations")
+    .value(
+      "bicycleRent",
+      TransmodelPlaceType.BICYCLE_RENT,
+      "Bicycle rent stations",
+      "Use vehicleRent instead"
+    )
+    .value(
+      "vehicleRent",
+      TransmodelPlaceType.VEHICLE_RENT,
+      "Vehicle (bicycles, scooters, cars ...) rental stations and vehicles"
+    )
     .value("bikePark", TransmodelPlaceType.BIKE_PARK, "Bike parks")
     .value("carPark", TransmodelPlaceType.CAR_PARK, "Car parks")
     .build();
@@ -233,6 +245,18 @@ public class EnumTypes {
       map("notAcceptingPassengers", OccupancyStatus.NOT_ACCEPTING_PASSENGERS)
     )
   );
+
+  public static final GraphQLEnumType PROPULSION_TYPE = GraphQLEnumType.newEnum()
+    .name("PropulsionType")
+    .value("human", PropulsionType.HUMAN)
+    .value("electric_assist", PropulsionType.ELECTRIC_ASSIST)
+    .value("electric", PropulsionType.ELECTRIC)
+    .value("combustion", PropulsionType.COMBUSTION)
+    .value("combustion_diesel", PropulsionType.COMBUSTION_DIESEL)
+    .value("hybrid", PropulsionType.HYBRID)
+    .value("plug_in_hybrid", PropulsionType.PLUG_IN_HYBRID)
+    .value("hydrogen_fuel_cell", PropulsionType.HYDROGEN_FUEL_CELL)
+    .build();
 
   public static final GraphQLEnumType PURCHASE_WHEN = GraphQLEnumType.newEnum()
     .name("PurchaseWhen")
@@ -482,6 +506,18 @@ public class EnumTypes {
     TransmodelTransportSubmode.values(),
     TransmodelTransportSubmode::getValue
   );
+
+  public static final GraphQLEnumType RENTAL_FORM_FACTOR = GraphQLEnumType.newEnum()
+    .name("RentalFormFactor")
+    .value("bicycle", RentalFormFactor.BICYCLE)
+    .value("cargo_bicycle", RentalFormFactor.CARGO_BICYCLE)
+    .value("car", RentalFormFactor.CAR)
+    .value("moped", RentalFormFactor.MOPED)
+    .value("scooter", RentalFormFactor.SCOOTER)
+    .value("scooter_standing", RentalFormFactor.SCOOTER_STANDING)
+    .value("scooter_seated", RentalFormFactor.SCOOTER_SEATED)
+    .value("other", RentalFormFactor.OTHER)
+    .build();
 
   public static final GraphQLEnumType VERTEX_TYPE = GraphQLEnumType.newEnum()
     .name("VertexType")
