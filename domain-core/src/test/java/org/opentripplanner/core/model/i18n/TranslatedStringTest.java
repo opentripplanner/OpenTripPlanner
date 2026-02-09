@@ -28,7 +28,7 @@ public class TranslatedStringTest {
     assertTrue(string2 instanceof NonLocalizedString);
 
     translations.put("fi", "Testi");
-    I18NString string3 = TranslatedString.getDeduplicatedI18NString(translations, false);
+    I18NString string3 = TranslatedString.getI18NString(translations, false);
     assertEquals("Test", string3.toString());
     assertEquals("Test", string3.toString(Locale.ENGLISH));
     assertEquals("Testi", string3.toString(new Locale("fi")));
@@ -38,7 +38,7 @@ public class TranslatedStringTest {
     translations2.put(null, "Test");
     translations2.put("en", "Test");
     translations2.put("fi", "Testi");
-    I18NString string4 = TranslatedString.getDeduplicatedI18NString(translations2, false);
+    I18NString string4 = TranslatedString.getI18NString(translations2, false);
     assertSame(string3, string4);
   }
 

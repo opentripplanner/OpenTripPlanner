@@ -157,7 +157,7 @@ final class TranslationHelper {
           hm.put(translation.getLanguage(), translation.getTranslation());
         }
       }
-      return TranslatedString.getDeduplicatedI18NString(hm, false);
+      return TranslatedString.getI18NString(hm, false);
     }
     return NonLocalizedString.ofNullable(defaultValue);
   }
