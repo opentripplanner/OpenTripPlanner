@@ -101,6 +101,18 @@ class UnscheduledTripTest {
   }
 
   @Test
+  void testEarliestDepartureAndLatestArrival() {
+    var stopTimes = List.of(
+      FlexStopTimesForTest.area("10:10", "14:10"),
+      FlexStopTimesForTest.area("11:10", "15:10")
+    );
+    var trip = UnscheduledTrip.of(id("1")).withStopTimes(stopTimes).build();
+
+    assertEquals(TimeUtils.time("10:10"), trip.earliestDepartureTime());
+    assertEquals(TimeUtils.time("15:10"), trip.latestArrivalTime());
+  }
+
+  @Test
   void testUnscheduledTrip() {
     var fromStopTime = new StopTime();
     fromStopTime.setStop(AREA_STOP);

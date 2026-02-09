@@ -6,7 +6,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -45,7 +47,6 @@ public class FlexRouter {
   /* Transit data */
 
   private final Graph graph;
-  private final TransitService transitService;
   private final RegularTransferService transferService;
   private final FlexParameters flexParameters;
   private final Collection<NearbyStop> streetAccesses;
@@ -59,7 +60,7 @@ public class FlexRouter {
   /* Request data */
   private final ZonedDateTime startOfTime;
   private final int requestedTime;
-  private final int requestedBookingTime;
+  private final Instant requestedBookingTime;
   private final List<FlexServiceDate> dates;
   private final Matcher<Trip> matcher;
 
@@ -78,7 +79,6 @@ public class FlexRouter {
     Collection<NearbyStop> streetEgresses
   ) {
     this.graph = graph;
-    this.transitService = transitService;
     this.transferService = transferService;
     this.flexParameters = flexParameters;
     this.streetAccesses = streetAccesses;
@@ -117,9 +117,7 @@ public class FlexRouter {
     LocalDate searchDate = LocalDate.ofInstant(requestedTime, tz);
     this.startOfTime = ServiceDateUtils.asStartOfService(searchDate, tz);
     this.requestedTime = ServiceDateUtils.secondsSinceStartOfTime(startOfTime, requestedTime);
-    this.requestedBookingTime = requestedBookingTime == null
-      ? RoutingBookingInfo.NOT_SET
-      : ServiceDateUtils.secondsSinceStartOfTime(startOfTime, requestedBookingTime);
+    this.requestedBookingTime = requestedBookingTime;
     this.dates = createFlexServiceDates(
       transitService,
       additionalPastSearchDays,
@@ -181,26 +179,51 @@ public class FlexRouter {
     int additionalFutureSearchDays,
     LocalDate searchDate
   ) {
-    final List<FlexServiceDate> dates = new ArrayList<>();
+    final Map<LocalDate, List<FlexTrip<?, ?>>> flexTripsForServiceDate = new HashMap<>();
 
-    // TODO - This code id not DRY, the same logic is in RaptorRoutingRequestTransitDataCreator
     for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
       LocalDate date = searchDate.plusDays(d);
-      dates.add(
-        new FlexServiceDate(
-          date,
-          ServiceDateUtils.secondsSinceStartOfTime(startOfTime, date),
-          requestedBookingTime,
-          transitService.getServiceCodesRunningForDate(date)
-        )
-      );
+      transitService
+        .getFlexIndex()
+        .getFlexTripsForRunningDate(date)
+        .forEach(flexTripForDate -> {
+          flexTripsForServiceDate
+            .computeIfAbsent(flexTripForDate.serviceDate(), k -> new ArrayList<>())
+            .add(flexTripForDate.flexTrip());
+        });
     }
-    return List.copyOf(dates);
+
+    return flexTripsForServiceDate
+      .entrySet()
+      .stream()
+      .map(entry -> {
+        LocalDate serviceDate = entry.getKey();
+        int requestedBookingTimeRelativeToServiceDate;
+        if (requestedBookingTime == null) {
+          requestedBookingTimeRelativeToServiceDate = RoutingBookingInfo.NOT_SET;
+        } else {
+          ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
+            serviceDate,
+            startOfTime.getZone()
+          );
+          requestedBookingTimeRelativeToServiceDate = ServiceDateUtils.secondsSinceStartOfTime(
+            startOfService,
+            requestedBookingTime
+          );
+        }
+        return new FlexServiceDate(
+          serviceDate,
+          ServiceDateUtils.secondsSinceStartOfTime(startOfTime, serviceDate),
+          requestedBookingTimeRelativeToServiceDate,
+          entry.getValue()
+        );
+      })
+      .toList();
   }
 
   /**
-   * This class work as an adaptor around OTP services. This allows us to pass in this instance
-   * and not the implementations (graph, transitService, flexIndex). We can easily mock this in
+   * This class work as an adaptor around OTP services. This allows us to pass in this instance and
+   * not the implementations (graph, transitService, flexIndex). We can easily mock this in
    * unit-tests. This also serves as documentation of which services the flex access/egress
    * generation logic needs.
    */
@@ -228,8 +251,7 @@ public class FlexRouter {
 
     @Override
     public boolean isDateActive(FlexServiceDate date, FlexTrip<?, ?> trip) {
-      int serviceCode = transitService.getServiceCode(trip.getTrip().getServiceId());
-      return date.isTripServiceRunning(serviceCode);
+      return date.isTripRunning(trip);
     }
   }
 }

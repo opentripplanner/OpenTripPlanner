@@ -118,6 +118,11 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   @Override
+  public int earliestDepartureTime() {
+    return Arrays.stream(stopTimes).mapToInt(StopTimeWindow::start).min().orElse(MISSING_VALUE);
+  }
+
+  @Override
   public int latestArrivalTime(
     int requestedArrivalTime,
     int boardStopPosition,
@@ -143,6 +148,11 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   @Override
   public int latestArrivalTime(int stopIndex) {
     return stopTimes[stopIndex].end();
+  }
+
+  @Override
+  public int latestArrivalTime() {
+    return Arrays.stream(stopTimes).mapToInt(StopTimeWindow::end).max().orElse(MISSING_VALUE);
   }
 
   @Override
