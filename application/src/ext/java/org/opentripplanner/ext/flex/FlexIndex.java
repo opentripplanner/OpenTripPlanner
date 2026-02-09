@@ -2,8 +2,12 @@ package org.opentripplanner.ext.flex;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -20,6 +24,8 @@ public class FlexIndex {
 
   private final Map<FeedScopedId, FlexTrip<?, ?>> tripById = new HashMap<>();
 
+  private final Map<LocalDate, List<FlexTripForDate>> flexTripsRunningOnDate = new HashMap<>();
+
   public FlexIndex(TimetableRepository timetableRepository) {
     for (FlexTrip<?, ?> flexTrip : timetableRepository.getAllFlexTrips()) {
       routeById.put(flexTrip.getTrip().getRoute().getId(), flexTrip.getTrip().getRoute());
@@ -33,6 +39,33 @@ public class FlexIndex {
           flexTripsByStop.put(stop, flexTrip);
         }
       }
+
+      int earliestDepartureTime = flexTrip.earliestDepartureTime();
+      int latestArrivalTime = flexTrip.latestArrivalTime();
+      long minDatePlusDays = Duration.ofSeconds(earliestDepartureTime).toDays();
+      long maxDatePlusDays = Duration.ofSeconds(latestArrivalTime).toDays();
+
+      timetableRepository
+        .getCalendarService()
+        .getServiceDatesForServiceId(flexTrip.getTrip().getServiceId())
+        .forEach(serviceDate -> {
+          LocalDate minDate = serviceDate.plusDays(minDatePlusDays);
+          LocalDate maxDate = serviceDate.plusDays(maxDatePlusDays);
+          FlexTripForDate flexTripForDate = new FlexTripForDate(
+            serviceDate,
+            minDate,
+            maxDate,
+            flexTrip
+          );
+
+          minDate
+            .datesUntil(maxDate.plusDays(1))
+            .forEach(runningDate -> {
+              flexTripsRunningOnDate
+                .computeIfAbsent(runningDate, d -> new ArrayList<>())
+                .add(flexTripForDate);
+            });
+        });
     }
   }
 
@@ -54,5 +87,14 @@ public class FlexIndex {
 
   public Collection<FlexTrip<?, ?>> getAllFlexTrips() {
     return tripById.values();
+  }
+
+  /**
+   * Returns flex trips for the given running date. Running date is not necessarily the same as the
+   * service date. A Trip "runs through" a date if any of its arrivals or departures is happening on
+   * that date. Flex trips can have multiple running dates.
+   */
+  public Collection<FlexTripForDate> getFlexTripsForRunningDate(LocalDate date) {
+    return flexTripsRunningOnDate.getOrDefault(date, List.of());
   }
 }

@@ -80,6 +80,14 @@ public class ScheduledDeviatedTrip
   }
 
   @Override
+  public int earliestDepartureTime() {
+    return Arrays.stream(stopTimes)
+      .mapToInt(it -> it.departureTime)
+      .min()
+      .orElse(MISSING_VALUE);
+  }
+
+  @Override
   public int latestArrivalTime(
     int arrivalTime,
     int boardStopPosition,
@@ -96,6 +104,14 @@ public class ScheduledDeviatedTrip
   @Override
   public int latestArrivalTime(int stopIndex) {
     return stopTimes[stopIndex].arrivalTime;
+  }
+
+  @Override
+  public int latestArrivalTime() {
+    return Arrays.stream(stopTimes)
+      .mapToInt(it -> it.arrivalTime)
+      .max()
+      .orElse(MISSING_VALUE);
   }
 
   @Override

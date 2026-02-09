@@ -1,18 +1,35 @@
 package org.opentripplanner.ext.flex.trip;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.areaWithContinuousStopping;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularStop;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularStopWithContinuousStopping;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.utils.time.TimeUtils;
 
 class ScheduledDeviatedTripTest {
+
+  @Test
+  void testEarliestDepartureAndLatestArrival() {
+    var stopTimes = List.of(
+      regularStop("10:10", "10:15"),
+      area("10:20", "10:30"),
+      regularStop("10:40", "10:45")
+    );
+    var trip = ScheduledDeviatedTrip.of(id("1")).withStopTimes(stopTimes).build();
+
+    assertEquals(TimeUtils.time("10:15"), trip.earliestDepartureTime());
+    assertEquals(TimeUtils.time("10:40"), trip.latestArrivalTime());
+  }
 
   private static List<List<StopTime>> isScheduledDeviatedTripCases() {
     return List.of(
