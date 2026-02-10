@@ -14,7 +14,7 @@ public interface TransitFilter {
    */
   boolean matchTripTimes(TripTimes trip);
 
-  default boolean isSubModePredicate() {
+  default boolean matchesOnTripLevel() {
     return false;
   }
 }

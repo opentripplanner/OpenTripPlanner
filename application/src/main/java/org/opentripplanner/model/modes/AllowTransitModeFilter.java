@@ -19,7 +19,13 @@ public interface AllowTransitModeFilter extends Serializable {
    */
   boolean match(TransitMode transitMode, SubMode netexSubMode);
 
-  default boolean isSubMode() {
+  /**
+   * Returns true if this filter needs to perform trip-level (TripTimes) filtering
+   * when a TripPattern contains multiple modes. When a pattern has trips with
+   * different modes or submodes, pattern-level filtering alone is insufficient
+   * and we must check each trip individually.
+   */
+  default boolean matchesOnTripLevel() {
     return false;
   }
 }

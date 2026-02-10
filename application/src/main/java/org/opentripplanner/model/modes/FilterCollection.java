@@ -35,7 +35,7 @@ public class FilterCollection implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean isSubMode() {
-    return filters.stream().anyMatch(AllowTransitModeFilter::isSubMode);
+  public boolean matchesOnTripLevel() {
+    return filters.stream().anyMatch(AllowTransitModeFilter::matchesOnTripLevel);
   }
 }

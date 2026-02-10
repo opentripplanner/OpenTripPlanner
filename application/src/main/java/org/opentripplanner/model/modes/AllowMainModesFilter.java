@@ -21,6 +21,11 @@ class AllowMainModesFilter implements AllowTransitModeFilter {
   }
 
   @Override
+  public boolean matchesOnTripLevel() {
+    return true;
+  }
+
+  @Override
   public int hashCode() {
     return mainModes.hashCode() + 176393;
   }
