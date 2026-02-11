@@ -770,20 +770,6 @@ public abstract class OsmEntity {
   }
 
   /**
-   * @return True if this entity provides an entrance to a platform or similar entity
-   */
-  public boolean isEntrance() {
-    return (
-      (isTag("railway", "subway_entrance") ||
-        isTag("highway", "elevator") ||
-        isTag("entrance", "yes") ||
-        isTag("entrance", "main")) &&
-      !isTag("access", "private") &&
-      !isTag("access", "no")
-    );
-  }
-
-  /**
    * @return True if this node / area is a bike parking.
    */
   public boolean isBikeParking() {

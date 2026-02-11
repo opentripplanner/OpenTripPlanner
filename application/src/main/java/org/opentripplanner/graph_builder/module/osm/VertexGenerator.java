@@ -134,7 +134,7 @@ class VertexGenerator {
         }
       }
 
-      if (includeOsmSubwayEntrances && node.isSubwayEntrance()) {
+      if (includeOsmSubwayEntrances && node.isStationEntrance()) {
         String ref = node.getTag("ref");
         iv = vertexFactory.stationEntrance(
           nid,
