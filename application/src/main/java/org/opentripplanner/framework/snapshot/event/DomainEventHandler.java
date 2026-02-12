@@ -1,11 +1,10 @@
 package org.opentripplanner.framework.snapshot.event;
 
 import org.opentripplanner.framework.snapshot.domain.DomainEvent;
-import org.opentripplanner.framework.snapshot.domain.world.TransitWorld;
 
-public interface DomainEventHandler<T extends DomainEvent> {
+public sealed interface DomainEventHandler<T extends DomainEvent>
+  permits DomainEventHandlerTransfers, DomainEventHandlerTimetable {
 
   Class<T> eventType();
 
-  void handle(T event, TransitWorld transitWorld);
 }

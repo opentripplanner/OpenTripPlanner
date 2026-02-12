@@ -5,7 +5,7 @@ This is a prototype for a multi repository snapshot implementation that satisfie
 - support for mutable repositories
 - support for synchronous domain events
 
-To have a working prototype, I also implemented a basic domain event system. Unfortunately the `DomainEventHandler` depends on the complete `TransitWorld` at the moment, which leads to the `NewStopHandler` inside the transfer package also having access to the whole `TransitWorld`. I am not quite sure how to solve this, but I think that is mainly a domain event problem and not a snapshot problem, so this is might be out of scope here.
+To have a working prototype, I also implemented a basic domain event system. 
 
 ## Design Ideas
 
