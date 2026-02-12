@@ -32,8 +32,12 @@ public class DomainEventDispatcher {
     for (var event : events) {
       for (var genericHandler : handlers.getOrDefault(event.getClass(), List.of())) {
         DomainEventHandler<E> handler = (DomainEventHandler<E>) genericHandler;
-        handler.handle(event, transitWorld);
+        switch (handler) {
+          case DomainEventHandlerTransfers<E> t -> t.handle(event, transitWorld.transfers());
+          case DomainEventHandlerTimetable<E> v -> v.handle(event, transitWorld.timetables());
+        }
       }
     }
   }
 }
+

@@ -1,10 +1,9 @@
 package org.opentripplanner.framework.snapshot.domain.transfer;
 
 import org.opentripplanner.framework.snapshot.domain.world.NewStopUsedByTripPattern;
-import org.opentripplanner.framework.snapshot.domain.world.TransitWorld;
-import org.opentripplanner.framework.snapshot.event.DomainEventHandler;
+import org.opentripplanner.framework.snapshot.event.DomainEventHandlerTransfers;
 
-public class NewStopHandler implements DomainEventHandler<NewStopUsedByTripPattern> {
+public class NewStopHandler implements DomainEventHandlerTransfers<NewStopUsedByTripPattern> {
 
 
   @Override
@@ -13,8 +12,7 @@ public class NewStopHandler implements DomainEventHandler<NewStopUsedByTripPatte
   }
 
   @Override
-  public void handle(NewStopUsedByTripPattern event, TransitWorld transitWorld) {
-    TransferRepo transfers = transitWorld.transfers();
+  public void handle(NewStopUsedByTripPattern event, TransferRepo transfers) {
     transfers.setNumberOfRecalculations(transfers.getNumberOfRecalculations() + 1);
   }
 }
