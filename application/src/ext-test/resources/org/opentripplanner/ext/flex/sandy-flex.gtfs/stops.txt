@@ -1,0 +1,6 @@
+stop_id,stop_code,platform_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,position,direction,wheelchair_boarding,tts_stop_name
+13528,,,Hwy 26 & Ruben Ln (Eastbound),,45.400529191,-122.279087994,1087,,0,,America/Los_Angeles,,,0,
+2320902,,,Evans St at Holiday Garden Apartments,,45.390574511,-122.255697279,1087,,0,,America/Los_Angeles,,,0,
+2320967,,,Sandy Transit Operations Center,This stop is a park & ride location.,45.403064328281,-122.297080918316,1087,,0,,America/Los_Angeles,,,0,
+4230519,,,Sandy Cinema,,45.40322556,-122.298063733,1087,,0,,America/Los_Angeles,,,0,
+duplicate,,,Fred Meyer (16625 362nd Ave),,45.40326418,-122.2924865,1087,,0,,America/Los_Angeles,,,0,

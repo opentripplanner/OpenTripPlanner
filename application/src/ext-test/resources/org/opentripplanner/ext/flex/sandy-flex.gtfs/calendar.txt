@@ -1,0 +1,14 @@
+service_id,service_name,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+c_70870_b_83797_d_64,SAM Year Round - Gresham (Sunday only),0,0,0,0,0,0,1,20241101,20260601
+c_70870_b_83797_d_32,SAM Year Round - Gresham (Saturday only),0,0,0,0,0,1,0,20241101,20260601
+c_70870_b_83797_d_31,SAM Year Round - Gresham (Weekday),1,1,1,1,1,0,0,20241101,20260601
+c_70870_b_83797_d_16,SAM Year Round - Gresham (Friday only),0,0,0,0,1,0,0,20241101,20260601
+c_70682_b_83345_d_32,Flex Year Round (Saturday only),0,0,0,0,0,1,0,20240801,20260601
+c_70682_b_83345_d_31,Flex Year Round (Weekday),1,1,1,1,1,0,0,20240801,20260601
+c_69989_b_81709_d_127,Villages Shuttle (All days of week),1,1,1,1,1,1,1,20231101,20260601
+c_551_b_85968_d_79,MHX - Winter Late Run + Greenwood (MTuWThSu),1,1,1,1,0,0,1,20251201,20260331
+c_551_b_85968_d_48,MHX - Winter Late Run + Greenwood (FSa),0,0,0,0,1,1,0,20251201,20260331
+c_551_b_85968_d_127,MHX - Winter Late Run + Greenwood (All days of week),1,1,1,1,1,1,1,20251201,20260331
+c_17794_b_85969_d_127,MHX Year Round (All days of week),1,1,1,1,1,1,1,20260401,20260601
+c_157_b_84629_d_63,SAM Year Round (No Sunday),1,1,1,1,1,1,0,20250530,20260601
+c_157_b_84629_d_127,SAM Year Round (All days of week),1,1,1,1,1,1,1,20250530,20260601

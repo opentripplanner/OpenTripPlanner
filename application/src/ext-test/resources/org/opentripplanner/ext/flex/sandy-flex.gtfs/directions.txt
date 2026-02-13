@@ -1,0 +1,13 @@
+route_id,direction_id,direction
+77124,0,No direction
+76878,1,Westbound
+76878,0,Eastbound
+5484,1,Counterclockwise
+1116,1,Westbound
+1116,0,Eastbound
+1115,1,Westbound
+1115,0,Eastbound
+416,1,Southbound
+416,0,Northbound
+415,1,Southbound
+415,0,Northbound

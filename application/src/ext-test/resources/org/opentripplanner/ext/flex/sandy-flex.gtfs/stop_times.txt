@@ -1,0 +1,9 @@
+trip_id,arrival_time,departure_time,stop_id,location_id,stop_sequence,pickup_type,drop_off_type,start_pickup_drop_off_window,end_pickup_drop_off_window
+t1,17:10:00,17:10:00,2320967,,1,0,0,,
+t1,17:11:00,17:11:00,duplicate,,3,0,0,,
+t1,17:49:00,17:49:00,duplicate,,34,0,0,,
+t1,,,,radius_1207_s_759187_s_4230519,35,2,2,17:49:00,17:50:00
+t1,17:50:00,17:50:00,4230519,,36,0,0,,
+t2,,,,radius_1207_s_759195_s_13528,4,2,2,17:22:00,17:24:00
+t2,17:24:00,17:24:00,13528,,5,0,0,,
+t2,,,,radius_1207_s_13528_s_29673,6,2,2,17:24:00,17:28:00

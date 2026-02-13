@@ -1,0 +1,3 @@
+route_id,service_id,trip_id,trip_short_name,trip_headsign,direction_id,block_id,shape_id,bikes_allowed,wheelchair_accessible,trip_type,continuous_pickup_message,continuous_drop_off_message,tts_trip_headsign,tts_trip_short_name
+1115,c_69989_b_81709_d_127,t2,,Rhododendron,0,1366173.0,p_1441653,,,,,,,
+5484,c_157_b_84629_d_63,t1,,,1,1366106.0,p_1441651,,,,,,,
