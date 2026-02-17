@@ -58,6 +58,23 @@ public interface RentalRestrictionExtension {
 
   Set<String> noDropOffNetworks();
 
+  /**
+   * Check if this restriction applies to the current state (network/vehicle type match).
+   * This is separate from whether the action is banned - used for priority-based selection
+   * when multiple restrictions overlap.
+   */
+  default boolean appliesTo(State state) {
+    return true;
+  }
+
+  /**
+   * Get the priority of this restriction. Lower values indicate higher priority (0 is highest).
+   * Used for selecting which restriction takes precedence when multiple overlap.
+   */
+  default int priority() {
+    return Integer.MAX_VALUE;
+  }
+
   enum RestrictionType {
     NO_TRAVERSAL,
     NO_DROP_OFF,

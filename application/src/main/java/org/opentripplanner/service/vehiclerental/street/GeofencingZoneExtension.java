@@ -90,4 +90,19 @@ public final class GeofencingZoneExtension implements RentalRestrictionExtension
   public String toString() {
     return zone.id().toString();
   }
+
+  @Override
+  public boolean appliesTo(State state) {
+    if (!state.isRentingVehicle()) {
+      return false;
+    }
+    return (
+      state.unknownRentalNetwork() || zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
+    );
+  }
+
+  @Override
+  public int priority() {
+    return zone.priority();
+  }
 }

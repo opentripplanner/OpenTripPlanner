@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_rental;
+package org.opentripplanner.service.vehiclerental.street;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -14,9 +14,6 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
-import org.opentripplanner.service.vehiclerental.street.BusinessAreaBorder;
-import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
-import org.opentripplanner.service.vehiclerental.street.NoRestriction;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 

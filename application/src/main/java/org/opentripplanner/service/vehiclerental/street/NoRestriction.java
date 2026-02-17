@@ -50,4 +50,10 @@ public final class NoRestriction implements RentalRestrictionExtension {
   public Set<String> noDropOffNetworks() {
     return Set.of();
   }
+
+  @Override
+  public boolean appliesTo(State state) {
+    // No restriction never applies as there is nothing to apply
+    return false;
+  }
 }
