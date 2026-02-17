@@ -155,7 +155,7 @@ public class TestStateBuilder {
     count++;
     var from = (StreetVertex) currentState.vertex;
     var to = StreetModelForTest.intersectionVertex(count, count);
-    var edge = StreetModelForTest.escalatorEdge(from, to, 30, null);
+    var edge = StreetModelForTest.escalatorEdge(from, to, 30);
 
     currentState = requireSingleState(edge.traverse(currentState));
     return this;

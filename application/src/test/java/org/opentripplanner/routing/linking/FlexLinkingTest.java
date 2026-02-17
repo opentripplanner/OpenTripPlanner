@@ -18,8 +18,8 @@ import org.opentripplanner.street.search.TraverseModeSet;
 
 class FlexLinkingTest {
 
-  public static final FeedScopedId AREA_STOP_1 = id("area-stop-1");
-  public static final FeedScopedId AREA_STOP_2 = id("area-stop-2");
+  private static final FeedScopedId AREA_STOP_1 = id("area-stop-1");
+  private static final FeedScopedId AREA_STOP_2 = id("area-stop-2");
 
   @Test
   void flex() {

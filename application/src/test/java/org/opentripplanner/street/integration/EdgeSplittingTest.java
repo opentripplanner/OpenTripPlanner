@@ -337,5 +337,4 @@ public class EdgeSplittingTest {
       }
     }
   }
-
 }
