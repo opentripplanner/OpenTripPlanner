@@ -20,10 +20,6 @@ public class DisposableEdgeCollection {
 
   private final Set<Edge> edges = new HashSet<>();
 
-  public DisposableEdgeCollection(Graph graph) {
-    this(graph, null);
-  }
-
   public DisposableEdgeCollection(Graph graph, Scope scope) {
     this.graph = graph;
     this.scope = scope;
