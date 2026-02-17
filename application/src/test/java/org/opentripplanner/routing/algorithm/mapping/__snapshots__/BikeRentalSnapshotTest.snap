@@ -25,7 +25,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         ]
       },
-      "generalizedCost" : 2232,
+      "generalizedCost" : 2107,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -123,7 +123,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 423,
+          "generalizedCost" : 298,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "BICYCLE",
@@ -1166,7 +1166,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         ]
       },
-      "generalizedCost" : 2232,
+      "generalizedCost" : 2107,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -1264,7 +1264,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 423,
+          "generalizedCost" : 298,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "BICYCLE",
@@ -1605,7 +1605,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         ]
       },
-      "generalizedCost" : 2232,
+      "generalizedCost" : 2107,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -1703,7 +1703,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 423,
+          "generalizedCost" : 298,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "BICYCLE",
@@ -2334,7 +2334,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 1064,
+      "generalizedCost" : 939,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2432,7 +2432,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 423,
+          "generalizedCost" : 298,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "BICYCLE",
@@ -2588,7 +2588,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 869,
+      "generalizedCost" : 686,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2686,7 +2686,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 573,
+          "generalizedCost" : 390,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "BICYCLE",
@@ -2785,7 +2785,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details" : { },
         "fare" : { }
       },
-      "generalizedCost" : 868,
+      "generalizedCost" : 686,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2883,7 +2883,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 572,
+          "generalizedCost" : 389,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "BICYCLE",
@@ -2997,7 +2997,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         ]
       },
-      "generalizedCost" : 2150,
+      "generalizedCost" : 2025,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -3323,7 +3323,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 413,
+          "generalizedCost" : 287,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "BICYCLE",
@@ -4216,7 +4216,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         ]
       },
-      "generalizedCost" : 2150,
+      "generalizedCost" : 2025,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -4542,7 +4542,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 413,
+          "generalizedCost" : 287,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "BICYCLE",

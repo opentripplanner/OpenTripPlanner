@@ -6,7 +6,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.VehicleWalkingRequest;
 import org.opentripplanner.street.search.request.WalkRequest;
 
-class StreetEdgeReluctanceCalculator {
+public class StreetEdgeReluctanceCalculator {
 
   /** Utility class, private constructor to prevent instantiation */
   private StreetEdgeReluctanceCalculator() {}
@@ -71,5 +71,14 @@ class StreetEdgeReluctanceCalculator {
       }
     }
     return reluctance;
+  }
+
+  /**
+   * Exaggerate the safety for SAFEST_STREET routing.
+   * The effect is to make normal streets not safe, "reasonably safe" streets appear neutral, and
+   * "very safe" streets appear safe.
+   */
+  public static double getSafetyForSafestStreet(double originalSafety) {
+    return originalSafety * originalSafety * 2.0;
   }
 }

@@ -18,6 +18,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 
 /**
  * Generates "direct" street routes, i.e. those that do not use transit and are on the street
@@ -37,6 +38,8 @@ public class DirectStreetRouter {
     }
     OTPRequestTimeoutException.checkForTimeout();
     try {
+      StreetLimitationParametersService streetLimitationParametersService =
+        serverContext.streetLimitationParametersService();
       var maxCarSpeed = serverContext.streetLimitationParametersService().maxCarSpeed();
       if (!straightLineDistanceIsWithinLimit(request, maxCarSpeed, linkingContext)) {
         return Collections.emptyList();
@@ -46,7 +49,7 @@ public class DirectStreetRouter {
       GraphPathFinder gpFinder = new GraphPathFinder(
         serverContext.traverseVisitor(),
         serverContext.listExtensionRequestContexts(request),
-        maxCarSpeed
+        streetLimitationParametersService
       );
       List<GraphPath<State, Edge, Vertex>> paths = gpFinder.graphPathFinderEntryPoint(
         request,

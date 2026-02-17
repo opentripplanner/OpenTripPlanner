@@ -116,7 +116,7 @@ public class GraphSerializationTest {
 
   private static DefaultStreetRepository createStreetRepository() {
     var streetRepository = new DefaultStreetRepository();
-    streetRepository.setStreetModelDetails(new StreetModelDetails(33f, 17));
+    streetRepository.setStreetModelDetails(new StreetModelDetails(33f, 17, 1.0f, 1.0f));
     return streetRepository;
   }
 
