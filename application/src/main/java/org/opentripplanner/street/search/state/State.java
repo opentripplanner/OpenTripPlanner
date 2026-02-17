@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -453,6 +454,45 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public boolean isInsideNoRentalDropOffArea() {
     return stateData.insideNoRentalDropOffArea;
+  }
+
+  /**
+   * Get the geofencing zones the rental vehicle is currently inside.
+   * Used for state-based geofencing where zone membership is tracked
+   * throughout the routing process.
+   */
+  public Set<GeofencingZone> getCurrentGeofencingZones() {
+    return stateData.currentGeofencingZones;
+  }
+
+  /**
+   * Check if drop-off is banned by any geofencing zone the vehicle is currently inside.
+   * This considers only zones that match the current rental network.
+   */
+  public boolean isDropOffBannedByCurrentZones() {
+    if (!isRentingVehicle()) {
+      return false;
+    }
+    var network = getVehicleRentalNetwork();
+    return stateData.currentGeofencingZones
+      .stream()
+      .filter(zone -> unknownRentalNetwork() || zone.id().getFeedId().equals(network))
+      .anyMatch(GeofencingZone::dropOffBanned);
+  }
+
+  /**
+   * Check if traversal is banned by any geofencing zone the vehicle is currently inside.
+   * This considers only zones that match the current rental network.
+   */
+  public boolean isTraversalBannedByCurrentZones() {
+    if (!isRentingVehicle()) {
+      return false;
+    }
+    var network = getVehicleRentalNetwork();
+    return stateData.currentGeofencingZones
+      .stream()
+      .filter(zone -> unknownRentalNetwork() || zone.id().getFeedId().equals(network))
+      .anyMatch(GeofencingZone::traversalBanned);
   }
 
   /**

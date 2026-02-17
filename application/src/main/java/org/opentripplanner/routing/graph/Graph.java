@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.linking.Scope;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.service.vehiclerental.street.GeofencingZoneIndex;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
@@ -69,6 +71,13 @@ public class Graph implements Serializable {
   private final OpeningHoursCalendarService openingHoursCalendarService;
 
   private transient StreetIndex streetIndex;
+
+  /**
+   * Per-network spatial indexes for geofencing zones, used at vehicle pickup to initialize
+   * zone state for boundary-only geofencing. Each updater stores its own network's index
+   * so that updates from one network don't overwrite another's zones.
+   */
+  private transient final Map<String, GeofencingZoneIndex> geofencingZoneIndexes = new HashMap<>();
 
   /** The convex hull of all the graph vertices. Generated at the time the Graph is built. */
   private Geometry convexHull = null;
@@ -381,5 +390,30 @@ public class Graph implements Serializable {
     if (streetIndex == null) {
       throw new IllegalStateException("Graph must be indexed before querying.");
     }
+  }
+
+  /**
+   * Set the geofencing zone spatial index for a specific network.
+   * Each VehicleRentalUpdater stores its own network's index so that
+   * updates from one network don't overwrite another's zones.
+   */
+  public void setGeofencingZoneIndex(String network, GeofencingZoneIndex index) {
+    geofencingZoneIndexes.put(network, index);
+  }
+
+  /**
+   * Get the geofencing zone spatial index for a specific network.
+   * May return null if no geofencing zones are configured for that network.
+   */
+  @Nullable
+  public GeofencingZoneIndex getGeofencingZoneIndex(String network) {
+    return geofencingZoneIndexes.get(network);
+  }
+
+  /**
+   * Get all per-network geofencing zone indexes.
+   */
+  public Map<String, GeofencingZoneIndex> getGeofencingZoneIndexes() {
+    return geofencingZoneIndexes;
   }
 }

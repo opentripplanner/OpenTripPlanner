@@ -57,4 +57,23 @@ public final class BusinessAreaBorder implements RentalRestrictionExtension {
   public List<String> networks() {
     return List.of(network);
   }
+
+  @Override
+  public boolean appliesTo(State state) {
+    if (!state.isRentingVehicle()) {
+      return false;
+    }
+    if (state.getRequest().arriveBy()) {
+      // In arrive-by search we don't know the rental network yet,
+      // so we apply to all networks
+      return true;
+    }
+    return network.equals(state.getVehicleRentalNetwork());
+  }
+
+  @Override
+  public int priority() {
+    // Business area borders have lowest priority - geofencing zones take precedence
+    return Integer.MAX_VALUE;
+  }
 }

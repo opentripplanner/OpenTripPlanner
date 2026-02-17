@@ -11,6 +11,7 @@ import java.util.Set;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToFormFactorMapper;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.search.TraverseMode;
@@ -56,6 +57,14 @@ public class StateData implements Cloneable {
 
   protected boolean insideNoRentalDropOffArea = false;
   public Set<String> noRentalDropOffZonesAtStartOfReverseSearch = Set.of();
+
+  /**
+   * Geofencing zones the rental vehicle is currently inside.
+   * Initialized at vehicle pickup via spatial query, updated at boundary crossings.
+   * Used for state-based geofencing where restrictions are checked against
+   * the zones the vehicle is currently in rather than edge-by-edge.
+   */
+  protected Set<GeofencingZone> currentGeofencingZones = Set.of();
 
   /** Private constructor, use static methods to get a set of initial states. */
   private StateData(StreetMode requestMode) {

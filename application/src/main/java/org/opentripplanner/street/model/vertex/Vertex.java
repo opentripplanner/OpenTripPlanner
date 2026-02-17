@@ -260,6 +260,10 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return rentalRestrictions;
   }
 
+  public boolean hasGeofencingBoundary() {
+    return rentalRestrictions.hasGeofencingBoundary();
+  }
+
   public boolean rentalDropOffBanned(State currentState) {
     return rentalRestrictions.dropOffBanned(currentState);
   }

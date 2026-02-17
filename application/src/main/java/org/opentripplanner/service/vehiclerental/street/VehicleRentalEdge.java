@@ -1,10 +1,12 @@
 package org.opentripplanner.service.vehiclerental.street;
 
 import java.time.Instant;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -89,6 +91,8 @@ public class VehicleRentalEdge extends Edge {
               return State.empty();
             }
             s1.beginFloatingVehicleRenting(formFactor, getPropulsionType(station), network, true);
+            // Initialize geofencing zone state at vehicle pickup (arriveBy search, floating vehicle)
+            initializeGeofencingZones(s0, s1, network);
             pickedUp = true;
           } else {
             return State.empty();
@@ -119,6 +123,8 @@ public class VehicleRentalEdge extends Edge {
             false,
             true
           );
+          // Initialize geofencing zone state at vehicle pickup (arriveBy search, station)
+          initializeGeofencingZones(s0, s1, network);
           pickedUp = true;
         }
         default -> throw new IllegalStateException();
@@ -149,6 +155,8 @@ public class VehicleRentalEdge extends Edge {
               false
             );
           }
+          // Initialize geofencing zone state at vehicle pickup (depart-after search)
+          initializeGeofencingZones(s0, s1, network);
           pickedUp = true;
         }
         case HAVE_RENTED -> {
@@ -239,5 +247,27 @@ public class VehicleRentalEdge extends Edge {
         .orElse(PropulsionType.HUMAN);
     }
     return PropulsionType.HUMAN;
+  }
+
+  /**
+   * Initialize geofencing zone state at vehicle pickup.
+   * Looks up the per-network spatial index and finds all zones containing the pickup location.
+   * No network filtering is needed since each index contains only that network's zones.
+   */
+  private void initializeGeofencingZones(State s0, StateEditor editor, String network) {
+    var indexes = s0.getRequest().geofencingZoneIndexes();
+    if (indexes == null) {
+      return;
+    }
+    var geofencingIndex = indexes.get(network);
+    if (geofencingIndex == null || geofencingIndex.isEmpty()) {
+      return;
+    }
+
+    var pickupLocation = tov.getCoordinate();
+    Set<GeofencingZone> initialZones = geofencingIndex.getZonesContaining(pickupLocation);
+    if (!initialZones.isEmpty()) {
+      editor.setCurrentGeofencingZones(initialZones);
+    }
   }
 }

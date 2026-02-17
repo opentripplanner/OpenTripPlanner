@@ -3,13 +3,16 @@ package org.opentripplanner.street.search;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.astar.AStarBuilder;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.service.vehiclerental.street.GeofencingZoneIndex;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -25,6 +28,10 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
   private RouteRequest routeRequest;
   private StreetRequest streetRequest = StreetRequest.DEFAULT;
   private IntersectionTraversalCalculator intersectionTraversalCalculator;
+
+  @Nullable
+  private Map<String, GeofencingZoneIndex> geofencingZoneIndexes;
+
   private List<ExtensionRequestContext> extensionRequestContexts = List.of();
 
   public static StreetSearchBuilder of() {
@@ -61,6 +68,13 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
     return this;
   }
 
+  public StreetSearchBuilder withGeofencingZoneIndexes(
+    @Nullable Map<String, GeofencingZoneIndex> geofencingZoneIndexes
+  ) {
+    this.geofencingZoneIndexes = geofencingZoneIndexes;
+    return this;
+  }
+
   @Override
   protected Duration streetRoutingTimeout() {
     return routeRequest.preferences().street().routingTimeout();
@@ -89,6 +103,9 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
     for (var state : initialStates) {
       state.getRequest().setIntersectionTraversalCalculator(intersectionTraversalCalculator);
       state.getRequest().setExtensionRequestContexts(extensionRequestContexts);
+      if (geofencingZoneIndexes != null) {
+        state.getRequest().setGeofencingZoneIndexes(geofencingZoneIndexes);
+      }
     }
   }
 

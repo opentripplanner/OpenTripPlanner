@@ -17,6 +17,7 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.street.GeofencingVertexUpdater;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -230,8 +231,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         latestModifiedEdges.forEach(StreetEdge::removeRentalExtension);
 
         var updater = new GeofencingVertexUpdater(context.graph()::findEdges);
-        latestModifiedEdges = updater.applyGeofencingZones(geofencingZones);
+        var result = updater.applyGeofencingZones(geofencingZones);
+        latestModifiedEdges = result.modifiedEdges();
         latestAppliedGeofencingZones = geofencingZones;
+
+        // Store the spatial index on the graph for pickup zone initialization
+        context.graph().setGeofencingZoneIndex(nameForLogging, result.index());
 
         var end = System.currentTimeMillis();
         var millis = Duration.ofMillis(end - start);

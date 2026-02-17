@@ -17,6 +17,7 @@ import org.opentripplanner.framework.geometry.SplitLineString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
+import org.opentripplanner.service.vehiclerental.street.GeofencingBoundaryExtension;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
@@ -596,6 +597,16 @@ public class StreetEdge
   }
 
   /**
+   * Add a rental restriction to the "to" vertex of this edge.
+   * Used for boundary extensions where the restriction should be detected
+   * when arriving at the vertex, not when leaving it.
+   * This method is not thread-safe!
+   */
+  public void addRentalRestrictionToDestination(RentalRestrictionExtension ext) {
+    tov.addRentalRestriction(ext);
+  }
+
+  /**
    * Split this street edge and return the resulting street edges. After splitting, the original
    * edge will be removed from the graph.
    */
@@ -932,6 +943,49 @@ public class StreetEdge
     );
   }
 
+  /**
+   * Update geofencing zone state when crossing boundary edges.
+   * This handles entering and exiting zones based on GeofencingBoundaryExtension markers.
+   * The direction of crossing depends on whether this is an arriveBy search.
+   *
+   * Note: Boundary extensions are placed on the "to" vertex of an edge, so we check
+   * tov for boundary markers. When "entering" is true, the boundary was configured
+   * such that traversing this edge enters the zone.
+   */
+  private void updateGeofencingZoneState(State s0, StateEditor s1) {
+    var restrictions = tov.rentalRestrictions();
+
+    for (var ext : restrictions.toList()) {
+      if (ext instanceof GeofencingBoundaryExtension boundary && boundary.appliesTo(s0)) {
+        applyBoundaryTransition(s0, s1, boundary);
+      }
+    }
+  }
+
+  /**
+   * Apply a single boundary transition (enter or exit a zone).
+   * In arrive-by searches, the direction is reversed: entering means exiting and vice versa.
+   */
+  private void applyBoundaryTransition(
+    State s0,
+    StateEditor s1,
+    GeofencingBoundaryExtension boundary
+  ) {
+    boolean arriveBy = s0.getRequest().arriveBy();
+    boolean entering = boundary.entering();
+
+    // In arrive-by search, we traverse backwards, so entering/exiting is reversed
+    if (arriveBy) {
+      entering = !entering;
+    }
+
+    if (entering) {
+      s1.enterGeofencingZone(boundary.zone());
+    } else {
+      s1.exitGeofencingZone(boundary.zone());
+    }
+  }
+
   private void setGeometry(LineString geometry) {
     this.compactGeometry = CompactLineStringUtils.compactLineString(
       fromv.getLon(),
@@ -980,6 +1034,11 @@ public class StreetEdge
         s1.enterNoRentalDropOffArea();
       } else if (s0.isInsideNoRentalDropOffArea() && !tov.rentalDropOffBanned(s0)) {
         s1.leaveNoRentalDropOffArea();
+      }
+
+      // Update geofencing zone state if crossing boundary edges
+      if (s0.isRentingVehicle() && tov.hasGeofencingBoundary()) {
+        updateGeofencingZoneState(s0, s1);
       }
     }
 

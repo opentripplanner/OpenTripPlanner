@@ -5,12 +5,14 @@ import static java.util.Objects.requireNonNull;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.astar.spi.AStarRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.service.vehiclerental.street.GeofencingZoneIndex;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -55,6 +57,9 @@ public class StreetSearchRequest implements AStarRequest {
 
   private IntersectionTraversalCalculator intersectionTraversalCalculator =
     IntersectionTraversalCalculator.DEFAULT;
+
+  @Nullable
+  private Map<String, GeofencingZoneIndex> geofencingZoneIndexes;
 
   private List<ExtensionRequestContext> extensionRequestContexts;
 
@@ -180,6 +185,17 @@ public class StreetSearchRequest implements AStarRequest {
     IntersectionTraversalCalculator intersectionTraversalCalculator
   ) {
     this.intersectionTraversalCalculator = intersectionTraversalCalculator;
+  }
+
+  @Nullable
+  public Map<String, GeofencingZoneIndex> geofencingZoneIndexes() {
+    return geofencingZoneIndexes;
+  }
+
+  public void setGeofencingZoneIndexes(
+    @Nullable Map<String, GeofencingZoneIndex> geofencingZoneIndexes
+  ) {
+    this.geofencingZoneIndexes = geofencingZoneIndexes;
   }
 
   /**

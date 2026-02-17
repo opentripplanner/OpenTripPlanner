@@ -1,8 +1,10 @@
 package org.opentripplanner.street.search.state;
 
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
@@ -412,6 +414,41 @@ public class StateEditor {
   public void resetStartedInNoDropOffZone() {
     cloneStateDataAsNeeded();
     child.stateData.noRentalDropOffZonesAtStartOfReverseSearch = Set.of();
+  }
+
+  /**
+   * Set the current geofencing zones for the rental vehicle.
+   * Called at vehicle pickup to initialize zones based on spatial query.
+   */
+  public void setCurrentGeofencingZones(Set<GeofencingZone> zones) {
+    cloneStateDataAsNeeded();
+    child.stateData.currentGeofencingZones = Set.copyOf(zones);
+  }
+
+  /**
+   * Add a geofencing zone to the current set (entering a zone boundary).
+   */
+  public void enterGeofencingZone(GeofencingZone zone) {
+    if (child.stateData.currentGeofencingZones.contains(zone)) {
+      return;
+    }
+    cloneStateDataAsNeeded();
+    var newSet = new HashSet<>(child.stateData.currentGeofencingZones);
+    newSet.add(zone);
+    child.stateData.currentGeofencingZones = Set.copyOf(newSet);
+  }
+
+  /**
+   * Remove a geofencing zone from the current set (exiting a zone boundary).
+   */
+  public void exitGeofencingZone(GeofencingZone zone) {
+    if (!child.stateData.currentGeofencingZones.contains(zone)) {
+      return;
+    }
+    cloneStateDataAsNeeded();
+    var newSet = new HashSet<>(child.stateData.currentGeofencingZones);
+    newSet.remove(zone);
+    child.stateData.currentGeofencingZones = Set.copyOf(newSet);
   }
 
   /* PRIVATE METHODS */
