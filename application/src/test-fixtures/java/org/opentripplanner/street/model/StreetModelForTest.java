@@ -215,14 +215,10 @@ public class StreetModelForTest {
       Vertex tov = street.getToVertex();
 
       /* forward edges and vertices */
-      if (SphericalDistanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {
-        // no need to link to area edges caught on-end
-      } else if (SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
-        // no need to link to area edges caught on-end
-      } else {
-        // creates links from street head -> location -> street tail.
-        createHalfLocationForTest(location, name, nearestPoint, street, endVertex);
-      }
+        if (!(SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1)) {
+          // creates links from street head -> location -> street tail.
+          createHalfLocationForTest(location, name, nearestPoint, street, endVertex);
+        }
     }
     return location;
   }

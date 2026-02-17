@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking.moduletests;
+package org.opentripplanner.routing.linking;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.model.edge.LinkingDirection.BIDIRECTIONAL;
@@ -7,9 +7,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphDataFetcher;
-import org.opentripplanner.routing.linking.Scope;
-import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;

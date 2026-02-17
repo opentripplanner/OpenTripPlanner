@@ -1,6 +1,7 @@
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.gtfs.graphbuilder.module;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.VisibilityMode;

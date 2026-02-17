@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking.moduletests;
+package org.opentripplanner.routing.linking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,8 +19,6 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphDataFetcher;
-import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;

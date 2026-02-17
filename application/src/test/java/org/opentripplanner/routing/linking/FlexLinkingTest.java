@@ -1,6 +1,7 @@
-package org.opentripplanner.routing.linking.moduletests;
+package org.opentripplanner.routing.linking;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model.edge.LinkingDirection.BIDIRECTIONAL;
 import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
@@ -10,9 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
+import org.opentripplanner.routing.graph.GraphDataFetcher;
 import org.opentripplanner.street.model.StreetModelForTest;
-import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
 
@@ -24,12 +24,12 @@ class FlexLinkingTest {
   @Test
   void flex() {
     OTPFeature.FlexRouting.testOn(() -> {
-      var v1 = StreetModelForTest.intersectionVertex(0.0, 0.0);
+      var v1 = intersectionVertex(0.0, 0.0);
       v1.addAreaStops(Set.of(AREA_STOP_1));
-      var v2 = StreetModelForTest.intersectionVertex(0.001, 0.001);
+      var v2 = intersectionVertex(0.001, 0.001);
       v2.addAreaStops(Set.of(AREA_STOP_2));
 
-      var toBeLinked = StreetModelForTest.intersectionVertex(0.0005, 0.0006);
+      var toBeLinked = intersectionVertex(0.0005, 0.0006);
 
       assertThat(toBeLinked.areaStops()).isEmpty();
 
@@ -54,11 +54,11 @@ class FlexLinkingTest {
           )
       );
 
-      var splitterVertices = graph.getVerticesOfType(SplitterVertex.class);
-      assertThat(splitterVertices).hasSize(1);
-      var splitter = splitterVertices.getFirst();
+      var summary = new GraphDataFetcher(graph).summarizeSplitVertices();
 
-      assertThat(splitter.areaStops()).containsExactly(AREA_STOP_1, AREA_STOP_2);
+      assertThat(summary).containsExactly(
+        "(0.00055,0.00055)[areaStops=F:area-stop-1,F:area-stop-2]"
+      );
     });
   }
 }

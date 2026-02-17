@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking.moduletests;
+package org.opentripplanner.routing.linking;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.routing.linking.Scope.PERMANENT;
@@ -11,9 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphDataFetcher;
-import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.model.StreetModelForTest;
-import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
 
@@ -31,24 +29,9 @@ class MultipleModeLinkingTest {
       intersectionVertex(0.01, 0.0002),
     };
 
-    var walkEdge1 = StreetModelForTest.streetEdge(
-      vertices[0],
-      vertices[1],
-      0.01,
-      PEDESTRIAN
-    );
-    var walkEdge2 = StreetModelForTest.streetEdge(
-      vertices[2],
-      vertices[3],
-      0.01,
-      PEDESTRIAN
-    );
-    var carEdge = StreetModelForTest.streetEdge(
-      vertices[4],
-      vertices[5],
-      0.01,
-      CAR
-    );
+    var walkEdge1 = StreetModelForTest.streetEdge(vertices[0], vertices[1], 0.01, PEDESTRIAN);
+    var walkEdge2 = StreetModelForTest.streetEdge(vertices[2], vertices[3], 0.01, PEDESTRIAN);
+    var carEdge = StreetModelForTest.streetEdge(vertices[4], vertices[5], 0.01, CAR);
 
     // link point below all edges, in the middle
     var split = intersectionVertex(0.005, -0.0001);
