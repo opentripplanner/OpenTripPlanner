@@ -40,7 +40,7 @@ class GraphTest {
     var g = new Graph();
     Vertex a = StreetModelForTest.intersectionVertex("A", 5, 5);
     g.addVertex(a);
-    Vertex b = g.getVertex("A");
+    Vertex b = g.getVertex(VertexLabel.string("A"));
     assertEquals(a, b);
   }
 

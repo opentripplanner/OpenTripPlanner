@@ -10,11 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.model.StreetModelForTest;
-import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
@@ -64,11 +61,4 @@ class FlexLinkingTest {
       assertThat(splitter.areaStops()).containsExactly(AREA_STOP_1, AREA_STOP_2);
     });
   }
-
-  private record TestModel(
-    IntersectionVertex split,
-    StreetEdge edge,
-    Graph graph,
-    VertexLinker linker
-  ) {}
 }

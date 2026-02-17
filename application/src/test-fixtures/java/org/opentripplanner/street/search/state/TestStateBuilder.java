@@ -1,7 +1,6 @@
 package org.opentripplanner.street.search.state;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType.EGRESS;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -86,18 +85,6 @@ public class TestStateBuilder {
 
   public static TestStateBuilder ofScooterRental() {
     return new TestStateBuilder(StreetMode.SCOOTER_RENTAL);
-  }
-
-  /**
-   * Creates a state that starts the scooter rental in arriveBy mode, so starting with
-   * a rental scooter and going backwards until it finds a rental vertex where to drop it.
-   */
-  public static TestStateBuilder ofScooterRentalArriveBy() {
-    return new TestStateBuilder(StreetMode.SCOOTER_RENTAL, EGRESS);
-  }
-
-  public static TestStateBuilder ofBikeRental() {
-    return new TestStateBuilder(StreetMode.BIKE_RENTAL);
   }
 
   public static TestStateBuilder ofCycling() {
@@ -193,31 +180,10 @@ public class TestStateBuilder {
     );
   }
 
-  public TestStateBuilder pickUpFreeFloatingCar() {
-    return pickUpRentalVehicle(
-      RentalFormFactor.CAR,
-      TestFreeFloatingRentalVehicleBuilder.of().withVehicleCar().build()
-    );
-  }
-
   public TestStateBuilder pickUpFreeFloatingScooter() {
     return pickUpRentalVehicle(
       RentalFormFactor.SCOOTER,
       TestFreeFloatingRentalVehicleBuilder.of().withVehicleScooter().build()
-    );
-  }
-
-  public TestStateBuilder pickUpBikeFromStation() {
-    return pickUpRentalVehicle(
-      RentalFormFactor.BICYCLE,
-      TestVehicleRentalStationBuilder.of().withVehicleTypeElectricBicycle(10, 10).build()
-    );
-  }
-
-  public TestStateBuilder pickUpFreeFloatingBike() {
-    return pickUpRentalVehicle(
-      RentalFormFactor.BICYCLE,
-      TestFreeFloatingRentalVehicleBuilder.of().withVehicleBicycle().build()
     );
   }
 
