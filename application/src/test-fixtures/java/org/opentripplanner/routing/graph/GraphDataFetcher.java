@@ -5,6 +5,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -102,19 +103,19 @@ public class GraphDataFetcher {
   private static String summarizeVertex(Vertex v) {
     var buf = new StringBuilder();
 
-    buf.append(
-      String.format(
-        "(%s,%s)".formatted(DECIMAL_FORMAT.format(v.getLat()), DECIMAL_FORMAT.format(v.getLon()))
-      )
+    var coord = String.format(
+      "(%s,%s)".formatted(DECIMAL_FORMAT.format(v.getLat()), DECIMAL_FORMAT.format(v.getLon()))
     );
+    buf.append(coord);
 
     if (!v.areaStops().isEmpty()) {
-      buf
-        .append("[areaStops=")
-        .append(
-          String.join(",", v.areaStops().stream().map(FeedScopedId::toString).sorted().toList())
-        )
-        .append("]");
+      var ids = v
+        .areaStops()
+        .stream()
+        .map(FeedScopedId::toString)
+        .sorted()
+        .collect(Collectors.joining(","));
+      buf.append("[areaStops=").append(ids).append("]");
     }
 
     return buf.toString();

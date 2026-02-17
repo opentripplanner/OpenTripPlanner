@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.linking;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.routing.linking.Scope.PERMANENT;
 import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
+import static org.opentripplanner.street.model.StreetModelForTest.streetEdge;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.edge.LinkingDirection.BIDIRECTIONAL;
@@ -11,7 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphDataFetcher;
-import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
 
@@ -29,9 +28,9 @@ class MultipleModeLinkingTest {
       intersectionVertex(0.01, 0.0002),
     };
 
-    var walkEdge1 = StreetModelForTest.streetEdge(vertices[0], vertices[1], 0.01, PEDESTRIAN);
-    var walkEdge2 = StreetModelForTest.streetEdge(vertices[2], vertices[3], 0.01, PEDESTRIAN);
-    var carEdge = StreetModelForTest.streetEdge(vertices[4], vertices[5], 0.01, CAR);
+    streetEdge(vertices[0], vertices[1], 0.01, PEDESTRIAN);
+    streetEdge(vertices[2], vertices[3], 0.01, PEDESTRIAN);
+    streetEdge(vertices[4], vertices[5], 0.01, CAR);
 
     // link point below all edges, in the middle
     var split = intersectionVertex(0.005, -0.0001);
@@ -41,9 +40,6 @@ class MultipleModeLinkingTest {
       g.addVertex(vertex);
     }
     g.index();
-    g.insert(walkEdge1, PERMANENT);
-    g.insert(walkEdge2, PERMANENT);
-    g.insert(carEdge, PERMANENT);
 
     var gf = new GraphDataFetcher(g);
 
