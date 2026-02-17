@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.routing.linking.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -18,6 +18,8 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -34,22 +36,15 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.test.support.GeoJsonIo;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.service.TimetableRepository;
 
-public class LinkStopToPlatformTest {
+public class PlatformLinkingTest {
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
-    var siteRepository = new SiteRepository();
-    Graph graph = new Graph();
+    var graph = new Graph();
     var vertexFactory = new VertexFactory(graph);
 
-    var timetableRepository = new TimetableRepository(siteRepository);
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
     Coordinate[] closedGeom = new Coordinate[platform.length + 1];
 
@@ -92,7 +87,7 @@ public class LinkStopToPlatformTest {
         vertices.get(next_i),
         vertices.get(i),
         areaGroup,
-        "edge " + String.valueOf(i + platform.length)
+        "edge " + (i + platform.length)
       );
       // make one corner surrounded by walk nothru edges
       if (i < 2) {
@@ -103,18 +98,12 @@ public class LinkStopToPlatformTest {
       edgeBuilder2.buildAndConnect();
     }
 
-    RegularStop[] transitStops = new RegularStop[stops.length];
     for (int i = 0; i < stops.length; i++) {
       Coordinate stop = stops[i];
-      transitStops[i] = testModel.stop("TestStop " + i).withCoordinate(stop.y, stop.x).build();
+      vertexFactory.transitStop(ofStop(i, stop));
     }
 
-    timetableRepository.index();
     graph.index();
-
-    for (RegularStop s : transitStops) {
-      vertexFactory.transitStop(ofStop(s));
-    }
 
     return graph;
   }

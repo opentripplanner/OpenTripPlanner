@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.routing.linking.moduletests;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.model.edge.LinkingDirection.BIDIRECTIONAL;
@@ -12,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.Scope;
+import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -22,7 +25,7 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseModeSet;
 
-class VertexLinkerTest {
+class ScopedLinkingTest {
 
   public static final FeedScopedId AREA_STOP_1 = id("area-stop-1");
   public static final FeedScopedId AREA_STOP_2 = id("area-stop-2");
