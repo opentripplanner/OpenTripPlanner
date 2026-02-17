@@ -15,7 +15,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.linking.LinkingContext;
-import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -23,6 +22,7 @@ import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,20 +57,20 @@ public class GraphPathFinder {
 
   private final Collection<ExtensionRequestContext> extensionRequestContexts;
 
-  private final float maxCarSpeed;
+  private final StreetLimitationParametersService streetLimitationParametersService;
 
   public GraphPathFinder(@Nullable TraverseVisitor<State, Edge> traverseVisitor) {
-    this(traverseVisitor, List.of(), StreetConstants.DEFAULT_MAX_CAR_SPEED);
+    this(traverseVisitor, List.of(), StreetLimitationParametersService.DEFAULT);
   }
 
   public GraphPathFinder(
     @Nullable TraverseVisitor<State, Edge> traverseVisitor,
     Collection<ExtensionRequestContext> extensionRequestContexts,
-    float maxCarSpeed
+    StreetLimitationParametersService streetLimitationParametersService
   ) {
     this.traverseVisitor = traverseVisitor;
     this.extensionRequestContexts = Objects.requireNonNull(extensionRequestContexts);
-    this.maxCarSpeed = maxCarSpeed;
+    this.streetLimitationParametersService = streetLimitationParametersService;
   }
 
   /**
@@ -86,7 +86,7 @@ public class GraphPathFinder {
 
     StreetSearchBuilder aStar = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
-      .withHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
+      .withHeuristic(new EuclideanRemainingWeightHeuristic(streetLimitationParametersService))
       .withSkipEdgeStrategy(
         new DurationSkipEdgeStrategy(
           preferences.maxDirectDuration().valueOf(request.journey().direct().mode())

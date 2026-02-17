@@ -70,7 +70,7 @@ class WalkableAreaBuilder {
   private final List<OsmVertex> platformLinkingPoints;
   private final Set<String> boardingLocationRefTags;
   private final EdgeNamer namer;
-  private final SafetyValueNormalizer normalizer;
+  private final SafetyValueApplier safetyValueApplier;
 
   // template for AreaEdge names
   private static final String LABEL_TEMPLATE = "way (area) %s from %s to %s";
@@ -83,7 +83,7 @@ class WalkableAreaBuilder {
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     VertexGenerator vertexBuilder,
     EdgeNamer namer,
-    SafetyValueNormalizer normalizer,
+    SafetyValueApplier safetyValueApplier,
     DataImportIssueStore issueStore,
     int maxAreaNodes,
     boolean platformEntriesLinking,
@@ -94,7 +94,7 @@ class WalkableAreaBuilder {
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
     this.vertexBuilder = vertexBuilder;
     this.namer = namer;
-    this.normalizer = normalizer;
+    this.safetyValueApplier = safetyValueApplier;
     this.issueStore = issueStore;
     this.maxAreaNodes = maxAreaNodes;
     this.platformEntriesLinking = platformEntriesLinking;
@@ -536,7 +536,7 @@ class WalkableAreaBuilder {
 
     AreaEdge street = streetEdgeBuilder.buildAndConnect();
     AreaEdge backStreet = backStreetEdgeBuilder.buildAndConnect();
-    normalizer.applyWayProperties(street, backStreet, wayData, wayData, parent);
+    safetyValueApplier.applyWayProperties(street, backStreet, wayData, wayData, parent);
     return Set.of(street, backStreet);
   }
 

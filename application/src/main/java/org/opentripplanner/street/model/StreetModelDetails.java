@@ -11,15 +11,26 @@ public class StreetModelDetails implements Serializable {
 
   private final Float maxCarSpeed;
   private final Integer maxAreaNodes;
+  private final float bestBikeSafety;
+  private final float bestWalkSafety;
 
   public static final StreetModelDetails DEFAULT = new StreetModelDetails(
     StreetConstants.DEFAULT_MAX_CAR_SPEED,
-    StreetConstants.DEFAULT_MAX_AREA_NODES
+    StreetConstants.DEFAULT_MAX_AREA_NODES,
+    1.0f,
+    1.0f
   );
 
-  public StreetModelDetails(Float maxCarSpeed, Integer maxAreaNodes) {
+  public StreetModelDetails(
+    Float maxCarSpeed,
+    Integer maxAreaNodes,
+    float bestBikeSafety,
+    float bestWalkSafety
+  ) {
     this.maxCarSpeed = maxCarSpeed;
     this.maxAreaNodes = maxAreaNodes;
+    this.bestBikeSafety = bestBikeSafety;
+    this.bestWalkSafety = bestWalkSafety;
   }
 
   /**
@@ -35,5 +46,13 @@ public class StreetModelDetails implements Serializable {
    */
   public int maxAreaNodes() {
     return maxAreaNodes;
+  }
+
+  public float bestBikeSafety() {
+    return bestBikeSafety;
+  }
+
+  public float bestWalkSafety() {
+    return bestWalkSafety;
   }
 }

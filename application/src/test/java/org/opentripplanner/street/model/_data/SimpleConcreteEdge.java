@@ -25,10 +25,18 @@ public class SimpleConcreteEdge extends Edge {
   public State[] traverse(State s0) {
     double d = getDistanceMeters();
     TraverseMode mode = s0.currentMode();
-    int t = (int) ((1000.0 * d) / TemporaryConcreteEdge.getSpeed(mode, s0.getRequest(), false));
+    var request = s0.getRequest();
+    double t = d / TemporaryConcreteEdge.getSpeed(mode, s0.getRequest(), false);
+    double reluctance = switch (mode) {
+      case WALK -> request.walk().reluctance();
+      case BICYCLE -> request.bike().reluctance();
+      case SCOOTER -> request.scooter().reluctance();
+      default -> 1;
+    };
+    double w = t * reluctance;
     StateEditor s1 = s0.edit(this);
-    s1.incrementTimeInMilliseconds(t);
-    s1.incrementWeight(d);
+    s1.incrementTimeInMilliseconds((int) (t * 1000));
+    s1.incrementWeight(w);
     return s1.makeStateArray();
   }
 
