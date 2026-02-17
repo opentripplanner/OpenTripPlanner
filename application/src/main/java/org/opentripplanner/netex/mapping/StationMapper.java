@@ -122,7 +122,7 @@ class StationMapper {
         }
       }
 
-      name = TranslatedString.getDeduplicatedI18NString(translations, false);
+      name = TranslatedString.getI18NString(translations, false);
     } else {
       name = new NonLocalizedString(stopPlace.getName().getValue());
     }

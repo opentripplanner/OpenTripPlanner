@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This is for translated strings for which translations are read from OSM or GTFS alerts.
@@ -24,7 +25,8 @@ public class TranslatedString implements I18NString, Serializable {
    * Store all translations, so we don't get memory overhead for identical strings As this is
    * static, it isn't serialized when saving the graph.
    */
-  private static final HashMap<Map<String, String>, I18NString> TRANSLATION_CACHE = new HashMap<>();
+  private static final ConcurrentHashMap<Map<String, String>, I18NString> TRANSLATION_CACHE =
+    new ConcurrentHashMap<>();
 
   private final Map<String, String> translations = new HashMap<>();
 
@@ -53,32 +55,8 @@ public class TranslatedString implements I18NString, Serializable {
   }
 
   /**
-   * Gets a deduplicated I18NString. If the translations only have a single value, return a
-   * NonLocalizedString, otherwise a TranslatedString. The resulting I18NString is interned for
-   * memory efficiency.
-   * <p>
-   * This should be used when calling this method during graph building. This should not be called
-   * from a real-time updater as this is not thread-safe and may cause a memory leak.
-   *
-   * @param translations A Map of languages and translations, a null language is the default
-   *                     translation
-   * @param forceTranslatedString Should the language information be kept, even when only a single
-   *                              translation is provided. This is useful when the language
-   *                              information is important or is presented to the user.
-   */
-  public static I18NString getDeduplicatedI18NString(
-    Map<String, String> translations,
-    boolean forceTranslatedString
-  ) {
-    return getI18NString(translations, true, forceTranslatedString);
-  }
-
-  /**
-   * Gets a non-deduplicated I18NString. If the translations only have a single value, return a
-   * NonLocalizedString, otherwise a TranslatedString. The resulting I18NString is NOT interned.
-   * <p>
-   * This should be used from real-time updaters to avoid memory leaks. For graph building, use
-   * {@link #getDeduplicatedI18NString(Map, boolean)} instead.
+   * Gets an I18NString. If the translations only have a single value, return a NonLocalizedString,
+   * otherwise a TranslatedString
    *
    * @param translations A Map of languages and translations, a null language is the default
    *                     translation
@@ -90,34 +68,11 @@ public class TranslatedString implements I18NString, Serializable {
     Map<String, String> translations,
     boolean forceTranslatedString
   ) {
-    return getI18NString(translations, false, forceTranslatedString);
-  }
-
-  /**
-   * Gets an I18NString. If the translations only have a single value, return a NonLocalizedString,
-   * otherwise a TranslatedString
-   *
-   * @param translations A Map of languages and translations, a null language is the default
-   *                     translation
-   * @param intern Should the resulting I18NString be interned. This should be used when calling
-   *               this method during graph building. This should not be called from a real-time
-   *               updater as this is not thread-safe and may cause a memory leak.
-   * @param forceTranslatedString Should the language information be kept, even when only a single
-   *                              translation is provided. This is useful when the language
-   *                              information is important or is presented to the user.
-   */
-  static I18NString getI18NString(
-    Map<String, String> translations,
-    boolean intern,
-    boolean forceTranslatedString
-  ) {
-    if (translations.isEmpty()) {
-      throw new IllegalArgumentException("At least one translation must be provided");
-    }
-    if (TRANSLATION_CACHE.containsKey(translations)) {
-      return TRANSLATION_CACHE.get(translations);
-    } else {
-      I18NString ret;
+    I18NString ret = TRANSLATION_CACHE.get(translations);
+    if (ret == null) {
+      if (translations.isEmpty()) {
+        throw new IllegalArgumentException("At least one translation must be provided");
+      }
       // Check if we only have one name, even under multiple languages
       boolean allValuesEqual = new HashSet<>(translations.values()).size() == 1;
       var firstLanguage = translations.keySet().iterator().next();
@@ -130,11 +85,9 @@ public class TranslatedString implements I18NString, Serializable {
       } else {
         ret = new TranslatedString(translations);
       }
-      if (intern) {
-        TRANSLATION_CACHE.put(translations, ret);
-      }
-      return ret;
+      TRANSLATION_CACHE.put(translations, ret);
     }
+    return ret;
   }
 
   @Override

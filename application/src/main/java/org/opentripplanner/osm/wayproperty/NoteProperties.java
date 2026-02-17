@@ -28,7 +28,7 @@ public class NoteProperties {
     if (PATTERN_MATCHER.matcher(notePattern).matches()) {
       //This gets language -> translation of notePattern and all tags (which can have translations name:en for example)
       Map<String, String> noteText = way.generateI18NForPattern(notePattern);
-      text = TranslatedString.getDeduplicatedI18NString(noteText, false);
+      text = TranslatedString.getI18NString(noteText, false);
     } else {
       text = LocalizedStringMapper.getInstance().map(notePattern, way);
     }
