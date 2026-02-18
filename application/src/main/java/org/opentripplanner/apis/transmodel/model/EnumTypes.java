@@ -338,6 +338,11 @@ public class EnumTypes {
       RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT,
       "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
     )
+    .value(
+      "onBoardLocationMissingAimedDepartureTime",
+      RoutingErrorCode.ON_BOARD_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME,
+      "The on-board location is ambiguous because the stop is visited more than once by the service journey. An aimedDepartureTime is necessary to disambiguate."
+    )
     .build();
 
   public static final GraphQLEnumType SERVICE_ALTERATION = GraphQLEnumType.newEnum()

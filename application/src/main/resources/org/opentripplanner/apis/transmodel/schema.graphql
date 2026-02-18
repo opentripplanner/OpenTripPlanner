@@ -1918,6 +1918,8 @@ enum RoutingErrorCode {
   noTransitConnection
   "A transit connection was found, but it was outside the search window. Use paging to navigate to a result."
   noTransitConnectionInSearchWindow
+  "The on-board location is ambiguous because the stop is visited more than once by the service journey. An aimedDepartureTime is necessary to disambiguate."
+  onBoardLocationMissingAimedDepartureTime
   "The coordinates are outside the bounds of the data currently loaded into the system"
   outsideBounds
   "The date specified is outside the range of data currently loaded into the system"
@@ -2223,6 +2225,14 @@ input BikePreferencesInput {
   triangleFactors: TriangleFactors
 }
 
+"Identifies a specific service journey on a specific service date. Exactly one of the fields must be set."
+input DatedServiceJourneyReference @oneOf {
+  "Identifies the service journey by a dated service journey ID (e.g. from NeTEx data where a service journey on a date has a unique ID)."
+  datedServiceJourneyId: String
+  "Identifies the service journey by service journey ID and service date."
+  serviceJourneyOnServiceDate: ServiceJourneyOnServiceDate
+}
+
 "Filter trips by disallowing lines involving certain elements. If both lines and authorities are specified, only one must be valid for each line to be banned. If a line is both banned and whitelisted, it will be counted as banned."
 input InputBanned {
   "Set of ids for authorities that should not be used"
@@ -2291,12 +2301,14 @@ input ItineraryFilters {
   transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams
 }
 
-"Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known."
+"Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known. Alternatively, an onBoardLocation can be used to start the search on-board a vehicle."
 input Location {
   "Coordinates for the location. This can be used alone or as fallback if the place id is not found."
   coordinates: InputCoordinates
   "The name of the location. This is pass-through informationand is not used in routing."
   name: String
+  "Identifies an on-board position on a specific transit trip. When set, the search starts from on-board the specified vehicle."
+  onBoardLocation: OnBoardLocationInput
   "The id of an element in the OTP model. Currently supports Quay, StopPlace, multimodal StopPlace, and GroupOfStopPlaces."
   place: String
 }
@@ -2311,6 +2323,14 @@ input Modes {
   egressMode: StreetMode
   "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
   transportModes: [TransportModes]
+}
+
+"Identifies a position on-board a specific service journey. Used to start a trip planning search from on-board a vehicle."
+input OnBoardLocationInput {
+  "Identifies the service journey and service date, either by service journey ID and service date, or by a dated service journey ID."
+  datedServiceJourneyReference: DatedServiceJourneyReference!
+  "Identifies the point in the journey pattern where the traveler is considered to be boarding, or the last stop passed."
+  pointInJourneyPatternReference: PointInJourneyPatternReference!
 }
 
 "Defines one point which the journey must pass through."
@@ -2342,6 +2362,14 @@ input PenaltyForStreetMode {
   timePenalty: DoubleFunction!
 }
 
+"Identifies a point in a journey pattern by stop location ID, optionally with an aimed departure time for disambiguation."
+input PointInJourneyPatternReference {
+  "The exact aimed departure time at this stop, corresponding to the aimedDepartureTime on EstimatedCall. Must match exactly. Used for disambiguation when the stop location is visited more than once in the journey pattern (e.g. ring lines). If provided, it is always validated against the timetable."
+  aimedDepartureTime: DateTime
+  "The stop location ID (quay or stop place). Must not be the last stop in the journey pattern, as boarding there would not allow further travel."
+  stopLocationId: String!
+}
+
 """
 A relax-cost is used to increase the limit when comparing one cost to another cost.
 This is used to include more results into the result. A `ratio=2.0` means a path (itinerary)
@@ -2368,6 +2396,14 @@ input ScooterPreferencesInput {
   speed: Float = 5.0
   "When using optimisationMethod 'triangle', these values tell the routing engine how important each factor is compared to the others. All values should add up to 1."
   triangleFactors: TriangleFactors
+}
+
+"Identifies a service journey by service journey ID and service date."
+input ServiceJourneyOnServiceDate {
+  "The service date of the trip, in ISO 8601 format (YYYY-MM-DD)."
+  serviceDate: Date!
+  "The service journey ID."
+  serviceJourneyId: String!
 }
 
 "A combination of street mode and corresponding duration"

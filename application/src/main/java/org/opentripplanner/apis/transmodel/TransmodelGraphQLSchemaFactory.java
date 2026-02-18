@@ -57,6 +57,7 @@ import org.opentripplanner.apis.transmodel.model.framework.AuthorityType;
 import org.opentripplanner.apis.transmodel.model.framework.BrandingType;
 import org.opentripplanner.apis.transmodel.model.framework.EmissionType;
 import org.opentripplanner.apis.transmodel.model.framework.InfoLinkType;
+import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.MultilingualStringType;
 import org.opentripplanner.apis.transmodel.model.framework.NoticeType;
 import org.opentripplanner.apis.transmodel.model.framework.OperatorType;
@@ -423,6 +424,7 @@ public class TransmodelGraphQLSchemaFactory {
 
     GraphQLInputObjectType durationPerStreetModeInput = StreetModeDurationInputType.create();
     GraphQLInputObjectType penaltyForStreetMode = PenaltyForStreetModeType.create();
+    GraphQLInputObjectType locationInputType = LocationInputType.create(dateTimeScalar);
 
     GraphQLFieldDefinition tripQuery = tripQueryFactory.create(
       routing,
@@ -430,7 +432,8 @@ public class TransmodelGraphQLSchemaFactory {
       tripType,
       durationPerStreetModeInput,
       penaltyForStreetMode,
-      dateTimeScalar
+      dateTimeScalar,
+      locationInputType
     );
 
     GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
@@ -442,7 +445,8 @@ public class TransmodelGraphQLSchemaFactory {
       viaTripType,
       viaLocationInputType,
       viaSegmentInputType,
-      dateTimeScalar
+      dateTimeScalar,
+      locationInputType
     );
 
     GraphQLInputObjectType inputPlaceIds = GraphQLInputObjectType.newInputObject()
