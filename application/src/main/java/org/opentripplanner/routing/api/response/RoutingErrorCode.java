@@ -36,4 +36,10 @@ public enum RoutingErrorCode {
    * The location was found, but no stops could be found within the search radius.
    */
   NO_STOPS_IN_RANGE,
+
+  /**
+   * The on-board location is ambiguous because the stop is visited more than once by the
+   * service journey. A {@code scheduledDepartureTime} is necessary to disambiguate.
+   */
+  ON_BOARD_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME,
 }

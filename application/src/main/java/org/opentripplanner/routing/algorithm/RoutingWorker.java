@@ -22,6 +22,7 @@ import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMa
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.OnBoardAccessResolver;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
@@ -37,6 +38,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +55,7 @@ public class RoutingWorker {
   /** An object that accumulates profiling and debugging info for inclusion in the response. */
   private final DebugTimingAggregator debugTimingAggregator;
 
-  private final RouteRequest request;
+  private RouteRequest request;
   private final OtpServerRequestContext serverContext;
   /**
    * The transit service time-zero normalized for the current search. All transit times are relative
@@ -80,6 +82,19 @@ public class RoutingWorker {
     ZoneId zoneId
   ) {
     this.request = orginalRequest.withPageCursor();
+
+    // For on-board access we need to amend the request to have an on-board access at the exact
+    // boarding time for the access. We do that here in the RoutingWorker because finding the exact
+    // boarding time requires using the transit service to look up timetable data.
+    if (this.request.isOnBoardAccessRequest()) {
+      this.request = amendOnBoardAccessRequestWithExactBoardingTime(
+        this.request,
+        serverContext.transitService(),
+        zoneId,
+        serverContext.raptorTuningParameters()
+      );
+    }
+
     this.serverContext = serverContext;
     this.debugTimingAggregator = new DebugTimingAggregator(
       serverContext.meterRegistry(),
@@ -226,6 +241,10 @@ public class RoutingWorker {
   }
 
   private RoutingResult routeDirectStreet() {
+    // On-board trip locations don't have street vertices, so direct routing is not applicable
+    if (request.isOnBoardAccessRequest()) {
+      return RoutingResult.empty();
+    }
     // TODO: Add support for via search to the direct-street search and remove this.
     //       The direct search is used to prune away silly transit results and it
     //       would be nice to also support via as a feature in the direct-street
@@ -265,6 +284,9 @@ public class RoutingWorker {
   }
 
   private RoutingResult routeDirectFlex() {
+    if (request.isOnBoardAccessRequest()) {
+      return RoutingResult.empty();
+    }
     if (!OTPFeature.FlexRouting.isOn()) {
       return RoutingResult.ok(List.of());
     }
@@ -281,6 +303,9 @@ public class RoutingWorker {
   }
 
   private RoutingResult routeCarpooling() {
+    if (request.isOnBoardAccessRequest()) {
+      return RoutingResult.empty();
+    }
     if (OTPFeature.CarPooling.isOff()) {
       return RoutingResult.ok(List.of());
     }
@@ -338,5 +363,24 @@ public class RoutingWorker {
   private LinkingContext createLinkingContext(TemporaryVerticesContainer container) {
     var linkingRequest = LinkingContextRequestMapper.map(request);
     return serverContext.linkingContextFactory().create(container, linkingRequest);
+  }
+
+  private static RouteRequest amendOnBoardAccessRequestWithExactBoardingTime(
+    RouteRequest request,
+    TransitService transitService,
+    ZoneId zoneId,
+    RaptorTuningParameters tuningParameters
+  ) {
+    var fromLocation = request.from();
+    if (fromLocation == null || fromLocation.tripLocation == null) {
+      throw new IllegalArgumentException();
+    }
+
+    var boardingDateTime = new OnBoardAccessResolver(transitService).resolveBoardingDateTime(
+      fromLocation.tripLocation,
+      zoneId
+    );
+    var iterationStep = Duration.ofSeconds(tuningParameters.iterationDepartureStepInSeconds());
+    return request.copyOf().withOnBoardAccessAt(boardingDateTime, iterationStep).buildRequest();
   }
 }

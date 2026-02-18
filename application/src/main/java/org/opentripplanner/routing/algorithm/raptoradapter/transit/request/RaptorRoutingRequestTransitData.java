@@ -175,6 +175,14 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     return patternIndex.get(routeIndex);
   }
 
+  /**
+   * Create an {@link OnBoardTripPatternSearch} for resolving on-board trip locations against the
+   * active Raptor pattern index.
+   */
+  public OnBoardTripPatternSearch onBoardTripPatternSearch() {
+    return new OnBoardTripPatternSearch(patternIndex);
+  }
+
   @Override
   public int numberOfStops() {
     return raptorTransitData.getStopCount();

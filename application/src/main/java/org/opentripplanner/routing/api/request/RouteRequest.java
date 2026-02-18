@@ -284,6 +284,14 @@ public class RouteRequest implements Serializable {
     return !via.isEmpty();
   }
 
+  /**
+   * Return {@code true} if the origin is on-board a transit vehicle rather than a geographic
+   * location.
+   */
+  public boolean isOnBoardAccessRequest() {
+    return from != null && from.isOnBoard();
+  }
+
   public List<ViaLocation> listViaLocations() {
     return via;
   }

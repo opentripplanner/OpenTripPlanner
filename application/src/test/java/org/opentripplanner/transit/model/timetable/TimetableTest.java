@@ -1,19 +1,29 @@
 package org.opentripplanner.transit.model.timetable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 class TimetableTest {
+
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final Route ROUTE = TimetableRepositoryForTest.route("routeId").build();
+  public static final RegularStop STOP_A = TEST_MODEL.stop("A").build();
+  public static final RegularStop STOP_C = TEST_MODEL.stop("C").build();
 
   private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
   private final RegularStop stopA = envBuilder.stop("A");
@@ -100,5 +110,71 @@ class TimetableTest {
     var unknownTrip = Trip.of(id("unknown")).withRoute(envBuilder.route("lookupRoute2")).build();
     assertNull(timetable.getTripTimes(unknownTrip));
     assertNull(timetable.getTripTimes(id("unknown")));
+  }
+
+  @Test
+  void tripTimesWithScheduleFallbackFoundInCurrentTimetable() {
+    var trip = TimetableRepositoryForTest.trip("t1").build();
+    var pattern = TripPattern.of(id("pattern"))
+      .withRoute(ROUTE)
+      .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A, STOP_C))
+      .withScheduledTimeTableBuilder(builder ->
+        builder.addTripTimes(
+          ScheduledTripTimes.of().withTrip(trip).withDepartureTimes("08:00 09:00").build()
+        )
+      )
+      .build();
+
+    var timetable = pattern.getScheduledTimetable();
+    var result = timetable.getTripTimesWithScheduleFallback(trip);
+
+    assertNotNull(result);
+    assertEquals(trip, result.getTrip());
+  }
+
+  @Test
+  void tripTimesWithScheduleFallbackFoundInScheduledTimetable() {
+    var trip = TimetableRepositoryForTest.trip("t1").build();
+    var pattern = TripPattern.of(id("pattern"))
+      .withRoute(ROUTE)
+      .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A, STOP_C))
+      .withScheduledTimeTableBuilder(builder ->
+        builder.addTripTimes(
+          ScheduledTripTimes.of().withTrip(trip).withDepartureTimes("08:00 09:00").build()
+        )
+      )
+      .build();
+
+    var scheduledTimetable = pattern.getScheduledTimetable();
+    var realtimeTimetable = scheduledTimetable
+      .copyOf()
+      .removeTripTimes(scheduledTimetable.getTripTimes(trip))
+      .withServiceDate(LocalDate.of(2025, 1, 1))
+      .build();
+
+    // Trip is not in the realtime timetable
+    assertNull(realtimeTimetable.getTripTimes(trip));
+    // But the fallback finds it in the scheduled timetable
+    var result = realtimeTimetable.getTripTimesWithScheduleFallback(trip);
+    assertNotNull(result);
+    assertEquals(trip, result.getTrip());
+  }
+
+  @Test
+  void tripTimesWithScheduleFallbackNotFoundInEither() {
+    var trip = TimetableRepositoryForTest.trip("t1").build();
+    var unknownTrip = TimetableRepositoryForTest.trip("unknown").build();
+    var pattern = TripPattern.of(id("pattern"))
+      .withRoute(ROUTE)
+      .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A, STOP_C))
+      .withScheduledTimeTableBuilder(builder ->
+        builder.addTripTimes(
+          ScheduledTripTimes.of().withTrip(trip).withDepartureTimes("08:00 09:00").build()
+        )
+      )
+      .build();
+
+    var timetable = pattern.getScheduledTimetable();
+    assertNull(timetable.getTripTimesWithScheduleFallback(unknownTrip));
   }
 }
