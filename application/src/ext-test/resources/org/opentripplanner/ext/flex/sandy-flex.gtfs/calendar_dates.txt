@@ -1,8 +1,0 @@
-service_id,date,holiday_name,exception_type
-c_70870_b_83797_d_64,20260525,Memorial Day,1
-c_70870_b_83797_d_31,20260525,Memorial Day,2
-c_70682_b_83345_d_31,20260525,Memorial Day,2
-c_69989_b_81709_d_127,20260525,Memorial Day,2
-c_17794_b_85969_d_127,20260525,Memorial Day,2
-c_157_b_84629_d_63,20260525,Memorial Day,2
-c_157_b_84629_d_127,20260525,Memorial Day,2
