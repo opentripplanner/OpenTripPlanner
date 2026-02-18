@@ -111,6 +111,24 @@ public class TripRequestMapper {
       PreferencesMapper.mapPreferences(environment, callWith, preferences)
     );
 
+    validateDateTimeNotSetWithOnBoardLocation(environment, requestBuilder);
+
     return requestBuilder;
+  }
+
+  /**
+   * For on-board departures, the dateTime must not be explicitly set because the departure time
+   * is determined by the on-board position in the timetable.
+   */
+  private static void validateDateTimeNotSetWithOnBoardLocation(
+    DataFetchingEnvironment environment,
+    RouteRequestBuilder requestBuilder
+  ) {
+    if (GqlUtil.hasArgument(environment, "dateTime") && requestBuilder.from().isOnBoard()) {
+      throw new IllegalArgumentException(
+        "The 'dateTime' parameter cannot be set when 'from' contains a 'onBoardLocation'. " +
+          "The departure time is determined by the on-board position."
+      );
+    }
   }
 }
