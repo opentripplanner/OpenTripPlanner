@@ -16,7 +16,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 
-public class StreetEdgeSplittingTest {
+class StreetEdgeSplittingTest {
 
   /**
    * Ensure that splitting edges yields edges that are identical in length for forward and back

@@ -6,63 +6,61 @@ import static org.opentripplanner.street.model.edge.LinkingDirection.BIDIRECTION
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.GraphDataFetcher;
 import org.opentripplanner.street.model.StreetModelForTest;
-import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
 
+/**
+ * Tests that the right number of permanent edges are in the graph for the various linking
+ * scopes.
+ */
 class ScopedLinkingTest {
 
-  @Test
-  void splitPermanently() {
-    var model = buildModel();
-    assertThat(model.graph().listStreetEdges()).hasSize(1);
-
-    model
-      .linker()
-      .linkVertexPermanently(
-        model.split(),
-        TraverseModeSet.allModes(),
-        BIDIRECTIONAL,
-        (vertex, streetVertex) -> List.of(model.edge())
-      );
-
-    assertThat(model.graph().listStreetEdges()).hasSize(2);
-  }
+  private static final IntersectionVertex SPLIT = StreetModelForTest.intersectionVertex(0.05, 0.05);
 
   @Test
   void splitRequestScoped() {
-    var model = buildModel();
-    assertThat(model.graph().listStreetEdges()).hasSize(1);
-    var temp = model
+    var env = buildEnv();
+    assertThat(env.graph().listStreetEdges()).hasSize(1);
+    var temp = env.linkVertexForRequest(0.05, 0.05);
+    assertThat(env.graph().listStreetEdges()).hasSize(2);
+    temp.disposeEdges();
+    assertThat(env.graph().listStreetEdges()).hasSize(1);
+  }
+
+  @Test
+  void splitPermanently() {
+    var env = buildEnv();
+    assertThat(env.graph().listStreetEdges()).hasSize(1);
+    TraverseModeSet traverseModes = TraverseModeSet.allModes();
+    env
       .linker()
-      .linkVertexForRequest(model.split(), TraverseModeSet.allModes(), BIDIRECTIONAL, (v1, v2) ->
+      .linkVertexPermanently(SPLIT, traverseModes, BIDIRECTIONAL, (vertex, streetVertex) ->
         List.of()
       );
-    assertThat(model.graph().listStreetEdges()).hasSize(2);
-    temp.disposeEdges();
-    assertThat(model.graph().listStreetEdges()).hasSize(1);
+    System.out.println(env.graph().geoJsonUrl());
+    assertThat(env.graph().listStreetEdges()).hasSize(2);
+    env.disposeEdges();
+    // edges should stay after disposing
+    assertThat(env.graph().listStreetEdges()).hasSize(2);
   }
 
   @Test
   void splitRealtime() {
-    var model = buildModel();
-    assertThat(model.graph().listStreetEdges()).hasSize(1);
-    var temp = model
+    var env = buildEnv();
+    assertThat(env.graph().listStreetEdges()).hasSize(1);
+    TraverseModeSet traverseModes = TraverseModeSet.allModes();
+    var temp = env
       .linker()
-      .linkVertexForRealTime(model.split(), TraverseModeSet.allModes(), BIDIRECTIONAL, (v1, v2) ->
-        List.of()
-      );
-    assertThat(model.graph().listStreetEdges()).hasSize(2);
+      .linkVertexForRealTime(SPLIT, traverseModes, BIDIRECTIONAL, (v1, v2) -> List.of());
+    assertThat(env.graph().listStreetEdges()).hasSize(2);
     temp.disposeEdges();
-    assertThat(model.graph().listStreetEdges()).hasSize(1);
+    assertThat(env.graph().listStreetEdges()).hasSize(1);
   }
 
-  private static TestModel buildModel() {
+  private static LinkingEnvironment buildEnv() {
     var v1 = StreetModelForTest.intersectionVertex(0.0, 0.0);
     var v2 = StreetModelForTest.intersectionVertex(0.1, 0.1);
-    var split = StreetModelForTest.intersectionVertex(0.05, 0.05);
 
     var edge = StreetModelForTest.streetEdge(v1, v2);
 
@@ -71,14 +69,7 @@ class ScopedLinkingTest {
     g.addVertex(v2);
     g.index();
     g.insert(edge, Scope.PERMANENT);
-    var linker = VertexLinkerTestFactory.of(g);
-    return new TestModel(split, edge, new GraphDataFetcher(g), linker);
-  }
 
-  private record TestModel(
-    IntersectionVertex split,
-    StreetEdge edge,
-    GraphDataFetcher graph,
-    VertexLinker linker
-  ) {}
+    return new LinkingEnvironment(g);
+  }
 }
