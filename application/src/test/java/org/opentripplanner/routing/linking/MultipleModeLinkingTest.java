@@ -38,7 +38,9 @@ class MultipleModeLinkingTest {
     // vertex is linked to closest walk edge and to the car edge, not to all 3 edges
     assertThat(env.graph().summarizeTempEdges()).containsExactly(
       "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
-      "(0,0.0002) → (0.005,0.0002) CAR ♿✅"
+      "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
+      "(0,0.0002) → (0.005,0.0002) CAR ♿✅",
+      "(0.005,0.0002) → (0.01,0.0002) CAR ♿✅"
     );
 
     // the majority of the temporary edges are in the disposable edge collection

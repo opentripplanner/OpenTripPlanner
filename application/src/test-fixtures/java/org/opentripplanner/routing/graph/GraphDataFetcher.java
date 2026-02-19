@@ -2,6 +2,7 @@ package org.opentripplanner.routing.graph;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
@@ -40,8 +41,18 @@ public class GraphDataFetcher {
     return graph.getVerticesOfType(TransitStopVertex.class);
   }
 
+  /**
+   * Iterates over all vertices in the graph and gets all incoming _and_ outgoing edges.
+   * This is a different behavior than {@link Graph#getEdges()}, which only returns edges that are
+   * outgoing.
+   */
   public List<Edge> listEdges() {
-    return List.copyOf(graph.getEdges());
+    return graph
+      .getVertices()
+      .stream()
+      .flatMap(v -> Stream.concat(v.getOutgoing().stream(), v.getIncoming().stream()))
+      .distinct()
+      .toList();
   }
 
   public List<AreaEdge> listAreaEdges() {
@@ -49,7 +60,7 @@ public class GraphDataFetcher {
   }
 
   public String geoJsonUrl() {
-    return GeoJsonIo.toUrl(graph);
+    return GeoJsonIo.toUrl(this.listEdges(), graph.getVertices());
   }
 
   public Collection<String> summarizeSplitVertices() {
@@ -65,8 +76,7 @@ public class GraphDataFetcher {
    * in the graph.
    */
   public Collection<String> summarizeTempEdges() {
-    return graph
-      .getEdges()
+    return listEdges()
       .stream()
       .filter(e -> e instanceof TemporaryEdge)
       .map(StreetSummaries::summarizeEdge)
