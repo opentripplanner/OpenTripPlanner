@@ -83,5 +83,4 @@ public class StreetEdgeSplittingTest {
       assertTrue(sp1.tail().isBack());
     }
   }
-
 }
