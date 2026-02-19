@@ -21,25 +21,20 @@ import org.opentripplanner.street.search.TraverseModeSet;
  */
 public class LinkingEnvironment {
 
-  private final Graph graph;
   private final GraphDataFetcher graphFetcher;
   private final VertexLinker linker;
 
   @Nullable
   private DisposableEdgeCollection disposable;
 
-  public LinkingEnvironment(Graph graph) {
-    this.graph = graph;
-    this.graphFetcher = new GraphDataFetcher(graph);
-    this.linker = VertexLinkerTestFactory.of(graph);
-  }
-
   public LinkingEnvironment(Vertex... vertices) {
-    this(new Graph());
+    var graph = new Graph();
     for (var v : vertices) {
       graph.addVertex(v);
     }
     graph.index();
+    graphFetcher = new GraphDataFetcher(graph);
+    linker = VertexLinkerTestFactory.of(graph);
   }
 
   public DisposableEdgeCollection linkVertexForRequest(double lat, double lon) {

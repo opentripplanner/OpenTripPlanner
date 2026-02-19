@@ -5,7 +5,6 @@ import static org.opentripplanner.street.model.edge.LinkingDirection.BIDIRECTION
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
@@ -61,14 +60,8 @@ class ScopedLinkingTest {
     var v1 = StreetModelForTest.intersectionVertex(0.0, 0.0);
     var v2 = StreetModelForTest.intersectionVertex(0.1, 0.1);
 
-    var edge = StreetModelForTest.streetEdge(v1, v2);
+    StreetModelForTest.streetEdge(v1, v2);
 
-    var g = new Graph();
-    g.addVertex(v1);
-    g.addVertex(v2);
-    g.index();
-    g.insert(edge, Scope.PERMANENT);
-
-    return new LinkingEnvironment(g);
+    return new LinkingEnvironment(v1, v2);
   }
 }
