@@ -10,8 +10,6 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.GraphDataFetcher;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
@@ -35,28 +33,22 @@ class FlexLinkingTest {
 
       StreetModelForTest.streetEdge(v1, v2);
 
-      var graph = new Graph();
+      var env = new LinkingEnvironment(v1, v2);
 
-      graph.addVertex(v1);
-      graph.addVertex(v2);
-      graph.index();
+      env
+        .linker()
+        .linkVertexPermanently(
+          toBeLinked,
+          TraverseModeSet.allModes(),
+          BIDIRECTIONAL,
+          (vertex, streetVertex) ->
+            List.of(
+              StreetModelForTest.streetEdge((StreetVertex) vertex, streetVertex),
+              StreetModelForTest.streetEdge(streetVertex, (StreetVertex) vertex)
+            )
+        );
 
-      var linker = VertexLinkerTestFactory.of(graph);
-
-      linker.linkVertexPermanently(
-        toBeLinked,
-        TraverseModeSet.allModes(),
-        BIDIRECTIONAL,
-        (vertex, streetVertex) ->
-          List.of(
-            StreetModelForTest.streetEdge((StreetVertex) vertex, streetVertex),
-            StreetModelForTest.streetEdge(streetVertex, (StreetVertex) vertex)
-          )
-      );
-
-      var summary = new GraphDataFetcher(graph).summarizeSplitVertices();
-
-      assertThat(summary).containsExactly(
+      assertThat(env.graph().summarizeSplitVertices()).containsExactly(
         "(0.00055,0.00055)[areaStops=F:area-stop-1,F:area-stop-2]"
       );
     });

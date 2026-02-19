@@ -38,7 +38,6 @@ class ScopedLinkingTest {
       .linkVertexPermanently(SPLIT, traverseModes, BIDIRECTIONAL, (vertex, streetVertex) ->
         List.of()
       );
-    System.out.println(env.graph().geoJsonUrl());
     assertThat(env.graph().listStreetEdges()).hasSize(2);
     env.disposeEdges();
     // edges should stay after disposing

@@ -15,7 +15,7 @@ public class EdgeTest {
   public void testConstruct() {
     Vertex head = StreetModelFactory.intersectionVertex("head", 47.669457, -122.387577);
     Vertex tail = StreetModelFactory.intersectionVertex("tail", 47.669462, -122.384739);
-    Edge e = SimpleConcreteEdge.createSimpleConcreteEdge(head, tail);
+    Edge e = new SimpleConcreteEdge(head, tail);
 
     assertEquals(head, e.getFromVertex());
     assertEquals(tail, e.getToVertex());
