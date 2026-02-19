@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@eslint/compat": "2.0.2",
-    "@eslint/js": "9.39.2",
+    "@eslint/js": "10.0.1",
     "@graphql-codegen/cli": "6.1.1",
     "@graphql-codegen/client-preset": "5.2.3",
     "@graphql-codegen/introspection": "5.0.0",
@@ -43,7 +43,7 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.4",
     "@vitest/coverage-v8": "4.0.18",
-    "eslint": "9.39.2",
+    "eslint": "10.0.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
