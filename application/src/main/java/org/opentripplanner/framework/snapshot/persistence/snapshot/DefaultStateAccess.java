@@ -5,8 +5,8 @@ import java.util.function.Function;
 import org.opentripplanner.framework.snapshot.application.StateAccess;
 import org.opentripplanner.framework.snapshot.application.TransactionalContext;
 import org.opentripplanner.framework.snapshot.domain.world.TransitWorld;
-import org.opentripplanner.framework.snapshot.persistence.world.MutableTransitWorld;
-import org.opentripplanner.framework.snapshot.persistence.world.ImmutableTransitWorld;
+import org.opentripplanner.framework.snapshot.persistence.snapshot.world.MutableTransitWorld;
+import org.opentripplanner.framework.snapshot.persistence.snapshot.world.ImmutableTransitWorld;
 import org.opentripplanner.framework.snapshot.event.DomainEventDispatcher;
 
 public class DefaultStateAccess implements StateAccess {

@@ -11,7 +11,7 @@ import org.opentripplanner.framework.snapshot.domain.transfer.NewStopHandler;
 import org.opentripplanner.framework.snapshot.event.DomainEventDispatcher;
 import org.opentripplanner.framework.snapshot.persistence.snapshot.SnapshotStore;
 import org.opentripplanner.framework.snapshot.persistence.snapshot.DefaultStateAccess;
-import org.opentripplanner.framework.snapshot.persistence.world.TransitWorldConfig;
+import org.opentripplanner.framework.snapshot.persistence.snapshot.world.TransitWorldConfig;
 
 public class SnapshotPrototypeTest {
 
