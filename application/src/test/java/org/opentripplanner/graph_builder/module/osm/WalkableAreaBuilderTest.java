@@ -85,7 +85,7 @@ public class WalkableAreaBuilderTest {
   @Test
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(true)
-  @MaxAreaNodes(1000)
+  @MaxAreaNodes(5)
   void testCalculateVerticesArea(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     var areas = graph

@@ -12,7 +12,6 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.locationtech.jts.operation.valid.IsValidOp;
 import org.opentripplanner.osm.model.OsmEntity;
