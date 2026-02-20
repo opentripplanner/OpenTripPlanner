@@ -1,11 +1,12 @@
 package org.opentripplanner.street.model;
 
 import java.io.Serializable;
+import org.opentripplanner.street.graph.Graph;
 
 /**
  * Container for street model information calculated during graph build.
  * <p>
- * TODO this can be expanded to include some fields from the {@link org.opentripplanner.routing.graph.Graph}.
+ * TODO this can be expanded to include some fields from the {@link Graph}.
  */
 public class StreetModelDetails implements Serializable {
 

@@ -26,10 +26,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSear
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;

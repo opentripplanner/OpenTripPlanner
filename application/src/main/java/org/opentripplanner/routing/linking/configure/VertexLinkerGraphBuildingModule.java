@@ -3,10 +3,10 @@ package org.opentripplanner.routing.linking.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.VisibilityMode;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.street.graph.Graph;
 
 /**
  * Provides the vertex linker for the graph build.

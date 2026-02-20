@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.services.notes;
+package org.opentripplanner.street.internal.notes;
 
 import java.io.Serializable;
 import java.util.ArrayList;

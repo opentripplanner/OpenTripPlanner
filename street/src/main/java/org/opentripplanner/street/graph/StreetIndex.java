@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.street.graph;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.routing.linking.Scope;
+import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.HashGridSpatialIndex;
 import org.opentripplanner.street.model.edge.Edge;

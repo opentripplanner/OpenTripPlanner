@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.Scope;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 

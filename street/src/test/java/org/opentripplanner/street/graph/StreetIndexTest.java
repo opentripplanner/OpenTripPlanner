@@ -1,37 +1,35 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.street.graph;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.core.model.id.FeedScopedIdFactory.id;
 
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.Station;
 
 class StreetIndexTest {
 
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
-  private final RegularStop stop = testModel.stop("A").build();
+  private final FeedScopedId STOP_ID = id("A");
   private final TransitStopVertex stopVertex = TransitStopVertex.of()
-    .withId(stop.getId())
-    .withPoint(stop.getGeometry())
+    .withId(STOP_ID)
+    .withPoint(GeometryUtils.getGeometryFactory().createPoint(new Coordinate(0, 0)))
     .build();
-  private final Station station = testModel
-    .station("OMEGA")
-    .withShouldRouteToCentroid(true)
-    .build();
+  private final FeedScopedId STATION_ID = id("OMEGA");
   private final StationCentroidVertex centroidVertex = new StationCentroidVertex(
-    station.getId(),
-    station.getName(),
-    station.getCoordinate()
+    STATION_ID,
+    I18NString.of(STATION_ID.getId()),
+    WgsCoordinate.GREENWICH
   );
 
   @Test
   void stopId() {
     var streetIndex = buildIndex();
-    assertThat(streetIndex.findStopVertex(stop.getId())).hasValue(stopVertex);
+    assertThat(streetIndex.findStopVertex(STOP_ID)).hasValue(stopVertex);
   }
 
   @Test
@@ -43,7 +41,7 @@ class StreetIndexTest {
   @Test
   void stationCentroid() {
     var streetIndex = buildIndex();
-    assertThat(streetIndex.findStationCentroidVertex(station.getId())).hasValue(centroidVertex);
+    assertThat(streetIndex.findStationCentroidVertex(STATION_ID)).hasValue(centroidVertex);
   }
 
   private StreetIndex buildIndex() {

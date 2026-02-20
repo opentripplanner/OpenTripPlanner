@@ -11,8 +11,8 @@ import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.street.graph.Graph;
 
 class BoardingLocationTest {
 

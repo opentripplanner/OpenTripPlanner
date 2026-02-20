@@ -20,10 +20,10 @@ import org.opentripplanner.model.plan.walkstep.verticaltransportation.EscalatorU
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.StairsUse;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUseFactory;
 import org.opentripplanner.routing.graphfinder.EntranceResolver;
-import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.geometry.DirectionUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;

@@ -34,6 +34,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transfer.regular.TransferRepository;

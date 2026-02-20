@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;

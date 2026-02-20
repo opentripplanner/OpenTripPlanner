@@ -15,7 +15,7 @@ import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.AWSCredentials;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

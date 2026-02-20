@@ -11,7 +11,7 @@ import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 

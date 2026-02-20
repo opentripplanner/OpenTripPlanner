@@ -13,7 +13,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

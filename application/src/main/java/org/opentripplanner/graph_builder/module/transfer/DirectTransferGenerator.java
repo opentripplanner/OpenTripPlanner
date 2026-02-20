@@ -23,8 +23,8 @@ import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbySt
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.transfer.filter.PatternConsideringNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;

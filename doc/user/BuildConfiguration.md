@@ -593,7 +593,7 @@ The date is inclusive. If set, any transit service on a day AFTER the given date
 will not be part of the graph. Use an absolute date or a period relative to the date the graph is
 build(BUILD_DAY).
 
-Use an empty string to make it unbounded.
+To get an effectively unbounded value, use a very large period like `"P100Y"`.
 
 
 <h3 id="transitServiceStart">transitServiceStart</h3>
@@ -609,7 +609,7 @@ The date is inclusive. If set, any transit service on a day BEFORE the given dat
 will not be part of the graph. Use an absolute date or a period relative to the date the graph is
 build(BUILD_DAY).
 
-Use an empty string to make unbounded.
+To get an effectively unbounded value, use a very large period like `"-P100Y"`.
 
 
 <h3 id="writeCachedElevations">writeCachedElevations</h3>

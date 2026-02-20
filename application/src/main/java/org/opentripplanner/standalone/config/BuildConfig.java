@@ -414,7 +414,7 @@ public class BuildConfig implements OtpDataStoreConfig {
           will not be part of the graph. Use an absolute date or a period relative to the date the graph is
           build(BUILD_DAY).
 
-          Use an empty string to make unbounded.
+          To get an effectively unbounded value, use a very large period like `"-P100Y"`.
           """
         )
         .asDateOrRelativePeriod("-P1Y", confZone);
@@ -430,7 +430,7 @@ public class BuildConfig implements OtpDataStoreConfig {
           will not be part of the graph. Use an absolute date or a period relative to the date the graph is
           build(BUILD_DAY).
 
-          Use an empty string to make it unbounded.
+          To get an effectively unbounded value, use a very large period like `"P100Y"`.
           """
         )
         .asDateOrRelativePeriod("P3Y", confZone);

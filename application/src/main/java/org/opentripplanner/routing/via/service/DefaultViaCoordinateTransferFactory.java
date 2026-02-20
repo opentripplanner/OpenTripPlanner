@@ -9,11 +9,11 @@ import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbySt
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.TransitServiceResolver;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.service.TransitService;
 

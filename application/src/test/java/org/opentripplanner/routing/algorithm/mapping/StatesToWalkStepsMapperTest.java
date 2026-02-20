@@ -22,10 +22,10 @@ import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.ElevatorUse;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.EscalatorUse;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.StairsUse;
-import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model.site.Entrance;
 

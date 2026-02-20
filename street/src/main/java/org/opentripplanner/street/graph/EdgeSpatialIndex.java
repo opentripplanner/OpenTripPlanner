@@ -1,9 +1,9 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.street.graph;
 
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.linking.Scope;
+import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.HashGridSpatialIndex;
 import org.opentripplanner.street.model.edge.Edge;
 

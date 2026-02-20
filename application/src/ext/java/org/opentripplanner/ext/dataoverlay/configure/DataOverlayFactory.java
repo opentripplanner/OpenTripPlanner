@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.GenericDataFile;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

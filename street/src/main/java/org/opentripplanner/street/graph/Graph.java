@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.street.graph;
 
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
@@ -15,10 +15,10 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.routing.linking.Scope;
-import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
 import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;

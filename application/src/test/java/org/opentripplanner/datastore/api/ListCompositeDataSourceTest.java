@@ -70,6 +70,6 @@ class ListCompositeDataSourceTest {
   }
 
   private String replaceHash(String name) {
-    return name.replaceAll("\\d{6,}", "NNN");
+    return name.replaceAll("-?\\d+", "NNN");
   }
 }

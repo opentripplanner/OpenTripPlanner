@@ -15,7 +15,7 @@ import org.geotools.api.coverage.Coverage;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

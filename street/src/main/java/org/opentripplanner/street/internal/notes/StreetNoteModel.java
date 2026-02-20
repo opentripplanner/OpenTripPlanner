@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.services.notes;
+package org.opentripplanner.street.internal.notes;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;

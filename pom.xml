@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>242</otp.serialization.version.id>
+        <otp.serialization.version.id>243</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>34.2</geotools.version>

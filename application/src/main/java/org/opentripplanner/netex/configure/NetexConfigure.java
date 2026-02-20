@@ -11,10 +11,10 @@ import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
