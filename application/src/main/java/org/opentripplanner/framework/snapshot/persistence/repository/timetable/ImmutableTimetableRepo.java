@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.snapshot.persistence.timetable;
+package org.opentripplanner.framework.snapshot.persistence.repository.timetable;
 
 import jakarta.ws.rs.NotSupportedException;
 import org.opentripplanner.framework.snapshot.domain.timetable.TimetableRepo;

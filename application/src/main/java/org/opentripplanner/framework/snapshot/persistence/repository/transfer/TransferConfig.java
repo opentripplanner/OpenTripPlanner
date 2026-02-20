@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.snapshot.persistence.transfer;
+package org.opentripplanner.framework.snapshot.persistence.repository.transfer;
 
 public class TransferConfig {
 

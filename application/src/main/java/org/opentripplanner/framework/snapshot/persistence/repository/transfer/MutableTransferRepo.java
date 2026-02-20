@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.snapshot.persistence.transfer;
+package org.opentripplanner.framework.snapshot.persistence.repository.transfer;
 
 import org.opentripplanner.framework.snapshot.domain.world.NewStopUsedByTripPattern;
 import org.opentripplanner.framework.snapshot.domain.transfer.TransferRepo;

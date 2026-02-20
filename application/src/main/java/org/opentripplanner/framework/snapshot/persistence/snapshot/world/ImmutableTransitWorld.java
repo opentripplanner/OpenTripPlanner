@@ -1,8 +1,8 @@
-package org.opentripplanner.framework.snapshot.persistence.world;
+package org.opentripplanner.framework.snapshot.persistence.snapshot.world;
 
 import org.opentripplanner.framework.snapshot.domain.world.TransitWorld;
-import org.opentripplanner.framework.snapshot.persistence.timetable.ImmutableTimetableRepo;
-import org.opentripplanner.framework.snapshot.persistence.transfer.ImmutableTransferRepo;
+import org.opentripplanner.framework.snapshot.persistence.repository.timetable.ImmutableTimetableRepo;
+import org.opentripplanner.framework.snapshot.persistence.repository.transfer.ImmutableTransferRepo;
 
 public class ImmutableTransitWorld implements TransitWorld {
 

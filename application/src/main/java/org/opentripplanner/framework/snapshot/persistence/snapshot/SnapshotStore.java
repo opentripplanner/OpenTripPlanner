@@ -1,7 +1,7 @@
 package org.opentripplanner.framework.snapshot.persistence.snapshot;
 
 import java.util.concurrent.atomic.AtomicReference;
-import org.opentripplanner.framework.snapshot.persistence.world.ImmutableTransitWorld;
+import org.opentripplanner.framework.snapshot.persistence.snapshot.world.ImmutableTransitWorld;
 
 public class SnapshotStore {
 
