@@ -9,7 +9,8 @@ public class VertexLinkerTestFactory {
     return new VertexLinker(
       graph,
       VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES,
-      StreetConstants.DEFAULT_MAX_AREA_NODES
+      StreetConstants.DEFAULT_MAX_AREA_NODES,
+      true
     );
   }
 }

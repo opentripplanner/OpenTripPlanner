@@ -3,6 +3,7 @@ package org.opentripplanner.routing.linking.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.VisibilityMode;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -21,6 +22,6 @@ public class VertexLinkerGraphBuildingModule {
   @Singleton
   static VertexLinker linker(Graph graph, BuildConfig config) {
     var mode = VisibilityMode.ofBoolean(config.areaVisibility);
-    return new VertexLinker(graph, mode, config.maxAreaNodes);
+    return new VertexLinker(graph, mode, config.maxAreaNodes, OTPFeature.FlexRouting.isOn());
   }
 }

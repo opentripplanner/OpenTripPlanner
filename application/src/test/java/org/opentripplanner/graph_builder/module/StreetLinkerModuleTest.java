@@ -229,7 +229,7 @@ class StreetLinkerModuleTest {
 
       module = new StreetLinkerModule(
         graph,
-        new VertexLinker(graph, TRAVERSE_AREA_EDGES, 0),
+        new VertexLinker(graph, TRAVERSE_AREA_EDGES, 0, false),
         new DefaultVehicleParkingRepository(),
         timetableRepository,
         DataImportIssueStore.NOOP

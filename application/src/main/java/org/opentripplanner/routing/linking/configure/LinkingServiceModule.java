@@ -5,6 +5,7 @@ import static org.opentripplanner.routing.linking.VisibilityMode.COMPUTE_AREA_VI
 import dagger.Module;
 import dagger.Provides;
 import java.util.Optional;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -23,7 +24,8 @@ public class LinkingServiceModule {
     return new VertexLinker(
       graph,
       COMPUTE_AREA_VISIBILITY_LINES,
-      streetLimitationParametersService.maxAreaNodes()
+      streetLimitationParametersService.maxAreaNodes(),
+      OTPFeature.FlexRouting.isOn()
     );
   }
 

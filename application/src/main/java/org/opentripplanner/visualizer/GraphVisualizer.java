@@ -524,7 +524,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
           new VertexLinker(
             graph,
             VisibilityMode.TRAVERSE_AREA_EDGES,
-            StreetConstants.DEFAULT_MAX_AREA_NODES
+            StreetConstants.DEFAULT_MAX_AREA_NODES,
+            true
           )
         )
       );

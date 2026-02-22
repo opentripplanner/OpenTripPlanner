@@ -17,7 +17,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
@@ -98,16 +97,23 @@ public class VertexLinker {
 
   private final VisibilityMode visibilityMode;
   private final int maxAreaNodes;
+  private final boolean shouldLinkFlex;
 
   /**
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
    * given time.
    */
-  public VertexLinker(Graph graph, VisibilityMode visibilityMode, int maxAreaNodes) {
+  public VertexLinker(
+    Graph graph,
+    VisibilityMode visibilityMode,
+    int maxAreaNodes,
+    boolean linkFlex
+  ) {
     this.graph = Objects.requireNonNull(graph);
     this.vertexFactory = new VertexFactory(graph);
     this.visibilityMode = Objects.requireNonNull(visibilityMode);
     this.maxAreaNodes = maxAreaNodes;
+    this.shouldLinkFlex = linkFlex;
   }
 
   public void linkVertexPermanently(
@@ -437,7 +443,7 @@ public class VertexLinker {
       start = split;
     }
 
-    if (OTPFeature.FlexRouting.isOn()) {
+    if (shouldLinkFlex) {
       var areaStops = Stream.concat(start.getIncoming().stream(), start.getOutgoing().stream())
         .flatMap(e ->
           Stream.concat(

@@ -459,7 +459,12 @@ public class PlatformLinkingTest {
   }
 
   private void linkStops(GraphDataFetcher graph, int maxAreaNodes, boolean permanent) {
-    var linker = new VertexLinker(graph.graph(), COMPUTE_AREA_VISIBILITY_LINES, maxAreaNodes);
+    var linker = new VertexLinker(
+      graph.graph(),
+      COMPUTE_AREA_VISIBILITY_LINES,
+      maxAreaNodes,
+      false
+    );
     for (TransitStopVertex tStop : graph.listStopVertices()) {
       if (permanent) {
         linker.linkVertexPermanently(
