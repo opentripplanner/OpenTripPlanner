@@ -54,7 +54,7 @@ public final class FareTransferRule implements Serializable {
   }
 
   /**
-   * Returns true if there is no limit on the number of transfers.
+   * Returns true if there is no limit on the number of transfers or if limit unknown.
    */
   public boolean unlimitedTransfers() {
     return transferCount == UNLIMITED_TRANSFERS;
