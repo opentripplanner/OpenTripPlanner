@@ -110,6 +110,17 @@ class FareTransferRuleMapperTest {
   }
 
   @Test
+  void explicitUnlimitedTransfer() {
+    var rule = new FareTransferRule();
+    rule.setFromLegGroupId(groupId1);
+    rule.setToLegGroupId(groupId2);
+    rule.setTransferCount(-1);
+
+    var transferRule = map(fareProduct(), rule);
+    assertTrue(transferRule.unlimitedTransfers());
+  }
+
+  @Test
   void transferCount() {
     var rule = new FareTransferRule();
     rule.setFromLegGroupId(groupId1);
