@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public final class FareTransferRule implements Serializable {
@@ -33,7 +34,11 @@ public final class FareTransferRule implements Serializable {
     this.fareProducts = List.copyOf(b.fareProducts());
     this.fromLegGroup = b.fromLegGroup();
     this.toLegGroup = b.toLegGroup();
-    this.transferCount = b.transferCount();
+    this.transferCount = IntUtils.requireInRange(
+      b.transferCount(),
+      UNLIMITED_TRANSFERS,
+      Integer.MAX_VALUE
+    );
     this.timeLimit = b.timeLimit();
   }
 

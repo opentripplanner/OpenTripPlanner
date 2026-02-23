@@ -99,6 +99,37 @@ class FareTransferRuleMapperTest {
     assertTrue(transferRule.isFree());
   }
 
+  @Test
+  void defaultTransferCount() {
+    var rule = new FareTransferRule();
+    rule.setFromLegGroupId(groupId1);
+    rule.setToLegGroupId(groupId2);
+
+    var transferRule = map(fareProduct(), rule);
+    assertTrue(transferRule.unlimitedTransfers());
+  }
+
+  @Test
+  void transferCount() {
+    var rule = new FareTransferRule();
+    rule.setFromLegGroupId(groupId1);
+    rule.setToLegGroupId(groupId2);
+    rule.setTransferCount(2);
+
+    var transferRule = map(fareProduct(), rule);
+    assertFalse(transferRule.unlimitedTransfers());
+  }
+
+  @Test
+  void invalidTransferCount() {
+    var rule = new FareTransferRule();
+    rule.setFromLegGroupId(groupId1);
+    rule.setToLegGroupId(groupId2);
+    rule.setTransferCount(-2);
+
+    assertThrows(IllegalArgumentException.class, () -> map(fareProduct(), rule));
+  }
+
   private FareProduct fareProduct() {
     var fareProduct = new FareProduct();
     fareProduct.setId(id);
