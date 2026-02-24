@@ -136,11 +136,13 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   static Stream<Arguments> banningCases() {
     return Stream.of(
       of(Map.of(), "[ALL]"),
+      of(Map.of("routes", ""), "[ALL]"),
+      of(Map.of("agencies", ""), "[ALL]"),
+      of(Map.of("agencies", "", "routes", ""), "[ALL]"),
       of(
         Map.of("routes", "trimet:555"),
         "[(not: [(transportModes: EMPTY, routes: [trimet:555])])]"
       ),
-      of(Map.of("agencies", ""), "[(not: [(transportModes: EMPTY)])]"),
       of(
         Map.of("agencies", "trimet:666"),
         "[(not: [(transportModes: EMPTY, agencies: [trimet:666])])]"
@@ -195,7 +197,8 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       Arguments.of("F:t1", List.of(TRIP_ID_1)),
       Arguments.of("F:t1,F:t2", List.of(TRIP_ID_1, TRIP_ID_2)),
       Arguments.of("F:t1, F:t2", List.of(TRIP_ID_1, TRIP_ID_2)),
-      Arguments.of(",F:t1, F:t2,", List.of(TRIP_ID_1, TRIP_ID_2))
+      Arguments.of(",F:t1, F:t2,", List.of(TRIP_ID_1, TRIP_ID_2)),
+      Arguments.of("", List.of())
     );
   }
 
