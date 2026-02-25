@@ -2,11 +2,14 @@ package org.opentripplanner.ext.carpooling.internal;
 
 import java.time.Duration;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
+import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
@@ -163,5 +166,39 @@ public class CarpoolItineraryMapper {
     return Itinerary.ofDirect(List.of(carpoolLeg))
       .withGeneralizedCost(Cost.costOfSeconds(carpoolLeg.generalizedCost()))
       .build();
+  }
+
+  public Itinerary toItinerary(
+    CarpoolAccessEgress accessEgress,
+    ZonedDateTime transitSearchTimeZero
+  ) {
+    var segments = accessEgress.getSegments();
+    var allEdges = segments
+      .stream()
+      .flatMap(seg -> seg.edges.stream())
+      .toList();
+    var startTime = transitSearchTimeZero.plusSeconds(accessEgress.getStartOfTrip());
+    var endTime = transitSearchTimeZero.plusSeconds(accessEgress.getEndOfTrip());
+    var fromVertex = segments.getFirst().states.getFirst().getVertex();
+    var toVertex = segments.getLast().states.getLast().getVertex();
+    LineString geometry = GeometryUtils.concatenateLineStrings(allEdges, Edge::getGeometry);
+    var cost = accessEgress.getTotalWeight();
+
+    var carpoolLeg = CarpoolLeg.of()
+      .withStartTime(startTime)
+      .withEndTime(endTime)
+      .withFrom(Place.normal(fromVertex, new NonLocalizedString("Carpool boarding")))
+      .withTo(Place.normal(toVertex, new NonLocalizedString("Carpool alighting")))
+      .withGeometry(GeometryUtils.concatenateLineStrings(allEdges, Edge::getGeometry))
+      .withDistanceMeters(allEdges.stream().mapToDouble(Edge::getDistanceMeters).sum())
+      .withGeneralizedCost((int) cost)
+      .withGeometry(geometry)
+      .build();
+
+    var itinerary = Itinerary.ofDirect(List.of(carpoolLeg))
+      .withGeneralizedCost(Cost.costOfSeconds(carpoolLeg.generalizedCost()))
+      .build();
+
+    return itinerary;
   }
 }

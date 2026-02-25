@@ -70,7 +70,7 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
    * times; like street modes, it uses private vehicles traveling on the road network. This street
    * mode is the input for requesting carpool routing, while the transit mode appears in responses.
    */
-  CARPOOL(Feature.WALKING, Feature.DRIVING, Feature.PICKUP),
+  CARPOOL(Feature.DRIVING, Feature.PICKUP, Feature.ACCESS, Feature.EGRESS),
 
   /**
    * Encompasses all types of on-demand and flexible transportation.

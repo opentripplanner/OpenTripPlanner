@@ -307,7 +307,8 @@ public class RoutingWorker {
         transitSearchTimeZero,
         additionalSearchDays,
         debugTimingAggregator,
-        linkingContext()
+        linkingContext(),
+        serverContext.carpoolingService()
       );
       raptorSearchParamsUsed = transitResults.getSearchParams();
       var itineraries = transitResults.getItineraries();

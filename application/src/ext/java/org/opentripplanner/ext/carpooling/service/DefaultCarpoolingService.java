@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling.service;
 
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -10,14 +11,18 @@ import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
 import org.opentripplanner.ext.carpooling.filter.FilterChain;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
+import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.CarpoolStreetRouter;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.ext.carpooling.routing.InsertionEvaluator;
 import org.opentripplanner.ext.carpooling.routing.InsertionPosition;
 import org.opentripplanner.ext.carpooling.routing.InsertionPositionFinder;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
+import org.opentripplanner.graph_builder.module.nearbystops.StopResolver;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -220,6 +225,18 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
     LOG.info("Returning {} carpool itineraries", itineraries.size());
     return itineraries;
+  }
+
+  @Override
+  public List<CarpoolAccessEgress> routeAccessEgress(
+    RouteRequest request,
+    StreetRequest streetRequest,
+    AccessEgressType accessOrEgress,
+    StopResolver stopResolver,
+    LinkingContext linkingContext,
+    ZonedDateTime transitSearchTimeZero
+  ) {
+    return List.of();
   }
 
   private void validateRequest(RouteRequest request) throws RoutingValidationException {

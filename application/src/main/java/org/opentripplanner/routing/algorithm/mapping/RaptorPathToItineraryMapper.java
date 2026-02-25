@@ -10,6 +10,8 @@ import java.util.Objects;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
+import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.GenericLocation;
@@ -110,7 +112,20 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     var accessPathLeg = Objects.requireNonNull(path.accessLeg());
     // Map access leg
-    List<Leg> legs = new ArrayList<>(mapAccessLeg(accessPathLeg));
+    List<Leg> legs = new ArrayList<>();
+
+    CarpoolItineraryMapper carpoolItineraryMapper = new CarpoolItineraryMapper(
+      transitService.getTimeZone()
+    );
+    if (accessPathLeg.access() instanceof CarpoolAccessEgress) {
+      legs.addAll(
+        carpoolItineraryMapper
+          .toItinerary((CarpoolAccessEgress) accessPathLeg.access(), transitSearchTimeZero)
+          .legs()
+      );
+    } else {
+      legs.addAll(mapAccessLeg(accessPathLeg));
+    }
 
     PathLeg<T> pathLeg = path.accessLeg().nextLeg();
 
@@ -147,7 +162,12 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     // Map egress leg
     EgressPathLeg<T> egressPathLeg = pathLeg.asEgressLeg();
-    Itinerary mapped = mapEgressLeg(egressPathLeg);
+    Itinerary mapped = egressPathLeg.egress() instanceof CarpoolAccessEgress
+      ? carpoolItineraryMapper.toItinerary(
+          (CarpoolAccessEgress) egressPathLeg.egress(),
+          transitSearchTimeZero
+        )
+      : mapEgressLeg(egressPathLeg);
     legs.addAll(mapped == null ? List.of() : mapped.legs());
 
     var generalizedCost = Cost.costOfCentiSeconds(path.c1()).normalize();
