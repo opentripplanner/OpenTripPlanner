@@ -217,6 +217,20 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   }
 
   @Test
+  void emptyStringBanning() {
+    Map<String, Object> arguments = decorateWithRequiredParams(
+      Map.of("banned", Map.of("trips", "", "agencies", "", "routes", ""))
+    );
+
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      CONTEXT
+    );
+    assertThat(routeRequest.journey().transit().bannedTrips()).isEmpty();
+    assertEquals("[ALL]", routeRequest.journey().transit().filters().toString());
+  }
+
+  @Test
   void defaultBikeOptimize() {
     Map<String, Object> arguments = decorateWithRequiredParams(Map.of());
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
