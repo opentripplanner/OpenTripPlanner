@@ -154,7 +154,7 @@ public class TransitRouter {
     // Transit routing using Raptor
     var raptorService = new RaptorService<>(
       serverContext.raptorConfig(),
-      createExtraMcRouterSearch(accessEgresses, raptorTransitData)
+      createExtraMcRouterSearchForSorlandsbanen(accessEgresses, raptorTransitData)
     );
     var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
 
@@ -413,10 +413,11 @@ public class TransitRouter {
   }
 
   /**
-   * An optional factory for creating a decorator around the multi-criteria RangeRaptor instance.
+   * An optional factory for creating a decorator around the multi-criteria RangeRaptor instance,
+   * specifically for the Sorlandsbanen OTP feature.
    */
   @Nullable
-  private ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(
+  private ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearchForSorlandsbanen(
     AccessEgresses accessEgresses,
     RaptorTransitData raptorTransitData
   ) {
