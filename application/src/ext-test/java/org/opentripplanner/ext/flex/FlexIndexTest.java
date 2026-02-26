@@ -44,7 +44,6 @@ class FlexIndexTest {
     assertEquals(1, tripsOnServiceDate.size(), "Should have 1 trip on service date");
     FlexTripForDate ftfd1 = tripsOnServiceDate.iterator().next();
     assertEquals(serviceDate, ftfd1.serviceDate());
-    assertEquals(serviceDate, ftfd1.startOfRunningPeriod());
     assertEquals(nextDay, ftfd1.endOfRunningPeriod());
     assertEquals(flexTrip, ftfd1.flexTrip());
 
@@ -52,7 +51,6 @@ class FlexIndexTest {
     assertEquals(1, tripsOnNextDay.size(), "Should have 1 trip on next day");
     FlexTripForDate ftfd2 = tripsOnNextDay.iterator().next();
     assertEquals(serviceDate, ftfd2.serviceDate());
-    assertEquals(serviceDate, ftfd2.startOfRunningPeriod());
     assertEquals(nextDay, ftfd2.endOfRunningPeriod());
     assertEquals(flexTrip, ftfd2.flexTrip());
 
@@ -83,10 +81,9 @@ class FlexIndexTest {
 
     FlexIndex index = new FlexIndex(repo);
 
-    assertTrue(
-      index.getFlexTripsForRunningDate(serviceDate).isEmpty(),
-      "Should have no trips on service date"
-    );
+    Collection<FlexTripForDate> tripsOnServiceDay = index.getFlexTripsForRunningDate(serviceDate);
+    assertEquals(1, tripsOnServiceDay.size(), "Should have 1 trip on service day");
+    assertEquals(serviceDate, tripsOnServiceDay.iterator().next().serviceDate());
 
     LocalDate nextDay = serviceDate.plusDays(1);
     Collection<FlexTripForDate> tripsOnNextDay = index.getFlexTripsForRunningDate(nextDay);

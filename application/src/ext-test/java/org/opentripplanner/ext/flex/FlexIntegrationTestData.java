@@ -3,7 +3,9 @@ package org.opentripplanner.ext.flex;
 import static graphql.Assert.assertTrue;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.core.model.time.LocalDateInterval;
@@ -25,27 +27,22 @@ public final class FlexIntegrationTestData {
   private static final File ASPEN_GTFS = RES.file("aspen-flex-on-demand.gtfs");
   static final File COBB_BUS_30_GTFS = RES.file("cobblinc-bus-30-only.gtfs.zip");
   static final File COBB_FLEX_GTFS = RES.file("cobblinc-scheduled-deviated-flex.gtfs");
-  static final File COBB_OSM = RES.file("cobb-county.filtered.osm.pbf");
+  private static final File COBB_OSM = RES.file("cobb-county.filtered.osm.pbf");
   static final File MARTA_BUS_856_GTFS = RES.file("marta-bus-856-only.gtfs.zip");
-  static final File MIDNIGHT_FLEX_GTFS = RES.file("midnight-flex.gtfs");
 
   public static TestOtpModel aspenGtfs() {
-    return buildFlexOnlyGraph(ASPEN_GTFS);
+    return buildFlexGraph(ASPEN_GTFS);
   }
 
   public static TestOtpModel cobbFlexGtfs() {
-    return buildFlexOnlyGraph(COBB_FLEX_GTFS);
+    return buildFlexGraph(COBB_FLEX_GTFS);
   }
 
   public static TestOtpModel cobbOsm() {
     return ConstantsForTests.buildOsmGraph(COBB_OSM);
   }
 
-  public static TestOtpModel midnightFlexGtfs() {
-    return buildFlexOnlyGraph(MIDNIGHT_FLEX_GTFS);
-  }
-
-  static TestOtpModel buildFlexOnlyGraph(File file) {
+  private static TestOtpModel buildFlexGraph(File file) {
     var graph = new Graph();
     var timetableRepository = new TimetableRepository(new SiteRepository());
     GtfsBundle gtfsBundle = GtfsBundleTestFactory.forTest(file);
@@ -53,13 +50,13 @@ public final class FlexIntegrationTestData {
       List.of(gtfsBundle),
       timetableRepository,
       graph,
-      LocalDateInterval.unbounded()
+      new LocalDateInterval(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1))
     );
-    OTPFeature.FlexRouting.testOn(() -> {
-      module.buildGraph();
-      timetableRepository.index();
-      graph.index();
-    });
+    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
+    module.buildGraph();
+    timetableRepository.index();
+    graph.index();
+    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
     assertTrue(timetableRepository.hasFlexTrips());
     return new TestOtpModel(graph, timetableRepository, TransferServiceTestFactory.withFlex());
   }

@@ -60,7 +60,7 @@ public class FlexRouter {
   /* Request data */
   private final ZonedDateTime startOfTime;
   private final int requestedTime;
-  private final Instant requestedBookingTime;
+  private final int requestedBookingTime;
   private final List<FlexServiceDate> dates;
   private final Matcher<Trip> matcher;
 
@@ -117,8 +117,11 @@ public class FlexRouter {
     LocalDate searchDate = LocalDate.ofInstant(requestedTime, tz);
     this.startOfTime = ServiceDateUtils.asStartOfService(searchDate, tz);
     this.requestedTime = ServiceDateUtils.secondsSinceStartOfTime(startOfTime, requestedTime);
-    this.requestedBookingTime = requestedBookingTime;
+    this.requestedBookingTime = requestedBookingTime == null
+      ? RoutingBookingInfo.NOT_SET
+      : ServiceDateUtils.secondsSinceStartOfTime(startOfTime, requestedBookingTime);
     this.dates = createFlexServiceDates(
+      matcher,
       transitService,
       additionalPastSearchDays,
       additionalFutureSearchDays,
@@ -174,6 +177,7 @@ public class FlexRouter {
   }
 
   private List<FlexServiceDate> createFlexServiceDates(
+    Matcher<Trip> matcher,
     TransitService transitService,
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
@@ -186,6 +190,8 @@ public class FlexRouter {
       transitService
         .getFlexIndex()
         .getFlexTripsForRunningDate(date)
+        .stream()
+        .filter(flexTripForDate -> matcher.match(flexTripForDate.flexTrip().getTrip()))
         .forEach(flexTripForDate -> {
           flexTripsForServiceDate
             .computeIfAbsent(flexTripForDate.serviceDate(), k -> new ArrayList<>())
@@ -197,33 +203,24 @@ public class FlexRouter {
       .entrySet()
       .stream()
       .map(entry -> {
-        LocalDate serviceDate = entry.getKey();
-        int requestedBookingTimeRelativeToServiceDate;
-        if (requestedBookingTime == null) {
-          requestedBookingTimeRelativeToServiceDate = RoutingBookingInfo.NOT_SET;
-        } else {
-          ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
-            serviceDate,
-            startOfTime.getZone()
-          );
-          requestedBookingTimeRelativeToServiceDate = ServiceDateUtils.secondsSinceStartOfTime(
-            startOfService,
-            requestedBookingTime
-          );
-        }
+        var serviceDate = entry.getKey();
         return new FlexServiceDate(
           serviceDate,
           ServiceDateUtils.secondsSinceStartOfTime(startOfTime, serviceDate),
-          requestedBookingTimeRelativeToServiceDate,
+          requestedBookingTime,
           entry.getValue()
         );
       })
       .toList();
   }
 
+  Collection<FlexServiceDate> flexServiceDates() {
+    return dates;
+  }
+
   /**
-   * This class work as an adaptor around OTP services. This allows us to pass in this instance and
-   * not the implementations (graph, transitService, flexIndex). We can easily mock this in
+   * This class work as an adaptor around OTP services. This allows us to pass in this instance
+   * and not the implementations (graph, transitService, flexIndex). We can easily mock this in
    * unit-tests. This also serves as documentation of which services the flex access/egress
    * generation logic needs.
    */

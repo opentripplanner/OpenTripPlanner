@@ -1,3 +1,0 @@
-stop_id,stop_name,stop_lat,stop_lon
-A,Stop A,44.997000,9.010000
-B,Stop B,45.032000,9.023000

@@ -2,7 +2,6 @@ package org.opentripplanner.ext.flex;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,25 +39,14 @@ public class FlexIndex {
         }
       }
 
-      int earliestDepartureTime = flexTrip.earliestDepartureTime();
-      int latestArrivalTime = flexTrip.latestArrivalTime();
-      long minDatePlusDays = Duration.ofSeconds(earliestDepartureTime).toDays();
-      long maxDatePlusDays = Duration.ofSeconds(latestArrivalTime).toDays();
-
       timetableRepository
         .getCalendarService()
         .getServiceDatesForServiceId(flexTrip.getTrip().getServiceId())
         .forEach(serviceDate -> {
-          LocalDate minDate = serviceDate.plusDays(minDatePlusDays);
-          LocalDate maxDate = serviceDate.plusDays(maxDatePlusDays);
-          FlexTripForDate flexTripForDate = new FlexTripForDate(
-            serviceDate,
-            minDate,
-            maxDate,
-            flexTrip
-          );
+          LocalDate maxDate = serviceDate.plusDays(flexTrip.maxSpanDays());
+          FlexTripForDate flexTripForDate = new FlexTripForDate(serviceDate, maxDate, flexTrip);
 
-          minDate
+          serviceDate
             .datesUntil(maxDate.plusDays(1))
             .forEach(runningDate -> {
               flexTripsRunningOnDate

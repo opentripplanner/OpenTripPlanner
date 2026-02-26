@@ -1,2 +1,0 @@
-booking_rule_id,booking_type,prior_notice_duration_min
-BR1,1,30

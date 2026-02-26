@@ -3,6 +3,7 @@ package org.opentripplanner.ext.flex.trip;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +30,8 @@ public class ScheduledDeviatedTrip
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
+  private final long maxSpanDays;
+
   ScheduledDeviatedTrip(ScheduledDeviatedTripBuilder builder) {
     super(builder);
     List<StopTime> stopTimes = builder.stopTimes();
@@ -46,6 +49,13 @@ public class ScheduledDeviatedTrip
       this.dropOffBookingInfos[i] = stopTimes.get(i).getDropOffBookingInfo();
       this.pickupBookingInfos[i] = stopTimes.get(i).getPickupBookingInfo();
     }
+
+    var latestArrivalTime = Arrays.stream(this.stopTimes)
+      .mapToInt(st -> st.arrivalTime)
+      .max()
+      .orElse(0);
+
+    this.maxSpanDays = Duration.ofSeconds(latestArrivalTime).toDays();
   }
 
   public static ScheduledDeviatedTripBuilder of(FeedScopedId id) {
@@ -80,14 +90,6 @@ public class ScheduledDeviatedTrip
   }
 
   @Override
-  public int earliestDepartureTime() {
-    return Arrays.stream(stopTimes)
-      .mapToInt(it -> it.departureTime)
-      .min()
-      .orElse(MISSING_VALUE);
-  }
-
-  @Override
   public int latestArrivalTime(
     int arrivalTime,
     int boardStopPosition,
@@ -107,11 +109,8 @@ public class ScheduledDeviatedTrip
   }
 
   @Override
-  public int latestArrivalTime() {
-    return Arrays.stream(stopTimes)
-      .mapToInt(it -> it.arrivalTime)
-      .max()
-      .orElse(MISSING_VALUE);
+  public long maxSpanDays() {
+    return maxSpanDays;
   }
 
   @Override

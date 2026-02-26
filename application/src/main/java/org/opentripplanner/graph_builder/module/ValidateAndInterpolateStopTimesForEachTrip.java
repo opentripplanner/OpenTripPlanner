@@ -238,9 +238,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
 
       // Interpolate, if necessary, the times of non-timepoint stops
       if (
-        !(st0.isDepartureTimeSet() && st0.isArrivalTimeSet()) &&
-        !FlexTrip.isFlexStop(st0.getStop()) &&
-        !st0.hasFlexWindow()
+        !(st0.isDepartureTimeSet() && st0.isArrivalTimeSet()) && !FlexTrip.isFlexStop(st0.getStop())
       ) {
         // figure out how many such stops there are in a row.
         int j;

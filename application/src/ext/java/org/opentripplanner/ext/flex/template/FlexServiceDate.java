@@ -37,10 +37,6 @@ public class FlexServiceDate {
     this.tripsRunning = new HashSet<>(tripsRunning);
   }
 
-  LocalDate serviceDate() {
-    return serviceDate;
-  }
-
   int secondsFromStartOfTime() {
     return secondsFromStartOfTime;
   }
@@ -50,6 +46,20 @@ public class FlexServiceDate {
    */
   int requestedBookingTime() {
     return requestedBookingTime;
+  }
+
+  /**
+   * Return the service date this {@code FlexServiceDate} corresponds to.
+   */
+  public LocalDate serviceDate() {
+    return serviceDate;
+  }
+
+  /**
+   * Return all trips running on the service date this {@code FlexServiceDate} corresponds to.
+   */
+  public Set<FlexTrip<?, ?>> tripsRunning() {
+    return tripsRunning;
   }
 
   /**

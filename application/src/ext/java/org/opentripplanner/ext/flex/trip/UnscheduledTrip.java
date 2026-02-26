@@ -2,6 +2,7 @@ package org.opentripplanner.ext.flex.trip;
 
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +41,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
+  private final long maxSpanDays;
 
   private final TimePenalty timePenalty;
 
@@ -61,6 +63,13 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       this.pickupBookingInfos[i] = stopTimes.get(i).getPickupBookingInfo();
     }
     this.timePenalty = Objects.requireNonNull(builder.timePenalty());
+
+    var latestArrivalTime = Arrays.stream(this.stopTimes)
+      .mapToInt(StopTimeWindow::end)
+      .max()
+      .orElse(0);
+    this.maxSpanDays = Duration.ofSeconds(latestArrivalTime).toDays();
+
     DurationUtils.requireNonNegative(timePenalty.constant());
     DoubleUtils.requireInRange(timePenalty.coefficient(), 0.05d, Double.MAX_VALUE);
   }
@@ -118,11 +127,6 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   @Override
-  public int earliestDepartureTime() {
-    return Arrays.stream(stopTimes).mapToInt(StopTimeWindow::start).min().orElse(MISSING_VALUE);
-  }
-
-  @Override
   public int latestArrivalTime(
     int requestedArrivalTime,
     int boardStopPosition,
@@ -151,8 +155,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   @Override
-  public int latestArrivalTime() {
-    return Arrays.stream(stopTimes).mapToInt(StopTimeWindow::end).max().orElse(MISSING_VALUE);
+  public long maxSpanDays() {
+    return maxSpanDays;
   }
 
   @Override

@@ -59,11 +59,6 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
   public abstract int earliestDepartureTime(int stopIndex);
 
   /**
-   * Earliest departure time from any stop position.
-   */
-  public abstract int earliestDepartureTime();
-
-  /**
    * Latest arrival time to alightStopPosition from boardStopPosition, which arrives before arrivalTime,
    * and for which the flex trip has a duration of flexTime seconds.
    *
@@ -84,9 +79,12 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
   public abstract int latestArrivalTime(int stopIndex);
 
   /**
-   * Latest arrival time to any stop position.
+   * The maximum number of whole days that this trip spans from its service date midnight to the
+   * latest arrival at any stop. For most trips this is zero(0) - all times are on the same
+   * service-day(operation day). For a nightbus which ends at 02:45+1d this is 1. For multi-day
+   * services like coastal ferries it can span several days.
    */
-  public abstract int latestArrivalTime();
+  public abstract long maxSpanDays();
 
   /**
    * Return number-of-stops this trip visit.

@@ -1,2 +1,0 @@
-agency_id,agency_name,agency_url,agency_timezone,agency_lang
-1,Flex Agency,http://example.com,Europe/Rome,en
