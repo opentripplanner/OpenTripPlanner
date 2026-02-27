@@ -105,21 +105,19 @@ public class GeometryUtils {
     LineString lineString,
     Coordinate endCoord
   ) {
-    Coordinate[] coordinates = new Coordinate[lineString.getCoordinates().length + 2];
-    coordinates[0] = startCoord;
-    for (int j = 0; j < lineString.getCoordinates().length; j++) {
-      coordinates[j + 1] = lineString.getCoordinates()[j];
-    }
-    coordinates[lineString.getCoordinates().length + 1] = endCoord;
-    return makeLineString(coordinates);
+    Coordinate[] c = lineString.getCoordinates();
+    Coordinate[] result = new Coordinate[c.length + 2];
+    result[0] = startCoord;
+    System.arraycopy(c, 0, result, 1, c.length);
+    result[c.length + 1] = endCoord;
+    return makeLineString(result);
   }
 
   public static LineString removeStartEndCoordinatesFromLineString(LineString lineString) {
-    Coordinate[] coordinates = new Coordinate[lineString.getCoordinates().length - 2];
-    for (int j = 1; j < lineString.getCoordinates().length - 1; j++) {
-      coordinates[j - 1] = lineString.getCoordinates()[j];
-    }
-    return makeLineString(coordinates);
+    Coordinate[] c = lineString.getCoordinates();
+    Coordinate[] result = new Coordinate[c.length - 2];
+    System.arraycopy(c, 1, result, 0, c.length - 2);
+    return makeLineString(result);
   }
 
   public static GeometryFactory getGeometryFactory() {
