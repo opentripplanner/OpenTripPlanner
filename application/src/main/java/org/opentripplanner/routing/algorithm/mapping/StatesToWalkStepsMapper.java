@@ -113,6 +113,13 @@ public class StatesToWalkStepsMapper {
     for (int i = 0; i < states.size() - 1; i++) {
       processState(states.get(i), states.get(i + 1));
     }
+    if (states.getLast().getVertex() instanceof StationEntranceVertex stationEntranceVertex) {
+      createAndSaveStationEntranceWalkStep(
+        states.get(states.size() - 2),
+        states.get(states.size() - 1),
+        stationEntranceVertex
+      );
+    }
 
     return steps.stream().map(WalkStepBuilder::build).toList();
   }
@@ -186,6 +193,11 @@ public class StatesToWalkStepsMapper {
       return;
     }
 
+    if (backState.getVertex() instanceof StationEntranceVertex stationEntranceVertex) {
+      createAndSaveStationEntranceWalkStep(backState, forwardState, stationEntranceVertex);
+      // Create a separate entrance step (do not return).
+    }
+
     // generate a step for getting off an elevator (all elevator narrative generation occurs
     // when alighting). We don't need to know what came before or will come after
     if (edge instanceof ElevatorAlightEdge elevatorAlightEdge) {
@@ -196,9 +208,6 @@ public class StatesToWalkStepsMapper {
       return;
     } else if (edge instanceof StreetEdge streetEdge && streetEdge.isStairs()) {
       createAndSaveStairsWalkStep(backState, forwardState, edge, geom);
-      return;
-    } else if (backState.getVertex() instanceof StationEntranceVertex stationEntranceVertex) {
-      createAndSaveStationEntranceWalkStep(backState, forwardState, stationEntranceVertex);
       return;
     } else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
       createAndSaveStep(
@@ -627,6 +636,8 @@ public class StatesToWalkStepsMapper {
         // station, since the doors might be between or inside stations.
         .withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
         .withEntrance(getEntrance(vertex))
+        .withDirectionText(I18NString.of("entrance"))
+        .withNameIsDerived(false)
     );
   }
 
