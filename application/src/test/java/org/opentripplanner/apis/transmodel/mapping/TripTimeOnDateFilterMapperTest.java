@@ -71,7 +71,12 @@ class TripTimeOnDateFilterMapperTest {
       argumentSet("emptySelectArray", list(map("select", list())), "[ALL]"),
       argumentSet("emptyNotArray", list(map("not", list())), "[ALL]"),
       argumentSet("emptySelectorInSelect", list(map("select", list(map()))), "[(select: [()])]"),
-      argumentSet("emptySelectorInNot", list(map("not", list(map()))), "[(not: [()])]")
+      argumentSet("emptySelectorInNot", list(map("not", list(map()))), "[(not: [()])]"),
+      argumentSet(
+        "emptySelectorInSelectAndNot",
+        list(map(entry("select", list(map())), entry("not", list(map())))),
+        "[(select: [()], not: [()])]"
+      )
     );
   }
 
