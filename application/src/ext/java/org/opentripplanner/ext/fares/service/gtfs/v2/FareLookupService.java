@@ -86,7 +86,7 @@ class FareLookupService implements Serializable {
       return Set.of();
     }
     return this.transferRules.stream()
-      .filter(FareTransferRule::unlimitedTransfers)
+      .filter(t -> t.allowsNumberOfTransfers(legs.size() - 1))
       .filter(FareTransferRule::isFree)
       .filter(r -> TimeLimitEvaluator.withinTimeLimit(r, legs.getFirst(), legs.getLast()))
       .flatMap(r -> findTransferMatches(r, legs).stream())
@@ -109,7 +109,11 @@ class FareLookupService implements Serializable {
    * Find fare offers for a specific pair of legs.
    */
   Set<LegOffer> findTransferOffersForSubLegs(TransitLeg head, List<TransitLeg> tail) {
+    // transfer count is all legs minus one, but that is the same length as the tail, so
+    // we just use that
+    int transferCount = tail.size();
     Set<TransferMatch> transfers = this.transferRules.stream()
+      .filter(t -> t.allowsNumberOfTransfers(transferCount))
       .flatMap(r -> {
         var fromRules = findFareLegRule(r.fromLegGroup());
         var toRules = findFareLegRule(r.toLegGroup());

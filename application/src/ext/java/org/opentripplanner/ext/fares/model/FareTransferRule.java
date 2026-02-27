@@ -60,6 +60,13 @@ public final class FareTransferRule implements Serializable {
     return transferCount == UNLIMITED_TRANSFERS;
   }
 
+  public boolean allowsNumberOfTransfers(int transferCount) {
+    if (unlimitedTransfers()) {
+      return true;
+    }
+    return this.transferCount >= transferCount;
+  }
+
   public FeedScopedId id() {
     return id;
   }
