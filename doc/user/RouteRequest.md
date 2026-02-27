@@ -456,6 +456,7 @@ The default values are
 - `car-pickup` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `car-rental` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `car-hailing` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
+- `carpool` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `flexible` = (timePenalty: 10m + 1.30 t, costFactor: 1.30)
 
 Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
