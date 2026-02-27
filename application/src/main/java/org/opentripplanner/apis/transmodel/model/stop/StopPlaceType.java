@@ -345,8 +345,7 @@ public class StopPlaceType {
               .description(
                 "A list of filters for which estimated calls should be included. " +
                   "An estimated call will be included if it matches with at least one filter. " +
-                  "An empty list of filters means that all estimated calls should be included. " +
-                  "If a search include this parameter, \"whiteListed\", & \"whiteListedModes\" filters will be ignored."
+                  "An empty list of filters means that all estimated calls should be included. "
               )
               .type(GraphQLList.list(new GraphQLNonNull(EstimatedCallFilterInputType.INPUT_TYPE)))
               .build()
@@ -379,17 +378,6 @@ public class StopPlaceType {
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idMapper);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
-            boolean hasLegacyFilters =
-              !whiteListed.authorityIds.isEmpty() ||
-              !whiteListed.lineIds.isEmpty() ||
-              (transitModes != null && !transitModes.isEmpty());
-
-            if (filtersInput != null && hasLegacyFilters) {
-              throw new IllegalArgumentException(
-                "The 'filters' parameter cannot be combined with 'whiteListed' or 'whiteListedModes'."
-              );
-            }
-
             var requestBuilder = TripTimeOnDateRequest.of(monoOrMultiModalStation.getChildStops())
               .withTime(startTime)
               .withTimeWindow(timeRange)
@@ -400,14 +388,13 @@ public class StopPlaceType {
             if (filtersInput != null) {
               var mapper = new TripTimeOnDateFilterMapper(idMapper);
               requestBuilder.withTransitFilters(mapper.mapFilters(filtersInput));
-            } else {
-              requestBuilder
-                .withIncludeAgencies(
-                  whiteListed.authorityIds.isEmpty() ? null : whiteListed.authorityIds
-                )
-                .withIncludeRoutes(whiteListed.lineIds.isEmpty() ? null : whiteListed.lineIds)
-                .withIncludeModes(transitModes);
             }
+            requestBuilder
+              .withIncludeAgencies(
+                whiteListed.authorityIds.isEmpty() ? null : whiteListed.authorityIds
+              )
+              .withIncludeRoutes(whiteListed.lineIds.isEmpty() ? null : whiteListed.lineIds)
+              .withIncludeModes(transitModes);
 
             var tripTimeOnDateStream = GqlUtil.getTransitService(environment)
               .findTripTimesOnDate(requestBuilder.build())
