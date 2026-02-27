@@ -211,7 +211,11 @@ public class SimpleIntersectionTraversalCalculator
     if (!(o instanceof SimpleIntersectionTraversalCalculator that)) {
       return false;
     }
-    return Double.compare(acrossTrafficBicycleTurnMultiplier, that.acrossTrafficBicycleTurnMultiplier) == 0 && drivingDirection == that.drivingDirection;
+    return (
+      Double.compare(acrossTrafficBicycleTurnMultiplier, that.acrossTrafficBicycleTurnMultiplier) ==
+        0 &&
+      drivingDirection == that.drivingDirection
+    );
   }
 
   @Override
