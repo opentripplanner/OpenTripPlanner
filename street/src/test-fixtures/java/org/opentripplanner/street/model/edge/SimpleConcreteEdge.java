@@ -19,5 +19,4 @@ public class SimpleConcreteEdge extends Edge {
   public State[] traverse(State s0) {
     return State.empty();
   }
-
-  }
+}

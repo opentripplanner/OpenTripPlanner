@@ -1,22 +1,18 @@
 package org.opentripplanner.routing.linking.internal;
 
 import java.util.List;
-import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,32 +34,24 @@ public class VertexCreationService {
    * Creates a temporary vertex from a coordinate and links it to the graph.
    *
    * @param container The container to add the temporary edges to
-   * @param coordinate The coordinate where the vertex should be created
-   * @param label Optional label for the vertex
-   * @param modes The traverse modes that should be available from this vertex
-   * @param type The type of location (origin, destination, or via)
+   * @param request   Contains the required information for creating the vertex and linking it to
+   *                  the graph.
    * @return The created vertex
    */
   public Vertex createVertexFromCoordinate(
     TemporaryVerticesContainer container,
-    Coordinate coordinate,
-    @Nullable String label,
-    List<TraverseMode> modes,
-    LocationType type
+    VertexCreationRequest request
   ) {
-    LOG.debug("Creating {} vertex for {}", type.description(), coordinate);
-
-    I18NString name = label == null || label.isEmpty()
-      ? new LocalizedString(type.translationKey())
-      : new NonLocalizedString(label);
-
-    var temporaryStreetLocation = new TemporaryStreetLocation(coordinate, name);
+    var temporaryStreetLocation = new TemporaryStreetLocation(
+      request.coordinate(),
+      request.label()
+    );
 
     var disposableEdgeCollection = vertexLinker.linkVertexForRequest(
       temporaryStreetLocation,
-      new TraverseModeSet(modes),
-      mapDirection(type),
-      (vertex, streetVertex) -> createEdges((TemporaryStreetLocation) vertex, streetVertex, type)
+      new TraverseModeSet(request.incomingModes()),
+      new TraverseModeSet(request.outgoingModes()),
+      TemporaryFreeEdge::createTemporaryFreeEdge
     );
     container.addEdgeCollection(disposableEdgeCollection);
 
@@ -71,51 +59,62 @@ public class VertexCreationService {
       temporaryStreetLocation.getIncoming().isEmpty() &&
       temporaryStreetLocation.getOutgoing().isEmpty()
     ) {
-      LOG.warn("Couldn't link {}", coordinate);
+      LOG.warn("Couldn't link {}", request.coordinate());
     }
 
     return temporaryStreetLocation;
   }
 
+  public static VertexCreationRequest createVertexCreationRequest(
+    GenericLocation location,
+    List<TraverseMode> modes,
+    LocationType type
+  ) {
+    var incomingModes = getIncomingModes(modes, type);
+    var outgoingModes = getOutgoingModes(modes, type);
+    var label = StringUtils.hasValue(location.label)
+      ? new NonLocalizedString(location.label)
+      : new LocalizedString(type.translationKey());
+    return new VertexCreationRequest(location.getCoordinate(), label, incomingModes, outgoingModes);
+  }
+
   /**
-   * Maps a street mode to the appropriate traverse mode for vertex linking.
+   * Maps a street mode to the appropriate traverse modes for vertex linking.
    *
    * @param streetMode The street mode from the request
    * @param type The location type (origin, destination, or via)
-   * @return The traverse mode to use for linking
+   * @return The traverse modes to use for linking
    */
-  public TraverseMode getTraverseModeForLinker(StreetMode streetMode, LocationType type) {
-    TraverseMode nonTransitMode = TraverseMode.WALK;
-    // for park and ride we will start in car mode and walk to the end vertex
+  public static List<TraverseMode> getTraverseModeForLinker(
+    StreetMode streetMode,
+    LocationType type
+  ) {
+    // TODO we should try to link to cycling-only ways with BICYCLE modes if they are the closest
+
+    // arrival and departure is allowed with either car or walk (not 100% sure about departure with
+    // flex).
+    if (
+      streetMode == StreetMode.FLEXIBLE ||
+      streetMode == StreetMode.CAR_HAILING ||
+      streetMode == StreetMode.CAR_PICKUP
+    ) {
+      return List.of(TraverseMode.WALK, TraverseMode.CAR);
+    }
+    // for park and ride, we will start in car mode and walk to the end vertex
     boolean parkAndRideDepart = streetMode == StreetMode.CAR_TO_PARK && type == LocationType.FROM;
     boolean onlyCarAvailable = streetMode == StreetMode.CAR;
     if (onlyCarAvailable || parkAndRideDepart) {
-      nonTransitMode = TraverseMode.CAR;
+      return List.of(TraverseMode.CAR);
     }
-    return nonTransitMode;
+    return List.of(TraverseMode.WALK);
   }
 
-  private LinkingDirection mapDirection(LocationType type) {
-    return switch (type) {
-      case FROM -> LinkingDirection.INCOMING;
-      case TO -> LinkingDirection.OUTGOING;
-      case VISIT_VIA_LOCATION -> LinkingDirection.BIDIRECTIONAL;
-    };
+  private static List<TraverseMode> getIncomingModes(List<TraverseMode> modes, LocationType type) {
+    return type == LocationType.TO || type == LocationType.VISIT_VIA_LOCATION ? modes : List.of();
   }
 
-  private List<Edge> createEdges(
-    TemporaryStreetLocation location,
-    StreetVertex streetVertex,
-    LocationType type
-  ) {
-    return switch (type) {
-      case FROM -> List.of(TemporaryFreeEdge.createTemporaryFreeEdge(location, streetVertex));
-      case TO -> List.of(TemporaryFreeEdge.createTemporaryFreeEdge(streetVertex, location));
-      case VISIT_VIA_LOCATION -> List.of(
-        TemporaryFreeEdge.createTemporaryFreeEdge(location, streetVertex),
-        TemporaryFreeEdge.createTemporaryFreeEdge(streetVertex, location)
-      );
-    };
+  private static List<TraverseMode> getOutgoingModes(List<TraverseMode> modes, LocationType type) {
+    return type == LocationType.FROM || type == LocationType.VISIT_VIA_LOCATION ? modes : List.of();
   }
 
   /**

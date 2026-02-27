@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.utils.collection.SetUtils;
 
 /**
  * A set of traverse modes -- typically, one non-transit mode (walking, biking, car) and zero or
@@ -35,6 +36,13 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
   public TraverseModeSet(Collection<TraverseMode> modeList) {
     this(modeList.toArray(new TraverseMode[0]));
+  }
+
+  /**
+   * Returns a set that contains all modes from this and the other set.
+   */
+  public TraverseModeSet merge(TraverseModeSet other) {
+    return new TraverseModeSet(SetUtils.combine(this.getModes(), other.getModes()));
   }
 
   /**

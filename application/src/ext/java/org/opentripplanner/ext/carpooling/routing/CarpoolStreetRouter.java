@@ -14,10 +14,8 @@ import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
-import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -140,12 +138,8 @@ public class CarpoolStreetRouter {
     var disposableEdges = vertexLinker.linkVertexForRequest(
       tempVertex,
       new TraverseModeSet(TraverseMode.CAR),
-      LinkingDirection.BIDIRECTIONAL,
-      (vertex, streetVertex) ->
-        List.of(
-          TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryVertex) vertex, streetVertex),
-          TemporaryFreeEdge.createTemporaryFreeEdge(streetVertex, (TemporaryVertex) vertex)
-        )
+      new TraverseModeSet(TraverseMode.CAR),
+      TemporaryFreeEdge::createTemporaryFreeEdge
     );
 
     // Add to container for automatic cleanup

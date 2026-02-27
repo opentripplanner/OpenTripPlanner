@@ -46,7 +46,6 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -388,21 +387,10 @@ public class ConstantsForTests {
         graph.addVertex(stationVertex);
         VehicleRentalEdge.createVehicleRentalEdge(stationVertex, vehicleType.formFactor());
 
-        linker.linkVertexPermanently(
+        linker.linkVertexBidirectionallyPermanently(
           stationVertex,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                (VehicleRentalPlaceVertex) vertex,
-                streetVertex
-              ),
-              StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                streetVertex,
-                (VehicleRentalPlaceVertex) vertex
-              )
-            )
+          StreetVehicleRentalLink::createStreetVehicleRentalLink
         );
       }
     } catch (IOException e) {

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
@@ -27,14 +26,12 @@ import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.streetadapter.VertexFactory;
@@ -177,7 +174,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
               area.getName()
             );
             linker.addPermanentAreaVertex(boardingLocation, areaGroup);
-            linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
+            linkBoardingLocationToStop(ts, boardingLocation);
             return true;
           }
         }
@@ -221,14 +218,19 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         platform.references(),
         name
       );
-      for (var vertex : linker.linkToSpecificStreetEdgesPermanently(
+      linker.linkToSpecificStreetEdgesPermanently(
         boardingLocation,
         new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BIDIRECTIONAL,
-        platformEdgeList.getValue().stream().map(StreetEdge.class::cast).collect(Collectors.toSet())
-      )) {
-        linkBoardingLocationToStop(ts, stop.getCode(), vertex);
-      }
+        platformEdgeList
+          .getValue()
+          .stream()
+          .map(StreetEdge.class::cast)
+          .collect(Collectors.toSet()),
+        (splitterVertex, _) ->
+          BoardingLocationToStopLink.createBoardingLocationToStopLink(ts, splitterVertex),
+        (_, splitterVertex) ->
+          BoardingLocationToStopLink.createBoardingLocationToStopLink(splitterVertex, ts)
+      );
       return true;
     }
     return false;
@@ -252,15 +254,26 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     for (var boardingLocation : nearbyBoardingLocations) {
       if (matchesReference(stop, boardingLocation.references)) {
         if (!boardingLocation.isConnectedToStreetNetwork()) {
-          linker.linkVertexPermanently(
+          linker.linkVertexBidirectionallyPermanently(
             boardingLocation,
             new TraverseModeSet(TraverseMode.WALK),
-            LinkingDirection.BIDIRECTIONAL,
-            (osmBoardingLocationVertex, splitVertex) ->
-              getConnectingEdges(boardingLocation, osmBoardingLocationVertex, splitVertex)
+            (splitterVertex, osmBoardingLocationVertex) ->
+              osmBoardingLocationVertex == splitterVertex
+                ? null
+                : linkBoardingLocationToStreetNetwork(
+                    (StreetVertex) osmBoardingLocationVertex,
+                    (StreetVertex) splitterVertex
+                  ),
+            (osmBoardingLocationVertex, splitterVertex) ->
+              splitterVertex == osmBoardingLocationVertex
+                ? null
+                : linkBoardingLocationToStreetNetwork(
+                    (StreetVertex) splitterVertex,
+                    (StreetVertex) osmBoardingLocationVertex
+                  )
           );
         }
-        linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
+        linkBoardingLocationToStop(ts, boardingLocation);
         return true;
       }
     }
@@ -282,22 +295,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     );
   }
 
-  private List<Edge> getConnectingEdges(
-    OsmBoardingLocationVertex boardingLocation,
-    Vertex osmBoardingLocationVertex,
-    StreetVertex splitVertex
-  ) {
-    if (osmBoardingLocationVertex == splitVertex) {
-      return List.of();
-    }
-    // the OSM boarding location vertex is not connected to the street network, so we
-    // need to link it first
-    return List.of(
-      linkBoardingLocationToStreetNetwork(boardingLocation, splitVertex),
-      linkBoardingLocationToStreetNetwork(splitVertex, boardingLocation)
-    );
-  }
-
   private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
     var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
     return new StreetEdgeBuilder<>()
@@ -311,20 +308,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       .buildAndConnect();
   }
 
-  private void linkBoardingLocationToStop(
-    TransitStopVertex ts,
-    @Nullable String stopCode,
-    StreetVertex boardingLocation
-  ) {
+  private void linkBoardingLocationToStop(TransitStopVertex ts, StreetVertex boardingLocation) {
     BoardingLocationToStopLink.createBoardingLocationToStopLink(ts, boardingLocation);
     BoardingLocationToStopLink.createBoardingLocationToStopLink(boardingLocation, ts);
-    LOG.debug(
-      "Connected {} ({}) to {} at {}",
-      ts,
-      stopCode,
-      boardingLocation.getLabel(),
-      boardingLocation.getCoordinate()
-    );
   }
 
   private boolean matchesReference(StationElement<?, ?> stop, Collection<String> references) {

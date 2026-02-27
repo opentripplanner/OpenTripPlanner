@@ -22,7 +22,6 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
@@ -159,21 +158,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         if (vehicleRentalVertex == null) {
           vehicleRentalVertex = vertexFactory.vehicleRentalPlace(station);
-          DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
+          DisposableEdgeCollection tempEdges = linker.linkVertexBidirectionallyForRealTime(
             vehicleRentalVertex,
             new TraverseModeSet(TraverseMode.WALK),
-            LinkingDirection.BIDIRECTIONAL,
-            (vertex, streetVertex) ->
-              List.of(
-                StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                  (VehicleRentalPlaceVertex) vertex,
-                  streetVertex
-                ),
-                StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                  streetVertex,
-                  (VehicleRentalPlaceVertex) vertex
-                )
-              )
+            StreetVehicleRentalLink::createStreetVehicleRentalLink
           );
           if (vehicleRentalVertex.getOutgoing().isEmpty()) {
             // Copy reference to pass into lambda

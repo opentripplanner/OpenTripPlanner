@@ -133,16 +133,16 @@ public class StreetEdge
   }
 
   /**
-   * Checks permissions of the street edge if specified modes are allowed to travel.
+   * Checks permissions of the street edge if any of the specified modes are allowed to travel.
    * <p>
-   * Barriers aren't taken into account. So it can happen that canTraverse returns True. But
-   * doTraverse returns false. Since there are barriers on a street.
+   * Barriers aren't taken into account. So it can happen that isLinkableWith returns True. But
+   * doTraverse/canTraverse returns false. Since there are barriers on a street.
    * <p>
-   * This is because this function is used also on street when searching for start/stop. Those
-   * streets are then split. On splitted streets can be possible to drive with a CAR because it is
-   * only blocked from one way.
+   * This is because this function is used for searching for edges that can be linked to/from origin
+   * and destination. Those streets are then split. On splitted streets can be possible to drive
+   * with a CAR because it is only blocked from one way.
    */
-  public boolean canTraverse(TraverseModeSet modes) {
+  public boolean isLinkableWith(TraverseModeSet modes) {
     return getPermission().allows(modes);
   }
 

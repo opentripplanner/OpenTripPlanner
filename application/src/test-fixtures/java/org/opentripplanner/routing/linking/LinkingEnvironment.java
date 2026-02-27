@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.linking;
 
-import static org.opentripplanner.street.model.edge.LinkingDirection.BIDIRECTIONAL;
-
-import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
@@ -38,13 +35,21 @@ public class LinkingEnvironment {
   }
 
   public DisposableEdgeCollection linkVertexForRequest(double lat, double lon) {
+    return linkVertexForRequest(lat, lon, TraverseModeSet.allModes(), TraverseModeSet.allModes());
+  }
+
+  public DisposableEdgeCollection linkVertexForRequest(
+    double lat,
+    double lon,
+    TraverseModeSet incoming,
+    TraverseModeSet outgoing
+  ) {
     var split = new TemporaryStreetLocation(new Coordinate(lon, lat), I18NString.of("split"));
     disposable = linker.linkVertexForRequest(
       split,
-      TraverseModeSet.allModes(),
-      BIDIRECTIONAL,
-      (v1, v2) ->
-        List.of(TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) v1, v2))
+      incoming,
+      outgoing,
+      TemporaryFreeEdge::createTemporaryFreeEdge
     );
     return disposable;
   }

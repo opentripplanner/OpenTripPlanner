@@ -97,17 +97,17 @@ class StreetLinkerModuleTest {
 
       // stop is used by a flex trip, needs to be linked to both the walk and car edge
       assertThat(model.stopVertex().getOutgoing()).hasSize(2);
-      var linkToWalk = model.outgoingLinks().getFirst();
-      SplitterVertex walkSplit = (SplitterVertex) linkToWalk.getToVertex();
+      var walkSplits = findWalkableVertices(model.outgoingLinks());
+      assertThat(walkSplits).hasSize(1);
 
-      assertTrue(walkSplit.isConnectedToWalkingEdge());
+      var walkSplit = walkSplits.getFirst();
       assertFalse(walkSplit.isConnectedToDriveableEdge());
 
-      var linkToCar = model.outgoingLinks().getLast();
-      SplitterVertex carSplit = (SplitterVertex) linkToCar.getToVertex();
+      var carSplits = findDriveableVertices(model.outgoingLinks());
+      assertThat(carSplits).hasSize(1);
 
+      var carSplit = carSplits.getFirst();
       assertFalse(carSplit.isConnectedToWalkingEdge());
-      assertTrue(carSplit.isConnectedToDriveableEdge());
     });
   }
 
@@ -138,21 +138,21 @@ class StreetLinkerModuleTest {
       var links = model.outgoingLinks();
       assertInstanceOf(BoardingLocationToStopLink.class, links.getFirst());
 
-      // the second link is the link to the walkable street network. this is not really necessary
+      // there should be a link to the walkable street network. this is not really necessary
       // because the boarding location is walkable. this will be refactored away in the future.
-      var linkToWalk = links.get(1);
-      SplitterVertex walkSplit = (SplitterVertex) linkToWalk.getToVertex();
+      var walkSplits = findWalkableVertices(links);
+      assertThat(walkSplits).hasSize(1);
 
-      assertTrue(walkSplit.isConnectedToWalkingEdge());
+      var walkSplit = walkSplits.getFirst();
       assertFalse(walkSplit.isConnectedToDriveableEdge());
 
       // lastly we have the link to the drivable street network because vehicles also need to
       // reach the stop if it's part of a flex trip.
-      var linkToCar = links.getLast();
-      SplitterVertex carSplit = (SplitterVertex) linkToCar.getToVertex();
+      var carSplits = findDriveableVertices(links);
+      assertThat(carSplits).hasSize(1);
 
+      var carSplit = carSplits.getFirst();
       assertFalse(carSplit.isConnectedToWalkingEdge());
-      assertTrue(carSplit.isConnectedToDriveableEdge());
     });
   }
 
@@ -173,17 +173,37 @@ class StreetLinkerModuleTest {
 
     // Because the stop is used by a carsAllowed trip it needs to be linked to both the walk and car edge
     assertThat(model.stopVertex().getOutgoing()).hasSize(2);
-    var linkToWalk = model.outgoingLinks().getFirst();
-    SplitterVertex walkSplit = (SplitterVertex) linkToWalk.getToVertex();
+    var walkSplits = findWalkableVertices(model.outgoingLinks());
+    assertThat(walkSplits).hasSize(1);
 
-    assertTrue(walkSplit.isConnectedToWalkingEdge());
+    var walkSplit = walkSplits.getFirst();
     assertFalse(walkSplit.isConnectedToDriveableEdge());
 
-    var linkToCar = model.outgoingLinks().getLast();
-    SplitterVertex carSplit = (SplitterVertex) linkToCar.getToVertex();
+    var carSplits = findDriveableVertices(model.outgoingLinks());
+    assertThat(carSplits).hasSize(1);
 
+    var carSplit = carSplits.getFirst();
     assertFalse(carSplit.isConnectedToWalkingEdge());
-    assertTrue(carSplit.isConnectedToDriveableEdge());
+  }
+
+  private List<SplitterVertex> findWalkableVertices(List<Edge> edges) {
+    return edges
+      .stream()
+      .map(Edge::getToVertex)
+      .filter(vertex -> vertex instanceof SplitterVertex)
+      .map(SplitterVertex.class::cast)
+      .filter(SplitterVertex::isConnectedToWalkingEdge)
+      .toList();
+  }
+
+  private List<SplitterVertex> findDriveableVertices(List<Edge> edges) {
+    return edges
+      .stream()
+      .map(Edge::getToVertex)
+      .filter(vertex -> vertex instanceof SplitterVertex)
+      .map(SplitterVertex.class::cast)
+      .filter(SplitterVertex::isConnectedToDriveableEdge)
+      .toList();
   }
 
   private static class TestModel {

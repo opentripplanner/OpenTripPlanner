@@ -26,7 +26,6 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -462,38 +461,16 @@ public class PlatformLinkingTest {
     var linker = new VertexLinker(graph.graph(), COMPUTE_AREA_VISIBILITY_LINES, maxAreaNodes);
     for (TransitStopVertex tStop : graph.listStopVertices()) {
       if (permanent) {
-        linker.linkVertexPermanently(
+        linker.linkVertexBidirectionallyPermanently(
           tStop,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetTransitStopLink.createStreetTransitStopLink(
-                (TransitStopVertex) vertex,
-                streetVertex
-              ),
-              StreetTransitStopLink.createStreetTransitStopLink(
-                streetVertex,
-                (TransitStopVertex) vertex
-              )
-            )
+          StreetTransitStopLink::createStreetTransitStopLink
         );
       } else {
-        linker.linkVertexForRealTime(
+        linker.linkVertexBidirectionallyForRealTime(
           tStop,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetTransitStopLink.createStreetTransitStopLink(
-                (TransitStopVertex) vertex,
-                streetVertex
-              ),
-              StreetTransitStopLink.createStreetTransitStopLink(
-                streetVertex,
-                (TransitStopVertex) vertex
-              )
-            )
+          StreetTransitStopLink::createStreetTransitStopLink
         );
       }
     }

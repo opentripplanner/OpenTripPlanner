@@ -2,16 +2,13 @@ package org.opentripplanner.routing.linking;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
-import static org.opentripplanner.street.model.edge.LinkingDirection.BIDIRECTIONAL;
 import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
-import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.street.model.StreetModelForTest;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
 
 class FlexLinkingTest {
@@ -37,15 +34,10 @@ class FlexLinkingTest {
 
       env
         .linker()
-        .linkVertexPermanently(
+        .linkVertexBidirectionallyPermanently(
           toBeLinked,
           TraverseModeSet.allModes(),
-          BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetModelForTest.streetEdge((StreetVertex) vertex, streetVertex),
-              StreetModelForTest.streetEdge(streetVertex, (StreetVertex) vertex)
-            )
+          StreetModelForTest::streetEdge
         );
 
       assertThat(env.graph().summarizeSplitVertices()).containsExactly(

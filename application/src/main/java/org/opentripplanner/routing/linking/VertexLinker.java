@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.linking;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -22,6 +22,7 @@ import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
@@ -110,31 +111,127 @@ public class VertexLinker {
     this.maxAreaNodes = maxAreaNodes;
   }
 
-  public void linkVertexPermanently(
+  /**
+   * Attempts to link the given vertex to the street network permanently through two links or more
+   * links that allow the vertex to be visited from the street network and vice versa.
+   *
+   * @param traverseModeSet Linking is done to one (sometimes more if there are multiple options
+   *                        within almost identical distance) of the nearest street edges for each
+   *                        mode (i.e. traversal with the mode needs to be allowed). Sometimes links
+   *                        allow multiple traversal modes and sometimes each mode gets its own link
+   *                        to a different edge. There is also a risk that we cannot find edges
+   *                        nearby that allow traversal with one or more of the given modes.
+   * @param edgeCreator     Used to create linking edges between the given vertex and the street
+   *                        network. The same edge creator is used for both directions of linking,
+   *                        so it needs to be able to handle both cases (i.e. the from and to vertex
+   *                        will switch places).
+   */
+  public void linkVertexBidirectionallyPermanently(
     Vertex vertex,
-    TraverseModeSet traverseModes,
-    LinkingDirection direction,
-    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    TraverseModeSet traverseModeSet,
+    EdgeCreator edgeCreator
   ) {
-    link(vertex, traverseModes, direction, Scope.PERMANENT, edgeFunction);
+    link(vertex, traverseModeSet, traverseModeSet, Scope.PERMANENT, edgeCreator);
   }
 
-  public DisposableEdgeCollection linkVertexForRealTime(
+  /**
+   * Attempts to link the given vertex to the street network permanently through two links or more
+   * links that allow the vertex to be visited from the street network and vice versa.
+   *
+   * @param traverseModeSet     Linking is done to one (sometimes more if there are multiple options
+   *                            within almost identical distance) of the nearest street edges for
+   *                            each mode (i.e. traversal with the mode needs to be allowed).
+   *                            Sometimes links allow multiple traversal modes and sometimes each
+   *                            mode gets its own link to a different edge. There is also a risk
+   *                            that we cannot find edges nearby that allow traversal with one or
+   *                            more of the given modes.
+   * @param incomingEdgeCreator Used to create links between splitter vertices and the given vertex.
+   *                            The from location here is the splitter vertex and the to location is
+   *                            the input vertex.
+   * @param outgoingEdgeCreator Used to create links between the given vertex and splitter vertices.
+   *                            The from location here is the input vertex and the to location is
+   *                            the splitter vertex.
+   */
+  public void linkVertexBidirectionallyPermanently(
     Vertex vertex,
-    TraverseModeSet traverseModes,
-    LinkingDirection direction,
-    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    TraverseModeSet traverseModeSet,
+    EdgeCreator incomingEdgeCreator,
+    EdgeCreator outgoingEdgeCreator
   ) {
-    return link(vertex, traverseModes, direction, Scope.REALTIME, edgeFunction);
+    link(
+      vertex,
+      traverseModeSet,
+      traverseModeSet,
+      Scope.PERMANENT,
+      incomingEdgeCreator,
+      outgoingEdgeCreator
+    );
   }
 
+  /**
+   * Attempts to link the given vertex originating from a real-time update to the street network
+   * temporarily through two links or more links that allow the vertex to be visited from the street
+   * network and vice versa.
+   *
+   * @param traverseModeSet Linking is done to one (sometimes more if there are multiple options
+   *                        within almost identical distance) of the nearest street edges for each
+   *                        mode (i.e. traversal with the mode needs to be allowed). Sometimes links
+   *                        allow multiple traversal modes and sometimes each mode gets its own link
+   *                        to a different edge. There is also a risk that we cannot find edges
+   *                        nearby that allow traversal with one or more of the given modes.
+   * @param edgeCreator     Used to create linking edges between the given vertex and the street
+   *                        network. The same edge creator is used for both directions of linking,
+   *                        so it needs to be able to handle both cases (i.e. the from and to vertex
+   *                        will switch places).
+   */
+  public DisposableEdgeCollection linkVertexBidirectionallyForRealTime(
+    Vertex vertex,
+    TraverseModeSet traverseModeSet,
+    EdgeCreator edgeCreator
+  ) {
+    return link(vertex, traverseModeSet, traverseModeSet, Scope.REALTIME, edgeCreator);
+  }
+
+  /**
+   * Attempts to link the given vertex to the street network temporarily (for the duration of a
+   * request) through two links or more links that allow the vertex to be visited from the street
+   * network and vice versa.
+   *
+   * @param incomingTraverseModes Linking is done from one (sometimes more if there are multiple
+   *                              options within almost identical distance) of the nearest street
+   *                              edges for each mode (i.e. traversal with the mode needs to be
+   *                              allowed). If this set is empty, no linking is done to this
+   *                              direction. Sometimes links allow multiple traversal modes and
+   *                              sometimes each mode gets its own link to a different edge. There
+   *                              is also a risk that we cannot find edges nearby that allow
+   *                              traversal with one or more of the given modes.
+   * @param outgoingTraverseModes Linking is done to one (sometimes more if there are multiple
+   *                              options within almost identical distance) of the nearest street
+   *                              edges for each mode (i.e. traversal with the mode needs to be
+   *                              allowed). If this set is empty, no linking is done to this
+   *                              direction. Sometimes links allow multiple traversal modes and
+   *                              sometimes each mode gets its own link to a different edge. There
+   *                              is also a risk that we cannot find edges nearby that allow
+   *                              traversal with one or more of the given modes.
+   * @param edgeCreator           Used to create linking edges between the given vertex and the
+   *                              street network. The same edge creator is used for both directions
+   *                              of linking, so it needs to be able to handle both cases (i.e. the
+   *                              from and to vertex will switch places).
+   */
   public DisposableEdgeCollection linkVertexForRequest(
     Vertex vertex,
-    TraverseModeSet traverseModes,
-    LinkingDirection direction,
-    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    TraverseModeSet incomingTraverseModes,
+    TraverseModeSet outgoingTraverseModes,
+    RestrictedEdgeCreator edgeCreator
   ) {
-    return link(vertex, traverseModes, direction, Scope.REQUEST, edgeFunction);
+    return link(
+      vertex,
+      incomingTraverseModes,
+      outgoingTraverseModes,
+      Scope.REQUEST,
+      edgeCreator,
+      edgeCreator
+    );
   }
 
   private void removeEdgeFromIndex(Edge edge, Scope scope) {
@@ -168,29 +265,73 @@ public class VertexLinker {
     return GEOMETRY_FACTORY.createLineString(coords);
   }
 
+  private DisposableEdgeCollection link(
+    Vertex vertex,
+    TraverseModeSet incomingTraverseModes,
+    TraverseModeSet outgoingTraverseModes,
+    Scope scope,
+    EdgeCreator edgeCreator
+  ) {
+    return link(
+      vertex,
+      incomingTraverseModes,
+      outgoingTraverseModes,
+      scope,
+      (fromVertex, toVertex, _) -> edgeCreator.create(fromVertex, toVertex),
+      (fromVertex, toVertex, _) -> edgeCreator.create(fromVertex, toVertex)
+    );
+  }
+
+  private DisposableEdgeCollection link(
+    Vertex vertex,
+    TraverseModeSet incomingTraverseModes,
+    TraverseModeSet outgoingTraverseModes,
+    Scope scope,
+    EdgeCreator incomingEdgeCreator,
+    EdgeCreator outgoingEdgeCreator
+  ) {
+    return link(
+      vertex,
+      incomingTraverseModes,
+      outgoingTraverseModes,
+      scope,
+      (fromVertex, toVertex, _) -> incomingEdgeCreator.create(fromVertex, toVertex),
+      (fromVertex, toVertex, _) -> outgoingEdgeCreator.create(fromVertex, toVertex)
+    );
+  }
+
   /**
    * This method will link the provided vertex into the street graph. This may involve splitting an
    * existing edge (if the scope is not PERMANENT, the existing edge will be kept).
    * <p>
-   * In OTP2 where the transit search can be quite fast, searching for a good linking point can be a
-   * significant fraction of response time. Hannes Junnila has reported >70% speedups in searches by
-   * making the search radius smaller. Therefore we use an expanding-envelope search, which is more
-   * efficient in dense areas.
+   * Searching for a good linking point can be a significant fraction of response time. Hannes
+   * Junnila has reported >70% speedups in searches by making the search radius smaller. Therefore,
+   * we use an expanding-envelope search, which is more efficient in dense areas.
    *
-   * @param vertex        Vertex to be linked into the street graph
-   * @param traverseModes Only street edges allowing one of these modes will be linked
-   * @param direction     The direction of the new edges to be created
-   * @param scope         The scope of the split
-   * @param edgeFunction  How the provided vertex should be linked into the street graph
+   * @param vertex                Vertex to be linked into the street graph.
+   * @param incomingTraverseModes Only street edges allowing one of these modes will be linked to
+   *                              the vertex. If the set is empty, no links will be added in this
+   *                              direction.
+   * @param outgoingTraverseModes Only street edges allowing one of these modes will be linked from
+   *                              the vertex. If the set is empty, no links will be added in this
+   *                              direction.
+   * @param scope                 The scope of the split.
+   * @param incomingEdgeCreator   Used to create links between splitter vertices and the given
+   *                              vertex. The from location here is the splitter vertex and the to
+   *                              location is the input vertex.
+   * @param outgoingEdgeCreator   Used to create links between the given vertex and splitter
+   *                              vertices. The from location here is the input vertex and the to
+   *                              location is the splitter vertex.
    * @return A DisposableEdgeCollection with edges created by this method. It is the caller's
    * responsibility to call the dispose method on this object when the edges are no longer needed.
    */
   private DisposableEdgeCollection link(
     Vertex vertex,
-    TraverseModeSet traverseModes,
-    LinkingDirection direction,
+    TraverseModeSet incomingTraverseModes,
+    TraverseModeSet outgoingTraverseModes,
     Scope scope,
-    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    RestrictedEdgeCreator incomingEdgeCreator,
+    RestrictedEdgeCreator outgoingEdgeCreator
   ) {
     DisposableEdgeCollection tempEdges = (scope != Scope.PERMANENT)
       ? new DisposableEdgeCollection(graph, scope)
@@ -199,30 +340,25 @@ public class VertexLinker {
     try {
       Set<StreetVertex> streetVertices = linkToStreetEdges(
         vertex,
-        traverseModes,
-        direction,
+        incomingTraverseModes,
+        outgoingTraverseModes,
         scope,
         INITIAL_SEARCH_RADIUS_DEGREES,
-        tempEdges
+        tempEdges,
+        incomingEdgeCreator,
+        outgoingEdgeCreator
       );
       if (streetVertices.isEmpty() && scope == Scope.REQUEST) {
-        streetVertices = linkToStreetEdges(
+        linkToStreetEdges(
           vertex,
-          traverseModes,
-          direction,
+          incomingTraverseModes,
+          outgoingTraverseModes,
           scope,
           MAX_SEARCH_RADIUS_DEGREES,
-          tempEdges
+          tempEdges,
+          incomingEdgeCreator,
+          outgoingEdgeCreator
         );
-      }
-
-      for (StreetVertex streetVertex : streetVertices) {
-        List<Edge> edges = edgeFunction.apply(vertex, streetVertex);
-        if (tempEdges != null) {
-          for (Edge edge : edges) {
-            tempEdges.addEdge(edge);
-          }
-        }
       }
     } catch (Exception e) {
       if (tempEdges != null) {
@@ -235,23 +371,26 @@ public class VertexLinker {
   }
 
   /**
-   * Link a boarding location vertex to specific street edges.
+   * Link a boarding location vertex to specific street edges bidirectionally.
    * <p>
    * This is used if a platform is mapped as a linear way, where the given edges form the platform.
    */
   public Set<StreetVertex> linkToSpecificStreetEdgesPermanently(
     Vertex vertex,
     TraverseModeSet traverseModes,
-    LinkingDirection direction,
-    Set<StreetEdge> edges
+    Set<StreetEdge> edges,
+    EdgeCreator incomingEdgeCreator,
+    EdgeCreator outgoingEdgeCreator
   ) {
     var xscale = getXscale(vertex);
     return linkToCandidateEdges(
       vertex,
       traverseModes,
-      direction,
+      traverseModes,
       Scope.PERMANENT,
       null,
+      (from, to, _) -> incomingEdgeCreator.create(from, to),
+      (from, to, _) -> outgoingEdgeCreator.create(from, to),
       edges
         .stream()
         .map(e -> new DistanceTo<>(e, distance(vertex, e, xscale)))
@@ -262,11 +401,13 @@ public class VertexLinker {
 
   private Set<StreetVertex> linkToStreetEdges(
     Vertex vertex,
-    TraverseModeSet traverseModes,
-    LinkingDirection direction,
+    TraverseModeSet incomingTraverseModes,
+    TraverseModeSet outgoingTraverseModes,
     Scope scope,
     double radiusDeg,
-    @Nullable DisposableEdgeCollection tempEdges
+    @Nullable DisposableEdgeCollection tempEdges,
+    RestrictedEdgeCreator incomingEdgeCreator,
+    RestrictedEdgeCreator outgoingEdgeCreator
   ) {
     Envelope env = new Envelope(vertex.getCoordinate());
 
@@ -285,17 +426,23 @@ public class VertexLinker {
       .stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
-      .filter(e -> e.canTraverse(traverseModes) && e.isReachableFromGraph())
+      .filter(
+        e ->
+          (e.isLinkableWith(incomingTraverseModes) || e.isLinkableWith(outgoingTraverseModes)) &&
+          e.isReachableFromGraph()
+      )
       .map(e -> new DistanceTo<>(e, distance(vertex, e, xscale)))
       .filter(ead -> ead.distanceDegreesLat < radiusDeg)
       .toList();
 
     return linkToCandidateEdges(
       vertex,
-      traverseModes,
-      direction,
+      incomingTraverseModes,
+      outgoingTraverseModes,
       scope,
       tempEdges,
+      incomingEdgeCreator,
+      outgoingEdgeCreator,
       candidateDistanceToEdges,
       xscale
     );
@@ -307,56 +454,98 @@ public class VertexLinker {
 
   private Set<StreetVertex> linkToCandidateEdges(
     Vertex vertex,
-    TraverseModeSet traverseModes,
-    LinkingDirection direction,
+    TraverseModeSet incomingTraverseModes,
+    TraverseModeSet outgoingTraverseModes,
     Scope scope,
     @Nullable DisposableEdgeCollection tempEdges,
+    RestrictedEdgeCreator incomingEdgeCreator,
+    RestrictedEdgeCreator outgoingEdgeCreator,
     List<DistanceTo<StreetEdge>> candidateEdges,
     double xscale
   ) {
     if (candidateEdges.isEmpty()) {
       return Set.of();
     }
-    Set<DistanceTo<StreetEdge>> closestEdges = getClosestEdgesPerMode(
-      traverseModes,
-      candidateEdges
-    );
-    HashMap<AreaGroup, IntersectionVertex> linkedAreas = new HashMap<>();
-    return closestEdges
+    var allModes = incomingTraverseModes.merge(outgoingTraverseModes);
+    var closestEdges = getClosestEdges(allModes, candidateEdges);
+    var linkedAreas = new HashMap<AreaGroup, IntersectionVertex>();
+    var snapResults = new HashSet<VertexPairWithPermission>();
+    for (var edge : closestEdges) {
+      var snapResult = snapAndLink(
+        vertex,
+        edge,
+        xscale,
+        scope,
+        incomingTraverseModes,
+        outgoingTraverseModes,
+        tempEdges,
+        linkedAreas
+      );
+      if (snapResult != null) {
+        snapResults.add(snapResult);
+      }
+    }
+    for (var vertexPair : snapResults) {
+      var permission = vertexPair.permission();
+      createAndStoreEdge(
+        vertexPair.intersection(),
+        vertexPair.vertex(),
+        permission.intersection(incomingTraverseModes),
+        incomingEdgeCreator,
+        tempEdges
+      );
+      createAndStoreEdge(
+        vertexPair.vertex(),
+        vertexPair.intersection(),
+        permission.intersection(outgoingTraverseModes),
+        outgoingEdgeCreator,
+        tempEdges
+      );
+    }
+    return snapResults
       .stream()
-      .map(ce -> snapAndLink(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
-      .filter(Objects::nonNull)
+      .map(VertexPairWithPermission::intersection)
       .collect(Collectors.toSet());
   }
 
+  private void createAndStoreEdge(
+    Vertex from,
+    Vertex to,
+    StreetTraversalPermission permission,
+    RestrictedEdgeCreator edgeCreator,
+    @Nullable DisposableEdgeCollection tempEdges
+  ) {
+    if (permission.allowsAnything()) {
+      var newEdge = edgeCreator.create(from, to, permission);
+      if (newEdge != null && tempEdges != null) {
+        tempEdges.addEdge(newEdge);
+      }
+    }
+  }
+
   /**
-   * We need to get the closest edges per mode to be sure that we are linking to edges traversable
-   * by all the specified modes. We use a set here to avoid duplicates in the case that edges are
-   * traversable by more than one of the modes specified.
+   * Find the closest edges. If the same edge(s) are the closest for multiple modes, pair the
+   * edge(s) with all of those modes for traversal permission.
+   *
+   * @param candidateEdges these edges should be already filtered to only traversable with the given
+   *                       modes and within a max search radius.
    */
-  private Set<DistanceTo<StreetEdge>> getClosestEdgesPerMode(
+  private List<EdgeWithPermission> getClosestEdges(
     TraverseModeSet traverseModeSet,
     List<DistanceTo<StreetEdge>> candidateEdges
   ) {
     // The following logic has gone through several different versions using different approaches.
-    // The core idea is to find all edges that are roughly the same distance from the given vertex, which will
-    // catch things like superimposed edges going in opposite directions.
-    // First, all edges within INITIAL_SEARCH_RADIUS_DEGREES of of the best distance were selected.
-    // More recently, the edges were sorted in order of increasing distance, and all edges in the list were selected
-    // up to the point where a distance increase of DUPLICATE_WAY_EPSILON_DEGREES from one edge to the next.
-    // This was in response to concerns about arbitrary cutoff distances: at any distance, it's always possible
-    // one half of a dual carriageway (or any other pair of edges in opposite directions) will be caught and the
-    // other half lost. It seems like this was based on some incorrect premises about floating point calculations
-    // being non-deterministic.
+    // The core idea is to find all edges that are roughly the same distance (within
+    // DUPLICATE_WAY_EPSILON_DEGREES from each other) from the given vertex, which will catch things
+    // like superimposed edges going in opposite directions. This is done for all the requested
+    // modes.
 
-    Set<DistanceTo<StreetEdge>> closestEdges = new HashSet<>();
-    for (TraverseMode mode : traverseModeSet.getModes()) {
-      TraverseModeSet modeSet = new TraverseModeSet(mode);
-      // There is at least one appropriate edge within range.
-
+    var closestEdgesForModes = new HashMap<TraverseMode, List<StreetEdge>>();
+    for (var mode : traverseModeSet.getModes()) {
+      var modeSet = new TraverseModeSet(mode);
       var candidateEdgesForMode = candidateEdges
         .stream()
-        .filter(e -> e.item.canTraverse(modeSet))
+        .filter(e -> e.item.isLinkableWith(modeSet))
         .toList();
 
       if (candidateEdgesForMode.isEmpty()) {
@@ -369,30 +558,50 @@ public class VertexLinker {
         .min()
         .getAsDouble();
 
-      // Because this is a set, each instance of DistanceTo<StreetEdge> will only be added once
-      // Note: add only closest edges of each mode
-      closestEdges.addAll(
+      closestEdgesForModes.put(
+        mode,
         candidateEdgesForMode
           .stream()
           .filter(ce -> ce.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
-          .collect(Collectors.toSet())
+          .map(ce -> ce.item)
+          .toList()
       );
     }
+
+    // To avoid duplicates, we merge the nearest edges from all the requested modes while keeping
+    // information of what modes they were the nearest for.
+    var closestEdges = new ArrayList<EdgeWithPermission>();
+    for (var edge : candidateEdges) {
+      var permission = StreetTraversalPermission.NONE;
+      for (var edgeForMode : closestEdgesForModes.entrySet()) {
+        if (edgeForMode.getValue().contains(edge.item)) {
+          permission = permission.add(edgeForMode.getKey());
+        }
+      }
+      if (permission.allowsAnything()) {
+        closestEdges.add(new EdgeWithPermission(edge.item, permission));
+      }
+    }
+
     return closestEdges;
   }
 
   /* Snap a vertex to and edge if necessary, create required linking and return the applied entry vertex */
-  private StreetVertex snapAndLink(
+  @Nullable
+  private VertexPairWithPermission snapAndLink(
     Vertex vertex,
-    StreetEdge edge,
+    EdgeWithPermission edgeWithPermission,
     double xScale,
     Scope scope,
-    LinkingDirection direction,
+    TraverseModeSet incomingTraverseModes,
+    TraverseModeSet outgoingTraverseModes,
     DisposableEdgeCollection tempEdges,
     HashMap<AreaGroup, IntersectionVertex> linkedAreas
   ) {
     IntersectionVertex start = null;
+    var edge = edgeWithPermission.edge();
 
+    var direction = getLinkingDirection(incomingTraverseModes, outgoingTraverseModes);
     // Always consider linking to closest point on the edge
     IntersectionVertex split = findSplitVertex(vertex, edge, xScale, scope, direction, tempEdges);
 
@@ -449,7 +658,9 @@ public class VertexLinker {
       start.addAreaStops(areaStops);
     }
 
-    return start;
+    return start != null
+      ? new VertexPairWithPermission(vertex, start, edgeWithPermission.permission())
+      : null;
   }
 
   /**
@@ -808,4 +1019,28 @@ public class VertexLinker {
       tempEdges.addEdge(reverseAreaEdge);
     }
   }
+
+  private LinkingDirection getLinkingDirection(
+    TraverseModeSet incomingModes,
+    TraverseModeSet outgoingModes
+  ) {
+    if (outgoingModes.isValid() && incomingModes.isValid()) {
+      return LinkingDirection.BIDIRECTIONAL;
+    }
+    if (incomingModes.isValid()) {
+      return LinkingDirection.OUTGOING;
+    }
+    if (outgoingModes.isValid()) {
+      return LinkingDirection.INCOMING;
+    }
+    throw new IllegalArgumentException("Both incoming and outgoing modes cannot be empty.");
+  }
+
+  private record EdgeWithPermission(StreetEdge edge, StreetTraversalPermission permission) {}
+
+  private record VertexPairWithPermission(
+    Vertex vertex,
+    IntersectionVertex intersection,
+    StreetTraversalPermission permission
+  ) {}
 }

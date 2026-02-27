@@ -1,10 +1,8 @@
 package org.opentripplanner.graph_builder.module.linking;
 
-import java.util.List;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -72,21 +70,10 @@ class TestGraph {
     VertexLinker linker = VertexLinkerTestFactory.of(graph);
 
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-      linker.linkVertexPermanently(
+      linker.linkVertexBidirectionallyPermanently(
         tStop,
         new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BIDIRECTIONAL,
-        (vertex, streetVertex) ->
-          List.of(
-            StreetTransitStopLink.createStreetTransitStopLink(
-              (TransitStopVertex) vertex,
-              streetVertex
-            ),
-            StreetTransitStopLink.createStreetTransitStopLink(
-              streetVertex,
-              (TransitStopVertex) vertex
-            )
-          )
+        StreetTransitStopLink::createStreetTransitStopLink
       );
     }
   }

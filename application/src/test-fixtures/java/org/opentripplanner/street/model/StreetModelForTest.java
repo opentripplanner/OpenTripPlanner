@@ -57,9 +57,9 @@ public class StreetModelForTest {
     );
   }
 
-  public static StreetEdge streetEdge(StreetVertex vA, StreetVertex vB) {
+  public static StreetEdge streetEdge(Vertex vA, Vertex vB) {
     var meters = SphericalDistanceLibrary.distance(vA.getCoordinate(), vB.getCoordinate());
-    return streetEdge(vA, vB, meters, StreetTraversalPermission.ALL);
+    return streetEdge((StreetVertex) vA, (StreetVertex) vB, meters, StreetTraversalPermission.ALL);
   }
 
   public static StreetEdgeBuilder<?> streetEdgeBuilder(

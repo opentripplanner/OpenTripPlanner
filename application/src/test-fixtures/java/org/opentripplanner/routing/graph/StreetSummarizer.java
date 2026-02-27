@@ -28,9 +28,10 @@ class StreetSummarizer {
         summarizeBoolean(tpe.isWheelchairAccessible())
       );
       case TemporaryFreeEdge tfe -> String.format(
-        "%s → %s ALL",
+        "%s → %s %s",
         summarizeVertex(e.getFromVertex()),
-        summarizeVertex(e.getToVertex())
+        summarizeVertex(e.getToVertex()),
+        tfe.permission()
       );
       default -> throw new NotImplementedException(
         "No summary for edge " + e.getClass().getSimpleName()

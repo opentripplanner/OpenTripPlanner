@@ -73,8 +73,8 @@ public class GraphDataFetcher {
   }
 
   /**
-   * A list of textual representations of the links (edges of type {@link TemporaryPartialStreetEdge})
-   * in the graph.
+   * A list of textual representations of the split edges (edges of type
+   * {@link TemporaryPartialStreetEdge}) in the graph.
    */
   public Collection<String> summarizeTempEdges() {
     return listEdges()

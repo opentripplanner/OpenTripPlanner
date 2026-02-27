@@ -3,17 +3,14 @@ package org.opentripplanner.routing.linking;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
-import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 
@@ -48,9 +45,8 @@ public class TemporaryVerticesContainerTest {
       var collection = vertexLinker.linkVertexForRequest(
         temporaryLocation,
         new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.OUTGOING,
-        (vertex, streetVertex) ->
-          List.of(TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryVertex) vertex, streetVertex))
+        new TraverseModeSet(),
+        TemporaryFreeEdge::createTemporaryFreeEdge
       );
       container.addEdgeCollection(collection);
       // There should be vertices from B -> C and B -> to split edge

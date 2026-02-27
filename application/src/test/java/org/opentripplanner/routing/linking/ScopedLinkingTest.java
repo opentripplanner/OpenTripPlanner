@@ -1,9 +1,7 @@
 package org.opentripplanner.routing.linking;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.street.model.edge.LinkingDirection.BIDIRECTIONAL;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -32,11 +30,7 @@ class ScopedLinkingTest {
     var env = buildEnv();
     assertThat(env.graph().listStreetEdges()).hasSize(1);
     TraverseModeSet traverseModes = TraverseModeSet.allModes();
-    env
-      .linker()
-      .linkVertexPermanently(SPLIT, traverseModes, BIDIRECTIONAL, (vertex, streetVertex) ->
-        List.of()
-      );
+    env.linker().linkVertexBidirectionallyPermanently(SPLIT, traverseModes, (_, _) -> null);
     assertThat(env.graph().listStreetEdges()).hasSize(2);
     env.disposeEdges();
     // edges should stay after disposing
@@ -50,7 +44,7 @@ class ScopedLinkingTest {
     TraverseModeSet traverseModes = TraverseModeSet.allModes();
     var temp = env
       .linker()
-      .linkVertexForRealTime(SPLIT, traverseModes, BIDIRECTIONAL, (v1, v2) -> List.of());
+      .linkVertexBidirectionallyForRealTime(SPLIT, traverseModes, (_, _) -> null);
     assertThat(env.graph().listStreetEdges()).hasSize(2);
     temp.disposeEdges();
     assertThat(env.graph().listStreetEdges()).hasSize(1);
