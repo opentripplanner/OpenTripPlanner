@@ -168,12 +168,27 @@ public final class CompactLineStringUtils {
   }
 
   /**
-   * Wrapper for the above method in the case where there are no start/end coordinates provided.
-   * 0-coordinates are added and then removed in order for the delta encoding to work correctly.
-   * Same as the other version, but in a var-len int packed form (Dlugosz coding).
+   * Uncompact a line string that was compacted without start/end endpoint context. Decodes the
+   * delta-encoded coordinates directly, avoiding the intermediate dummy-endpoint LineString and
+   * subsequent strip that the previous implementation used.
    */
   public static LineString uncompactLineString(byte[] packedCoords, boolean reverse) {
-    LineString lineString = uncompactLineString(0.0, 0.0, 0.0, 0.0, packedCoords, reverse);
-    return GeometryUtils.removeStartEndCoordinatesFromLineString(lineString);
+    int[] coords = DlugoszVarLenIntPacker.unpack(packedCoords);
+    if (coords == null || coords.length == 0) {
+      return GeometryUtils.makeLineString(new Coordinate[0]);
+    }
+    int size = coords.length / 2;
+    Coordinate[] c = new Coordinate[size];
+    int oix = 0;
+    int oiy = 0;
+    for (int i = 0; i < size; i++) {
+      int ix = oix + coords[i * 2];
+      int iy = oiy + coords[i * 2 + 1];
+      c[i] = new Coordinate(ix / FIXED_FLOAT_MULT, iy / FIXED_FLOAT_MULT);
+      oix = ix;
+      oiy = iy;
+    }
+    LineString out = GeometryUtils.makeLineString(c);
+    return reverse ? out.reverse() : out;
   }
 }

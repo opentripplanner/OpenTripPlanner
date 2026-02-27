@@ -113,13 +113,6 @@ public class GeometryUtils {
     return makeLineString(result);
   }
 
-  public static LineString removeStartEndCoordinatesFromLineString(LineString lineString) {
-    Coordinate[] c = lineString.getCoordinates();
-    Coordinate[] result = new Coordinate[c.length - 2];
-    System.arraycopy(c, 1, result, 0, c.length - 2);
-    return makeLineString(result);
-  }
-
   public static GeometryFactory getGeometryFactory() {
     return GF;
   }
