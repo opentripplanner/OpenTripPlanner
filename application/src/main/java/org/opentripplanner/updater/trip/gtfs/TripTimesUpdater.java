@@ -31,12 +31,8 @@ import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 import org.opentripplanner.updater.trip.gtfs.model.TripTimesPatch;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class TripTimesUpdater {
-
-  private static final Logger LOG = LoggerFactory.getLogger(TripTimesUpdater.class);
 
   private final ZoneId timeZone;
   private final DeduplicatorService deduplicator;
@@ -77,7 +73,6 @@ class TripTimesUpdater {
 
     var tripTimes = timetable.getTripTimes(tripId);
     if (tripTimes == null) {
-      LOG.debug("tripId {} not found in pattern.", tripId);
       return Result.failure(new UpdateError(tripId, TRIP_NOT_FOUND_IN_PATTERN));
     }
 
@@ -139,19 +134,9 @@ class TripTimesUpdater {
         } else {
           // Else the status is SCHEDULED, update times as needed.
           if (!update.isArrivalValid()) {
-            LOG.debug(
-              "Arrival time at index {} of trip {} has neither a delay nor a time.",
-              pos,
-              tripId
-            );
             return Result.failure(new UpdateError(tripId, INVALID_ARRIVAL_TIME, pos));
           }
           if (!update.isDepartureValid()) {
-            LOG.debug(
-              "Departure time at index {} of trip {} has neither a delay nor a time.",
-              pos,
-              tripId
-            );
             return Result.failure(new UpdateError(tripId, INVALID_DEPARTURE_TIME, pos));
           }
           setArrivalAndDeparture(builder, pos, update, today);
@@ -161,16 +146,9 @@ class TripTimesUpdater {
 
     // Interpolate missing times for stops which don't have times associated. Note: Currently for
     // GTFS-RT updates ONLY not for SIRI updates.
-    if (ForwardsDelayInterpolator.getInstance(forwardsDelay).interpolateDelay(builder)) {
-      LOG.debug("Interpolated delays for for missing stops on trip {}.", tripId);
-    }
+    ForwardsDelayInterpolator.getInstance(forwardsDelay).interpolateDelay(builder);
 
-    var backwardPropagationIndex = BackwardsDelayInterpolator.getInstance(
-      backwardsDelay
-    ).propagateBackwards(builder);
-    backwardPropagationIndex.ifPresent(index ->
-      LOG.debug("Propagated delay from stop index {} backwards on trip {}.", index, tripId)
-    );
+    BackwardsDelayInterpolator.getInstance(backwardsDelay).propagateBackwards(builder);
 
     tripUpdate.wheelchairAccessibility().ifPresent(builder::withWheelchairAccessibility);
 
@@ -223,12 +201,6 @@ class TripTimesUpdater {
       if (arrival.isPresent()) {
         final var arrivalTime = arrival.getAsLong() - midnightSecondsSinceEpoch;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          LOG.debug(
-            "NEW trip {} on {} has invalid arrival time (compared to start date in " +
-              "TripDescriptor), skipping.",
-            trip.getId(),
-            tripUpdate.serviceDate()
-          );
           return UpdateError.result(trip.getId(), INVALID_ARRIVAL_TIME);
         }
         stopTime.setArrivalTime((int) arrivalTime);
@@ -238,12 +210,6 @@ class TripTimesUpdater {
       if (departure.isPresent()) {
         final long departureTime = departure.getAsLong() - midnightSecondsSinceEpoch;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          LOG.debug(
-            "NEW trip {} on {} has invalid departure time (compared to start date in " +
-              "TripDescriptor), skipping.",
-            trip.getId(),
-            tripUpdate.serviceDate()
-          );
           return UpdateError.result(trip.getId(), INVALID_DEPARTURE_TIME);
         }
         stopTime.setDepartureTime((int) departureTime);
