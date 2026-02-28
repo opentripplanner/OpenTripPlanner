@@ -29,7 +29,7 @@ class DelayedTest implements RealtimeTestConstants {
   private static final int STOP_SEQUENCE = 1;
 
   @Test
-  void singleStopDelay() {
+  void singleStopSequence() {
     var tripInput = TripInput.of(TRIP_1_ID)
       .addStop(STOP_A, "0:00:10", "0:00:11")
       .addStop(STOP_B, "0:00:20", "0:00:21");
@@ -85,6 +85,25 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertEquals(
       "UPDATED | A 10:01 10:01 | B 10:11 10:11",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
+  }
+
+  @Test
+  void singleStopId() {
+    var tripInput = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "10:00", "10:00")
+      .addStop(STOP_B, "10:10", "10:10");
+
+    var env = ENV_BUILDER.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
+
+    var tripUpdate = rt.tripUpdateScheduled(TRIP_1_ID).addStopTime(STOP_B_ID, "10:11").build();
+
+    assertSuccess(rt.applyTripUpdate(tripUpdate));
+
+    assertEquals(
+      "UPDATED | A [ND] 10:00 10:00 | B 10:11 10:11",
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
