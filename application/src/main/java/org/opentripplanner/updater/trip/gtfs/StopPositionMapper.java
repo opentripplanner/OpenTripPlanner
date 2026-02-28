@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip.gtfs;
 
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
 
 import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -37,7 +38,11 @@ class StopPositionMapper {
       }
     } else if (update.stopId().isPresent()) {
       var i = stopIds.indexOf(update.stopId().get());
-      return Result.success(i);
+      if (i < 0) {
+        return Result.failure(new UpdateError(tripId, UNKNOWN_STOP));
+      } else {
+        return Result.success(i);
+      }
     } else {
       return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE));
     }
