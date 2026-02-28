@@ -10,7 +10,6 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.Schedu
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -91,100 +90,86 @@ class TripTimesUpdater {
     Map<Integer, PickDrop> updatedDropoffs = new HashMap<>();
     Map<Integer, String> replacedStopIndices = new HashMap<>();
 
-    // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
-    Iterator<StopTimeUpdate> updates = tripUpdate.stopTimeUpdates().iterator();
-    StopTimeUpdate update = null;
-    if (!updates.hasNext()) {
-      LOG.warn("Zero-length trip update to trip {}.", tripId);
-    } else {
-      update = updates.next();
-    }
-
-    int numStops = tripTimes.getNumStops();
-
     final long today = ServiceDateUtils.asStartOfService(
       tripUpdate.serviceDate(),
       timeZone
     ).toEpochSecond();
 
-    for (int i = 0; i < numStops; i++) {
-      var index = i;
-      boolean match = false;
-      if (update != null) {
-        if (update.stopSequence().isPresent()) {
-          match = update.stopSequence().getAsInt() == tripTimes.gtfsSequenceOfStopIndex(i);
-        } else if (update.stopId().isPresent()) {
-          match = timetable.getPattern().getStop(i).getId().getId().equals(update.stopId().get());
+    var stopIds = timetable
+      .getPattern()
+      .getStops()
+      .stream()
+      .map(s -> s.getId().getId())
+      .toList();
+
+    for (var update : tripUpdate.stopTimeUpdates()) {
+      int i;
+      if (update.stopSequence().isPresent()) {
+        var tmp = tripTimes.stopPositionForGtfsSequence(update.stopSequence().getAsInt());
+        if (tmp.isEmpty()) {
+          return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE));
+        } else {
+          i = tmp.getAsInt();
         }
+      } else if (update.stopId().isPresent()) {
+        i = stopIds.indexOf(update.stopId().get());
+      } else {
+        return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE));
       }
 
-      if (match) {
-        var scheduledStopId = timetable.getPattern().getStop(i).getId().getId();
-        var scheduledStopHeadsign = tripTimes.getHeadsign(i);
-        var scheduledPickup = timetable.getPattern().getBoardType(i);
-        var scheduledDropoff = timetable.getPattern().getAlightType(i);
-        update
-          .stopHeadsign()
-          .filter(x -> !Objects.equals(x, scheduledStopHeadsign))
-          .ifPresent(x -> builder.withStopHeadsign(index, x));
-        update
-          .pickup()
-          .filter(x -> x != scheduledPickup)
-          .ifPresent(x -> updatedPickups.put(index, x));
-        update
-          .dropoff()
-          .filter(x -> x != scheduledDropoff)
-          .ifPresent(x -> updatedDropoffs.put(index, x));
-        update
-          .assignedStopId()
-          .filter(x -> !Objects.equals(x, scheduledStopId))
-          .ifPresent(x -> replacedStopIndices.put(index, x));
+      final int pos = i;
+      var scheduledStopId = timetable.getPattern().getStop(pos).getId().getId();
+      var scheduledStopHeadsign = tripTimes.getHeadsign(pos);
+      var scheduledPickup = timetable.getPattern().getBoardType(pos);
+      var scheduledDropoff = timetable.getPattern().getAlightType(pos);
+      update
+        .stopHeadsign()
+        .filter(x -> !Objects.equals(x, scheduledStopHeadsign))
+        .ifPresent(x -> builder.withStopHeadsign(pos, x));
+      update
+        .pickup()
+        .filter(x -> x != scheduledPickup)
+        .ifPresent(x -> updatedPickups.put(pos, x));
+      update
+        .dropoff()
+        .filter(x -> x != scheduledDropoff)
+        .ifPresent(x -> updatedDropoffs.put(pos, x));
+      update
+        .assignedStopId()
+        .filter(x -> !Objects.equals(x, scheduledStopId))
+        .ifPresent(x -> replacedStopIndices.put(pos, x));
 
-        var scheduleRelationship = update.scheduleRelationship();
-        // Handle each schedule relationship case
-        if (scheduleRelationship == ScheduleRelationship.SKIPPED) {
-          // Set status to cancelled
-          updatedPickups.put(i, PickDrop.CANCELLED);
-          updatedDropoffs.put(i, PickDrop.CANCELLED);
-          builder.withCanceled(i);
-        } else if (scheduleRelationship == ScheduleRelationship.NO_DATA) {
-          // Set status to NO_DATA and delays to 0.
-          // Note: GTFS-RT requires NO_DATA stops to have no arrival departure times.
-          builder.withNoData(i);
-        } else {
-          // Else the status is SCHEDULED, update times as needed.
-          if (!update.isArrivalValid()) {
-            LOG.debug(
-              "Arrival time at index {} of trip {} has neither a delay nor a time.",
-              i,
-              tripId
-            );
-            return Result.failure(new UpdateError(tripId, INVALID_ARRIVAL_TIME, i));
-          }
-          if (!update.isDepartureValid()) {
-            LOG.debug(
-              "Departure time at index {} of trip {} has neither a delay nor a time.",
-              i,
-              tripId
-            );
-            return Result.failure(new UpdateError(tripId, INVALID_DEPARTURE_TIME, i));
-          }
-          setArrivalAndDeparture(builder, i, update, today);
+      var scheduleRelationship = update.scheduleRelationship();
+      // Handle each schedule relationship case
+      if (scheduleRelationship == ScheduleRelationship.SKIPPED) {
+        // Set status to cancelled
+        updatedPickups.put(pos, PickDrop.CANCELLED);
+        updatedDropoffs.put(pos, PickDrop.CANCELLED);
+        builder.withCanceled(pos);
+      } else if (scheduleRelationship == ScheduleRelationship.NO_DATA) {
+        // Set status to NO_DATA and delays to 0.
+        // Note: GTFS-RT requires NO_DATA stops to have no arrival departure times.
+        builder.withNoData(pos);
+      } else {
+        // Else the status is SCHEDULED, update times as needed.
+        if (!update.isArrivalValid()) {
+          LOG.debug(
+            "Arrival time at index {} of trip {} has neither a delay nor a time.",
+            pos,
+            tripId
+          );
+          return Result.failure(new UpdateError(tripId, INVALID_ARRIVAL_TIME, pos));
         }
-
-        if (updates.hasNext()) {
-          update = updates.next();
-        } else {
-          update = null;
+        if (!update.isDepartureValid()) {
+          LOG.debug(
+            "Departure time at index {} of trip {} has neither a delay nor a time.",
+            pos,
+            tripId
+          );
+          return Result.failure(new UpdateError(tripId, INVALID_DEPARTURE_TIME, pos));
         }
+        setArrivalAndDeparture(builder, pos, update, today);
       }
-    }
-    if (update != null) {
-      LOG.debug(
-        "Part of a TripUpdate object could not be applied successfully to trip {}.",
-        tripId
-      );
-      return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE));
     }
 
     // Interpolate missing times for stops which don't have times associated. Note: Currently for
