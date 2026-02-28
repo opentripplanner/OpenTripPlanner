@@ -3,7 +3,6 @@ package org.opentripplanner.updater.trip.gtfs;
 import static org.opentripplanner.transit.model.framework.Result.success;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
@@ -13,9 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.DataValidationException;
@@ -27,7 +24,6 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
@@ -64,7 +60,7 @@ class TripTimesUpdater {
    * all trips in a timetable are from the same feed, which should always be the case.
    *
    * @param tripUpdate                    GTFS-RT trip update
-   * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
+   * @param backwardsDelay Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag
    * @return {@link Result < TripTimesPatch ,    UpdateError   >} contains either a new copy of updated
    * TripTimes after TripUpdate has been applied on TripTimes of trip with the id specified in the
@@ -74,8 +70,8 @@ class TripTimesUpdater {
   public Result<TripTimesPatch, UpdateError> createUpdatedTripTimesFromGtfsRt(
     Timetable timetable,
     TripUpdate tripUpdate,
-    ForwardsDelayPropagationType forwardsDelayPropagationType,
-    BackwardsDelayPropagationType backwardsDelayPropagationType
+    ForwardsDelayPropagationType forwardsDelay,
+    BackwardsDelayPropagationType backwardsDelay
   ) {
     var tripId = tripUpdate.tripId();
 
@@ -98,8 +94,10 @@ class TripTimesUpdater {
       timeZone
     ).toEpochSecond();
 
+    var mapper = new StopPositionMapper(tripId, tripTimes, timetable);
+
     for (var update : tripUpdate.stopTimeUpdates()) {
-      var res = stopPositionInPattern(update, tripId, tripTimes, timetable);
+      var res = mapper.stopPositionInPattern(update);
 
       if (res.isFailure()) {
         return res.toFailureResult();
@@ -163,14 +161,12 @@ class TripTimesUpdater {
 
     // Interpolate missing times for stops which don't have times associated. Note: Currently for
     // GTFS-RT updates ONLY not for SIRI updates.
-    if (
-      ForwardsDelayInterpolator.getInstance(forwardsDelayPropagationType).interpolateDelay(builder)
-    ) {
+    if (ForwardsDelayInterpolator.getInstance(forwardsDelay).interpolateDelay(builder)) {
       LOG.debug("Interpolated delays for for missing stops on trip {}.", tripId);
     }
 
     var backwardPropagationIndex = BackwardsDelayInterpolator.getInstance(
-      backwardsDelayPropagationType
+      backwardsDelay
     ).propagateBackwards(builder);
     backwardPropagationIndex.ifPresent(index ->
       LOG.debug("Propagated delay from stop index {} backwards on trip {}.", index, tripId)
@@ -296,34 +292,6 @@ class TripTimesUpdater {
 
     // Add new trip times to the buffer
     return success(new TripTimesWithStopPattern(tripTimes, new StopPattern(stopTimes)));
-  }
-
-  private static Result<Integer, UpdateError> stopPositionInPattern(
-    StopTimeUpdate update,
-    FeedScopedId tripId,
-    TripTimes tripTimes,
-    Timetable timetable
-  ) {
-    var stopIds = timetable
-      .getPattern()
-      .getStops()
-      .stream()
-      .map(s -> s.getId().getId())
-      .toList();
-
-    if (update.stopSequence().isPresent()) {
-      var tmp = tripTimes.stopPositionForGtfsSequence(update.stopSequence().getAsInt());
-      if (tmp.isEmpty()) {
-        return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE));
-      } else {
-        return Result.success(tmp.getAsInt());
-      }
-    } else if (update.stopId().isPresent()) {
-      var i = stopIds.indexOf(update.stopId().get());
-      return Result.success(i);
-    } else {
-      return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE));
-    }
   }
 
   private static void setArrivalAndDeparture(
