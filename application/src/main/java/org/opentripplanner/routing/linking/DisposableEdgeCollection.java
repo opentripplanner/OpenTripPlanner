@@ -2,6 +2,7 @@ package org.opentripplanner.routing.linking;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.street.Scope;
@@ -20,10 +21,6 @@ public class DisposableEdgeCollection {
   private final Scope scope;
 
   private final Set<Edge> edges = new HashSet<>();
-
-  public DisposableEdgeCollection(Graph graph) {
-    this(graph, null);
-  }
 
   public DisposableEdgeCollection(Graph graph, Scope scope) {
     this.graph = graph;
@@ -60,5 +57,9 @@ public class DisposableEdgeCollection {
       graph.removeIfUnconnected(v);
     }
     edges.clear();
+  }
+
+  public Set<Edge> listEdges() {
+    return Collections.unmodifiableSet(edges);
   }
 }

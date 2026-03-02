@@ -307,7 +307,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     private static int indexCounter = 0;
 
     /**
-     * Generate a street from A to B. The streets are horisontal and paralell to each other with
+     * Generate a street from A to B. The streets are horizontal and parallel to each other with
      * about 10-11m apart (see {@link #STREET_DELTA}).
      */
     static LinkingTestCase of(StreetTraversalPermission permission) {
