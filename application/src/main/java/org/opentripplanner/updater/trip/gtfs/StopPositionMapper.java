@@ -1,8 +1,9 @@
 package org.opentripplanner.updater.trip.gtfs;
 
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_REFERENCE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
 
+import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -28,23 +29,32 @@ class StopPositionMapper {
       .toList();
   }
 
-  Result<Integer, UpdateError> stopPositionInPattern(StopTimeUpdate update) {
+  Result<Integer, UpdateError> stopPositionInPattern(StopTimeUpdate update, int listIndex) {
     if (update.stopSequence().isPresent()) {
       var tmp = tripTimes.stopPositionForGtfsSequence(update.stopSequence().getAsInt());
       if (tmp.isEmpty()) {
-        return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE));
+        return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE, listIndex));
       } else {
         return Result.success(tmp.getAsInt());
       }
     } else if (update.stopId().isPresent()) {
-      var i = stopIds.indexOf(update.stopId().get());
-      if (i < 0) {
-        return Result.failure(new UpdateError(tripId, UNKNOWN_STOP));
-      } else {
+      var visitsAtStop = Collections.frequency(stopIds, update.stopId().get());
+      if (visitsAtStop == 0) {
+        return Result.failure(new UpdateError(tripId, INVALID_STOP_REFERENCE, listIndex));
+      } else if (visitsAtStop == 1) {
+        var i = stopIds.indexOf(update.stopId().get());
         return Result.success(i);
       }
+      if (visitsAtStop > 1) {
+        var id = stopIds.get(listIndex);
+        if (id.equals(update.stopId().get())) {
+          return Result.success(listIndex);
+        }
+        return Result.failure(new UpdateError(tripId, INVALID_STOP_REFERENCE, listIndex));
+      }
+      return Result.failure(new UpdateError(tripId, INVALID_STOP_REFERENCE, listIndex));
     } else {
-      return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE));
+      return Result.failure(new UpdateError(tripId, INVALID_STOP_REFERENCE, listIndex));
     }
   }
 }

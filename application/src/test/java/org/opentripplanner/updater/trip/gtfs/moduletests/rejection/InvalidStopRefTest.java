@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.rejection;
 
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_REFERENCE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
@@ -28,7 +29,7 @@ class InvalidStopRefTest implements RealtimeTestConstants {
     var rt = GtfsRtTestHelper.of(env);
     var update = rt.tripUpdateScheduled(TRIP_1_ID).addStopTime("unknown stop", "10:00").build();
 
-    assertFailure(INVALID_STOP_SEQUENCE, rt.applyTripUpdate(update));
+    assertFailure(INVALID_STOP_REFERENCE, rt.applyTripUpdate(update));
   }
 
   @Test
@@ -41,7 +42,7 @@ class InvalidStopRefTest implements RealtimeTestConstants {
       .addStopTime("unknown stop", "10:00")
       .build();
 
-    assertFailure(INVALID_STOP_SEQUENCE, rt.applyTripUpdate(update));
+    assertFailure(INVALID_STOP_REFERENCE, rt.applyTripUpdate(update));
   }
 
   @Test
@@ -77,6 +78,6 @@ class InvalidStopRefTest implements RealtimeTestConstants {
         StopTimeUpdate.newBuilder().setDeparture(StopTimeEvent.newBuilder().setDelay(60)).build()
       )
       .build();
-    assertFailure(INVALID_STOP_SEQUENCE, rt.applyTripUpdate(update));
+    assertFailure(INVALID_STOP_REFERENCE, rt.applyTripUpdate(update));
   }
 }

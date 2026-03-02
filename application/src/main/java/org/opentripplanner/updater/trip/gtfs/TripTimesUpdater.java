@@ -91,8 +91,9 @@ class TripTimesUpdater {
 
     var mapper = new StopPositionMapper(tripId, tripTimes, timetable);
 
-    for (var update : tripUpdate.stopTimeUpdates()) {
-      var res = mapper.stopPositionInPattern(update);
+    for (var i = 0; i < tripUpdate.stopTimeUpdates().size(); i++) {
+      var update = tripUpdate.stopTimeUpdates().get(i);
+      var res = mapper.stopPositionInPattern(update, i);
 
       if (res.isFailure()) {
         return res.toFailureResult();
