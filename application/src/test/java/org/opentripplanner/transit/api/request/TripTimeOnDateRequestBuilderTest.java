@@ -97,16 +97,6 @@ class TripTimeOnDateRequestBuilderTest {
   }
 
   @Test
-  void withIncludeAgenciesNull() {
-    var request = TripTimeOnDateRequest.of(List.of(STOP))
-      .withTime(TIME)
-      .withIncludeAgencies(null)
-      .build();
-
-    assertTrue(request.includeAgencies().includeEverything());
-  }
-
-  @Test
   void withIncludeRoutes() {
     var routeId = new FeedScopedId("F", "R1");
     var request = TripTimeOnDateRequest.of(List.of(STOP))
@@ -162,6 +152,26 @@ class TripTimeOnDateRequestBuilderTest {
 
     assertFalse(request.excludeModes().includeEverything());
     assertTrue(request.excludeModes().get().contains(TransitMode.RAIL));
+  }
+
+  @Test
+  void withNullIncludeAndExcludes() {
+    var request = TripTimeOnDateRequest.of(List.of(STOP))
+      .withTime(TIME)
+      .withIncludeRoutes(null)
+      .withExcludeRoutes(null)
+      .withIncludeAgencies(null)
+      .withExcludeAgencies(null)
+      .withIncludeModes(null)
+      .withExcludeModes(null)
+      .build();
+
+    assertTrue(request.includeRoutes().includeEverything());
+    assertTrue(request.includeAgencies().includeEverything());
+    assertTrue(request.includeModes().includeEverything());
+    assertTrue(request.excludeRoutes().includeEverything());
+    assertTrue(request.excludeAgencies().includeEverything());
+    assertTrue(request.excludeModes().includeEverything());
   }
 
   @Test
