@@ -12,6 +12,10 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 
+/**
+ * Takes a trip and a list of stop times and maps the stop times to the stop positions in the
+ * trip's pattern.
+ */
 class StopPositionMapper {
 
   private final FeedScopedId tripId;
@@ -29,6 +33,13 @@ class StopPositionMapper {
       .toList();
   }
 
+  /**
+   * Takes a stop time update and the index of the stop time in the list of stop times and returns
+   * the stop position in the trip's pattern.
+   *
+   * @param listIndex The list index of the update in the list of stop time updates
+   * @return
+   */
   Result<Integer, UpdateError> stopPositionInPattern(StopTimeUpdate update, int listIndex) {
     if (update.stopSequence().isPresent()) {
       var tmp = tripTimes.stopPositionForGtfsSequence(update.stopSequence().getAsInt());
@@ -45,7 +56,11 @@ class StopPositionMapper {
         var i = stopIds.indexOf(update.stopId().get());
         return Result.success(i);
       }
+      // special case: circular stop pattern but the updates supplied contain only stop_id
+      // not stop_sequence. it's quite questionable that this should be supported at all.
       if (visitsAtStop > 1) {
+        // we take the position of the update in the list and see if that by chance is the same
+        // index the pattern.
         var id = stopIds.get(listIndex);
         if (id.equals(update.stopId().get())) {
           return Result.success(listIndex);
