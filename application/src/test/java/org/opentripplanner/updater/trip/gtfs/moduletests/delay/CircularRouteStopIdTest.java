@@ -42,4 +42,40 @@ class CircularRouteStopIdTest implements RealtimeTestConstants {
       env.tripData(TRIP_1_ID).showTimetable()
     );
   }
+
+  @Test
+  void missingStopAtBeginning() {
+    var env = builder.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
+    var update = rt
+      .tripUpdateScheduled(TRIP_1_ID)
+      .addStopTime(STOP_B_ID, "10:21")
+      .addStopTime(STOP_A_ID, "10:31")
+      .build();
+
+    assertSuccess(rt.applyTripUpdate(update));
+
+    assertEquals(
+      "UPDATED | A [ND] 10:00 10:00 | B 10:21 10:21 | A 10:31 10:31",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
+  }
+
+  @Test
+  void missingStopAtEnd() {
+    var env = builder.addTrip(tripInput).build();
+    var rt = GtfsRtTestHelper.of(env);
+    var update = rt
+      .tripUpdateScheduled(TRIP_1_ID)
+      .addStopTime(STOP_A_ID, "10:11")
+      .addStopTime(STOP_B_ID, "10:21")
+      .build();
+
+    assertSuccess(rt.applyTripUpdate(update));
+
+    assertEquals(
+      "UPDATED | A 10:11 10:11 | B 10:21 10:21 | A 10:31 10:31",
+      env.tripData(TRIP_1_ID).showTimetable()
+    );
+  }
 }
