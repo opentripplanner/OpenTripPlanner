@@ -37,9 +37,15 @@ class ScheduledTransitLegTest {
   ).toZonedDateTime();
   private static final ZonedDateTime END_TIME = START_TIME.plusMinutes(10);
   private static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
-  private static final RegularStop STOP_0 = ENV_BUILDER.stop("Stop_0");
-  private static final RegularStop STOP_1 = ENV_BUILDER.stop("Stop_1");
-  private static final RegularStop STOP_2 = ENV_BUILDER.stop("Stop_2");
+  private static final RegularStop STOP_0 = ENV_BUILDER.stop("Stop_0", b ->
+    b.withCoordinate(60.0, 10.0)
+  );
+  private static final RegularStop STOP_1 = ENV_BUILDER.stop("Stop_1", b ->
+    b.withCoordinate(60.0, 10.01)
+  );
+  private static final RegularStop STOP_2 = ENV_BUILDER.stop("Stop_2", b ->
+    b.withCoordinate(60.0, 10.02)
+  );
   private static final TransitTestEnvironment ENV = ENV_BUILDER.addTrip(
     TripInput.of("trip1")
       .addStop(STOP_0, "10:00", "10:01")
@@ -177,7 +183,7 @@ class ScheduledTransitLegTest {
     assertEquals(
       "ScheduledTransitLeg{" +
         "from: Place{name: Stop_0, stop: RegularStop{F:Stop_0 Stop_0}, coordinate: (60.0, 10.0), vertexType: TRANSIT, viaLocationType: PASS_THROUGH}, " +
-        "to: Place{name: Stop_2, stop: RegularStop{F:Stop_2 Stop_2}, coordinate: (60.0, 10.0), vertexType: TRANSIT, viaLocationType: VISIT}, " +
+        "to: Place{name: Stop_2, stop: RegularStop{F:Stop_2 Stop_2}, coordinate: (60.0, 10.02), vertexType: TRANSIT, viaLocationType: VISIT}, " +
         "startTime: 2023-04-17T17:49:06, " +
         "endTime: 2023-04-17T17:59:06, " +
         "realTime: true, " +
