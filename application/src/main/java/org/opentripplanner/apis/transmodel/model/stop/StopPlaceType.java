@@ -37,7 +37,6 @@ import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -422,50 +421,6 @@ public class StopPlaceType {
           .build()
       )
       .build();
-  }
-
-  public static Stream<TripTimeOnDate> getTripTimesForStop(
-    StopLocation stop,
-    Instant startTimeSeconds,
-    Duration timeRange,
-    ArrivalDeparture arrivalDeparture,
-    boolean includeCancelledTrips,
-    int numberOfDepartures,
-    Integer departuresPerLineAndDestinationDisplay,
-    Collection<FeedScopedId> authorityIdsWhiteListed,
-    Collection<FeedScopedId> lineIdsWhiteListed,
-    Collection<TransitMode> transitModes,
-    DataFetchingEnvironment environment
-  ) {
-    TransitService transitService = GqlUtil.getTransitService(environment);
-
-    List<StopTimesInPattern> stopTimesInPatterns = transitService.findStopTimesInPattern(
-      stop,
-      startTimeSeconds,
-      timeRange,
-      numberOfDepartures,
-      arrivalDeparture,
-      includeCancelledTrips
-    );
-
-    Stream<StopTimesInPattern> stopTimesStream = stopTimesInPatterns.stream();
-
-    if (transitModes != null && !transitModes.isEmpty()) {
-      stopTimesStream = stopTimesStream.filter(it -> transitModes.contains(it.pattern.getMode()));
-    }
-
-    Stream<TripTimeOnDate> tripTimesStream = stopTimesStream.flatMap(p -> p.times.stream());
-
-    tripTimesStream = JourneyWhiteListed.whiteListAuthoritiesAndOrLines(
-      tripTimesStream,
-      authorityIdsWhiteListed,
-      lineIdsWhiteListed
-    );
-
-    return limitPerLineAndDestinationDisplay(
-      tripTimesStream,
-      departuresPerLineAndDestinationDisplay
-    );
   }
 
   private static Stream<TripTimeOnDate> limitPerLineAndDestinationDisplay(
