@@ -135,10 +135,10 @@ class TripTimesUpdater {
         } else {
           // Else the status is SCHEDULED, update times as needed.
           if (!update.isArrivalValid()) {
-            return Result.failure(new UpdateError(tripId, INVALID_ARRIVAL_TIME, pos));
+            return Result.failure(new UpdateError(tripId, INVALID_ARRIVAL_TIME, i));
           }
           if (!update.isDepartureValid()) {
-            return Result.failure(new UpdateError(tripId, INVALID_DEPARTURE_TIME, pos));
+            return Result.failure(new UpdateError(tripId, INVALID_DEPARTURE_TIME, i));
           }
           setArrivalAndDeparture(builder, pos, update, today);
         }
