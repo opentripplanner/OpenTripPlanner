@@ -40,7 +40,7 @@ class StopPositionMapper {
     } else if (update.stopId().isPresent()) {
       var visitsAtStop = Collections.frequency(stopIds, update.stopId().get());
       if (visitsAtStop == 0) {
-        return Result.failure(new UpdateError(tripId, INVALID_STOP_REFERENCE, listIndex));
+        return invalid(listIndex);
       } else if (visitsAtStop == 1) {
         var i = stopIds.indexOf(update.stopId().get());
         return Result.success(i);
@@ -50,11 +50,15 @@ class StopPositionMapper {
         if (id.equals(update.stopId().get())) {
           return Result.success(listIndex);
         }
-        return Result.failure(new UpdateError(tripId, INVALID_STOP_REFERENCE, listIndex));
+        return invalid(listIndex);
       }
-      return Result.failure(new UpdateError(tripId, INVALID_STOP_REFERENCE, listIndex));
+      return invalid(listIndex);
     } else {
-      return Result.failure(new UpdateError(tripId, INVALID_STOP_REFERENCE, listIndex));
+      return invalid(listIndex);
     }
+  }
+
+  private Result<Integer, UpdateError> invalid(int listIndex) {
+    return Result.failure(new UpdateError(tripId, INVALID_STOP_REFERENCE, listIndex));
   }
 }
