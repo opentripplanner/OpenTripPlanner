@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * @param routeCreation                true if an added trip cannot be registered under an existing route
  *                                     and a new route must be created.
  * @param dataSource                   the dataSource of the real-time update.
- * @param scheduledPatternToDeleteFrom when non-null, signals the snapshot manager to mark the trip
+ * @param hideTripInScheduledPattern when non-null, signals the snapshot manager to mark the trip
  *                                     as deleted in this pattern.
  */
 record TripUpdate(
@@ -34,7 +34,7 @@ record TripUpdate(
   @Nullable TripPattern addedTripPattern,
   boolean routeCreation,
   @Nullable String dataSource,
-  @Nullable TripPattern scheduledPatternToDeleteFrom
+  @Nullable TripPattern hideTripInScheduledPattern
 ) {
   public TripUpdate {
     Objects.requireNonNull(stopPattern);
@@ -68,7 +68,7 @@ record TripUpdate(
     return addedTripOnServiceDate != null;
   }
 
-  TripUpdate withScheduledPatternToDeleteFrom(@Nullable TripPattern pattern) {
+  TripUpdate withHideTripInScheduledPattern(@Nullable TripPattern pattern) {
     return new TripUpdate(
       stopPattern,
       tripTimes,

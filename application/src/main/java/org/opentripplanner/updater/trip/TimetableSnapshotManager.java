@@ -180,7 +180,7 @@ public final class TimetableSnapshotManager {
     }
 
     // Phase 2: Mark trip as deleted in scheduled pattern if moving to a modified pattern
-    var scheduledPattern = realTimeTripUpdate.scheduledPatternToDeleteFrom();
+    var scheduledPattern = realTimeTripUpdate.hideTripInScheduledPattern();
     if (scheduledPattern != null) {
       var scheduledTripTimes = scheduledPattern.getScheduledTimetable().getTripTimes(trip);
       if (scheduledTripTimes != null) {

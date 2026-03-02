@@ -274,7 +274,7 @@ public class SiriRealTimeTripUpdateAdapter {
       ? pattern
       : null;
 
-    return updateResult.mapSuccess(tu -> tu.withScheduledPatternToDeleteFrom(deleteFrom));
+    return updateResult.mapSuccess(tu -> tu.withHideTripInScheduledPattern(deleteFrom));
   }
 
   private Result<TripUpdate, UpdateError> handleExtraCall(
@@ -354,7 +354,7 @@ public class SiriRealTimeTripUpdateAdapter {
       ? pattern
       : null;
 
-    return updateResult.mapSuccess(tu -> tu.withScheduledPatternToDeleteFrom(deleteFrom));
+    return updateResult.mapSuccess(tu -> tu.withHideTripInScheduledPattern(deleteFrom));
   }
 
   /**
@@ -386,7 +386,7 @@ public class SiriRealTimeTripUpdateAdapter {
       .withRouteCreation(tripUpdate.routeCreation())
       .withProducer(tripUpdate.dataSource())
       .withRevertPreviousRealTimeUpdates(revertPreviousRealTimeUpdates)
-      .withScheduledPatternToDeleteFrom(tripUpdate.scheduledPatternToDeleteFrom())
+      .withHideTripInScheduledPattern(tripUpdate.hideTripInScheduledPattern())
       .build();
     var result = snapshotManager.updateBuffer(realTimeTripUpdate);
     LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);

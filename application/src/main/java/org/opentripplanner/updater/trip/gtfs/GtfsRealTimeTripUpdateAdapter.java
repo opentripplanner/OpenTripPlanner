@@ -245,7 +245,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       return snapshotManager.updateBuffer(
         RealTimeTripUpdate.of(newPattern, updatedTripTimes, tripUpdate.serviceDate())
           .withRevertPreviousRealTimeUpdates(true)
-          .withScheduledPatternToDeleteFrom(pattern)
+          .withHideTripInScheduledPattern(pattern)
           .build()
       );
     } else {
@@ -382,16 +382,16 @@ public class GtfsRealTimeTripUpdateAdapter {
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip);
 
     // Look up the scheduled pattern for MODIFIED trips so the manager can mark it as deleted
-    TripPattern scheduledPatternToDeleteFrom = null;
+    TripPattern hideTripInScheduledPattern = null;
     if (realTimeState == RealTimeState.MODIFIED) {
-      scheduledPatternToDeleteFrom = getPatternForTripId(trip.getId());
+      hideTripInScheduledPattern = getPatternForTripId(trip.getId());
     }
 
     // Add new trip times to the buffer
     var builder = RealTimeTripUpdate.of(pattern, tripTimes, serviceDate)
       .withRouteCreation(hasANewRouteBeenCreated)
       .withRevertPreviousRealTimeUpdates(true)
-      .withScheduledPatternToDeleteFrom(scheduledPatternToDeleteFrom);
+      .withHideTripInScheduledPattern(hideTripInScheduledPattern);
     if (realTimeState == RealTimeState.ADDED) {
       builder
         .withAddedTripOnServiceDate(

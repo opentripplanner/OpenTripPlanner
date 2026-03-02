@@ -26,7 +26,7 @@ public final class RealTimeTripUpdate {
   private final boolean revertPreviousRealTimeUpdates;
 
   @Nullable
-  private final TripPattern scheduledPatternToDeleteFrom;
+  private final TripPattern hideTripInScheduledPattern;
 
   private RealTimeTripUpdate(Builder builder) {
     this.pattern = Objects.requireNonNull(builder.pattern);
@@ -37,7 +37,7 @@ public final class RealTimeTripUpdate {
     this.routeCreation = builder.routeCreation;
     this.producer = builder.producer;
     this.revertPreviousRealTimeUpdates = builder.revertPreviousRealTimeUpdates;
-    this.scheduledPatternToDeleteFrom = builder.scheduledPatternToDeleteFrom;
+    this.hideTripInScheduledPattern = builder.hideTripInScheduledPattern;
 
     if (pattern.numberOfStops() != updatedTripTimes.getNumStops()) {
       throw new IllegalArgumentException(
@@ -100,8 +100,8 @@ public final class RealTimeTripUpdate {
   }
 
   @Nullable
-  public TripPattern scheduledPatternToDeleteFrom() {
-    return scheduledPatternToDeleteFrom;
+  public TripPattern hideTripInScheduledPattern() {
+    return hideTripInScheduledPattern;
   }
 
   public static class Builder {
@@ -114,7 +114,7 @@ public final class RealTimeTripUpdate {
     private boolean routeCreation;
     private String producer;
     private boolean revertPreviousRealTimeUpdates;
-    private TripPattern scheduledPatternToDeleteFrom;
+    private TripPattern hideTripInScheduledPattern;
 
     private Builder(TripPattern pattern, TripTimes updatedTripTimes, LocalDate serviceDate) {
       this.pattern = pattern;
@@ -168,8 +168,8 @@ public final class RealTimeTripUpdate {
      * When non-null, signals the snapshot manager to mark the trip as deleted in this pattern
      * (prevents duplication when moving to a modified pattern).
      */
-    public Builder withScheduledPatternToDeleteFrom(TripPattern scheduledPatternToDeleteFrom) {
-      this.scheduledPatternToDeleteFrom = scheduledPatternToDeleteFrom;
+    public Builder withHideTripInScheduledPattern(TripPattern hideTripInScheduledPattern) {
+      this.hideTripInScheduledPattern = hideTripInScheduledPattern;
       return this;
     }
 
