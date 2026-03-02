@@ -1,6 +1,5 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import java.util.function.IntUnaryOperator;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
@@ -36,13 +35,13 @@ public class TestTripSearchTimetable implements TripSearchTimetable<TestTripSche
   }
 
   @Override
-  public IntUnaryOperator getArrivalTimes(int stopPositionInPattern) {
-    return (int tripIndex) -> trips[tripIndex].arrival(stopPositionInPattern);
+  public int arrivalTime(int stopPositionInPattern, int tripIndex) {
+    return trips[tripIndex].arrival(stopPositionInPattern);
   }
 
   @Override
-  public IntUnaryOperator getDepartureTimes(int stopPositionInPattern) {
-    return (int tripIndex) -> trips[tripIndex].departure(stopPositionInPattern);
+  public int departureTime(int stopPositionInPattern, int tripIndex) {
+    return trips[tripIndex].departure(stopPositionInPattern);
   }
 
   @Override
