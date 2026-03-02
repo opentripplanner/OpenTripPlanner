@@ -36,9 +36,8 @@ public class EstimatedCallSelectInputType {
       GraphQLInputObjectField.newInputObjectField()
         .name("transportModes")
         .description(
-          "The allowed modes for the transit part of the trip. Use an empty list to " +
-            "disallow transit for this search. If the element is not present or null, it will " +
-            "default to all transport modes."
+          "The allowed modes of the journeys of the estimated call. " +
+            "If the element is not present or null, it will default to all transport modes."
         )
         .type(new GraphQLList(new GraphQLNonNull(ModeAndSubModeInputType.INPUT_TYPE)))
         .build()
