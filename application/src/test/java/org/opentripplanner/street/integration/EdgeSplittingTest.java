@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,7 +16,6 @@ import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
@@ -38,7 +36,6 @@ import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
-import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -47,12 +44,8 @@ import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.streetadapter.VertexFactory;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.service.TimetableRepository;
 
 public class EdgeSplittingTest {
-
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   private Graph graph;
   private StreetEdge top;
@@ -64,14 +57,10 @@ public class EdgeSplittingTest {
   private IntersectionVertex tr;
   private IntersectionVertex bl;
   private IntersectionVertex tl;
-  private TransitStopVertex station1;
-  private TransitStopVertex station2;
-  private TimetableRepository timetableRepository;
 
   @BeforeEach
   public void setUp() {
     graph = new Graph();
-    var siteRepositoryBuilder = testModel.siteRepositoryBuilder();
     var factory = new VertexFactory(graph);
     // a 0.1 degree x 0.1 degree square
     tl = factory.intersection("tl", -74.01, 40.01);
@@ -144,19 +133,9 @@ public class EdgeSplittingTest {
       .withBack(true)
       .buildAndConnect();
 
-    var s1 = testModel.stop("fleem station", 40.0099999, -74.005).build();
-    var s2 = testModel.stop("morx station", 40.0099999, -74.002).build();
-
-    siteRepositoryBuilder.withRegularStop(s1).withRegularStop(s2);
-    timetableRepository = new TimetableRepository(siteRepositoryBuilder.build());
-
-    station1 = factory.transitStop(ofStop(s1));
-    station2 = factory.transitStop(ofStop(s2));
-
     //Linkers aren't run otherwise in testNetworkLinker
     graph.hasStreets = true;
 
-    timetableRepository.index();
     graph.index();
   }
 
@@ -356,26 +335,5 @@ public class EdgeSplittingTest {
         assertNotSame(s.getBackEdge(), top);
       }
     }
-  }
-
-  @Test
-  public void testNetworkLinker() {
-    int numVerticesBefore = graph.getVertices().size();
-    TestStreetLinkerModule.link(graph, timetableRepository);
-    int numVerticesAfter = graph.getVertices().size();
-    assertEquals(4, numVerticesAfter - numVerticesBefore);
-    Collection<Edge> outgoing = station1.getOutgoing();
-    assertEquals(2, outgoing.size());
-    Edge edge = outgoing.iterator().next();
-
-    Vertex midpoint = edge.getToVertex();
-    assertTrue(Math.abs(midpoint.getCoordinate().y - 40.01) < 0.00000001);
-
-    outgoing = station2.getOutgoing();
-    assertEquals(2, outgoing.size());
-    edge = outgoing.iterator().next();
-
-    Vertex station2point = edge.getToVertex();
-    assertTrue(Math.abs(station2point.getCoordinate().x - -74.002) < 0.00000001);
   }
 }

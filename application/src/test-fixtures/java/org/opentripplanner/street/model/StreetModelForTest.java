@@ -2,10 +2,8 @@ package org.opentripplanner.street.model;
 
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.accessibility.Accessibility;
@@ -108,12 +106,7 @@ public class StreetModelForTest {
     return streetEdgeBuilder(vA, vB, length, perm, false).buildAndConnect();
   }
 
-  public static EscalatorEdge escalatorEdge(
-    StreetVertex vA,
-    StreetVertex vB,
-    double length,
-    @Nullable Duration duration
-  ) {
+  public static EscalatorEdge escalatorEdge(StreetVertex vA, StreetVertex vB, double length) {
     return EscalatorEdge.createEscalatorEdge(vA, vB, length, null);
   }
 
@@ -128,7 +121,7 @@ public class StreetModelForTest {
     coords[1] = vB.getCoordinate();
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-    AreaGroup AREA = new AreaGroup(null);
+    AreaGroup area = new AreaGroup(null);
 
     return new AreaEdgeBuilder()
       .withFromVertex(vA)
@@ -136,7 +129,7 @@ public class StreetModelForTest {
       .withGeometry(geom)
       .withPermission(perm)
       .withName(name)
-      .withArea(AREA)
+      .withArea(area)
       .buildAndConnect();
   }
 
@@ -211,15 +204,10 @@ public class StreetModelForTest {
     TemporaryStreetLocation location = new TemporaryStreetLocation(nearestPoint, name);
 
     for (StreetEdge street : edges) {
-      Vertex fromv = street.getFromVertex();
       Vertex tov = street.getToVertex();
 
       /* forward edges and vertices */
-      if (SphericalDistanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {
-        // no need to link to area edges caught on-end
-      } else if (SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
-        // no need to link to area edges caught on-end
-      } else {
+      if (!(SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1)) {
         // creates links from street head -> location -> street tail.
         createHalfLocationForTest(location, name, nearestPoint, street, endVertex);
       }

@@ -6,7 +6,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -45,7 +47,6 @@ public class FlexRouter {
   /* Transit data */
 
   private final Graph graph;
-  private final TransitService transitService;
   private final RegularTransferService transferService;
   private final FlexParameters flexParameters;
   private final Collection<NearbyStop> streetAccesses;
@@ -78,7 +79,6 @@ public class FlexRouter {
     Collection<NearbyStop> streetEgresses
   ) {
     this.graph = graph;
-    this.transitService = transitService;
     this.transferService = transferService;
     this.flexParameters = flexParameters;
     this.streetAccesses = streetAccesses;
@@ -121,6 +121,7 @@ public class FlexRouter {
       ? RoutingBookingInfo.NOT_SET
       : ServiceDateUtils.secondsSinceStartOfTime(startOfTime, requestedBookingTime);
     this.dates = createFlexServiceDates(
+      matcher,
       transitService,
       additionalPastSearchDays,
       additionalFutureSearchDays,
@@ -176,26 +177,45 @@ public class FlexRouter {
   }
 
   private List<FlexServiceDate> createFlexServiceDates(
+    Matcher<Trip> matcher,
     TransitService transitService,
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     LocalDate searchDate
   ) {
-    final List<FlexServiceDate> dates = new ArrayList<>();
+    final Map<LocalDate, List<FlexTrip<?, ?>>> flexTripsForServiceDate = new HashMap<>();
 
-    // TODO - This code id not DRY, the same logic is in RaptorRoutingRequestTransitDataCreator
     for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
       LocalDate date = searchDate.plusDays(d);
-      dates.add(
-        new FlexServiceDate(
-          date,
-          ServiceDateUtils.secondsSinceStartOfTime(startOfTime, date),
-          requestedBookingTime,
-          transitService.getServiceCodesRunningForDate(date)
-        )
-      );
+      transitService
+        .getFlexIndex()
+        .getFlexTripsForRunningDate(date)
+        .stream()
+        .filter(flexTripForDate -> matcher.match(flexTripForDate.flexTrip().getTrip()))
+        .forEach(flexTripForDate -> {
+          flexTripsForServiceDate
+            .computeIfAbsent(flexTripForDate.serviceDate(), k -> new ArrayList<>())
+            .add(flexTripForDate.flexTrip());
+        });
     }
-    return List.copyOf(dates);
+
+    return flexTripsForServiceDate
+      .entrySet()
+      .stream()
+      .map(entry -> {
+        var serviceDate = entry.getKey();
+        return new FlexServiceDate(
+          serviceDate,
+          ServiceDateUtils.secondsSinceStartOfTime(startOfTime, serviceDate),
+          requestedBookingTime,
+          entry.getValue()
+        );
+      })
+      .toList();
+  }
+
+  Collection<FlexServiceDate> flexServiceDates() {
+    return dates;
   }
 
   /**
@@ -228,8 +248,7 @@ public class FlexRouter {
 
     @Override
     public boolean isDateActive(FlexServiceDate date, FlexTrip<?, ?> trip) {
-      int serviceCode = transitService.getServiceCode(trip.getTrip().getServiceId());
-      return date.isTripServiceRunning(serviceCode);
+      return date.isTripRunning(trip);
     }
   }
 }
