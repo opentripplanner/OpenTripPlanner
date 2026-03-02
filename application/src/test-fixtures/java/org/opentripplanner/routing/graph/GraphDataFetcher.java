@@ -68,7 +68,7 @@ public class GraphDataFetcher {
     return graph
       .getVerticesOfType(SplitterVertex.class)
       .stream()
-      .map(StreetSummaries::summarizeVertex)
+      .map(StreetSummarizer::summarizeVertex)
       .toList();
   }
 
@@ -80,7 +80,7 @@ public class GraphDataFetcher {
     return listEdges()
       .stream()
       .filter(e -> e instanceof TemporaryEdge)
-      .map(StreetSummaries::summarizeEdge)
+      .map(StreetSummarizer::summarizeEdge)
       .toList();
   }
 

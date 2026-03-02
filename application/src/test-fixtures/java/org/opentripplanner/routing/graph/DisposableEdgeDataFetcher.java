@@ -18,7 +18,7 @@ public class DisposableEdgeDataFetcher {
     return temp
       .listEdges()
       .stream()
-      .map(StreetSummaries::summarizeEdge)
+      .map(StreetSummarizer::summarizeEdge)
       .collect(Collectors.toSet());
   }
 

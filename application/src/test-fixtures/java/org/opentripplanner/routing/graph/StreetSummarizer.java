@@ -11,7 +11,7 @@ import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
 
-class StreetSummaries {
+class StreetSummarizer {
 
   private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat(
     "0.######",
