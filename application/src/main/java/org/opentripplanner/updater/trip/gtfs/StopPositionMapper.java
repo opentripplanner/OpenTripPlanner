@@ -42,34 +42,58 @@ class StopPositionMapper {
    */
   Result<Integer, UpdateError> stopPositionInPattern(StopTimeUpdate update, int listIndex) {
     if (update.stopSequence().isPresent()) {
-      var tmp = tripTimes.stopPositionForGtfsSequence(update.stopSequence().getAsInt());
-      if (tmp.isEmpty()) {
-        return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE, listIndex));
-      } else {
-        return Result.success(tmp.getAsInt());
-      }
+      return handleStopSequence(update, listIndex);
     } else if (update.stopId().isPresent()) {
-      var visitsAtStop = Collections.frequency(stopIds, update.stopId().get());
-      if (visitsAtStop == 0) {
-        return invalid(listIndex);
-      } else if (visitsAtStop == 1) {
-        var i = stopIds.indexOf(update.stopId().get());
-        return Result.success(i);
-      }
-      // special case: circular stop pattern but the updates supplied contain only stop_id
-      // not stop_sequence. it's quite questionable that this should be supported at all.
-      if (visitsAtStop > 1) {
-        // we take the position of the update in the list and see if that by chance is the same
-        // index the pattern.
-        var id = stopIds.get(listIndex);
-        if (id.equals(update.stopId().get())) {
-          return Result.success(listIndex);
-        }
-        return invalid(listIndex);
-      }
-      return invalid(listIndex);
+      return handleStopId(listIndex, update.stopId().get());
     } else {
       return invalid(listIndex);
+    }
+  }
+
+  private Result<Integer, UpdateError> handleStopSequence(StopTimeUpdate update, int listIndex) {
+    var tmp = tripTimes.stopPositionForGtfsSequence(update.stopSequence().getAsInt());
+    if (tmp.isEmpty()) {
+      return Result.failure(new UpdateError(tripId, INVALID_STOP_SEQUENCE, listIndex));
+    } else {
+      return Result.success(tmp.getAsInt());
+    }
+  }
+
+  private Result<Integer, UpdateError> handleStopId(int listIndex, String stopId) {
+    var visitsAtStop = Collections.frequency(stopIds, stopId);
+    if (visitsAtStop == 0) {
+      return invalid(listIndex);
+    } else if (visitsAtStop == 1) {
+      var i = stopIds.indexOf(stopId);
+      return Result.success(i);
+    }
+    // special case: circular stop pattern but the updates supplied contain only stop_id
+    // not stop_sequence. it's quite questionable that this should be supported at all.
+    if (visitsAtStop > 1) {
+      return handleCircularRoute(listIndex, stopId);
+    }
+    return invalid(listIndex);
+  }
+
+  /**
+   * Special handling for finding the stop position in the pattern when it is circular and the
+   * update supplies only stop_id.
+   */
+  private Result<Integer, UpdateError> handleCircularRoute(int listIndex, String stopId) {
+    // we take the position of the update in the list and see if that by chance is the same
+    // index the pattern.
+    if (stopIds.get(listIndex).equals(stopId)) {
+      // order in the updates also happens to match the order in the stop pattern
+      return Result.success(listIndex);
+    } else {
+      // very niche edge case: the stop pattern is circular, the update supplies only stop_id
+      // and the beginning of the trip is missing in the real-time update
+      var lastPosInPattern = stopIds.lastIndexOf(stopId);
+      if (lastPosInPattern == -1) {
+        return invalid(listIndex);
+      } else {
+        return Result.success(lastPosInPattern);
+      }
     }
   }
 
