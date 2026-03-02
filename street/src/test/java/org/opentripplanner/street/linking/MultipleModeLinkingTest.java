@@ -24,6 +24,9 @@ class MultipleModeLinkingTest {
     new TraverseModeSet(TraverseMode.BICYCLE),
     new TraverseModeSet(TraverseMode.CAR)
   );
+  private static final double NO_RESULTS_DEGREES = 0.0000001;
+  private static final double WALK_RESULT_DEGREES = 0.0001;
+  private static final double ALL_RESULTS_DEGREES = 0.001;
 
   private static List<Arguments> multiModeLinkingWithSeparateTestCases() {
     return List.of(
@@ -243,6 +246,156 @@ class MultipleModeLinkingTest {
     env.linkVertexForRequest(0.005, -0.0001, incoming, outgoing);
 
     // vertex is linked to the closest edge, not to all 3 edges
+    assertThat(env.graph().summarizeTempEdges()).containsExactlyElementsIn(expectedTempEdges);
+
+    // the majority of the temporary edges are in the disposable edge collection
+    assertThat(env.disposable().summarize()).containsExactlyElementsIn(expectedDisposableEdges);
+    env.disposeEdges();
+
+    // after disposing all temporary edges should be gone
+    assertCleanUp(env);
+  }
+
+  private static List<Arguments> multiModeWithExpansionTestCases() {
+    return List.of(
+      // Both attempts fail
+      Arguments.of(AND_ALL_MODES, NO_RESULTS_DEGREES, NO_RESULTS_DEGREES * 2, List.of(), List.of()),
+      Arguments.of(OR_ALL_MODES, NO_RESULTS_DEGREES, NO_RESULTS_DEGREES * 2, List.of(), List.of()),
+      // Second attempt finds results only for WALK
+      Arguments.of(
+        AND_ALL_MODES,
+        NO_RESULTS_DEGREES,
+        WALK_RESULT_DEGREES,
+        List.of("(0,0) → (0.005,0) PEDESTRIAN ♿✅", "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅"),
+        List.of(
+          "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
+          "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
+          "(0.005,-0.0001) → (0.005,0) PEDESTRIAN",
+          "(0.005,0) → (0.005,-0.0001) PEDESTRIAN"
+        )
+      ),
+      Arguments.of(
+        OR_ALL_MODES,
+        NO_RESULTS_DEGREES,
+        WALK_RESULT_DEGREES,
+        List.of("(0,0) → (0.005,0) PEDESTRIAN ♿✅", "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅"),
+        List.of(
+          "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
+          "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
+          "(0.005,-0.0001) → (0.005,0) PEDESTRIAN",
+          "(0.005,0) → (0.005,-0.0001) PEDESTRIAN"
+        )
+      ),
+      // Second attempt finds results for ALL
+      Arguments.of(
+        AND_ALL_MODES,
+        NO_RESULTS_DEGREES,
+        ALL_RESULTS_DEGREES,
+        List.of(
+          "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
+          "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
+          "(0,0.0002) → (0.005,0.0002) CAR ♿✅",
+          "(0.005,0.0002) → (0.01,0.0002) CAR ♿✅"
+        ),
+        List.of(
+          "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
+          "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
+          "(0,0.0002) → (0.005,0.0002) CAR ♿✅",
+          "(0.005,0.0002) → (0.01,0.0002) CAR ♿✅",
+          "(0.005,-0.0001) → (0.005,0) PEDESTRIAN",
+          "(0.005,0) → (0.005,-0.0001) PEDESTRIAN",
+          "(0.005,0.0002) → (0.005,-0.0001) CAR",
+          "(0.005,-0.0001) → (0.005,0.0002) CAR"
+        )
+      ),
+      // Second attempt should only find results for ALL since we are using OR logic
+        Arguments.of(
+          OR_ALL_MODES,
+          NO_RESULTS_DEGREES,
+          ALL_RESULTS_DEGREES,
+          List.of(
+            "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
+            "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅"
+          ),
+          List.of(
+            "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
+            "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
+            "(0.005,-0.0001) → (0.005,0) PEDESTRIAN",
+            "(0.005,0) → (0.005,-0.0001) PEDESTRIAN"
+          )
+        ),
+        // First attempt finds results for WALK and the second for CAR
+        Arguments.of(
+          AND_ALL_MODES,
+          WALK_RESULT_DEGREES,
+          ALL_RESULTS_DEGREES,
+          List.of(
+            "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
+            "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
+            "(0,0.0002) → (0.005,0.0002) CAR ♿✅",
+            "(0.005,0.0002) → (0.01,0.0002) CAR ♿✅"
+          ),
+          List.of(
+            "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
+            "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
+            "(0,0.0002) → (0.005,0.0002) CAR ♿✅",
+            "(0.005,0.0002) → (0.01,0.0002) CAR ♿✅",
+            "(0.005,-0.0001) → (0.005,0) PEDESTRIAN",
+            "(0.005,0) → (0.005,-0.0001) PEDESTRIAN",
+            "(0.005,0.0002) → (0.005,-0.0001) CAR",
+            "(0.005,-0.0001) → (0.005,0.0002) CAR"
+          ),
+          // Since we use OR logic, not second attempt should be made, we should only find results
+          // for WALK
+          Arguments.of(
+            OR_ALL_MODES,
+            WALK_RESULT_DEGREES,
+            ALL_RESULTS_DEGREES,
+            List.of(
+              "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
+              "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅"
+            ),
+            List.of(
+              "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
+              "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
+              "(0.005,-0.0001) → (0.005,0) PEDESTRIAN",
+              "(0.005,0) → (0.005,-0.0001) PEDESTRIAN"
+            )
+          )
+      )
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("multiModeWithExpansionTestCases")
+  void multiModeWithExpansion(
+    Set<TraverseModeSet> modes,
+    double initialSearchRadiusDegrees,
+    double maxSearchRadiusDegrees,
+    List<String> expectedTempEdges,
+    List<String> expectedDisposableEdges
+  ) {
+    // test model has 3 parallel horizontal edges, all of them allow everything
+    IntersectionVertex[] vertices = {
+      StreetModelFactory.intersectionVertex(0.0, 0.0),
+      StreetModelFactory.intersectionVertex(0.01, 0.0),
+      StreetModelFactory.intersectionVertex(0.0, 0.0001),
+      StreetModelFactory.intersectionVertex(0.01, 0.0001),
+      StreetModelFactory.intersectionVertex(0.0, 0.0002),
+      StreetModelFactory.intersectionVertex(0.01, 0.0002),
+    };
+    StreetModelFactory.streetEdge(vertices[0], vertices[1], 0.01, PEDESTRIAN);
+    StreetModelFactory.streetEdge(vertices[2], vertices[3], 0.01, PEDESTRIAN);
+    StreetModelFactory.streetEdge(vertices[4], vertices[5], 0.01, CAR);
+
+    var env = new LinkingEnvironment(vertices);
+
+    assertThat(env.graph().listStreetEdges()).hasSize(3);
+
+    // Attempt to link point below all edges, in the middle
+    env.linkVertexForRequest(0.005, -0.0001, modes, initialSearchRadiusDegrees, maxSearchRadiusDegrees);
+
+    // vertex might be linked to the closest edge, not to all 3 edges
     assertThat(env.graph().summarizeTempEdges()).containsExactlyElementsIn(expectedTempEdges);
 
     // the majority of the temporary edges are in the disposable edge collection

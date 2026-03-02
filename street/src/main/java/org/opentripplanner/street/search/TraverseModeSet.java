@@ -46,6 +46,13 @@ public class TraverseModeSet implements Cloneable, Serializable {
   }
 
   /**
+   * Checks if this set has no modes in common with the other set.
+   */
+  public boolean isDisjoint(TraverseModeSet other) {
+    return getModes().stream().noneMatch(other::contains);
+  }
+
+  /**
    * Returns a mode set containing all modes.
    */
   public static TraverseModeSet allModes() {

@@ -126,4 +126,12 @@ public enum StreetTraversalPermission {
   public boolean allowsNothing() {
     return this == StreetTraversalPermission.NONE;
   }
+
+  public TraverseModeSet asTraverseModeSet() {
+    TraverseModeSet modes = new TraverseModeSet();
+    modes.setWalk(allows(StreetTraversalPermission.PEDESTRIAN));
+    modes.setBicycle(allows(StreetTraversalPermission.BICYCLE));
+    modes.setCar(allows(StreetTraversalPermission.CAR));
+    return modes;
+  }
 }

@@ -68,6 +68,25 @@ public class LinkingEnvironment {
     return disposable;
   }
 
+  public DisposableEdgeCollection linkVertexForRequest(
+    double lat,
+    double lon,
+    Set<TraverseModeSet> modes,
+    double initialSearchRadiusDegrees,
+    double maxSearchRadiusDegrees
+  ) {
+    var split = new TemporaryStreetLocation(new Coordinate(lon, lat), I18NString.of("split"));
+    disposable = linker.linkVertexForRequest(
+      split,
+      modes,
+      modes,
+      TemporaryFreeEdge::createTemporaryFreeEdge,
+      initialSearchRadiusDegrees,
+      maxSearchRadiusDegrees
+    );
+    return disposable;
+  }
+
   public void disposeEdges() {
     if (disposable != null) {
       disposable.disposeEdges();
