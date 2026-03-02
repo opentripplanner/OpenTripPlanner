@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -20,13 +20,15 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model._data.TripInput;
+import org.opentripplanner.transit.model._data.TripOnDateDataFetcher;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
-import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
-import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class ScheduledTransitLegTest {
 
@@ -34,18 +36,19 @@ class ScheduledTransitLegTest {
     "2023-04-17T17:49:06+02:00"
   ).toZonedDateTime();
   private static final ZonedDateTime END_TIME = START_TIME.plusMinutes(10);
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
-  private static final Route ROUTE = TimetableRepositoryForTest.route(id("2")).build();
-  private static final TripPattern PATTERN = TimetableRepositoryForTest.tripPattern("1", ROUTE)
-    .withStopPattern(TEST_MODEL.stopPattern(3))
-    .build();
-  private static final Trip TRIP = TimetableRepositoryForTest.trip("trip1").build();
-
-  private static final ScheduledTripTimes TRIP_TIMES = ScheduledTripTimes.of()
-    .withArrivalTimes("10:00 11:00 12:00")
-    .withDepartureTimes("10:01 11:02 12:03")
-    .withTrip(TRIP)
-    .build();
+  private static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
+  private static final RegularStop STOP_0 = ENV_BUILDER.stop("Stop_0");
+  private static final RegularStop STOP_1 = ENV_BUILDER.stop("Stop_1");
+  private static final RegularStop STOP_2 = ENV_BUILDER.stop("Stop_2");
+  private static final TransitTestEnvironment ENV = ENV_BUILDER.addTrip(
+    TripInput.of("trip1")
+      .addStop(STOP_0, "10:00", "10:01")
+      .addStop(STOP_1, "11:00", "11:02")
+      .addStop(STOP_2, "12:00", "12:03")
+  ).build();
+  private static final TripOnDateDataFetcher TRIP_DATA = ENV.tripData("trip1");
+  private static final TripPattern PATTERN = TRIP_DATA.tripPattern();
+  private static final TripTimes TRIP_TIMES = TRIP_DATA.scheduledTripTimes();
 
   private static final int BOARD_STOP_INDEX_IN_PATTERN = 0;
   private static final int ALIGHT_STOP_INDEX_IN_PATTERN = 2;
@@ -180,8 +183,8 @@ class ScheduledTransitLegTest {
         "realTime: true, " +
         "distance: 900.0m, " +
         "generalizedCost: $980, " +
-        "agencyId: F:A1, " +
-        "routeId: F:Rtrip1, " +
+        "agencyId: F:Agency1, " +
+        "routeId: F:Route1, " +
         "tripId: F:trip1, " +
         "serviceDate: 2023-04-17, " +
         "boardRule: SCHEDULED, " +
