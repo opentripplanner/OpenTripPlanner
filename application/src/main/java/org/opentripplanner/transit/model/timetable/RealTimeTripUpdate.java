@@ -109,12 +109,12 @@ public final class RealTimeTripUpdate {
     private final TripPattern pattern;
     private final TripTimes updatedTripTimes;
     private final LocalDate serviceDate;
-    private TripOnServiceDate addedTripOnServiceDate;
-    private boolean tripCreation;
-    private boolean routeCreation;
-    private String producer;
-    private boolean revertPreviousRealTimeUpdates;
-    private TripPattern hideTripInScheduledPattern;
+    private TripOnServiceDate addedTripOnServiceDate = null;
+    private boolean tripCreation = false;
+    private boolean routeCreation = false;
+    private String producer = null;
+    private boolean revertPreviousRealTimeUpdates = false;
+    private TripPattern hideTripInScheduledPattern = null;
 
     private Builder(TripPattern pattern, TripTimes updatedTripTimes, LocalDate serviceDate) {
       this.pattern = pattern;
