@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;

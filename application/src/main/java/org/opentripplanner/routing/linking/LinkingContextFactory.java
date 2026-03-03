@@ -28,6 +28,7 @@ import org.opentripplanner.routing.linking.internal.VertexCreationService.Locati
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -38,7 +39,7 @@ import org.opentripplanner.street.search.TraverseMode;
  * that contain coordinates to the Graph used in the A-Star search. This factory also validates that
  * it was possible to link the locations to the graph and throws {@link RoutingValidationException}
  * if it was not possible. The responsibility of cleaning up the temporary vertices and edges is on
- * the {@link org.opentripplanner.street.linking.TemporaryVerticesContainer}.
+ * the {@link TemporaryVerticesContainer}.
  */
 public class LinkingContextFactory {
 
@@ -76,10 +77,10 @@ public class LinkingContextFactory {
    * Links locations to the Graph used in the A-Star search. This method also validates that it was
    * possible to link the locations to the graph and throws {@link RoutingValidationException} if it
    * was not possible. The responsibility of cleaning up the temporary vertices and edges is on the
-   * {@link org.opentripplanner.street.linking.TemporaryVerticesContainer}.
+   * {@link TemporaryVerticesContainer}.
    */
   public LinkingContext create(
-    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
+    TemporaryVerticesContainer container,
     LinkingContextRequest request
   ) {
     var from = request.from();
@@ -119,7 +120,7 @@ public class LinkingContextFactory {
   }
 
   private Set<Vertex> getFromVertices(
-    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
+    TemporaryVerticesContainer container,
     LinkingContextRequest request
   ) {
     var from = request.from();
@@ -136,7 +137,7 @@ public class LinkingContextFactory {
   }
 
   private Set<Vertex> getToVertices(
-    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
+    TemporaryVerticesContainer container,
     LinkingContextRequest request
   ) {
     var to = request.to();
@@ -153,7 +154,7 @@ public class LinkingContextFactory {
   }
 
   private Map<GenericLocation, Set<Vertex>> getVerticesForViaLocationsWithCoordinates(
-    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
+    TemporaryVerticesContainer container,
     LinkingContextRequest request
   ) {
     var visitViaLocationsWithCoordinates = request.viaLocationsWithCoordinates();
@@ -211,7 +212,7 @@ public class LinkingContextFactory {
   }
 
   private void addAdjustedEdges(
-    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
+    TemporaryVerticesContainer container,
     Set<Vertex> fromVertices,
     Set<Vertex> toVertices,
     List<GenericLocation> visitViaLocationsWithCoordinates,
@@ -245,7 +246,7 @@ public class LinkingContextFactory {
   }
 
   private void addAdjustedEdgesBetween(
-    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
+    TemporaryVerticesContainer container,
     Set<Vertex> fromVertices,
     Set<Vertex> toVertices
   ) {
@@ -261,7 +262,7 @@ public class LinkingContextFactory {
    * the stop or station types by id, and if not successful, it uses the coordinates if provided.
    */
   private Set<Vertex> getStreetVerticesForLocation(
-    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
+    TemporaryVerticesContainer container,
     GenericLocation location,
     EnumSet<StreetMode> streetModes,
     LocationType type
@@ -332,7 +333,7 @@ public class LinkingContextFactory {
    * with cars.
    */
   private Optional<Vertex> getCarRoutableStreetVertex(
-    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
+    TemporaryVerticesContainer container,
     GenericLocation location,
     LocationType type
   ) {

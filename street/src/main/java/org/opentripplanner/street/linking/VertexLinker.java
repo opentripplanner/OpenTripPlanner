@@ -26,7 +26,6 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
@@ -821,5 +820,4 @@ public class VertexLinker {
     graph.addVertex(vertex);
     return vertex;
   }
-
 }

@@ -1,5 +1,6 @@
-package org.opentripplanner.test.support;
+package org.opentripplanner.street;
 
+import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URLEncoder;
@@ -8,7 +9,6 @@ import java.util.Collection;
 import java.util.Objects;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
@@ -20,7 +20,9 @@ import org.opentripplanner.utils.collection.ListUtils;
  */
 public class GeoJsonIo {
 
-  private static final ObjectMapper MAPPER = ObjectMappers.geoJson();
+  private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(
+    new JtsModule(GeometryUtils.getGeometryFactory())
+  );
 
   public static String toUrl(Geometry geometry) {
     try {

@@ -1,10 +1,10 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.street.graph;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.street.GeoJsonIo;
 import org.opentripplanner.street.linking.DisposableEdgeCollection;
-import org.opentripplanner.test.support.GeoJsonIo;
 
 public class DisposableEdgeDataFetcher {
 

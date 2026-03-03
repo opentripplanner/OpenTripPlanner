@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,9 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.model.StreetModelForTest;
+import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
@@ -22,15 +21,15 @@ public class TemporaryVerticesContainerTest {
   @Test
   void temporaryChangesRemovedOnClose() {
     var graph = new Graph();
-    var intersectionVertexA = StreetModelForTest.intersectionVertex(new Coordinate(0, 0));
-    var intersectionVertexB = StreetModelForTest.intersectionVertex(new Coordinate(0, 1));
-    var intersectionVertexC = StreetModelForTest.intersectionVertex(new Coordinate(1, 0));
-    StreetModelForTest.streetEdge(
+    var intersectionVertexA = StreetModelFactory.intersectionVertex(new Coordinate(0, 0));
+    var intersectionVertexB = StreetModelFactory.intersectionVertex(new Coordinate(0, 1));
+    var intersectionVertexC = StreetModelFactory.intersectionVertex(new Coordinate(1, 0));
+    StreetModelFactory.streetEdge(
       intersectionVertexA,
       intersectionVertexB,
       StreetTraversalPermission.PEDESTRIAN
     );
-    var secondEdge = StreetModelForTest.streetEdge(
+    var secondEdge = StreetModelFactory.streetEdge(
       intersectionVertexB,
       intersectionVertexC,
       StreetTraversalPermission.PEDESTRIAN
@@ -39,8 +38,13 @@ public class TemporaryVerticesContainerTest {
     graph.addVertex(intersectionVertexB);
     graph.addVertex(intersectionVertexC);
     graph.index();
-    try (var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer()) {
-      var vertexLinker = VertexLinkerTestFactory.of(graph);
+    try (var container = new TemporaryVerticesContainer()) {
+      var vertexLinker = new VertexLinker(
+        graph,
+        VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES,
+        50,
+        true
+      );
       var temporaryLocation = new TemporaryStreetLocation(
         new Coordinate(0.5, 0.5),
         new NonLocalizedString("Temp location")
