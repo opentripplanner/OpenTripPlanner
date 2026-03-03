@@ -71,6 +71,9 @@ public interface CallWrapper {
       }
     }
 
+    // we reject messages that contain both Order and VisitNumber since we do not see any obvious
+    // use case that requires both, and making them mutually exclusive make the implementation
+    // simpler. We can relax this validation rule later if valid use cases are identified.
     if (hasOrderCalls && hasVisitNumberCalls) {
       return Result.failure(UpdateErrorType.MIXED_CALL_ORDER_AND_VISIT_NUMBER);
     }
