@@ -76,7 +76,8 @@ class AddedTripBuilder {
     TransitEditorService transitService,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
-    Function<Trip, FeedScopedId> getTripPatternId
+    Function<Trip, FeedScopedId> getTripPatternId,
+    List<CallWrapper> calls
   ) {
     this.deduplicator = deduplicator;
     // Verifying values required in SIRI Profile
@@ -104,7 +105,7 @@ class AddedTripBuilder {
       : lineRef;
     replacedRoute = entityResolver.resolveRoute(externalLineRef);
 
-    serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
+    serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney, calls);
 
     shortName = getFirstStringFromList(estimatedVehicleJourney.getPublishedLineNames());
 
@@ -117,7 +118,7 @@ class AddedTripBuilder {
     cancellation = TRUE.equals(estimatedVehicleJourney.isCancellation());
     headsign = getFirstStringFromList(estimatedVehicleJourney.getDestinationNames());
 
-    calls = CallWrapper.of(estimatedVehicleJourney);
+    this.calls = calls;
 
     this.transitService = transitService;
     this.entityResolver = entityResolver;
