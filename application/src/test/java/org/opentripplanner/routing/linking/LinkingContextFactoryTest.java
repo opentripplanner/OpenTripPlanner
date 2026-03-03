@@ -92,7 +92,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void coordinates() {
-    var container = new TemporaryVerticesContainer();
+    var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer();
     var from = GenericLocation.fromCoordinate(stopA.getLat(), stopA.getLon());
     var to = GenericLocation.fromCoordinate(stopD.getLat(), stopD.getLon());
     var request = LinkingContextRequest.of()
@@ -113,7 +113,7 @@ class LinkingContextFactoryTest {
       Set::of,
       id -> Optional.empty()
     );
-    var container = new TemporaryVerticesContainer();
+    var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer();
     var from = stopToLocation(stopA);
     var to = stopToLocation(stopB);
     var request = LinkingContextRequest.of()
@@ -137,7 +137,7 @@ class LinkingContextFactoryTest {
       mapping::get,
       id -> Optional.empty()
     );
-    var container = new TemporaryVerticesContainer();
+    var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer();
     var from = GenericLocation.fromStopId("station", OMEGA_ID.getFeedId(), OMEGA_ID.getId());
     var request = LinkingContextRequest.of()
       .withFrom(from)
@@ -168,7 +168,7 @@ class LinkingContextFactoryTest {
           : Optional.empty();
       }
     );
-    var container = new TemporaryVerticesContainer();
+    var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer();
     var from = GenericLocation.fromStopId(
       stationAlpha.getName().toString(),
       stationAlpha.getId().getFeedId(),
@@ -200,7 +200,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void centroid() {
-    var container = new TemporaryVerticesContainer();
+    var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer();
     var from = GenericLocation.fromStopId("station", ALPHA_ID.getFeedId(), ALPHA_ID.getId());
     var request = LinkingContextRequest.of()
       .withFrom(from)
@@ -217,7 +217,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void locationsShouldBeRoutableWithTheGivenModes() {
-    try (var container = new TemporaryVerticesContainer()) {
+    try (var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer()) {
       var from = GenericLocation.fromCoordinate(0.5, 0.5);
       var to = GenericLocation.fromCoordinate(0.6, 0.4);
       var via = GenericLocation.fromCoordinate(0.4, 0.6);
@@ -278,7 +278,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void verticesShouldInheritNamesFromLocations() {
-    try (var container = new TemporaryVerticesContainer()) {
+    try (var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer()) {
       var from = new GenericLocation("First", null, 0.5, 0.5);
       var via = new GenericLocation("Second", null, 0.4, 0.6);
       var to = new GenericLocation("Third", null, 0.6, 0.4);
@@ -304,7 +304,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void verticesShouldHaveDefaultNames() {
-    try (var container = new TemporaryVerticesContainer()) {
+    try (var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer()) {
       var from = GenericLocation.fromCoordinate(0.5, 0.5);
       var to = GenericLocation.fromCoordinate(0.6, 0.4);
       var via = GenericLocation.fromCoordinate(0.4, 0.6);
@@ -331,7 +331,7 @@ class LinkingContextFactoryTest {
   @Test
   void locationNotFoundException() {
     // Coordinate not found (but in bounds)
-    var container = new TemporaryVerticesContainer();
+    var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer();
     var from = GenericLocation.fromCoordinate(65, 65);
     var to = GenericLocation.fromCoordinate(0.0, 1.0);
     var viaRequest = LinkingContextRequest.of()
@@ -351,7 +351,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void locationOutsideBoundsException() {
-    var container = new TemporaryVerticesContainer();
+    var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer();
     var request = LinkingContextRequest.of()
       .withFrom(GenericLocation.fromCoordinate(80, 80))
       .withTo(GenericLocation.fromCoordinate(85, 85))
@@ -377,7 +377,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void walkingBetterThanTransitException() {
-    var container = new TemporaryVerticesContainer();
+    var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer();
     var sameLocation = GenericLocation.fromCoordinate(0.0, 0.0);
     var request = LinkingContextRequest.of()
       .withFrom(sameLocation)
@@ -397,7 +397,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void nonExistingPlaceIdWithCoordinatesShouldFallbackToCoordinates() {
-    var container = new TemporaryVerticesContainer();
+    var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer();
     var nonExistingStopId = new FeedScopedId("F", "NonExistingStop");
 
     // Create locations with both a non-existing stop ID and valid coordinates

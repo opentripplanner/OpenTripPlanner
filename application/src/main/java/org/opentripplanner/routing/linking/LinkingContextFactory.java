@@ -38,7 +38,7 @@ import org.opentripplanner.street.search.TraverseMode;
  * that contain coordinates to the Graph used in the A-Star search. This factory also validates that
  * it was possible to link the locations to the graph and throws {@link RoutingValidationException}
  * if it was not possible. The responsibility of cleaning up the temporary vertices and edges is on
- * the {@link TemporaryVerticesContainer}.
+ * the {@link org.opentripplanner.street.linking.TemporaryVerticesContainer}.
  */
 public class LinkingContextFactory {
 
@@ -76,10 +76,10 @@ public class LinkingContextFactory {
    * Links locations to the Graph used in the A-Star search. This method also validates that it was
    * possible to link the locations to the graph and throws {@link RoutingValidationException} if it
    * was not possible. The responsibility of cleaning up the temporary vertices and edges is on the
-   * {@link TemporaryVerticesContainer}.
+   * {@link org.opentripplanner.street.linking.TemporaryVerticesContainer}.
    */
   public LinkingContext create(
-    TemporaryVerticesContainer container,
+    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
     LinkingContextRequest request
   ) {
     var from = request.from();
@@ -119,7 +119,7 @@ public class LinkingContextFactory {
   }
 
   private Set<Vertex> getFromVertices(
-    TemporaryVerticesContainer container,
+    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
     LinkingContextRequest request
   ) {
     var from = request.from();
@@ -136,7 +136,7 @@ public class LinkingContextFactory {
   }
 
   private Set<Vertex> getToVertices(
-    TemporaryVerticesContainer container,
+    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
     LinkingContextRequest request
   ) {
     var to = request.to();
@@ -153,7 +153,7 @@ public class LinkingContextFactory {
   }
 
   private Map<GenericLocation, Set<Vertex>> getVerticesForViaLocationsWithCoordinates(
-    TemporaryVerticesContainer container,
+    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
     LinkingContextRequest request
   ) {
     var visitViaLocationsWithCoordinates = request.viaLocationsWithCoordinates();
@@ -211,7 +211,7 @@ public class LinkingContextFactory {
   }
 
   private void addAdjustedEdges(
-    TemporaryVerticesContainer container,
+    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
     Set<Vertex> fromVertices,
     Set<Vertex> toVertices,
     List<GenericLocation> visitViaLocationsWithCoordinates,
@@ -245,7 +245,7 @@ public class LinkingContextFactory {
   }
 
   private void addAdjustedEdgesBetween(
-    TemporaryVerticesContainer container,
+    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
     Set<Vertex> fromVertices,
     Set<Vertex> toVertices
   ) {
@@ -261,7 +261,7 @@ public class LinkingContextFactory {
    * the stop or station types by id, and if not successful, it uses the coordinates if provided.
    */
   private Set<Vertex> getStreetVerticesForLocation(
-    TemporaryVerticesContainer container,
+    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
     GenericLocation location,
     EnumSet<StreetMode> streetModes,
     LocationType type
@@ -332,7 +332,7 @@ public class LinkingContextFactory {
    * with cars.
    */
   private Optional<Vertex> getCarRoutableStreetVertex(
-    TemporaryVerticesContainer container,
+    org.opentripplanner.street.linking.TemporaryVerticesContainer container,
     GenericLocation location,
     LocationType type
   ) {

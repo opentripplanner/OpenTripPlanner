@@ -39,7 +39,7 @@ public class TemporaryVerticesContainerTest {
     graph.addVertex(intersectionVertexB);
     graph.addVertex(intersectionVertexC);
     graph.index();
-    try (var container = new TemporaryVerticesContainer()) {
+    try (var container = new org.opentripplanner.street.linking.TemporaryVerticesContainer()) {
       var vertexLinker = VertexLinkerTestFactory.of(graph);
       var temporaryLocation = new TemporaryStreetLocation(
         new Coordinate(0.5, 0.5),

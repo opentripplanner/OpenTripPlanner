@@ -3,7 +3,7 @@ package org.opentripplanner.routing.graph;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.routing.linking.DisposableEdgeCollection;
+import org.opentripplanner.street.linking.DisposableEdgeCollection;
 import org.opentripplanner.test.support.GeoJsonIo;
 
 public class DisposableEdgeDataFetcher {

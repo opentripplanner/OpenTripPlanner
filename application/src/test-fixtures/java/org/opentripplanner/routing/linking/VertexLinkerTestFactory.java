@@ -5,10 +5,10 @@ import org.opentripplanner.street.model.StreetConstants;
 
 public class VertexLinkerTestFactory {
 
-  public static VertexLinker of(Graph graph) {
-    return new VertexLinker(
+  public static org.opentripplanner.street.linking.VertexLinker of(Graph graph) {
+    return new org.opentripplanner.street.linking.VertexLinker(
       graph,
-      VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES,
+      org.opentripplanner.street.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES,
       StreetConstants.DEFAULT_MAX_AREA_NODES,
       true
     );

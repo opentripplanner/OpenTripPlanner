@@ -10,6 +10,8 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.routing.graph.DisposableEdgeDataFetcher;
 import org.opentripplanner.routing.graph.GraphDataFetcher;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.DisposableEdgeCollection;
+import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;

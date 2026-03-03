@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
-import static org.opentripplanner.routing.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
+import static org.opentripplanner.street.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -459,7 +459,7 @@ public class PlatformLinkingTest {
   }
 
   private void linkStops(GraphDataFetcher graph, int maxAreaNodes, boolean permanent) {
-    var linker = new VertexLinker(
+    var linker = new org.opentripplanner.street.linking.VertexLinker(
       graph.graph(),
       COMPUTE_AREA_VISIBILITY_LINES,
       maxAreaNodes,

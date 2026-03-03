@@ -12,7 +12,6 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
@@ -23,7 +22,6 @@ import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.OsmElevatorVertex;
 import org.opentripplanner.street.model.vertex.OsmEntityType;
 import org.opentripplanner.street.model.vertex.OsmVertex;
-import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitBoardingAreaVertex;
@@ -96,15 +94,6 @@ public class VertexFactory {
     @Nullable I18NString name
   ) {
     return addToGraph(new OsmBoardingLocationVertex(label, coordinate.x, coordinate.y, name, refs));
-  }
-
-  public SplitterVertex splitter(
-    StreetEdge originalEdge,
-    double x,
-    double y,
-    String uniqueSplitLabel
-  ) {
-    return addToGraph(new SplitterVertex(uniqueSplitLabel, x, y, originalEdge.getName()));
   }
 
   public BarrierVertex barrier(

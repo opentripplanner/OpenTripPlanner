@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,7 +35,6 @@ import org.opentripplanner.street.model.vertex.TemporarySplitterVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.streetadapter.VertexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,8 +92,6 @@ public class VertexLinker {
 
   private final Graph graph;
 
-  private final VertexFactory vertexFactory;
-
   private final VisibilityMode visibilityMode;
   private final int maxAreaNodes;
   private final boolean shouldLinkFlex;
@@ -110,7 +107,6 @@ public class VertexLinker {
     boolean linkFlex
   ) {
     this.graph = Objects.requireNonNull(graph);
-    this.vertexFactory = new VertexFactory(graph);
     this.visibilityMode = Objects.requireNonNull(visibilityMode);
     this.maxAreaNodes = maxAreaNodes;
     this.shouldLinkFlex = linkFlex;
@@ -557,7 +553,7 @@ public class VertexLinker {
       );
       v = tsv;
     } else {
-      v = vertexFactory.splitter(originalEdge, x, y, uniqueSplitLabel);
+      v = splitterVertex(originalEdge, x, y, uniqueSplitLabel);
     }
     v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
     v.addRentalRestriction(originalEdge.getToVertex().rentalRestrictions());
@@ -814,4 +810,16 @@ public class VertexLinker {
       tempEdges.addEdge(reverseAreaEdge);
     }
   }
+
+  private SplitterVertex splitterVertex(
+    StreetEdge originalEdge,
+    double x,
+    double y,
+    String uniqueSplitLabel
+  ) {
+    var vertex = new SplitterVertex(uniqueSplitLabel, x, y, originalEdge.getName());
+    graph.addVertex(vertex);
+    return vertex;
+  }
+
 }
