@@ -44,9 +44,9 @@ class ApiTransitServiceTest {
   private static final String TRIP_2_ID = "TestTrip2";
 
   private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
-  private final RegularStop STOP_A = envBuilder.stop("A");
-  private final RegularStop STOP_B = envBuilder.stop("B");
-  private final RegularStop STOP_C = envBuilder.stop("C");
+  private final RegularStop STOP_A = envBuilder.stop("A", b -> b.withCoordinate(60.0, 10.0));
+  private final RegularStop STOP_B = envBuilder.stop("B", b -> b.withCoordinate(60.0, 10.01));
+  private final RegularStop STOP_C = envBuilder.stop("C", b -> b.withCoordinate(60.0, 10.02));
 
   private final TripInput TRIP1_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A, "12:00:00", "12:00:00")
@@ -140,7 +140,6 @@ class ApiTransitServiceTest {
       .withEndTime(ANY_TIME)
       .withServiceDate(SERVICE_DATE)
       .withZoneId(env.timeZone())
-      .withDistanceMeters(1000)
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(2)
       .build();

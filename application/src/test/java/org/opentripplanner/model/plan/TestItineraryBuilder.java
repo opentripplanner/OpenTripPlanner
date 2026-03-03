@@ -555,8 +555,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     ScheduledTransitLeg leg;
 
-    var distance = speed(trip.getMode()) * (end - start);
-
     if (headwaySecs != null) {
       leg = new FrequencyTransitLegBuilder()
         .withTripTimes(tripTimes)
@@ -569,7 +567,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
         .withZoneId(UTC)
         .withTransferFromPreviousLeg(transferFromPreviousLeg)
         .withGeneralizedCost(legCost)
-        .withDistanceMeters(distance)
         .withFrequencyHeadwayInSeconds(headwaySecs)
         .withToViaLocationType(to.viaLocationType)
         .build();
@@ -585,7 +582,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
         .withZoneId(UTC)
         .withTransferFromPreviousLeg(transferFromPreviousLeg)
         .withGeneralizedCost(legCost)
-        .withDistanceMeters(distance)
         .withToViaLocationType(to.viaLocationType)
         .build();
     }

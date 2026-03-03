@@ -13,9 +13,34 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 
 public class GroupByDistanceTest implements PlanTestConstants {
+
+  // Override PlanTestConstants places with stops close together so transit
+  // distances (from geometry) are comparable to walk distances.
+  // Distances: A-B ~668m, B-C ~445m, C-D ~556m, D-E ~556m
+  private static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
+  private static final Place A = Place.forStop(
+    ENV_BUILDER.stop("A", b -> b.withCoordinate(60.0, 10.000))
+  );
+  private static final Place B = Place.forStop(
+    ENV_BUILDER.stop("B", b -> b.withCoordinate(60.0, 10.012))
+  );
+  private static final Place C = Place.forStop(
+    ENV_BUILDER.stop("C", b -> b.withCoordinate(60.0, 10.020))
+  );
+  private static final Place D = Place.forStop(
+    ENV_BUILDER.stop("D", b -> b.withCoordinate(60.0, 10.030))
+  );
+  private static final Place E = Place.forStop(
+    ENV_BUILDER.stop("E", b -> b.withCoordinate(60.0, 10.040))
+  );
+
+  private static final double DISTANCE_DELTA = 0.001;
 
   @Test
   public void calculateTotalDistanceTest() {
@@ -29,16 +54,18 @@ public class GroupByDistanceTest implements PlanTestConstants {
     Leg l2 = i.legs().get(1);
     Leg l3 = i.legs().get(2);
 
-    // 3 minutes on a bus
-    double expectedDistanceRidingABus = BUS_SPEED * 3 * 60;
-    // 2 minute walking
-    double expectedDistanceWalking = WALK_SPEED * 2 * 60;
-    // total
-    double expectedDistance = expectedDistanceRidingABus + expectedDistanceWalking;
-
-    assertEquals(expectedDistanceRidingABus, calculateTotalDistance(List.of(l1, l3)), 0.001);
-    assertEquals(expectedDistanceWalking, calculateTotalDistance(List.of(l2)), 0.001);
-    assertEquals(expectedDistance, calculateTotalDistance(List.of(l1, l2, l3)), 0.001);
+    // Verify the method correctly sums leg distances
+    assertEquals(
+      l1.distanceMeters() + l3.distanceMeters(),
+      calculateTotalDistance(List.of(l1, l3)),
+      DISTANCE_DELTA
+    );
+    assertEquals(l2.distanceMeters(), calculateTotalDistance(List.of(l2)), 0.001);
+    assertEquals(
+      l1.distanceMeters() + l2.distanceMeters() + l3.distanceMeters(),
+      calculateTotalDistance(List.of(l1, l2, l3)),
+      DISTANCE_DELTA
+    );
   }
 
   @Test

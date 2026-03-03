@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,9 +18,31 @@ import org.opentripplanner.ext.emission.model.TripPatternEmission;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 
 class EmissionItineraryDecoratorTest implements PlanTestConstants {
+
+  // Override PlanTestConstants places with stops that are close together so geometry-based
+  // transit distances produce reasonable emission values.
+  private static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
+  private static final Place A = Place.forStop(
+    ENV_BUILDER.stop("A", b -> b.withCoordinate(60.0, 10.000))
+  );
+  private static final Place B = Place.forStop(
+    ENV_BUILDER.stop("B", b -> b.withCoordinate(60.0, 10.012))
+  );
+  private static final Place C = Place.forStop(
+    ENV_BUILDER.stop("C", b -> b.withCoordinate(60.0, 10.020))
+  );
+  private static final Place D = Place.forStop(
+    ENV_BUILDER.stop("D", b -> b.withCoordinate(60.0, 10.030))
+  );
+  private static final Place E = Place.forStop(
+    ENV_BUILDER.stop("E", b -> b.withCoordinate(60.0, 10.040))
+  );
 
   private static final int START_TIME = T11_09;
   private static final int END_TIME = T11_55;
@@ -45,8 +66,8 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
 
   @BeforeEach
   void setUpItineraries() {
-    var routeA = route("R1").build();
-    var routeB = route("R2").build();
+    var routeA = ENV_BUILDER.route("R1");
+    var routeB = ENV_BUILDER.route("R2");
 
     bus = newItinerary(A).bus(routeA, 21, START_TIME, END_TIME, B).build();
     busZeroEmission = newItinerary(A).bus(routeB, 22, START_TIME, END_TIME, B).build();
@@ -114,8 +135,8 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
   void decorateBusUsingRouteEmission() {
     var subject = new EmissionItineraryDecorator(emissionService);
     var it = subject.decorate(bus);
-    assertEquals(Emission.ofCo2Gram(345), it.emissionPerPerson());
-    assertEquals(Emission.ofCo2Gram(345), it.legs().getFirst().emissionPerPerson());
+    assertEquals(Emission.ofCo2Gram(6.672), it.emissionPerPerson());
+    assertEquals(Emission.ofCo2Gram(6.672), it.legs().getFirst().emissionPerPerson());
   }
 
   @Test
@@ -160,7 +181,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     // car - bus - rail - flex
     assertEmission(33.75, it.legs().get(0).emissionPerPerson());
     assertEmission(31, it.legs().get(1).emissionPerPerson());
-    assertEmission(11.25, it.legs().get(2).emissionPerPerson());
+    assertEmission(5.56, it.legs().get(2).emissionPerPerson());
     assertNull(it.legs().get(3).emissionPerPerson());
   }
 
@@ -170,11 +191,11 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
 
     var it = subject.decorate(combinedNoFlex);
 
-    assertEmission(76.0, it.emissionPerPerson());
-    // car - bus - rail
+    assertEmission(70.31, it.emissionPerPerson());
+    // car - rail - bus(routeA) - bus(routeB, zero emission)
     assertEmission(33.75, it.legs().get(0).emissionPerPerson());
     assertEmission(31, it.legs().get(1).emissionPerPerson());
-    assertEmission(11.25, it.legs().get(2).emissionPerPerson());
+    assertEmission(5.56, it.legs().get(2).emissionPerPerson());
   }
 
   private void assertEmission(double expectedCo2, Emission actual) {

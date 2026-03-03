@@ -193,11 +193,6 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     return alerts;
   }
 
-  public B withDistanceMeters(double distance) {
-    this.distanceMeters = distance;
-    return instance();
-  }
-
   public Double distanceMeters() {
     return distanceMeters;
   }
