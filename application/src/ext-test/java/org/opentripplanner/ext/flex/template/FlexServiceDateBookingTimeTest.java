@@ -34,7 +34,7 @@ class FlexServiceDateBookingTimeTest {
   @Test
   void testRequestedBookingTimePreviousDay() {
     // Booking at 14:40 on Jan 12, service date is Jan 13
-    // This is the bug scenario: booking time should be negative relative to Jan 13
+    // Booking time should be negative relative to Jan 13
     LocalDate bookingDate = LocalDate.of(2026, 1, 12);
     LocalDate serviceDate = LocalDate.of(2026, 1, 13);
 
@@ -78,7 +78,7 @@ class FlexServiceDateBookingTimeTest {
   @Test
   void testBookingTimeOnDifferentDatesProducesDifferentResults() {
     // Same booking instant should produce different requestedBookingTime values
-    // for different service dates - this is the core fix
+    // for different service dates
     Instant bookingTime = ZonedDateTime.of(
       LocalDate.of(2026, 1, 12),
       LocalTime.of(14, 40),
