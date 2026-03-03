@@ -2,6 +2,7 @@ package org.opentripplanner.api.model.geometry;
 
 import java.util.Objects;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.PolylineEncoder;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -81,7 +82,11 @@ public final class EncodedPolyline {
 
   private void calculateDistance() {
     if (distance_m == NOT_SET) {
-      distance_m = (int) GeometryUtils.sumDistances(geometry.getCoordinates());
+      if (geometry instanceof LineString ls) {
+        distance_m = (int) GeometryUtils.sumDistances(ls.getCoordinateSequence());
+      } else {
+        distance_m = (int) GeometryUtils.sumDistances(geometry.getCoordinates());
+      }
     }
   }
 }
