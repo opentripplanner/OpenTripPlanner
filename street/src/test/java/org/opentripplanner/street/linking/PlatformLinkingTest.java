@@ -1,15 +1,16 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
-import static org.opentripplanner.routing.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
+import static org.opentripplanner.street.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
+import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -17,16 +18,16 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
-import org.opentripplanner.routing.graph.GraphDataFetcher;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.graph.GraphDataFetcher;
+import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -34,7 +35,6 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.streetadapter.VertexFactory;
 
 public class PlatformLinkingTest {
 
@@ -67,7 +67,7 @@ public class PlatformLinkingTest {
     // both split points are linked to the stop bidirectionally (+4 edges).
     // both split points also link to 2 visibility points at opposite side (+8 edges)
     // 14 new edges in total
-    assertEquals(22, graph.listEdges().size());
+    Assertions.assertEquals(22, graph.listEdges().size());
   }
 
   /**
@@ -97,7 +97,7 @@ public class PlatformLinkingTest {
     // new vertex connects to all 4 visibility points with 4*2 new edges
     // new vertex connects to the closest edge pair split points with 2*2 edges
     // edge pair splits to 2 edges more
-    assertEquals(24, graph.listEdges().size());
+    Assertions.assertEquals(24, graph.listEdges().size());
 
     // transit stop is connected in one rectangle corner only to walk no thru trafic edges
     // verify that new area edge connection is also walk no thru
@@ -134,7 +134,7 @@ public class PlatformLinkingTest {
     linkStops(graph, 100, true);
 
     // stop links to a existing vertex with 2 edges
-    assertEquals(10, graph.listEdges().size());
+    Assertions.assertEquals(10, graph.listEdges().size());
   }
 
   /**
@@ -166,16 +166,22 @@ public class PlatformLinkingTest {
     }
     assertNotNull(ag);
 
-    var vertexFactory = new VertexFactory(graph.graph());
-    var v = vertexFactory.intersection("boardingLocation", 10.00000001, 60.00000001);
-    VertexLinkerTestFactory.of(graph.graph()).addPermanentAreaVertex(v, ag);
+    var v = intersectionVertex("boardingLocation", 10.00000001, 60.00000001);
+
+    var linker = new VertexLinker(
+      graph.graph(),
+      VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES,
+      50,
+      true
+    );
+    linker.addPermanentAreaVertex(v, ag);
 
     // vertex links to the single visibility point with 2 edges
-    assertEquals(10, graph.listEdges().size());
+    Assertions.assertEquals(10, graph.listEdges().size());
 
     // check that link edges obey area safety factors
     var out = v.getOutgoing();
-    assertEquals(out.size(), 1);
+    Assertions.assertEquals(out.size(), 1);
     StreetEdge streetEdge = null;
     if (out.iterator().next() instanceof StreetEdge se) {
       streetEdge = se;
@@ -209,7 +215,7 @@ public class PlatformLinkingTest {
     // Bottom edge pair splits in the middle (+2)
     // Stop links to split vertices (+4)
     // Split vertices link with visibily vertices at top corners (+8)
-    assertEquals(22, graph.listEdges().size());
+    Assertions.assertEquals(22, graph.listEdges().size());
   }
 
   /**
@@ -238,7 +244,7 @@ public class PlatformLinkingTest {
     // stops are also linked directly (+2)
     // each stop links bidirectionally to closest edge pair (+ 2*2*2)
     // closest edge pairs split into two (+ 2*2)
-    assertEquals(42, graph.listEdges().size());
+    Assertions.assertEquals(42, graph.listEdges().size());
 
     // verify direct linking
     List<TransitStopVertex> transitStops = graph.listStopVertices();
@@ -294,7 +300,7 @@ public class PlatformLinkingTest {
     // edge pair splitting adds 2 edges, and transit vertex linking 2 more
     // new splitting vertices cannot connect with the visibility points
     // because they are hidden behind the corner
-    assertEquals(
+    Assertions.assertEquals(
       20,
       graph.listEdges().size(),
       "Incorrect number of edges, check %s".formatted(graph.geoJsonUrl())
@@ -378,13 +384,13 @@ public class PlatformLinkingTest {
 
     // Edge split points become visibility points
     var aEdges = graph.listAreaEdges();
-    assertEquals(3, aEdges.getFirst().getArea().visibilityVertices().size());
+    Assertions.assertEquals(3, aEdges.getFirst().getArea().visibilityVertices().size());
 
     // platform is a loop of 6 points, which adds 5 area edge pairs
     // western boundary splitting adds an edge pair
     // visibility edge connection from split points to exit adds two pairs more
     // Transit stop linking adds 2 pairs more
-    assertEquals(
+    Assertions.assertEquals(
       20,
       graph.listEdges().size(),
       "Incorrect number of edges, check %s".formatted(graph.geoJsonUrl())
@@ -393,14 +399,14 @@ public class PlatformLinkingTest {
 
   private GraphDataFetcher prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
     var graph = new Graph();
-    var vertexFactory = new VertexFactory(graph);
 
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
     Coordinate[] closedGeom = new Coordinate[platform.length + 1];
 
     for (int i = 0; i < platform.length; i++) {
       Coordinate c = platform[i];
-      var vertex = vertexFactory.intersection(String.valueOf(i), c.x, c.y);
+      var vertex = intersectionVertex(String.valueOf(i), c.y, c.x);
+      graph.addVertex(vertex);
       vertices.add(vertex);
       closedGeom[i] = c;
     }
@@ -450,7 +456,8 @@ public class PlatformLinkingTest {
 
     for (int i = 0; i < stops.length; i++) {
       Coordinate stop = stops[i];
-      vertexFactory.transitStop(ofStop(i, stop));
+      var stopVertex = StreetModelFactory.transitStopVertex(i, stop);
+      graph.addVertex(stopVertex);
     }
 
     graph.index();
@@ -459,7 +466,12 @@ public class PlatformLinkingTest {
   }
 
   private void linkStops(GraphDataFetcher graph, int maxAreaNodes, boolean permanent) {
-    var linker = new VertexLinker(graph.graph(), COMPUTE_AREA_VISIBILITY_LINES, maxAreaNodes);
+    var linker = new VertexLinker(
+      graph.graph(),
+      COMPUTE_AREA_VISIBILITY_LINES,
+      maxAreaNodes,
+      false
+    );
     for (TransitStopVertex tStop : graph.listStopVertices()) {
       if (permanent) {
         linker.linkVertexPermanently(

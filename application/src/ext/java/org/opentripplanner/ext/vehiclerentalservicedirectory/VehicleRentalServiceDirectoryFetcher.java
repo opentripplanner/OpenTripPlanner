@@ -20,8 +20,8 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalSe
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.gbfs.GbfsVehicleRentalDataSourceParameters;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
+import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;

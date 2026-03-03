@@ -11,6 +11,7 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.DisposableEdgeCollection;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;

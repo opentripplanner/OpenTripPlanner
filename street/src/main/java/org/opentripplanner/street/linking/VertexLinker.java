@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,7 +17,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
@@ -27,7 +26,6 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
@@ -36,7 +34,6 @@ import org.opentripplanner.street.model.vertex.TemporarySplitterVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.streetadapter.VertexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,20 +91,24 @@ public class VertexLinker {
 
   private final Graph graph;
 
-  private final VertexFactory vertexFactory;
-
   private final VisibilityMode visibilityMode;
   private final int maxAreaNodes;
+  private final boolean shouldLinkFlex;
 
   /**
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
    * given time.
    */
-  public VertexLinker(Graph graph, VisibilityMode visibilityMode, int maxAreaNodes) {
+  public VertexLinker(
+    Graph graph,
+    VisibilityMode visibilityMode,
+    int maxAreaNodes,
+    boolean linkFlex
+  ) {
     this.graph = Objects.requireNonNull(graph);
-    this.vertexFactory = new VertexFactory(graph);
     this.visibilityMode = Objects.requireNonNull(visibilityMode);
     this.maxAreaNodes = maxAreaNodes;
+    this.shouldLinkFlex = linkFlex;
   }
 
   public void linkVertexPermanently(
@@ -437,7 +438,7 @@ public class VertexLinker {
       start = split;
     }
 
-    if (OTPFeature.FlexRouting.isOn()) {
+    if (shouldLinkFlex) {
       var areaStops = Stream.concat(start.getIncoming().stream(), start.getOutgoing().stream())
         .flatMap(e ->
           Stream.concat(
@@ -551,7 +552,7 @@ public class VertexLinker {
       );
       v = tsv;
     } else {
-      v = vertexFactory.splitter(originalEdge, x, y, uniqueSplitLabel);
+      v = splitterVertex(originalEdge, x, y, uniqueSplitLabel);
     }
     v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
     v.addRentalRestriction(originalEdge.getToVertex().rentalRestrictions());
@@ -807,5 +808,16 @@ public class VertexLinker {
     if (scope != Scope.PERMANENT) {
       tempEdges.addEdge(reverseAreaEdge);
     }
+  }
+
+  private SplitterVertex splitterVertex(
+    StreetEdge originalEdge,
+    double x,
+    double y,
+    String uniqueSplitLabel
+  ) {
+    var vertex = new SplitterVertex(uniqueSplitLabel, x, y, originalEdge.getName());
+    graph.addVertex(vertex);
+    return vertex;
   }
 }

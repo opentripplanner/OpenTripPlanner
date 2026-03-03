@@ -1,13 +1,13 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
-import static org.opentripplanner.street.model.StreetModelForTest.streetEdge;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
+import static com.google.common.truth.Truth.assertThat;
+
+import com.google.common.truth.Truth;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 
 class MultipleModeLinkingTest {
@@ -16,21 +16,21 @@ class MultipleModeLinkingTest {
   void multiModeLinking() {
     // test model has 3 parallel horizontal edges, of which uppermost allows car driving
     IntersectionVertex[] vertices = {
-      intersectionVertex(0.0, 0.0),
-      intersectionVertex(0.01, 0.0),
-      intersectionVertex(0.0, 0.0001),
-      intersectionVertex(0.01, 0.0001),
-      intersectionVertex(0.0, 0.0002),
-      intersectionVertex(0.01, 0.0002),
+      StreetModelFactory.intersectionVertex(0.0, 0.0),
+      StreetModelFactory.intersectionVertex(0.01, 0.0),
+      StreetModelFactory.intersectionVertex(0.0, 0.0001),
+      StreetModelFactory.intersectionVertex(0.01, 0.0001),
+      StreetModelFactory.intersectionVertex(0.0, 0.0002),
+      StreetModelFactory.intersectionVertex(0.01, 0.0002),
     };
 
-    streetEdge(vertices[0], vertices[1], 0.01, PEDESTRIAN);
-    streetEdge(vertices[2], vertices[3], 0.01, PEDESTRIAN);
-    streetEdge(vertices[4], vertices[5], 0.01, CAR);
+    StreetModelFactory.streetEdge(vertices[0], vertices[1], 0.01, PEDESTRIAN);
+    StreetModelFactory.streetEdge(vertices[2], vertices[3], 0.01, PEDESTRIAN);
+    StreetModelFactory.streetEdge(vertices[4], vertices[5], 0.01, CAR);
 
     var env = new LinkingEnvironment(vertices);
 
-    assertThat(env.graph().listStreetEdges()).hasSize(3);
+    Truth.assertThat(env.graph().listStreetEdges()).hasSize(3);
 
     // link point below all edges, in the middle
     env.linkVertexForRequest(0.005, -0.0001);
@@ -44,7 +44,7 @@ class MultipleModeLinkingTest {
     );
 
     // the majority of the temporary edges are in the disposable edge collection
-    assertThat(env.disposable().summarize()).containsExactly(
+    Truth.assertThat(env.disposable().summarize()).containsExactly(
       "(0,0) → (0.005,0) PEDESTRIAN ♿✅",
       "(0.005,0) → (0.01,0) PEDESTRIAN ♿✅",
       "(0,0.0002) → (0.005,0.0002) CAR ♿✅",
@@ -55,8 +55,8 @@ class MultipleModeLinkingTest {
     env.disposeEdges();
 
     // after disposing all temporary edges should be gone
-    assertThat(env.disposable().summarize()).isEmpty();
-    assertWithMessage(
+    Truth.assertThat(env.disposable().summarize()).isEmpty();
+    Truth.assertWithMessage(
       "Graph should not have any temporary edges. Inspect %s",
       env.graph().geoJsonUrl()
     )

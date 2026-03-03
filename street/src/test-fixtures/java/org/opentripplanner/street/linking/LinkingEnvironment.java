@@ -1,15 +1,17 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.linking;
 
-import static org.opentripplanner.street.model.edge.LinkingDirection.BIDIRECTIONAL;
+import static org.opentripplanner.street.linking.LinkingDirection.BIDIRECTIONAL;
+import static org.opentripplanner.street.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
 
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.routing.graph.DisposableEdgeDataFetcher;
-import org.opentripplanner.routing.graph.GraphDataFetcher;
+import org.opentripplanner.street.graph.DisposableEdgeDataFetcher;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.graph.GraphDataFetcher;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -34,7 +36,12 @@ public class LinkingEnvironment {
     }
     graph.index();
     graphFetcher = new GraphDataFetcher(graph);
-    linker = VertexLinkerTestFactory.of(graph);
+    linker = new VertexLinker(
+      graph,
+      COMPUTE_AREA_VISIBILITY_LINES,
+      StreetConstants.DEFAULT_MAX_AREA_NODES,
+      true
+    );
   }
 
   public DisposableEdgeCollection linkVertexForRequest(double lat, double lon) {
