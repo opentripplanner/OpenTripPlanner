@@ -24,7 +24,7 @@ import org.opentripplanner.utils.time.TimeUtils;
  */
 public class StreetSearchRequest implements AStarRequest {
 
-  private static final StreetSearchRequest DEFAULT = new StreetSearchRequest();
+  public static final StreetSearchRequest DEFAULT = new StreetSearchRequest();
 
   /**
    * How close to do you have to be to the start or end to be considered "close".
@@ -80,7 +80,7 @@ public class StreetSearchRequest implements AStarRequest {
     this.rentalPeriod = null;
     this.intersectionTraversalCalculator = IntersectionTraversalCalculator.DEFAULT;
     this.extensionRequestContexts = List.of();
-    this.timeout = Duration.ofSeconds(30);
+    this.timeout = Duration.ofSeconds(5);
   }
 
   StreetSearchRequest(StreetSearchRequestBuilder builder) {
