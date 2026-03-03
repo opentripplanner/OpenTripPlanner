@@ -12,8 +12,6 @@ import org.opentripplanner.model.fare.FareProduct;
 
 class FareTransferRuleMapper {
 
-  public final int MISSING_VALUE = -999;
-
   private final IdFactory idFactory;
   private final FareProductMapper fareProductMapper;
 
@@ -36,9 +34,11 @@ class FareTransferRuleMapper {
       .withId(idFactory.createId(rhs.getId(), "fare transfer rule"))
       .withFromLegGroup(idFactory.createNullableId(rhs.getFromLegGroupId()))
       .withToLegGroup(idFactory.createNullableId(rhs.getToLegGroupId()))
-      .withTransferCount(rhs.getTransferCount())
       .withFareProducts(products);
-    if (rhs.getDurationLimit() != MISSING_VALUE) {
+    if (rhs.isTransferCountSet()) {
+      builder.withTransferCount(rhs.getTransferCount());
+    }
+    if (rhs.isDurationLimitSet()) {
       var duration = Duration.ofSeconds(rhs.getDurationLimit());
       var type = mapLimitType(rhs.getDurationLimitType());
       builder.withTimeLimit(type, duration);
