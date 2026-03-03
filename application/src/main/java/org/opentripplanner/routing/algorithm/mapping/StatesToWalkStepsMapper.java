@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
@@ -49,6 +50,9 @@ public class StatesToWalkStepsMapper {
    * walk step. See {@link StatesToWalkStepsMapper#removeZag(WalkStepBuilder, WalkStepBuilder)}
    */
   private static final double MAX_ZAG_DISTANCE = 30;
+  private static final LocalizedString STATION_ENTRANCE_NAME = new LocalizedString(
+    "name.station_entrance"
+  );
 
   private final double ellipsoidToGeoidDifference;
   private final StreetNotesService streetNotesService;
@@ -636,8 +640,8 @@ public class StatesToWalkStepsMapper {
         // station, since the doors might be between or inside stations.
         .withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
         .withEntrance(getEntrance(vertex))
-        .withDirectionText(I18NString.of("entrance"))
-        .withNameIsDerived(false)
+        .withDirectionText(STATION_ENTRANCE_NAME)
+        .withNameIsDerived(true)
     );
   }
 
