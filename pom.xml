@@ -473,6 +473,15 @@
             </dependency>
 
             <dependency>
+                <!-- This makes sure all Jackson libraries are using compatible versions. -->
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
@@ -680,7 +689,7 @@
                 </repository>
             </distributionManagement>
         </profile>
-        
+
         <profile>
             <id>integrationTests</id>
             <activation>
