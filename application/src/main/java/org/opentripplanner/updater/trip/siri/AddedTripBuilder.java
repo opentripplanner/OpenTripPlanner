@@ -282,7 +282,8 @@ class AddedTripBuilder {
           tripOnServiceDate,
           pattern,
           isAddedRoute,
-          dataSource
+          dataSource,
+          null
         )
       );
     } catch (DataValidationException e) {

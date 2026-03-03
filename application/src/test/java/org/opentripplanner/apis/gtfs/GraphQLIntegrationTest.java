@@ -268,11 +268,11 @@ class GraphQLIntegrationTest {
 
     TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
     timetableSnapshot.update(
-      new RealTimeTripUpdate(
+      RealTimeTripUpdate.of(
         pattern,
         tripTimes2.createRealTimeFromScheduledTimes().cancelTrip().build(),
         secondDate
-      )
+      ).build()
     );
 
     var routes = Stream.concat(
@@ -312,18 +312,17 @@ class GraphQLIntegrationTest {
         new Deduplicator()
       ).withServiceCode(SERVICE_CODE);
       timetableSnapshot.update(
-        new RealTimeTripUpdate(
+        RealTimeTripUpdate.of(
           TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
             .withRoute(t.getRoute())
             .withStopPattern(TimetableRepositoryForTest.stopPattern(A.stop, B.stop, C.stop, D.stop))
             .withRealTimeStopPatternModified()
             .build(),
           realTimeTripTimes,
-          SERVICE_DATE,
-          null,
-          t == addedTrip,
-          false
+          SERVICE_DATE
         )
+          .withTripCreation(t == addedTrip)
+          .build()
       );
     }
 

@@ -180,7 +180,16 @@ class ExtraCallTripBuilder {
     /* Validate */
     try {
       return Result.success(
-        new TripUpdate(stopPattern, builder.build(), serviceDate, null, pattern, false, dataSource)
+        new TripUpdate(
+          stopPattern,
+          builder.build(),
+          serviceDate,
+          null,
+          pattern,
+          false,
+          dataSource,
+          null
+        )
       );
     } catch (DataValidationException e) {
       return DataValidationExceptionMapper.toResult(e, dataSource);
