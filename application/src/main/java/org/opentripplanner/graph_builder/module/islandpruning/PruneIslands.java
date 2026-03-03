@@ -85,14 +85,6 @@ public class PruneIslands implements GraphBuilderModule {
     if (streetLinkerModule != null) {
       LOG.info("Reconnecting stops");
       streetLinkerModule.linkTransitStops(graph, timetableRepository);
-      int isolated = 0;
-      for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-        if (tStop.getDegreeOut() + tStop.getDegreeIn() == 0) {
-          issueStore.add(new IsolatedStop(tStop));
-          isolated++;
-        }
-      }
-      LOG.info("{} stops remain isolated", isolated);
     }
 
     // clean up pruned street vertices

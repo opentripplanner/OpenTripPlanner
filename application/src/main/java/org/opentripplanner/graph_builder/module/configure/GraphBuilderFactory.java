@@ -34,6 +34,7 @@ import org.opentripplanner.graph_builder.module.geometry.CalculateWorldEnvelopeM
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.graph_builder.module.stopconnectivity.StopConnectivityModule;
 import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
@@ -78,6 +79,7 @@ public interface GraphBuilderFactory {
   OsmBoardingLocationsModule osmBoardingLocationsModule();
   OsmModule osmModule();
   PruneIslands pruneIslands();
+  StopConnectivityModule stopConnectivityModule();
   StreetLinkerModule streetLinkerModule();
   TimeZoneAdjusterModule timeZoneAdjusterModule();
   TripPatternNamer tripPatternNamer();
