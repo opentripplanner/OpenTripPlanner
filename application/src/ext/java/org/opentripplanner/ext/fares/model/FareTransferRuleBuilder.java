@@ -49,8 +49,8 @@ public class FareTransferRuleBuilder {
     return this;
   }
 
-  public FareTransferRuleBuilder withFareProducts(FareProduct... fareProductB) {
-    return withFareProducts(Arrays.asList(fareProductB));
+  public FareTransferRuleBuilder withFareProducts(FareProduct... fareProducts) {
+    return withFareProducts(List.of(fareProducts));
   }
 
   public FeedScopedId id() {

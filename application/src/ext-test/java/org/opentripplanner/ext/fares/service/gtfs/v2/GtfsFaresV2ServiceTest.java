@@ -66,7 +66,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .withLegGroupId(LEG_GROUP1)
         .withNetworkId(EXPRESS_NETWORK)
         .build(),
-      FareLegRule.of(id("5"), LOCAL_DAY_PASS)
+      FareLegRule.of(id("6"), LOCAL_DAY_PASS)
         .withLegGroupId(LEG_GROUP1)
         .withNetworkId(LOCAL_NETWORK)
         .build(),

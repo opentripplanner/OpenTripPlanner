@@ -31,6 +31,10 @@ public class GtfsFaresV2ServiceBuilder {
     return this;
   }
 
+  public GtfsFaresV2ServiceBuilder withTransferRules(FareTransferRule... fareTransferRules) {
+    return withTransferRules(Arrays.stream(fareTransferRules).toList());
+  }
+
   public GtfsFaresV2ServiceBuilder withStopAreas(Multimap<FeedScopedId, FeedScopedId> stopAreas) {
     this.stopAreas = stopAreas;
     return this;
