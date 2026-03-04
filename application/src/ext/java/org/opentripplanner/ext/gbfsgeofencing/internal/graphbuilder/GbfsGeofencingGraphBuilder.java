@@ -46,17 +46,9 @@ public class GbfsGeofencingGraphBuilder implements GraphBuilderModule {
         try {
           var zones = loadGeofencingZonesFromFeed(feedParams, httpClientFactory);
           allZones.addAll(zones);
-          LOG.info(
-            "Loaded {} geofencing zones from GBFS feed: {}",
-            zones.size(),
-            feedParams.url()
-          );
+          LOG.info("Loaded {} geofencing zones from GBFS feed: {}", zones.size(), feedParams.url());
         } catch (Exception e) {
-          LOG.error(
-            "Failed to load geofencing zones from GBFS feed: {}",
-            feedParams.url(),
-            e
-          );
+          LOG.error("Failed to load geofencing zones from GBFS feed: {}", feedParams.url(), e);
         }
       }
     }

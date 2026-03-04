@@ -1,8 +1,7 @@
 package org.opentripplanner.street.linking;
 
-import static org.opentripplanner.street.linking.LinkingDirection.BIDIRECTIONAL;
-
 import static com.google.common.truth.Truth.assertThat;
+import static org.opentripplanner.street.linking.LinkingDirection.BIDIRECTIONAL;
 
 import com.google.common.truth.Truth;
 import java.util.List;

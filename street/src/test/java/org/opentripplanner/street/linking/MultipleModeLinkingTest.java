@@ -1,9 +1,8 @@
 package org.opentripplanner.street.linking;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
-
-import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.truth.Truth;
 import org.junit.jupiter.api.Test;
