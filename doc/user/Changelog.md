@@ -100,6 +100,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Reject SIRI messages with missing Order attribute on calls [#7324](https://github.com/opentripplanner/OpenTripPlanner/pull/7324)
 - Add running days to flex routing [#7281](https://github.com/opentripplanner/OpenTripPlanner/pull/7281)
 - Update Entur-specific emission data docs url in Transmodel custom documentation  [#7352](https://github.com/opentripplanner/OpenTripPlanner/pull/7352)
+- Fix booking time calculation for multi-day flex trip searches [#7255](https://github.com/opentripplanner/OpenTripPlanner/pull/7255)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.8.1 (2025-09-22)
