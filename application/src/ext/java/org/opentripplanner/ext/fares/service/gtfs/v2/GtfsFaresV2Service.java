@@ -58,18 +58,33 @@ public final class GtfsFaresV2Service implements Serializable {
       splits.forEach(split ->
         split
           .subTails()
-          .forEach(legs -> {
-            var offers = lookup.findTransferOffersForSubLegs(split.head(), legs);
-            legs.forEach(leg -> offerContainer.addToLeg(leg, offers));
-            var hasFreeTransfer = lookup.hasFreeTransfers(legs);
+          .forEach(tail -> {
+            var unlimitedTransferOffers = lookup.findTransferOffersForSubLegs(
+              split.head(),
+              tail,
+              FareTransferRule::unlimitedTransfers
+            );
+            tail.forEach(leg -> offerContainer.addToLeg(leg, unlimitedTransferOffers));
+            var hasFreeTransfer = lookup.hasFreeTransfers(tail);
             if (hasFreeTransfer) {
-              offerContainer.transferProducts(legs.getFirst(), legs);
+              offerContainer.transferProducts(tail.getFirst(), tail);
             }
+
+            var transfers = tail.size();
+            var limitedTransferOffers = lookup.findTransferOffersForSubLegs(
+              split.head(),
+              tail,
+              t -> t.limitedTransfers() && t.allowsNumberOfTransfers(transfers)
+            );
+            offerContainer.addTransferLimitedOffer(split.head(), tail, limitedTransferOffers);
           })
       );
     }
 
-    var itinProducts = lookup.findTransfersMatchingAllLegs(transitLegs);
+    var itinProducts = lookup.findTransfersMatchingAllLegs(
+      transitLegs,
+      FareTransferRule::unlimitedTransfers
+    );
     return new FareResult(itinProducts, offerContainer.toMultimap());
   }
 
