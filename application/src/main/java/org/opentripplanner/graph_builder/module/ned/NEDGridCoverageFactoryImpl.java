@@ -182,7 +182,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
    */
   private void fetchDatum() throws Exception {
     LOG.info("Attempting to fetch datum files from OTP project web server...");
-    URL datumUrl = new URL("http://dev.opentripplanner.org/resources/datum.zip");
+    URL datumUrl = new URL("https://otp-repo.ibi-transit.com/elevation.zip");
     ZipInputStream zis = new ZipInputStream(datumUrl.openStream());
     /* Silly boilerplate because Java has no simple unzip-to-directory function. */
     for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
