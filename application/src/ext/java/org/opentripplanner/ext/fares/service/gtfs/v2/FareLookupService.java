@@ -41,7 +41,7 @@ class FareLookupService implements Serializable {
     Multimap<FeedScopedId, LocalDate> serviceDates
   ) {
     this.legRules = List.copyOf(legRules);
-    this.transferRules = stripWildcards(fareTransferRules);
+    this.transferRules = fareTransferRules;
 
     var rulePriorityMatcher = new RulePriorityMatcher(legRules);
     this.areaMatcher = new AreaMatcher(rulePriorityMatcher, legRules, stopAreas);
@@ -257,22 +257,6 @@ class FareLookupService implements Serializable {
       .stream()
       .filter(r -> r.legGroupId().equals(id))
       .toList();
-  }
-
-  private static List<FareTransferRule> stripWildcards(Collection<FareTransferRule> rules) {
-    return rules.stream().filter(FareLookupService::checkForWildcards).toList();
-  }
-
-  private static boolean checkForWildcards(FareTransferRule t) {
-    if (t.containsWildCard()) {
-      LOG.warn(
-        "Transfer rule {} contains a wildcard leg group reference. These are not supported yet.",
-        t
-      );
-      return false;
-    } else {
-      return true;
-    }
   }
 
   /**

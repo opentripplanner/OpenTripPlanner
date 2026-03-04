@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.fares.model;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
