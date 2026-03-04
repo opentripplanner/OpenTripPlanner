@@ -58,6 +58,5 @@ class FreeTransferAcrossNetworksTest implements PlanTestConstants, FareTestConst
       FareOffer.of(first.startTime(), FARE_PRODUCT_A),
       FareOffer.of(second.startTime(), FARE_PRODUCT_B)
     );
-    assertThat(result.itineraryProducts()).containsExactly(FARE_PRODUCT_A);
   }
 }

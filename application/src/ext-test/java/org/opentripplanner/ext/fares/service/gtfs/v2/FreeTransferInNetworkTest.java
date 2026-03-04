@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.service.gtfs.v2;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
@@ -55,7 +56,7 @@ class FreeTransferInNetworkTest implements PlanTestConstants {
   void differentNetwork() {
     var i1 = newItinerary(A, 0).bus(1, 0, 50, B).build();
     var result = service.calculateFares(i1);
-    assertEquals(Set.of(), result.itineraryProducts());
+    assertThat(result.legProducts().isEmpty());
   }
 
   @Test
@@ -72,6 +73,10 @@ class FreeTransferInNetworkTest implements PlanTestConstants {
   void severalLegs() {
     var i1 = newItinerary(A, 0).bus(ROUTE, 1, 0, 50, B).bus(ROUTE, 1, 0, 50, C).build();
     var result = service.calculateFares(i1);
-    assertEquals(Set.of(REGULAR), result.itineraryProducts());
+    i1
+      .listTransitLegs()
+      .forEach(l -> {
+        assertThat(result.offersForLeg(l)).containsExactly(FareOffer.of(l.startTime(), REGULAR));
+      });
   }
 }

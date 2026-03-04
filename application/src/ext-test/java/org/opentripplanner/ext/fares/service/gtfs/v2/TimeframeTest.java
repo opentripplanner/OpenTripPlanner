@@ -25,7 +25,6 @@ class TimeframeTest implements PlanTestConstants, FareTestConstants {
     var it = TestItinerary.of(leg).build();
     var result = buildService(leg.serviceDate()).calculateFares(it);
 
-    assertThat(result.itineraryProducts()).isEmpty();
     assertThat(result.offersForLeg(leg)).containsExactly(
       FareOffer.of(leg.startTime(), FARE_PRODUCT_A)
     );
@@ -46,7 +45,6 @@ class TimeframeTest implements PlanTestConstants, FareTestConstants {
     var it = TestItinerary.of(leg1, leg2).build();
     var result = buildService(leg1.serviceDate()).calculateFares(it);
 
-    assertThat(result.itineraryProducts()).isEmpty();
     assertThat(result.offersForLeg(leg1)).containsExactly(
       FareOffer.of(leg1.startTime(), FARE_PRODUCT_A)
     );

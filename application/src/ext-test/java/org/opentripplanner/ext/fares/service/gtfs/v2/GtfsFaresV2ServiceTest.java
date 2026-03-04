@@ -127,7 +127,6 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       .build();
 
     var result = SERVICE.calculateFares(i1);
-    assertEquals(0, result.itineraryProducts().size());
 
     var localLeg = i1.legs().get(1);
     var localLegProducts = result.offersForLeg(localLeg);
