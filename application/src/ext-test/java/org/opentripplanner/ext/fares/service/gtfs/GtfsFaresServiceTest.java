@@ -66,4 +66,21 @@ class GtfsFaresServiceTest implements FareTestConstants {
       FareOffer.of(leg2.startTime(), FARE_PRODUCT_B)
     );
   }
+
+  @Test
+  void singleLeg() {
+    var leg1 = TestTransitLeg.of()
+      .withStartTime("10:00")
+      .withEndTime("10:30")
+      .withNetwork(NETWORK_A.getId())
+      .build();
+    var service = new GtfsFaresService(new DefaultFareService(), V2_SERVICE);
+
+    var result = service.calculateFares(TestItinerary.of(leg1).build());
+
+    assertThat(result.getLegProducts().get(leg1)).containsExactly(
+      FareOffer.of(leg1.startTime(), FARE_PRODUCT_A),
+      FareOffer.of(leg1.startTime(), FARE_PRODUCT_B)
+    );
+  }
 }
