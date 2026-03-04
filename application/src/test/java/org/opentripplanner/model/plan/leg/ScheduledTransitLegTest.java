@@ -57,6 +57,7 @@ class ScheduledTransitLegTest {
   private static final TripTimes TRIP_TIMES = TRIP_DATA.scheduledTripTimes();
 
   private static final double EXPECTED_DISTANCE = 1111.95;
+  private static final double EXPECTED_DISTANCE_STOP1_TO_STOP2 = EXPECTED_DISTANCE / 2;
   private static final double DISTANCE_DELTA = 0.01;
   private static final int BOARD_STOP_INDEX_IN_PATTERN = 0;
   private static final int ALIGHT_STOP_INDEX_IN_PATTERN = 2;
@@ -173,11 +174,27 @@ class ScheduledTransitLegTest {
     assertEquals(EMISSION, copy.emissionPerPerson());
     assertEquals(FARE_PRODUCTS, copy.fareOffers());
 
-    // We change something else and make sure distance is unchanged
+    // Distance is unchanged when board/alight positions don't change
     assertEquals(
       subject.distanceMeters(),
       subject.copyOf().withGeneralizedCost(9).build().distanceMeters()
     );
+  }
+
+  @Test
+  void copyOfRecomputesDistanceWhenBoardStopChanges() {
+    // The subject boards at stop 0 and alights at stop 2 (full pattern).
+    // A copy that changes the board stop to 1 should have a shorter distance.
+    var shorterLeg = subject.copyOf().withBoardStopIndexInPattern(1).build();
+
+    assertTrue(
+      shorterLeg.distanceMeters() < subject.distanceMeters(),
+      "Expected shorter distance when boarding later, but got " +
+        shorterLeg.distanceMeters() +
+        " >= " +
+        subject.distanceMeters()
+    );
+    assertEquals(EXPECTED_DISTANCE_STOP1_TO_STOP2, shorterLeg.distanceMeters(), DISTANCE_DELTA);
   }
 
   @Test
