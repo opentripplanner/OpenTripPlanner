@@ -127,9 +127,8 @@ public class ScheduledTransitLeg implements TransitLeg {
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
-    Double builderDistance = builder.distanceMeters();
     this.distanceMeters = DoubleUtils.roundTo2Decimals(
-      builderDistance != null ? builderDistance : GeometryUtils.sumDistances(transitLegCoordinates)
+      GeometryUtils.sumDistances(transitLegCoordinates)
     );
     this.transitAlerts = Set.copyOf(builder.alerts());
     this.fromViaLocationType = builder.fromViaLocationType();
