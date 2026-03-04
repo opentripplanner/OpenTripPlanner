@@ -16,11 +16,16 @@ import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Module to analyze connectivity of stops in the graph. Ferry stops are considered isolated if
+ * they are not connected to any edge. The rest are isolated when you cannot walk for at least
+ * 10 minutes after alighting at the stop.
+ */
 public class StopConnectivityModule implements GraphBuilderModule {
-  public static final Duration DURATION = Duration.ofMinutes(10);
+
+  private static final Duration DURATION = Duration.ofMinutes(10);
   private final Graph graph;
   private final DataImportIssueStore issueStore;
-
 
   private static final Logger LOG = LoggerFactory.getLogger(StopConnectivityModule.class);
 
@@ -31,16 +36,19 @@ public class StopConnectivityModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    var progress = ProgressTracker.track("Stop connectivity analysis", 5000, graph.getVerticesOfType(TransitStopVertex.class).size());
+    var progress = ProgressTracker.track(
+      "Stop connectivity analysis",
+      5000,
+      graph.getVerticesOfType(TransitStopVertex.class).size()
+    );
     LOG.info(progress.startMessage());
     var issues = graph
       .getVerticesOfType(TransitStopVertex.class)
       .parallelStream()
       .map(stop -> {
-        if(stop.isFerryStop()){
+        if (stop.isFerryStop()) {
           return checkFerryStop(stop, progress);
-        }
-        else {
+        } else {
           return checkWalkingConnection(stop, progress);
         }
       })
@@ -54,16 +62,18 @@ public class StopConnectivityModule implements GraphBuilderModule {
 
   private static IsolatedStop checkFerryStop(TransitStopVertex stop, ProgressTracker progress) {
     progress.step(i -> LOG.info(i));
-    if(stop.isConnectedToGraph()){
+    if (stop.isConnectedToGraph()) {
       return null;
-    }
-    else {
+    } else {
       return new IsolatedStop(stop);
     }
   }
 
   @Nullable
-  private static IsolatedStop checkWalkingConnection(TransitStopVertex stop, ProgressTracker progress) {
+  private static IsolatedStop checkWalkingConnection(
+    TransitStopVertex stop,
+    ProgressTracker progress
+  ) {
     var spt = StreetSearchBuilder.of()
       .withPreStartHook(() -> {})
       .withRequest(StreetSearchRequest.of().withMode(StreetMode.WALK).build())
