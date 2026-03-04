@@ -129,19 +129,6 @@ class GraphTest {
     assertEquals(allStreetEdges, edges);
   }
 
-  @Test
-  void testGetEdgesAndVerticesById() {
-    StreetVertex a = intersectionVertex("A", 5, 5);
-    StreetVertex b = intersectionVertex("B", 6, 6);
-    StreetVertex c = intersectionVertex("C", 3, 2);
-
-    Set<Edge> allEdges = HashSet.newHashSet(4);
-    allEdges.add(edge(a, b, 1.0));
-    allEdges.add(edge(b, c, 1.0));
-    allEdges.add(edge(c, b, 1.0));
-    allEdges.add(edge(c, a, 1.0));
-  }
-
   /**
    * Create an edge. If twoWay, create two edges (back and forth).
    */
