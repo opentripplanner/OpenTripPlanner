@@ -397,7 +397,12 @@ public class LinkingContextFactory {
     }
 
     // check that vertices where found if to-location was specified
-    if (to != null && to.isSpecified() && toStopVertices.isEmpty() && isDisconnected(toVertices, LocationType.TO)) {
+    if (
+      to != null &&
+      to.isSpecified() &&
+      toStopVertices.isEmpty() &&
+      isDisconnected(toVertices, LocationType.TO)
+    ) {
       routingErrors.add(
         new RoutingError(getRoutingErrorCodeForDisconnected(to), InputField.TO_PLACE)
       );
