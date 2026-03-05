@@ -39,8 +39,11 @@ class OjpToTriasTransformerTest {
   void error() {
     var ojp = ErrorMapper.error("An error occurred", ZDT);
     var actual = OjpToTriasTransformer.ojpToTrias(ojp);
+    actual = normalizeToLf(actual);
     var file = LOADER.extTestResourceFile("error.xml");
     var original = readFile(file);
+    original = normalizeToLf(original);
+
     writeFile(file, actual);
     assertEqualStrings(original, actual);
   }
@@ -58,5 +61,10 @@ class OjpToTriasTransformerTest {
     marshaller.marshal(ojpReq, writer);
 
     return writer.getBuffer().toString();
+  }
+
+  private String normalizeToLf(String nonnormalized) {
+    // normalize to LF, JAXB_FORMATTED_OUTPUT cannot be overridden with line.separator
+    return nonnormalized.replace("\r\n", "\n").replace("\r", "\n");
   }
 }
