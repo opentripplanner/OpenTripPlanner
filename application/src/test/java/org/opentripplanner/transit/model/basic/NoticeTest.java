@@ -15,26 +15,26 @@ class NoticeTest {
   private static final String TEXT = "text";
   private static final String PUBLIC_CODE = "public code";
 
-  private static final Notice subject = Notice.of(TimetableRepositoryForTest.id(ID))
+  private static final Notice SUBJECT = Notice.of(TimetableRepositoryForTest.id(ID))
     .withPublicCode(PUBLIC_CODE)
     .withText(TEXT)
     .build();
 
   @Test
   void copy() {
-    assertEquals(ID, subject.getId().getId());
+    assertEquals(ID, SUBJECT.getId().getId());
 
     // Make a copy, and set the same publicCode (nothing is changed)
-    var copy = subject.copy().withPublicCode(PUBLIC_CODE).build();
+    var copy = SUBJECT.copy().withPublicCode(PUBLIC_CODE).build();
 
-    assertSame(subject, copy);
+    assertSame(SUBJECT, copy);
 
     // Copy and change name
-    copy = subject.copy().withPublicCode("v2").build();
+    copy = SUBJECT.copy().withPublicCode("v2").build();
 
     // The two objects are not the same instance, but is equal(same id)
-    assertNotSame(subject, copy);
-    assertEquals(subject, copy);
+    assertNotSame(SUBJECT, copy);
+    assertEquals(SUBJECT, copy);
 
     assertEquals(ID, copy.getId().getId());
     assertEquals("v2", copy.publicCode());
@@ -43,9 +43,9 @@ class NoticeTest {
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withPublicCode("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withText("X").build()));
+    assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withPublicCode("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withText("X").build()));
   }
 }

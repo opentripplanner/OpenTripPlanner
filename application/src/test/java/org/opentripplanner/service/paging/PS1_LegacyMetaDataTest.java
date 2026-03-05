@@ -1,7 +1,7 @@
 package org.opentripplanner.service.paging;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.service.paging.TestPagingModel.D30m;
+import static org.opentripplanner.service.paging.TestPagingModel.D30_m;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class PS1_LegacyMetaDataTest {
   private static final int T12_00 = TimeUtils.time("12:00");
   private static final int T13_00 = TimeUtils.time("13:00");
 
-  private static final Duration SEARCH_WINDOW_USED = D30m;
+  private static final Duration SEARCH_WINDOW_USED = D30_m;
 
   @Test
   @SuppressWarnings("deprecation")
@@ -30,7 +30,7 @@ class PS1_LegacyMetaDataTest {
     var testDriver = model.departAfterDriver(T12_00, SEARCH_WINDOW_USED, 3);
     var subject = testDriver.pagingService();
 
-    assertEquals(D30m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
+    assertEquals(D30_m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
     assertEquals(
       "11:30",
       TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime())
@@ -50,7 +50,7 @@ class PS1_LegacyMetaDataTest {
     var testDriver = model.departAfterDriver(T08_45, SEARCH_WINDOW_USED, 3);
     var subject = testDriver.pagingService();
 
-    assertEquals(D30m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
+    assertEquals(D30_m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
     assertEquals(
       "8:15",
       TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime())
@@ -70,7 +70,7 @@ class PS1_LegacyMetaDataTest {
     var testDriver = model.arriveByDriver(T12_00, T13_00, SEARCH_WINDOW_USED, 3);
     var subject = testDriver.pagingService();
 
-    assertEquals(D30m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
+    assertEquals(D30_m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
     assertEquals(
       "11:39",
       TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime())
@@ -88,7 +88,7 @@ class PS1_LegacyMetaDataTest {
     var testDriver = model.arriveByDriver(T09_15, T12_00, SEARCH_WINDOW_USED, 3);
     var subject = testDriver.pagingService();
 
-    assertEquals(D30m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
+    assertEquals(D30_m, subject.createTripSearchMetadata().raptorSearchWindowUsed());
     assertEquals(
       "8:45",
       TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime())

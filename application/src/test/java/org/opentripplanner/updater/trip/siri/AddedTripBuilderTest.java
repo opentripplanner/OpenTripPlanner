@@ -194,10 +194,8 @@ class AddedTripBuilderTest {
     assertEquals(secondsInDay(10, 20), scheduledTimes.getDepartureTime(0));
     assertEquals(0, scheduledTimes.getDepartureDelay(0));
     assertEquals(HEADSIGN, scheduledTimes.getHeadsign(0).toString());
-    assertFalse(
-      scheduledTimes.isRecordedStop(0),
-      "Scheduled timetable should not have actual departure time"
-    );
+    assertFalse(scheduledTimes.hasArrived(0), "Scheduled timetable should not have arrived");
+    assertFalse(scheduledTimes.hasDeparted(0), "Scheduled timetable should not have departed");
     assertEquals(secondsInDay(10, 30), scheduledTimes.getArrivalTime(1));
     assertEquals(secondsInDay(10, 30), scheduledTimes.getDepartureTime(1));
     assertEquals(0, scheduledTimes.getArrivalDelay(1));
@@ -215,16 +213,19 @@ class AddedTripBuilderTest {
     assertEquals(secondsInDay(10, 19), times.getDepartureTime(0));
     assertEquals(-60, times.getDepartureDelay(0));
     assertEquals(HEADSIGN, times.getHeadsign(0).toString());
-    assertTrue(times.isRecordedStop(0), "First stop has actual departure time");
+    assertTrue(times.hasArrived(0), "First stop should have arrived");
+    assertTrue(times.hasDeparted(0), "First stop should have departed");
     assertEquals(secondsInDay(10, 29), times.getArrivalTime(1));
     assertEquals(secondsInDay(10, 31), times.getDepartureTime(1));
     assertEquals(-60, times.getArrivalDelay(1));
     assertEquals(60, times.getDepartureDelay(1));
-    assertFalse(times.isRecordedStop(1), "First stop has actual departure time");
+    assertFalse(times.hasArrived(1), "Second stop should not have arrived");
+    assertFalse(times.hasDeparted(1), "Second stop should not have departed");
     assertEquals(secondsInDay(10, 41), times.getArrivalTime(2));
     assertEquals(secondsInDay(10, 41), times.getDepartureTime(2));
     assertEquals(60, times.getArrivalDelay(2));
-    assertFalse(times.isRecordedStop(2), "First stop has actual departure time");
+    assertFalse(times.hasArrived(1), "Third stop should not have arrived");
+    assertFalse(times.hasDeparted(1), "Third stop should not have departed");
   }
 
   @Test
@@ -599,6 +600,7 @@ class AddedTripBuilderTest {
         .withAimedDepartureTime(zonedDateTime(hour, 20))
         .withExpectedDepartureTime(zonedDateTime(hour, 20))
         .withActualDepartureTime(zonedDateTime(hour, 19))
+        .withIsRecorded(true)
         .build(),
       TestCall.of()
         .withStopPointRef(STOP_B.getId().getId())

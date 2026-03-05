@@ -10,7 +10,6 @@ import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSec
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 import static org.opentripplanner.utils.text.MarkdownFormatter.HEADER_4;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.DocBuilder;
@@ -29,7 +28,6 @@ public class GbfsConfigDocTest {
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
-  public static final ObjectMapper mapper = new ObjectMapper();
 
   @Test
   public void updateDoc() {

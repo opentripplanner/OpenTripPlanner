@@ -8,8 +8,8 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.Map;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * OTP simple built-in geocoder used by the debug client.

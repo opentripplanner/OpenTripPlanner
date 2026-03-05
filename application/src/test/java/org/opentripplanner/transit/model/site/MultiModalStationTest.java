@@ -10,7 +10,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class MultiModalStationTest {
@@ -23,7 +23,7 @@ class MultiModalStationTest {
   private static final Station STATION_2 = TEST_MODEL.station("1:2").build();
 
   public static final Set<Station> CHILD_STATIONS = Set.of(STATION_1, STATION_2);
-  private static final MultiModalStation subject = MultiModalStation.of(
+  private static final MultiModalStation SUBJECT = MultiModalStation.of(
     TimetableRepositoryForTest.id(ID)
   )
     .withName(NAME)
@@ -33,19 +33,19 @@ class MultiModalStationTest {
 
   @Test
   void copy() {
-    assertEquals(ID, subject.getId().getId());
+    assertEquals(ID, SUBJECT.getId().getId());
 
     // Make a copy, and set the same name (nothing is changed)
-    var copy = subject.copy().withName(NAME).build();
+    var copy = SUBJECT.copy().withName(NAME).build();
 
-    assertSame(subject, copy);
+    assertSame(SUBJECT, copy);
 
     // Copy and change name
-    copy = subject.copy().withName(new NonLocalizedString("v2")).build();
+    copy = SUBJECT.copy().withName(new NonLocalizedString("v2")).build();
 
     // The two objects are not the same instance, but are equal(same id)
-    assertNotSame(subject, copy);
-    assertEquals(subject, copy);
+    assertNotSame(SUBJECT, copy);
+    assertEquals(SUBJECT, copy);
 
     assertEquals(ID, copy.getId().getId());
     assertTrue(copy.getChildStations().containsAll(CHILD_STATIONS));
@@ -54,9 +54,9 @@ class MultiModalStationTest {
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withChildStations(Set.of(STATION_1)).build()));
+    assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withName(new NonLocalizedString("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withChildStations(Set.of(STATION_1)).build()));
   }
 }

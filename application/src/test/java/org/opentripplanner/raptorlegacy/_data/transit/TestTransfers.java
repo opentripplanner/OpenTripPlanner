@@ -5,7 +5,7 @@ import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorC
 import java.util.EnumSet;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 
 /**
  * Simple factory to create {@link DefaultRaptorTransfer}s for unit-testing.

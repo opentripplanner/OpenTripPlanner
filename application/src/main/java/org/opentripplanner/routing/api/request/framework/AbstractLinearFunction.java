@@ -3,7 +3,7 @@ package org.opentripplanner.routing.api.request.framework;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Objects;
-import org.opentripplanner.framework.model.Units;
+import org.opentripplanner.utils.lang.Units;
 
 /**
  * This is a data-transfer-object representing a linear function(constant and coefficient) of time.

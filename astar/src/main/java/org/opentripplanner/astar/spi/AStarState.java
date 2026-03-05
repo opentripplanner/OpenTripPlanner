@@ -25,7 +25,5 @@ public interface AStarState<
 
   Instant getTime();
 
-  void initBackEdge(Edge originBackEdge);
-
   AStarRequest getRequest();
 }

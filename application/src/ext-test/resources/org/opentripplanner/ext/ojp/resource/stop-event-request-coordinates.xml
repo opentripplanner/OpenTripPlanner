@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OJP version="2.0" xmlns="http://www.vdv.de/ojp" xmlns:ifopt="http://www.ifopt.org.uk/ifopt" xmlns:opengis="http://www.opengis.net/gml/3.2" xmlns:ns8="http://datex2.eu/schema/2_0RC1/2_0" xmlns:siri="http://www.siri.org.uk/siri" xmlns:acsb="http://www.ifopt.org.uk/acsb" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <OJPRequest>
+        <siri:ServiceRequest>
+            <siri:RequestTimestamp>2025-01-27T13:34:00</siri:RequestTimestamp>
+            <siri:RequestorRef>OpenTripPlanner Explorer</siri:RequestorRef>
+            <OJPStopEventRequest>
+                <siri:RequestTimestamp>2025-01-27T13:34:00</siri:RequestTimestamp>
+                <siri:MessageIdentifier>mymessage-1</siri:MessageIdentifier>
+                <Location>
+                    <PlaceRef>
+                        <GeoPosition>
+                            <siri:Longitude>12.1231</siri:Longitude>
+                            <siri:Latitude>53.2323</siri:Latitude>
+                        </GeoPosition>
+                    </PlaceRef>
+                    <DepArrTime>2025-02-13T13:03:36</DepArrTime>
+                </Location>
+                <Params>
+                    <NumberOfResults>1</NumberOfResults>
+                    <StopEventType>departure</StopEventType>
+                    <IncludePreviousCalls>true</IncludePreviousCalls>
+                    <IncludeOnwardCalls>true</IncludeOnwardCalls>
+                    <UseRealtimeData>none</UseRealtimeData>
+                </Params>
+            </OJPStopEventRequest>
+        </siri:ServiceRequest>
+    </OJPRequest>
+</OJP>

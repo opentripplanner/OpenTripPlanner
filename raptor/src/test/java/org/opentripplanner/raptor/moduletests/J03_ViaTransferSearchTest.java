@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.D1m;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.D20s;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.D30s;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.D1_m;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.D20_s;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.D30_s;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_A;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_B;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_C;
@@ -88,13 +88,13 @@ class J03_ViaTransferSearchTest {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D30s))
+      .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocation(
         RaptorViaLocation.via("B")
-          .addViaTransfer(STOP_B, TestTransfer.transfer(STOP_B, D1m))
+          .addViaTransfer(STOP_B, TestTransfer.transfer(STOP_B, D1_m))
           .build()
       )
-      .addEgressPaths(walk(STOP_D, D30s));
+      .addEgressPaths(walk(STOP_D, D30_s));
 
     var result = raptorService.route(requestBuilder.build(), data);
 
@@ -126,9 +126,11 @@ class J03_ViaTransferSearchTest {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D30s))
-      .addViaLocation(via("BxC").addViaTransfer(STOP_B, TestTransfer.transfer(STOP_C, D1m)).build())
-      .addEgressPaths(walk(STOP_E, D30s));
+      .addAccessPaths(walk(STOP_A, D30_s))
+      .addViaLocation(
+        via("BxC").addViaTransfer(STOP_B, TestTransfer.transfer(STOP_C, D1_m)).build()
+      )
+      .addEgressPaths(walk(STOP_E, D30_s));
 
     var result = raptorService.route(requestBuilder.build(), data);
 
@@ -160,16 +162,18 @@ class J03_ViaTransferSearchTest {
         0:17  0:15
         """
       )
-      .withTransfer(STOP_C, transfer(STOP_E, D1m))
-      .withTransfer(STOP_D, transfer(STOP_E, D1m));
+      .withTransfer(STOP_C, transfer(STOP_E, D1_m))
+      .withTransfer(STOP_D, transfer(STOP_E, D1_m));
 
     var requestBuilder = prepareRequest();
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D30s))
-      .addViaLocation(via("BxC").addViaTransfer(STOP_B, TestTransfer.transfer(STOP_C, D1m)).build())
-      .addEgressPaths(walk(STOP_F, D30s));
+      .addAccessPaths(walk(STOP_A, D30_s))
+      .addViaLocation(
+        via("BxC").addViaTransfer(STOP_B, TestTransfer.transfer(STOP_C, D1_m)).build()
+      )
+      .addEgressPaths(walk(STOP_F, D30_s));
 
     var result = raptorService.route(requestBuilder.build(), data);
 
@@ -204,15 +208,15 @@ class J03_ViaTransferSearchTest {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D30s))
+      .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocations(
         List.of(
           RaptorViaLocation.via("B", minWaitTime)
-            .addViaTransfer(STOP_B, transfer(STOP_B, D20s))
+            .addViaTransfer(STOP_B, transfer(STOP_B, D20_s))
             .build()
         )
       )
-      .addEgressPaths(walk(STOP_C, D30s));
+      .addEgressPaths(walk(STOP_C, D30_s));
 
     // We expect to bard the second trip at 0:05:45, since the minWaitTime is 45s and the
     // transfer slack is 60s.

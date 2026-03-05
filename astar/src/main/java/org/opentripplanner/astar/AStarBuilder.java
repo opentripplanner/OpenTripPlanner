@@ -17,6 +17,7 @@ import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AStarBuilder<
   State extends AStarState<State, Edge, Vertex>,
@@ -25,7 +26,7 @@ public abstract class AStarBuilder<
   Builder extends AStarBuilder<State, Edge, Vertex, Builder>
 > {
 
-  Logger LOG = org.slf4j.LoggerFactory.getLogger(AStarBuilder.class);
+  Logger LOG = LoggerFactory.getLogger(AStarBuilder.class);
 
   private Builder builder;
   private Runnable preStartHook = () ->
@@ -38,8 +39,6 @@ public abstract class AStarBuilder<
   private Set<Vertex> toVertices;
   private SearchTerminationStrategy<State> terminationStrategy;
   private DominanceFunction<State> dominanceFunction;
-  private Edge originBackEdge;
-  private Collection<State> initialStates;
 
   protected AStarBuilder() {}
 
@@ -113,11 +112,6 @@ public abstract class AStarBuilder<
 
   protected abstract Duration streetRoutingTimeout();
 
-  public Builder withOriginBackEdge(Edge originBackEdge) {
-    this.originBackEdge = originBackEdge;
-    return builder;
-  }
-
   public ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
     return build().getShortestPathTree();
   }
@@ -130,21 +124,8 @@ public abstract class AStarBuilder<
     final Set<Vertex> origin = arriveBy ? toVertices : fromVertices;
     final Set<Vertex> destination = arriveBy ? fromVertices : toVertices;
 
-    Collection<State> initialStates;
+    Collection<State> initialStates = createInitialStates(origin);
 
-    if (this.initialStates != null) {
-      initialStates = this.initialStates;
-    } else {
-      initialStates = createInitialStates(origin);
-
-      if (originBackEdge != null) {
-        for (var state : initialStates) {
-          state.initBackEdge(originBackEdge);
-        }
-      }
-    }
-
-    prepareInitialStates(initialStates);
     initializeHeuristic(heuristic, origin, destination, arriveBy);
 
     return new AStar<>(
@@ -163,8 +144,6 @@ public abstract class AStarBuilder<
   }
 
   protected abstract Collection<State> createInitialStates(Set<Vertex> originVertices);
-
-  protected abstract void prepareInitialStates(Collection<State> initialStates);
 
   protected abstract void initializeHeuristic(
     RemainingWeightHeuristic<State> heuristic,

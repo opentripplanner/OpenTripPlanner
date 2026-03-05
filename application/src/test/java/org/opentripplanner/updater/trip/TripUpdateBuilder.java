@@ -406,6 +406,11 @@ public class TripUpdateBuilder {
     return this;
   }
 
+  public TripUpdateBuilder withRouteId(String routeId) {
+    tripDescriptorBuilder.setRouteId(routeId);
+    return this;
+  }
+
   private TripUpdateBuilder addStopTime(
     @Nullable String stopId,
     @Nullable String arrivalTime,

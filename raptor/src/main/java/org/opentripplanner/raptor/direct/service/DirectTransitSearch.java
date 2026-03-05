@@ -81,7 +81,7 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
   /// timetable. For each route/pattern we only want the best combination of access and egress.
   private List<RaptorPath<T>> routeSearch(RaptorRoute<T> route) {
     this.currentRouteBoardSlack = data.slackProvider().boardSlack(route.pattern().slackIndex());
-    RaptorPath<T> bestPath = null;
+    PathAndTripIndex<T> bestPath = null;
 
     for (var access : accesses) {
       var pattern = route.pattern();
@@ -102,7 +102,7 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
 
         if (pathOp.isPresent()) {
           var candidate = pathOp.get();
-          if (bestPath == null || candidate.c1() < bestPath.c1()) {
+          if (bestPath == null || candidate.path.c1() < bestPath.path.c1()) {
             bestPath = candidate;
           }
         }
@@ -113,7 +113,7 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
     return bestPath == null ? List.of() : findAllPathsInSearchWindow(route, bestPath);
   }
 
-  private Optional<RaptorPath<T>> findFirstPathInSearchWindow(
+  private Optional<PathAndTripIndex<T>> findFirstPathInSearchWindow(
     RaptorRoute<T> route,
     RaptorAccessEgress access,
     RaptorAccessEgress egress,
@@ -140,17 +140,18 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
     }
 
     if (path.startTime() < latestDepartureTime) {
-      return Optional.of(path);
+      return Optional.of(new PathAndTripIndex<T>(path, boardEvent.tripIndex()));
     }
     return Optional.empty();
   }
 
   private List<RaptorPath<T>> findAllPathsInSearchWindow(
     RaptorRoute<T> route,
-    RaptorPath<T> firstPath
+    PathAndTripIndex<T> firstPathAndIndex
   ) {
+    var firstPath = firstPathAndIndex.path();
     var transitLeg = firstPath.accessLeg().nextLeg().asTransitLeg();
-    int tripScheduleStartIndex = transitLeg.trip().tripSortIndex() + 1;
+    int tripScheduleStartIndex = firstPathAndIndex.tripIndexInPattern() + 1;
     var access = firstPath.accessLeg().access();
     var egress = firstPath.egressLeg().egress();
     int boardPos = transitLeg.getFromStopPosition();
@@ -227,4 +228,9 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
       );
     }
   }
+
+  private record PathAndTripIndex<T extends RaptorTripSchedule>(
+    RaptorPath<T> path,
+    int tripIndexInPattern
+  ) {}
 }

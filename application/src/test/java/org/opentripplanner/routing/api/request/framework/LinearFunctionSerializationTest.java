@@ -17,8 +17,8 @@ import org.opentripplanner.utils.time.DurationUtils;
 
 class LinearFunctionSerializationTest {
 
-  private static final Duration D2h9s = Duration.ofSeconds(129);
-  private static final Duration D1h = Duration.ofSeconds(3600);
+  private static final Duration D2_h_9_s = Duration.ofSeconds(129);
+  private static final Duration D1_h = Duration.ofSeconds(3600);
 
   @SuppressWarnings("unused")
   static Stream<Arguments> parseTestCases() {
@@ -64,10 +64,10 @@ class LinearFunctionSerializationTest {
   @Test
   void serialize() {
     assertEquals("0s + 0.00 t", LinearFunctionSerialization.serialize(Duration.ZERO, 0));
-    assertEquals("2m9s + 0.01 t", LinearFunctionSerialization.serialize(D2h9s, 0.0111));
-    assertEquals("1h + 0.11 t", LinearFunctionSerialization.serialize(D1h, 0.111));
-    assertEquals("1h + 1.11 t", LinearFunctionSerialization.serialize(D1h, 1.111));
-    assertEquals("1h + 2.1 t", LinearFunctionSerialization.serialize(D1h, 2.111));
+    assertEquals("2m9s + 0.01 t", LinearFunctionSerialization.serialize(D2_h_9_s, 0.0111));
+    assertEquals("1h + 0.11 t", LinearFunctionSerialization.serialize(D1_h, 0.111));
+    assertEquals("1h + 1.11 t", LinearFunctionSerialization.serialize(D1_h, 1.111));
+    assertEquals("1h + 2.1 t", LinearFunctionSerialization.serialize(D1_h, 2.111));
   }
 
   @Test

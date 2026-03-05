@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.carpooling;
 
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Shared test coordinates and constants for carpooling tests.

@@ -16,9 +16,9 @@ import org.opentripplanner.framework.application.OTPFeature;
 
 class IntrospectionTypeWiring {
 
-  private static final Predicate<Method> isMethodPublic = method ->
+  private static final Predicate<Method> IS_METHOD_PUBLIC = method ->
     Modifier.isPublic(method.getModifiers());
-  private static final Predicate<Method> isMethodReturnTypeDataFetcher = ((Predicate<
+  private static final Predicate<Method> IS_METHOD_RETURN_TYPE_DATA_FETCHER = ((Predicate<
       Method
     >) method -> method.getReturnType().equals(DataFetcher.class)).or(method ->
     Arrays.asList(method.getReturnType().getInterfaces()).contains(DataFetcher.class)
@@ -48,8 +48,8 @@ class IntrospectionTypeWiring {
     return TypeRuntimeWiring.newTypeWiring(clazz.getSimpleName().replaceAll("Impl$", ""))
       .dataFetchers(
         Arrays.stream(clazz.getDeclaredMethods())
-          .filter(isMethodPublic)
-          .filter(isMethodReturnTypeDataFetcher)
+          .filter(IS_METHOD_PUBLIC)
+          .filter(IS_METHOD_RETURN_TYPE_DATA_FETCHER)
           .collect(
             Collectors.toMap(Method::getName, method -> {
               String fieldName = method.getName();

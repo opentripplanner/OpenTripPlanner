@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
@@ -23,14 +24,13 @@ import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
-import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.leg.FrequencyTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
-import org.opentripplanner.street.model._data.StreetModelForTest;
+import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
@@ -555,8 +555,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     ScheduledTransitLeg leg;
 
-    var distance = speed(trip.getMode()) * (end - start);
-
     if (headwaySecs != null) {
       leg = new FrequencyTransitLegBuilder()
         .withTripTimes(tripTimes)
@@ -569,7 +567,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
         .withZoneId(UTC)
         .withTransferFromPreviousLeg(transferFromPreviousLeg)
         .withGeneralizedCost(legCost)
-        .withDistanceMeters(distance)
         .withFrequencyHeadwayInSeconds(headwaySecs)
         .withToViaLocationType(to.viaLocationType)
         .build();
@@ -585,7 +582,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
         .withZoneId(UTC)
         .withTransferFromPreviousLeg(transferFromPreviousLeg)
         .withGeneralizedCost(legCost)
-        .withDistanceMeters(distance)
         .withToViaLocationType(to.viaLocationType)
         .build();
     }

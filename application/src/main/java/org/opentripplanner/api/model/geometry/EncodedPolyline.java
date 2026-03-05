@@ -2,8 +2,8 @@ package org.opentripplanner.api.model.geometry;
 
 import java.util.Objects;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.PolylineEncoder;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

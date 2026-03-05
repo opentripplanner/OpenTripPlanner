@@ -8,8 +8,8 @@ import graphql.language.StringValue;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import java.util.Map;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.graphql.scalar.CostScalarFactory;
-import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.utils.time.DurationUtils;
 

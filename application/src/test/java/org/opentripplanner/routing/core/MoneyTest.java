@@ -20,23 +20,23 @@ import org.opentripplanner.transit.model.basic.Money;
 
 class MoneyTest {
 
-  private static final Money hundredNOK = Money.ofFractionalAmount(
+  private static final Money HUNDRED_NOK = Money.ofFractionalAmount(
     Currency.getInstance("NOK"),
     100
   );
-  private static final Money oneDollar = Money.usDollars(1);
-  private static final Money twoDollars = Money.usDollars(2);
+  private static final Money ONE_DOLLAR = Money.usDollars(1);
+  private static final Money TWO_DOLLARS = Money.usDollars(2);
   static Money threeEuroTwelve = Money.euros(3.12f);
 
   static Stream<Arguments> testCases() {
     return Stream.of(
-      of(oneDollar, Locale.US, "$1.00"),
-      of(oneDollar, Locale.GERMANY, "1,00 $"),
+      of(ONE_DOLLAR, Locale.US, "$1.00"),
+      of(ONE_DOLLAR, Locale.GERMANY, "1,00 $"),
       of(Money.euros(1), Locale.GERMANY, "1,00 €"),
-      of(oneDollar, NORWEGIAN_BOKMAL, "USD 1,00"),
-      //of(oneDollar, NORWEGIAN_NYNORSK, "1.00 USD"),
-      of(hundredNOK, NORWEGIAN_BOKMAL, "kr 100,00")
-      //of(hundredNOK, NORWEGIAN_NYNORSK, "100.00 kr")
+      of(ONE_DOLLAR, NORWEGIAN_BOKMAL, "USD 1,00"),
+      //of(ONE_DOLLAR, NORWEGIAN_NYNORSK, "1.00 USD"),
+      of(HUNDRED_NOK, NORWEGIAN_BOKMAL, "kr 100,00")
+      //of(HUNDRED_NOK, NORWEGIAN_NYNORSK, "100.00 kr")
     );
   }
 
@@ -50,11 +50,11 @@ class MoneyTest {
 
   static Stream<Arguments> amountCases() {
     return Stream.of(
-      of(oneDollar, 1.0f),
+      of(ONE_DOLLAR, 1.0f),
       of(threeEuroTwelve, 3.12f),
       of(Money.euros(3.1f), 3.1f),
       of(Money.euros(999.99f), 999.99f),
-      of(hundredNOK, 100.0f),
+      of(HUNDRED_NOK, 100.0f),
       // Yen doesn't have fractional digits
       of(yen(1000), 1000f),
       of(yen(9999), 9999f)
@@ -74,17 +74,17 @@ class MoneyTest {
 
   @Test
   void plus() {
-    assertEquals(twoDollars, oneDollar.plus(oneDollar));
+    assertEquals(TWO_DOLLARS, ONE_DOLLAR.plus(ONE_DOLLAR));
   }
 
   @Test
   void minus() {
-    assertEquals(oneDollar, twoDollars.minus(oneDollar));
+    assertEquals(ONE_DOLLAR, TWO_DOLLARS.minus(ONE_DOLLAR));
   }
 
   @Test
   void times() {
-    assertEquals(Money.usDollars(4), oneDollar.times(4));
+    assertEquals(Money.usDollars(4), ONE_DOLLAR.times(4));
   }
 
   @Test
@@ -101,14 +101,14 @@ class MoneyTest {
 
   @Test
   void greaterThan() {
-    assertTrue(twoDollars.greaterThan(oneDollar));
-    assertFalse(oneDollar.greaterThan(oneDollar));
-    assertFalse(oneDollar.greaterThan(twoDollars));
+    assertTrue(TWO_DOLLARS.greaterThan(ONE_DOLLAR));
+    assertFalse(ONE_DOLLAR.greaterThan(ONE_DOLLAR));
+    assertFalse(ONE_DOLLAR.greaterThan(TWO_DOLLARS));
   }
 
   @Test
   void serializable() {
-    assertInstanceOf(Serializable.class, oneDollar);
+    assertInstanceOf(Serializable.class, ONE_DOLLAR);
   }
 
   @Test

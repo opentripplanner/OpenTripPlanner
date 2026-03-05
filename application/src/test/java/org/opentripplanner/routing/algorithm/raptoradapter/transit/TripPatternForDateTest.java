@@ -27,7 +27,7 @@ class TripPatternForDateTest {
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final RegularStop STOP = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
   private static final Route ROUTE = TimetableRepositoryForTest.route("1").build();
-  private static final ScheduledTripTimes tripTimes = TripTimesFactory.tripTimes(
+  private static final ScheduledTripTimes TRIP_TIMES = TripTimesFactory.tripTimes(
     TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build(),
     List.of(new StopTime()),
     new Deduplicator()
@@ -36,7 +36,7 @@ class TripPatternForDateTest {
   static Stream<Arguments> testCases() {
     return Stream.of(
       List.of(
-        new FrequencyEntry(new Frequency(tripTimes.getTrip(), 0, 86400, 600, false), tripTimes)
+        new FrequencyEntry(new Frequency(TRIP_TIMES.getTrip(), 0, 86400, 600, false), TRIP_TIMES)
       ),
       List.of()
     ).map(Arguments::of);
@@ -56,7 +56,7 @@ class TripPatternForDateTest {
 
     var withFrequencies = new TripPatternForDate(
       tripPattern,
-      List.of(tripTimes),
+      List.of(TRIP_TIMES),
       freqs,
       LocalDate.now()
     );

@@ -14,11 +14,11 @@ public class GraphQLResponseSerializer {
 
   static final Logger LOG = LoggerFactory.getLogger(GraphQLResponseSerializer.class);
 
-  private static final ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   public static String serialize(ExecutionResult executionResult) {
     try {
-      return objectMapper.writeValueAsString(executionResult.toSpecification());
+      return OBJECT_MAPPER.writeValueAsString(executionResult.toSpecification());
     } catch (JsonProcessingException e) {
       LOG.error("Unable to serialize response", e);
       throw new RuntimeException(e);

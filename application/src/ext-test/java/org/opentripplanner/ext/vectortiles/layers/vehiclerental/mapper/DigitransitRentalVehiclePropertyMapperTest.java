@@ -7,12 +7,12 @@ import static org.opentripplanner.street.model.RentalFormFactor.BICYCLE;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeFactory;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
-import org.opentripplanner.transit.model.basic.Ratio;
 
 class DigitransitRentalVehiclePropertyMapperTest {
 

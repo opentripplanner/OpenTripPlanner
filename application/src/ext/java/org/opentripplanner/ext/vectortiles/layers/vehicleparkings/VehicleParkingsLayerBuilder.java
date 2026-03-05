@@ -13,11 +13,11 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.street.geometry.GeometryUtils;
 
 public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 

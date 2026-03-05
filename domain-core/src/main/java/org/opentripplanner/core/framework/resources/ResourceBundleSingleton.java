@@ -12,7 +12,7 @@ import java.util.Set;
 public enum ResourceBundleSingleton {
   INSTANCE;
 
-  static final ResourceBundle.Control noFallbackControl = Control.getNoFallbackControl(
+  static final ResourceBundle.Control NO_FALLBACK_CONTROL = Control.getNoFallbackControl(
     Control.FORMAT_PROPERTIES
   );
   private static final Set<String> INTERNAL_KEYS = ResourceBundle.getBundle("internals").keySet();
@@ -29,9 +29,9 @@ public enum ResourceBundleSingleton {
     try {
       ResourceBundle resourceBundle;
       if (INTERNAL_KEYS.contains(key)) {
-        resourceBundle = ResourceBundle.getBundle("internals", locale, noFallbackControl);
+        resourceBundle = ResourceBundle.getBundle("internals", locale, NO_FALLBACK_CONTROL);
       } else {
-        resourceBundle = ResourceBundle.getBundle("WayProperties", locale, noFallbackControl);
+        resourceBundle = ResourceBundle.getBundle("WayProperties", locale, NO_FALLBACK_CONTROL);
       }
       return resourceBundle.getString(key);
     } catch (MissingResourceException e) {

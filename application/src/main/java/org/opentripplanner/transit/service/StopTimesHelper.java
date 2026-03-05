@@ -2,6 +2,7 @@ package org.opentripplanner.transit.service;
 
 import static org.opentripplanner.transit.service.ArrivalDeparture.ARRIVALS;
 import static org.opentripplanner.transit.service.ArrivalDeparture.DEPARTURES;
+import static org.opentripplanner.utils.time.ServiceDateUtils.calculateRunningDates;
 
 import com.google.common.collect.MinMaxPriorityQueue;
 import java.time.Duration;
@@ -26,7 +27,7 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
-class StopTimesHelper {
+public class StopTimesHelper {
 
   private final TransitService transitService;
 
@@ -35,11 +36,11 @@ class StopTimesHelper {
   }
 
   /**
-   * Fetch upcoming vehicle departures from a stop. It goes though all patterns passing the stop for
-   * the previous, current and next service date. It uses a priority queue to keep track of the next
-   * departures. The queue is shared between all dates, as services from the previous service date
-   * can visit the stop later than the current service date's services. This happens eg. with
-   * sleeper trains.
+   * Fetch upcoming vehicle departures from a stop. It goes through all patterns passing the stop
+   * for the given time-window `[startTime, startTime+timeRange]`. It uses a priority queue to keep
+   * track of the next departures. The queue is shared between all dates, as services from earlier
+   * service dates can visit the stop later than the current service date's services. This happens
+   * with sleeper trains and multi-day services.
    * <p>
    * TODO: Add frequency based trips
    *
@@ -225,11 +226,6 @@ class StopTimesHelper {
     Comparator<TripTimeOnDate> sortOrder
   ) {
     ZoneId zoneId = transitService.getTimeZone();
-    LocalDate startDate = startTime.atZone(zoneId).toLocalDate().minusDays(1);
-    LocalDate endDate = startTime.plus(timeRange).atZone(zoneId).toLocalDate();
-
-    // datesUntil is exclusive in the end, so need to add one day
-    List<LocalDate> serviceDates = startDate.datesUntil(endDate.plusDays(1)).toList();
 
     // The bounded priority Q is used to keep a sorted short list of trip times. We can not
     // rely on the trip times to be in order because of real-time updates. This code can
@@ -245,13 +241,28 @@ class StopTimesHelper {
       .create();
 
     int timeRangeSeconds = (int) timeRange.toSeconds();
+    int maxTripSpanDays = pattern.getScheduledTimetable().getMaxTripSpanDays();
 
-    // Loop through all possible days
-    for (LocalDate serviceDate : serviceDates) {
+    // The `maxTripSpanDays + 1` is used to "overselect" the running-dates to account for up to
+    // 24h delays. This had a performance overhead of ~25% (Bergen, Norway), so we check if there are delays
+    // in the loop below and remove the extra day if not.
+    var runningDates = calculateRunningDates(startTime, timeRange, zoneId, maxTripSpanDays + 1);
+    var firstDay = runningDates.getFirst();
+
+    for (LocalDate serviceDate : runningDates) {
       Timetable timetable = transitService.findTimetable(pattern, serviceDate);
-      ZonedDateTime midnight = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
+
+      // Skip the first running date if the maxTripSpanDays is the same for the scheduled
+      // and the realtime timetable. We overselected the runing dates in case the realtime
+      // timetable was delayed into the next service-day. Note! If no realtime data exist this
+      // check is true, and the first running date is skiped.
+      if (firstDay == serviceDate && maxTripSpanDays == timetable.getMaxTripSpanDays()) {
+        continue;
+      }
+
+      var serviceDateMidnight = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
       int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
-        midnight,
+        serviceDateMidnight,
         ZonedDateTime.ofInstant(startTime, zoneId)
       );
       var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
@@ -291,7 +302,13 @@ class StopTimesHelper {
               (arrivalDeparture != DEPARTURES && arrivalTimeInRange)
             ) {
               pq.add(
-                new TripTimeOnDate(tripTimes, stopPos, pattern, serviceDate, midnight.toInstant())
+                new TripTimeOnDate(
+                  tripTimes,
+                  stopPos,
+                  pattern,
+                  serviceDate,
+                  serviceDateMidnight.toInstant()
+                )
               );
             }
           }

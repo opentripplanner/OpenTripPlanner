@@ -102,6 +102,7 @@ The current list of custom fare type is:
     - `ALWAYS`: All interlined legs are combined. (default)
     - `SAME_ROUTE`: Only interlined legs whose route ID are identical are combined.
 - `orca` (no parameters)
+- `hop` (no parameters)
 - `off` (no parameters)
 
 ## Removed fare calculators

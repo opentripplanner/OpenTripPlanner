@@ -60,9 +60,6 @@ class TestState implements AStarState<TestState, TestEdge, TestVertex> {
   }
 
   @Override
-  public void initBackEdge(TestEdge originBackEdge) {}
-
-  @Override
   public AStarRequest getRequest() {
     return () -> false;
   }

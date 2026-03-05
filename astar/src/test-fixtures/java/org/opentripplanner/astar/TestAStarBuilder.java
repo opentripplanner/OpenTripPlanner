@@ -29,9 +29,6 @@ public class TestAStarBuilder
   }
 
   @Override
-  protected void prepareInitialStates(Collection initialStates) {}
-
-  @Override
   protected void initializeHeuristic(
     RemainingWeightHeuristic heuristic,
     Set origin,

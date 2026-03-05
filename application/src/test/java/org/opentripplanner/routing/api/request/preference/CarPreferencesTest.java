@@ -6,7 +6,7 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 
 class CarPreferencesTest {
 

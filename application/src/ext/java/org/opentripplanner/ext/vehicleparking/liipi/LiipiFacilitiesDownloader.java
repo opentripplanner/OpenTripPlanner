@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class LiipiFacilitiesDownloader {
 
   private static final Logger LOG = LoggerFactory.getLogger(LiipiFacilitiesDownloader.class);
-  private static final ObjectMapper mapper = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private final String jsonParsePath;
   private final BiFunction<
@@ -86,7 +86,7 @@ public class LiipiFacilitiesDownloader {
 
     String facilitiesString = convertStreamToString(dataStream);
 
-    JsonNode rootNode = mapper.readTree(facilitiesString);
+    JsonNode rootNode = MAPPER.readTree(facilitiesString);
 
     if (!jsonParsePath.isEmpty()) {
       String delimiter = "/";

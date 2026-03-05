@@ -128,12 +128,12 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
     EGRESS_CLOSING
   );
 
-  public static final int EGRESS_C1_W_1M_SLACK =
+  public static final int EGRESS_C1_W_1_m_SLACK =
     EGRESS_C1 + toRaptorCost(TRANSFER_C1_SEC) + C1_CALCULATOR.waitCost(TRANSFER_SLACK);
-  public static final int EGRESS_C1_W_7M45S_SLACK =
-    EGRESS_C1_W_1M_SLACK + C1_CALCULATOR.waitCost(durationInSeconds("6m45s"));
-  public static final int EGRESS_C1_W_9M45S_SLACK =
-    EGRESS_C1_W_1M_SLACK + C1_CALCULATOR.waitCost(durationInSeconds("8m45s"));
+  public static final int EGRESS_C1_W_7_m_45_s_SLACK =
+    EGRESS_C1_W_1_m_SLACK + C1_CALCULATOR.waitCost(durationInSeconds("6m45s"));
+  public static final int EGRESS_C1_W_9_m_45_s_SLACK =
+    EGRESS_C1_W_1_m_SLACK + C1_CALCULATOR.waitCost(durationInSeconds("8m45s"));
 
   public static final String LINE_A = "A";
   public static final String LINE_B = "B";
@@ -181,7 +181,7 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
         "Flex 6m Rₙ1 10:21:15 10:27:15 %s " +
         "[10:01 10:27:15 26m15s Tₙ2 %s]",
       C1.format(ACCESS_C1),
-      C1.format(EGRESS_C1_W_1M_SLACK),
+      C1.format(EGRESS_C1_W_1_m_SLACK),
       C1.format(TOT_C1_A)
     );
   }
@@ -199,7 +199,7 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
         "Flex 6m Rₙ1 10:23:15 10:29:15 %s" +
         " [10:00 10:29:15 29m15s Tₙ2 %s]",
       C1.format(ACCESS_C1),
-      C1.format(EGRESS_C1_W_1M_SLACK),
+      C1.format(EGRESS_C1_W_1_m_SLACK),
       C1.format(TOT_C1_B)
     );
   }
@@ -216,7 +216,7 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
         "[9:50 10:36 46m Tₙ2 %s]",
       C1.format(ACCESS_C1),
       C1.format(L1_C1_INC_WAIT_W_OPENING_HOURS_A),
-      C1.format(EGRESS_C1_W_9M45S_SLACK),
+      C1.format(EGRESS_C1_W_9_m_45_s_SLACK),
       C1.format(TOT_C1_W_OPENING_HOURS_A)
     );
   }
@@ -235,7 +235,7 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
         " [9:50 10:36 46m Tₙ2 %s]",
       C1.format(ACCESS_C1),
       C1.format(L1_C1_INC_WAIT_W_OPENING_HOURS_B),
-      C1.format(EGRESS_C1_W_7M45S_SLACK),
+      C1.format(EGRESS_C1_W_7_m_45_s_SLACK),
       C1.format(TOT_C1_W_OPENING_HOURS_B)
     );
   }

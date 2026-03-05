@@ -251,7 +251,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   private Optional<ServiceDelivery> serviceDelivery(ByteString data) {
     Siri siri;
     try {
-      siri = SiriXml.parseXml(data.toStringUtf8());
+      siri = SiriXml.parseXml(data.newInput());
     } catch (XMLStreamException | JAXBException e) {
       throw new RuntimeException(e);
     }

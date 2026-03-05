@@ -2,7 +2,7 @@ package org.opentripplanner.service.worldenvelope.model;
 
 import java.io.Serializable;
 import java.util.Optional;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

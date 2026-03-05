@@ -10,9 +10,11 @@ import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
@@ -25,7 +27,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.service.DefaultRoutingService;
@@ -40,6 +41,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
@@ -76,6 +78,9 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final CarpoolingService carpoolingService;
 
   @Nullable
+  private final DataOverlayParameterBindings dataOverlayParameterBindings;
+
+  @Nullable
   private final ItineraryDecorator emissionItineraryDecorator;
 
   private final StreetDetailsService streetDetailsService;
@@ -103,6 +108,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   private final TriasApiParameters triasApiParameters;
 
+  private final OjpApiParameters ojpApiParameters;
+
   private final GtfsApiParameters gtfsApiParameters;
 
   private final TransmodelAPIParameters transmodelAPIParameters;
@@ -125,6 +132,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     Graph graph,
     LinkingContextFactory linkingContextFactory,
     MeterRegistry meterRegistry,
+    OjpApiParameters ojpApiParameters,
     RaptorConfig<TripSchedule> raptorConfig,
     RealtimeVehicleService realtimeVehicleService,
     List<RideHailingService> rideHailingServices,
@@ -142,6 +150,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     ViaCoordinateTransferFactory viaTransferResolver,
     WorldEnvelopeService worldEnvelopeService,
     @Nullable CarpoolingService carpoolingService,
+    @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
     StreetDetailsService streetDetailsService,
     @Nullable EmpiricalDelayService empiricalDelayService,
@@ -159,6 +168,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.graph = graph;
     this.linkingContextFactory = linkingContextFactory;
     this.meterRegistry = meterRegistry;
+    this.ojpApiParameters = ojpApiParameters;
     this.raptorConfig = raptorConfig;
     this.realtimeVehicleService = realtimeVehicleService;
     this.rideHailingServices = rideHailingServices;
@@ -179,6 +189,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
     // Optional fields
     this.carpoolingService = carpoolingService;
+    this.dataOverlayParameterBindings = dataOverlayParameterBindings;
     this.emissionItineraryDecorator = emissionItineraryDecorator;
     this.streetDetailsService = streetDetailsService;
     this.empiricalDelayService = empiricalDelayService;
@@ -313,6 +324,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
+  public OjpApiParameters ojpApiParameters() {
+    return ojpApiParameters;
+  }
+
+  @Override
   public GtfsApiParameters gtfsApiParameters() {
     return gtfsApiParameters;
   }
@@ -326,6 +342,12 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public CarpoolingService carpoolingService() {
     return carpoolingService;
+  }
+
+  @Nullable
+  @Override
+  public DataOverlayParameterBindings dataOverlayParameterBindings() {
+    return dataOverlayParameterBindings;
   }
 
   @Nullable

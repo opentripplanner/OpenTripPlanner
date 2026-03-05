@@ -93,7 +93,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   private static final int C2 = 7;
 
   /** Stop cost for stop NA, A, C, E .. H is zero(0), B: 30s, and D: 60s. ?=0, A=1 .. H=8 */
-  private static final int[] STOP_C1S = { 0, 0, 3_000, 0, 6_000, 0, 0, 0, 0, 0 };
+  private static final int[] STOP_C1_S = { 0, 0, 3_000, 0, 6_000, 0, 0, 0, 0, 0 };
 
   // These times should not have eny effect on tests
   private static final int VERY_EARLY = time("00:00");
@@ -118,8 +118,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final int L11_DURATION = L11_END - L11_START;
   private static final int L11_WAIT_DURATION = L11_START - ACCESS_END + ALIGHT_SLACK;
   public static final int LINE_11_C1 =
-    STOP_C1S[STOP_A] +
-    STOP_C1S[STOP_B] +
+    STOP_C1_S[STOP_A] +
+    STOP_C1_S[STOP_B] +
     toRaptorCost(BOARD_C1_SEC + WAIT_RELUCTANCE * L11_WAIT_DURATION + L11_DURATION);
   public static final int LINE_11_C2 = 2;
 
@@ -137,8 +137,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final int L21_DURATION = L21_END - L21_START;
   private static final int L21_WAIT_DURATION = L21_START - TX_END + ALIGHT_SLACK;
   public static final int LINE_21_C1 =
-    STOP_C1S[STOP_C] +
-    STOP_C1S[STOP_D] +
+    STOP_C1_S[STOP_C] +
+    STOP_C1_S[STOP_D] +
     toRaptorCost(
       BOARD_C1_SEC + TRANSFER_C1_SEC + WAIT_RELUCTANCE * L21_WAIT_DURATION + L21_DURATION
     );
@@ -150,8 +150,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final int L31_DURATION = L31_END - L31_START;
   private static final int L31_WAIT_DURATION = L31_START - (L21_END + ALIGHT_SLACK) + ALIGHT_SLACK;
   public static final int LINE_31_C1 =
-    STOP_C1S[STOP_D] +
-    STOP_C1S[STOP_E] +
+    STOP_C1_S[STOP_D] +
+    STOP_C1_S[STOP_E] +
     toRaptorCost(
       BOARD_C1_SEC + TRANSFER_C1_SEC + WAIT_RELUCTANCE * L31_WAIT_DURATION + L31_DURATION
     );
@@ -214,7 +214,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     BOARD_C1_SEC,
     TRANSFER_C1_SEC,
     WAIT_RELUCTANCE,
-    STOP_C1S
+    STOP_C1_S
   );
 
   public static final int TOTAL_C1 =

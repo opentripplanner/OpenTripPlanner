@@ -61,11 +61,11 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
 
   TransferGenerator<TestTripSchedule> transfers = dummyTransferGenerator(
     List.of(
-      TestTransferBuilder.tx(trip1, STOP_B, trip2, STOP_C).priority(ALLOWED).walk(D1m).build(),
-      TestTransferBuilder.tx(trip1, STOP_C, trip2, STOP_D).priority(RECOMMENDED).walk(D2m).build(),
-      TestTransferBuilder.tx(trip1, STOP_D, trip2, STOP_E).priority(PREFERRED).walk(D3m).build(),
-      TestTransferBuilder.tx(trip1, STOP_E, trip2, STOP_F).guaranteed().walk(D4m).build(),
-      TestTransferBuilder.tx(trip1, STOP_F, trip2, STOP_G).staySeated().walk(D5m).build(),
+      TestTransferBuilder.tx(trip1, STOP_B, trip2, STOP_C).priority(ALLOWED).walk(D1_m).build(),
+      TestTransferBuilder.tx(trip1, STOP_C, trip2, STOP_D).priority(RECOMMENDED).walk(D2_m).build(),
+      TestTransferBuilder.tx(trip1, STOP_D, trip2, STOP_E).priority(PREFERRED).walk(D3_m).build(),
+      TestTransferBuilder.tx(trip1, STOP_E, trip2, STOP_F).guaranteed().walk(D4_m).build(),
+      TestTransferBuilder.tx(trip1, STOP_F, trip2, STOP_G).staySeated().walk(D5_m).build(),
       TestTransferBuilder.tx(trip1, STOP_C, trip2, STOP_C).priority(NOT_ALLOWED).build(),
       TestTransferBuilder.tx(trip1, STOP_D, trip2, STOP_D).priority(NOT_ALLOWED).build(),
       TestTransferBuilder.tx(trip1, STOP_E, trip2, STOP_E).priority(NOT_ALLOWED).build(),
@@ -140,9 +140,9 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     var original = OptimizePathDomainServiceTest.pathBuilder()
       .access(START_TIME_T1, STOP_A)
       .bus(trip1, STOP_B)
-      .walk(D1m, STOP_C)
+      .walk(D1_m, STOP_C)
       .bus(trip2, egressStop)
-      .egress(D0s);
+      .egress(D0_s);
 
     var subject = OptimizePathDomainServiceTest.subject(transfers, null);
 

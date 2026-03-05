@@ -34,7 +34,6 @@ import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 import org.opentripplanner.ext.empiricaldelay.model.TripDelays;
 import org.opentripplanner.ext.empiricaldelay.model.calendar.EmpiricalDelayCalendar;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareServiceFactory;
-import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.plan.Emission;
@@ -49,6 +48,8 @@ import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRe
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.StreetRepository;
+import org.opentripplanner.street.geometry.HashGridSpatialIndex;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.model.StreetModelDetails;
 import org.opentripplanner.transfer.regular.TransferRepository;

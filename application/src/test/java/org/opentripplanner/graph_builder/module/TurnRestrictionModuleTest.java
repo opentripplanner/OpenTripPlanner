@@ -13,11 +13,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
@@ -30,6 +28,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
 
@@ -351,15 +350,10 @@ public class TurnRestrictionModuleTest {
     assertEquals(7, graph.countVertices());
     assertEquals(16, graph.countEdges());
 
-    var streetRequest = new StreetRequest(StreetMode.CAR);
-
-    var request = RouteRequest.of()
-      .withJourney(j -> j.withDirect(streetRequest))
-      .buildDefault();
+    var request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .withRequest(request)
-      .withStreetRequest(streetRequest)
       .withFrom(A)
       .withTo(F)
       .getShortestPathTree();
@@ -430,15 +424,11 @@ public class TurnRestrictionModuleTest {
     assertEquals(6, graph.countVertices());
     assertEquals(11, graph.countEdges());
 
-    var streetRequest = new StreetRequest(StreetMode.CAR);
-    var request = RouteRequest.of()
-      .withJourney(j -> j.withDirect(streetRequest))
-      .buildDefault();
+    var request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();
 
     assertNull(
       StreetSearchBuilder.of()
         .withRequest(request)
-        .withStreetRequest(streetRequest)
         .withFrom(A)
         .withTo(B)
         .getShortestPathTree()
@@ -447,7 +437,6 @@ public class TurnRestrictionModuleTest {
     assertNull(
       StreetSearchBuilder.of()
         .withRequest(request)
-        .withStreetRequest(streetRequest)
         .withFrom(A)
         .withTo(C)
         .getShortestPathTree()
@@ -455,7 +444,6 @@ public class TurnRestrictionModuleTest {
     );
     GraphPath<State, Edge, Vertex> path = StreetSearchBuilder.of()
       .withRequest(request)
-      .withStreetRequest(streetRequest)
       .withFrom(A)
       .withTo(E)
       .getShortestPathTree()

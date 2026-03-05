@@ -34,7 +34,7 @@ public class AStar<
 
   private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
 
-  private static final boolean verbose = LOG.isDebugEnabled();
+  private static final boolean VERBOSE = LOG.isDebugEnabled();
 
   private final boolean arriveBy;
   private final Set<Vertex> fromVertices;
@@ -107,7 +107,7 @@ public class AStar<
 
   private boolean iterate() {
     // print debug info
-    if (verbose) {
+    if (VERBOSE) {
       double w = pq.peek_min_key();
       LOG.debug("pq min key = {}", w);
     }
@@ -131,7 +131,7 @@ public class AStar<
 
     Vertex u_vertex = u.getVertex();
 
-    if (verbose) {
+    if (VERBOSE) {
       LOG.debug("   vertex {}", u_vertex);
     }
 
@@ -158,7 +158,7 @@ public class AStar<
         }
         double estimate = v.getWeight() + remaining_w;
 
-        if (verbose) {
+        if (VERBOSE) {
           LOG.debug("      edge {}", edge);
           LOG.debug(
             "      {} -> {}(w) + {}(heur) = {} vert = {}",

@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 
 class LinkingContextRequestTest {
 

@@ -175,7 +175,7 @@ public class TimetableSnapshot {
     );
   }
 
-  private TimetableSnapshot(
+  TimetableSnapshot(
     Map<FeedScopedId, SortedSet<Timetable>> timetables,
     Map<TripIdAndServiceDate, TripPattern> realTimeNewTripPatternsForModifiedTrips,
     Map<FeedScopedId, Route> realtimeAddedRoutes,
@@ -428,11 +428,13 @@ public class TimetableSnapshot {
       feedId
     );
     boolean addedTripPatternsWereCleared = clearEntriesForRealtimeAddedTrips(feedId);
+    boolean patternsForStopWereCleared = clearPatternsForStop(feedId);
     // If this snapshot was modified, it will be dirty after the clear actions.
     if (
       timetablesWereCleared ||
       newTripPatternsForModifiedTripsWereCleared ||
-      addedTripPatternsWereCleared
+      addedTripPatternsWereCleared ||
+      patternsForStopWereCleared
     ) {
       dirty = true;
     }
@@ -568,7 +570,15 @@ public class TimetableSnapshot {
     return (
       dirtyTimetables.isEmpty() &&
       timetables.isEmpty() &&
-      realTimeNewTripPatternsForModifiedTrips.isEmpty()
+      realTimeNewTripPatternsForModifiedTrips.isEmpty() &&
+      patternsForStop.isEmpty() &&
+      realtimeAddedRoutes.isEmpty() &&
+      realTimeAddedTrips.isEmpty() &&
+      realTimeAddedPatternForTrip.isEmpty() &&
+      realTimeAddedPatternsForRoute.isEmpty() &&
+      realTimeAddedTripOnServiceDateById.isEmpty() &&
+      realTimeAddedReplacedByTripOnServiceDateById.isEmpty() &&
+      realTimeAddedTripOnServiceDateForTripAndDay.isEmpty()
     );
   }
 
@@ -615,7 +625,9 @@ public class TimetableSnapshot {
   /**
    * Clear all realtime added routes, trip patterns and trips matching the provided feed id.
    *
-   * */
+   * @param feedId feed id to clear out
+   * @return true if realTimeAddedTrips changed as a result of the call
+   */
   private boolean clearEntriesForRealtimeAddedTrips(String feedId) {
     // it is sufficient to test for the removal of added trips, since other indexed entities are
     // added only if a new trip is added.
@@ -625,13 +637,26 @@ public class TimetableSnapshot {
     realTimeAddedPatternForTrip.keySet().removeIf(trip -> feedId.equals(trip.getId().getFeedId()));
     realTimeAddedTripOnServiceDateForTripAndDay
       .keySet()
-      .removeIf(tripOnServiceDate -> feedId.equals(tripOnServiceDate.tripId().getFeedId()));
+      .removeIf(tripIdAndServiceDate -> feedId.equals(tripIdAndServiceDate.tripId().getFeedId()));
     realTimeAddedTripOnServiceDateById.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
     realTimeAddedPatternsForRoute
       .keySet()
       .removeIf(route -> feedId.equals(route.getId().getFeedId()));
     realtimeAddedRoutes.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
+    realTimeAddedReplacedByTripOnServiceDateById
+      .keySet()
+      .removeIf(id -> feedId.equals(id.getFeedId()));
     return removedEntry;
+  }
+
+  /**
+   * Clear all trip patterns from patternsForStop matching the provided feed id.
+   *
+   * @param feedId feed id to clear out
+   * @return true if patternsForStop changed as a result of the call
+   */
+  private boolean clearPatternsForStop(String feedId) {
+    return patternsForStop.values().removeIf(tripPattern -> feedId.equals(tripPattern.getFeedId()));
   }
 
   /**

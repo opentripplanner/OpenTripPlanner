@@ -23,7 +23,7 @@ import org.opentripplanner.osm.wayproperty.specifier.Condition.Equals;
 import org.opentripplanner.osm.wayproperty.specifier.Condition.Not;
 import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
-import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.street.internal.notes.StreetNotesService;
 
 /**
  * This factory class provides a default collection of {@link WayProperties} that determine how OSM

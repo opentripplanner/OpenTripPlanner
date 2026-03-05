@@ -7,7 +7,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.LineStrings;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
-import org.opentripplanner.street.model._data.StreetModelForTest;
+import org.opentripplanner.street.model.StreetModelForTest;
 
 class TimePenaltyCalculatorTest {
 

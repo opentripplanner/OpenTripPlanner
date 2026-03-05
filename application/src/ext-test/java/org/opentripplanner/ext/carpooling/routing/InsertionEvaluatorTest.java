@@ -20,17 +20,20 @@ import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTr
 import static org.opentripplanner.ext.carpooling.TestCarpoolTripBuilder.createTripWithStops;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.utils.collection.Pair;
 
 class InsertionEvaluatorTest {
 
@@ -67,6 +70,34 @@ class InsertionEvaluatorTest {
     return evaluator.findBestInsertion(trip, viablePositions, passengerPickup, passengerDropoff);
   }
 
+  private WgsCoordinate getCoordinateBetween(WgsCoordinate coordinate1, WgsCoordinate coordinate2) {
+    return new WgsCoordinate(
+      (coordinate1.latitude() + coordinate2.latitude()) / 2,
+      (coordinate1.longitude() + coordinate2.longitude()) / 2
+    );
+  }
+
+  @Test
+  void findOptimalInsertion_onDeviationBudgetExceeded_returnsNull() {
+    var trip = createTripWithStops(
+      OSLO_SOUTH,
+      List.of(createStopAt(0, OSLO_CENTER), createStopAt(0, OSLO_NORTHEAST)),
+      OSLO_NORTH
+    );
+
+    var mockPath = createGraphPath(Duration.ofMinutes(4));
+    RoutingFunction routingFunction = (from, to, linkingContext) -> mockPath;
+
+    var result = findOptimalInsertion(
+      trip,
+      getCoordinateBetween(OSLO_SOUTH, OSLO_CENTER),
+      getCoordinateBetween(OSLO_NORTHEAST, OSLO_NORTH),
+      routingFunction
+    );
+
+    assertNull(result);
+  }
+
   @Test
   void findOptimalInsertion_noValidPositions_returnsNull() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
@@ -100,18 +131,18 @@ class InsertionEvaluatorTest {
     var stop1 = createStopAt(0, OSLO_EAST);
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
-    var mockPath = createGraphPath(Duration.ofMinutes(5));
+    var mockPath = createGraphPath(Duration.ofMinutes(3));
 
     // Routing sequence:
     // 1. Baseline calculation (2 segments: OSLO_CENTER → OSLO_EAST → OSLO_NORTH) = mockPath x2
     // 2. First insertion attempt fails (null for first segment)
     // 3. Second insertion attempt succeeds (mockPath for all segments)
-    final int[] callCount = { 0 };
+    @SuppressWarnings("ConstantConditions")
     RoutingFunction routingFunction = (from, to, linkingContext) -> {
-      int call = callCount[0]++;
-      if (call < 2) {
-        return mockPath;
-      } else if (call == 2) {
+      if (
+        new WgsCoordinate(from.lat, from.lng).equals(OSLO_CENTER) &&
+        new WgsCoordinate(to.lat, to.lng).equals(OSLO_MIDPOINT_NORTH)
+      ) {
         return null;
       } else {
         return mockPath;
@@ -123,6 +154,11 @@ class InsertionEvaluatorTest {
 
     // Should skip failed routing and find a valid one
     assertNotNull(result);
+    /*
+      Since segment between OSLO_CENTER and OSLO_MIDPOINT_NORTH is invalid,
+      pickup position has to be after OSLO_EAST
+     */
+    assertEquals(2, result.pickupPosition());
   }
 
   @Test
@@ -173,42 +209,24 @@ class InsertionEvaluatorTest {
   void findOptimalInsertion_selectsMinimumAdditionalDuration() {
     var trip = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_CENTER, OSLO_NORTH);
 
-    // Baseline: 1 segment (CENTER → NORTH) at 10 min
-    // The algorithm will try multiple pickup/dropoff positions
-    // We'll return different durations based on segment index
-    var mockPath10 = createGraphPath(Duration.ofMinutes(10));
-    var mockPath4 = createGraphPath(Duration.ofMinutes(4));
-    var mockPath6 = createGraphPath(Duration.ofMinutes(6));
-    var mockPath5 = createGraphPath(Duration.ofMinutes(5));
-    var mockPath7 = createGraphPath(Duration.ofMinutes(7));
+    final Map<Pair<WgsCoordinate>, GraphPath<State, Edge, Vertex>> pathsMap = new HashMap<>(
+      Map.of(
+        new Pair<>(OSLO_CENTER, OSLO_NORTH),
+        createGraphPath(Duration.ofMinutes(10)),
+        new Pair<>(OSLO_CENTER, OSLO_EAST),
+        createGraphPath(Duration.ofMinutes(4)),
+        new Pair<>(OSLO_EAST, OSLO_WEST),
+        createGraphPath(Duration.ofMinutes(5)),
+        new Pair<>(OSLO_WEST, OSLO_NORTH),
+        createGraphPath(Duration.ofMinutes(6))
+      )
+    );
 
-    // Provide consistent route times
-    // Baseline
-    // First insertion (15 min total, 5 min additional)
-    // Second insertion (18 min total, 8 min additional)
-    @SuppressWarnings("unchecked")
-    final GraphPath<State, Edge, Vertex>[] firstInsertionPaths = new GraphPath[] {
-      mockPath4,
-      mockPath5,
-      mockPath6,
-    };
-    @SuppressWarnings("unchecked")
-    final GraphPath<State, Edge, Vertex>[] secondInsertionPaths = new GraphPath[] {
-      mockPath5,
-      mockPath6,
-      mockPath7,
-    };
-    final int[] callCount = { 0 };
-    RoutingFunction routingFunction = (from, to, linkingContext) -> {
-      int call = callCount[0]++;
-      if (call == 0) {
-        return mockPath10;
-      } else if (call >= 1 && call <= 3) {
-        return firstInsertionPaths[call - 1];
-      } else {
-        return secondInsertionPaths[(call - 4) % 3];
-      }
-    };
+    @SuppressWarnings("ConstantConditions")
+    RoutingFunction routingFunction = (from, to, linkingContext) ->
+      pathsMap.get(
+        new Pair<>(new WgsCoordinate(from.lat, from.lng), new WgsCoordinate(to.lat, to.lng))
+      );
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
@@ -259,24 +277,26 @@ class InsertionEvaluatorTest {
     // MIDPOINT_NORTH → NORTH
     var segmentDB = createGraphPath(Duration.ofMinutes(4));
 
-    // Setup routing: return all segment mocks for any routing call
-    // The algorithm will evaluate multiple insertion positions
-    @SuppressWarnings("unchecked")
-    final GraphPath<State, Edge, Vertex>[] paths = new GraphPath[] {
-      baselinePath,
-      segmentAC,
-      segmentCD,
-      segmentDB,
-      segmentAC,
-      segmentCD,
-      segmentDB,
-      segmentAC,
-      segmentCD,
-    };
+    final Map<Pair<WgsCoordinate>, GraphPath<State, Edge, Vertex>> pathsMap = new HashMap<>(
+      Map.of(
+        new Pair<>(OSLO_CENTER, OSLO_NORTH),
+        baselinePath,
+        new Pair<>(OSLO_CENTER, OSLO_EAST),
+        segmentAC,
+        new Pair<>(OSLO_EAST, OSLO_MIDPOINT_NORTH),
+        segmentCD,
+        new Pair<>(OSLO_MIDPOINT_NORTH, OSLO_NORTH),
+        segmentDB
+      )
+    );
+
     final int[] callCount = { 0 };
+    @SuppressWarnings("ConstantConditions")
     RoutingFunction routingFunction = (from, to, linkingContext) -> {
-      int call = callCount[0]++;
-      return call < paths.length ? paths[call] : segmentAC;
+      callCount[0]++;
+      return pathsMap.get(
+        new Pair<>(new WgsCoordinate(from.lat, from.lng), new WgsCoordinate(to.lat, to.lng))
+      );
     };
 
     // Passenger pickup at OSLO_EAST, dropoff at OSLO_MIDPOINT_NORTH
@@ -292,8 +312,9 @@ class InsertionEvaluatorTest {
     // (typically 1-2 seconds per edge due to millisecond rounding in StreetEdge.doTraverse())
     // The baseline should be approximately 10 minutes (within 10 seconds tolerance)
     assertTrue(
-      Math.abs(result.baselineDuration().toSeconds() - 600) < 10,
-      "Baseline should be approximately 10 min (within 10s), got " + result.baselineDuration()
+      Math.abs(result.durationBetweenOriginAndDestination().toSeconds() - 600) < 10,
+      "Baseline should be approximately 10 min (within 10s), got " +
+        result.durationBetweenOriginAndDestination()
     );
 
     // CRITICAL: Total duration should be sum of NEW segments, NOT baseline duration
@@ -326,7 +347,7 @@ class InsertionEvaluatorTest {
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTH);
 
     // Baseline has 2 segments: CENTER→EAST, EAST→NORTH
-    var mockPath = createGraphPath(Duration.ofMinutes(5));
+    var mockPath = createGraphPath(Duration.ofMinutes(3));
 
     final int[] callCount = { 0 };
     RoutingFunction routingFunction = (from, to, linkingContext) -> {
@@ -339,8 +360,12 @@ class InsertionEvaluatorTest {
 
     assertNotNull(result, "Should find valid insertion");
 
-    // Baseline should be calculated correctly
-    assertEquals(Duration.ofMinutes(10), result.baselineDuration());
+    // Duration between start and stop should be calculated correctly
+    assertTrue(
+      Duration.ofMinutes(3).minus(result.durationBetweenOriginAndDestination()).toSeconds() < 10,
+      "Baseline should be approximately 3 min (within 10s), got " +
+        result.durationBetweenOriginAndDestination()
+    );
 
     // The modified route should have more segments than baseline
     assertTrue(
@@ -366,7 +391,7 @@ class InsertionEvaluatorTest {
     var stop1 = createStopAt(0, OSLO_EAST);
     var trip = createTripWithStops(OSLO_CENTER, List.of(stop1), OSLO_NORTHEAST);
 
-    var mockPath = createGraphPath(Duration.ofMinutes(5));
+    var mockPath = createGraphPath(Duration.ofMinutes(3));
 
     final int[] callCount = { 0 };
     RoutingFunction routingFunction = (from, to, linkingContext) -> {
@@ -412,6 +437,6 @@ class InsertionEvaluatorTest {
 
     // Total duration should be positive
     assertTrue(result.totalDuration().compareTo(Duration.ZERO) > 0);
-    assertTrue(result.baselineDuration().compareTo(Duration.ZERO) > 0);
+    assertTrue(result.durationBetweenOriginAndDestination().compareTo(Duration.ZERO) > 0);
   }
 }

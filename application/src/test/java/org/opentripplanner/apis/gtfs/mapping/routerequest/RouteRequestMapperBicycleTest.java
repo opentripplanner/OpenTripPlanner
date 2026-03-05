@@ -10,8 +10,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
+import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 
 class RouteRequestMapperBicycleTest {
 

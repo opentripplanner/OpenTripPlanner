@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.transit.model._data.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
@@ -136,7 +137,7 @@ public class ReplacementHelperTest implements RealtimeTestConstants {
       .buildEstimatedTimetableDeliveries();
 
     var result = siri.applyEstimatedTimetable(createExtraJourney);
-    assertEquals(1, result.successful());
+    assertSuccess(result);
 
     var service = env.transitService();
     return service.getTripOnServiceDate(id(newId));

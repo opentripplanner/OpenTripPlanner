@@ -52,6 +52,10 @@ public class GenericLocation {
     this.lng = lng;
   }
 
+  public static GenericLocation fromStopId(FeedScopedId id) {
+    return new GenericLocation(null, id, null, null);
+  }
+
   public static GenericLocation fromStopId(String name, String feedId, String stopId) {
     return new GenericLocation(name, new FeedScopedId(feedId, stopId), null, null);
   }

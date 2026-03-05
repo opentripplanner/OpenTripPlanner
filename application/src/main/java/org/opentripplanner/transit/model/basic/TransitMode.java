@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model.basic;
 
 import java.util.EnumSet;
 import java.util.Set;
-import org.opentripplanner.framework.doc.DocumentedEnum;
+import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
  * Equivalent to GTFS route_type or to NeTEx TransportMode.

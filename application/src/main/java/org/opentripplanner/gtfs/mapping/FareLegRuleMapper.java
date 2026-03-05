@@ -6,12 +6,12 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Area;
+import org.opentripplanner.core.model.basic.Distance;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.Timeframe;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.transit.model.basic.Distance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

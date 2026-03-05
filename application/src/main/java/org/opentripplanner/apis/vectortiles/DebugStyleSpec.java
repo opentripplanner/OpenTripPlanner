@@ -131,7 +131,7 @@ public class DebugStyleSpec {
   private static final String NO_THRU_TRAFFIC_GROUP = "No-thru traffic";
   private static final String VERTICAL_TRANSPORTATION_GROUP = "Vertical transportation";
 
-  private static final StreetTraversalPermission[] streetModes = new StreetTraversalPermission[] {
+  private static final StreetTraversalPermission[] STREET_MODES = new StreetTraversalPermission[] {
     StreetTraversalPermission.PEDESTRIAN,
     StreetTraversalPermission.BICYCLE,
     StreetTraversalPermission.CAR,
@@ -577,7 +577,7 @@ public class DebugStyleSpec {
   }
 
   private static List<StyleBuilder> traversalPermissions(VectorSourceLayer edges) {
-    var permissionStyles = Arrays.stream(streetModes)
+    var permissionStyles = Arrays.stream(STREET_MODES)
       .map(streetTraversalPermission ->
         StyleBuilder.ofId("permission " + streetTraversalPermission)
           .vectorSourceLayer(edges)
@@ -613,7 +613,7 @@ public class DebugStyleSpec {
   }
 
   private static List<StyleBuilder> noThruTraffic(VectorSourceLayer edges) {
-    var noThruTrafficStyles = Arrays.stream(streetModes)
+    var noThruTrafficStyles = Arrays.stream(STREET_MODES)
       .map(streetTraversalPermission ->
         StyleBuilder.ofId("no-thru-traffic " + streetTraversalPermission)
           .vectorSourceLayer(edges)

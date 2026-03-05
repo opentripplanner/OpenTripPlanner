@@ -13,9 +13,9 @@ import org.opentripplanner.utils.collection.ListSection;
 
 public class NumItinerariesFilterTest {
 
-  private static final Itinerary i1 = newItinerary(A, 6).walk(1, B).build();
-  private static final Itinerary i2 = newItinerary(A).bicycle(6, 8, B).build();
-  private static final Itinerary i3 = newItinerary(A).bus(21, 7, 9, B).build();
+  private static final Itinerary I1 = newItinerary(A, 6).walk(1, B).build();
+  private static final Itinerary I2 = newItinerary(A).bicycle(6, 8, B).build();
+  private static final Itinerary I3 = newItinerary(A).bus(21, 7, 9, B).build();
 
   @Test
   public void name() {
@@ -26,52 +26,52 @@ public class NumItinerariesFilterTest {
   @Test
   public void testCropHead() {
     NumItinerariesFilter subject = new NumItinerariesFilter(1, ListSection.HEAD);
-    List<Itinerary> itineraries = List.of(i1, i2, i3);
+    List<Itinerary> itineraries = List.of(I1, I2, I3);
     var result = subject.removeMatchesForTest(itineraries);
-    assertEquals(toStr(List.of(i3)), toStr(result));
+    assertEquals(toStr(List.of(I3)), toStr(result));
   }
 
   @Test
   public void testCropTailAndSubscribe() {
     var subject = new NumItinerariesFilter(2, ListSection.TAIL);
-    var itineraries = List.of(i1, i2, i3);
+    var itineraries = List.of(I1, I2, I3);
 
     var processedList = subject.removeMatchesForTest(itineraries);
 
     assertEquals(
-      i3.startTime().toInstant().toString(),
+      I3.startTime().toInstant().toString(),
       subject.getNumItinerariesFilterResult().earliestRemovedDeparture().toString()
     );
 
     assertEquals(
-      i3.startTime().toInstant().toString(),
+      I3.startTime().toInstant().toString(),
       subject.getNumItinerariesFilterResult().latestRemovedDeparture().toString()
     );
 
-    assertEquals(i2.keyAsString(), subject.getNumItinerariesFilterResult().pageCut().keyAsString());
+    assertEquals(I2.keyAsString(), subject.getNumItinerariesFilterResult().pageCut().keyAsString());
 
-    assertEquals(toStr(List.of(i1, i2)), toStr(processedList));
+    assertEquals(toStr(List.of(I1, I2)), toStr(processedList));
   }
 
   @Test
   public void testCropHeadAndSubscribe() {
     var subject = new NumItinerariesFilter(1, ListSection.HEAD);
-    var itineraries = List.of(i1, i2, i3);
+    var itineraries = List.of(I1, I2, I3);
 
     var processedList = subject.removeMatchesForTest(itineraries);
 
     assertEquals(
-      i2.startTime().toInstant().toString(),
+      I2.startTime().toInstant().toString(),
       subject.getNumItinerariesFilterResult().earliestRemovedDeparture().toString()
     );
 
     assertEquals(
-      i2.startTime().toInstant().toString(),
+      I2.startTime().toInstant().toString(),
       subject.getNumItinerariesFilterResult().latestRemovedDeparture().toString()
     );
 
-    assertEquals(i3.keyAsString(), subject.getNumItinerariesFilterResult().pageCut().keyAsString());
+    assertEquals(I3.keyAsString(), subject.getNumItinerariesFilterResult().pageCut().keyAsString());
 
-    assertEquals(toStr(List.of(i3)), toStr(processedList));
+    assertEquals(toStr(List.of(I3)), toStr(processedList));
   }
 }

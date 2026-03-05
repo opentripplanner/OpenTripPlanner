@@ -66,7 +66,7 @@ public class E01_StaySeatedTransferTest implements RaptorTestConstants {
 
     // Make sure the slack have values which prevent a normal transfer.
     // The test scenario have zero seconds to transfer, so any slack will do.
-    data.withSlackProvider(new TestSlackProvider(D30s, D20s, D10s));
+    data.withSlackProvider(new TestSlackProvider(D30_s, D20_s, D10_s));
 
     ModuleTestDebugLogging.setupDebugLogging(data);
   }

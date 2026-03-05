@@ -1,11 +1,14 @@
 package org.opentripplanner.transit.model.timetable;
 
+import static org.opentripplanner.utils.time.ServiceDateUtils.wholeDays;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -23,16 +26,22 @@ public class Timetable implements Serializable {
 
   private List<TripTimes> tripTimes;
 
+  private Map<FeedScopedId, TripTimes> tripTimesIndex;
+
   private List<FrequencyEntry> frequencyEntries;
 
   @Nullable
   private final LocalDate serviceDate;
 
+  private final int maxTripSpanDays;
+
   Timetable(TimetableBuilder timetableBuilder) {
     this.pattern = timetableBuilder.getPattern();
     this.serviceDate = timetableBuilder.getServiceDate();
     this.tripTimes = timetableBuilder.createImmutableOrderedListOfTripTimes();
+    this.tripTimesIndex = timetableBuilder.createImmutableTripTimesIndex();
     this.frequencyEntries = List.copyOf(timetableBuilder.getFrequencies());
+    this.maxTripSpanDays = computeMaxTripSpanDays(this.tripTimes);
   }
 
   /** Construct an empty Timetable. */
@@ -49,21 +58,12 @@ public class Timetable implements Serializable {
 
   @Nullable
   public TripTimes getTripTimes(Trip trip) {
-    for (TripTimes tt : tripTimes) {
-      if (tt.getTrip() == trip) {
-        return tt;
-      }
-    }
-    return null;
+    return getTripTimes(trip.getId());
   }
 
+  @Nullable
   public TripTimes getTripTimes(FeedScopedId tripId) {
-    for (TripTimes tt : tripTimes) {
-      if (tt.getTrip().getId().equals(tripId)) {
-        return tt;
-      }
-    }
-    return null;
+    return tripTimesIndex.get(tripId);
   }
 
   public boolean isValidFor(LocalDate serviceDate) {
@@ -77,6 +77,9 @@ public class Timetable implements Serializable {
       .stream()
       .map(tt -> tt.withServiceCode(serviceCodes.get(tt.getTrip().getServiceId())))
       .toList();
+    tripTimesIndex = tripTimes
+      .stream()
+      .collect(Collectors.toUnmodifiableMap(tt -> tt.getTrip().getId(), tt -> tt));
     // Repeated code... bad sign...
     frequencyEntries = frequencyEntries
       .stream()
@@ -113,6 +116,16 @@ public class Timetable implements Serializable {
   @Nullable
   public LocalDate getServiceDate() {
     return serviceDate;
+  }
+
+  /**
+   * The maximum number of whole days that any trip in this pattern spans from its service date
+   * midnight to the latest arrival at the last stop. For most patterns this is zero(0) - all times
+   * are on the same service-day(operation day). For a nightbus which ends at 02:45+1d this is 1.
+   * And for a multi-day services like coastal ferries it can span several days.
+   */
+  public int getMaxTripSpanDays() {
+    return maxTripSpanDays;
   }
 
   /**
@@ -186,5 +199,20 @@ public class Timetable implements Serializable {
       );
     }
     return copyOf().withServiceDate(date).build();
+  }
+
+  /**
+   * Compute the maximum number of whole days a trip schedule lasts. This method
+   * will use the last stop arrival time of the last trip. Return zero if the
+   * arrival time is negative.
+   */
+  private static int computeMaxTripSpanDays(List<TripTimes> tripTimes) {
+    if (tripTimes.isEmpty()) {
+      return 0;
+    }
+
+    var lastTrip = tripTimes.getLast();
+    // We ignore overtaking and return 0 for negative values
+    return wholeDays(lastTrip.getArrivalTime(lastTrip.getNumStops() - 1));
   }
 }

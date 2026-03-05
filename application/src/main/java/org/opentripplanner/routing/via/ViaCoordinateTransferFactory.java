@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.via;
 
 import java.util.List;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.linking;
 
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetConstants;
 
 public class VertexLinkerTestFactory {

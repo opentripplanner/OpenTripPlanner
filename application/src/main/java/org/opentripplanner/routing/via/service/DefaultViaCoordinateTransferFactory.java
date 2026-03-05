@@ -4,16 +4,16 @@ import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.TransitServiceResolver;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
+import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -95,8 +95,8 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     RouteRequest request,
     boolean reverseDirection
   ) {
-    var transferRequest = request.journey().transfer();
-    var r = finder.findNearbyStops(viaVertex, request, transferRequest, reverseDirection);
+    var transferMode = request.journey().transfer().mode();
+    var r = finder.findNearbyStops(viaVertex, request, transferMode, reverseDirection);
     return r
       .stream()
       .filter(it -> !it.stop.transfersNotAllowed())

@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
-import static org.opentripplanner.framework.geometry.SphericalDistanceLibrary.distance;
+import static org.opentripplanner.street.geometry.SphericalDistanceLibrary.distance;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -10,11 +10,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.TransitDataImport;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.model.Level;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
@@ -26,8 +27,7 @@ import org.opentripplanner.street.model.vertex.TransitBoardingAreaVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitPathwayNodeVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.VertexFactory;
-import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.BoardingArea;
@@ -120,7 +120,7 @@ public class AddTransitEntitiesToGraph {
         .withId(stop.getId())
         .withPoint(stop.getGeometry())
         .withWheelchairAccessiblity(stop.getWheelchairAccessibility())
-        .withModes(modes);
+        .withIsFerry(modes.contains(TransitMode.FERRY));
       TransitStopVertex stopVertex = vertexFactory.transitStop(b);
 
       if (modes.contains(TransitMode.SUBWAY)) {

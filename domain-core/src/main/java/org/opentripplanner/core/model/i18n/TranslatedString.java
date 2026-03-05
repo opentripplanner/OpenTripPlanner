@@ -24,7 +24,7 @@ public class TranslatedString implements I18NString, Serializable {
    * Store all translations, so we don't get memory overhead for identical strings As this is
    * static, it isn't serialized when saving the graph.
    */
-  private static final HashMap<Map<String, String>, I18NString> translationCache = new HashMap<>();
+  private static final HashMap<Map<String, String>, I18NString> TRANSLATION_CACHE = new HashMap<>();
 
   private final Map<String, String> translations = new HashMap<>();
 
@@ -114,8 +114,8 @@ public class TranslatedString implements I18NString, Serializable {
     if (translations.isEmpty()) {
       throw new IllegalArgumentException("At least one translation must be provided");
     }
-    if (translationCache.containsKey(translations)) {
-      return translationCache.get(translations);
+    if (TRANSLATION_CACHE.containsKey(translations)) {
+      return TRANSLATION_CACHE.get(translations);
     } else {
       I18NString ret;
       // Check if we only have one name, even under multiple languages
@@ -131,7 +131,7 @@ public class TranslatedString implements I18NString, Serializable {
         ret = new TranslatedString(translations);
       }
       if (intern) {
-        translationCache.put(translations, ret);
+        TRANSLATION_CACHE.put(translations, ret);
       }
       return ret;
     }

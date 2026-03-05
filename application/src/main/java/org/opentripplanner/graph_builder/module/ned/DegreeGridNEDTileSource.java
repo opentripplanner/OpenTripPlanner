@@ -15,7 +15,7 @@ import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.AWSCredentials;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DegreeGridNEDTileSource implements NEDTileSource {
 
-  private static final Logger log = LoggerFactory.getLogger(DegreeGridNEDTileSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DegreeGridNEDTileSource.class);
 
   private File cacheDirectory;
 
@@ -100,7 +100,7 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
           "Cannot download NED tiles from S3: awsAccessKey or awsSecretKey properties are not set"
         );
       }
-      log.info("Downloading NED degree tile {}", path);
+      LOG.info("Downloading NED degree tile {}", path);
       // download the file from S3.
       AWSCredentials awsCredentials = new AWSCredentials(awsAccessKey, awsSecretKey);
       String key = formatLatLon(x, y) + ".tiff";
@@ -130,7 +130,7 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
         // the target bucket. If just GetObject is provided, the S3ServiceException will instead indicate a
         // forbidden access error.
         if (e.getS3ErrorCode().equals("NoSuchKey")) {
-          log.error(
+          LOG.error(
             String.format("Elevation tile %s missing from s3bucket. Proceeding without tile!", key)
           );
           return null;

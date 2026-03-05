@@ -16,48 +16,48 @@ class PassThroughViaLocationTest {
   private static final String LABEL = "AName";
 
   @SuppressWarnings("DataFlowIssue")
-  private static final ViaLocation subject = new PassThroughViaLocation(LABEL, List.of(ID));
+  private static final ViaLocation SUBJECT = new PassThroughViaLocation(LABEL, List.of(ID));
 
   @Test
   void allowAsPassThroughPoint() {
-    assertTrue(subject.isPassThroughLocation());
+    assertTrue(SUBJECT.isPassThroughLocation());
   }
 
   @Test
   void minimumWaitTime() {
-    assertEquals(Duration.ZERO, subject.minimumWaitTime());
+    assertEquals(Duration.ZERO, SUBJECT.minimumWaitTime());
   }
 
   @Test
   void label() {
-    assertEquals(LABEL, subject.label());
+    assertEquals(LABEL, SUBJECT.label());
   }
 
   @Test
   void stopLocationIds() {
-    assertEquals("[F:1]", subject.stopLocationIds().toString());
+    assertEquals("[F:1]", SUBJECT.stopLocationIds().toString());
   }
 
   @Test
   void coordinates() {
-    assertTrue(subject.coordinate().isEmpty());
+    assertTrue(SUBJECT.coordinate().isEmpty());
   }
 
   @Test
   void testToString() {
     assertEquals(
       "PassThroughViaLocation{label: AName, stopLocationIds: [F:1]}",
-      subject.toString()
+      SUBJECT.toString()
     );
   }
 
   @Test
   void testEqAndHashCode() {
-    AssertEqualsAndHashCode.verify(subject)
-      .sameAs(new PassThroughViaLocation(subject.label(), subject.stopLocationIds()))
+    AssertEqualsAndHashCode.verify(SUBJECT)
+      .sameAs(new PassThroughViaLocation(SUBJECT.label(), SUBJECT.stopLocationIds()))
       .differentFrom(
-        new PassThroughViaLocation("Other", subject.stopLocationIds()),
-        new PassThroughViaLocation(subject.label(), List.of(new FeedScopedId("F", "2")))
+        new PassThroughViaLocation("Other", SUBJECT.stopLocationIds()),
+        new PassThroughViaLocation(SUBJECT.label(), List.of(new FeedScopedId("F", "2")))
       );
   }
 }

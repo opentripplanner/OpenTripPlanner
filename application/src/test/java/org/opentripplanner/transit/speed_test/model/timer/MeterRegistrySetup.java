@@ -17,7 +17,7 @@ import java.util.Optional;
 
 class MeterRegistrySetup {
 
-  public static final String influxPasswordEnvVariable = "PERFORMANCE_INFLUX_DB_PASSWORD";
+  public static final String INFLUX_PASSWORD_ENV_VARIABLE = "PERFORMANCE_INFLUX_DB_PASSWORD";
 
   public static Optional<MeterRegistry> getRegistry() {
     return influxPassword().map(password -> {
@@ -29,7 +29,9 @@ class MeterRegistrySetup {
   }
 
   static Optional<String> influxPassword() {
-    return Optional.ofNullable(System.getenv(influxPasswordEnvVariable)).filter(s -> !s.isBlank());
+    return Optional.ofNullable(System.getenv(INFLUX_PASSWORD_ENV_VARIABLE)).filter(s ->
+      !s.isBlank()
+    );
   }
 
   static MeterRegistry influxRegistry(String password) {

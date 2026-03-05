@@ -58,17 +58,17 @@ public class TransferTestData {
   public static final TransferPoint STOP_POINT_A = new StopTransferPoint(STOP_A);
   public static final TransferPoint STOP_POINT_B = new StopTransferPoint(STOP_B);
 
-  public static final TransferPoint ROUTE_POINT_1S = new RouteStationTransferPoint(
+  public static final TransferPoint ROUTE_POINT_1_S = new RouteStationTransferPoint(
     ROUTE_1,
     STATION
   );
-  public static final TransferPoint ROUTE_POINT_2S = new RouteStationTransferPoint(
+  public static final TransferPoint ROUTE_POINT_2_S = new RouteStationTransferPoint(
     ROUTE_2,
     STATION
   );
 
-  public static final TransferPoint ROUTE_POINT_1A = new RouteStopTransferPoint(ROUTE_1, STOP_A);
-  public static final TransferPoint ROUTE_POINT_2B = new RouteStopTransferPoint(ROUTE_2, STOP_B);
+  public static final TransferPoint ROUTE_POINT_1_A = new RouteStopTransferPoint(ROUTE_1, STOP_A);
+  public static final TransferPoint ROUTE_POINT_2_B = new RouteStopTransferPoint(ROUTE_2, STOP_B);
 
   public static final TransferPoint TRIP_POINT_11_1 = new TripTransferPoint(TRIP_11, POS_1);
   public static final TransferPoint TRIP_POINT_21_3 = new TripTransferPoint(TRIP_21, POS_3);

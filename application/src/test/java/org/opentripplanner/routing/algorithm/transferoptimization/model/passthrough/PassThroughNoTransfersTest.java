@@ -76,9 +76,9 @@ public class PassThroughNoTransfersTest implements RaptorTestConstants {
   public void tripWithoutTransfers(TestCase tc) {
     var originalPath = pathBuilder()
       .c2(tc.points().size())
-      .access(ITERATION_START_TIME, STOP_B, D1s)
+      .access(ITERATION_START_TIME, STOP_B, D1_s)
       .bus(trip1, STOP_D)
-      .egress(D1s);
+      .egress(D1_s);
 
     var subject = domainService(tc.points());
 

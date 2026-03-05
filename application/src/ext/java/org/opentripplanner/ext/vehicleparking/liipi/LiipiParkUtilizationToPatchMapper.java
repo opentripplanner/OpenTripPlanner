@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LiipiParkUtilizationToPatchMapper {
 
-  private static final Logger log = LoggerFactory.getLogger(
+  private static final Logger LOG = LoggerFactory.getLogger(
     LiipiParkUtilizationToPatchMapper.class
   );
 
@@ -33,7 +33,7 @@ public class LiipiParkUtilizationToPatchMapper {
       );
       return new LiipiParkPatch(vehicleParkId, capacityType, spacesAvailable);
     } catch (Exception e) {
-      log.warn("Error parsing park utilization {}", vehicleParkId, e);
+      LOG.warn("Error parsing park utilization {}", vehicleParkId, e);
       return null;
     }
   }

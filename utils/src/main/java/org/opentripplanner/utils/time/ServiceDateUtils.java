@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +23,7 @@ import java.util.regex.Pattern;
  */
 public class ServiceDateUtils {
 
+  public static final int SECONDS_IN_A_DAY = (int) Duration.ofDays(1).toSeconds();
   private static final String MAX_TEXT = "MAX";
   private static final String MIN_TEXT = "MIN";
   private static final Pattern PATTERN = Pattern.compile("^(\\d{4})-?(\\d{2})-?(\\d{2})$");
@@ -109,6 +111,52 @@ public class ServiceDateUtils {
     ZonedDateTime dateTime
   ) {
     return (int) Duration.between(startOfService, dateTime).toSeconds();
+  }
+
+  /// List all running dates given a time window `[startTime, startTime+window]` and the service
+  /// `serviceZoneId`. The given `serviceMaxTripSpanDays` is used to expand the running dates ahead.
+  /// This accounts for night-busses(a service running past midnight) and for a multi-day services
+  /// like coastal ferries spanning several days.
+  ///
+  /// The time-window is inclusive - inclusive.
+  ///
+  /// > **NOTE! Day-light-saving(DST) handling**
+  /// >
+  /// > In case DST is used for the given `serviceZoneId`, then the service-day overlap when
+  /// > the transition from winter-time to summer-time occours. This method checks for this and
+  /// > includes the first service-day of summer-time, when the time is last-service-day in
+  /// > winter-time and the clock is between 23:00 to 23:59:59. There is **no** such check performed
+  /// > in fall. The method returns the first-day of winter-time, when the time is in the 1 hour gap
+  /// > between last day of summer and first day of winter. This overselection should not cause any
+  /// > problems.
+  ///
+  public static List<LocalDate> calculateRunningDates(
+    Instant startTime,
+    Duration window,
+    ZoneId serviceZoneId,
+    int serviceMaxTripSpanDays
+  ) {
+    var t0 = startTime.atZone(serviceZoneId);
+    var t1 = t0.plus(window);
+
+    // Account for over-night services like night-busses and multi-day trips
+    var ld0 = t0.toLocalDate().minusDays(serviceMaxTripSpanDays);
+    var ld1 = t1.toLocalDate();
+
+    // Adjust for overlapping service-days. This happens when we go from winter-time to summer time.
+    if (t1.getHour() == 23 && t1.plusHours(12).getHour() == 12) {
+      ld1 = ld1.plusDays(1);
+    }
+    // +1 to end, to include the end. The `datesUntil` is [inclusive, exclusive)
+    return ld0.datesUntil(ld1.plusDays(1)).toList();
+  }
+
+  /**
+   * Calculate the number of whole days from a duration in seconds. Returns 0 if the given input
+   * is negative.
+   */
+  public static int wholeDays(int seconds) {
+    return seconds < 0 ? 0 : (seconds / SECONDS_IN_A_DAY);
   }
 
   /**

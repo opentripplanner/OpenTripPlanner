@@ -5,10 +5,10 @@ import static org.opentripplanner.transfer.constrained.TransferTestData.ANY_STOP
 import static org.opentripplanner.transfer.constrained.TransferTestData.POS_1;
 import static org.opentripplanner.transfer.constrained.TransferTestData.POS_2;
 import static org.opentripplanner.transfer.constrained.TransferTestData.POS_3;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1A;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1S;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2B;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2S;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1_A;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1_S;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2_B;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2_S;
 import static org.opentripplanner.transfer.constrained.TransferTestData.STATION_POINT;
 import static org.opentripplanner.transfer.constrained.TransferTestData.STOP_A;
 import static org.opentripplanner.transfer.constrained.TransferTestData.STOP_B;
@@ -37,10 +37,10 @@ class TransferPointMapTest {
   void addAndGet() {
     subject.put(TRIP_POINT_11_1, "A");
     subject.put(TRIP_POINT_21_3, "B");
-    subject.put(ROUTE_POINT_1A, "C");
-    subject.put(ROUTE_POINT_2B, "D");
-    subject.put(ROUTE_POINT_1S, "E");
-    subject.put(ROUTE_POINT_2S, "F");
+    subject.put(ROUTE_POINT_1_A, "C");
+    subject.put(ROUTE_POINT_2_B, "D");
+    subject.put(ROUTE_POINT_1_S, "E");
+    subject.put(ROUTE_POINT_2_S, "F");
     subject.put(STOP_POINT_A, "G");
     subject.put(STOP_POINT_B, "H");
     subject.put(STATION_POINT, "I");
@@ -54,10 +54,10 @@ class TransferPointMapTest {
   @Test
   void computeIfAbsent() {
     assertEquals("A", subject.computeIfAbsent(TRIP_POINT_11_1, () -> "A"));
-    assertEquals("B", subject.computeIfAbsent(ROUTE_POINT_1A, () -> "B"));
+    assertEquals("B", subject.computeIfAbsent(ROUTE_POINT_1_A, () -> "B"));
     assertEquals("C", subject.computeIfAbsent(STOP_POINT_B, () -> "C"));
     assertEquals("D", subject.computeIfAbsent(STATION_POINT, () -> "D"));
-    assertEquals("E", subject.computeIfAbsent(ROUTE_POINT_1S, () -> "E"));
+    assertEquals("E", subject.computeIfAbsent(ROUTE_POINT_1_S, () -> "E"));
 
     assertEquals(List.of("A", "B", "E", "D"), subject.get(TRIP_11, STOP_A, POS_1));
     assertEquals(List.of("C"), subject.get(TRIP_21, STOP_B, POS_2));

@@ -13,7 +13,7 @@ import java.util.Comparator;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.DocBuilder;
 import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 @GeneratesDocumentation

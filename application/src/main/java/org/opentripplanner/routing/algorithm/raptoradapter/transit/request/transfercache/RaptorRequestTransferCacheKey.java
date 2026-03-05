@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.request.BikeRequest;
 import org.opentripplanner.street.search.request.CarRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
 import org.opentripplanner.street.search.request.WalkRequest;
 import org.opentripplanner.street.search.request.WheelchairRequest;
+import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 class RaptorRequestTransferCacheKey {

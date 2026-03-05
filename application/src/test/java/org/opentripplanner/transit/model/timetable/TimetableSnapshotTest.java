@@ -7,6 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
@@ -24,13 +30,18 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.TestStopLocation;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TimetableSnapshotTest {
 
-  private static final ZoneId timeZone = ZoneIds.GMT;
+  private static final ZoneId TIME_ZONE = ZoneIds.GMT;
   public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
   private static Map<FeedScopedId, TripPattern> patternIndex;
   private static String feedId;
@@ -53,8 +64,8 @@ public class TimetableSnapshotTest {
   @Test
   public void testCompare() {
     Timetable orig = Timetable.of().build();
-    Timetable a = orig.copyOf().withServiceDate(LocalDate.now(timeZone).minusDays(1)).build();
-    Timetable b = orig.copyOf().withServiceDate(LocalDate.now(timeZone)).build();
+    Timetable a = orig.copyOf().withServiceDate(LocalDate.now(TIME_ZONE).minusDays(1)).build();
+    Timetable b = orig.copyOf().withServiceDate(LocalDate.now(TIME_ZONE)).build();
     assertTrue(new TimetableSnapshot.SortedTimetableComparator().compare(a, b) < 0);
   }
 
@@ -91,10 +102,14 @@ public class TimetableSnapshotTest {
   @Test
   void testCannotUpdateReadOnlyTimetableSnapshot() {
     TimetableSnapshot committedSnapshot = createCommittedSnapshot();
-    LocalDate today = LocalDate.now(timeZone);
+    LocalDate today = LocalDate.now(TIME_ZONE);
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     TripTimes tripTimes = pattern.getScheduledTimetable().getTripTimes().getFirst();
-    RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(pattern, tripTimes, today);
+    RealTimeTripUpdate realTimeTripUpdate = RealTimeTripUpdate.of(
+      pattern,
+      tripTimes,
+      today
+    ).build();
     assertThrows(ConcurrentModificationException.class, () ->
       committedSnapshot.update(realTimeTripUpdate)
     );
@@ -169,20 +184,72 @@ public class TimetableSnapshotTest {
     assertNotNull(snapshot.getRealtimeAddedRoute(pattern.getRoute().getId()));
   }
 
+  @Test
+  void testClearWithAllCollections() {
+    TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+    RegularStop STOP_A = TEST_MODEL.stop("A").build();
+    RegularStop STOP_B = TEST_MODEL.stop("B").build();
+
+    FeedScopedId id = new FeedScopedId(feedId, "1.2");
+    TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(id, SERVICE_DATE);
+    TripOnServiceDate tripOnServiceDate = TripOnServiceDate.of(
+      new FeedScopedId(feedId, "triponservicedateid")
+    ).build();
+    TestStopLocation testStopLocation = new TestStopLocation(
+      new FeedScopedId(feedId, "stoplocationid")
+    );
+    Route route = TimetableRepositoryForTest.route(new FeedScopedId(feedId, "routeId")).build();
+    Trip trip = TimetableRepositoryForTest.trip(feedId, "tripId").build();
+    TripPattern tripPattern = TripPattern.of(new FeedScopedId(feedId, "tripPatternId"))
+      .withRoute(route)
+      .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A, STOP_B))
+      .withScheduledTimeTableBuilder(builder ->
+        builder.addTripTimes(
+          ScheduledTripTimes.of().withTrip(trip).withDepartureTimes(new int[] { 0, 1 }).build()
+        )
+      )
+      .build();
+
+    Multimap<Route, TripPattern> realTimeAddedPatternsForRoute = ArrayListMultimap.create();
+    realTimeAddedPatternsForRoute.put(route, tripPattern);
+    ListMultimap<FeedScopedId, TripOnServiceDate> realTimeAddedReplacedByTripOnServiceDateById =
+      ArrayListMultimap.create();
+    realTimeAddedReplacedByTripOnServiceDateById.put(id, tripOnServiceDate);
+    SetMultimap<StopLocation, TripPattern> patternsForStop = HashMultimap.create();
+    patternsForStop.put(testStopLocation, tripPattern);
+
+    // The entries do not necessarily make sense, they are only for testing the clear method.
+    TimetableSnapshot snapshot = new TimetableSnapshot(
+      new HashMap<>(Map.of(id, ImmutableSortedSet.of())),
+      new HashMap<>(Map.of(tripIdAndServiceDate, tripPattern)),
+      new HashMap<>(Map.of(id, route)),
+      new HashMap<>(Map.of(id, trip)),
+      new HashMap<>(Map.of(trip, tripPattern)),
+      realTimeAddedPatternsForRoute,
+      new HashMap<>(Map.of(id, tripOnServiceDate)),
+      realTimeAddedReplacedByTripOnServiceDateById,
+      new HashMap<>(Map.of(tripIdAndServiceDate, tripOnServiceDate)),
+      patternsForStop,
+      false
+    );
+    assertFalse(snapshot.isEmpty());
+    snapshot.clear(id.getFeedId());
+    assertTrue(snapshot.isEmpty());
+  }
+
   private static RealTimeTripUpdate createRealTimeTripUpdate(TripPattern pattern, Trip trip) {
     TripTimes updatedTriptimes = TripTimesFactory.tripTimes(
       trip,
       List.of(new StopTime(), new StopTime(), new StopTime()),
       new Deduplicator()
     );
-    return new RealTimeTripUpdate(
-      pattern,
-      updatedTriptimes,
-      SERVICE_DATE,
-      TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(SERVICE_DATE).build(),
-      true,
-      true
-    );
+    return RealTimeTripUpdate.of(pattern, updatedTriptimes, SERVICE_DATE)
+      .withAddedTripOnServiceDate(
+        TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(SERVICE_DATE).build()
+      )
+      .withTripCreation(true)
+      .withRouteCreation(true)
+      .build();
   }
 
   private static TimetableSnapshot createCommittedSnapshot() {

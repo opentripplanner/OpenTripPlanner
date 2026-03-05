@@ -12,10 +12,10 @@ import org.opentripplanner.transit.service.TimetableRepository;
 
 class TestStopConsolidationModel {
 
-  private static final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
-  public static final RegularStop STOP_A = testModel.stop("A").withCoordinate(1, 1).build();
-  public static final RegularStop STOP_B = testModel.stop("B").withCoordinate(1.1, 1.1).build();
-  public static final RegularStop STOP_C = testModel.stop("C").withCoordinate(1.2, 1.2).build();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  public static final RegularStop STOP_A = TEST_MODEL.stop("A").withCoordinate(1, 1).build();
+  public static final RegularStop STOP_B = TEST_MODEL.stop("B").withCoordinate(1.1, 1.1).build();
+  public static final RegularStop STOP_C = TEST_MODEL.stop("C").withCoordinate(1.2, 1.2).build();
   public static final StopPattern STOP_PATTERN = TimetableRepositoryForTest.stopPattern(
     STOP_A,
     STOP_B,
@@ -31,8 +31,7 @@ class TestStopConsolidationModel {
   )
     .withAgency(AGENCY)
     .build();
-  static final RegularStop STOP_D = testModel
-    .stop("D")
+  static final RegularStop STOP_D = TEST_MODEL.stop("D")
     .withId(new FeedScopedId(SECONDARY_FEED_ID, "secondary-stop-D"))
     .build();
 
@@ -42,7 +41,7 @@ class TestStopConsolidationModel {
     .build();
 
   static TimetableRepository buildTimetableRepository() {
-    var siteRepositoryBuilder = testModel.siteRepositoryBuilder();
+    var siteRepositoryBuilder = TEST_MODEL.siteRepositoryBuilder();
     List.of(STOP_A, STOP_B, STOP_C, STOP_D).forEach(siteRepositoryBuilder::withRegularStop);
     return new TimetableRepository(siteRepositoryBuilder.build());
   }

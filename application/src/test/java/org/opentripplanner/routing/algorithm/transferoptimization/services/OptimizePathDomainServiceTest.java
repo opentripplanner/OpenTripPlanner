@@ -25,9 +25,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
    * The exact start time to walk to stop A to catch Trip_1 with 40s board slack
    */
   private static final int ITERATION_START_TIME = time("10:00");
-  private static final int TRANSFER_SLACK = D1m;
-  private static final int BOARD_SLACK = D40s;
-  private static final int ALIGHT_SLACK = D20s;
+  private static final int TRANSFER_SLACK = D1_m;
+  private static final int BOARD_SLACK = D40_s;
+  private static final int ALIGHT_SLACK = D20_s;
   private static final int BOARD_COST_SEC = 10;
   private static final int TRANSFER_COST_SEC = 20;
   private static final double WAIT_RELUCTANCE = 1.0;
@@ -45,7 +45,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     new TransferWaitTimeCostCalculator(1.0, 2.0);
 
   static {
-    TRANS_WAIT_TIME_CALC.setMinSafeTransferTime(D5m);
+    TRANS_WAIT_TIME_CALC.setMinSafeTransferTime(D5_m);
   }
 
   /**
@@ -64,10 +64,10 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     // and a path: Walk ~ B ~ T1 ~ C ~ Walk
     var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_B, D1m)
+      .access(ITERATION_START_TIME, STOP_B, D1_m)
       .bus(trip1, STOP_C)
       .c2(345)
-      .egress(D1m);
+      .egress(D1_m);
 
     var subject = subject(transfers, null);
 
@@ -90,28 +90,28 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   public void testTripWithOneTransfer() {
     // Given
     var trip1 = TestTripSchedule.schedule()
-      .arrDepOffset(D0s)
+      .arrDepOffset(D0_s)
       .pattern("T1", STOP_A, STOP_B, STOP_C, STOP_D)
       .times("10:02 10:10 10:20 10:30")
       .build();
 
     var trip2 = TestTripSchedule.schedule()
-      .arrDepOffset(D0s)
+      .arrDepOffset(D0_s)
       .pattern("T2", STOP_E, STOP_F, STOP_G)
       .times("10:12 10:22 10:50")
       .build();
 
     var transfers = dummyTransferGenerator(
-      List.of(tx(trip1, STOP_C, trip2, STOP_F).walk(D30s).build())
+      List.of(tx(trip1, STOP_C, trip2, STOP_F).walk(D30_s).build())
     );
 
     // Path:  Access ~ B ~ T1 ~ C ~ Walk 30s ~ D ~ T2 ~ E ~ Egress
     var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_B, D1m)
+      .access(ITERATION_START_TIME, STOP_B, D1_m)
       .bus(trip1, STOP_C)
-      .walk(D30s, STOP_F)
+      .walk(D30_s, STOP_F)
       .bus(trip2, STOP_G)
-      .egress(D1m);
+      .egress(D1_m);
 
     var subject = subject(transfers, TRANS_WAIT_TIME_CALC);
 
@@ -156,19 +156,22 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var transfers = dummyTransferGenerator(
       List.of(
         tx(trip1, STOP_B, trip2).build(),
-        tx(trip1, STOP_B, trip2, STOP_C).walk(D30s).build(),
+        tx(trip1, STOP_B, trip2, STOP_C).walk(D30_s).build(),
         tx(trip1, STOP_D, trip2).build()
       ),
-      List.of(tx(trip2, STOP_D, trip3, STOP_E).walk(D30s).build(), tx(trip2, STOP_F, trip3).build())
+      List.of(
+        tx(trip2, STOP_D, trip3, STOP_E).walk(D30_s).build(),
+        tx(trip2, STOP_F, trip3).build()
+      )
     );
 
     var original = pathBuilder()
       .access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
-      .walk(D30s, STOP_E)
+      .walk(D30_s, STOP_E)
       .bus(trip3, STOP_G)
-      .egress(D0s);
+      .egress(D0_s);
 
     // First we do the test without a wait-time cost calculator, which should pick the
     // option with the lowest cost and as early as possible. So the preferred transfer
@@ -237,7 +240,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       .access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
-      .egress(D0s);
+      .egress(D0_s);
 
     var subject = subject(transfers, null);
 
@@ -286,11 +289,11 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     var transfers = dummyTransferGenerator(
       List.of(
-        tx(trip1, STOP_A, trip2, STOP_B).walk(D10s).build(),
-        tx(trip1, STOP_A, trip2, STOP_C).walk(D10s).build(),
+        tx(trip1, STOP_A, trip2, STOP_B).walk(D10_s).build(),
+        tx(trip1, STOP_A, trip2, STOP_C).walk(D10_s).build(),
         tx(trip1, STOP_B, trip2).build(),
-        tx(trip1, STOP_B, trip2, STOP_C).walk(D10s).build(),
-        tx(trip1, STOP_C, trip2, STOP_B).walk(D10s).build(),
+        tx(trip1, STOP_B, trip2, STOP_C).walk(D10_s).build(),
+        tx(trip1, STOP_C, trip2, STOP_B).walk(D10_s).build(),
         tx(trip1, STOP_C, trip2).build()
       )
     );
@@ -299,7 +302,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       .access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
-      .egress(D0s);
+      .egress(D0_s);
 
     var subject = subject(transfers, null);
 

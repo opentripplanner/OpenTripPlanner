@@ -9,15 +9,15 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolStopType;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Builder utility for creating test CarpoolTrip instances without requiring full Graph infrastructure.
  */
 public class TestCarpoolTripBuilder {
 
-  private static final AtomicInteger idCounter = new AtomicInteger(0);
-  private static final AtomicInteger areaStopCounter = new AtomicInteger(0);
+  private static final AtomicInteger ID_COUNTER = new AtomicInteger(0);
+  private static final AtomicInteger AREA_STOP_COUNTER = new AtomicInteger(0);
 
   /**
    * Creates a simple trip with origin and destination stops, default capacity of 4.
@@ -107,7 +107,7 @@ public class TestCarpoolTripBuilder {
     List<CarpoolStop> stops
   ) {
     return new org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder(
-      FeedScopedId.ofNullable("TEST", "trip-" + idCounter.incrementAndGet())
+      FeedScopedId.ofNullable("TEST", "trip-" + ID_COUNTER.incrementAndGet())
     )
       .withStops(stops)
       .withAvailableSeats(seats)
@@ -126,7 +126,7 @@ public class TestCarpoolTripBuilder {
     List<CarpoolStop> stops
   ) {
     return new org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder(
-      FeedScopedId.ofNullable("TEST", "trip-" + idCounter.incrementAndGet())
+      FeedScopedId.ofNullable("TEST", "trip-" + ID_COUNTER.incrementAndGet())
     )
       .withStops(stops)
       .withAvailableSeats(seats)
@@ -155,8 +155,8 @@ public class TestCarpoolTripBuilder {
    */
   public static CarpoolStop createStopAt(int sequence, int passengerDelta, WgsCoordinate location) {
     return CarpoolStop.of(
-      FeedScopedId.ofNullable("TEST", "area-" + areaStopCounter.incrementAndGet()),
-      areaStopCounter::getAndIncrement
+      FeedScopedId.ofNullable("TEST", "area-" + AREA_STOP_COUNTER.incrementAndGet()),
+      AREA_STOP_COUNTER::getAndIncrement
     )
       .withCentroid(location)
       .withSequenceNumber(sequence)
@@ -203,8 +203,8 @@ public class TestCarpoolTripBuilder {
     ZonedDateTime aimedArrivalTime
   ) {
     return CarpoolStop.of(
-      FeedScopedId.ofNullable("TEST", "area-" + areaStopCounter.incrementAndGet()),
-      areaStopCounter::getAndIncrement
+      FeedScopedId.ofNullable("TEST", "area-" + AREA_STOP_COUNTER.incrementAndGet()),
+      AREA_STOP_COUNTER::getAndIncrement
     )
       .withCentroid(location)
       .withCarpoolStopType(CarpoolStopType.DROP_OFF_ONLY)

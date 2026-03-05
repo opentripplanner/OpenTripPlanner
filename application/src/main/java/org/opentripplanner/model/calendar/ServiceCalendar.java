@@ -4,6 +4,7 @@ package org.opentripplanner.model.calendar;
 import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateInterval;
 
 /**
  * Note that I decided to call this class ServiceCalendar instead of Calendar, so as to avoid

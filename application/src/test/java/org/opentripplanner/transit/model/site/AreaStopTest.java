@@ -11,8 +11,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.service.SiteRepository;
 
@@ -30,7 +30,7 @@ class AreaStopTest {
 
   private static final WgsCoordinate COORDINATE = new WgsCoordinate(59.925, 10.7376);
 
-  private static final AreaStop subject = areaStopBuilder().withGeometry(GEOMETRY).build();
+  private static final AreaStop SUBJECT = areaStopBuilder().withGeometry(GEOMETRY).build();
 
   private static AreaStopBuilder areaStopBuilder() {
     return SiteRepository.of()
@@ -43,19 +43,19 @@ class AreaStopTest {
 
   @Test
   void copy() {
-    assertEquals(ID, subject.getId().getId());
+    assertEquals(ID, SUBJECT.getId().getId());
 
     // Make a copy, and set the same name (nothing is changed)
-    var copy = subject.copy().withName(NAME).build();
+    var copy = SUBJECT.copy().withName(NAME).build();
 
-    assertSame(subject, copy);
+    assertSame(SUBJECT, copy);
 
     // Copy and change name
-    copy = subject.copy().withName(new NonLocalizedString("v2")).build();
+    copy = SUBJECT.copy().withName(new NonLocalizedString("v2")).build();
 
     // The two objects are not the same instance, but are equal(same id)
-    assertNotSame(subject, copy);
-    assertEquals(subject, copy);
+    assertNotSame(SUBJECT, copy);
+    assertEquals(SUBJECT, copy);
 
     assertEquals(ID, copy.getId().getId());
     assertEquals(DESCRIPTION, copy.getDescription());
@@ -68,16 +68,16 @@ class AreaStopTest {
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
+    assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
-      subject.sameAs(subject.copy().withDescription(new NonLocalizedString("X")).build())
+      SUBJECT.sameAs(SUBJECT.copy().withDescription(new NonLocalizedString("X")).build())
     );
-    assertFalse(subject.sameAs(subject.copy().withUrl(new NonLocalizedString("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withZoneId("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withUrl(new NonLocalizedString("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withZoneId("X").build()));
     assertFalse(
-      subject.sameAs(subject.copy().withGeometry(GeometryUtils.makeLineString(0, 0, 0, 2)).build())
+      SUBJECT.sameAs(SUBJECT.copy().withGeometry(GeometryUtils.makeLineString(0, 0, 0, 2)).build())
     );
   }
 }

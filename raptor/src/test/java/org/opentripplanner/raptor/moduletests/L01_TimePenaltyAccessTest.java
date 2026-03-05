@@ -41,7 +41,7 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
  */
 public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
 
-  private static final Duration D8m = Duration.ofMinutes(8);
+  private static final Duration D8_m = Duration.ofMinutes(8);
 
   // There are 5 possible trips
 
@@ -54,8 +54,8 @@ public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
     data.withRoute(route("R1", STOP_A, STOP_B).withTimetable(schedule("0:10 0:40").repeat(10, 60)));
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D2m).withTimePenalty(D1m))
-      .addEgressPaths(walk(STOP_B, D1m));
+      .addAccessPaths(walk(STOP_A, D2_m).withTimePenalty(D1_m))
+      .addEgressPaths(walk(STOP_B, D1_m));
 
     requestBuilder.searchParams().timetable(true);
 
@@ -73,7 +73,7 @@ public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase.of()
       .withRequest(r ->
-        r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8m)
+        r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8_m)
       )
       .addMinDuration("34m", TX_0, edt, lat)
       .add(TC_STANDARD, withoutCost(expected.all()))
@@ -108,7 +108,7 @@ public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase.of()
       .withRequest(r ->
-        r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8m)
+        r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8_m)
       )
       .addMinDuration("34m", TX_0, edt, lat)
       .add(TC_STANDARD, withoutCost(expected.all()))

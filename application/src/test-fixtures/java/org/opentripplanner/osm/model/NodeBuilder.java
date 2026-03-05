@@ -1,6 +1,6 @@
 package org.opentripplanner.osm.model;
 
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 public class NodeBuilder {
 

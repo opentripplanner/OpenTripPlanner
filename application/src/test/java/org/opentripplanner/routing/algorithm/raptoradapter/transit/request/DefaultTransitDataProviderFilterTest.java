@@ -18,8 +18,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -30,8 +30,8 @@ import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -378,6 +378,67 @@ class DefaultTransitDataProviderFilterTest {
 
     assertTrue(validateModes(List.of(new MainAndSubMode(BUS)), patternTimes));
     assertTrue(validateModes(List.of(new MainAndSubMode(BUS, LOCAL_BUS)), patternTimes));
+  }
+
+  /**
+   * When the filter matches the pattern's declared mode, trips with a different mode
+   * should still be excluded by trip-level filtering.
+   */
+  @Test
+  void multiModePatternFilterMatchesPatternModeExcludesNonMatchingTrips() {
+    var patternMode = TransitMode.BUS;
+
+    var busTrip = createMultiModePatternAndTimes("T1", patternMode, TransitMode.BUS);
+    var coachTrip = createMultiModePatternAndTimes("T2", patternMode, TransitMode.COACH);
+
+    var filter = DefaultTransitDataProviderFilter.of()
+      .withFilters(filterForMode(TransitMode.BUS))
+      .build();
+
+    assertTrue(validate(filter, busTrip), "BUS trip should be included when filtering for BUS");
+    assertFalse(
+      validate(filter, coachTrip),
+      "COACH trip should be excluded when filtering for BUS"
+    );
+  }
+
+  /**
+   * When the filter does NOT match the pattern's declared mode, trips whose mode matches
+   * the filter should still be included by trip-level filtering.
+   */
+  @Test
+  void multiModePatternFilterDoesNotMatchPatternModeIncludesMatchingTrips() {
+    var patternMode = TransitMode.BUS;
+
+    var busTrip = createMultiModePatternAndTimes("T1", patternMode, TransitMode.BUS);
+    var railTrip = createMultiModePatternAndTimes("T2", patternMode, TransitMode.RAIL);
+
+    var filter = DefaultTransitDataProviderFilter.of()
+      .withFilters(filterForMode(TransitMode.RAIL))
+      .build();
+
+    assertFalse(validate(filter, busTrip), "BUS trip should be excluded when filtering for RAIL");
+    assertTrue(validate(filter, railTrip), "RAIL trip should be included when filtering for RAIL");
+  }
+
+  /**
+   * On a single-mode pattern, filtering is done at the pattern level only. This test uses
+   * a contrived scenario where the trip mode differs from the pattern mode (which would not
+   * happen in practice) to verify that only the pattern-level mode is checked.
+   */
+  @Test
+  void singleModePatternDoesNotApplyTripLevelModeFiltering() {
+    var patternMode = TransitMode.BUS;
+    var coachTrip = createPatternAndTimes("T1", patternMode, TransitMode.COACH, false);
+
+    var filter = DefaultTransitDataProviderFilter.of()
+      .withFilters(filterForMode(TransitMode.BUS))
+      .build();
+
+    assertTrue(
+      validate(filter, coachTrip),
+      "Trip-level mode filtering should not be applied on a single-mode pattern"
+    );
   }
 
   @Ignore
@@ -973,6 +1034,52 @@ class DefaultTransitDataProviderFilterTest {
       null,
       true
     );
+  }
+
+  private PatternAndTimes createPatternAndTimes(
+    String tripIdSuffix,
+    TransitMode patternMode,
+    TransitMode tripMode,
+    boolean containsMultipleModes
+  ) {
+    Trip trip = Trip.of(TimetableRepositoryForTest.id(tripIdSuffix))
+      .withRoute(ROUTE)
+      .withMode(tripMode)
+      .withBikesAllowed(BikeAccess.NOT_ALLOWED)
+      .withCarsAllowed(CarAccess.NOT_ALLOWED)
+      .withWheelchairBoarding(Accessibility.NOT_POSSIBLE)
+      .build();
+
+    StopTime stopTime = new StopTime();
+    stopTime.setStop(STOP_FOR_TEST);
+    stopTime.setArrivalTime(60);
+    stopTime.setDepartureTime(60);
+    stopTime.setStopSequence(0);
+
+    StopPattern stopPattern = new StopPattern(List.of(stopTime));
+
+    var tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
+      .withRoute(ROUTE)
+      .withStopPattern(stopPattern)
+      .withMode(patternMode)
+      .withContainsMultipleModes(containsMultipleModes)
+      .build();
+
+    TripTimes tripTimes = TripTimesFactory.tripTimes(
+      trip,
+      List.of(new StopTime()),
+      new Deduplicator()
+    );
+
+    return new PatternAndTimes(tripPattern, tripTimes);
+  }
+
+  private PatternAndTimes createMultiModePatternAndTimes(
+    String tripIdSuffix,
+    TransitMode patternMode,
+    TransitMode tripMode
+  ) {
+    return createPatternAndTimes(tripIdSuffix, patternMode, tripMode, true);
   }
 
   public static RegularStop stopForTest(

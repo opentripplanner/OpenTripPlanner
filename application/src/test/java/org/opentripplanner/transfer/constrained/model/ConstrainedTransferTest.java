@@ -3,10 +3,10 @@ package org.opentripplanner.transfer.constrained.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1A;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1S;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2B;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2S;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1_A;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1_S;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2_B;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2_S;
 import static org.opentripplanner.transfer.constrained.TransferTestData.STATION_POINT;
 import static org.opentripplanner.transfer.constrained.TransferTestData.STOP_POINT_A;
 import static org.opentripplanner.transfer.constrained.TransferTestData.STOP_POINT_B;
@@ -22,32 +22,32 @@ public class ConstrainedTransferTest {
 
   private final ConstrainedTransfer TX_STATION_TO_STATION = noConstTx(STATION_POINT, STATION_POINT);
   private final ConstrainedTransfer TX_STATION_TO_B = noConstTx(STATION_POINT, STOP_POINT_B);
-  private final ConstrainedTransfer TX_STATION_TO_R2B = noConstTx(STATION_POINT, ROUTE_POINT_2B);
-  private final ConstrainedTransfer TX_STATION_TO_R2S = noConstTx(STATION_POINT, ROUTE_POINT_2S);
+  private final ConstrainedTransfer TX_STATION_TO_R2B = noConstTx(STATION_POINT, ROUTE_POINT_2_B);
+  private final ConstrainedTransfer TX_STATION_TO_R2S = noConstTx(STATION_POINT, ROUTE_POINT_2_S);
   private final ConstrainedTransfer TX_STATION_TO_T23 = noConstTx(STATION_POINT, TRIP_POINT_21_3);
 
   private final ConstrainedTransfer TX_A_TO_STATION = noConstTx(STOP_POINT_A, STATION_POINT);
   private final ConstrainedTransfer TX_A_TO_B = noConstTx(STOP_POINT_A, STOP_POINT_B);
-  private final ConstrainedTransfer TX_A_TO_R2B = noConstTx(STOP_POINT_A, ROUTE_POINT_2B);
-  private final ConstrainedTransfer TX_A_TO_R2S = noConstTx(STOP_POINT_A, ROUTE_POINT_2S);
+  private final ConstrainedTransfer TX_A_TO_R2B = noConstTx(STOP_POINT_A, ROUTE_POINT_2_B);
+  private final ConstrainedTransfer TX_A_TO_R2S = noConstTx(STOP_POINT_A, ROUTE_POINT_2_S);
   private final ConstrainedTransfer TX_A_TO_T23 = noConstTx(STOP_POINT_A, TRIP_POINT_21_3);
 
-  private final ConstrainedTransfer TX_R1S_TO_STATION = noConstTx(ROUTE_POINT_1S, STATION_POINT);
-  private final ConstrainedTransfer TX_R1S_TO_B = noConstTx(ROUTE_POINT_1S, STOP_POINT_B);
-  private final ConstrainedTransfer TX_R1S_TO_R2B = noConstTx(ROUTE_POINT_1S, ROUTE_POINT_2B);
-  private final ConstrainedTransfer TX_R1S_TO_R2S = noConstTx(ROUTE_POINT_1S, ROUTE_POINT_2S);
-  private final ConstrainedTransfer TX_R1S_TO_T23 = noConstTx(ROUTE_POINT_1S, TRIP_POINT_21_3);
+  private final ConstrainedTransfer TX_R1S_TO_STATION = noConstTx(ROUTE_POINT_1_S, STATION_POINT);
+  private final ConstrainedTransfer TX_R1S_TO_B = noConstTx(ROUTE_POINT_1_S, STOP_POINT_B);
+  private final ConstrainedTransfer TX_R1S_TO_R2B = noConstTx(ROUTE_POINT_1_S, ROUTE_POINT_2_B);
+  private final ConstrainedTransfer TX_R1S_TO_R2S = noConstTx(ROUTE_POINT_1_S, ROUTE_POINT_2_S);
+  private final ConstrainedTransfer TX_R1S_TO_T23 = noConstTx(ROUTE_POINT_1_S, TRIP_POINT_21_3);
 
-  private final ConstrainedTransfer TX_R1A_TO_STATION = noConstTx(ROUTE_POINT_1A, STATION_POINT);
-  private final ConstrainedTransfer TX_R1A_TO_B = noConstTx(ROUTE_POINT_1A, STOP_POINT_B);
-  private final ConstrainedTransfer TX_R1A_TO_R2B = noConstTx(ROUTE_POINT_1A, ROUTE_POINT_2B);
-  private final ConstrainedTransfer TX_R1A_TO_R2S = noConstTx(ROUTE_POINT_1A, ROUTE_POINT_2S);
-  private final ConstrainedTransfer TX_R1A_TO_T23 = noConstTx(ROUTE_POINT_1A, TRIP_POINT_21_3);
+  private final ConstrainedTransfer TX_R1A_TO_STATION = noConstTx(ROUTE_POINT_1_A, STATION_POINT);
+  private final ConstrainedTransfer TX_R1A_TO_B = noConstTx(ROUTE_POINT_1_A, STOP_POINT_B);
+  private final ConstrainedTransfer TX_R1A_TO_R2B = noConstTx(ROUTE_POINT_1_A, ROUTE_POINT_2_B);
+  private final ConstrainedTransfer TX_R1A_TO_R2S = noConstTx(ROUTE_POINT_1_A, ROUTE_POINT_2_S);
+  private final ConstrainedTransfer TX_R1A_TO_T23 = noConstTx(ROUTE_POINT_1_A, TRIP_POINT_21_3);
 
   private final ConstrainedTransfer TX_T11_TO_STATION = noConstTx(TRIP_POINT_11_1, STATION_POINT);
   private final ConstrainedTransfer TX_T11_TO_B = noConstTx(TRIP_POINT_11_1, STOP_POINT_B);
-  private final ConstrainedTransfer TX_T11_TO_R2B = noConstTx(TRIP_POINT_11_1, ROUTE_POINT_2B);
-  private final ConstrainedTransfer TX_T11_TO_R2S = noConstTx(TRIP_POINT_11_1, ROUTE_POINT_2S);
+  private final ConstrainedTransfer TX_T11_TO_R2B = noConstTx(TRIP_POINT_11_1, ROUTE_POINT_2_B);
+  private final ConstrainedTransfer TX_T11_TO_R2S = noConstTx(TRIP_POINT_11_1, ROUTE_POINT_2_S);
   private final ConstrainedTransfer TX_T11_TO_T23 = noConstTx(TRIP_POINT_11_1, TRIP_POINT_21_3);
 
   private final ConstrainedTransfer TX_NO_CONSTRAINS = noConstTx(STOP_POINT_A, STOP_POINT_B);
@@ -95,7 +95,7 @@ public class ConstrainedTransferTest {
   @Test
   public void testOtherAccessors() {
     assertEquals(STOP_POINT_A, TX_A_TO_R2B.getFrom());
-    assertEquals(ROUTE_POINT_2B, TX_A_TO_R2B.getTo());
+    assertEquals(ROUTE_POINT_2_B, TX_A_TO_R2B.getTo());
   }
 
   @Test

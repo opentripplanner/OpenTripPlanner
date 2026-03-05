@@ -142,6 +142,7 @@ public enum OTPFeature {
       "(transit-group-priority) is kept, even if the max-limit is exceeded. This is turned off by default " +
       "for now, until this feature is well tested."
   ),
+  OjpApi(false, true, "OJP v2.0 API."),
   RealtimeResolver(
     false,
     true,

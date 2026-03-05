@@ -29,28 +29,31 @@ import org.opentripplanner.transit.model.network.Route;
 
 class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
 
-  static final Route route = TimetableRepositoryForTest.route("route-1").build();
-  static final Itinerary interlinedWithDifferentRoute = newItinerary(
+  static final Route ROUTE = TimetableRepositoryForTest.route("route-1").build();
+  static final Itinerary INTERLINED_WITH_DIFFERENT_ROUTE = newItinerary(
     Place.forStop(AIRPORT_STOP),
     T11_00
   )
     .bus(1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
-    .staySeatedBus(route, 2, T11_12, T11_16, Place.forStop(CITY_CENTER_B_STOP))
+    .staySeatedBus(ROUTE, 2, T11_12, T11_16, Place.forStop(CITY_CENTER_B_STOP))
     .build();
 
-  static final Itinerary interlinedWithSameRoute = newItinerary(Place.forStop(AIRPORT_STOP), T11_00)
-    .bus(route, 1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
-    .staySeatedBus(route, 2, T11_12, T11_16, Place.forStop(CITY_CENTER_B_STOP))
+  static final Itinerary INTERLINED_WITH_SAME_ROUTE = newItinerary(
+    Place.forStop(AIRPORT_STOP),
+    T11_00
+  )
+    .bus(ROUTE, 1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
+    .staySeatedBus(ROUTE, 2, T11_12, T11_16, Place.forStop(CITY_CENTER_B_STOP))
     .build();
   static Money tenDollars = Money.usDollars(10);
   static Money twentyDollars = Money.usDollars(20);
 
   static Stream<Arguments> testCases() {
     return Stream.of(
-      Arguments.of(ALWAYS, interlinedWithSameRoute, tenDollars, "same routes"),
-      Arguments.of(ALWAYS, interlinedWithDifferentRoute, tenDollars, "different routes"),
-      Arguments.of(SAME_ROUTE, interlinedWithSameRoute, tenDollars, "same routes"),
-      Arguments.of(SAME_ROUTE, interlinedWithDifferentRoute, twentyDollars, "different routes")
+      Arguments.of(ALWAYS, INTERLINED_WITH_SAME_ROUTE, tenDollars, "same routes"),
+      Arguments.of(ALWAYS, INTERLINED_WITH_DIFFERENT_ROUTE, tenDollars, "different routes"),
+      Arguments.of(SAME_ROUTE, INTERLINED_WITH_SAME_ROUTE, tenDollars, "same routes"),
+      Arguments.of(SAME_ROUTE, INTERLINED_WITH_DIFFERENT_ROUTE, twentyDollars, "different routes")
     );
   }
 
@@ -88,7 +91,7 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
 
   @Test
   void legFares() {
-    var itinerary = interlinedWithSameRoute;
+    var itinerary = INTERLINED_WITH_SAME_ROUTE;
     var service = new CombinedInterlinedLegsFareService(ALWAYS);
     service.addFareRules(
       FareType.regular,

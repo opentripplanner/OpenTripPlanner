@@ -5,10 +5,10 @@ import static org.opentripplanner.transfer.constrained.TransferTestData.ANY_POS;
 import static org.opentripplanner.transfer.constrained.TransferTestData.ANY_TRIP;
 import static org.opentripplanner.transfer.constrained.TransferTestData.POS_1;
 import static org.opentripplanner.transfer.constrained.TransferTestData.POS_3;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1A;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1S;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2B;
-import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2S;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1_A;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_1_S;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2_B;
+import static org.opentripplanner.transfer.constrained.TransferTestData.ROUTE_POINT_2_S;
 import static org.opentripplanner.transfer.constrained.TransferTestData.STATION_POINT;
 import static org.opentripplanner.transfer.constrained.TransferTestData.STOP_A;
 import static org.opentripplanner.transfer.constrained.TransferTestData.STOP_B;
@@ -38,19 +38,19 @@ public class TransferServiceTest {
     // 84
     var A = transfer(TRIP_POINT_11_1, TRIP_POINT_21_3);
     // 74
-    var B = transfer(TRIP_POINT_11_1, ROUTE_POINT_2B);
+    var B = transfer(TRIP_POINT_11_1, ROUTE_POINT_2_B);
     // 64
-    var C = transfer(TRIP_POINT_11_1, ROUTE_POINT_2S);
+    var C = transfer(TRIP_POINT_11_1, ROUTE_POINT_2_S);
     // 51
     var D = transfer(STOP_POINT_A, TRIP_POINT_21_3);
     // 43
-    var E = transfer(ROUTE_POINT_1A, STOP_POINT_B);
+    var E = transfer(ROUTE_POINT_1_A, STOP_POINT_B);
     // 32
-    var F = transfer(ROUTE_POINT_1S, STOP_POINT_B);
+    var F = transfer(ROUTE_POINT_1_S, STOP_POINT_B);
     // 30
-    var G = transfer(STATION_POINT, ROUTE_POINT_2B);
+    var G = transfer(STATION_POINT, ROUTE_POINT_2_B);
     // 20
-    var H = transfer(STATION_POINT, ROUTE_POINT_2S);
+    var H = transfer(STATION_POINT, ROUTE_POINT_2_S);
     // 11
     var I = transfer(STATION_POINT, STATION_POINT);
 
@@ -103,7 +103,7 @@ public class TransferServiceTest {
   @Test
   public void listAll() {
     // Given:
-    var A = transfer(STATION_POINT, ROUTE_POINT_1A);
+    var A = transfer(STATION_POINT, ROUTE_POINT_1_A);
     var B = transfer(STOP_POINT_A, STOP_POINT_B);
     var C = transfer(STOP_POINT_A, TRIP_POINT_21_3);
 

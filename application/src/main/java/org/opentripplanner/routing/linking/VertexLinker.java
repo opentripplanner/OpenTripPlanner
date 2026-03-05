@@ -18,9 +18,10 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.Scope;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
@@ -33,9 +34,9 @@ import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporarySplitterVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.streetadapter.VertexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -348,7 +349,7 @@ public class VertexLinker {
     // other half lost. It seems like this was based on some incorrect premises about floating point calculations
     // being non-deterministic.
 
-    Set<DistanceTo<StreetEdge>> closesEdges = new HashSet<>();
+    Set<DistanceTo<StreetEdge>> closestEdges = new HashSet<>();
     for (TraverseMode mode : traverseModeSet.getModes()) {
       TraverseModeSet modeSet = new TraverseModeSet(mode);
       // There is at least one appropriate edge within range.
@@ -369,14 +370,15 @@ public class VertexLinker {
         .getAsDouble();
 
       // Because this is a set, each instance of DistanceTo<StreetEdge> will only be added once
-      closesEdges.addAll(
-        candidateEdges
+      // Note: add only closest edges of each mode
+      closestEdges.addAll(
+        candidateEdgesForMode
           .stream()
           .filter(ce -> ce.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
           .collect(Collectors.toSet())
       );
     }
-    return closesEdges;
+    return closestEdges;
   }
 
   /* Snap a vertex to and edge if necessary, create required linking and return the applied entry vertex */
@@ -507,16 +509,16 @@ public class VertexLinker {
     // existing vertices
     var newEdges = scope == Scope.PERMANENT
       ? originalEdge.splitDestructively(v)
-      : originalEdge.splitNonDestructively(v, tempEdges, direction);
+      : originalEdge.splitNonDestructively(v, direction);
+
+    if (scope != Scope.PERMANENT) {
+      newEdges.forEach(tempEdges::addEdge);
+    }
 
     if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges
-      if (newEdges.head() != null) {
-        graph.insert(newEdges.head(), scope);
-      }
-      if (newEdges.tail() != null) {
-        graph.insert(newEdges.tail(), scope);
-      }
+
+      newEdges.forEach(e -> graph.insert(e, scope));
 
       if (scope == Scope.PERMANENT) {
         // remove original edges from the spatial index
@@ -547,7 +549,6 @@ public class VertexLinker {
         y,
         originalEdge
       );
-      tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
       v = tsv;
     } else {
       v = vertexFactory.splitter(originalEdge, x, y, uniqueSplitLabel);

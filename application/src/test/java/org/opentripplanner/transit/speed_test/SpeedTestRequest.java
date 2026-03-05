@@ -62,6 +62,10 @@ public class SpeedTestRequest {
 
     builder.withFrom(input.fromPlace()).withTo(input.toPlace());
 
+    if (input.viaLocation() != null) {
+      builder.withViaLocations(List.of(input.viaLocation()));
+    }
+
     // Filter the results inside the SpeedTest, not in the itineraries filter,
     // when ignoring street results. This will use the default which is 50.
     if (!config.ignoreStreetResults()) {

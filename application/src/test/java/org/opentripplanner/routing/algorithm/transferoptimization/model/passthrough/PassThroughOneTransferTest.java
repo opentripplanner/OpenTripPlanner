@@ -140,19 +140,19 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
     // We need *a* path - the transfer here can be any.
     var originalPath = pathBuilder()
       .c2(tc.points().size())
-      .access(ITERATION_START_TIME, STOP_B, D1s)
+      .access(ITERATION_START_TIME, STOP_B, D1_s)
       .bus(trip1, STOP_D)
       .walk(txCost.walkDuration(STOP_D, STOP_F), STOP_F)
       .bus(trip2, STOP_I)
-      .egress(D1s);
+      .egress(D1_s);
 
     var expectedPath = pathBuilder()
       .c2(tc.points().size())
-      .access(ITERATION_START_TIME, STOP_B, D1s)
+      .access(ITERATION_START_TIME, STOP_B, D1_s)
       .bus(trip1, tc.stopIndexA())
       .walk(txCost.walkDuration(tc.stopIndexA(), tc.stopIndexB()), tc.stopIndexB())
       .bus(trip2, STOP_I)
-      .egress(D1s);
+      .egress(D1_s);
 
     // These are illegal transfers for the given path, we add them here to make sure they
     // do not interfere with the result. For simpler debugging problems try commenting out these

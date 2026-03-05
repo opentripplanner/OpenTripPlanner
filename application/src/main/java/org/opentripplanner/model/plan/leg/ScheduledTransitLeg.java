@@ -12,9 +12,9 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.accessibility.Accessibility;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
@@ -24,8 +24,8 @@ import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
@@ -128,7 +128,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
     this.distanceMeters = DoubleUtils.roundTo2Decimals(
-      Objects.requireNonNull(builder.distanceMeters(), "distanceMeters")
+      GeometryUtils.sumDistances(transitLegCoordinates)
     );
     this.transitAlerts = Set.copyOf(builder.alerts());
     this.fromViaLocationType = builder.fromViaLocationType();

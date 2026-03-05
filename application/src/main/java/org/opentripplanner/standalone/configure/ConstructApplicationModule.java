@@ -11,6 +11,7 @@ import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
@@ -23,7 +24,6 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -36,6 +36,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
@@ -61,6 +62,7 @@ public class ConstructApplicationModule {
     List<RideHailingService> rideHailingServices,
     ViaCoordinateTransferFactory viaTransferResolver,
     @Nullable CarpoolingService carpoolingService,
+    @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
@@ -78,6 +80,7 @@ public class ConstructApplicationModule {
 
     var transitRoutingConfig = routerConfig.transitTuningConfig();
     var triasApiParameters = routerConfig.triasApiParameters();
+    var ojpApiParameters = routerConfig.ojpApiParameters();
     var gtfsApiConfig = routerConfig.gtfsApiParameters();
     var vectorTileConfig = routerConfig.vectorTileConfig();
     var flexParameters = routerConfig.flexParameters();
@@ -90,6 +93,7 @@ public class ConstructApplicationModule {
       graph,
       linkingContextFactory,
       Metrics.globalRegistry,
+      ojpApiParameters,
       raptorConfig,
       realtimeVehicleService,
       rideHailingServices,
@@ -108,6 +112,7 @@ public class ConstructApplicationModule {
       worldEnvelopeService,
       // Optional Sandbox services
       carpoolingService,
+      dataOverlayParameterBindings,
       emissionItineraryDecorator,
       streetDetailsService,
       empiricalDelayService,

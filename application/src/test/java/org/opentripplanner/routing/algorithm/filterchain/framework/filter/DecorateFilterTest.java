@@ -14,8 +14,8 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
 
 class DecorateFilterTest implements ItineraryDecorator, PlanTestConstants {
 
-  private static final Itinerary i1 = newItinerary(A, 6).walk(1, B).build();
-  private static final Itinerary i2 = newItinerary(A).bicycle(6, 8, B).build();
+  private static final Itinerary I1 = newItinerary(A, 6).walk(1, B).build();
+  private static final Itinerary I2 = newItinerary(A).bicycle(6, 8, B).build();
 
   private Iterator<Itinerary> expectedQueue;
 
@@ -43,7 +43,7 @@ class DecorateFilterTest implements ItineraryDecorator, PlanTestConstants {
 
   @Test
   void filterOneElement() {
-    var input = List.of(i1);
+    var input = List.of(I1);
     expectedQueue = input.iterator();
     new DecorateFilter(this).filter(input);
     assertTrue(!expectedQueue.hasNext(), "All elements are processed");
@@ -51,7 +51,7 @@ class DecorateFilterTest implements ItineraryDecorator, PlanTestConstants {
 
   @Test
   void filterTwoElements() {
-    var input = List.of(i1, i2);
+    var input = List.of(I1, I2);
     expectedQueue = input.iterator();
     new DecorateFilter(this).filter(input);
     assertTrue(!expectedQueue.hasNext(), "All elements are processed");

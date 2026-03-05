@@ -24,7 +24,7 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
   implements GbfsFeedLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoaderImpl.class);
-  private static final ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
   public static final String HEADER_ETAG = "ETag";
   public static final String HEADER_IF_NONE_MATCH = "If-None-Match";
 
@@ -34,7 +34,7 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
   private final OtpHttpClient otpHttpClient;
 
   static {
-    objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+    OBJECT_MAPPER.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
   }
 
   public GbfsFeedLoaderImpl(List<F> feeds, HttpHeaders httpHeaders, OtpHttpClient otpHttpClient) {
@@ -106,7 +106,7 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
     Class<T> clazz
   ) {
     try {
-      return otpHttpClient.getAndMapAsJsonObject(uri, httpHeaders.asMap(), objectMapper, clazz);
+      return otpHttpClient.getAndMapAsJsonObject(uri, httpHeaders.asMap(), OBJECT_MAPPER, clazz);
     } catch (OtpHttpClientException e) {
       LOG.warn("Error parsing vehicle rental feed from {}. Details: {}.", uri, e.getMessage(), e);
       return null;
@@ -164,7 +164,7 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
           otpHttpResponse ->
             new GBFSFeedResponse<>(
               otpHttpResponse.statusOk()
-                ? objectMapper.readValue(otpHttpResponse.body(), implementingClass)
+                ? OBJECT_MAPPER.readValue(otpHttpResponse.body(), implementingClass)
                 : null,
               otpHttpResponse.header(HEADER_ETAG).orElse(null),
               otpHttpResponse.statusNotModified()

@@ -9,10 +9,12 @@ import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
@@ -26,7 +28,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinker;
@@ -38,6 +39,7 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
 import org.opentripplanner.street.search.state.State;
@@ -146,6 +148,8 @@ public interface OtpServerRequestContext {
 
   TriasApiParameters triasApiParameters();
 
+  OjpApiParameters ojpApiParameters();
+
   GtfsApiParameters gtfsApiParameters();
 
   TransmodelAPIParameters transmodelAPIParameters();
@@ -156,12 +160,15 @@ public interface OtpServerRequestContext {
   CarpoolingService carpoolingService();
 
   @Nullable
+  DataOverlayParameterBindings dataOverlayParameterBindings();
+
+  @Nullable
   default List<ExtensionRequestContext> listExtensionRequestContexts(RouteRequest request) {
     var list = new ArrayList<ExtensionRequestContext>();
     if (OTPFeature.DataOverlay.isOn()) {
       list.add(
         new DataOverlayContext(
-          graph().dataOverlayParameterBindings,
+          dataOverlayParameterBindings(),
           request.preferences().system().dataOverlay()
         )
       );

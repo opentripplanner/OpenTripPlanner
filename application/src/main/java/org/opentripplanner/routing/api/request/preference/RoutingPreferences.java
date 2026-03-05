@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

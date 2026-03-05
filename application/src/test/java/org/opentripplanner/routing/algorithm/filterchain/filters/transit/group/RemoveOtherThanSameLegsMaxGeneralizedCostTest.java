@@ -17,7 +17,7 @@ class RemoveOtherThanSameLegsMaxGeneralizedCostTest implements PlanTestConstants
       .bus(30, T11_16, T11_20, C)
       .build();
 
-    Itinerary second = newItinerary(A).rail(20, T11_05, T11_14, B).walk(D10m, C).build();
+    Itinerary second = newItinerary(A).rail(20, T11_05, T11_14, B).walk(D10_m, C).build();
 
     var subject = new RemoveOtherThanSameLegsMaxGeneralizedCost(2.0);
     assertEquals(List.of(second), subject.flagForRemoval(List.of(first, second)));
@@ -30,7 +30,7 @@ class RemoveOtherThanSameLegsMaxGeneralizedCostTest implements PlanTestConstants
       .bus(30, T11_16, T11_20, C)
       .build();
 
-    Itinerary second = newItinerary(A).rail(40, T11_05, T11_14, B).walk(D10m, C).build();
+    Itinerary second = newItinerary(A).rail(40, T11_05, T11_14, B).walk(D10_m, C).build();
 
     var subject = new RemoveOtherThanSameLegsMaxGeneralizedCost(2.0);
     assertEquals(List.of(), subject.flagForRemoval(List.of(first, second)));
@@ -48,7 +48,7 @@ class RemoveOtherThanSameLegsMaxGeneralizedCostTest implements PlanTestConstants
 
     Itinerary second = newItinerary(A)
       .rail(20, T11_05, T11_14, B, 400)
-      .walk(D10m, C)
+      .walk(D10_m, C)
       .build(itineraryCost);
 
     var subject = new RemoveOtherThanSameLegsMaxGeneralizedCost(2.0);

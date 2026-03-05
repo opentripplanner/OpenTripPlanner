@@ -10,7 +10,6 @@ import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSec
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 import static org.opentripplanner.utils.text.MarkdownFormatter.HEADER_4;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,6 @@ public class SiriGooglePubSubConfigDocTest {
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final Set<String> INCLUDE_UPDATERS = Set.of("siri-et-google-pubsub-updater");
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
-  public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
    * NOTE! This test updates the {@code doc/user/sandbox/SiriGooglePubSubUpdater.md} document based on the latest

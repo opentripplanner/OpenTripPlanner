@@ -79,7 +79,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     ServiceBusFailureReason.MESSAGING_ENTITY_ALREADY_EXISTS
   );
 
-  private static final Logger log = LoggerFactory.getLogger(SiriAzureUpdater.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiriAzureUpdater.class);
   private final String updaterType;
   private final AuthenticationType authenticationType;
   private final String fullyQualifiedNamespace;
@@ -212,7 +212,7 @@ public class SiriAzureUpdater implements GraphUpdater {
         () -> {
           var initialData = fetchInitialSiriData();
           if (initialData.isEmpty()) {
-            log.info("Got empty response from history endpoint");
+            LOG.info("Got empty response from history endpoint");
           } else {
             processInitialSiriData(initialData.get());
           }
@@ -228,7 +228,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       // Register shutdown hook only once, and only after subscriptionName is set
       registerShutdownHook();
     } catch (InterruptedException e) {
-      log.info("Startup interrupted, aborting updater initialization");
+      LOG.info("Startup interrupted, aborting updater initialization");
       // Preserve interrupt status
       Thread.currentThread().interrupt();
       // Don't set primed, don't register shutdown hook - just exit
@@ -264,27 +264,27 @@ public class SiriAzureUpdater implements GraphUpdater {
     while (System.currentTimeMillis() - startTime < timeoutMs) {
       try {
         task.run();
-        log.info("{} succeeded after {} attempts.", description, attemptCounter);
+        LOG.info("{} succeeded after {} attempts.", description, attemptCounter);
         return true;
       } catch (InterruptedException ie) {
-        log.warn("{} was interrupted.", description);
+        LOG.warn("{} was interrupted.", description);
         Thread.currentThread().interrupt();
         throw ie;
       } catch (Exception e) {
-        log.warn("{} failed. Error: {} (Attempt {})", description, e.getMessage(), attemptCounter);
+        LOG.warn("{} failed. Error: {} (Attempt {})", description, e.getMessage(), attemptCounter);
 
         if (!shouldRetry(e)) {
-          log.error("{} encountered a non-retryable error: {}.", description, e.getMessage());
+          LOG.error("{} encountered a non-retryable error: {}.", description, e.getMessage());
           throw e;
         }
 
-        log.debug("{} will retry in {} ms.", description, sleepPeriod);
+        LOG.debug("{} will retry in {} ms.", description, sleepPeriod);
         attemptCounter++;
 
         try {
           sleep(sleepPeriod);
         } catch (InterruptedException ie) {
-          log.warn("{} was interrupted during sleep.", description);
+          LOG.warn("{} was interrupted during sleep.", description);
           Thread.currentThread().interrupt();
           throw ie;
         }
@@ -294,7 +294,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     }
 
     // Timeout exceeded
-    log.warn("{} timed out after {} ms", description, timeoutMs);
+    LOG.warn("{} timed out after {} ms", description, timeoutMs);
     return false;
   }
 
@@ -303,27 +303,27 @@ public class SiriAzureUpdater implements GraphUpdater {
       ServiceBusFailureReason reason = sbException.getReason();
 
       if (RETRYABLE_REASONS.contains(reason)) {
-        log.warn("Transient error encountered: {}. Retrying...", reason);
+        LOG.warn("Transient error encountered: {}. Retrying...", reason);
         return true;
       } else if (NON_RETRYABLE_REASONS.contains(reason)) {
-        log.error("Non-recoverable error encountered: {}. Not retrying.", reason);
+        LOG.error("Non-recoverable error encountered: {}. Not retrying.", reason);
         return false;
       } else {
-        log.warn("Unhandled ServiceBusFailureReason: {}. Retrying by default.", reason);
+        LOG.warn("Unhandled ServiceBusFailureReason: {}. Retrying by default.", reason);
         return true;
       }
     } else if (ExceptionUtils.hasCause(e, OtpHttpClientException.class)) {
       // retry for OtpHttpClientException as it is thrown if historical data can't be read at the moment
       return true;
     } else if (getNetworkErrorType(e).isPresent()) {
-      log.warn(
+      LOG.warn(
         "Network connectivity error encountered: {}. Retrying...",
         getNetworkErrorType(e).get()
       );
       return true;
     }
 
-    log.warn("Non-ServiceBus exception encountered: {}. Not retrying.", e.getClass().getName());
+    LOG.warn("Non-ServiceBus exception encountered: {}. Not retrying.", e.getClass().getName());
     return false;
   }
 
@@ -362,9 +362,9 @@ public class SiriAzureUpdater implements GraphUpdater {
     try {
       boolean success = executeWithRetry(task, stepDescription, startupTimeout.toMillis());
       if (success) {
-        log.info("{} completed successfully", stepDescription);
+        LOG.info("{} completed successfully", stepDescription);
       } else {
-        log.warn(
+        LOG.warn(
           "REALTIME_STARTUP_ALERT component={} status=TIMEOUT error=\"{} timed out after {} ms\"",
           stepDescription,
           stepDescription,
@@ -373,7 +373,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       }
     } catch (InterruptedException e) {
       // Rethrow to abort startup process and avoid blocking JVM shutdown
-      log.warn(
+      LOG.warn(
         "REALTIME_STARTUP_ALERT component={} status=INTERRUPTED error=\"Aborting startup due to interrupt\"",
         stepDescription
       );
@@ -382,7 +382,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       throw e;
     } catch (Exception e) {
       String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-      log.warn(
+      LOG.warn(
         "REALTIME_STARTUP_ALERT component={} status=FAILED error=\"{}\"",
         stepDescription,
         message
@@ -401,15 +401,15 @@ public class SiriAzureUpdater implements GraphUpdater {
    * Performs orderly shutdown of all resources with proper error handling.
    */
   private void performShutdown() {
-    log.info("Starting shutdown for {} updater", updaterType);
+    LOG.info("Starting shutdown for {} updater", updaterType);
 
     // 1. Close event processor
     if (eventProcessor != null) {
       try {
         eventProcessor.close();
-        log.debug("Event processor closed successfully");
+        LOG.debug("Event processor closed successfully");
       } catch (Exception e) {
-        log.warn("Error closing event processor: {}", e.getMessage());
+        LOG.warn("Error closing event processor: {}", e.getMessage());
       }
     }
 
@@ -417,13 +417,13 @@ public class SiriAzureUpdater implements GraphUpdater {
     if (serviceBusAdmin != null && subscriptionName != null) {
       try {
         serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
-        log.info("Subscription '{}' deleted on topic '{}'", subscriptionName, topicName);
+        LOG.info("Subscription '{}' deleted on topic '{}'", subscriptionName, topicName);
       } catch (Exception e) {
-        log.warn("Error deleting subscription '{}': {}", subscriptionName, e.getMessage());
+        LOG.warn("Error deleting subscription '{}': {}", subscriptionName, e.getMessage());
       }
     }
 
-    log.info("Shutdown complete for {} updater", updaterType);
+    LOG.info("Shutdown complete for {} updater", updaterType);
   }
 
   /**
@@ -456,16 +456,16 @@ public class SiriAzureUpdater implements GraphUpdater {
 
     // Make sure there is no old subscription on serviceBus
     if (serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName)) {
-      log.info(
+      LOG.info(
         "Subscription '{}' already exists. Deleting existing subscription.",
         subscriptionName
       );
       serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
-      log.info("Service Bus deleted subscription {}.", subscriptionName);
+      LOG.info("Service Bus deleted subscription {}.", subscriptionName);
     }
     serviceBusAdmin.createSubscription(topicName, subscriptionName, options);
 
-    log.info("{} updater created subscription {}", updaterType, subscriptionName);
+    LOG.info("{} updater created subscription {}", updaterType, subscriptionName);
   }
 
   /**
@@ -505,7 +505,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       .buildProcessorClient();
 
     eventProcessor.start();
-    log.info(
+    LOG.info(
       "Service Bus processor started for topic '{}' and subscription '{}', prefetching {} messages.",
       topicName,
       subscriptionName,
@@ -518,7 +518,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     MESSAGE_COUNTER.incrementAndGet();
 
     if (MESSAGE_COUNTER.get() % MESSAGE_COUNTER_LOG_INTERVAL == 0) {
-      log.debug("Total SIRI-{} messages received={}", updaterType, MESSAGE_COUNTER.get());
+      LOG.debug("Total SIRI-{} messages received={}", updaterType, MESSAGE_COUNTER.get());
     }
 
     try {
@@ -527,15 +527,15 @@ public class SiriAzureUpdater implements GraphUpdater {
       var serviceDelivery = siri.getServiceDelivery();
       if (serviceDelivery == null) {
         if (siri.getHeartbeatNotification() != null) {
-          log.debug("Updater {} received SIRI heartbeat message", updaterType);
+          LOG.debug("Updater {} received SIRI heartbeat message", updaterType);
         } else {
-          log.debug("Updater {} received SIRI message without ServiceDelivery", updaterType);
+          LOG.debug("Updater {} received SIRI message without ServiceDelivery", updaterType);
         }
       } else {
         messageHandler.handleMessage(serviceDelivery, message.getMessageId());
       }
     } catch (JAXBException | XMLStreamException e) {
-      log.error(e.getLocalizedMessage(), e);
+      LOG.error(e.getLocalizedMessage(), e);
     }
   }
 
@@ -562,14 +562,14 @@ public class SiriAzureUpdater implements GraphUpdater {
     }
     var headers = HttpHeaders.of().acceptApplicationXML().build().asMap();
 
-    log.info(
+    LOG.info(
       "Fetching initial Siri data from {}, timeout is {} ms.",
       this.dataInitializationUrl,
       timeout
     );
 
     try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
-      var otpHttpClient = otpHttpClientFactory.create(log);
+      var otpHttpClient = otpHttpClientFactory.create(LOG);
       var t1 = System.currentTimeMillis();
       var siriOptional = otpHttpClient.executeAndMapOptional(
         new HttpGet(dataInitializationUrl),
@@ -578,10 +578,10 @@ public class SiriAzureUpdater implements GraphUpdater {
         response -> SiriXml.parseXml(response.body())
       );
       var t2 = System.currentTimeMillis();
-      log.info("Fetched initial data in {} ms", (t2 - t1));
+      LOG.info("Fetched initial data in {} ms", (t2 - t1));
 
       if (siriOptional.isEmpty()) {
-        log.info("Got status 204 'No Content'.");
+        LOG.info("Got status 204 'No Content'.");
       }
 
       return siriOptional.map(Siri::getServiceDelivery);
@@ -595,7 +595,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       if (f != null) {
         f.get();
       }
-      log.info("{} updater initialized in {} ms.", updaterType, (System.currentTimeMillis() - t1));
+      LOG.info("{} updater initialized in {} ms.", updaterType, (System.currentTimeMillis() - t1));
     } catch (ExecutionException | InterruptedException e) {
       throw new SiriAzureInitializationException("Error applying history", e);
     }
@@ -607,14 +607,14 @@ public class SiriAzureUpdater implements GraphUpdater {
    * @param errorContext Context for errors handled by the ServiceBusProcessorClient.
    */
   private void errorConsumer(ServiceBusErrorContext errorContext) {
-    log.error(
+    LOG.error(
       "Error when receiving messages from namespace={}, Entity={}",
       errorContext.getFullyQualifiedNamespace(),
       errorContext.getEntityPath()
     );
 
     if (!(errorContext.getException() instanceof ServiceBusException e)) {
-      log.error("Non-ServiceBusException occurred!", errorContext.getException());
+      LOG.error("Non-ServiceBusException occurred!", errorContext.getException());
       return;
     }
 
@@ -626,27 +626,27 @@ public class SiriAzureUpdater implements GraphUpdater {
       reason ==
       ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND
     ) {
-      log.error(
+      LOG.error(
         "An unrecoverable error occurred. Stopping processing with reason {} {}",
         reason,
         e.getMessage()
       );
     } else if (reason == ServiceBusFailureReason.MESSAGE_LOCK_LOST) {
-      log.error("Message lock lost for message", e);
+      LOG.error("Message lock lost for message", e);
     } else if (
       reason == ServiceBusFailureReason.SERVICE_BUSY ||
       reason == ServiceBusFailureReason.UNAUTHORIZED
     ) {
-      log.error("Service Bus is busy or unauthorized, wait and try again");
+      LOG.error("Service Bus is busy or unauthorized, wait and try again");
       try {
         // Wait before retrying when Service Bus is busy or unauthorized
         TimeUnit.SECONDS.sleep(ERROR_RETRY_WAIT_SECONDS);
       } catch (InterruptedException ie) {
         Thread.currentThread().interrupt();
-        log.info("OTP is shutting down, stopping processing of ServiceBus error messages");
+        LOG.info("OTP is shutting down, stopping processing of ServiceBus error messages");
       }
     } else {
-      log.error(e.getLocalizedMessage(), e);
+      LOG.error(e.getLocalizedMessage(), e);
     }
   }
 }

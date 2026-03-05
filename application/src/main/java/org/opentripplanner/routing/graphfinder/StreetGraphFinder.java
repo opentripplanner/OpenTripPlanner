@@ -10,13 +10,13 @@ import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.LinkingContextRequest;
 import org.opentripplanner.routing.linking.TemporaryVerticesContainer;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.StreetSearchBuilder;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -100,10 +100,9 @@ public class StreetGraphFinder implements GraphFinder {
       // Make a normal OTP routing request so we can traverse edges and use GenericAStar
       // TODO make a function that builds normal routing requests from profile requests
       // TODO: This is incorrect, the configured defaults are not used.
-      var request = RouteRequest.of()
-        .withPreferences(pref -> pref.withWalk(it -> it.withSpeed(1)))
-        .withNumItineraries(1)
-        .buildDefault();
+      var request = StreetSearchRequest.of()
+        .withWalk(it -> it.withSpeed(1))
+        .build();
       StreetSearchBuilder.of()
         .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
         .withSkipEdgeStrategy(skipEdgeStrategy)

@@ -30,7 +30,8 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model._data.TransitTestEnvironment;
+import org.opentripplanner.transit.model._data.TransitTestEnvironmentBuilder;
 import org.opentripplanner.utils.lang.Box;
 
 /**
@@ -39,15 +40,25 @@ import org.opentripplanner.utils.lang.Box;
  */
 class ItineraryListFilterChainTest implements PlanTestConstants {
 
-  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
-  private static final Place A = Place.forStop(TEST_MODEL.stop("A").build());
-  private static final Place B = Place.forStop(TEST_MODEL.stop("B").build());
-  private static final Place C = Place.forStop(TEST_MODEL.stop("C").build());
-  private static final Place D = Place.forStop(TEST_MODEL.stop("D").build());
-  private static final Place E = Place.forStop(TEST_MODEL.stop("E").build());
+  private static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
+  private static final Place A = Place.forStop(
+    ENV_BUILDER.stop("A", b -> b.withCoordinate(60.0, 10.000))
+  );
+  private static final Place B = Place.forStop(
+    ENV_BUILDER.stop("B", b -> b.withCoordinate(60.0, 10.010))
+  );
+  private static final Place C = Place.forStop(
+    ENV_BUILDER.stop("C", b -> b.withCoordinate(60.0, 10.015))
+  );
+  private static final Place D = Place.forStop(
+    ENV_BUILDER.stop("D", b -> b.withCoordinate(60.0, 10.022))
+  );
+  private static final Place E = Place.forStop(
+    ENV_BUILDER.stop("E", b -> b.withCoordinate(60.0, 10.030))
+  );
 
   private static final int I3_LATE_START_TIME = T11_33;
-  private static final Duration SW_D10m = Duration.ofSeconds(D10m);
+  private static final Duration SW_D10_m = Duration.ofSeconds(D10_m);
 
   private Itinerary i1;
   private Itinerary i2;
@@ -57,13 +68,13 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
   void setUpItineraries() {
     // Add some itineraries, with some none optimal options
     // Short walk - 2 minutes - to destination:
-    i1 = newItinerary(A, T11_06).walk(D2m, E).build();
+    i1 = newItinerary(A, T11_06).walk(D2_m, E).build();
 
     // Not optimal, takes longer than walking
     i2 = newItinerary(A).bus(21, T11_06, T11_09, E).build();
 
     // Not optimal, departure is very late
-    i3 = newItinerary(A).bus(20, I3_LATE_START_TIME, I3_LATE_START_TIME + D1m, E).build();
+    i3 = newItinerary(A).bus(20, I3_LATE_START_TIME, I3_LATE_START_TIME + D1_m, E).build();
   }
 
   @Test
@@ -77,7 +88,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
   @Test
   void testFilterChainWithSearchWindowFilterSet() {
     ItineraryListFilterChain chain = createBuilder(false, false, 10)
-      .withSearchWindow(TestItineraryBuilder.newTime(T11_00).toInstant(), SW_D10m)
+      .withSearchWindow(TestItineraryBuilder.newTime(T11_00).toInstant(), SW_D10_m)
       .build();
     var result = chain.filter(List.of(i1, i2, i3));
     assertEquals(toStr(List.of(i1)), toStr(result));
@@ -103,7 +114,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
   void testDebugFilterChain() {
     // Given a filter-chain with debugging enabled
     ItineraryListFilterChain chain = createBuilder(false, true, 3)
-      .withSearchWindow(newTime(T11_00).toInstant(), SW_D10m)
+      .withSearchWindow(newTime(T11_00).toInstant(), SW_D10_m)
       .build();
 
     // Walk first, then transit sorted on arrival-time
@@ -122,7 +133,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       .withRemoveWalkAllTheWayResults(true)
       .build();
 
-    Itinerary walk = newItinerary(A, T11_06).walk(D10m, E).build();
+    Itinerary walk = newItinerary(A, T11_06).walk(D10_m, E).build();
     Itinerary bus = newItinerary(A).bus(21, T11_06, T11_12, E).build();
 
     assertEquals(toStr(List.of(bus)), toStr(chain.filter(List.of(walk, bus))));
@@ -181,7 +192,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       )
       .build();
 
-    Itinerary walk = newItinerary(A, T11_06).walk(D10m, E).build();
+    Itinerary walk = newItinerary(A, T11_06).walk(D10_m, E).build();
     Itinerary bus = newItinerary(A).bus(21, T11_06, T11_28, E).build();
 
     assertTrue(chain.filter(List.of(walk, bus)).isEmpty());
@@ -357,7 +368,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     void setUpItineraries() {
       // given
       // Walk for 12 minute
-      walk = newItinerary(A, T11_06).walk(D12m, E).build();
+      walk = newItinerary(A, T11_06).walk(D12_m, E).build();
       // Not optimal, takes longer than walking
       bus = newItinerary(A).bus(21, T11_06, T11_28, E).build();
     }

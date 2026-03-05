@@ -36,7 +36,6 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   private ConstrainedTransfer transferToNextLeg;
   private int generalizedCost;
   private Set<TransitAlert> alerts = Set.of();
-  private Double distanceMeters;
   private ViaLocationType fromViaLocationType;
   private ViaLocationType toViaLocationType;
 
@@ -61,7 +60,6 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     generalizedCost = original.generalizedCost();
     zoneId = original.zoneId();
     alerts = original.listTransitAlerts();
-    distanceMeters = original.distanceMeters();
     fareOffers = original.fareOffers();
     fromViaLocationType = original.fromViaLocationType();
     toViaLocationType = original.toViaLocationType();
@@ -191,15 +189,6 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
 
   public Set<TransitAlert> alerts() {
     return alerts;
-  }
-
-  public B withDistanceMeters(double distance) {
-    this.distanceMeters = distance;
-    return instance();
-  }
-
-  public Double distanceMeters() {
-    return distanceMeters;
   }
 
   public Float accessibilityScore() {

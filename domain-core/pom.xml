@@ -10,16 +10,7 @@
     </parent>
 
     <artifactId>domain-core</artifactId>
-    <name>OpenTripPlanner - Domain Code</name>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    <name>OpenTripPlanner - Domain Core</name>
 
     <dependencies>
         <dependency>
@@ -33,12 +24,17 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
         </dependency>
 
     </dependencies>

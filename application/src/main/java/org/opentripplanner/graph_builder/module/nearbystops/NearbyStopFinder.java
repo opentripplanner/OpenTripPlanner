@@ -2,8 +2,8 @@ package org.opentripplanner.graph_builder.module.nearbystops;
 
 import java.util.Collection;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
@@ -17,7 +17,7 @@ public interface NearbyStopFinder {
   Collection<NearbyStop> findNearbyStops(
     Vertex vertex,
     RouteRequest routingRequest,
-    StreetRequest streetRequest,
+    StreetMode streetMode,
     boolean reverseDirection
   );
 }

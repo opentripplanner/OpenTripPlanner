@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OJP version="2.0" xmlns="http://www.vdv.de/ojp" xmlns:ifopt="http://www.ifopt.org.uk/ifopt" xmlns:opengis="http://www.opengis.net/gml/3.2" xmlns:ns8="http://datex2.eu/schema/2_0RC1/2_0" xmlns:siri="http://www.siri.org.uk/siri" xmlns:acsb="http://www.ifopt.org.uk/acsb" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <OJPResponse>
+        <siri:ServiceDelivery>
+            <siri:ResponseTimestamp>2026-01-12T10:00:00Z</siri:ResponseTimestamp>
+            <siri:ProducerRef>OpenTripPlanner</siri:ProducerRef>
+            <OJPTripDelivery>
+                <siri:ResponseTimestamp>2026-01-12T10:00:00Z</siri:ResponseTimestamp>
+                <TripResponseContext>
+                    <Places>
+                        <Place>
+                            <StopPoint>
+                                <siri:StopPointRef>F:A</siri:StopPointRef>
+                                <StopPointName>
+                                    <Text xsi:type="siri:DefaultedTextStructure">A</Text>
+                                </StopPointName>
+                            </StopPoint>
+                            <Name>
+                                <Text xsi:type="siri:DefaultedTextStructure">A</Text>
+                            </Name>
+                            <GeoPosition>
+                                <siri:Longitude>8.0</siri:Longitude>
+                                <siri:Latitude>5.0</siri:Latitude>
+                            </GeoPosition>
+                        </Place>
+                        <Place>
+                            <StopPoint>
+                                <siri:StopPointRef>F:B</siri:StopPointRef>
+                                <StopPointName>
+                                    <Text xsi:type="siri:DefaultedTextStructure">B</Text>
+                                </StopPointName>
+                            </StopPoint>
+                            <Name>
+                                <Text xsi:type="siri:DefaultedTextStructure">B</Text>
+                            </Name>
+                            <GeoPosition>
+                                <siri:Longitude>8.5</siri:Longitude>
+                                <siri:Latitude>6.0</siri:Latitude>
+                            </GeoPosition>
+                        </Place>
+                        <Place>
+                            <StopPoint>
+                                <siri:StopPointRef>F:C</siri:StopPointRef>
+                                <StopPointName>
+                                    <Text xsi:type="siri:DefaultedTextStructure">C</Text>
+                                </StopPointName>
+                            </StopPoint>
+                            <Name>
+                                <Text xsi:type="siri:DefaultedTextStructure">C</Text>
+                            </Name>
+                            <GeoPosition>
+                                <siri:Longitude>9.0</siri:Longitude>
+                                <siri:Latitude>7.0</siri:Latitude>
+                            </GeoPosition>
+                        </Place>
+                        <Place>
+                            <StopPoint>
+                                <siri:StopPointRef>F:D</siri:StopPointRef>
+                                <StopPointName>
+                                    <Text xsi:type="siri:DefaultedTextStructure">D</Text>
+                                </StopPointName>
+                            </StopPoint>
+                            <Name>
+                                <Text xsi:type="siri:DefaultedTextStructure">D</Text>
+                            </Name>
+                            <GeoPosition>
+                                <siri:Longitude>9.5</siri:Longitude>
+                                <siri:Latitude>8.0</siri:Latitude>
+                            </GeoPosition>
+                        </Place>
+                    </Places>
+                </TripResponseContext>
+                <TripResult>
+                    <Id>2d18c6f6-693e-3882-89da-77c0bcfc5f38</Id>
+                    <Trip>
+                        <Id>2d18c6f6-693e-3882-89da-77c0bcfc5f38</Id>
+                        <Duration>PT17M</Duration>
+                        <StartTime>2020-02-02T11:00:00Z</StartTime>
+                        <EndTime>2020-02-02T11:17:00Z</EndTime>
+                        <Transfers>2</Transfers>
+                        <Leg>
+                            <Id>0</Id>
+                            <Duration>PT3M</Duration>
+                            <ContinuousLeg>
+                                <LegStart>
+                                    <siri:StopPointRef>F:A</siri:StopPointRef>
+                                    <Name>
+                                        <Text xsi:type="siri:DefaultedTextStructure">A</Text>
+                                    </Name>
+                                </LegStart>
+                                <LegEnd>
+                                    <siri:StopPointRef>F:B</siri:StopPointRef>
+                                    <Name>
+                                        <Text xsi:type="siri:DefaultedTextStructure">B</Text>
+                                    </Name>
+                                </LegEnd>
+                                <Service>
+                                    <PersonalModeOfOperation>own</PersonalModeOfOperation>
+                                    <PersonalMode>foot</PersonalMode>
+                                </Service>
+                                <TimeWindowStart>2020-02-02T11:00:00Z</TimeWindowStart>
+                                <TimeWindowEnd>2020-02-02T11:03:00Z</TimeWindowEnd>
+                                <Duration>PT3M</Duration>
+                                <Length>252</Length>
+                            </ContinuousLeg>
+                        </Leg>
+                        <Leg>
+                            <Id>1</Id>
+                            <Duration>PT10M</Duration>
+                            <TimedLeg>
+                                <LegBoard>
+                                    <siri:StopPointRef>F:B</siri:StopPointRef>
+                                    <StopPointName>
+                                        <Text xsi:type="siri:DefaultedTextStructure">B</Text>
+                                    </StopPointName>
+                                    <ServiceDeparture>
+                                        <TimetabledTime>2020-02-02T11:05:00Z</TimetabledTime>
+                                    </ServiceDeparture>
+                                </LegBoard>
+                                <LegAlight>
+                                    <siri:StopPointRef>F:C</siri:StopPointRef>
+                                    <StopPointName>
+                                        <Text xsi:type="siri:DefaultedTextStructure">C</Text>
+                                    </StopPointName>
+                                    <ServiceArrival>
+                                        <TimetabledTime>2020-02-02T11:15:00Z</TimetabledTime>
+                                    </ServiceArrival>
+                                </LegAlight>
+                                <Service>
+                                    <OperatingDayRef>2020-02-02</OperatingDayRef>
+                                    <JourneyRef>F:1</JourneyRef>
+                                    <PublicCode>1</PublicCode>
+                                    <siri:LineRef>F:1</siri:LineRef>
+                                    <siri:DirectionRef>UNKNOWN</siri:DirectionRef>
+                                    <Mode>
+                                        <PtMode>bus</PtMode>
+                                    </Mode>
+                                    <PublishedServiceName>
+                                        <Text xsi:type="siri:DefaultedTextStructure">1</Text>
+                                    </PublishedServiceName>
+                                    <OriginStopPointRef>F:B</OriginStopPointRef>
+                                    <OriginText>
+                                        <Text xsi:type="siri:DefaultedTextStructure">B</Text>
+                                    </OriginText>
+                                    <siri:OperatorRef>F:A1</siri:OperatorRef>
+                                    <DestinationStopPointRef>F:C</DestinationStopPointRef>
+                                    <DestinationText>
+                                        <Text xsi:type="siri:DefaultedTextStructure">Trip headsign 1</Text>
+                                    </DestinationText>
+                                </Service>
+                            </TimedLeg>
+                        </Leg>
+                        <Leg>
+                            <Id>2</Id>
+                            <Duration>PT2M</Duration>
+                            <ContinuousLeg>
+                                <LegStart>
+                                    <siri:StopPointRef>F:C</siri:StopPointRef>
+                                    <Name>
+                                        <Text xsi:type="siri:DefaultedTextStructure">C</Text>
+                                    </Name>
+                                </LegStart>
+                                <LegEnd>
+                                    <siri:StopPointRef>F:D</siri:StopPointRef>
+                                    <Name>
+                                        <Text xsi:type="siri:DefaultedTextStructure">D</Text>
+                                    </Name>
+                                </LegEnd>
+                                <Service>
+                                    <PersonalModeOfOperation>own</PersonalModeOfOperation>
+                                    <PersonalMode>foot</PersonalMode>
+                                </Service>
+                                <TimeWindowStart>2020-02-02T11:15:00Z</TimeWindowStart>
+                                <TimeWindowEnd>2020-02-02T11:17:00Z</TimeWindowEnd>
+                                <Duration>PT2M</Duration>
+                                <Length>168</Length>
+                            </ContinuousLeg>
+                        </Leg>
+                    </Trip>
+                </TripResult>
+            </OJPTripDelivery>
+        </siri:ServiceDelivery>
+    </OJPResponse>
+</OJP>

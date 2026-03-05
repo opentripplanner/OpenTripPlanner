@@ -8,6 +8,7 @@ import org.opentripplanner.ext.fares.service.gtfs.v1.custom.CombineInterlinedLeg
 import org.opentripplanner.ext.fares.service.gtfs.v1.custom.HSLFareServiceFactory;
 import org.opentripplanner.ext.fares.service.gtfs.v1.custom.HighestFareInFreeTransferWindowFareServiceFactory;
 import org.opentripplanner.ext.fares.service.gtfs.v1.custom.OrcaFareFactory;
+import org.opentripplanner.ext.fares.service.gtfs.v2.custom.OregonHopFareFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
@@ -75,6 +76,7 @@ public class FaresConfiguration {
       case "hsl" -> new HSLFareServiceFactory();
       case "atlanta" -> new AtlantaFareServiceFactory();
       case "orca" -> new OrcaFareFactory();
+      case "hop" -> new OregonHopFareFactory();
       case "combine-interlined-legs" -> new CombineInterlinedLegsFactory();
       default -> throw new IllegalArgumentException(String.format("Unknown fare type: '%s'", type));
     };

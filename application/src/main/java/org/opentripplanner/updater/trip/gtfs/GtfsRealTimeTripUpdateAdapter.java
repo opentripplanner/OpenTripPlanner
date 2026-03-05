@@ -1,7 +1,5 @@
 package org.opentripplanner.updater.trip.gtfs;
 
-import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED;
-import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.DELETED;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_DUPLICATED;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_UNSCHEDULED;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
@@ -11,7 +9,6 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.OUTSID
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
-import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
 import com.google.transit.realtime.GtfsRealtime;
@@ -24,21 +21,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
-import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
@@ -52,23 +46,15 @@ import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Adapts from GTFS-RT TripUpdates to OTP's internal real-time data model.
  */
 public class GtfsRealTimeTripUpdateAdapter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GtfsRealTimeTripUpdateAdapter.class);
-
   /**
    * A synchronized cache of trip patterns added to the timetable repository
    * due to GTFS-realtime messages.
-   * <p>
-   * This has "Siri" in the name because we are combining the two versions very carefully, step by
-   * step. Once this process is complete, we will clean up the name and move it to an appropriate
-   * package.
    **/
   private final TripPatternCache tripPatternCache;
 
@@ -78,8 +64,6 @@ public class GtfsRealTimeTripUpdateAdapter {
    * timetable snapshot.
    */
   private final TransitEditorService transitEditorService;
-
-  private final DeduplicatorService deduplicator;
 
   private final TimetableSnapshotManager snapshotManager;
   private final Supplier<LocalDate> localDateNow;
@@ -100,7 +84,6 @@ public class GtfsRealTimeTripUpdateAdapter {
       timetableRepository,
       snapshotManager.getTimetableSnapshotBuffer()
     );
-    this.deduplicator = deduplicator;
     this.tripTimesUpdater = new TripTimesUpdater(timetableRepository.getTimeZone(), deduplicator);
     this.tripPatternCache = new TripPatternCache(
       new TripPatternIdGenerator(),
@@ -151,11 +134,6 @@ public class GtfsRealTimeTripUpdateAdapter {
           continue;
         }
 
-        // Determine what kind of trip update this is
-        if (updateIncrementality == DIFFERENTIAL) {
-          purgePatternModifications(tripUpdate);
-        }
-
         result = applyUpdate(
           tripUpdate,
           updateIncrementality,
@@ -195,47 +173,6 @@ public class GtfsRealTimeTripUpdateAdapter {
       case UNSCHEDULED -> UpdateError.result(tripUpdate.tripId(), NOT_IMPLEMENTED_UNSCHEDULED);
       case DUPLICATED -> UpdateError.result(tripUpdate.tripId(), NOT_IMPLEMENTED_DUPLICATED);
     };
-  }
-
-  /**
-   * Remove previous realtime updates for this trip. This is necessary to avoid previous stop
-   * pattern modifications from persisting. If a trip was previously added with the
-   * ScheduleRelationship NEW and is now cancelled or deleted, we still want to keep the realtime
-   * added trip pattern.
-   */
-  private void purgePatternModifications(TripUpdate tripUpdate) {
-    final TripPattern pattern = snapshotManager.getNewTripPatternForModifiedTrip(
-      tripUpdate.tripId(),
-      tripUpdate.serviceDate()
-    );
-    if (
-      !isPreviouslyAddedTrip(tripUpdate, pattern) ||
-      (tripUpdate.scheduleRelationship() != CANCELED &&
-        tripUpdate.scheduleRelationship() != DELETED)
-    ) {
-      // Remove previous realtime updates for this trip. This is necessary to avoid previous
-      // stop pattern modifications from persisting. If a trip was previously added with the ScheduleRelationship
-      // NEW and is now cancelled or deleted, we still want to keep the realtime added trip pattern.
-      this.snapshotManager.revertTripToScheduledTripPattern(
-        tripUpdate.tripId(),
-        tripUpdate.serviceDate()
-      );
-    }
-  }
-
-  private boolean isPreviouslyAddedTrip(TripUpdate update, TripPattern pattern) {
-    if (pattern == null) {
-      return false;
-    }
-    var timetable = snapshotManager.resolve(pattern, update.serviceDate());
-    if (timetable == null) {
-      return false;
-    }
-    var tripTimes = timetable.getTripTimes(update.tripId());
-    if (tripTimes == null) {
-      return false;
-    }
-    return tripTimes.getRealTimeState() == RealTimeState.ADDED;
   }
 
   private Result<UpdateSuccess, UpdateError> handleScheduledTrip(
@@ -305,14 +242,18 @@ public class GtfsRealTimeTripUpdateAdapter {
       // Get cached trip pattern or create one if it doesn't exist yet
       final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(newStopPattern, trip);
 
-      cancelScheduledTrip(tripUpdate.tripId(), tripUpdate.serviceDate(), CancelationType.DELETE);
       return snapshotManager.updateBuffer(
-        new RealTimeTripUpdate(newPattern, updatedTripTimes, tripUpdate.serviceDate())
+        RealTimeTripUpdate.of(newPattern, updatedTripTimes, tripUpdate.serviceDate())
+          .withRevertPreviousRealTimeUpdates(true)
+          .withHideTripInScheduledPattern(pattern)
+          .build()
       );
     } else {
       // Set the updated trip times in the buffer
       return snapshotManager.updateBuffer(
-        new RealTimeTripUpdate(pattern, updatedTripTimes, tripUpdate.serviceDate())
+        RealTimeTripUpdate.of(pattern, updatedTripTimes, tripUpdate.serviceDate())
+          .withRevertPreviousRealTimeUpdates(true)
+          .build()
       );
     }
   }
@@ -434,99 +375,31 @@ public class GtfsRealTimeTripUpdateAdapter {
     RealTimeTripTimes tripTimes = tripTimesWithStopPattern.tripTimes();
     Trip trip = tripTimes.getTrip();
 
-    if (realTimeState == RealTimeState.MODIFIED) {
-      // Mark scheduled trip as DELETED
-      cancelScheduledTrip(trip.getId(), serviceDate, CancelationType.DELETE);
-    }
-
     // Create StopPattern
     final StopPattern stopPattern = tripTimesWithStopPattern.stopPattern();
 
     // Get cached trip pattern or create one if it doesn't exist yet
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip);
 
+    // Look up the scheduled pattern for MODIFIED trips so the manager can mark it as deleted
+    TripPattern hideTripInScheduledPattern = null;
+    if (realTimeState == RealTimeState.MODIFIED) {
+      hideTripInScheduledPattern = getPatternForTripId(trip.getId());
+    }
+
     // Add new trip times to the buffer
-    return snapshotManager.updateBuffer(
-      new RealTimeTripUpdate(
-        pattern,
-        tripTimes,
-        serviceDate,
-        realTimeState == RealTimeState.ADDED
-          ? TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(serviceDate).build()
-          : null,
-        realTimeState == RealTimeState.ADDED,
-        hasANewRouteBeenCreated
-      )
-    );
-  }
-
-  /**
-   * Cancel scheduled trip in buffer given trip id  on service date
-   *
-   * @return true if scheduled trip was cancelled
-   */
-  private boolean cancelScheduledTrip(
-    final FeedScopedId tripId,
-    final LocalDate serviceDate,
-    CancelationType cancelationType
-  ) {
-    boolean success = false;
-
-    final TripPattern pattern = getPatternForTripId(tripId);
-
-    if (pattern != null) {
-      // Cancel scheduled trip times for this trip in this pattern
-      final Timetable timetable = pattern.getScheduledTimetable();
-      var tripTimes = timetable.getTripTimes(tripId);
-      if (tripTimes != null) {
-        cancelTrip(serviceDate, cancelationType, pattern, tripTimes);
-        success = true;
-      }
+    var builder = RealTimeTripUpdate.of(pattern, tripTimes, serviceDate)
+      .withRouteCreation(hasANewRouteBeenCreated)
+      .withRevertPreviousRealTimeUpdates(true)
+      .withHideTripInScheduledPattern(hideTripInScheduledPattern);
+    if (realTimeState == RealTimeState.ADDED) {
+      builder
+        .withAddedTripOnServiceDate(
+          TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(serviceDate).build()
+        )
+        .withTripCreation(true);
     }
-
-    return success;
-  }
-
-  /**
-   * Cancel previously added trip from buffer if there is a previously added trip with given trip id
-   * on service date. This does not remove the added trip from the buffer, it just marks it as
-   * canceled or deleted. Any TripPattern that was created for the added trip continues to exist,
-   * and will be reused if a similar added trip message is received with the same route and stop
-   * sequence.
-   *
-   * @return true if a previously added trip was cancelled
-   */
-  private boolean cancelPreviouslyAddedTrip(TripUpdate update, CancelationType cancelationType) {
-    boolean cancelledAddedTrip = false;
-
-    final TripPattern pattern = snapshotManager.getNewTripPatternForModifiedTrip(
-      update.tripId(),
-      update.serviceDate()
-    );
-    if (isPreviouslyAddedTrip(update, pattern)) {
-      // Cancel trip times for this trip in this pattern
-      final Timetable timetable = snapshotManager.resolve(pattern, update.serviceDate());
-      var tripTimes = timetable.getTripTimes(update.tripId());
-      if (tripTimes != null) {
-        cancelTrip(update.serviceDate(), cancelationType, pattern, tripTimes);
-        cancelledAddedTrip = true;
-      }
-    }
-    return cancelledAddedTrip;
-  }
-
-  private void cancelTrip(
-    LocalDate serviceDate,
-    CancelationType cancelationType,
-    TripPattern pattern,
-    TripTimes tripTimes
-  ) {
-    final RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
-    switch (cancelationType) {
-      case CANCEL -> builder.cancelTrip();
-      case DELETE -> builder.deleteTrip();
-    }
-    snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, builder.build(), serviceDate));
+    return snapshotManager.updateBuffer(builder.build());
   }
 
   /**
@@ -562,25 +435,51 @@ public class GtfsRealTimeTripUpdateAdapter {
     CancelationType cancelationType,
     UpdateIncrementality incrementality
   ) {
-    var canceledPreviouslyAddedTrip =
-      incrementality != FULL_DATASET && cancelPreviouslyAddedTrip(tripUpdate, cancelationType);
-
-    // if previously an added trip was removed, there can't be a scheduled trip to remove
-    if (canceledPreviouslyAddedTrip) {
-      return Result.success(UpdateSuccess.noWarnings());
+    // For DIFFERENTIAL updates, try to cancel a previously added trip
+    if (incrementality != FULL_DATASET) {
+      var addedPattern = snapshotManager.getNewTripPatternForModifiedTrip(
+        tripUpdate.tripId(),
+        tripUpdate.serviceDate()
+      );
+      if (addedPattern != null) {
+        var timetable = snapshotManager.resolve(addedPattern, tripUpdate.serviceDate());
+        if (timetable != null) {
+          var tripTimes = timetable.getTripTimes(tripUpdate.tripId());
+          if (tripTimes != null && tripTimes.getRealTimeState() == RealTimeState.ADDED) {
+            var builder = tripTimes.createRealTimeFromScheduledTimes();
+            switch (cancelationType) {
+              case CANCEL -> builder.cancelTrip();
+              case DELETE -> builder.deleteTrip();
+            }
+            return snapshotManager.updateBuffer(
+              RealTimeTripUpdate.of(addedPattern, builder.build(), tripUpdate.serviceDate()).build()
+            );
+          }
+        }
+      }
     }
-    // Try to cancel scheduled trip
-    final boolean cancelScheduledSuccess = cancelScheduledTrip(
-      tripUpdate.tripId(),
-      tripUpdate.serviceDate(),
-      cancelationType
-    );
 
-    if (!cancelScheduledSuccess) {
+    // Cancel the scheduled trip
+    var pattern = getPatternForTripId(tripUpdate.tripId());
+    if (pattern == null) {
       return UpdateError.result(tripUpdate.tripId(), NO_TRIP_FOR_CANCELLATION_FOUND);
     }
 
-    return Result.success(UpdateSuccess.noWarnings());
+    var tripTimes = pattern.getScheduledTimetable().getTripTimes(tripUpdate.tripId());
+    if (tripTimes == null) {
+      return UpdateError.result(tripUpdate.tripId(), NO_TRIP_FOR_CANCELLATION_FOUND);
+    }
+
+    var builder = tripTimes.createRealTimeFromScheduledTimes();
+    switch (cancelationType) {
+      case CANCEL -> builder.cancelTrip();
+      case DELETE -> builder.deleteTrip();
+    }
+    return snapshotManager.updateBuffer(
+      RealTimeTripUpdate.of(pattern, builder.build(), tripUpdate.serviceDate())
+        .withRevertPreviousRealTimeUpdates(true)
+        .build()
+    );
   }
 
   /**

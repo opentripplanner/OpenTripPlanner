@@ -22,7 +22,7 @@ public class DebugTimingAggregator {
 
   private static final Logger LOG = LoggerFactory.getLogger(DebugTimingAggregator.class);
 
-  private static final long nanosToMillis = 1000000;
+  private static final long NANOS_TO_MILLIS = 1000000;
   public static final String ROUTING_TOTAL = "routing.total";
   public static final String ROUTING_RAPTOR = "routing.raptor";
 
@@ -346,6 +346,6 @@ public class DebugTimingAggregator {
   }
 
   private void log(String msg, long nanos) {
-    messages.add(String.format("%-36s: %5s ms", msg, nanos / nanosToMillis));
+    messages.add(String.format("%-36s: %5s ms", msg, nanos / NANOS_TO_MILLIS));
   }
 }

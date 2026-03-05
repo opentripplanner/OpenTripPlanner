@@ -2,7 +2,7 @@ package org.opentripplanner.service.worldenvelope.model;
 
 import java.util.Collection;
 import java.util.function.Function;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Calculates lower/upper right/left latitude and longitude of all the coordinates.

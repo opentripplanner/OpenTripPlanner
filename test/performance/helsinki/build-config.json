@@ -4,11 +4,11 @@
   "staticParkAndRide": false,
   "includeInclinedEdgeLevelInfo": true,
   "subwayAccessTime": 0,
-  "maxAreaNodes": 50,
+  "maxAreaNodes": 1000,
   "maxTransferDuration": "26m",
   "multiThreadElevationCalculations": true,
-  "transitServiceStart": "2026-01-01",
-  "transitServiceEnd": "2026-01-31",
+  "transitServiceStart": "2026-02-01",
+  "transitServiceEnd": "2026-02-28",
   "transitModelTimeZone": "Europe/Helsinki",
   "fares": "hsl",
   "transferRequests": [
@@ -40,13 +40,13 @@
   "transitFeeds": [
     {
       "type": "gtfs",
-      "source": "https://otp-performance.leonard.io/data/helsinki/hsl-gtfs-2026-01-12.zip",
+      "source": "https://otp-performance.leonard.io/data/helsinki/hsl-gtfs-2026-02-19.zip",
       "feedId": "HSL"
     }
   ],
   "osm": [
     {
-      "source": "https://otp-performance.leonard.io/data/helsinki/hsl-2026-01-12.osm.pbf"
+      "source": "https://otp-performance.leonard.io/data/helsinki/hsl-2026-02-19.osm.pbf"
     }
   ]
 }

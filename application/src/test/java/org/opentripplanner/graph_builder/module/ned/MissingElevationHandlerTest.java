@@ -12,8 +12,8 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.core.model.i18n.LocalizedStringFormat;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetElevationExtensionBuilder;
@@ -22,7 +22,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 
 class MissingElevationHandlerTest {
 
-  private static final DataImportIssueStore issueStore = DefaultDataImportIssueStore.NOOP;
+  private static final DataImportIssueStore ISSUE_STORE = DefaultDataImportIssueStore.NOOP;
 
   private StreetEdge AB;
   private StreetEdge BC;
@@ -102,7 +102,7 @@ class MissingElevationHandlerTest {
 
   @Test
   void zeroPropagationDistance() {
-    var subject = new MissingElevationHandler(issueStore, elevations, 0);
+    var subject = new MissingElevationHandler(ISSUE_STORE, elevations, 0);
 
     subject.run();
 
@@ -125,7 +125,7 @@ class MissingElevationHandlerTest {
 
   @Test
   void smallPropagationDistance() {
-    var subject = new MissingElevationHandler(issueStore, elevations, 20);
+    var subject = new MissingElevationHandler(ISSUE_STORE, elevations, 20);
 
     subject.run();
 
@@ -150,7 +150,7 @@ class MissingElevationHandlerTest {
 
   @Test
   void partialPropagationDistance() {
-    var subject = new MissingElevationHandler(issueStore, elevations, 150);
+    var subject = new MissingElevationHandler(ISSUE_STORE, elevations, 150);
 
     subject.run();
 
@@ -177,7 +177,7 @@ class MissingElevationHandlerTest {
 
   @Test
   void fullPropagationDistance() {
-    var subject = new MissingElevationHandler(issueStore, elevations, 300);
+    var subject = new MissingElevationHandler(ISSUE_STORE, elevations, 300);
 
     subject.run();
 

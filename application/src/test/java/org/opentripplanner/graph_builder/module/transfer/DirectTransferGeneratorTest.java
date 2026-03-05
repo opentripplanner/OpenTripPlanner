@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.module.TransferParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.street.model.StreetMode;
 
 /**
  * This test uses the following graph/network for testing the DirectTransfer generation. The
@@ -24,7 +24,7 @@ class DirectTransferGeneratorTest {
   private static final RouteRequest REQUEST_WITH_BIKE_TRANSFER = RouteRequest.of()
     .withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.BIKE)))
     .buildDefault();
-  private static final TransferParameters TX_BIKES_ALLOWED_1H = new TransferParameters(
+  private static final TransferParameters TX_BIKES_ALLOWED_1_h = new TransferParameters(
     null,
     null,
     Duration.parse("PT1H"),
@@ -283,7 +283,7 @@ class DirectTransferGeneratorTest {
         .withPatterns()
         .withStreetGraph()
         .withTransferRequests(REQUEST_WITH_BIKE_TRANSFER)
-        .addTransferParameters(StreetMode.BIKE, TX_BIKES_ALLOWED_1H)
+        .addTransferParameters(StreetMode.BIKE, TX_BIKES_ALLOWED_1_h)
         .build();
 
       var bikeTransfers = repository.findTransfersByMode(StreetMode.BIKE);
@@ -304,7 +304,7 @@ class DirectTransferGeneratorTest {
         .withPatterns()
         .withStreetGraph()
         .withTransferRequests(REQUEST_WITH_BIKE_TRANSFER)
-        .addTransferParameters(StreetMode.BIKE, TX_BIKES_ALLOWED_1H)
+        .addTransferParameters(StreetMode.BIKE, TX_BIKES_ALLOWED_1_h)
         .build();
 
       var bikeTransfers = repository.findTransfersByMode(StreetMode.BIKE);

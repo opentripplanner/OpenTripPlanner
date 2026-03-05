@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 class GbfsFeedLoaderTest {
 
-  private static final OtpHttpClient otpHttpClient = new OtpHttpClientFactory().create(
+  private static final OtpHttpClient OTP_HTTP_CLIENT = new OtpHttpClientFactory().create(
     LoggerFactory.getLogger(GbfsFeedLoaderTest.class)
   );
 
@@ -34,7 +34,7 @@ class GbfsFeedLoaderTest {
     GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/ridecheck/almere/gbfs.json",
       HttpHeaders.empty(),
-      otpHttpClient
+      OTP_HTTP_CLIENT
     );
 
     assertTrue(loader.update());

@@ -4,7 +4,7 @@ import static org.opentripplanner.apis.transmodel.mapping.preferences.RentalPref
 
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
-import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 
 public class BikePreferencesMapper {
 

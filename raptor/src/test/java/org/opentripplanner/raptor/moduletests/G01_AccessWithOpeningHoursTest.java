@@ -128,7 +128,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("openInSearchIntervalTestCases")
   public void openInSearchIntervalTest(RaptorModuleTestCase testCase) {
-    requestBuilder.searchParams().addAccessPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00));
+    requestBuilder.searchParams().addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_00, T01_00));
     assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 
@@ -144,7 +144,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
         r
           .searchParams()
           .earliestDepartureTime(T24_10)
-          .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00))
+          .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_00, T01_00))
       )
       .add(standard().manyIterations(), withoutCost(expected.all()))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
@@ -173,7 +173,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
         r
           .searchParams()
           .searchWindow(Duration.ofHours(1))
-          .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_23, T01_00))
+          .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_23, T01_00))
       )
       .add(TC_STANDARD, withoutCost(expected.first(3)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
@@ -205,7 +205,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
         r
           .searchParams()
           .searchWindow(Duration.ofHours(1))
-          .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_20))
+          .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_00, T00_20))
       )
       .add(TC_STANDARD, withoutCost(expected.get(0, 1, 2, 4)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
@@ -239,7 +239,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
           .searchWindow(Duration.ofMinutes(30))
           .earliestDepartureTime(T24_10)
           .latestArrivalTime(T25_00)
-          .addAccessPaths(walk(STOP_B, D2m).openingHours(T00_18, T00_20))
+          .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_18, T00_20))
       )
       .add(TC_STANDARD, withoutCost(expected.all()))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))

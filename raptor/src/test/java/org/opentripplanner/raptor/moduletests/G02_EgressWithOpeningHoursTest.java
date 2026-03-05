@@ -39,7 +39,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
   private static final int T00_35 = hm2time(0, 35);
   private static final int T24_10 = hm2time(24, 10);
   private static final int T25_00 = hm2time(25, 0);
-  private static final Duration D15m = Duration.ofMinutes(15);
+  private static final Duration D15_m = Duration.ofMinutes(15);
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
@@ -63,7 +63,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       .searchParams()
       .earliestDepartureTime(T00_10)
       .latestArrivalTime(T25_00)
-      .searchWindow(D15m)
+      .searchWindow(D15_m)
       .timetable(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data);
@@ -78,7 +78,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
     );
 
     return RaptorModuleTestCase.of()
-      .withRequest(r -> r.searchParams().addEgressPaths(walk(STOP_B, D2m)))
+      .withRequest(r -> r.searchParams().addEgressPaths(walk(STOP_B, D2_m)))
       .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.first(3)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
@@ -107,7 +107,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase.of()
       .withRequest(r ->
-        r.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00))
+        r.searchParams().addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_00, T01_00))
       )
       .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.first(3)))
@@ -133,7 +133,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
         r
           .searchParams()
           .earliestDepartureTime(T24_10)
-          .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T01_00))
+          .addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_00, T01_00))
       )
       .addMinDuration("12m", TX_0, T24_10, T25_00)
       .add(standard(), withoutCost(expected))
@@ -155,7 +155,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase.of()
       .withRequest(r ->
-        r.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_00, T00_25))
+        r.searchParams().addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_00, T00_25))
       )
       .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.all()))
@@ -183,7 +183,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
           .earliestDepartureTime(T24_10)
           .latestArrivalTime(T25_00)
           .searchWindow(Duration.ofMinutes(30))
-          .addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_40))
+          .addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_25, T00_40))
       )
       .addMinDuration("12m", TX_0, T24_10, T25_00)
       .add(standard(), withoutCost(expected))
@@ -207,7 +207,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
     return RaptorModuleTestCase.of()
       .withRequest(r ->
-        r.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHours(T00_25, T00_35))
+        r.searchParams().addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_25, T00_35))
       )
       .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.first(3)))
@@ -230,7 +230,7 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
   private static List<RaptorModuleTestCase> closedTestCase() {
     return RaptorModuleTestCase.of()
-      .withRequest(r -> r.searchParams().addEgressPaths(walk(STOP_B, D2m).openingHoursClosed()))
+      .withRequest(r -> r.searchParams().addEgressPaths(walk(STOP_B, D2_m).openingHoursClosed()))
       .add(minDuration())
       .add(standard())
       .add(multiCriteria())

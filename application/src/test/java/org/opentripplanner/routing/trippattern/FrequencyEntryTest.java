@@ -19,7 +19,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 public class FrequencyEntryTest {
 
   private static final int STOP_NUM = 8;
-  private static final ScheduledTripTimes tripTimes;
+  private static final ScheduledTripTimes TRIP_TIMES;
 
   static {
     Trip trip = TimetableRepositoryForTest.trip("testtrip").build();
@@ -44,7 +44,7 @@ public class FrequencyEntryTest {
       stopTimes.add(stopTime);
     }
 
-    tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
+    TRIP_TIMES = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
   }
 
   @Test
@@ -122,8 +122,8 @@ public class FrequencyEntryTest {
 
   private static FrequencyEntry make(int startTime, int endTime, int headwaySecs, boolean exact) {
     return new FrequencyEntry(
-      new Frequency(tripTimes.getTrip(), startTime, endTime, headwaySecs, exact),
-      tripTimes
+      new Frequency(TRIP_TIMES.getTrip(), startTime, endTime, headwaySecs, exact),
+      TRIP_TIMES
     );
   }
 }

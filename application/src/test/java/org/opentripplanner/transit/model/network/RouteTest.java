@@ -39,7 +39,7 @@ class RouteTest {
   private static final Integer GTFS_SORT_ORDER = 0;
   private static final String URL = "url";
   public static final Agency AGENCY = TimetableRepositoryForTest.AGENCY;
-  private static final Route subject = Route.of(TimetableRepositoryForTest.id(ID))
+  private static final Route SUBJECT = Route.of(TimetableRepositoryForTest.id(ID))
     .withShortName(SHORT_NAME)
     .withLongName(LONG_NAME)
     .withDescription(DESCRIPTION)
@@ -59,19 +59,19 @@ class RouteTest {
 
   @Test
   void copy() {
-    assertEquals(ID, subject.getId().getId());
+    assertEquals(ID, SUBJECT.getId().getId());
 
     // Make a copy, and set the same name (nothing is changed)
-    var copy = subject.copy().withShortName(SHORT_NAME).build();
+    var copy = SUBJECT.copy().withShortName(SHORT_NAME).build();
 
-    assertSame(subject, copy);
+    assertSame(SUBJECT, copy);
 
     // Copy and change name
-    copy = subject.copy().withShortName("v2").build();
+    copy = SUBJECT.copy().withShortName("v2").build();
 
     // The two objects are not the same instance, but are equal(same id)
-    assertNotSame(subject, copy);
-    assertEquals(subject, copy);
+    assertNotSame(SUBJECT, copy);
+    assertEquals(SUBJECT, copy);
 
     assertEquals(ID, copy.getId().getId());
     assertEquals("v2", copy.getShortName());
@@ -93,18 +93,17 @@ class RouteTest {
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withShortName("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withLongName(new NonLocalizedString("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withDescription("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withBikesAllowed(BikeAccess.NOT_ALLOWED).build()));
-    assertFalse(subject.sameAs(subject.copy().withMode(TransitMode.RAIL).build()));
-    assertFalse(subject.sameAs(subject.copy().withNetexSubmode("X").build()));
+    assertTrue(SUBJECT.sameAs(SUBJECT.copy().build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withId(TimetableRepositoryForTest.id("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withShortName("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withLongName(new NonLocalizedString("X")).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withDescription("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withBikesAllowed(BikeAccess.NOT_ALLOWED).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withMode(TransitMode.RAIL).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withNetexSubmode("X").build()));
     assertFalse(
-      subject.sameAs(
-        subject
-          .copy()
+      SUBJECT.sameAs(
+        SUBJECT.copy()
           .withOperator(
             Operator.of(FeedScopedId.parse("x:otherOperatorId"))
               .withName("other operator name")
@@ -114,21 +113,20 @@ class RouteTest {
       )
     );
     assertFalse(
-      subject.sameAs(subject.copy().withAgency(TimetableRepositoryForTest.agency("X")).build())
+      SUBJECT.sameAs(SUBJECT.copy().withAgency(TimetableRepositoryForTest.agency("X")).build())
     );
     assertFalse(
-      subject.sameAs(
-        subject
-          .copy()
+      SUBJECT.sameAs(
+        SUBJECT.copy()
           .withBranding(Branding.of(FeedScopedId.parse("x:otherBrandingId")).build())
           .build()
       )
     );
-    assertFalse(subject.sameAs(subject.copy().withColor("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withTextColor("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withGtfsType(-1).build()));
-    assertFalse(subject.sameAs(subject.copy().withGtfsSortOrder(99).build()));
-    assertFalse(subject.sameAs(subject.copy().withFlexibleLineType("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withColor("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withTextColor("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withGtfsType(-1).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withGtfsSortOrder(99).build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withFlexibleLineType("X").build()));
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withUrl("X").build()));
   }
 }

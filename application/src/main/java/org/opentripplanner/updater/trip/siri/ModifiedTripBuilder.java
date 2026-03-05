@@ -55,7 +55,8 @@ class ModifiedTripBuilder {
     EstimatedVehicleJourney journey,
     LocalDate serviceDate,
     ZoneId zoneId,
-    EntityResolver entityResolver
+    EntityResolver entityResolver,
+    List<CallWrapper> calls
   ) {
     this.existingTripTimes = existingTripTimes;
     this.pattern = pattern;
@@ -63,7 +64,7 @@ class ModifiedTripBuilder {
     this.zoneId = zoneId;
     this.entityResolver = entityResolver;
 
-    calls = CallWrapper.of(journey);
+    this.calls = calls;
     cancellation = TRUE.equals(journey.isCancellation());
     predictionInaccurate = TRUE.equals(journey.isPredictionInaccurate());
     occupancy = journey.getOccupancy();

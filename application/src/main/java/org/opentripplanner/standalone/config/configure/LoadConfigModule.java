@@ -4,14 +4,14 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import java.io.File;
+import org.opentripplanner.core.framework.di.TransitServicePeriod;
+import org.opentripplanner.core.model.time.LocalDateInterval;
 import org.opentripplanner.datastore.api.OtpBaseDirectory;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
-import org.opentripplanner.model.calendar.LocalDateInterval;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
-import org.opentripplanner.standalone.config.api.TransitServicePeriod;
 
 /**
  * Load and create the {@link ConfigModel} using the provided configuration file

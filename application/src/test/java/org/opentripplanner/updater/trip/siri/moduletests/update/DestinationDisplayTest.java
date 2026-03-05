@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip.siri.moduletests.update;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitTestEnvironment;
@@ -52,7 +53,7 @@ class DestinationDisplayTest implements RealtimeTestConstants {
 
     var result = siri.applyEstimatedTimetable(update);
 
-    assertEquals(1, result.successful());
+    assertSuccess(result);
 
     var tt = env.tripData(TRIP_1_ID).tripTimes();
     assertEquals("Updated A", tt.getHeadsign(0).toString());

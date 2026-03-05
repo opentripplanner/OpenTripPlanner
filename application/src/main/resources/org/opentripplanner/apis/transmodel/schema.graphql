@@ -252,6 +252,8 @@ type EstimatedCall {
   expectedArrivalTime: DateTime!
   "Expected time of departure from quay. Updated with real time information if available."
   expectedDepartureTime: DateTime!
+  "Whether this call is an extra call introduced by real-time data"
+  extraCall: Boolean!
   "Whether vehicle may be alighted at quay."
   forAlighting: Boolean!
   "Whether vehicle may be boarded at quay."

@@ -12,26 +12,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Distance;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Money;
 
 class DistancesTest {
 
-  private static final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final Place INNER_ZONE_STOP = Place.forStop(
-    testModel.stop("inner city stop").withCoordinate(1, 1).build()
+    TEST_MODEL.stop("inner city stop").withCoordinate(1, 1).build()
   );
   private static final Place OUTER_ZONE_STOP = Place.forStop(
-    testModel.stop("outer city stop").withCoordinate(2, 2).build()
+    TEST_MODEL.stop("outer city stop").withCoordinate(2, 2).build()
   );
   FeedScopedId INNER_ZONE = id("inner-zone");
   FeedScopedId OUTER_ZONE = id("outer-zone");
@@ -148,7 +148,7 @@ class DistancesTest {
 
   @Test
   void directDistance() {
-    Place dest = testModel.place(
+    Place dest = TEST_MODEL.place(
       "Destination",
       PlanTestConstants.A.coordinate.latitude(),
       PlanTestConstants.A.coordinate.longitude() + SphericalDistanceLibrary.metersToDegrees(5_000)

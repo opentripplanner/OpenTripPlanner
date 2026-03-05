@@ -14,24 +14,24 @@ import org.opentripplanner.utils.time.DurationUtils;
 
 public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {
 
-  private static final int D2m = DurationUtils.durationInSeconds("2m");
-  private static final int D32m20s = DurationUtils.durationInSeconds("32m20s");
-  private static final int TRANSIT_TIME = D32m20s;
+  private static final int D2_m = DurationUtils.durationInSeconds("2m");
+  private static final int D32_m_20_s = DurationUtils.durationInSeconds("32m20s");
+  private static final int TRANSIT_TIME = D32_m_20_s;
 
   private static final TestPathBuilder PATH_BUILDER = new TestPathBuilder(COST_CALCULATOR);
 
   private final MinSafeTransferTimeCalculator<TestTripSchedule> subject =
     new MinSafeTransferTimeCalculator<>(SLACK_PROVIDER);
-  RaptorPath<TestTripSchedule> path_1_bus_leg = PATH_BUILDER.access(time("10:00:15"), STOP_A, D2m)
+  RaptorPath<TestTripSchedule> path_1_bus_leg = PATH_BUILDER.access(time("10:00:15"), STOP_A, D2_m)
     .bus("L11", time("10:03"), TRANSIT_TIME, STOP_B)
-    .egress(D2m);
+    .egress(D2_m);
 
-  RaptorPath<TestTripSchedule> path_3_bus_legs = PATH_BUILDER.access(time("10:00:15"), STOP_A, D2m)
+  RaptorPath<TestTripSchedule> path_3_bus_legs = PATH_BUILDER.access(time("10:00:15"), STOP_A, D2_m)
     .bus("L1", time("10:03"), TRANSIT_TIME, STOP_B)
-    .walk(D2m, STOP_C)
+    .walk(D2_m, STOP_C)
     .bus("L2", time("10:45"), TRANSIT_TIME, STOP_D)
     .bus("L3", time("11:30"), TRANSIT_TIME, STOP_E)
-    .egress(D2m);
+    .egress(D2_m);
 
   @Test
   public void testMinSafeTransferTimeOneTransit() {

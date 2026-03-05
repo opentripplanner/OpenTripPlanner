@@ -7,21 +7,21 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 
 public class debugOutputImpl implements GraphQLDataFetchers.GraphQLDebugOutput {
 
-  private static final long nanosToMillis = 1000000;
+  private static final long NANOS_TO_MILLIS = 1000000;
 
   @Override
   public DataFetcher<Long> pathCalculationTime() {
-    return environment -> getSource(environment).transitRouterTime / nanosToMillis;
+    return environment -> getSource(environment).transitRouterTime / NANOS_TO_MILLIS;
   }
 
   @Override
   public DataFetcher<Long> precalculationTime() {
-    return environment -> getSource(environment).precalculationTime / nanosToMillis;
+    return environment -> getSource(environment).precalculationTime / NANOS_TO_MILLIS;
   }
 
   @Override
   public DataFetcher<Long> renderingTime() {
-    return environment -> getSource(environment).renderingTime / nanosToMillis;
+    return environment -> getSource(environment).renderingTime / NANOS_TO_MILLIS;
   }
 
   @Override
@@ -31,7 +31,7 @@ public class debugOutputImpl implements GraphQLDataFetchers.GraphQLDebugOutput {
 
   @Override
   public DataFetcher<Long> totalTime() {
-    return environment -> getSource(environment).totalTime / nanosToMillis;
+    return environment -> getSource(environment).totalTime / NANOS_TO_MILLIS;
   }
 
   private DebugOutput getSource(DataFetchingEnvironment environment) {

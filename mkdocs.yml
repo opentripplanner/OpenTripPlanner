@@ -132,3 +132,4 @@ nav:
     - Stop Consolidation: 'sandbox/StopConsolidation.md'
     - Sørlandsbanen: 'sandbox/Sorlandsbanen.md'
     - TRIAS API: 'sandbox/TriasApi.md'
+    - OpenJourneyPlanner API: 'sandbox/OjpApi.md'

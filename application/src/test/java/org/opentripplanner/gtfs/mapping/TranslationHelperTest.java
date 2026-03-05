@@ -23,11 +23,11 @@ public class TranslationHelperTest {
   private static final Collection<Translation> ALL_TRANSLATIONS = new ArrayList<>();
   private static final Collection<FeedInfo> FEED_INFOS = new ArrayList<>();
 
-  private static final TranslationHelper helper = new TranslationHelper();
+  private static final TranslationHelper HELPER = new TranslationHelper();
 
   //Translation's structure:
   //table_name,field_name,language,translation,record_id,record_sub_id,field_value
-  private static final String[][] translations = {
+  private static final String[][] TRANSLATIONS = {
     { "feed_info", "feed_publisher_name", "sv", "SV feed name", null, null, null },
     { "feed_info", "feed_publisher_url", "sv", "http://sv-feed-url", null, null, null },
     { "stops", "stop_name", "sv", "SV stop rec 1", "1", null, null },
@@ -45,19 +45,19 @@ public class TranslationHelperTest {
     feedInfo.setLang(LANGUAGE_FEED);
     FEED_INFOS.add(feedInfo);
 
-    for (int x = 0; x < translations.length; x++) {
+    for (int x = 0; x < TRANSLATIONS.length; x++) {
       Translation t = new Translation();
       t.setId(x + 1);
-      t.setTableName(translations[x][0]);
-      t.setFieldName(translations[x][1]);
-      t.setLanguage(translations[x][2]);
-      t.setTranslation(translations[x][3]);
-      t.setRecordId(translations[x][4]);
-      t.setRecordSubId(translations[x][5]);
-      t.setFieldValue(translations[x][6]);
+      t.setTableName(TRANSLATIONS[x][0]);
+      t.setFieldName(TRANSLATIONS[x][1]);
+      t.setLanguage(TRANSLATIONS[x][2]);
+      t.setTranslation(TRANSLATIONS[x][3]);
+      t.setRecordId(TRANSLATIONS[x][4]);
+      t.setRecordSubId(TRANSLATIONS[x][5]);
+      t.setFieldValue(TRANSLATIONS[x][6]);
       ALL_TRANSLATIONS.add(t);
     }
-    helper.importTranslations(ALL_TRANSLATIONS, FEED_INFOS);
+    HELPER.importTranslations(ALL_TRANSLATIONS, FEED_INFOS);
   }
 
   @Test
@@ -92,14 +92,14 @@ public class TranslationHelperTest {
     stops.add(s5);
 
     for (Stop stop : stops) {
-      I18NString nameTranslation = helper.getTranslation(
+      I18NString nameTranslation = HELPER.getTranslation(
         org.onebusaway.gtfs.model.Stop.class,
         "name",
         stop.getId().getId(),
         stop.getName()
       );
 
-      I18NString urlTranslation = helper.getTranslation(
+      I18NString urlTranslation = HELPER.getTranslation(
         org.onebusaway.gtfs.model.Stop.class,
         "url",
         stop.getId().getId(),
@@ -147,14 +147,14 @@ public class TranslationHelperTest {
     feed.setPublisherName("Feed name");
     feed.setPublisherUrl("http://feed-url");
 
-    I18NString nameTranslation = helper.getTranslation(
+    I18NString nameTranslation = HELPER.getTranslation(
       org.onebusaway.gtfs.model.FeedInfo.class,
       "publisherName",
       feed.getId(),
       feed.getPublisherName()
     );
 
-    I18NString urlTranslation = helper.getTranslation(
+    I18NString urlTranslation = HELPER.getTranslation(
       org.onebusaway.gtfs.model.FeedInfo.class,
       "publisherUrl",
       feed.getId(),
@@ -203,7 +203,7 @@ public class TranslationHelperTest {
         String.valueOf(stopTime.getStopSequence())
       );
 
-      I18NString headSignTranslation = helper.getTranslation(
+      I18NString headSignTranslation = HELPER.getTranslation(
         org.onebusaway.gtfs.model.StopTime.class,
         "stopHeadsign",
         id,

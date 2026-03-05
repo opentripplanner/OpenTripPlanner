@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class LiipiHubsDownloader {
 
   private static final Logger LOG = LoggerFactory.getLogger(LiipiHubsDownloader.class);
-  private static final ObjectMapper mapper = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private final String jsonParsePath;
   private final Function<JsonNode, Map<FeedScopedId, VehicleParkingGroup>> hubsParser;
@@ -75,7 +75,7 @@ public class LiipiHubsDownloader {
 
     String hubsString = convertStreamToString(dataStream);
 
-    JsonNode rootNode = mapper.readTree(hubsString);
+    JsonNode rootNode = MAPPER.readTree(hubsString);
 
     if (!jsonParsePath.isEmpty()) {
       String delimiter = "/";

@@ -1,6 +1,6 @@
 package org.opentripplanner.service.paging;
 
-import static org.opentripplanner.service.paging.TestPagingModel.D30m;
+import static org.opentripplanner.service.paging.TestPagingModel.D30_m;
 import static org.opentripplanner.service.paging.TestPagingModel.T12_00;
 import static org.opentripplanner.service.paging.TestPagingModel.T12_30;
 import static org.opentripplanner.service.paging.TestPagingModel.T13_00;
@@ -38,7 +38,7 @@ import org.opentripplanner.model.plan.paging.cursor.PageType;
 @SuppressWarnings("DataFlowIssue")
 class PS2_ManyParetoOptimalItinerariesTest {
 
-  private static final Duration SEARCH_WINDOW_USED = D30m;
+  private static final Duration SEARCH_WINDOW_USED = D30_m;
   private final TestPagingModel model = TestPagingModel.testDataWithManyItinerariesCaseA();
 
   /**

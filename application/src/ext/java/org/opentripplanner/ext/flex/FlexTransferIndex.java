@@ -3,7 +3,7 @@ package org.opentripplanner.ext.flex;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.internal.TransferIndex;
 import org.opentripplanner.transfer.regular.model.PathTransfer;

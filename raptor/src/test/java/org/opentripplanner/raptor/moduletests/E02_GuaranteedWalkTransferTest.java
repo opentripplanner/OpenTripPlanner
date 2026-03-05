@@ -77,7 +77,7 @@ public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
 
     // Make sure the slack have values which prevent a normal transfer.
     // The test scenario have zero seconds to transfer and a 30s walk leg, so any slack will do.
-    data.withSlackProvider(new TestSlackProvider(D30s, D20s, D10s));
+    data.withSlackProvider(new TestSlackProvider(D30_s, D20_s, D10_s));
 
     ModuleTestDebugLogging.setupDebugLogging(data);
   }

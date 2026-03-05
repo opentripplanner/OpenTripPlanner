@@ -38,14 +38,14 @@ class TestPagingModel {
   static final int TIME_NOT_SET = -9_999_999;
 
   // Times CASE - B
-  static final int T15_00_MINUS_1d = TimeUtils.time("15:00:00-1d");
-  static final int T15_30_MINUS_1d = TimeUtils.time("15:30:00-1d");
+  static final int T15_00_MINUS_1_d = TimeUtils.time("15:00:00-1d");
+  static final int T15_30_MINUS_1_d = TimeUtils.time("15:30:00-1d");
   static final int T09_00 = hm2time(9, 0);
   static final int T09_30 = hm2time(9, 30);
   static final int T15_00 = hm2time(15, 0);
   static final int T15_30 = hm2time(15, 30);
-  static final int T09_00_PLUS_1d = TimeUtils.time("09:00:00+1d");
-  static final int T09_30_PLUS_1d = TimeUtils.time("09:30:00+1d");
+  static final int T09_00_PLUS_1_d = TimeUtils.time("09:00:00+1d");
+  static final int T09_30_PLUS_1_d = TimeUtils.time("09:30:00+1d");
 
   // Times CASE - C
   static final int T16_15_00 = TimeUtils.time("16:15:00");
@@ -54,7 +54,7 @@ class TestPagingModel {
   static final int T17_00_00 = TimeUtils.time("17:00:00");
   static final int T17_30_00 = TimeUtils.time("17:30:00");
 
-  static final Duration D30m = Duration.ofMinutes(30);
+  static final Duration D30_m = Duration.ofMinutes(30);
 
   // The SEARCH-WINDOW is set to "fixed" 30m in this test for simplicity
   private static final List<Duration> SEARCH_WINDOW_ADJUSTMENTS = List.of();
@@ -116,10 +116,10 @@ class TestPagingModel {
    *  </pre>
    */
   private static final List<Itinerary> ITINERARIES_CASE_B = List.of(
-    itinerary(T15_00_MINUS_1d, T15_30_MINUS_1d, COST_HIGH, TX_1, TRANSIT),
+    itinerary(T15_00_MINUS_1_d, T15_30_MINUS_1_d, COST_HIGH, TX_1, TRANSIT),
     itinerary(T09_00, T09_30, COST_HIGH, TX_1, TRANSIT),
     itinerary(T15_00, T15_30, COST_HIGH, TX_1, TRANSIT),
-    itinerary(T09_00_PLUS_1d, T09_30_PLUS_1d, COST_HIGH, TX_1, TRANSIT)
+    itinerary(T09_00_PLUS_1_d, T09_30_PLUS_1_d, COST_HIGH, TX_1, TRANSIT)
   );
 
   static final List<Itinerary> ITINERARIES_CASE_B_DEPART_AFTER = ITINERARIES_CASE_B.stream()

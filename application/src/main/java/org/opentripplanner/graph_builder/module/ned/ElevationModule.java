@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import static org.opentripplanner.street.model.elevation.ElevationUtils.computeEllipsoidToGeoidDifference;
+import static org.opentripplanner.routing.util.EllipsoidUtils.computeEllipsoidToGeoidDifference;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -27,15 +27,15 @@ import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.framework.geometry.PolylineEncoder;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ElevationFlattened;
 import org.opentripplanner.graph_builder.issues.ElevationProfileFailure;
 import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.geometry.PolylineEncoder;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetElevationExtensionBuilder;

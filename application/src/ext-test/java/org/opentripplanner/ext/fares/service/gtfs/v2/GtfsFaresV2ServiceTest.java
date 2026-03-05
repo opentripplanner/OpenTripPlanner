@@ -21,8 +21,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   private static final FeedScopedId LEG_GROUP1 = id("leg-group1");
   private static final int ID = 100;
-  private static final FeedScopedId expressNetwork = id("express");
-  private static final FeedScopedId localNetwork = id("local");
+  private static final FeedScopedId EXPRESS_NETWORK = id("express");
+  private static final FeedScopedId LOCAL_NETWORK = id("local");
 
   private static final FareProduct ALL_NETWORKS_SINGLE = FareProduct.of(
     new FeedScopedId(FEED_ID, "single"),
@@ -64,11 +64,11 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       FareLegRule.of(id("4"), ALL_NETWORKS_DAY_PASS).withLegGroupId(LEG_GROUP1).build(),
       FareLegRule.of(id("5"), EXPRESS_DAY_PASS)
         .withLegGroupId(LEG_GROUP1)
-        .withNetworkId(expressNetwork)
+        .withNetworkId(EXPRESS_NETWORK)
         .build(),
       FareLegRule.of(id("5"), LOCAL_DAY_PASS)
         .withLegGroupId(LEG_GROUP1)
-        .withNetworkId(localNetwork)
+        .withNetworkId(LOCAL_NETWORK)
         .build(),
       FareLegRule.of(MONTHLY_PASS.id(), MONTHLY_PASS)
         .withLegGroupId(id("another-leg-group"))
@@ -102,7 +102,10 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   @Test
   void networkId() {
-    Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, expressNetwork).build();
+    Itinerary i1 = newItinerary(A, 0)
+      .walk(20, B)
+      .faresV2Rail(ID, 0, 50, C, EXPRESS_NETWORK)
+      .build();
 
     var result = SERVICE.calculateFares(i1);
     var startTime = i1.listTransitLegs().getFirst().startTime();
@@ -119,8 +122,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   void separateFares() {
     Itinerary i1 = newItinerary(A, 0)
       .walk(20, A)
-      .faresV2Rail(ID, 0, 50, B, localNetwork)
-      .faresV2Rail(ID, 60, 100, C, expressNetwork)
+      .faresV2Rail(ID, 0, 50, B, LOCAL_NETWORK)
+      .faresV2Rail(ID, 60, 100, C, EXPRESS_NETWORK)
       .build();
 
     var result = SERVICE.calculateFares(i1);

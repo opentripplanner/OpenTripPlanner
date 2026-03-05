@@ -10,7 +10,7 @@ import graphql.language.ObjectValue;
 import graphql.language.StringValue;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 class RelaxCostTypeTest {

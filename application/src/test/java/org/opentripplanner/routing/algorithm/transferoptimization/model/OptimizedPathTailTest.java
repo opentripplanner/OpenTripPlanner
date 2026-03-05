@@ -41,7 +41,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     t2.trip(),
     STOP_C
   )
-    .walk(D2m)
+    .walk(D2_m)
     .build();
 
   private final TransferWaitTimeCostCalculator waitTimeCalc = new TransferWaitTimeCostCalculator(
@@ -75,7 +75,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    waitTimeCalc.setMinSafeTransferTime(D5m);
+    waitTimeCalc.setMinSafeTransferTime(D5_m);
   }
 
   @Test

@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
-import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -76,7 +76,8 @@ class AddedTripBuilder {
     TransitEditorService transitService,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
-    Function<Trip, FeedScopedId> getTripPatternId
+    Function<Trip, FeedScopedId> getTripPatternId,
+    List<CallWrapper> calls
   ) {
     this.deduplicator = deduplicator;
     // Verifying values required in SIRI Profile
@@ -104,7 +105,7 @@ class AddedTripBuilder {
       : lineRef;
     replacedRoute = entityResolver.resolveRoute(externalLineRef);
 
-    serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
+    serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney, calls);
 
     shortName = getFirstStringFromList(estimatedVehicleJourney.getPublishedLineNames());
 
@@ -117,7 +118,7 @@ class AddedTripBuilder {
     cancellation = TRUE.equals(estimatedVehicleJourney.isCancellation());
     headsign = getFirstStringFromList(estimatedVehicleJourney.getDestinationNames());
 
-    calls = CallWrapper.of(estimatedVehicleJourney);
+    this.calls = calls;
 
     this.transitService = transitService;
     this.entityResolver = entityResolver;
@@ -282,7 +283,8 @@ class AddedTripBuilder {
           tripOnServiceDate,
           pattern,
           isAddedRoute,
-          dataSource
+          dataSource,
+          null
         )
       );
     } catch (DataValidationException e) {

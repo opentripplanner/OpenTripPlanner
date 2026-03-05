@@ -5,12 +5,13 @@ import static org.opentripplanner.transit.model.timetable.TimetableValidationErr
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.IntUtils;
@@ -30,6 +31,9 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
   private final int[] departureTimes;
   private final RealTimeState realTimeState;
   private final StopRealTimeState[] stopRealTimeStates;
+  private final BitSet extraCalls;
+  private final BitSet hasArrived;
+  private final BitSet hasDeparted;
 
   @Nullable
   private final I18NString tripHeadsign;
@@ -44,10 +48,13 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     departureTimes = builder.departureTimes();
     realTimeState = builder.realTimeState();
     stopRealTimeStates = builder.stopRealTimeStates();
+    extraCalls = builder.extraCalls();
     tripHeadsign = builder.tripHeadsign();
     stopHeadsigns = builder.stopHeadsigns();
     occupancyStatus = builder.occupancyStatus();
     wheelchairAccessibility = builder.wheelchairAccessibility();
+    hasArrived = builder.hasArrived();
+    hasDeparted = builder.hasDeparted();
     validateNonIncreasingTimes();
   }
 
@@ -60,10 +67,13 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     this.departureTimes = original.departureTimes;
     this.realTimeState = original.realTimeState;
     this.stopRealTimeStates = original.stopRealTimeStates;
+    this.extraCalls = original.extraCalls;
     this.tripHeadsign = original.tripHeadsign;
     this.stopHeadsigns = original.stopHeadsigns;
     this.occupancyStatus = original.occupancyStatus;
     this.wheelchairAccessibility = original.wheelchairAccessibility;
+    this.hasArrived = original.hasArrived;
+    this.hasDeparted = original.hasDeparted;
   }
 
   /**
@@ -78,10 +88,13 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     this.departureTimes = IntUtils.shiftArray(timeShift, original.departureTimes);
     this.realTimeState = original.realTimeState;
     this.stopRealTimeStates = original.stopRealTimeStates;
+    this.extraCalls = original.extraCalls;
     this.tripHeadsign = original.tripHeadsign;
     this.stopHeadsigns = original.stopHeadsigns;
     this.occupancyStatus = original.occupancyStatus;
     this.wheelchairAccessibility = original.wheelchairAccessibility;
+    this.hasArrived = original.hasArrived;
+    this.hasDeparted = original.hasDeparted;
   }
 
   ScheduledTripTimes scheduledTripTimes() {
@@ -176,8 +189,14 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     return isStopRealTimeStates(stopPos, StopRealTimeState.CANCELLED);
   }
 
-  public boolean isRecordedStop(int stopPos) {
-    return isStopRealTimeStates(stopPos, StopRealTimeState.RECORDED);
+  @Override
+  public boolean hasArrived(int stopPos) {
+    return hasArrived.get(stopPos);
+  }
+
+  @Override
+  public boolean hasDeparted(int stopPos) {
+    return hasDeparted.get(stopPos);
   }
 
   public boolean isNoDataStop(int stopPos) {
@@ -186,6 +205,10 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
 
   public boolean isPredictionInaccurate(int stopPos) {
     return isStopRealTimeStates(stopPos, StopRealTimeState.INACCURATE_PREDICTIONS);
+  }
+
+  public boolean isExtraCall(int stopPos) {
+    return extraCalls.get(stopPos);
   }
 
   public boolean isRealTimeUpdated(int stopPos) {

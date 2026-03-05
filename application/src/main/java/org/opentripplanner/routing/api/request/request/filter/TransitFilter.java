@@ -14,7 +14,13 @@ public interface TransitFilter {
    */
   boolean matchTripTimes(TripTimes trip);
 
-  default boolean isSubModePredicate() {
+  /**
+   * Returns {@code true} if this filter contains mode-selective constraints that may require
+   * per-trip filtering on multi-mode patterns.
+   *
+   * @see org.opentripplanner.model.modes.AllowTransitModeFilter#isModeSelective()
+   */
+  default boolean isModeSelective() {
     return false;
   }
 }

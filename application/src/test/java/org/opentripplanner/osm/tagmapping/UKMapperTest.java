@@ -10,17 +10,17 @@ import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 public class UKMapperTest {
 
-  static final WayPropertySet wps;
+  static final WayPropertySet WPS;
 
   static {
-    wps = new UKMapper().buildWayPropertySet();
+    WPS = new UKMapper().buildWayPropertySet();
   }
 
   @Test
   void cycleway() {
     assertEquals(
       PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.cycleway()).getPermission()
+      WPS.getDataForEntity(WayTestData.cycleway()).getPermission()
     );
   }
 
@@ -28,19 +28,19 @@ public class UKMapperTest {
   void bridleway() {
     assertEquals(
       PEDESTRIAN_AND_BICYCLE,
-      wps.getDataForEntity(WayTestData.bridleway()).getPermission()
+      WPS.getDataForEntity(WayTestData.bridleway()).getPermission()
     );
   }
 
   @Test
   void trunk() {
     var way = WayTestData.highwayTrunk();
-    assertEquals(ALL, wps.getDataForWay(way).forward().getPermission());
-    assertEquals(2.5, wps.getDataForWay(way).forward().walkSafety());
-    assertEquals(2.5, wps.getDataForWay(way).forward().bicycleSafety());
+    assertEquals(ALL, WPS.getDataForWay(way).forward().getPermission());
+    assertEquals(2.5, WPS.getDataForWay(way).forward().walkSafety());
+    assertEquals(2.5, WPS.getDataForWay(way).forward().bicycleSafety());
     way.addTag("oneway", "yes");
     way.addTag("expressway", "yes");
-    assertEquals(12.5, wps.getDataForWay(way).forward().walkSafety());
-    assertEquals(12.5, wps.getDataForWay(way).forward().bicycleSafety());
+    assertEquals(12.5, WPS.getDataForWay(way).forward().walkSafety());
+    assertEquals(12.5, WPS.getDataForWay(way).forward().bicycleSafety());
   }
 }

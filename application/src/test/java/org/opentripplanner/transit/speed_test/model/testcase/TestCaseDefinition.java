@@ -1,8 +1,10 @@
 package org.opentripplanner.transit.speed_test.model.testcase;
 
 import java.time.Duration;
+import javax.annotation.Nullable;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
@@ -15,8 +17,9 @@ public record TestCaseDefinition(
   Duration window,
   GenericLocation fromPlace,
   GenericLocation toPlace,
+  @Nullable VisitViaLocation viaLocation,
   /**
-   * A test cases can be grouped into a category used to group similar cases, like "Flex" or
+   * A test case can be grouped into a category used to group similar cases, like "Flex" or
    * "Long Distance".
    */
   String category,
@@ -25,11 +28,13 @@ public record TestCaseDefinition(
   @Override
   public String toString() {
     return String.format(
-      "#%s %s - %s, %s - %s, %s-%s(%s)",
+      "#%s %s - via:%s - %s, %s - via:%s - %s, %s-%s(%s)",
       id,
       fromPlace.label,
+      viaLocation != null ? viaLocation.label() : null,
       toPlace.label,
       coordinateString(fromPlace),
+      viaLocation != null ? coordinateString(viaLocation.coordinateLocation()) : null,
       coordinateString(toPlace),
       TimeUtils.timeToStrCompact(departureTime, TestCase.NOT_SET),
       TimeUtils.timeToStrCompact(arrivalTime, TestCase.NOT_SET),

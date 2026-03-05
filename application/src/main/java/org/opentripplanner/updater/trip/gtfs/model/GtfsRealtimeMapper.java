@@ -2,7 +2,7 @@ package org.opentripplanner.updater.trip.gtfs.model;
 
 import com.google.transit.realtime.GtfsRealtime.VehicleDescriptor.WheelchairAccessible;
 import java.util.Optional;
-import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 
 class GtfsRealtimeMapper {
 

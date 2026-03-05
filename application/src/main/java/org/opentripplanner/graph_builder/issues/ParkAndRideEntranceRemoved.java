@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
+import org.opentripplanner.street.geometry.GeometryUtils;
 
 public record ParkAndRideEntranceRemoved(VehicleParkingEntrance vehicleParkingEntrance) implements
   DataImportIssue {

@@ -23,11 +23,11 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
+import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -64,8 +64,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   private static final int FRAME_RATE = 30;
   private static final boolean VIDEO = false;
   private static final String VIDEO_PATH = "/home/syncopate/pathimage/";
-  private static final DecimalFormat latFormatter = new DecimalFormat("00.0000°N ; 00.0000°S");
-  private static final DecimalFormat lonFormatter = new DecimalFormat("000.0000°E ; 000.0000°W");
+  private static final DecimalFormat LAT_FORMATTER = new DecimalFormat("00.0000°N ; 00.0000°S");
+  private static final DecimalFormat LON_FORMATTER = new DecimalFormat("000.0000°E ; 000.0000°W");
   /* Layer constants */
   // XY coordinates
   static final int DRAW_MINIMAL = 0;
@@ -91,7 +91,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   // these queues are filled by a search in another thread, so must be threadsafe
   private final Queue<Vertex> newHighlightedVertices = new LinkedBlockingQueue<>();
   private final Queue<Edge> newHighlightedEdges = new LinkedBlockingQueue<>();
-  private static final DateTimeFormatter shortDateFormat = DateTimeFormatter.ofPattern(
+  private static final DateTimeFormatter SHORT_DATE_FORMAT = DateTimeFormatter.ofPattern(
     "HH:mm:ss z"
   );
   private final LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<>();
@@ -672,7 +672,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     fill(240, 240, 240);
     Vertex v = s.getVertex();
     drawVertex(v, 8);
-    str += " " + shortDateFormat.format(Instant.ofEpochSecond(s.getTimeSeconds()));
+    str += " " + SHORT_DATE_FORMAT.format(Instant.ofEpochSecond(s.getTimeSeconds()));
     str += " [" + (int) s.getWeight() + "]";
     double x = toScreenX(v.getX()) + 10;
     double y = toScreenY(v.getY());
@@ -766,7 +766,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     // Print lat & lon coordinates
     fill(128, 128, 256);
     // noStroke();
-    String output = lonFormatter.format(mouseModelX) + " " + latFormatter.format(mouseModelY);
+    String output = LON_FORMATTER.format(mouseModelX) + " " + LAT_FORMATTER.format(mouseModelY);
     textAlign(LEFT, TOP);
     text(output, 6, 6);
   }
