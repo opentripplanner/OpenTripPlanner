@@ -96,8 +96,10 @@ public class LinkingContextFactory {
     checkIfVerticesFound(
       from,
       fromVertices,
+      fromStopVertices,
       to,
       toVertices,
+      toStopVertices,
       visitViaLocationsWithCoordinates,
       verticesForVisitViaLocationsWithCoordinates
     );
@@ -378,22 +380,24 @@ public class LinkingContextFactory {
   private void checkIfVerticesFound(
     GenericLocation from,
     Set<Vertex> fromVertices,
+    Set<TransitStopVertex> fromStopVertices,
     @Nullable GenericLocation to,
     Set<Vertex> toVertices,
+    Set<TransitStopVertex> toStopVertices,
     List<GenericLocation> visitViaLocationsWithCoordinates,
     Map<GenericLocation, Set<Vertex>> visitViaLocationVertices
   ) {
     List<RoutingError> routingErrors = new ArrayList<>();
 
     // check that vertices where found if from-location was specified
-    if (isDisconnected(fromVertices, LocationType.FROM)) {
+    if (fromStopVertices.isEmpty() && isDisconnected(fromVertices, LocationType.FROM)) {
       routingErrors.add(
         new RoutingError(getRoutingErrorCodeForDisconnected(from), InputField.FROM_PLACE)
       );
     }
 
     // check that vertices where found if to-location was specified
-    if (to != null && to.isSpecified() && isDisconnected(toVertices, LocationType.TO)) {
+    if (to != null && to.isSpecified() && toStopVertices.isEmpty() && isDisconnected(toVertices, LocationType.TO)) {
       routingErrors.add(
         new RoutingError(getRoutingErrorCodeForDisconnected(to), InputField.TO_PLACE)
       );
