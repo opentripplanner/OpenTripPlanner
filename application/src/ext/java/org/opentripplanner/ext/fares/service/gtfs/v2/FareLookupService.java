@@ -38,7 +38,7 @@ class FareLookupService implements Serializable {
     Multimap<FeedScopedId, LocalDate> serviceDates
   ) {
     this.legRules = List.copyOf(legRules);
-    this.transferRules = fareTransferRules;
+    this.transferRules = List.copyOf(fareTransferRules);
 
     var rulePriorityMatcher = new RulePriorityMatcher(legRules);
     this.areaMatcher = new AreaMatcher(rulePriorityMatcher, legRules, stopAreas);
