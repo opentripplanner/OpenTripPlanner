@@ -114,18 +114,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     // Map access leg
     List<Leg> legs = new ArrayList<>();
 
-    CarpoolItineraryMapper carpoolItineraryMapper = new CarpoolItineraryMapper(
-      transitService.getTimeZone()
-    );
-    if (accessPathLeg.access() instanceof CarpoolAccessEgress) {
-      legs.addAll(
-        carpoolItineraryMapper
-          .toItinerary((CarpoolAccessEgress) accessPathLeg.access(), transitSearchTimeZero)
-          .legs()
-      );
-    } else {
-      legs.addAll(mapAccessLeg(accessPathLeg));
-    }
+    legs.addAll(mapAccessLeg(accessPathLeg));
 
     PathLeg<T> pathLeg = path.accessLeg().nextLeg();
 
@@ -162,12 +151,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     // Map egress leg
     EgressPathLeg<T> egressPathLeg = pathLeg.asEgressLeg();
-    Itinerary mapped = egressPathLeg.egress() instanceof CarpoolAccessEgress
-      ? carpoolItineraryMapper.toItinerary(
-          (CarpoolAccessEgress) egressPathLeg.egress(),
-          transitSearchTimeZero
-        )
-      : mapEgressLeg(egressPathLeg);
+    Itinerary mapped = mapEgressLeg(egressPathLeg);
     legs.addAll(mapped == null ? List.of() : mapped.legs());
 
     var generalizedCost = Cost.costOfCentiSeconds(path.c1()).normalize();
@@ -214,6 +198,15 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   private List<Leg> mapAccessLeg(AccessPathLeg<T> accessPathLeg) {
     if (accessPathLeg.access().isFree()) {
       return List.of();
+    }
+
+    if (accessPathLeg.access() instanceof CarpoolAccessEgress) {
+      CarpoolItineraryMapper carpoolItineraryMapper = new CarpoolItineraryMapper(
+        transitService.getTimeZone()
+      );
+      return carpoolItineraryMapper
+        .toItinerary((CarpoolAccessEgress) accessPathLeg.access(), transitSearchTimeZero)
+        .legs();
     }
 
     var subItinerary = mapAccessEgressPathLeg(accessPathLeg.access());
@@ -372,6 +365,16 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   private Itinerary mapEgressLeg(EgressPathLeg<T> egressPathLeg) {
     if (isFree(egressPathLeg)) {
       return null;
+    }
+
+    if (egressPathLeg.egress() instanceof CarpoolAccessEgress) {
+      CarpoolItineraryMapper carpoolItineraryMapper = new CarpoolItineraryMapper(
+        transitService.getTimeZone()
+      );
+      return carpoolItineraryMapper.toItinerary(
+        (CarpoolAccessEgress) egressPathLeg.egress(),
+        transitSearchTimeZero
+      );
     }
 
     var subItinerary = mapAccessEgressPathLeg(egressPathLeg.egress());
