@@ -19,15 +19,12 @@ import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.utils.collection.SetUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The main part of the fare engine: it applies the leg and transfer rules to the transit legs.
  */
 class FareLookupService implements Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FareLookupService.class);
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
   private final AreaMatcher areaMatcher;
