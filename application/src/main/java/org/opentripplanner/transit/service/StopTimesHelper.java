@@ -110,7 +110,6 @@ public class StopTimesHelper {
           .filter(matcher::match)
       )
       .sorted(request.sortOrder())
-      .distinct()
       .toList();
 
     return limitPerLineAndDestinationDisplay(
@@ -378,7 +377,6 @@ public class StopTimesHelper {
         group
           .stream()
           .sorted(TripTimeOnDate.compareByDeparture())
-          .distinct()
           .limit(departuresPerLineAndDestinationDisplay)
       )
       .toList();
