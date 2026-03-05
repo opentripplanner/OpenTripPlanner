@@ -9,14 +9,18 @@ public class EstimatedCallFilterInputType {
 
   public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("EstimatedCallFilterInput")
-    .description("A collection of selectors for what estimated calls should be included / excluded")
+    .description(
+      "A collection of selectors for what estimated calls should be included / excluded. " +
+        "The `select` is always applied first, then `not`. " +
+        "If only `not` is present, the exclude is applied to the existing set of estimated calls."
+    )
     .field(
       GraphQLInputObjectField.newInputObjectField()
         .name("select")
         .description(
           "A list of selectors for what estimated calls should be included. " +
-            "In order to be accepted a call has to match with at least one selector. " +
-            "An empty list means that everything should be allowed. "
+            "A call is included if it matches at least one selector. " +
+            "If the list is empty or omitted, all calls are included."
         )
         .type(new GraphQLList(new GraphQLNonNull(EstimatedCallSelectInputType.INPUT_TYPE)))
         .build()

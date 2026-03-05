@@ -12,23 +12,28 @@ public class EstimatedCallSelectInputType {
   static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("EstimatedCallSelectInput")
     .description(
-      "A list of selectors for filter allow-list / exclude-list. " +
-        "An empty list means that everything is allowed. " +
-        "An estimated call will match with selectors if it matches with all non-empty lists. " +
-        "The `select` is always applied first, then `not`. If only `not` is present, the exclude " +
-        "is applied to the existing set of estimated calls. "
+      "A selector for filter allow-list / exclude-list. " +
+        "A field that is not present or empty means all values are matched. " +
+        "An estimated call matches a selector if it matches all fields. " +
+        "Within each field, a call matches if it matches any of the listed values."
     )
     .field(
       GraphQLInputObjectField.newInputObjectField()
         .name("lines")
-        .description("Set of ids for lines that should be included in/excluded from search")
+        .description(
+          "Set of ids for lines that should be included in/excluded from search. " +
+            "A call matches if its line matches any of the given IDs."
+        )
         .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
         .build()
     )
     .field(
       GraphQLInputObjectField.newInputObjectField()
         .name("authorities")
-        .description("Set of ids for authorities that should be included in/excluded from search")
+        .description(
+          "Set of ids for authorities that should be included in/excluded from search. " +
+            "A call matches if its authority matches any of the given IDs."
+        )
         .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
         .build()
     )
@@ -36,8 +41,8 @@ public class EstimatedCallSelectInputType {
       GraphQLInputObjectField.newInputObjectField()
         .name("transportModes")
         .description(
-          "The allowed modes of the journeys of the estimated call. " +
-            "If the element is not present or null, it will default to all transport modes."
+          "The allowed modes for the estimated call. " +
+            "A call matches if its mode matches any of the listed modes."
         )
         .type(new GraphQLList(new GraphQLNonNull(ModeAndSubModeInputType.INPUT_TYPE)))
         .build()
